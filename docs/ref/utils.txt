@@ -432,9 +432,7 @@ Atom1Feed
 
     Consider a typical case, where a view might need to call a model's method
     to perform some computation, before placing the model instance into the
-    context, where the template might invoke the method once more:
-
-    .. code-block:: python
+    context, where the template might invoke the method once more::
 
         # the model
         class Person(models.Model):
@@ -446,8 +444,12 @@ Atom1Feed
 
         # in the view:
         if person.friends():
+            ...
 
-        # in the template:
+    And in the template you would have:
+
+    .. code-block:: html+django
+
         {% for friend in person.friends %}
 
     Here, ``friends()`` will be called twice. Since the instance ``person`` in
@@ -467,6 +469,7 @@ Atom1Feed
 
         # in the view:
         if person.friends:
+            ...
 
     The cached value can be treated like an ordinary attribute of the instance::
 
@@ -573,18 +576,14 @@ escaping HTML.
     because it applies escaping to all arguments - just like the Template system
     applies escaping by default.
 
-    So, instead of writing:
-
-    .. code-block:: python
+    So, instead of writing::
 
         mark_safe("%s <b>%s</b> %s" % (some_html,
                                         escape(some_text),
                                         escape(some_other_text),
                                         ))
 
-    you should instead use:
-
-    .. code-block:: python
+    You should instead use::
 
         format_html("{0} <b>{1}</b> {2}",
                     mark_safe(some_html), some_text, some_other_text)
@@ -615,7 +614,8 @@ escaping HTML.
 
     Tries to remove anything that looks like an HTML tag from the string, that
     is anything contained within ``<>``.
-    Absolutely NO guaranty is provided about the resulting string being entirely
+
+    Absolutely NO guarantee is provided about the resulting string being
     HTML safe. So NEVER mark safe the result of a ``strip_tag`` call without
     escaping it first, for example with :func:`~django.utils.html.escape`.
 
@@ -629,11 +629,21 @@ escaping HTML.
     If you are looking for a more robust solution, take a look at the `bleach`_
     Python library.
 
-    .. _bleach: https://pypi.python.org/pypi/bleach
-
 .. function:: remove_tags(value, tags)
 
+    .. deprecated:: 1.8
+
+        ``remove_tags()`` cannot guarantee HTML safe output and has been
+        deprecated due to security concerns. Consider using `bleach`_ instead.
+
     Removes a space-separated list of [X]HTML tag names from the output.
+
+    Absolutely NO guarantee is provided about the resulting string being HTML
+    safe. In particular, it doesn't work recursively, so the output of
+    ``remove_tags("<sc<script>ript>alert('XSS')</sc</script>ript>", "script")``
+    won't remove the "nested" script tags. So if the ``value`` is untrusted,
+    NEVER mark safe the result of a ``remove_tags()`` call without escaping it
+    first, for example with :func:`~django.utils.html.escape`.
 
     For example::
 
@@ -648,6 +658,7 @@ escaping HTML.
     the return value will be ``"<B>Joel</B> <button>is</button> a slug"``.
 
 .. _str.format: http://docs.python.org/library/stdtypes.html#str.format
+.. _bleach: https://pypi.python.org/pypi/bleach
 
 ``django.utils.http``
 =====================
@@ -890,6 +901,10 @@ appropriate entities.
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
     on entry with :func:`deactivate()` instead.
 
+    .. versionchanged:: 1.8
+
+        ``override`` is now usable as a function decorator.
+
 .. function:: localtime(value, timezone=None)
 
     Converts an aware :class:`~datetime.datetime` to a different time zone,
@@ -1037,6 +1052,10 @@ For a complete discussion on the usage of the following see the
     :func:`django.utils.translation.deactivate` if the ``deactivate`` argument
     is ``True``. If you pass ``None`` as the language argument, a
     ``NullTranslations()`` instance is activated within the context.
+
+    .. versionchanged:: 1.8
+
+        ``override`` is now usable as a function decorator.
 
 .. function:: get_language()
 

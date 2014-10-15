@@ -6,7 +6,7 @@ import os
 import shutil
 
 from django.apps import apps
-from django.db import models
+from django.db import connection, models
 from django.core.management import call_command, CommandError
 from django.db.migrations import questioner
 from django.test import override_settings, override_system_checks
@@ -93,6 +93,13 @@ class MigrateTests(MigrationTestBase):
         """
         Makes sure that sqlmigrate does something.
         """
+        # Make sure the output is wrapped in a transaction
+        stdout = six.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=stdout)
+        output = stdout.getvalue()
+        self.assertIn(connection.ops.start_transaction_sql(), output)
+        self.assertIn(connection.ops.end_transaction_sql(), output)
+
         # Test forwards. All the databases agree on CREATE TABLE, at least.
         stdout = six.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=stdout)
@@ -539,3 +546,34 @@ class MakeMigrationsTests(MigrationTestBase):
             questioner.input = old_input
             if os.path.exists(merge_file):
                 os.remove(merge_file)
+
+    @override_system_checks([])
+    def test_makemigrations_with_custom_name(self):
+        """
+        Makes sure that makemigrations generate a custom migration.
+        """
+        def cmd(migration_count, migration_name, *args):
+            with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
+                try:
+                    call_command("makemigrations", "migrations", "--verbosity", "0", "--name", migration_name, *args)
+                except CommandError:
+                    self.fail("Makemigrations errored in creating empty migration with custom name for a proper app.")
+            migration_file = os.path.join(self.migration_dir, "%s_%s.py" % (migration_count, migration_name))
+            # Check for existing migration file in migration folder
+            self.assertTrue(os.path.exists(migration_file))
+            with codecs.open(migration_file, "r", encoding="utf-8") as fp:
+                content = fp.read()
+                self.assertTrue("# -*- coding: utf-8 -*-" in content)
+                content = content.replace(" ", "")
+            return content
+
+        # generate an initial migration
+        migration_name_0001 = "my_initial_migration"
+        content = cmd("0001", migration_name_0001)
+        self.assertIn("dependencies=[\n]", content)
+
+        # generate an empty migration
+        migration_name_0002 = "my_custom_migration"
+        content = cmd("0002", migration_name_0002, "--empty")
+        self.assertIn("dependencies=[\n('migrations','0001_%s'),\n]" % migration_name_0001, content)
+        self.assertIn("operations=[\n]", content)

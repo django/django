@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.test import TestCase, override_settings
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.questioner import MigrationQuestioner
@@ -25,6 +26,7 @@ class AutodetectorTests(TestCase):
 
     author_empty = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))])
     author_name = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))])
+    author_name_null = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, null=True))])
     author_name_longer = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=400))])
     author_name_renamed = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("names", models.CharField(max_length=200))])
     author_name_default = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default='Ada Lovelace'))])
@@ -32,6 +34,7 @@ class AutodetectorTests(TestCase):
     author_name_deconstructable_2 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=DeconstructableObject()))])
     author_name_deconstructable_3 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=models.IntegerField()))])
     author_name_deconstructable_4 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=models.IntegerField()))])
+    author_custom_pk = ModelState("testapp", "Author", [("pk_field", models.IntegerField(primary_key=True))])
     author_with_book = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
     author_with_book_order_wrt = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))], options={"order_with_respect_to": "book"})
     author_renamed_with_book = ModelState("testapp", "Writer", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
@@ -45,6 +48,10 @@ class AutodetectorTests(TestCase):
     author_proxy_proxy = ModelState("testapp", "AAuthorProxyProxy", [], {"proxy": True}, ("testapp.authorproxy", ))
     author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
     author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author", ))
+    author_unmanaged_default_pk = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))])
+    author_unmanaged_custom_pk = ModelState("testapp", "Author", [
+        ("pk_field", models.IntegerField(primary_key=True)),
+    ])
     author_with_m2m = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher")),
@@ -54,6 +61,7 @@ class AutodetectorTests(TestCase):
     contract = ModelState("testapp", "Contract", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("publisher", models.ForeignKey("testapp.Publisher"))])
     publisher = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=100))])
     publisher_with_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("name", models.CharField(max_length=100))])
+    publisher_with_aardvark_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Aardvark")), ("name", models.CharField(max_length=100))])
     publisher_with_book = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("otherapp.Book")), ("name", models.CharField(max_length=100))])
     other_pony = ModelState("otherapp", "Pony", [("id", models.AutoField(primary_key=True))])
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
@@ -66,18 +74,19 @@ class AutodetectorTests(TestCase):
     book_with_field_and_author_renamed = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("writer", models.ForeignKey("testapp.Writer")), ("title", models.CharField(max_length=200))])
     book_with_multiple_authors = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("authors", models.ManyToManyField("testapp.Author")), ("title", models.CharField(max_length=200))])
     book_with_multiple_authors_through_attribution = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("authors", models.ManyToManyField("testapp.Author", through="otherapp.Attribution")), ("title", models.CharField(max_length=200))])
-    book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("author", "title")]})
-    book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "author")]})
-    book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "newfield")]})
+    book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("author", "title")}})
+    book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("title", "author")}})
+    book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("title", "newfield")}})
     attribution = ModelState("otherapp", "Attribution", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("book", models.ForeignKey("otherapp.Book"))])
     edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
     custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))], bases=(AbstractBaseUser, ))
     custom_user_no_inherit = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))])
     aardvark = ModelState("thirdapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
+    aardvark_testapp = ModelState("testapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
     aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author", ))
     aardvark_pk_fk_author = ModelState("testapp", "Aardvark", [("id", models.OneToOneField("testapp.Author", primary_key=True))])
     knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
-    rabbit = ModelState("eggs", "Rabbit", [("id", models.AutoField(primary_key=True)), ("knight", models.ForeignKey("eggs.Knight")), ("parent", models.ForeignKey("eggs.Rabbit"))], {"unique_together": [("parent", "knight")]})
+    rabbit = ModelState("eggs", "Rabbit", [("id", models.AutoField(primary_key=True)), ("knight", models.ForeignKey("eggs.Knight")), ("parent", models.ForeignKey("eggs.Rabbit"))], {"unique_together": {("parent", "knight")}})
 
     def repr_changes(self, changes):
         output = ""
@@ -129,12 +138,13 @@ class AutodetectorTests(TestCase):
         operation = migration.operations[operation_index]
         for attr, value in attrs.items():
             if getattr(operation, attr, None) != value:
-                self.fail("Attribute mismatch for %s.%s op #%s, %s (expected %r):\n%s" % (
+                self.fail("Attribute mismatch for %s.%s op #%s, %s (expected %r, got %r):\n%s" % (
                     app_label,
                     migration.name,
-                    operation_index + 1,
+                    operation_index,
                     attr,
                     value,
+                    getattr(operation, attr, None),
                     self.repr_changes(changes),
                 ))
 
@@ -152,8 +162,8 @@ class AutodetectorTests(TestCase):
         graph.add_node(("testapp", "0001_initial"), None)
         graph.add_node(("testapp", "0002_foobar"), None)
         graph.add_node(("otherapp", "0001_initial"), None)
-        graph.add_dependency(("testapp", "0002_foobar"), ("testapp", "0001_initial"))
-        graph.add_dependency(("testapp", "0002_foobar"), ("otherapp", "0001_initial"))
+        graph.add_dependency("testapp.0002_foobar", ("testapp", "0002_foobar"), ("testapp", "0001_initial"))
+        graph.add_dependency("testapp.0002_foobar", ("testapp", "0002_foobar"), ("otherapp", "0001_initial"))
         # Use project state to make a new migration change set
         before = self.make_project_state([])
         after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable])
@@ -178,11 +188,36 @@ class AutodetectorTests(TestCase):
         graph = MigrationGraph()
         changes = autodetector.arrange_for_graph(changes, graph)
         changes["testapp"][0].dependencies.append(("otherapp", "0001_initial"))
-        changes = autodetector._trim_to_apps(changes, set(["testapp"]))
+        changes = autodetector._trim_to_apps(changes, {"testapp"})
         # Make sure there's the right set of migrations
         self.assertEqual(changes["testapp"][0].name, "0001_initial")
         self.assertEqual(changes["otherapp"][0].name, "0001_initial")
         self.assertNotIn("thirdapp", changes)
+
+    def test_custom_migration_name(self):
+        "Tests custom naming of migrations for graph matching."
+        # Make a fake graph
+        graph = MigrationGraph()
+        graph.add_node(("testapp", "0001_initial"), None)
+        graph.add_node(("testapp", "0002_foobar"), None)
+        graph.add_node(("otherapp", "0001_initial"), None)
+        graph.add_dependency("testapp.0002_foobar", ("testapp", "0002_foobar"), ("testapp", "0001_initial"))
+
+        # Use project state to make a new migration change set
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+
+        # Run through arrange_for_graph
+        migration_name = 'custom_name'
+        changes = autodetector.arrange_for_graph(changes, graph, migration_name)
+
+        # Make sure there's a new name, deps match, etc.
+        self.assertEqual(changes["testapp"][0].name, "0003_%s" % migration_name)
+        self.assertEqual(changes["testapp"][0].dependencies, [("testapp", "0002_foobar")])
+        self.assertEqual(changes["otherapp"][0].name, "0002_%s" % migration_name)
+        self.assertEqual(changes["otherapp"][0].dependencies, [("otherapp", "0001_initial")])
 
     def test_new_model(self):
         "Tests autodetection of new models"
@@ -268,13 +303,18 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterField")
         self.assertEqual(action.name, "name")
+        self.assertTrue(action.preserve_default)
 
-    def test_rename_field(self):
-        "Tests autodetection of renamed fields"
+    def test_alter_field_to_not_null_with_default(self):
+        "#23609 - Tests autodetection of nullable to non-nullable alterations"
+        class CustomQuestioner(MigrationQuestioner):
+            def ask_not_null_alteration(self, field_name, model_name):
+                raise Exception("Should not have prompted for not null addition")
+
         # Make state
-        before = self.make_project_state([self.author_name])
-        after = self.make_project_state([self.author_name_renamed])
-        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename": True}))
+        before = self.make_project_state([self.author_name_null])
+        after = self.make_project_state([self.author_name_default])
+        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
         changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)
@@ -283,9 +323,72 @@ class AutodetectorTests(TestCase):
         self.assertEqual(len(migration.operations), 1)
         # Right action?
         action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "RenameField")
-        self.assertEqual(action.old_name, "name")
-        self.assertEqual(action.new_name, "names")
+        self.assertEqual(action.__class__.__name__, "AlterField")
+        self.assertEqual(action.name, "name")
+        self.assertTrue(action.preserve_default)
+        self.assertEqual(action.field.default, 'Ada Lovelace')
+
+    def test_alter_field_to_not_null_without_default(self):
+        "#23609 - Tests autodetection of nullable to non-nullable alterations"
+        class CustomQuestioner(MigrationQuestioner):
+            def ask_not_null_alteration(self, field_name, model_name):
+                # Ignore for now, and let me handle existing rows with NULL
+                # myself (e.g. adding a RunPython or RunSQL operation in the new
+                # migration file before the AlterField operation)
+                return models.NOT_PROVIDED
+
+        # Make state
+        before = self.make_project_state([self.author_name_null])
+        after = self.make_project_state([self.author_name])
+        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterField")
+        self.assertEqual(action.name, "name")
+        self.assertTrue(action.preserve_default)
+        self.assertIs(action.field.default, models.NOT_PROVIDED)
+
+    def test_alter_field_to_not_null_oneoff_default(self):
+        "#23609 - Tests autodetection of nullable to non-nullable alterations"
+        class CustomQuestioner(MigrationQuestioner):
+            def ask_not_null_alteration(self, field_name, model_name):
+                # Provide a one-off default now (will be set on all existing rows)
+                return 'Some Name'
+
+        # Make state
+        before = self.make_project_state([self.author_name_null])
+        after = self.make_project_state([self.author_name])
+        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterField")
+        self.assertEqual(action.name, "name")
+        self.assertFalse(action.preserve_default)
+        self.assertEqual(action.field.default, "Some Name")
+
+    def test_rename_field(self):
+        "Tests autodetection of renamed fields"
+        # Make state
+        before = self.make_project_state([self.author_name])
+        after = self.make_project_state([self.author_name_renamed])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename": True}))
+        changes = autodetector._detect_changes()
+        # Check
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["RenameField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, old_name="name", new_name="names")
 
     def test_rename_model(self):
         "Tests autodetection of renamed models"
@@ -407,21 +510,14 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_with_publisher, self.publisher])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        # Right number of actions?
-        migration = changes['testapp'][0]
-        self.assertEqual(len(migration.operations), 3)
-        # Right actions?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        action = migration.operations[1]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        # Third action might vanish one day if the optimizer improves.
-        action = migration.operations[2]
-        self.assertEqual(action.__class__.__name__, "AddField")
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel", "AddField"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="publisher")
         # Right dependencies?
-        self.assertEqual(migration.dependencies, [])
+        self.assertEqual(changes['testapp'][0].dependencies, [])
 
     def test_circular_fk_dependency(self):
         """
@@ -434,30 +530,18 @@ class AutodetectorTests(TestCase):
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        self.assertEqual(len(changes['otherapp']), 2)
-        # Right number of actions?
-        migration1 = changes['testapp'][0]
-        self.assertEqual(len(migration1.operations), 2)
-        migration2 = changes['otherapp'][0]
-        self.assertEqual(len(migration2.operations), 1)
-        migration3 = changes['otherapp'][1]
-        self.assertEqual(len(migration3.operations), 1)
-        # Right actions?
-        action = migration1.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        self.assertEqual(action.name, "Author")
-        self.assertEqual(len(action.fields), 3)
-        action = migration2.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        self.assertEqual(len(action.fields), 2)
-        action = migration3.operations[0]
-        self.assertEqual(action.__class__.__name__, "AddField")
-        self.assertEqual(action.name, "author")
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertNumberMigrations(changes, 'otherapp', 2)
+        # Right types?
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel"])
+        self.assertOperationTypes(changes, 'otherapp', 0, ["CreateModel"])
+        self.assertOperationTypes(changes, 'otherapp', 1, ["AddField"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
         # Right dependencies?
-        self.assertEqual(migration1.dependencies, [("otherapp", "auto_1")])
-        self.assertEqual(migration2.dependencies, [])
-        self.assertEqual(set(migration3.dependencies), set([("testapp", "auto_1"), ("otherapp", "auto_1")]))
+        self.assertEqual(changes['testapp'][0].dependencies, [("otherapp", "auto_1")])
+        self.assertEqual(changes['otherapp'][0].dependencies, [])
+        self.assertEqual(set(changes['otherapp'][1].dependencies), {("otherapp", "auto_1"), ("testapp", "auto_1")})
 
     def test_same_app_circular_fk_dependency(self):
         """
@@ -469,24 +553,14 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_with_publisher, self.publisher_with_author])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        # Right number of actions?
-        migration1 = changes['testapp'][0]
-        self.assertEqual(len(migration1.operations), 4)
-        # Right actions?
-        action = migration1.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        action = migration1.operations[1]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        action = migration1.operations[2]
-        self.assertEqual(action.__class__.__name__, "AddField")
-        self.assertEqual(action.name, "publisher")
-        action = migration1.operations[3]
-        self.assertEqual(action.__class__.__name__, "AddField")
-        self.assertEqual(action.name, "author")
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel", "AddField"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="publisher")
         # Right dependencies?
-        self.assertEqual(migration1.dependencies, [])
+        self.assertEqual(changes['testapp'][0].dependencies, [])
 
     def test_same_app_circular_fk_dependency_and_unique_together(self):
         """
@@ -499,23 +573,13 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.knight, self.rabbit])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['eggs']), 1)
-        # Right number of actions?
-        migration1 = changes['eggs'][0]
-        self.assertEqual(len(migration1.operations), 3)
-        # Right actions?
-        action = migration1.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        action = migration1.operations[1]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        self.assertEqual(action.name, "Rabbit")
-        self.assertFalse("unique_together" in action.options)
-        action = migration1.operations[2]
-        self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
-        self.assertEqual(action.name, "rabbit")
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'eggs', 1)
+        self.assertOperationTypes(changes, 'eggs', 0, ["CreateModel", "CreateModel", "AlterUniqueTogether"])
+        self.assertFalse("unique_together" in changes['eggs'][0].operations[0].options)
+        self.assertFalse("unique_together" in changes['eggs'][0].operations[1].options)
         # Right dependencies?
-        self.assertEqual(migration1.dependencies, [])
+        self.assertEqual(changes['eggs'][0].dependencies, [])
 
     def test_unique_together(self):
         "Tests unique_together detection"
@@ -533,7 +597,61 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
         self.assertEqual(action.name, "book")
-        self.assertEqual(action.unique_together, set([("author", "title")]))
+        self.assertEqual(action.unique_together, {("author", "title")})
+
+    def test_unique_together_no_changes(self):
+        "Tests that unique_togther doesn't generate a migration if no changes have been made"
+        # Make state
+        before = self.make_project_state([self.author_empty, self.book_unique])
+        after = self.make_project_state([self.author_empty, self.book_unique])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes), 0)
+
+    def test_empty_foo_together(self):
+        "#23452 - Empty unique/index_togther shouldn't generate a migration."
+        # Explicitly testing for not specified, since this is the case after
+        # a CreateModel operation w/o any definition on the original model
+        model_state_not_secified = ModelState("a", "model",
+            [("id", models.AutoField(primary_key=True))]
+        )
+        # Explicitly testing for None, since this was the issue in #23452 after
+        # a AlterFooTogether operation with e.g. () as value
+        model_state_none = ModelState("a", "model",
+            [("id", models.AutoField(primary_key=True))],
+            {"unique_together": None, "index_together": None}
+        )
+        # Explicitly testing for the empty set, since we now always have sets.
+        # During removal (('col1', 'col2'),) --> () this becomes set([])
+        model_state_empty = ModelState("a", "model",
+            [("id", models.AutoField(primary_key=True))],
+            {"unique_together": set(), "index_together": set()}
+        )
+
+        def test(from_state, to_state, msg):
+            before = self.make_project_state([from_state])
+            after = self.make_project_state([to_state])
+            autodetector = MigrationAutodetector(before, after)
+            changes = autodetector._detect_changes()
+            if len(changes) > 0:
+                ops = ', '.join(o.__class__.__name__ for o in changes['a'][0].operations)
+                self.fail('Created operation(s) %s from %s' % (ops, msg))
+
+        tests = (
+            (model_state_not_secified, model_state_not_secified, '"not specified" to "not specified"'),
+            (model_state_not_secified, model_state_none, '"not specified" to "None"'),
+            (model_state_not_secified, model_state_empty, '"not specified" to "empty"'),
+            (model_state_none, model_state_not_secified, '"None" to "not specified"'),
+            (model_state_none, model_state_none, '"None" to "None"'),
+            (model_state_none, model_state_empty, '"None" to "empty"'),
+            (model_state_empty, model_state_not_secified, '"empty" to "not specified"'),
+            (model_state_empty, model_state_none, '"empty" to "None"'),
+            (model_state_empty, model_state_empty, '"empty" to "empty"'),
+        )
+
+        for t in tests:
+            test(*t)
 
     def test_unique_together_ordering(self):
         "Tests that unique_together also triggers on ordering changes"
@@ -551,7 +669,7 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
         self.assertEqual(action.name, "book")
-        self.assertEqual(action.unique_together, set([("title", "author")]))
+        self.assertEqual(action.unique_together, {("title", "author")})
 
     def test_add_field_and_unique_together(self):
         "Tests that added fields will be created before using them in unique together"
@@ -569,12 +687,12 @@ class AutodetectorTests(TestCase):
         action2 = migration.operations[1]
         self.assertEqual(action1.__class__.__name__, "AddField")
         self.assertEqual(action2.__class__.__name__, "AlterUniqueTogether")
-        self.assertEqual(action2.unique_together, set([("title", "newfield")]))
+        self.assertEqual(action2.unique_together, {("title", "newfield")})
 
     def test_remove_index_together(self):
         author_index_together = ModelState("testapp", "Author", [
             ("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))
-        ], {"index_together": [("id", "name")]})
+        ], {"index_together": {("id", "name")}})
 
         before = self.make_project_state([author_index_together])
         after = self.make_project_state([self.author_name])
@@ -588,12 +706,12 @@ class AutodetectorTests(TestCase):
         # Right actions?
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterIndexTogether")
-        self.assertEqual(action.index_together, None)
+        self.assertEqual(action.index_together, set())
 
     def test_remove_unique_together(self):
         author_unique_together = ModelState("testapp", "Author", [
             ("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))
-        ], {"unique_together": [("id", "name")]})
+        ], {"unique_together": {("id", "name")}})
 
         before = self.make_project_state([author_unique_together])
         after = self.make_project_state([self.author_name])
@@ -607,7 +725,7 @@ class AutodetectorTests(TestCase):
         # Right actions?
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
-        self.assertEqual(action.unique_together, None)
+        self.assertEqual(action.unique_together, set())
 
     def test_proxy(self):
         "Tests that the autodetector correctly deals with proxy models"
@@ -633,30 +751,64 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="AuthorProxy")
         self.assertOperationAttributes(changes, "testapp", 0, 1, name="AuthorProxy", options={})
 
-    def test_unmanaged_ignorance(self):
-        "Tests that the autodetector correctly ignores managed models"
+    def test_proxy_custom_pk(self):
+        "#23415 - The autodetector must correctly deal with custom FK on proxy models."
+        # First, we test the default pk field name
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_empty, self.author_proxy_third, self.book_proxy_fk])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # The field name the FK on the book model points to
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'id')
+
+        # Now, we test the custom pk field name
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_custom_pk, self.author_proxy_third, self.book_proxy_fk])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # The field name the FK on the book model points to
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'pk_field')
+
+    def test_unmanaged(self):
+        "Tests that the autodetector correctly deals with managed models"
         # First, we test adding an unmanaged model
         before = self.make_project_state([self.author_empty])
         after = self.make_project_state([self.author_empty, self.author_unmanaged])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number of migrations?
-        self.assertEqual(len(changes), 0)
-
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="AuthorUnmanaged")
+        self.assertEqual(changes['testapp'][0].operations[0].options['managed'], False)
         # Now, we test turning an unmanaged model into a managed model
         before = self.make_project_state([self.author_empty, self.author_unmanaged])
         after = self.make_project_state([self.author_empty, self.author_unmanaged_managed])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        # Right number of actions?
-        migration = changes['testapp'][0]
-        self.assertEqual(len(migration.operations), 1)
-        # Right action?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        self.assertEqual(action.name, "AuthorUnmanaged")
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["DeleteModel", "CreateModel"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="AuthorUnmanaged")
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="AuthorUnmanaged")
+
+    def test_unmanaged_custom_pk(self):
+        "#23415 - The autodetector must correctly deal with custom FK on unmanaged models."
+        # First, we test the default pk field name
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_unmanaged_default_pk, self.book])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # The field name the FK on the book model points to
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'id')
+
+        # Now, we test the custom pk field name
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_unmanaged_custom_pk, self.book])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # The field name the FK on the book model points to
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'pk_field')
 
     @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
     def test_swappable(self):
@@ -710,6 +862,31 @@ class AutodetectorTests(TestCase):
         changes = autodetector._detect_changes()
         self.assertEqual(changes, {})
 
+    def test_deconstruct_type(self):
+        """
+        #22951 -- Uninstanted classes with deconstruct are correctly returned
+        by deep_deconstruct during serialization.
+        """
+        author = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(
+                    max_length=200,
+                    # IntegerField intentionally not instantiated.
+                    default=models.IntegerField,
+                ))
+            ],
+        )
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([author])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
+
     def test_replace_string_with_foreignkey(self):
         """
         Adding an FK in the same "spot" as a deleted CharField should work. (#22300).
@@ -719,21 +896,12 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_with_publisher, self.publisher])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        # Right number of actions?
-        migration = changes['testapp'][0]
-        self.assertEqual(len(migration.operations), 3)
-        # Right actions?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        self.assertEqual(action.name, "Publisher")
-        action = migration.operations[1]
-        self.assertEqual(action.__class__.__name__, "AddField")
-        self.assertEqual(action.name, "publisher")
-        action = migration.operations[2]
-        self.assertEqual(action.__class__.__name__, "RemoveField")
-        self.assertEqual(action.name, "publisher_name")
+        # Right result?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "RemoveField", "AddField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Publisher")
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="publisher_name")
+        self.assertOperationAttributes(changes, 'testapp', 0, 2, name="publisher")
 
     def test_foreign_key_removed_before_target_model(self):
         """
@@ -884,6 +1052,13 @@ class AutodetectorTests(TestCase):
         # Right number of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         # Right actions in right order?
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelOptions"])
+        # Changing them back to empty should also make a change
+        before = self.make_project_state([self.author_with_options])
+        after = self.make_project_state([self.author_empty])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["AlterModelOptions"])
 
     def test_alter_model_options_proxy(self):
@@ -1059,7 +1234,8 @@ class AutodetectorTests(TestCase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_last_dependency(self):
         """
-        Tests that a dependency to an app with existing migrations uses __latest__.
+        Tests that a dependency to an app with existing migrations uses the
+        last migration of that app.
         """
         # Load graph
         loader = MigrationLoader(connection)
@@ -1074,4 +1250,148 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'otherapp', 0, ["CreateModel"])
         self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="Book")
         # Right dependencies?
-        self.assertEqual(changes['otherapp'][0].dependencies, [("migrations", "__latest__")])
+        self.assertEqual(changes['otherapp'][0].dependencies, [("migrations", "0002_second")])
+
+    def test_alter_fk_before_model_deletion(self):
+        """
+        Tests that ForeignKeys are altered _before_ the model they used to
+        refer to are deleted.
+        """
+        # Make state
+        before = self.make_project_state([self.author_name, self.publisher_with_author])
+        after = self.make_project_state([self.aardvark_testapp, self.publisher_with_aardvark_author])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "AlterField", "DeleteModel"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Aardvark")
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author")
+        self.assertOperationAttributes(changes, 'testapp', 0, 2, name="Author")
+
+    def test_fk_dependency_other_app(self):
+        """
+        Tests that ForeignKeys correctly depend on other apps' models (#23100)
+        """
+        # Make state
+        before = self.make_project_state([self.author_name, self.book])
+        after = self.make_project_state([self.author_with_book, self.book])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AddField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="book")
+        self.assertEqual(changes['testapp'][0].dependencies, [("otherapp", "__first__")])
+
+    def test_circular_dependency_mixed_addcreate(self):
+        """
+        Tests that the dependency resolver knows to put all CreateModel
+        before AddField and not become unsolvable (#23315)
+        """
+        address = ModelState("a", "Address", [
+            ("id", models.AutoField(primary_key=True)),
+            ("country", models.ForeignKey("b.DeliveryCountry")),
+        ])
+        person = ModelState("a", "Person", [
+            ("id", models.AutoField(primary_key=True)),
+        ])
+        apackage = ModelState("b", "APackage", [
+            ("id", models.AutoField(primary_key=True)),
+            ("person", models.ForeignKey("a.Person")),
+        ])
+        country = ModelState("b", "DeliveryCountry", [
+            ("id", models.AutoField(primary_key=True)),
+        ])
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([address, person, apackage, country])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'a', 2)
+        self.assertNumberMigrations(changes, 'b', 1)
+        self.assertOperationTypes(changes, 'a', 0, ["CreateModel", "CreateModel"])
+        self.assertOperationTypes(changes, 'a', 1, ["AddField"])
+        self.assertOperationTypes(changes, 'b', 0, ["CreateModel", "CreateModel"])
+
+    @override_settings(AUTH_USER_MODEL="a.Tenant")
+    def test_circular_dependency_swappable(self):
+        """
+        Tests that the dependency resolver knows to explicitly resolve
+        swappable models (#23322)
+        """
+        tenant = ModelState("a", "Tenant", [
+            ("id", models.AutoField(primary_key=True)),
+            ("primary_address", models.ForeignKey("b.Address"))],
+            bases=(AbstractBaseUser, )
+        )
+        address = ModelState("b", "Address", [
+            ("id", models.AutoField(primary_key=True)),
+            ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL)),
+        ])
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([address, tenant])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'a', 2)
+        self.assertNumberMigrations(changes, 'b', 1)
+        self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
+        self.assertOperationTypes(changes, 'a', 1, ["AddField"])
+        self.assertOperationTypes(changes, 'b', 0, ["CreateModel"])
+        self.assertEqual(changes['a'][0].dependencies, [])
+        self.assertEqual(set(changes['a'][1].dependencies), {('a', 'auto_1'), ('b', 'auto_1')})
+        self.assertEqual(changes['b'][0].dependencies, [('__setting__', 'AUTH_USER_MODEL')])
+
+    @override_settings(AUTH_USER_MODEL="b.Tenant")
+    def test_circular_dependency_swappable2(self):
+        """
+        Tests that the dependency resolver knows to explicitly resolve
+        swappable models but with the swappable not being the first migrated
+        model (#23322)
+        """
+        address = ModelState("a", "Address", [
+            ("id", models.AutoField(primary_key=True)),
+            ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL)),
+        ])
+        tenant = ModelState("b", "Tenant", [
+            ("id", models.AutoField(primary_key=True)),
+            ("primary_address", models.ForeignKey("a.Address"))],
+            bases=(AbstractBaseUser, )
+        )
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([address, tenant])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'a', 2)
+        self.assertNumberMigrations(changes, 'b', 1)
+        self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
+        self.assertOperationTypes(changes, 'a', 1, ["AddField"])
+        self.assertOperationTypes(changes, 'b', 0, ["CreateModel"])
+        self.assertEqual(changes['a'][0].dependencies, [])
+        self.assertEqual(set(changes['a'][1].dependencies), {('__setting__', 'AUTH_USER_MODEL'), ('a', 'auto_1')})
+        self.assertEqual(changes['b'][0].dependencies, [('a', 'auto_1')])
+
+    @override_settings(AUTH_USER_MODEL="a.Person")
+    def test_circular_dependency_swappable_self(self):
+        """
+        Tests that the dependency resolver knows to explicitly resolve
+        swappable models (#23322)
+        """
+        person = ModelState("a", "Person", [
+            ("id", models.AutoField(primary_key=True)),
+            ("parent1", models.ForeignKey(settings.AUTH_USER_MODEL, related_name='children'))
+        ])
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([person])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'a', 1)
+        self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
+        self.assertEqual(changes['a'][0].dependencies, [])

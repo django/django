@@ -64,7 +64,7 @@ def make_msgid(idstring=None):
 
 
 # Header names that contain structured address data (RFC #5322)
-ADDRESS_HEADERS = set([
+ADDRESS_HEADERS = {
     'from',
     'sender',
     'reply-to',
@@ -76,7 +76,7 @@ ADDRESS_HEADERS = set([
     'resent-to',
     'resent-cc',
     'resent-bcc',
-])
+}
 
 
 def forbid_multi_line_headers(name, val, encoding):
@@ -123,7 +123,7 @@ def sanitize_address(addr, encoding):
 
 
 class MIMEMixin():
-    def as_string(self, unixfrom=False):
+    def as_string(self, unixfrom=False, linesep='\n'):
         """Return the entire formatted message as a string.
         Optional `unixfrom' when True, means include the Unix From_ envelope
         header.
@@ -133,13 +133,16 @@ class MIMEMixin():
         """
         fp = six.StringIO()
         g = generator.Generator(fp, mangle_from_=False)
-        g.flatten(self, unixfrom=unixfrom)
+        if six.PY2:
+            g.flatten(self, unixfrom=unixfrom)
+        else:
+            g.flatten(self, unixfrom=unixfrom, linesep=linesep)
         return fp.getvalue()
 
     if six.PY2:
         as_bytes = as_string
     else:
-        def as_bytes(self, unixfrom=False):
+        def as_bytes(self, unixfrom=False, linesep='\n'):
             """Return the entire formatted message as bytes.
             Optional `unixfrom' when True, means include the Unix From_ envelope
             header.
@@ -149,7 +152,7 @@ class MIMEMixin():
             """
             fp = six.BytesIO()
             g = generator.BytesGenerator(fp, mangle_from_=False)
-            g.flatten(self, unixfrom=unixfrom)
+            g.flatten(self, unixfrom=unixfrom, linesep=linesep)
             return fp.getvalue()
 
 
@@ -166,7 +169,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
     def __init__(self, text, subtype, charset):
         self.encoding = charset
         if charset == 'utf-8':
-            # Unfortunately, Python doesn't support setting a Charset instance
+            # Unfortunately, Python < 3.5 doesn't support setting a Charset instance
             # as MIMEText init parameter (http://bugs.python.org/issue16324).
             # We do it manually and trigger re-encoding of the payload.
             MIMEText.__init__(self, text, subtype, None)
@@ -393,7 +396,9 @@ class EmailMultiAlternatives(EmailMessage):
         bytestrings). The SafeMIMEText class will handle any necessary encoding
         conversions.
         """
-        super(EmailMultiAlternatives, self).__init__(subject, body, from_email, to, bcc, connection, attachments, headers, cc)
+        super(EmailMultiAlternatives, self).__init__(
+            subject, body, from_email, to, bcc, connection, attachments, headers, cc
+        )
         self.alternatives = alternatives or []
 
     def attach_alternative(self, content, mimetype):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-1. Bare-bones model
+Bare-bones model
 
 This is a basic model with only two non-primary-key fields.
 """

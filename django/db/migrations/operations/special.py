@@ -24,7 +24,7 @@ class SeparateDatabaseAndState(Operation):
         for database_operation in self.database_operations:
             to_state = from_state.clone()
             database_operation.state_forwards(app_label, to_state)
-            database_operation.database_forwards(self, app_label, schema_editor, from_state, to_state)
+            database_operation.database_forwards(app_label, schema_editor, from_state, to_state)
             from_state = to_state
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -36,7 +36,7 @@ class SeparateDatabaseAndState(Operation):
                 dbop.state_forwards(app_label, to_state)
             from_state = base_state.clone()
             database_operation.state_forwards(app_label, from_state)
-            database_operation.database_backwards(self, app_label, schema_editor, from_state, to_state)
+            database_operation.database_backwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
         return "Custom state/database change combination"
@@ -64,19 +64,31 @@ class RunSQL(Operation):
             state_operation.state_forwards(app_label, state)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        statements = schema_editor.connection.ops.prepare_sql_script(self.sql)
-        for statement in statements:
-            schema_editor.execute(statement)
+        self._run_sql(schema_editor, self.sql)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_sql is None:
             raise NotImplementedError("You cannot reverse this operation")
-        statements = schema_editor.connection.ops.prepare_sql_script(self.reverse_sql)
-        for statement in statements:
-            schema_editor.execute(statement)
+        self._run_sql(schema_editor, self.reverse_sql)
 
     def describe(self):
         return "Raw SQL operation"
+
+    def _run_sql(self, schema_editor, sql):
+        if isinstance(sql, (list, tuple)):
+            for sql in sql:
+                params = None
+                if isinstance(sql, (list, tuple)):
+                    elements = len(sql)
+                    if elements == 2:
+                        sql, params = sql
+                    else:
+                        raise ValueError("Expected a 2-tuple but got %d" % elements)
+                schema_editor.execute(sql, params=params)
+        else:
+            statements = schema_editor.connection.ops.prepare_sql_script(sql)
+            for statement in statements:
+                schema_editor.execute(statement, params=None)
 
 
 class RunPython(Operation):

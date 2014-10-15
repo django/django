@@ -46,7 +46,7 @@ __ http://sphinx-doc.org/
 __ http://docutils.sourceforge.net/
 
 To actually build the documentation locally, you'll currently need to install
-Sphinx -- ``sudo pip install Sphinx`` should do the trick.
+Sphinx -- ``pip install Sphinx`` should do the trick.
 
 .. note::
 
@@ -154,7 +154,7 @@ Django-specific markup
 Besides the `Sphinx built-in markup`__, Django's docs defines some extra
 description units:
 
-__ http://sphinx-doc.org/markup/desc.html
+__ http://sphinx-doc.org/markup/
 
 * Settings::
 
@@ -191,6 +191,10 @@ __ http://sphinx-doc.org/markup/desc.html
         .. django-admin-option:: --traceback
 
   To link, use ``:djadminopt:`--traceback```.
+
+* Links to Trac tickets (typically reserved for minor release notes)::
+
+        :ticket:`12345`
 
 .. _documenting-new-features:
 
@@ -318,10 +322,6 @@ look better:
   to help do this work.
 
   This will probably be a continuing, never-ending project.
-
-* Add `info field lists`__ where appropriate.
-
-  __ http://sphinx-doc.org/markup/desc.html#info-field-lists
 
 * Whenever possible, use links. So, use ``:setting:`ADMINS``` instead
   of ````ADMINS````.

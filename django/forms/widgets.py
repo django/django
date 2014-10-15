@@ -55,16 +55,23 @@ class Media(object):
         return mark_safe('\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
 
     def render_js(self):
-        return [format_html('<script type="text/javascript" src="{0}"></script>', self.absolute_path(path)) for path in self._js]
+        return [
+            format_html(
+                '<script type="text/javascript" src="{0}"></script>',
+                self.absolute_path(path)
+            ) for path in self._js
+        ]
 
     def render_css(self):
         # To keep rendering order consistent, we can't just iterate over items().
         # We need to sort the keys, and iterate over the sorted list.
         media = sorted(self._css.keys())
-        return chain(*[
-            [format_html('<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
-             for path in self._css[medium]]
-            for medium in media])
+        return chain(*[[
+            format_html(
+                '<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />',
+                self.absolute_path(path), medium
+            ) for path in self._css[medium]
+        ] for medium in media])
 
     def absolute_path(self, path, prefix=None):
         if path.startswith(('http://', 'https://', '/')):
@@ -341,11 +348,12 @@ class ClearableFileInput(FileInput):
     input_text = ugettext_lazy('Change')
     clear_checkbox_label = ugettext_lazy('Clear')
 
-    template_with_initial = '%(initial_text)s: %(initial)s %(clear_template)s<br />%(input_text)s: %(input)s'
+    template_with_initial = (
+        '%(initial_text)s: <a href="%(initial_url)s">%(initial)s</a> '
+        '%(clear_template)s<br />%(input_text)s: %(input)s'
+    )
 
     template_with_clear = '%(clear)s <label for="%(clear_checkbox_id)s">%(clear_checkbox_label)s</label>'
-
-    url_markup_template = '<a href="{0}">{1}</a>'
 
     def clear_checkbox_name(self, name):
         """
@@ -360,6 +368,21 @@ class ClearableFileInput(FileInput):
         """
         return name + '_id'
 
+    def is_initial(self, value):
+        """
+        Return whether value is considered to be initial value.
+        """
+        return bool(value and hasattr(value, 'url'))
+
+    def get_template_substitution_values(self, value):
+        """
+        Return value-related substitutions.
+        """
+        return {
+            'initial': conditional_escape(value),
+            'initial_url': conditional_escape(value.url),
+        }
+
     def render(self, name, value, attrs=None):
         substitutions = {
             'initial_text': self.initial_text,
@@ -370,11 +393,9 @@ class ClearableFileInput(FileInput):
         template = '%(input)s'
         substitutions['input'] = super(ClearableFileInput, self).render(name, value, attrs)
 
-        if value and hasattr(value, "url"):
+        if self.is_initial(value):
             template = self.template_with_initial
-            substitutions['initial'] = format_html(self.url_markup_template,
-                                                   value.url,
-                                                   force_text(value))
+            substitutions.update(self.get_template_substitution_values(value))
             if not self.is_required:
                 checkbox_name = self.clear_checkbox_name(name)
                 checkbox_id = self.clear_checkbox_id(checkbox_name)
@@ -601,13 +622,17 @@ class ChoiceInput(SubWidget):
             label_for = format_html(' for="{0}"', self.id_for_label)
         else:
             label_for = ''
-        return format_html('<label{0}>{1} {2}</label>', label_for, self.tag(), self.choice_label)
+        attrs = dict(self.attrs, **attrs) if attrs else self.attrs
+        return format_html(
+            '<label{0}>{1} {2}</label>', label_for, self.tag(attrs), self.choice_label
+        )
 
     def is_checked(self):
         return self.value == self.choice_value
 
-    def tag(self):
-        final_attrs = dict(self.attrs, type=self.input_type, name=self.name, value=self.choice_value)
+    def tag(self, attrs=None):
+        attrs = attrs or self.attrs
+        final_attrs = dict(attrs, type=self.input_type, name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
         return format_html('<input{0} />', flatatt(final_attrs))

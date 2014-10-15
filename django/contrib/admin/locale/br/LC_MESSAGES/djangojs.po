@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fulup  <fulup.jakez@gmail.com>, 2012.
+# Fulup <fulup.jakez@gmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-06-30 18:35+0000\n"
-"Last-Translator: Fulup <fulup.jakez@gmail.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:41+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Breton (http://www.transifex.com/projects/p/django/language/"
 "br/)\n"
 "MIME-Version: 1.0\n"
@@ -17,154 +17,174 @@ msgstr ""
 "Language: br\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: static/admin/js/SelectFilter2.js:45
+#: contrib/admin/static/admin/js/SelectFilter2.js:45
 #, c-format
 msgid "Available %s"
 msgstr "Hegerz %s"
 
-#: static/admin/js/SelectFilter2.js:46
+#: contrib/admin/static/admin/js/SelectFilter2.js:46
 #, c-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:53
+#: contrib/admin/static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:57
+#: contrib/admin/static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Sil"
 
-#: static/admin/js/SelectFilter2.js:61
+#: contrib/admin/static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "Dibab an holl"
 
-#: static/admin/js/SelectFilter2.js:61
+#: contrib/admin/static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
 msgstr "Klikañ evit dibab an holl %s war un dro."
 
-#: static/admin/js/SelectFilter2.js:67
+#: contrib/admin/static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr "Dibab"
 
-#: static/admin/js/SelectFilter2.js:69
+#: contrib/admin/static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Lemel kuit"
 
-#: static/admin/js/SelectFilter2.js:75
+#: contrib/admin/static/admin/js/SelectFilter2.js:75
 #, c-format
 msgid "Chosen %s"
 msgstr "Dibabet %s"
 
-#: static/admin/js/SelectFilter2.js:76
+#: contrib/admin/static/admin/js/SelectFilter2.js:76
 #, c-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:80
+#: contrib/admin/static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr "Lemel kuit pep tra"
 
-#: static/admin/js/SelectFilter2.js:80
+#: contrib/admin/static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Klikañ evit dilemel an holl %s dibabet war un dro."
 
-#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
+#: contrib/admin/static/admin/js/actions.js:22
+#: contrib/admin/static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
+#: contrib/admin/static/admin/js/actions.js:114
+#: contrib/admin/static/admin/js/actions.min.js:4
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+#: contrib/admin/static/admin/js/actions.js:126
+#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
 
-#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
+#: contrib/admin/static/admin/js/actions.js:128
+#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 
-#: static/admin/js/calendar.js:26
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:79
+#, c-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
+#, c-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
+msgid "Now"
+msgstr "Bremañ"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:118
+msgid "Clock"
+msgstr "Horolaj"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
+msgid "Choose a time"
+msgstr "Dibab un eur"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
+msgid "Midnight"
+msgstr "Hanternoz"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:151
+msgid "6 a.m."
+msgstr "6e00"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:152
+msgid "Noon"
+msgstr "Kreisteiz"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:156
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:276
+msgid "Cancel"
+msgstr "Nullañ"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:216
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:269
+msgid "Today"
+msgstr "Hiziv"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:220
+msgid "Calendar"
+msgstr "Deiziadur"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:267
+msgid "Yesterday"
+msgstr "Dec'h"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:271
+msgid "Tomorrow"
+msgstr "Warc'hoazh"
+
+#: contrib/admin/static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
 "Genver C'hwevrer Meurzh Ebrel Mae Mezheven Gouere Eost Gwengolo Here Du Kerzu"
 
-#: static/admin/js/calendar.js:27
+#: contrib/admin/static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "S L M M Y G S"
 
-#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
-#: static/admin/js/collapse.min.js:1
+#: contrib/admin/static/admin/js/collapse.js:8
+#: contrib/admin/static/admin/js/collapse.js:19
+#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "Diskouez"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+#: contrib/admin/static/admin/js/collapse.js:16
+#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Kuzhat"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
-msgid "Now"
-msgstr "Bremañ"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:53
-msgid "Clock"
-msgstr "Horolaj"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:81
-msgid "Choose a time"
-msgstr "Dibab un eur"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:86
-msgid "Midnight"
-msgstr "Hanternoz"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:87
-msgid "6 a.m."
-msgstr "6e00"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:88
-msgid "Noon"
-msgstr "Kreisteiz"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
-msgid "Cancel"
-msgstr "Nullañ"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
-msgid "Today"
-msgstr "Hiziv"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:148
-msgid "Calendar"
-msgstr "Deiziadur"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:195
-msgid "Yesterday"
-msgstr "Dec'h"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:199
-msgid "Tomorrow"
-msgstr "Warc'hoazh"

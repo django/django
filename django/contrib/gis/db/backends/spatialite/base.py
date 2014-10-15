@@ -4,7 +4,9 @@ from django.conf import settings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.base import (Database,
-    DatabaseWrapper as SQLiteDatabaseWrapper, SQLiteCursorWrapper)
+    DatabaseWrapper as SQLiteDatabaseWrapper,
+    DatabaseFeatures as SQLiteDatabaseFeatures, SQLiteCursorWrapper)
+from django.contrib.gis.db.backends.base import BaseSpatialFeatures
 from django.contrib.gis.db.backends.spatialite.client import SpatiaLiteClient
 from django.contrib.gis.db.backends.spatialite.creation import SpatiaLiteCreation
 from django.contrib.gis.db.backends.spatialite.introspection import SpatiaLiteIntrospection
@@ -13,7 +15,15 @@ from django.contrib.gis.db.backends.spatialite.schema import SpatialiteSchemaEdi
 from django.utils import six
 
 
+class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
+    supports_distance_geodetic = False
+    # SpatiaLite can only count vertices in LineStrings
+    supports_num_points_poly = False
+
+
 class DatabaseWrapper(SQLiteDatabaseWrapper):
+    SchemaEditorClass = SpatialiteSchemaEditor
+
     def __init__(self, *args, **kwargs):
         # Before we get too far, make sure pysqlite 2.5+ is installed.
         if Database.version_info < (2, 5, 0):
@@ -33,14 +43,11 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
                                        'SPATIALITE_LIBRARY_PATH in your settings.'
                                        )
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
+        self.features = DatabaseFeatures(self)
         self.ops = SpatiaLiteOperations(self)
         self.client = SpatiaLiteClient(self)
         self.creation = SpatiaLiteCreation(self)
         self.introspection = SpatiaLiteIntrospection(self)
-
-    def schema_editor(self, *args, **kwargs):
-        "Returns a new instance of this backend's SchemaEditor"
-        return SpatialiteSchemaEditor(self, *args, **kwargs)
 
     def get_new_connection(self, conn_params):
         conn = super(DatabaseWrapper, self).get_new_connection(conn_params)

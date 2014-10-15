@@ -28,7 +28,7 @@ class GenericForeignKey(object):
         self.for_concrete_model = for_concrete_model
         self.editable = False
 
-    def contribute_to_class(self, cls, name):
+    def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
         self.model = cls
         self.cache_attr = "_%s_cache" % name
@@ -104,7 +104,10 @@ class GenericForeignKey(object):
                         "'%s.%s' is not a ForeignKey." % (
                             self.model._meta.object_name, self.ct_field
                         ),
-                        hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                        hint=(
+                            "GenericForeignKeys must use a ForeignKey to "
+                            "'contenttypes.ContentType' as the 'content_type' field."
+                        ),
                         obj=self,
                         id='contenttypes.E003',
                     )
@@ -115,7 +118,10 @@ class GenericForeignKey(object):
                         "'%s.%s' is not a ForeignKey to 'contenttypes.ContentType'." % (
                             self.model._meta.object_name, self.ct_field
                         ),
-                        hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                        hint=(
+                            "GenericForeignKeys must use a ForeignKey to "
+                            "'contenttypes.ContentType' as the 'content_type' field."
+                        ),
                         obj=self,
                         id='contenttypes.E004',
                     )
@@ -316,8 +322,9 @@ class GenericRelation(ForeignObject):
         qs = getattr(obj, self.name).all()
         return smart_text([instance._get_pk_val() for instance in qs])
 
-    def contribute_to_class(self, cls, name):
-        super(GenericRelation, self).contribute_to_class(cls, name, virtual_only=True)
+    def contribute_to_class(self, cls, name, **kwargs):
+        kwargs['virtual_only'] = True
+        super(GenericRelation, self).contribute_to_class(cls, name, **kwargs)
         # Save a reference to which model this class is on for future use
         self.model = cls
         # Add the descriptor for the relation
@@ -456,6 +463,9 @@ def create_generic_related_manager(superclass):
             )
         do_not_call_in_templates = True
 
+        def __str__(self):
+            return repr(self)
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
@@ -526,6 +536,20 @@ def create_generic_related_manager(superclass):
             db = router.db_for_write(self.model, instance=self.instance)
             return super(GenericRelatedObjectManager, self).using(db).create(**kwargs)
         create.alters_data = True
+
+        def get_or_create(self, **kwargs):
+            kwargs[self.content_type_field_name] = self.content_type
+            kwargs[self.object_id_field_name] = self.pk_val
+            db = router.db_for_write(self.model, instance=self.instance)
+            return super(GenericRelatedObjectManager, self).using(db).get_or_create(**kwargs)
+        get_or_create.alters_data = True
+
+        def update_or_create(self, **kwargs):
+            kwargs[self.content_type_field_name] = self.content_type
+            kwargs[self.object_id_field_name] = self.pk_val
+            db = router.db_for_write(self.model, instance=self.instance)
+            return super(GenericRelatedObjectManager, self).using(db).update_or_create(**kwargs)
+        update_or_create.alters_data = True
 
     return GenericRelatedObjectManager
 

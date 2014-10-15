@@ -28,6 +28,9 @@ output incorrect code.
 All of the core Django operations are available from the
 ``django.db.migrations.operations`` module.
 
+For introductory material, see the :doc:`migrations topic guide
+</topics/migrations>`.
+
 Schema Operations
 =================
 
@@ -102,7 +105,7 @@ subclass).
 AlterOrderWithRespectTo
 -----------------------
 
-.. class:: AlterIndexTogether(name, order_with_respect_to)
+.. class:: AlterOrderWithRespectTo(name, order_with_respect_to)
 
 Makes or deletes the ``_order`` column needed for the
 :attr:`~django.db.models.Options.order_with_respect_to` option on the ``Meta``
@@ -111,11 +114,12 @@ subclass.
 AlterModelOptions
 -----------------
 
-.. class:: AlterIndexTogether(name, options)
+.. class:: AlterModelOptions(name, options)
 
 Stores changes to miscellaneous model options (settings on a model's ``Meta``)
 like ``permissions`` and ``verbose_name``. Does not affect the database, but
-persists these changes for :class:`RunPython` instances to use.
+persists these changes for :class:`RunPython` instances to use. ``options``
+should be a dictionary mapping option names to values.
 
 AddField
 --------
@@ -133,7 +137,7 @@ or if it is temporary and just for this migration (``False``) - usually
 because the migration is adding a non-nullable field to a table and needs
 a default value to put into existing rows. It does not effect the behavior
 of setting defaults in the database directly - Django never sets database
-defaults, and always applies them in the Django ORM code.
+defaults and always applies them in the Django ORM code.
 
 RemoveField
 -----------
@@ -149,15 +153,27 @@ from any data loss, which of course is irreversible).
 AlterField
 ----------
 
-.. class:: AlterField(model_name, name, field)
+.. class:: AlterField(model_name, name, field, preserve_default=True)
 
 Alters a field's definition, including changes to its type,
 :attr:`~django.db.models.Field.null`, :attr:`~django.db.models.Field.unique`,
 :attr:`~django.db.models.Field.db_column` and other field attributes.
 
+The ``preserve_default`` argument indicates whether the field's default
+value is permanent and should be baked into the project state (``True``),
+or if it is temporary and just for this migration (``False``) - usually
+because the migration is altering a nullable field to a non-nullable one and
+needs a default value to put into existing rows. It does not effect the
+behavior of setting defaults in the database directly - Django never sets
+database defaults and always applies them in the Django ORM code.
+
 Note that not all changes are possible on all databases - for example, you
 cannot change a text-type field like ``models.TextField()`` into a number-type
 field like ``models.IntegerField()`` on most databases.
+
+.. versionchanged:: 1.7.1
+
+    The ``preserve_default`` argument was added.
 
 RenameField
 -----------
@@ -184,12 +200,33 @@ the database. On most database backends (all but PostgreSQL), Django will
 split the SQL into individual statements prior to executing them. This
 requires installing the sqlparse_ Python library.
 
+You can also pass a list of strings or 2-tuples. The latter is used for passing
+queries and parameters in the same way as :ref:`cursor.execute()
+<executing-custom-sql>`. These three operations are equivalent::
+
+    migrations.RunSQL("INSERT INTO musician (name) VALUES ('Reinhardt');")
+    migrations.RunSQL(["INSERT INTO musician (name) VALUES ('Reinhardt');", None])
+    migrations.RunSQL(["INSERT INTO musician (name) VALUES (%s);", ['Reinhardt']])
+
+If you want to include literal percent signs in the query, you have to double
+them if you are passing parameters.
+
 The ``state_operations`` argument is so you can supply operations that are
 equivalent to the SQL in terms of project state; for example, if you are
 manually creating a column, you should pass in a list containing an ``AddField``
 operation here so that the autodetector still has an up-to-date state of the
 model (otherwise, when you next run ``makemigrations``, it won't see any
 operation that adds that field and so will try to run it again).
+
+.. versionchanged:: 1.7.1
+
+    If you want to include literal percent signs in a query without parameters
+    you don't need to double them anymore.
+
+.. versionchanged:: 1.8
+
+    The ability to pass parameters to the ``sql`` and ``reverse_sql`` queries
+    was added.
 
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
@@ -218,8 +255,10 @@ model::
         # if we directly import it, it'll be the wrong version
         Country = apps.get_model("myapp", "Country")
         db_alias = schema_editor.connection.alias
-        Country.objects.create(name="USA", code="us", using=db_alias)
-        Country.objects.create(name="France", code="fr", using=db_alias)
+        Country.objects.using(db_alias).bulk_create([
+            Country(name="USA", code="us"),
+            Country(name="France", code="fr"),
+        ])
 
     class Migration(migrations.Migration):
 
@@ -238,10 +277,12 @@ ORM and/or python code for.
 
 If you're upgrading from South, this is basically the South pattern as an
 operation - one or two methods for forwards and backwards, with an ORM and
-schema operations available. You should be able to translate the ``orm.Model``
-or ``orm["appname", "Model"]`` references from South directly into
-``apps.get_model("appname", "Model")`` references here and leave most of the
-rest of the code unchanged for data migrations.
+schema operations available. Most of the time, you should be able to translate
+the ``orm.Model`` or ``orm["appname", "Model"]`` references from South directly
+into ``apps.get_model("appname", "Model")`` references here and leave most of
+the rest of the code unchanged for data migrations. However, ``apps`` will only
+have references to models in the current app unless migrations in other apps
+are added to the migration's dependencies.
 
 Much like :class:`RunSQL`, ensure that if you change schema inside here you're
 either doing it outside the scope of the Django model system (e.g. triggers)

@@ -149,6 +149,20 @@ class RawQueryTests(TestCase):
         self.assertEqual(len(results), 1)
         self.assertIsInstance(repr(qset), str)
 
+    def test_query_representation(self):
+        """
+        Test representation of raw query with parameters
+        """
+        query = "SELECT * FROM raw_query_author WHERE last_name = %(last)s"
+        qset = Author.objects.raw(query, {'last': 'foo'})
+        self.assertEqual(repr(qset), "<RawQuerySet: SELECT * FROM raw_query_author WHERE last_name = foo>")
+        self.assertEqual(repr(qset.query), "<RawQuery: SELECT * FROM raw_query_author WHERE last_name = foo>")
+
+        query = "SELECT * FROM raw_query_author WHERE last_name = %s"
+        qset = Author.objects.raw(query, {'foo'})
+        self.assertEqual(repr(qset), "<RawQuerySet: SELECT * FROM raw_query_author WHERE last_name = foo>")
+        self.assertEqual(repr(qset.query), "<RawQuery: SELECT * FROM raw_query_author WHERE last_name = foo>")
+
     def test_many_to_many(self):
         """
         Test of a simple raw query against a model containing a m2m field
@@ -239,3 +253,9 @@ class RawQueryTests(TestCase):
 
     def test_query_count(self):
         self.assertNumQueries(1, list, Author.objects.raw("SELECT * FROM raw_query_author"))
+
+    def test_subquery_in_raw_sql(self):
+        try:
+            list(Book.objects.raw('SELECT id FROM (SELECT * FROM raw_query_book WHERE paperback IS NOT NULL) sq'))
+        except InvalidQuery:
+            self.fail("Using a subquery in a RawQuerySet raised InvalidQuery")

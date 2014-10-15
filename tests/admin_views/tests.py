@@ -18,6 +18,7 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.admin.options import TO_FIELD_VAR
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
@@ -598,6 +599,54 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get("/test_admin/admin/admin_views/workhour/?employee__person_ptr__exact=%d" % e1.pk)
         self.assertEqual(response.status_code, 200)
 
+    def test_disallowed_to_field(self):
+        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+            response = self.client.get("/test_admin/admin/admin_views/section/", {TO_FIELD_VAR: 'missing_field'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 1)
+
+        # Specifying a field that is not refered by any other model registered
+        # to this admin site should raise an exception.
+        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+            response = self.client.get("/test_admin/admin/admin_views/section/", {TO_FIELD_VAR: 'name'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 1)
+
+        # Specifying a field referenced by another model should be allowed.
+        response = self.client.get("/test_admin/admin/admin_views/section/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
+        # Specifying a field referenced by another model though a m2m should be allowed.
+        response = self.client.get("/test_admin/admin/admin_views/m2mreference/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
+        # #23604 - Specifying the pk of this model should be allowed when this model defines a m2m relationship
+        response = self.client.get("/test_admin/admin/admin_views/ingredient/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
+        # #23329 - Specifying a field that is not refered by any other model directly registered
+        # to this admin site but registered through inheritance should be allowed.
+        response = self.client.get("/test_admin/admin/admin_views/referencedbyparent/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
+        # #23431 - Specifying a field that is only refered to by a inline of a registered
+        # model should be allowed.
+        response = self.client.get("/test_admin/admin/admin_views/referencedbyinline/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
+        # We also want to prevent the add and change view from leaking a
+        # disallowed field value.
+        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+            response = self.client.post("/test_admin/admin/admin_views/section/add/", {TO_FIELD_VAR: 'name'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 1)
+
+        section = Section.objects.create()
+        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+            response = self.client.post("/test_admin/admin/admin_views/section/%d/" % section.pk, {TO_FIELD_VAR: 'name'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 1)
+
     def test_allowed_filtering_15103(self):
         """
         Regressions test for ticket 15103 - filtering on fields defined in a
@@ -712,6 +761,15 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
         color2_delete_log = LogEntry.objects.all()[0]
         self.assertEqual(color2_content_type, color2_delete_log.content_type)
+
+    def test_adminsite_display_site_url(self):
+        """
+        #13749 - Admin should display link to front-end site 'View site'
+        """
+        url = reverse('admin:index')
+        response = self.client.get(url)
+        self.assertEqual(response.context['site_url'], '/my-site-url/')
+        self.assertContains(response, '<a href="/my-site-url/">View site</a>')
 
 
 @override_settings(TEMPLATE_DIRS=ADMIN_VIEW_TEMPLATES_DIR)
@@ -1425,10 +1483,15 @@ class AdminViewPermissionsTest(TestCase):
         self.client.get('/test_admin/admin/')
         self.client.post(login_url, self.deleteuser_login)
         response = self.client.get('/test_admin/admin/admin_views/section/1/delete/')
+        self.assertContains(response, "<h2>Summary</h2>")
+        self.assertContains(response, "<li>Articles: 3</li>")
         # test response contains link to related Article
         self.assertContains(response, "admin_views/article/1/")
 
         response = self.client.get('/test_admin/admin/admin_views/article/1/delete/')
+        self.assertContains(response, "admin_views/article/1/")
+        self.assertContains(response, "<h2>Summary</h2>")
+        self.assertContains(response, "<li>Articles: 1</li>")
         self.assertEqual(response.status_code, 200)
         post = self.client.post('/test_admin/admin/admin_views/article/1/delete/', delete_dict)
         self.assertRedirects(post, '/test_admin/admin/')
@@ -2373,10 +2436,9 @@ class AdminSearchTest(TestCase):
         """Ensure that the to_field GET parameter is preserved when a search
         is performed. Refs #10918.
         """
-        from django.contrib.admin.views.main import TO_FIELD_VAR
-        response = self.client.get('/test_admin/admin/auth/user/?q=joe&%s=username' % TO_FIELD_VAR)
+        response = self.client.get('/test_admin/admin/auth/user/?q=joe&%s=id' % TO_FIELD_VAR)
         self.assertContains(response, "\n1 user\n")
-        self.assertContains(response, '<input type="hidden" name="_to_field" value="username"/>', html=True)
+        self.assertContains(response, '<input type="hidden" name="%s" value="id"/>' % TO_FIELD_VAR, html=True)
 
     def test_exact_matches(self):
         response = self.client.get('/test_admin/admin/admin_views/recommendation/?q=bar')
@@ -2416,9 +2478,26 @@ class AdminSearchTest(TestCase):
         """
         Test presence of reset link in search bar ("1 result (_x total_)").
         """
-        response = self.client.get('/test_admin/admin/admin_views/person/?q=Gui')
+        #   1 query for session + 1 for fetching user
+        # + 1 for filtered result + 1 for filtered count
+        # + 1 for total count
+        with self.assertNumQueries(5):
+            response = self.client.get('/test_admin/admin/admin_views/person/?q=Gui')
         self.assertContains(response,
             """<span class="small quiet">1 result (<a href="?">3 total</a>)</span>""",
+            html=True)
+
+    def test_no_total_count(self):
+        """
+        #8408 -- "Show all" should be displayed instead of the total count if
+        ModelAdmin.show_full_result_count is False.
+        """
+        #   1 query for session + 1 for fetching user
+        # + 1 for filtered result + 1 for filtered count
+        with self.assertNumQueries(4):
+            response = self.client.get('/test_admin/admin/admin_views/recommendation/?q=bar')
+        self.assertContains(response,
+            """<span class="small quiet">1 result (<a href="?">Show all</a>)</span>""",
             html=True)
 
 
@@ -2547,6 +2626,9 @@ class AdminActionsTest(TestCase):
         confirmation = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
         self.assertIsInstance(confirmation, TemplateResponse)
         self.assertContains(confirmation, "Are you sure you want to delete the selected subscribers?")
+        self.assertContains(confirmation, "<h2>Summary</h2>")
+        self.assertContains(confirmation, "<li>Subscribers: 3</li>")
+        self.assertContains(confirmation, "<li>External subscribers: 1</li>")
         self.assertContains(confirmation, ACTION_CHECKBOX_NAME, count=2)
         self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
         self.assertEqual(Subscriber.objects.count(), 0)
@@ -3724,7 +3806,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.get('%s%s' % (self.live_server_url,
             '/test_admin/admin/admin_views/picture/add/'))
         self.assertEqual(
-            self.selenium.switch_to_active_element(),
+            self.selenium.switch_to.active_element,
             self.selenium.find_element_by_id('id_name')
         )
 
@@ -3732,9 +3814,40 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.get('%s%s' % (self.live_server_url,
             '/test_admin/admin/admin_views/reservation/add/'))
         self.assertEqual(
-            self.selenium.switch_to_active_element(),
+            self.selenium.switch_to.active_element,
             self.selenium.find_element_by_id('id_start_date_0')
         )
+
+    def test_cancel_delete_confirmation(self):
+        "Cancelling the deletion of an object takes the user back one page."
+        pizza = Pizza.objects.create(name="Panucci's Double Cheese")
+        url = reverse('admin:admin_views_pizza_change', args=(pizza.id,))
+        full_url = '%s%s' % (self.live_server_url, url)
+        self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
+        self.selenium.get(full_url)
+        self.selenium.find_element_by_class_name('deletelink').click()
+        self.selenium.find_element_by_class_name('cancel-link').click()
+        self.assertEqual(self.selenium.current_url, full_url)
+        self.assertEqual(Pizza.objects.count(), 1)
+
+    def test_cancel_delete_related_confirmation(self):
+        """
+        Cancelling the deletion of an object with relations takes the user back
+        one page.
+        """
+        pizza = Pizza.objects.create(name="Panucci's Double Cheese")
+        topping1 = Topping.objects.create(name="Cheddar")
+        topping2 = Topping.objects.create(name="Mozzarella")
+        pizza.toppings.add(topping1, topping2)
+        url = reverse('admin:admin_views_pizza_change', args=(pizza.id,))
+        full_url = '%s%s' % (self.live_server_url, url)
+        self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
+        self.selenium.get(full_url)
+        self.selenium.find_element_by_class_name('deletelink').click()
+        self.selenium.find_element_by_class_name('cancel-link').click()
+        self.assertEqual(self.selenium.current_url, full_url)
+        self.assertEqual(Pizza.objects.count(), 1)
+        self.assertEqual(Topping.objects.count(), 2)
 
 
 class SeleniumAdminViewsChromeTests(SeleniumAdminViewsFirefoxTests):

@@ -114,7 +114,7 @@ class LookupTests(TestCase):
         self.assertEqual(arts[self.a1.id], self.a1)
         self.assertEqual(arts[self.a2.id], self.a2)
         self.assertEqual(Article.objects.in_bulk([self.a3.id]), {self.a3.id: self.a3})
-        self.assertEqual(Article.objects.in_bulk(set([self.a3.id])), {self.a3.id: self.a3})
+        self.assertEqual(Article.objects.in_bulk({self.a3.id}), {self.a3.id: self.a3})
         self.assertEqual(Article.objects.in_bulk(frozenset([self.a3.id])), {self.a3.id: self.a3})
         self.assertEqual(Article.objects.in_bulk((self.a3.id,)), {self.a3.id: self.a3})
         self.assertEqual(Article.objects.in_bulk([1000]), {})

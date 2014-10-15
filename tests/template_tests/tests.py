@@ -10,6 +10,7 @@ import warnings
 
 from django import template
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
     RequestContext, Template, TemplateSyntaxError)
@@ -109,13 +110,17 @@ class SomeClass:
             raise SomeOtherException
         raise KeyError
 
+    @property
     def silent_fail_attribute(self):
         raise SomeException
-    silent_fail_attribute = property(silent_fail_attribute)
 
+    @property
     def noisy_fail_attribute(self):
         raise SomeOtherException
-    noisy_fail_attribute = property(noisy_fail_attribute)
+
+    @property
+    def attribute_error_attribute(self):
+        raise AttributeError
 
 
 class OtherClass:
@@ -499,6 +504,15 @@ class TemplateRegressionTests(TestCase):
         with self.assertRaises(urlresolvers.NoReverseMatch):
             t.render(Context({}))
 
+    def test_debug_tag_non_ascii(self):
+        """
+        Test non-ASCII model representation in debug output (#23060).
+        """
+        Group.objects.create(name="清風")
+        c1 = Context({"objs": Group.objects.all()})
+        t1 = Template('{% debug %}')
+        self.assertIn("清風", t1.render(c1))
+
 
 # Set ALLOWED_INCLUDE_ROOTS so that ssi works.
 @override_settings(MEDIA_URL="/media/", STATIC_URL="/static/",
@@ -576,6 +590,9 @@ class TemplateTests(TestCase):
                                             # Ignore deprecations of using the wrong number of variables with the 'for' tag.
                                             # and warnings for {% url %} reversing by dotted path
                                             warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaulttags")
+                                            # Ignore deprecations of old style unordered_list
+                                            # and removetags.
+                                            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaultfilters")
                                             output = self.render(test_template, vals)
                                     except ShouldNotExecuteException:
                                         failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
@@ -810,6 +827,9 @@ class TemplateTests(TestCase):
             'filter-syntax23': (r'1{{ var.noisy_fail_key }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)),
             'filter-syntax24': (r'1{{ var.noisy_fail_attribute }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)),
 
+            # #16383 - A @property that raises AttributeError should not fail loudly.
+            'filter-syntax25': ('{{ var.attribute_error_attribute }}', {"var": SomeClass()}, (AttributeError)),
+
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
             'comment-syntax02': ("{# this is hidden #}hello{# foo #}", {}, "hello"),
@@ -880,6 +900,9 @@ class TemplateTests(TestCase):
 
             # Raise exception for custom tags used in child with {% load %} tag in parent, not in child
             'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
+
+            # Raise exception for block.super used in base template
+            'exception05': ("{% block first %}{{ block.super }}{% endblock %}", {}, template.TemplateSyntaxError),
 
             ### FILTER TAG ############################################################
             'filter01': ('{% filter upper %}{% endfilter %}', {}, ''),

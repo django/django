@@ -14,6 +14,7 @@ from django.test import SimpleTestCase, RequestFactory, override_settings
 from django.test.client import FakePayload
 from django.test.utils import str_prefix
 from django.utils import six
+from django.utils.encoding import force_str
 from django.utils.http import cookie_date, urlencode
 from django.utils.six.moves.urllib.parse import urlencode as original_urlencode
 from django.utils.timezone import utc
@@ -67,7 +68,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(list(request.GET.keys()), [])
         self.assertEqual(list(request.POST.keys()), [])
         self.assertEqual(list(request.COOKIES.keys()), [])
-        self.assertEqual(set(request.META.keys()), set(['PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME', 'wsgi.input']))
+        self.assertEqual(set(request.META.keys()), {'PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME', 'wsgi.input'})
         self.assertEqual(request.META['PATH_INFO'], 'bogus')
         self.assertEqual(request.META['REQUEST_METHOD'], 'bogus')
         self.assertEqual(request.META['SCRIPT_NAME'], '')
@@ -192,6 +193,13 @@ class RequestsTests(SimpleTestCase):
         # both as an output string, and using the cookie attributes
         self.assertTrue('; httponly' in str(example_cookie))
         self.assertTrue(example_cookie['httponly'])
+
+    def test_unicode_cookie(self):
+        "Verify HttpResponse.set_cookie() works with unicode data."
+        response = HttpResponse()
+        cookie_value = '清風'
+        response.set_cookie('test', cookie_value)
+        self.assertEqual(force_str(cookie_value), response.cookies['test'].value)
 
     def test_limited_stream(self):
         # Read all of a limited stream

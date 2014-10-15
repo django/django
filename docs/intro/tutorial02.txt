@@ -275,8 +275,8 @@ with the admin just as we did with ``Question``. That's easy:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Choice
-
+    from polls.models import Choice, Question
+    # ...
     admin.site.register(Choice)
 
 Now "Choices" is an available option in the Django admin. The "Add choice" form
@@ -319,8 +319,7 @@ registration code to read:
     class QuestionAdmin(admin.ModelAdmin):
         fieldsets = [
             (None,               {'fields': ['question_text']}),
-            ('Date information', {'fields': ['pub_date'],
-                                  'classes': ['collapse']}),
+            ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
         ]
         inlines = [ChoiceInline]
 
@@ -512,10 +511,18 @@ template directory in the source code of Django itself
         import django
         print(django.__path__)"
 
-Then, just edit the file and replace ``{{ site_header }}`` with your own
-site's name as you see fit. We use this approach to teach you how to override
-templates. In an actual project, you would probably use the
-:attr:`django.contrib.admin.AdminSite.site_header` attribute to more easily
+Then, just edit the file and replace
+``{{ site_header|default:_('Django administration') }}`` (including the curly
+braces) with your own site's name as you see fit. You should end up with
+a line like:
+
+.. code-block:: html+django
+
+    <h1 id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></h1>
+
+We use this approach to teach you how to override templates. In an actual
+project, you would probably use
+the :attr:`django.contrib.admin.AdminSite.site_header` attribute to more easily
 make this particular customization.
 
 This template file contains lots of text like ``{% block branding %}``

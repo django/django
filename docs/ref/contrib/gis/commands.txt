@@ -7,7 +7,7 @@ GeoDjango Management Commands
 inspectdb
 =========
 
-.. describe:: django-admin.py inspectdb
+.. describe:: django-admin inspectdb
 
 When :mod:`django.contrib.gis` is in your :setting:`INSTALLED_APPS`, the
 :djadmin:`inspectdb` management command is overridden with one from GeoDjango.

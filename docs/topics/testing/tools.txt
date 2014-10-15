@@ -462,10 +462,12 @@ If you point the test client at a view that raises an exception, that exception
 will be visible in the test case. You can then use a standard ``try ... except``
 block or :meth:`~unittest.TestCase.assertRaises` to test for exceptions.
 
-The only exceptions that are not visible to the test client are ``Http404``,
-``PermissionDenied`` and ``SystemExit``. Django catches these exceptions
-internally and converts them into the appropriate HTTP response codes. In these
-cases, you can check ``response.status_code`` in your test.
+The only exceptions that are not visible to the test client are
+:class:`~django.http.Http404`,
+:class:`~django.core.exceptions.PermissionDenied`, :exc:`SystemExit`, and
+:class:`~django.core.exceptions.SuspiciousOperation`. Django catches these
+exceptions internally and converts them into the appropriate HTTP response
+codes. In these cases, you can check ``response.status_code`` in your test.
 
 Persistent state
 ~~~~~~~~~~~~~~~~
@@ -636,7 +638,10 @@ to test the effects of commit and rollback:
     While ``commit`` and ``rollback`` operations still *appear* to work when
     used in ``TestCase``, no actual commit or rollback will be performed by the
     database. This can cause your tests to pass or fail unexpectedly. Always
-    use ``TransactionTestCase`` when testing transactional behavior.
+    use ``TransactionTestCase`` when testing transactional behavior or any code
+    that can't normally be executed in autocommit mode
+    (:meth:`~django.db.models.query.QuerySet.select_for_update()` is an
+    example).
 
 ``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
 
@@ -692,9 +697,7 @@ via the :djadminopt:`--liveserver` option, for example:
 
 Another way of changing the default server address is by setting the
 `DJANGO_LIVE_TEST_SERVER_ADDRESS` environment variable somewhere in your
-code (for example, in a :ref:`custom test runner<topics-testing-test_runner>`):
-
-.. code-block:: python
+code (for example, in a :ref:`custom test runner<topics-testing-test_runner>`)::
 
     import os
     os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8082'
@@ -724,9 +727,7 @@ Python path:
    pip install selenium
 
 Then, add a ``LiveServerTestCase``-based test to your app's tests module
-(for example: ``myapp/tests.py``). The code for this test may look as follows:
-
-.. code-block:: python
+(for example: ``myapp/tests.py``). The code for this test may look as follows::
 
     from django.test import LiveServerTestCase
     from selenium.webdriver.firefox.webdriver import WebDriver
@@ -784,9 +785,9 @@ out the `full reference`_ for more details.
 
     If you use the ``staticfiles`` app in your project and need to perform live
     testing then you might want to consider using the
-    :class:`~django.contrib.staticfiles.testing.StaticLiveServerCase` subclass
-    shipped with it instead because it's the one that implements the original
-    behavior now. See :ref:`the relevant documentation
+    :class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`
+    subclass shipped with it instead because it's the one that implements the
+    original behavior now. See :ref:`the relevant documentation
     <staticfiles-testing-support>` for more details.
 
 .. note::
@@ -802,9 +803,7 @@ out the `full reference`_ for more details.
     need to check that a response is received by Selenium and that the next
     page is loaded before proceeding with further test execution.
     Do this, for example, by making Selenium wait until the ``<body>`` HTML tag
-    is found in the response (requires Selenium > 2.13):
-
-    .. code-block:: python
+    is found in the response (requires Selenium > 2.13)::
 
         def test_login(self):
             from selenium.webdriver.support.wait import WebDriverWait
@@ -1498,7 +1497,7 @@ your test suite.
 
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to
-    ``False``, which turns the comparison into a Python set comparison.
+    ``False``, which turns the comparison into a ``collections.Counter`` comparison.
     If the order is undefined (if the given ``qs`` isn't ordered and the
     comparison is against more than one ordered values), a ``ValueError`` is
     raised.
@@ -1613,10 +1612,10 @@ features class. See ``django.db.backends.BaseDatabaseFeatures``
 class for a full list of database features that can be used as a basis
 for skipping tests.
 
-.. function:: skipIfDBFeature(feature_name_string)
+.. function:: skipIfDBFeature(*feature_name_strings)
 
-Skip the decorated test or ``TestCase`` if the named database feature is
-supported.
+Skip the decorated test or ``TestCase`` if all of the named database features
+are supported.
 
 For example, the following test will not be executed if the database
 supports transactions (e.g., it would *not* run under PostgreSQL, but
@@ -1631,10 +1630,14 @@ it would under MySQL with MyISAM tables)::
 
     ``skipIfDBFeature`` can now be used to decorate a ``TestCase`` class.
 
-.. function:: skipUnlessDBFeature(feature_name_string)
+.. versionchanged:: 1.8
 
-Skip the decorated test or ``TestCase`` if the named database feature is *not*
-supported.
+    ``skipIfDBFeature`` can accept multiple feature strings.
+
+.. function:: skipUnlessDBFeature(*feature_name_strings)
+
+Skip the decorated test or ``TestCase`` if any of the named database features
+are *not* supported.
 
 For example, the following test will only be executed if the database
 supports transactions (e.g., it would run under PostgreSQL, but *not*
@@ -1648,3 +1651,7 @@ under MySQL with MyISAM tables)::
 .. versionchanged:: 1.7
 
     ``skipUnlessDBFeature`` can now be used to decorate a ``TestCase`` class.
+
+.. versionchanged:: 1.8
+
+    ``skipUnlessDBFeature`` can accept multiple feature strings.

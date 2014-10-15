@@ -12,7 +12,9 @@ from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
 
 from django.contrib.admin import FieldListFilter
-from django.contrib.admin.exceptions import DisallowedModelAdminLookup
+from django.contrib.admin.exceptions import (
+    DisallowedModelAdminLookup, DisallowedModelAdminToField,
+)
 from django.contrib.admin.options import IncorrectLookupParameters, IS_POPUP_VAR, TO_FIELD_VAR
 from django.contrib.admin.utils import (quote, get_fields_from_path,
     lookup_needs_distinct, prepare_lookup_value)
@@ -58,7 +60,10 @@ class ChangeList(object):
             self.page_num = 0
         self.show_all = ALL_VAR in request.GET
         self.is_popup = IS_POPUP_VAR in request.GET
-        self.to_field = request.GET.get(TO_FIELD_VAR)
+        to_field = request.GET.get(TO_FIELD_VAR)
+        if to_field and not model_admin.to_field_allowed(request, to_field):
+            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
+        self.to_field = to_field
         self.params = dict(request.GET.items())
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
@@ -172,10 +177,13 @@ class ChangeList(object):
         # Perform a slight optimization:
         # full_result_count is equal to paginator.count if no filters
         # were applied
-        if self.get_filters_params() or self.params.get(SEARCH_VAR):
-            full_result_count = self.root_queryset.count()
+        if self.model_admin.show_full_result_count:
+            if self.get_filters_params() or self.params.get(SEARCH_VAR):
+                full_result_count = self.root_queryset.count()
+            else:
+                full_result_count = result_count
         else:
-            full_result_count = result_count
+            full_result_count = None
         can_show_all = result_count <= self.list_max_show_all
         multi_page = result_count > self.list_per_page
 
@@ -189,6 +197,10 @@ class ChangeList(object):
                 raise IncorrectLookupParameters
 
         self.result_count = result_count
+        self.show_full_result_count = self.model_admin.show_full_result_count
+        # Admin actions are shown if there is at least one entry
+        # or if entries are not counted because show_full_result_count is disabled
+        self.show_admin_actions = self.show_full_result_count or bool(full_result_count)
         self.full_result_count = full_result_count
         self.result_list = result_list
         self.can_show_all = can_show_all
@@ -263,7 +275,7 @@ class ChangeList(object):
         # ordering fields so we can guarantee a deterministic order across all
         # database backends.
         pk_name = self.lookup_opts.pk.name
-        if not (set(ordering) & set(['pk', '-pk', pk_name, '-' + pk_name])):
+        if not (set(ordering) & {'pk', '-pk', pk_name, '-' + pk_name}):
             # The two sets do not intersect, meaning the pk isn't present. So
             # we add it.
             ordering.append('-pk')

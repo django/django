@@ -61,9 +61,9 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, PROJ.4, PostGIS           8.4+                Requires PostGIS.
-MySQL               GEOS                            5.x                 Not OGC-compliant; :ref:`limited functionality <mysql-spatial-limitations>`.
-Oracle              GEOS                            10.2, 11            XE not supported; not tested with 9.
+PostgreSQL          GEOS, PROJ.4, PostGIS           9.0+                Requires PostGIS.
+MySQL               GEOS                            5.5+                Not OGC-compliant; :ref:`limited functionality <mysql-spatial-limitations>`.
+Oracle              GEOS                            11.1+               XE not supported.
 SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+
 ==================  ==============================  ==================  =========================================
 
@@ -107,8 +107,7 @@ Add Google projection to ``spatial_ref_sys`` table
 
 .. note::
 
-    If you're running PostGIS 1.4 or above, you can skip this step. The entry
-    is already included in the default ``spatial_ref_sys`` table.
+    If you're running GDAL 1.7 or above (most users), you can skip this step.
 
 In order to conduct database transformations to the so-called "Google"
 projection (a spherical mercator projection used by Google Maps),
@@ -327,7 +326,7 @@ psycopg2
 After you've installed the KyngChaos binaries and modified your ``PATH``, as
 described above, ``psycopg2`` may be installed using the following command::
 
-    $ sudo pip install psycopg2
+    $ pip install psycopg2
 
 .. note::
 
@@ -361,7 +360,7 @@ the `Apple Developer Tools`_ are required.
 
 Summary::
 
-    $ sudo port install postgresql83-server
+    $ sudo port install postgresql93-server
     $ sudo port install geos
     $ sudo port install proj
     $ sudo port install postgis
@@ -373,12 +372,12 @@ Summary::
     You will also have to modify the ``PATH`` in your ``.profile`` so
     that the MacPorts programs are accessible from the command-line::
 
-        export PATH=/opt/local/bin:/opt/local/lib/postgresql83/bin
+        export PATH=/opt/local/bin:/opt/local/lib/postgresql93/bin
 
     In addition, add the ``DYLD_FALLBACK_LIBRARY_PATH`` setting so that
     the libraries can be found by Python::
 
-        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql83
+        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql93
 
 __ http://www.macports.org/
 

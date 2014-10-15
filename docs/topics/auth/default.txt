@@ -7,10 +7,9 @@ Using the Django authentication system
 This document explains the usage of Django's authentication system in its
 default configuration. This configuration has evolved to serve the most common
 project needs, handling a reasonably wide range of tasks, and has a careful
-implementation of passwords and permissions, and can handle many projects as
-is.  For projects where authentication needs differ from the default, Django
-supports extensive :doc:`extension and customization
-</topics/auth/customizing>` of authentication.
+implementation of passwords and permissions. For projects where authentication
+needs differ from the default, Django supports extensive :doc:`extension and
+customization </topics/auth/customizing>` of authentication.
 
 Django authentication provides both authentication and authorization together
 and is generally referred to as the authentication system, as these features
@@ -95,7 +94,7 @@ whose username matches the current system user.
 You can also change a password programmatically, using
 :meth:`~django.contrib.auth.models.User.set_password()`:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> from django.contrib.auth.models import User
     >>> u = User.objects.get(username='john')
@@ -183,9 +182,7 @@ customize permissions for different object instances of the same type.
 fields: ``groups`` and ``user_permissions``.
 :class:`~django.contrib.auth.models.User` objects can access their related
 objects in the same way as any other :doc:`Django model
-</topics/db/models>`:
-
-.. code-block:: python
+</topics/db/models>`::
 
     myuser.groups = [group_list]
     myuser.groups.add(group, group, ...)
@@ -477,9 +474,11 @@ The login_required decorator
     Note that if you don't specify the ``login_url`` parameter, you'll need to
     ensure that the :setting:`settings.LOGIN_URL <LOGIN_URL>` and your login
     view are properly associated. For example, using the defaults, add the
-    following line to your URLconf::
+    following lines to your URLconf::
 
-        (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+        from django.contrib.auth import views as auth_views
+
+        url(r'^accounts/login/$', auth_views.login),
 
     The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts view function
     names and :ref:`named URL patterns <naming-url-patterns>`. This allows you
@@ -753,7 +752,7 @@ patterns.
     the view in your URLconf. For example, this URLconf line would use
     :file:`myapp/login.html` instead::
 
-        (r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'myapp/login.html'}),
+        url(r'^accounts/login/$', auth_views.login, {'template_name': 'myapp/login.html'}),
 
     You can also specify the name of the ``GET`` field which contains the URL
     to redirect to after login by passing ``redirect_field_name`` to the view.
@@ -984,6 +983,11 @@ patterns.
     .. versionadded:: 1.7
 
         ``html_email_template_name`` was added.
+
+    .. deprecated:: 1.8
+
+        The ``is_admin_site`` argument is deprecated and will be removed in
+        Django 2.0.
 
     **Template context:**
 

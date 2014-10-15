@@ -121,7 +121,10 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         command.execute(username="joe", stdout=self.stdout)
         command_output = self.stdout.getvalue().strip()
 
-        self.assertEqual(command_output, "Changing password for user 'joe'\nPassword changed successfully for user 'joe'")
+        self.assertEqual(
+            command_output,
+            "Changing password for user 'joe'\nPassword changed successfully for user 'joe'"
+        )
         self.assertTrue(models.User.objects.get(username="joe").check_password("not qwerty"))
 
     def test_that_max_tries_exits_1(self):

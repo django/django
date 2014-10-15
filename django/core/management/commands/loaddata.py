@@ -17,6 +17,7 @@ from django.utils import lru_cache
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango19Warning
 from itertools import product
 
 try:
@@ -185,7 +186,7 @@ class Command(BaseCommand):
             fixture_name = os.path.basename(fixture_name)
         else:
             fixture_dirs = self.fixture_dirs
-            if os.path.sep in fixture_name:
+            if os.path.sep in os.path.normpath(fixture_name):
                 fixture_dirs = [os.path.join(dir_, os.path.dirname(fixture_name))
                                 for dir_ in fixture_dirs]
                 fixture_name = os.path.basename(fixture_name)
@@ -219,6 +220,11 @@ class Command(BaseCommand):
         if fixture_name != 'initial_data' and not fixture_files:
             # Warning kept for backwards-compatibility; why not an exception?
             warnings.warn("No fixture named '%s' found." % fixture_name)
+        elif fixture_name == 'initial_data' and fixture_files:
+            warnings.warn(
+                'initial_data fixtures are deprecated. Use data migrations instead.',
+                RemovedInDjango19Warning
+            )
 
         return fixture_files
 

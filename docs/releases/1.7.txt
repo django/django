@@ -1,18 +1,22 @@
-============================================
-Django 1.7 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 1.7 release notes
+========================
+
+*September 2, 2014*
 
 Welcome to Django 1.7!
 
 These release notes cover the `new features`_, as well as some `backwards
 incompatible changes`_ you'll want to be aware of when upgrading from Django
 1.6 or older versions. We've also dropped some features, which are detailed in
-:ref:`our deprecation plan <deprecation-removed-in-1.7>`, and we've `begun the
-deprecation process for some features`_.
+:ref:`our deprecation plan <deprecation-removed-in-1.7>`, we've `begun the
+deprecation process for some features`_, and some features have reached the
+end of their deprecation process and `have been removed`_.
 
 .. _`new features`: `What's new in Django 1.7`_
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.7`_
 .. _`begun the deprecation process for some features`: `Features deprecated in 1.7`_
+.. _`have been removed`: `Features removed in 1.7`_
 
 Python compatibility
 ====================
@@ -49,11 +53,11 @@ but a few of the key features are:
   to your models and make migrations for them.
 
   :data:`~django.db.models.signals.pre_syncdb` and
-  :data:`~django.db.models.signals.post_syncdb` have been replaced by
-  :data:`~django.db.models.signals.pre_migrate` and
-  :data:`~django.db.models.signals.post_migrate` respectively. These new
-  signals have slightly different arguments. Check the documentation for
-  details.
+  :data:`~django.db.models.signals.post_syncdb` have been deprecated,
+  to be replaced by :data:`~django.db.models.signals.pre_migrate` and
+  :data:`~django.db.models.signals.post_migrate` respectively. These
+  new signals have slightly different arguments. Check the
+  documentation for details.
 
 * The ``allow_syncdb`` method on database routers is now called ``allow_migrate``,
   but still performs the same function. Routers with ``allow_syncdb`` methods
@@ -61,7 +65,9 @@ but a few of the key features are:
   it as soon as possible (nothing more than renaming is required).
 
 * ``initial_data`` fixtures are no longer loaded for apps with migrations; if
-  you want to load initial data for an app, we suggest you do it in a migration.
+  you want to load initial data for an app, we suggest you create a migration for
+  your application and define a :class:`~django.db.migrations.operations.RunPython`
+  or :class:`~django.db.migrations.operations.RunSQL` operation in the ``operations`` section of the migration.
 
 * Test rollback behavior is different for apps with migrations; in particular,
   Django will no longer emulate rollbacks on non-transactional databases or
@@ -121,8 +127,10 @@ Improvements thus far include:
 New method on Field subclasses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To help power both schema migrations and composite keys, the :class:`~django.db.models.Field` API now
-has a new required method: ``deconstruct()``.
+To help power both schema migrations and to enable easier addition of
+composite keys in future releases of Django, the
+:class:`~django.db.models.Field` API now has a new required method:
+``deconstruct()``.
 
 This method takes no arguments, and returns a tuple of four items:
 
@@ -183,7 +191,7 @@ class method can now directly :ref:`create Manager with QuerySet methods
 
     class Food(models.Model):
         kind = models.CharField(max_length=50)
-        vegetarian = models.BooleanField()
+        vegetarian = models.BooleanField(default=False)
         objects = FoodQuerySet.as_manager()
 
     Food.objects.pizzas().vegetarian()
@@ -253,10 +261,13 @@ specific backend's cursor defined the behavior of the context manager. The
 behavior of magic method lookups was changed with Python 2.7 and cursors were
 no longer usable as context managers.
 
-Django 1.7 allows a cursor to be used as a context manager that is a shortcut
-for the following, instead of backend specific behavior.
+Django 1.7 allows a cursor to be used as a context manager. That is,
+the following can be used::
 
-.. code-block:: python
+    with connection.cursor() as c:
+        c.execute(...)
+
+instead of::
 
     c = connection.cursor()
     try:
@@ -283,7 +294,7 @@ to ``DateField`` it is possible to filter on the transformed value, for
 example ``qs.filter(author__birthdate__year__lte=1981)``.
 
 For more information about both custom lookups and transforms refer to
-:doc:`custom lookups </howto/custom-lookups>` documentation.
+the :doc:`custom lookups </howto/custom-lookups>` documentation.
 
 Improvements to ``Form`` error handling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -510,7 +521,7 @@ Minor features
   that doesn't use the cache system at all but instead a JSON file called
   ``staticfiles.json`` for storing the mapping between the original file name
   (e.g. ``css/styles.css``) and the hashed file name (e.g.
-  ``css/styles.55e7cbb9ba48.css``. The ``staticfiles.json`` file is created
+  ``css/styles.55e7cbb9ba48.css``). The ``staticfiles.json`` file is created
   when running the :djadmin:`collectstatic` management command and should
   be a less expensive alternative for remote storages such as Amazon S3.
 
@@ -558,7 +569,7 @@ Email
 * :func:`~django.core.mail.send_mail` now accepts an ``html_message``
   parameter for sending a multipart ``text/plain`` and ``text/html`` email.
 * The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now accepts a
-  :attr:`~django.core.mail.backends.smtp.EmailBackend.timeout` parameter.
+  ``timeout`` parameter.
 
 File Storage
 ^^^^^^^^^^^^
@@ -587,6 +598,13 @@ File Uploads
 * Uploaded files are now explicitly closed before the response is delivered to
   the client. Partially uploaded files are also closed as long as they are
   named ``file`` in the upload handler.
+
+* :meth:`Storage.get_available_name()
+  <django.core.files.storage.Storage.get_available_name>` now appends an
+  underscore plus a random 7 character alphanumeric string (e.g.
+  ``"_x3a1gho"``), rather than iterating through an underscore followed by a
+  number (e.g. ``"_1"``, ``"_2"``, etc.) to prevent a denial-of-service attack.
+  This change was also made in the 1.6.6, 1.5.9, and 1.4.14 security releases.
 
 Forms
 ^^^^^
@@ -686,7 +704,7 @@ Internationalization
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
-* The :djadminopt:`--no-color` option for ``django-admin.py`` allows you to
+* The :djadminopt:`--no-color` option for ``django-admin`` allows you to
   disable the colorization of management command output.
 
 * The new :djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary`
@@ -961,6 +979,9 @@ Instead, you are encouraged to load initial data in migrations if you need it
 this has the added advantage that your initial data will not need updating
 every time you change the schema.
 
+Additionally, like the rest of Django's old ``syncdb`` code, ``initial_data``
+has been started down the deprecation path and will be removed in Django 1.9.
+
 deconstruct() and serializability
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1000,6 +1021,22 @@ script with::
     >>> django.setup()
 
 Otherwise, you will hit an ``AppRegistryNotReady`` exception.
+
+WSGI scripts
+^^^^^^^^^^^^
+
+Until Django 1.3, the recommended way to create a WSGI application was::
+
+    import django.core.handlers.wsgi
+    application = django.core.handlers.wsgi.WSGIHandler()
+
+In Django 1.4, support for WSGI was improved and the API changed to::
+
+    from django.core.wsgi import get_wsgi_application
+    application = get_wsgi_application()
+
+If you're still using the former style in your WSGI script, you need to
+upgrade to the latter, or you will hit an ``AppRegistryNotReady`` exception.
 
 App registry consistency
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1329,7 +1366,7 @@ Miscellaneous
   (similarly to what one gets with :setting:`DEBUG = True <DEBUG>` at
   development-time) has been moved to a new class that lives in the
   ``staticfiles`` application (the one actually in charge of such feature):
-  :class:`django.contrib.staticfiles.testing.StaticLiveServerCase`. In other
+  :class:`django.contrib.staticfiles.testing.StaticLiveServerTestCase`. In other
   words, ``LiveServerTestCase`` itself is less powerful but at the same time
   has less magic.
 
@@ -1404,6 +1441,29 @@ Miscellaneous
   models, and model managers <field-checking>` all implement a ``check()``
   method that is registered with the check framework. If you have an existing
   method called ``check()`` on one of these objects, you will need to rename it.
+
+* As noted above in the "Cache" section of "Minor Features", defining the
+  :setting:`TIMEOUT <CACHES-TIMEOUT>` argument of the
+  :setting:`CACHES` setting as ``None`` will set the cache keys as
+  "non-expiring". Previously, with the memcache backend, a
+  :setting:`TIMEOUT <CACHES-TIMEOUT>` of ``0`` would set non-expiring keys,
+  but this was inconsistent with the set-and-expire (i.e. no caching) behavior
+  of ``set("key", "value", timeout=0)``. If you want non-expiring keys,
+  please update your settings to use ``None`` instead of ``0`` as the latter
+  now designates set-and-expire in the settings as well.
+
+* The ``sql*`` management commands now respect the ``allow_migrate()`` method
+  of :setting:`DATABASE_ROUTERS`. If you have models synced to non-default
+  databases, use the :djadminopt:`--database` flag to get SQL for those
+  models (previously they would always be included in the output).
+
+* Decoding the query string from URLs now falls back to the ISO-8859-1 encoding
+  when the input is not valid UTF-8.
+
+* With the addition of the
+  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` to
+  the default project template, a database must be created before accessing
+  a page using :djadmin:`runserver`.
 
 .. _deprecated-features-1.7:
 
@@ -1702,3 +1762,56 @@ FastCGI support
 
 FastCGI support via the ``runfcgi`` management command will be removed in
 Django 1.9. Please deploy your project using WSGI.
+
+.. removed-features-1.7:
+
+Features removed in 1.7
+=======================
+
+These features have reached the end of their
+:ref:`deprecation cycle <deprecation-removed-in-1.7>` and so have been
+removed in Django 1.7 (please see the
+:ref:`deprecation timeline <deprecation-removed-in-1.7>` for more details):
+
+
+* ``django.utils.simplejson`` is removed.
+
+* ``django.utils.itercompat.product`` is removed.
+
+* INSTALLED_APPS and TEMPLATE_DIRS are no longer corrected from a plain
+  string into a tuple.
+
+* :class:`~django.http.HttpResponse`,
+  :class:`~django.template.response.SimpleTemplateResponse`,
+  :class:`~django.template.response.TemplateResponse`,
+  :func:`~django.shortcuts.render_to_response`,
+  :func:`~django.contrib.sitemaps.views.index`, and
+  :func:`~django.contrib.sitemaps.views.sitemap` no longer take a ``mimetype``
+  argument
+
+* :class:`~django.http.HttpResponse` immediately consumes its content if it's
+  an iterator.
+
+* The ``AUTH_PROFILE_MODULE`` setting, and the ``get_profile()`` method on
+  the User model are removed.
+
+* The ``cleanup`` management command is removed.
+
+* The ``daily_cleanup.py`` script is removed.
+
+* :meth:`~django.db.models.query.QuerySet.select_related` no longer has a
+  ``depth`` keyword argument.
+
+* The ``get_warnings_state()``/``restore_warnings_state()``
+  functions from :mod:`django.test.utils` and the ``save_warnings_state()``/
+  ``restore_warnings_state()``
+  :ref:`django.test.*TestCase <django-testcase-subclasses>` are removed.
+
+* The ``check_for_test_cookie`` method in
+  :class:`~django.contrib.auth.forms.AuthenticationForm` is removed.
+
+* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+  supports base36 encoded user IDs
+  (``django.contrib.auth.views.password_reset_confirm_uidb36``) is removed.
+
+* The ``django.utils.encoding.StrAndUnicode`` mix-in is removed.

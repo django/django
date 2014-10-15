@@ -1,11 +1,14 @@
 import os
 import sys
+import warnings
 
+from django.db import connection
 from django.core import management
 from django.core.management import CommandError
 from django.core.management.utils import find_command, popen_wrapper
 from django.test import SimpleTestCase
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six import StringIO
 
 
@@ -13,14 +16,15 @@ class CommandTests(SimpleTestCase):
     def test_command(self):
         out = StringIO()
         management.call_command('dance', stdout=out)
-        self.assertEqual(out.getvalue(),
-            "I don't feel like dancing Rock'n'Roll.\n")
+        self.assertIn("I don't feel like dancing Rock'n'Roll.\n", out.getvalue())
 
     def test_command_style(self):
         out = StringIO()
         management.call_command('dance', style='Jive', stdout=out)
-        self.assertEqual(out.getvalue(),
-            "I don't feel like dancing Jive.\n")
+        self.assertIn("I don't feel like dancing Jive.\n", out.getvalue())
+        # Passing options as arguments also works (thanks argparse)
+        management.call_command('dance', '--style', 'Jive', stdout=out)
+        self.assertIn("I don't feel like dancing Jive.\n", out.getvalue())
 
     def test_language_preserved(self):
         out = StringIO()
@@ -74,12 +78,25 @@ class CommandTests(SimpleTestCase):
             if current_path is not None:
                 os.environ['PATH'] = current_path
 
+    def test_call_command_option_parsing(self):
+        """
+        When passing the long option name to call_command, the available option
+        key is the option dest name (#22985).
+        """
+        out = StringIO()
+        management.call_command('dance', stdout=out, opt_3=True)
+        self.assertIn("option3", out.getvalue())
+        self.assertNotIn("opt_3", out.getvalue())
+        self.assertNotIn("opt-3", out.getvalue())
+
     def test_optparse_compatibility(self):
         """
         optparse should be supported during Django 1.8/1.9 releases.
         """
         out = StringIO()
-        management.call_command('optparse_cmd', stdout=out)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            management.call_command('optparse_cmd', stdout=out)
         self.assertEqual(out.getvalue(), "All right, let's dance Rock'n'Roll.\n")
 
         # Simulate command line execution
@@ -91,6 +108,33 @@ class CommandTests(SimpleTestCase):
             output = sys.stdout.getvalue()
             sys.stdout, sys.stderr = old_stdout, old_stderr
         self.assertEqual(output, "All right, let's dance Rock'n'Roll.\n")
+
+    def test_calling_a_command_with_only_empty_parameter_should_ends_gracefully(self):
+        out = StringIO()
+        management.call_command('hal', "--empty", stdout=out)
+        self.assertIn("Dave, I can't do that.\n", out.getvalue())
+
+    def test_calling_command_with_app_labels_and_parameters_should_be_ok(self):
+        out = StringIO()
+        management.call_command('hal', 'myapp', "--verbosity", "3", stdout=out)
+        self.assertIn("Dave, my mind is going. I can feel it. I can feel it.\n", out.getvalue())
+
+    def test_calling_command_with_parameters_and_app_labels_at_the_end_should_be_ok(self):
+        out = StringIO()
+        management.call_command('hal', "--verbosity", "3", "myapp", stdout=out)
+        self.assertIn("Dave, my mind is going. I can feel it. I can feel it.\n", out.getvalue())
+
+    def test_calling_a_command_with_no_app_labels_and_parameters_should_raise_a_command_error(self):
+        out = StringIO()
+        with self.assertRaises(CommandError):
+            management.call_command('hal', stdout=out)
+
+    def test_output_transaction(self):
+        out = StringIO()
+        management.call_command('transaction', stdout=out, no_color=True)
+        output = out.getvalue().strip()
+        self.assertTrue(output.startswith(connection.ops.start_transaction_sql()))
+        self.assertTrue(output.endswith(connection.ops.end_transaction_sql()))
 
 
 class UtilsTests(SimpleTestCase):

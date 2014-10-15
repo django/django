@@ -128,7 +128,10 @@ class UpdateQuery(Query):
         for name, val in six.iteritems(values):
             field, model, direct, m2m = self.get_meta().get_field_by_name(name)
             if not direct or m2m:
-                raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
+                raise FieldError(
+                    'Cannot update model field %r (only non-relations and '
+                    'foreign keys permitted).' % field
+                )
             if model:
                 self.add_related_update(model, field, val)
                 continue

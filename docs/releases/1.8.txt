@@ -23,7 +23,25 @@ Like Django 1.7, Django 1.8 requires Python 2.7 or above, though we
 What's new in Django 1.8
 ========================
 
-...
+Security enhancements
+~~~~~~~~~~~~~~~~~~~~~
+
+Several features of the django-secure_ third-party library have been
+integrated into Django. :class:`django.middleware.security.SecurityMiddleware`
+provides several security enhancements to the request/response cycle. The new
+:djadminopt:`--deploy` option of the :djadmin:`check` command allows you to
+check your production settings file for ways to increase the security of your
+site.
+
+.. _django-secure: https://pypi.python.org/pypi/django-secure
+
+New data types
+~~~~~~~~~~~~~~
+
+* Django now has a :class:`~django.db.models.UUIDField` for storing
+  universally unique identifiers. There is a corresponding :class:`form field
+  <django.forms.UUIDField>`. It is stored as the native ``uuid`` data type on
+  PostgreSQL and as a fixed length character field on other backends.
 
 Minor features
 ~~~~~~~~~~~~~~
@@ -34,6 +52,29 @@ Minor features
 * :class:`~django.contrib.admin.ModelAdmin` now has a
   :meth:`~django.contrib.admin.ModelAdmin.has_module_permission`
   method to allow limiting access to the module on the admin index page.
+
+* :class:`~django.contrib.admin.InlineModelAdmin` now has an attribute
+  :attr:`~django.contrib.admin.InlineModelAdmin.show_change_link` that
+  supports showing a link to an inline object's change form.
+
+* Use the new ``django.contrib.admin.RelatedOnlyFieldListFilter`` in
+  :attr:`ModelAdmin.list_filter <django.contrib.admin.ModelAdmin.list_filter>`
+  to limit the ``list_filter`` choices to foreign objects which are attached to
+  those from the ``ModelAdmin``.
+
+* The :meth:`ModelAdmin.delete_view()
+  <django.contrib.admin.ModelAdmin.delete_view>` displays a summary of objects
+  to be deleted on the deletion confirmation page.
+
+* The jQuery library embedded in the admin has been upgraded to version 1.11.1.
+
+* You can now specify :attr:`AdminSite.site_url
+  <django.contrib.admin.AdminSite.site_url>` in order to display a link to the
+  front-end site.
+
+* You can now specify :attr:`ModelAdmin.show_full_result_count
+  <django.contrib.admin.ModelAdmin.show_full_result_count>` to control whether
+  or not the full count of objects should be displayed on a filtered admin page.
 
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -70,6 +111,9 @@ Minor features
 * Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
   Django 1.2 have been removed.
 
+* The Spatialite backend now supports ``Collect`` and ``Extent`` aggregates
+  when the database version is 3.0 or later.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -95,7 +139,10 @@ Minor features
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* :func:`~django.contrib.sites.shortcuts.get_current_site` will now lookup
+  the current site based on :meth:`request.get_host()
+  <django.http.HttpRequest.get_host>` if the :setting:`SITE_ID` setting is not
+  defined.
 
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -110,13 +157,21 @@ Minor features
 Cache
 ^^^^^
 
-* ...
+* The ``incr()`` method of the
+  ``django.core.cache.backends.locmem.LocMemCache`` backend is now thread-safe.
 
 Email
 ^^^^^
 
 * :ref:`Email backends <topic-email-backends>` now support the context manager
   protocol for opening and closing connections.
+
+* The SMTP email backend now supports ``keyfile`` and ``certfile``
+  authentication with the :setting:`EMAIL_SSL_CERTFILE` and
+  :setting:`EMAIL_SSL_KEYFILE` settings.
+
+* The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now supports
+  setting the ``timeout`` parameter with the :setting:`EMAIL_TIMEOUT` setting.
 
 File Storage
 ^^^^^^^^^^^^
@@ -156,6 +211,27 @@ Forms
   :attr:`~django.forms.extras.widgets.SelectDateWidget.empty_label` argument, which will
   override the top list choice label when :class:`~django.forms.DateField` is not required.
 
+* After an :class:`~django.forms.ImageField` has been cleaned and validated, the
+  ``UploadedFile`` object will have an additional ``image`` attribute containing
+  the Pillow ``Image`` instance used to check if the file was a valid image. It
+  will also update ``UploadedFile.content_type`` with the image's content type
+  as determined by Pillow.
+
+Generic Views
+^^^^^^^^^^^^^
+
+* Generic views that use :class:`~django.views.generic.list.MultipleObjectMixin`
+  may now specify the ordering applied to the
+  :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` by setting
+  :attr:`~django.views.generic.list.MultipleObjectMixin.ordering` or overriding
+  :meth:`~django.views.generic.list.MultipleObjectMixin.get_ordering()`.
+
+* The new :attr:`SingleObjectMixin.query_pk_and_slug
+  <django.views.generic.detail.SingleObjectMixin.query_pk_and_slug>`
+  attribute allows changing the behavior of
+  :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
+  so that it'll perform its lookup using both the primary key and the slug.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -181,6 +257,25 @@ Management Commands
 
 * :djadmin:`inspectdb` now outputs ``Meta.unique_together``.
 
+* When calling management commands from code through :ref:`call_command
+  <call-command>` and passing options, the option name can match the command
+  line option name (without the initial dashes) or the final option destination
+  variable name, but in either case, the resulting option received by the
+  command is now always the ``dest`` name specified in the command option
+  definition (as long as the command uses the new :py:mod:`argparse` module).
+
+* The :djadmin:`dbshell` command now supports MySQL's optional SSL certificate
+  authority setting (``--ssl-ca``).
+
+* The :djadminopt:`--name` option for :djadmin:`makemigrations` allows you to
+  to give the migration(s) a custom name instead of a generated one.
+
+Migrations
+^^^^^^^^^^
+
+* The :class:`~django.db.migrations.operations.RunSQL` operation can now handle
+  parameters passed to the SQL statements.
+
 Models
 ^^^^^^
 
@@ -202,12 +297,22 @@ Models
   Django uses whenever objects are loaded using the ORM. The method allows
   customizing model loading behavior.
 
+* ``extra(select={...})`` now allows you to escape a literal ``%s`` sequence
+  using ``%%s``.
+
+* :doc:`Custom Lookups</howto/custom-lookups>` can now be registered using
+  a decorator pattern.
+
 Signals
 ^^^^^^^
 
 * Exceptions from the ``(receiver, exception)`` tuples returned by
   :meth:`Signal.send_robust() <django.dispatch.Signal.send_robust>` now have
   their traceback attached as a ``__traceback__`` attribute.
+
+* The ``environ`` argument, which contains the WSGI environment structure from
+  the request, was added to the :data:`~django.core.signals.request_started`
+  signal.
 
 Templates
 ^^^^^^^^^
@@ -240,6 +345,9 @@ Requests and Responses
   This brings this class into line with the documentation and with
   ``WSGIRequest``.
 
+* The :attr:`HttpResponse.charset <django.http.HttpResponse.charset>` attribute
+  was added.
+
 Tests
 ^^^^^
 
@@ -255,6 +363,10 @@ Tests
 
 * Added the :attr:`~django.test.Response.resolver_match` attribute to test
   client responses.
+
+* Added several settings that allow customization of test tablespace parameters
+  for Oracle: :setting:`DATAFILE`, :setting:`DATAFILE_TMP`,
+  :setting:`DATAFILE_MAXSIZE` and :setting:`DATAFILE_TMP_MAXSIZE`.
 
 Validators
 ^^^^^^^^^^
@@ -288,8 +400,8 @@ This has one backwards incompatible side effect, signal handlers triggered from
 these methods are now executed within the method's transaction and any
 exception in a signal handler will prevent the whole operation.
 
-Unassigning unsaved objects to relations raises an error
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Assigning unsaved objects to relations raises an error
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Assigning unsaved objects to a :class:`~django.db.models.ForeignKey`,
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, and
@@ -387,6 +499,62 @@ affected models (or add ``max_length=75`` if you wish to keep the length on
 your current fields). A migration for
 :attr:`django.contrib.auth.models.User.email` is included.
 
+Support for PostgreSQL versions older than 9.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The end of upstream support periods was reached in July 2014 for PostgreSQL 8.4.
+As a consequence, Django 1.8 sets 9.0 as the minimum PostgreSQL version it
+officially supports.
+
+This also includes dropping support for PostGIS 1.3 and 1.4 as these versions
+are not supported on versions of PostgreSQL later than 8.4.
+
+Django also now requires the use of Psycopg2 version 2.0.9 or higher.
+
+Support for MySQL versions older than 5.5
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The end of upstream support periods was reached in January 2012 for MySQL 5.0
+and December 2013 for MySQL 5.1. As a consequence, Django 1.8 sets 5.5 as the
+minimum MySQL version it officially supports.
+
+Support for Oracle versions older than 11.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The end of upstream support periods was reached in July 2010 for Oracle 9.2,
+January 2012 for Oracle 10.1, and July 2013 for Oracle 10.2. As a consequence,
+Django 1.8 sets 11.1 as the minimum Oracle version it officially supports.
+
+Specific privileges used instead of roles for tests on Oracle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Earlier versions of Django granted the CONNECT and RESOURCE roles to the test
+user on Oracle. These roles have been deprecated, so Django 1.8 uses the
+specific underlying privileges instead. This changes the privileges required
+of the main user for running tests (unless the project is configured to avoid
+creating a test user). The exact privileges required now are detailed in
+:ref:`Oracle notes <oracle-notes>`.
+
+``AbstractUser.last_login`` allows null values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :attr:`AbstractUser.last_login <django.contrib.auth.models.User.last_login>`
+field now allows null values. Previously, it defaulted to the time when the user
+was created which was misleading if the user never logged in. Please run the
+database migration. If your custom user inherits from ``AbstractUser`` and you
+wish to set ``last_login`` to ``NULL`` for users who haven't logged in, you can
+run this query::
+
+    from django.db import models
+    from django.contrib.auth import get_user_model
+    from django.contrib.auth.models import AbstractBaseUser
+
+    UserModel = get_user_model()
+    if issubclass(UserModel, AbstractBaseUser):
+        UserModel._default_manager.filter(
+            last_login=models.F('date_joined')
+        ).update(last_login=None)
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -422,6 +590,37 @@ Miscellaneous
   ``Meta.errors_messages['username']`` or, if you have a custom form field for
   ``'username'``, using the the ``'unique'`` key in its
   :attr:`~django.forms.Field.error_messages` argument.
+
+* ``AdminSite`` no longer takes an ``app_name`` argument and its ``app_name``
+  attribute has been removed. The application name is always ``admin`` (as
+  opposed to the instance name which you can still customize using
+  ``AdminSite(name="...")``.
+
+* Internal changes were made to the :class:`~django.forms.ClearableFileInput`
+  widget to allow more customization. The undocumented ``url_markup_template``
+  attribute was removed in favor of ``template_with_initial``.
+
+* For consistency with other major vendors, the ``en_GB`` locale now has Monday
+  as the first day of the week.
+
+* Seconds have been removed from any locales that had them in ``TIME_FORMAT``,
+  ``DATETIME_FORMAT``, or ``SHORT_DATETIME_FORMAT``.
+
+* The default max size of the Oracle test tablespace has increased from 200M
+  to 500M.
+
+* :func:`~django.core.urlresolvers.reverse` and
+  :func:`~django.core.urlresolvers.reverse_lazy` now return Unicode strings
+  instead of byte strings.
+
+* GIS-specific lookups have been refactored to use the
+  :class:`django.db.models.Lookup` API.
+
+* The ``CacheClass`` shim has been removed from all cache backends.
+  These aliases were provided for backwards compatibility with Django 1.3.
+  If you are still using them, please update your project to use the real
+  class name found in the :setting:`BACKEND <CACHES-BACKEND>` key of the
+  :setting:`CACHES` setting.
 
 .. _deprecated-features-1.8:
 
@@ -489,6 +688,13 @@ Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
         url('^other/$', views.otherview),
     ]
 
+Passing a string as ``view`` to :func:`~django.conf.urls.url`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Related to the previous item, referencing views as strings in the ``url()``
+function is deprecated. Pass the callable view as described in the previous
+section instead.
+
 ``django.test.SimpleTestCase.urls``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -521,8 +727,10 @@ for reversing instead.
 If you are using :mod:`django.contrib.sitemaps`, add the ``name`` argument to
 the ``url`` that references :func:`django.contrib.sitemaps.views.sitemap`::
 
-    url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
-        {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
+    from django.contrib.sitemaps.views import sitemap
+
+    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap')
 
 to ensure compatibility when reversing by Python path is removed in Django 2.0.
 
@@ -571,3 +779,64 @@ The function has been informally marked as "Deprecated" for some time. Replace
 It provided the :ttag:`lorem` template tag which is now included in the
 built-in tags. Simply remove ``'django.contrib.webdesign'`` from
 :setting:`INSTALLED_APPS` and ``{% load webdesign %}`` from your templates.
+
+``error_message`` argument to ``django.forms.RegexField``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It provided backwards compatibility for pre-1.0 code, but its functionality is
+redundant. Use ``Field.error_messages['invalid']`` instead.
+
+Old :tfilter:`unordered_list` syntax
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An older (pre-1.0), more restrictive and verbose input format for the
+:tfilter:`unordered_list` template filter has been deprecated::
+
+    ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``
+
+Using the new syntax, this becomes::
+
+    ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``
+
+``django.forms.Field._has_changed()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rename this method to :meth:`~django.forms.Field.has_changed` by removing the
+leading underscore. The old name will still work until Django 2.0.
+
+``django.utils.html.remove_tags()`` and ``removetags`` template filter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.utils.html.remove_tags()`` as well as the template filter
+``removetags`` have been deprecated as they cannot guarantee safe output. Their
+existence is likely to lead to their use in security-sensitive contexts where
+they are not actually safe.
+
+The unused and undocumented ``django.utils.html.strip_entities()`` function has
+also been deprecated.
+
+``is_admin_site`` argument to ``django.contrib.auth.views.password_reset()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's a legacy option that should no longer be necessary.
+
+``SubfieldBase``
+~~~~~~~~~~~~~~~~
+
+``django.db.models.fields.subclassing.SubfieldBase`` has been deprecated and
+will be removed in Django 2.0. Historically, it was used to handle fields where
+type conversion was needed when loading from the database, but it was not used
+in ``.values()`` calls or in aggregates. It has been replaced with
+:meth:`~django.db.models.Field.from_db_value`. Note that the new approach does
+not call the :meth:`~django.db.models.Field.to_python` method on assignment
+as was the case with ``SubfieldBase``.
+
+``django.utils.checksums``
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``django.utils.checksums`` module has been deprecated and will be removed
+in Django 2.0. The functionality it provided (validating checksum using the
+Luhn algorithm) was undocumented and not used in Django. The module has been
+moved to the `django-localflavor`_ package (version 1.1+).
+
+.. _django-localflavor: https://pypi.python.org/pypi/django-localflavor

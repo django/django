@@ -491,7 +491,7 @@ pytz_. If you're using MySQL, you must install pytz_ and load the time zone
 tables with `mysql_tzinfo_to_sql`_.
 
 .. _pytz: http://pytz.sourceforge.net/
-.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
+.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 Addition of ``QuerySet.datetimes()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1098,6 +1098,26 @@ a regular deprecation path.
 
 Methods that return a ``QuerySet`` such as ``Manager.get_query_set`` or
 ``ModelAdmin.queryset`` have been renamed to ``get_queryset``.
+
+If you are writing a library that implements, for example, a
+``Manager.get_query_set`` method, and you need to support old Django versions,
+you should rename the method and conditionally add an alias with the old name::
+
+    class CustomManager(models.Manager):
+        def get_queryset(self):
+            pass # ...
+
+        if django.VERSION < (1, 6):
+            get_query_set = get_queryset
+
+        # For Django >= 1.6, models.Manager provides a get_query_set fallback
+        # that emits a warning when used.
+
+If you are writing a library that needs to call the ``get_queryset`` method and
+must support old Django versions, you should write::
+
+    method = getattr(some_manager, 'get_queryset', some_manager.get_query_set)
+    method(params)
 
 ``shortcut`` view and URLconf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

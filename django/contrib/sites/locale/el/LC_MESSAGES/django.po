@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# nikolas demiridis <nikolas@demiridis.gr>, 2014
+# Panos Laganakos <panos.laganakos@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-08-17 09:37+0000\n"
+"Last-Translator: Panos Laganakos <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
 "el/)\n"
 "MIME-Version: 1.0\n"
@@ -17,18 +19,26 @@ msgstr ""
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:39
+#: contrib/sites/apps.py:8
+msgid "Sites"
+msgstr "Ιστότοποι"
+
+#: contrib/sites/models.py:30
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "Το όνομα χώρου δεν μπορεί να περιέχει κενά."
+
+#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "όνομα χώρου"
 
-#: models.py:40
+#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "εμφανιζόμενο όνομα"
 
-#: models.py:45
+#: contrib/sites/models.py:74
 msgid "site"
 msgstr "ιστότοπος"
 
-#: models.py:46
+#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "ιστότοποι"

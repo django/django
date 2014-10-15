@@ -767,13 +767,19 @@ class Variable(object):
             for bit in self.lookups:
                 try:  # dictionary lookup
                     current = current[bit]
-                except (TypeError, AttributeError, KeyError, ValueError):
+                    # ValueError/IndexError are for numpy.array lookup on
+                    # numpy < 1.9 and 1.9+ respectively
+                except (TypeError, AttributeError, KeyError, ValueError, IndexError):
                     try:  # attribute lookup
                         # Don't return class attributes if the class is the context:
                         if isinstance(current, BaseContext) and getattr(type(current), bit):
                             raise AttributeError
                         current = getattr(current, bit)
-                    except (TypeError, AttributeError):
+                    except (TypeError, AttributeError) as e:
+                        # Reraise an AttributeError raised by a @property
+                        if (isinstance(e, AttributeError) and
+                                not isinstance(current, BaseContext) and bit in dir(current)):
+                            raise
                         try:  # list-index lookup
                             current = current[int(bit)]
                         except (IndexError,  # list index out of range

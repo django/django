@@ -27,7 +27,7 @@ from django.utils.six import PY3
 from django.utils.translation import (activate, deactivate,
     get_language, get_language_from_request, get_language_info,
     to_locale, trans_real,
-    gettext_lazy,
+    gettext, gettext_lazy,
     ugettext, ugettext_lazy,
     ngettext_lazy,
     ungettext_lazy,
@@ -70,6 +70,44 @@ class TranslationTests(TestCase):
             with translation.override(None):
                 self.assertEqual(get_language(), settings.LANGUAGE_CODE)
             self.assertEqual(get_language(), 'de')
+        finally:
+            deactivate()
+
+    def test_override_decorator(self):
+
+        @translation.override('pl')
+        def func_pl():
+            self.assertEqual(get_language(), 'pl')
+
+        @translation.override(None)
+        def func_none():
+            self.assertEqual(get_language(), settings.LANGUAGE_CODE)
+
+        try:
+            activate('de')
+            func_pl()
+            self.assertEqual(get_language(), 'de')
+            func_none()
+            self.assertEqual(get_language(), 'de')
+        finally:
+            deactivate()
+
+    def test_override_exit(self):
+        """
+        Test that the language restored is the one used when the function was
+        called, not the one used when the decorator was initialized. refs #23381
+        """
+        activate('fr')
+
+        @translation.override('pl')
+        def func_pl():
+            pass
+        deactivate()
+
+        try:
+            activate('en')
+            func_pl()
+            self.assertEqual(get_language(), 'en')
         finally:
             deactivate()
 
@@ -154,6 +192,17 @@ class TranslationTests(TestCase):
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 5}, 'Willkommen Jim, 5 guten Resultate')
             with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
                 complex_context_deferred % {'name': 'Jim'}
+
+    @skipUnless(six.PY2, "PY3 doesn't have distinct int and long types")
+    def test_ungettext_lazy_long(self):
+        """
+        Regression test for #22820: int and long should be treated alike in ungettext_lazy.
+        """
+        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', 4)
+        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
+        # Now with a long
+        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', long(4))
+        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
@@ -295,6 +344,16 @@ class TranslationTests(TestCase):
         six.text_type(string_concat(...)) should not raise a TypeError - #4796
         """
         self.assertEqual('django', six.text_type(string_concat("dja", "ngo")))
+
+    def test_empty_value(self):
+        """
+        Empty value must stay empty after being translated (#23196).
+        """
+        with translation.override('de'):
+            self.assertEqual("", ugettext(""))
+            self.assertEqual(str(""), gettext(str("")))
+            s = mark_safe("")
+            self.assertEqual(s, ugettext(s))
 
     def test_safe_status(self):
         """
@@ -528,7 +587,7 @@ class FormattingTests(TestCase):
             self.assertEqual('j \d\e F \d\e Y', get_format('DATE_FORMAT'))
             self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual(',', get_format('DECIMAL_SEPARATOR'))
-            self.assertEqual('10:15:48', time_format(self.t))
+            self.assertEqual('10:15', time_format(self.t))
             self.assertEqual('31 de desembre de 2009', date_format(self.d))
             self.assertEqual('desembre del 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
             self.assertEqual('31/12/2009 20:50', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
@@ -576,7 +635,7 @@ class FormattingTests(TestCase):
                 self.assertEqual('31 de desembre de 2009 a les 20:50', Template('{{ dt }}').render(self.ctxt))
                 self.assertEqual('66666,67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
                 self.assertEqual('100000,0', Template('{{ f|floatformat }}').render(self.ctxt))
-                self.assertEqual('10:15:48', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
+                self.assertEqual('10:15', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
                 self.assertEqual('31/12/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
                 self.assertEqual('31/12/2009 20:50', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
                 self.assertEqual(date_format(datetime.datetime.now(), "DATE_FORMAT"),
@@ -733,6 +792,12 @@ class FormattingTests(TestCase):
                 self.assertEqual(sanitize_separators('77 777,777'), '77777.777')
             with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=False):
                 self.assertEqual(sanitize_separators('12\xa0345'), '12\xa0345')
+
+        with patch_formats(get_language(), THOUSAND_SEPARATOR='.', DECIMAL_SEPARATOR=','):
+            with self.settings(USE_THOUSAND_SEPARATOR=True):
+                self.assertEqual(sanitize_separators('10.234'), '10234')
+                # Suspicion that user entered dot as decimal separator (#22171)
+                self.assertEqual(sanitize_separators('10.10'), '10.10')
 
     def test_iter_format_modules(self):
         """

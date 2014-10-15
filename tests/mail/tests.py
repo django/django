@@ -9,7 +9,7 @@ import smtpd
 import sys
 import tempfile
 import threading
-from smtplib import SMTPException
+from smtplib import SMTPException, SMTP
 from ssl import SSLError
 
 from django.core import mail
@@ -969,6 +969,34 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         backend = smtp.EmailBackend()
         self.assertFalse(backend.use_ssl)
 
+    @override_settings(EMAIL_SSL_CERTFILE='foo')
+    def test_email_ssl_certfile_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.ssl_certfile, 'foo')
+
+    @override_settings(EMAIL_SSL_CERTFILE='foo')
+    def test_email_ssl_certfile_override_settings(self):
+        backend = smtp.EmailBackend(ssl_certfile='bar')
+        self.assertEqual(backend.ssl_certfile, 'bar')
+
+    def test_email_ssl_certfile_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.ssl_certfile, None)
+
+    @override_settings(EMAIL_SSL_KEYFILE='foo')
+    def test_email_ssl_keyfile_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.ssl_keyfile, 'foo')
+
+    @override_settings(EMAIL_SSL_KEYFILE='foo')
+    def test_email_ssl_keyfile_override_settings(self):
+        backend = smtp.EmailBackend(ssl_keyfile='bar')
+        self.assertEqual(backend.ssl_keyfile, 'bar')
+
+    def test_email_ssl_keyfile_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.ssl_keyfile, None)
+
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
@@ -1005,3 +1033,42 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         self.assertEqual(myemailbackend.timeout, 42)
         self.assertEqual(myemailbackend.connection.timeout, 42)
         myemailbackend.close()
+
+    @override_settings(EMAIL_TIMEOUT=10)
+    def test_email_timeout_override_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.timeout, 10)
+
+    def test_email_msg_uses_crlf(self):
+        """#23063 -- Test that RFC-compliant messages are sent over SMTP."""
+        send = SMTP.send
+        try:
+            smtp_messages = []
+
+            def mock_send(self, s):
+                smtp_messages.append(s)
+                return send(self, s)
+
+            SMTP.send = mock_send
+
+            email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
+            mail.get_connection().send_messages([email])
+
+            # Find the actual message
+            msg = None
+            for i, m in enumerate(smtp_messages):
+                if m[:4] == 'data':
+                    msg = smtp_messages[i+1]
+                    break
+
+            self.assertTrue(msg)
+
+            if PY3:
+                msg = msg.decode('utf-8')
+            # Ensure that the message only contains CRLF and not combinations of CRLF, LF, and CR.
+            msg = msg.replace('\r\n', '')
+            self.assertNotIn('\r', msg)
+            self.assertNotIn('\n', msg)
+
+        finally:
+            SMTP.send = send

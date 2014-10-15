@@ -3,11 +3,11 @@
 # Translators:
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-08-01 11:31+0000\n"
-"Last-Translator: Павал Клёк <yehekim@gmail.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Belarusian (http://www.transifex.com/projects/p/django/"
 "language/be/)\n"
 "MIME-Version: 1.0\n"
@@ -17,78 +17,82 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: views.py:9
-msgid "No feeds are registered."
-msgstr "Няма запісаных стужак."
+#: contrib/gis/apps.py:8
+msgid "GIS"
+msgstr ""
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr "Біркі «%r» няма ў запісаных."
-
-#: db/models/fields.py:51
+#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Галоўнае поле ҐІС — адлюстроўвае ґеамэтрычныя віды паводле спэцыфікацыі "
 "«OpenGIS»."
 
-#: db/models/fields.py:271
+#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Пункт"
 
-#: db/models/fields.py:275
+#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Ломаная"
 
-#: db/models/fields.py:279
+#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Шматкутнік"
 
-#: db/models/fields.py:283
+#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Набор пунктаў"
 
-#: db/models/fields.py:287
+#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Набор ломаных"
 
-#: db/models/fields.py:291
+#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Набор шматкутнікаў"
 
-#: db/models/fields.py:295
+#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Набор ґеамэтрычных аб’ектаў"
 
-#: forms/fields.py:19
+#: contrib/gis/forms/fields.py:22
 msgid "No geometry value provided."
 msgstr "Не пазначылі значэньне ґеамэтрыі."
 
-#: forms/fields.py:20
+#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Хібнае значэньне ґеамэтрыі."
 
-#: forms/fields.py:21
+#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Хібны від ґеамэтрыі."
 
-#: forms/fields.py:22
+#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr "Не ўдалося ператварыць ґеамэтрыю ў SRID."
 
-#: sitemaps/views.py:46
+#: contrib/gis/sitemaps/views.py:56
 #, python-format
 msgid "No sitemap available for section: %r"
 msgstr "Разьдзел «%r» ня мае мапы пляцоўкі."
 
-#: sitemaps/views.py:60
+#: contrib/gis/sitemaps/views.py:70
 #, python-format
 msgid "Page %s empty"
 msgstr "Бачына «%s» парожняя"
 
-#: sitemaps/views.py:62
+#: contrib/gis/sitemaps/views.py:72
 #, python-format
 msgid "No page '%s'"
 msgstr "Бачына «%s» не існуе"
+
+#: contrib/gis/views.py:10
+msgid "No feeds are registered."
+msgstr "Няма запісаных стужак."
+
+#: contrib/gis/views.py:16
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Біркі «%r» няма ў запісаных."

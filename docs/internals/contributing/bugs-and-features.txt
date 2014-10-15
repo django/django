@@ -150,29 +150,24 @@ follow the votes.
 
 However, consensus is not always possible. If consensus cannot be reached, or
 if the discussion towards a consensus fizzles out without a concrete decision,
-we use a more formal process.
+any :ref:`core team member <core-team>` may defer the decision to the
+:ref:`technical board <technical-board>`.
 
-Any :doc:`core committer</internals/committers>` may call for a formal vote
-using the same voting mechanism above. A proposition will be considered carried
-by the core team if:
+Internally, the technical board will use the same voting mechanism. A
+proposition will be considered carried if:
 
-* There are three "+1" votes from members of the core team.
+* There are at least three "+1" votes from members of the technical board.
 
-* There is no "-1" vote from any member of the core team.
+* There is no "-1" vote from any member of the technical board.
 
-When calling for a vote, the caller should specify a deadline by which
-votes must be received. One week is generally suggested as the minimum
-amount of time.
+Votes should be submitted within a week.
 
-Since this process allows any core committer to veto a proposal, any "-1"
-votes should be accompanied by an explanation that explains what it would
-take to convert that "-1" into at least a "+0".
+Since this process allows any technical board member to veto a proposal, a
+"-1" vote should be accompanied by an explanation of what it would take to
+convert that "-1" into at least a "+0".
 
-Whenever possible, these formal votes should be announced and held in
-public on the |django-developers| mailing list. However, overly sensitive
-or contentious issues -- including, most notably, votes on new core
-committers -- may be held in private.
-
+Votes on technical matters should be announced and held in public on the
+|django-developers| mailing list.
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query

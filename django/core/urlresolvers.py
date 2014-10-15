@@ -309,7 +309,14 @@ class RegexURLResolver(LocaleRegexProvider):
                     for name in pattern.reverse_dict:
                         for matches, pat, defaults in pattern.reverse_dict.getlist(name):
                             new_matches = normalize(parent_pat + pat)
-                            lookups.appendlist(name, (new_matches, p_pattern + pat, dict(defaults, **pattern.default_kwargs)))
+                            lookups.appendlist(
+                                name,
+                                (
+                                    new_matches,
+                                    p_pattern + pat,
+                                    dict(defaults, **pattern.default_kwargs),
+                                )
+                            )
                     for namespace, (prefix, sub_pattern) in pattern.namespace_dict.items():
                         namespaces[namespace] = (p_pattern + prefix, sub_pattern)
                     for app_name, namespace_list in pattern.app_dict.items():
@@ -346,6 +353,11 @@ class RegexURLResolver(LocaleRegexProvider):
             self._populate()
         return self._app_dict[language_code]
 
+    def _is_callback(self, name):
+        if not self._populated:
+            self._populate()
+        return name in self._callback_strs
+
     def resolve(self, path):
         path = force_text(path)  # path may be a reverse_lazy object
         tried = []
@@ -365,7 +377,14 @@ class RegexURLResolver(LocaleRegexProvider):
                     if sub_match:
                         sub_match_dict = dict(match.groupdict(), **self.default_kwargs)
                         sub_match_dict.update(sub_match.kwargs)
-                        return ResolverMatch(sub_match.func, sub_match.args, sub_match_dict, sub_match.url_name, self.app_name or sub_match.app_name, [self.namespace] + sub_match.namespaces)
+                        return ResolverMatch(
+                            sub_match.func,
+                            sub_match.args,
+                            sub_match_dict,
+                            sub_match.url_name,
+                            self.app_name or sub_match.app_name,
+                            [self.namespace] + sub_match.namespaces
+                        )
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
         raise Resolver404({'path': path})
@@ -416,7 +435,7 @@ class RegexURLResolver(LocaleRegexProvider):
 
         original_lookup = lookup_view
         try:
-            if lookup_view in self._callback_strs:
+            if self._is_callback(lookup_view):
                 lookup_view = get_callable(lookup_view, True)
         except (ImportError, AttributeError) as e:
             raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
@@ -436,7 +455,8 @@ class RegexURLResolver(LocaleRegexProvider):
                         continue
                     candidate_subs = dict(zip(prefix_args + params, text_args))
                 else:
-                    if set(kwargs.keys()) | set(defaults.keys()) != set(params) | set(defaults.keys()) | set(prefix_args):
+                    if (set(kwargs.keys()) | set(defaults.keys()) != set(params) |
+                            set(defaults.keys()) | set(prefix_args)):
                         continue
                     matches = True
                     for k, v in defaults.items():
@@ -456,7 +476,11 @@ class RegexURLResolver(LocaleRegexProvider):
                     # safe characters from `pchar` definition of RFC 3986
                     candidate_subs = dict((k, urlquote(v, safe=RFC3986_SUBDELIMS + str('/~:@')))
                                           for (k, v) in candidate_subs.items())
-                    return candidate_pat % candidate_subs
+                    url = candidate_pat % candidate_subs
+                    # Don't allow construction of scheme relative urls.
+                    if url.startswith('//'):
+                        url = '/%%2F%s' % url[2:]
+                    return url
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in
         # error messages.
@@ -553,9 +577,9 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
         if ns_pattern:
             resolver = get_ns_resolver(ns_pattern, resolver)
 
-    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+    return force_text(iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs)))
 
-reverse_lazy = lazy(reverse, str)
+reverse_lazy = lazy(reverse, six.text_type)
 
 
 def clear_url_caches():

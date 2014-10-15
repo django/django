@@ -27,10 +27,10 @@ command. For example:
 .. code-block:: bash
 
     # Install current stable version.
-    $ sudo pip install uwsgi
+    $ pip install uwsgi
 
     # Or install LTS (long term support).
-    $ sudo pip install http://projects.unbit.it/downloads/uwsgi-lts.tar.gz
+    $ pip install http://projects.unbit.it/downloads/uwsgi-lts.tar.gz
 
 .. _installation procedures: http://uwsgi-docs.readthedocs.org/en/latest/Install.html
 
@@ -78,7 +78,7 @@ Here's an example command to start a uWSGI server::
 
 This assumes you have a top-level project package named ``mysite``, and
 within it a module :file:`mysite/wsgi.py` that contains a WSGI ``application``
-object. This is the layout you'll have if you ran ``django-admin.py
+object. This is the layout you'll have if you ran ``django-admin
 startproject mysite`` (using your own project name in place of ``mysite``) with
 a recent version of Django. If this file doesn't exist, you'll need to create
 it. See the :doc:`/howto/deployment/wsgi/index` documentation for the default

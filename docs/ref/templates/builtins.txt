@@ -108,7 +108,7 @@ Variables included in the cycle will be escaped.  You can disable auto-escaping
 with::
 
     {% for o in some_list %}
-        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}
+        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
             ...
         </tr>
     {% endfor %}
@@ -407,9 +407,7 @@ variables or to negate a given variable::
     {% endif %}
 
     {% if not athlete_list or coach_list %}
-        There are no athletes or there are some coaches (OK, so
-        writing English translations of boolean logic sounds
-        stupid; it's not our fault).
+        There are no athletes or there are some coaches.
     {% endif %}
 
     {% if athlete_list and not coach_list %}
@@ -778,11 +776,11 @@ Example::
     It is {% now "jS F Y H:i" %}
 
 Note that you can backslash-escape a format string if you want to use the
-"raw" value. In this example, "f" is backslash-escaped, because otherwise
-"f" is a format string that displays the time. The "o" doesn't need to be
-escaped, because it's not a format character::
+"raw" value. In this example, both "o" and "f" are backslash-escaped, because
+otherwise each is a format string that displays the year and the time,
+respectively::
 
-    It is the {% now "jS o\f F" %}
+    It is the {% now "jS \o\f F" %}
 
 This would display as "It is the 4th of September".
 
@@ -1918,19 +1916,38 @@ If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output could be ``"b"``.
 removetags
 ^^^^^^^^^^
 
+.. deprecated:: 1.8
+
+    ``removetags`` cannot guarantee HTML safe output and has been deprecated due
+    to security concerns. Consider using `bleach`_ instead.
+
+.. _bleach: http://bleach.readthedocs.org/en/latest/
+
 Removes a space-separated list of [X]HTML tags from the output.
 
 For example::
 
-    {{ value|removetags:"b span"|safe }}
+    {{ value|removetags:"b span" }}
 
 If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-output will be ``"Joel <button>is</button> a slug"``.
+unescaped output will be ``"Joel <button>is</button> a slug"``.
 
 Note that this filter is case-sensitive.
 
 If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"`` the
-output will be ``"<B>Joel</B> <button>is</button> a slug"``.
+unescaped output will be ``"<B>Joel</B> <button>is</button> a slug"``.
+
+.. admonition:: No safety guarantee
+
+    Note that ``removetags`` doesn't give any guarantee about its output being
+    HTML safe. In particular, it doesn't work recursively, so an input like
+    ``"<sc<script>ript>alert('XSS')</sc</script>ript>"`` won't be safe even if
+    you apply ``|removetags:"script"``. So if the input is user provided,
+    **NEVER** apply the ``safe`` filter to a ``removetags`` output. If you are
+    looking for something more robust, you can use the ``bleach`` Python
+    library, notably its `clean`_ method.
+
+.. _clean: http://bleach.readthedocs.org/en/latest/clean.html
 
 .. templatefilter:: rjust
 
@@ -2047,10 +2064,10 @@ output will be ``"Joel is a slug"``.
 .. admonition:: No safety guarantee
 
     Note that ``striptags`` doesn't give any guarantee about its output being
-    entirely HTML safe, particularly with non valid HTML input. So **NEVER**
-    apply the ``safe`` filter to a ``striptags`` output.
-    If you are looking for something more robust, you can use the ``bleach``
-    Python library, notably its `clean`_ method.
+    HTML safe, particularly with non valid HTML input. So **NEVER** apply the
+    ``safe`` filter to a ``striptags`` output. If you are looking for something
+    more robust, you can use the ``bleach`` Python library, notably its
+    `clean`_ method.
 
 .. _clean: http://bleach.readthedocs.org/en/latest/clean.html
 
@@ -2259,8 +2276,11 @@ contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
     </ul>
     </li>
 
-Note: An older, more restrictive and verbose input format is also supported:
-``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``,
+.. deprecated:: 1.8
+
+    An older, more restrictive and verbose input format is also supported:
+    ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``.
+    Support for this syntax will be removed in Django 2.0.
 
 .. templatefilter:: upper
 

@@ -2,6 +2,9 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
+import gettext
+from importlib import import_module
+import os
 from unittest import TestCase, skipIf
 
 try:
@@ -637,6 +640,50 @@ class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         self.assertEqual(len(selected), 0)
 
+    def test_calendar_show_date_from_input(self):
+        """
+        Ensure that the calendar show the date from the input field for every
+        locale supported by django.
+        """
+        self.admin_login(username='super', password='secret', login_url='/')
+
+        # Enter test data
+        member = models.Member.objects.create(name='Bob', birthdate=datetime(1984, 5, 15), gender='M')
+
+        # Get month names translations for every locales
+        month_string = 'January February March April May June July August September October November December'
+        path = os.path.join(os.path.dirname(import_module('django.contrib.admin').__file__), 'locale')
+        for language_code, language_name in settings.LANGUAGES:
+            try:
+                catalog = gettext.translation('djangojs', path, [language_code])
+            except IOError:
+                continue
+            if month_string in catalog._catalog:
+                month_names = catalog._catalog[month_string]
+            else:
+                month_names = month_string
+
+            # Get the expected caption
+            may_translation = month_names.split(' ')[4]
+            expected_caption = '{0:s} {1:d}'.format(may_translation, 1984)
+
+            # Test with every locale
+            with override_settings(LANGUAGE_CODE=language_code, USE_L10N=True):
+
+                # Open a page that has a date picker widget
+                self.selenium.get('{}{}'.format(self.live_server_url,
+                    '/admin_widgets/member/{}/'.format(member.pk)))
+
+                # Click on the calendar icon
+                self.selenium.find_element_by_id('calendarlink0').click()
+
+                # Get the calendar caption
+                calendar0 = self.selenium.find_element_by_id('calendarin0')
+                caption = calendar0.find_element_by_tag_name('caption')
+
+                # Make sure that the right month and year are displayed
+                self.assertEqual(caption.text, expected_caption)
+
 
 class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
@@ -942,6 +989,17 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
             self.assertSelectOptions(to_box,
                         [str(self.peter.id), str(self.jason.id)])
 
+            # -----------------------------------------------------------------
+            # Check that pressing enter on a filtered option sends it properly
+            # to the 'to' box.
+            self.get_select_option(to_box, str(self.jason.id)).click()
+            self.selenium.find_element_by_css_selector(remove_link).click()
+            input.send_keys('ja')
+            self.assertSelectOptions(from_box, [str(self.jason.id)])
+            input.send_keys([Keys.ENTER])
+            self.assertSelectOptions(to_box, [str(self.peter.id), str(self.jason.id)])
+            input.send_keys([Keys.BACK_SPACE, Keys.BACK_SPACE])
+
         # Save and check that everything is properly stored in the database ---
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.wait_page_loaded()
@@ -985,26 +1043,26 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # Open the popup window and click on a band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
-        self.selenium.switch_to_window('id_main_band')
+        self.selenium.switch_to.window('id_main_band')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
         self.assertTrue('/band/42/' in link.get_attribute('href'))
         link.click()
 
         # The field now contains the selected band's id
-        self.selenium.switch_to_window(main_window)
+        self.selenium.switch_to.window(main_window)
         self.wait_for_value('#id_main_band', '42')
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
-        self.selenium.switch_to_window('id_main_band')
+        self.selenium.switch_to.window('id_main_band')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
         self.assertTrue('/band/98/' in link.get_attribute('href'))
         link.click()
 
         # The field now contains the other selected band's id
-        self.selenium.switch_to_window(main_window)
+        self.selenium.switch_to.window(main_window)
         self.wait_for_value('#id_main_band', '98')
 
     def test_many_to_many(self):
@@ -1020,26 +1078,26 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # Open the popup window and click on a band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
-        self.selenium.switch_to_window('id_supporting_bands')
+        self.selenium.switch_to.window('id_supporting_bands')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
         self.assertTrue('/band/42/' in link.get_attribute('href'))
         link.click()
 
         # The field now contains the selected band's id
-        self.selenium.switch_to_window(main_window)
+        self.selenium.switch_to.window(main_window)
         self.wait_for_value('#id_supporting_bands', '42')
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
-        self.selenium.switch_to_window('id_supporting_bands')
+        self.selenium.switch_to.window('id_supporting_bands')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
         self.assertTrue('/band/98/' in link.get_attribute('href'))
         link.click()
 
         # The field now contains the two selected bands' ids
-        self.selenium.switch_to_window(main_window)
+        self.selenium.switch_to.window(main_window)
         self.wait_for_value('#id_supporting_bands', '42,98')
 
 
@@ -1067,8 +1125,8 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         main_window = self.selenium.current_window_handle
         # Click the Add User button to add new
         self.selenium.find_element_by_id('add_id_user').click()
-        self.selenium.switch_to_window('id_user')
-        self.wait_page_loaded()
+        self.selenium.switch_to.window('id_user')
+        self.wait_for('#id_password')
         password_field = self.selenium.find_element_by_id('id_password')
         password_field.send_keys('password')
 
@@ -1078,7 +1136,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         save_button_css_selector = '.submit-row > input[type=submit]'
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
-        self.selenium.switch_to_window(main_window)
+        self.selenium.switch_to.window(main_window)
         # The field now contains the new user
         self.wait_for('#id_user option[value="newuser"]')
 

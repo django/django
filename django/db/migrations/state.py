@@ -8,7 +8,7 @@ from django.db.models.fields.related import do_pending_lookups
 from django.db.models.fields.proxy import OrderWrt
 from django.conf import settings
 from django.utils import six
-from django.utils.encoding import force_text
+from django.utils.encoding import force_text, smart_text
 from django.utils.module_loading import import_string
 
 
@@ -124,6 +124,10 @@ class AppConfigStub(AppConfig):
     path = ''
 
     def __init__(self, label):
+        self.label = label
+        # App-label and app-name are not the same thing, so technically passing
+        # in the label here is wrong. In practice, migrations don't care about
+        # the app name, but we need something unique, and the label works fine.
         super(AppConfigStub, self).__init__(label, None)
 
     def import_models(self, all_models):
@@ -207,6 +211,8 @@ class ModelState(object):
                     options[name] = set(normalize_together(it))
                 else:
                     options[name] = model._meta.original_attrs[name]
+        # Force-convert all options to text_type (#23226)
+        options = cls.force_text_recursive(options)
         # If we're ignoring relationships, remove all field-listing model
         # options (that option basically just means "make a stub model")
         if exclude_rels:
@@ -249,6 +255,23 @@ class ModelState(object):
             options,
             bases,
         )
+
+    @classmethod
+    def force_text_recursive(cls, value):
+        if isinstance(value, six.string_types):
+            return smart_text(value)
+        elif isinstance(value, list):
+            return [cls.force_text_recursive(x) for x in value]
+        elif isinstance(value, tuple):
+            return tuple(cls.force_text_recursive(x) for x in value)
+        elif isinstance(value, set):
+            return set(cls.force_text_recursive(x) for x in value)
+        elif isinstance(value, dict):
+            return dict(
+                (cls.force_text_recursive(k), cls.force_text_recursive(v))
+                for k, v in value.items()
+            )
+        return value
 
     def construct_fields(self):
         "Deep-clone the fields using deconstruction"

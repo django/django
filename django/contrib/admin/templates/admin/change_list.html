@@ -81,15 +81,15 @@
         {% endif %}
       {% endblock %}
 
-      <form id="changelist-form" action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %}>{% csrf_token %}
+      <form id="changelist-form" action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
       {% if cl.formset %}
         <div>{{ cl.formset.management_form }}</div>
       {% endif %}
 
       {% block result_list %}
-          {% if action_form and actions_on_top and cl.full_result_count %}{% admin_actions %}{% endif %}
+          {% if action_form and actions_on_top and cl.show_admin_actions %}{% admin_actions %}{% endif %}
           {% result_list cl %}
-          {% if action_form and actions_on_bottom and cl.full_result_count %}{% admin_actions %}{% endif %}
+          {% if action_form and actions_on_bottom and cl.show_admin_actions %}{% admin_actions %}{% endif %}
       {% endblock %}
       {% block pagination %}{% pagination cl %}{% endblock %}
       </form>

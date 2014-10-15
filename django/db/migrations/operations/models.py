@@ -124,10 +124,14 @@ class RenameModel(Operation):
         del state.models[app_label, self.old_name.lower()]
         # Repoint the FKs and M2Ms pointing to us
         for related_object in (related_objects + related_m2m_objects):
-            related_key = (
-                related_object.model._meta.app_label,
-                related_object.model._meta.object_name.lower(),
-            )
+            # Use the new related key for self referential related objects.
+            if related_object.model == model:
+                related_key = (app_label, self.new_name.lower())
+            else:
+                related_key = (
+                    related_object.model._meta.app_label,
+                    related_object.model._meta.object_name.lower(),
+                )
             new_fields = []
             for name, field in state.models[related_key].fields:
                 if name == related_object.field.name:
@@ -152,12 +156,20 @@ class RenameModel(Operation):
             related_objects = old_model._meta.get_all_related_objects()
             related_m2m_objects = old_model._meta.get_all_related_many_to_many_objects()
             for related_object in (related_objects + related_m2m_objects):
+                if related_object.model == old_model:
+                    model = new_model
+                    related_key = (app_label, self.new_name.lower())
+                else:
+                    model = related_object.model
+                    related_key = (
+                        related_object.model._meta.app_label,
+                        related_object.model._meta.object_name.lower(),
+                    )
                 to_field = new_apps.get_model(
-                    related_object.model._meta.app_label,
-                    related_object.model._meta.object_name.lower(),
+                    *related_key
                 )._meta.get_field_by_name(related_object.field.name)[0]
                 schema_editor.alter_field(
-                    related_object.model,
+                    model,
                     related_object.field,
                     to_field,
                 )
@@ -221,9 +233,7 @@ class AlterUniqueTogether(Operation):
     def __init__(self, name, unique_together):
         self.name = name
         unique_together = normalize_together(unique_together)
-        # need None rather than an empty set to prevent infinite migrations
-        # after removing unique_together from a model
-        self.unique_together = set(tuple(cons) for cons in unique_together) or None
+        self.unique_together = set(tuple(cons) for cons in unique_together)
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
@@ -261,9 +271,7 @@ class AlterIndexTogether(Operation):
     def __init__(self, name, index_together):
         self.name = name
         index_together = normalize_together(index_together)
-        # need None rather than an empty set to prevent infinite migrations
-        # after removing unique_together from a model
-        self.index_together = set(tuple(cons) for cons in index_together) or None
+        self.index_together = set(tuple(cons) for cons in index_together)
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
@@ -337,6 +345,17 @@ class AlterModelOptions(Operation):
     may still need them.
     """
 
+    # Model options we want to compare and preserve in an AlterModelOptions op
+    ALTER_OPTION_KEYS = [
+        "get_latest_by",
+        "ordering",
+        "permissions",
+        "default_permissions",
+        "select_on_save",
+        "verbose_name",
+        "verbose_name_plural",
+    ]
+
     def __init__(self, name, options):
         self.name = name
         self.options = options
@@ -345,6 +364,9 @@ class AlterModelOptions(Operation):
         model_state = state.models[app_label, self.name.lower()]
         model_state.options = dict(model_state.options)
         model_state.options.update(self.options)
+        for key in self.ALTER_OPTION_KEYS:
+            if key not in self.options and key in model_state.options:
+                del model_state.options[key]
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         pass

@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Michael Thornhill <michael@maithu.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Michael Thornhill <michael@maithu.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-16 13:32+0000\n"
-"Last-Translator: Michael Thornhill <michael@maithu.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:43+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Irish (http://www.transifex.com/projects/p/django/language/"
 "ga/)\n"
 "MIME-Version: 1.0\n"
@@ -19,22 +19,22 @@ msgstr ""
 "Plural-Forms: nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
 "4);\n"
 
-#: templates/formtools/wizard/wizard_form.html:15
+#: contrib/formtools/apps.py:8
+msgid "Form Tools"
+msgstr ""
+
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
 msgstr "chéad chéim"
 
-#: templates/formtools/wizard/wizard_form.html:16
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:16
 msgid "prev step"
 msgstr "chéim roimhe seo"
 
-#: templates/formtools/wizard/wizard_form.html:18
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:18
 msgid "submit"
 msgstr "chur faoi bhráid"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
+#: contrib/formtools/wizard/views.py:276
+msgid "ManagementForm data is missing or has been tampered."
 msgstr ""
-"Gabh ár leithscéal, ach tá do fhoirm in éag. Lean ar aghaidh le do thoil "
-"líonadh amach an fhoirm ón leathanach seo."

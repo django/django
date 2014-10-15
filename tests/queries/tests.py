@@ -13,7 +13,7 @@ from django.db.models import Count, F, Q
 from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import str_prefix, CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
 
@@ -91,10 +91,10 @@ class Queries1Tests(BaseQuerysetTest):
         qs1 = Tag.objects.filter(pk__lte=0)
         qs2 = Tag.objects.filter(parent__in=qs1)
         qs3 = Tag.objects.filter(parent__in=qs2)
-        self.assertEqual(qs3.query.subq_aliases, set(['T', 'U', 'V']))
+        self.assertEqual(qs3.query.subq_aliases, {'T', 'U', 'V'})
         self.assertIn('v0', str(qs3.query).lower())
         qs4 = qs3.filter(parent__in=qs1)
-        self.assertEqual(qs4.query.subq_aliases, set(['T', 'U', 'V']))
+        self.assertEqual(qs4.query.subq_aliases, {'T', 'U', 'V'})
         # It is possible to reuse U for the second subquery, no need to use W.
         self.assertNotIn('w0', str(qs4.query).lower())
         # So, 'U0."id"' is referenced twice.
@@ -1655,6 +1655,21 @@ class Queries5Tests(TestCase):
             ['<Note: n1>', '<Note: n2>']
         )
 
+    def test_extra_select_literal_percent_s(self):
+        # Allow %%s to escape select clauses
+        self.assertEqual(
+            Note.objects.extra(select={'foo': "'%%s'"})[0].foo,
+            '%s'
+        )
+        self.assertEqual(
+            Note.objects.extra(select={'foo': "'%%s bar %%s'"})[0].foo,
+            '%s bar %s'
+        )
+        self.assertEqual(
+            Note.objects.extra(select={'foo': "'bar %%s'"})[0].foo,
+            'bar %s'
+        )
+
 
 class SelectRelatedTests(TestCase):
     def test_tickets_3045_3288(self):
@@ -1846,12 +1861,12 @@ class RawQueriesTests(TestCase):
         query = "SELECT * FROM queries_note WHERE note = %s"
         params = ['n1']
         qs = Note.objects.raw(query, params=params)
-        self.assertEqual(repr(qs), str_prefix("<RawQuerySet: %(_)s'SELECT * FROM queries_note WHERE note = n1'>"))
+        self.assertEqual(repr(qs), "<RawQuerySet: SELECT * FROM queries_note WHERE note = n1>")
 
         query = "SELECT * FROM queries_note WHERE note = %s and misc = %s"
         params = ['n1', 'foo']
         qs = Note.objects.raw(query, params=params)
-        self.assertEqual(repr(qs), str_prefix("<RawQuerySet: %(_)s'SELECT * FROM queries_note WHERE note = n1 and misc = foo'>"))
+        self.assertEqual(repr(qs), "<RawQuerySet: SELECT * FROM queries_note WHERE note = n1 and misc = foo>")
 
 
 class GeneratorExpressionTests(TestCase):
@@ -1957,29 +1972,29 @@ class SubqueryTests(TestCase):
     def test_ordered_subselect(self):
         "Subselects honor any manual ordering"
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])
-        self.assertEqual(set(query.values_list('id', flat=True)), set([3, 4]))
+        self.assertEqual(set(query.values_list('id', flat=True)), {3, 4})
 
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[:2])
-        self.assertEqual(set(query.values_list('id', flat=True)), set([3, 4]))
+        self.assertEqual(set(query.values_list('id', flat=True)), {3, 4})
 
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2])
-        self.assertEqual(set(query.values_list('id', flat=True)), set([3]))
+        self.assertEqual(set(query.values_list('id', flat=True)), {3})
 
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[2:])
-        self.assertEqual(set(query.values_list('id', flat=True)), set([1, 2]))
+        self.assertEqual(set(query.values_list('id', flat=True)), {1, 2})
 
     def test_slice_subquery_and_query(self):
         """
         Slice a query that has a sliced subquery
         """
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])[0:2]
-        self.assertEqual(set([x.id for x in query]), set([3, 4]))
+        self.assertEqual({x.id for x in query}, {3, 4})
 
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:3])[1:3]
-        self.assertEqual(set([x.id for x in query]), set([3]))
+        self.assertEqual({x.id for x in query}, {3})
 
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[2:])[1:]
-        self.assertEqual(set([x.id for x in query]), set([2]))
+        self.assertEqual({x.id for x in query}, {2})
 
     def test_related_sliced_subquery(self):
         """
@@ -1995,18 +2010,18 @@ class SubqueryTests(TestCase):
         query = ManagedModel.normal_manager.filter(
             tag__in=Tag.objects.order_by('-id')[:1]
         )
-        self.assertEqual(set([x.id for x in query]), set([mm2.id]))
+        self.assertEqual({x.id for x in query}, {mm2.id})
 
     def test_sliced_delete(self):
         "Delete queries can safely contain sliced subqueries"
         DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:1]).delete()
-        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1, 2, 3]))
+        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), {1, 2, 3})
 
         DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2]).delete()
-        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1, 3]))
+        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), {1, 3})
 
         DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:]).delete()
-        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([3]))
+        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), {3})
 
 
 class CloneTests(TestCase):
@@ -2130,6 +2145,26 @@ class ValuesQuerysetTests(BaseQuerysetTest):
             order_by=['value_minus_one'])
         qs = qs.values('num')
 
+    def test_extra_select_params_values_order_in_extra(self):
+        # testing for 23259 issue
+        qs = Number.objects.extra(
+            select={'value_plus_x': 'num+%s'},
+            select_params=[1],
+            order_by=['value_plus_x'])
+        qs = qs.filter(num=72)
+        qs = qs.values('num')
+        self.assertQuerysetEqual(qs, [{'num': 72}], self.identity)
+
+    def test_extra_multiple_select_params_values_order_by(self):
+        # testing for 23259 issue
+        qs = Number.objects.extra(select=OrderedDict([('value_plus_x', 'num+%s'),
+                                                     ('value_minus_x', 'num-%s')]),
+                                  select_params=(72, 72))
+        qs = qs.order_by('value_minus_x')
+        qs = qs.filter(num=1)
+        qs = qs.values('num')
+        self.assertQuerysetEqual(qs, [], self.identity)
+
     def test_extra_values_list(self):
         # testing for ticket 14930 issues
         qs = Number.objects.extra(select={'value_plus_one': 'num+1'})
@@ -2143,6 +2178,13 @@ class ValuesQuerysetTests(BaseQuerysetTest):
         qs = qs.order_by('value_plus_one')
         qs = qs.values_list('num', flat=True)
         self.assertQuerysetEqual(qs, [72], self.identity)
+
+    def test_field_error_values_list(self):
+        # see #23443
+        with self.assertRaisesMessage(FieldError,
+                "Cannot resolve keyword %r into field."
+                " Join on 'name' not permitted." % 'foo'):
+            Tag.objects.values_list('name__foo')
 
 
 class QuerySetSupportsPythonIdioms(TestCase):
@@ -2318,7 +2360,7 @@ class ToFieldTests(TestCase):
 
         self.assertEqual(
             set(Eaten.objects.filter(food__in=[apple, pear])),
-            set([lunch, dinner]),
+            {lunch, dinner},
         )
 
     def test_reverse_in(self):
@@ -2329,7 +2371,7 @@ class ToFieldTests(TestCase):
 
         self.assertEqual(
             set(Food.objects.filter(eaten__in=[lunch_apple, lunch_pear])),
-            set([apple, pear])
+            {apple, pear}
         )
 
     def test_single_object(self):
@@ -2339,7 +2381,7 @@ class ToFieldTests(TestCase):
 
         self.assertEqual(
             set(Eaten.objects.filter(food=apple)),
-            set([lunch, dinner])
+            {lunch, dinner}
         )
 
     def test_single_object_reverse(self):
@@ -2348,7 +2390,7 @@ class ToFieldTests(TestCase):
 
         self.assertEqual(
             set(Food.objects.filter(eaten=lunch)),
-            set([apple])
+            {apple}
         )
 
     def test_recursive_fk(self):
@@ -3440,6 +3482,10 @@ class RelatedLookupTypeTests(TestCase):
 
         # parent objects
         self.assertQuerysetEqual(ObjectC.objects.exclude(childobjecta=self.oa), out_c)
+
+        # Test for #23226
+        with self.assertNumQueries(0):
+            ObjectB.objects.filter(objecta__in=ObjectA.objects.all())
 
 
 class Ticket14056Tests(TestCase):

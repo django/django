@@ -1,14 +1,12 @@
 from __future__ import unicode_literals
 
-from unittest import skipUnless
-
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+from django.contrib.gis.tests.utils import mysql
 from django.db import connection, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
-from django.test import TransactionTestCase
+from django.test import skipUnlessDBFeature, TransactionTestCase
 
-if HAS_SPATIAL_DB:
+if connection.features.gis_enabled:
     from django.contrib.gis.db.models import fields
     try:
         GeometryColumns = connection.ops.geometry_columns()
@@ -17,7 +15,7 @@ if HAS_SPATIAL_DB:
         HAS_GEOMETRY_COLUMNS = False
 
 
-@skipUnless(HAS_SPATIAL_DB, "Spatial db is required.")
+@skipUnlessDBFeature("gis_enabled")
 class OperationTests(TransactionTestCase):
     available_apps = ["django.contrib.gis.tests.gis_migrations"]
 
@@ -48,10 +46,21 @@ class OperationTests(TransactionTestCase):
             [
                 ("id", models.AutoField(primary_key=True)),
                 ('name', models.CharField(max_length=100, unique=True)),
-                ('geom', fields.MultiPolygonField(srid=4326, null=True)),
+                ('geom', fields.MultiPolygonField(srid=4326)),
             ],
         )]
         return self.apply_operations('gis', ProjectState(), operations)
+
+    def assertGeometryColumnsCount(self, expected_count):
+        table_name = "gis_neighborhood"
+        if connection.features.uppercases_column_names:
+            table_name = table_name.upper()
+        self.assertEqual(
+            GeometryColumns.objects.filter(**{
+                GeometryColumns.table_name_col(): table_name,
+            }).count(),
+            expected_count
+        )
 
     def test_add_gis_field(self):
         """
@@ -61,21 +70,23 @@ class OperationTests(TransactionTestCase):
         operation = migrations.AddField(
             "Neighborhood",
             "path",
-            fields.LineStringField(srid=4326, null=True, blank=True),
+            fields.LineStringField(srid=4326),
         )
         new_state = project_state.clone()
         operation.state_forwards("gis", new_state)
         with connection.schema_editor() as editor:
             operation.database_forwards("gis", editor, project_state, new_state)
+        self.current_state = new_state
         self.assertColumnExists("gis_neighborhood", "path")
 
         # Test GeometryColumns when available
         if HAS_GEOMETRY_COLUMNS:
-            self.assertEqual(
-                GeometryColumns.objects.filter(**{GeometryColumns.table_name_col(): "gis_neighborhood"}).count(),
-                2
-            )
-        self.current_state = new_state
+            self.assertGeometryColumnsCount(2)
+
+        if self.has_spatial_indexes:
+            with connection.cursor() as cursor:
+                indexes = connection.introspection.get_indexes(cursor, "gis_neighborhood")
+            self.assertIn('path', indexes)
 
     def test_remove_gis_field(self):
         """
@@ -87,12 +98,26 @@ class OperationTests(TransactionTestCase):
         operation.state_forwards("gis", new_state)
         with connection.schema_editor() as editor:
             operation.database_forwards("gis", editor, project_state, new_state)
+        self.current_state = new_state
         self.assertColumnNotExists("gis_neighborhood", "geom")
 
         # Test GeometryColumns when available
         if HAS_GEOMETRY_COLUMNS:
-            self.assertEqual(
-                GeometryColumns.objects.filter(**{GeometryColumns.table_name_col(): "gis_neighborhood"}).count(),
-                0
-            )
-        self.current_state = new_state
+            self.assertGeometryColumnsCount(0)
+
+    def test_create_model_spatial_index(self):
+        self.current_state = self.set_up_test_model()
+
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        with connection.cursor() as cursor:
+            indexes = connection.introspection.get_indexes(cursor, "gis_neighborhood")
+        self.assertIn('geom', indexes)
+
+    @property
+    def has_spatial_indexes(self):
+        if mysql:
+            with connection.cursor() as cursor:
+                return connection.introspection.supports_spatial_index(cursor, "gis_neighborhood")
+        return True

@@ -260,7 +260,7 @@ class QuerySet(object):
                     load_fields.append(field.name)
 
         skip = None
-        if load_fields and not fill_cache:
+        if load_fields:
             # Some fields have been deferred, so we have to initialize
             # via keyword arguments.
             skip = set()
@@ -357,7 +357,9 @@ class QuerySet(object):
         clone = self.filter(*args, **kwargs)
         if self.query.can_filter():
             clone = clone.order_by()
-        clone = clone[:MAX_GET_RESULTS + 1]
+        if (not clone.query.select_for_update or
+                connections[self.db].features.supports_select_for_update_with_limit):
+            clone = clone[:MAX_GET_RESULTS + 1]
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
@@ -514,21 +516,19 @@ class QuerySet(object):
         """
         Returns the first object of a query, returns None if no match is found.
         """
-        qs = self if self.ordered else self.order_by('pk')
-        try:
-            return qs[0]
-        except IndexError:
-            return None
+        objects = list((self if self.ordered else self.order_by('pk'))[:1])
+        if objects:
+            return objects[0]
+        return None
 
     def last(self):
         """
         Returns the last object of a query, returns None if no match is found.
         """
-        qs = self.reverse() if self.ordered else self.order_by('-pk')
-        try:
-            return qs[0]
-        except IndexError:
-            return None
+        objects = list((self.reverse() if self.ordered else self.order_by('-pk'))[:1])
+        if objects:
+            return objects[0]
+        return None
 
     def in_bulk(self, id_list):
         """
@@ -1341,12 +1341,12 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         init_list = []
         # Build the list of fields that *haven't* been requested
         for field, model in klass._meta.get_concrete_fields_with_model():
-            if field.name not in load_fields:
-                skip.add(field.attname)
-            elif from_parent and issubclass(from_parent, model.__class__):
+            if from_parent and model and issubclass(from_parent, model):
                 # Avoid loading fields already loaded for parent model for
                 # child models.
                 continue
+            elif field.name not in load_fields:
+                skip.add(field.attname)
             else:
                 init_list.append(field.attname)
         # Retrieve all the requested fields
@@ -1558,7 +1558,6 @@ class RawQuerySet(object):
         compiler = connections[db].ops.compiler('SQLCompiler')(
             self.query, connections[db], db
         )
-        need_resolv_columns = hasattr(compiler, 'resolve_columns')
 
         query = iter(self.query)
 
@@ -1576,11 +1575,11 @@ class RawQuerySet(object):
                 model_cls = deferred_class_factory(self.model, skip)
             else:
                 model_cls = self.model
-            if need_resolv_columns:
-                fields = [self.model_fields.get(c, None) for c in self.columns]
+            fields = [self.model_fields.get(c, None) for c in self.columns]
+            converters = compiler.get_converters(fields)
             for values in query:
-                if need_resolv_columns:
-                    values = compiler.resolve_columns(values, fields)
+                if converters:
+                    values = compiler.apply_converters(values, converters)
                 # Associate fields to values
                 model_init_values = [values[pos] for pos in model_init_pos]
                 instance = model_cls.from_db(db, model_init_names, model_init_values)
@@ -1594,10 +1593,7 @@ class RawQuerySet(object):
                 self.query.cursor.close()
 
     def __repr__(self):
-        text = self.raw_query
-        if self.params:
-            text = text % (self.params if hasattr(self.params, 'keys') else tuple(self.params))
-        return "<RawQuerySet: %r>" % text
+        return "<RawQuerySet: %s>" % self.query
 
     def __getitem__(self, k):
         return list(self)[k]

@@ -16,7 +16,8 @@ SingleObjectMixin
 
         The model that this view will display data for. Specifying ``model
         = Foo`` is effectively the same as specifying ``queryset =
-        Foo.objects.all()``.
+        Foo.objects.all()``, where ``objects`` stands for ``Foo``’s
+        :ref:`default manager <default-managers>`.
 
     .. attribute:: queryset
 
@@ -50,16 +51,40 @@ SingleObjectMixin
 
         Designates the name of the variable to use in the context.
 
+    .. attribute:: query_pk_and_slug
+
+        .. versionadded:: 1.8
+
+        If ``True``, causes :meth:`get_object()` to perform its lookup using
+        both the primary key and the slug. Defaults to ``False``.
+
+        This attribute can help mitigate `insecure direct object reference`_
+        attacks. When applications allow access to individual objects by a
+        sequential primary key, an attacker could brute-force guess all URLs;
+        thereby obtaining a list of all objects in the application. If users
+        with access to individual objects should be prevented from obtaining
+        this list, setting ``query_pk_and_slug`` to ``True`` will help prevent
+        the guessing of URLs as each URL will require two correct,
+        non-sequential arguments. Simply using a unique slug may serve the same
+        purpose, but this scheme allows you to have non-unique slugs.
+
+        .. _insecure direct object reference: https://www.owasp.org/index.php/Top_10_2013-A4-Insecure_Direct_Object_References
+
     .. method:: get_object(queryset=None)
 
-        Returns the single object that this view will display. If
-        ``queryset`` is provided, that queryset will be used as the
-        source of objects; otherwise, :meth:`get_queryset` will be used.
-        ``get_object()`` looks for a :attr:`pk_url_kwarg` argument in the
-        arguments to the view; if this argument is found, this method performs
-        a primary-key based lookup using that value. If this argument is not
-        found, it looks for a :attr:`slug_url_kwarg` argument, and performs a
-        slug lookup using the :attr:`slug_field`.
+        Returns the single object that this view will display. If ``queryset``
+        is provided, that queryset will be used as the source of objects;
+        otherwise, :meth:`get_queryset` will be used. ``get_object()`` looks
+        for a :attr:`pk_url_kwarg` argument in the arguments to the view; if
+        this argument is found, this method performs a primary-key based lookup
+        using that value. If this argument is not found, it looks for a
+        :attr:`slug_url_kwarg` argument, and performs a slug lookup using the
+        :attr:`slug_field`.
+
+        .. versionchanged:: 1.8
+
+            When :attr:`query_pk_and_slug` is ``True``, ``get_object()`` will
+            perform its lookup using both the primary key and the slug.
 
     .. method:: get_queryset()
 
@@ -80,6 +105,10 @@ SingleObjectMixin
     .. method:: get_context_data(**kwargs)
 
         Returns context data for displaying the list of objects.
+
+        The base implementation of this method requires that the ``object``
+        attribute be set by the view (even if ``None``). Be sure to do this if
+        you are using this mixin without one of the built-in views that does so.
 
     .. method:: get_slug_field()
 

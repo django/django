@@ -73,7 +73,7 @@ respectively. For example::
         def __init__(self, *args, **kwargs):
             kwargs['file_permissions_mode'] = 0o640
             kwargs['directory_permissions_mode'] = 0o760
-            super(CustomStaticFilesStorage, self).__init__(*args, **kwargs)
+            super(MyStaticFilesStorage, self).__init__(*args, **kwargs)
 
 Then set the :setting:`STATICFILES_STORAGE` setting to
 ``'path.to.MyStaticFilesStorage'``.
@@ -198,7 +198,7 @@ in your project's :setting:`INSTALLED_APPS` setting.
 
 Example usage::
 
-    django-admin.py runserver --nostatic
+    django-admin runserver --nostatic
 
 .. django-admin-option:: --insecure
 
@@ -214,7 +214,7 @@ in your project's :setting:`INSTALLED_APPS` setting. :djadmin:`runserver`
 
 Example usage::
 
-    django-admin.py runserver --insecure
+    django-admin runserver --insecure
 
 .. _staticfiles-storages:
 
@@ -488,7 +488,7 @@ files in app directories.
 Specialized test case to support 'live testing'
 -----------------------------------------------
 
-.. class:: testing.StaticLiveServerCase
+.. class:: testing.StaticLiveServerTestCase
 
 This unittest TestCase subclass extends :class:`django.test.LiveServerTestCase`.
 
@@ -505,5 +505,5 @@ transparently overlay at test execution-time the assets provided by the
 
 .. versionadded:: 1.7
 
-    ``StaticLiveServerCase`` is new in Django 1.7. Previously its functionality
-    was provided by :class:`django.test.LiveServerTestCase`.
+    ``StaticLiveServerTestCase`` is new in Django 1.7. Previously its
+    functionality was provided by :class:`django.test.LiveServerTestCase`.

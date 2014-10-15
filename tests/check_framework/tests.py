@@ -194,6 +194,12 @@ def tagged_system_check(**kwargs):
 tagged_system_check.tags = ['simpletag']
 
 
+def deployment_system_check(**kwargs):
+    deployment_system_check.kwargs = kwargs
+    return [checks.Warning('Deployment Check')]
+deployment_system_check.tags = ['deploymenttag']
+
+
 class CheckCommandTests(TestCase):
 
     def setUp(self):
@@ -238,6 +244,27 @@ class CheckCommandTests(TestCase):
     def test_list_tags(self):
         call_command('check', list_tags=True)
         self.assertEqual('simpletag\n', sys.stdout.getvalue())
+
+    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    def test_list_deployment_check_omitted(self):
+        call_command('check', list_tags=True)
+        self.assertEqual('simpletag\n', sys.stdout.getvalue())
+
+    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    def test_list_deployment_check_included(self):
+        call_command('check', deploy=True, list_tags=True)
+        self.assertEqual('deploymenttag\nsimpletag\n', sys.stdout.getvalue())
+
+    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    def test_tags_deployment_check_omitted(self):
+        msg = 'There is no system check with the "deploymenttag" tag.'
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command('check', tags=['deploymenttag'])
+
+    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    def test_tags_deployment_check_included(self):
+        call_command('check', deploy=True, tags=['deploymenttag'])
+        self.assertIn('Deployment Check', sys.stderr.getvalue())
 
 
 def custom_error_system_check(app_configs, **kwargs):

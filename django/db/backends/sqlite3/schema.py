@@ -78,7 +78,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             del body[old_field.name]
             del mapping[old_field.column]
             body[new_field.name] = new_field
-            mapping[new_field.column] = self.quote_name(old_field.column)
+            if old_field.null and not new_field.null:
+                case_sql = "coalesce(%(col)s, %(default)s)" % {
+                    'col': self.quote_name(old_field.column),
+                    'default': self.quote_value(self.effective_default(new_field))
+                }
+                mapping[new_field.column] = case_sql
+            else:
+                mapping[new_field.column] = self.quote_name(old_field.column)
             rename_mapping[old_field.name] = new_field.name
         # Remove any deleted fields
         for field in delete_fields:
@@ -127,13 +134,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             ', '.join(y for x, y in field_maps),
             self.quote_name(model._meta.db_table),
         ))
-        # Delete the old table (not using self.delete_model to avoid deleting
-        # all implicit M2M tables)
-        self.execute(self.sql_delete_table % {
-            "table": self.quote_name(model._meta.db_table),
-        })
+        # Delete the old table
+        self.delete_model(model, handle_autom2m=False)
         # Rename the new to the old
-        self.alter_db_table(model, temp_model._meta.db_table, model._meta.db_table)
+        self.alter_db_table(temp_model, temp_model._meta.db_table, model._meta.db_table)
         # Run deferred SQL on correct table
         for sql in self.deferred_sql:
             self.execute(sql.replace(temp_model._meta.db_table, model._meta.db_table))
@@ -141,6 +145,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Fix any PK-removed field
         if restore_pk_field:
             restore_pk_field.primary_key = True
+
+    def delete_model(self, model, handle_autom2m=True):
+        if handle_autom2m:
+            super(DatabaseSchemaEditor, self).delete_model(model)
+        else:
+            # Delete the table (and only that)
+            self.execute(self.sql_delete_table % {
+                "table": self.quote_name(model._meta.db_table),
+            })
 
     def add_field(self, model, field):
         """
@@ -166,9 +179,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # For explicit "through" M2M fields, do nothing
         # For everything else, remake.
         else:
+            # It might not actually have a column behind it
+            if field.db_parameters(connection=self.connection)['type'] is None:
+                return
             self._remake_table(model, delete_fields=[field])
 
-    def _alter_field(self, model, old_field, new_field, old_type, new_type, old_db_params, new_db_params, strict=False):
+    def _alter_field(self, model, old_field, new_field, old_type, new_type,
+                     old_db_params, new_db_params, strict=False):
         """Actually perform a "physical" (non-ManyToMany) field update."""
         # Alter by remaking table
         self._remake_table(model, alter_fields=[(old_field, new_field)])

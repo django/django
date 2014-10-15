@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 """
 Base classes for writing management commands (named commands which can
-be executed through ``django-admin.py`` or ``manage.py``).
+be executed through ``django-admin`` or ``manage.py``).
 """
 
 import os
@@ -112,7 +112,7 @@ class BaseCommand(object):
     the command-parsing and -execution behavior, the normal flow works
     as follows:
 
-    1. ``django-admin.py`` or ``manage.py`` loads the command class
+    1. ``django-admin`` or ``manage.py`` loads the command class
        and calls its ``run_from_argv()`` method.
 
     2. The ``run_from_argv()`` method calls ``create_parser()`` to get
@@ -290,7 +290,12 @@ class BaseCommand(object):
                 type='choice', choices=['0', '1', '2', '3'],
                 help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
             parser.add_option('--settings',
-                help='The Python path to a settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
+                help=(
+                    'The Python path to a settings module, e.g. '
+                    '"myproject.settings.main". If this isn\'t provided, the '
+                    'DJANGO_SETTINGS_MODULE environment variable will be used.'
+                ),
+            )
             parser.add_option('--pythonpath',
                 help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
             parser.add_option('--traceback', action='store_true',
@@ -307,7 +312,12 @@ class BaseCommand(object):
                 type=int, choices=[0, 1, 2, 3],
                 help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
             parser.add_argument('--settings',
-                help='The Python path to a settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
+                help=(
+                    'The Python path to a settings module, e.g. '
+                    '"myproject.settings.main". If this isn\'t provided, the '
+                    'DJANGO_SETTINGS_MODULE environment variable will be used.'
+                ),
+            )
             parser.add_argument('--pythonpath',
                 help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".')
             parser.add_argument('--traceback', action='store_true',
@@ -350,11 +360,7 @@ class BaseCommand(object):
             options = parser.parse_args(argv[2:])
             cmd_options = vars(options)
             # Move positional args out of options to mimic legacy optparse
-            if 'args' in options:
-                args = options.args
-                del cmd_options['args']
-            else:
-                args = ()
+            args = cmd_options.pop('args', ())
         else:
             options, args = parser.parse_args(argv[2:])
             cmd_options = vars(options)
@@ -380,6 +386,7 @@ class BaseCommand(object):
         if options.get('no_color'):
             self.style = no_style()
             self.stderr = OutputWrapper(options.get('stderr', sys.stderr))
+            os.environ[str("DJANGO_COLORS")] = str("nocolor")
         else:
             self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
 
@@ -397,7 +404,7 @@ class BaseCommand(object):
                                    "(%s) and 'can_import_settings' (%s) command "
                                    "options." % (self.leave_locale_alone,
                                                  self.can_import_settings))
-            # Switch to US English, because django-admin.py creates database
+            # Switch to US English, because django-admin creates database
             # content like permissions, and those shouldn't contain any
             # translations.
             from django.utils import translation
@@ -406,7 +413,7 @@ class BaseCommand(object):
 
         try:
             if (self.requires_system_checks and
-                    not options.get('skip_validation') and  # This will be removed at the end of deprecation process for `skip_validation`.
+                    not options.get('skip_validation') and  # Remove at the end of deprecation for `skip_validation`.
                     not options.get('skip_checks')):
                 self.check()
             output = self.handle(*args, **options)
@@ -435,14 +442,19 @@ class BaseCommand(object):
 
         return self.check(app_configs=app_configs, display_num_errors=display_num_errors)
 
-    def check(self, app_configs=None, tags=None, display_num_errors=False):
+    def check(self, app_configs=None, tags=None, display_num_errors=False,
+              include_deployment_checks=False):
         """
         Uses the system check framework to validate entire Django project.
         Raises CommandError for any serious message (error or critical errors).
         If there are only light messages (like warnings), they are printed to
         stderr and no exception is raised.
         """
-        all_issues = checks.run_checks(app_configs=app_configs, tags=tags)
+        all_issues = checks.run_checks(
+            app_configs=app_configs,
+            tags=tags,
+            include_deployment_checks=include_deployment_checks,
+        )
 
         msg = ""
         visible_issue_count = 0  # excludes silenced warnings

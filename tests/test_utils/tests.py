@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import unittest
 
 from django.conf.urls import url
+from django.core.files.storage import default_storage
 from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import connection
 from django.forms import EmailField, IntegerField
@@ -14,19 +15,76 @@ from django.test.html import HTMLParseError, parse_html
 from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 
-from .models import Person
+from .models import Car, Person, PossessedCar
 from .views import empty_response
 
 
 class SkippingTestCase(TestCase):
+    def _assert_skipping(self, func, expected_exc):
+        # We cannot simply use assertRaises because a SkipTest exception will go unnoticed
+        try:
+            func()
+        except expected_exc:
+            pass
+        except Exception as e:
+            self.fail("No %s exception should have been raised for %s." % (
+                e.__class__.__name__, func.__name__))
+
     def test_skip_unless_db_feature(self):
-        "A test that might be skipped is actually called."
+        """
+        Testing the django.test.skipUnlessDBFeature decorator.
+        """
         # Total hack, but it works, just want an attribute that's always true.
         @skipUnlessDBFeature("__class__")
         def test_func():
             raise ValueError
 
-        self.assertRaises(ValueError, test_func)
+        @skipUnlessDBFeature("notprovided")
+        def test_func2():
+            raise ValueError
+
+        @skipUnlessDBFeature("__class__", "__class__")
+        def test_func3():
+            raise ValueError
+
+        @skipUnlessDBFeature("__class__", "notprovided")
+        def test_func4():
+            raise ValueError
+
+        self._assert_skipping(test_func, ValueError)
+        self._assert_skipping(test_func2, unittest.SkipTest)
+        self._assert_skipping(test_func3, ValueError)
+        self._assert_skipping(test_func4, unittest.SkipTest)
+
+    def test_skip_if_db_feature(self):
+        """
+        Testing the django.test.skipIfDBFeature decorator.
+        """
+        @skipIfDBFeature("__class__")
+        def test_func():
+            raise ValueError
+
+        @skipIfDBFeature("notprovided")
+        def test_func2():
+            raise ValueError
+
+        @skipIfDBFeature("__class__", "__class__")
+        def test_func3():
+            raise ValueError
+
+        @skipIfDBFeature("__class__", "notprovided")
+        def test_func4():
+            raise ValueError
+
+        @skipIfDBFeature("notprovided", "notprovided")
+        def test_func5():
+            raise ValueError
+
+        self._assert_skipping(test_func, unittest.SkipTest)
+        self._assert_skipping(test_func2, ValueError)
+        self._assert_skipping(test_func3, unittest.SkipTest)
+        self._assert_skipping(test_func4, unittest.SkipTest)
+        self._assert_skipping(test_func5, ValueError)
 
 
 class SkippingClassTestCase(TestCase):
@@ -119,6 +177,33 @@ class AssertQuerysetEqualTests(TestCase):
         self.assertQuerysetEqual(
             Person.objects.filter(name='p1'),
             [repr(self.p1)]
+        )
+
+    def test_repeated_values(self):
+        """
+        Test that assertQuerysetEqual checks the number of appearance of each item
+        when used with option ordered=False.
+        """
+        batmobile = Car.objects.create(name='Batmobile')
+        k2000 = Car.objects.create(name='K 2000')
+        PossessedCar.objects.bulk_create([
+            PossessedCar(car=batmobile, belongs_to=self.p1),
+            PossessedCar(car=batmobile, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+        ])
+        with self.assertRaises(AssertionError):
+            self.assertQuerysetEqual(
+                self.p1.cars.all(),
+                [repr(batmobile), repr(k2000)],
+                ordered=False
+            )
+        self.assertQuerysetEqual(
+            self.p1.cars.all(),
+            [repr(batmobile)] * 2 + [repr(k2000)] * 4,
+            ordered=False
         )
 
 
@@ -707,3 +792,41 @@ class OverrideSettingsTests(TestCase):
 
         self.assertRaises(NoReverseMatch, lambda: reverse('first'))
         self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+    def test_override_media_root(self):
+        """
+        Overriding the MEDIA_ROOT setting should be reflected in the
+        base_location attribute of django.core.files.storage.default_storage.
+        """
+        self.assertEqual(default_storage.base_location, '')
+        with self.settings(MEDIA_ROOT='test_value'):
+            self.assertEqual(default_storage.base_location, 'test_value')
+
+    def test_override_media_url(self):
+        """
+        Overriding the MEDIA_URL setting should be reflected in the
+        base_url attribute of django.core.files.storage.default_storage.
+        """
+        self.assertEqual(default_storage.base_location, '')
+        with self.settings(MEDIA_URL='/test_value/'):
+            self.assertEqual(default_storage.base_url, '/test_value/')
+
+    def test_override_file_upload_permissions(self):
+        """
+        Overriding the FILE_UPLOAD_PERMISSIONS setting should be reflected in
+        the file_permissions_mode attribute of
+        django.core.files.storage.default_storage.
+        """
+        self.assertIsNone(default_storage.file_permissions_mode)
+        with self.settings(FILE_UPLOAD_PERMISSIONS=0o777):
+            self.assertEqual(default_storage.file_permissions_mode, 0o777)
+
+    def test_override_file_upload_directory_permissions(self):
+        """
+        Overriding the FILE_UPLOAD_DIRECTORY_PERMISSIONS setting should be
+        reflected in the directory_permissions_mode attribute of
+        django.core.files.storage.default_storage.
+        """
+        self.assertIsNone(default_storage.directory_permissions_mode)
+        with self.settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o777):
+            self.assertEqual(default_storage.directory_permissions_mode, 0o777)

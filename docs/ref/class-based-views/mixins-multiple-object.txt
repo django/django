@@ -15,7 +15,7 @@ MultipleObjectMixin
     * Use the ``page`` parameter in the URLconf. For example, this is what
       your URLconf might look like::
 
-        (r'^objects/page(?P<page>[0-9]+)/$', PaginatedView.as_view())
+        url(r'^objects/page(?P<page>[0-9]+)/$', PaginatedView.as_view()),
 
     * Pass the page number via the ``page`` query-string parameter. For
       example, a URL would look like this::
@@ -56,7 +56,8 @@ MultipleObjectMixin
 
         The model that this view will display data for. Specifying ``model
         = Foo`` is effectively the same as specifying ``queryset =
-        Foo.objects.all()``.
+        Foo.objects.all()``, where ``objects`` stands for ``Foo``’s
+        :ref:`default manager <default-managers>`.
 
     .. attribute:: queryset
 
@@ -70,6 +71,13 @@ MultipleObjectMixin
             its :meth:`~django.db.models.query.QuerySet.all` method or
             retrieve it with :meth:`get_queryset` which takes care of the
             cloning behind the scenes.
+
+    .. attribute:: ordering
+
+        .. versionadded:: 1.8
+
+        A string or list of strings specifying the ordering to apply to the ``queryset``.
+        Valid values are the same as those for :meth:`~django.db.models.query.QuerySet.order_by`.
 
     .. attribute:: paginate_by
 
@@ -109,6 +117,15 @@ MultipleObjectMixin
 
         Get the list of items for this view. This must be an iterable and may
         be a queryset (in which queryset-specific behavior will be enabled).
+
+    .. method:: get_ordering()
+
+        .. versionadded:: 1.8
+
+        Returns a string (or iterable of strings) that defines the ordering that
+        will be applied to the ``queryset``.
+
+        Returns :attr:`ordering` by default.
 
     .. method:: paginate_queryset(queryset, page_size)
 

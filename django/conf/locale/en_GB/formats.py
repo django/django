@@ -6,13 +6,13 @@ from __future__ import unicode_literals
 # The *_FORMAT strings use the Django date format syntax,
 # see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = 'j M Y'                   # '25 Oct 2006'
-TIME_FORMAT = 'P'                       # '2:30 pm'
-DATETIME_FORMAT = 'j M Y, P'            # '25 Oct 2006, 2:30 pm'
+TIME_FORMAT = 'P'                       # '2:30 p.m.'
+DATETIME_FORMAT = 'j M Y, P'            # '25 Oct 2006, 2:30 p.m.'
 YEAR_MONTH_FORMAT = 'F Y'               # 'October 2006'
 MONTH_DAY_FORMAT = 'j F'                # '25 October'
 SHORT_DATE_FORMAT = 'd/m/Y'             # '25/10/2006'
-SHORT_DATETIME_FORMAT = 'd/m/Y P'       # '25/10/2006 2:30 pm'
-FIRST_DAY_OF_WEEK = 0                   # Sunday
+SHORT_DATETIME_FORMAT = 'd/m/Y P'       # '25/10/2006 2:30 p.m.'
+FIRST_DAY_OF_WEEK = 1                   # Monday
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see http://docs.python.org/library/datetime.html#strftime-strptime-behavior

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from collections import Counter
 from copy import copy
 import difflib
 import errno
@@ -327,8 +328,8 @@ class SimpleTestCase(unittest.TestCase):
         else:
             content = response.content
         if not isinstance(text, bytes) or html:
-            text = force_text(text, encoding=response._charset)
-            content = content.decode(response._charset)
+            text = force_text(text, encoding=response.charset)
+            content = content.decode(response.charset)
             text_repr = "'%s'" % text
         else:
             text_repr = repr(text)
@@ -871,7 +872,7 @@ class TransactionTestCase(SimpleTestCase):
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
         items = six.moves.map(transform, qs)
         if not ordered:
-            return self.assertEqual(set(items), set(values), msg=msg)
+            return self.assertEqual(Counter(items), Counter(values), msg=msg)
         values = list(values)
         # For example qs.iterator() could be passed as qs, but it does not
         # have 'ordered' attribute.
@@ -976,20 +977,24 @@ def _deferredSkip(condition, reason):
     return decorator
 
 
-def skipIfDBFeature(feature):
+def skipIfDBFeature(*features):
     """
-    Skip a test if a database has the named feature
+    Skip a test if a database has at least one of the named features.
     """
-    return _deferredSkip(lambda: getattr(connection.features, feature),
-                         "Database has feature %s" % feature)
+    return _deferredSkip(
+        lambda: any(getattr(connection.features, feature, False) for feature in features),
+        "Database has feature(s) %s" % ", ".join(features)
+    )
 
 
-def skipUnlessDBFeature(feature):
+def skipUnlessDBFeature(*features):
     """
-    Skip a test unless a database has the named feature
+    Skip a test unless a database has all the named features.
     """
-    return _deferredSkip(lambda: not getattr(connection.features, feature),
-                         "Database doesn't support feature %s" % feature)
+    return _deferredSkip(
+        lambda: not all(getattr(connection.features, feature, False) for feature in features),
+        "Database doesn't support feature(s): %s" % ", ".join(features)
+    )
 
 
 class QuietWSGIRequestHandler(WSGIRequestHandler):

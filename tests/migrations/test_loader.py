@@ -25,7 +25,7 @@ class RecorderTests(TestCase):
         recorder.record_applied("myapp", "0432_ponies")
         self.assertEqual(
             set((x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"),
-            set([("myapp", "0432_ponies")]),
+            {("myapp", "0432_ponies")},
         )
         # That should not affect records of another database
         recorder_other = MigrationRecorder(connections['other'])
@@ -119,26 +119,6 @@ class LoaderTests(TestCase):
                 ("migrations", "0001_initial"),
                 ("migrations", "0003_third"),
                 ("migrations", "0002_second"),
-            ],
-        )
-
-    @modify_settings(INSTALLED_APPS={'append': 'basic'})
-    @override_settings(MIGRATION_MODULES={
-        "migrations": "migrations.test_migrations_latest",
-        "basic": "migrations.test_migrations_latest_basic",
-    })
-    def test_latest(self):
-        """
-        Makes sure that __latest__ works correctly.
-        """
-        # Load and test the plan
-        migration_loader = MigrationLoader(connection)
-        self.assertEqual(
-            migration_loader.graph.forwards_plan(("migrations", "0001_initial")),
-            [
-                ("basic", "0001_initial"),
-                ("basic", "0002_second"),
-                ("migrations", "0001_initial"),
             ],
         )
 

@@ -44,9 +44,9 @@ def handle_extensions(extensions=('html',), ignored=('py',)):
     would result in an extension list: ['.js', '.txt', '.xhtml']
 
     >>> handle_extensions(['.html', 'html,js,py,py,py,.py', 'py,.py'])
-    set(['.html', '.js'])
+    {'.html', '.js'}
     >>> handle_extensions(['.html, txt,.tpl'])
-    set(['.html', '.tpl', '.txt'])
+    {'.html', '.tpl', '.txt'}
     """
     ext_list = []
     for ext in extensions:

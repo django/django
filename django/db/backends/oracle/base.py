@@ -10,6 +10,7 @@ import decimal
 import re
 import platform
 import sys
+import uuid
 import warnings
 
 
@@ -121,6 +122,23 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     closed_cursor_error_class = InterfaceError
     bare_select_suffix = " FROM DUAL"
     uppercases_column_names = True
+    # select for update with limit can be achieved on Oracle, but not with the current backend.
+    supports_select_for_update_with_limit = False
+
+    def introspected_boolean_field_type(self, field=None, created_separately=False):
+        """
+        Some versions of Oracle -- we've seen this on 11.2.0.1 and suspect
+        it goes back -- have a weird bug where, when an integer column is
+        added to an existing table with a default, its precision is later
+        reported on introspection as 0, regardless of the real precision.
+        For Django introspection, this means that such columns are reported
+        as IntegerField even if they are really BigIntegerField or BooleanField.
+
+        The bug is solved in Oracle 11.2.0.2 and up.
+        """
+        if self.connection.oracle_full_version < '11.2.0.2' and field and field.has_default() and created_separately:
+            return 'IntegerField'
+        return super(DatabaseFeatures, self).introspected_boolean_field_type(field, created_separately)
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -248,49 +266,71 @@ WHEN (new.%(col_name)s IS NULL)
             sql = field_name    # Cast to DATE removes sub-second precision.
         return sql, []
 
-    def convert_values(self, value, field):
-        if isinstance(value, Database.LOB):
-            value = value.read()
-            if field and field.get_internal_type() == 'TextField':
-                value = force_text(value)
+    def get_db_converters(self, internal_type):
+        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+        if internal_type == 'TextField':
+            converters.append(self.convert_textfield_value)
+        elif internal_type == 'BinaryField':
+            converters.append(self.convert_binaryfield_value)
+        elif internal_type in ['BooleanField', 'NullBooleanField']:
+            converters.append(self.convert_booleanfield_value)
+        elif internal_type == 'DecimalField':
+            converters.append(self.convert_decimalfield_value)
+        elif internal_type == 'DateField':
+            converters.append(self.convert_datefield_value)
+        elif internal_type == 'TimeField':
+            converters.append(self.convert_timefield_value)
+        elif internal_type == 'UUIDField':
+            converters.append(self.convert_uuidfield_value)
+        converters.append(self.convert_empty_values)
+        return converters
 
+    def convert_empty_values(self, value, field):
         # Oracle stores empty strings as null. We need to undo this in
         # order to adhere to the Django convention of using the empty
         # string instead of null, but only if the field accepts the
         # empty string.
-        if value is None and field and field.empty_strings_allowed:
+        if value is None and field.empty_strings_allowed:
+            value = ''
             if field.get_internal_type() == 'BinaryField':
                 value = b''
-            else:
-                value = ''
-        # Convert 1 or 0 to True or False
-        elif value in (1, 0) and field and field.get_internal_type() in ('BooleanField', 'NullBooleanField'):
+        return value
+
+    def convert_textfield_value(self, value, field):
+        if isinstance(value, Database.LOB):
+            value = force_text(value.read())
+        return value
+
+    def convert_binaryfield_value(self, value, field):
+        if isinstance(value, Database.LOB):
+            value = force_bytes(value.read())
+        return value
+
+    def convert_booleanfield_value(self, value, field):
+        if value in (1, 0):
             value = bool(value)
-        # Force floats to the correct type
-        elif value is not None and field and field.get_internal_type() == 'FloatField':
-            value = float(value)
-        # Convert floats to decimals
-        elif value is not None and field and field.get_internal_type() == 'DecimalField':
+        return value
+
+    def convert_decimalfield_value(self, value, field):
+        if value is not None:
             value = backend_utils.typecast_decimal(field.format_number(value))
-        # cx_Oracle always returns datetime.datetime objects for
-        # DATE and TIMESTAMP columns, but Django wants to see a
-        # python datetime.date, .time, or .datetime.  We use the type
-        # of the Field to determine which to cast to, but it's not
-        # always available.
-        # As a workaround, we cast to date if all the time-related
-        # values are 0, or to time if the date is 1/1/1900.
-        # This could be cleaned a bit by adding a method to the Field
-        # classes to normalize values from the database (the to_python
-        # method is used for validation and isn't what we want here).
-        elif isinstance(value, Database.Timestamp):
-            if field and field.get_internal_type() == 'DateTimeField':
-                pass
-            elif field and field.get_internal_type() == 'DateField':
-                value = value.date()
-            elif field and field.get_internal_type() == 'TimeField' or (value.year == 1900 and value.month == value.day == 1):
-                value = value.time()
-            elif value.hour == value.minute == value.second == value.microsecond == 0:
-                value = value.date()
+        return value
+
+    # cx_Oracle always returns datetime.datetime objects for
+    # DATE and TIMESTAMP columns, but Django wants to see a
+    # python datetime.date, .time, or .datetime.
+    def convert_datefield_value(self, value, field):
+        if isinstance(value, Database.Timestamp):
+            return value.date()
+
+    def convert_timefield_value(self, value, field):
+        if isinstance(value, Database.Timestamp):
+            value = value.time()
+        return value
+
+    def convert_uuidfield_value(self, value, field):
+        if value is not None:
+            value = uuid.UUID(value)
         return value
 
     def deferrable_sql(self):
@@ -359,21 +399,12 @@ WHEN (new.%(col_name)s IS NULL)
     def random_function_sql(self):
         return "DBMS_RANDOM.RANDOM"
 
-    def regex_lookup_9(self, lookup_type):
-        raise NotImplementedError("Regexes are not supported in Oracle before version 10g.")
-
-    def regex_lookup_10(self, lookup_type):
+    def regex_lookup(self, lookup_type):
         if lookup_type == 'regex':
             match_option = "'c'"
         else:
             match_option = "'i'"
         return 'REGEXP_LIKE(%%s, %%s, %s)' % match_option
-
-    def regex_lookup(self, lookup_type):
-        # If regex_lookup is called before it's been initialized, then create
-        # a cursor to initialize it and recur.
-        with self.connection.cursor():
-            return self.connection.ops.regex_lookup(lookup_type)
 
     def return_insert_id(self):
         return "RETURNING %s INTO %%s", (InsertIdVar(),)
@@ -577,6 +608,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     })
 
     Database = Database
+    SchemaEditorClass = DatabaseSchemaEditor
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
@@ -646,15 +678,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self.operators = self._standard_operators
             cursor.close()
 
-        # There's no way for the DatabaseOperations class to know the
-        # currently active Oracle version, so we do some setups here.
-        # TODO: Multi-db support will need a better solution (a way to
-        # communicate the current version).
-        if self.oracle_version is not None and self.oracle_version <= 9:
-            self.ops.regex_lookup = self.ops.regex_lookup_9
-        else:
-            self.ops.regex_lookup = self.ops.regex_lookup_10
-
         try:
             self.connection.stmtcachesize = 20
         except AttributeError:
@@ -686,10 +709,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
                 raise
 
-    def schema_editor(self, *args, **kwargs):
-        "Returns a new instance of this backend's SchemaEditor"
-        return DatabaseSchemaEditor(self, *args, **kwargs)
-
     # Oracle doesn't support releasing savepoints. But we fake them when query
     # logging is enabled to keep query counts consistent with other backends.
     def _savepoint_commit(self, sid):
@@ -713,22 +732,21 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def is_usable(self):
         try:
-            if hasattr(self.connection, 'ping'):    # Oracle 10g R2 and higher
-                self.connection.ping()
-            else:
-                # Use a cx_Oracle cursor directly, bypassing Django's utilities.
-                self.connection.cursor().execute("SELECT 1 FROM DUAL")
+            self.connection.ping()
         except Database.Error:
             return False
         else:
             return True
 
     @cached_property
-    def oracle_version(self):
+    def oracle_full_version(self):
         with self.temporary_connection():
-            version = self.connection.version
+            return self.connection.version
+
+    @cached_property
+    def oracle_version(self):
         try:
-            return int(version.split('.')[0])
+            return int(self.oracle_full_version.split('.')[0])
         except ValueError:
             return None
 
@@ -760,9 +778,9 @@ class OracleParam(object):
         # Oracle doesn't recognize True and False correctly in Python 3.
         # The conversion done below works both in 2 and 3.
         if param is True:
-            param = "1"
+            param = 1
         elif param is False:
-            param = "0"
+            param = 0
         if hasattr(param, 'bind_parameter'):
             self.force_bytes = param.bind_parameter(cursor)
         elif isinstance(param, Database.Binary):

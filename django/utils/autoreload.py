@@ -91,6 +91,7 @@ def gen_filenames(only_new=False):
     # fail with RuntimeError: cannot mutate dictionary while iterating
     global _cached_modules, _cached_filenames
     module_values = set(sys.modules.values())
+    _cached_filenames = clean_files(_cached_filenames)
     if _cached_modules == module_values:
         # No changes in module list, short-circuit the function
         if only_new:

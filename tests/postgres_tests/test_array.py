@@ -4,10 +4,11 @@ import unittest
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
 from django.core import exceptions, serializers
+from django.core.management import call_command
 from django.db import models, IntegrityError, connection
 from django.db.migrations.writer import MigrationWriter
 from django import forms
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from .models import IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel, DateTimeArrayModel, NestedIntegerArrayModel
@@ -225,6 +226,13 @@ class TestMigrations(TestCase):
         field = ArrayField(models.CharField(max_length=20))
         statement, imports = MigrationWriter.serialize(field)
         self.assertEqual(statement, 'django.contrib.postgres.fields.ArrayField(models.CharField(max_length=20), size=None)')
+
+    @override_settings(MIGRATION_MODULES={
+        "postgres_tests": "postgres_tests.array_default_migrations",
+    })
+    def test_adding_field_with_default(self):
+        # See #22962
+        call_command('migrate', 'postgres_tests', verbosity=0)
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')

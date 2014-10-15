@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Baptiste  <baptiste+transifex@darthenay.fr>, 2012.
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
-"Last-Translator: Baptiste <baptiste+transifex@darthenay.fr>\n"
+"POT-Creation-Date: 2014-05-20 12:20+0200\n"
+"PO-Revision-Date: 2014-09-25 18:48+0000\n"
+"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
 "language/eo/)\n"
 "MIME-Version: 1.0\n"
@@ -17,203 +18,200 @@ msgstr ""
 "Language: eo\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:41
+#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Personaj informoj"
 
-#: admin.py:42
+#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Permesoj"
 
-#: admin.py:44
+#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Gravaj datoj"
 
-#: admin.py:126
+#: contrib/auth/admin.py:134
 msgid "Password changed successfully."
 msgstr "Pasvorto suksese ŝanĝita."
 
-#: admin.py:136
+#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Ŝanĝi pasvorton: %s"
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: contrib/auth/apps.py:10
+msgid "Authentication and Authorization"
+msgstr "Aŭtentigo kaj rajtigo"
+
+#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
+#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
-msgstr ""
+msgstr "Neniu pasvorto agordita."
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
+#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "Nevalida pasvorta formato, aŭ nekonata haketa algoritmo."
 
-#: forms.py:67
+#: contrib/auth/forms.py:76
 msgid "A user with that username already exists."
 msgstr "Uzanto kun sama salutnomo jam ekzistas."
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
+#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "La du pasvotaj kampoj ne kongruas."
 
-#: forms.py:70 forms.py:115
+#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
 msgid "Username"
 msgstr "Salutnomo"
 
-#: forms.py:72 forms.py:116
+#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
+#: contrib/auth/models.py:368
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr "Petita. 30 karakteroj aŭ malpli. Literoj, ciferoj kaj @/./+/-/_ nure."
 
-#: forms.py:75 forms.py:119
+#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 "Ĉi-tiu valoro povas enhavi nur literoj, ciferoj kaj la @/./+/-/_ karakteroj."
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
+#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Pasvorto"
 
-#: forms.py:79
+#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Pasvorta konfirmo"
 
-#: forms.py:81
+#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Entajpu la saman pasvorton kiel supre, por konfirmo."
 
-#: forms.py:122
+#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
-"Pasvortoj ne estas krude entenita, do ne eblas vidi la pasvorton de tiu "
-"uzanto, sed vi povas ŝanĝi la pasvorton uzante <a href=\"password/\">tiu "
-"formalaro</a>."
+"Pasvortoj ne estas krude entenitaj, do ne eblas vidi la pasvorton de tiu "
+"uzanto, sed vi povas ŝanĝi la pasvorton uzante <a href=\"password/\">tiun "
+"formalaron</a>."
 
-#: forms.py:151
+#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Bonvolu enigi korektan %(username)s-n kaj pasvorton. Notu, ke ambaŭ kampoj "
+"povas esti usklecodistingaj."
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Ŝajnas ke via retumilo ne havas kuketoj enŝaltitaj. Kuketoj estas postulitaj "
-"por ensaluti."
-
-#: forms.py:155
+#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Ĉi-tiu konto ne estas aktiva."
 
-#: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr ""
-
-#: forms.py:211
+#: contrib/auth/forms.py:231
 msgid "Email"
-msgstr ""
+msgstr "Retpoŝto"
 
-#: forms.py:271
+#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Nova pasvorto"
 
-#: forms.py:273
+#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Nova pasvorto por konfirmo"
 
-#: forms.py:302
+#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 "Via malnova pasvorto estis nekorekte tajpita. Bonvolu denove entajpi ĝin."
 
-#: forms.py:305
+#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Malnova pasvorto"
 
-#: forms.py:333
+#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Pasvorto (denove)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
+#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
+#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
+#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algoritmo"
 
-#: hashers.py:242
+#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iteracioj"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
+#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
+#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "salo"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
+#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
+#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "haketo"
 
-#: hashers.py:293
+#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "laborfaktoro"
 
-#: hashers.py:295
+#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "kontrolsumo"
 
-#: models.py:72 models.py:121
+#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "nomo"
 
-#: models.py:74
+#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "kodnomo"
 
-#: models.py:78
+#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "permeso"
 
-#: models.py:79 models.py:123
+#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "permesoj"
 
-#: models.py:128
+#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grupo"
 
-#: models.py:129 models.py:301
+#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grupoj"
 
-#: models.py:200
+#: contrib/auth/models.py:192
 msgid "password"
 msgstr "pasvorto"
 
-#: models.py:201
+#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "lasta ensaluto"
 
-#: models.py:298
+#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "ĉefuzanta statuso"
 
-#: models.py:299
+#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
 "Indikas ke tiu uzanto havas ĉiujn permesojn, sen eksplicite asigni ilin."
 
-#: models.py:302
+#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
@@ -221,49 +219,47 @@ msgstr ""
 "La grupoj en kiu tiu uzanto apartenas. Uzanto akiros ĉiuj permesoj donita al "
 "ĉiuj de lia/ŝia grupo."
 
-#: models.py:306
+#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "uzantaj permesoj"
 
-#: models.py:377
+#: contrib/auth/models.py:300
+msgid "Specific permissions for this user."
+msgstr "Specifaj permesoj por tiu ĉi uzanto."
+
+#: contrib/auth/models.py:367
 msgid "username"
 msgstr "salutnomo"
 
-#: models.py:378
-msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
-"Petita. 30 karakteroj aŭ malpli. Literoj, nombroj kaj @/./+/-/_ karakteroj"
-
-#: models.py:381
+#: contrib/auth/models.py:371
 msgid "Enter a valid username."
-msgstr ""
+msgstr "Enigu validan salutnomon."
 
-#: models.py:383
+#: contrib/auth/models.py:373
 msgid "first name"
 msgstr "persona nomo"
 
-#: models.py:384
+#: contrib/auth/models.py:374
 msgid "last name"
-msgstr "famalia nomo"
+msgstr "familia nomo"
 
-#: models.py:385
+#: contrib/auth/models.py:375
 msgid "email address"
-msgstr ""
+msgstr "retpoŝta adreso"
 
-#: models.py:386
+#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "personara statuso"
 
-#: models.py:387
+#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Indikas ĉu la uzanto povas saluti en ĉi-tiu administranta retejo."
 
-#: models.py:389
+#: contrib/auth/models.py:379
 msgid "active"
 msgstr "aktiva"
 
-#: models.py:390
+#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -271,23 +267,55 @@ msgstr ""
 "Indikas ĉu tiu uzanto devus esti traktita kiel aktiva. Malselekti tion ĉi "
 "anstataŭ forigi kontojn."
 
-#: models.py:392
+#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "dato aliĝita"
 
-#: models.py:400
+#: contrib/auth/models.py:390
 msgid "user"
 msgstr "uzanto"
 
-#: models.py:401
+#: contrib/auth/models.py:391
 msgid "users"
 msgstr "uzantoj"
 
-#: views.py:94
-msgid "Logged out"
-msgstr "Adiaŭita"
-
-#: templates/registration/password_reset_subject.txt:2
+#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Pasvorta rekomencigo ĉe %(site_name)s"
+
+#: contrib/auth/tests/test_forms.py:387
+msgid "Enter a valid email address."
+msgstr "Enigu validan retpoŝtan adreson."
+
+#: contrib/auth/views.py:92
+msgid "Logged out"
+msgstr "Adiaŭita"
+
+#: contrib/auth/views.py:169
+msgid "Password reset"
+msgstr "Pasvorta rekomencigo"
+
+#: contrib/auth/views.py:181
+msgid "Password reset successful"
+msgstr "Pasvorta rekomencigo suksesis"
+
+#: contrib/auth/views.py:216
+msgid "Enter new password"
+msgstr "Enigu novan pasvorton"
+
+#: contrib/auth/views.py:227
+msgid "Password reset unsuccessful"
+msgstr "Pasvorta rekomencigo malsuksesis"
+
+#: contrib/auth/views.py:244
+msgid "Password reset complete"
+msgstr "Pasvorta rekomencigo plenumita"
+
+#: contrib/auth/views.py:278
+msgid "Password change"
+msgstr "Pasvorta ŝanĝo"
+
+#: contrib/auth/views.py:291
+msgid "Password change successful"
+msgstr "Pasvorto sukcese ŝanĝita"

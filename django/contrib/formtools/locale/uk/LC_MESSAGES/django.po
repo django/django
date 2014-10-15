@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Sergey Lysach <sergikoff88@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
+# Sergey Lysach <sergikoff88@gmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-11 17:26+0000\n"
-"Last-Translator: Sergey Lysach <sergikoff88@gmail.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-09-24 18:34+0000\n"
+"Last-Translator: Max V. Stotsky <transifex@ms.pereslavl.ru>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -19,22 +20,22 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: templates/formtools/wizard/wizard_form.html:15
+#: contrib/formtools/apps.py:8
+msgid "Form Tools"
+msgstr "Інструменти форми."
+
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
 msgstr "перший крок"
 
-#: templates/formtools/wizard/wizard_form.html:16
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:16
 msgid "prev step"
 msgstr "попередній крок"
 
-#: templates/formtools/wizard/wizard_form.html:18
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:18
 msgid "submit"
 msgstr "відправити"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Пробачте, але закінчився строк заповнення форми. Будь ласка, продовжіть "
-"заповнення форми з цієї сторінки."
+#: contrib/formtools/wizard/views.py:276
+msgid "ManagementForm data is missing or has been tampered."
+msgstr "Дані ManagementForm відсутні або були спотворені."

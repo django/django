@@ -9,6 +9,7 @@ import datetime
 import os
 import re
 import sys
+import uuid
 import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
@@ -25,7 +26,7 @@ from django.forms.widgets import (
 from django.utils import formats
 from django.utils.encoding import smart_text, force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning, RenameMethodsBase
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
@@ -41,11 +42,17 @@ __all__ = (
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField', 'IPAddressField', 'GenericIPAddressField', 'FilePathField',
-    'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField'
+    'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField', 'UUIDField',
 )
 
 
-class Field(object):
+class RenameFieldMethods(RenameMethodsBase):
+    renamed_methods = (
+        ('_has_changed', 'has_changed', RemovedInDjango20Warning),
+    )
+
+
+class Field(six.with_metaclass(RenameFieldMethods, object)):
     widget = TextInput  # Default widget to use when rendering this type of Field.
     hidden_widget = HiddenInput  # Default widget to use when rendering this as "hidden".
     default_validators = []  # Default set of validators
@@ -185,7 +192,7 @@ class Field(object):
             return self.limit_choices_to()
         return self.limit_choices_to
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         """
         Return True if data differs from initial.
         """
@@ -531,6 +538,11 @@ class RegexField(CharField):
         """
         # error_message is just kept for backwards compatibility:
         if error_message is not None:
+            warnings.warn(
+                "The 'error_message' argument is deprecated. Use "
+                "Field.error_messages['invalid'] instead.",
+                RemovedInDjango20Warning, stacklevel=2
+            )
             error_messages = kwargs.get('error_messages') or {}
             error_messages['invalid'] = error_message
             kwargs['error_messages'] = error_messages
@@ -624,7 +636,7 @@ class FileField(Field):
             return initial
         return data
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if data is None:
             return False
         return True
@@ -632,7 +644,10 @@ class FileField(Field):
 
 class ImageField(FileField):
     default_error_messages = {
-        'invalid_image': _("Upload a valid image. The file you uploaded was either not an image or a corrupted image."),
+        'invalid_image': _(
+            "Upload a valid image. The file you uploaded was either not an "
+            "image or a corrupted image."
+        ),
     }
 
     def to_python(self, data):
@@ -659,8 +674,13 @@ class ImageField(FileField):
         try:
             # load() could spot a truncated JPEG, but it loads the entire
             # image in memory, which is a DoS vector. See #3848 and #18520.
+            image = Image.open(file)
             # verify() must be called immediately after the constructor.
-            Image.open(file).verify()
+            image.verify()
+
+            # Annotating so subclasses can reuse it for their own validation
+            f.image = image
+            f.content_type = Image.MIME[image.format]
         except Exception:
             # Pillow doesn't recognize it as an image.
             six.reraise(ValidationError, ValidationError(
@@ -734,7 +754,7 @@ class BooleanField(Field):
         if not value and self.required:
             raise ValidationError(self.error_messages['required'], code='required')
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         # Sometimes data or initial could be None or '' which should be the
         # same thing as False.
         if initial == 'False':
@@ -753,13 +773,15 @@ class NullBooleanField(BooleanField):
     def to_python(self, value):
         """
         Explicitly checks for the string 'True' and 'False', which is what a
-        hidden field will submit for True and False, and for '1' and '0', which
-        is what a RadioField will submit. Unlike the Booleanfield we need to
-        explicitly check for True, because we are not using the bool() function
+        hidden field will submit for True and False, for 'true' and 'false',
+        which are likely to be returned by JavaScript serializations of forms,
+        and for '1' and '0', which is what a RadioField will submit. Unlike
+        the Booleanfield we need to explicitly check for True, because we are
+        not using the bool() function
         """
-        if value in (True, 'True', '1'):
+        if value in (True, 'True', 'true', '1'):
             return True
-        elif value in (False, 'False', '0'):
+        elif value in (False, 'False', 'false', '0'):
             return False
         else:
             return None
@@ -767,7 +789,7 @@ class NullBooleanField(BooleanField):
     def validate(self, value):
         pass
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         # None (unknown) and False (No) are not the same
         if initial is not None:
             initial = bool(initial)
@@ -894,7 +916,7 @@ class MultipleChoiceField(ChoiceField):
                     params={'value': val},
                 )
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if initial is None:
             initial = []
         if data is None:
@@ -1072,14 +1094,14 @@ class MultiValueField(Field):
         """
         raise NotImplementedError('Subclasses must implement this method.')
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if initial is None:
             initial = ['' for x in range(0, len(data))]
         else:
             if not isinstance(initial, list):
                 initial = self.widget.decompress(initial)
         for field, initial, data in zip(self.fields, initial, data):
-            if field._has_changed(field.to_python(initial), data):
+            if field.has_changed(field.to_python(initial), data):
                 return True
         return False
 
@@ -1203,3 +1225,25 @@ class SlugField(CharField):
     def clean(self, value):
         value = self.to_python(value).strip()
         return super(SlugField, self).clean(value)
+
+
+class UUIDField(CharField):
+    default_error_messages = {
+        'invalid': _('Enter a valid UUID.'),
+    }
+
+    def prepare_value(self, value):
+        if isinstance(value, uuid.UUID):
+            return value.hex
+        return value
+
+    def to_python(self, value):
+        value = super(UUIDField, self).to_python(value)
+        if value in self.empty_values:
+            return None
+        if not isinstance(value, uuid.UUID):
+            try:
+                value = uuid.UUID(value)
+            except ValueError:
+                raise ValidationError(self.error_messages['invalid'], code='invalid')
+        return value

@@ -324,16 +324,12 @@ manager.
 
 .. _`Python ticket #9220`: http://bugs.python.org/issue9220
 
-Using a cursor as a context manager:
-
-.. code-block:: python
+Using a cursor as a context manager::
 
     with connection.cursor() as c:
         c.execute(...)
 
-is equivalent to:
-
-.. code-block:: python
+is equivalent to::
 
     c = connection.cursor()
     try:

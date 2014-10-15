@@ -143,10 +143,11 @@ class ViewDetailView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
-        mod, func = urlresolvers.get_mod_func(view)
-        try:
+        urlconf = urlresolvers.get_urlconf()
+        if urlresolvers.get_resolver(urlconf)._is_callback(view):
+            mod, func = urlresolvers.get_mod_func(view)
             view_func = getattr(import_module(mod), func)
-        except (ImportError, AttributeError):
+        else:
             raise Http404
         title, body, metadata = utils.parse_docstring(view_func.__doc__)
         if title:
@@ -218,7 +219,10 @@ class ModelDetailView(BaseAdminDocsView):
         for field in opts.many_to_many:
             data_type = field.rel.to.__name__
             app_label = field.rel.to._meta.app_label
-            verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': app_label, 'object_name': data_type}
+            verbose = _("related `%(app_label)s.%(object_name)s` objects") % {
+                'app_label': app_label,
+                'object_name': data_type,
+            }
             fields.append({
                 'name': "%s.all" % field.name,
                 "data_type": 'List',
@@ -250,7 +254,10 @@ class ModelDetailView(BaseAdminDocsView):
 
         # Gather related objects
         for rel in opts.get_all_related_objects() + opts.get_all_related_many_to_many_objects():
-            verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': rel.opts.app_label, 'object_name': rel.opts.object_name}
+            verbose = _("related `%(app_label)s.%(object_name)s` objects") % {
+                'app_label': rel.opts.app_label,
+                'object_name': rel.opts.object_name,
+            }
             accessor = rel.get_accessor_name()
             fields.append({
                 'name': "%s.all" % accessor,

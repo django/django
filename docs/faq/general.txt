@@ -46,8 +46,9 @@ We've also recorded an `audio clip of the pronunciation`_.
 Is Django stable?
 -----------------
 
-Yes, it's quite stable. World Online has been using Django for many years. Sites built on
-Django have weathered traffic spikes of over 50 thousand hits per second.
+Yes, it's quite stable. Companies like Disqus, Instagram, Pinterest, and
+Mozilla have been using Django for many years. Sites built on Django have
+weathered traffic spikes of over 50 thousand hits per second.
 
 Does Django scale?
 ------------------
@@ -66,9 +67,8 @@ Who's behind this?
 ------------------
 
 Django was originally developed at World Online, the Web department of a
-newspaper in Lawrence, Kansas, USA. Django's now run by an international team of
-volunteers; you can read all about them over at the :doc:`list of committers
-</internals/committers>`.
+newspaper in Lawrence, Kansas, USA. Django's now run by an international
+:doc:`team of volunteers </internals/team>`.
 
 Which sites use Django?
 -----------------------

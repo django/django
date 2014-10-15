@@ -176,7 +176,7 @@ class WSGIHandler(base.BaseHandler):
                     raise
 
         set_script_prefix(get_script_name(environ))
-        signals.request_started.send(sender=self.__class__)
+        signals.request_started.send(sender=self.__class__, environ=environ)
         try:
             request = self.request_class(environ)
         except UnicodeDecodeError:
@@ -263,4 +263,4 @@ def get_str_from_wsgi(environ, key, default):
     """
     value = environ.get(str(key), str(default))
     # Same comment as above
-    return value if six.PY2 else value.encode(ISO_8859_1).decode(UTF_8)
+    return value if six.PY2 else value.encode(ISO_8859_1).decode(UTF_8, errors='replace')

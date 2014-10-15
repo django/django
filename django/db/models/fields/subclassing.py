@@ -7,6 +7,10 @@ to_python() and the other necessary methods and everything will work
 seamlessly.
 """
 
+import warnings
+
+from django.utils.deprecation import RemovedInDjango20Warning
+
 
 class SubfieldBase(type):
     """
@@ -14,6 +18,9 @@ class SubfieldBase(type):
     has the descriptor protocol attached to it.
     """
     def __new__(cls, name, bases, attrs):
+        warnings.warn("SubfieldBase has been deprecated. Use Field.from_db_value instead.",
+                  RemovedInDjango20Warning)
+
         new_class = super(SubfieldBase, cls).__new__(cls, name, bases, attrs)
         new_class.contribute_to_class = make_contrib(
             new_class, attrs.get('contribute_to_class')
@@ -46,11 +53,11 @@ def make_contrib(superclass, func=None):
     case that the existing contribute_to_class() calls all the necessary
     superclass methods.
     """
-    def contribute_to_class(self, cls, name):
+    def contribute_to_class(self, cls, name, **kwargs):
         if func:
-            func(self, cls, name)
+            func(self, cls, name, **kwargs)
         else:
-            super(superclass, self).contribute_to_class(cls, name)
+            super(superclass, self).contribute_to_class(cls, name, **kwargs)
         setattr(cls, self.name, Creator(self))
 
     return contribute_to_class

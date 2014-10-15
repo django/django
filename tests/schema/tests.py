@@ -1,16 +1,16 @@
-from __future__ import absolute_import
 import datetime
 import unittest
 
 from django.test import TransactionTestCase
 from django.db import connection, DatabaseError, IntegrityError, OperationalError
-from django.db.models.fields import IntegerField, TextField, CharField, SlugField, BooleanField, BinaryField
+from django.db.models.fields import (BinaryField, BooleanField, CharField, IntegerField,
+    PositiveIntegerField, SlugField, TextField)
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough,
-    AuthorWithEvenLongerName)
+    AuthorWithEvenLongerName, BookWeak)
 
 
 class SchemaTests(TransactionTestCase):
@@ -27,7 +27,8 @@ class SchemaTests(TransactionTestCase):
     models = [
         Author, AuthorWithM2M, Book, BookWithLongName, BookWithSlug,
         BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest,
-        Thing, TagThrough, BookWithM2MThrough, AuthorWithEvenLongerName
+        Thing, TagThrough, BookWithM2MThrough, AuthorWithEvenLongerName,
+        BookWeak,
     ]
 
     # Utility functions
@@ -150,6 +151,94 @@ class SchemaTests(TransactionTestCase):
         else:
             self.fail("No FK constraint for author_id found")
 
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_fk_db_constraint(self):
+        "Tests that the db_constraint parameter is respected"
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+            editor.create_model(Author)
+            editor.create_model(BookWeak)
+        # Check that initial tables are there
+        list(Author.objects.all())
+        list(Tag.objects.all())
+        list(BookWeak.objects.all())
+        # Check that BookWeak doesn't have an FK constraint
+        constraints = self.get_constraints(BookWeak._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["author_id"] and details['foreign_key']:
+                self.fail("FK constraint for author_id found")
+        # Make a db_constraint=False FK
+        new_field = ForeignKey(Tag, db_constraint=False)
+        new_field.set_attributes_from_name("tag")
+        with connection.schema_editor() as editor:
+            editor.add_field(
+                Author,
+                new_field,
+            )
+        # Make sure no FK constraint is present
+        constraints = self.get_constraints(Author._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["tag_id"] and details['foreign_key']:
+                self.fail("FK constraint for tag_id found")
+        # Alter to one with a constraint
+        new_field_2 = ForeignKey(Tag)
+        new_field_2.set_attributes_from_name("tag")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                Author,
+                new_field,
+                new_field_2,
+                strict=True,
+            )
+        # Make sure the new FK constraint is present
+        constraints = self.get_constraints(Author._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["tag_id"] and details['foreign_key']:
+                self.assertEqual(details['foreign_key'], ('schema_tag', 'id'))
+                break
+        else:
+            self.fail("No FK constraint for tag_id found")
+        # Alter to one without a constraint again
+        new_field_2 = ForeignKey(Tag)
+        new_field_2.set_attributes_from_name("tag")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                Author,
+                new_field_2,
+                new_field,
+                strict=True,
+            )
+        # Make sure no FK constraint is present
+        constraints = self.get_constraints(Author._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["tag_id"] and details['foreign_key']:
+                self.fail("FK constraint for tag_id found")
+
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_m2m_db_constraint(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+            editor.create_model(Author)
+        # Check that initial tables are there
+        list(Author.objects.all())
+        list(Tag.objects.all())
+        # Make a db_constraint=False FK
+        new_field = ManyToManyField("schema.Tag", related_name="authors", db_constraint=False)
+        new_field.contribute_to_class(Author, "tags")
+        # Add the field
+        with connection.schema_editor() as editor:
+            editor.add_field(
+                Author,
+                new_field,
+            )
+        # Make sure no FK constraint is present
+        constraints = self.get_constraints(new_field.rel.through._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["tag_id"] and details['foreign_key']:
+                self.fail("FK constraint for tag_id found")
+
     def test_add_field(self):
         """
         Tests adding fields to models
@@ -225,12 +314,8 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         # BooleanField are stored as TINYINT(1) on MySQL.
-        field_type, field_info = columns['awesome']
-        if connection.vendor == 'mysql':
-            self.assertEqual(field_type, 'IntegerField')
-            self.assertEqual(field_info.precision, 1)
-        else:
-            self.assertEqual(field_type, 'BooleanField')
+        field_type = columns['awesome'][0]
+        self.assertEqual(field_type, connection.features.introspected_boolean_field_type(new_field, created_separately=True))
 
     def test_add_field_default_transform(self):
         """
@@ -330,6 +415,80 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
         self.assertEqual(bool(columns['name'][1][6]), False)
+
+    def test_alter_null_to_not_null(self):
+        """
+        #23609 - Tests handling of default values when altering from NULL to NOT NULL.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Ensure the field is right to begin with
+        columns = self.column_classes(Author)
+        self.assertTrue(columns['height'][1][6])
+        # Create some test data
+        Author.objects.create(name='Not null author', height=12)
+        Author.objects.create(name='Null author')
+        # Verify null value
+        self.assertEqual(Author.objects.get(name='Not null author').height, 12)
+        self.assertIsNone(Author.objects.get(name='Null author').height)
+        # Alter the height field to NOT NULL with default
+        new_field = PositiveIntegerField(default=42)
+        new_field.set_attributes_from_name("height")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                Author,
+                Author._meta.get_field_by_name("height")[0],
+                new_field
+            )
+        # Ensure the field is right afterwards
+        columns = self.column_classes(Author)
+        self.assertFalse(columns['height'][1][6])
+        # Verify default value
+        self.assertEqual(Author.objects.get(name='Not null author').height, 12)
+        self.assertEqual(Author.objects.get(name='Null author').height, 42)
+
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_alter_fk(self):
+        """
+        Tests altering of FKs
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        # Ensure the field is right to begin with
+        columns = self.column_classes(Book)
+        self.assertEqual(columns['author_id'][0], "IntegerField")
+        # Make sure the FK constraint is present
+        constraints = self.get_constraints(Book._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["author_id"] and details['foreign_key']:
+                self.assertEqual(details['foreign_key'], ('schema_author', 'id'))
+                break
+        else:
+            self.fail("No FK constraint for author_id found")
+        # Alter the FK
+        new_field = ForeignKey(Author, editable=False)
+        new_field.set_attributes_from_name("author")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                Book,
+                Book._meta.get_field_by_name("author")[0],
+                new_field,
+                strict=True,
+            )
+        # Ensure the field is right afterwards
+        columns = self.column_classes(Book)
+        self.assertEqual(columns['author_id'][0], "IntegerField")
+        # Make sure the FK constraint is present
+        constraints = self.get_constraints(Book._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["author_id"] and details['foreign_key']:
+                self.assertEqual(details['foreign_key'], ('schema_author', 'id'))
+                break
+        else:
+            self.fail("No FK constraint for author_id found")
 
     def test_rename(self):
         """
@@ -907,3 +1066,53 @@ class SchemaTests(TransactionTestCase):
             DatabaseError,
             lambda: list(Thing.objects.all()),
         )
+
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_remove_constraints_capital_letters(self):
+        """
+        #23065 - Constraint names must be quoted if they contain capital letters.
+        """
+        def get_field(*args, **kwargs):
+            kwargs['db_column'] = "CamelCase"
+            field = kwargs.pop('field_class', IntegerField)(*args, **kwargs)
+            field.set_attributes_from_name("CamelCase")
+            return field
+
+        model = Author
+        field = get_field()
+        table = model._meta.db_table
+        column = field.column
+
+        with connection.schema_editor() as editor:
+            editor.create_model(model)
+            editor.add_field(model, field)
+
+            editor.execute(
+                editor.sql_create_index % {
+                    "table": editor.quote_name(table),
+                    "name": editor.quote_name("CamelCaseIndex"),
+                    "columns": editor.quote_name(column),
+                    "extra": "",
+                }
+            )
+            editor.alter_field(model, get_field(db_index=True), field)
+
+            editor.execute(
+                editor.sql_create_unique % {
+                    "table": editor.quote_name(table),
+                    "name": editor.quote_name("CamelCaseUniqConstraint"),
+                    "columns": editor.quote_name(field.column),
+                }
+            )
+            editor.alter_field(model, get_field(unique=True), field)
+
+            editor.execute(
+                editor.sql_create_fk % {
+                    "table": editor.quote_name(table),
+                    "name": editor.quote_name("CamelCaseFKConstraint"),
+                    "column": editor.quote_name(column),
+                    "to_table": editor.quote_name(table),
+                    "to_column": editor.quote_name(model._meta.auto_field.column),
+                }
+            )
+            editor.alter_field(model, get_field(Author, field_class=ForeignKey), field)

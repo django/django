@@ -66,7 +66,7 @@ class StateTests(TestCase):
         self.assertEqual(author_state.fields[1][1].max_length, 255)
         self.assertEqual(author_state.fields[2][1].null, False)
         self.assertEqual(author_state.fields[3][1].null, True)
-        self.assertEqual(author_state.options, {"unique_together": set([("name", "bio")]), "index_together": set([("bio", "age")])})
+        self.assertEqual(author_state.options, {"unique_together": {("name", "bio")}, "index_together": {("bio", "age")}})
         self.assertEqual(author_state.bases, (models.Model, ))
 
         self.assertEqual(book_state.app_label, "migrations")
@@ -253,6 +253,27 @@ class StateTests(TestCase):
         project_state.add_model_state(ModelState.from_model(F))
         with self.assertRaises(InvalidBasesError):
             project_state.render()
+
+    def test_render_unique_app_labels(self):
+        """
+        Tests that the ProjectState render method doesn't raise an
+        ImproperlyConfigured exception about unique labels if two dotted app
+        names have the same last part.
+        """
+        class A(models.Model):
+            class Meta:
+                app_label = "django.contrib.auth"
+
+        class B(models.Model):
+            class Meta:
+                app_label = "vendor.auth"
+
+        # Make a ProjectState and render it
+        project_state = ProjectState()
+        project_state.add_model_state(ModelState.from_model(A))
+        project_state.add_model_state(ModelState.from_model(B))
+        final_apps = project_state.render()
+        self.assertEqual(len(final_apps.get_models()), 2)
 
     def test_equality(self):
         """

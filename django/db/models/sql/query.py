@@ -7,7 +7,7 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
-from collections import OrderedDict
+from collections import Mapping, OrderedDict
 import copy
 import warnings
 
@@ -54,19 +54,10 @@ class RawQuery(object):
     def clone(self, using):
         return RawQuery(self.sql, using, params=self.params)
 
-    def convert_values(self, value, field, connection):
-        """Convert the database-returned value into a type that is consistent
-        across database backends.
-
-        By default, this defers to the underlying backend operations, but
-        it can be overridden by Query classes for specific backends.
-        """
-        return connection.ops.convert_values(value, field)
-
     def get_columns(self):
         if self.cursor is None:
             self._execute_query()
-        converter = connections[self.using].introspection.table_name_converter
+        converter = connections[self.using].introspection.column_name_converter
         return [converter(column_meta[0])
                 for column_meta in self.cursor.description]
 
@@ -83,7 +74,11 @@ class RawQuery(object):
         return iter(result)
 
     def __repr__(self):
-        return "<RawQuery: %r>" % (self.sql % tuple(self.params))
+        return "<RawQuery: %s>" % self
+
+    def __str__(self):
+        _type = dict if isinstance(self.params, Mapping) else tuple
+        return self.sql % _type(self.params)
 
     def _execute_query(self):
         self.cursor = connections[self.using].cursor()
@@ -304,15 +299,6 @@ class Query(object):
             obj._setup_query()
         return obj
 
-    def convert_values(self, value, field, connection):
-        """Convert the database-returned value into a type that is consistent
-        across database backends.
-
-        By default, this defers to the underlying backend operations, but
-        it can be overridden by Query classes for specific backends.
-        """
-        return connection.ops.convert_values(value, field)
-
     def resolve_aggregate(self, value, aggregate, connection):
         """Resolve the value of aggregates returned by the database to
         consistent (and reasonable) types.
@@ -333,7 +319,13 @@ class Query(object):
             return float(value)
         else:
             # Return value depends on the type of the field being processed.
-            return self.convert_values(value, aggregate.field, connection)
+            backend_converters = connection.ops.get_db_converters(aggregate.field.get_internal_type())
+            field_converters = aggregate.field.get_db_converters(connection)
+            for converter in backend_converters:
+                value = converter(value, aggregate.field)
+            for converter in field_converters:
+                value = converter(value, connection)
+            return value
 
     def get_aggregation(self, using, force_subq=False):
         """
@@ -582,7 +574,7 @@ class Query(object):
             return
         orig_opts = self.get_meta()
         seen = {}
-        must_include = {orig_opts.concrete_model: set([orig_opts.pk])}
+        must_include = {orig_opts.concrete_model: {orig_opts.pk}}
         for field_name in field_names:
             parts = field_name.split(LOOKUP_SEP)
             cur_model = self.model._meta.concrete_model
@@ -1104,8 +1096,19 @@ class Query(object):
         if field.rel:
             # testing for iterable of models
             if hasattr(value, '__iter__'):
-                for v in value:
-                    self.check_query_object_type(v, opts)
+                # Check if the iterable has a model attribute, if so
+                # it is likely something like a QuerySet.
+                if hasattr(value, 'model') and hasattr(value.model, '_meta'):
+                    model = value.model
+                    if not (model == opts.concrete_model
+                            or opts.concrete_model in model._meta.get_parent_list()
+                            or model in opts.get_parent_list()):
+                        raise ValueError(
+                            'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
+                            (model._meta.model_name, opts.object_name))
+                else:
+                    for v in value:
+                        self.check_query_object_type(v, opts)
             else:
                 # expecting single model instance here
                 self.check_query_object_type(value, opts)
@@ -1367,9 +1370,13 @@ class Query(object):
             try:
                 field, model, direct, m2m = opts.get_field_by_name(name)
             except FieldDoesNotExist:
-                # We didn't found the current field, so move position back
+                # We didn't find the current field, so move position back
                 # one step.
                 pos -= 1
+                if pos == -1 or fail_on_missing:
+                    available = opts.get_all_field_names() + list(self.aggregate_select)
+                    raise FieldError("Cannot resolve keyword %r into field. "
+                                     "Choices are: %s" % (name, ", ".join(available)))
                 break
             # Check if we need any joins for concrete inheritance cases (the
             # field lives in parent, but we are currently in one of its
@@ -1387,7 +1394,9 @@ class Query(object):
                         targets = (final_field.rel.get_related_field(),)
                         opts = int_model._meta
                         path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
-                        cur_names_with_path[1].append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
+                        cur_names_with_path[1].append(
+                            PathInfo(final_field.model._meta, opts, targets, final_field, False, True)
+                        )
             if hasattr(field, 'get_path_info'):
                 pathinfos = field.get_path_info()
                 if not allow_many:
@@ -1407,15 +1416,12 @@ class Query(object):
                 # Local non-relational field.
                 final_field = field
                 targets = (field,)
+                if fail_on_missing and pos + 1 != len(names):
+                    raise FieldError(
+                        "Cannot resolve keyword %r into field. Join on '%s'"
+                        " not permitted." % (names[pos + 1], name))
                 break
-        if pos == -1 or (fail_on_missing and pos + 1 != len(names)):
-            self.raise_field_error(opts, name)
         return path, final_field, targets, names[pos + 1:]
-
-    def raise_field_error(self, opts, name):
-        available = opts.get_all_field_names() + list(self.aggregate_select)
-        raise FieldError("Cannot resolve keyword %r into field. "
-                         "Choices are: %s" % (name, ", ".join(available)))
 
     def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True):
         """
@@ -1769,7 +1775,8 @@ class Query(object):
                 entry_params = []
                 pos = entry.find("%s")
                 while pos != -1:
-                    entry_params.append(next(param_iter))
+                    if pos == 0 or entry[pos - 1] != '%':
+                        entry_params.append(next(param_iter))
                     pos = entry.find("%s", pos + 2)
                 select_pairs[name] = (entry, entry_params)
             # This is order preserving, since self.extra_select is an OrderedDict.
@@ -2017,7 +2024,7 @@ def add_to_dict(data, key, value):
     if key in data:
         data[key].add(value)
     else:
-        data[key] = set([value])
+        data[key] = {value}
 
 
 def is_reverse_o2o(field):

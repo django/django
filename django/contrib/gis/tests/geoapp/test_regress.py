@@ -2,21 +2,20 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
-from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import no_mysql, no_spatialite
 from django.contrib.gis.shortcuts import render_to_kmz
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+from django.contrib.gis.tests.utils import no_oracle
 from django.db.models import Count, Min
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
 if HAS_GEOS:
     from .models import City, PennsylvaniaCity, State, Truth
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnlessDBFeature("gis_enabled")
 class GeoRegressionTests(TestCase):
+    fixtures = ['initial']
 
     def test_update(self):
         "Testing GeoQuerySet.update(). See #10411."
@@ -40,8 +39,7 @@ class GeoRegressionTests(TestCase):
         }]
         render_to_kmz('gis/kml/placemarks.kml', {'places': places})
 
-    @no_spatialite
-    @no_mysql
+    @skipUnlessDBFeature("supports_extent_aggr")
     def test_extent(self):
         "Testing `extent` on a table with a single point. See #11827."
         pnt = City.objects.get(name='Pueblo').point
@@ -68,6 +66,10 @@ class GeoRegressionTests(TestCase):
         # .count() should not throw TypeError in __eq__
         self.assertEqual(cities_within_state.count(), 1)
 
+    # TODO: fix on Oracle -- get the following error because the SQL is ordered
+    # by a geometry object, which Oracle apparently doesn't like:
+    #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
+    @no_oracle
     def test_defer_or_only_with_annotate(self):
         "Regression for #16409. Make sure defer() and only() work with annotate()"
         self.assertIsInstance(list(City.objects.annotate(Count('point')).defer('name')), list)

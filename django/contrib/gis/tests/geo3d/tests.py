@@ -6,8 +6,7 @@ from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import postgis
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils._os import upath
 
 if HAS_GEOS:
@@ -45,7 +44,17 @@ city_dict = dict((name, coords) for name, coords in city_data)
 #  http://seamless.usgs.gov/products/9arc.php
 interstate_data = (
     ('I-45',
-     'LINESTRING(-95.3708481 29.7765870 11.339,-95.3694580 29.7787980 4.536,-95.3690305 29.7797359 9.762,-95.3691886 29.7812450 12.448,-95.3696447 29.7850144 10.457,-95.3702511 29.7868518 9.418,-95.3706724 29.7881286 14.858,-95.3711632 29.7896157 15.386,-95.3714525 29.7936267 13.168,-95.3717848 29.7955007 15.104,-95.3717719 29.7969804 16.516,-95.3717305 29.7982117 13.923,-95.3717254 29.8000778 14.385,-95.3719875 29.8013539 15.160,-95.3720575 29.8026785 15.544,-95.3721321 29.8040912 14.975,-95.3722074 29.8050998 15.688,-95.3722779 29.8060430 16.099,-95.3733818 29.8076750 15.197,-95.3741563 29.8103686 17.268,-95.3749458 29.8129927 19.857,-95.3763564 29.8144557 15.435)',
+     'LINESTRING(-95.3708481 29.7765870 11.339,-95.3694580 29.7787980 4.536,'
+     '-95.3690305 29.7797359 9.762,-95.3691886 29.7812450 12.448,'
+     '-95.3696447 29.7850144 10.457,-95.3702511 29.7868518 9.418,'
+     '-95.3706724 29.7881286 14.858,-95.3711632 29.7896157 15.386,'
+     '-95.3714525 29.7936267 13.168,-95.3717848 29.7955007 15.104,'
+     '-95.3717719 29.7969804 16.516,-95.3717305 29.7982117 13.923,'
+     '-95.3717254 29.8000778 14.385,-95.3719875 29.8013539 15.160,'
+     '-95.3720575 29.8026785 15.544,-95.3721321 29.8040912 14.975,'
+     '-95.3722074 29.8050998 15.688,-95.3722779 29.8060430 16.099,'
+     '-95.3733818 29.8076750 15.197,-95.3741563 29.8103686 17.268,'
+     '-95.3749458 29.8129927 19.857,-95.3763564 29.8144557 15.435)',
      (11.339, 4.536, 9.762, 12.448, 10.457, 9.418, 14.858,
       15.386, 13.168, 15.104, 16.516, 13.923, 14.385, 15.16,
       15.544, 14.975, 15.688, 16.099, 15.197, 17.268, 19.857,
@@ -57,12 +66,14 @@ interstate_data = (
 # system 32140), with elevation values from the National Elevation Dataset
 # (see above).
 bbox_data = (
-    'POLYGON((941527.97 4225693.20,962596.48 4226349.75,963152.57 4209023.95,942051.75 4208366.38,941527.97 4225693.20))',
+    'POLYGON((941527.97 4225693.20,962596.48 4226349.75,963152.57 4209023.95,'
+    '942051.75 4208366.38,941527.97 4225693.20))',
     (21.71, 13.21, 9.12, 16.40, 21.71)
 )
 
 
-@skipUnless(HAS_GEOS and HAS_GDAL and postgis, "Geos, GDAL and postgis are required.")
+@skipUnless(HAS_GDAL, "GDAL is required for Geo3DTest.")
+@skipUnlessDBFeature("gis_enabled", "supports_3d_functions")
 class Geo3DTest(TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
@@ -70,7 +81,7 @@ class Geo3DTest(TestCase):
     available within GeoDjango.  For more information, see the PostGIS docs
     on the routines that support 3D:
 
-    http://postgis.refractions.net/documentation/manual-1.4/ch08.html#PostGIS_3D_Functions
+    http://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
     """
 
     def _load_interstate_data(self):
@@ -184,12 +195,16 @@ class Geo3DTest(TestCase):
         # PostGIS query that returned the reference EWKT for this test:
         #  `SELECT ST_AsText(ST_Union(point)) FROM geo3d_city3d;`
         self._load_city_data()
-        ref_ewkt = 'SRID=4326;MULTIPOINT(-123.305196 48.462611 15,-104.609252 38.255001 1433,-97.521157 34.464642 380,-96.801611 32.782057 147,-95.363151 29.763374 18,-95.23506 38.971823 251,-87.650175 41.850385 181,174.783117 -41.315268 14)'
+        ref_ewkt = (
+            'SRID=4326;MULTIPOINT(-123.305196 48.462611 15,-104.609252 38.255001 1433,'
+            '-97.521157 34.464642 380,-96.801611 32.782057 147,-95.363151 29.763374 18,'
+            '-95.23506 38.971823 251,-87.650175 41.850385 181,174.783117 -41.315268 14)'
+        )
         ref_union = GEOSGeometry(ref_ewkt)
         union = City3D.objects.aggregate(Union('point'))['point__union']
         self.assertTrue(union.hasz)
         # Ordering of points in the resulting geometry may vary between implementations
-        self.assertSetEqual(set([p.ewkt for p in ref_union]), set([p.ewkt for p in union]))
+        self.assertSetEqual({p.ewkt for p in ref_union}, {p.ewkt for p in union})
 
     def test_extent(self):
         """

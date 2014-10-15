@@ -154,7 +154,7 @@ class Command(BaseCommand):
             message.append('.\n\n')
 
         if self.clear:
-            message.append('This will DELETE EXISTING FILES!\n')
+            message.append('This will DELETE ALL FILES in this location!\n')
         else:
             message.append('This will overwrite existing files!\n')
 

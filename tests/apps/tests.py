@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import os
 import sys
@@ -164,6 +164,14 @@ class AppsTests(TestCase):
     def test_duplicate_names(self):
         with six.assertRaisesRegex(self, ImproperlyConfigured, "Application names aren't unique"):
             with self.settings(INSTALLED_APPS=['apps.apps.RelabeledAppsConfig', 'apps']):
+                pass
+
+    def test_import_exception_is_not_masked(self):
+        """
+        App discovery should preserve stack traces. Regression test for #22920.
+        """
+        with six.assertRaisesRegex(self, ImportError, "Oops"):
+            with self.settings(INSTALLED_APPS=['apps.failing_app']):
                 pass
 
     def test_models_py(self):

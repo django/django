@@ -1,24 +1,25 @@
 from __future__ import unicode_literals
 
 import os
+import re
 from unittest import skipUnless
 
 from django.core.management import call_command
-from django.db import connections
-from django.test import TestCase
+from django.db import connection, connections
+from django.test import TestCase, skipUnlessDBFeature
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import TEST_DATA
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.utils.six import StringIO
 
 if HAS_GDAL:
-    from django.contrib.gis.gdal import Driver
+    from django.contrib.gis.gdal import Driver, OGRException
     from django.contrib.gis.utils.ogrinspect import ogrinspect
 
     from .models import AllOGRFields
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
+@skipUnless(HAS_GDAL, "InspectDbTests needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class InspectDbTests(TestCase):
     def test_geom_columns(self):
         """
@@ -29,12 +30,17 @@ class InspectDbTests(TestCase):
                  table_name_filter=lambda tn: tn.startswith('inspectapp_'),
                  stdout=out)
         output = out.getvalue()
-        self.assertIn('geom = models.PolygonField()', output)
-        self.assertIn('point = models.PointField()', output)
+        if connection.features.supports_geometry_field_introspection:
+            self.assertIn('geom = models.PolygonField()', output)
+            self.assertIn('point = models.PointField()', output)
+        else:
+            self.assertIn('geom = models.GeometryField(', output)
+            self.assertIn('point = models.GeometryField(', output)
         self.assertIn('objects = models.GeoManager()', output)
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
+@skipUnless(HAS_GDAL, "OGRInspectTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class OGRInspectTest(TestCase):
     maxDiff = 1024
 
@@ -76,23 +82,20 @@ class OGRInspectTest(TestCase):
         self.assertEqual(model_def, '\n'.join(expected))
 
     def test_time_field(self):
-        # Only possible to test this on PostGIS at the moment.  MySQL
-        # complains about permissions, and SpatiaLite/Oracle are
-        # insanely difficult to get support compiled in for in GDAL.
-        if not connections['default'].ops.postgis:
-            self.skipTest("This database does not support 'ogrinspect'ion")
-
         # Getting the database identifier used by OGR, if None returned
         # GDAL does not have the support compiled in.
         ogr_db = get_ogr_db_string()
         if not ogr_db:
-            self.skipTest("Your GDAL installation does not support PostGIS databases")
+            self.skipTest("Unable to setup an OGR connection to your database")
 
-        # Writing shapefiles via GDAL currently does not support writing OGRTime
-        # fields, so we need to actually use a database
-        model_def = ogrinspect(ogr_db, 'Measurement',
-                               layer_key=AllOGRFields._meta.db_table,
-                               decimal=['f_decimal'])
+        try:
+            # Writing shapefiles via GDAL currently does not support writing OGRTime
+            # fields, so we need to actually use a database
+            model_def = ogrinspect(ogr_db, 'Measurement',
+                                   layer_key=AllOGRFields._meta.db_table,
+                                   decimal=['f_decimal'])
+        except OGRException:
+            self.skipTest("Unable to setup an OGR connection to your database")
 
         self.assertTrue(model_def.startswith(
             '# This is an auto-generated Django model module created by ogrinspect.\n'
@@ -110,10 +113,9 @@ class OGRInspectTest(TestCase):
         self.assertIn('    f_char = models.CharField(max_length=10)', model_def)
         self.assertIn('    f_date = models.DateField()', model_def)
 
-        self.assertTrue(model_def.endswith(
-            '    geom = models.PolygonField()\n'
-            '    objects = models.GeoManager()'
-        ))
+        self.assertIsNotNone(re.search(
+            r'    geom = models.PolygonField\(([^\)])*\)\n'  # Some backends may have srid=-1
+            r'    objects = models.GeoManager\(\)', model_def))
 
     def test_management_command(self):
         shp_file = os.path.join(TEST_DATA, 'cities', 'cities.shp')
@@ -141,7 +143,11 @@ def get_ogr_db_string():
         'django.contrib.gis.db.backends.spatialite': ('SQLite', '%(db_name)s', '')
     }
 
-    drv_name, db_str, param_sep = drivers[db['ENGINE']]
+    db_engine = db['ENGINE']
+    if db_engine not in drivers:
+        return None
+
+    drv_name, db_str, param_sep = drivers[db_engine]
 
     # Ensure that GDAL library has driver support for the database.
     try:

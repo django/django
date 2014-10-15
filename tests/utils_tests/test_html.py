@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 import os
 from unittest import TestCase
+import warnings
 
 from django.utils import html, safestring
 from django.utils._os import upath
@@ -124,7 +125,9 @@ class TestUtilsHtml(TestCase):
         # Strings that should come out untouched.
         values = ("&", "&a", "&a", "a&#a")
         for value in values:
-            self.check_output(f, value)
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                self.check_output(f, value)
         # Valid entities that should be stripped from the patterns.
         entities = ("&#1;", "&#12;", "&a;", "&fdasdfasdfasdf;")
         patterns = (
@@ -135,7 +138,9 @@ class TestUtilsHtml(TestCase):
         )
         for entity in entities:
             for in_pattern, output in patterns:
-                self.check_output(f, in_pattern % {'entity': entity}, output)
+                with warnings.catch_warnings(record=True):
+                    warnings.simplefilter("always")
+                    self.check_output(f, in_pattern % {'entity': entity}, output)
 
     def test_escapejs(self):
         f = html.escapejs
@@ -156,7 +161,9 @@ class TestUtilsHtml(TestCase):
             ("<a>x</a> <p><b>y</b></p>", "a b", "x <p>y</p>"),
         )
         for value, tags, output in items:
-            self.assertEqual(f(value, tags), output)
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                self.assertEqual(f(value, tags), output)
 
     def test_smart_urlquote(self):
         quote = html.smart_urlquote
@@ -166,7 +173,12 @@ class TestUtilsHtml(TestCase):
         # Ensure that everything unsafe is quoted, !*'();:@&=+$,/?#[]~ is considered safe as per RFC
         self.assertEqual(quote('http://example.com/path/öäü/'), 'http://example.com/path/%C3%B6%C3%A4%C3%BC/')
         self.assertEqual(quote('http://example.com/%C3%B6/ä/'), 'http://example.com/%C3%B6/%C3%A4/')
-        self.assertEqual(quote('http://example.com/?x=1&y=2'), 'http://example.com/?x=1&y=2')
+        self.assertEqual(quote('http://example.com/?x=1&y=2+3&z='), 'http://example.com/?x=1&y=2+3&z=')
+        self.assertEqual(quote('http://example.com/?x=<>"\''), 'http://example.com/?x=%3C%3E%22%27')
+        self.assertEqual(quote('http://example.com/?q=http://example.com/?x=1%26q=django'),
+                         'http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango')
+        self.assertEqual(quote('http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango'),
+                         'http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango')
 
     def test_conditional_escape(self):
         s = '<h1>interop</h1>'

@@ -23,10 +23,10 @@ Third-party tools, most notably `South <http://south.aeracode.org>`_,
 provided support for these additional types of change, but it was considered
 important enough that support was brought into core Django.
 
-Two Commands
+The Commands
 ------------
 
-There are two commands which you will use to interact with migrations
+There are several commands which you will use to interact with migrations
 and Django's handling of database schema:
 
 * :djadmin:`migrate`, which is responsible for applying migrations, as well as
@@ -34,6 +34,8 @@ and Django's handling of database schema:
 
 * :djadmin:`makemigrations`, which is responsible for creating new migrations
   based on the changes you have made to your models.
+
+* :djadmin:`sqlmigrate`, which displays the SQL statements for a migration.
 
 It's worth noting that migrations are created and run on a per-app basis.
 In particular, it's possible to have apps that *do not use migrations* (these
@@ -307,6 +309,13 @@ Note that this only works given two things:
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
 
+.. versionadded:: 1.8
+
+If you want to give the migration(s) a meaningful name instead of a generated one,
+you can use the :djadminopt:`--name` option::
+
+    $ python manage.py makemigrations --name changed_my_model your_app_label
+
 .. _historical-models:
 
 Historical models
@@ -328,6 +337,12 @@ They will, however, have the same fields, relationships and ``Meta`` options
   This means that you will NOT have custom ``save()`` methods called on objects
   when you access them in migrations, and you will NOT have any custom
   constructors or instance methods. Plan appropriately!
+
+References to functions in field options such as ``upload_to`` and
+``limit_choices_to`` are serialized in migrations, so the functions will need
+to be kept around for as long as there is a migration referencing them. Any
+:doc:`custom model fields </howto/custom-model-fields>` will also need to be
+kept, since these are imported directly by migrations.
 
 In addition, the base classes of the model are just stored as pointers,
 so you must always keep base classes around for as long as there is a migration
@@ -481,11 +496,33 @@ work::
     you can delete them.
 
 Note that model interdependencies in Django can get very complex, and squashing
-may occasionally result in an optimized migration that doesn't work or is
-impossible to run. When this occurs, you can re-try with ``--no-optimize``, but
-please `file a bug report <https://code.djangoproject.com/newticket>`_ either
-way detailing the models and their relationships so we can improve the
-optimizer to handle your case.
+may result in migrations that do not run; either mis-optimized (in which case
+you can try again with ``--no-optimize``, though you should also report an issue),
+or with a ``CircularDependencyError``, in which case you can manually resolve it.
+
+To manually resolve a ``CircularDependencyError``, break out one of
+the ForeignKeys in the circular dependency loop into a separate
+migration, and move the dependency on the other app with it. If you're unsure,
+see how makemigrations deals with the problem when asked to create brand
+new migrations from your models. In a future release of Django, squashmigrations
+will be updated to attempt to resolve these errors itself.
+
+Once you've squashed your migration, you should then commit it alongside the
+migrations it replaces and distribute this change to all running instances
+of your application, making sure that they run ``migrate`` to store the change
+in their database.
+
+After this has been done, you must then transition the squashed migration to
+a normal initial migration, by:
+
+- Deleting all the migration files it replaces
+- Removing the ``replaces`` argument in the ``Migration`` class of the
+  squashed migration (this is how Django tells that it is a squashed migration)
+
+.. note::
+    Once you've squashed a migration, you should not then re-squash that squashed
+    migration until you have fully transitioned it to a normal migration.
+
 
 .. _migration-serializing:
 
@@ -505,12 +542,17 @@ Django can serialize the following:
 
 - ``int``, ``long``, ``float``, ``bool``, ``str``, ``unicode``, ``bytes``, ``None``
 - ``list``, ``set``, ``tuple``, ``dict``
-- ``datetime.date`` and ``datetime.datetime`` instances
+- ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
+  (include those that are timezone-aware)
 - ``decimal.Decimal`` instances
 - Any Django field
-- Any function or method reference (e.g. ``datetime.datetime.today``)
-- Any class reference
+- Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
+- Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
+
+.. versionchanged:: 1.7.1
+
+    Support for serializing timezone-aware datetimes was added.
 
 Django can serialize the following on Python 3 only:
 
@@ -518,6 +560,7 @@ Django can serialize the following on Python 3 only:
 
 Django cannot serialize:
 
+- Nested classes
 - Arbitrary class instances (e.g. ``MyClass(4.3, 5.7)``)
 - Lambdas
 
@@ -543,26 +586,34 @@ Adding a deconstruct() method
 
 You can let Django serialize your own custom class instances by giving the class
 a ``deconstruct()`` method. It takes no arguments, and should return a tuple
-of three things: ``(path, args, kwargs)``. Note this return value is different
-from the ``deconstruct()`` method :ref:`for custom fields
-<custom-field-deconstruct-method>` which returns a tuple of four items.
+of three things ``(path, args, kwargs)``:
 
-``path`` should be the Python path to the class, with the class name included as the
-last part (for example, ``myapp.custom_things.MyClass``). If your class is not
-available at the top level of a module it is not serializable.
+* ``path`` should be the Python path to the class, with the class name included
+  as the last part (for example, ``myapp.custom_things.MyClass``). If your
+  class is not available at the top level of a module it is not serializable.
 
-``args`` should be a list of positional arguments to pass to your class'
-``__init__`` method. Everything in this list should itself be serializable.
+* ``args`` should be a list of positional arguments to pass to your class'
+  ``__init__`` method. Everything in this list should itself be serializable.
 
-``kwargs`` should be a dict of keyword arguments to pass to your class'
-``__init__`` method. Every value should itself be serializable.
+* ``kwargs`` should be a dict of keyword arguments to pass to your class'
+  ``__init__`` method. Every value should itself be serializable.
+
+.. note::
+    This return value is different from the ``deconstruct()`` method
+    :ref:`for custom fields <custom-field-deconstruct-method>` which returns a
+    tuple of four items.
 
 Django will write out the value as an instantiation of your class with the
 given arguments, similar to the way it writes out references to Django fields.
 
+To prevent a new migration from being created each time
+:djadmin:`makemigrations` is run, you should also add a ``__eq__()`` method to
+the decorated class. This function will be called by Django's migration
+framework to detect changes between states.
+
 As long as all of the arguments to your class' constructor are themselves
-serializable, you can just use the ``@deconstructible`` class decorator
-from ``django.utils.deconstruct`` to add the method::
+serializable, you can use the ``@deconstructible`` class decorator from
+``django.utils.deconstruct`` to add the ``deconstruct()`` method::
 
     from django.utils.deconstruct import deconstructible
 
@@ -570,7 +621,12 @@ from ``django.utils.deconstruct`` to add the method::
     class MyCustomClass(object):
 
         def __init__(self, foo=1):
+            self.foo = foo
             ...
+
+        def __eq__(self, other):
+            return self.foo == other.foo
+
 
 The decorator adds logic to capture and preserve the arguments on their
 way into your constructor, and then returns those arguments exactly when
@@ -582,10 +638,11 @@ Upgrading from South
 --------------------
 
 If you already have pre-existing migrations created with
-`South 0.x <http://south.aeracode.org>`_, then the upgrade process to use
+`South <http://south.aeracode.org>`_, then the upgrade process to use
 ``django.db.migrations`` is quite simple:
 
-* Ensure all installs are fully up-to-date with their migrations
+* Ensure all installs are fully up-to-date with their migrations.
+* Remove ``'south'`` from :setting:`INSTALLED_APPS`.
 * Delete all your (numbered) migration files, but not the directory or
   ``__init__.py`` - make sure you remove the ``.pyc`` files too.
 * Run ``python manage.py makemigrations``. Django should see the empty
@@ -599,3 +656,25 @@ of foreign keys; in this case, ``makemigrations`` might make more than one
 initial migration, and you'll need to mark them all as applied using::
 
     python manage.py migrate --fake yourappnamehere
+
+Libraries/Third-party Apps
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are a library or app maintainer, and wish to support both South migrations
+(for Django 1.6 and below) and Django migrations (for 1.7 and above) you should
+keep two parallel migration sets in your app, one in each format.
+
+To aid in this, South 1.0 will automatically look for South-format migrations
+in a ``south_migrations`` directory first, before looking in ``migrations``,
+meaning that users' projects will transparently use the correct set as long
+as you put your South migrations in the ``south_migrations`` directory and
+your Django migrations in the ``migrations`` directory.
+
+More information is available in the
+`South 1.0 release notes <http://south.readthedocs.org/en/latest/releasenotes/1.0.html#library-migration-path>`_.
+
+.. seealso::
+
+    :doc:`The Migrations Operations Reference </ref/migration-operations>`
+        Covers the schema operations API, special operations, and writing your
+        own operations.

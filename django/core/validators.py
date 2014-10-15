@@ -179,12 +179,21 @@ class EmailValidator(object):
         return False
 
     def __eq__(self, other):
-        return isinstance(other, EmailValidator) and (self.domain_whitelist == other.domain_whitelist) and (self.message == other.message) and (self.code == other.code)
+        return (
+            isinstance(other, EmailValidator) and
+            (self.domain_whitelist == other.domain_whitelist) and
+            (self.message == other.message) and
+            (self.code == other.code)
+        )
 
 validate_email = EmailValidator()
 
 slug_re = re.compile(r'^[-a-zA-Z0-9_]+$')
-validate_slug = RegexValidator(slug_re, _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."), 'invalid')
+validate_slug = RegexValidator(
+    slug_re,
+    _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."),
+    'invalid'
+)
 
 ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
 validate_ipv4_address = RegexValidator(ipv4_re, _('Enter a valid IPv4 address.'), 'invalid')
@@ -228,7 +237,11 @@ def ip_address_validators(protocol, unpack_ipv4):
                          % (protocol, list(ip_address_validator_map)))
 
 comma_separated_int_list_re = re.compile('^[\d,]+$')
-validate_comma_separated_integer_list = RegexValidator(comma_separated_int_list_re, _('Enter only digits separated by commas.'), 'invalid')
+validate_comma_separated_integer_list = RegexValidator(
+    comma_separated_int_list_re,
+    _('Enter only digits separated by commas.'),
+    'invalid'
+)
 
 
 @deconstructible
@@ -238,17 +251,24 @@ class BaseValidator(object):
     message = _('Ensure this value is %(limit_value)s (it is %(show_value)s).')
     code = 'limit_value'
 
-    def __init__(self, limit_value):
+    def __init__(self, limit_value, message=None):
         self.limit_value = limit_value
+        if message:
+            self.message = message
 
     def __call__(self, value):
         cleaned = self.clean(value)
-        params = {'limit_value': self.limit_value, 'show_value': cleaned}
+        params = {'limit_value': self.limit_value, 'show_value': cleaned, 'value': value}
         if self.compare(cleaned, self.limit_value):
             raise ValidationError(self.message, code=self.code, params=params)
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and (self.limit_value == other.limit_value) and (self.message == other.message) and (self.code == other.code)
+        return (
+            isinstance(other, self.__class__) and
+            (self.limit_value == other.limit_value)
+            and (self.message == other.message)
+            and (self.code == other.code)
+        )
 
 
 @deconstructible

@@ -949,7 +949,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
                     (fk.rel.to != parent_model and
                      fk.rel.to not in parent_model._meta.get_parent_list()):
                 raise ValueError(
-                    "fk_name '%s' is not a ForeignKey to '%s.%'."
+                    "fk_name '%s' is not a ForeignKey to '%s.%s'."
                     % (fk_name, parent_model._meta.app_label, parent_model._meta.object_name))
         elif len(fks_to_parent) == 0:
             raise ValueError(
@@ -969,12 +969,22 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
             if can_fail:
                 return
             raise ValueError(
-                "'%s.%s' has no ForeignKey to '%s.%s'."
-                % (model._meta.app_label, model._meta.object_name, parent_model._meta.app_label, parent_model._meta.object_name))
+                "'%s.%s' has no ForeignKey to '%s.%s'." % (
+                    model._meta.app_label,
+                    model._meta.object_name,
+                    parent_model._meta.app_label,
+                    parent_model._meta.object_name,
+                )
+            )
         else:
             raise ValueError(
-                "'%s.%s' has more than one ForeignKey to '%s.%s'."
-                % (model._meta.app_label, model._meta.object_name, parent_model._meta.app_label, parent_model._meta.object_name))
+                "'%s.%s' has more than one ForeignKey to '%s.%s'." % (
+                    model._meta.app_label,
+                    model._meta.object_name,
+                    parent_model._meta.app_label,
+                    parent_model._meta.object_name,
+                )
+            )
     return fk
 
 
@@ -1058,7 +1068,7 @@ class InlineForeignKeyField(Field):
             raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
         return self.parent_instance
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         return False
 
 
@@ -1073,12 +1083,12 @@ class ModelChoiceIterator(object):
         if self.field.cache_choices:
             if self.field.choice_cache is None:
                 self.field.choice_cache = [
-                    self.choice(obj) for obj in self.queryset.all()
+                    self.choice(obj) for obj in self.queryset.iterator()
                 ]
             for choice in self.field.choice_cache:
                 yield choice
         else:
-            for obj in self.queryset.all():
+            for obj in self.queryset.iterator():
                 yield self.choice(obj)
 
     def __len__(self):
@@ -1179,14 +1189,14 @@ class ModelChoiceField(ChoiceField):
         try:
             key = self.to_field_name or 'pk'
             value = self.queryset.get(**{key: value})
-        except (ValueError, self.queryset.model.DoesNotExist):
+        except (ValueError, TypeError, self.queryset.model.DoesNotExist):
             raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
         return value
 
     def validate(self, value):
         return Field.validate(self, value)
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         initial_value = initial if initial is not None else ''
         data_value = data if data is not None else ''
         return force_text(self.prepare_value(initial_value)) != force_text(data_value)
@@ -1227,7 +1237,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         for pk in value:
             try:
                 self.queryset.filter(**{key: pk})
-            except ValueError:
+            except (ValueError, TypeError):
                 raise ValidationError(
                     self.error_messages['invalid_pk_value'],
                     code='invalid_pk_value',
@@ -1254,7 +1264,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
             return [super(ModelMultipleChoiceField, self).prepare_value(v) for v in value]
         return super(ModelMultipleChoiceField, self).prepare_value(value)
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if initial is None:
             initial = []
         if data is None:

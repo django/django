@@ -17,7 +17,10 @@ def check_for_migrations(app_config, connection):
     from django.db.migrations.loader import MigrationLoader
     loader = MigrationLoader(connection)
     if app_config.label in loader.migrated_apps:
-        raise CommandError("App '%s' has migrations. Only the sqlmigrate and sqlflush commands can be used when an app has migrations." % app_config.label)
+        raise CommandError(
+            "App '%s' has migrations. Only the sqlmigrate and sqlflush commands "
+            "can be used when an app has migrations." % app_config.label
+        )
 
 
 def sql_create(app_config, style, connection):
@@ -36,7 +39,7 @@ def sql_create(app_config, style, connection):
     # We trim models from the current app so that the sqlreset command does not
     # generate invalid SQL (leaving models out of known_models is harmless, so
     # we can be conservative).
-    app_models = app_config.get_models(include_auto_created=True)
+    app_models = list(app_config.get_models(include_auto_created=True))
     final_output = []
     tables = connection.introspection.table_names()
     known_models = set(model for model in connection.introspection.installed_models(tables) if model not in app_models)
@@ -113,6 +116,8 @@ def sql_delete(app_config, style, connection, close_connection=True):
             cursor.close()
             connection.close()
 
+    if not output:
+        output.append('-- App creates no tables in the database. Nothing to do.')
     return output[::-1]  # Reverse it, to deal with table dependencies.
 
 
@@ -124,9 +129,9 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
     models and are in INSTALLED_APPS will be included.
     """
     if only_django:
-        tables = connection.introspection.django_table_names(only_existing=True)
+        tables = connection.introspection.django_table_names(only_existing=True, include_views=False)
     else:
-        tables = connection.introspection.table_names()
+        tables = connection.introspection.table_names(include_views=False)
     seqs = connection.introspection.sequence_list() if reset_sequences else ()
     statements = connection.ops.sql_flush(style, tables, seqs, allow_cascade)
     return statements
@@ -174,7 +179,11 @@ def sql_all(app_config, style, connection):
     check_for_migrations(app_config, connection)
 
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
-    return sql_create(app_config, style, connection) + sql_custom(app_config, style, connection) + sql_indexes(app_config, style, connection)
+    return (
+        sql_create(app_config, style, connection) +
+        sql_custom(app_config, style, connection) +
+        sql_indexes(app_config, style, connection)
+    )
 
 
 def _split_statements(content):

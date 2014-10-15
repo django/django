@@ -18,6 +18,7 @@ from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached
 from django.test.signals import template_rendered, setting_changed
 from django.utils import six
+from django.utils.decorators import ContextDecorator
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
@@ -146,7 +147,7 @@ def get_runner(settings, test_runner_class=None):
     return test_runner
 
 
-class override_template_loaders(object):
+class override_template_loaders(ContextDecorator):
     """
     Acts as a function decorator, context manager or start/end manager and
     override the template loaders. It could be used in the following ways:
@@ -173,13 +174,6 @@ class override_template_loaders(object):
 
     def __exit__(self, type, value, traceback):
         loader.template_source_loaders = self.old_loaders
-
-    def __call__(self, test_func):
-        @wraps(test_func)
-        def inner(*args, **kwargs):
-            with self:
-                return test_func(*args, **kwargs)
-        return inner
 
     @classmethod
     def override(cls, *loaders):
@@ -365,7 +359,7 @@ class modify_settings(override_settings):
         super(modify_settings, self).enable()
 
 
-def override_system_checks(new_checks):
+def override_system_checks(new_checks, deployment_checks=None):
     """ Acts as a decorator. Overrides list of registered system checks.
     Useful when you override `INSTALLED_APPS`, e.g. if you exclude `auth` app,
     you also need to exclude its system checks. """
@@ -377,10 +371,14 @@ def override_system_checks(new_checks):
         def inner(*args, **kwargs):
             old_checks = registry.registered_checks
             registry.registered_checks = new_checks
+            old_deployment_checks = registry.deployment_checks
+            if deployment_checks is not None:
+                registry.deployment_checks = deployment_checks
             try:
                 return test_func(*args, **kwargs)
             finally:
                 registry.registered_checks = old_checks
+                registry.deployment_checks = old_deployment_checks
         return inner
     return outer
 
@@ -507,15 +505,15 @@ class CaptureQueriesContext(object):
         return self.connection.queries[self.initial_queries:self.final_queries]
 
     def __enter__(self):
-        self.use_debug_cursor = self.connection.use_debug_cursor
-        self.connection.use_debug_cursor = True
+        self.force_debug_cursor = self.connection.force_debug_cursor
+        self.connection.force_debug_cursor = True
         self.initial_queries = len(self.connection.queries_log)
         self.final_queries = None
         request_started.disconnect(reset_queries)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.connection.use_debug_cursor = self.use_debug_cursor
+        self.connection.force_debug_cursor = self.force_debug_cursor
         request_started.connect(reset_queries)
         if exc_type is not None:
             return

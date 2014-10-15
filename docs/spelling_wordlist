@@ -57,6 +57,7 @@ Biggs
 Bjørn
 blocktrans
 blog
+blogs
 Boersma
 boilerplatish
 Bokmål
@@ -133,6 +134,7 @@ datatype
 datetimes
 dbshell
 de
+Debian
 deconstruct
 deconstructing
 deepcopy
@@ -151,6 +153,7 @@ dictsortreversed
 diff
 diffsettings
 dirmod
+Disqus
 distro
 divisibleby
 django
@@ -202,6 +205,7 @@ filesizeformat
 filesystem
 filesystems
 findstatic
+Firesheep
 firstof
 fk
 flatpage
@@ -286,6 +290,7 @@ init
 inline
 inlines
 inspectdb
+Instagram
 intcomma
 internet
 intranet
@@ -309,6 +314,7 @@ iTunes
 ize
 Jannis
 javascript
+Jinja
 jQuery
 JServ
 Julien
@@ -326,6 +332,7 @@ Kyngesburye
 latin
 lawrence
 Lawrence
+Leidel
 lexer
 lhs
 lifecycle
@@ -344,12 +351,14 @@ localflavors
 localhost
 localizable
 localtime
+Loïc
 lorem
 lt
 lte
 Magee
 makemessages
 makemigrations
+Mako
 Mapnik
 MBR
 memcache
@@ -375,6 +384,7 @@ modelformset
 modwsgi
 monkeypatched
 Montréal
+mssql
 multijoins
 multiline
 multipart
@@ -422,11 +432,13 @@ Palau
 params
 parens
 pdf
+PEM
 perl
 permalink
 pessimization
 Peucker
 pgAdmin
+phishing
 php
 pickleable
 picosecond
@@ -434,6 +446,7 @@ PIL
 pingback
 pingbacks
 Pinney
+Pinterest
 plaintext
 plugin
 plugins
@@ -459,6 +472,7 @@ prepopulate
 prepopulated
 prepopulates
 preprocess
+Procida
 programmatically
 projectname
 proxied
@@ -496,6 +510,7 @@ regex
 regexes
 reimplement
 reindex
+releasers
 removetags
 repo
 reprojection
@@ -503,7 +518,7 @@ reraise
 reST
 reStructuredText
 reupload
-Reusability
+reusability
 revalidate
 rhs
 rjust
@@ -517,6 +532,7 @@ Sandvik
 savepoint
 savepoints
 Schaub
+schemas
 screencast
 screencasts
 screenshot
@@ -528,6 +544,7 @@ serializability
 serializable
 serializer
 serializers
+servlet
 sessionid
 setuptools
 sha
@@ -562,7 +579,10 @@ sqlmigrate
 sqlsequencereset
 squashmigrations
 ssi
+SSL
 stacktrace
+startapp
+startproject
 startswith
 stateful
 staticfile
@@ -646,6 +666,7 @@ unapplying
 uncheck
 unclaim
 uncopyable
+unencoded
 unescape
 unescaped
 ungrouped
@@ -731,6 +752,7 @@ www
 xe
 xgettext
 xref
+XSS
 xxxxx
 yesno
 Zope

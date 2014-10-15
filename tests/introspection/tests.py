@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import connection
+from django.db.utils import DatabaseError
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Reporter, Article
@@ -34,10 +35,27 @@ class IntrospectionTests(TestCase):
         tl = connection.introspection.django_table_names(only_existing=False)
         self.assertIs(type(tl), list)
 
+    def test_table_names_with_views(self):
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute(
+                    'CREATE VIEW introspection_article_view AS SELECT headline '
+                    'from introspection_article;')
+            except DatabaseError as e:
+                if 'insufficient privileges' in str(e):
+                    self.fail("The test user has no CREATE VIEW privileges")
+                else:
+                    raise
+
+        self.assertIn('introspection_article_view',
+                      connection.introspection.table_names(include_views=True))
+        self.assertNotIn('introspection_article_view',
+                         connection.introspection.table_names())
+
     def test_installed_models(self):
         tables = [Article._meta.db_table, Reporter._meta.db_table]
         models = connection.introspection.installed_models(tables)
-        self.assertEqual(models, set([Article, Reporter]))
+        self.assertEqual(models, {Article, Reporter})
 
     def test_sequence_list(self):
         sequences = connection.introspection.sequence_list()
@@ -59,7 +77,8 @@ class IntrospectionTests(TestCase):
             ['AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
              'CharField', 'CharField', 'CharField',
              'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
-             'BinaryField' if connection.features.can_introspect_binary_field else 'TextField']
+             'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
+             'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField']
         )
 
     # The following test fails on Oracle due to #17202 (can't correctly
@@ -80,7 +99,7 @@ class IntrospectionTests(TestCase):
         nullable_by_backend = connection.features.interprets_empty_strings_as_nulls
         self.assertEqual(
             [r[6] for r in desc],
-            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True]
+            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False]
         )
 
     # Regression test for #9991 - 'real' types in postgres
@@ -110,8 +129,8 @@ class IntrospectionTests(TestCase):
             key_columns = connection.introspection.get_key_columns(cursor, Article._meta.db_table)
         self.assertEqual(
             set(key_columns),
-            set([('reporter_id', Reporter._meta.db_table, 'id'),
-                 ('response_to_id', Article._meta.db_table, 'id')]))
+            {('reporter_id', Reporter._meta.db_table, 'id'),
+             ('response_to_id', Article._meta.db_table, 'id')})
 
     def test_get_primary_key_column(self):
         with connection.cursor() as cursor:

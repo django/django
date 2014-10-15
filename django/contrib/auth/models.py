@@ -32,8 +32,7 @@ class PermissionManager(models.Manager):
     def get_by_natural_key(self, codename, app_label, model):
         return self.get(
             codename=codename,
-            content_type=ContentType.objects.get_by_natural_key(app_label,
-                                                                model),
+            content_type=ContentType.objects.db_manager(self.db).get_by_natural_key(app_label, model),
         )
 
 
@@ -173,7 +172,7 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(username=username, email=email,
                           is_staff=is_staff, is_active=True,
-                          is_superuser=is_superuser, last_login=now,
+                          is_superuser=is_superuser,
                           date_joined=now, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -191,7 +190,7 @@ class UserManager(BaseUserManager):
 @python_2_unicode_compatible
 class AbstractBaseUser(models.Model):
     password = models.CharField(_('password'), max_length=128)
-    last_login = models.DateTimeField(_('last login'), default=timezone.now)
+    last_login = models.DateTimeField(_('last login'), blank=True, null=True)
 
     is_active = True
 
@@ -510,3 +509,6 @@ class AnonymousUser(object):
 
     def is_authenticated(self):
         return False
+
+    def get_username(self):
+        return self.username

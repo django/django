@@ -35,7 +35,9 @@ from .models import (Article, Chapter, Child, Parent, Picture, Widget,
     UnchangeableObject, UserMessenger, Simple, Choice, ShortMessage, Telegram,
     FilteredManager, EmptyModelHidden, EmptyModelVisible, EmptyModelMixin,
     State, City, Restaurant, Worker, ParentWithDependentChildren,
-    DependentChild, StumpJoke, FieldOverridePost, FunkyTag)
+    DependentChild, StumpJoke, FieldOverridePost, FunkyTag,
+    ReferencedByParent, ChildOfReferer, M2MReference, ReferencedByInline,
+    InlineReference, InlineReferer, Ingredient)
 
 
 def callable_year(dt_value):
@@ -325,6 +327,7 @@ class LanguageAdmin(admin.ModelAdmin):
 
 
 class RecommendationAdmin(admin.ModelAdmin):
+    show_full_result_count = False
     search_fields = ('=titletranslation__text', '=recommender__titletranslation__text',)
 
 
@@ -831,7 +834,16 @@ class FunkyTagAdmin(admin.ModelAdmin):
     list_display = ('name', 'content_object')
 
 
+class InlineReferenceInline(admin.TabularInline):
+    model = InlineReference
+
+
+class InlineRefererAdmin(admin.ModelAdmin):
+    inlines = [InlineReferenceInline]
+
+
 site = admin.AdminSite(name="admin")
+site.site_url = '/my-site-url/'
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
 site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -887,6 +899,11 @@ site.register(City, CityAdmin)
 site.register(Restaurant, RestaurantAdmin)
 site.register(Worker, WorkerAdmin)
 site.register(FunkyTag, FunkyTagAdmin)
+site.register(ReferencedByParent)
+site.register(ChildOfReferer)
+site.register(M2MReference)
+site.register(ReferencedByInline)
+site.register(InlineReferer, InlineRefererAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
@@ -923,6 +940,7 @@ site.register(EmptyModelHidden, EmptyModelHiddenAdmin)
 site.register(EmptyModelVisible, EmptyModelVisibleAdmin)
 site.register(EmptyModelMixin, EmptyModelMixinAdmin)
 site.register(StumpJoke)
+site.register(Ingredient)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group

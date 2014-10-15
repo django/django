@@ -17,7 +17,6 @@ from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
 from django.test import override_settings
-from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import six
 from django.utils.six import PY3, StringIO
@@ -465,18 +464,6 @@ class TestFixtures(TestCase):
                 verbosity=0,
             )
 
-    def test_loaddata_not_existant_fixture_file(self):
-        stdout_output = StringIO()
-        with warnings.catch_warnings(record=True):
-            management.call_command(
-                'loaddata',
-                'this_fixture_doesnt_exist',
-                verbosity=2,
-                stdout=stdout_output,
-            )
-        self.assertTrue("No fixture 'this_fixture_doesnt_exist' in" in
-            force_text(stdout_output.getvalue()))
-
     def test_ticket_20820(self):
         """
         Regression for ticket #20820 -- loaddata on a model that inherits
@@ -857,3 +844,15 @@ class TestTicket11101(TransactionTestCase):
             self.assertEqual(Thingy.objects.count(), 1)
             transaction.set_rollback(True)
         self.assertEqual(Thingy.objects.count(), 0)
+
+
+class TestLoadFixtureFromOtherAppDirectory(TestCase):
+    """
+    #23612 -- fixtures path should be normalized to allow referencing relative
+    paths on Windows.
+    """
+    fixtures = ['fixtures_regress/fixtures/absolute.json']
+
+    def test_fixtures_loaded(self):
+        count = Absolute.objects.count()
+        self.assertGreater(count, 0, "Fixtures not loaded properly.")

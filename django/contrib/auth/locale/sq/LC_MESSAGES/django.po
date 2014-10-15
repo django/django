@@ -1,15 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-# Besnik <besnik@programeshqip.org>, 2011.
+# Besnik <besnik@programeshqip.org>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2013-02-20 08:30+0000\n"
-"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2014-05-20 12:20+0200\n"
+"PO-Revision-Date: 2014-05-21 09:39+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -18,71 +17,80 @@ msgstr ""
 "Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:41
+#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Të dhëna personale"
 
-#: admin.py:42
+#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Leje"
 
-#: admin.py:44
+#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Të dhëna të rëndësishme"
 
-#: admin.py:126
+#: contrib/auth/admin.py:134
 msgid "Password changed successfully."
 msgstr "Fjalëkalimi u ndryshua me sukses."
 
-#: admin.py:136
+#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Ndryshoni fjalëkalimin: %s"
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: contrib/auth/apps.py:10
+msgid "Authentication and Authorization"
+msgstr ""
+
+#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
+#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Nuk ka fjalëkalim të caktuar."
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
+#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Format i pavlefshëm fjalëkalimi ose algoritëm i panjohur hashi."
 
-#: forms.py:67
+#: contrib/auth/forms.py:76
 msgid "A user with that username already exists."
 msgstr "Ka tashmë një emër të tillë përdoruesi."
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
+#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Dy fushat për fjalëkalim nuk u përputhën."
 
-#: forms.py:70 forms.py:115
+#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
 msgid "Username"
 msgstr "Emër përdoruesi"
 
-#: forms.py:72 forms.py:116
+#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
+#: contrib/auth/models.py:368
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "E domosdoshme. 30 ose më pak shenja. Vetëm shkronja, shifra dhe shenjat @/./"
 "+/-/_ ."
 
-#: forms.py:75 forms.py:119
+#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 "Kjo vlerë mund të përmbajë vetëm shkronja, numra dhe shenja si @/./+/-/_ ."
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
+#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Fjalëkalim"
 
-#: forms.py:79
+#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Ripohim fjalëkalimi"
 
-#: forms.py:81
+#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më sipër."
 
-#: forms.py:122
+#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -92,134 +100,119 @@ msgstr ""
 "fjalëkalimi i këtij përdoruesi, por mund ta ndryshoni fjalëkalimin duke "
 "përdorur <a href=\"password/\">këtë formular</a>."
 
-#: forms.py:151
+#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Ju lutemi, jepni një %(username)s dhe një fjalëkalim të saktë. Kini parasysh "
+"se që të dyja fushat mund të jenë të ndjeshme ndaj shkrimit me shkronja të "
+"mëdha ose të vogla."
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Shfletuesi juaj Web nuk duket se i ka të aktivizuara \"cookie\"-t. \"Cookie"
-"\"-t janë të domosdoshme për hyrjen."
-
-#: forms.py:155
+#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Kjo llogari nuk është aktive."
 
-#: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Kësaj adrese email nuk i përshoqërohet ndonjë llogari përdoruesi. Jeni i "
-"sigurt se jeni regjistruar?"
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr ""
-"Llogaria e përdoruesit të përshoqëruar me këtë adres email nuk mund të "
-"kryejë ricaktim të fjalëkalimit."
-
-#: forms.py:211
+#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "Email"
 
-#: forms.py:271
+#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Fjalëkalim i ri"
 
-#: forms.py:273
+#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Ripohim fjalëkalimi të ri"
 
-#: forms.py:302
+#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Fjalëkalimi juaj i vjetër u dha pasaktësisht. Ju lutem, jepeni sërish."
 
-#: forms.py:305
+#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Fjalëkalim i vjetër"
 
-#: forms.py:333
+#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Fjalëkalim (sërish)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
+#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
+#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
+#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algoritëm"
 
-#: hashers.py:242
+#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "përsëritje"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
+#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
+#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "kripë"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
+#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
+#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "hash"
 
-#: hashers.py:293
+#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr ""
 
-#: hashers.py:295
+#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr ""
 
-#: models.py:72 models.py:121
+#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "emër"
 
-#: models.py:74
+#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "emër i koduar"
 
-#: models.py:78
+#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "leje"
 
-#: models.py:79 models.py:123
+#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "leje"
 
-#: models.py:128
+#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grup"
 
-#: models.py:129 models.py:301
+#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grupe"
 
-#: models.py:200
+#: contrib/auth/models.py:192
 msgid "password"
 msgstr "fjalëkalim"
 
-#: models.py:201
+#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "hyrja e fundit"
 
-#: models.py:298
+#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "gjendje superpërdoruesi"
 
-#: models.py:299
+#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
 "Përcakton që ky përdorues ka krejt lejet, pa ia akorduar ato shprehimisht."
 
-#: models.py:302
+#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
@@ -227,49 +220,47 @@ msgstr ""
 "Grupet ku bën pjesë ky përdorues. Një përdorues përfiton krejt lejet e dhëna "
 "për secilin grup të tij/saj."
 
-#: models.py:306
+#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "leje përdoruesi"
 
-#: models.py:377
+#: contrib/auth/models.py:300
+msgid "Specific permissions for this user."
+msgstr ""
+
+#: contrib/auth/models.py:367
 msgid "username"
 msgstr "emër përdoruesi"
 
-#: models.py:378
-msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
-"E domosdoshme. 30 ose më pak shenja. Shkronja, numra dhe shenjat @/./+/-/_"
-
-#: models.py:381
+#: contrib/auth/models.py:371
 msgid "Enter a valid username."
 msgstr "Jepni emër përdoruesi të vlefshëm."
 
-#: models.py:383
+#: contrib/auth/models.py:373
 msgid "first name"
 msgstr "emër"
 
-#: models.py:384
+#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "mbiemër"
 
-#: models.py:385
+#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "adresë email"
 
-#: models.py:386
+#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "vend në ekip"
 
-#: models.py:387
+#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Përcakton nëse mund të hyjë ose jo përdoruesi te ky site administrimi."
 
-#: models.py:389
+#: contrib/auth/models.py:379
 msgid "active"
 msgstr "veprues"
 
-#: models.py:390
+#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -277,23 +268,55 @@ msgstr ""
 "Përcakton nëse ky përdorues do të duhej trajtuar si aktiv. Çpërzgjidhni "
 "këtë, në vend se të fshihni llogarira."
 
-#: models.py:392
+#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "datë anëtarësimi"
 
-#: models.py:400
+#: contrib/auth/models.py:390
 msgid "user"
 msgstr "përdorues"
 
-#: models.py:401
+#: contrib/auth/models.py:391
 msgid "users"
 msgstr "përdoruesa"
 
-#: views.py:94
-msgid "Logged out"
-msgstr "I dalë"
-
-#: templates/registration/password_reset_subject.txt:2
+#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Ricaktim fjalëkalimi për te %(site_name)s"
+
+#: contrib/auth/tests/test_forms.py:387
+msgid "Enter a valid email address."
+msgstr "Jepni një adresë email të vlefshme."
+
+#: contrib/auth/views.py:92
+msgid "Logged out"
+msgstr "I dalë"
+
+#: contrib/auth/views.py:169
+msgid "Password reset"
+msgstr ""
+
+#: contrib/auth/views.py:181
+msgid "Password reset successful"
+msgstr ""
+
+#: contrib/auth/views.py:216
+msgid "Enter new password"
+msgstr ""
+
+#: contrib/auth/views.py:227
+msgid "Password reset unsuccessful"
+msgstr ""
+
+#: contrib/auth/views.py:244
+msgid "Password reset complete"
+msgstr ""
+
+#: contrib/auth/views.py:278
+msgid "Password change"
+msgstr ""
+
+#: contrib/auth/views.py:291
+msgid "Password change successful"
+msgstr ""

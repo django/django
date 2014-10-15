@@ -11,6 +11,7 @@ from django.contrib.admin import widgets, helpers
 from django.contrib.admin import validation
 from django.contrib.admin.checks import (BaseModelAdminChecks, ModelAdminChecks,
     InlineModelAdminChecks)
+from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.utils import (quote, unquote, flatten_fieldsets,
     get_deleted_objects, model_format_dict, NestedObjects,
     lookup_needs_distinct)
@@ -109,6 +110,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     readonly_fields = ()
     ordering = None
     view_on_site = True
+    show_full_result_count = True
 
     # Validation of ModelAdmin definitions
     # Old, deprecated style:
@@ -271,7 +273,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                                     self.admin_site, using=db)
             kwargs['help_text'] = ''
         elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
-            kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
+            kwargs['widget'] = widgets.FilteredSelectMultiple(
+                db_field.verbose_name,
+                db_field.name in self.filter_vertical
+            )
 
         if 'queryset' not in kwargs:
             queryset = self.get_field_queryset(db, db_field, request)
@@ -412,7 +417,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                     # since it's ignored in ChangeList.get_filters().
                     return True
                 model = field.rel.to
-                rel_name = field.rel.get_related_field().name
+                if hasattr(field.rel, 'get_related_field'):
+                    rel_name = field.rel.get_related_field().name
+                else:
+                    rel_name = None
             elif isinstance(field, RelatedObject):
                 model = field.model
                 rel_name = model._meta.pk.name
@@ -433,6 +441,40 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             else:
                 valid_lookups.append(filter_item)
         return clean_lookup in valid_lookups
+
+    def to_field_allowed(self, request, to_field):
+        """
+        Returns True if the model associated with this admin should be
+        allowed to be referenced by the specified field.
+        """
+        opts = self.model._meta
+
+        try:
+            field = opts.get_field(to_field)
+        except FieldDoesNotExist:
+            return False
+
+        # Check whether this model is the origin of a M2M relationship
+        # in which case to_field has to be the pk on this model.
+        if opts.many_to_many and field.primary_key:
+            return True
+
+        # Make sure at least one of the models registered for this site
+        # references this field through a FK or a M2M relationship.
+        registered_models = set()
+        for model, admin in self.admin_site._registry.items():
+            registered_models.add(model)
+            for inline in admin.inlines:
+                registered_models.add(inline.model)
+
+        for related_object in (opts.get_all_related_objects(include_hidden=True) +
+                               opts.get_all_related_many_to_many_objects()):
+            related_model = related_object.model
+            if (any(issubclass(model, related_model) for model in registered_models) and
+                    related_object.field.rel.get_related_field() == field):
+                return True
+
+        return False
 
     def has_add_permission(self, request):
         """
@@ -1110,7 +1152,10 @@ class ModelAdmin(BaseModelAdmin):
                                             (opts.app_label, opts.model_name),
                                             args=(quote(pk_value),),
                                             current_app=self.admin_site.name)
-            post_url_continue = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, post_url_continue)
+            post_url_continue = add_preserved_filters(
+                {'preserved_filters': preserved_filters, 'opts': opts},
+                post_url_continue
+            )
             return HttpResponseRedirect(post_url_continue)
 
         elif "_addanother" in request.POST:
@@ -1337,6 +1382,10 @@ class ModelAdmin(BaseModelAdmin):
     @transaction.atomic
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
 
+        to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
+        if to_field and not self.to_field_allowed(request, to_field):
+            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
+
         model = self.model
         opts = model._meta
         add = object_id is None
@@ -1409,8 +1458,7 @@ class ModelAdmin(BaseModelAdmin):
             original=obj,
             is_popup=(IS_POPUP_VAR in request.POST or
                       IS_POPUP_VAR in request.GET),
-            to_field=request.POST.get(TO_FIELD_VAR,
-                                      request.GET.get(TO_FIELD_VAR)),
+            to_field=to_field,
             media=media,
             inline_admin_formsets=inline_formsets,
             errors=helpers.AdminErrorList(form, formsets),
@@ -1606,7 +1654,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
-        (deleted_objects, perms_needed, protected) = get_deleted_objects(
+        (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
             [obj], opts, request.user, self.admin_site, using)
 
         if request.POST:  # The user has already confirmed the deletion.
@@ -1631,6 +1679,7 @@ class ModelAdmin(BaseModelAdmin):
             object_name=object_name,
             object=obj,
             deleted_objects=deleted_objects,
+            model_count=dict(model_count),
             perms_lacking=perms_needed,
             protected=protected,
             opts=opts,
@@ -1721,6 +1770,7 @@ class InlineModelAdmin(BaseModelAdmin):
     verbose_name = None
     verbose_name_plural = None
     can_delete = True
+    show_change_link = False
 
     checks_class = InlineModelAdminChecks
 
@@ -1728,6 +1778,7 @@ class InlineModelAdmin(BaseModelAdmin):
         self.admin_site = admin_site
         self.parent_model = parent_model
         self.opts = self.model._meta
+        self.has_registered_model = admin_site.is_registered(self.model)
         super(InlineModelAdmin, self).__init__()
         if self.verbose_name is None:
             self.verbose_name = self.model._meta.verbose_name
@@ -1806,7 +1857,8 @@ class InlineModelAdmin(BaseModelAdmin):
                         objs = []
                         for p in collector.protected:
                             objs.append(
-                                # Translators: Model verbose name and instance representation, suitable to be an item in a list
+                                # Translators: Model verbose name and instance representation,
+                                # suitable to be an item in a list.
                                 _('%(class_name)s %(instance)s') % {
                                     'class_name': p._meta.verbose_name,
                                     'instance': p}

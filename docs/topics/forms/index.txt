@@ -224,9 +224,7 @@ The :class:`Form` class
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 We already know what we want our HTML form to look like. Our starting point for
-it in Django is this:
-
-.. code-block:: python
+it in Django is this::
 
     from django import forms
 
@@ -273,9 +271,7 @@ same view which published the form. This allows us to reuse some of the same
 logic.
 
 To handle the form we need to instantiate it in the view for the URL where we
-want it to be published:
-
-.. code-block:: python
+want it to be published::
 
     from django.shortcuts import render
     from django.http import HttpResponseRedirect
@@ -345,6 +341,16 @@ from that ``{{ form }}`` by Django's template language.
     directly tied to forms in templates, this tag is omitted from the
     following examples in this document.
 
+.. admonition:: HTML5 input types and browser validation
+
+    If your form includes a :class:`~django.forms.URLField`, an
+    :class:`~django.forms.EmailField` or any integer field type, Django will
+    use the ``url``, ``email`` and ``number`` HTML5 input types. By default,
+    browsers may apply their own validation on these fields, which may be
+    stricter than Django's validation. If you would like to disable this
+    behavior, set the `novalidate` attribute on the ``form`` tag, or specify
+    a different widget on the field, like :class:`TextInput`.
+
 We now have a working web form, described by a Django :class:`Form`, processed
 by a view, and rendered as an HTML ``<form>``.
 
@@ -386,9 +392,7 @@ More on fields
 --------------
 
 Consider a more useful form than our minimal example above, which we could use
-to implement "contact me" functionality on a personal Web site:
-
-.. code-block:: python
+to implement "contact me" functionality on a personal Web site::
 
     from django import forms
 
@@ -413,9 +417,9 @@ type="text">``.
 
 In most cases, the field will have a sensible default widget. For example, by
 default, a :class:`CharField` will have a :class:`TextInput` widget, that
-produces an ``<input type="text">`` in the HTML. If you needed
-``<input type="textarea">`` instead, you'd specify the appropriate widget when
-defining your form field, as we have done for the ``message`` field.
+produces an ``<input type="text">`` in the HTML. If you needed ``<textarea>``
+instead, you'd specify the appropriate widget when defining your form field,
+as we have done for the ``message`` field.
 
 Field data
 ^^^^^^^^^^
@@ -434,9 +438,7 @@ In the contact form example above, ``cc_myself`` will be a boolean value.
 Likewise, fields such as :class:`IntegerField` and :class:`FloatField` convert
 values to a Python ``int`` and ``float`` respectively.
 
-Here's how the form data could be processed in the view that handles this form:
-
-.. code-block:: python
+Here's how the form data could be processed in the view that handles this form::
 
     from django.core.mail import send_mail
 

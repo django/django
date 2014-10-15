@@ -1,5 +1,10 @@
 "Functions that help with dynamically creating decorators for views."
 
+try:
+    from contextlib import ContextDecorator
+except ImportError:
+    ContextDecorator = None
+
 from functools import wraps, update_wrapper, WRAPPER_ASSIGNMENTS
 
 from django.utils import six
@@ -8,7 +13,7 @@ from django.utils import six
 class classonlymethod(classmethod):
     def __get__(self, instance, owner):
         if instance is not None:
-            raise AttributeError("This method is available only on the view class.")
+            raise AttributeError("This method is available only on the class, not on instances.")
         return super(classonlymethod, self).__get__(instance, owner)
 
 
@@ -124,3 +129,18 @@ def make_middleware_decorator(middleware_class):
             return _wrapped_view
         return _decorator
     return _make_decorator
+
+
+if ContextDecorator is None:
+    # ContextDecorator was introduced in Python 3.2
+    # See https://docs.python.org/3/library/contextlib.html#contextlib.ContextDecorator
+    class ContextDecorator(object):
+        """
+        A base class that enables a context manager to also be used as a decorator.
+        """
+        def __call__(self, func):
+            @wraps(func, assigned=available_attrs(func))
+            def inner(*args, **kwargs):
+                with self:
+                    return func(*args, **kwargs)
+            return inner

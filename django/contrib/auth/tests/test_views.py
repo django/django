@@ -2,6 +2,7 @@ from importlib import import_module
 import itertools
 import os
 import re
+import warnings
 
 from django.apps import apps
 from django.conf import global_settings, settings
@@ -160,10 +161,12 @@ class PasswordResetTest(AuthViewsTestCase):
     @override_settings(ALLOWED_HOSTS=['adminsite.com'])
     def test_admin_reset(self):
         "If the reset view is marked as being for admin, the HTTP_HOST header is used for a domain override."
-        response = self.client.post('/admin_password_reset/',
-            {'email': 'staffmember@example.com'},
-            HTTP_HOST='adminsite.com'
-        )
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            response = self.client.post('/admin_password_reset/',
+                {'email': 'staffmember@example.com'},
+                HTTP_HOST='adminsite.com'
+            )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
         self.assertTrue("http://adminsite.com" in mail.outbox[0].body)

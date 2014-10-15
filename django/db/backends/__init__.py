@@ -23,6 +23,13 @@ from django.utils.functional import cached_property
 from django.utils import six
 from django.utils import timezone
 
+# Structure returned by DatabaseIntrospection.get_table_list()
+TableInfo = namedtuple('TableInfo', ['name', 'type'])
+
+# Structure returned by the DB-API cursor.description interface (PEP 249)
+FieldInfo = namedtuple('FieldInfo',
+    'name type_code display_size internal_size precision scale null_ok')
+
 
 class BaseDatabaseWrapper(object):
     """
@@ -30,6 +37,7 @@ class BaseDatabaseWrapper(object):
     """
     ops = None
     vendor = 'unknown'
+    SchemaEditorClass = None
 
     queries_limit = 9000
 
@@ -45,7 +53,7 @@ class BaseDatabaseWrapper(object):
         self.alias = alias
         # Query logging in debug mode or when explicitly enabled.
         self.queries_log = deque(maxlen=self.queries_limit)
-        self.use_debug_cursor = False
+        self.force_debug_cursor = False
 
         # Transaction related attributes.
         # Tracks if the connection is in autocommit mode. Per PEP 249, by
@@ -75,7 +83,7 @@ class BaseDatabaseWrapper(object):
 
     @property
     def queries_logged(self):
-        return self.use_debug_cursor or settings.DEBUG
+        return self.force_debug_cursor or settings.DEBUG
 
     @property
     def queries(self):
@@ -466,14 +474,23 @@ class BaseDatabaseWrapper(object):
         """
         Only required when autocommits_when_autocommit_is_off = True.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a _start_transaction_under_autocommit() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseWrapper may require a '
+            '_start_transaction_under_autocommit() method'
+        )
 
     def schema_editor(self, *args, **kwargs):
-        "Returns a new instance of this backend's SchemaEditor"
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a schema_editor() method')
+        """
+        Returns a new instance of this backend's SchemaEditor.
+        """
+        if self.SchemaEditorClass is None:
+            raise NotImplementedError(
+                'The SchemaEditorClass attribute of this database wrapper is still None')
+        return self.SchemaEditorClass(self, *args, **kwargs)
 
 
 class BaseDatabaseFeatures(object):
+    gis_enabled = False
     allows_group_by_pk = False
     # True if django.db.backends.utils.typecast_timestamp is used on values
     # returned from dates() calls.
@@ -497,6 +514,7 @@ class BaseDatabaseFeatures(object):
     can_return_id_from_insert = False
     has_bulk_insert = False
     uses_savepoints = False
+    can_release_savepoints = False
     can_combine_inserts_with_and_without_auto_increment_pk = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive
@@ -596,9 +614,6 @@ class BaseDatabaseFeatures(object):
     # Can the backend introspect an BinaryField, instead of an TextField?
     can_introspect_binary_field = True
 
-    # Can the backend introspect an BooleanField, instead of an IntegerField?
-    can_introspect_boolean_field = True
-
     # Can the backend introspect an DecimalField, instead of an FloatField?
     can_introspect_decimal_field = True
 
@@ -665,6 +680,9 @@ class BaseDatabaseFeatures(object):
 
     uppercases_column_names = False
 
+    # Does the backend support "select for update" queries with limit (and offset)?
+    supports_select_for_update_with_limit = True
+
     def __init__(self, connection):
         self.connection = connection
 
@@ -693,6 +711,23 @@ class BaseDatabaseFeatures(object):
             return True
         except NotImplementedError:
             return False
+
+    def introspected_boolean_field_type(self, field=None, created_separately=False):
+        """
+        What is the type returned when the backend introspects a BooleanField?
+        The optional arguments may be used to give further details of the field to be
+        introspected; in particular, they are provided by Django's test suite:
+        field -- the field definition
+        created_separately -- True if the field was added via a SchemaEditor's AddField,
+                              False if the field was created with the model
+
+        Note that return value from this function is compared by tests against actual
+        introspection results; it should provide expectations, not run an introspection
+        itself.
+        """
+        if self.can_introspect_null and field and field.null:
+            return 'NullBooleanField'
+        return 'BooleanField'
 
 
 class BaseDatabaseOperations(object):
@@ -1185,20 +1220,13 @@ class BaseDatabaseOperations(object):
             second = timezone.make_aware(second, tz)
         return [first, second]
 
-    def convert_values(self, value, field):
+    def get_db_converters(self, internal_type):
+        """Get a list of functions needed to convert field data.
+
+        Some field types on some backends do not provide data in the correct
+        format, this is the hook for coverter functions.
         """
-        Coerce the value returned by the database backend into a consistent type
-        that is compatible with the field type.
-        """
-        if value is None or field is None:
-            return value
-        internal_type = field.get_internal_type()
-        if internal_type == 'FloatField':
-            return float(value)
-        elif (internal_type and (internal_type.endswith('IntegerField')
-                                 or internal_type == 'AutoField')):
-            return int(value)
-        return value
+        return []
 
     def check_aggregate_support(self, aggregate_func):
         """Check that the backend supports the provided aggregate
@@ -1234,11 +1262,6 @@ class BaseDatabaseOperations(object):
         return self.integer_field_ranges[internal_type]
 
 
-# Structure returned by the DB-API cursor.description interface (PEP 249)
-FieldInfo = namedtuple('FieldInfo',
-    'name type_code display_size internal_size precision scale null_ok')
-
-
 class BaseDatabaseIntrospection(object):
     """
     This class encapsulates all backend-specific introspection utilities
@@ -1263,26 +1286,37 @@ class BaseDatabaseIntrospection(object):
         """
         return name
 
-    def table_names(self, cursor=None):
+    def column_name_converter(self, name):
+        """
+        Apply a conversion to the column name for the purposes of comparison.
+
+        Uses table_name_converter() by default.
+        """
+        return self.table_name_converter(name)
+
+    def table_names(self, cursor=None, include_views=False):
         """
         Returns a list of names of all tables that exist in the database.
         The returned table list is sorted by Python's default sorting. We
         do NOT use database's ORDER BY here to avoid subtle differences
         in sorting order between databases.
         """
+        def get_names(cursor):
+            return sorted([ti.name for ti in self.get_table_list(cursor)
+                           if include_views or ti.type == 't'])
         if cursor is None:
             with self.connection.cursor() as cursor:
-                return sorted(self.get_table_list(cursor))
-        return sorted(self.get_table_list(cursor))
+                return get_names(cursor)
+        return get_names(cursor)
 
     def get_table_list(self, cursor):
         """
-        Returns an unsorted list of names of all tables that exist in the
-        database.
+        Returns an unsorted list of TableInfo named tuples of all tables and
+        views that exist in the database.
         """
         raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_table_list() method')
 
-    def django_table_names(self, only_existing=False):
+    def django_table_names(self, only_existing=False, include_views=True):
         """
         Returns a list of all table names that have associated Django models and
         are in INSTALLED_APPS.
@@ -1301,7 +1335,7 @@ class BaseDatabaseIntrospection(object):
                 tables.update(f.m2m_db_table() for f in model._meta.local_many_to_many)
         tables = list(tables)
         if only_existing:
-            existing_tables = self.table_names()
+            existing_tables = self.table_names(include_views=include_views)
             tables = [
                 t
                 for t in tables
@@ -1317,10 +1351,10 @@ class BaseDatabaseIntrospection(object):
         for app_config in apps.get_app_configs():
             all_models.extend(router.get_migratable_models(app_config, self.connection.alias))
         tables = list(map(self.table_name_converter, tables))
-        return set([
+        return {
             m for m in all_models
             if self.table_name_converter(m._meta.db_table) in tables
-        ])
+        }
 
     def sequence_list(self):
         "Returns a list of information about all DB sequences for all models in all apps."

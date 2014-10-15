@@ -60,13 +60,12 @@ ALWAYS_MIDDLEWARE_CLASSES = (
 
 
 def get_test_modules():
-    from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
     modules = []
     discovery_paths = [
         (None, RUNTESTS_DIR),
         (CONTRIB_MODULE_PATH, CONTRIB_DIR)
     ]
-    if HAS_SPATIAL_DB:
+    if connection.features.gis_enabled:
         discovery_paths.append(
             ('django.contrib.gis.tests', os.path.join(CONTRIB_DIR, 'gis', 'tests'))
         )
@@ -219,6 +218,16 @@ def django_tests(verbosity, interactive, failfast, test_labels):
             'ignore',
             "Custom SQL location '<app_label>/models/sql' is deprecated, "
             "use '<app_label>/sql' instead.",
+            RemovedInDjango19Warning
+        )
+        warnings.filterwarnings(
+            'ignore',
+            'initial_data fixtures are deprecated. Use data migrations instead.',
+            RemovedInDjango19Warning
+        )
+        warnings.filterwarnings(
+            'ignore',
+            'IPAddressField has been deprecated. Use GenericIPAddressField instead.',
             RemovedInDjango19Warning
         )
         failures = test_runner.run_tests(

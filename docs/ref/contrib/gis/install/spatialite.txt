@@ -159,7 +159,7 @@ or if you are on Mac OS X:
 After modifying ``setup.cfg`` appropriately, then run the ``setup.py`` script
 to build and install::
 
-    $ sudo python setup.py install
+    $ python setup.py install
 
 .. _spatialite_macosx:
 
@@ -180,9 +180,7 @@ location available in your ``PATH``.  For example::
     $ sudo cp spatialite /Library/Frameworks/SQLite3.framework/Programs
 
 Finally, for GeoDjango to be able to find the KyngChaos SpatiaLite library,
-add the following to your ``settings.py``:
-
-.. code-block:: python
+add the following to your ``settings.py``::
 
     SPATIALITE_LIBRARY_PATH='/Library/Frameworks/SQLite3.framework/SQLite3'
 

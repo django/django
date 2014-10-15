@@ -25,7 +25,8 @@ from .models import (
     Foo, Bar, Whiz, BigD, BigS, BigIntegerModel, Post, NullBooleanModel,
     BooleanModel, PrimaryKeyCharModel, DataModel, Document, RenamedField,
     DateTimeModel, VerboseNameField, FksToBooleans, FkToChar, FloatModel,
-    SmallIntegerModel, IntegerModel, PositiveSmallIntegerModel, PositiveIntegerModel)
+    SmallIntegerModel, IntegerModel, PositiveSmallIntegerModel, PositiveIntegerModel,
+    WhizIter, WhizIterEmpty)
 
 
 class BasicFieldTests(test.TestCase):
@@ -258,9 +259,6 @@ class BooleanFieldTests(unittest.TestCase):
         formfield with the blank option (#9640, #10549).
         """
         choices = [(1, 'Si'), (2, 'No')]
-        f = models.BooleanField(choices=choices, default=1, null=True)
-        self.assertEqual(f.formfield().choices, [('', '---------')] + choices)
-
         f = models.BooleanField(choices=choices, default=1, null=False)
         self.assertEqual(f.formfield().choices, choices)
 
@@ -375,6 +373,31 @@ class ChoicesTests(test.TestCase):
         self.assertEqual(Whiz(c=None).get_c_display(), None)    # Blank value
         self.assertEqual(Whiz(c='').get_c_display(), '')        # Empty value
 
+    def test_iterator_choices(self):
+        """
+        Check that get_choices works with Iterators (#23112).
+        """
+        self.assertEqual(WhizIter(c=1).c, 1)          # A nested value
+        self.assertEqual(WhizIter(c=9).c, 9)          # Invalid value
+        self.assertEqual(WhizIter(c=None).c, None)    # Blank value
+        self.assertEqual(WhizIter(c='').c, '')        # Empty value
+
+    def test_empty_iterator_choices(self):
+        """
+        Check that get_choices works with empty iterators (#23112).
+        """
+        self.assertEqual(WhizIterEmpty(c="a").c, "a")      # A nested value
+        self.assertEqual(WhizIterEmpty(c="b").c, "b")      # Invalid value
+        self.assertEqual(WhizIterEmpty(c=None).c, None)    # Blank value
+        self.assertEqual(WhizIterEmpty(c='').c, '')        # Empty value
+
+    def test_charfield_get_choices_with_blank_iterator(self):
+        """
+        Check that get_choices works with an empty Iterator
+        """
+        f = models.CharField(choices=(x for x in []))
+        self.assertEqual(f.get_choices(include_blank=True), [('', '---------')])
+
 
 class SlugFieldTests(test.TestCase):
     def test_slugfield_max_length(self):
@@ -415,6 +438,13 @@ class ValidationTest(test.TestCase):
     def test_charfield_get_choices_with_blank_defined(self):
         f = models.CharField(choices=[('', '<><>'), ('a', 'A')])
         self.assertEqual(f.get_choices(True), [('', '<><>'), ('a', 'A')])
+
+    def test_charfield_get_choices_doesnt_evaluate_lazy_strings(self):
+        # Regression test for #23098
+        # Will raise ZeroDivisionError if lazy is evaluated
+        lazy_func = lazy(lambda x: 0 / 0, int)
+        f = models.CharField(choices=[(lazy_func('group'), (('a', 'A'), ('b', 'B')))])
+        self.assertEqual(f.get_choices(True)[0], ('', '---------'))
 
     def test_choices_validation_supports_named_groups(self):
         f = models.IntegerField(

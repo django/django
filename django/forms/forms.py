@@ -49,7 +49,10 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
         stacklevel=2,
     )
 
-    fields = [(field_name, attrs.pop(field_name)) for field_name, obj in list(six.iteritems(attrs)) if isinstance(obj, Field)]
+    fields = [
+        (field_name, attrs.pop(field_name))
+        for field_name, obj in list(six.iteritems(attrs)) if isinstance(obj, Field)
+    ]
     fields.sort(key=lambda x: x[1].creation_counter)
 
     # If this class is subclassing another Form, add that Form's fields.
@@ -133,6 +136,18 @@ class BaseForm(object):
 
     def __str__(self):
         return self.as_table()
+
+    def __repr__(self):
+        if self._errors is None:
+            is_valid = "Unknown"
+        else:
+            is_valid = self.is_bound and not bool(self._errors)
+        return '<%(cls)s bound=%(bound)s, valid=%(valid)s, fields=(%(fields)s)>' % {
+            'cls': self.__class__.__name__,
+            'bound': self.is_bound,
+            'valid': is_valid,
+            'fields': ';'.join(self.fields),
+        }
 
     def __iter__(self):
         for name in self.fields:
@@ -403,7 +418,7 @@ class BaseForm(object):
 
     def clean(self):
         """
-        Hook for doing any extra form-wide cleaning after Field.clean() been
+        Hook for doing any extra form-wide cleaning after Field.clean() has been
         called on every field. Any ValidationError raised by this method will
         not be associated with a particular field; it will have a special-case
         association with the field named '__all__'.
@@ -420,7 +435,7 @@ class BaseForm(object):
     def changed_data(self):
         if self._changed_data is None:
             self._changed_data = []
-            # XXX: For now we're asking the individual widgets whether or not the
+            # XXX: For now we're asking the individual fields whether or not the
             # data has changed. It would probably be more efficient to hash the
             # initial data, store it in a hidden field, and compare a hash of the
             # submitted data, but we'd need a way to easily get the string value
@@ -443,7 +458,7 @@ class BaseForm(object):
                         # Always assume data has changed if validation fails.
                         self._changed_data.append(name)
                         continue
-                if field._has_changed(initial_value, data_value):
+                if field.has_changed(initial_value, data_value):
                     self._changed_data.append(name)
         return self._changed_data
 
@@ -529,6 +544,10 @@ class BoundField(object):
         return len(list(self.__iter__()))
 
     def __getitem__(self, idx):
+        # Prevent unnecessary reevaluation when accessing BoundField's attrs
+        # from templates.
+        if not isinstance(idx, six.integer_types):
+            raise TypeError
         return list(self.__iter__())[idx]
 
     @property
