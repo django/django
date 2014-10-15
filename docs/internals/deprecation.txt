@@ -143,6 +143,10 @@ details on these changes.
 * Support for the ``=`` comparison operator in the ``if`` template tag will be
   removed.
 
+* The backwards compatibility shims to allow ``Storage.get_available_name()``
+  and ``Storage.save()`` to be defined without a ``max_length`` argument will
+  be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
