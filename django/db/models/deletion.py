@@ -93,8 +93,8 @@ class Collector(object):
             concrete_model_objs[concrete_model].setdefault(model, [])
             concrete_model_objs[concrete_model][model].append(obj)
 
-        for concrete_model, model_objs in concrete_model_objs.iteritems():
-            for model, objs in model_objs.iteritems():
+        for concrete_model, model_objs in six.iteritems(concrete_model_objs):
+            for model, objs in six.iteritems(model_objs):
                 instances = self.data.setdefault(model, set())
                 for obj in objs:
                     if obj not in instances:
@@ -129,8 +129,8 @@ class Collector(object):
             concrete_model_objs[concrete_model].setdefault(model, [])
             concrete_model_objs[concrete_model][model].append(obj)
 
-        for concrete_model, model_objs in concrete_model_objs.iteritems():
-            for model, objs in model_objs.iteritems():
+        for concrete_model, model_objs in six.iteritems(concrete_model_objs):
+            for model, objs in six.iteritems(model_objs):
                 self.field_updates.setdefault(
                     model, {}).setdefault(
                     (field, value), set()).update(objs)
@@ -205,9 +205,9 @@ class Collector(object):
             concrete_model_objs[concrete_model].setdefault(model, [])
             concrete_model_objs[concrete_model][model].append(obj)
 
-        for concrete_model, model_objs in concrete_model_objs.iteritems():
+        for concrete_model, model_objs in six.iteritems(concrete_model_objs):
             parent_objs = []
-            for model, new_objs in model_objs.iteritems():
+            for model, new_objs in six.iteritems(model_objs):
                 # Recursively collect concrete model's parent models, but not their
                 # related objects. These will be found by meta.get_all_related_objects()
                 for ptr in six.itervalues(concrete_model._meta.parents):
@@ -224,7 +224,7 @@ class Collector(object):
                              reverse_dependency=True)
 
             if collect_related:
-                for model, new_objs in model_objs.iteritems():
+                for model, new_objs in six.iteritems(model_objs):
                     for related in model._meta.get_all_related_objects(
                             include_hidden=True, include_proxy_eq=True):
                         field = related.field
