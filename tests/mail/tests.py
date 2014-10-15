@@ -1004,7 +1004,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
             msg = None
             for i, m in enumerate(smtp_messages):
                 if m[:4] == 'data':
-                    msg = smtp_messages[i+1]
+                    msg = smtp_messages[i + 1]
                     break
 
             self.assertTrue(msg)
