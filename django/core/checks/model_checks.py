@@ -1,45 +1,60 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import inspect
 
-from itertools import chain
+import inspect
 import types
 
 from django.apps import apps
-
-from . import Warning, Error, Tags, register
+from django.core.checks import Error, Tags, register
 
 
 @register(Tags.models)
 def check_all_models(app_configs=None, **kwargs):
+    # Avoid circular import
+    from django.db.models.fields import FieldDoesNotExist
+
     errors = []
     for model in apps.get_models():
         if app_configs is None or model._meta.app_config in app_configs:
-            if inspect.ismethod(model.check):
-                errors.append(model.check(**kwargs))
-            else:
+            try:
+                field = model._meta.get_field('check')
+            except FieldDoesNotExist:
+                field = None
+
+            if field:
                 errors.append(
-                    [
-                        Warning(
-                            "'check' is a reserved word on Model and cannot "
-                            "be overridden by '{0}'.".format(
-                                type(model.check).__name__
-                            ),
-                            hint=None,
-                            obj=model,
-                            id='fields.W162'
-                        )
-                    ]
+                    Error(
+                        "'check' is a reserved word on Model and cannot "
+                        "be overridden by '{0}'.".format(type(field).__name__),
+                        hint=None,
+                        obj=model,
+                        id='models.E020'
+                    )
                 )
-    return list(chain(*errors))
+            elif not inspect.ismethod(model.check):
+                errors.append(
+                    Error(
+                        "'check' is a reserved word on Model and cannot "
+                        "be overridden by '{0}'.".format(type(model.check).__name__),
+                        hint=None,
+                        obj=model,
+                        id='models.E020'
+                    )
+                )
+            else:
+                errors.extend(model.check(**kwargs))
+    return errors
 
 
 @register(Tags.models, Tags.signals)
 def check_model_signals(app_configs=None, **kwargs):
-    """Ensure lazily referenced model signals senders are installed."""
+    """
+    Ensure lazily referenced model signals senders are installed.
+    """
+    # Avoid circular import
     from django.db import models
-    errors = []
 
+    errors = []
     for name in dir(models.signals):
         obj = getattr(models.signals, name)
         if isinstance(obj, models.signals.ModelSignal):

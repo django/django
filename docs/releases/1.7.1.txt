@@ -9,10 +9,6 @@ Django 1.7.1 fixes several bugs in 1.7.
 Bugfixes
 ========
 
-* An attribute named ``check`` defined on :class:`~django.db.models.Model` will
-  now generate a warning with id **fields.W162**, as it is a reserved word.
-  This avoids raising a apparently unrelated exception (:ticket:`23615`).
-
 * Allowed related many-to-many fields to be referenced in the admin
   (:ticket:`23604`).
 
@@ -124,3 +120,7 @@ Bugfixes
 
 * Fixed a crash while parsing cookies containing invalid content
   (:ticket:`23638`).
+
+* An attribute named ``check`` defined on :class:`~django.db.models.Model` will
+  now generate a warning with id **models.E020**, as it is a reserved word.
+  This avoids raising an apparently unrelated exception (:ticket:`23615`).

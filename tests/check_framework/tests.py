@@ -8,12 +8,13 @@ from django.apps import apps
 from django.conf import settings
 from django.core import checks
 from django.core.checks import Error, Warning
+from django.core.checks.model_checks import check_all_models
 from django.core.checks.registry import CheckRegistry
 from django.core.checks.compatibility.django_1_6_0 import check_1_6_compatibility
 from django.core.checks.compatibility.django_1_7_0 import check_1_7_compatibility
 from django.core.management.base import CommandError
 from django.core.management import call_command
-from django.db.models import Model, ForeignKey
+from django.db import models
 from django.db.models.fields import NOT_PROVIDED
 from django.test import TestCase
 from django.test.utils import override_settings, override_system_checks
@@ -331,34 +332,60 @@ class SilencingCheckTests(TestCase):
 
 
 class CheckFrameworkReservedNamesTests(TestCase):
-    """Tests for the Check framework checks that validate field names.
-    """
-    def setUp(self):
-        """Register a new model that will use the reserved keyword.
-        """
-        class AnotherArticle(Model):
-            pass
 
-        class Collection(Model):
-            check = ForeignKey("NewsArticle")
-            article = ForeignKey(AnotherArticle, related_name="check")
+    def setUp(self):
+        self.current_models = apps.all_models[__package__]
+        self.saved_models = set(self.current_models)
 
     def tearDown(self):
-        """Unregister the invalid model.
-        """
-        from django.apps import apps
-        apps.all_models[__package__].pop("collection")
-        apps.all_models[__package__].pop("anotherarticle")
+        for model in (set(self.current_models) - self.saved_models):
+            del self.current_models[model]
+        apps.clear_cache()
 
-    @override_settings(SILENCED_SYSTEM_CHECKS=['fields.W162'])
-    def test_check_as_a_field_name_generates_a_warning(self):
-        """A ForeignKey field named `check` on a model will generate a warning
-        during the checks, instead of raising an Exception.
+    @override_settings(SILENCED_SYSTEM_CHECKS=['models.E020'])
+    def test_model_check_method_not_shadowed(self):
+        class ModelWithAttributeCalledCheck(models.Model):
+            check = 42
 
-        This tests the check for E008. See ticket #23615.
-        """
-        from django.core.checks.model_checks import check_all_models
-        warnings = check_all_models()
-        self.assertEquals(2, len(warnings))
-        for warn in warnings:
-            self.assertEqual("fields.W162", warn.id)
+        class ModelWithFieldCalledCheck(models.Model):
+            check = models.IntegerField()
+
+        class ModelWithRelatedManagerCalledCheck(models.Model):
+            pass
+
+        class ModelWithDescriptorCalledCheck(models.Model):
+            check = models.ForeignKey(ModelWithRelatedManagerCalledCheck)
+            article = models.ForeignKey(ModelWithRelatedManagerCalledCheck, related_name='check')
+
+        expected = [
+            Error(
+                "'check' is a reserved word on Model and cannot "
+                "be overridden by 'int'.",
+                hint=None,
+                obj=ModelWithAttributeCalledCheck,
+                id='models.E020'
+            ),
+            Error(
+                "'check' is a reserved word on Model and cannot "
+                "be overridden by 'IntegerField'.",
+                hint=None,
+                obj=ModelWithFieldCalledCheck,
+                id='models.E020'
+            ),
+            Error(
+                "'check' is a reserved word on Model and cannot "
+                "be overridden by 'ForeignRelatedObjectsDescriptor'.",
+                hint=None,
+                obj=ModelWithRelatedManagerCalledCheck,
+                id='models.E020'
+            ),
+            Error(
+                "'check' is a reserved word on Model and cannot "
+                "be overridden by 'ForeignKey'.",
+                hint=None,
+                obj=ModelWithDescriptorCalledCheck,
+                id='models.E020'
+            ),
+        ]
+
+        self.assertEqual(check_all_models(), expected)
