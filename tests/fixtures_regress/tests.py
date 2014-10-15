@@ -11,7 +11,6 @@ from django.core import serializers
 from django.core.serializers.base import DeserializationError
 from django.core import management
 from django.core.management.base import CommandError
-from django.core.management.commands.dumpdata import sort_dependencies
 from django.db import transaction, IntegrityError
 from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
@@ -579,7 +578,7 @@ class NaturalKeyFixtureTests(TestCase):
         Store *must* be serialized before then Person, and both
         must be serialized before Book.
         """
-        sorted_deps = sort_dependencies(
+        sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [Book, Person, Store])]
         )
         self.assertEqual(
@@ -588,7 +587,7 @@ class NaturalKeyFixtureTests(TestCase):
         )
 
     def test_dependency_sorting_2(self):
-        sorted_deps = sort_dependencies(
+        sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [Book, Store, Person])]
         )
         self.assertEqual(
@@ -597,7 +596,7 @@ class NaturalKeyFixtureTests(TestCase):
         )
 
     def test_dependency_sorting_3(self):
-        sorted_deps = sort_dependencies(
+        sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [Store, Book, Person])]
         )
         self.assertEqual(
@@ -606,7 +605,7 @@ class NaturalKeyFixtureTests(TestCase):
         )
 
     def test_dependency_sorting_4(self):
-        sorted_deps = sort_dependencies(
+        sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [Store, Person, Book])]
         )
         self.assertEqual(
@@ -615,7 +614,7 @@ class NaturalKeyFixtureTests(TestCase):
         )
 
     def test_dependency_sorting_5(self):
-        sorted_deps = sort_dependencies(
+        sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [Person, Book, Store])]
         )
         self.assertEqual(
@@ -624,7 +623,7 @@ class NaturalKeyFixtureTests(TestCase):
         )
 
     def test_dependency_sorting_6(self):
-        sorted_deps = sort_dependencies(
+        sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [Person, Store, Book])]
         )
         self.assertEqual(
@@ -633,7 +632,7 @@ class NaturalKeyFixtureTests(TestCase):
         )
 
     def test_dependency_sorting_dangling(self):
-        sorted_deps = sort_dependencies(
+        sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [Person, Circle1, Store, Book])]
         )
         self.assertEqual(
@@ -643,38 +642,38 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_dependency_sorting_tight_circular(self):
         self.assertRaisesMessage(
-            CommandError,
+            RuntimeError,
             """Can't resolve dependencies for fixtures_regress.Circle1, fixtures_regress.Circle2 in serialized app list.""",
-            sort_dependencies,
+            serializers.sort_dependencies,
             [('fixtures_regress', [Person, Circle2, Circle1, Store, Book])],
         )
 
     def test_dependency_sorting_tight_circular_2(self):
         self.assertRaisesMessage(
-            CommandError,
+            RuntimeError,
             """Can't resolve dependencies for fixtures_regress.Circle1, fixtures_regress.Circle2 in serialized app list.""",
-            sort_dependencies,
+            serializers.sort_dependencies,
             [('fixtures_regress', [Circle1, Book, Circle2])],
         )
 
     def test_dependency_self_referential(self):
         self.assertRaisesMessage(
-            CommandError,
+            RuntimeError,
             """Can't resolve dependencies for fixtures_regress.Circle3 in serialized app list.""",
-            sort_dependencies,
+            serializers.sort_dependencies,
             [('fixtures_regress', [Book, Circle3])],
         )
 
     def test_dependency_sorting_long(self):
         self.assertRaisesMessage(
-            CommandError,
+            RuntimeError,
             """Can't resolve dependencies for fixtures_regress.Circle1, fixtures_regress.Circle2, fixtures_regress.Circle3 in serialized app list.""",
-            sort_dependencies,
+            serializers.sort_dependencies,
             [('fixtures_regress', [Person, Circle2, Circle1, Circle3, Store, Book])],
         )
 
     def test_dependency_sorting_normal(self):
-        sorted_deps = sort_dependencies(
+        sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [Person, ExternalDependency, Book])]
         )
         self.assertEqual(
@@ -720,7 +719,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
         #14226, namely if M2M checks are removed from sort_dependencies
         altogether.
         """
-        sorted_deps = sort_dependencies(
+        sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [M2MSimpleA, M2MSimpleB])]
         )
         self.assertEqual(sorted_deps, [M2MSimpleB, M2MSimpleA])
@@ -731,10 +730,10 @@ class M2MNaturalKeyFixtureTests(TestCase):
         fail loudly
         """
         self.assertRaisesMessage(
-            CommandError,
+            RuntimeError,
             "Can't resolve dependencies for fixtures_regress.M2MSimpleCircularA, "
             "fixtures_regress.M2MSimpleCircularB in serialized app list.",
-            sort_dependencies,
+            serializers.sort_dependencies,
             [('fixtures_regress', [M2MSimpleCircularA, M2MSimpleCircularB])]
         )
 
@@ -743,7 +742,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
         M2M relations with explicit through models should NOT count as
         dependencies.  The through model itself will have dependencies, though.
         """
-        sorted_deps = sort_dependencies(
+        sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [M2MComplexA, M2MComplexB, M2MThroughAB])]
         )
         # Order between M2MComplexA and M2MComplexB doesn't matter. The through
@@ -758,7 +757,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
                                      M2MComplexCircular1C, M2MCircular1ThroughAB,
                                      M2MCircular1ThroughBC, M2MCircular1ThroughCA)
         try:
-            sorted_deps = sort_dependencies(
+            sorted_deps = serializers.sort_dependencies(
                 [('fixtures_regress', [A, B, C, AtoB, BtoC, CtoA])]
             )
         except CommandError:
@@ -778,7 +777,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
         This test tests the circularity with explicit natural_key.dependencies
         """
         try:
-            sorted_deps = sort_dependencies([
+            sorted_deps = serializers.sort_dependencies([
                 ('fixtures_regress', [
                     M2MComplexCircular2A,
                     M2MComplexCircular2B,
