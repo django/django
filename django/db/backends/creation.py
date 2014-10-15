@@ -8,7 +8,6 @@ from django.utils.encoding import force_bytes
 from django.utils.functional import cached_property
 from django.utils.six.moves import input
 from django.utils.six import StringIO
-from django.core.management.commands.dumpdata import sort_dependencies
 from django.db import router
 from django.apps import apps
 from django.core import serializers
@@ -425,7 +424,7 @@ class BaseDatabaseCreation(object):
 
         # Make a function to iteratively return every object
         def get_objects():
-            for model in sort_dependencies(app_list):
+            for model in serializers.sort_dependencies(app_list):
                 if (not model._meta.proxy and model._meta.managed and
                         router.allow_migrate(self.connection.alias, model)):
                     queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
