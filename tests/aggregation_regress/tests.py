@@ -740,6 +740,17 @@ class AggregationTests(TestCase):
             list(qs), list(Book.objects.values_list("name", flat=True))
         )
 
+    def test_values_list_annotation_args_ordering(self):
+        """
+        Annotate *args ordering should be preserved in values_list results.
+        **kwargs comes after *args.
+        Regression test for #23659.
+        """
+        books = Book.objects.values_list("publisher__name").annotate(
+            Count("id"), Avg("price"), Avg("authors__age"), avg_pgs=Avg("pages")
+            ).order_by("-publisher__name")
+        self.assertEqual(books[0], ('Sams', 1, 23.09, 45.0, 528.0))
+
     def test_annotation_disjunction(self):
         qs = Book.objects.annotate(n_authors=Count("authors")).filter(
             Q(n_authors=2) | Q(name="Python Web Development with Django")

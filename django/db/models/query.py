@@ -2,7 +2,7 @@
 The main QuerySet implementation. This provides the public API for the ORM.
 """
 
-from collections import deque
+from collections import deque, OrderedDict
 import copy
 import sys
 import warnings
@@ -786,27 +786,29 @@ class QuerySet(object):
         Return a query set in which the returned objects have been annotated
         with data aggregated from related fields.
         """
+        aggrs = OrderedDict()  # To preserve ordering of args
         for arg in args:
             if arg.default_alias in kwargs:
                 raise ValueError("The named annotation '%s' conflicts with the "
                                  "default name for another annotation."
                                  % arg.default_alias)
-            kwargs[arg.default_alias] = arg
+            aggrs[arg.default_alias] = arg
+        aggrs.update(kwargs)
 
         names = getattr(self, '_fields', None)
         if names is None:
             names = set(self.model._meta.get_all_field_names())
-        for aggregate in kwargs:
+        for aggregate in aggrs:
             if aggregate in names:
                 raise ValueError("The annotation '%s' conflicts with a field on "
                     "the model." % aggregate)
 
         obj = self._clone()
 
-        obj._setup_aggregate_query(list(kwargs))
+        obj._setup_aggregate_query(list(aggrs))
 
         # Add the aggregates to the query
-        for (alias, aggregate_expr) in kwargs.items():
+        for (alias, aggregate_expr) in aggrs.items():
             obj.query.add_aggregate(aggregate_expr, self.model, alias,
                 is_summary=False)
 
