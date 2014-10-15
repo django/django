@@ -70,17 +70,11 @@ Most larger Django sites use a separate Web server -- i.e., one that's not also
 running Django -- for serving static files. This server often runs a different
 type of web server -- faster but less full-featured. Some common choices are:
 
-* lighttpd_
 * Nginx_
-* TUX_
-* Cherokee_
 * A stripped-down version of Apache_
 
-.. _lighttpd: http://www.lighttpd.net/
 .. _Nginx: http://wiki.nginx.org/Main
-.. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
 .. _Apache: http://httpd.apache.org/
-.. _Cherokee: http://www.cherokee-project.com/
 
 Configuring these servers is out of scope of this document; check each
 server's respective documentation for instructions.
