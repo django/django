@@ -8,7 +8,7 @@ import pickle
 from django.test import SimpleTestCase
 from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils.datastructures import (DictWrapper, ImmutableList,
-    MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
+    MultiValueDict, MultiValueDictKeyError, MergeDict, OrderedSet, SortedDict)
 from django.utils import six
 
 
@@ -204,6 +204,16 @@ class MergeDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):
         d1 = MergeDict({'key1': 42})
         with six.assertRaisesRegex(self, KeyError, 'key2'):
             d1['key2']
+
+
+class OrderedSetTests(SimpleTestCase):
+
+    def test_bool(self):
+        # Refs #23664
+        s = OrderedSet()
+        self.assertFalse(s)
+        s.add(1)
+        self.assertTrue(s)
 
 
 class MultiValueDictTests(SimpleTestCase):
