@@ -10,7 +10,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.safestring import SafeData, SafeText, mark_safe
 from django.utils import six
 from django.utils.six.moves.urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 from django.utils.text import normalize_newlines
@@ -47,7 +47,7 @@ def escape(text):
     """
     return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;')
         .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
-escape = allow_lazy(escape, six.text_type)
+escape = allow_lazy(escape, six.text_type, SafeText)
 
 _js_escapes = {
     ord('\\'): '\\u005C',
@@ -70,7 +70,7 @@ _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
-escapejs = allow_lazy(escapejs, six.text_type)
+escapejs = allow_lazy(escapejs, six.text_type, SafeText)
 
 
 def conditional_escape(text):
