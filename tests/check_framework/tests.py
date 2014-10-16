@@ -359,32 +359,41 @@ class CheckFrameworkReservedNamesTests(TestCase):
 
         expected = [
             Error(
-                "'check' is a reserved word on Model and cannot "
-                "be overridden by 'int'.",
+                "The 'ModelWithAttributeCalledCheck.check()' class method is "
+                "currently overridden by 42.",
                 hint=None,
                 obj=ModelWithAttributeCalledCheck,
-                id='models.E020'
+                id='models.E021'
             ),
-            Error(
-                "'check' is a reserved word on Model and cannot "
-                "be overridden by 'IntegerField'.",
-                hint=None,
+            Warning(
+                "The field 'check' from parent model "
+                "'ModelWithFieldCalledCheck' clashes with the 'ModelWithFieldCalledCheck.check()' "
+                "method.",
+                hint="Rename the field.",
                 obj=ModelWithFieldCalledCheck,
-                id='models.E020'
+                id='models.W020'
             ),
             Error(
-                "'check' is a reserved word on Model and cannot "
-                "be overridden by 'ForeignRelatedObjectsDescriptor'.",
+                "The 'ModelWithRelatedManagerCalledCheck.check()' class method is "
+                "currently overridden by %r." % ModelWithRelatedManagerCalledCheck.check,
                 hint=None,
                 obj=ModelWithRelatedManagerCalledCheck,
-                id='models.E020'
+                id='models.E021'
+            ),
+            Warning(
+                "The field 'check' from parent model "
+                "'ModelWithDescriptorCalledCheck' clashes with the 'ModelWithDescriptorCalledCheck.check()' "
+                "method.",
+                hint="Rename the field.",
+                obj=ModelWithDescriptorCalledCheck,
+                id='models.W020'
             ),
             Error(
-                "'check' is a reserved word on Model and cannot "
-                "be overridden by 'ForeignKey'.",
+                "The 'ModelWithDescriptorCalledCheck.check()' class method is "
+                "currently overridden by %r." % ModelWithDescriptorCalledCheck.check,
                 hint=None,
                 obj=ModelWithDescriptorCalledCheck,
-                id='models.E020'
+                id='models.E021'
             ),
         ]
 

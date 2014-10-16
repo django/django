@@ -121,6 +121,7 @@ Bugfixes
 * Fixed a crash while parsing cookies containing invalid content
   (:ticket:`23638`).
 
-* An attribute named ``check`` defined on :class:`~django.db.models.Model` will
-  now generate a warning with id **models.E020**, as it is a reserved word.
-  This avoids raising an apparently unrelated exception (:ticket:`23615`).
+* A field named ``check`` defined on :class:`~django.db.models.Model` will
+  now generate a warning with id **models.W020**, as it is a reserved word.
+  If the class method ``Model.check()`` is unreachable it raises the error
+  with id **models.E021** (:ticket:`23615`).

@@ -5,7 +5,7 @@ import inspect
 import types
 
 from django.apps import apps
-from django.core.checks import Error, Tags, register
+from django.core.checks import Error, Tags, Warning, register
 
 
 @register(Tags.models)
@@ -23,22 +23,25 @@ def check_all_models(app_configs=None, **kwargs):
 
             if field:
                 errors.append(
-                    Error(
-                        "'check' is a reserved word on Model and cannot "
-                        "be overridden by '{0}'.".format(type(field).__name__),
-                        hint=None,
+                    Warning(
+                        "The field 'check' from parent model "
+                        "'%s' clashes with the '%s.check()' "
+                        "method." % (model.__name__, model.__name__),
+                        hint="Rename the field.",
                         obj=model,
-                        id='models.E020'
+                        id='models.W020'
                     )
                 )
-            elif not inspect.ismethod(model.check):
+
+            if not inspect.ismethod(model.check):
                 errors.append(
                     Error(
-                        "'check' is a reserved word on Model and cannot "
-                        "be overridden by '{0}'.".format(type(model.check).__name__),
+                        "The '%s.check()' class method is "
+                        "currently overridden by %r." % (
+                            model.__name__, model.check),
                         hint=None,
                         obj=model,
-                        id='models.E020'
+                        id='models.E021'
                     )
                 )
             else:
