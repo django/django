@@ -140,8 +140,7 @@ class QuerySet(object):
         return repr(data)
 
     def __len__(self):
-        self._fetch_all()
-        return len(self._result_cache)
+        return self.count()
 
     def __iter__(self):
         """
@@ -163,8 +162,7 @@ class QuerySet(object):
         return iter(self._result_cache)
 
     def __nonzero__(self):
-        self._fetch_all()
-        return bool(self._result_cache)
+        return self.exists()
 
     def __getitem__(self, k):
         """
