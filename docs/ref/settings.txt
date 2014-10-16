@@ -1575,7 +1575,7 @@ standard domain cookies, existing user cookies that have the old domain
 will not be updated. This will result in site users being unable to switch
 the language as long as these cookies persist. The only safe and reliable
 option to perform the switch is to change the language cookie name
-permanently (via the :setting:`SESSION_COOKIE_NAME` setting) and to add
+permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting) and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the old one.
 
@@ -1611,7 +1611,7 @@ setting to use a deeper path than it previously used, existing user cookies that
 have the old path will not be updated. This will result in site users being
 unable to switch the language as long as these cookies persist. The only safe
 and reliable option to perform the switch is to change the language cookie name
-permanently (via the :setting:`SESSION_COOKIE_NAME` setting), and to add
+permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting), and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the one.
 
