@@ -324,7 +324,7 @@ All code changes
   guidelines? Are there any ``flake8`` errors?
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
-* Is Django's test suite passing? Ask in ``#django-developers`` for a core dev
+* Is Django's test suite passing? Ask in ``#django-dev`` for a core dev
   to build the pull request against our continuous integration server.
 
 All tickets
