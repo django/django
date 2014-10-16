@@ -271,8 +271,11 @@ class OrderedSet(object):
     def __contains__(self, item):
         return item in self.dict
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.dict)
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
 
 
 class MultiValueDictKeyError(KeyError):
