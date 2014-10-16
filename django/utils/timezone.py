@@ -350,10 +350,12 @@ def is_naive(value):
     return value.tzinfo is None or value.tzinfo.utcoffset(value) is None
 
 
-def make_aware(value, timezone):
+def make_aware(value, timezone=None):
     """
     Makes a naive datetime.datetime in a given time zone aware.
     """
+    if timezone is None:
+        timezone = get_current_timezone()
     if hasattr(timezone, 'localize'):
         # This method is available for pytz time zones.
         return timezone.localize(value, is_dst=None)
@@ -366,10 +368,12 @@ def make_aware(value, timezone):
         return value.replace(tzinfo=timezone)
 
 
-def make_naive(value, timezone):
+def make_naive(value, timezone=None):
     """
     Makes an aware datetime.datetime naive in a given time zone.
     """
+    if timezone is None:
+        timezone = get_current_timezone()
     # If `value` is naive, astimezone() will raise a ValueError,
     # so we don't need to perform a redundant check.
     value = value.astimezone(timezone)

@@ -954,20 +954,30 @@ appropriate entities.
     Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
     function assumes that ``value`` is a :class:`~datetime.datetime`.
 
-.. function:: make_aware(value, timezone)
+.. function:: make_aware(value, timezone=None)
 
     Returns an aware :class:`~datetime.datetime` that represents the same
     point in time as ``value`` in ``timezone``, ``value`` being a naive
-    :class:`~datetime.datetime`.
+    :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
+    defaults to the :ref:`current time zone <default-current-time-zone>`.
 
     This function can raise an exception if ``value`` doesn't exist or is
     ambiguous because of DST transitions.
 
-.. function:: make_naive(value, timezone)
+    .. versionchanged:: 1.8
+
+        In older versions of Django, ``timezone`` was a required argument.
+
+.. function:: make_naive(value, timezone=None)
 
     Returns an naive :class:`~datetime.datetime` that represents in
     ``timezone``  the same point in time as ``value``, ``value`` being an
-    aware :class:`~datetime.datetime`
+    aware :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
+    defaults to the :ref:`current time zone <default-current-time-zone>`.
+
+    .. versionchanged:: 1.8
+
+        In older versions of Django, ``timezone`` was a required argument.
 
 .. _pytz: http://pytz.sourceforge.net/
 
