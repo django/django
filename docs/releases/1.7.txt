@@ -440,11 +440,11 @@ Minor features
   enabled. See :ref:`session-invalidation-on-password-change` for more details
   including upgrade considerations when enabling this new middleware.
 
-:mod:`django.contrib.formtools`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``django.contrib.formtools``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Calls to :meth:`WizardView.done()
-  <django.contrib.formtools.wizard.views.WizardView.done>` now include a
+  <formtools.wizard.views.WizardView.done>` now include a
   ``form_dict`` to allow easier access to forms by their step name.
 
 :mod:`django.contrib.gis`

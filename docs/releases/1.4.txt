@@ -358,7 +358,7 @@ more information.
 New form wizard
 ~~~~~~~~~~~~~~~
 
-The previous ``FormWizard`` from :mod:`django.contrib.formtools` has been
+The previous ``FormWizard`` from ``django.contrib.formtools`` has been
 replaced with a new implementation based on the class-based views
 introduced in Django 1.3. It features a pluggable storage API and doesn't
 require the wizard to pass around hidden fields for every previous step.
@@ -367,9 +367,6 @@ Django 1.4 ships with a session-based storage backend and a cookie-based
 storage backend. The latter uses the tools for
 :doc:`cryptographic signing </topics/signing>` also introduced in
 Django 1.4 to store the wizard's state in the user's cookies.
-
-See the :doc:`form wizard </ref/contrib/formtools/form-wizard>` docs for
-more information.
 
 ``reverse_lazy``
 ~~~~~~~~~~~~~~~~

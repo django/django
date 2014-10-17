@@ -172,10 +172,6 @@ manipulation of form data.
   :doc:`Formsets <topics/forms/formsets>` |
   :doc:`Customizing validation <ref/forms/validation>`
 
-* **Extras:**
-  :doc:`Form preview <ref/contrib/formtools/form-preview>` |
-  :doc:`Form wizard <ref/contrib/formtools/form-wizard>`
-
 The development process
 =======================
 

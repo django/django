@@ -2018,11 +2018,11 @@ The secret key is used for:
 * All :doc:`messages </ref/contrib/messages>` if you are using
   :class:`~django.contrib.messages.storage.cookie.CookieStorage` or
   :class:`~django.contrib.messages.storage.fallback.FallbackStorage`.
-* :doc:`Form wizard </ref/contrib/formtools/form-wizard>` progress when using
+* :mod:`Form wizard <formtools.wizard.views>` progress when using
   cookie storage with
-  :class:`django.contrib.formtools.wizard.views.CookieWizardView`.
+  :class:`formtools.wizard.views.CookieWizardView`.
 * All :func:`~django.contrib.auth.views.password_reset` tokens.
-* All in progress :doc:`form previews </ref/contrib/formtools/form-preview>`.
+* All in progress :mod:`form previews <formtools.preview>`.
 * Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
   different key is provided.
 

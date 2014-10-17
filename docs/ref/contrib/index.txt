@@ -71,27 +71,6 @@ See the :doc:`flatpages documentation </ref/contrib/flatpages>`.
 
 Requires the sites_ contrib package to be installed as well.
 
-formtools
-=========
-
-A set of high-level abstractions for Django forms (django.forms).
-
-django.contrib.formtools.preview
---------------------------------
-
-An abstraction of the following workflow:
-
-"Display an HTML form, force a preview, then do something with the submission."
-
-See the :doc:`form preview documentation </ref/contrib/formtools/form-preview>`.
-
-django.contrib.formtools.wizard
--------------------------------
-
-Splits forms across multiple Web pages.
-
-See the :doc:`form wizard documentation </ref/contrib/formtools/form-wizard>`.
-
 gis
 ====
 

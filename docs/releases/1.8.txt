@@ -122,17 +122,6 @@ Minor features
   :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
   :class:`~django.db.models.ForeignKey`\s.
 
-:mod:`django.contrib.formtools`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* A :doc:`form wizard </ref/contrib/formtools/form-wizard>` using the
-  :class:`~django.contrib.formtools.wizard.views.CookieWizardView` will now ignore
-  an invalid cookie, and the wizard will restart from the first step. An invalid
-  cookie can occur in cases of intentional manipulation, but also after a secret
-  key change. Previously, this would raise ``WizardViewCookieModified``, a
-  ``SuspiciousOperation``, causing an exception for any user with an invalid cookie
-  upon every request to the wizard, until the cookie is removed.
-
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -709,6 +698,17 @@ The decorators :func:`~django.test.override_settings` and
 :func:`~django.test.modify_settings` now act at the class level when used as
 class decorators. As a consequence, when overriding ``setUpClass()`` or
 ``tearDownClass()``, the ``super`` implementation should always be called.
+
+Removal of ``django.contrib.formtools``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The formtools contrib app has been moved into a separate package.
+``django.contrib.formtools`` itself has been removed. The docs provide
+:ref:`migration instructions <formtools-how-to-migrate>`.
+
+The new package is available `on Github`_ and on PyPI.
+
+.. _on GitHub: https://github.com/django/django-formtools/
 
 Miscellaneous
 ~~~~~~~~~~~~~

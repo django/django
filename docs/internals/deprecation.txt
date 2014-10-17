@@ -419,9 +419,8 @@ details on these changes.
   superseded by :setting:`IGNORABLE_404_URLS` in the 1.4 release. They will be
   removed.
 
-* The :doc:`form wizard </ref/contrib/formtools/form-wizard>` has been
-  refactored to use class-based views with pluggable backends in 1.4.
-  The previous implementation will be removed.
+* The form wizard has been refactored to use class-based views with pluggable
+  backends in 1.4. The previous implementation will be removed.
 
 * Legacy ways of calling
   :func:`~django.views.decorators.cache.cache_page` will be removed.
