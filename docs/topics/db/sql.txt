@@ -348,6 +348,6 @@ supports it.
 
 .. warning::
 
-    Most database backends do not support keyword parameters, and the support
-    of it is nonstandard, never pass keyword parameters to
-    ``cursor.callproc()`` when in doubt.
+    Most database backends do not support keyword parameters for
+    ``cursor.callproc()``, and the support of it is nonstandard, never pass
+    keyword parameters to ``cursor.callproc()`` when in doubt.

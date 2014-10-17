@@ -9,6 +9,7 @@ from time import time
 from django.conf import settings
 from django.utils.encoding import force_bytes
 from django.utils.timezone import utc
+from django.db.utils import NotSupportedError
 
 
 logger = logging.getLogger('django.db.backends')
@@ -50,6 +51,9 @@ class CursorWrapper(object):
     # which may supports keyword parameters(e.g cx_Oracle), such deviation
     # seems acceptable.
     def callproc(self, procname, params=None, kparams=None):
+        if kparams is not None and not self.db.features.callproc_supports_kwargs:
+            raise NotSupportedError("The {} backend does not support keyword parameters for callproc"
+                    .format(self.db.vendor))
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
             if params is None and kparams is None:

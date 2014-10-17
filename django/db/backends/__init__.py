@@ -683,6 +683,10 @@ class BaseDatabaseFeatures(object):
     # Does the backend support "select for update" queries with limit (and offset)?
     supports_select_for_update_with_limit = True
 
+    # Does the backend support keyword parameters for cursor.callproc()?
+    # See ticket #23546
+    callproc_supports_kwargs = False
+
     def __init__(self, connection):
         self.connection = connection
 
