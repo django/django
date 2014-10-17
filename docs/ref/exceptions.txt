@@ -217,6 +217,20 @@ Transaction exceptions are defined in :mod:`django.db.transaction`.
     The :exc:`TransactionManagementError` is raised for any and all problems
     related to database transactions.
 
+.. currentmodule:: django.test
+
+Testing Framework Exceptions
+============================
+
+Exceptions provided by the :mod:`django.test` package.
+
+.. exception:: client.RedirectCycleError
+
+    .. versionadded:: 1.8
+
+    :exc:`~client.RedirectCycleError` is raised when the test client detects a
+    loop or an overly long chain of redirects.
+
 Python Exceptions
 =================
 

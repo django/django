@@ -10,7 +10,7 @@ import itertools
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template import TemplateSyntaxError, Context, Template
 from django.test import Client, TestCase, override_settings
-from django.test.client import encode_file, RequestFactory
+from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.template.response import SimpleTemplateResponse
 from django.utils._os import upath
@@ -377,15 +377,24 @@ class AssertRedirectsTests(TestCase):
 
     def test_redirect_chain_to_self(self):
         "Redirections to self are caught and escaped"
-        response = self.client.get('/redirect_to_self/', {}, follow=True)
+        with self.assertRaises(RedirectCycleError) as context:
+            self.client.get('/redirect_to_self/', {}, follow=True)
+        response = context.exception.last_response
         # The chain of redirects stops once the cycle is detected.
         self.assertRedirects(response, '/redirect_to_self/',
             status_code=301, target_status_code=301)
         self.assertEqual(len(response.redirect_chain), 2)
 
+    def test_redirect_to_self_with_changing_query(self):
+        "Redirections don't loop forever even if query is changing"
+        with self.assertRaises(RedirectCycleError):
+            self.client.get('/redirect_to_self_with_changing_query_view/', {'counter': '0'}, follow=True)
+
     def test_circular_redirect(self):
         "Circular redirect chains are caught and escaped"
-        response = self.client.get('/circular_redirect_1/', {}, follow=True)
+        with self.assertRaises(RedirectCycleError) as context:
+            self.client.get('/circular_redirect_1/', {}, follow=True)
+        response = context.exception.last_response
         # The chain of redirects will get back to the starting point, but stop there.
         self.assertRedirects(response, '/circular_redirect_2/',
             status_code=301, target_status_code=301)

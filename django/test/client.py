@@ -27,12 +27,22 @@ from django.utils import six
 from django.utils.six.moves.urllib.parse import urlparse, urlsplit
 from django.test.utils import ContextList
 
-__all__ = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')
+__all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'encode_multipart')
 
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
 CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')
+
+
+class RedirectCycleError(Exception):
+    """
+    The test client has been asked to follow a redirect loop.
+    """
+    def __init__(self, message, last_response):
+        super(RedirectCycleError, self).__init__(message)
+        self.last_response = last_response
+        self.redirect_chain = last_response.redirect_chain
 
 
 class FakePayload(object):
@@ -630,11 +640,11 @@ class Client(RequestFactory):
 
         response.redirect_chain = []
         while response.status_code in (301, 302, 303, 307):
-            url = response.url
+            response_url = response.url
             redirect_chain = response.redirect_chain
-            redirect_chain.append((url, response.status_code))
+            redirect_chain.append((response_url, response.status_code))
 
-            url = urlsplit(url)
+            url = urlsplit(response_url)
             if url.scheme:
                 extra['wsgi.url_scheme'] = url.scheme
             if url.hostname:
@@ -645,7 +655,14 @@ class Client(RequestFactory):
             response = self.get(url.path, QueryDict(url.query), follow=False, **extra)
             response.redirect_chain = redirect_chain
 
-            # Prevent loops
-            if response.redirect_chain[-1] in response.redirect_chain[0:-1]:
-                break
+            if redirect_chain[-1] in redirect_chain[:-1]:
+                # Check that we're not redirecting to somewhere we've already
+                # been to, to prevent loops.
+                raise RedirectCycleError("Redirect loop detected.", last_response=response)
+            if len(redirect_chain) > 20:
+                # Such a lengthy chain likely also means a loop, but one with
+                # a growing path, changing view, or changing query argument;
+                # 20 is the value of "network.http.redirection-limit" from Firefox.
+                raise RedirectCycleError("Too many redirects.", last_response=response)
+
         return response
