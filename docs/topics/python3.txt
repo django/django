@@ -79,7 +79,7 @@ String handling
 ---------------
 
 Python 2's `unicode`_ type was renamed :class:`str` in Python 3,
-``str()`` was renamed :func:`bytes`, and `basestring`_ disappeared.
+``str()`` was renamed :class:`bytes`, and `basestring`_ disappeared.
 six_ provides :ref:`tools <string-handling-with-six>` to deal with these
 changes.
 
