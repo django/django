@@ -78,8 +78,8 @@ wherever possible and avoid the ``b`` prefixes.
 String handling
 ---------------
 
-Python 2's :func:`unicode` type was renamed :func:`str` in Python 3,
-:func:`str` was renamed ``bytes()``, and :func:`basestring` disappeared.
+Python 2's :func:`unicode` type was renamed ``str()`` in Python 3,
+``str()`` was renamed ``bytes()``, and :func:`basestring` disappeared.
 six_ provides :ref:`tools <string-handling-with-six>` to deal with these
 changes.
 
@@ -138,7 +138,7 @@ In Python 2, the object model specifies :meth:`~object.__str__` and
 :meth:`~object.__unicode__` methods. If these methods exist, they must return
 ``str`` (bytes) and ``unicode`` (text) respectively.
 
-The ``print`` statement and the :func:`str` built-in call
+The ``print`` statement and the :class:`str` built-in call
 :meth:`~object.__str__` to determine the human-readable representation of an
 object. The :func:`unicode` built-in calls :meth:`~object.__unicode__` if it
 exists, and otherwise falls back to :meth:`~object.__str__` and decodes the
@@ -233,7 +233,7 @@ In order to enable the same behavior in Python 2, every module must import
     my_bytestring = b"This is a bytestring"
 
 If you need a byte string literal under Python 2 and a unicode string literal
-under Python 3, use the :func:`str` builtin::
+under Python 3, use the :class:`str` builtin::
 
     str('my string')
 
