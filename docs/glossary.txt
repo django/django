@@ -46,7 +46,7 @@ Glossary
         version 2.2. This is a neat way to implement attributes whose usage
         resembles attribute access, but whose implementation uses method calls.
 
-        See :func:`property`.
+        See :class:`property`.
 
     queryset
         An object representing some set of rows to be fetched from the database.
