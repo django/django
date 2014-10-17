@@ -917,16 +917,19 @@ class MigrationAutodetector(object):
         code in migrations needs them)
         """
         models_to_check = self.kept_model_keys.union(self.kept_proxy_keys).union(self.kept_unmanaged_keys)
+        ignore_ordering_for = {"permissions", "default_permissions"}
         for app_label, model_name in sorted(models_to_check):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
             old_options = dict(
-                option for option in old_model_state.options.items()
+                (option_name, (set(option) if option_name in ignore_ordering_for else option)
+                for option_name, option in old_model_state.options.items()
                 if option[0] in AlterModelOptions.ALTER_OPTION_KEYS
             )
             new_options = dict(
-                option for option in new_model_state.options.items()
+                (option_name, (set(option) if option_name in ignore_ordering_for else option)
+                for option_name, option in new_model_state.options.items()
                 if option[0] in AlterModelOptions.ALTER_OPTION_KEYS
             )
             if old_options != new_options:
