@@ -799,6 +799,10 @@ Miscellaneous
   when both the ``fields`` and ``form_class`` attributes are specified.
   Previously, ``fields`` was silently ignored.
 
+* When following redirects, the test client now raises
+  :exc:`~django.test.client.RedirectCycleError` if it detects a loop or hits a
+  maximum redirect limit (rather than passing silently).
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8

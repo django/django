@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from django.test import Client
 from django.test.client import CONTENT_TYPE_RE
 from django.test.utils import setup_test_environment
+from django.utils.six.moves.urllib.parse import urlencode
 
 
 class CustomTestException(Exception):
@@ -83,6 +84,12 @@ def login_protected_redirect_view(request):
     "A view that redirects all requests to the GET view"
     return HttpResponseRedirect('/get_view/')
 login_protected_redirect_view = login_required(login_protected_redirect_view)
+
+
+def redirect_to_self_with_changing_query_view(request):
+    query = request.GET.copy()
+    query['counter'] += '0'
+    return HttpResponseRedirect('/redirect_to_self_with_changing_query_view/?%s' % urlencode(query))
 
 
 def set_session_view(request):
