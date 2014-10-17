@@ -166,7 +166,8 @@ Backwards Compatibility
 The following checks are performed to warn the user of any potential problems
 that might occur as a result of a version upgrade.
 
-* **1_6.W001**: Some project unit tests may not execute as expected.
+* **1_6.W001**: Some project unit tests may not execute as expected. *This
+  check was removed in Django 1.8 due to false positives*.
 * **1_6.W002**: ``BooleanField`` does not have a default value.
 
 Admin
