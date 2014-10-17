@@ -676,8 +676,8 @@ Also note that even an uploaded HTML file, since it can be executed by the
 browser (though not by the server), can pose security threats that are
 equivalent to XSS or CSRF attacks.
 
-By default, :class:`FileField` instances are
-created as ``varchar(100)`` columns in your database. As with other fields, you
+:class:`FileField` instances are created in your database as ``varchar``
+columns with a default max length of 100 characters. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 FileField and FieldFile
@@ -803,8 +803,8 @@ base filename, not the full path. So, this example::
 because the :attr:`~FilePathField.match` applies to the base filename
 (``foo.png`` and ``bar.png``).
 
-By default, :class:`FilePathField` instances are
-created as ``varchar(100)`` columns in your database. As with other fields, you
+:class:`FilePathField` instances are created in your database as ``varchar``
+columns with a default max length of 100 characters. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 ``FloatField``
@@ -855,9 +855,9 @@ Requires the `Pillow`_ library.
 
 .. _Pillow: http://pillow.readthedocs.org/en/latest/
 
-By default, :class:`ImageField` instances are created as ``varchar(100)``
-columns in your database. As with other fields, you can change the maximum
-length using the :attr:`~CharField.max_length` argument.
+:class:`ImageField` instances are created in your database as ``varchar``
+columns with a default max length of 100 characters. As with other fields, you
+can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 The default form widget for this field is a
 :class:`~django.forms.ClearableFileInput`.
