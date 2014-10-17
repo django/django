@@ -165,6 +165,7 @@ class Command(BaseCommand):
                 database=db,
                 reset_sequences=False,
                 inhibit_post_migrate=True,
+                skip_checks=True,
             )
 
         # Migrate!
