@@ -86,47 +86,6 @@ class MessageTests(TestCase):
 
 class Django_1_6_0_CompatibilityChecks(TestCase):
 
-    @override_settings(TEST_RUNNER='django.test.runner.DiscoverRunner')
-    def test_test_runner_new_default(self):
-        errors = check_1_6_compatibility()
-        self.assertEqual(errors, [])
-
-    @override_settings(TEST_RUNNER='myapp.test.CustomRunner')
-    def test_test_runner_overriden(self):
-        errors = check_1_6_compatibility()
-        self.assertEqual(errors, [])
-
-    def test_test_runner_not_set_explicitly(self):
-        # If TEST_RUNNER was set explicitly, temporarily pretend it wasn't
-        test_runner_overridden = False
-        if 'TEST_RUNNER' in settings._wrapped._explicit_settings:
-            test_runner_overridden = True
-            settings._wrapped._explicit_settings.remove('TEST_RUNNER')
-        # We remove some settings to make this look like a project generated under Django 1.5.
-        settings._wrapped._explicit_settings.add('MANAGERS')
-        settings._wrapped._explicit_settings.add('ADMINS')
-        try:
-            errors = check_1_6_compatibility()
-            expected = [
-                checks.Warning(
-                    "Some project unittests may not execute as expected.",
-                    hint=("Django 1.6 introduced a new default test runner. It looks like "
-                          "this project was generated using Django 1.5 or earlier. You should "
-                          "ensure your tests are all running & behaving as expected. See "
-                          "https://docs.djangoproject.com/en/dev/releases/1.6/#new-test-runner "
-                          "for more information."),
-                    obj=None,
-                    id='1_6.W001',
-                )
-            ]
-            self.assertEqual(errors, expected)
-        finally:
-            # Restore settings value
-            if test_runner_overridden:
-                settings._wrapped._explicit_settings.add('TEST_RUNNER')
-            settings._wrapped._explicit_settings.remove('MANAGERS')
-            settings._wrapped._explicit_settings.remove('ADMINS')
-
     @override_settings(TEST_RUNNER='myapp.test.CustomRunner')
     def test_boolean_field_default_value(self):
         # We patch the field's default value to trigger the warning
