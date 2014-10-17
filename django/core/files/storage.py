@@ -46,7 +46,7 @@ class Storage(object):
             name = content.name
 
         if not hasattr(content, 'chunks'):
-            content = File(content)
+            content = File(content, name)
 
         name = self.get_available_name(name)
         name = self._save(name, content)
