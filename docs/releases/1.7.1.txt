@@ -123,3 +123,6 @@ Bugfixes
 
 * The system check framework now raises error **models.E020** when the
   class method ``Model.check()`` is unreachable (:ticket:`23615`).
+
+* Made the Oracle test database creation drop the test user in the event of an
+  unclean exit of a previous test run (:ticket:`23649`).
