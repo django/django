@@ -51,6 +51,17 @@ class ExtractorTests(SimpleTestCase):
             pass
         os.chdir(self._cwd)
 
+    def _run_makemessages(self, **options):
+        os.chdir(self.test_dir)
+        stdout = StringIO()
+        management.call_command('makemessages', locale=[LOCALE], verbosity=2,
+            stdout=stdout, **options)
+        output = stdout.getvalue()
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = fp.read()
+        return output, po_contents
+
     def assertMsgId(self, msgid, s, use_quotes=True):
         q = '"'
         if use_quotes:
@@ -321,37 +332,34 @@ class JavascriptExtractorTests(ExtractorTests):
 
     def test_javascript_literals(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', domain='djangojs', locale=[LOCALE], verbosity=0)
-        self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
-            self.assertMsgId('This literal should be included.', po_contents)
-            self.assertMsgId('This one as well.', po_contents)
-            self.assertMsgId(r'He said, \"hello\".', po_contents)
-            self.assertMsgId("okkkk", po_contents)
-            self.assertMsgId("TEXT", po_contents)
-            self.assertMsgId("It's at http://example.com", po_contents)
-            self.assertMsgId("String", po_contents)
-            self.assertMsgId("/* but this one will be too */ 'cause there is no way of telling...", po_contents)
-            self.assertMsgId("foo", po_contents)
-            self.assertMsgId("bar", po_contents)
-            self.assertMsgId("baz", po_contents)
-            self.assertMsgId("quz", po_contents)
-            self.assertMsgId("foobar", po_contents)
+        _, po_contents = self._run_makemessages(domain='djangojs')
+        self.assertMsgId('This literal should be included.', po_contents)
+        self.assertMsgId('This one as well.', po_contents)
+        self.assertMsgId(r'He said, \"hello\".', po_contents)
+        self.assertMsgId("okkkk", po_contents)
+        self.assertMsgId("TEXT", po_contents)
+        self.assertMsgId("It's at http://example.com", po_contents)
+        self.assertMsgId("String", po_contents)
+        self.assertMsgId("/* but this one will be too */ 'cause there is no way of telling...", po_contents)
+        self.assertMsgId("foo", po_contents)
+        self.assertMsgId("bar", po_contents)
+        self.assertMsgId("baz", po_contents)
+        self.assertMsgId("quz", po_contents)
+        self.assertMsgId("foobar", po_contents)
+
+    @override_settings(
+        STATIC_ROOT=os.path.join(this_directory, 'commands', 'static/'),
+        MEDIA_ROOT=os.path.join(this_directory, 'commands', 'media_root/'))
+    def test_media_static_dirs_ignored(self):
+        """
+        Regression test for #23583.
+        """
+        _, po_contents = self._run_makemessages(domain='djangojs')
+        self.assertMsgId("Static content inside app should be included.", po_contents)
+        self.assertNotMsgId("Content from STATIC_ROOT should not be included", po_contents)
 
 
 class IgnoredExtractorTests(ExtractorTests):
-
-    def _run_makemessages(self, **options):
-        os.chdir(self.test_dir)
-        stdout = StringIO()
-        management.call_command('makemessages', locale=[LOCALE], verbosity=2,
-            stdout=stdout, **options)
-        data = stdout.getvalue()
-        self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
-        return data, po_contents
 
     def test_ignore_directory(self):
         out, po_contents = self._run_makemessages(ignore_patterns=[
@@ -377,11 +385,11 @@ class IgnoredExtractorTests(ExtractorTests):
         self.assertNotMsgId('This should be ignored too.', po_contents)
 
     @override_settings(
-        STATIC_ROOT=os.path.join(this_directory, 'commands', 'static_root/'),
+        STATIC_ROOT=os.path.join(this_directory, 'commands', 'static/'),
         MEDIA_ROOT=os.path.join(this_directory, 'commands', 'media_root/'))
     def test_media_static_dirs_ignored(self):
         out, _ = self._run_makemessages()
-        self.assertIn("ignoring directory static_root", out)
+        self.assertIn("ignoring directory static", out)
         self.assertIn("ignoring directory media_root", out)
 
 

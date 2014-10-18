@@ -216,10 +216,6 @@ class Command(NoArgsCommand):
         ignore_patterns = options.get('ignore_patterns')
         if options.get('use_default_ignore_patterns'):
             ignore_patterns += ['CVS', '.*', '*~', '*.pyc']
-        base_path = os.path.abspath('.')
-        for path in (settings.MEDIA_ROOT, settings.STATIC_ROOT):
-            if path and path.startswith(base_path):
-                ignore_patterns.append('%s*' % path[len(base_path) + 1:])
         self.ignore_patterns = list(set(ignore_patterns))
 
         # Avoid messing with mutable class variables
@@ -359,9 +355,11 @@ class Command(NoArgsCommand):
                 norm_patterns.append(p)
 
         all_files = []
+        ignored_roots = [os.path.normpath(p) for p in (settings.MEDIA_ROOT, settings.STATIC_ROOT)]
         for dirpath, dirnames, filenames in os.walk(force_text(root), topdown=True, followlinks=self.symlinks):
             for dirname in dirnames[:]:
-                if is_ignored(os.path.normpath(os.path.join(dirpath, dirname)), norm_patterns):
+                if (is_ignored(os.path.normpath(os.path.join(dirpath, dirname)), norm_patterns) or
+                        os.path.join(os.path.abspath(dirpath), dirname) in ignored_roots):
                     dirnames.remove(dirname)
                     if self.verbosity > 1:
                         self.stdout.write('ignoring directory %s\n' % dirname)
