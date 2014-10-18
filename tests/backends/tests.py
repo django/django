@@ -345,13 +345,14 @@ class ParameterHandlingTest(TestCase):
 # Unfortunately, the following tests would be a good test to run on all
 # backends, but it breaks MySQL hard. Until #13711 is fixed, it can't be run
 # everywhere (although it would be an effective test of #13711).
-class LongNameTest(TestCase):
+class LongNameTest(TransactionTestCase):
     """Long primary keys and model names can result in a sequence name
     that exceeds the database limits, which will result in truncation
     on certain databases (e.g., Postgres). The backend needs to use
     the correct sequence name in last_insert_id and other places, so
     check it is. Refs #8901.
     """
+    available_apps = ['backends']
 
     def test_sequence_name_length_limits_create(self):
         """Test creation of model with long name and long pk name doesn't error. Ref #8901"""
@@ -465,7 +466,9 @@ class EscapingChecksDebug(EscapingChecks):
     pass
 
 
-class BackendTestCase(TestCase):
+class BackendTestCase(TransactionTestCase):
+
+    available_apps = ['backends']
 
     def create_squares_with_executemany(self, args):
         self.create_squares(args, 'format', True)
@@ -653,9 +656,8 @@ class BackendTestCase(TestCase):
         """
         Test the documented API of connection.queries.
         """
-        reset_queries()
-
         with connection.cursor() as cursor:
+            reset_queries()
             cursor.execute("SELECT 1" + connection.features.bare_select_suffix)
         self.assertEqual(1, len(connection.queries))
 
@@ -823,7 +825,9 @@ class FkConstraintsTests(TransactionTestCase):
             transaction.set_rollback(True)
 
 
-class ThreadTests(TestCase):
+class ThreadTests(TransactionTestCase):
+
+    available_apps = ['backends']
 
     def test_default_connection_thread_local(self):
         """
@@ -987,9 +991,7 @@ class MySQLPKZeroTests(TestCase):
             models.Square.objects.create(id=0, root=0, square=1)
 
 
-class DBConstraintTestCase(TransactionTestCase):
-
-    available_apps = ['backends']
+class DBConstraintTestCase(TestCase):
 
     def test_can_reference_existent(self):
         obj = models.Object.objects.create()
@@ -1066,6 +1068,7 @@ class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(DBTestSettingsRenamedTests, cls).setUpClass()
         # Silence "UserWarning: Overriding setting DATABASES can lead to
         # unexpected behavior."
         cls.warning_classes.append(UserWarning)

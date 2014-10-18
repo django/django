@@ -507,6 +507,9 @@ Tests
 * The :func:`~django.test.override_settings` decorator can now affect the
   master router in :setting:`DATABASE_ROUTERS`.
 
+* Added the ability to setup test data at the class level in a ``TestCase``,
+  using the classmethod ``setUpTestData()`` to speed up the tests.
+
 Validators
 ^^^^^^^^^^
 
@@ -1109,6 +1112,14 @@ The following functions will no longer accept a ``dirs`` parameter to override
 
 The parameter didn't work consistently across different template loaders and
 didn't work for included templates.
+
+Database connections reloading between tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django used to close database connections between each test within
+``TestCase``. This is no longer the case as Django now wraps the whole
+``TestCase`` within a transaction. If some of your tests relied on that
+behavior, you should have them inherit from ``TransactionTestCase`` instead.
 
 ``django.template.loader.BaseLoader``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

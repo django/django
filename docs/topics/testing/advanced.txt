@@ -234,7 +234,6 @@ Advanced features of ``TransactionTestCase``
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is an relatively expensive database operation.
 
-
 Using the Django test runner to test reusable applications
 ==========================================================
 
