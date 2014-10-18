@@ -132,3 +132,6 @@ Bugfixes
 
 * Fixed a regression when feeding the Django test client with an empty data
   string (:ticket:`21740`).
+
+* Fixed a regression in :djadmin:`makemessages` where static files were
+  unexpectedly ignored (:ticket:`23583`).
