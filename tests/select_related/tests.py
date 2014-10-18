@@ -7,7 +7,8 @@ from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Specie
 
 class SelectRelatedTests(TestCase):
 
-    def create_tree(self, stringtree):
+    @classmethod
+    def create_tree(cls, stringtree):
         """
         Helper to create a complete tree.
         """
@@ -26,17 +27,12 @@ class SelectRelatedTests(TestCase):
             obj.save()
             parent = obj
 
-    def create_base_data(self):
-        self.create_tree("Eukaryota Animalia Anthropoda Insecta Diptera Drosophilidae Drosophila melanogaster")
-        self.create_tree("Eukaryota Animalia Chordata Mammalia Primates Hominidae Homo sapiens")
-        self.create_tree("Eukaryota Plantae Magnoliophyta Magnoliopsida Fabales Fabaceae Pisum sativum")
-        self.create_tree("Eukaryota Fungi Basidiomycota Homobasidiomycatae Agaricales Amanitacae Amanita muscaria")
-
-    def setUp(self):
-        # The test runner sets settings.DEBUG to False, but we want to gather
-        # queries so we'll set it to True here and reset it at the end of the
-        # test case.
-        self.create_base_data()
+    @classmethod
+    def setUpTestData(cls):
+        cls.create_tree("Eukaryota Animalia Anthropoda Insecta Diptera Drosophilidae Drosophila melanogaster")
+        cls.create_tree("Eukaryota Animalia Chordata Mammalia Primates Hominidae Homo sapiens")
+        cls.create_tree("Eukaryota Plantae Magnoliophyta Magnoliopsida Fabales Fabaceae Pisum sativum")
+        cls.create_tree("Eukaryota Fungi Basidiomycota Homobasidiomycatae Agaricales Amanitacae Amanita muscaria")
 
     def test_access_fks_without_select_related(self):
         """
