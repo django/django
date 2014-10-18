@@ -919,3 +919,11 @@ to construct the "view on site" URL. This URL is now accessible using the
 ``FormMixin`` subclasses that override the ``get_form()`` method should make
 sure to provide a default value for the ``form_class`` argument since it's
 now optional.
+
+Overriding ``setUpClass`` / ``tearDownClass`` in test cases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The decorators :func:`~django.test.override_settings` and
+:func:`~django.test.modify_settings` now act at the class level when used as
+class decorators. As a consequence, when overriding ``setUpClass()`` or
+``tearDownClass()``, the ``super`` implementation should always be called.
