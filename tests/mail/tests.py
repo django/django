@@ -855,6 +855,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(SMTPBackendTests, cls).setUpClass()
         cls.server = FakeSMTPServer(('127.0.0.1', 0), None)
         cls._settings_override = override_settings(
             EMAIL_HOST="127.0.0.1",
@@ -866,6 +867,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
     def tearDownClass(cls):
         cls._settings_override.disable()
         cls.server.stop()
+        super(SMTPBackendTests, cls).tearDownClass()
 
     def setUp(self):
         super(SMTPBackendTests, self).setUp()
