@@ -19,12 +19,12 @@ class DefaultTests(TestCase):
     def test_uuid_field_defaults(self):
         first_comment = Comment()
         second_comment = Comment()
-        self.assertNotEquals(first_comment.id, second_comment.id)
+        self.assertNotEqual(first_comment.id, second_comment.id)
         for comment in (first_comment, second_comment):
             uuid_as_hex = comment.id.hex
             try:
-                self.assertEquals(32, len(uuid_as_hex))
-                self.assertEquals("4", uuid_as_hex[12])
+                self.assertEqual(32, len(uuid_as_hex))
+                self.assertEqual("4", uuid_as_hex[12])
             except AssertionError as exc:
                 raise AssertionError(
                     "This id does not appear to be a valid UUID4 identifier: "
