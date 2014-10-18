@@ -5,7 +5,7 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import connection
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.test.utils import CaptureQueriesContext
 from django.utils import six
 
@@ -379,7 +379,9 @@ class ModelInheritanceTests(TestCase):
             s.titles.all(), [])
 
 
-class InheritanceSameModelNameTests(TestCase):
+class InheritanceSameModelNameTests(TransactionTestCase):
+
+    available_apps = ['model_inheritance']
 
     def setUp(self):
         # The Title model has distinct accessors for both
@@ -402,14 +404,19 @@ class InheritanceSameModelNameTests(TestCase):
                 INSTALLED_APPS={'append': ['model_inheritance.same_model_name']}):
             call_command('migrate', verbosity=0)
             from .same_model_name.models import Copy
+            copy = self.title.attached_same_model_name_copy_set.create(
+                content='The Web framework for perfectionists with deadlines.',
+                url='http://www.djangoproject.com/',
+                title='Django Rocks'
+            )
             self.assertEqual(
-                self.title.attached_same_model_name_copy_set.create(
-                    content='The Web framework for perfectionists with deadlines.',
-                    url='http://www.djangoproject.com/',
-                    title='Django Rocks'
-                ), Copy.objects.get(
+                copy,
+                Copy.objects.get(
                     content='The Web framework for perfectionists with deadlines.',
                 ))
+            # We delete the copy manually so that it doesn't block the flush
+            # command under Oracle (which does not cascade deletions).
+            copy.delete()
 
     def test_related_name_attribute_exists(self):
         # The Post model doesn't have an attribute called 'attached_%(app_label)s_%(class)s_set'.

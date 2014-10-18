@@ -507,6 +507,10 @@ Tests
 * The :func:`~django.test.override_settings` decorator can now affect the
   master router in :setting:`DATABASE_ROUTERS`.
 
+* Added the ability to setup test data at the class level using
+  :meth:`TestCase.setUpTestData() <django.test.TestCase.setUpTestData>`. Using
+  this technique can speed up the tests as compared to using ``setUp()``.
+
 Validators
 ^^^^^^^^^^
 
@@ -742,6 +746,14 @@ The formtools contrib app has been moved into a separate package.
 The new package is available `on Github`_ and on PyPI.
 
 .. _on GitHub: https://github.com/django/django-formtools/
+
+Database connection reloading between tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django previously closed database connections between each test within a
+``TestCase``. This is no longer the case as Django now wraps the whole
+``TestCase`` within a transaction. If some of your tests relied on the old
+behavior, you should have them inherit from ``TransactionTestCase`` instead.
 
 Miscellaneous
 ~~~~~~~~~~~~~
