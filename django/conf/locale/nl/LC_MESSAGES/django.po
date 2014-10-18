@@ -11,6 +11,7 @@
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012,2014
 # Michiel Overtoom <motoom@xs4all.nl>, 2014
 # Tino de Bruijn <tinodb@gmail.com>, 2013
+# Sander Steffann <sander@steffann.nl>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -36,7 +37,7 @@ msgstr "Arabisch"
 
 #: conf/global_settings.py:53
 msgid "Asturian"
-msgstr ""
+msgstr "Asturisch"
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -92,7 +93,7 @@ msgstr "Engels"
 
 #: conf/global_settings.py:66
 msgid "Australian English"
-msgstr ""
+msgstr "Australisch-Engels"
 
 #: conf/global_settings.py:67
 msgid "British English"
@@ -364,11 +365,11 @@ msgstr "Traditioneel Chinees"
 
 #: contrib/sitemaps/apps.py:8
 msgid "Site Maps"
-msgstr ""
+msgstr "Sitemaps"
 
 #: contrib/staticfiles/apps.py:8
 msgid "Static Files"
-msgstr ""
+msgstr "Statische bestanden"
 
 #: contrib/syndication/apps.py:8
 msgid "Syndication"
@@ -376,7 +377,7 @@ msgstr ""
 
 #: contrib/webdesign/apps.py:8
 msgid "Web Design"
-msgstr ""
+msgstr "Webdesign"
 
 #: core/validators.py:21
 msgid "Enter a valid value."
@@ -388,7 +389,7 @@ msgstr "Geef een geldige URL op."
 
 #: core/validators.py:115
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Geen een geheel getal op."
 
 #: core/validators.py:120
 msgid "Enter a valid email address."
@@ -471,12 +472,12 @@ msgstr "en"
 #: db/models/base.py:977
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s met deze %(field_labels)s bestaat al."
 
 #: db/models/fields/__init__.py:104
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Waarde %(value)r is geen geldige keuze."
 
 #: db/models/fields/__init__.py:105
 msgid "This field cannot be null."
@@ -498,6 +499,7 @@ msgstr "Er bestaat al een %(model_name)s met eenzelfde %(field_label)s."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s moet uniek zijn voor %(date_field_label)s %(lookup_type)s."
 
 #: db/models/fields/__init__.py:116
 #, python-format
@@ -511,12 +513,12 @@ msgstr "Geheel getal"
 #: db/models/fields/__init__.py:851 db/models/fields/__init__.py:1571
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "'%(value)s' waarde moet een geheel getal zijn."
 
 #: db/models/fields/__init__.py:926
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "'%(value)s' waarde moet True of False zijn."
 
 #: db/models/fields/__init__.py:928
 msgid "Boolean (Either True or False)"
@@ -537,6 +539,8 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' waarde heeft een ongeldige datumnotatie. Deze moet in de YYYY-MM-DD "
+"notatie opgegeven worden."
 
 #: db/models/fields/__init__.py:1082 db/models/fields/__init__.py:1189
 #, python-format
@@ -544,6 +548,8 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"'%(value)s' waarde heeft een geldige notatie (YYYY-MM-DD) maar is een ongeldige "
+"datum."
 
 #: db/models/fields/__init__.py:1085
 msgid "Date (without time)"
@@ -555,6 +561,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' waarde heeft een ongeldige notatie. Deze moet in de YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] notatie opgegeven worden."
 
 #: db/models/fields/__init__.py:1191
 #, python-format
@@ -562,6 +570,8 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"'%(value)s' waarde heeft een geldige notatie (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) maar is een ongeldige datum/tijd."
 
 #: db/models/fields/__init__.py:1195
 msgid "Date (with time)"
@@ -570,7 +580,7 @@ msgstr "Datum (met tijd)"
 #: db/models/fields/__init__.py:1297
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "'%(value)s' waarde moet een decimaal getal zijn."
 
 #: db/models/fields/__init__.py:1299
 msgid "Decimal number"
@@ -587,7 +597,7 @@ msgstr "Bestandspad"
 #: db/models/fields/__init__.py:1537
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "'%(value)s' waarde moet een decimaal getal zijn."
 
 #: db/models/fields/__init__.py:1539
 msgid "Floating point number"
@@ -608,7 +618,7 @@ msgstr "IP-adres"
 #: db/models/fields/__init__.py:1747
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "'%(value)s' waarde moet None, True of False."
 
 #: db/models/fields/__init__.py:1749
 msgid "Boolean (Either True, False or None)"
@@ -641,6 +651,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"'%(value)s' waarde heeft een ongeldige notatie. Deze moet in de HH:MM[:ss[.uuuuuu]] "
+"notatie opgegeven worden."
 
 #: db/models/fields/__init__.py:1895
 #, python-format
@@ -648,6 +660,8 @@ msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"'%(value)s' waarde heeft een geldige notatie (HH:MM[:ss[.uuuuuu]]) maar is een "
+"ongeldige tijd."
 
 #: db/models/fields/__init__.py:1898
 msgid "Time"
@@ -672,7 +686,7 @@ msgstr "Plaatje"
 #: db/models/fields/related.py:1580
 #, python-format
 msgid "%(model)s instance with pk %(pk)r does not exist."
-msgstr ""
+msgstr "%(model)s met primaire sleutel %(pk)r bestaat niet."
 
 #: db/models/fields/related.py:1582
 msgid "Foreign Key (type determined by related field)"
@@ -778,11 +792,11 @@ msgstr "Selecteer een geldige keuze. %(value)s is geen beschikbare keuze."
 
 #: forms/fields.py:872 forms/fields.py:987 forms/models.py:1191
 msgid "Enter a list of values."
-msgstr "Geef een lijst op met waardes."
+msgstr "Geef een lijst met waardes op."
 
 #: forms/fields.py:988
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Geef een volledige waarde op"
 
 #. Translators: This is the default suffix added to form field labels
 #: forms/forms.py:122
@@ -803,7 +817,7 @@ msgstr ":?.!"
 
 #: forms/formsets.py:95
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "ManagementForm gegevens missen of zijn mee geknoeid"
 
 #: forms/formsets.py:332
 #, python-format
@@ -816,8 +830,8 @@ msgstr[1] "Verstuur niet meer dan %d formulieren."
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Geef alstublieft %d of meer formulieren op."
+msgstr[1] "Geef alstublieft %d of meer formulieren op."
 
 #: forms/formsets.py:367 forms/formsets.py:369
 msgid "Order"
@@ -1239,7 +1253,7 @@ msgstr "december"
 
 #: utils/ipv6.py:10
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Dis is geen geldig IPv6-adres."
 
 #: utils/text.py:76
 #, python-format
@@ -1304,11 +1318,11 @@ msgstr "0 minuten"
 
 #: views/csrf.py:105
 msgid "Forbidden"
-msgstr ""
+msgstr "Verboden"
 
 #: views/csrf.py:106
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "CSRF verificatie mislukt. Verzoek afgebroken."
 
 #: views/csrf.py:110
 msgid ""
@@ -1317,6 +1331,10 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"U ziet deze melding omdat deze HTTPS website vereist dat uw webbrowser een 'Referer "
+"header' meestuurt, maar deze ontbreekt. Deze header is noodzakelijk om"
+"veiligheidsredenen om er zeker van te zijn dat uw browser niet door derden "
+"gekaapt wordt."
 
 #: views/csrf.py:115
 msgid ""
@@ -1324,6 +1342,9 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Als u uw webbrowser ingesteld heeft om geen 'Referer headers' mee te sturen, schakelt"
+"u deze dan alstublieft weer in, op zijn minst voor deze website, voor HTTPS verbindingen, "
+"of voor 'same-origin' verzoeken."
 
 #: views/csrf.py:120
 msgid ""
@@ -1331,16 +1352,22 @@ msgid ""
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"U ziet deze melding omdat deze website vereist dat een CSRF cookie wordt "
+"meegestuurd bij het versturen van formulieren. Dit cookie is vereist om "
+"veiligheidsredenen om er zeker van te zijn dat uw browser niet door derden "
+"gekaapt wordt."
 
 #: views/csrf.py:125
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Als u cookies in uw webbrowser heeft uitgeschakeld, schakel deze dan alstublieft "
+"weer in, op zijn minst voor deze website of voor 'same-origin' verzoeken."
 
 #: views/csrf.py:129
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Meer informatie is beschikbaar met DEBUG=True."
 
 #: views/generic/dates.py:43
 msgid "No year specified"
