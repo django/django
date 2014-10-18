@@ -691,12 +691,44 @@ additions, including:
 
 * Automatic loading of fixtures.
 
-* Wraps each test in a transaction.
+* Wraps the tests within two nested ``atomic`` blocks: one for the whole class
+  and one for each test.
 
 * Creates a TestClient instance.
 
 * Django-specific assertions for testing for things like redirection and form
   errors.
+
+.. classmethod:: TestCase.setUpTestData()
+
+    .. versionadded:: 1.8
+
+    The class-level ``atomic`` block described above allows the creation of
+    initial data at the class level, once for the whole ``TestCase``. This
+    technique allows for faster tests as compared to using ``setUp()``.
+
+    For example::
+
+        from django.test import TestCase
+
+        class MyTests(TestCase):
+            @classmethod
+            def setUpTestData(cls):
+                # Set up data for the whole TestCase
+                cls.foo = Foo.objects.create(bar="Test")
+                ...
+
+            def test1(self):
+                # Some test using self.foo
+                ...
+
+            def test2(self):
+                # Some other test using self.foo
+                ...
+
+    Note that if the tests are run on a database with no transaction support
+    (for instance, MySQL with the MyISAM engine), ``setUpTestData()`` will be
+    called before each test, negating the speed benefits.
 
 .. warning::
 

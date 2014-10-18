@@ -2,12 +2,15 @@ from __future__ import unicode_literals
 
 from django.db import connection
 from django.db.utils import DatabaseError
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import Reporter, Article
 
 
-class IntrospectionTests(TestCase):
+class IntrospectionTests(TransactionTestCase):
+
+    available_apps = ['introspection']
+
     def test_table_names(self):
         tl = connection.introspection.table_names()
         self.assertEqual(tl, sorted(tl))
