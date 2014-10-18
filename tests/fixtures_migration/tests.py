@@ -1,10 +1,10 @@
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.core import management
 
 from .models import Book
 
 
-class TestNoInitialDataLoading(TestCase):
+class TestNoInitialDataLoading(TransactionTestCase):
     """
     Apps with migrations should ignore initial data. This test can be removed
     in Django 1.9 when migrations become required and initial data is no longer

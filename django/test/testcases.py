@@ -786,10 +786,11 @@ class TransactionTestCase(SimpleTestCase):
 
             raise
 
-    def _databases_names(self, include_mirrors=True):
+    @classmethod
+    def _databases_names(cls, include_mirrors=True):
         # If the test case has a multi_db=True flag, act on all databases,
         # including mirrors or not. Otherwise, just on the default DB.
-        if getattr(self, 'multi_db', False):
+        if getattr(cls, 'multi_db', False):
             return [alias for alias in connections
                     if include_mirrors or not connections[alias].settings_dict['TEST']['MIRROR']]
         else:
@@ -829,6 +830,9 @@ class TransactionTestCase(SimpleTestCase):
                 call_command('loaddata', *self.fixtures,
                              **{'verbosity': 0, 'database': db_name})
 
+    def _should_reload_connections(self):
+        return True
+
     def _post_teardown(self):
         """Performs any post-test things. This includes:
 
@@ -839,14 +843,15 @@ class TransactionTestCase(SimpleTestCase):
         try:
             self._fixture_teardown()
             super(TransactionTestCase, self)._post_teardown()
-            # Some DB cursors include SQL statements as part of cursor
-            # creation. If you have a test that does rollback, the effect of
-            # these statements is lost, which can effect the operation of
-            # tests (e.g., losing a timezone setting causing objects to be
-            # created with the wrong time). To make sure this doesn't happen,
-            # get a clean connection at the start of every test.
-            for conn in connections.all():
-                conn.close()
+            if self._should_reload_connections():
+                # Some DB cursors include SQL statements as part of cursor
+                # creation. If you have a test that does a rollback, the effect
+                # of these statements is lost, which can affect the operation of
+                # tests (e.g., losing a timezone setting causing objects to be
+                # created with the wrong time). To make sure this doesn't
+                # happen, get a clean connection at the start of every test.
+                for conn in connections.all():
+                    conn.close()
         finally:
             if self.available_apps is not None:
                 apps.unset_available_apps()
@@ -899,15 +904,54 @@ def connections_support_transactions():
 
 class TestCase(TransactionTestCase):
     """
-    Does basically the same as TransactionTestCase, but surrounds every test
-    with a transaction, monkey-patches the real transaction management routines
-    to do nothing, and rollsback the test transaction at the end of the test.
-    You have to use TransactionTestCase, if you need transaction management
-    inside a test.
+    Similar to TransactionTestCase, but uses `transaction.atomic()` to achieve
+    test isolation.
+
+    In most situation, TestCase should be prefered to TransactionTestCase as
+    it allows faster execution. However, there are some situations where using
+    TransactionTestCase might be necessary (e.g. testing some transactional
+    behavior).
+
+    On database backends with no transaction support, TestCase behaves as
+    TransactionTestCase.
     """
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCase, cls).setUpClass()
+        if not connections_support_transactions():
+            return
+        cls.cls_atomics = {}
+        for db_name in cls._databases_names():
+            cls.cls_atomics[db_name] = transaction.atomic(using=db_name)
+            cls.cls_atomics[db_name].__enter__()
+        cls.setUpTestData()
+
+    @classmethod
+    def tearDownClass(cls):
+        if connections_support_transactions():
+            for db_name in reversed(cls._databases_names()):
+                transaction.set_rollback(True, using=db_name)
+                cls.cls_atomics[db_name].__exit__(None, None, None)
+            for conn in connections.all():
+                conn.close()
+        super(TestCase, cls).tearDownClass()
+
+    @classmethod
+    def setUpTestData(cls):
+        """Load initial data for the TestCase"""
+        pass
+
+    def _should_reload_connections(self):
+        if connections_support_transactions():
+            return False
+        return super(TestCase, self)._should_reload_connections()
 
     def _fixture_setup(self):
         if not connections_support_transactions():
+            # If the backend does not support transactions, we should reload
+            # class data before each test
+            self.setUpTestData()
             return super(TestCase, self)._fixture_setup()
 
         assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
