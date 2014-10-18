@@ -1,4 +1,5 @@
 *.egg-info
+*.mo
 *.pot
 *.py[co]
 __pycache__

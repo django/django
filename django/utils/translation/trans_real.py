@@ -2,8 +2,10 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+import glob
 import os
 import re
+import subprocess
 import sys
 import gettext as gettext_module
 from threading import local
@@ -132,6 +134,13 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         Using param `use_null_fallback` to avoid confusion with any other
         references to 'fallback'.
         """
+        # Checking .mo presence should only affect people running Django from a development tree
+        if not glob.glob('%s/*/LC_MESSAGES/*.mo' % localedir):
+            po_files = glob.glob('%s/*/LC_MESSAGES/*.po' % localedir)
+            for po_file in po_files:
+                mo_file = '%s.mo' % po_file[:-3]
+                subprocess.call(["msgfmt", "-o", mo_file, po_file])
+
         translation = gettext_module.translation(
             domain='django',
             localedir=localedir,
