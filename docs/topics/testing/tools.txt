@@ -607,6 +607,25 @@ then you should use :class:`~django.test.TransactionTestCase` or
 
 ``SimpleTestCase`` inherits from ``unittest.TestCase``.
 
+.. warning::
+
+    ``SimpleTestCase`` and its subclasses (e.g. ``TestCase``, ...) rely on
+    ``setUpClass()`` and ``tearDownClass()`` to perform some class-wide
+    initialization (e.g. overriding settings). If you need to override those
+    methods, don't forget to call the ``super`` implementation::
+
+        class MyTestCase(TestCase):
+
+            @classmethod
+            def setUpClass(cls):
+                super(cls, MyTestCase).setUpClass()     # Call parent first
+                ...
+
+            @classmethod
+            def tearDownClass(cls):
+                ...
+                super(cls, MyTestCase).tearDownClass()  # Call parent last
+
 TransactionTestCase
 ~~~~~~~~~~~~~~~~~~~
 
@@ -751,8 +770,8 @@ Then, add a ``LiveServerTestCase``-based test to your app's tests module
 
         @classmethod
         def setUpClass(cls):
-            cls.selenium = WebDriver()
             super(MySeleniumTests, cls).setUpClass()
+            cls.selenium = WebDriver()
 
         @classmethod
         def tearDownClass(cls):

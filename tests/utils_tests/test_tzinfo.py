@@ -20,6 +20,7 @@ class TzinfoTests(IgnoreDeprecationWarningsMixin, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(TzinfoTests, cls).setUpClass()
         cls.old_TZ = os.environ.get('TZ')
         os.environ['TZ'] = 'US/Eastern'
 
@@ -41,6 +42,7 @@ class TzinfoTests(IgnoreDeprecationWarningsMixin, unittest.TestCase):
         # Cleanup - force re-evaluation of TZ environment variable.
         if cls.tz_tests:
             time.tzset()
+        super(TzinfoTests, cls).tearDownClass()
 
     def test_fixedoffset(self):
         self.assertEqual(repr(FixedOffset(0)), '+0000')
