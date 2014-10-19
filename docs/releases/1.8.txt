@@ -634,6 +634,9 @@ Miscellaneous
   class name found in the :setting:`BACKEND <CACHES-BACKEND>` key of the
   :setting:`CACHES` setting.
 
+* By default, :ref:`call_command <call-command>` now always skips the check
+  framework (unless you pass it ``skip_checks=False``).
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
