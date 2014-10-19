@@ -505,7 +505,7 @@ class ImageFieldTests(IsolatedModelsTestCase):
             Error(
                 'Cannot use ImageField because Pillow is not installed.',
                 hint=('Get Pillow at https://pypi.python.org/pypi/Pillow '
-                      'or run command "pip install pillow".'),
+                      'or run command "pip install Pillow".'),
                 obj=field,
                 id='fields.E210',
             ),
