@@ -139,27 +139,6 @@ class MigrateTests(MigrationTestBase):
         stdout = six.StringIO()
         call_command("migrate", "migrated_unapplied_app", stdout=stdout)
 
-    @override_system_checks([])
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
-    def test_migrate_system_checks(self):
-        """
-        Migrate should only call system checks once, even with test_flush=True (Refs #23650).
-        """
-        from django.core.management.base import BaseCommand
-
-        self.counter = 0
-
-        def patched_check(self_, **kwargs):
-            self.counter = self.counter + 1
-
-        saved_check = BaseCommand.check
-        BaseCommand.check = patched_check
-        try:
-            call_command("migrate", "migrations", verbosity=0, test_flush=True)
-        finally:
-            BaseCommand.check = saved_check
-        self.assertEqual(self.counter, 1)
-
 
 class MakeMigrationsTests(MigrationTestBase):
     """
