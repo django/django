@@ -352,7 +352,7 @@ class Command(BaseCommand):
             for app_label in app_labels:
                 call_command(
                     'loaddata', 'initial_data', verbosity=self.verbosity,
-                    database=connection.alias, skip_validation=True,
+                    database=connection.alias, skip_checks=True,
                     app_label=app_label, hide_empty=True,
                 )
 
