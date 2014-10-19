@@ -114,6 +114,8 @@ def call_command(name, *args, **options):
         # Legacy optparse method
         defaults, _ = parser.parse_args(args=[])
         defaults = dict(defaults.__dict__, **options)
+    if 'skip_checks' not in options:
+        defaults['skip_checks'] = True
 
     return command.execute(*args, **defaults)
 

@@ -4,7 +4,7 @@ import warnings
 
 from django.db import connection
 from django.core import management
-from django.core.management import CommandError
+from django.core.management import BaseCommand, CommandError
 from django.core.management.utils import find_command, popen_wrapper
 from django.test import SimpleTestCase
 from django.utils import translation
@@ -135,6 +135,26 @@ class CommandTests(SimpleTestCase):
         output = out.getvalue().strip()
         self.assertTrue(output.startswith(connection.ops.start_transaction_sql()))
         self.assertTrue(output.endswith(connection.ops.end_transaction_sql()))
+
+    def test_call_command_no_checks(self):
+        """
+        By default, call_command should not trigger the check framework, unless
+        specifically asked.
+        """
+        self.counter = 0
+
+        def patched_check(self_, **kwargs):
+            self.counter = self.counter + 1
+
+        saved_check = BaseCommand.check
+        BaseCommand.check = patched_check
+        try:
+            management.call_command("dance", verbosity=0)
+            self.assertEqual(self.counter, 0)
+            management.call_command("dance", verbosity=0, skip_checks=False)
+            self.assertEqual(self.counter, 1)
+        finally:
+            BaseCommand.check = saved_check
 
 
 class UtilsTests(SimpleTestCase):
