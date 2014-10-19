@@ -274,18 +274,20 @@ class InlineAdminForm(AdminForm):
         self.formset = formset
         self.model_admin = model_admin
         self.original = original
-        if original is not None:
-            def _original_content_type_id(self):
-                warnings.warn("Use absolute_url attr instead.", RemovedInDjango20Warning)
-                # Since this module gets imported in the application's root package,
-                # it cannot import models from other applications at the module level.
-                from django.contrib.contenttypes.models import ContentType
-                return ContentType.objects.get_for_model(original).pk
-            self.__class__.original_content_type_id = cached_property(_original_content_type_id)
         self.show_url = original and view_on_site_url is not None
         self.absolute_url = view_on_site_url
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields,
             readonly_fields, model_admin)
+
+    @cached_property
+    def original_content_type_id(self):
+        warnings.warn("Use absolute_url attr instead.", RemovedInDjango20Warning)
+        if self.original is not None:
+            # Since this module gets imported in the application's root package,
+            # it cannot import models from other applications at the module level.
+            from django.contrib.contenttypes.models import ContentType
+            return ContentType.objects.get_for_model(self.original).pk
+        raise AttributeError
 
     def __iter__(self):
         for name, options in self.fieldsets:
