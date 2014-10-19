@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         warnings.warn("The syncdb command will be removed in Django 1.9", RemovedInDjango19Warning)
-        call_command("migrate", skip_checks=True, **options)
+        call_command("migrate", **options)
 
         try:
             apps.get_model('auth', 'Permission')
@@ -41,5 +41,5 @@ class Command(BaseCommand):
                     confirm = input('Please enter either "yes" or "no": ')
                     continue
                 if confirm == 'yes':
-                    call_command("createsuperuser", interactive=True, database=options['database'], skip_checks=True)
+                    call_command("createsuperuser", interactive=True, database=options['database'])
                 break

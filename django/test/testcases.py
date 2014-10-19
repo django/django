@@ -830,7 +830,7 @@ class TransactionTestCase(SimpleTestCase):
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
                 call_command('loaddata', *self.fixtures,
-                             **{'verbosity': 0, 'database': db_name, 'skip_checks': True})
+                             **{'verbosity': 0, 'database': db_name})
 
     def _post_teardown(self):
         """Performs any post-test things. This includes:
@@ -864,8 +864,7 @@ class TransactionTestCase(SimpleTestCase):
         for db_name in self._databases_names(include_mirrors=False):
             # Flush the database
             call_command('flush', verbosity=0, interactive=False,
-                         database=db_name, skip_checks=True,
-                         reset_sequences=False,
+                         database=db_name, reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
                          inhibit_post_migrate=self.available_apps is not None)
 
@@ -931,7 +930,6 @@ class TestCase(TransactionTestCase):
                                      'verbosity': 0,
                                      'commit': False,
                                      'database': db_name,
-                                     'skip_checks': True,
                                  })
                 except Exception:
                     self._fixture_teardown()
