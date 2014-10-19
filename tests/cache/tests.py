@@ -2058,22 +2058,6 @@ class TestWithTemplateResponse(TestCase):
         self.assertTrue(response.has_header('ETag'))
 
 
-@override_settings(ROOT_URLCONF="admin_views.urls")
-class TestEtagWithAdmin(TestCase):
-    # See https://code.djangoproject.com/ticket/16003
-
-    def test_admin(self):
-        with self.settings(USE_ETAGS=False):
-            response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 302)
-            self.assertFalse(response.has_header('ETag'))
-
-        with self.settings(USE_ETAGS=True):
-            response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 302)
-            self.assertTrue(response.has_header('ETag'))
-
-
 class TestMakeTemplateFragmentKey(TestCase):
     def test_without_vary_on(self):
         key = make_template_fragment_key('a.fragment')
