@@ -124,6 +124,11 @@ class ConditionalGet(TestCase):
         response = self.client.get('/condition/last_modified2/')
         self.assertFullResponse(response, check_etag=False)
 
+    def test_single_condition_head(self):
+        self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_STR
+        response = self.client.head('/condition/')
+        self.assertNotModified(response)
+
     def test_invalid_etag(self):
         self.client.defaults['HTTP_IF_NONE_MATCH'] = r'"\"'
         response = self.client.get('/condition/etag/')
