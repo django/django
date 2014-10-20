@@ -62,6 +62,9 @@ about each item can often be found in the release notes of two versions prior.
 * ``django.utils.checksums`` will be removed; its functionality is included
   in django-localflavor 1.1+.
 
+* The ``original_content_type_id`` attribute on
+  ``django.contrib.admin.helpers.InlineAdminForm`` will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
