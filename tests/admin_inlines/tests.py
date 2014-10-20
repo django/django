@@ -1,11 +1,14 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django.contrib.admin import TabularInline, ModelAdmin
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings, RequestFactory
+from django.utils.encoding import force_text
 
 # local test models
 from .admin import InnerInline, site as admin_site
@@ -402,6 +405,27 @@ class TestInlineAdminForm(TestCase):
         iaf = InlineAdminForm(None, None, {}, {}, joe)
         parent_ct = ContentType.objects.get_for_model(Parent)
         self.assertEqual(iaf.original.content_type, parent_ct)
+
+    def test_original_content_type_id_deprecated(self):
+        """
+        #23444 -- Verify a warning is raised when accessing
+        `original_content_type_id` attribute of `InlineAdminForm` object.
+        """
+        iaf = InlineAdminForm(None, None, {}, {}, None)
+        poll = Poll.objects.create(name="poll")
+        iaf2 = InlineAdminForm(None, None, {}, {}, poll)
+        poll_ct = ContentType.objects.get_for_model(Poll)
+        with warnings.catch_warnings(record=True) as recorded:
+            with self.assertRaises(AttributeError):
+                iaf.original_content_type_id
+            msg = force_text(recorded.pop().message)
+            self.assertEqual(
+                msg,
+                'InlineAdminForm.original_content_type_id is deprecated and will be '
+                'removed in Django 2.0. If you were using this attribute to construct '
+                'the "view on site" URL, use the `absolute_url` attribute instead.'
+            )
+            self.assertEqual(iaf2.original_content_type_id, poll_ct.id)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
