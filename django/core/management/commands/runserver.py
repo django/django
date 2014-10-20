@@ -41,6 +41,14 @@ class Command(BaseCommand):
         parser.add_argument('--noreload', action='store_false', dest='use_reloader', default=True,
             help='Tells Django to NOT use the auto-reloader.')
 
+    def execute(self, *args, **options):
+        if options.get('no_color'):
+            # We rely on the environment because it's currently the only
+            # way to reach WSGIRequestHandler. This seems an acceptable
+            # compromise considering `runserver` runs indefinitely.
+            os.environ[str("DJANGO_COLORS")] = str("nocolor")
+        super(Command, self).execute(*args, **options)
+
     def get_handler(self, *args, **options):
         """
         Returns the default WSGI handler for the runner.

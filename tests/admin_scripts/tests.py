@@ -1397,7 +1397,6 @@ class CommandTypes(AdminScriptTestCase):
         out = StringIO()
 
         call_command('color_command', no_color=True, stdout=out)
-        self.assertEqual(os.environ.get('DJANGO_COLORS', ''), 'nocolor')
         self.assertEqual(out.getvalue(), 'BEGIN\n')
 
     def test_base_command(self):
