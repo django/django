@@ -52,7 +52,7 @@ require_safe = require_http_methods(["GET", "HEAD"])
 require_safe.__doc__ = "Decorator to require that a view only accept safe methods: GET and HEAD."
 
 
-def condition(etag_func=None, last_modified_func=None):
+def condition(etag_func=None, last_modified_func=None, update=("PATCH", "PUT")):
     """
     Decorator to support conditional retrieval (or change) for a view
     function.
@@ -65,6 +65,7 @@ def condition(etag_func=None, last_modified_func=None):
 
     If both parameters are provided, all the preconditions must be met before
     the view is processed.
+    see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.24
 
     This decorator will either pass control to the wrapped view function or
     return an HTTP 304 response (unmodified) or 412 response (preconditions
@@ -73,6 +74,11 @@ def condition(etag_func=None, last_modified_func=None):
     Any behavior marked as "undefined" in the HTTP spec (e.g. If-none-match
     plus If-modified-since headers) will result in the view function being
     called.
+
+    The update parameter specifies for which methods (default: PATCH and PUT)
+    the response header should be updated with the latest values.
+    Otherwise the initial values are kept.
+    see http://tools.ietf.org/id/draft-reschke-http-etag-on-write-09.txt
     """
     def decorator(func):
         @wraps(func, assigned=available_attrs(func))
@@ -81,8 +87,12 @@ def condition(etag_func=None, last_modified_func=None):
             if_modified_since = request.META.get("HTTP_IF_MODIFIED_SINCE")
             if if_modified_since:
                 if_modified_since = parse_http_date_safe(if_modified_since)
+            if_unmodified_since = request.META.get("HTTP_IF_UNMODIFIED_SINCE")
+            if if_unmodified_since:
+                if_unmodified_since = parse_http_date_safe(if_unmodified_since)
             if_none_match = request.META.get("HTTP_IF_NONE_MATCH")
             if_match = request.META.get("HTTP_IF_MATCH")
+            etags = []
             if if_none_match or if_match:
                 # There can be more than one ETag in the request, so we
                 # consider the list of values.
@@ -96,22 +106,23 @@ def condition(etag_func=None, last_modified_func=None):
                     if_none_match = None
                     if_match = None
 
-            # Compute values (if any) for the requested resource.
-            if etag_func:
-                res_etag = etag_func(request, *args, **kwargs)
-            else:
-                res_etag = None
-            if last_modified_func:
-                dt = last_modified_func(request, *args, **kwargs)
-                if dt:
-                    res_last_modified = timegm(dt.utctimetuple())
-                else:
-                    res_last_modified = None
-            else:
-                res_last_modified = None
+            def get_etag():
+                # Compute values (if any) for the requested resource.
+                if etag_func:
+                    return etag_func(request, *args, **kwargs)
+            def get_last_modified():
+                if last_modified_func:
+                    dt = last_modified_func(request, *args, **kwargs)
+                    if dt:
+                        return timegm(dt.utctimetuple())
+
+            res_etag = get_etag()
+            res_last_modified = get_last_modified()
 
             response = None
-            if not ((if_match and (if_modified_since or if_none_match)) or
+            if not ((if_match and if_modified_since) or
+                    (if_none_match and if_unmodified_since) or
+                    (if_modified_since and if_unmodified_since) or
                     (if_match and if_none_match)):
                 # We only get here if no undefined combinations of headers are
                 # specified.
@@ -130,8 +141,10 @@ def condition(etag_func=None, last_modified_func=None):
                             }
                         )
                         response = HttpResponse(status=412)
-                elif if_match and ((not res_etag and "*" in etags) or
-                        (res_etag and res_etag not in etags)):
+                elif (if_match and ((not res_etag and "*" in etags) or
+                        (res_etag and res_etag not in etags) or
+                        (res_last_modified and if_unmodified_since and
+                        res_last_modified > if_unmodified_since))):
                     logger.warning('Precondition Failed: %s', request.path,
                         extra={
                             'status_code': 412,
@@ -143,15 +156,32 @@ def condition(etag_func=None, last_modified_func=None):
                         res_last_modified and if_modified_since and
                         res_last_modified <= if_modified_since):
                     response = HttpResponseNotModified()
+                elif (not if_match and
+                        res_last_modified and if_unmodified_since and
+                        res_last_modified > if_unmodified_since):
+                    logger.warning('Precondition Failed: %s', request.path,
+                        extra={
+                            'status_code': 412,
+                            'request': request
+                        }
+                    )
+                    response = HttpResponse(status=412)
 
             if response is None:
                 response = func(request, *args, **kwargs)
 
             # Set relevant headers on the response if they don't already exist.
-            if res_last_modified and not response.has_header('Last-Modified'):
-                response['Last-Modified'] = http_date(res_last_modified)
-            if res_etag and not response.has_header('ETag'):
-                response['ETag'] = quote_etag(res_etag)
+            if not response.has_header('Last-Modified'):
+                if request.method in update:
+                    res_last_modified = get_last_modified()
+                if res_last_modified:
+                    response['Last-Modified'] = http_date(res_last_modified)
+
+            if not response.has_header('ETag'):
+                if request.method in update:
+                    res_etag = get_etag()
+                if res_etag:
+                    response['ETag'] = quote_etag(res_etag)
 
             return response
 
