@@ -37,7 +37,7 @@ Example
 
 The following is a simple unit test using the request factory::
 
-    from django.contrib.auth.models import User
+    from django.contrib.auth.models import AnonymousUser, User
     from django.test import TestCase, RequestFactory
 
     class SimpleTest(TestCase):
@@ -54,6 +54,10 @@ The following is a simple unit test using the request factory::
             # Recall that middleware are not supported. You can simulate a
             # logged-in user by setting request.user manually.
             request.user = self.user
+
+            # Or you can simulate an anonymous user by setting request.user to
+            # an AnonymousUser instance.
+            request.user = AnonymousUser()
 
             # Test my_view() as if it were deployed at /customer/details
             response = my_view(request)
