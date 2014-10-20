@@ -73,8 +73,9 @@ Here are some other terms that will help us to handle a common language:
     language code
       Represents the name of a language. Browsers send the names of the
       languages they accept in the ``Accept-Language`` HTTP header using this
-      format. Examples: ``it``, ``de-at``, ``es``, ``pt-br``. Both the language
-      and the country parts are in lower case. The separator is a dash.
+      format. Examples: ``it``, ``de-at``, ``es``, ``pt-br``. Language codes
+      are generally represented in lower-case, but the HTTP ``Accept-Language``
+      header is case-insensitive. The separator is a dash.
 
     message file
       A message file is a plain-text file, representing a single language,
