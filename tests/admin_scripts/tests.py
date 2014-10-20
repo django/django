@@ -1162,7 +1162,7 @@ class ManageCheck(AdminScriptTestCase):
         args = ['check']
         out, err = self.run_manage(args)
         expected_err = (
-            "CommandError: System check identified some issues:\n"
+            "SystemCheckError: System check identified some issues:\n"
             "\n"
             "ERRORS:\n"
             "?: An error\n"

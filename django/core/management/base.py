@@ -38,6 +38,13 @@ class CommandError(Exception):
     pass
 
 
+class SystemCheckError(CommandError):
+    """
+    The system check framework detected unrecoverable errors.
+    """
+    pass
+
+
 class CommandParser(ArgumentParser):
     """
     Customized ArgumentParser class to improve some error messages and prevent
@@ -385,7 +392,11 @@ class BaseCommand(object):
             if options.traceback or not isinstance(e, CommandError):
                 raise
 
-            self.stderr.write('%s: %s' % (e.__class__.__name__, e))
+            # SystemCheckError takes care of its own formatting.
+            if isinstance(e, SystemCheckError):
+                self.stderr.write(str(e), lambda x: x)
+            else:
+                self.stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
 
     def execute(self, *args, **options):
@@ -468,7 +479,7 @@ class BaseCommand(object):
             include_deployment_checks=include_deployment_checks,
         )
 
-        msg = ""
+        header, body, footer = "", "", ""
         visible_issue_count = 0  # excludes silenced warnings
 
         if all_issues:
@@ -489,19 +500,20 @@ class BaseCommand(object):
                 if issues:
                     visible_issue_count += len(issues)
                     formatted = (
-                        color_style().ERROR(force_str(e))
+                        self.style.ERROR(force_str(e))
                         if e.is_serious()
-                        else color_style().WARNING(force_str(e))
+                        else self.style.WARNING(force_str(e))
                         for e in issues)
                     formatted = "\n".join(sorted(formatted))
-                    msg += '\n%s:\n%s\n' % (group_name, formatted)
-            if msg:
-                msg = "System check identified some issues:\n%s" % msg
+                    body += '\n%s:\n%s\n' % (group_name, formatted)
+
+        if visible_issue_count:
+            header = "System check identified some issues:\n"
 
         if display_num_errors:
-            if msg:
-                msg += '\n'
-            msg += "System check identified %s (%s silenced)." % (
+            if visible_issue_count:
+                footer += '\n'
+            footer += "System check identified %s (%s silenced)." % (
                 "no issues" if visible_issue_count == 0 else
                 "1 issue" if visible_issue_count == 1 else
                 "%s issues" % visible_issue_count,
@@ -509,11 +521,16 @@ class BaseCommand(object):
             )
 
         if any(e.is_serious() and not e.is_silenced() for e in all_issues):
-            raise CommandError(msg)
-        elif msg and visible_issue_count:
-            self.stderr.write(msg)
-        elif msg:
-            self.stdout.write(msg)
+            msg = self.style.ERROR("SystemCheckError: %s" % header) + body + footer
+            raise SystemCheckError(msg)
+        else:
+            msg = header + body + footer
+
+        if msg:
+            if visible_issue_count:
+                self.stderr.write(msg, lambda x: x)
+            else:
+                self.stdout.write(msg)
 
     def handle(self, *args, **options):
         """
