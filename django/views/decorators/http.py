@@ -139,7 +139,7 @@ def condition(etag_func=None, last_modified_func=None):
                         }
                     )
                     response = HttpResponse(status=412)
-                elif (not if_none_match and request.method == "GET" and
+                elif (not if_none_match and request.method in ("GET", "HEAD") and
                         res_last_modified and if_modified_since and
                         res_last_modified <= if_modified_since):
                     response = HttpResponseNotModified()
