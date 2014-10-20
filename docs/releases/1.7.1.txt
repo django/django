@@ -129,3 +129,6 @@ Bugfixes
 
 * Fixed :djadmin:`makemigrations` to detect changes to
   :attr:`Meta.db_table <django.db.models.Options.db_table>` (:ticket:`23629`).
+
+* Fixed a regression when feeding the Django test client with an empty data
+  string (:ticket:`21740`).
