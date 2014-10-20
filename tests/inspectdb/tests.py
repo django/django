@@ -51,6 +51,7 @@ class InspectDBTestCase(TestCase):
         if (connection.features.can_introspect_max_length and
                 not connection.features.interprets_empty_strings_as_nulls):
             assertFieldType('char_field', "models.CharField(max_length=10)")
+            assertFieldType('null_char_field', "models.CharField(max_length=10, blank=True, null=True)")
             assertFieldType('comma_separated_int_field', "models.CharField(max_length=99)")
         assertFieldType('date_field', "models.DateField()")
         assertFieldType('date_time_field', "models.DateTimeField()")

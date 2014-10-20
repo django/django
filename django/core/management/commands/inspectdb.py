@@ -123,8 +123,7 @@ class Command(BaseCommand):
                             field_type = 'NullBooleanField('
                         else:
                             extra_params['blank'] = True
-                            if field_type not in ('TextField(', 'CharField('):
-                                extra_params['null'] = True
+                            extra_params['null'] = True
 
                     field_desc = '%s = %s%s' % (
                         att_name,
