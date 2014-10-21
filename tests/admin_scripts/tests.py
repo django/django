@@ -21,7 +21,7 @@ import django
 from django import conf, get_version
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management import BaseCommand, CommandError, call_command
+from django.core.management import BaseCommand, CommandError, call_command, color
 from django.db import connection
 from django.utils.encoding import force_text
 from django.utils._os import npath, upath
@@ -1392,12 +1392,83 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "Prints the CREATE TABLE, custom SQL and CREATE INDEX SQL statements for the\ngiven model module name(s).")
         self.assertEqual(out.count('optional arguments'), 1)
 
-    def test_no_color(self):
-        "--no-color prevent colorization of the output"
-        out = StringIO()
+    def test_command_color(self):
+        class Command(BaseCommand):
+            requires_system_checks = False
 
-        call_command('color_command', no_color=True, stdout=out)
-        self.assertEqual(out.getvalue(), 'BEGIN\n')
+            def handle(self, *args, **options):
+                self.stdout.write('Hello, world!', self.style.ERROR)
+                self.stderr.write('Hello, world!', self.style.ERROR)
+
+        out = StringIO()
+        err = StringIO()
+        command = Command(stdout=out, stderr=err)
+        command.execute()
+        if color.supports_color():
+            self.assertIn('Hello, world!\n', out.getvalue())
+            self.assertIn('Hello, world!\n', err.getvalue())
+            self.assertNotEqual(out.getvalue(), 'Hello, world!\n')
+            self.assertNotEqual(err.getvalue(), 'Hello, world!\n')
+        else:
+            self.assertEqual(out.getvalue(), 'Hello, world!\n')
+            self.assertEqual(err.getvalue(), 'Hello, world!\n')
+
+    def test_command_no_color(self):
+        "--no-color prevent colorization of the output"
+        class Command(BaseCommand):
+            requires_system_checks = False
+
+            def handle(self, *args, **options):
+                self.stdout.write('Hello, world!', self.style.ERROR)
+                self.stderr.write('Hello, world!', self.style.ERROR)
+
+        out = StringIO()
+        err = StringIO()
+        command = Command(stdout=out, stderr=err, no_color=True)
+        command.execute()
+        self.assertEqual(out.getvalue(), 'Hello, world!\n')
+        self.assertEqual(err.getvalue(), 'Hello, world!\n')
+
+        out = StringIO()
+        err = StringIO()
+        command = Command(stdout=out, stderr=err)
+        command.execute(no_color=True)
+        self.assertEqual(out.getvalue(), 'Hello, world!\n')
+        self.assertEqual(err.getvalue(), 'Hello, world!\n')
+
+    def test_custom_stdout(self):
+        class Command(BaseCommand):
+            requires_system_checks = False
+
+            def handle(self, *args, **options):
+                self.stdout.write("Hello, World!")
+
+        out = StringIO()
+        command = Command(stdout=out)
+        command.execute()
+        self.assertEqual(out.getvalue(), "Hello, World!\n")
+        out.truncate(0)
+        new_out = StringIO()
+        command.execute(stdout=new_out)
+        self.assertEqual(out.getvalue(), "")
+        self.assertEqual(new_out.getvalue(), "Hello, World!\n")
+
+    def test_custom_stderr(self):
+        class Command(BaseCommand):
+            requires_system_checks = False
+
+            def handle(self, *args, **options):
+                self.stderr.write("Hello, World!")
+
+        err = StringIO()
+        command = Command(stderr=err)
+        command.execute()
+        self.assertEqual(err.getvalue(), "Hello, World!\n")
+        err.truncate(0)
+        new_err = StringIO()
+        command.execute(stderr=new_err)
+        self.assertEqual(err.getvalue(), "")
+        self.assertEqual(new_err.getvalue(), "Hello, World!\n")
 
     def test_base_command(self):
         "User BaseCommands can execute when a label is provided"
