@@ -57,10 +57,10 @@ class ExtractorTests(SimpleTestCase):
 
     def _run_makemessages(self, **options):
         os.chdir(self.test_dir)
-        stdout = StringIO()
+        out = StringIO()
         management.call_command('makemessages', locale=[LOCALE], verbosity=2,
-            stdout=stdout, **options)
-        output = stdout.getvalue()
+            stdout=out, **options)
+        output = out.getvalue()
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
@@ -224,19 +224,19 @@ class BasicExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         shutil.copyfile('./not_utf8.sample', './not_utf8.txt')
         self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'not_utf8.txt'))
-        stdout = StringIO()
-        management.call_command('makemessages', locale=[LOCALE], stdout=stdout)
+        out = StringIO()
+        management.call_command('makemessages', locale=[LOCALE], stdout=out)
         self.assertIn("UnicodeDecodeError: skipped file not_utf8.txt in .",
-                      force_text(stdout.getvalue()))
+                      force_text(out.getvalue()))
 
     def test_extraction_warning(self):
         """test xgettext warning about multiple bare interpolation placeholders"""
         os.chdir(self.test_dir)
         shutil.copyfile('./code.sample', './code_sample.py')
         self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'code_sample.py'))
-        stdout = StringIO()
-        management.call_command('makemessages', locale=[LOCALE], stdout=stdout)
-        self.assertIn("code_sample.py:4", force_text(stdout.getvalue()))
+        out = StringIO()
+        management.call_command('makemessages', locale=[LOCALE], stdout=out)
+        self.assertIn("code_sample.py:4", force_text(out.getvalue()))
 
     def test_template_message_context_extractor(self):
         """

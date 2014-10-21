@@ -1524,40 +1524,36 @@ class CommandTypes(AdminScriptTestCase):
         Test run_from_argv properly terminates even with custom execute() (#19665)
         Also test proper traceback display.
         """
-        command = BaseCommand()
+        err = StringIO()
+        command = BaseCommand(stderr=err)
 
         def raise_command_error(*args, **kwargs):
             raise CommandError("Custom error")
 
-        old_stderr = sys.stderr
-        sys.stderr = err = StringIO()
-        try:
-            command.execute = lambda args: args  # This will trigger TypeError
+        command.execute = lambda args: args  # This will trigger TypeError
 
-            # If the Exception is not CommandError it should always
-            # raise the original exception.
-            with self.assertRaises(TypeError):
-                command.run_from_argv(['', ''])
+        # If the Exception is not CommandError it should always
+        # raise the original exception.
+        with self.assertRaises(TypeError):
+            command.run_from_argv(['', ''])
 
-            # If the Exception is CommandError and --traceback is not present
-            # this command should raise a SystemExit and don't print any
-            # traceback to the stderr.
-            command.execute = raise_command_error
-            err.truncate(0)
-            with self.assertRaises(SystemExit):
-                command.run_from_argv(['', ''])
-            err_message = err.getvalue()
-            self.assertNotIn("Traceback", err_message)
-            self.assertIn("CommandError", err_message)
+        # If the Exception is CommandError and --traceback is not present
+        # this command should raise a SystemExit and don't print any
+        # traceback to the stderr.
+        command.execute = raise_command_error
+        err.truncate(0)
+        with self.assertRaises(SystemExit):
+            command.run_from_argv(['', ''])
+        err_message = err.getvalue()
+        self.assertNotIn("Traceback", err_message)
+        self.assertIn("CommandError", err_message)
 
-            # If the Exception is CommandError and --traceback is present
-            # this command should raise the original CommandError as if it
-            # were not a CommandError.
-            err.truncate(0)
-            with self.assertRaises(CommandError):
-                command.run_from_argv(['', '', '--traceback'])
-        finally:
-            sys.stderr = old_stderr
+        # If the Exception is CommandError and --traceback is present
+        # this command should raise the original CommandError as if it
+        # were not a CommandError.
+        err.truncate(0)
+        with self.assertRaises(CommandError):
+            command.run_from_argv(['', '', '--traceback'])
 
     def test_run_from_argv_non_ascii_error(self):
         """
@@ -1567,9 +1563,8 @@ class CommandTypes(AdminScriptTestCase):
         def raise_command_error(*args, **kwargs):
             raise CommandError("Erreur personnalisée")
 
-        command = BaseCommand()
+        command = BaseCommand(stderr=StringIO())
         command.execute = raise_command_error
-        command.stderr = StringIO()
 
         with self.assertRaises(SystemExit):
             command.run_from_argv(['', ''])
