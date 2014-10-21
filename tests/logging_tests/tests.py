@@ -2,10 +2,10 @@
 from __future__ import unicode_literals
 
 import logging
-import tempfile
 import warnings
 
 from django.core import mail
+from django.core.files.temp import NamedTemporaryFile
 from django.test import TestCase, RequestFactory, override_settings
 from django.test.utils import patch_logger
 from django.utils.encoding import force_text
@@ -433,7 +433,7 @@ args=(sys.stdout,)
 [formatter_simple]
 format=%(message)s
 """
-        self.temp_file = tempfile.NamedTemporaryFile()
+        self.temp_file = NamedTemporaryFile()
         self.temp_file.write(logging_conf.encode('utf-8'))
         self.temp_file.flush()
         sdict = {'LOGGING_CONFIG': '"logging.config.fileConfig"',
