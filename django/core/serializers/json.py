@@ -32,6 +32,7 @@ class Serializer(PythonSerializer):
         self.json_kwargs = self.options.copy()
         self.json_kwargs.pop('stream', None)
         self.json_kwargs.pop('fields', None)
+        self.encoder = self.json_kwargs.pop('encoder', DjangoJSONEncoder)
         if self.options.get('indent'):
             # Prevent trailing spaces
             self.json_kwargs['separators'] = (',', ': ')
@@ -54,7 +55,7 @@ class Serializer(PythonSerializer):
         if indent:
             self.stream.write("\n")
         json.dump(self.get_dump_object(obj), self.stream,
-                  cls=DjangoJSONEncoder, **self.json_kwargs)
+                  cls=self.encoder, **self.json_kwargs)
         self._current = None
 
     def getvalue(self):
