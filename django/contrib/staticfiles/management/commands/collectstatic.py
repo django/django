@@ -302,6 +302,8 @@ class Command(BaseCommand):
         # Skip this file if it was already copied earlier
         if prefixed_path in self.copied_files:
             return self.log("Skipping '%s' (already copied earlier)" % path)
+        else:
+            self.copied_files.append(prefixed_path)
         # Delete the target file if needed or break
         if not self.delete_file(path, prefixed_path, source_storage):
             return
@@ -314,5 +316,3 @@ class Command(BaseCommand):
             self.log("Copying '%s'" % source_path, level=1)
             with source_storage.open(path) as source_file:
                 self.storage.save(prefixed_path, source_file)
-        if prefixed_path not in self.copied_files:
-            self.copied_files.append(prefixed_path)
