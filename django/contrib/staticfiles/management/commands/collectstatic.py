@@ -22,7 +22,7 @@ class Command(BaseCommand):
     requires_system_checks = False
 
     def __init__(self, *args, **kwargs):
-        super(BaseCommand, self).__init__(*args, **kwargs)
+        super(Command, self).__init__(*args, **kwargs)
         self.copied_files = []
         self.symlinked_files = []
         self.unmodified_files = []
