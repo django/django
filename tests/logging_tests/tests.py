@@ -437,7 +437,7 @@ format=%(message)s
         self.temp_file.write(logging_conf.encode('utf-8'))
         self.temp_file.flush()
         sdict = {'LOGGING_CONFIG': '"logging.config.fileConfig"',
-                 'LOGGING': '"%s"' % self.temp_file.name}
+                 'LOGGING': 'r"%s"' % self.temp_file.name}
         self.write_settings('settings.py', sdict=sdict)
 
     def tearDown(self):
