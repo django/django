@@ -372,7 +372,13 @@ conversions in templates <time-zones-in-templates>`.
 Writing custom template tags
 ----------------------------
 
-Tags are more complex than filters, because tags can do anything.
+Tags are more complex than filters, because tags can do anything. The next
+section describes in detail how to write a tag from scratch. If you just want
+a tag that outputs a value, sets a variable in the context, or outputs another
+template with some custom data, you can skip forward to the sections on
+:ref:`simple tags<howto-custom-template-tags-simple-tags>`,
+:ref:`assignment tags<howto-custom-template-tags-assignment-tags>`, and
+:ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
 
 A quick overview
 ~~~~~~~~~~~~~~~~
