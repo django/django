@@ -740,16 +740,16 @@ Our earlier ``current_time`` function could thus be written like this::
 
     register = template.Library()
 
+    @register.simple_tag
     def current_time(format_string):
         return datetime.datetime.now().strftime(format_string)
 
-    register.simple_tag(current_time)
+The standalone register syntax also works::
 
-The decorator syntax also works::
-
-    @register.simple_tag
     def current_time(format_string):
         ...
+
+    register.simple_tag(current_time)
 
 A few things to note about the ``simple_tag`` helper function:
 
@@ -764,18 +764,18 @@ If your template tag needs to access the current context, you can use the
 ``takes_context`` argument when registering your tag::
 
     # The first argument *must* be called "context" here.
+    @register.simple_tag(takes_context=True)
+    def current_time(context, format_string):
+        timezone = context['timezone']
+        return your_get_current_time_method(timezone, format_string)
+
+Or, using standalone syntax::
+
     def current_time(context, format_string):
         timezone = context['timezone']
         return your_get_current_time_method(timezone, format_string)
 
     register.simple_tag(takes_context=True)(current_time)
-
-Or, using decorator syntax::
-
-    @register.simple_tag(takes_context=True)
-    def current_time(context, format_string):
-        timezone = context['timezone']
-        return your_get_current_time_method(timezone, format_string)
 
 For more information on how the ``takes_context`` option works, see the section
 on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
@@ -1046,16 +1046,16 @@ outputting it.
 
 Our earlier ``current_time`` function could thus be written like this::
 
+    @register.assignment_tag
     def get_current_time(format_string):
         return datetime.datetime.now().strftime(format_string)
 
-    register.assignment_tag(get_current_time)
+The standalone syntax also works::
 
-The decorator syntax also works::
-
-    @register.assignment_tag
     def get_current_time(format_string):
         ...
+
+    register.assignment_tag(get_current_time)
 
 You may then store the result in a template variable using the ``as`` argument
 followed by the variable name, and output it yourself where you see fit:
@@ -1069,18 +1069,18 @@ If your template tag needs to access the current context, you can use the
 ``takes_context`` argument when registering your tag::
 
     # The first argument *must* be called "context" here.
+    @register.assignment_tag(takes_context=True)
+    def get_current_time(context, format_string):
+        timezone = context['timezone']
+        return your_get_current_time_method(timezone, format_string)
+
+Or, using standalone syntax::
+
     def get_current_time(context, format_string):
         timezone = context['timezone']
         return your_get_current_time_method(timezone, format_string)
 
     register.assignment_tag(takes_context=True)(get_current_time)
-
-Or, using decorator syntax::
-
-    @register.assignment_tag(takes_context=True)
-    def get_current_time(context, format_string):
-        timezone = context['timezone']
-        return your_get_current_time_method(timezone, format_string)
 
 For more information on how the ``takes_context`` option works, see the section
 on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
