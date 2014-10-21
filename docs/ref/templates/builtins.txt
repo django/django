@@ -263,11 +263,11 @@ Sample usage::
 This is equivalent to::
 
     {% if var1 %}
-        {{ var1|safe }}
+        {{ var1 }}
     {% elif var2 %}
-        {{ var2|safe }}
+        {{ var2 }}
     {% elif var3 %}
-        {{ var3|safe }}
+        {{ var3 }}
     {% endif %}
 
 You can also use a literal string as a fallback value in case all
