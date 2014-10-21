@@ -9,7 +9,7 @@ from django.apps import apps
 from django.db import connection, models
 from django.core.management import call_command, CommandError
 from django.db.migrations import questioner
-from django.test import override_settings, override_system_checks
+from django.test import override_settings
 from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import force_text
@@ -23,10 +23,6 @@ class MigrateTests(MigrationTestBase):
     Tests running the migrate command.
     """
 
-    # `auth` app is imported, but not installed in these tests (thanks to
-    # MigrationTestBase), so we need to exclude checks registered by this app.
-
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate(self):
         """
@@ -55,7 +51,6 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate_list(self):
         """
@@ -78,7 +73,6 @@ class MigrateTests(MigrationTestBase):
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_migrate_conflict_exit(self):
         """
@@ -87,7 +81,6 @@ class MigrateTests(MigrationTestBase):
         with self.assertRaises(CommandError):
             call_command("migrate", "migrations")
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate(self):
         """
@@ -116,7 +109,6 @@ class MigrateTests(MigrationTestBase):
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
 
-    @override_system_checks([])
     @override_settings(
         INSTALLED_APPS=[
             "migrations.migrations_test_apps.migrated_app",
@@ -183,9 +175,6 @@ class MakeMigrationsTests(MigrationTestBase):
             return
         shutil.rmtree(dname)
 
-    # `auth` app is imported, but not installed in this test (thanks to
-    # MigrationTestBase), so we need to exclude checks registered by this app.
-    @override_system_checks([])
     def test_files_content(self):
         self.assertTableNotExists("migrations_unicodemodel")
         apps.register_model('migrations', UnicodeModel)
@@ -222,9 +211,6 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertTrue('\\xda\\xd1\\xcd\\xa2\\xd3\\xd0\\xc9' in content)  # title.verbose_name
                 self.assertTrue('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d' in content)  # title.default
 
-    # `auth` app is imported, but not installed in this test (thanks to
-    # MigrationTestBase), so we need to exclude checks registered by this app.
-    @override_system_checks([])
     def test_failing_migration(self):
         #21280 - If a migration fails to serialize, it shouldn't generate an empty file.
         apps.register_model('migrations', UnserializableModel)
@@ -236,7 +222,6 @@ class MakeMigrationsTests(MigrationTestBase):
         initial_file = os.path.join(self.migration_dir, "0001_initial.py")
         self.assertFalse(os.path.exists(initial_file))
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_makemigrations_conflict_exit(self):
         """
@@ -245,7 +230,6 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.assertRaises(CommandError):
             call_command("makemigrations")
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_makemigrations_merge_no_conflict(self):
         """
@@ -258,7 +242,6 @@ class MakeMigrationsTests(MigrationTestBase):
             self.fail("Makemigrations errored in merge mode with no conflicts")
         self.assertIn("No conflicts detected to merge.", stdout.getvalue())
 
-    @override_system_checks([])
     def test_makemigrations_no_app_sys_exit(self):
         """
         Makes sure that makemigrations exits if a non-existent app is specified.
@@ -268,7 +251,6 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", "this_app_does_not_exist", stderr=stderr)
         self.assertIn("'this_app_does_not_exist' could not be found.", stderr.getvalue())
 
-    @override_system_checks([])
     def test_makemigrations_empty_no_app_specified(self):
         """
         Makes sure that makemigrations exits if no app is specified with 'empty' mode.
@@ -276,7 +258,6 @@ class MakeMigrationsTests(MigrationTestBase):
         with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
             self.assertRaises(CommandError, call_command, "makemigrations", empty=True)
 
-    @override_system_checks([])
     def test_makemigrations_empty_migration(self):
         """
         Makes sure that makemigrations properly constructs an empty migration.
@@ -301,7 +282,6 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertIn('dependencies=[\n]', content)
             self.assertIn('operations=[\n]', content)
 
-    @override_system_checks([])
     def test_makemigrations_no_changes_no_apps(self):
         """
         Makes sure that makemigrations exits when there are no changes and no apps are specified.
@@ -310,7 +290,6 @@ class MakeMigrationsTests(MigrationTestBase):
         call_command("makemigrations", stdout=stdout)
         self.assertIn("No changes detected", stdout.getvalue())
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_changes"})
     def test_makemigrations_no_changes(self):
         """
@@ -320,7 +299,6 @@ class MakeMigrationsTests(MigrationTestBase):
         call_command("makemigrations", "migrations", stdout=stdout)
         self.assertIn("No changes detected in app 'migrations'", stdout.getvalue())
 
-    @override_system_checks([])
     def test_makemigrations_migrations_announce(self):
         """
         Makes sure that makemigrations announces the migration at the default verbosity level.
@@ -330,7 +308,6 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", "migrations", stdout=stdout)
         self.assertIn("Migrations for 'migrations'", stdout.getvalue())
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_ancestor"})
     def test_makemigrations_no_common_ancestor(self):
         """
@@ -343,7 +320,6 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertIn("0002_second", exception_message)
         self.assertIn("0002_conflicting_second", exception_message)
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_makemigrations_interactive_reject(self):
         """
@@ -361,7 +337,6 @@ class MakeMigrationsTests(MigrationTestBase):
         finally:
             questioner.input = old_input
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_makemigrations_interactive_accept(self):
         """
@@ -383,7 +358,6 @@ class MakeMigrationsTests(MigrationTestBase):
             questioner.input = old_input
         self.assertIn("Created new merge migration", stdout.getvalue())
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_makemigrations_handle_merge(self):
         """
@@ -400,7 +374,6 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertFalse(os.path.exists(merge_file))
         self.assertIn("Created new merge migration", stdout.getvalue())
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_default"})
     def test_makemigrations_dry_run(self):
         """
@@ -419,7 +392,6 @@ class MakeMigrationsTests(MigrationTestBase):
         # Output the expected changes directly, without asking for defaults
         self.assertIn("Add field silly_date to sillymodel", stdout.getvalue())
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_default"})
     def test_makemigrations_dry_run_verbosity_3(self):
         """
@@ -450,7 +422,6 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertIn("model_name='sillymodel',", stdout.getvalue())
         self.assertIn("name='silly_char',", stdout.getvalue())
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_path_doesnt_exist.foo.bar"})
     def test_makemigrations_migrations_modules_path_not_exist(self):
         """
@@ -476,7 +447,6 @@ class MakeMigrationsTests(MigrationTestBase):
                        "test_migrations_path_doesnt_exist", "foo", "bar",
                        "0001_initial.py")))
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_makemigrations_interactive_by_default(self):
         """
@@ -501,7 +471,6 @@ class MakeMigrationsTests(MigrationTestBase):
                 os.remove(merge_file)
         self.assertNotIn("Created new merge migration", stdout.getvalue())
 
-    @override_system_checks([])
     @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_changes"},
         INSTALLED_APPS=[
@@ -517,7 +486,6 @@ class MakeMigrationsTests(MigrationTestBase):
         except CommandError:
             self.fail("Makemigrations fails resolving conflicts in an unspecified app")
 
-    @override_system_checks([])
     @override_settings(
         INSTALLED_APPS=[
             "migrations.migrations_test_apps.migrated_app",
@@ -547,7 +515,6 @@ class MakeMigrationsTests(MigrationTestBase):
             if os.path.exists(merge_file):
                 os.remove(merge_file)
 
-    @override_system_checks([])
     def test_makemigrations_with_custom_name(self):
         """
         Makes sure that makemigrations generate a custom migration.
