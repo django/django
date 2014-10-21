@@ -912,12 +912,9 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self._perform_cull_test(caches['zero_cull'], 50, 18)
 
     def test_second_call_doesnt_crash(self):
-        stdout = six.StringIO()
-        management.call_command(
-            'createcachetable',
-            stdout=stdout
-        )
-        self.assertEqual(stdout.getvalue(),
+        out = six.StringIO()
+        management.call_command('createcachetable', stdout=out)
+        self.assertEqual(out.getvalue(),
             "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
 
     def test_createcachetable_with_table_argument(self):
@@ -926,14 +923,14 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         specifying the table name).
         """
         self.drop_table()
-        stdout = six.StringIO()
+        out = six.StringIO()
         management.call_command(
             'createcachetable',
             'test cache table',
             verbosity=2,
-            stdout=stdout
+            stdout=out,
         )
-        self.assertEqual(stdout.getvalue(),
+        self.assertEqual(out.getvalue(),
             "Cache table 'test cache table' created.\n")
 
     def test_clear_commits_transaction(self):
