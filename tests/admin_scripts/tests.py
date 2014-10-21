@@ -1392,6 +1392,22 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "Prints the CREATE TABLE, custom SQL and CREATE INDEX SQL statements for the\ngiven model module name(s).")
         self.assertEqual(out.count('optional arguments'), 1)
 
+    def test_color_style(self):
+        style = color.no_style()
+        self.assertEqual(style.ERROR('Hello, world!'), 'Hello, world!')
+
+        style = color.make_style('nocolor')
+        self.assertEqual(style.ERROR('Hello, world!'), 'Hello, world!')
+
+        style = color.make_style('dark')
+        self.assertIn('Hello, world!', style.ERROR('Hello, world!'))
+        self.assertNotEqual(style.ERROR('Hello, world!'), 'Hello, world!')
+
+        # Default palette has color.
+        style = color.make_style('')
+        self.assertIn('Hello, world!', style.ERROR('Hello, world!'))
+        self.assertNotEqual(style.ERROR('Hello, world!'), 'Hello, world!')
+
     def test_command_color(self):
         class Command(BaseCommand):
             requires_system_checks = False
