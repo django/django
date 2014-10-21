@@ -3,8 +3,7 @@ from __future__ import unicode_literals
 from django.core.management import call_command
 from django.db import connection
 from django.test import (
-    override_settings, override_system_checks, skipUnlessDBFeature,
-    TransactionTestCase
+    override_settings, skipUnlessDBFeature, TransactionTestCase
 )
 
 
@@ -27,7 +26,6 @@ class MigrateTests(TransactionTestCase):
         with connection.cursor() as cursor:
             self.assertNotIn(table, connection.introspection.table_names(cursor))
 
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"gis": "django.contrib.gis.tests.gis_migrations.migrations"})
     def test_migrate_gis(self):
         """
