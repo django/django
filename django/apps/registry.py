@@ -208,9 +208,10 @@ class Apps(object):
         model_name = model._meta.model_name
         app_models = self.all_models[app_label]
         if model_name in app_models:
-            raise RuntimeError(
+            warnings.warn(
                 "Conflicting '%s' models in application '%s': %s and %s." %
-                (model_name, app_label, app_models[model_name], model))
+                (model_name, app_label, app_models[model_name], model),
+                RuntimeWarning, stacklevel=2)
         app_models[model_name] = model
         self.clear_cache()
 
