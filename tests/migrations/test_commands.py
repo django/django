@@ -56,20 +56,20 @@ class MigrateTests(MigrationTestBase):
         """
         Tests --list output of migrate command
         """
-        stdout = six.StringIO()
-        call_command("migrate", list=True, stdout=stdout, verbosity=0)
-        self.assertIn("migrations", stdout.getvalue().lower())
-        self.assertIn("[ ] 0001_initial", stdout.getvalue().lower())
-        self.assertIn("[ ] 0002_second", stdout.getvalue().lower())
+        out = six.StringIO()
+        call_command("migrate", list=True, stdout=out, verbosity=0)
+        self.assertIn("migrations", out.getvalue().lower())
+        self.assertIn("[ ] 0001_initial", out.getvalue().lower())
+        self.assertIn("[ ] 0002_second", out.getvalue().lower())
 
         call_command("migrate", "migrations", "0001", verbosity=0)
 
-        stdout = six.StringIO()
+        out = six.StringIO()
         # Giving the explicit app_label tests for selective `show_migration_list` in the command
-        call_command("migrate", "migrations", list=True, stdout=stdout, verbosity=0)
-        self.assertIn("migrations", stdout.getvalue().lower())
-        self.assertIn("[x] 0001_initial", stdout.getvalue().lower())
-        self.assertIn("[ ] 0002_second", stdout.getvalue().lower())
+        call_command("migrate", "migrations", list=True, stdout=out, verbosity=0)
+        self.assertIn("migrations", out.getvalue().lower())
+        self.assertIn("[x] 0001_initial", out.getvalue().lower())
+        self.assertIn("[ ] 0002_second", out.getvalue().lower())
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
 
@@ -87,24 +87,24 @@ class MigrateTests(MigrationTestBase):
         Makes sure that sqlmigrate does something.
         """
         # Make sure the output is wrapped in a transaction
-        stdout = six.StringIO()
-        call_command("sqlmigrate", "migrations", "0001", stdout=stdout)
-        output = stdout.getvalue()
+        out = six.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=out)
+        output = out.getvalue()
         self.assertIn(connection.ops.start_transaction_sql(), output)
         self.assertIn(connection.ops.end_transaction_sql(), output)
 
         # Test forwards. All the databases agree on CREATE TABLE, at least.
-        stdout = six.StringIO()
-        call_command("sqlmigrate", "migrations", "0001", stdout=stdout)
-        self.assertIn("create table", stdout.getvalue().lower())
+        out = six.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=out)
+        self.assertIn("create table", out.getvalue().lower())
 
         # Cannot generate the reverse SQL unless we've applied the migration.
         call_command("migrate", "migrations", verbosity=0)
 
         # And backwards is a DROP TABLE
-        stdout = six.StringIO()
-        call_command("sqlmigrate", "migrations", "0001", stdout=stdout, backwards=True)
-        self.assertIn("drop table", stdout.getvalue().lower())
+        out = six.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=out, backwards=True)
+        self.assertIn("drop table", out.getvalue().lower())
 
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
@@ -128,8 +128,7 @@ class MigrateTests(MigrationTestBase):
         "B" was not included in the ProjectState that is used to detect
         soft-applied migrations.
         """
-        stdout = six.StringIO()
-        call_command("migrate", "migrated_unapplied_app", stdout=stdout)
+        call_command("migrate", "migrated_unapplied_app", stdout=six.StringIO())
 
 
 class MakeMigrationsTests(MigrationTestBase):
@@ -235,21 +234,21 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         Makes sure that makemigrations exits if in merge mode with no conflicts.
         """
-        stdout = six.StringIO()
+        out = six.StringIO()
         try:
-            call_command("makemigrations", merge=True, stdout=stdout)
+            call_command("makemigrations", merge=True, stdout=out)
         except CommandError:
             self.fail("Makemigrations errored in merge mode with no conflicts")
-        self.assertIn("No conflicts detected to merge.", stdout.getvalue())
+        self.assertIn("No conflicts detected to merge.", out.getvalue())
 
     def test_makemigrations_no_app_sys_exit(self):
         """
         Makes sure that makemigrations exits if a non-existent app is specified.
         """
-        stderr = six.StringIO()
+        err = six.StringIO()
         with self.assertRaises(SystemExit):
-            call_command("makemigrations", "this_app_does_not_exist", stderr=stderr)
-        self.assertIn("'this_app_does_not_exist' could not be found.", stderr.getvalue())
+            call_command("makemigrations", "this_app_does_not_exist", stderr=err)
+        self.assertIn("'this_app_does_not_exist' could not be found.", err.getvalue())
 
     def test_makemigrations_empty_no_app_specified(self):
         """
@@ -286,27 +285,27 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         Makes sure that makemigrations exits when there are no changes and no apps are specified.
         """
-        stdout = six.StringIO()
-        call_command("makemigrations", stdout=stdout)
-        self.assertIn("No changes detected", stdout.getvalue())
+        out = six.StringIO()
+        call_command("makemigrations", stdout=out)
+        self.assertIn("No changes detected", out.getvalue())
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_changes"})
     def test_makemigrations_no_changes(self):
         """
         Makes sure that makemigrations exits when there are no changes to an app.
         """
-        stdout = six.StringIO()
-        call_command("makemigrations", "migrations", stdout=stdout)
-        self.assertIn("No changes detected in app 'migrations'", stdout.getvalue())
+        out = six.StringIO()
+        call_command("makemigrations", "migrations", stdout=out)
+        self.assertIn("No changes detected in app 'migrations'", out.getvalue())
 
     def test_makemigrations_migrations_announce(self):
         """
         Makes sure that makemigrations announces the migration at the default verbosity level.
         """
-        stdout = six.StringIO()
+        out = six.StringIO()
         with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
-            call_command("makemigrations", "migrations", stdout=stdout)
-        self.assertIn("Migrations for 'migrations'", stdout.getvalue())
+            call_command("makemigrations", "migrations", stdout=out)
+        self.assertIn("Migrations for 'migrations'", out.getvalue())
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_ancestor"})
     def test_makemigrations_no_common_ancestor(self):
@@ -345,9 +344,9 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto accept
         old_input = questioner.input
         questioner.input = lambda _: "y"
-        stdout = six.StringIO()
+        out = six.StringIO()
         try:
-            call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=stdout)
+            call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
             merge_file = os.path.join(self.test_dir, 'test_migrations_conflict', '0003_merge.py')
             self.assertTrue(os.path.exists(merge_file))
             os.remove(merge_file)
@@ -356,23 +355,23 @@ class MakeMigrationsTests(MigrationTestBase):
             self.fail("Makemigrations failed while running interactive questioner")
         finally:
             questioner.input = old_input
-        self.assertIn("Created new merge migration", stdout.getvalue())
+        self.assertIn("Created new merge migration", out.getvalue())
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_makemigrations_handle_merge(self):
         """
         Makes sure that makemigrations properly merges the conflicting migrations with --noinput.
         """
-        stdout = six.StringIO()
-        call_command("makemigrations", "migrations", merge=True, interactive=False, stdout=stdout)
-        self.assertIn("Merging migrations", stdout.getvalue())
-        self.assertIn("Branch 0002_second", stdout.getvalue())
-        self.assertIn("Branch 0002_conflicting_second", stdout.getvalue())
+        out = six.StringIO()
+        call_command("makemigrations", "migrations", merge=True, interactive=False, stdout=out)
+        self.assertIn("Merging migrations", out.getvalue())
+        self.assertIn("Branch 0002_second", out.getvalue())
+        self.assertIn("Branch 0002_conflicting_second", out.getvalue())
         merge_file = os.path.join(self.test_dir, 'test_migrations_conflict', '0003_merge.py')
         self.assertTrue(os.path.exists(merge_file))
         os.remove(merge_file)
         self.assertFalse(os.path.exists(merge_file))
-        self.assertIn("Created new merge migration", stdout.getvalue())
+        self.assertIn("Created new merge migration", out.getvalue())
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_default"})
     def test_makemigrations_dry_run(self):
@@ -387,10 +386,10 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        stdout = six.StringIO()
-        call_command("makemigrations", "migrations", dry_run=True, stdout=stdout)
+        out = six.StringIO()
+        call_command("makemigrations", "migrations", dry_run=True, stdout=out)
         # Output the expected changes directly, without asking for defaults
-        self.assertIn("Add field silly_date to sillymodel", stdout.getvalue())
+        self.assertIn("Add field silly_date to sillymodel", out.getvalue())
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_default"})
     def test_makemigrations_dry_run_verbosity_3(self):
@@ -406,21 +405,21 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        stdout = six.StringIO()
-        call_command("makemigrations", "migrations", dry_run=True, stdout=stdout, verbosity=3)
+        out = six.StringIO()
+        call_command("makemigrations", "migrations", dry_run=True, stdout=out, verbosity=3)
 
         # Normal --dry-run output
-        self.assertIn("- Add field silly_char to sillymodel", stdout.getvalue())
+        self.assertIn("- Add field silly_char to sillymodel", out.getvalue())
 
         # Additional output caused by verbosity 3
         # The complete migrations file that would be written
-        self.assertIn("# -*- coding: utf-8 -*-", stdout.getvalue())
-        self.assertIn("class Migration(migrations.Migration):", stdout.getvalue())
-        self.assertIn("dependencies = [", stdout.getvalue())
-        self.assertIn("('migrations', '0001_initial'),", stdout.getvalue())
-        self.assertIn("migrations.AddField(", stdout.getvalue())
-        self.assertIn("model_name='sillymodel',", stdout.getvalue())
-        self.assertIn("name='silly_char',", stdout.getvalue())
+        self.assertIn("# -*- coding: utf-8 -*-", out.getvalue())
+        self.assertIn("class Migration(migrations.Migration):", out.getvalue())
+        self.assertIn("dependencies = [", out.getvalue())
+        self.assertIn("('migrations', '0001_initial'),", out.getvalue())
+        self.assertIn("migrations.AddField(", out.getvalue())
+        self.assertIn("model_name='sillymodel',", out.getvalue())
+        self.assertIn("name='silly_char',", out.getvalue())
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_path_doesnt_exist.foo.bar"})
     def test_makemigrations_migrations_modules_path_not_exist(self):
@@ -436,11 +435,11 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        stdout = six.StringIO()
-        call_command("makemigrations", "migrations", stdout=stdout)
+        out = six.StringIO()
+        call_command("makemigrations", "migrations", stdout=out)
 
         # Command output indicates the migration is created.
-        self.assertIn(" - Create model SillyModel", stdout.getvalue())
+        self.assertIn(" - Create model SillyModel", out.getvalue())
 
         # Migrations file is actually created in the expected path.
         self.assertTrue(os.path.isfile(os.path.join(self.test_dir,
@@ -457,10 +456,10 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto reject
         old_input = questioner.input
         questioner.input = lambda _: "N"
-        stdout = six.StringIO()
+        out = six.StringIO()
         merge_file = os.path.join(self.test_dir, 'test_migrations_conflict', '0003_merge.py')
         try:
-            call_command("makemigrations", "migrations", merge=True, stdout=stdout)
+            call_command("makemigrations", "migrations", merge=True, stdout=out)
             # This will fail if interactive is False by default
             self.assertFalse(os.path.exists(merge_file))
         except CommandError:
@@ -469,7 +468,7 @@ class MakeMigrationsTests(MigrationTestBase):
             questioner.input = old_input
             if os.path.exists(merge_file):
                 os.remove(merge_file)
-        self.assertNotIn("Created new merge migration", stdout.getvalue())
+        self.assertNotIn("Created new merge migration", out.getvalue())
 
     @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_changes"},
@@ -498,16 +497,16 @@ class MakeMigrationsTests(MigrationTestBase):
         # Monkeypatch interactive questioner to auto accept
         old_input = questioner.input
         questioner.input = lambda _: "y"
-        stdout = six.StringIO()
+        out = six.StringIO()
         merge_file = os.path.join(self.test_dir,
                                   'migrations_test_apps',
                                   'unspecified_app_with_conflict',
                                   'migrations',
                                   '0003_merge.py')
         try:
-            call_command("makemigrations", "migrated_app", merge=True, interactive=True, stdout=stdout)
+            call_command("makemigrations", "migrated_app", merge=True, interactive=True, stdout=out)
             self.assertFalse(os.path.exists(merge_file))
-            self.assertIn("No conflicts detected to merge.", stdout.getvalue())
+            self.assertIn("No conflicts detected to merge.", out.getvalue())
         except CommandError:
             self.fail("Makemigrations fails resolving conflicts in an unspecified app")
         finally:
