@@ -211,7 +211,9 @@ class Apps(object):
             if (model.__name__ == app_models[model_name].__name__ and
                     model.__module__ == app_models[model_name].__module__):
                 warnings.warn(
-                    "Model '%s.%s' was already registered." % (model_name, app_label),
+                    "Model '%s.%s' was already registered. "
+                    "Reloading models is not advised as it can lead to inconsistencies, "
+                    "most notably with related models." % (model_name, app_label),
                     RuntimeWarning, stacklevel=2)
             else:
                 raise RuntimeError(
