@@ -430,6 +430,12 @@ You can pass a second callable to
 want executed when migrating backwards. If this callable is omitted, migrating
 backwards will raise an exception.
 
+.. note::
+When performing data migrations on large datasets, it may be helpful to set the
+settings.DEBUG = False in the beginning of your RunPython method.  When DEBUG 
+is True Django saves all SQL queries run which may cause your machine to use up
+all the system memory or become unresponsive on large data sets.
+
 If you're interested in the more advanced migration operations, or want
 to be able to write your own, see the :doc:`migration operations reference
 </ref/migration-operations>`.
