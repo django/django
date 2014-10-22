@@ -212,6 +212,14 @@ class AlterModelTable(Operation):
                 old_model._meta.db_table,
                 new_model._meta.db_table,
             )
+            # Rename M2M fields whose name is based on this model's db_table
+            for (old_field, new_field) in zip(old_model._meta.local_many_to_many, new_model._meta.local_many_to_many):
+                if new_field.rel.through._meta.auto_created:
+                    schema_editor.alter_db_table(
+                        new_field.rel.through,
+                        old_field.rel.through._meta.db_table,
+                        new_field.rel.through._meta.db_table,
+                    )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
