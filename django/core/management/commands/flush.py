@@ -5,6 +5,7 @@ from importlib import import_module
 
 from django.apps import apps
 from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
+from django.db.migrations.executor import MigrationExecutor
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
@@ -85,8 +86,12 @@ Are you sure you want to do this?
 
             # Reinstall the initial_data fixture.
             if options.get('load_initial_data'):
-                # Reinstall the initial_data fixture.
-                call_command('loaddata', 'initial_data', **options)
+                # Work out which apps have migrations and which do not
+                executor = MigrationExecutor(connection)
+                app_options = options.copy()
+                for app_label in executor.loader.unmigrated_apps:
+                    app_options['app_label'] = app_label
+                    call_command('loaddata', 'initial_data', **app_options)
 
         else:
             self.stdout.write("Flush cancelled.\n")
