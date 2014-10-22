@@ -234,7 +234,10 @@ class AppsTests(TestCase):
             type(str("SouthPonies"), (models.Model,), body)
             self.assertEqual(len(w), 1)
             self.assertTrue(issubclass(w[-1].category, RuntimeWarning))
-            self.assertEqual(str(w[-1].message), "Model 'southponies.apps' was already registered.")
+            self.assertEqual(str(w[-1].message),
+                 "Model 'southponies.apps' was already registered. "
+                 "Reloading models is not advised as it can lead to inconsistencies, "
+                 "most notably with related models.")
 
         # If it doesn't appear to be a reloaded module then we expect
         # a RuntimeError.
