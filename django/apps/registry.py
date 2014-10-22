@@ -208,9 +208,15 @@ class Apps(object):
         model_name = model._meta.model_name
         app_models = self.all_models[app_label]
         if model_name in app_models:
-            raise RuntimeError(
-                "Conflicting '%s' models in application '%s': %s and %s." %
-                (model_name, app_label, app_models[model_name], model))
+            if (model.__name__ == app_models[model_name].__name__ and
+                    model.__module__ == app_models[model_name].__module__):
+                warnings.warn(
+                    "Model '%s.%s' was already registered." % (model_name, app_label),
+                    RuntimeWarning, stacklevel=2)
+            else:
+                raise RuntimeError(
+                    "Conflicting '%s' models in application '%s': %s and %s." %
+                    (model_name, app_label, app_models[model_name], model))
         app_models[model_name] = model
         self.clear_cache()
 
