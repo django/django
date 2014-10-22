@@ -418,6 +418,13 @@ need to do is use the historical model and iterate over the rows::
 Once that's done, we can just run ``python manage.py migrate`` as normal and
 the data migration will run in place alongside other migrations.
 
+.. note::
+
+    Be careful when running a migration with :setting:`DEBUG=True <DEBUG>` as
+    Django :ref:`saves all SQL queries <faq-see-raw-sql-queries>` that are run
+    which may result in large memory usage. This issue is addressed in
+    Django 1.8 where only 9000 queries are saved.
+
 You can pass a second callable to
 :class:`~django.db.migrations.operations.RunPython` to run whatever logic you
 want executed when migrating backwards. If this callable is omitted, migrating
