@@ -247,7 +247,6 @@ Be aware that not all Django output can be passed unmodified to :mod:`json`.
 In particular, :ref:`lazy translation objects <lazy-translations>` need a
 `special encoder`_ written for them. Something like this will work::
 
-    import json
     from django.utils.functional import Promise
     from django.utils.encoding import force_text
     from django.core.serializers.json import DjangoJSONEncoder
