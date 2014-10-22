@@ -129,7 +129,10 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
     """
     def setUp(self):
         super(BaseCollectionTestCase, self).setUp()
-        if not os.path.exists(settings.STATIC_ROOT):
+        if not os.path.exists(settings.STATIC_ROOT) and os.access(
+            os.path.abspath(
+                os.path.join(
+                    settings.STATIC_ROOT, os.pardir)), os.W_OK):
             os.mkdir(settings.STATIC_ROOT)
         self.run_collectstatic()
         # Use our own error handler that can handle .svn dirs on Windows
