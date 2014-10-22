@@ -850,7 +850,13 @@ class TestLoadFixtureFromOtherAppDirectory(TestCase):
     #23612 -- fixtures path should be normalized to allow referencing relative
     paths on Windows.
     """
-    fixtures = ['fixtures_regress/fixtures/absolute.json']
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    # relative_prefix is something like tests/fixtures_regress or
+    # fixtures_regress depending on how runtests.py is invoked.
+    # All path separators must be / in order to be a proper regression test on
+    # Windows, so replace as appropriate.
+    relative_prefix = current_dir.replace(os.getcwd(), '', 1)[1:].replace('\\', '/')
+    fixtures = [relative_prefix + '/fixtures/absolute.json']
 
     def test_fixtures_loaded(self):
         count = Absolute.objects.count()
