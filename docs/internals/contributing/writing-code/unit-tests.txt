@@ -36,14 +36,14 @@ sample settings module that uses the SQLite database. To run the tests:
 
 .. versionchanged:: 1.7
 
-Older versions of Django required specifying a settings file:
+    Older versions of Django required specifying a settings file:
 
-.. code-block:: bash
+    .. code-block:: bash
 
-   $ PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
+        $ PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
 
-``runtests.py`` now uses ``test_sqlite`` by default if settings aren't provided
-through either ``--settings`` or :envvar:`DJANGO_SETTINGS_MODULE`.
+    ``runtests.py`` now uses ``test_sqlite`` by default if settings aren't
+    provided through either ``--settings`` or :envvar:`DJANGO_SETTINGS_MODULE`.
 
 You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
 checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
