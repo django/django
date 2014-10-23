@@ -233,7 +233,7 @@ def reorder_suite(suite, classes):
 
 def partition_suite(suite, classes, bins):
     """
-    Partitions a test suite by test type.
+    Partitions a test suite by test type. Also prevents duplicated tests.
 
     classes is a sequence of types
     bins is a sequence of TestSuites, one more than classes
@@ -248,10 +248,12 @@ def partition_suite(suite, classes, bins):
         else:
             for i in range(len(classes)):
                 if isinstance(test, classes[i]):
-                    bins[i].addTest(test)
+                    if test not in bins[i]:
+                        bins[i].addTest(test)
                     break
             else:
-                bins[-1].addTest(test)
+                if test not in bins[-1]:
+                    bins[-1].addTest(test)
 
 
 def setup_databases(verbosity, interactive, keepdb=False, **kwargs):
