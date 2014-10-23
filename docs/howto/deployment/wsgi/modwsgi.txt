@@ -133,8 +133,6 @@ will be served using mod_wsgi::
     Alias /robots.txt /path/to/mysite.com/static/robots.txt
     Alias /favicon.ico /path/to/mysite.com/static/favicon.ico
 
-    AliasMatch ^/([^/]*\.css) /path/to/mysite.com/static/styles/$1
-
     Alias /media/ /path/to/mysite.com/media/
     Alias /static/ /path/to/mysite.com/static/
 
