@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed migration's renaming of auto-created many-to-many tables when changing
   :attr:`Meta.db_table <django.db.models.Options.db_table>` (:ticket:`23630`).
+
+* Fixed a migration crash when adding an explicit ``id`` field to a model on
+  SQLite (:ticket:`23702`).
