@@ -1512,6 +1512,7 @@ class SwappableOperationTests(OperationTestBase):
     available_apps = [
         "migrations",
         "django.contrib.auth",
+        "django.contrib.contenttypes",
     ]
 
     @override_settings(TEST_SWAP_MODEL="migrations.SomeFakeModel")
