@@ -900,7 +900,7 @@ Without passing ``safe=False``, a :exc:`TypeError` will be raised.
 Changing the default JSON encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you need to use a differ JSON encoder class you can pass the ``encoder``
+If you need to use a different JSON encoder class you can pass the ``encoder``
 parameter to the constructor method::
 
     >>> response = JsonResponse(data, encoder=MyJSONEncoder)
