@@ -117,6 +117,15 @@ class DiscoverRunnerTest(TestCase):
             # All others can follow in unspecified order, including doctests
             self.assertIn('DocTestCase', [t.__class__.__name__ for t in suite._tests[2:]])
 
+    def test_duplicates_ignored(self):
+        """
+        Tests shouldn't be discovered twice when discovering on overlapping paths.
+        """
+        single = DiscoverRunner().build_suite(["django.contrib.gis"]).countTestCases()
+        dups = DiscoverRunner().build_suite(
+            ["django.contrib.gis", "django.contrib.gis.tests.geo3d"]).countTestCases()
+        self.assertEqual(single, dups)
+
     def test_overrideable_test_suite(self):
         self.assertEqual(DiscoverRunner().test_suite, TestSuite)
 
