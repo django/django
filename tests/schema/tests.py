@@ -490,6 +490,25 @@ class SchemaTests(TransactionTestCase):
         else:
             self.fail("No FK constraint for author_id found")
 
+    def test_alter_implicit_id_to_explict(self):
+        """
+        Should be able to convert an implicit "id" field to an explicit "id"
+        primary key field.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+
+        new_field = IntegerField(primary_key=True)
+        new_field.set_attributes_from_name("id")
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                Author,
+                Author._meta.get_field_by_name("id")[0],
+                new_field,
+                strict=True,
+            )
+
     def test_rename(self):
         """
         Tests simple altering of fields

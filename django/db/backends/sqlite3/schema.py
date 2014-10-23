@@ -75,8 +75,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 )
         # Add in any altered fields
         for (old_field, new_field) in alter_fields:
-            del body[old_field.name]
-            del mapping[old_field.column]
+            body.pop(old_field.name, None)
+            mapping.pop(old_field.column, None)
             body[new_field.name] = new_field
             if old_field.null and not new_field.null:
                 case_sql = "coalesce(%(col)s, %(default)s)" % {
