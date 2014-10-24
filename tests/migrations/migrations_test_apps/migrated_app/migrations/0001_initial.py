@@ -9,22 +9,10 @@ class Migration(migrations.Migration):
     operations = [
 
         migrations.CreateModel(
-            "Author",
+            "Book",
             [
-                ("id", models.AutoField(primary_key=True)),
-                ("name", models.CharField(max_length=255)),
-                ("slug", models.SlugField(null=True)),
-                ("age", models.IntegerField(default=0)),
-                ("silly_field", models.BooleanField(default=False)),
+                ("name", models.CharField(max_length=100)),
             ],
         ),
-
-        migrations.CreateModel(
-            "Tribble",
-            [
-                ("id", models.AutoField(primary_key=True)),
-                ("fluffy", models.BooleanField(default=True)),
-            ],
-        )
 
     ]
