@@ -741,5 +741,6 @@ class Options(object):
             if hasattr(field, 'related')
         )
         for _, names in six.iteritems(fields):
-            res.update(name for name in names if not name.endswith('+'))
+            res.update(name for name in names
+                       if not (name.endswith('+') or name.endswith('_id')))
         return res
