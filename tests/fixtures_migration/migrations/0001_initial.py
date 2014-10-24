@@ -7,12 +7,10 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     operations = [
-
         migrations.CreateModel(
             "Book",
             [
                 ("name", models.CharField(max_length=100)),
             ],
         ),
-
     ]
