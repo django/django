@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed a migration crash when adding an explicit ``id`` field to a model on
   SQLite (:ticket:`23702`).
+
+* Prevented :djadmin:`flush` from loading initial data for migrated apps
+  (:ticket:`23699`).
