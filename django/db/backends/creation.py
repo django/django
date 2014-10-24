@@ -524,6 +524,10 @@ class BaseDatabaseCreation(object):
         if not keepdb:
             self._destroy_test_db(test_database_name, verbosity)
 
+        # Restore the original database name
+        settings.DATABASES[self.connection.alias]["NAME"] = old_database_name
+        self.connection.settings_dict["NAME"] = old_database_name
+
     def _destroy_test_db(self, test_database_name, verbosity):
         """
         Internal implementation - remove the test db tables.
