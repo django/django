@@ -17,9 +17,9 @@ Python and Django projects share common problems. Wouldn't it be great if we
 could save some of this repeated work?
 
 Reusability is the way of life in Python. `The Python Package Index (PyPI)
-<http://guide.python-distribute.org/contributing.html#pypi-info>`_ has a vast
-range of packages you can use in your own Python programs. Check out `Django
-Packages <https://www.djangopackages.com>`_ for existing reusable apps you could
+<https://pypi.python.org/pypi>`_ has a vast range of packages you can use in
+your own Python programs. Check out `Django Packages
+<https://www.djangopackages.com>`_ for existing reusable apps you could
 incorporate in your project. Django itself is also just a Python package. This
 means that you can take existing Python packages or Django apps and compose
 them into your own web project. You only need to write the parts that make
@@ -257,8 +257,8 @@ this. For a small app like polls, this process isn't too difficult.
    ``django-polls``). This creates a directory called ``dist`` and builds your
    new package, ``django-polls-0.1.tar.gz``.
 
-For more information on packaging, see `The Hitchhiker's Guide to Packaging
-<http://guide.python-distribute.org/quickstart.html>`_.
+For more information on packaging, see Python's `Tutorial on Packaging and
+Distributing Projects <https://packaging.python.org/en/latest/distributing.html>`_.
 
 Using your own package
 ======================
@@ -302,13 +302,10 @@ the world! If this wasn't just an example, you could now:
 
 * Upload the package on your Web site.
 
-* Post the package on a public repository, such as `The Python Package Index
-  (PyPI) <http://guide.python-distribute.org/contributing.html#pypi-info>`_.
-
-For more information on PyPI, see the `Quickstart
-<http://guide.python-distribute.org/quickstart.html#register-your-package-with-the-python-package-index-pypi>`_
-section of The Hitchhiker's Guide to Packaging. One detail this guide mentions
-is choosing the license under which your code is distributed.
+* Post the package on a public repository, such as `the Python Package Index
+  (PyPI)`_. `packaging.python.org <https://packaging.python.org>`_ has `a good
+  tutorial <https://packaging.python.org/en/latest/distributing.html#uploading-your-project-to-pypi>`_
+  for doing this.
 
 Installing Python packages with virtualenv
 ==========================================
