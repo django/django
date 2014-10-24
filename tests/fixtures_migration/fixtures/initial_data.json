@@ -1,0 +1,9 @@
+[
+    {
+        "pk": "10",
+        "model": "fixtures_migration.book",
+        "fields": {
+            "name": "Achieving self-awareness of Python programs"
+        }
+    }
+]
