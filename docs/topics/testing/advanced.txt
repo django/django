@@ -256,8 +256,8 @@ tests via Django's test runner.
 
 .. versionchanged:: 1.7
 
-If you are not using a management command to invoke the tests, you will also
-need to first setup Django itself using :func:`django.setup()`.
+    If you are not using a management command to invoke the tests, you will
+    also need to first setup Django itself using :func:`django.setup()`.
 
 .. _other-testing-frameworks:
 
