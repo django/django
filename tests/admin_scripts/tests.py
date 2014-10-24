@@ -21,7 +21,7 @@ import django
 from django import conf, get_version
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management import BaseCommand, CommandError, call_command
+from django.core.management import BaseCommand, CommandError, call_command, color
 from django.db import connection
 from django.utils.encoding import force_text
 from django.utils._os import npath, upath
@@ -1162,7 +1162,7 @@ class ManageCheck(AdminScriptTestCase):
         args = ['check']
         out, err = self.run_manage(args)
         expected_err = (
-            "CommandError: System check identified some issues:\n"
+            "SystemCheckError: System check identified some issues:\n"
             "\n"
             "ERRORS:\n"
             "?: An error\n"
@@ -1392,12 +1392,99 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "Prints the CREATE TABLE, custom SQL and CREATE INDEX SQL statements for the\ngiven model module name(s).")
         self.assertEqual(out.count('optional arguments'), 1)
 
-    def test_no_color(self):
-        "--no-color prevent colorization of the output"
-        out = StringIO()
+    def test_color_style(self):
+        style = color.no_style()
+        self.assertEqual(style.ERROR('Hello, world!'), 'Hello, world!')
 
-        call_command('color_command', no_color=True, stdout=out)
-        self.assertEqual(out.getvalue(), 'BEGIN\n')
+        style = color.make_style('nocolor')
+        self.assertEqual(style.ERROR('Hello, world!'), 'Hello, world!')
+
+        style = color.make_style('dark')
+        self.assertIn('Hello, world!', style.ERROR('Hello, world!'))
+        self.assertNotEqual(style.ERROR('Hello, world!'), 'Hello, world!')
+
+        # Default palette has color.
+        style = color.make_style('')
+        self.assertIn('Hello, world!', style.ERROR('Hello, world!'))
+        self.assertNotEqual(style.ERROR('Hello, world!'), 'Hello, world!')
+
+    def test_command_color(self):
+        class Command(BaseCommand):
+            requires_system_checks = False
+
+            def handle(self, *args, **options):
+                self.stdout.write('Hello, world!', self.style.ERROR)
+                self.stderr.write('Hello, world!', self.style.ERROR)
+
+        out = StringIO()
+        err = StringIO()
+        command = Command(stdout=out, stderr=err)
+        command.execute()
+        if color.supports_color():
+            self.assertIn('Hello, world!\n', out.getvalue())
+            self.assertIn('Hello, world!\n', err.getvalue())
+            self.assertNotEqual(out.getvalue(), 'Hello, world!\n')
+            self.assertNotEqual(err.getvalue(), 'Hello, world!\n')
+        else:
+            self.assertEqual(out.getvalue(), 'Hello, world!\n')
+            self.assertEqual(err.getvalue(), 'Hello, world!\n')
+
+    def test_command_no_color(self):
+        "--no-color prevent colorization of the output"
+        class Command(BaseCommand):
+            requires_system_checks = False
+
+            def handle(self, *args, **options):
+                self.stdout.write('Hello, world!', self.style.ERROR)
+                self.stderr.write('Hello, world!', self.style.ERROR)
+
+        out = StringIO()
+        err = StringIO()
+        command = Command(stdout=out, stderr=err, no_color=True)
+        command.execute()
+        self.assertEqual(out.getvalue(), 'Hello, world!\n')
+        self.assertEqual(err.getvalue(), 'Hello, world!\n')
+
+        out = StringIO()
+        err = StringIO()
+        command = Command(stdout=out, stderr=err)
+        command.execute(no_color=True)
+        self.assertEqual(out.getvalue(), 'Hello, world!\n')
+        self.assertEqual(err.getvalue(), 'Hello, world!\n')
+
+    def test_custom_stdout(self):
+        class Command(BaseCommand):
+            requires_system_checks = False
+
+            def handle(self, *args, **options):
+                self.stdout.write("Hello, World!")
+
+        out = StringIO()
+        command = Command(stdout=out)
+        command.execute()
+        self.assertEqual(out.getvalue(), "Hello, World!\n")
+        out.truncate(0)
+        new_out = StringIO()
+        command.execute(stdout=new_out)
+        self.assertEqual(out.getvalue(), "")
+        self.assertEqual(new_out.getvalue(), "Hello, World!\n")
+
+    def test_custom_stderr(self):
+        class Command(BaseCommand):
+            requires_system_checks = False
+
+            def handle(self, *args, **options):
+                self.stderr.write("Hello, World!")
+
+        err = StringIO()
+        command = Command(stderr=err)
+        command.execute()
+        self.assertEqual(err.getvalue(), "Hello, World!\n")
+        err.truncate(0)
+        new_err = StringIO()
+        command.execute(stderr=new_err)
+        self.assertEqual(err.getvalue(), "")
+        self.assertEqual(new_err.getvalue(), "Hello, World!\n")
 
     def test_base_command(self):
         "User BaseCommands can execute when a label is provided"
@@ -1453,40 +1540,36 @@ class CommandTypes(AdminScriptTestCase):
         Test run_from_argv properly terminates even with custom execute() (#19665)
         Also test proper traceback display.
         """
-        command = BaseCommand()
+        err = StringIO()
+        command = BaseCommand(stderr=err)
 
         def raise_command_error(*args, **kwargs):
             raise CommandError("Custom error")
 
-        old_stderr = sys.stderr
-        sys.stderr = err = StringIO()
-        try:
-            command.execute = lambda args: args  # This will trigger TypeError
+        command.execute = lambda args: args  # This will trigger TypeError
 
-            # If the Exception is not CommandError it should always
-            # raise the original exception.
-            with self.assertRaises(TypeError):
-                command.run_from_argv(['', ''])
+        # If the Exception is not CommandError it should always
+        # raise the original exception.
+        with self.assertRaises(TypeError):
+            command.run_from_argv(['', ''])
 
-            # If the Exception is CommandError and --traceback is not present
-            # this command should raise a SystemExit and don't print any
-            # traceback to the stderr.
-            command.execute = raise_command_error
-            err.truncate(0)
-            with self.assertRaises(SystemExit):
-                command.run_from_argv(['', ''])
-            err_message = err.getvalue()
-            self.assertNotIn("Traceback", err_message)
-            self.assertIn("CommandError", err_message)
+        # If the Exception is CommandError and --traceback is not present
+        # this command should raise a SystemExit and don't print any
+        # traceback to the stderr.
+        command.execute = raise_command_error
+        err.truncate(0)
+        with self.assertRaises(SystemExit):
+            command.run_from_argv(['', ''])
+        err_message = err.getvalue()
+        self.assertNotIn("Traceback", err_message)
+        self.assertIn("CommandError", err_message)
 
-            # If the Exception is CommandError and --traceback is present
-            # this command should raise the original CommandError as if it
-            # were not a CommandError.
-            err.truncate(0)
-            with self.assertRaises(CommandError):
-                command.run_from_argv(['', '', '--traceback'])
-        finally:
-            sys.stderr = old_stderr
+        # If the Exception is CommandError and --traceback is present
+        # this command should raise the original CommandError as if it
+        # were not a CommandError.
+        err.truncate(0)
+        with self.assertRaises(CommandError):
+            command.run_from_argv(['', '', '--traceback'])
 
     def test_run_from_argv_non_ascii_error(self):
         """
@@ -1496,9 +1579,8 @@ class CommandTypes(AdminScriptTestCase):
         def raise_command_error(*args, **kwargs):
             raise CommandError("Erreur personnalisée")
 
-        command = BaseCommand()
+        command = BaseCommand(stderr=StringIO())
         command.execute = raise_command_error
-        command.stderr = StringIO()
 
         with self.assertRaises(SystemExit):
             command.run_from_argv(['', ''])
