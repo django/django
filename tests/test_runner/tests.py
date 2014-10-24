@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import unittest
 
 from django import db
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.db.backends.dummy.base import DatabaseCreation
@@ -335,6 +336,18 @@ class SetupDatabasesTests(unittest.TestCase):
         self.runner_instance.teardown_databases(old_config)
 
         self.assertEqual(destroyed_names.count('dbname'), 1)
+
+    def test_destroy_test_db_restores_db_name(self):
+        db.connections = db.ConnectionHandler({
+            'default': {
+                'ENGINE': settings.DATABASES[db.DEFAULT_DB_ALIAS]["ENGINE"],
+                'NAME': 'xxx_test_database',
+            },
+        })
+        # Using the real current name as old_name to not mess with the test suite.
+        old_name = settings.DATABASES[db.DEFAULT_DB_ALIAS]["NAME"]
+        db.connections['default'].creation.destroy_test_db(old_name, verbosity=0, keepdb=True)
+        self.assertEqual(db.connections['default'].settings_dict["NAME"], old_name)
 
     def test_serialization(self):
         serialize = []
