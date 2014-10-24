@@ -2,9 +2,7 @@ from __future__ import unicode_literals
 
 from django.core.management import call_command
 from django.db import connection
-from django.test import (
-    override_settings, skipUnlessDBFeature, TransactionTestCase
-)
+from django.test import skipUnlessDBFeature, TransactionTestCase
 
 
 @skipUnlessDBFeature("gis_enabled")
