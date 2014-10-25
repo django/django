@@ -155,10 +155,12 @@ class MigrationWriter(object):
         imports.discard("from django.db import models")
         items["imports"] = "\n".join(imports) + "\n" if imports else ""
         if migration_imports:
-            items["imports"] += "\n\n# Functions from the following migrations need manual copying.\n# Move them and any dependencies into this file, then update the\n# RunPython operations to refer to the local versions:\n# %s" % (
-                "\n# ".join(migration_imports)
-            )
-
+            items["imports"] += (
+                "\n\n# Functions from the following migrations need manual "
+                "copying.\n# Move them and any dependencies into this file, "
+                "then update the\n# RunPython operations to refer to the local "
+                "versions:\n# %s"
+            ) % "\n# ".join(migration_imports)
         # If there's a replaces, make a string for it
         if self.migration.replaces:
             items['replaces_str'] = "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
@@ -396,7 +398,11 @@ class MigrationWriter(object):
             return "re.compile(%s)" % ', '.join(args), imports
         # Uh oh.
         else:
-            raise ValueError("Cannot serialize: %r\nThere are some values Django cannot serialize into migration files.\nFor more, see https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing" % value)
+            raise ValueError(
+                "Cannot serialize: %r\nThere are some values Django cannot serialize into "
+                "migration files.\nFor more, see https://docs.djangoproject.com/en/dev/"
+                "topics/migrations/#migration-serializing" % value
+            )
 
 
 MIGRATION_TEMPLATE = """\
