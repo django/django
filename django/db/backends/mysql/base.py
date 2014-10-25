@@ -1,7 +1,8 @@
 """
 MySQL database backend for Django.
 
-Requires MySQLdb: http://sourceforge.net/projects/mysql-python
+Requires mysqclient: https://pypi.python.org/pypi/mysqlclient/
+MySQLdb is supported for Python 2 only: http://sourceforge.net/projects/mysql-python
 """
 from __future__ import unicode_literals
 
