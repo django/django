@@ -68,7 +68,12 @@ class ProjectState(object):
                     except InvalidBasesError:
                         new_unrendered_models.append(model)
                 if len(new_unrendered_models) == len(unrendered_models):
-                    raise InvalidBasesError("Cannot resolve bases for %r\nThis can happen if you are inheriting models from an app with migrations (e.g. contrib.auth)\n in an app with no migrations; see https://docs.djangoproject.com/en/1.7/topics/migrations/#dependencies for more" % new_unrendered_models)
+                    raise InvalidBasesError(
+                        "Cannot resolve bases for %r\nThis can happen if you are inheriting models from an "
+                        "app with migrations (e.g. contrib.auth)\n in an app with no migrations; see "
+                        "https://docs.djangoproject.com/en/1.7/topics/migrations/#dependencies "
+                        "for more" % new_unrendered_models
+                    )
                 unrendered_models = new_unrendered_models
             # make sure apps has no dangling references
             if self.apps._pending_lookups:
@@ -78,16 +83,15 @@ class ProjectState(object):
                     try:
                         model = self.apps.get_model(lookup_model[0], lookup_model[1])
                     except LookupError:
-                        if "%s.%s" % (lookup_model[0], lookup_model[1]) == settings.AUTH_USER_MODEL and ignore_swappable:
+                        app_label = "%s.%s" % (lookup_model[0], lookup_model[1])
+                        if app_label == settings.AUTH_USER_MODEL and ignore_swappable:
                             continue
                         # Raise an error with a best-effort helpful message
                         # (only for the first issue). Error message should look like:
                         # "ValueError: Lookup failed for model referenced by
                         # field migrations.Book.author: migrations.Author"
-                        raise ValueError("Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}".format(
-                            field=operations[0][1],
-                            model=lookup_model,
-                        ))
+                        msg = "Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}"
+                        raise ValueError(msg.format(field=operations[0][1], model=lookup_model))
                     else:
                         do_pending_lookups(model)
         try:
@@ -326,7 +330,8 @@ class ModelState(object):
             (self.app_label == other.app_label) and
             (self.name == other.name) and
             (len(self.fields) == len(other.fields)) and
-            all((k1 == k2 and (f1.deconstruct()[1:] == f2.deconstruct()[1:])) for (k1, f1), (k2, f2) in zip(self.fields, other.fields)) and
+            all((k1 == k2 and (f1.deconstruct()[1:] == f2.deconstruct()[1:]))
+                for (k1, f1), (k2, f2) in zip(self.fields, other.fields)) and
             (self.options == other.options) and
             (self.bases == other.bases)
         )

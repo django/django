@@ -108,7 +108,9 @@ class MigrationLoader(object):
                         break
                     raise
                 if not hasattr(migration_module, "Migration"):
-                    raise BadMigrationError("Migration %s in app %s has no Migration class" % (migration_name, app_config.label))
+                    raise BadMigrationError(
+                        "Migration %s in app %s has no Migration class" % (migration_name, app_config.label)
+                    )
                 # Ignore South-style migrations
                 if hasattr(migration_module.Migration, "forwards"):
                     south_style_migrations = True
@@ -129,7 +131,9 @@ class MigrationLoader(object):
             if l == app_label and n.startswith(name_prefix):
                 results.append((l, n))
         if len(results) > 1:
-            raise AmbiguityError("There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix))
+            raise AmbiguityError(
+                "There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix)
+            )
         elif len(results) == 0:
             raise KeyError("There no migrations for '%s' with the prefix '%s'" % (app_label, name_prefix))
         else:
