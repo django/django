@@ -300,7 +300,8 @@ class MigrationOptimizer(object):
             return [other]
 
     def reduce_add_field_rename_field(self, operation, other, in_between):
-        if operation.model_name.lower() == other.model_name.lower() and operation.name.lower() == other.old_name.lower():
+        if (operation.model_name.lower() == other.model_name.lower() and
+                operation.name.lower() == other.old_name.lower()):
             return [
                 migrations.AddField(
                     model_name=operation.model_name,
@@ -310,7 +311,8 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_alter_field_rename_field(self, operation, other, in_between):
-        if operation.model_name.lower() == other.model_name.lower() and operation.name.lower() == other.old_name.lower():
+        if (operation.model_name.lower() == other.model_name.lower() and
+                operation.name.lower() == other.old_name.lower()):
             return [
                 other,
                 migrations.AlterField(
@@ -321,7 +323,8 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_rename_field_self(self, operation, other, in_between):
-        if operation.model_name.lower() == other.model_name.lower() and operation.new_name.lower() == other.old_name.lower():
+        if (operation.model_name.lower() == other.model_name.lower() and
+                operation.new_name.lower() == other.old_name.lower()):
             return [
                 migrations.RenameField(
                     operation.model_name,
