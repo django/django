@@ -223,26 +223,30 @@ running ``migrate``::
 MySQL DB API Drivers
 --------------------
 
-The Python Database API is described in `PEP 249`_. MySQL has two prominent
+The Python Database API is described in `PEP 249`_. MySQL has three prominent
 drivers that implement this API:
 
 .. _PEP 249: http://www.python.org/dev/peps/pep-0249/
 
 - `MySQLdb`_ is a native driver that has been developed and supported for over
   a decade by Andy Dustman.
+- `mysqlclient` is a fork of ``MySQLdb`` which notably supports Python 3 and
+  can be used as a drop-in replacement for MySQLdb. At the time of this writing,
+  this is **the recommended choice** for using MySQL with Django.
 - `MySQL Connector/Python`_ is a pure Python driver from Oracle that does not
   require the MySQL client library or any Python modules outside the standard
   library.
 
 .. _MySQLdb: https://pypi.python.org/pypi/MySQL-python/1.2.4
+.. _mysqlclient: https://pypi.python.org/pypi/mysqlclient
 .. _MySQL Connector/Python: http://dev.mysql.com/downloads/connector/python
 
-Both drivers are thread-safe and both provide connection pooling. The major
-difference is that MySQL Connector/Python supports Python 3.
+All these drivers are thread-safe and provide connection pooling. ``MySQLdb``
+is the only one not supporting Python 3 currently.
 
 In addition to a DB API driver, Django needs an adapter to access the database
-drivers from its ORM. Django provides an adapter for MySQLdb while MySQL
-Connector/Python includes `its own`_.
+drivers from its ORM. Django provides an adapter for MySQLdb/mysqlclient while
+MySQL Connector/Python includes `its own`_.
 
 .. _its own: http://dev.mysql.com/doc/refman/5.6/en/connector-python-django-backend.html
 
@@ -270,12 +274,14 @@ Django requires MySQLdb version 1.2.1p2 or later.
 .. note::
     At the time of writing, the latest release of MySQLdb (1.2.4) doesn't
     support Python 3. In order to use MySQLdb under Python 3, you'll have to
-    install an unofficial fork, such as `MySQL-for-Python-3`_.
+    install ``mysqlclient``.
 
-    This port is still in alpha. In particular, it doesn't support binary
-    data, making it impossible to use :class:`django.db.models.BinaryField`.
+mysqlclient
+~~~~~~~~~~~
 
-.. _MySQL-for-Python-3: https://github.com/clelland/MySQL-for-Python-3
+Django requires mysqlclient 1.3.3 or later. Note that Python 3.2 is not
+supported. Except for the Python 3.3+ support, mysqlclient should mostly behave
+the same as MySQLDB.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
