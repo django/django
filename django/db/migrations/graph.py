@@ -37,9 +37,13 @@ class MigrationGraph(object):
 
     def add_dependency(self, migration, child, parent):
         if child not in self.nodes:
-            raise KeyError("Migration %s dependencies reference nonexistent child node %r" % (migration, child))
+            raise KeyError(
+                "Migration %s dependencies reference nonexistent child node %r" % (migration, child)
+            )
         if parent not in self.nodes:
-            raise KeyError("Migration %s dependencies reference nonexistent parent node %r" % (migration, parent))
+            raise KeyError(
+                "Migration %s dependencies reference nonexistent parent node %r" % (migration, parent)
+            )
         self.dependencies.setdefault(child, set()).add(parent)
         self.dependents.setdefault(parent, set()).add(child)
 
@@ -72,7 +76,8 @@ class MigrationGraph(object):
         """
         roots = set()
         for node in self.nodes:
-            if not any(key[0] == node[0] for key in self.dependencies.get(node, set())) and (not app or app == node[0]):
+            if (not any(key[0] == node[0] for key in self.dependencies.get(node, set()))
+                    and (not app or app == node[0])):
                 roots.add(node)
         return sorted(roots)
 
@@ -86,7 +91,8 @@ class MigrationGraph(object):
         """
         leaves = set()
         for node in self.nodes:
-            if not any(key[0] == node[0] for key in self.dependents.get(node, set())) and (not app or app == node[0]):
+            if (not any(key[0] == node[0] for key in self.dependents.get(node, set()))
+                    and (not app or app == node[0])):
                 leaves.add(node)
         return sorted(leaves)
 
@@ -116,7 +122,10 @@ class MigrationGraph(object):
         return list(OrderedSet(visited))
 
     def __str__(self):
-        return "Graph: %s nodes, %s edges" % (len(self.nodes), sum(len(x) for x in self.dependencies.values()))
+        return "Graph: %s nodes, %s edges" % (
+            len(self.nodes),
+            sum(len(x) for x in self.dependencies.values()),
+        )
 
     def make_state(self, nodes=None, at_end=True, real_apps=None):
         """

@@ -55,7 +55,10 @@ class ContentTypeManager(models.Manager):
             # It's possible to migrate a single app before contenttypes,
             # as it's not a required initial dependency (it's contrib!)
             # Have a nice error for this.
-            raise RuntimeError("Error creating new content types. Please make sure contenttypes is migrated before trying to migrate apps individually.")
+            raise RuntimeError(
+                "Error creating new content types. Please make sure contenttypes "
+                "is migrated before trying to migrate apps individually."
+            )
         except self.model.DoesNotExist:
             # Not found in the database; we proceed to create it.  This time we
             # use get_or_create to take care of any race conditions.
