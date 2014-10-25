@@ -90,7 +90,8 @@ class Migration(object):
             # there instead
             if collect_sql and not operation.reduces_to_sql:
                 schema_editor.collected_sql.append("--")
-                schema_editor.collected_sql.append("-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS SQL:")
+                schema_editor.collected_sql.append("-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE "
+                                                   "WRITTEN AS SQL:")
                 schema_editor.collected_sql.append("-- %s" % operation.describe())
                 schema_editor.collected_sql.append("--")
                 continue
@@ -122,7 +123,8 @@ class Migration(object):
             # there instead
             if collect_sql and not operation.reduces_to_sql:
                 schema_editor.collected_sql.append("--")
-                schema_editor.collected_sql.append("-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS SQL:")
+                schema_editor.collected_sql.append("-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE "
+                                                   "WRITTEN AS SQL:")
                 schema_editor.collected_sql.append("-- %s" % operation.describe())
                 schema_editor.collected_sql.append("--")
                 continue
