@@ -63,11 +63,14 @@ class MigrationExecutor(object):
         """
         if plan is None:
             plan = self.migration_plan(targets)
+        state = None
         for migration, backwards in plan:
+            if state is None:
+                state = self.loader.project_state((migration.app_label, migration.name), at_end=False)
             if not backwards:
-                self.apply_migration(migration, fake=fake)
+                state = self.apply_migration(state, migration, fake=fake)
             else:
-                self.unapply_migration(migration, fake=fake)
+                state = self.unapply_migration(state, migration, fake=fake)
 
     def collect_sql(self, plan):
         """
@@ -75,17 +78,19 @@ class MigrationExecutor(object):
         statements that represent the best-efforts version of that plan.
         """
         statements = []
+        state = None
         for migration, backwards in plan:
             with self.connection.schema_editor(collect_sql=True) as schema_editor:
-                project_state = self.loader.project_state((migration.app_label, migration.name), at_end=False)
+                if state is None:
+                    state = self.loader.project_state((migration.app_label, migration.name), at_end=False)
                 if not backwards:
-                    migration.apply(project_state, schema_editor, collect_sql=True)
+                    state = migration.apply(state, schema_editor, collect_sql=True)
                 else:
-                    migration.unapply(project_state, schema_editor, collect_sql=True)
+                    state = migration.unapply(state, schema_editor, collect_sql=True)
             statements.extend(schema_editor.collected_sql)
         return statements
 
-    def apply_migration(self, migration, fake=False):
+    def apply_migration(self, state, migration, fake=False):
         """
         Runs a migration forwards.
         """
@@ -93,7 +98,7 @@ class MigrationExecutor(object):
             self.progress_callback("apply_start", migration, fake)
         if not fake:
             # Test to see if this is an already-applied initial migration
-            if self.detect_soft_applied(migration):
+            if self.detect_soft_applied(state, migration):
                 fake = True
             else:
                 # Alright, do it normally
@@ -109,8 +114,9 @@ class MigrationExecutor(object):
         # Report progress
         if self.progress_callback:
             self.progress_callback("apply_success", migration, fake)
+        return state
 
-    def unapply_migration(self, migration, fake=False):
+    def unapply_migration(self, state, migration, fake=False):
         """
         Runs a migration backwards.
         """
@@ -129,8 +135,9 @@ class MigrationExecutor(object):
         # Report progress
         if self.progress_callback:
             self.progress_callback("unapply_success", migration, fake)
+        return state
 
-    def detect_soft_applied(self, migration):
+    def detect_soft_applied(self, project_state, migration):
         """
         Tests whether a migration has been implicitly applied - that the
         tables it would create exist. This is intended only for use
