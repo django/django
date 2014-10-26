@@ -1,4 +1,5 @@
 from collections import Counter, defaultdict, OrderedDict
+import copy
 import os
 import sys
 import threading
@@ -116,6 +117,15 @@ class Apps(object):
 
             self.ready = True
 
+    def clone(self):
+        """
+        Return a clone of this registry, mainly used by the migration framework.
+        """
+        clone = Apps([])
+        clone.all_models = copy.deepcopy(self.all_models)
+        clone.app_configs = copy.deepcopy(self.app_configs)
+        return clone
+
     def check_apps_ready(self):
         """
         Raises an exception if all apps haven't been imported yet.
@@ -220,6 +230,9 @@ class Apps(object):
                     "Conflicting '%s' models in application '%s': %s and %s." %
                     (model_name, app_label, app_models[model_name], model))
         app_models[model_name] = model
+        if self.ready and app_label in self.app_configs:
+            # This mostly happens when the migration framework re-registers a model
+            self.app_configs[app_label].models[model_name] = model
         self.clear_cache()
 
     def is_installed(self, app_name):
