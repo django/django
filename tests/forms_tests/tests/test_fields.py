@@ -961,6 +961,28 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual('5', f.clean('5'))
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, '6')
 
+    def test_choicefield_callable(self):
+        choices = lambda: [('J', 'John'), ('P', 'Paul')]
+        f = ChoiceField(choices=choices)
+        self.assertEqual('J', f.clean('J'))
+
+    def test_choicefield_callable_may_evaluate_to_different_values(self):
+        choices = []
+
+        def choices_as_callable():
+            return choices
+
+        class ChoiceFieldForm(Form):
+            choicefield = ChoiceField(choices=choices_as_callable)
+
+        choices = [('J', 'John')]
+        form = ChoiceFieldForm()
+        self.assertEqual([('J', 'John')], list(form.fields['choicefield'].choices))
+
+        choices = [('P', 'Paul')]
+        form = ChoiceFieldForm()
+        self.assertEqual([('P', 'Paul')], list(form.fields['choicefield'].choices))
+
     # TypedChoiceField ############################################################
     # TypedChoiceField is just like ChoiceField, except that coerced types will
     # be returned:
