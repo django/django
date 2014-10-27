@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed a migration crash when adding an explicit ``id`` field to a model on
   SQLite (:ticket:`23702`).
+
+* Fixed a :djadmin:`makemessages` regression in 1.7.1 when
+  :setting:`STATIC_ROOT` has the default ``None`` value (:ticket:`23717`).
