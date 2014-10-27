@@ -21,3 +21,6 @@ Bugfixes
 
 * Prevented :djadmin:`flush` from loading initial data for migrated apps
   (:ticket:`23699`).
+
+* Fixed a :djadmin:`makemessages` regression in 1.7.1 when
+  :setting:`STATIC_ROOT` has the default ``None`` value (:ticket:`23717`).
