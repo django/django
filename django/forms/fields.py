@@ -798,6 +798,15 @@ class NullBooleanField(BooleanField):
         return initial != data
 
 
+class CallableChoiceIterator(object):
+    def __init__(self, choices_func):
+        self.choices_func = choices_func
+
+    def __iter__(self):
+        for e in self.choices_func():
+            yield e
+
+
 class ChoiceField(Field):
     widget = Select
     default_error_messages = {
@@ -822,7 +831,12 @@ class ChoiceField(Field):
         # Setting choices also sets the choices on the widget.
         # choices can be any iterable, but we call list() on it because
         # it will be consumed more than once.
-        self._choices = self.widget.choices = list(value)
+        if callable(value):
+            value = CallableChoiceIterator(value)
+        else:
+            value = list(value)
+
+        self._choices = self.widget.choices = value
 
     choices = property(_get_choices, _set_choices)
 
