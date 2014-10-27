@@ -86,6 +86,12 @@ class AutodetectorTests(TestCase):
     book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("author", "title")}})
     book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("title", "author")}})
     book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("title", "newfield")}})
+    book_unique_4 = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("newfield2", models.IntegerField()),
+        ("author", models.ForeignKey("testapp.Author")),
+        ("title", models.CharField(max_length=200)),
+    ], {"unique_together": {("title", "newfield2")}})
     attribution = ModelState("otherapp", "Attribution", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("book", models.ForeignKey("otherapp.Book"))])
     edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
     custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))], bases=(AbstractBaseUser, ))
@@ -749,16 +755,9 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_empty, self.book_unique_2])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['otherapp']), 1)
-        # Right number of actions?
-        migration = changes['otherapp'][0]
-        self.assertEqual(len(migration.operations), 1)
-        # Right action?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
-        self.assertEqual(action.name, "book")
-        self.assertEqual(action.unique_together, {("title", "author")})
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(changes, "otherapp", 0, ["AlterUniqueTogether"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together={("title", "author")})
 
     def test_add_field_and_unique_together(self):
         "Tests that added fields will be created before using them in unique together"
@@ -766,17 +765,29 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_empty, self.book_unique_3])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['otherapp']), 1)
-        # Right number of actions?
-        migration = changes['otherapp'][0]
-        self.assertEqual(len(migration.operations), 2)
-        # Right actions order?
-        action1 = migration.operations[0]
-        action2 = migration.operations[1]
-        self.assertEqual(action1.__class__.__name__, "AddField")
-        self.assertEqual(action2.__class__.__name__, "AlterUniqueTogether")
-        self.assertEqual(action2.unique_together, {("title", "newfield")})
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(changes, "otherapp", 0, ["AddField", "AlterUniqueTogether"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", unique_together={("title", "newfield")})
+
+    def test_remove_field_and_unique_together(self):
+        "Tests that removed fields will be removed after updating unique_together"
+        before = self.make_project_state([self.author_empty, self.book_unique_3])
+        after = self.make_project_state([self.author_empty, self.book_unique])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(changes, "otherapp", 0, ["AlterUniqueTogether", "RemoveField"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together={("author", "title")})
+
+    def test_rename_field_and_unique_together(self):
+        "Tests that removed fields will be removed after updating unique together"
+        before = self.make_project_state([self.author_empty, self.book_unique_3])
+        after = self.make_project_state([self.author_empty, self.book_unique_4])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename": True}))
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(changes, "otherapp", 0, ["RenameField", "AlterUniqueTogether"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", unique_together={("title", "newfield2")})
 
     def test_remove_index_together(self):
         author_index_together = ModelState("testapp", "Author", [
@@ -787,15 +798,9 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_name])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        migration = changes['testapp'][0]
-        # Right number of actions?
-        self.assertEqual(len(migration.operations), 1)
-        # Right actions?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "AlterIndexTogether")
-        self.assertEqual(action.index_together, set())
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterIndexTogether"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="author", index_together=set())
 
     def test_remove_unique_together(self):
         author_unique_together = ModelState("testapp", "Author", [
@@ -806,15 +811,9 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_name])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        migration = changes['testapp'][0]
-        # Right number of actions?
-        self.assertEqual(len(migration.operations), 1)
-        # Right actions?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
-        self.assertEqual(action.unique_together, set())
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterUniqueTogether"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="author", unique_together=set())
 
     def test_proxy(self):
         "Tests that the autodetector correctly deals with proxy models"
