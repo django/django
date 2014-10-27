@@ -198,7 +198,9 @@ class MigrationAutodetector(object):
                         if dep[0] == app_label:
                             # Alright, there's a dependency on the same app.
                             for j, op2 in enumerate(ops):
-                                if self.check_dependency(op2, dep) and j > i:
+                                if j > i and self.check_dependency(op2, dep):
+                                    # shift the operation from position i after
+                                    # the operation at position j
                                     ops = ops[:i] + ops[i + 1:j + 1] + [op] + ops[j + 1:]
                                     found = True
                                     break
@@ -320,7 +322,8 @@ class MigrationAutodetector(object):
 
     def check_dependency(self, operation, dependency):
         """
-        Checks if an operation dependency matches an operation.
+        Returns ``True`` if the given operation depends on the given dependency,
+        ``False`` otherwise.
         """
         # Created model
         if dependency[2] is None and dependency[3] is True:
@@ -369,6 +372,19 @@ class MigrationAutodetector(object):
                 operation.name.lower() == dependency[1].lower() and
                 (operation.order_with_respect_to or "").lower() != dependency[2].lower()
             )
+        # Field is removed and part of an index/unique_together
+        elif dependency[2] is not None and dependency[3] == "foo_together_change":
+            if operation.name.lower() == dependency[1].lower():
+                return (
+                    (
+                        isinstance(operation, operations.AlterUniqueTogether) and
+                        any(dependency[2] not in t for t in operation.unique_together)
+                    ) or
+                    (
+                        isinstance(operation, operations.AlterIndexTogether) and
+                        any(dependency[2] not in t for t in operation.index_together)
+                    )
+                )
         # Unknown dependency. Raise an error.
         else:
             raise ValueError("Can't handle dependency %r" % (dependency, ))
@@ -828,9 +844,13 @@ class MigrationAutodetector(object):
                     model_name=model_name,
                     name=field_name,
                 ),
-                # We might need to depend on the removal of an order_with_respect_to;
+                # We might need to depend on the removal of an
+                # order_with_respect_to or index/unique_together operation;
                 # this is safely ignored if there isn't one
-                dependencies=[(app_label, model_name, field_name, "order_wrt_unset")],
+                dependencies=[
+                    (app_label, model_name, field_name, "order_wrt_unset"),
+                    (app_label, model_name, field_name, "foo_together_change"),
+                ],
             )
 
     def generate_altered_fields(self):
