@@ -258,6 +258,16 @@ Manager methods
         Same as :meth:`create_user`, but sets :attr:`~models.User.is_staff` and
         :attr:`~models.User.is_superuser` to ``True``.
 
+    .. method:: with_perm(permission_name)
+
+        .. versionadded:: 1.8
+
+        Returns a queryset containing :class:`~django.contrib.auth.models.User`
+        objects that have the given permission, including superusers.
+
+        If ``permission_name`` isn't formatted properly, ``ValueError`` will be
+        raised. If the permision doesn't exist, the result will be an empty
+        queryset.
 
 Anonymous users
 ===============
@@ -443,9 +453,9 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     :class:`~django.contrib.auth.models.PermissionsMixin`.
 
     :meth:`has_perm`, :meth:`get_all_permissions`, :meth:`get_user_permissions`,
-    and :meth:`get_group_permissions` allow an object to be passed as a
-    parameter for object-specific permissions, but this backend does not
-    implement them other than returning an empty set of permissions if
+    and :meth:`get_group_permissions`, :meth:`with_perm` allow an object to be
+    passed as a parameter for object-specific permissions, but this backend does
+    not implement them other than returning an empty set of permissions if
     ``obj is not None``.
 
     .. method:: authenticate(username=None, password=None, **kwargs)
@@ -491,6 +501,10 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
         Returns whether the ``user_obj`` has any permissions on the app
         ``app_label``.
+
+    .. method:: with_perm(perm, obj=None)
+
+        Returns all users who have the permission `perm` on this backend.
 
 .. class:: RemoteUserBackend
 

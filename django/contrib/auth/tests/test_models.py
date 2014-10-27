@@ -1,10 +1,16 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import AbstractUser, Group, Permission, User, UserManager
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db.models.signals import post_save
 from django.test import TestCase, override_settings
+
+
+class CustomBackend(ModelBackend):
+    def with_perm(self, perm, obj=None):
+        return User.objects.filter(username='charlie')
 
 
 @skipIfCustomUser
@@ -104,6 +110,10 @@ class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
 
 @skipIfCustomUser
 class UserManagerTestCase(TestCase):
+    def setUp(self):
+        self.content_type = ContentType.objects.get_for_model(Group)
+        self.permission = Permission.objects.create(name='test',
+            content_type=self.content_type, codename='test')
 
     def test_create_user(self):
         email_lowercase = 'normal@normal.com'
@@ -111,6 +121,66 @@ class UserManagerTestCase(TestCase):
         self.assertEqual(user.email, email_lowercase)
         self.assertEqual(user.username, 'user')
         self.assertFalse(user.has_usable_password())
+
+    def test_with_perm_invalid_permission_name(self):
+        "Invalid permission names should raise ValueError."
+        for perm in ('nodots', 'too.many.dots', '...........', ''):
+            self.assertRaisesMessage(ValueError,
+                "Permission name should be in the form 'app_label.codename'.", User.objects.with_perm, perm)
+
+    def test_with_perm_user_permissions(self):
+        "Users with the permission should be included in results."
+        user1 = User.objects.create_user('user1', 'foo@example.com')
+        user1.user_permissions.add(self.permission)
+        self.assertQuerysetEqual(User.objects.with_perm('auth.test'), [user1], lambda x: x)
+
+    def test_with_perm_group_permissions(self):
+        """
+        Users with permissions from their groups should be included in
+        results.
+        """
+        group1 = Group.objects.create(name='test')
+        group1.permissions.add(self.permission)
+        group1.save()
+        user1 = User.objects.create_user('user1', 'foo@example.com')
+        user1.groups.add(group1)
+        self.assertQuerysetEqual(User.objects.with_perm('auth.test'), [user1], lambda x: x)
+
+    def test_with_perm_no_permissions(self):
+        "A user with no permissions should be excluded from results."
+        User.objects.create_user('user2', 'bar@example.com')
+        self.assertEqual(list(User.objects.with_perm('auth.test')), [])
+
+    def test_with_perm_superuser(self):
+        "Superusers should be included in `with_perm` results."
+        superuser = User.objects.create_superuser('user1', 'foo@example.com', '')
+        self.assertQuerysetEqual(User.objects.with_perm('auth.test'), [superuser], lambda x: x)
+
+    def test_with_perm_inactive(self):
+        "Inactive users shouldn't be in `with_perm` results."
+        user = User.objects.create_superuser('user1', 'foo@example.com', '')
+        user.is_active = False
+        user.save()
+        self.assertQuerysetEqual(User.objects.with_perm('auth.test'), [], lambda x: x)
+
+    def test_with_perm_distinct(self):
+        "Results should be distinct (no duplicate users)."
+        group1 = Group.objects.create(name='test')
+        group1.permissions.add(self.permission)
+        group2 = Group.objects.create(name='test2')
+        group2.permissions.add(self.permission)
+        user1 = User.objects.create_user('user1', 'foo@example.com')
+        user1.groups.add(group1, group2)
+        user1.user_permissions.add(self.permission)
+        self.assertQuerysetEqual(User.objects.with_perm('auth.test'), [user1], lambda x: x)
+
+    @override_settings(AUTHENTICATION_BACKENDS=(
+        'django.contrib.auth.tests.test_models.CustomBackend',
+        'django.contrib.auth.backends.ModelBackend'))
+    def test_with_perm_custom_backend(self):
+        "Results from a custom auth backend override the default."
+        user = User.objects.create_user('charlie', 'charlie@brown.com')
+        self.assertQuerysetEqual(User.objects.with_perm('auth.test'), [user], lambda x: x)
 
     def test_create_user_email_domain_normalize_rfc3696(self):
         # According to  http://tools.ietf.org/html/rfc3696#section-3
