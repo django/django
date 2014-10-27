@@ -108,6 +108,7 @@ class ChangeList(object):
 
         filter_specs = []
         if self.list_filter:
+            lookup_params_all = lookup_params.copy()
             for list_filter in self.list_filter:
                 if callable(list_filter):
                     # This is simply a custom list filter class.
@@ -128,8 +129,9 @@ class ChangeList(object):
                         field = get_fields_from_path(self.model, field_path)[-1]
                     spec = field_list_filter_class(field, request, lookup_params,
                         self.model, self.model_admin, field_path=field_path)
-                    # Check if we need to use distinct()
-                    use_distinct = (use_distinct or
+                    # Check if we need to use distinct() only if list_filter in params
+                    if any((field_path in k) for k in lookup_params_all):
+                        use_distinct = (use_distinct or
                                     lookup_needs_distinct(self.lookup_opts,
                                                           field_path))
                 if spec and spec.has_output():
