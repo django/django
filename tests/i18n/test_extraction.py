@@ -358,6 +358,14 @@ class JavascriptExtractorTests(ExtractorTests):
         self.assertMsgId("Static content inside app should be included.", po_contents)
         self.assertNotMsgId("Content from STATIC_ROOT should not be included", po_contents)
 
+    @override_settings(STATIC_ROOT=None, MEDIA_ROOT='')
+    def test_default_root_settings(self):
+        """
+        Regression test for #23717.
+        """
+        _, po_contents = self._run_makemessages(domain='djangojs')
+        self.assertMsgId("Static content inside app should be included.", po_contents)
+
 
 class IgnoredExtractorTests(ExtractorTests):
 
