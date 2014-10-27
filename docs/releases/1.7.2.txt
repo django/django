@@ -15,5 +15,9 @@ Bugfixes
 * Fixed a migration crash when adding an explicit ``id`` field to a model on
   SQLite (:ticket:`23702`).
 
+* Added a warning for duplicate models when a module is reloaded. Previously a
+  ``RuntimeError`` was raised every time two models clashed in the app registry.
+  (:ticket:`23621`).
+
 * Prevented :djadmin:`flush` from loading initial data for migrated apps
   (:ticket:`23699`).
