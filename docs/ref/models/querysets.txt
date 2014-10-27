@@ -649,13 +649,13 @@ Examples::
 datetimes
 ~~~~~~~~~
 
-.. method:: datetimes(field, kind, order='ASC', tzinfo=None)
+.. method:: datetimes(field_name, kind, order='ASC', tzinfo=None)
 
 Returns a ``DateTimeQuerySet`` — a ``QuerySet`` that evaluates to a list of
 :class:`datetime.datetime` objects representing all available dates of a
 particular kind within the contents of the ``QuerySet``.
 
-``field`` should be the name of a ``DateTimeField`` of your model.
+``field_name`` should be the name of a ``DateTimeField`` of your model.
 
 ``kind`` should be either ``"year"``, ``"month"``, ``"day"``, ``"hour"``,
 ``"minute"`` or ``"second"``. Each ``datetime.datetime`` object in the result
