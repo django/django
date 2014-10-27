@@ -61,12 +61,18 @@ should put in this file, and what else you can add to it.
 
 .. warning::
 
-   If multiple Django sites are run in a single mod_wsgi process, all of them
-   will use the settings of whichever one happens to run first. This can be
-   solved with a minor edit to ``wsgi.py`` (see comment in the file for
-   details), or by :ref:`using mod_wsgi daemon mode<daemon-mode>` and ensuring
-   that each site runs in its own daemon process.
+    If multiple Django sites are run in a single mod_wsgi process, all of them
+    will use the settings of whichever one happens to run first. This can be
+    solved by changing::
 
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{{ project_name }}.settings")
+
+    in ``wsgi.py``, to::
+
+        os.environ["DJANGO_SETTINGS_MODULE"] = "{{ project_name }}.settings"
+
+    or by :ref:`using mod_wsgi daemon mode<daemon-mode>` and ensuring that each
+    site runs in its own daemon process.
 
 Using a virtualenv
 ==================
