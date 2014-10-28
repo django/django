@@ -1,4 +1,5 @@
 import inspect
+import logging
 import re
 
 from django.apps import apps as django_apps
@@ -70,8 +71,13 @@ def authenticate(**credentials):
         return user
 
     # The credentials supplied are invalid to all backends, fire signal
+    # and log a warning
     user_login_failed.send(sender=__name__,
             credentials=_clean_credentials(credentials))
+
+    logger = logging.getLogger('django.security.FailedLogin')
+    logger.warning('User login credentials invalid to all supplied '
+                   'authentication backends.')
 
 
 def login(request, user):

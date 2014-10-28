@@ -93,6 +93,8 @@ Minor features
 * :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` and
   :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
   :class:`~django.db.models.ForeignKey`\s.
+* :func:`~django.contrib.auth.signals.user_login_failed` signals now also
+  logged to ``django.security.FailedLogin`` as a warning.
 
 :mod:`django.contrib.formtools`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

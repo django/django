@@ -410,6 +410,14 @@ class SecurityLoggerTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn('path:/suspicious/,', mail.outbox[0].body)
 
+    def test_user_login_failed_creates_log_message(self):
+        with patch_logger('django.security.FailedLogin', 'warning') as calls:
+            self.client.login(username='testclient', password='bad')
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0],
+                         'User login credentials invalid to all supplied '
+                         'authentication backends.')
+
 
 class SettingsCustomLoggingTest(AdminScriptTestCase):
     """

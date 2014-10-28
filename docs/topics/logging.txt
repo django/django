@@ -493,6 +493,11 @@ specific logger following this example:
         },
     },
 
+.. versionchanged:: 1.8
+
+   Invalid login attemps will be logged to ``django.security.FailedLogin`` as
+   a warning.
+
 ``django.db.backends.schema``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
