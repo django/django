@@ -15,6 +15,13 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
         super(MySQLGISSchemaEditor, self).__init__(*args, **kwargs)
         self.geometry_sql = []
 
+    def skip_default(self, field):
+        return (
+            super(MySQLGISSchemaEditor, self).skip_default(field) or
+            # Geometry fields are stored as BLOB/TEXT and can't have defaults.
+            isinstance(field, GeometryField)
+        )
+
     def column_sql(self, model, field, include_default=False):
         column_sql = super(MySQLGISSchemaEditor, self).column_sql(model, field, include_default)
         # MySQL doesn't support spatial indexes on NULL columns
