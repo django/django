@@ -159,6 +159,8 @@ class Command(BaseCommand):
 
         if self.clear:
             message.append('This will DELETE ALL FILES in this location!\n')
+        elif self.overwrite:
+            message.append('This will rewrite static files even if the files there are newer!\n')
         else:
             message.append('This will overwrite existing files!\n')
 
@@ -319,6 +321,6 @@ class Command(BaseCommand):
             with source_storage.open(path) as source_file:
                 if not self.overwrite:
                     self.storage.save(prefixed_path, source_file)
-                else if not self.storage.path(prefixed_path) == source_file:
+                elif not self.storage.path(prefixed_path) == source_file:
                     self.storage.save(prefixed_path, source_file)
         self.copied_files.append(prefixed_path)
