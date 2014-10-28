@@ -355,6 +355,7 @@ Loïc
 lorem
 lt
 lte
+Luhn
 Magee
 makemessages
 makemigrations
@@ -396,6 +397,7 @@ myapp
 myproject
 mysite
 mysql
+mysqlclient
 naïve
 namespace
 namespaced
