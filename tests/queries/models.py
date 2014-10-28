@@ -408,6 +408,10 @@ class ObjectA(models.Model):
     def __str__(self):
         return self.name
 
+    def __iter__(self):
+        # Ticket #23721
+        assert False, 'type checking should happen without calling model __iter__'
+
 
 class ProxyObjectA(ObjectA):
     class Meta:
