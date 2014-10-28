@@ -300,7 +300,7 @@ class ResolverTests(unittest.TestCase):
                     self.assertIsInstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type'])
                     if 'name' in e:
                         if not e['name']:
-                            self.assertTrue(t.name is None, 'Expected no URL name but found %s.' % t.name)
+                            self.assertIsNone(t.name, 'Expected no URL name but found %s.' % t.name)
                         else:
                             self.assertEqual(t.name, e['name'], 'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name))
 

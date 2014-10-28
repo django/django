@@ -133,7 +133,7 @@ class AggregationTests(TestCase):
             rating=3.0
         )
         # Different DB backends return different types for the extra select computation
-        self.assertTrue(obj.manufacture_cost == 11.545 or obj.manufacture_cost == Decimal('11.545'))
+        self.assertIn(obj.manufacture_cost, (11.545, Decimal('11.545')))
 
         # Order of the annotate/extra in the query doesn't matter
         obj = Book.objects.extra(select={'manufacture_cost': 'price * .5'}).annotate(mean_auth_age=Avg('authors__age')).get(pk=2)
@@ -150,12 +150,12 @@ class AggregationTests(TestCase):
             rating=3.0
         )
         # Different DB backends return different types for the extra select computation
-        self.assertTrue(obj.manufacture_cost == 11.545 or obj.manufacture_cost == Decimal('11.545'))
+        self.assertIn(obj.manufacture_cost, (11.545, Decimal('11.545')))
 
         # Values queries can be combined with annotate and extra
         obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost': 'price * .5'}).values().get(pk=2)
         manufacture_cost = obj['manufacture_cost']
-        self.assertTrue(manufacture_cost == 11.545 or manufacture_cost == Decimal('11.545'))
+        self.assertIn(manufacture_cost, (11.545, Decimal('11.545')))
         del obj['manufacture_cost']
         self.assertEqual(obj, {
             "contact_id": 3,
@@ -174,7 +174,7 @@ class AggregationTests(TestCase):
         # matter
         obj = Book.objects.values().annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost': 'price * .5'}).get(pk=2)
         manufacture_cost = obj['manufacture_cost']
-        self.assertTrue(manufacture_cost == 11.545 or manufacture_cost == Decimal('11.545'))
+        self.assertIn(manufacture_cost, (11.545, Decimal('11.545')))
         del obj['manufacture_cost']
         self.assertEqual(obj, {
             'contact_id': 3,

@@ -403,7 +403,7 @@ class TemplateRegressionTests(TestCase):
             while tb.tb_next is not None:
                 tb = tb.tb_next
                 depth += 1
-            self.assertTrue(depth > 5,
+            self.assertGreater(depth, 5,
                 "The traceback context was lost when reraising the traceback. See #19827")
 
     @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)

@@ -777,14 +777,14 @@ class Queries1Tests(BaseQuerysetTest):
         self.assertQuerysetEqual(qs, ['<Author: a1>', '<Author: a2>'])
 
         # The subquery result cache should not be populated
-        self.assertTrue(subq._result_cache is None)
+        self.assertIsNone(subq._result_cache)
 
         subq = Author.objects.filter(num__lt=3000)
         qs = Author.objects.exclude(pk__in=subq)
         self.assertQuerysetEqual(qs, ['<Author: a3>', '<Author: a4>'])
 
         # The subquery result cache should not be populated
-        self.assertTrue(subq._result_cache is None)
+        self.assertIsNone(subq._result_cache)
 
         subq = Author.objects.filter(num__lt=3000)
         self.assertQuerysetEqual(
@@ -793,7 +793,7 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
         # The subquery result cache should not be populated
-        self.assertTrue(subq._result_cache is None)
+        self.assertIsNone(subq._result_cache)
 
     def test_ticket7076(self):
         # Excluding shouldn't eliminate NULL entries.
@@ -938,8 +938,8 @@ class Queries1Tests(BaseQuerysetTest):
             q,
             ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>'],
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 1)
-        self.assertTrue('INNER JOIN' not in str(q.query))
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 1)
+        self.assertNotIn('INNER JOIN', str(q.query))
 
     def test_ticket_10790_2(self):
         # Querying across several tables should strip only the last outer join,
@@ -950,8 +950,8 @@ class Queries1Tests(BaseQuerysetTest):
             q,
             ['<Tag: t4>', '<Tag: t5>'],
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 0)
-        self.assertTrue(str(q.query).count('INNER JOIN') == 1)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 1)
 
         # Querying without isnull should not convert anything to left outer join.
         q = Tag.objects.filter(parent__parent=self.t1)
@@ -959,22 +959,22 @@ class Queries1Tests(BaseQuerysetTest):
             q,
             ['<Tag: t4>', '<Tag: t5>'],
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 0)
-        self.assertTrue(str(q.query).count('INNER JOIN') == 1)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 1)
 
     def test_ticket_10790_3(self):
         # Querying via indirect fields should populate the left outer join
         q = NamedCategory.objects.filter(tag__isnull=True)
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 1)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 1)
         # join to dumbcategory ptr_id
-        self.assertTrue(str(q.query).count('INNER JOIN') == 1)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 1)
         self.assertQuerysetEqual(q, [])
 
         # Querying across several tables should strip only the last join, while
         # preserving the preceding left outer joins.
         q = NamedCategory.objects.filter(tag__parent__isnull=True)
-        self.assertTrue(str(q.query).count('INNER JOIN') == 1)
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 1)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 1)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 1)
         self.assertQuerysetEqual(q, ['<NamedCategory: Generic>'])
 
     def test_ticket_10790_4(self):
@@ -984,7 +984,7 @@ class Queries1Tests(BaseQuerysetTest):
             q,
             ['<Author: a2>', '<Author: a3>'],
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 2)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 2)
         self.assertTrue('INNER JOIN' not in str(q.query))
 
         q = Author.objects.filter(item__tags__parent__isnull=True)
@@ -992,7 +992,7 @@ class Queries1Tests(BaseQuerysetTest):
             q,
             ['<Author: a1>', '<Author: a2>', '<Author: a2>', '<Author: a3>'],
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 3)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 3)
         self.assertTrue('INNER JOIN' not in str(q.query))
 
     def test_ticket_10790_5(self):
@@ -1002,24 +1002,24 @@ class Queries1Tests(BaseQuerysetTest):
             q,
             ['<Author: a1>', '<Author: a1>', '<Author: a2>', '<Author: a2>', '<Author: a4>']
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 0)
-        self.assertTrue(str(q.query).count('INNER JOIN') == 2)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 2)
 
         q = Author.objects.filter(item__tags__parent__isnull=False)
         self.assertQuerysetEqual(
             q,
             ['<Author: a1>', '<Author: a2>', '<Author: a4>']
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 0)
-        self.assertTrue(str(q.query).count('INNER JOIN') == 3)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 3)
 
         q = Author.objects.filter(item__tags__parent__parent__isnull=False)
         self.assertQuerysetEqual(
             q,
             ['<Author: a4>']
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 0)
-        self.assertTrue(str(q.query).count('INNER JOIN') == 4)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 4)
 
     def test_ticket_10790_6(self):
         # Querying with isnull=True across m2m field should not create inner joins
@@ -1030,16 +1030,16 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Author: a1>', '<Author: a1>', '<Author: a2>', '<Author: a2>',
              '<Author: a2>', '<Author: a3>']
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 4)
-        self.assertTrue(str(q.query).count('INNER JOIN') == 0)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 4)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 0)
 
         q = Author.objects.filter(item__tags__parent__isnull=True)
         self.assertQuerysetEqual(
             q,
             ['<Author: a1>', '<Author: a2>', '<Author: a2>', '<Author: a3>']
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 3)
-        self.assertTrue(str(q.query).count('INNER JOIN') == 0)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 3)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 0)
 
     def test_ticket_10790_7(self):
         # Reverse querying with isnull should not strip the join
@@ -1048,16 +1048,16 @@ class Queries1Tests(BaseQuerysetTest):
             q,
             ['<Author: a3>']
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 1)
-        self.assertTrue(str(q.query).count('INNER JOIN') == 0)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 1)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 0)
 
         q = Author.objects.filter(item__isnull=False)
         self.assertQuerysetEqual(
             q,
             ['<Author: a1>', '<Author: a2>', '<Author: a2>', '<Author: a4>']
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 0)
-        self.assertTrue(str(q.query).count('INNER JOIN') == 1)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 1)
 
     def test_ticket_10790_8(self):
         # Querying with combined q-objects should also strip the left outer join
@@ -1066,8 +1066,8 @@ class Queries1Tests(BaseQuerysetTest):
             q,
             ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>']
         )
-        self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 0)
-        self.assertTrue(str(q.query).count('INNER JOIN') == 0)
+        self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(q.query).count('INNER JOIN'), 0)
 
     def test_ticket_10790_combine(self):
         # Combining queries should not re-populate the left outer join
@@ -1079,13 +1079,13 @@ class Queries1Tests(BaseQuerysetTest):
             q3,
             ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>'],
         )
-        self.assertTrue(str(q3.query).count('LEFT OUTER JOIN') == 0)
-        self.assertTrue(str(q3.query).count('INNER JOIN') == 0)
+        self.assertEqual(str(q3.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(q3.query).count('INNER JOIN'), 0)
 
         q3 = q1 & q2
         self.assertQuerysetEqual(q3, [])
-        self.assertTrue(str(q3.query).count('LEFT OUTER JOIN') == 0)
-        self.assertTrue(str(q3.query).count('INNER JOIN') == 0)
+        self.assertEqual(str(q3.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(q3.query).count('INNER JOIN'), 0)
 
         q2 = Tag.objects.filter(parent=self.t1)
         q3 = q1 | q2
@@ -1093,16 +1093,16 @@ class Queries1Tests(BaseQuerysetTest):
             q3,
             ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>']
         )
-        self.assertTrue(str(q3.query).count('LEFT OUTER JOIN') == 0)
-        self.assertTrue(str(q3.query).count('INNER JOIN') == 0)
+        self.assertEqual(str(q3.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(q3.query).count('INNER JOIN'), 0)
 
         q3 = q2 | q1
         self.assertQuerysetEqual(
             q3,
             ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>']
         )
-        self.assertTrue(str(q3.query).count('LEFT OUTER JOIN') == 0)
-        self.assertTrue(str(q3.query).count('INNER JOIN') == 0)
+        self.assertEqual(str(q3.query).count('LEFT OUTER JOIN'), 0)
+        self.assertEqual(str(q3.query).count('INNER JOIN'), 0)
 
         q1 = Tag.objects.filter(parent__isnull=True)
         q2 = Tag.objects.filter(parent__parent__isnull=True)
@@ -1112,16 +1112,16 @@ class Queries1Tests(BaseQuerysetTest):
             q3,
             ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>']
         )
-        self.assertTrue(str(q3.query).count('LEFT OUTER JOIN') == 1)
-        self.assertTrue(str(q3.query).count('INNER JOIN') == 0)
+        self.assertEqual(str(q3.query).count('LEFT OUTER JOIN'), 1)
+        self.assertEqual(str(q3.query).count('INNER JOIN'), 0)
 
         q3 = q2 | q1
         self.assertQuerysetEqual(
             q3,
             ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>']
         )
-        self.assertTrue(str(q3.query).count('LEFT OUTER JOIN') == 1)
-        self.assertTrue(str(q3.query).count('INNER JOIN') == 0)
+        self.assertEqual(str(q3.query).count('LEFT OUTER JOIN'), 1)
+        self.assertEqual(str(q3.query).count('INNER JOIN'), 0)
 
     def test_ticket19672(self):
         self.assertQuerysetEqual(

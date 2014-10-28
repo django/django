@@ -257,7 +257,7 @@ class FileUploadTests(TestCase):
         for name, _, expected in cases:
             got = result[name]
             self.assertEqual(expected, got, 'Mismatch for {0}'.format(name))
-            self.assertTrue(len(got) < 256,
+            self.assertLess(len(got), 256,
                             "Got a long file name (%s characters)." % len(got))
 
     def test_content_type_extra(self):

@@ -1464,8 +1464,8 @@ class ModelChoiceFieldTests(TestCase):
         field1 = form1.fields['category']
         # To allow the widget to change the queryset of field1.widget.choices correctly,
         # without affecting other forms, the following must hold:
-        self.assertTrue(field1 is not ModelChoiceForm.base_fields['category'])
-        self.assertTrue(field1.widget.choices.field is field1)
+        self.assertIsNot(field1, ModelChoiceForm.base_fields['category'])
+        self.assertIs(field1.widget.choices.field, field1)
 
     def test_modelchoicefield_22745(self):
         """

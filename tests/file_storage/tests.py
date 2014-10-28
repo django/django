@@ -138,7 +138,7 @@ class FileStorageTests(unittest.TestCase):
 
         self.assertEqual(atime, datetime.fromtimestamp(
             os.path.getatime(self.storage.path(f_name))))
-        self.assertTrue(datetime.now() - self.storage.accessed_time(f_name) < timedelta(seconds=2))
+        self.assertLess(datetime.now() - self.storage.accessed_time(f_name), timedelta(seconds=2))
         self.storage.delete(f_name)
 
     def test_file_created_time(self):
@@ -154,7 +154,7 @@ class FileStorageTests(unittest.TestCase):
 
         self.assertEqual(ctime, datetime.fromtimestamp(
             os.path.getctime(self.storage.path(f_name))))
-        self.assertTrue(datetime.now() - self.storage.created_time(f_name) < timedelta(seconds=2))
+        self.assertLess(datetime.now() - self.storage.created_time(f_name), timedelta(seconds=2))
 
         self.storage.delete(f_name)
 
@@ -171,7 +171,7 @@ class FileStorageTests(unittest.TestCase):
 
         self.assertEqual(mtime, datetime.fromtimestamp(
             os.path.getmtime(self.storage.path(f_name))))
-        self.assertTrue(datetime.now() - self.storage.modified_time(f_name) < timedelta(seconds=2))
+        self.assertLess(datetime.now() - self.storage.modified_time(f_name), timedelta(seconds=2))
 
         self.storage.delete(f_name)
 

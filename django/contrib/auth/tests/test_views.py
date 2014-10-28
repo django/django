@@ -148,8 +148,8 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertTrue(message.is_multipart())
         self.assertEqual(message.get_payload(0).get_content_type(), 'text/plain')
         self.assertEqual(message.get_payload(1).get_content_type(), 'text/html')
-        self.assertTrue('<html>' not in message.get_payload(0).get_payload())
-        self.assertTrue('<html>' in message.get_payload(1).get_payload())
+        self.assertNotIn('<html>', message.get_payload(0).get_payload())
+        self.assertIn('<html>', message.get_payload(1).get_payload())
 
     def test_email_found_custom_from(self):
         "Email is sent if a valid email address is provided for password reset when a custom from_email is provided."
@@ -215,7 +215,7 @@ class PasswordResetTest(AuthViewsTestCase):
 
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
-        self.assertTrue(urlmatch is not None, "No URL found in sent email")
+        self.assertIsNotNone(urlmatch, "No URL found in sent email")
         return urlmatch.group(), urlmatch.groups()[0]
 
     def test_confirm_valid(self):
@@ -346,7 +346,7 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
 
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
-        self.assertTrue(urlmatch is not None, "No URL found in sent email")
+        self.assertIsNotNone(urlmatch, "No URL found in sent email")
         return urlmatch.group(), urlmatch.groups()[0]
 
     def test_confirm_valid_custom_user(self):
