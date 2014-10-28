@@ -955,7 +955,7 @@ class ContextTests(TestCase):
         "Context variables can be retrieved from a single context"
         response = self.client.get("/request_data/", data={'foo': 'whiz'})
         self.assertEqual(response.context.__class__, Context)
-        self.assertTrue('get-foo' in response.context)
+        self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'sausage')
@@ -971,7 +971,7 @@ class ContextTests(TestCase):
         response = self.client.get("/request_data_extended/", data={'foo': 'whiz'})
         self.assertEqual(response.context.__class__, ContextList)
         self.assertEqual(len(response.context), 2)
-        self.assertTrue('get-foo' in response.context)
+        self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'bacon')

@@ -114,14 +114,14 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'], Author.objects.get(pk=1))
         self.assertEqual(res.context['thingy'], Author.objects.get(pk=1))
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
 
     def test_duplicated_context_object_name(self):
         res = self.client.get('/detail/author/1/dupe_context_object_name/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'], Author.objects.get(pk=1))
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
 
     def test_invalid_url(self):

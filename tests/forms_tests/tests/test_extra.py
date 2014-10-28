@@ -318,7 +318,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
         # label tag is correctly associated with month dropdown
         d = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
-        self.assertTrue('<label for="id_mydate_month">' in d.as_p())
+        self.assertIn('<label for="id_mydate_month">', d.as_p())
 
     def test_selectdate_empty_label(self):
         w = SelectDateWidget(years=('2014',), empty_label='empty_label')
@@ -865,4 +865,4 @@ class FormsExtraL10NTestCase(TestCase):
     def test_form_label_association(self):
         # label tag is correctly associated with first rendered dropdown
         a = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
-        self.assertTrue('<label for="id_mydate_day">' in a.as_p())
+        self.assertIn('<label for="id_mydate_day">', a.as_p())

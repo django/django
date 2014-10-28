@@ -449,11 +449,11 @@ class ModelFormsetTest(TestCase):
 
         PostFormSet = modelformset_factory(Post, form=PostForm1)
         formset = PostFormSet()
-        self.assertFalse("subtitle" in formset.forms[0].fields)
+        self.assertNotIn("subtitle", formset.forms[0].fields)
 
         PostFormSet = modelformset_factory(Post, form=PostForm2)
         formset = PostFormSet()
-        self.assertFalse("subtitle" in formset.forms[0].fields)
+        self.assertNotIn("subtitle", formset.forms[0].fields)
 
     def test_custom_queryset_init(self):
         """

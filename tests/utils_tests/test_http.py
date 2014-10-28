@@ -47,7 +47,7 @@ class TestUtilsHttp(unittest.TestCase):
             'c=3&a=1&b=2',
             'c=3&b=2&a=1'
         ]
-        self.assertTrue(result in acceptable_results)
+        self.assertIn(result, acceptable_results)
         result = http.urlencode({'a': [1, 2]}, doseq=False)
         self.assertEqual(result, 'a=%5B%271%27%2C+%272%27%5D')
         result = http.urlencode({'a': [1, 2]}, doseq=True)
@@ -65,7 +65,7 @@ class TestUtilsHttp(unittest.TestCase):
             'name=Adrian&name=Simon&position=Developer',
             'position=Developer&name=Adrian&name=Simon'
         ]
-        self.assertTrue(result in acceptable_results)
+        self.assertIn(result, acceptable_results)
 
     def test_base36(self):
         # reciprocity works

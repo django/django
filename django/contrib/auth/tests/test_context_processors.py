@@ -45,10 +45,10 @@ class PermWrapperTests(TestCase):
         """
         perms = PermWrapper(MockUser())
         # Works for modules and full permissions.
-        self.assertTrue('mockapp' in perms)
-        self.assertFalse('nonexisting' in perms)
-        self.assertTrue('mockapp.someperm' in perms)
-        self.assertFalse('mockapp.nonexisting' in perms)
+        self.assertIn('mockapp', perms)
+        self.assertNotIn('nonexisting', perms)
+        self.assertIn('mockapp.someperm', perms)
+        self.assertNotIn('mockapp.nonexisting', perms)
 
     def test_permlookupdict_in(self):
         """

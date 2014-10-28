@@ -399,7 +399,7 @@ class DeprecationDisplayTest(AdminScriptTestCase):
         args = ['test', '--settings=test_project.settings', '--verbosity=0', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
         self.assertIn("Ran 1 test", err)
-        self.assertFalse("warning from test" in err)
+        self.assertNotIn("warning from test", err)
 
 
 class AutoIncrementResetTest(TransactionTestCase):

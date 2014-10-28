@@ -391,35 +391,34 @@ class ListMixinTest(unittest.TestCase):
 
         pl, ul = self.lists_of_len()
         self.assertEqual(pl, ul, 'cmp for equal')
-        self.assertFalse(ul == pl + [2], 'cmp for not equal')
-        self.assertTrue(pl >= ul, 'cmp for gte self')
-        self.assertTrue(pl <= ul, 'cmp for lte self')
-        self.assertTrue(ul >= pl, 'cmp for self gte')
-        self.assertTrue(ul <= pl, 'cmp for self lte')
+        self.assertNotEqual(ul, pl + [2], 'cmp for not equal')
+        self.assertGreaterEqual(pl, ul, 'cmp for gte self')
+        self.assertLessEqual(pl, ul, 'cmp for lte self')
+        self.assertGreaterEqual(ul, pl, 'cmp for self gte')
+        self.assertLessEqual(ul, pl, 'cmp for self lte')
 
-        self.assertTrue(pl + [5] > ul, 'cmp')
-        self.assertTrue(pl + [5] >= ul, 'cmp')
-        self.assertTrue(pl < ul + [2], 'cmp')
-        self.assertTrue(pl <= ul + [2], 'cmp')
-        self.assertTrue(ul + [5] > pl, 'cmp')
-        self.assertTrue(ul + [5] >= pl, 'cmp')
-        self.assertTrue(ul < pl + [2], 'cmp')
-        self.assertTrue(ul <= pl + [2], 'cmp')
+        self.assertGreater(pl + [5], ul, 'cmp')
+        self.assertGreaterEqual(pl + [5], ul, 'cmp')
+        self.assertLess(pl, ul + [2], 'cmp')
+        self.assertLessEqual(pl, ul + [2], 'cmp')
+        self.assertGreater(ul + [5], pl, 'cmp')
+        self.assertGreaterEqual(ul + [5], pl, 'cmp')
+        self.assertLess(ul, pl + [2], 'cmp')
+        self.assertLessEqual(ul, pl + [2], 'cmp')
 
         # Also works with a custom IndexError
         ul_longer = ul + [2]
         ul_longer._IndexError = TypeError
         ul._IndexError = TypeError
-        self.assertFalse(ul_longer == pl)
-        self.assertFalse(ul == ul_longer)
-        self.assertTrue(ul_longer > ul)
+        self.assertNotEqual(ul_longer, pl)
+        self.assertGreater(ul_longer, ul)
 
         pl[1] = 20
-        self.assertTrue(pl > ul, 'cmp for gt self')
-        self.assertTrue(ul < pl, 'cmp for self lt')
+        self.assertGreater(pl, ul, 'cmp for gt self')
+        self.assertLess(ul, pl, 'cmp for self lt')
         pl[1] = -20
-        self.assertTrue(pl < ul, 'cmp for lt self')
-        self.assertTrue(pl < ul, 'cmp for lt self')
+        self.assertLess(pl, ul, 'cmp for lt self')
+        self.assertGreater(ul, pl, 'cmp for gt self')
 
 
 class ListMixinTestSingle(ListMixinTest):

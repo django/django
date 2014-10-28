@@ -228,8 +228,8 @@ class RelatedGeoModelTest(TestCase):
         combined = qs1 | qs2
         names = [c.name for c in combined]
         self.assertEqual(2, len(names))
-        self.assertTrue('Aurora' in names)
-        self.assertTrue('Kecksburg' in names)
+        self.assertIn('Aurora', names)
+        self.assertIn('Kecksburg', names)
 
     def test11_geoquery_pickle(self):
         "Ensuring GeoQuery objects are unpickled correctly.  See #10839."

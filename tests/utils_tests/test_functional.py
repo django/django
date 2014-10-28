@@ -20,7 +20,7 @@ class FunctionalTestCase(unittest.TestCase):
             pass
 
         t = lazy(lambda: Klazz(), Klazz)()
-        self.assertTrue('base_method' in dir(t))
+        self.assertIn('base_method', dir(t))
 
     def test_lazy_property(self):
 

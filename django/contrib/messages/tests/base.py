@@ -163,7 +163,7 @@ class BaseTests(object):
             add_url = reverse('add_message', args=(level,))
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
-            self.assertTrue('messages' in response.context)
+            self.assertIn('messages', response.context)
             messages = [Message(self.levels[level], msg) for msg in data['messages']]
             self.assertEqual(list(response.context['messages']), messages)
             for msg in data['messages']:
@@ -179,7 +179,7 @@ class BaseTests(object):
             add_url = reverse('add_template_response', args=(level,))
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
-            self.assertTrue('messages' in response.context)
+            self.assertIn('messages', response.context)
             for msg in data['messages']:
                 self.assertContains(response, msg)
 
@@ -192,7 +192,7 @@ class BaseTests(object):
         show_url = reverse('show_template_response')
         response = self.client.get(show_url)
 
-        self.assertTrue('DEFAULT_MESSAGE_LEVELS' in response.context)
+        self.assertIn('DEFAULT_MESSAGE_LEVELS', response.context)
         self.assertEqual(response.context['DEFAULT_MESSAGE_LEVELS'], DEFAULT_LEVELS)
 
     @override_settings(MESSAGE_LEVEL=constants.DEBUG)
@@ -211,7 +211,7 @@ class BaseTests(object):
             add_url = reverse('add_message', args=(level,))
             self.client.post(add_url, data)
         response = self.client.get(show_url)
-        self.assertTrue('messages' in response.context)
+        self.assertIn('messages', response.context)
         self.assertEqual(list(response.context['messages']), messages)
         for msg in data['messages']:
             self.assertContains(response, msg)
@@ -255,7 +255,7 @@ class BaseTests(object):
             add_url = reverse('add_message', args=(level,))
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
-            self.assertFalse('messages' in response.context)
+            self.assertNotIn('messages', response.context)
 
     def stored_messages_count(self, storage, response):
         """

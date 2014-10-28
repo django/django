@@ -73,9 +73,9 @@ class RawQueryTests(TestCase):
         iterated over.
         """
         q = Author.objects.raw('SELECT * FROM raw_query_author')
-        self.assertTrue(q.query.cursor is None)
+        self.assertIsNone(q.query.cursor)
         list(q)
-        self.assertTrue(q.query.cursor is not None)
+        self.assertIsNotNone(q.query.cursor)
 
     def test_FK_raw_query(self):
         """

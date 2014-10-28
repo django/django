@@ -35,7 +35,7 @@ class ArchiveIndexViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'year', 'DESC')))
         self.assertEqual(list(res.context['thingies']), list(Book.objects.all()))
-        self.assertFalse('latest' in res.context)
+        self.assertNotIn('latest', res.context)
         self.assertTemplateUsed(res, 'generic_views/book_archive.html')
 
     def test_empty_archive_view(self):

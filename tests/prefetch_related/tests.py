@@ -113,7 +113,7 @@ class PrefetchRelatedTests(TestCase):
         70679243d1786e03557c28929f9762a119e3ac14.
         """
         qs = Book.objects.prefetch_related('first_time_authors')
-        self.assertTrue(qs[0] in qs)
+        self.assertIn(qs[0], qs)
 
     def test_clear(self):
         """
@@ -211,15 +211,15 @@ class PrefetchRelatedTests(TestCase):
         with self.assertRaises(AttributeError) as cm:
             list(qs)
 
-        self.assertTrue('prefetch_related' in str(cm.exception))
+        self.assertIn('prefetch_related', str(cm.exception))
 
     def test_invalid_final_lookup(self):
         qs = Book.objects.prefetch_related('authors__name')
         with self.assertRaises(ValueError) as cm:
             list(qs)
 
-        self.assertTrue('prefetch_related' in str(cm.exception))
-        self.assertTrue("name" in str(cm.exception))
+        self.assertIn('prefetch_related', str(cm.exception))
+        self.assertIn("name", str(cm.exception))
 
 
 class CustomPrefetchTests(TestCase):

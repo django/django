@@ -35,7 +35,7 @@ class NullFkTests(TestCase):
         )
 
         # Regression test for #7530, #7716.
-        self.assertTrue(Comment.objects.select_related('post').filter(post__isnull=True)[0].post is None)
+        self.assertIsNone(Comment.objects.select_related('post').filter(post__isnull=True)[0].post)
 
         self.assertQuerysetEqual(
             Comment.objects.select_related('post__forum__system_info__system_details'),
