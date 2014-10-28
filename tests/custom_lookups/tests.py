@@ -37,6 +37,7 @@ class Div3Transform(models.Transform):
         lhs, lhs_params = qn.compile(self.lhs)
         return 'mod(%s, 3)' % lhs, lhs_params
 
+
 class Div3BilateralTransform(Div3Transform):
     bilateral = True
 
@@ -48,6 +49,7 @@ class Mult3BilateralTransform(models.Transform):
     def as_sql(self, qn, connection):
         lhs, lhs_params = qn.compile(self.lhs)
         return '3 * (%s)' % lhs, lhs_params
+
 
 class UpperBilateralTransform(models.Transform):
     bilateral = True
