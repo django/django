@@ -26,3 +26,6 @@ Bugfixes
   :setting:`STATIC_ROOT` has the default ``None`` value (:ticket:`23717`).
 
 * Added GeoDjango compatibility with mysqlclient database driver.
+
+* Fixed MySQL 5.6+ crash with ``GeometryField``\s in migrations
+  (:ticket:`23719`).
