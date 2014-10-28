@@ -57,6 +57,9 @@ class Command(BaseCommand):
         parser.add_argument('-l', '--link',
             action='store_true', dest='link', default=False,
             help="Create a symbolic link to each file instead of copying.")
+        parser.add_argument('-o', '--overwrite',
+            action='store_true', dest='overwrite', default=False,
+            help="Overwrite file even if the destination is newer.")
         parser.add_argument('--no-default-ignore', action='store_false',
             dest='use_default_ignore_patterns', default=True,
             help="Don't ignore the common private glob-style patterns 'CVS', "
@@ -71,6 +74,7 @@ class Command(BaseCommand):
         self.symlink = options['link']
         self.clear = options['clear']
         self.dry_run = options['dry_run']
+        self.overwrite = options['overwrite']
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:
             ignore_patterns += ['CVS', '.*', '*~']
@@ -303,7 +307,7 @@ class Command(BaseCommand):
         if prefixed_path in self.copied_files:
             return self.log("Skipping '%s' (already copied earlier)" % path)
         # Delete the target file if needed or break
-        if not self.delete_file(path, prefixed_path, source_storage):
+        if not self.overwrite and not self.delete_file(path, prefixed_path, source_storage):
             return
         # The full path of the source file
         source_path = source_storage.path(path)
@@ -313,5 +317,8 @@ class Command(BaseCommand):
         else:
             self.log("Copying '%s'" % source_path, level=1)
             with source_storage.open(path) as source_file:
-                self.storage.save(prefixed_path, source_file)
+                if not self.overwrite:
+                    self.storage.save(prefixed_path, source_file)
+                else if not self.storage.path(prefixed_path) == source_file:
+                    self.storage.save(prefixed_path, source_file)
         self.copied_files.append(prefixed_path)
