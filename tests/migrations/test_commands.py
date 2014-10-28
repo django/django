@@ -196,19 +196,19 @@ class MakeMigrationsTests(MigrationTestBase):
 
         with codecs.open(initial_file, 'r', encoding='utf-8') as fp:
             content = fp.read()
-            self.assertTrue('# -*- coding: utf-8 -*-' in content)
-            self.assertTrue('migrations.CreateModel' in content)
+            self.assertIn('# -*- coding: utf-8 -*-', content)
+            self.assertIn('migrations.CreateModel', content)
 
             if six.PY3:
-                self.assertTrue('úñí©óðé µóðéø' in content)  # Meta.verbose_name
-                self.assertTrue('úñí©óðé µóðéøß' in content)  # Meta.verbose_name_plural
-                self.assertTrue('ÚÑÍ¢ÓÐÉ' in content)  # title.verbose_name
-                self.assertTrue('“Ðjáñgó”' in content)  # title.default
+                self.assertIn('úñí©óðé µóðéø', content)  # Meta.verbose_name
+                self.assertIn('úñí©óðé µóðéøß', content)  # Meta.verbose_name_plural
+                self.assertIn('ÚÑÍ¢ÓÐÉ', content)  # title.verbose_name
+                self.assertIn('“Ðjáñgó”', content)  # title.default
             else:
-                self.assertTrue('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8' in content)  # Meta.verbose_name
-                self.assertTrue('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8\\xdf' in content)  # Meta.verbose_name_plural
-                self.assertTrue('\\xda\\xd1\\xcd\\xa2\\xd3\\xd0\\xc9' in content)  # title.verbose_name
-                self.assertTrue('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d' in content)  # title.default
+                self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8', content)  # Meta.verbose_name
+                self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8\\xdf', content)  # Meta.verbose_name_plural
+                self.assertIn('\\xda\\xd1\\xcd\\xa2\\xd3\\xd0\\xc9', content)  # title.verbose_name
+                self.assertIn('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d', content)  # title.default
 
     def test_failing_migration(self):
         #21280 - If a migration fails to serialize, it shouldn't generate an empty file.
@@ -274,7 +274,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
         with codecs.open(initial_file, 'r', encoding='utf-8') as fp:
             content = fp.read()
-            self.assertTrue('# -*- coding: utf-8 -*-' in content)
+            self.assertIn('# -*- coding: utf-8 -*-', content)
 
             # Remove all whitespace to check for empty dependencies and operations
             content = content.replace(' ', '')
@@ -529,7 +529,7 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertTrue(os.path.exists(migration_file))
             with codecs.open(migration_file, "r", encoding="utf-8") as fp:
                 content = fp.read()
-                self.assertTrue("# -*- coding: utf-8 -*-" in content)
+                self.assertIn("# -*- coding: utf-8 -*-", content)
                 content = content.replace(" ", "")
             return content
 

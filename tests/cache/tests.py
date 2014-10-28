@@ -2084,7 +2084,7 @@ class CacheHandlerTest(TestCase):
         cache1 = caches['default']
         cache2 = caches['default']
 
-        self.assertTrue(cache1 is cache2)
+        self.assertIs(cache1, cache2)
 
     def test_per_thread(self):
         """
@@ -2101,4 +2101,4 @@ class CacheHandlerTest(TestCase):
             t.start()
             t.join()
 
-        self.assertFalse(c[0] is c[1])
+        self.assertIsNot(c[0], c[1])

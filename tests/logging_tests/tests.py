@@ -123,12 +123,12 @@ class WarningLoggerTests(TestCase):
     def test_warnings_capture(self):
         warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
         output = force_text(self.outputs[0].getvalue())
-        self.assertTrue('Foo Deprecated' in output)
+        self.assertIn('Foo Deprecated', output)
 
     def test_warnings_capture_debug_false(self):
         warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
         output = force_text(self.outputs[0].getvalue())
-        self.assertFalse('Foo Deprecated' in output)
+        self.assertNotIn('Foo Deprecated', output)
 
     @override_settings(DEBUG=True)
     def test_error_filter_still_raises(self):
@@ -263,8 +263,8 @@ class AdminEmailHandlerTest(TestCase):
         self.logger.error(message)
 
         self.assertEqual(len(mail.outbox), 1)
-        self.assertFalse('\n' in mail.outbox[0].subject)
-        self.assertFalse('\r' in mail.outbox[0].subject)
+        self.assertNotIn('\n', mail.outbox[0].subject)
+        self.assertNotIn('\r', mail.outbox[0].subject)
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
     @override_settings(

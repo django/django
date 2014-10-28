@@ -319,7 +319,7 @@ class MultiColumnFKTests(TestCase):
         with self.assertNumQueries(1):
             fetched = Article.objects.select_related('active_translation').get(
                 active_translation__title='Otsikko')
-            self.assertTrue(fetched.active_translation.title == 'Otsikko')
+            self.assertEqual(fetched.active_translation.title, 'Otsikko')
         a2 = Article.objects.create(pub_date=datetime.date.today())
         at2_fi = ArticleTranslation(article=a2, lang='fi', title='Atsikko', body='Diipadaapa',
                                     abstract='dipad')

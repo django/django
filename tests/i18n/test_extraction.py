@@ -96,9 +96,9 @@ class ExtractorTests(SimpleTestCase):
             parts.append(':%d' % line_number)
         needle = ''.join(parts)
         if assert_presence:
-            return self.assertTrue(needle in po_contents, '"%s" not found in final .po file.' % needle)
+            return self.assertIn(needle, po_contents, '"%s" not found in final .po file.' % needle)
         else:
-            return self.assertFalse(needle in po_contents, '"%s" shouldn\'t be in final .po file.' % needle)
+            return self.assertNotIn(needle, po_contents, '"%s" shouldn\'t be in final .po file.' % needle)
 
     def assertLocationCommentPresent(self, po_filename, line_number, *comment_parts):
         """
@@ -141,26 +141,26 @@ class BasicExtractorTests(ExtractorTests):
         self.assertTrue(os.path.exists(self.PO_FILE))
         with io.open(self.PO_FILE, 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
-            self.assertTrue('#. Translators: This comment should be extracted' in po_contents)
-            self.assertTrue('This comment should not be extracted' not in po_contents)
+            self.assertIn('#. Translators: This comment should be extracted', po_contents)
+            self.assertNotIn('This comment should not be extracted', po_contents)
             # Comments in templates
-            self.assertTrue('#. Translators: Django template comment for translators' in po_contents)
-            self.assertTrue("#. Translators: Django comment block for translators\n#. string's meaning unveiled" in po_contents)
+            self.assertIn('#. Translators: Django template comment for translators', po_contents)
+            self.assertIn("#. Translators: Django comment block for translators\n#. string's meaning unveiled", po_contents)
 
-            self.assertTrue('#. Translators: One-line translator comment #1' in po_contents)
-            self.assertTrue('#. Translators: Two-line translator comment #1\n#. continued here.' in po_contents)
+            self.assertIn('#. Translators: One-line translator comment #1', po_contents)
+            self.assertIn('#. Translators: Two-line translator comment #1\n#. continued here.', po_contents)
 
-            self.assertTrue('#. Translators: One-line translator comment #2' in po_contents)
-            self.assertTrue('#. Translators: Two-line translator comment #2\n#. continued here.' in po_contents)
+            self.assertIn('#. Translators: One-line translator comment #2', po_contents)
+            self.assertIn('#. Translators: Two-line translator comment #2\n#. continued here.', po_contents)
 
-            self.assertTrue('#. Translators: One-line translator comment #3' in po_contents)
-            self.assertTrue('#. Translators: Two-line translator comment #3\n#. continued here.' in po_contents)
+            self.assertIn('#. Translators: One-line translator comment #3', po_contents)
+            self.assertIn('#. Translators: Two-line translator comment #3\n#. continued here.', po_contents)
 
-            self.assertTrue('#. Translators: One-line translator comment #4' in po_contents)
-            self.assertTrue('#. Translators: Two-line translator comment #4\n#. continued here.' in po_contents)
+            self.assertIn('#. Translators: One-line translator comment #4', po_contents)
+            self.assertIn('#. Translators: Two-line translator comment #4\n#. continued here.', po_contents)
 
-            self.assertTrue('#. Translators: One-line translator comment #5 -- with non ASCII characters: áéíóúö' in po_contents)
-            self.assertTrue('#. Translators: Two-line translator comment #5 -- with non ASCII characters: áéíóúö\n#. continued here.' in po_contents)
+            self.assertIn('#. Translators: One-line translator comment #5 -- with non ASCII characters: áéíóúö', po_contents)
+            self.assertIn('#. Translators: Two-line translator comment #5 -- with non ASCII characters: áéíóúö\n#. continued here.', po_contents)
 
     def test_templatize_trans_tag(self):
         # ticket #11240
@@ -250,23 +250,23 @@ class BasicExtractorTests(ExtractorTests):
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
             # {% trans %}
-            self.assertTrue('msgctxt "Special trans context #1"' in po_contents)
+            self.assertIn('msgctxt "Special trans context #1"', po_contents)
             self.assertMsgId("Translatable literal #7a", po_contents)
-            self.assertTrue('msgctxt "Special trans context #2"' in po_contents)
+            self.assertIn('msgctxt "Special trans context #2"', po_contents)
             self.assertMsgId("Translatable literal #7b", po_contents)
-            self.assertTrue('msgctxt "Special trans context #3"' in po_contents)
+            self.assertIn('msgctxt "Special trans context #3"', po_contents)
             self.assertMsgId("Translatable literal #7c", po_contents)
 
             # {% blocktrans %}
-            self.assertTrue('msgctxt "Special blocktrans context #1"' in po_contents)
+            self.assertIn('msgctxt "Special blocktrans context #1"', po_contents)
             self.assertMsgId("Translatable literal #8a", po_contents)
-            self.assertTrue('msgctxt "Special blocktrans context #2"' in po_contents)
+            self.assertIn('msgctxt "Special blocktrans context #2"', po_contents)
             self.assertMsgId("Translatable literal #8b-singular", po_contents)
-            self.assertTrue("Translatable literal #8b-plural" in po_contents)
-            self.assertTrue('msgctxt "Special blocktrans context #3"' in po_contents)
+            self.assertIn("Translatable literal #8b-plural", po_contents)
+            self.assertIn('msgctxt "Special blocktrans context #3"', po_contents)
             self.assertMsgId("Translatable literal #8c-singular", po_contents)
-            self.assertTrue("Translatable literal #8c-plural" in po_contents)
-            self.assertTrue('msgctxt "Special blocktrans context #4"' in po_contents)
+            self.assertIn("Translatable literal #8c-plural", po_contents)
+            self.assertIn('msgctxt "Special blocktrans context #4"', po_contents)
             self.assertMsgId("Translatable literal #8d %(a)s", po_contents)
 
     def test_context_in_single_quotes(self):
@@ -276,12 +276,12 @@ class BasicExtractorTests(ExtractorTests):
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
             # {% trans %}
-            self.assertTrue('msgctxt "Context wrapped in double quotes"' in po_contents)
-            self.assertTrue('msgctxt "Context wrapped in single quotes"' in po_contents)
+            self.assertIn('msgctxt "Context wrapped in double quotes"', po_contents)
+            self.assertIn('msgctxt "Context wrapped in single quotes"', po_contents)
 
             # {% blocktrans %}
-            self.assertTrue('msgctxt "Special blocktrans context wrapped in double quotes"' in po_contents)
-            self.assertTrue('msgctxt "Special blocktrans context wrapped in single quotes"' in po_contents)
+            self.assertIn('msgctxt "Special blocktrans context wrapped in double quotes"', po_contents)
+            self.assertIn('msgctxt "Special blocktrans context wrapped in single quotes"', po_contents)
 
     def test_template_comments(self):
         """Template comment tags on the same line of other constructs (#19552)"""
@@ -312,31 +312,31 @@ class BasicExtractorTests(ExtractorTests):
             po_contents = force_text(fp.read())
 
             self.assertMsgId('Translatable literal #9a', po_contents)
-            self.assertFalse('ignored comment #1' in po_contents)
+            self.assertNotIn('ignored comment #1', po_contents)
 
-            self.assertFalse('Translators: ignored i18n comment #1' in po_contents)
+            self.assertNotIn('Translators: ignored i18n comment #1', po_contents)
             self.assertMsgId("Translatable literal #9b", po_contents)
 
-            self.assertFalse('ignored i18n comment #2' in po_contents)
-            self.assertFalse('ignored comment #2' in po_contents)
+            self.assertNotIn('ignored i18n comment #2', po_contents)
+            self.assertNotIn('ignored comment #2', po_contents)
             self.assertMsgId('Translatable literal #9c', po_contents)
 
-            self.assertFalse('ignored comment #3' in po_contents)
-            self.assertFalse('ignored i18n comment #3' in po_contents)
+            self.assertNotIn('ignored comment #3', po_contents)
+            self.assertNotIn('ignored i18n comment #3', po_contents)
             self.assertMsgId('Translatable literal #9d', po_contents)
 
-            self.assertFalse('ignored comment #4' in po_contents)
+            self.assertNotIn('ignored comment #4', po_contents)
             self.assertMsgId('Translatable literal #9e', po_contents)
-            self.assertFalse('ignored comment #5' in po_contents)
+            self.assertNotIn('ignored comment #5', po_contents)
 
-            self.assertFalse('ignored i18n comment #4' in po_contents)
+            self.assertNotIn('ignored i18n comment #4', po_contents)
             self.assertMsgId('Translatable literal #9f', po_contents)
-            self.assertTrue('#. Translators: valid i18n comment #5' in po_contents)
+            self.assertIn('#. Translators: valid i18n comment #5', po_contents)
 
             self.assertMsgId('Translatable literal #9g', po_contents)
-            self.assertTrue('#. Translators: valid i18n comment #6' in po_contents)
+            self.assertIn('#. Translators: valid i18n comment #6', po_contents)
             self.assertMsgId('Translatable literal #9h', po_contents)
-            self.assertTrue('#. Translators: valid i18n comment #7' in po_contents)
+            self.assertIn('#. Translators: valid i18n comment #7', po_contents)
             self.assertMsgId('Translatable literal #9i', po_contents)
 
             six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #8')
@@ -391,7 +391,7 @@ class IgnoredExtractorTests(ExtractorTests):
         out, po_contents = self._run_makemessages(ignore_patterns=[
             os.path.join('ignore_dir', '*'),
         ])
-        self.assertTrue("ignoring directory ignore_dir" in out)
+        self.assertIn("ignoring directory ignore_dir", out)
         self.assertMsgId('This literal should be included.', po_contents)
         self.assertNotMsgId('This should be ignored.', po_contents)
 
@@ -400,14 +400,14 @@ class IgnoredExtractorTests(ExtractorTests):
             'templates/*/ignore.html',
             'templates/subdir/*',
         ])
-        self.assertTrue("ignoring directory subdir" in out)
+        self.assertIn("ignoring directory subdir", out)
         self.assertNotMsgId('This subdir should be ignored too.', po_contents)
 
     def test_ignore_file_patterns(self):
         out, po_contents = self._run_makemessages(ignore_patterns=[
             'xxx_*',
         ])
-        self.assertTrue("ignoring file xxx_ignored.html" in out)
+        self.assertIn("ignoring file xxx_ignored.html", out)
         self.assertNotMsgId('This should be ignored too.', po_contents)
 
     @override_settings(
@@ -455,7 +455,7 @@ class SymlinkExtractorTests(ExtractorTests):
             with open(self.PO_FILE, 'r') as fp:
                 po_contents = force_text(fp.read())
                 self.assertMsgId('This literal should be included.', po_contents)
-                self.assertTrue('templates_symlinked/test.html' in po_contents)
+                self.assertIn('templates_symlinked/test.html', po_contents)
 
 
 class CopyPluralFormsExtractorTests(ExtractorTests):
@@ -477,7 +477,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
-            self.assertTrue('Plural-Forms: nplurals=2; plural=(n != 1)' in po_contents)
+            self.assertIn('Plural-Forms: nplurals=2; plural=(n != 1)', po_contents)
 
     def test_override_plural_forms(self):
         """Ticket #20311."""

@@ -542,24 +542,24 @@ class HTMLEqualTests(TestCase):
         # equal html contains each other
         dom1 = parse_html('<p>foo')
         dom2 = parse_html('<p>foo</p>')
-        self.assertTrue(dom1 in dom2)
-        self.assertTrue(dom2 in dom1)
+        self.assertIn(dom1, dom2)
+        self.assertIn(dom2, dom1)
 
         dom2 = parse_html('<div><p>foo</p></div>')
-        self.assertTrue(dom1 in dom2)
-        self.assertTrue(dom2 not in dom1)
+        self.assertIn(dom1, dom2)
+        self.assertNotIn(dom2, dom1)
 
-        self.assertFalse('<p>foo</p>' in dom2)
-        self.assertTrue('foo' in dom2)
+        self.assertNotIn('<p>foo</p>', dom2)
+        self.assertIn('foo', dom2)
 
         # when a root element is used ...
         dom1 = parse_html('<p>foo</p><p>bar</p>')
         dom2 = parse_html('<p>foo</p><p>bar</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>foo</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>bar</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
 
     def test_count(self):
         # equal html contains each other one time

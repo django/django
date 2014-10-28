@@ -22,7 +22,7 @@ class NullFkOrderingTests(TestCase):
         # We can't compare results directly (since different databases sort NULLs to
         # different ends of the ordering), but we can check that all results are
         # returned.
-        self.assertTrue(len(list(Article.objects.all())) == 3)
+        self.assertEqual(len(list(Article.objects.all())), 3)
 
         s = SystemInfo.objects.create(system_name='System Info')
         f = Forum.objects.create(system_info=s, forum_name='First forum')
@@ -39,4 +39,4 @@ class NullFkOrderingTests(TestCase):
         # everything else, some sort them afterwards. So we extract the ordered list
         # and check the length. Before the fix, this list was too short (some values
         # were omitted).
-        self.assertTrue(len(list(Comment.objects.all())) == 4)
+        self.assertEqual(len(list(Comment.objects.all())), 4)

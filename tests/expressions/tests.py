@@ -210,7 +210,7 @@ class ExpressionsTests(TestCase):
         # keys, or attributes which involve joins.
         test_gmbh.point_of_contact = None
         test_gmbh.save()
-        self.assertTrue(test_gmbh.point_of_contact is None)
+        self.assertIsNone(test_gmbh.point_of_contact)
 
         def test():
             test_gmbh.point_of_contact = F("ceo")

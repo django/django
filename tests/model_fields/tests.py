@@ -223,8 +223,8 @@ class BooleanFieldTests(unittest.TestCase):
         self.assertEqual(f.get_db_prep_lookup('exact', None, connection=connection), [None])
 
     def _test_to_python(self, f):
-        self.assertTrue(f.to_python(1) is True)
-        self.assertTrue(f.to_python(0) is False)
+        self.assertIs(f.to_python(1), True)
+        self.assertIs(f.to_python(0), False)
 
     def test_booleanfield_get_db_prep_lookup(self):
         self._test_get_db_prep_lookup(models.BooleanField())

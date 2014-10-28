@@ -403,7 +403,7 @@ class TemplateRegressionTests(TestCase):
             while tb.tb_next is not None:
                 tb = tb.tb_next
                 depth += 1
-            self.assertTrue(depth > 5,
+            self.assertGreater(depth, 5,
                 "The traceback context was lost when reraising the traceback. See #19827")
 
     @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
@@ -1852,8 +1852,8 @@ class TemplateTagLoading(TestCase):
         try:
             template.Template(ttext)
         except template.TemplateSyntaxError as e:
-            self.assertTrue('ImportError' in e.args[0])
-            self.assertTrue('Xtemplate' in e.args[0])
+            self.assertIn('ImportError', e.args[0])
+            self.assertIn('Xtemplate', e.args[0])
 
     def test_load_error_egg(self):
         ttext = "{% load broken_egg %}"
@@ -1866,8 +1866,8 @@ class TemplateTagLoading(TestCase):
                 with self.settings(INSTALLED_APPS=['tagsegg']):
                     template.Template(ttext)
             except template.TemplateSyntaxError as e:
-                self.assertTrue('ImportError' in e.args[0])
-                self.assertTrue('Xtemplate' in e.args[0])
+                self.assertIn('ImportError', e.args[0])
+                self.assertIn('Xtemplate', e.args[0])
 
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"

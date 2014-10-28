@@ -955,7 +955,7 @@ class FormsTestCase(TestCase):
         f2 = MyForm()
 
         f1.fields['myfield'].validators[0] = MaxValueValidator(12)
-        self.assertFalse(f1.fields['myfield'].validators[0] == f2.fields['myfield'].validators[0])
+        self.assertNotEqual(f1.fields['myfield'].validators[0], f2.fields['myfield'].validators[0])
 
     def test_hidden_widget(self):
         # HiddenInput widgets are displayed differently in the as_table(), as_ul())
@@ -2003,9 +2003,8 @@ class FormsTestCase(TestCase):
         field = ChoicesField()
         field2 = copy.deepcopy(field)
         self.assertIsInstance(field2, ChoicesField)
-        self.assertFalse(id(field2.fields) == id(field.fields))
-        self.assertFalse(id(field2.fields[0].choices) ==
-                         id(field.fields[0].choices))
+        self.assertIsNot(field2.fields, field.fields)
+        self.assertIsNot(field2.fields[0].choices, field.fields[0].choices)
 
     def test_multivalue_optional_subfields(self):
         class PhoneField(MultiValueField):

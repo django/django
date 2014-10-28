@@ -1194,12 +1194,12 @@ class ClearableFileInputTests(TestCase):
         widget = ClearableFileInput()
         field = StrangeFieldFile()
         output = widget.render('my<div>file', field)
-        self.assertFalse(field.url in output)
-        self.assertTrue('href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en"' in output)
-        self.assertFalse(six.text_type(field) in output)
-        self.assertTrue('something&lt;div onclick=&quot;alert(&#39;oops&#39;)&quot;&gt;.jpg' in output)
-        self.assertTrue('my&lt;div&gt;file' in output)
-        self.assertFalse('my<div>file' in output)
+        self.assertNotIn(field.url, output)
+        self.assertIn('href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en"', output)
+        self.assertNotIn(six.text_type(field), output)
+        self.assertIn('something&lt;div onclick=&quot;alert(&#39;oops&#39;)&quot;&gt;.jpg', output)
+        self.assertIn('my&lt;div&gt;file', output)
+        self.assertNotIn('my<div>file', output)
 
     def test_clear_input_renders_only_if_not_required(self):
         """

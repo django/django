@@ -44,7 +44,7 @@ class SignalTestCase(TestCase):
         self.assertEqual(len(self.login_failed), 1)
         self.assertEqual(self.login_failed[0]['username'], 'testclient')
         # verify the password is cleansed
-        self.assertTrue('***' in self.login_failed[0]['password'])
+        self.assertIn('***', self.login_failed[0]['password'])
 
         # Like this:
         self.client.login(username='testclient', password='password')

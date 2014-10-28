@@ -286,7 +286,7 @@ class SessionTestsMixin(object):
             self.assertEqual({}, self.session.decode(bad_encode))
             # check that the failed decode is logged
             self.assertEqual(len(calls), 1)
-            self.assertTrue('corrupted' in calls[0])
+            self.assertIn('corrupted', calls[0])
 
     def test_actual_expiry(self):
         # this doesn't work with JSONSerializer (serializing timedelta)

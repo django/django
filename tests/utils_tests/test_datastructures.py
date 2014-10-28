@@ -177,7 +177,7 @@ class MergeDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):
         self.assertEqual(sorted(six.iterkeys(mm)), ['key1', 'key2', 'key4'])
         self.assertEqual(len(list(six.itervalues(mm))), 3)
 
-        self.assertTrue('value1' in six.itervalues(mm))
+        self.assertIn('value1', six.itervalues(mm))
 
         self.assertEqual(
             sorted(six.iteritems(mm), key=lambda k: k[0]),
