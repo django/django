@@ -1102,12 +1102,11 @@ class Query(object):
                         'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
                         (value.model._meta.model_name, opts.object_name)
                     )
+            elif hasattr(value, '_meta'):
+                self.check_query_object_type(value, opts)
             elif hasattr(value, '__iter__'):
                 for v in value:
                     self.check_query_object_type(v, opts)
-            else:
-                # expecting single model instance here
-                self.check_query_object_type(value, opts)
 
     def build_lookup(self, lookups, lhs, rhs):
         lookups = lookups[:]
