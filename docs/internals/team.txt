@@ -489,8 +489,8 @@ Daniele Procida
 
 `Curtis Maloney`_
     Curtis is a self-taught programmer from Melbourne, Australia, who eschews
-    specialisation.  Upon finding Django when it was first open sourced, he
-    realised it was possible to enjoy web development.
+    specialization.  Upon finding Django when it was first open sourced, he
+    realized it was possible to enjoy web development.
 
     He spends a lot of time helping people on the #django IRC channel, and has
     authored and released a number of `smaller django apps`_.
