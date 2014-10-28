@@ -124,6 +124,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     uppercases_column_names = True
     # select for update with limit can be achieved on Oracle, but not with the current backend.
     supports_select_for_update_with_limit = False
+    callproc_supports_kwargs = True
 
     def introspected_boolean_field_type(self, field=None, created_separately=False):
         """

@@ -336,3 +336,18 @@ is equivalent to::
         c.execute(...)
     finally:
         c.close()
+
+.. versionchanged:: 1.8
+
+Though :pep:`249` does not support keyword parameters for
+``cursor.callproc()``, some database backends do (e.g cx_Oracle), so you can
+pass keyword parameters to ``cursor.callproc()`` if the backend you are using
+supports it.
+
+.. method:: Cursor.callproc(procname, params=None, kparams=None)
+
+.. warning::
+
+    Most database backends do not support keyword parameters for
+    ``cursor.callproc()``, and the support of it is nonstandard, never pass
+    keyword parameters to ``cursor.callproc()`` when in doubt.

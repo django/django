@@ -9,6 +9,7 @@ from time import time
 from django.conf import settings
 from django.utils.encoding import force_bytes
 from django.utils.timezone import utc
+from django.db.utils import NotSupportedError
 
 
 logger = logging.getLogger('django.db.backends')
@@ -47,14 +48,24 @@ class CursorWrapper(object):
 
     # The following methods cannot be implemented in __getattr__, because the
     # code must run when the method is invoked, not just when it is accessed.
-
-    def callproc(self, procname, params=None):
+    # Ticket #23546: though keyword parameters for callproc are not supported
+    # in PEP 249, since we are just forwarding arguments to underlying backends
+    # which may supports keyword parameters(e.g cx_Oracle), such deviation
+    # seems acceptable.
+    def callproc(self, procname, params=None, kparams=None):
+        if kparams is not None and not self.db.features.callproc_supports_kwargs:
+            raise NotSupportedError("The {} backend does not support keyword parameters for callproc"
+                    .format(self.db.vendor))
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
-            if params is None:
+            if params is None and kparams is None:
                 return self.cursor.callproc(procname)
-            else:
+            elif kparams is None:
                 return self.cursor.callproc(procname, params)
+            elif params is None:
+                return self.cursor.callproc(procname, [], kparams)
+            else:
+                return self.cursor.callproc(procname, params, kparams)
 
     def execute(self, sql, params=None):
         self.db.validate_no_broken_transaction()
