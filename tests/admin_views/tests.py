@@ -90,7 +90,7 @@ class AdminViewBasicTestCase(TestCase):
         content.
         """
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.content.index(force_bytes(text1)) < response.content.index(force_bytes(text2)),
+        self.assertLess(response.content.index(force_bytes(text1)), response.content.index(force_bytes(text2)),
             failing_msg)
 
 
@@ -866,7 +866,7 @@ class AdminViewFormUrlTest(TestCase):
         Tests whether change_view has form_url in response.context
         """
         response = self.client.get('/test_admin/%s/admin_views/section/1/' % self.urlbit)
-        self.assertTrue('form_url' in response.context, msg='form_url not present in response.context')
+        self.assertIn('form_url', response.context, msg='form_url not present in response.context')
         self.assertEqual(response.context['form_url'], 'pony')
 
     def test_initial_data_can_be_overridden(self):
@@ -4123,7 +4123,7 @@ class UserAdminTest(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         adminform = response.context['adminform']
-        self.assertTrue('password' not in adminform.form.errors)
+        self.assertNotIn('password', adminform.form.errors)
         self.assertEqual(adminform.form.errors['password2'],
             ["The two password fields didn't match."])
 
@@ -5040,7 +5040,7 @@ class AdminViewOnSiteTests(TestCase):
 
         # just verifying the parent form failed validation, as expected --
         # this isn't the regression test
-        self.assertTrue('some_required_info' in response.context['adminform'].form.errors)
+        self.assertIn('some_required_info', response.context['adminform'].form.errors)
 
         # actual regression test
         for error_set in response.context['inline_admin_formset'].formset.errors:
@@ -5070,7 +5070,7 @@ class AdminViewOnSiteTests(TestCase):
 
         # just verifying the parent form failed validation, as expected --
         # this isn't the regression test
-        self.assertTrue('some_required_info' in response.context['adminform'].form.errors)
+        self.assertIn('some_required_info', response.context['adminform'].form.errors)
 
         # actual regression test
         for error_set in response.context['inline_admin_formset'].formset.errors:

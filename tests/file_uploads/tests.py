@@ -257,7 +257,7 @@ class FileUploadTests(TestCase):
         for name, _, expected in cases:
             got = result[name]
             self.assertEqual(expected, got, 'Mismatch for {0}'.format(name))
-            self.assertTrue(len(got) < 256,
+            self.assertLess(len(got), 256,
                             "Got a long file name (%s characters)." % len(got))
 
     def test_content_type_extra(self):
@@ -336,12 +336,12 @@ class FileUploadTests(TestCase):
             # Small file posting should work.
             response = self.client.post('/quota/', {'f': smallfile})
             got = json.loads(response.content.decode('utf-8'))
-            self.assertTrue('f' in got)
+            self.assertIn('f', got)
 
             # Large files don't go through.
             response = self.client.post("/quota/", {'f': bigfile})
             got = json.loads(response.content.decode('utf-8'))
-            self.assertTrue('f' not in got)
+            self.assertNotIn('f', got)
 
     def test_broken_custom_upload_handler(self):
         with tempfile.NamedTemporaryFile() as file:

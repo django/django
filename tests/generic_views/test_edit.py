@@ -108,8 +108,8 @@ class CreateViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context['form'], forms.ModelForm)
         self.assertIsInstance(res.context['view'], View)
-        self.assertFalse('object' in res.context)
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('object', res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/author_form.html')
 
         res = self.client.post('/edit/authors/create/',
@@ -153,8 +153,8 @@ class CreateViewTests(TestCase):
         res = self.client.get('/edit/authors/create/special/')
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context['form'], views.AuthorForm)
-        self.assertFalse('object' in res.context)
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('object', res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/form.html')
 
         res = self.client.post('/edit/authors/create/special/',
@@ -302,7 +302,7 @@ class UpdateViewTests(TestCase):
         self.assertIsInstance(res.context['form'], views.AuthorForm)
         self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
         self.assertEqual(res.context['thingy'], Author.objects.get(pk=a.pk))
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/form.html')
 
         res = self.client.post('/edit/author/%d/update/special/' % a.pk,
@@ -389,7 +389,7 @@ class DeleteViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
         self.assertEqual(res.context['thingy'], Author.objects.get(pk=a.pk))
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/confirm_delete.html')
 
         res = self.client.post('/edit/author/%d/delete/special/' % a.pk)

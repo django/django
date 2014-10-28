@@ -78,10 +78,10 @@ class QueryDictTests(unittest.TestCase):
 
         if six.PY2:
             self.assertTrue(q.has_key('foo'))
-        self.assertTrue('foo' in q)
+        self.assertIn('foo', q)
         if six.PY2:
             self.assertFalse(q.has_key('bar'))
-        self.assertFalse('bar' in q)
+        self.assertNotIn('bar', q)
 
         self.assertEqual(list(six.iteritems(q)), [('foo', 'bar')])
         self.assertEqual(list(six.iterlists(q)), [('foo', ['bar'])])
@@ -118,7 +118,7 @@ class QueryDictTests(unittest.TestCase):
         q = QueryDict(mutable=True)
         q['name'] = 'john'
         del q['name']
-        self.assertFalse('name' in q)
+        self.assertNotIn('name', q)
 
     def test_basic_mutable_operations(self):
         q = QueryDict(mutable=True)
@@ -137,7 +137,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(q['foo'], 'another')
         if six.PY2:
             self.assertTrue(q.has_key('foo'))
-        self.assertTrue('foo' in q)
+        self.assertIn('foo', q)
 
         self.assertListEqual(sorted(list(six.iteritems(q))),
                              [('foo', 'another'), ('name', 'john')])
@@ -609,8 +609,8 @@ class CookieTests(unittest.TestCase):
         """
         c = SimpleCookie()
         c['test'] = "An,awkward;value"
-        self.assertTrue(";" not in c.output().rstrip(';'))  # IE compat
-        self.assertTrue("," not in c.output().rstrip(';'))  # Safari compat
+        self.assertNotIn(";", c.output().rstrip(';'))  # IE compat
+        self.assertNotIn(",", c.output().rstrip(';'))  # Safari compat
 
     def test_decode(self):
         """
@@ -636,13 +636,13 @@ class CookieTests(unittest.TestCase):
         """
         Test that a single non-standard cookie name doesn't affect all cookies. Ticket #13007.
         """
-        self.assertTrue('good_cookie' in parse_cookie('good_cookie=yes;bad:cookie=yes').keys())
+        self.assertIn('good_cookie', parse_cookie('good_cookie=yes;bad:cookie=yes').keys())
 
     def test_repeated_nonstandard_keys(self):
         """
         Test that a repeated non-standard name doesn't affect all cookies. Ticket #15852
         """
-        self.assertTrue('good_cookie' in parse_cookie('a:=b; a:=c; good_cookie=yes').keys())
+        self.assertIn('good_cookie', parse_cookie('a:=b; a:=c; good_cookie=yes').keys())
 
     def test_httponly_after_load(self):
         """

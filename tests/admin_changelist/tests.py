@@ -93,7 +93,7 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
         row_html = '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th><td class="field-parent nowrap">(None)</td></tr></tbody>' % link
-        self.assertFalse(table_output.find(row_html) == -1,
+        self.assertNotEqual(table_output.find(row_html), -1,
             'Failed to find expected row element: %s' % table_output)
 
     def test_result_list_html(self):
@@ -116,7 +116,7 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
         row_html = '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th><td class="field-parent nowrap">Parent object</td></tr></tbody>' % link
-        self.assertFalse(table_output.find(row_html) == -1,
+        self.assertNotEqual(table_output.find(row_html), -1,
             'Failed to find expected row element: %s' % table_output)
 
     def test_result_list_editable_html(self):

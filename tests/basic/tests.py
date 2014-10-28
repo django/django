@@ -134,7 +134,7 @@ class ModelInstanceCreationTests(TestCase):
         a.save()
 
         # You can use 'in' to test for membership...
-        self.assertTrue(a in Article.objects.all())
+        self.assertIn(a, Article.objects.all())
         # ... but there will often be more efficient ways if that is all you need:
         self.assertTrue(Article.objects.filter(id=a.id).exists())
 
@@ -171,12 +171,10 @@ class ModelTest(TestCase):
         some_pub_date = datetime(2014, 5, 16, 12, 1)
         a1 = Article.objects.create(headline='First', pub_date=some_pub_date)
         a2 = Article.objects.create(headline='Second', pub_date=some_pub_date)
-        self.assertTrue(a1 != a2)
-        self.assertFalse(a1 == a2)
-        self.assertTrue(a1 == Article.objects.get(id__exact=a1.id))
+        self.assertNotEqual(a1, a2)
+        self.assertEqual(a1, Article.objects.get(id__exact=a1.id))
 
-        self.assertTrue(Article.objects.get(id__exact=a1.id) != Article.objects.get(id__exact=a2.id))
-        self.assertFalse(Article.objects.get(id__exact=a2.id) == Article.objects.get(id__exact=a1.id))
+        self.assertNotEqual(Article.objects.get(id__exact=a1.id), Article.objects.get(id__exact=a2.id))
 
     def test_multiple_objects_max_num_fetched(self):
         """
@@ -286,7 +284,7 @@ class ModelTest(TestCase):
         )
 
         s = {a10, a11, a12}
-        self.assertTrue(Article.objects.get(headline='Article 11') in s)
+        self.assertIn(Article.objects.get(headline='Article 11'), s)
 
     def test_field_ordering(self):
         """
@@ -299,10 +297,10 @@ class ModelTest(TestCase):
         f1 = Field()
         f2 = Field(auto_created=True)
         f3 = Field()
-        self.assertTrue(f2 < f1)
-        self.assertTrue(f3 > f1)
-        self.assertFalse(f1 is None)
-        self.assertFalse(f2 in (None, 1, ''))
+        self.assertLess(f2, f1)
+        self.assertGreater(f3, f1)
+        self.assertIsNotNone(f1)
+        self.assertNotIn(f2, (None, 1, ''))
 
     def test_extra_method_select_argument_with_dashes_and_values(self):
         # The 'select' argument to extra() supports names with dashes in
