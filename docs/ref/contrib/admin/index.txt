@@ -1276,7 +1276,7 @@ templates used by the :class:`ModelAdmin` views:
     ``ModelForm`` instance and a boolean value based on whether it is adding or
     changing the parent object.
 
-    For example to attach ``request.user`` to each changed formset
+    For example, to attach ``request.user`` to each changed formset
     model instance::
 
         class ArticleAdmin(admin.ModelAdmin):
@@ -1286,6 +1286,8 @@ templates used by the :class:`ModelAdmin` views:
                     instance.user = request.user
                     instance.save()
                 formset.save_m2m()
+
+    See also :ref:`saving-objects-in-the-formset`.
 
 .. method:: ModelAdmin.get_ordering(request)
 
