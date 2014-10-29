@@ -174,7 +174,8 @@ class RenameField(Operation):
     def state_forwards(self, app_label, state):
         # Rename the field
         state.models[app_label, self.model_name.lower()].fields = [
-            (self.new_name if n == self.old_name else n, f) for n, f in state.models[app_label, self.model_name.lower()].fields
+            (self.new_name if n == self.old_name else n, f)
+            for n, f in state.models[app_label, self.model_name.lower()].fields
         ]
         # Fix unique_together to refer to the new field
         options = state.models[app_label, self.model_name.lower()].options
