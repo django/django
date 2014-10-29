@@ -1455,6 +1455,42 @@ translation utilities with a ``gettext`` package if the command ``xgettext
 --version`` entered at a Windows command prompt causes a popup window saying
 "xgettext.exe has generated errors and will be closed by Windows".
 
+.. _customizing-makemessages:
+
+Customizing the ``makemessages`` command
+----------------------------------------
+
+.. highlightlang:: python
+
+If you want to pass additional parameters to ``xgettext``, you need to create a
+custom :djadmin:`makemessages` command and override its ``xgettext_options``
+attribute::
+
+    from django.core.management.commands import makemessages
+
+    class Command(makemessages.Command):
+        xgettext_options = makemessages.Command.xgettext_options + ['--keyword=mytrans']
+
+If you need more flexibility, you could also add a new argument to your custom
+:djadmin:`makemessages` command::
+
+    from django.core.management.commands import makemessages
+
+    class Command(makemessages.Command):
+
+        def add_arguments(self, parser):
+            super(Command, self).add_arguments(parser)
+            parser.add_argument('--extra-keyword', dest='xgettext_keywords',
+                                action='append')
+
+        def handle(self, *args, **options):
+            xgettext_keywords = options.pop('xgettext_keywords')
+            if xgettext_keywords:
+                self.xgettext_options = (
+                    makemessages.Command.xgettext_options[:] +
+                    ['--keyword=%s' % kwd for kwd in xgettext_keywords]
+                )
+            super(Command, self).handle(*args, **options)
 
 Miscellaneous
 =============
