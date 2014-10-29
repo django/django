@@ -666,6 +666,11 @@ Use the ``--keep-pot`` option to prevent Django from deleting the temporary
 .pot files it generates before creating the .po file. This is useful for
 debugging errors which may prevent the final language files from being created.
 
+.. seealso::
+
+    See :ref:`customizing-makemessages` for instructions on how to customize
+    the keywords that :djadmin:`makemessages` passes to ``xgettext``.
+
 makemigrations [<app_label>]
 ----------------------------
 
