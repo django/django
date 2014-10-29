@@ -32,3 +32,5 @@ Bugfixes
 
 * Fixed a migration crash when removing a field that is referenced in
   ``AlterIndexTogether`` or ``AlterUniqueTogether`` (:ticket:`23614`).
+
+* Updated the first day of the week in the Ukrainian locale to Monday.
