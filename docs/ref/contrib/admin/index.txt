@@ -1287,6 +1287,8 @@ templates used by the :class:`ModelAdmin` views:
                     instance.save()
                 formset.save_m2m()
 
+    For more information, see :ref:`Saving objects in the formset <saving-objects-in-the-formset>`
+
 .. method:: ModelAdmin.get_ordering(request)
 
     The ``get_ordering`` method takes a``request`` as parameter and
