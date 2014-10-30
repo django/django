@@ -36,4 +36,12 @@ class SpatiaLiteCreation(DatabaseCreation):
         Creates the spatial metadata tables.
         """
         cur = self.connection._cursor()
-        cur.execute("SELECT InitSpatialMetaData()")
+
+        # newer versions support initializing all metadata in
+        # one transaction which can result in a significant
+        # performance improvement when creating the database
+        # ticket #23152
+        if self.connection.ops.spatial_version >= (4, 1, 0):
+            cur.execute("SELECT InitSpatialMetaData(1)")
+        else:
+            cur.execute("SELECT InitSpatialMetaData()")
