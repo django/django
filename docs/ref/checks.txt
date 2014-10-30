@@ -119,6 +119,7 @@ Related Fields
   for ``<field name>``.
 * **fields.E306**: Related name must be a valid Python identifier or end with
   a ``'+'``.
+* **fields.E307**: Related name must be different than any manager name.
 * **fields.E310**: None of the fields ``<field1>``, ``<field2>``, ... on model
   ``<model>`` have a ``unique=True`` constraint.
 * **fields.E311**: ``<model>`` must set ``unique=True`` because it is
