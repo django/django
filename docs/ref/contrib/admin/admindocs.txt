@@ -12,9 +12,18 @@ docstrings of models, views, template tags, and template filters for any app in
 :setting:`INSTALLED_APPS` and makes that documentation available from the
 :mod:`Django admin <django.contrib.admin>`.
 
-In addition to providing offline documentation for all template tags and
-template filters that ship with Django, you may utilize admindocs to quickly
-document your own code.
+This way, Django admin documentation generator provides offline documentation
+for all custom and built-in template tags and template filters.
+
+.. admonition:: Note
+
+    You may, to some extent, utilize :mod:`~django.contrib.admindocs` app to
+    quickly document your own code. Although this has limited usage, as
+    admindocs app is primarily intended for documenting templates, template
+    tags and filters, it can still be useful since it doesn't require you to
+    write any extra documentation (besides docstrings) and is conveniently
+    available from the :mod:`Django admin <django.contrib.admin>`.
+
 
 Overview
 ========
