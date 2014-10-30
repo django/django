@@ -409,6 +409,13 @@ Backwards incompatible changes in 1.8
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+* When iterating over lines, :class:`~django.core.files.File` now uses
+  `universal newlines`_. The following are recognized as ending a line: the
+  Unix end-of-line convention ``'\n'``, the Windows convention ``'\r\n'``, and
+  the old Macintosh convention ``'\r'``.
+
+  .. _universal newlines: http://www.python.org/dev/peps/pep-0278
+
 Related object operations are run in a transaction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
