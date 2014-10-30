@@ -166,13 +166,13 @@ used template filters:
 
     If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
 
-:tfilter:`striptags`
-    Strips all [X]HTML tags. For example::
+:tfilter:`filesizeformat`
+    Formats the value like a "human-readable" file size (i.e. ``'13 KB'``,
+    ``'4.1 MB'``, ``'102 bytes'``, etc). For example::
 
-        {{ value|striptags }}
+        {{ value|filesizeformat }}
 
-    If ``value`` is ``"<b>Joel</b> <button>is</button> a
-    <span>slug</span>"``, the output will be ``"Joel is a slug"``.
+    If ``value`` is 123456789, the output would be ``117.7 MB``.
 
 Again, these are just a few examples; see the :ref:`built-in filter reference
 <ref-templates-builtins-filters>` for the complete list.
