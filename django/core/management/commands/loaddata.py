@@ -9,6 +9,7 @@ import zipfile
 from django.apps import apps
 from django.conf import settings
 from django.core import serializers
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
@@ -238,13 +239,23 @@ class Command(BaseCommand):
         current directory.
         """
         dirs = []
+        fixture_dirs = settings.FIXTURE_DIRS
+        if len(fixture_dirs) != len(set(fixture_dirs)):
+            raise ImproperlyConfigured("settings.FIXTURE_DIRS contains duplicates.")
         for app_config in apps.get_app_configs():
-            if self.app_label and app_config.label != self.app_label:
-                continue
+            app_label = app_config.label
             app_dir = os.path.join(app_config.path, 'fixtures')
+            if app_dir in fixture_dirs:
+                raise ImproperlyConfigured(
+                    "'%s' is a default fixture directory for the '%s' app "
+                    "and cannot be listed in settings.FIXTURE_DIRS." % (app_dir, app_label)
+                )
+
+            if self.app_label and app_label != self.app_label:
+                continue
             if os.path.isdir(app_dir):
                 dirs.append(app_dir)
-        dirs.extend(list(settings.FIXTURE_DIRS))
+        dirs.extend(list(fixture_dirs))
         dirs.append('')
         dirs = [upath(os.path.abspath(os.path.realpath(d))) for d in dirs]
         return dirs

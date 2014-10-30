@@ -8,6 +8,7 @@ import re
 import warnings
 
 from django.core import serializers
+from django.core.exceptions import ImproperlyConfigured
 from django.core.serializers.base import DeserializationError
 from django.core import management
 from django.core.management.base import CommandError
@@ -483,6 +484,48 @@ class TestFixtures(TestCase):
         management.call_command(
             'loaddata',
             'feature.json',
+            verbosity=0,
+        )
+
+    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
+                                     os.path.join(_cur_dir, 'fixtures_1')])
+    def test_fixture_dirs_with_duplicates(self):
+        """
+        settings.FIXTURE_DIRS cannot contain duplicates in order to avoid
+        repeated fixture loading.
+        """
+        self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "settings.FIXTURE_DIRS contains duplicates.",
+            management.call_command,
+            'loaddata',
+            'absolute.json',
+            verbosity=0,
+        )
+
+    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures')])
+    def test_fixture_dirs_with_default_fixture_path(self):
+        """
+        settings.FIXTURE_DIRS cannot contain a default fixtures directory
+        for application (app/fixtures) in order to avoid repeated fixture loading.
+        """
+        self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "'%s' is a default fixture directory for the '%s' app "
+            "and cannot be listed in settings.FIXTURE_DIRS."
+            % (os.path.join(_cur_dir, 'fixtures'), 'fixtures_regress'),
+            management.call_command,
+            'loaddata',
+            'absolute.json',
+            verbosity=0,
+        )
+
+    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
+                                     os.path.join(_cur_dir, 'fixtures_2')])
+    def test_loaddata_with_valid_fixture_dirs(self):
+        management.call_command(
+            'loaddata',
+            'absolute.json',
             verbosity=0,
         )
 
