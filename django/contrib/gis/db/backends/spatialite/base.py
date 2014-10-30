@@ -13,12 +13,20 @@ from django.contrib.gis.db.backends.spatialite.introspection import SpatiaLiteIn
 from django.contrib.gis.db.backends.spatialite.operations import SpatiaLiteOperations
 from django.contrib.gis.db.backends.spatialite.schema import SpatialiteSchemaEditor
 from django.utils import six
+from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
     supports_distance_geodetic = False
     # SpatiaLite can only count vertices in LineStrings
     supports_num_points_poly = False
+
+    @cached_property
+    def supports_initspatialmetadata_with_transactions(self):
+        # SpatiaLite 4.1+ support initializing all metadata in one transaction
+        # which can result in a significant performance improvement when
+        # creating the database.
+        return self.connection.ops.spatial_version >= (4, 1, 0)
 
 
 class DatabaseWrapper(SQLiteDatabaseWrapper):

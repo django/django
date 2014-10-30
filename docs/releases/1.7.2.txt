@@ -34,3 +34,6 @@ Bugfixes
   ``AlterIndexTogether`` or ``AlterUniqueTogether`` (:ticket:`23614`).
 
 * Updated the first day of the week in the Ukrainian locale to Monday.
+
+* Added support for transactional spatial metadata initialization on
+  SpatiaLite 4.1+ (:ticket:`23152`).
