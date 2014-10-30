@@ -163,6 +163,12 @@ Minor features
 
 * JavaScript slug generation now supports Romanian characters.
 
+:mod:`django.contrib.admindocs`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The model section of the ``admindocs`` now also describes methods that take
+  arguments, rather than ignoring them.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
