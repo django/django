@@ -44,9 +44,9 @@ To activate this behavior, put the email addresses of the recipients in the
 
 .. seealso::
 
-   Server error emails are sent using the logging framework, so you can
-   customize this behavior by :doc:`customizing your logging configuration
-   </topics/logging>`.
+    Server error emails are sent using the logging framework, so you can
+    customize this behavior by :doc:`customizing your logging configuration
+    </topics/logging>`.
 
 404 errors
 ~~~~~~~~~~
@@ -105,9 +105,9 @@ and override its methods.
 
 .. seealso::
 
-   404 errors are logged using the logging framework. By default, these log
-   records are ignored, but you can use them for error reporting by writing a
-   handler and :doc:`configuring logging </topics/logging>` appropriately.
+    404 errors are logged using the logging framework. By default, these log
+    records are ignored, but you can use them for error reporting by writing a
+    handler and :doc:`configuring logging </topics/logging>` appropriately.
 
 .. _filtering-error-reports:
 
