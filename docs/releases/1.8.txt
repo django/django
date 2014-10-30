@@ -284,6 +284,10 @@ Management Commands
 * The :djadminopt:`--name` option for :djadmin:`makemigrations` allows you to
   to give the migration(s) a custom name instead of a generated one.
 
+* The :djadmin:`loaddata` command now prevents repeated fixture loading. If
+  :setting:`FIXTURE_DIRS` contains duplicates or a default fixture directory
+  path (``app_name/fixtures``), an exception is raised.
+
 Migrations
 ^^^^^^^^^^
 
