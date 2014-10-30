@@ -95,7 +95,8 @@ class SpatiaLiteCreation(DatabaseCreation):
             # InitSpatialMetaData() transparently creates the spatial metadata
             # tables
             cur = self.connection._cursor()
-            cur.execute("SELECT InitSpatialMetaData()")
+            arg = "1" if self.connection.ops.spatial_version >= (4, 1, 0) else ""
+            cur.execute("SELECT InitSpatialMetaData(%s)" % arg)
         else:
             # Spatialite < 2.4 -- Load the initial SQL
 
