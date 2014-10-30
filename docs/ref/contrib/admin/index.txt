@@ -2552,6 +2552,8 @@ update :file:`myproject/urls.py` to reference your :class:`AdminSite` subclass.
 .. snippet::
     :filename: myproject/urls.py
 
+    from django.conf.urls import include, url
+
     from myapp.admin import admin_site
 
     urlpatterns = [
