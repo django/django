@@ -1255,13 +1255,15 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     imported::
 
         from django.db import models
-        from django.contrib.auth.models import User
+        from django.conf import settings
+        from django.contrib.auth import get_user_model()
 
         def get_sentinel_user():
-            return User.objects.get_or_create(username='deleted')[0]
+            return get_user_model().objects.get_or_create(username='deleted')[0]
 
         class MyModel(models.Model):
-            user = models.ForeignKey(User, on_delete=models.SET(get_sentinel_user))
+            user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                     on_delete=models.SET(get_sentinel_user))
 
 * .. attribute:: DO_NOTHING
 
@@ -1516,11 +1518,11 @@ as default value.
 With the following example::
 
     from django.db import models
-    from django.contrib.auth.models import User
+    from django.conf import settings
 
     class MySpecialUser(models.Model):
-        user = models.OneToOneField(User)
-        supervisor = models.OneToOneField(User, related_name='supervisor_of')
+        user = models.OneToOneField(settings.AUTH_USER_MODEL)
+        supervisor = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='supervisor_of')
 
 your resulting ``User`` model will have the following attributes::
 
