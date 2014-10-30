@@ -2431,18 +2431,13 @@ creating your own ``AdminSite`` instance (see below), and changing the
     this class is created as ``django.contrib.admin.site`` and you can
     register your models and ``ModelAdmin`` instances with it.
 
-    If you'd like to set up your own administrative site with custom
-    behavior, however, you're free to subclass ``AdminSite`` and override
-    or add anything you like. Then, simply create an instance of your
-    ``AdminSite`` subclass (the same way you'd instantiate any other
-    Python class), and register your models and ``ModelAdmin`` subclasses
-    with it instead of using the default.
-
     When constructing an instance of an ``AdminSite``, you can provide
     a unique instance name using the ``name`` argument to the constructor. This
     instance name is used to identify the instance, especially when
     :ref:`reversing admin URLs <admin-reverse-urls>`. If no instance name is
     provided, a default instance name of ``admin`` will be used.
+    See :ref:`customizing-adminsite` for an example of customizing the
+    :class:`AdminSite` class.
 
 ``AdminSite`` attributes
 ------------------------
@@ -2528,12 +2523,36 @@ In this example, we register the default ``AdminSite`` instance
         url(r'^admin/', include(admin.site.urls)),
     ]
 
-In this example, we register the ``AdminSite`` instance
-``myproject.admin.admin_site`` at the URL ``/myadmin/`` ::
+.. _customizing-adminsite:
 
-    # urls.py
-    from django.conf.urls import include, url
-    from myproject.admin import admin_site
+Customizing the :class:`AdminSite` class
+----------------------------------------
+
+If you'd like to set up your own admin site with custom behavior, you're free
+to subclass ``AdminSite`` and override or add anything you like. Then, simply
+create an instance of your ``AdminSite`` subclass (the same way you'd
+instantiate any other Python class) and register your models and
+``ModelAdmin`` subclasses with it instead of with the default site. Finally,
+update :file:`myproject/urls.py` to reference your :class:`AdminSite` subclass.
+
+.. snippet::
+    :filename: myapp/admin.py
+
+    from django.contrib.admin import AdminSite
+
+    from .models import MyModel
+
+    class MyAdminSite(AdminSite):
+        site_header = 'Monty Python administration'
+
+    admin_site = MyAdminSite(name='myadmin')
+    admin_site.register(MyModel)
+
+
+.. snippet::
+    :filename: myproject/urls.py
+
+    from myapp.admin import admin_site
 
     urlpatterns = [
         url(r'^myadmin/', include(admin_site.urls)),
