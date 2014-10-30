@@ -170,7 +170,9 @@ straight lookups. Here are some things to keep in mind:
   propagated, unless the exception has an attribute
   ``silent_variable_failure`` whose value is ``True``. If the exception
   *does* have a ``silent_variable_failure`` attribute whose value is
-  ``True``, the variable will render as an empty string. Example::
+  ``True``, the variable will render as the value of the
+  :setting:`TEMPLATE_STRING_IF_INVALID` setting (an empty string, by default).
+  Example::
 
     >>> t = Template("My name is {{ person.first_name }}.")
     >>> class PersonClass3:
@@ -198,7 +200,7 @@ straight lookups. Here are some things to keep in mind:
   silently.
 
 * A variable can only be called if it has no required arguments. Otherwise,
-  the system will return an empty string.
+  the system will return the value of :setting:`TEMPLATE_STRING_IF_INVALID`.
 
 .. _alters-data-description:
 
