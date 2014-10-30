@@ -4,12 +4,17 @@ from types import ModuleType
 import unittest
 import warnings
 
+from django.apps import apps
 from django.conf import LazySettings, Settings, settings
+from django.core.checks import Warning, settings_checks
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import (SimpleTestCase, TransactionTestCase, TestCase,
     modify_settings, override_settings, signals)
 from django.utils import six
+from django.utils._os import upath
+
+_cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
 
 
 @modify_settings(ITEMS={
@@ -457,3 +462,72 @@ class TestTupleSettings(unittest.TestCase):
             finally:
                 del sys.modules['fake_settings_module']
                 delattr(settings_module, setting)
+
+
+class TestSettingsChecks(TestCase):
+    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
+                                     os.path.join(_cur_dir, 'fixtures_1')])
+    def test_fixture_dirs_has_not_unique_items(self):
+        """
+        Refs: #23468
+        """
+        errors = settings_checks.check_fixture_dirs_has_non_unique_items()
+
+        expected = [
+            Warning(
+                "settings.FIXTURE_DIRS has duplications.",
+                hint="Each directory path in FIXTURE_DIRS setting should be "
+                "unique in order to avoid repeated fixture loading.",
+                obj="",
+                id='settings.W001',
+            )]
+        self.assertEqual(errors, expected)
+
+    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
+                                     os.path.join(_cur_dir, 'fixtures_2')])
+    def test_fixture_dirs_has_only_unique_items(self):
+        """
+        If settings.FIXTURE_DIRS has not duplications, function will
+        return empty list. Refs: #23468
+        """
+
+        errors = settings_checks.check_fixture_dirs_has_non_unique_items()
+        expected = []
+
+        self.assertEqual(errors, expected)
+
+    def test_fixture_dirs_contains_default_fixture_paths(self):
+        """
+        Refs: #23468
+        """
+        test_app_labels = ['auth', 'admin']
+        test_apps = [apps.get_app_config(app) for app in test_app_labels]
+        expected = []
+
+        for test_app in test_apps:
+            expected.append(
+                Warning(
+                    "'%s' is a default fixture directory for app '%s' and should "
+                    "not be listed in settings.FIXTURE_DIRS in order to "
+                    "avoid repeated fixture loading."
+                    % (os.path.join(test_app.path, 'fixtures'), test_app.label),
+                    hint="",
+                    obj="",
+                    id='settings.W002',
+                ))
+
+        with override_settings(FIXTURE_DIRS=[os.path.join(test_app.path, 'fixtures')
+                                             for test_app in test_apps]):
+            errors = settings_checks.check_fixture_dirs_contains_default_fixture_paths()
+
+            self.assertEqual(errors, expected)
+
+    @override_settings(FIXTURE_DIRS=[])
+    def test_fixture_dirs_not_contain_default_fixture_paths(self):
+        """
+        If there is no default fixture directory paths in settings.FIXTURE_DIRS,
+        check will return empty list. Refs: #23468
+        """
+        errors = settings_checks.check_fixture_dirs_contains_default_fixture_paths()
+        expected = []
+        self.assertEqual(errors, expected)
