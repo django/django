@@ -221,8 +221,15 @@ class MigrationLoader(object):
                 for child_key in reverse_dependencies.get(replaced, set()):
                     if child_key in migration.replaces:
                         continue
-                    normal[child_key].dependencies.remove(replaced)
-                    normal[child_key].dependencies.append(key)
+                    # child_key may appear in a replacement
+                    if child_key in reverse_replacements:
+                        for replaced_child_key in reverse_replacements[child_key]:
+                            if replaced in replacing[replaced_child_key].dependencies:
+                                replacing[replaced_child_key].dependencies.remove(replaced)
+                                replacing[replaced_child_key].dependencies.append(key)
+                    else:
+                        normal[child_key].dependencies.remove(replaced)
+                        normal[child_key].dependencies.append(key)
             normal[key] = migration
             # Mark the replacement as applied if all its replaced ones are
             if all(applied_statuses):
