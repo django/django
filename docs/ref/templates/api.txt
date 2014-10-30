@@ -504,26 +504,9 @@ optional, third positional argument, ``processors``. In this example, the
     shortcut to populate a template with the contents of a dictionary, your
     template will be passed a ``Context`` instance by default (not a
     ``RequestContext``). To use a ``RequestContext`` in your template
-    rendering, pass an optional third argument to
-    :func:`~django.shortcuts.render_to_response()`: a ``RequestContext``
-    instance. Your code might look like this::
-
-        from django.shortcuts import render_to_response
-        from django.template import RequestContext
-
-        def some_view(request):
-            # ...
-            return render_to_response('my_template.html',
-                                      my_data_dictionary,
-                                      context_instance=RequestContext(request))
-
-    Alternatively, use the :meth:`~django.shortcuts.render()` shortcut which is
+    rendering, use the :meth:`~django.shortcuts.render()` shortcut which is
     the same as a call to :func:`~django.shortcuts.render_to_response()` with a
-    context_instance argument that forces the use of a ``RequestContext``.
-
-    Note that the contents of a supplied dictionary (``my_data_dictionary``
-    in this example) will take precedence over any variables supplied by
-    context processors or the ``RequestContext``.
+    ``context_instance`` argument that forces the use of a ``RequestContext``.
 
 Here's what each of the default processors does:
 
