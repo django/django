@@ -40,6 +40,7 @@ caches that you don't directly control but to which you can provide hints (via
 HTTP headers) about which parts of your site should be cached, and how.
 
 .. seealso::
+
     The :ref:`Cache Framework design philosophy <cache-design-philosophy>`
     explains a few of the design decisions of the framework.
 
