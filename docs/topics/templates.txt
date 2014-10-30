@@ -662,15 +662,18 @@ Custom tag and filter libraries
 ===============================
 
 Certain applications provide custom tag and filter libraries. To access them in
-a template, use the :ttag:`load` tag::
+a template, ensure the application is in :setting:`INSTALLED_APPS` (we'd add
+``'django.contrib.humanize'`` for this example), and then use the :ttag:`load`
+tag in a template::
 
     {% load humanize %}
 
     {{ 45000|intcomma }}
 
 In the above, the :ttag:`load` tag loads the ``humanize`` tag library, which then
-makes the ``intcomma`` filter available for use. Consult the documentation
-area in your admin to find the list of custom libraries in your installation.
+makes the ``intcomma`` filter available for use. If you've enabled
+:mod:`django.contrib.admindocs`, you can consult the documentation area in your
+admin to find the list of custom libraries in your installation.
 
 The :ttag:`load` tag can take multiple library names, separated by spaces.
 Example::
