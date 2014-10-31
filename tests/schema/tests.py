@@ -7,7 +7,7 @@ from django.db.models.fields import (BinaryField, BooleanField, CharField, Integ
     PositiveIntegerField, SlugField, TextField)
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
-from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
+from .models import (Author, AuthorWithDefaultHeight, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough,
     AuthorWithEvenLongerName, BookWeak)
@@ -447,6 +447,31 @@ class SchemaTests(TransactionTestCase):
         # Verify default value
         self.assertEqual(Author.objects.get(name='Not null author').height, 12)
         self.assertEqual(Author.objects.get(name='Null author').height, 42)
+
+    @unittest.skipUnless(connection.features.supports_combined_alters, "No combined ALTER support")
+    def test_alter_null_to_not_null_keeping_default(self):
+        """
+        #23738 - Can change a nullable field with default to non-nullable
+        with the same default.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(AuthorWithDefaultHeight)
+        # Ensure the field is right to begin with
+        columns = self.column_classes(AuthorWithDefaultHeight)
+        self.assertTrue(columns['height'][1][6])
+        # Alter the height field to NOT NULL keeping the previous default
+        new_field = PositiveIntegerField(default=42)
+        new_field.set_attributes_from_name("height")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                AuthorWithDefaultHeight,
+                AuthorWithDefaultHeight._meta.get_field_by_name("height")[0],
+                new_field,
+            )
+        # Ensure the field is right afterwards
+        columns = self.column_classes(AuthorWithDefaultHeight)
+        self.assertFalse(columns['height'][1][6])
 
     @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
     def test_alter_fk(self):
