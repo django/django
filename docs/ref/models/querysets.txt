@@ -750,6 +750,24 @@ And here's ``select_related`` lookup::
     # in the previous query.
     b = e.blog
 
+You can use ``select_related()`` with any queryset of objects::
+
+    from django.utils import timezone
+
+    # Find all the blogs with entries scheduled to be published in the future.
+    blogs = set()
+
+    for e in Entry.objects.filter(pub_date__gt=timezone.now()).select_related('blog'):
+        # Without select_related(), this would make a database query for each
+        # loop iteration in order to fetch the related blog for each entry.
+        blogs.add(e.blog)
+
+The order of ``filter()`` and ``select_related()`` chaining isn't important.
+These querysets are equivalent::
+
+    Entry.objects.filter(pub_date__gt=timezone.now()).selected_related('blog')
+    Entry.objects.selected_related('blog').filter(pub_date__gt=timezone.now())
+
 You can follow foreign keys in a similar way to querying them. If you have the
 following models::
 
@@ -767,10 +785,10 @@ following models::
         # ...
         author = models.ForeignKey(Person)
 
-... then a call to ``Book.objects.select_related('person__city').get(id=4)``
+... then a call to ``Book.objects.select_related('author__hometown').get(id=4)``
 will cache the related ``Person`` *and* the related ``City``::
 
-    b = Book.objects.select_related('person__city').get(id=4)
+    b = Book.objects.select_related('author__hometown').get(id=4)
     p = b.author         # Doesn't hit the database.
     c = p.hometown       # Doesn't hit the database.
 
