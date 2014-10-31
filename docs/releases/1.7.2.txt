@@ -40,3 +40,6 @@ Bugfixes
 
 * Fixed a migration crash that prevented changing a nullable field with a
   default to non-nullable with the same default (:ticket:`23738`).
+
+* Fixed a migrations crash when adding ``GeometryField``\s with ``blank=True``
+  on PostGIS (:ticket:`23731`).
