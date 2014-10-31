@@ -343,6 +343,10 @@ Templates
   the top-level domain (e.g. ``djangoproject.com/`` and
   ``djangoproject.com/download/``).
 
+* :tfilter:`urlize` doesn't treat exclamation marks at the end of a domain or
+  its query string as part of the URL (the URL in e.g. ``'djangoproject.com!``
+  is ``djangoproject.com``)
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 

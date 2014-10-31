@@ -282,8 +282,8 @@ class DefaultFiltersTests(TestCase):
             '<a href="http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B" rel="nofollow">'
             'http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B</a>')
         self.assertEqual(urlize('www.mystore.com/30%OffCoupons!'),
-            '<a href="http://www.mystore.com/30%25OffCoupons!" rel="nofollow">'
-            'www.mystore.com/30%OffCoupons!</a>')
+            '<a href="http://www.mystore.com/30%25OffCoupons" rel="nofollow">'
+            'www.mystore.com/30%OffCoupons</a>!')
         self.assertEqual(urlize('http://en.wikipedia.org/wiki/Caf%C3%A9'),
             '<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
             'http://en.wikipedia.org/wiki/Caf%C3%A9</a>')
@@ -369,6 +369,16 @@ class DefaultFiltersTests(TestCase):
         # Check urlize copes with commas following URLs in quotes - see #20364
         self.assertEqual(urlize('Email us at "hi@example.com", or phone us at +xx.yy'),
             'Email us at "<a href="mailto:hi@example.com">hi@example.com</a>", or phone us at +xx.yy')
+
+        # Check urlize correctly handles exclamation marks after TLDs or query string - see #23715
+        self.assertEqual(urlize('Go to djangoproject.com! and enjoy.'),
+            'Go to <a href="http://djangoproject.com" rel="nofollow">djangoproject.com</a>! and enjoy.')
+        self.assertEqual(urlize('Search for google.com/?q=! and see.'),
+            'Search for <a href="http://google.com/?q=" rel="nofollow">google.com/?q=</a>! and see.')
+        self.assertEqual(urlize('Search for google.com/?q=dj!`? and see.'),
+            'Search for <a href="http://google.com/?q=dj%21%60%3F" rel="nofollow">google.com/?q=dj!`?</a> and see.')
+        self.assertEqual(urlize('Search for google.com/?q=dj!`?! and see.'),
+            'Search for <a href="http://google.com/?q=dj%21%60%3F" rel="nofollow">google.com/?q=dj!`?</a>! and see.')
 
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
