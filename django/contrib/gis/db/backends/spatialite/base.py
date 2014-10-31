@@ -22,7 +22,7 @@ class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
     supports_num_points_poly = False
 
     @cached_property
-    def supports_initspatialmetadata_with_transactions(self):
+    def supports_initspatialmetadata_in_one_transaction(self):
         # SpatiaLite 4.1+ support initializing all metadata in one transaction
         # which can result in a significant performance improvement when
         # creating the database.
