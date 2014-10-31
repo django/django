@@ -607,7 +607,7 @@ class BaseDatabaseSchemaEditor(object):
                 # directly run a (NOT) NULL alteration
                 actions = actions + null_actions
             # Combine actions together if we can (e.g. postgres)
-            if self.connection.features.supports_combined_alters:
+            if self.connection.features.supports_combined_alters and actions:
                 sql, params = tuple(zip(*actions))
                 actions = [(", ".join(sql), reduce(operator.add, params))]
             # Apply those actions

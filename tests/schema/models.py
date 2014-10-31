@@ -17,6 +17,14 @@ class Author(models.Model):
         apps = new_apps
 
 
+class AuthorWithDefaultHeight(models.Model):
+    name = models.CharField(max_length=255)
+    height = models.PositiveIntegerField(null=True, blank=True, default=42)
+
+    class Meta:
+        apps = new_apps
+
+
 class AuthorWithM2M(models.Model):
     name = models.CharField(max_length=255)
 

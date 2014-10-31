@@ -37,3 +37,6 @@ Bugfixes
 
 * Added support for transactional spatial metadata initialization on
   SpatiaLite 4.1+ (:ticket:`23152`).
+
+* Fixed a migration crash that prevented changing a nullable field with a
+  default to non-nullable with the same default (:ticket:`23738`).
