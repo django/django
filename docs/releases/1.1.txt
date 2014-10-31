@@ -372,7 +372,7 @@ Other improvements
 
 Other new features and changes introduced since Django 1.0 include:
 
-* The :doc:`CSRF protection middleware </ref/contrib/csrf>` has been split into
+* The :doc:`CSRF protection middleware </ref/csrf>` has been split into
   two classes -- ``CsrfViewMiddleware`` checks incoming requests, and
   ``CsrfResponseMiddleware`` processes outgoing responses. The combined
   ``CsrfMiddleware`` class (which does both) remains for

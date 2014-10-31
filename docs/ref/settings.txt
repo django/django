@@ -374,7 +374,7 @@ CSRF_COOKIE_NAME
 Default: ``'csrftoken'``
 
 The name of the cookie to use for the CSRF authentication token. This can be whatever you
-want.  See :doc:`/ref/contrib/csrf`.
+want.  See :doc:`/ref/csrf`.
 
 .. setting:: CSRF_COOKIE_PATH
 
@@ -415,7 +415,7 @@ is rejected by the CSRF protection.  The function should have this signature::
 
 where ``reason`` is a short message (intended for developers or logging, not for
 end users) indicating the reason the request was rejected.  See
-:doc:`/ref/contrib/csrf`.
+:doc:`/ref/csrf`.
 
 .. setting:: DATABASES
 

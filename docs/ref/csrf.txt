@@ -26,15 +26,14 @@ below.
 How to use it
 =============
 
-To enable CSRF protection for your views, follow these steps:
+To take advantage of CSRF protection in your views, follow these steps:
 
-1. Add the middleware
-   ``'django.middleware.csrf.CsrfViewMiddleware'`` to your list of
-   middleware classes, :setting:`MIDDLEWARE_CLASSES`.  (It should come
-   before any view middleware that assume that CSRF attacks have
-   been dealt with.)
+1. The CSRF middleware is activated by default in the
+   :setting:`MIDDLEWARE_CLASSES` setting. If you override that setting, remember
+   that ``'django.middleware.csrf.CsrfViewMiddleware'`` should come before any
+   view middleware that assume that CSRF attacks have been dealt with.
 
-   Alternatively, you can use the decorator
+   If you disabled it, which is not recommended, you can use
    :func:`~django.views.decorators.csrf.csrf_protect` on particular views
    you want to protect (see below).
 
