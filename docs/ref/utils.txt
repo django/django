@@ -298,6 +298,13 @@ The functions defined in this module share the following properties:
 
     Returns an ASCII string containing the encoded result.
 
+.. function:: escape_uri_path(path)
+
+    .. versionadded:: 1.8
+
+    Escapes the unsafe characters from the path portion of a Uniform Resource
+    Identifier (URI).
+
 ``django.utils.feedgenerator``
 ==============================
 
