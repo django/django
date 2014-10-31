@@ -1061,6 +1061,12 @@ If ``multi_db=True``, fixtures are loaded into all databases.
 Overriding settings
 ~~~~~~~~~~~~~~~~~~~
 
+.. warning::
+
+    Use the functions below to temporarily alter the value of settings in tests.
+    Don't manipulate ``django.conf.settings`` directly as Django won't restore
+    the original values after such manipulations.
+
 .. method:: SimpleTestCase.settings()
 
 For testing purposes it's often useful to change a setting temporarily and
