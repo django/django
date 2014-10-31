@@ -81,7 +81,7 @@ or for binary data, such as an image. A Web application that uses ``GET``
 requests for admin forms is a security risk: it can be easy for an attacker to
 mimic a form's request to gain access to sensitive parts of the system.
 ``POST``, coupled with other protections like Django's :doc:`CSRF protection
-</ref/contrib/csrf/>` offers more control over access.
+</ref/csrf/>` offers more control over access.
 
 On the other hand, ``GET`` is suitable for things like a web search form,
 because the URLs that represent a ``GET`` request can easily be bookmarked,
@@ -335,7 +335,7 @@ from that ``{{ form }}`` by Django's template language.
 .. admonition:: Forms and Cross Site Request Forgery protection
 
     Django ships with an easy-to-use :doc:`protection against Cross Site Request
-    Forgeries </ref/contrib/csrf>`. When submitting a form via ``POST`` with
+    Forgeries </ref/csrf>`. When submitting a form via ``POST`` with
     CSRF protection enabled you must use the :ttag:`csrf_token` template tag
     as in the preceding example. However, since CSRF protection is not
     directly tied to forms in templates, this tag is omitted from the
