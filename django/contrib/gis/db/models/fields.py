@@ -274,7 +274,7 @@ class GeometryField(Field):
 
     def get_db_prep_save(self, value, connection):
         "Prepares the value for saving in the database."
-        if value is None:
+        if not value:
             return None
         else:
             return connection.ops.Adapter(self.get_prep_value(value))

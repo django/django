@@ -69,10 +69,38 @@ class OperationTests(TransactionTestCase):
         Tests the AddField operation with a GIS-enabled column.
         """
         project_state = self.set_up_test_model()
+        self.current_state = project_state
         operation = migrations.AddField(
             "Neighborhood",
             "path",
             fields.LineStringField(srid=4326),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards("gis", new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards("gis", editor, project_state, new_state)
+        self.current_state = new_state
+        self.assertColumnExists("gis_neighborhood", "path")
+
+        # Test GeometryColumns when available
+        if HAS_GEOMETRY_COLUMNS:
+            self.assertGeometryColumnsCount(2)
+
+        if self.has_spatial_indexes:
+            with connection.cursor() as cursor:
+                indexes = connection.introspection.get_indexes(cursor, "gis_neighborhood")
+            self.assertIn('path', indexes)
+
+    def test_add_blank_gis_field(self):
+        """
+        Should be able to add a GeometryField with blank=True.
+        """
+        project_state = self.set_up_test_model()
+        self.current_state = project_state
+        operation = migrations.AddField(
+            "Neighborhood",
+            "path",
+            fields.LineStringField(blank=True, srid=4326),
         )
         new_state = project_state.clone()
         operation.state_forwards("gis", new_state)
@@ -95,6 +123,7 @@ class OperationTests(TransactionTestCase):
         Tests the RemoveField operation with a GIS-enabled column.
         """
         project_state = self.set_up_test_model()
+        self.current_state = project_state
         operation = migrations.RemoveField("Neighborhood", "geom")
         new_state = project_state.clone()
         operation.state_forwards("gis", new_state)
