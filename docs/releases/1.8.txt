@@ -381,6 +381,10 @@ Requests and Responses
 * ``WSGIRequestHandler`` now follows RFC in converting URI to IRI, using
   ``uri_to_iri()``.
 
+* The :meth:`HttpRequest.get_full_path()
+  <django.http.HttpRequest.get_full_path>` method now escapes unsafe characters
+  from the path portion of a Uniform Resource Identifier (URI) properly.
+
 Tests
 ^^^^^
 

@@ -35,6 +35,19 @@ class RequestsTests(SimpleTestCase):
         # and FILES should be MultiValueDict
         self.assertEqual(request.FILES.getlist('foo'), [])
 
+    def test_httprequest_full_path(self):
+        request = HttpRequest()
+        request.path = request.path_info = '/;some/?awful/=path/foo:bar/'
+        request.META['QUERY_STRING'] = ';some=query&+query=string'
+        expected = '/%3Bsome/%3Fawful/%3Dpath/foo:bar/?;some=query&+query=string'
+        self.assertEqual(request.get_full_path(), expected)
+
+    def test_httprequest_full_path_with_query_string_and_fragment(self):
+        request = HttpRequest()
+        request.path = request.path_info = '/foo#bar'
+        request.META['QUERY_STRING'] = 'baz#quux'
+        self.assertEqual(request.get_full_path(), '/foo%23bar?baz#quux')
+
     def test_httprequest_repr(self):
         request = HttpRequest()
         request.path = '/somepath/'
