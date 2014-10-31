@@ -141,7 +141,7 @@ Improved CSRF protection
 ------------------------
 
 Django now has much improved protection against :doc:`Cross-Site Request Forgery
-(CSRF) attacks</ref/contrib/csrf>`. This type of attack occurs when a malicious
+(CSRF) attacks</ref/csrf>`. This type of attack occurs when a malicious
 Web site contains a link, a form button or some JavaScript that is intended to
 perform some action on your Web site, using the credentials of a logged-in user
 who visits the malicious site in their browser. A related type of attack, "login
@@ -426,7 +426,7 @@ CSRF Protection
 ---------------
 
 We've made large changes to the way CSRF protection works, detailed in
-:doc:`the CSRF documentation </ref/contrib/csrf>`. Here are the major changes you
+:doc:`the CSRF documentation </ref/csrf>`. Here are the major changes you
 should be aware of:
 
 * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated and

@@ -25,7 +25,6 @@ those packages have.
    admin/index
    auth
    contenttypes
-   csrf
    flatpages
    formtools/index
    gis/index
@@ -62,13 +61,6 @@ A light framework for hooking into "types" of content, where each installed
 Django model is a separate content type.
 
 See the :doc:`contenttypes documentation </ref/contrib/contenttypes>`.
-
-csrf
-====
-
-A middleware for preventing Cross Site Request Forgeries
-
-See the :doc:`csrf documentation </ref/contrib/csrf>`.
 
 flatpages
 =========
