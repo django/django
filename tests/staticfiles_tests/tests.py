@@ -9,7 +9,7 @@ import sys
 import tempfile
 import unittest
 
-from django.template import loader, Context
+from django.template import Context, Template
 from django.conf import settings
 from django.core.cache.backends.base import BaseCache
 from django.core.exceptions import ImproperlyConfigured
@@ -89,7 +89,7 @@ class BaseStaticFilesTestCase(object):
 
     def render_template(self, template, **kwargs):
         if isinstance(template, six.string_types):
-            template = loader.get_template_from_string(template)
+            template = Template(template)
         return template.render(Context(kwargs)).strip()
 
     def static_template_snippet(self, path, asvar=False):
