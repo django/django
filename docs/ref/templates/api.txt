@@ -576,7 +576,7 @@ django.core.context_processors.csrf
 
 This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
-</ref/contrib/csrf>`.
+</ref/csrf>`.
 
 django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

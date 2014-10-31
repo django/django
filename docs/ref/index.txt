@@ -10,6 +10,7 @@ API Reference
    class-based-views/index
    clickjacking
    contrib/index
+   csrf
    databases
    django-admin
    exceptions

@@ -341,7 +341,7 @@ Prior to Django 1.2.5, Django's CSRF-prevention system exempted AJAX
 requests from CSRF verification; due to `security issues`_ reported to
 us, however, *all* requests are now subjected to CSRF
 verification. Consult :doc:`the Django CSRF documentation
-</ref/contrib/csrf>` for details on how to handle CSRF verification in
+</ref/csrf>` for details on how to handle CSRF verification in
 AJAX requests.
 
 .. _security issues: https://www.djangoproject.com/weblog/2011/feb/08/security/
