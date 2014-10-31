@@ -226,6 +226,23 @@ def uri_to_iri(uri):
     return repercent_broken_unicode(iri).decode('utf-8')
 
 
+def escape_uri_path(path):
+    """
+    Escape the unsafe characters from the path portion of a Uniform Resource
+    Identifier (URI).
+    """
+    # These are the "reserved" and "unreserved" characters specified in
+    # sections 2.2 and 2.3 of RFC 2396:
+    #   reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ","
+    #   unreserved  = alphanum | mark
+    #   mark        = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
+    # The list of safe characters here is constructed substracting ";", "=",
+    # and "?" according to section 3.3 of RFC 2396.
+    # The reason for not subtracting and escaping "/" is that we are escaping
+    # the entire path, not a path segment.
+    return quote(force_bytes(path), safe=b"/:@&+$,-_.!~*'()")
+
+
 def repercent_broken_unicode(path):
     """
     As per section 3.2 of RFC 3987, step three of converting a URI into an IRI,
