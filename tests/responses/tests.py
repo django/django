@@ -23,14 +23,14 @@ class HttpResponseBaseTests(SimpleTestCase):
         r = HttpResponseBase()
         self.assertEqual(r.writable(), False)
 
-        with self.assertRaises(IOError):
+        with self.assertRaisesMessage(IOError, 'This HttpResponseBase instance is not writable'):
             r.write('asdf')
-        with self.assertRaises(IOError):
+        with self.assertRaisesMessage(IOError, 'This HttpResponseBase instance is not writable'):
             r.writelines(['asdf\n', 'qwer\n'])
 
     def test_tell(self):
         r = HttpResponseBase()
-        with self.assertRaises(IOError):
+        with self.assertRaisesMessage(IOError, 'This HttpResponseBase instance cannot tell its position'):
             r.tell()
 
 

@@ -327,7 +327,7 @@ class HttpResponseBase(six.Iterator):
         raise IOError("This %s instance cannot tell its position" % self.__class__.__name__)
 
     # These methods partially implement a stream-like object interface.
-    # See https://docs.python.org/2/library/io.html#io.IOBase
+    # See https://docs.python.org/library/io.html#io.IOBase
 
     def writable(self):
         return False
@@ -432,7 +432,7 @@ class StreamingHttpResponse(HttpResponseBase):
         return self.streaming_content
 
     def getvalue(self):
-        return self.streaming_content
+        return b''.join(self.streaming_content)
 
 
 class HttpResponseRedirectBase(HttpResponse):

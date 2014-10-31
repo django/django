@@ -546,6 +546,9 @@ class StreamingHttpResponseTests(TestCase):
         with self.assertRaises(Exception):
             r.tell()
 
+        r = StreamingHttpResponse(iter(['hello', 'world']))
+        self.assertEqual(r.getvalue(), 'helloworld')
+
 
 class FileCloseTests(TestCase):
 
