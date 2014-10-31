@@ -206,17 +206,6 @@ class HttpResponseBase(six.Iterator):
     def __getitem__(self, header):
         return self._headers[header.lower()][1]
 
-    def __getstate__(self):
-        # SimpleCookie is not pickleable with pickle.HIGHEST_PROTOCOL, so we
-        # serialize to a string instead
-        state = self.__dict__.copy()
-        state['cookies'] = str(state['cookies'])
-        return state
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-        self.cookies = SimpleCookie(self.cookies)
-
     def has_header(self, header):
         """Case-insensitive check for a header."""
         return header.lower() in self._headers
