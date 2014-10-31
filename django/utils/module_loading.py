@@ -64,26 +64,26 @@ def autodiscover_modules(*args, **kwargs):
 
     register_to = kwargs.get('register_to')
     for app_config in apps.get_app_configs():
-        # Attempt to import the app's module.
-        try:
-            if register_to:
-                before_import_registry = copy.copy(register_to._registry)
+        for module_to_search in args:
+            # Attempt to import the app's module.
+            try:
+                if register_to:
+                    before_import_registry = copy.copy(register_to._registry)
 
-            for module_to_search in args:
                 import_module('%s.%s' % (app_config.name, module_to_search))
-        except:
-            # Reset the model registry to the state before the last import as
-            # this import will have to reoccur on the next request and this
-            # could raise NotRegistered and AlreadyRegistered exceptions
-            # (see #8245).
-            if register_to:
-                register_to._registry = before_import_registry
+            except:
+                # Reset the registry to the state before the last import
+                # as this import will have to reoccur on the next request and
+                # this could raise NotRegistered and AlreadyRegistered
+                # exceptions (see #8245).
+                if register_to:
+                    register_to._registry = before_import_registry
 
-            # Decide whether to bubble up this error. If the app just
-            # doesn't have an admin module, we can ignore the error
-            # attempting to import it, otherwise we want it to bubble up.
-            if module_has_submodule(app_config.module, module_to_search):
-                raise
+                # Decide whether to bubble up this error. If the app just
+                # doesn't have the module in question, we can ignore the error
+                # attempting to import it, otherwise we want it to bubble up.
+                if module_has_submodule(app_config.module, module_to_search):
+                    raise
 
 
 if sys.version_info[:2] >= (3, 3):
