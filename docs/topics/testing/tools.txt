@@ -1569,6 +1569,13 @@ your test suite.
             Person.objects.create(name="Aaron")
             Person.objects.create(name="Daniel")
 
+    .. versionchanged:: 1.8
+
+        Internal caches that prevent execution of some queries are cleared on
+        entering the context. You may temporarily disconnect some receivers
+        from the :data:`~django.test.signals.pre_capture_queries` signal if
+        you're testing cache priming.
+
 .. _topics-testing-email:
 
 Email services

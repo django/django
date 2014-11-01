@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.models import ContentType, clear_content_types_cache
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpRequest, Http404
 from django.test import TestCase, override_settings
+from django.test.signals import pre_capture_queries
 from django.utils import six
 
 from .models import ConcreteModel, ProxyModel, FooWithoutUrl, FooWithUrl, FooWithBrokenAbsoluteUrl
@@ -13,10 +14,12 @@ from .models import ConcreteModel, ProxyModel, FooWithoutUrl, FooWithUrl, FooWit
 class ContentTypesTests(TestCase):
 
     def setUp(self):
+        pre_capture_queries.disconnect(clear_content_types_cache)
         ContentType.objects.clear_cache()
 
     def tearDown(self):
         ContentType.objects.clear_cache()
+        pre_capture_queries.connect(clear_content_types_cache)
 
     def test_lookup_cache(self):
         """

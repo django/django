@@ -16,7 +16,7 @@ from django.db import reset_queries
 from django.http import request
 from django.template import Template
 from django.template.loaders import locmem
-from django.test.signals import template_rendered, setting_changed
+from django.test.signals import pre_capture_queries, setting_changed, template_rendered
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils.encoding import force_str
@@ -422,6 +422,7 @@ class CaptureQueriesContext(object):
         self.initial_queries = len(self.connection.queries_log)
         self.final_queries = None
         request_started.disconnect(reset_queries)
+        pre_capture_queries.send(sender=self.__class__)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):

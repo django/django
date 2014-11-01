@@ -499,7 +499,6 @@ class PermissionTestCase(TestCase):
         models.Permission._meta.permissions = self._original_permissions
         models.Permission._meta.default_permissions = self._original_default_permissions
         models.Permission._meta.verbose_name = self._original_verbose_name
-        ContentType.objects.clear_cache()
 
     def test_duplicated_permissions(self):
         """

@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 from django.apps import apps
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
+from django.test.signals import pre_capture_queries
+from django.utils.encoding import force_text, python_2_unicode_compatible, smart_text
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_text, force_text
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class ContentTypeManager(models.Manager):
@@ -199,3 +199,11 @@ class ContentType(models.Model):
 
     def natural_key(self):
         return (self.app_label, self.model)
+
+
+def clear_content_types_cache(**kwargs):
+    """
+    Resets the cache to allow ``assertNumQueries`` to count all queries.
+    """
+    ContentType.objects.clear_cache()
+pre_capture_queries.connect(clear_content_types_cache)

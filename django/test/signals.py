@@ -13,6 +13,8 @@ template_rendered = Signal(providing_args=["template", "context"])
 
 setting_changed = Signal(providing_args=["setting", "value", "enter"])
 
+pre_capture_queries = Signal()
+
 # Most setting_changed receivers are supposed to be added below,
 # except for cases where the receiver is related to a contrib app.
 

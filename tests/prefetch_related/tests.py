@@ -397,14 +397,14 @@ class CustomPrefetchTests(TestCase):
         TaggedItem.objects.create(tag="houses", content_object=self.house2)
 
         # Control lookups.
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             lst1 = self.traverse_qs(
                 TaggedItem.objects.filter(tag='houses').prefetch_related('content_object__rooms'),
                 [['content_object', 'rooms']]
             )
 
         # Test lookups.
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             lst2 = self.traverse_qs(
                 TaggedItem.objects.prefetch_related(
                     Prefetch('content_object'),
@@ -457,14 +457,14 @@ class CustomPrefetchTests(TestCase):
         TaggedItem.objects.create(content_object=bookmark, favorite=bookmark, tag='python')
 
         # Control lookups.
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             lst1 = self.traverse_qs(
                 Bookmark.objects.prefetch_related('tags', 'tags__content_object', 'favorite_tags'),
                 [['tags', 'content_object'], ['favorite_tags']]
             )
 
         # Test lookups.
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             lst2 = self.traverse_qs(
                 Bookmark.objects.prefetch_related(
                     Prefetch('tags', to_attr='tags_lst'),
@@ -686,16 +686,17 @@ class GenericRelationTests(TestCase):
         TaggedItem.objects.create(tag="outstanding", content_object=self.book2)
         TaggedItem.objects.create(tag="amazing", content_object=self.reader3)
 
-        # 1 for TaggedItem table, 1 for Book table, 1 for Reader table
-        with self.assertNumQueries(3):
+        # 1 for TaggedItem table, 1 for Book table, 1 for Reader table,
+        # 1 for Book content type and 1 for Reader content type
+        with self.assertNumQueries(5):
             qs = TaggedItem.objects.prefetch_related('content_object')
             list(qs)
 
     def test_prefetch_GFK_nonint_pk(self):
         Comment.objects.create(comment="awesome", content_object=self.book1)
 
-        # 1 for Comment table, 1 for Book table
-        with self.assertNumQueries(2):
+        # 1 for Comment table, 1 for Book table, 1 for Book content type
+        with self.assertNumQueries(3):
             qs = Comment.objects.prefetch_related('content_object')
             [c.content_object for c in qs]
 
@@ -713,9 +714,10 @@ class GenericRelationTests(TestCase):
 
         ct = ContentType.objects.get_for_model(Book)
 
-        # We get 3 queries - 1 for main query, 1 for content_objects since they
-        # all use the same table, and 1 for the 'read_by' relation.
-        with self.assertNumQueries(3):
+        # We get 4 queries - 1 for main query, 1 for content_objects since
+        # they all use the same table, 1 for the 'read_by' relation, and one
+        # for content type.
+        with self.assertNumQueries(4):
             # If we limit to books, we know that they will have 'read_by'
             # attributes, so the following makes sense:
             qs = TaggedItem.objects.filter(content_type=ct, tag='awesome').prefetch_related('content_object__read_by')
@@ -729,7 +731,7 @@ class GenericRelationTests(TestCase):
         TaggedItem.objects.create(tag="great", content_object=self.book2)
         TaggedItem.objects.create(tag="rubbish", content_object=self.book3)
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             result = [t.created_by for t in TaggedItem.objects.prefetch_related('created_by')]
 
         self.assertEqual(result,
@@ -740,7 +742,7 @@ class GenericRelationTests(TestCase):
         TaggedItem.objects.create(content_object=bookmark, tag='django')
         TaggedItem.objects.create(content_object=bookmark, tag='python')
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             tags = [t.tag for b in Bookmark.objects.prefetch_related('tags')
                     for t in b.tags.all()]
             self.assertEqual(sorted(tags), ["django", "python"])
@@ -750,7 +752,7 @@ class GenericRelationTests(TestCase):
         TaggedItem.objects.create(content_object=b, tag='django')
         TaggedItem.objects.create(content_object=b, favorite=b, tag='python')
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             bookmark = Bookmark.objects.filter(pk=b.pk).prefetch_related('tags', 'favorite_tags')[0]
             self.assertEqual(sorted([i.tag for i in bookmark.tags.all()]), ["django", "python"])
             self.assertEqual([i.tag for i in bookmark.favorite_tags.all()], ["python"])

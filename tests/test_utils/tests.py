@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import unittest
 
 from django.conf.urls import url
+from django.contrib.contenttypes.models import ContentType, clear_content_types_cache
 from django.core.files.storage import default_storage
 from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import connection
@@ -12,6 +13,7 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
+from django.test.signals import pre_capture_queries
 from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 
@@ -138,6 +140,16 @@ class AssertNumQueriesTests(TestCase):
             self.client.get("/test_utils/get_person/%s/" % person.pk)
             self.client.get("/test_utils/get_person/%s/" % person.pk)
         self.assertNumQueries(2, test_func)
+
+    def test_query_caches_clearing(self):
+        ContentType.objects.get_for_model(Car)
+        with self.assertNumQueries(1):
+            ContentType.objects.get_for_model(Car)
+        pre_capture_queries.disconnect(clear_content_types_cache)
+        ContentType.objects.get_for_model(Car)
+        with self.assertNumQueries(0):
+            ContentType.objects.get_for_model(Car)
+        pre_capture_queries.connect(clear_content_types_cache)
 
 
 class AssertQuerysetEqualTests(TestCase):
