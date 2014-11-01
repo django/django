@@ -771,7 +771,7 @@ Finally, you may run the test as follows:
 
 .. code-block:: bash
 
-    ./manage.py test myapp.MySeleniumTests.test_login
+    ./manage.py test myapp.tests.MySeleniumTests.test_login
 
 This example will automatically open Firefox then go to the login page, enter
 the credentials and press the "Log in" button. Selenium offers other drivers in
