@@ -119,7 +119,7 @@ class CsrfViewMiddlewareTest(TestCase):
         self.assertEqual(csrf_cookie['secure'], True)
         self.assertEqual(csrf_cookie['httponly'], True)
         self.assertEqual(csrf_cookie['path'], '/test/')
-        self.assertTrue('Cookie' in resp2.get('Vary', ''))
+        self.assertIn('Cookie', resp2.get('Vary', ''))
 
     def test_process_response_get_token_not_used(self):
         """
@@ -340,7 +340,7 @@ class CsrfViewMiddlewareTest(TestCase):
         req = self._get_GET_no_csrf_cookie_request()
         resp = view(req)
         self.assertTrue(resp.cookies.get(settings.CSRF_COOKIE_NAME, False))
-        self.assertTrue('Cookie' in resp.get('Vary', ''))
+        self.assertIn('Cookie', resp.get('Vary', ''))
 
     def test_ensures_csrf_cookie_with_middleware(self):
         """
@@ -357,7 +357,7 @@ class CsrfViewMiddlewareTest(TestCase):
         resp = view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE_NAME, False))
-        self.assertTrue('Cookie' in resp2.get('Vary', ''))
+        self.assertIn('Cookie', resp2.get('Vary', ''))
 
     def test_ensures_csrf_cookie_no_logging(self):
         """

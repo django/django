@@ -258,7 +258,7 @@ class ModelFormBaseTest(TestCase):
         except FieldError as e:
             # Make sure the exception contains some reference to the
             # field responsible for the problem.
-            self.assertTrue('no-field' in e.args[0])
+            self.assertIn('no-field', e.args[0])
         else:
             self.fail('Invalid "no-field" field not caught')
 
@@ -1764,14 +1764,14 @@ class FileAndImageFieldTests(TestCase):
                 fields = '__all__'
 
         form = DocumentForm()
-        self.assertTrue('name="myfile"' in six.text_type(form))
-        self.assertTrue('myfile-clear' not in six.text_type(form))
+        self.assertIn('name="myfile"', six.text_type(form))
+        self.assertNotIn('myfile-clear', six.text_type(form))
         form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', b'content')})
         self.assertTrue(form.is_valid())
         doc = form.save(commit=False)
         self.assertEqual(doc.myfile.name, 'something.txt')
         form = DocumentForm(instance=doc)
-        self.assertTrue('myfile-clear' in six.text_type(form))
+        self.assertIn('myfile-clear', six.text_type(form))
         form = DocumentForm(instance=doc, data={'myfile-clear': 'true'})
         doc = form.save(commit=False)
         self.assertEqual(bool(doc.myfile), False)
@@ -1797,8 +1797,8 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(form.errors['myfile'],
                          ['Please either submit a file or check the clear checkbox, not both.'])
         rendered = six.text_type(form)
-        self.assertTrue('something.txt' in rendered)
-        self.assertTrue('myfile-clear' in rendered)
+        self.assertIn('something.txt', rendered)
+        self.assertIn('myfile-clear', rendered)
 
     def test_file_field_data(self):
         # Test conditions when files is either not given or empty.

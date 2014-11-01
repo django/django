@@ -609,13 +609,13 @@ class RelatedM2MTests(OptionsBaseTests):
 
     def test_related_m2m_asymmetrical(self):
         m2m = Person._meta.many_to_many
-        self.assertTrue('following_base' in [f.attname for f in m2m])
+        self.assertIn('following_base', [f.attname for f in m2m])
         related_m2m = Person._meta.get_all_related_many_to_many_objects()
-        self.assertTrue('followers_base' in [o.field.related_query_name() for o in related_m2m])
+        self.assertIn('followers_base', [o.field.related_query_name() for o in related_m2m])
 
     def test_related_m2m_symmetrical(self):
         m2m = Person._meta.many_to_many
-        self.assertTrue('friends_base' in [f.attname for f in m2m])
+        self.assertIn('friends_base', [f.attname for f in m2m])
         related_m2m = Person._meta.get_all_related_many_to_many_objects()
         self.assertIn('friends_inherited_rel_+', [o.field.related_query_name() for o in related_m2m])
 

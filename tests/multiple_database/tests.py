@@ -1485,7 +1485,7 @@ class AuthTestCase(TestCase):
         new_io = StringIO()
         management.call_command('dumpdata', 'auth', format='json', database='other', stdout=new_io)
         command_output = new_io.getvalue().strip()
-        self.assertTrue('"email": "alice@example.com"' in command_output)
+        self.assertIn('"email": "alice@example.com"', command_output)
 
 
 class AntiPetRouter(object):

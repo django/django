@@ -11,9 +11,9 @@ class IntrospectionTests(TestCase):
     def test_table_names(self):
         tl = connection.introspection.table_names()
         self.assertEqual(tl, sorted(tl))
-        self.assertTrue(Reporter._meta.db_table in tl,
+        self.assertIn(Reporter._meta.db_table, tl,
                      "'%s' isn't in table_list()." % Reporter._meta.db_table)
-        self.assertTrue(Article._meta.db_table in tl,
+        self.assertIn(Article._meta.db_table, tl,
                      "'%s' isn't in table_list()." % Article._meta.db_table)
 
     def test_django_table_names(self):
@@ -60,7 +60,7 @@ class IntrospectionTests(TestCase):
     def test_sequence_list(self):
         sequences = connection.introspection.sequence_list()
         expected = {'table': Reporter._meta.db_table, 'column': 'id'}
-        self.assertTrue(expected in sequences,
+        self.assertIn(expected, sequences,
                      'Reporter sequence not found in sequence_list()')
 
     def test_get_table_description_names(self):

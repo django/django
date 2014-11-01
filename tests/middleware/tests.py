@@ -318,24 +318,24 @@ class ConditionalGetMiddlewareTest(TestCase):
     # Tests for the Date header
 
     def test_date_header_added(self):
-        self.assertFalse('Date' in self.resp)
+        self.assertNotIn('Date', self.resp)
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertTrue('Date' in self.resp)
+        self.assertIn('Date', self.resp)
 
     # Tests for the Content-Length header
 
     def test_content_length_header_added(self):
         content_length = len(self.resp.content)
-        self.assertFalse('Content-Length' in self.resp)
+        self.assertNotIn('Content-Length', self.resp)
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertTrue('Content-Length' in self.resp)
+        self.assertIn('Content-Length', self.resp)
         self.assertEqual(int(self.resp['Content-Length']), content_length)
 
     def test_content_length_header_not_added(self):
         resp = StreamingHttpResponse('content')
-        self.assertFalse('Content-Length' in resp)
+        self.assertNotIn('Content-Length', resp)
         resp = ConditionalGetMiddleware().process_response(self.req, resp)
-        self.assertFalse('Content-Length' in resp)
+        self.assertNotIn('Content-Length', resp)
 
     def test_content_length_header_not_changed(self):
         bad_content_length = len(self.resp.content) + 10

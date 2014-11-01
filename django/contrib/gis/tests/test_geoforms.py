@@ -174,7 +174,7 @@ class SpecializedFieldTest(SimpleTestCase):
         self.assertFalse(PointForm().is_valid())
         invalid = PointForm(data={'p': 'some invalid geom'})
         self.assertFalse(invalid.is_valid())
-        self.assertTrue('Invalid geometry value' in str(invalid.errors))
+        self.assertIn('Invalid geometry value', str(invalid.errors))
 
         for invalid in [geo for key, geo in self.geometries.items() if key != 'point']:
             self.assertFalse(PointForm(data={'p': invalid.wkt}).is_valid())

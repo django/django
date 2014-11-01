@@ -55,13 +55,13 @@ class AuthViewsTestCase(TestCase):
             'username': username,
             'password': password,
         })
-        self.assertTrue(SESSION_KEY in self.client.session)
+        self.assertIn(SESSION_KEY, self.client.session)
         return response
 
     def logout(self):
         response = self.client.get('/admin/logout/')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(SESSION_KEY not in self.client.session)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
     def assertFormError(self, response, error):
         """Assert that error is found in response.context['form'] errors"""
@@ -129,7 +129,7 @@ class PasswordResetTest(AuthViewsTestCase):
         response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertTrue("http://" in mail.outbox[0].body)
+        self.assertIn("http://", mail.outbox[0].body)
         self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
         # optional multipart text/html email has been added.  Make sure original,
         # default functionality is 100% the same
@@ -169,7 +169,7 @@ class PasswordResetTest(AuthViewsTestCase):
             )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertTrue("http://adminsite.com" in mail.outbox[0].body)
+        self.assertIn("http://adminsite.com", mail.outbox[0].body)
         self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
 
     # Skip any 500 handler action (like sending more mail...)
@@ -524,8 +524,7 @@ class LoginTest(AuthViewsTestCase):
                 'password': password,
             })
             self.assertEqual(response.status_code, 302)
-            self.assertTrue(good_url in response.url,
-                            "%s should be allowed" % good_url)
+            self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
 
     def test_login_form_contains_request(self):
         # 15198
@@ -683,7 +682,7 @@ class LoginRedirectUrlTest(AuthViewsTestCase):
 class LogoutTest(AuthViewsTestCase):
 
     def confirm_logged_out(self):
-        self.assertTrue(SESSION_KEY not in self.client.session)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
     def test_logout_default(self):
         "Logout without next_page option renders the default template"
@@ -783,8 +782,7 @@ class LogoutTest(AuthViewsTestCase):
             self.login()
             response = self.client.get(safe_url)
             self.assertEqual(response.status_code, 302)
-            self.assertTrue(good_url in response.url,
-                            "%s should be allowed" % good_url)
+            self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
             self.confirm_logged_out()
 
     def test_logout_preserve_language(self):

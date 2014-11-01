@@ -1156,15 +1156,15 @@ class JoinPromotionTests(TestCase):
     def test_existing_join_not_promoted(self):
         # No promotion for existing joins
         qs = Charlie.objects.filter(alfa__name__isnull=False).annotate(Count('alfa__name'))
-        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        self.assertIn(' INNER JOIN ', str(qs.query))
         # Also, the existing join is unpromoted when doing filtering for already
         # promoted join.
         qs = Charlie.objects.annotate(Count('alfa__name')).filter(alfa__name__isnull=False)
-        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        self.assertIn(' INNER JOIN ', str(qs.query))
         # But, as the join is nullable first use by annotate will be LOUTER
         qs = Charlie.objects.annotate(Count('alfa__name'))
-        self.assertTrue(' LEFT OUTER JOIN ' in str(qs.query))
+        self.assertIn(' LEFT OUTER JOIN ', str(qs.query))
 
     def test_non_nullable_fk_not_promoted(self):
         qs = Book.objects.annotate(Count('contact__name'))
-        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        self.assertIn(' INNER JOIN ', str(qs.query))

@@ -134,7 +134,7 @@ class ModelInstanceCreationTests(TestCase):
         a.save()
 
         # You can use 'in' to test for membership...
-        self.assertTrue(a in Article.objects.all())
+        self.assertIn(a, Article.objects.all())
         # ... but there will often be more efficient ways if that is all you need:
         self.assertTrue(Article.objects.filter(id=a.id).exists())
 

@@ -292,7 +292,7 @@ class ResolverTests(unittest.TestCase):
             self.fail('resolve did not raise a 404')
         except Resolver404 as e:
             # make sure we at least matched the root ('/') url resolver:
-            self.assertTrue('tried' in e.args[0])
+            self.assertIn('tried', e.args[0])
             tried = e.args[0]['tried']
             self.assertEqual(len(e.args[0]['tried']), len(url_types_names), 'Wrong number of tried URLs returned.  Expected %s, got %s.' % (len(url_types_names), len(e.args[0]['tried'])))
             for tried, expected in zip(e.args[0]['tried'], url_types_names):

@@ -127,7 +127,7 @@ class Queries1Tests(BaseQuerysetTest):
     def test_ticket2306(self):
         # Checking that no join types are "left outer" joins.
         query = Item.objects.filter(tags=self.t2).query
-        self.assertTrue(query.LOUTER not in [x[2] for x in query.alias_map.values()])
+        self.assertNotIn(query.LOUTER, [x[2] for x in query.alias_map.values()])
 
         self.assertQuerysetEqual(
             Item.objects.filter(Q(tags=self.t1)).order_by('name'),
@@ -335,7 +335,7 @@ class Queries1Tests(BaseQuerysetTest):
 
         # Excluding from a relation that cannot be NULL should not use outer joins.
         query = Item.objects.exclude(creator__in=[self.a1, self.a2]).query
-        self.assertTrue(query.LOUTER not in [x[2] for x in query.alias_map.values()])
+        self.assertNotIn(query.LOUTER, [x[2] for x in query.alias_map.values()])
 
         # Similarly, when one of the joins cannot possibly, ever, involve NULL
         # values (Author -> ExtraInfo, in the following), it should never be
@@ -500,7 +500,7 @@ class Queries1Tests(BaseQuerysetTest):
         # actually allow both "foo" and "foo_id".
 
         # The *_id version is returned by default.
-        self.assertTrue('note_id' in ExtraInfo.objects.values()[0])
+        self.assertIn('note_id', ExtraInfo.objects.values()[0])
 
         # You can also pass it in explicitly.
         self.assertValueQuerysetEqual(
@@ -911,7 +911,7 @@ class Queries1Tests(BaseQuerysetTest):
         q = Tag.objects.filter(parent__isnull=True)
 
         self.assertQuerysetEqual(q, ['<Tag: t1>'])
-        self.assertTrue('JOIN' not in str(q.query))
+        self.assertNotIn('JOIN', str(q.query))
 
         q = Tag.objects.filter(parent__isnull=False)
 
@@ -919,18 +919,18 @@ class Queries1Tests(BaseQuerysetTest):
             q,
             ['<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>'],
         )
-        self.assertTrue('JOIN' not in str(q.query))
+        self.assertNotIn('JOIN', str(q.query))
 
         q = Tag.objects.exclude(parent__isnull=True)
         self.assertQuerysetEqual(
             q,
             ['<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>'],
         )
-        self.assertTrue('JOIN' not in str(q.query))
+        self.assertNotIn('JOIN', str(q.query))
 
         q = Tag.objects.exclude(parent__isnull=False)
         self.assertQuerysetEqual(q, ['<Tag: t1>'])
-        self.assertTrue('JOIN' not in str(q.query))
+        self.assertNotIn('JOIN', str(q.query))
 
         q = Tag.objects.exclude(parent__parent__isnull=False)
 
@@ -985,7 +985,7 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Author: a2>', '<Author: a3>'],
         )
         self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 2)
-        self.assertTrue('INNER JOIN' not in str(q.query))
+        self.assertNotIn('INNER JOIN', str(q.query))
 
         q = Author.objects.filter(item__tags__parent__isnull=True)
         self.assertQuerysetEqual(
@@ -993,7 +993,7 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Author: a1>', '<Author: a2>', '<Author: a2>', '<Author: a3>'],
         )
         self.assertEqual(str(q.query).count('LEFT OUTER JOIN'), 3)
-        self.assertTrue('INNER JOIN' not in str(q.query))
+        self.assertNotIn('INNER JOIN', str(q.query))
 
     def test_ticket_10790_5(self):
         # Querying with isnull=False across m2m field should not create outer joins
@@ -1135,7 +1135,7 @@ class Queries1Tests(BaseQuerysetTest):
         qs = Author.objects.annotate(Count('item'))
         qs = qs.filter(~Q(extra__value=0))
 
-        self.assertTrue('SELECT' in str(qs.query))
+        self.assertIn('SELECT', str(qs.query))
         self.assertQuerysetEqual(
             qs,
             ['<Author: a1>', '<Author: a2>', '<Author: a3>', '<Author: a4>']
@@ -1395,7 +1395,7 @@ class Queries4Tests(BaseQuerysetTest):
         # Calling order_by() with no parameters removes any existing ordering on the
         # model. But it should still be possible to add new ordering after that.
         qs = Author.objects.order_by().order_by('name')
-        self.assertTrue('ORDER BY' in qs.query.get_compiler(qs.db).as_sql()[0])
+        self.assertIn('ORDER BY', qs.query.get_compiler(qs.db).as_sql()[0])
 
     def test_order_by_reverse_fk(self):
         # It is possible to order by reverse of foreign key, although that can lead
@@ -1719,9 +1719,9 @@ class NullableRelOrderingTests(TestCase):
         r = RelatedObject.objects.create(single=s, f=1)
         Plaything.objects.create(name="p2", others=r)
         qs = Plaything.objects.all().filter(others__isnull=False).order_by('pk')
-        self.assertTrue('JOIN' not in str(qs.query))
+        self.assertNotIn('JOIN', str(qs.query))
         qs = Plaything.objects.all().filter(others__f__isnull=False).order_by('pk')
-        self.assertTrue('INNER' in str(qs.query))
+        self.assertIn('INNER', str(qs.query))
         qs = qs.order_by('others__single__name')
         # The ordering by others__single__pk will add one new join (to single)
         # and that join must be LEFT join. The already existing join to related
@@ -1915,7 +1915,8 @@ class ExistsSql(TestCase):
         self.assertEqual(len(captured_queries), 1)
         qstr = captured_queries[0]
         id, name = connection.ops.quote_name('id'), connection.ops.quote_name('name')
-        self.assertTrue(id not in qstr and name not in qstr)
+        self.assertNotIn(id, qstr)
+        self.assertNotIn(name, qstr)
 
     def test_ticket_18414(self):
         Article.objects.create(name='one', created=datetime.datetime.now())
@@ -2961,13 +2962,13 @@ class NullJoinPromotionOrTest(TestCase):
 
     def test_null_join_demotion(self):
         qs = ModelA.objects.filter(Q(b__name__isnull=False) & Q(b__name__isnull=True))
-        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        self.assertIn(' INNER JOIN ', str(qs.query))
         qs = ModelA.objects.filter(Q(b__name__isnull=True) & Q(b__name__isnull=False))
-        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        self.assertIn(' INNER JOIN ', str(qs.query))
         qs = ModelA.objects.filter(Q(b__name__isnull=False) | Q(b__name__isnull=True))
-        self.assertTrue(' LEFT OUTER JOIN ' in str(qs.query))
+        self.assertIn(' LEFT OUTER JOIN ', str(qs.query))
         qs = ModelA.objects.filter(Q(b__name__isnull=True) | Q(b__name__isnull=False))
-        self.assertTrue(' LEFT OUTER JOIN ' in str(qs.query))
+        self.assertIn(' LEFT OUTER JOIN ', str(qs.query))
 
     def test_ticket_21366(self):
         n = Note.objects.create(note='n', misc='m')
@@ -3314,9 +3315,9 @@ class Ticket20101Tests(TestCase):
         n = Note.objects.create(note='foo', misc='bar')
         qs1 = Note.objects.exclude(annotation__in=[a1, a2])
         qs2 = Note.objects.filter(annotation__in=[a3])
-        self.assertTrue(n in qs1)
-        self.assertFalse(n in qs2)
-        self.assertTrue(n in (qs1 | qs2))
+        self.assertIn(n, qs1)
+        self.assertNotIn(n, qs2)
+        self.assertIn(n, (qs1 | qs2))
 
 
 class EmptyStringPromotionTests(TestCase):
@@ -3545,16 +3546,16 @@ class Ticket21203Tests(TestCase):
 class ValuesJoinPromotionTests(TestCase):
     def test_values_no_promotion_for_existing(self):
         qs = Node.objects.filter(parent__parent__isnull=False)
-        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        self.assertIn(' INNER JOIN ', str(qs.query))
         qs = qs.values('parent__parent__id')
-        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        self.assertIn(' INNER JOIN ', str(qs.query))
         # Make sure there is a left outer join without the filter.
         qs = Node.objects.values('parent__parent__id')
-        self.assertTrue(' LEFT OUTER JOIN ' in str(qs.query))
+        self.assertIn(' LEFT OUTER JOIN ', str(qs.query))
 
     def test_non_nullable_fk_not_promoted(self):
         qs = ObjectB.objects.values('objecta__name')
-        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        self.assertIn(' INNER JOIN ', str(qs.query))
 
     def test_ticket_21376(self):
         a = ObjectA.objects.create()
@@ -3567,7 +3568,7 @@ class ValuesJoinPromotionTests(TestCase):
         )
         self.assertEqual(qs.count(), 1)
         tblname = connection.ops.quote_name(ObjectB._meta.db_table)
-        self.assertTrue(' LEFT OUTER JOIN %s' % tblname in str(qs.query))
+        self.assertIn(' LEFT OUTER JOIN %s' % tblname, str(qs.query))
 
 
 class ForeignKeyToBaseExcludeTests(TestCase):

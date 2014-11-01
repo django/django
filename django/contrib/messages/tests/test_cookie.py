@@ -65,7 +65,7 @@ class CookieTest(BaseTests, TestCase):
         response = self.get_response()
         storage.add(constants.INFO, 'test')
         storage.update(response)
-        self.assertTrue('test' in response.cookies['messages'].value)
+        self.assertIn('test', response.cookies['messages'].value)
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], '')
         self.assertEqual(response.cookies['messages']['secure'], True)
