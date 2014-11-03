@@ -97,8 +97,8 @@ configuration instructions for the `using database-backed sessions`_.
 
 .. versionchanged:: 1.7
 
-Before version 1.7, the ``cached_db`` backend always used the ``default`` cache
-rather than the :setting:`SESSION_CACHE_ALIAS`.
+    Before version 1.7, the ``cached_db`` backend always used the ``default``
+    cache rather than the :setting:`SESSION_CACHE_ALIAS`.
 
 Using file-based sessions
 -------------------------
