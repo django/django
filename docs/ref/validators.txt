@@ -149,9 +149,13 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. class:: URLValidator([schemes=None, regex=None, message=None, code=None])
 
     A :class:`RegexValidator` that ensures a value looks like a URL, and raises
-    an error code of ``'invalid'`` if it doesn't. In addition to the optional
-    arguments of its parent :class:`RegexValidator` class, ``URLValidator``
-    accepts an extra optional attribute:
+    an error code of ``'invalid'`` if it doesn't.
+
+    Loopback addresses and reserved IP spaces are considered valid. Literal
+    IPv6 addresses (:rfc:`2732`) and unicode domains are both supported.
+
+    In addition to the optional arguments of its parent :class:`RegexValidator`
+    class, ``URLValidator`` accepts an extra optional attribute:
 
     .. attribute:: schemes
 
@@ -164,6 +168,11 @@ to, or in lieu of custom ``field.clean()`` methods.
     .. versionchanged:: 1.7
 
         The optional ``schemes`` attribute was added.
+
+    .. versionchanged:: 1.8
+
+        Support for IPv6 addresses, unicode domains, and URLs containing
+        authentication data was added.
 
 ``validate_email``
 ------------------

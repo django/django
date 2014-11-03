@@ -10,3 +10,39 @@ http://inv-.alid-.com
 http://inv-.-alid.com
 file://localhost/path
 git://example.com/
+http://.
+http://..
+http://../
+http://?
+http://??
+http://??/
+http://#
+http://##
+http://##/
+http://foo.bar?q=Spaces should be encoded
+//
+//a
+///a
+///
+http:///a
+foo.com
+rdar://1234
+h://test
+http:// shouldfail.com
+:// should fail
+http://foo.bar/foo(bar)baz quux
+http://-error-.invalid/
+http://-a.b.co
+http://a.b-.co
+http:/
+http://
+http://
+http://1.1.1.1.1
+http://123.123.123
+http://3628126748
+http://123
+http://.www.foo.bar/
+http://.www.foo.bar./
+http://[::1:2::3]:8080/
+http://[]
+http://[]:8080

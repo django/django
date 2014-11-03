@@ -606,7 +606,8 @@ Tests
 Validators
 ^^^^^^^^^^
 
-* ...
+* :class:`~django.core.validators.URLValidator` now supports IPv6 addresses,
+  unicode domains, and URLs containing authentication data.
 
 Backwards incompatible changes in 1.8
 =====================================
