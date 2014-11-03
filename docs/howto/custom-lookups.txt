@@ -152,8 +152,24 @@ applied, Django uses the ``output_field`` attribute. We didn't need to specify
 this here as it didn't change, but supposing we were applying ``AbsoluteValue``
 to some field which represents a more complex type (for example a point
 relative to an origin, or a complex number) then we may have wanted to specify
-``output_field = FloatField``, which will ensure that further lookups like
-``abs__lte`` behave as they would for a ``FloatField``.
+that the transform returns a ``FloatField`` type for further lookups. This can
+be done by adding an ``output_field`` attribute to the transform::
+
+    from django.db.models import FloatField, Transform
+
+    class AbsoluteValue(Transform):
+        lookup_name = 'abs'
+
+        def as_sql(self, qn, connection):
+            lhs, params = qn.compile(self.lhs)
+            return "ABS(%s)" % lhs, params
+
+        @property
+        def output_field(self):
+            return FloatField()
+
+This ensures that further lookups like ``abs__lte`` behave as they would for
+a ``FloatField``.
 
 Writing an efficient abs__lt lookup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
