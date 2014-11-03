@@ -474,7 +474,7 @@ a fallback when the database-backed sites framework is not available.
 
     .. versionchanged:: 1.7
 
-      This class used to be defined in ``django.contrib.sites.models``.
+        This class used to be defined in ``django.contrib.sites.models``.
 
 A :class:`~django.contrib.sites.requests.RequestSite` object has a similar
 interface to a normal :class:`~django.contrib.sites.models.Site` object,
@@ -500,10 +500,10 @@ Finally, to avoid repetitive fallback code, the framework provides a
 
     .. versionchanged:: 1.7
 
-      This function used to be defined in ``django.contrib.sites.models``.
+        This function used to be defined in ``django.contrib.sites.models``.
 
     .. versionchanged:: 1.8
 
-      This function will now lookup the current site based on
-      :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
-      :setting:`SITE_ID` setting is not defined.
+        This function will now lookup the current site based on
+        :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
+        :setting:`SITE_ID` setting is not defined.

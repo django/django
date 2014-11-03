@@ -604,8 +604,8 @@ For example::
 
 .. versionchanged:: 1.7
 
-  In previous versions only instances of the exact same class and same
-  primary key value were considered equal.
+    In previous versions only instances of the exact same class and same
+    primary key value were considered equal.
 
 ``__hash__``
 ------------
@@ -621,8 +621,8 @@ in Python`_).
 
 .. versionchanged:: 1.7
 
-  In previous versions instance's without primary key value were
-  hashable.
+    In previous versions instance's without primary key value were
+    hashable.
 
 .. _is forbidden in Python: http://docs.python.org/reference/datamodel.html#object.__hash__
 
