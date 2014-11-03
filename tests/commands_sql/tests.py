@@ -54,7 +54,7 @@ class SQLCommandsTestCase(TestCase):
             if 'CHECK' in statement:
                 success = True
         if not success:
-            self.fail("'CHECK' not found in ouput %s" % output)
+            self.fail("'CHECK' not found in output %s" % output)
 
     def test_sql_delete(self):
         app_config = apps.get_app_config('commands_sql')

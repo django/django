@@ -281,7 +281,7 @@ class ModelInheritanceTests(TestCase):
             .defer("italianrestaurant__serves_gnocchi")
             .order_by("rating"))
 
-        # Test that the field was actually defered
+        # Test that the field was actually deferred
         with self.assertNumQueries(2):
             objs = list(qs.all())
             self.assertTrue(objs[1].italianrestaurant.serves_gnocchi)

@@ -12,7 +12,7 @@ class GeoQuery(sql.Query):
     """
     A single spatial SQL query.
     """
-    # Overridding the valid query terms.
+    # Overriding the valid query terms.
     query_terms = QUERY_TERMS | set(GeometryField.class_lookups.keys())
     aggregates_module = gis_aggregates
 
