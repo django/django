@@ -793,7 +793,7 @@ Methods
 
     .. versionadded:: 1.8
 
-    Writes a list of lines to the response. Line seperators are not added. This
+    Writes a list of lines to the response. Line separators are not added. This
     method makes an :class:`HttpResponse` instance a stream-like object.
 
 .. _HTTP status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
