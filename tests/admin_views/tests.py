@@ -479,7 +479,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get('/test_admin/%s/admin_views/thing/' % self.urlbit, {'notarealfield': '5'})
         self.assertRedirects(response, '/test_admin/%s/admin_views/thing/?e=1' % self.urlbit)
 
-        # Spanning relationships through an inexistant related object (Refs #16716)
+        # Spanning relationships through a nonexistent related object (Refs #16716)
         response = self.client.get('/test_admin/%s/admin_views/thing/' % self.urlbit, {'notarealfield__whatever': '5'})
         self.assertRedirects(response, '/test_admin/%s/admin_views/thing/?e=1' % self.urlbit)
 
@@ -605,7 +605,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(calls), 1)
 
-        # Specifying a field that is not refered by any other model registered
+        # Specifying a field that is not referred by any other model registered
         # to this admin site should raise an exception.
         with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
             response = self.client.get("/test_admin/admin/admin_views/section/", {TO_FIELD_VAR: 'name'})
@@ -624,12 +624,12 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get("/test_admin/admin/admin_views/ingredient/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
-        # #23329 - Specifying a field that is not refered by any other model directly registered
+        # #23329 - Specifying a field that is not referred by any other model directly registered
         # to this admin site but registered through inheritance should be allowed.
         response = self.client.get("/test_admin/admin/admin_views/referencedbyparent/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
-        # #23431 - Specifying a field that is only refered to by a inline of a registered
+        # #23431 - Specifying a field that is only referred to by a inline of a registered
         # model should be allowed.
         response = self.client.get("/test_admin/admin/admin_views/referencedbyinline/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
