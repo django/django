@@ -18,6 +18,18 @@ class Family(models.Model):
 
 
 class Person(models.Model):
+    """
+    Stores information about a person, related to :model:`myapp.Company`.
+
+    **Notes**
+
+    Use ``save_changes()`` when saving this object.
+
+    ``company``
+        Field storing :model:`myapp.Company` where the person works.
+
+    (DESCRIPTION)
+    """
     first_name = models.CharField(max_length=200, help_text="The person's first name")
     last_name = models.CharField(max_length=200, help_text="The person's last name")
     company = models.ForeignKey(Company, help_text="place of work")
