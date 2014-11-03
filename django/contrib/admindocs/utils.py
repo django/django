@@ -19,9 +19,9 @@ else:
 
 def trim_docstring(docstring):
     """
-    Uniformly trims leading/trailing whitespace from docstrings.
+    Uniformly trim leading/trailing whitespace from docstrings.
 
-    Based on http://www.python.org/peps/pep-0257.html#handling-docstring-indentation
+    Based on https://www.python.org/dev/peps/pep-0257/#handling-docstring-indentation
     """
     if not docstring or not docstring.strip():
         return ''
@@ -34,7 +34,7 @@ def trim_docstring(docstring):
 
 def parse_docstring(docstring):
     """
-    Parse out the parts of a docstring.  Returns (title, body, metadata).
+    Parse out the parts of a docstring.  Return (title, body, metadata).
     """
     docstring = trim_docstring(docstring)
     parts = re.split(r'\n{2,}', docstring)
