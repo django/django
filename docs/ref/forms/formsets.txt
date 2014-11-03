@@ -20,4 +20,4 @@ Formset API reference. For introductory material about formsets, see the
 
     .. versionchanged:: 1.7
 
-    The ``min_num`` and ``validate_min`` parameters were added.
+        The ``min_num`` and ``validate_min`` parameters were added.

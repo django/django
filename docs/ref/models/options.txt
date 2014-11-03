@@ -323,8 +323,8 @@ Django quotes column and table names behind the scenes.
 
     .. versionchanged:: 1.7
 
-    The ``ValidationError`` raised during model validation when the
-    constraint is violated has the ``unique_together`` error code.
+        The ``ValidationError`` raised during model validation when the
+        constraint is violated has the ``unique_together`` error code.
 
 ``index_together``
 ------------------

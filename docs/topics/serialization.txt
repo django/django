@@ -482,12 +482,12 @@ line flags to generate natural keys.
 
 .. versionchanged:: 1.7
 
-Previously there was only a ``use_natural_keys`` argument for
-``serializers.serialize()`` and the `-n` or `--natural` command line flags.
-These have been deprecated in favor of the ``use_natural_foreign_keys`` and
-``use_natural_primary_keys`` arguments and the corresponding
-:djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary` options
-for :djadmin:`dumpdata`.
+    Previously there was only a ``use_natural_keys`` argument for
+    ``serializers.serialize()`` and the `-n` or `--natural` command line flags.
+    These have been deprecated in favor of the ``use_natural_foreign_keys`` and
+    ``use_natural_primary_keys`` arguments and the corresponding
+    :djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary` options
+    for :djadmin:`dumpdata`.
 
 The original argument and command line flags remain for backwards
 compatibility and map to the new ``use_natural_foreign_keys`` argument and

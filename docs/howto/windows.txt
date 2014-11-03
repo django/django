@@ -64,8 +64,8 @@ by executing ``django-admin.py --version`` in the command prompt.
 
 .. versionchanged:: 1.7
 
- In Django 1.7, a ``.exe`` has been introduced, so just use
- ``django-admin`` in place of ``django-admin.py`` in the command prompt.
+    In Django 1.7, a ``.exe`` has been introduced, so just use
+    ``django-admin`` in place of ``django-admin.py`` in the command prompt.
 
 See :ref:`database-installation` for information on database installation
 with Django.
