@@ -27,8 +27,8 @@ def get_gunicorn_config(**options):
 class GunicornApplication(gapp.Application):
 
     def __init__(self, handler, options=None):
-        self.options = options or {}
         self.handler = handler
+        self.options = options or {}
         super(GunicornApplication, self).__init__()
 
     def load_config(self):
