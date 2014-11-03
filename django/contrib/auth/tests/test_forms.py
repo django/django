@@ -386,7 +386,7 @@ class PasswordResetFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form['email'].errors, [_('Enter a valid email address.')])
 
-    def test_nonexistant_email(self):
+    def test_nonexistent_email(self):
         """
         Test nonexistent email address. This should not fail because it would
         expose information about registered users.

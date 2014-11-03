@@ -950,7 +950,7 @@ class DBConstraintTestCase(TransactionTestCase):
 
     available_apps = ['backends']
 
-    def test_can_reference_existant(self):
+    def test_can_reference_existent(self):
         obj = models.Object.objects.create()
         ref = models.ObjectReference.objects.create(obj=obj)
         self.assertEqual(ref.obj, obj)
@@ -958,7 +958,7 @@ class DBConstraintTestCase(TransactionTestCase):
         ref = models.ObjectReference.objects.get(obj=obj)
         self.assertEqual(ref.obj, obj)
 
-    def test_can_reference_non_existant(self):
+    def test_can_reference_non_existent(self):
         self.assertFalse(models.Object.objects.filter(id=12345).exists())
         ref = models.ObjectReference.objects.create(obj_id=12345)
         ref_new = models.ObjectReference.objects.get(obj_id=12345)

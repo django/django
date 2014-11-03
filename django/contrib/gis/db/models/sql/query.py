@@ -14,7 +14,7 @@ class GeoQuery(sql.Query):
     """
     A single spatial SQL query.
     """
-    # Overridding the valid query terms.
+    # Overriding the valid query terms.
     query_terms = ALL_TERMS
     aggregates_module = gis_aggregates
 

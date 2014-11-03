@@ -267,7 +267,7 @@ class ExpressionsTests(TestCase):
         # Another similar case for F() than above. Now we have the same join
         # in two filter kwargs, one in the lhs lookup, one in F. Here pre
         # #18375 the amount of joins generated was random if dict
-        # randomization was enabled, that is the generated query dependend
+        # randomization was enabled, that is the generated query dependent
         # on which clause was seen first.
         qs = Employee.objects.filter(
             company_ceo_set__num_employees=F('pk'),

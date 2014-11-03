@@ -903,7 +903,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
                          str(self.jenny.id), str(self.john.id)])
 
             # -----------------------------------------------------------------
-            # Check that chosing a filtered option sends it properly to the
+            # Check that choosing a filtered option sends it properly to the
             # 'to' box.
             input.send_keys('a')
             self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.jason.id)])
