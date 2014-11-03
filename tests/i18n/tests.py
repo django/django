@@ -1153,7 +1153,7 @@ class ResolutionOrderI18NTests(TestCase):
 
     def assertUgettext(self, msgid, msgstr):
         result = ugettext(msgid)
-        self.assertTrue(msgstr in result, ("The string '%s' isn't in the "
+        self.assertIn(msgstr, result, ("The string '%s' isn't in the "
             "translation of '%s'; the actual result is '%s'." % (msgstr, msgid, result)))
 
 

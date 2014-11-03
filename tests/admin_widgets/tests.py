@@ -1046,7 +1046,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.switch_to.window('id_main_band')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
-        self.assertTrue('/band/42/' in link.get_attribute('href'))
+        self.assertIn('/band/42/', link.get_attribute('href'))
         link.click()
 
         # The field now contains the selected band's id
@@ -1058,7 +1058,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.switch_to.window('id_main_band')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
-        self.assertTrue('/band/98/' in link.get_attribute('href'))
+        self.assertIn('/band/98/', link.get_attribute('href'))
         link.click()
 
         # The field now contains the other selected band's id
@@ -1081,7 +1081,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.switch_to.window('id_supporting_bands')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
-        self.assertTrue('/band/42/' in link.get_attribute('href'))
+        self.assertIn('/band/42/', link.get_attribute('href'))
         link.click()
 
         # The field now contains the selected band's id
@@ -1093,7 +1093,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.switch_to.window('id_supporting_bands')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
-        self.assertTrue('/band/98/' in link.get_attribute('href'))
+        self.assertIn('/band/98/', link.get_attribute('href'))
         link.click()
 
         # The field now contains the two selected bands' ids

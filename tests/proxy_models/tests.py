@@ -272,7 +272,7 @@ class ProxyModelTests(TestCase):
 
     def test_content_type(self):
         ctype = ContentType.objects.get_for_model
-        self.assertTrue(ctype(Person) is ctype(OtherPerson))
+        self.assertIs(ctype(Person), ctype(OtherPerson))
 
     def test_user_userproxy_userproxyproxy(self):
         User.objects.create(name='Bruce')
@@ -396,9 +396,9 @@ class ProxyModelAdminTests(TestCase):
         with self.assertNumQueries(7):
             collector = admin.utils.NestedObjects('default')
             collector.collect(ProxyTrackerUser.objects.all())
-        self.assertTrue(tracker_user in collector.edges.get(None, ()))
-        self.assertTrue(base_user in collector.edges.get(None, ()))
-        self.assertTrue(issue in collector.edges.get(tracker_user, ()))
+        self.assertIn(tracker_user, collector.edges.get(None, ()))
+        self.assertIn(base_user, collector.edges.get(None, ()))
+        self.assertIn(issue, collector.edges.get(tracker_user, ()))
 
     def test_delete_str_in_model_admin(self):
         """
