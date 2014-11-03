@@ -148,8 +148,7 @@ class Command(BaseCommand):
             reload=use_reloader,
         )
         wsgiapp = GunicornApplication(
-            gunicorn_config,
-            handler=self.get_handler(*args, **options)
+            self.get_handler(*args, **options), gunicorn_config
         )
         try:
             wsgiapp.run()
