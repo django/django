@@ -60,7 +60,7 @@ from django.template.base import (ALLOWED_VARIABLE_CHARS, BLOCK_TAG_END,  # NOQA
 # Exceptions
 from django.template.base import (ContextPopException, InvalidTemplateLibrary,  # NOQA
     TemplateDoesNotExist, TemplateEncodingError, TemplateSyntaxError,
-    VariableDoesNotExist)
+    VariableDoesNotExist, TemplateRecursionError)
 
 # Template parts
 from django.template.base import (Context, FilterExpression, Lexer, Node,  # NOQA

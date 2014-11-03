@@ -79,6 +79,10 @@ class TemplateSyntaxError(Exception):
     pass
 
 
+class TemplateRecursionError(Exception):
+    pass
+
+
 class TemplateDoesNotExist(Exception):
     pass
 

@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
-    token_kwargs, Variable
+    token_kwargs, Variable, TemplateRecursionError
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -10,6 +10,7 @@ from django.utils import six
 register = Library()
 
 BLOCK_CONTEXT_KEY = 'block_context'
+EXTENDS_HISTORY_CONTEXT_KEY = 'extends_history'
 
 
 class ExtendsError(Exception):
@@ -107,6 +108,19 @@ class ExtendsNode(Node):
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
+
+        # Keeping a history of the templates that have already been rendered,
+        # to avoid a circular template recursion error
+        extends_history = context.render_context.get(
+            EXTENDS_HISTORY_CONTEXT_KEY)
+        if extends_history is None:
+            extends_history = []
+            context.render_context[EXTENDS_HISTORY_CONTEXT_KEY] = (
+                extends_history)
+        if compiled_parent.name in extends_history:
+            raise TemplateRecursionError(
+                'Circular template extension error in %s' % extends_history)
+        extends_history.append(compiled_parent.name)
 
         if BLOCK_CONTEXT_KEY not in context.render_context:
             context.render_context[BLOCK_CONTEXT_KEY] = BlockContext()
