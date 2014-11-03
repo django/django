@@ -147,7 +147,10 @@ class Command(BaseCommand):
             bind=(self.addr, int(self.port)),
             reload=use_reloader,
         )
-        wsgiapp = GunicornApplication(gunicorn_config)
+        wsgiapp = GunicornApplication(
+            gunicorn_config,
+            handler=self.get_handler(*args, **options)
+        )
         try:
             wsgiapp.run()
         except KeyboardInterrupt:

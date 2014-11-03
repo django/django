@@ -26,8 +26,9 @@ def get_gunicorn_config(**options):
 
 class GunicornApplication(gapp.Application):
 
-    def __init__(self, options=None):
+    def __init__(self, handler, options=None):
         self.options = options or {}
+        self.handler = handler
         super(GunicornApplication, self).__init__()
 
     def load_config(self):
@@ -40,8 +41,7 @@ class GunicornApplication(gapp.Application):
             self.cfg.set(key, value)
 
     def load(self):
-        from django.core.servers.basehttp import get_internal_wsgi_application
-        return get_internal_wsgi_application()
+        return self.handler
 
 
 class DjangoLogger(glogging.Logger):
