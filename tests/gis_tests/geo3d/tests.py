@@ -74,7 +74,7 @@ bbox_data = (
 
 
 @skipUnless(HAS_GDAL, "GDAL is required for Geo3DTest.")
-@skipUnlessDBFeature("gis_enabled", "supports_3d_functions")
+@skipUnlessDBFeature("gis_enabled", "supports_3d_storage")
 class Geo3DTest(TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
@@ -189,6 +189,7 @@ class Geo3DTest(TestCase):
         ref_json_regex = re.compile(r'^{"type":"Point","coordinates":\[-95.363151,29.763374,18(\.0+)?\]}$')
         self.assertTrue(ref_json_regex.match(h.geojson))
 
+    @skipUnlessDBFeature("supports_3d_functions")
     def test_union(self):
         """
         Testing the Union aggregate of 3D models.
@@ -207,6 +208,7 @@ class Geo3DTest(TestCase):
         # Ordering of points in the resulting geometry may vary between implementations
         self.assertSetEqual({p.ewkt for p in ref_union}, {p.ewkt for p in union})
 
+    @skipUnlessDBFeature("supports_3d_functions")
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_extent(self):
         """
@@ -227,6 +229,7 @@ class Geo3DTest(TestCase):
         self.assertIsNone(City3D.objects.none().extent3d())
         self.assertIsNone(City3D.objects.none().aggregate(Extent3D('point'))['point__extent3d'])
 
+    @skipUnlessDBFeature("supports_3d_functions")
     def test_perimeter(self):
         """
         Testing GeoQuerySet.perimeter() on 3D fields.
@@ -244,6 +247,7 @@ class Geo3DTest(TestCase):
                                Polygon3D.objects.perimeter().get(name='3D BBox').perimeter.m,
                                tol)
 
+    @skipUnlessDBFeature("supports_3d_functions")
     def test_length(self):
         """
         Testing GeoQuerySet.length() on 3D fields.
@@ -276,6 +280,7 @@ class Geo3DTest(TestCase):
                                InterstateProj3D.objects.length().get(name='I-45').length.m,
                                tol)
 
+    @skipUnlessDBFeature("supports_3d_functions")
     def test_scale(self):
         """
         Testing GeoQuerySet.scale() on Z values.
@@ -287,6 +292,7 @@ class Geo3DTest(TestCase):
             for city in City3D.objects.scale(1.0, 1.0, zscale):
                 self.assertEqual(city_dict[city.name][2] * zscale, city.scale.z)
 
+    @skipUnlessDBFeature("supports_3d_functions")
     def test_translate(self):
         """
         Testing GeoQuerySet.translate() on Z values.
