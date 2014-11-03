@@ -33,12 +33,14 @@ class FileUploadTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(FileUploadTests, cls).setUpClass()
         if not os.path.isdir(MEDIA_ROOT):
             os.makedirs(MEDIA_ROOT)
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(MEDIA_ROOT)
+        super(FileUploadTests, cls).tearDownClass()
 
     def test_simple_upload(self):
         with open(__file__, 'rb') as fp:
@@ -494,12 +496,14 @@ class DirectoryCreationTests(TestCase):
     """
     @classmethod
     def setUpClass(cls):
+        super(DirectoryCreationTests, cls).setUpClass()
         if not os.path.isdir(MEDIA_ROOT):
             os.makedirs(MEDIA_ROOT)
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(MEDIA_ROOT)
+        super(DirectoryCreationTests, cls).tearDownClass()
 
     def setUp(self):
         self.obj = FileModel()
