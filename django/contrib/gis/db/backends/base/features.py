@@ -14,6 +14,8 @@ class BaseSpatialFeatures(object):
     # Does the backend introspect GeometryField to its subtypes?
     supports_geometry_field_introspection = True
 
+    # Does the backend support storing 3D geometries?
+    supports_3d_storage = False
     # Reference implementation of 3D functions is:
     # http://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
     supports_3d_functions = False
