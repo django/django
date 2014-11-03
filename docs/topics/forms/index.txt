@@ -578,8 +578,6 @@ over them:
         </ol>
     {% endif %}
 
-.. versionchanged:: 1.8
-
 Non-field errors (and/or hidden field errors that are rendered at the top of
 the form when using helpers like ``form.as_p()``) will be rendered with an
 additional class of ``nonfield`` to help distinguish them from field-specific
@@ -590,6 +588,10 @@ errors. For example, ``{{ form.non_field_errors }}`` would look like:
     <ul class="errorlist nonfield">
         <li>Generic validation error</li>
     </ul>
+
+.. versionchanged:: 1.8
+
+    The "nonfield" class as described in the example above was added.
 
 See :doc:`/ref/forms/api` for more on errors, styling, and working with form
 attributes in templates.

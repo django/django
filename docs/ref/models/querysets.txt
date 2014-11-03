@@ -819,12 +819,14 @@ If you need to clear the list of related fields added by past calls of
 
    >>> without_relations = queryset.select_related(None)
 
+Chaining ``select_related`` calls works in a similar way to other methods -
+that is that ``select_related('foo', 'bar')`` is equivalent to
+``select_related('foo').select_related('bar')``.
+
 .. versionchanged:: 1.7
 
-Chaining ``select_related`` calls now works in a similar way to other methods -
-that is that ``select_related('foo', 'bar')`` is equivalent to
-``select_related('foo').select_related('bar')``. Previously the latter would
-have been equivalent to ``select_related('bar')``.
+    Previously the latter would have been equivalent to
+    ``select_related('bar')``.
 
 prefetch_related
 ~~~~~~~~~~~~~~~~
