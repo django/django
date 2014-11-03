@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
+import io
+import os
 import re
 import types
 from unittest import TestCase
@@ -16,12 +18,13 @@ from django.core.validators import (
 )
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
+from django.utils._os import upath
 
 
 NOW = datetime.now()
 EXTENDED_SCHEMES = ['http', 'https', 'ftp', 'ftps', 'git', 'file']
 
-TEST_DATA = (
+TEST_DATA = [
     # (validator, value, expected),
     (validate_integer, '42', None),
     (validate_integer, '-42', None),
@@ -153,37 +156,9 @@ TEST_DATA = (
 
     (MinLengthValidator(10), '', ValidationError),
 
-    (URLValidator(), 'http://www.djangoproject.com/', None),
-    (URLValidator(), 'HTTP://WWW.DJANGOPROJECT.COM/', None),
-    (URLValidator(), 'http://localhost/', None),
-    (URLValidator(), 'http://example.com/', None),
-    (URLValidator(), 'http://www.example.com/', None),
-    (URLValidator(), 'http://www.example.com:8000/test', None),
-    (URLValidator(), 'http://valid-with-hyphens.com/', None),
-    (URLValidator(), 'http://subdomain.example.com/', None),
-    (URLValidator(), 'http://200.8.9.10/', None),
-    (URLValidator(), 'http://200.8.9.10:8000/test', None),
-    (URLValidator(), 'http://valid-----hyphens.com/', None),
-    (URLValidator(), 'http://example.com?something=value', None),
-    (URLValidator(), 'http://example.com/index.php?something=value&another=value2', None),
-    (URLValidator(), 'https://example.com/', None),
-    (URLValidator(), 'ftp://example.com/', None),
-    (URLValidator(), 'ftps://example.com/', None),
     (URLValidator(EXTENDED_SCHEMES), 'file://localhost/path', None),
     (URLValidator(EXTENDED_SCHEMES), 'git://example.com/', None),
 
-    (URLValidator(), 'foo', ValidationError),
-    (URLValidator(), 'http://', ValidationError),
-    (URLValidator(), 'http://example', ValidationError),
-    (URLValidator(), 'http://example.', ValidationError),
-    (URLValidator(), 'http://.com', ValidationError),
-    (URLValidator(), 'http://invalid-.com', ValidationError),
-    (URLValidator(), 'http://-invalid.com', ValidationError),
-    (URLValidator(), 'http://invalid.com-', ValidationError),
-    (URLValidator(), 'http://inv-.alid-.com', ValidationError),
-    (URLValidator(), 'http://inv-.-alid.com', ValidationError),
-    (URLValidator(), 'file://localhost/path', ValidationError),
-    (URLValidator(), 'git://example.com/', ValidationError),
     (URLValidator(EXTENDED_SCHEMES), 'git://-invalid.com', ValidationError),
 
     (BaseValidator(True), True, None),
@@ -208,7 +183,20 @@ TEST_DATA = (
     (RegexValidator('x', flags=re.IGNORECASE), 'y', ValidationError),
     (RegexValidator('a'), 'A', ValidationError),
     (RegexValidator('a', flags=re.IGNORECASE), 'A', None),
-)
+]
+
+
+def create_path(filename):
+    return os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), filename))
+
+# Add valid and invalid URL tests.
+# This only tests the validator without extended schemes.
+with io.open(create_path('valid_urls.txt'), encoding='utf8') as f:
+    for url in f:
+        TEST_DATA.append((URLValidator(), url.strip(), None))
+with io.open(create_path('invalid_urls.txt'), encoding='utf8') as f:
+    for url in f:
+        TEST_DATA.append((URLValidator(), url.strip(), ValidationError))
 
 
 def create_simple_test_method(validator, expected, value, num):
