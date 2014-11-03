@@ -7,6 +7,11 @@ import re
 import sys
 import socket
 
+try:
+    import gunicorn
+except ImportError:
+    gunicorn = None
+
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import run, get_internal_wsgi_application
 from django.db import connections, DEFAULT_DB_ALIAS
@@ -94,10 +99,61 @@ class Command(BaseCommand):
         """
         use_reloader = options.get('use_reloader')
 
-        if use_reloader:
+        if gunicorn is not None:
+            self.gunicorn_run(**options)
+        elif use_reloader:
             autoreload.main(self.inner_run, None, options)
         else:
             self.inner_run(None, **options)
+
+    def gunicorn_run(self, *args, **options):
+        from django.conf import settings
+        from django.utils import translation
+        from django.core.servers.gserver import GunicornApplication, get_gunicorn_config
+
+        use_reloader = options.get('use_reloader', True)
+        shutdown_message = options.get('shutdown_message', '')
+        quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
+
+        self.stdout.write("Performing system checks...\n\n")
+        self.validate(display_num_errors=True)
+        try:
+            self.check_migrations()
+        except ImproperlyConfigured:
+            pass
+        now = datetime.now().strftime('%B %d, %Y - %X')
+        if six.PY2:
+            now = now.decode(get_system_encoding())
+        self.stdout.write((
+            "%(started_at)s\n"
+            "Django version %(version)s, using settings %(settings)r\n"
+            "Starting development server using Gunicorn %(gunicorn_version)s at http://%(addr)s:%(port)s/\n"
+            "Quit the server with %(quit_command)s.\n"
+        ) % {
+            "started_at": now,
+            "version": self.get_version(),
+            "settings": settings.SETTINGS_MODULE,
+            "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
+            "port": self.port,
+            "quit_command": quit_command,
+            "gunicorn_version": gunicorn.__version__,
+        })
+        # django.core.management.base forces the locale to en-us. We should
+        # set it up correctly for the first request (particularly important
+        # in the "--noreload" case).
+        translation.activate(settings.LANGUAGE_CODE)
+
+        gunicorn_config = get_gunicorn_config(
+            bind=(self.addr, int(self.port)),
+            reload=use_reloader,
+        )
+        wsgiapp = GunicornApplication(gunicorn_config)
+        try:
+            wsgiapp.run()
+        except KeyboardInterrupt:
+            if shutdown_message:
+                self.stdout.write(shutdown_message)
+            sys.exit(0)
 
     def inner_run(self, *args, **options):
         from django.conf import settings

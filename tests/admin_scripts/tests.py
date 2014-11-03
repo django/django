@@ -17,6 +17,11 @@ import sys
 import unittest
 import warnings
 
+try:
+    import gunicorn
+except ImportError:
+    gunicorn = None
+
 import django
 from django import conf, get_version
 from django.conf import settings
@@ -1325,6 +1330,23 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
         out, err = self.run_manage(['runserver'])
         self.assertNoOutput(out)
         self.assertOutput(err, 'CommandError: You must set settings.ALLOWED_HOSTS if DEBUG is False.')
+
+
+@unittest.skipUnless(gunicorn, 'needs gunicorn')
+class ManageRunserverWithGunicorn(AdminScriptTestCase):
+
+    def setUp(self):
+        self.write_settings('settings.py', sdict={
+            'DEBUG': True,
+            'PORT': 6666,
+        })
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_gunicorn(self):
+        out, _ = self.run_manage(['runserver'])
+        self.assertOutput(out, 'Starting development server using Gunicorn')
 
 
 ##########################################################################

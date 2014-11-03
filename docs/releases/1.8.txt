@@ -288,6 +288,11 @@ Management Commands
   :setting:`FIXTURE_DIRS` contains duplicates or a default fixture directory
   path (``app_name/fixtures``), an exception is raised.
 
+* :djadmin:`runserver` now uses gunicorn_ as development server if it's
+  installed.
+
+.. _gunicorn: http://gunicorn.org/
+
 Migrations
 ^^^^^^^^^^
 

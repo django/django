@@ -915,6 +915,10 @@ the business of making Web frameworks, not Web servers, so improving this
 server to be able to handle a production environment is outside the scope of
 Django.)
 
+.. versionchanged:: 1.8
+
+    Django will be use gunicorn as development server if it's installed.
+
 The development server automatically reloads Python code for each request, as
 needed. You don't need to restart the server for code changes to take effect.
 However, some actions like adding files don't trigger a restart, so you'll
