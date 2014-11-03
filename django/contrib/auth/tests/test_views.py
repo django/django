@@ -502,7 +502,7 @@ class LoginTest(AuthViewsTestCase):
                 'password': password,
             })
             self.assertEqual(response.status_code, 302)
-            self.assertFalse(bad_url in response.url,
+            self.assertNotIn(bad_url, response.url,
                              "%s should be blocked" % bad_url)
 
         # These URLs *should* still pass the security check
@@ -695,7 +695,7 @@ class LogoutTest(AuthViewsTestCase):
         # Bug 14377
         self.login()
         response = self.client.get('/logout/')
-        self.assertTrue('site' in response.context)
+        self.assertIn('site', response.context)
 
     def test_logout_with_overridden_redirect_url(self):
         # Bug 11223
@@ -761,7 +761,7 @@ class LogoutTest(AuthViewsTestCase):
             self.login()
             response = self.client.get(nasty_url)
             self.assertEqual(response.status_code, 302)
-            self.assertFalse(bad_url in response.url,
+            self.assertNotIn(bad_url, response.url,
                              "%s should be blocked" % bad_url)
             self.confirm_logged_out()
 

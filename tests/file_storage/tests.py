@@ -459,7 +459,7 @@ class FileFieldStorageTests(unittest.TestCase):
         obj1.normal = SimpleUploadedFile("assignment.txt", b"content")
         dirs, files = temp_storage.listdir("tests")
         self.assertEqual(dirs, [])
-        self.assertFalse("assignment.txt" in files)
+        self.assertNotIn("assignment.txt", files)
 
         obj1.save()
         dirs, files = temp_storage.listdir("tests")

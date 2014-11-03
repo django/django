@@ -118,7 +118,7 @@ class QueryDictTests(unittest.TestCase):
         q = QueryDict(mutable=True)
         q['name'] = 'john'
         del q['name']
-        self.assertFalse('name' in q)
+        self.assertNotIn('name', q)
 
     def test_basic_mutable_operations(self):
         q = QueryDict(mutable=True)

@@ -2421,7 +2421,7 @@ class FormFieldCallbackTests(TestCase):
                 fields = "__all__"
 
         Form = modelform_factory(Person, form=BaseForm)
-        self.assertTrue(Form.base_fields['name'].widget is widget)
+        self.assertIs(Form.base_fields['name'].widget, widget)
 
     def test_factory_with_widget_argument(self):
         """ Regression for #15315: modelform_factory should accept widgets
