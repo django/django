@@ -63,13 +63,6 @@ Django model is a separate content type.
 
 See the :doc:`contenttypes documentation </ref/contrib/contenttypes>`.
 
-csrf
-====
-
-A middleware for preventing Cross Site Request Forgeries
-
-See the :doc:`csrf documentation </ref/contrib/csrf>`.
-
 flatpages
 =========
 
