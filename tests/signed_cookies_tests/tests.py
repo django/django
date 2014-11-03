@@ -37,7 +37,7 @@ class SignedCookieTest(TestCase):
         self.assertRaises(signing.BadSignature,
             request.get_signed_cookie, 'c')
 
-    def test_default_argument_supresses_exceptions(self):
+    def test_default_argument_suppresses_exceptions(self):
         response = HttpResponse()
         response.set_signed_cookie('c', 'hello')
         request = HttpRequest()
