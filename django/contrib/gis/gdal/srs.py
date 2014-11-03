@@ -1,5 +1,5 @@
 """
-  The Spatial Reference class, represensents OGR Spatial Reference objects.
+  The Spatial Reference class, represents OGR Spatial Reference objects.
 
   Example:
   >>> from django.contrib.gis.gdal import SpatialReference

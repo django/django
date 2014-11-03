@@ -1776,7 +1776,7 @@ class ForeignKey(ForeignObject):
                 params={
                     'model': self.rel.to._meta.verbose_name, 'pk': value,
                     'field': self.rel.field_name, 'value': value,
-                },  # 'pk' is included for backwards compatibilty
+                },  # 'pk' is included for backwards compatibility
             )
 
     def get_attname(self):

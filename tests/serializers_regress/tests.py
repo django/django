@@ -419,11 +419,11 @@ class SerializerTests(TestCase):
             serializers.get_serializer("nonsense")
         self.assertEqual(cm.exception.args, ("nonsense",))
 
-    def test_unregister_unkown_serializer(self):
+    def test_unregister_unknown_serializer(self):
         with self.assertRaises(SerializerDoesNotExist):
             serializers.unregister_serializer("nonsense")
 
-    def test_get_unkown_deserializer(self):
+    def test_get_unknown_deserializer(self):
         with self.assertRaises(SerializerDoesNotExist):
             serializers.get_deserializer("nonsense")
 

@@ -15,7 +15,7 @@ function findForm(node) {
 window.SelectFilter = {
     init: function(field_id, field_name, is_stacked, admin_static_prefix) {
         if (field_id.match(/__prefix__/)){
-            // Don't intialize on empty forms.
+            // Don't initialize on empty forms.
             return;
         }
         var from_box = document.getElementById(field_id);

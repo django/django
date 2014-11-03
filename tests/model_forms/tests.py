@@ -1116,7 +1116,7 @@ class ModelFormBasicTests(TestCase):
         self.assertEqual(f.cleaned_data['slug'], 'entertainment')
         self.assertEqual(f.cleaned_data['url'], 'entertainment')
         c1 = f.save()
-        # Testing wether the same object is returned from the
+        # Testing whether the same object is returned from the
         # ORM... not the fastest way...
 
         self.assertEqual(Category.objects.count(), 1)
