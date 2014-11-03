@@ -518,6 +518,9 @@ class SimpleTestCase(unittest.TestCase):
         if msg_prefix:
             msg_prefix += ": "
 
+        if template_name is not None and response is not None and not hasattr(response, 'templates'):
+            raise ValueError("Response object has no attribute 'templates'.")
+
         if not hasattr(response, 'templates') or (response is None and template_name):
             if response:
                 template_name = response
