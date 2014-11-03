@@ -76,6 +76,8 @@ Minor features
   <django.contrib.admin.ModelAdmin.show_full_result_count>` to control whether
   or not the full count of objects should be displayed on a filtered admin page.
 
+* Admindocs now parses reStructured text in model docstrings.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

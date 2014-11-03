@@ -22,11 +22,10 @@
 
 {% block content %}
 <div id="content-main">
-<h1>{{ summary }}</h1>
+<h1>{{ name }}</h1>
+<h2 class="subhead">{{ summary }}</h2>
 
-{% if description %}
-  <p>{% filter linebreaksbr %}{% trans description %}{% endfilter %}</p>
-{% endif %}
+{{ description }}
 
 <div class="module">
 <table class="model">
