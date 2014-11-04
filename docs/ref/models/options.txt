@@ -338,8 +338,8 @@ Django quotes column and table names behind the scenes.
 
     .. versionchanged:: 1.7
 
-    The ``ValidationError`` raised during model validation when the
-    constraint is violated has the ``unique_together`` error code.
+        The ``ValidationError`` raised during model validation when the
+        constraint is violated has the ``unique_together`` error code.
 
 ``index_together``
 ------------------
@@ -357,10 +357,10 @@ Django quotes column and table names behind the scenes.
 
     .. versionchanged:: 1.7
 
-    For convenience, ``index_together`` can be a single list when dealing with a single
-    set of fields::
+        For convenience, ``index_together`` can be a single list when dealing with a single
+        set of fields::
 
-        index_together = ["pub_date", "deadline"]
+            index_together = ["pub_date", "deadline"]
 
 ``verbose_name``
 ----------------
