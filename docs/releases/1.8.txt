@@ -304,6 +304,13 @@ Management Commands
   :setting:`FIXTURE_DIRS` contains duplicates or a default fixture directory
   path (``app_name/fixtures``), an exception is raised.
 
+Middleware
+^^^^^^^^^^
+
+* The :attr:`CommonMiddleware.response_redirect_class
+  <django.middleware.common.CommonMiddleware.response_redirect_class>`
+  attribute allows you to customize the redirects issued by the middleware.
+
 Migrations
 ^^^^^^^^^^
 
