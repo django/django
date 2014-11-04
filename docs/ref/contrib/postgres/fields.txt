@@ -289,7 +289,7 @@ To query based on a given key, you simply use that key as the lookup name::
 You can chain other lookups after key lookups::
 
     >>> Dog.objects.filter(data__breed__contains='l')
-    [<Dog: Rufus>, Dog: Meg>]
+    [<Dog: Rufus>, <Dog: Meg>]
 
 If the key you wish to query by clashes with the name of another lookup, you
 need to use the :lookup:`hstorefield.contains` lookup instead.
