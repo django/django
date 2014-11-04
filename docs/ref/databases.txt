@@ -230,7 +230,7 @@ drivers that implement this API:
 
 - `MySQLdb`_ is a native driver that has been developed and supported for over
   a decade by Andy Dustman.
-- `mysqlclient` is a fork of ``MySQLdb`` which notably supports Python 3 and
+- `mysqlclient`_ is a fork of ``MySQLdb`` which notably supports Python 3 and
   can be used as a drop-in replacement for MySQLdb. At the time of this writing,
   this is **the recommended choice** for using MySQL with Django.
 - `MySQL Connector/Python`_ is a pure Python driver from Oracle that does not
@@ -279,7 +279,7 @@ Django requires MySQLdb version 1.2.1p2 or later.
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires mysqlclient 1.3.3 or later. Note that Python 3.2 is not
+Django requires `mysqlclient`_ 1.3.3 or later. Note that Python 3.2 is not
 supported. Except for the Python 3.3+ support, mysqlclient should mostly behave
 the same as MySQLDB.
 
