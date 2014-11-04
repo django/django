@@ -3,8 +3,12 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import get_script_prefix
+from django.core.urlresolvers import NoReverseMatch
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri, python_2_unicode_compatible
+
+from .. import flatpages
 
 
 @python_2_unicode_compatible
@@ -35,4 +39,18 @@ class FlatPage(models.Model):
 
     def get_absolute_url(self):
         # Handle script prefix manually because we bypass reverse()
-        return iri_to_uri(get_script_prefix().rstrip('/') + self.url)
+        try:
+            # Handles a prefix on the flatpage view
+            return reverse(flatpages.views.flatpage, kwargs={'url': self.url.lstrip('/')})
+        except NoReverseMatch:
+            pass
+
+        try:
+            # For hardcoded URLs
+            return reverse(flatpages.views.flatpage, kwargs={'url': self.url})
+        except NoReverseMatch:
+            # Handles a URL via the flatpage middleware.
+            pass
+
+        return iri_to_uri(get_script_prefix().rstrip('/') + self.url) 
+
