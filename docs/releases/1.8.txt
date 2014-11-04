@@ -702,6 +702,9 @@ Miscellaneous
 
   .. _universal newlines: http://www.python.org/dev/peps/pep-0278
 
+* The :attr:`django.middleware.common.CommonMiddleware.response_redirect_class`
+  attribute allows you to customize the redirects issued by the middleware.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
