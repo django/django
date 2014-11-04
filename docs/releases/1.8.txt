@@ -240,6 +240,9 @@ Forms
   will also update ``UploadedFile.content_type`` with the image's content type
   as determined by Pillow.
 
+* You can now pass a callable that returns an iterable of choices when
+  instantiating a :class:`~django.forms.ChoiceField`.
+
 Generic Views
 ^^^^^^^^^^^^^
 
