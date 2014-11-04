@@ -30,10 +30,15 @@ class CommonMiddleware(object):
               urlpatterns, then an HTTP-redirect is returned to this new URL;
               otherwise the initial URL is processed as usual.
 
+          This behavior can be customized by subclassing CommonMiddleware and
+          overriding the response_redirect_class attribute.
+
         - ETags: If the USE_ETAGS setting is set, ETags will be calculated from
           the entire page content and Not Modified responses will be returned
           appropriately.
     """
+
+    response_redirect_class = http.HttpResponsePermanentRedirect
 
     def process_request(self, request):
         """
@@ -100,7 +105,7 @@ class CommonMiddleware(object):
                     newurl += '?' + request.META['QUERY_STRING'].decode()
                 except UnicodeDecodeError:
                     pass
-        return http.HttpResponsePermanentRedirect(newurl)
+        return self.response_redirect_class(newurl)
 
     def process_response(self, request, response):
         """

@@ -9,7 +9,10 @@ from unittest import skipIf
 
 from django.conf import settings
 from django.core import mail
-from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
+from django.http import (
+    HttpRequest, HttpResponse, StreamingHttpResponse, HttpResponsePermanentRedirect,
+    HttpResponseRedirect,
+)
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
 from django.middleware.http import ConditionalGetMiddleware
@@ -241,6 +244,23 @@ class CommonMiddlewareTest(TestCase):
         request.META['QUERY_STRING'] = force_str('drink=café')
         response = CommonMiddleware().process_request(request)
         self.assertEqual(response.status_code, 301)
+
+    def test_response_redirect_class(self):
+        request = self._get_request('slash')
+        r = CommonMiddleware().process_request(request)
+        self.assertEqual(r.status_code, 301)
+        self.assertEqual(r.url, 'http://testserver/slash/')
+        self.assertIsInstance(r, HttpResponsePermanentRedirect)
+
+    def test_response_redirect_class_subclass(self):
+        class MyCommonMiddleware(CommonMiddleware):
+            response_redirect_class = HttpResponseRedirect
+
+        request = self._get_request('slash')
+        r = MyCommonMiddleware().process_request(request)
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r.url, 'http://testserver/slash/')
+        self.assertIsInstance(r, HttpResponseRedirect)
 
 
 @override_settings(
