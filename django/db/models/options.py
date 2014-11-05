@@ -88,9 +88,10 @@ class Options(object):
         self.auto_created = False
 
         # To handle various inheritance situations, we need to track where
-        # managers came from (concrete or abstract base classes).
-        self.abstract_managers = []
-        self.concrete_managers = []
+        # managers came from (concrete or abstract base classes). `managers`
+        # keeps a list of 3-tuples of the form:
+        # (creation_counter, instance, abstract(=True))
+        self.managers = []
 
         # List of all lookups defined in ForeignKey 'limit_choices_to' options
         # from *other* models. Needed for some admin checks. Internal use only.
@@ -109,6 +110,20 @@ class Options(object):
     @property
     def installed(self):
         return self.app_config is not None
+
+    @property
+    def abstract_managers(self):
+        return [
+            (counter, instance.name, instance) for counter, instance, abstract
+            in self.managers if abstract
+        ]
+
+    @property
+    def concrete_managers(self):
+        return [
+            (counter, instance.name, instance) for counter, instance, abstract
+            in self.managers if not abstract
+        ]
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
