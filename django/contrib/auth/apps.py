@@ -10,4 +10,4 @@ class AuthConfig(AppConfig):
     verbose_name = _("Authentication and Authorization")
 
     def ready(self):
-        checks.register(checks.Tags.models)(check_user_model)
+        checks.register(check_user_model, checks.Tags.models)
