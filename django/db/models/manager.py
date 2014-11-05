@@ -62,6 +62,7 @@ class BaseManager(object):
         super(BaseManager, self).__init__()
         self._set_creation_counter()
         self.model = None
+        self.name = None
         self._inherited = False
         self._db = None
         self._hints = {}
@@ -69,12 +70,8 @@ class BaseManager(object):
     def __str__(self):
         """ Return "app_label.model_label.manager_name". """
         model = self.model
-        opts = model._meta
         app = model._meta.app_label
-        manager_name = next(name for (_, name, manager)
-            in opts.concrete_managers + opts.abstract_managers
-            if manager == self)
-        return '%s.%s.%s' % (app, model._meta.object_name, manager_name)
+        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
 
     def check(self, **kwargs):
         return []
@@ -116,6 +113,8 @@ class BaseManager(object):
     def contribute_to_class(self, model, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
         self.model = model
+        if not self.name:
+            self.name = name
         # Only contribute the manager if the model is concrete
         if model._meta.abstract:
             setattr(model, name, AbstractManagerDescriptor(model))
@@ -127,12 +126,11 @@ class BaseManager(object):
         if (not getattr(model, '_default_manager', None) or
                 self.creation_counter < model._default_manager.creation_counter):
             model._default_manager = self
+
+        abstract = False
         if model._meta.abstract or (self._inherited and not self.model._meta.proxy):
-            model._meta.abstract_managers.append((self.creation_counter, name,
-                    self))
-        else:
-            model._meta.concrete_managers.append((self.creation_counter, name,
-                self))
+            abstract = True
+        model._meta.managers.append((self.creation_counter, self, abstract))
 
     def _set_creation_counter(self):
         """
