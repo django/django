@@ -56,3 +56,6 @@ Bugfixes
 * Fixed a regression where custom form fields having a ``queryset`` attribute
   but no ``limit_choices_to`` could not be used in a
   :class:`~django.forms.ModelForm` (:ticket:`23795`).
+
+* Fixed a custom field type validation error with mysql backend when db_type
+  returned None.  (:ticket:`23761`)
