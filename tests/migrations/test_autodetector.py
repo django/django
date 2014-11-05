@@ -410,7 +410,7 @@ class AutodetectorTests(TestCase):
         "Shortcut to make ProjectStates from lists of predefined models"
         project_state = ProjectState()
         for model_state in model_states:
-            project_state.add_model_state(model_state.clone())
+            project_state.add_model(model_state.clone())
         return project_state
 
     def test_arrange_for_graph(self):
