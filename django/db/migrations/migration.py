@@ -95,19 +95,17 @@ class Migration(object):
                 schema_editor.collected_sql.append("-- %s" % operation.describe())
                 schema_editor.collected_sql.append("--")
                 continue
-            # Get the state after the operation has run
-            new_state = project_state.clone()
-            operation.state_forwards(self.app_label, new_state)
+            # Save the state before the operation has run
+            old_state = project_state.clone()
+            operation.state_forwards(self.app_label, project_state)
             # Run the operation
             if not schema_editor.connection.features.can_rollback_ddl and operation.atomic:
                 # We're forcing a transaction on a non-transactional-DDL backend
                 with atomic(schema_editor.connection.alias):
-                    operation.database_forwards(self.app_label, schema_editor, project_state, new_state)
+                    operation.database_forwards(self.app_label, schema_editor, old_state, project_state)
             else:
                 # Normal behaviour
-                operation.database_forwards(self.app_label, schema_editor, project_state, new_state)
-            # Switch states
-            project_state = new_state
+                operation.database_forwards(self.app_label, schema_editor, old_state, project_state)
         return project_state
 
     def unapply(self, project_state, schema_editor, collect_sql=False):
@@ -131,14 +129,12 @@ class Migration(object):
             # If it's irreversible, error out
             if not operation.reversible:
                 raise Migration.IrreversibleError("Operation %s in %s is not reversible" % (operation, self))
-            # Preserve new state from previous run to not tamper the same state
-            # over all operations
-            new_state = new_state.clone()
-            old_state = new_state.clone()
+            new_state = project_state.clone()
             operation.state_forwards(self.app_label, new_state)
-            to_run.insert(0, (operation, old_state, new_state))
-
-        # Phase 2
+            to_run.append((operation, project_state, new_state))
+            project_state = new_state
+        # Now run them in reverse
+        to_run.reverse()
         for operation, to_state, from_state in to_run:
             if collect_sql:
                 if not operation.reduces_to_sql:

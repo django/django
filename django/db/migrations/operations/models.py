@@ -21,13 +21,13 @@ class CreateModel(Operation):
         self.bases = bases or (models.Model,)
 
     def state_forwards(self, app_label, state):
-        state.models[app_label, self.name.lower()] = ModelState(
+        state.add_model(ModelState(
             app_label,
             self.name,
             list(self.fields),
             dict(self.options),
             tuple(self.bases),
-        )
+        ))
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = to_state.apps.get_model(app_label, self.name)
@@ -78,7 +78,7 @@ class DeleteModel(Operation):
         self.name = name
 
     def state_forwards(self, app_label, state):
-        del state.models[app_label, self.name.lower()]
+        state.remove_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.name)
@@ -110,12 +110,13 @@ class RenameModel(Operation):
         # Get all of the related objects we need to repoint
         apps = state.apps
         model = apps.get_model(app_label, self.old_name)
+        model._meta.apps = apps
         related_objects = model._meta.get_all_related_objects()
         related_m2m_objects = model._meta.get_all_related_many_to_many_objects()
         # Rename the model
         state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
         state.models[app_label, self.new_name.lower()].name = self.new_name
-        del state.models[app_label, self.old_name.lower()]
+        state.remove_model(app_label, self.old_name)
         # Repoint the FKs and M2Ms pointing to us
         for related_object in (related_objects + related_m2m_objects):
             if related_object.field.rel.to is not model:
@@ -137,7 +138,8 @@ class RenameModel(Operation):
                     field.rel.to = "%s.%s" % (app_label, self.new_name)
                 new_fields.append((name, field))
             state.models[related_key].fields = new_fields
-        del state.apps  # FIXME: this should be replaced by a logic in state (update_model?)
+            state.reload_model(*related_key)
+        state.reload_model(app_label, self.new_name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.new_name)
@@ -218,6 +220,7 @@ class AlterModelTable(Operation):
 
     def state_forwards(self, app_label, state):
         state.models[app_label, self.name.lower()].options["db_table"] = self.table
+        state.reload_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
@@ -262,6 +265,7 @@ class AlterUniqueTogether(Operation):
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
         model_state.options[self.option_name] = self.unique_together
+        state.reload_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
@@ -298,6 +302,7 @@ class AlterIndexTogether(Operation):
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
         model_state.options[self.option_name] = self.index_together
+        state.reload_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
@@ -331,6 +336,7 @@ class AlterOrderWithRespectTo(Operation):
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
         model_state.options['order_with_respect_to'] = self.order_with_respect_to
+        state.reload_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.name)
@@ -390,6 +396,7 @@ class AlterModelOptions(Operation):
         for key in self.ALTER_OPTION_KEYS:
             if key not in self.options and key in model_state.options:
                 del model_state.options[key]
+        state.reload_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         pass

@@ -223,7 +223,7 @@ class ExecutorTests(MigrationTestBase):
         global_apps.get_app_config("migrations").models["author"] = migrations_apps.get_model("migrations", "author")
         try:
             migration = executor.loader.get_migration("auth", "0001_initial")
-            self.assertEqual(executor.detect_soft_applied(None, migration), True)
+            self.assertEqual(executor.detect_soft_applied(None, migration)[0], True)
         finally:
             connection.introspection.get_table_list = old_get_table_list
             del global_apps.get_app_config("migrations").models["author"]
