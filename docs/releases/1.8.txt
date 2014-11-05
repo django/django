@@ -6,13 +6,14 @@ Welcome to Django 1.8!
 
 These release notes cover the `new features`_, as well as some `backwards
 incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.6 or older versions. We've also dropped some features, which are detailed in
-:ref:`our deprecation plan <deprecation-removed-in-1.8>`, and we've `begun the
-deprecation process for some features`_.
+1.6 or older versions. We've also `begun the deprecation process for some
+features`_, and some features have reached the end of their deprecation process
+and `have been removed`_.
 
 .. _`new features`: `What's new in Django 1.8`_
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.8`_
 .. _`begun the deprecation process for some features`: `Features deprecated in 1.8`_
+.. _`have been removed`: `Features removed in 1.8`_
 
 Python compatibility
 ====================
@@ -950,3 +951,80 @@ The decorators :func:`~django.test.override_settings` and
 :func:`~django.test.modify_settings` now act at the class level when used as
 class decorators. As a consequence, when overriding ``setUpClass()`` or
 ``tearDownClass()``, the ``super`` implementation should always be called.
+
+.. removed-features-1.8:
+
+Features removed in 1.8
+=======================
+
+These features have reached the end of their deprecation cycle and so have been
+removed in Django 1.8 (please see the :ref:`deprecation timeline
+<deprecation-removed-in-1.8>` for more details):
+
+* ``django.contrib.comments`` is removed.
+
+* The following transaction management APIs are removed:
+
+  - ``TransactionMiddleware``
+  - the decorators and context managers ``autocommit``, ``commit_on_success``,
+    and ``commit_manually``, defined in ``django.db.transaction``
+  - the functions ``commit_unless_managed`` and ``rollback_unless_managed``,
+    also defined in ``django.db.transaction``
+  - the ``TRANSACTIONS_MANAGED`` setting
+
+* The :ttag:`cycle` and :ttag:`firstof` template tags auto-escape their
+  arguments.
+
+* The ``SEND_BROKEN_LINK_EMAILS`` setting is removed.
+
+* ``django.middleware.doc.XViewMiddleware`` is removed.
+
+* The ``Model._meta.module_name`` alias is removed.
+
+* The backward compatible shims introduced to rename ``get_query_set``
+  and similar queryset methods are removed. This affects the following classes:
+  ``BaseModelAdmin``, ``ChangeList``, ``BaseCommentNode``,
+  ``GenericForeignKey``, ``Manager``, ``SingleRelatedObjectDescriptor`` and
+  ``ReverseSingleRelatedObjectDescriptor``.
+
+* The backward compatible shims introduced to rename the attributes
+  ``ChangeList.root_query_set`` and ``ChangeList.query_set`` are removed.
+
+* ``django.views.defaults.shortcut`` and ``django.conf.urls.shortcut`` are
+  removed.
+
+* Support for the Python Imaging Library (PIL) module is removed.
+
+* The following private APIs are removed:
+
+  - ``django.db.backend``
+  - ``django.db.close_connection()``
+  - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
+  - ``django.db.transaction.is_managed()``
+  - ``django.db.transaction.managed()``
+
+* ``django.forms.widgets.RadioInput`` is removed.
+
+* The module ``django.test.simple`` and the class
+  ``django.test.simple.DjangoTestSuiteRunner`` are removed.
+
+* The module ``django.test._doctest`` is removed.
+
+* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting is removed.
+
+* Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
+  more than one.* string to override or append to user-provided ``help_text`` in
+  forms for ``ManyToMany`` model fields is not be performed by Django anymore
+  either at the model or forms layer.
+
+* The ``Model._meta.get_(add|change|delete)_permission`` methods are removed.
+
+* The session key ``django_language`` is no longer read for backwards
+  compatibility.
+
+* Geographic Sitemaps are removed
+  (``django.contrib.gis.sitemaps.views.index`` and
+  ``django.contrib.gis.sitemaps.views.sitemap``).
+
+* ``django.utils.html.fix_ampersands``, the ``fix_ampersands`` template filter,
+  and ``django.utils.html.clean_html`` are removed.
