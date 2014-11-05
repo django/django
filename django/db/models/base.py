@@ -1225,8 +1225,7 @@ class Model(six.with_metaclass(ModelBase)):
         """ Perform all manager checks. """
 
         errors = []
-        managers = cls._meta.concrete_managers + cls._meta.abstract_managers
-        for __, __, manager in managers:
+        for __, manager, __ in cls._meta.managers:
             errors.extend(manager.check(**kwargs))
         return errors
 
