@@ -326,13 +326,6 @@ write a cleaning method that operates on the ``recipients`` field, like so::
             # not.
             return data
 
-Sometimes you may want to add an error message to a particular field from the
-form's :meth:`~Form.clean()` method, in which case you can use
-:meth:`~django.forms.Form.add_error()`. Note that this won't always be
-appropriate and the more typical situation is to raise a ``ValidationError``
-from , which is turned into a form-wide error that is available through the
-:meth:`Form.non_field_errors() <django.forms.Form.non_field_errors>` method.
-
 .. _validating-fields-with-clean:
 
 Cleaning and validating fields that depend on each other
