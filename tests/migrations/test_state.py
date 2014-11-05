@@ -122,6 +122,23 @@ class StateTests(TestCase):
             bases=("migrations.Tag",),
         ))
 
+        base_mgr = models.Manager()
+        mgr1 = FoodManager('a', 'b')
+        mgr2 = FoodManager('x', 'y', c=3, d=4)
+        project_state.add_model_state(ModelState(
+            app_label="migrations",
+            name="Food",
+            fields=[
+                ("id", models.AutoField(primary_key=True)),
+            ],
+            managers=[
+                # The ordering we really want is objects, mgr1, mgr2
+                ('default', base_mgr),
+                ('food_mgr2', mgr2),
+                ('food_mgr1', mgr1),
+            ]
+        ))
+
         new_apps = project_state.render()
         self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field_by_name("name")[0].max_length, 100)
         self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field_by_name("hidden")[0].null, False)
@@ -242,7 +259,7 @@ class StateTests(TestCase):
         project_state.add_model_state(ModelState.from_model(D))
         project_state.add_model_state(ModelState.from_model(E))
         project_state.add_model_state(ModelState.from_model(F))
-        final_apps = project_state.render()
+        final_apps = project_state.apps
         self.assertEqual(len(final_apps.get_models()), 6)
 
         # Now make an invalid ProjectState and make sure it fails
@@ -252,7 +269,7 @@ class StateTests(TestCase):
         project_state.add_model_state(ModelState.from_model(C))
         project_state.add_model_state(ModelState.from_model(F))
         with self.assertRaises(InvalidBasesError):
-            project_state.render()
+            project_state.apps
 
     def test_render_unique_app_labels(self):
         """
@@ -272,8 +289,7 @@ class StateTests(TestCase):
         project_state = ProjectState()
         project_state.add_model_state(ModelState.from_model(A))
         project_state.add_model_state(ModelState.from_model(B))
-        final_apps = project_state.render()
-        self.assertEqual(len(final_apps.get_models()), 2)
+        self.assertEqual(len(project_state.apps.get_models()), 2)
 
     def test_equality(self):
         """
@@ -344,20 +360,19 @@ class StateTests(TestCase):
         project_state.add_model_state(ModelState.from_model(Author))
         project_state.add_model_state(ModelState.from_model(Book))
         project_state.add_model_state(ModelState.from_model(Magazine))
-        rendered_state = project_state.render()
-        self.assertEqual(len(rendered_state.get_models()), 3)
+        self.assertEqual(len(project_state.apps.get_models()), 3)
 
         # now make an invalid one with a ForeignKey
         project_state = ProjectState()
         project_state.add_model_state(ModelState.from_model(Book))
         with self.assertRaises(ValueError):
-            rendered_state = project_state.render()
+            project_state.apps
 
         # and another with ManyToManyField
         project_state = ProjectState()
         project_state.add_model_state(ModelState.from_model(Magazine))
         with self.assertRaises(ValueError):
-            rendered_state = project_state.render()
+            project_state.apps
 
     def test_real_apps(self):
         """
@@ -377,12 +392,12 @@ class StateTests(TestCase):
         project_state = ProjectState()
         project_state.add_model_state(ModelState.from_model(TestModel))
         with self.assertRaises(ValueError):
-            project_state.render()
+            project_state.apps
 
         # If we include the real app it should succeed
         project_state = ProjectState(real_apps=["contenttypes"])
         project_state.add_model_state(ModelState.from_model(TestModel))
-        rendered_state = project_state.render()
+        rendered_state = project_state.apps
         self.assertEqual(
             len([x for x in rendered_state.get_models() if x._meta.app_label == "migrations"]),
             1,
@@ -450,4 +465,4 @@ class ModelStateTests(TestCase):
         project_state = ProjectState()
         project_state.add_model_state(state)
         with self.assertRaisesMessage(InvalidBasesError, "Cannot resolve bases for [<ModelState: 'app.Model'>]"):
-            project_state.render()
+            project_state.apps
