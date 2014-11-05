@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from importlib import import_module
 import itertools
+import time
 import traceback
 import warnings
 
@@ -216,22 +217,29 @@ class Command(BaseCommand):
 
     def migration_progress_callback(self, action, migration, fake=False):
         if self.verbosity >= 1:
+            compute_time = self.verbosity > 1
             if action == "apply_start":
+                if compute_time:
+                    self.start = time.time()
                 self.stdout.write("  Applying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "apply_success":
+                elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
                 if fake:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED"))
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED" + elapsed))
                 else:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK" + elapsed))
             elif action == "unapply_start":
+                if compute_time:
+                    self.start = time.time()
                 self.stdout.write("  Unapplying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "unapply_success":
+                elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
                 if fake:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED"))
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED" + elapsed))
                 else:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
+                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK" + elapsed))
 
     def sync_apps(self, connection, app_labels):
         "Runs the old syncdb-style operation on a list of app_labels."
