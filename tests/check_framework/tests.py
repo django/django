@@ -40,8 +40,37 @@ class SystemCheckFrameworkTests(TestCase):
             calls[0] += 1
             return [1, 2, 3]
         errors = registry.run_checks()
-        self.assertEqual(errors, [1, 2, 3])
+        self.assertEqual(sorted(errors), [1, 2, 3])
         self.assertEqual(calls[0], 1)
+
+        @registry.register("tag1", "tag2")
+        def f2(**kwargs):
+            return [4, ]
+
+        registry.register(lambda **kwargs: [5, ], "tag2", "tag3")
+
+        @registry.register("tag3", deploy=True)
+        def f3(**kwargs):
+            return [6, ]
+
+        registry.register(lambda **kwargs: [7, ], "tag3", deploy=True)
+
+        registry.register(lambda **kwargs: [8, ])
+        registry.register(lambda **kwargs: [9, ], deploy=True)
+
+        errors = registry.run_checks(tags=["tag3"])
+        self.assertEqual(sorted(errors), [5, ])
+        errors = registry.run_checks(tags=["tag1", "tag2", "tag3"])
+        self.assertEqual(sorted(errors), [4, 5])
+        errors = registry.run_checks(tags=["tag1", "tag2", "tag3"], include_deployment_checks=True)
+        self.assertEqual(sorted(errors), [4, 5, 6, 7])
+        errors = registry.run_checks(tags=["tag3"], include_deployment_checks=True)
+        self.assertEqual(sorted(errors), [5, 6, 7])
+        errors = registry.run_checks()
+        self.assertEqual(sorted(errors), [1, 2, 3, 4, 5, 8])
+        errors = registry.run_checks(include_deployment_checks=True)
+        self.assertEqual(sorted(errors), [1, 2, 3, 4, 5, 6, 7, 8, 9])
+
 
 
 class MessageTests(TestCase):

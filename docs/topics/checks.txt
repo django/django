@@ -151,6 +151,17 @@ settings file like this::
 These checks will only be run if the :djadminopt:`--deploy` option is passed to
 the :djadmin:`check` command.
 
+Now you can also use register as a function rather than a decorator.
+
+.. function:: register(check, *tags, deploy=False)
+
+The code below is equivalent to the code above.
+::
+
+    def my_check(app_configs, **kwargs):
+        ...
+    register(my_check, Tags.security, deploy=True)
+
 .. _field-checking:
 
 Field, Model, and Manager checks
