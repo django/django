@@ -38,6 +38,7 @@ class AddField(Operation):
         else:
             field = self.field
         state.models[app_label, self.model_name.lower()].fields.append((self.name, field))
+        state.reload_model(app_label, self.model_name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
@@ -94,6 +95,7 @@ class RemoveField(Operation):
             if name != self.name:
                 new_fields.append((name, instance))
         state.models[app_label, self.model_name.lower()].fields = new_fields
+        state.reload_model(app_label, self.model_name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.apps.get_model(app_label, self.model_name)
@@ -150,6 +152,7 @@ class AlterField(Operation):
         state.models[app_label, self.model_name.lower()].fields = [
             (n, field if n == self.name else f) for n, f in state.models[app_label, self.model_name.lower()].fields
         ]
+        state.reload_model(app_label, self.model_name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
@@ -220,6 +223,7 @@ class RenameField(Operation):
                     [self.new_name if n == self.old_name else n for n in together]
                     for together in options[option]
                 ]
+        state.reload_model(app_label, self.model_name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
