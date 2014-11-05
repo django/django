@@ -137,7 +137,7 @@ class MigrationExecutor(object):
         on initial migrations (as it only looks for CreateModel).
         """
         project_state = self.loader.project_state((migration.app_label, migration.name), at_end=True)
-        apps = project_state.render()
+        apps = project_state.apps
         found_create_migration = False
         # Bail if the migration isn't the first one in its app
         if [name for app, name in migration.dependencies if app == migration.app_label]:
