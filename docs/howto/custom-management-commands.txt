@@ -353,6 +353,24 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     :class:`CommandError`, intercept it and print it sensibly to
     stderr.
 
+.. method:: BaseCommand.info(msg, *args, **kwargs)
+
+    .. versionadded:: 1.8
+
+    Logs a message to ``stdout`` by default.
+
+.. method:: BaseCommand.warning(msg, *args, **kwargs)
+
+    .. versionadded:: 1.8
+
+    Logs a warning to ``stdout`` by default.
+
+.. method:: BaseCommand.error(msg, *args, **kwargs)
+
+    .. versionadded:: 1.8
+
+    Logs an error to ``stderr`` by default.
+
 .. admonition:: Calling a management command in your code
 
     ``execute()`` should not be called directly from your code to execute a

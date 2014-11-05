@@ -7,6 +7,7 @@ Base classes for writing management commands (named commands which can
 be executed through ``django-admin`` or ``manage.py``).
 """
 
+import logging
 import os
 import sys
 import warnings
@@ -106,6 +107,12 @@ class OutputWrapper(object):
         return getattr(self._out, name)
 
     def write(self, msg, style_func=None, ending=None):
+        warnings.warn(
+            "The 'stdout' and 'stderr' attributes are deprecated. Use "
+            "one of the new 'info', 'warning' and 'error' methods instead.",
+            RemovedInDjango20Warning,
+            stacklevel=2
+        )
         ending = self.ending if ending is None else ending
         if ending and not msg.endswith(ending):
             msg += ending
@@ -237,10 +244,12 @@ class BaseCommand(object):
     # requires_system_checks = True
 
     def __init__(self, stdout=None, stderr=None, no_color=False):
+        self.logger = logging.getLogger('django.commands')
         self.stdout = OutputWrapper(stdout or sys.stdout)
         self.stderr = OutputWrapper(stderr or sys.stderr)
         if no_color:
             self.style = no_style()
+            self.stderr.style_func = None
         else:
             self.style = color_style()
             self.stderr.style_func = self.style.ERROR
@@ -292,6 +301,24 @@ class BaseCommand(object):
             return '%s\n\n%s' % (usage, self.help)
         else:
             return usage
+
+    def info(self, msg, *args, **kwargs):
+        """
+        Log a message to stdout by default.
+        """
+        self.logger.info(msg, *args, **kwargs)
+
+    def warning(self, msg, *args, **kwargs):
+        """
+        Log a warning to stderr by default.
+        """
+        self.logger.warning(msg, *args, **kwargs)
+
+    def error(self, msg, *args, **kwargs):
+        """
+        Log an error to stderr by default.
+        """
+        self.logger.error(msg, *args, **kwargs)
 
     def create_parser(self, prog_name, subcommand):
         """

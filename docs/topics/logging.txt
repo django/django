@@ -502,6 +502,13 @@ Logs the SQL queries that are executed during schema changes to the database by
 the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
 queries executed by :class:`~django.db.migrations.operations.RunPython`.
 
+``django.commands``
+~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.8
+
+Log messages related to management commands.
+
 Handlers
 --------
 
@@ -650,9 +657,17 @@ logging module.
 Django's default logging configuration
 ======================================
 
-By default, Django configures the ``django.request`` logger so that all messages
-with ``ERROR`` or ``CRITICAL`` level are sent to :class:`AdminEmailHandler`, as
-long as the :setting:`DEBUG` setting is set to ``False``.
+By default, Django configures three loggers:
+
+* The ``django.request`` logger is configured to send all messages with
+  ``ERROR`` or ``CRITICAL`` level to :class:`AdminEmailHandler`, as long as the
+  :setting:`DEBUG` setting is set to ``False``.
+
+* The ``django.security`` logger is configured the same as the
+  ``django.request`` logger, and any error events will be mailed to admins.
+
+* The ``django.commands`` logger is configured to send all messages with
+  ``INFO`` level to ``stdout``, ``WARNING`` and ``ERROR`` level to ``stderr``.
 
 All messages reaching the ``django`` catch-all logger when :setting:`DEBUG` is
 ``True`` are sent to the console. They are simply discarded (sent to

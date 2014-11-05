@@ -7,6 +7,7 @@ import warnings
 from django.conf import settings
 from django.core import mail
 from django.core.mail import get_connection
+from django.core.management.color import color_style
 from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
@@ -31,12 +32,36 @@ DEFAULT_LOGGING = {
         'require_debug_true': {
             '()': 'django.utils.log.RequireDebugTrue',
         },
+        'stdout': {
+            '()': 'django.utils.log.StdoutFilter',
+        },
+        'stderr': {
+            '()': 'django.utils.log.StderrFilter',
+        },
+    },
+    'formatters': {
+        'colored': {
+            '()': 'django.utils.log.ColoredFormatter',
+        }
     },
     'handlers': {
         'console': {
             'level': 'INFO',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
+        },
+        'commands_stdout': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'colored',
+            'stream': 'ext://sys.stdout',
+            'filters': ['stdout'],
+        },
+        'commands_stderr': {
+            'level': 'WARNING',
+            'class': 'logging.StreamHandler',
+            'formatter': 'colored',
+            'filters': ['stderr'],
         },
         'null': {
             'class': 'logging.NullHandler',
@@ -50,6 +75,11 @@ DEFAULT_LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
+        },
+        'django.commands': {
+            'handlers': ['commands_stdout', 'commands_stderr'],
+            'level': 'INFO',
+            'propagate': False,
         },
         'django.request': {
             'handlers': ['mail_admins'],
@@ -145,6 +175,14 @@ class AdminEmailHandler(logging.Handler):
         return formatted_subject[:989]
 
 
+class ColoredFormatter(logging.Formatter):
+    def format(self, record):
+        style = color_style()
+        if record.levelname in ('WARNING', 'ERROR'):
+            return getattr(style, record.levelname)(record.getMessage())
+        return super(ColoredFormatter, self).format(record)
+
+
 class CallbackFilter(logging.Filter):
     """
     A logging filter that checks the return value of a given callable (which
@@ -169,3 +207,13 @@ class RequireDebugFalse(logging.Filter):
 class RequireDebugTrue(logging.Filter):
     def filter(self, record):
         return settings.DEBUG
+
+
+class StdoutFilter(logging.Filter):
+    def filter(self, record):
+        return record.levelno <= logging.INFO
+
+
+class StderrFilter(logging.Filter):
+    def filter(self, record):
+        return record.levelno >= logging.WARNING
