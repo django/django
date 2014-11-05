@@ -8,10 +8,9 @@ Welcome to Django 1.7!
 
 These release notes cover the `new features`_, as well as some `backwards
 incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.6 or older versions. We've also dropped some features, which are detailed in
-:ref:`our deprecation plan <deprecation-removed-in-1.7>`, we've `begun the
-deprecation process for some features`_, and some features have reached the
-end of their deprecation process and `have been removed`_.
+1.6 or older versions. We've `begun the deprecation process for some features`_,
+and some features have reached the end of their deprecation process and
+`have been removed`_.
 
 .. _`new features`: `What's new in Django 1.7`_
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.7`_
