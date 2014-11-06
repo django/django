@@ -440,7 +440,7 @@ Tests
 Validators
 ^^^^^^^^^^
 
-* ...
+* Added a new :class:`~django.core.validators.DomainNameValidator` validator.
 
 Backwards incompatible changes in 1.8
 =====================================

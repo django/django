@@ -66,12 +66,15 @@ class RegexValidator(object):
 
 @deconstructible
 class URLValidator(RegexValidator):
-    regex = re.compile(
-        r'^(?:[a-z0-9\.\-]*)://'  # scheme is validated separately
+    domain_regex = (
         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}(?<!-)\.?)|'  # domain...
         r'localhost|'  # localhost...
         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
         r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
+    )
+    regex = re.compile(
+        r'^(?:[a-z0-9\.\-]*)://' +  # scheme is validated separately
+        domain_regex +
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
     message = _('Enter a valid URL.')
@@ -187,6 +190,35 @@ class EmailValidator(object):
         )
 
 validate_email = EmailValidator()
+
+
+@deconstructible
+class DomainNameValidator(RegexValidator):
+    message = _('Enter a valid domain name value')
+    regex = re.compile(URLValidator.domain_regex, re.IGNORECASE)
+
+    def __init__(self, *args, **kwargs):
+        self.accept_idna = kwargs.pop('accept_idna', True)
+        super(DomainNameValidator, self).__init__(*args, **kwargs)
+        if self.accept_idna:
+            self.message = _('Enter a valid plain or internationalized domain name value')
+
+    def __call__(self, value):
+        try:
+            super(DomainNameValidator, self).__call__(value)
+        except ValidationError as exc:
+            if not self.accept_idna:
+                raise
+            if not value:
+                raise
+            try:
+                idnavalue = value.encode('idna')
+            except UnicodeEncodeError:
+                raise exc
+            super(DomainNameValidator, self).__call__(idnavalue)
+
+
+validate_domain_name = DomainNameValidator()
 
 slug_re = re.compile(r'^[-a-zA-Z0-9_]+$')
 validate_slug = RegexValidator(

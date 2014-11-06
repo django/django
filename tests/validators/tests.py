@@ -12,9 +12,9 @@ from django.core.exceptions import ValidationError
 from django.core.validators import (
     BaseValidator, EmailValidator, MaxLengthValidator, MaxValueValidator,
     MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
-    validate_comma_separated_integer_list, validate_email, validate_integer,
-    validate_ipv46_address, validate_ipv4_address, validate_ipv6_address,
-    validate_slug,
+    DomainNameValidator, validate_comma_separated_integer_list, validate_email,
+    validate_domain_name, validate_integer, validate_ipv46_address,
+    validate_ipv4_address, validate_ipv6_address, validate_slug,
 )
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
@@ -73,6 +73,25 @@ TEST_DATA = [
     # Max length of domain name in email is 249 (see validator for calculation)
     (validate_email, 'a@%s.us' % ('a' * 249), None),
     (validate_email, 'a@%s.us' % ('a' * 250), ValidationError),
+
+    (validate_domain_name, '000000.org', None),
+    (validate_domain_name, 'localhost', None),
+    (validate_domain_name, 'python.org', None),
+    (validate_domain_name, 'python.co.uk', None),
+    (validate_domain_name, 'python.tk', None),
+    (validate_domain_name, 'domain.with.idn.tld.उदाहरण.परीक्ष', None),
+    (validate_domain_name, 'ıçğü.com', None),
+    (DomainNameValidator(accept_idna=False), 'ıçğü.com', ValidationError),
+    (validate_domain_name, 'hg.python.org', None),
+    (validate_domain_name, 'python.xyz', None),
+    (validate_domain_name, 'djangoproject.com', None),
+    (validate_domain_name, 'DJANGOPROJECT.COM', None),
+    (validate_domain_name, 'localhost', None),
+    (validate_domain_name, 'spam.eggs', None),
+    (validate_domain_name, 'python-python.com', None),
+    (validate_domain_name, 'python..org', ValidationError),
+    (validate_domain_name, 'python-.org', ValidationError),
+    (validate_domain_name, 'python.name.uk', None),
 
     (validate_slug, 'slug-ok', None),
     (validate_slug, 'longer-slug-still-ok', None),
@@ -348,4 +367,22 @@ class TestValidatorEquality(TestCase):
         self.assertNotEqual(
             MinValueValidator(45),
             MinValueValidator(11),
+        )
+
+    def test_domain_name_equality(self):
+        self.assertEqual(
+            DomainNameValidator(),
+            DomainNameValidator(),
+        )
+        self.assertNotEqual(
+            DomainNameValidator(),
+            EmailValidator(),
+        )
+        self.assertNotEqual(
+            DomainNameValidator(),
+            DomainNameValidator(accept_idna=False),
+        )
+        self.assertEqual(
+            DomainNameValidator(message="BAD DOMAIN"),
+            DomainNameValidator(message="BAD DOMAIN"),
         )
