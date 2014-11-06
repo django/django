@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import math
 import os
 import re
 import tokenize
@@ -69,6 +70,10 @@ class WriterTests(TestCase):
         """
         # Basic values
         self.assertSerializedEqual(1)
+        self.assertSerializedEqual(1.2)
+        self.assertTrue(math.isinf(self.serialize_round_trip(float("inf"))))
+        self.assertTrue(math.isinf(self.serialize_round_trip(float("-inf"))))
+        self.assertTrue(math.isnan(self.serialize_round_trip(float("nan"))))
         self.assertSerializedEqual(None)
         self.assertSerializedEqual(b"foobar")
         string, imports = MigrationWriter.serialize(b"foobar")
