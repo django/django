@@ -101,6 +101,8 @@ character set. If your database server doesn't use UTF-8 as a default charset,
 you will need to include a value for :setting:`TEST_CHARSET` in the settings
 dictionary for the applicable database.
 
+.. _running-some-tests:
+
 Running only some of the tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -248,8 +250,8 @@ method as above:
 Troubleshooting
 ---------------
 
-Many test failures with ``UnicodeEncodeError``.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Many test failures with ``UnicodeEncodeError``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If the ``locales`` package is not installed, some tests will fail with a
 ``UnicodeEncodeError``.
@@ -260,3 +262,35 @@ You can resolve this on Debian-based systems, for example, by running:
 
     $ apt-get install locales
     $ dpkg-reconfigure locales
+
+Tests that only fail in combination
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In case a test case passes when run in separation, but fails within the whole
+suite, we have some tools to help with analyzing the problem.
+
+The ``--bisect`` option will run the failing test halving the tests set it is
+run together with on each iteration, often making it possible to identify a
+small number of tests that may be related to the failure.
+
+The ``--pair`` option runs the given test alongside every other test from the
+suite, letting you check if maybe another test has side-effects that cause the
+failure.
+
+For example, suppose that the failing test that works on its own is
+``ModelTest.test_eq``, then using:
+
+.. code-block:: bash
+
+   $ ./runtests.py --bisect basic.tests.ModelTest.test_eq
+
+will try to determine a test that interferes with the given one, by repeatedly
+splitting the tests group it is run with in half, and:
+
+.. code-block:: bash
+
+   $ ./runtests.py --pair basic.tests.ModelTest.test_eq
+
+will pair ``test_eq`` with every test label. If you already suspect which
+cases might be responsible for the failure, with both options you may limit
+tests to be cross-analyzed by :ref:`specifying labels<running-some-tests>`.
