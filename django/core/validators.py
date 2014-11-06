@@ -64,14 +64,16 @@ class RegexValidator(object):
         return not (self == other)
 
 
+domain_regex = (
+    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}(?<!-)\.?)|'  # domain...
+    r'localhost|'  # localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
+    r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
+)
+
+
 @deconstructible
 class URLValidator(RegexValidator):
-    domain_regex = (
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}(?<!-)\.?)|'  # domain...
-        r'localhost|'  # localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
-        r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
-    )
     regex = re.compile(
         r'^(?:[a-z0-9\.\-]*)://' +  # scheme is validated separately
         domain_regex +
@@ -195,7 +197,7 @@ validate_email = EmailValidator()
 @deconstructible
 class DomainNameValidator(RegexValidator):
     message = _('Enter a valid plain or internationalized domain name value')
-    regex = re.compile(URLValidator.domain_regex, re.IGNORECASE)
+    regex = re.compile(domain_regex, re.IGNORECASE)
 
     def __init__(self, accept_idna=True, **kwargs):
         message = kwargs.get('message')
