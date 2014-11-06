@@ -194,14 +194,15 @@ validate_email = EmailValidator()
 
 @deconstructible
 class DomainNameValidator(RegexValidator):
-    message = _('Enter a valid domain name value')
+    message = _('Enter a valid plain or internationalized domain name value')
     regex = re.compile(URLValidator.domain_regex, re.IGNORECASE)
 
-    def __init__(self, *args, **kwargs):
-        self.accept_idna = kwargs.pop('accept_idna', True)
-        super(DomainNameValidator, self).__init__(*args, **kwargs)
-        if self.accept_idna:
-            self.message = _('Enter a valid plain or internationalized domain name value')
+    def __init__(self, accept_idna=True, **kwargs):
+        message = kwargs.get('message')
+        self.accept_idna = accept_idna
+        super(DomainNameValidator, self).__init__(**kwargs)
+        if not self.accept_idna and message is None:
+            self.message = _('Enter a valid domain name value')
 
     def __call__(self, value):
         try:
