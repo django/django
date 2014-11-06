@@ -213,7 +213,7 @@ class DomainNameValidator(RegexValidator):
                 raise
             try:
                 idnavalue = value.encode('idna')
-            except UnicodeEncodeError:
+            except UnicodeError:
                 raise exc
             super(DomainNameValidator, self).__call__(idnavalue)
 
