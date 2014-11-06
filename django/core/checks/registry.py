@@ -36,7 +36,7 @@ class CheckRegistry(object):
             def my_check(apps, **kwargs):
                 # ... perform checks and collect `errors` ...
                 return errors
-            #or
+            # or
             registry.register(my_check, 'mytag', 'anothertag')
 
         """

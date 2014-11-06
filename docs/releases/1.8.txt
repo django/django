@@ -353,6 +353,11 @@ Signals
   the request, was added to the :data:`~django.core.signals.request_started`
   signal.
 
+System Check Framework
+^^^^^^^
+
+* The ability to use :attr:`~django.core.checks.register` as a function was added.
+
 Templates
 ^^^^^^^^^
 
