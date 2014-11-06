@@ -54,7 +54,24 @@ class Operation(object):
         Takes the state from the previous migration, and mutates it
         so that it matches what this migration would perform.
         """
-        raise NotImplementedError('subclasses of Operation must provide a state_forwards() method')
+        if state.apps:
+            # If state.apps is populated, de-register and re-register the model and its related models
+            # Most child classes are supposed to call their parents
+            model_name = self.model_name.lower() if hasattr(self, 'model_name') else self.name.lower()
+            try:
+                del state.apps.all_models[app_label][model_name]
+            except KeyError:
+                pass
+            state.models[app_label, model_name].render(state.apps)
+            model = state.apps.get_model(app_label, model_name)
+            related_models = set([f.rel.to for f in model._meta.local_many_to_many])
+            for rel_model in related_models:
+                del state.apps.all_models[rel_model._meta.app_label][rel_model._meta.model_name]
+                state.models[rel_model._meta.app_label, rel_model._meta.model_name].render(state.apps)
+            if related_models:
+                # Re-render this model after related models have been reloaded
+                del state.apps.all_models[app_label][model_name]
+                state.models[app_label, model_name].render(state.apps)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         """

@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from collections import OrderedDict
+
 from django.apps import AppConfig
 from django.apps.registry import Apps, apps as global_apps
 from django.db import models
@@ -34,10 +36,13 @@ class ProjectState(object):
 
     def clone(self):
         "Returns an exact copy of this ProjectState"
-        return ProjectState(
+        new_state = ProjectState(
             models=dict((k, v.clone()) for k, v in self.models.items()),
             real_apps=self.real_apps,
         )
+        if self.apps is not None:
+            new_state.apps = self.apps.clone()
+        return new_state
 
     def render(self, include_real=None, ignore_swappable=False, skip_cache=False):
         "Turns the project state into actual models in a new Apps"
@@ -296,6 +301,9 @@ class ModelState(object):
 
     def render(self, apps):
         "Creates a Model object from our current state into the given apps"
+        if self.app_label not in apps.app_configs:
+            apps.app_configs[self.app_label] = AppConfigStub(self.app_label)
+            apps.app_configs[self.app_label].models = OrderedDict()
         # First, make a Meta object
         meta_contents = {'app_label': self.app_label, "apps": apps}
         meta_contents.update(self.options)
@@ -312,12 +320,14 @@ class ModelState(object):
         body = dict(self.construct_fields())
         body['Meta'] = meta
         body['__module__'] = "__fake__"
-        # Then, make a Model object
-        return type(
+        # Then, make a Model object (which registers with apps in __new__)
+        new_model = type(
             str(self.name),
             bases,
             body,
         )
+        apps.clear_cache()
+        return new_model
 
     def get_field_by_name(self, name):
         for fname, field in self.fields:
