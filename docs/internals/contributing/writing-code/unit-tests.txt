@@ -101,6 +101,8 @@ character set. If your database server doesn't use UTF-8 as a default charset,
 you will need to include a value for :setting:`TEST_CHARSET` in the settings
 dictionary for the applicable database.
 
+.. _runtests-specifying-labels:
+
 Running only some of the tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -248,8 +250,8 @@ method as above:
 Troubleshooting
 ---------------
 
-Many test failures with ``UnicodeEncodeError``.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Many test failures with ``UnicodeEncodeError``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If the ``locales`` package is not installed, some tests will fail with a
 ``UnicodeEncodeError``.
@@ -260,3 +262,47 @@ You can resolve this on Debian-based systems, for example, by running:
 
     $ apt-get install locales
     $ dpkg-reconfigure locales
+
+Tests that only fail in combination
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In case a test passes when run in isolation but fails within the whole suite,
+we have some tools to help analyze the problem.
+
+The ``--bisect`` option of ``runtests.py`` will run the failing test while halving the test set it
+is run together with on each iteration, often making it possible to identify a
+small number of tests that may be related to the failure.
+
+For example, suppose that the failing test that works on its own is
+``ModelTest.test_eq``, then using:
+
+.. code-block:: bash
+
+   $ ./runtests.py --bisect basic.tests.ModelTest.test_eq
+
+will try to determine a test that interferes with the given one. First, the
+test is run with the first half of the test suite. If a failure occurs, the
+first half of the test suite is split in two groups and each group is then run
+with the specified test. If there is no failure with the first half of the test
+suite, the second half of the test suite is run with the specified test and
+split appropriately as described earlier. The process repeats until the set of
+failing tests is minimized.
+
+The ``--pair`` option runs the given test alongside every other test from the
+suite, letting you check if another test has side-effects that cause the
+failure. So:
+
+.. code-block:: bash
+
+   $ ./runtests.py --pair basic.tests.ModelTest.test_eq
+
+will pair ``test_eq`` with every test label.
+
+With both ``--bisect`` and ``--pair``, if you already suspect which cases
+might be responsible for the failure, you may limit tests to be cross-analyzed
+by :ref:`specifying further test labels <runtests-specifying-labels>` after
+the first one:
+
+.. code-block:: bash
+
+   $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
