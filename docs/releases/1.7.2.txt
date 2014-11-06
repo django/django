@@ -49,3 +49,6 @@ Bugfixes
 
 * Allowed usage of ``DateTimeField()`` as ``Transform.output_field``
   (:ticket:`23420`).
+
+* Fixed a migration serializing bug involving ``float("nan")`` and
+  ``float("inf")`` (:ticket:23770:).
