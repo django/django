@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
 
-import datetime
-import inspect
-import decimal
 import collections
+import datetime
+import decimal
 from importlib import import_module
+import inspect
+import math
 import os
 import re
 import sys
@@ -304,7 +305,11 @@ class MigrationWriter(object):
         elif isinstance(value, SettingsReference):
             return "settings.%s" % value.setting_name, {"from django.conf import settings"}
         # Simple types
-        elif isinstance(value, six.integer_types + (float, bool, type(None))):
+        elif isinstance(value, float):
+            if math.isnan(value) or math.isinf(value):
+                return 'float("{}")'.format(value), set()
+            return repr(value), set()
+        elif isinstance(value, six.integer_types + (bool, type(None))):
             return repr(value), set()
         elif isinstance(value, six.binary_type):
             value_repr = repr(value)
