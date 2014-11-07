@@ -259,6 +259,27 @@ tests via Django's test runner.
     If you are not using a management command to invoke the tests, you will
     also need to first setup Django itself using :func:`django.setup()`.
 
+Here an example of a Python script::
+
+    # runtests.py
+    # equivalent to running:
+    # ./manage.py test my_app --liveserver=127.0.0.1:8082
+
+    import os
+    import django
+    from django.test.runner import DiscoverRunner
+
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'my_project.settings'
+    os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = '127.0.0.1:8082'
+
+    django.setup()
+    runner = DiscoverRunner()
+    runner.run_tests(['my_app'])
+
+That you can invoke like this::
+
+    PYTHONPATH=/path/to/my_project:$PYTHONPATH ./runtests.py
+
 .. _other-testing-frameworks:
 
 Using different testing frameworks
