@@ -49,7 +49,12 @@ class BaseHandler(object):
             mw_class = import_string(middleware_path)
             try:
                 mw_instance = mw_class()
-            except MiddlewareNotUsed:
+            except MiddlewareNotUsed as exc:
+                if settings.DEBUG:
+                    if six.text_type(exc):
+                        logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
+                    else:
+                        logger.debug('MiddlewareNotUsed: %r', middleware_path)
                 continue
 
             if hasattr(mw_instance, 'process_request'):

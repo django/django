@@ -337,6 +337,10 @@ Middleware
   <django.middleware.common.CommonMiddleware.response_redirect_class>`
   attribute allows you to customize the redirects issued by the middleware.
 
+* A debug message will be logged to the ``django.request`` logger when a
+  middleware raises a :exc:`~django.core.exceptions.MiddlewareNotUsed` exception
+  in :setting:`DEBUG` mode.
+
 Migrations
 ^^^^^^^^^^
 
