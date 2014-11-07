@@ -729,6 +729,10 @@ Miscellaneous
 
   .. _universal newlines: http://www.python.org/dev/peps/pep-0278
 
+* The Memcached cache backends ``MemcachedCache`` and ``PyLibMCCache`` will
+  delete a key if ``set()`` fails. This is necessary to ensure the ``cache_db``
+  session store always fetches the most current session data.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
