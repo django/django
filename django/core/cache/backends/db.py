@@ -14,6 +14,9 @@ from django.db.backends.utils import typecast_timestamp
 from django.utils import timezone, six
 from django.utils.encoding import force_bytes
 
+# When updating, need a way to specify that the expiration is not changing.
+USE_EXISTING_TIMEOUT = object()
+
 
 class Options(object):
     """A class that will quack like a Django model _meta class.
@@ -93,6 +96,12 @@ class DatabaseCache(BaseDatabaseCache):
         return self._base_set('add', key, value, timeout)
 
     def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
+        use_existing_timeout = False
+
+        if timeout is USE_EXISTING_TIMEOUT:
+            use_existng_timeout = True
+            timeout = DEFAULT_TIMEOUT
+
         timeout = self.get_backend_timeout(timeout)
         db = router.db_for_write(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
@@ -133,9 +142,15 @@ class DatabaseCache(BaseDatabaseCache):
                             current_expires = typecast_timestamp(str(current_expires))
                     exp = connections[db].ops.value_to_db_datetime(exp)
                     if result and (mode == 'set' or (mode == 'add' and current_expires < now)):
-                        cursor.execute("UPDATE %s SET value = %%s, expires = %%s "
-                                       "WHERE cache_key = %%s" % table,
-                                       [b64encoded, exp, key])
+                        if use_existing_timeout:
+                            set_sql = 'value = %s'
+                            set_args = [b64encoded, key]
+                        else:
+                            set_sql = 'value = %s, expires = %s'
+                            set_args = [b64encoded, exp, key]
+                        cursor.execute("UPDATE %s SET %s "
+                                       "WHERE cache_key = %%s" % (table, set_sql),
+                                       set_args)
                     else:
                         cursor.execute("INSERT INTO %s (cache_key, value, expires) "
                                        "VALUES (%%s, %%s, %%s)" % table,
@@ -174,6 +189,17 @@ class DatabaseCache(BaseDatabaseCache):
                            "WHERE cache_key = %%s and expires > %%s" % table,
                            [key, connections[db].ops.value_to_db_datetime(now)])
             return cursor.fetchone() is not None
+
+    def incr(self, key, delta=1, version=None):
+        db = router.db_for_write(self.cache_model_class)
+
+        with transaction.atomic(using=db):
+            value = self.get(key, version=version)
+            if value is None:
+                raise ValueError("Key '%s' not found" % key)
+            new_value = value + delta
+            self.set(key, new_value, version=version, timeout=USE_EXISTING_TIMEOUT)
+            return new_value
 
     def _cull(self, db, cursor, now):
         if self._cull_frequency == 0:
