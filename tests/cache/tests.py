@@ -1133,6 +1133,24 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
         # culling isn't implemented, memcached deals with it.
         pass
 
+    def test_memcached_deletes_key_on_failed_set(self):
+        # By default memcached allows objects up to 1MB. For the cache_db session
+        # backend to always use the current session, memcached needs to delete
+        # the old key if it fails to set.
+        # pylibmc doesn't seem to have SERVER_MAX_VALUE_LENGTH as far as I can
+        # tell from a quick check of its source code. This is falling back to
+        # the default value exposed by python-memcached on my system.
+        max_value_length = getattr(cache._lib, 'SERVER_MAX_VALUE_LENGTH', 1048576)
+
+        cache.set('small_value', 'a')
+        self.assertEqual(cache.get('small_value'), 'a')
+
+        large_value = 'a' * (max_value_length + 1)
+        cache.set('small_value', large_value)
+        # small_value should be deleted, or set if configured to accept larger values
+        value = cache.get('small_value')
+        self.assertTrue(value is None or value == large_value)
+
 
 @override_settings(CACHES=caches_setting_for_tests(
     BACKEND='django.core.cache.backends.filebased.FileBasedCache',
