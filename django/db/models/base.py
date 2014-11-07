@@ -1082,6 +1082,13 @@ class Model(six.with_metaclass(ModelBase)):
         if errors:
             raise ValidationError(errors)
 
+    def natural_key(self):
+        return tuple(getattr(self, field_name) for field_name in self._meta.natural_key_fields)
+
+    @classmethod
+    def has_natural_key(cls):
+        return cls._meta.natural_key_fields or cls.natural_key != Model.natural_key
+
     @classmethod
     def check(cls, **kwargs):
         errors = []

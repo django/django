@@ -20,7 +20,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
-                 'select_on_save', 'default_related_name')
+                 'select_on_save', 'default_related_name', 'natural_key_fields')
 
 
 def normalize_together(option_together):
@@ -100,6 +100,7 @@ class Options(object):
         self.apps = apps
 
         self.default_related_name = None
+        self.natural_key_fields = ()
 
     @property
     def app_config(self):

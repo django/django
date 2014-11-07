@@ -13,7 +13,8 @@ from django.db import connection, router
 from django.db.models.sql import InsertQuery
 
 from .models import (Worker, Article, Party, Event, Department,
-    BrokenUnicodeMethod, NonAutoPK, Model1, Model2, Model3)
+    BrokenUnicodeMethod, NonAutoPK, Model1, Model2, Model3,
+    NoNaturalKeys, HasNaturalMethodKey, HasNaturalMetaKey, )
 
 
 class ModelTests(TestCase):
@@ -245,3 +246,14 @@ class EvaluateMethodTest(TestCase):
         dept = Department.objects.create(pk=1, name='abc')
         dept.evaluate = 'abc'
         Worker.objects.filter(department=dept)
+
+
+class NaturalKeyTest(TestCase):
+    def test_no_natural_key_detection(self):
+        self.assertFalse(NoNaturalKeys.has_natural_key())
+
+    def test_method_natural_key_dectection(self):
+        self.assertTrue(HasNaturalMethodKey.has_natural_key())
+
+    def test_meta_natural_key_dectection(self):
+        self.assertTrue(HasNaturalMetaKey.has_natural_key())

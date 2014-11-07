@@ -19,6 +19,7 @@ class Review(models.Model):
 
     class Meta:
         ordering = ('source',)
+        natural_key_fields = ('name',)
 
 
 class PersonManager(models.Manager):
@@ -28,7 +29,6 @@ class PersonManager(models.Manager):
 
 @python_2_unicode_compatible
 class Person(models.Model):
-    objects = PersonManager()
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -36,6 +36,7 @@ class Person(models.Model):
 
     class Meta:
         ordering = ('name',)
+        natural_key_fields = ('name',)
 
 
 # This book manager doesn't do anything interesting; it just

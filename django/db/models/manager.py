@@ -168,7 +168,6 @@ class BaseManager(object):
     #######################
     # PROXIES TO QUERYSET #
     #######################
-
     def get_queryset(self):
         """
         Returns a new QuerySet object.  Subclasses can override this method to
@@ -184,6 +183,16 @@ class BaseManager(object):
         # implementation of `RelatedManager.get_queryset()` for a better
         # understanding of how this comes into play.
         return self.get_queryset()
+
+    def get_by_natural_key(self, *args):
+        natural_key_fields = self.model._meta.natural_key_fields
+        if len(args) != len(natural_key_fields):
+            raise ValueError("The natural key fields with values %s do not match the field_names of %s" % (args, natural_key_fields,))
+        kwargs = dict(zip(natural_key_fields, args))
+        return self.get(**kwargs)
+
+    def has_natural_key(self):
+        return self.model._meta.natural_key_fields or self.__class__.get_by_natural_key != BaseManager.get_by_natural_key
 
 
 class Manager(BaseManager.from_queryset(QuerySet)):

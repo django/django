@@ -49,7 +49,7 @@ class Serializer(base.Serializer):
 
         self.indent(1)
         attrs = {"model": smart_text(obj._meta)}
-        if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
+        if not self.use_natural_primary_keys or not obj.has_natural_key():
             obj_pk = obj._get_pk_val()
             if obj_pk is not None:
                 attrs['pk'] = smart_text(obj_pk)
@@ -90,7 +90,7 @@ class Serializer(base.Serializer):
         self._start_relational_field(field)
         related_att = getattr(obj, field.get_attname())
         if related_att is not None:
-            if self.use_natural_foreign_keys and hasattr(field.rel.to, 'natural_key'):
+            if self.use_natural_foreign_keys and field.rel.to.has_natural_key():
                 related = getattr(obj, field.name)
                 # If related object has a natural key, use it
                 related = related.natural_key()
@@ -113,7 +113,7 @@ class Serializer(base.Serializer):
         """
         if field.rel.through._meta.auto_created:
             self._start_relational_field(field)
-            if self.use_natural_foreign_keys and hasattr(field.rel.to, 'natural_key'):
+            if self.use_natural_foreign_keys and field.rel.to.has_natural_key():
                 # If the objects in the m2m have a natural key, use it
                 def handle_m2m(value):
                     natural = value.natural_key()
@@ -227,7 +227,7 @@ class Deserializer(base.Deserializer):
         if node.getElementsByTagName('None'):
             return None
         else:
-            if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
+            if field.rel.to._default_manager.has_natural_key():
                 keys = node.getElementsByTagName('natural')
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
@@ -251,7 +251,7 @@ class Deserializer(base.Deserializer):
         """
         Handle a <field> node for a ManyToManyField.
         """
-        if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
+        if field.rel.to._default_manager.has_natural_key():
             def m2m_convert(n):
                 keys = n.getElementsByTagName('natural')
                 if keys:
