@@ -1213,6 +1213,18 @@ are not allowed to visit any page, systemwide. Use this for bad robots/crawlers.
 This is only used if ``CommonMiddleware`` is installed (see
 :doc:`/topics/http/middleware`).
 
+.. setting:: DPASTE_URL
+
+DPASTE_URL
+----------
+
+.. versionadded:: 1.8
+
+Default: ``'http://dpaste.com/'``
+
+URL of a dpaste instance. You can disable this feature by setting
+the ``DPASTE_URL`` setting to ``''``.
+
 .. setting:: EMAIL_BACKEND
 
 EMAIL_BACKEND

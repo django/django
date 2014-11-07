@@ -871,14 +871,18 @@ TECHNICAL_500_TEMPLATE = ("""
     </ul>
   </div>
   {% endautoescape %}
-  <form action="http://dpaste.com/" name="pasteform" id="pasteform" method="post">
+{% if settings.DPASTE_URL %}
+  <form action="{{ settings.DPASTE_URL }}" name="pasteform" id="pasteform" method="post">
+{% endif %}
 {% if not is_email %}
   <div id="pastebinTraceback" class="pastebin">
+  {% if settings.DPASTE_URL %}
     <input type="hidden" name="language" value="PythonConsole">
     <input type="hidden" name="title"
       value="{{ exception_type|escape }}{% if request %} at {{ request.path_info|escape }}{% endif %}">
     <input type="hidden" name="source" value="Django Dpaste Agent">
     <input type="hidden" name="poster" value="Django">
+  {% endif %}
     <textarea name="content" id="traceback_area" cols="140" rows="25">
 Environment:
 
@@ -916,10 +920,14 @@ Traceback:
 Exception Type: {{ exception_type|escape }}{% if request %} at {{ request.path_info|escape }}{% endif %}
 Exception Value: {{ exception_value|force_escape }}
 </textarea>
+{% if settings.DPASTE_URL %}
   <br><br>
   <input type="submit" value="Share this traceback on a public Web site">
+{% endif %}
   </div>
+{% if settings.DPASTE_URL %}
 </form>
+{% endif %}
 </div>
 {% endif %}
 {% endif %}

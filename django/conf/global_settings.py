@@ -17,6 +17,8 @@ TEMPLATE_DEBUG = False
 # on a live site.
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
+DPASTE_URL = 'http://dpaste.com/'
+
 # Whether to use the "Etag" header. This saves bandwidth but slows down performance.
 USE_ETAGS = False
 
