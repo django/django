@@ -85,7 +85,99 @@ class TestSaveLoad(TestCase):
 
 @skipUnlessPG92
 class TestQuerying(TestCase):
-    pass
+
+    def setUp(self):
+        self.objs = [
+            RangesModel.objects.create(ints=NumericRange(0, 10)),
+            RangesModel.objects.create(ints=NumericRange(5, 15)),
+            RangesModel.objects.create(ints=NumericRange(None, 0)),
+            RangesModel.objects.create(ints=NumericRange(empty=True)),
+            RangesModel.objects.create(ints=None),
+        ]
+
+    def test_exact(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__exact=NumericRange(0, 10)),
+            [self.objs[0]],
+        )
+
+    def test_isnull(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__isnull=True),
+            [self.objs[4]],
+        )
+
+    def test_isempty(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__isempty=True),
+            [self.objs[3]],
+        )
+
+    def test_contains(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__contains=8),
+            [self.objs[0], self.objs[1]],
+        )
+
+    def test_contains_range(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__contains=NumericRange(3, 8)),
+            [self.objs[0]],
+        )
+
+    def test_contained_by(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__contained_by=NumericRange(0, 20)),
+            [self.objs[0], self.objs[1], self.objs[3]],
+        )
+
+    def test_overlap(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__overlap=NumericRange(3, 8)),
+            [self.objs[0], self.objs[1]],
+        )
+
+    def test_fully_lt(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__fully_lt=NumericRange(5, 10)),
+            [self.objs[2]],
+        )
+
+    def test_fully_gt(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__fully_gt=NumericRange(5, 10)),
+            [],
+        )
+
+    def test_not_lt(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__not_lt=NumericRange(5, 10)),
+            [self.objs[1]],
+        )
+
+    def test_not_gt(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__not_gt=NumericRange(5, 10)),
+            [self.objs[0], self.objs[2]],
+        )
+
+    def test_adjacent_to(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__adjacent_to=NumericRange(0, 5)),
+            [self.objs[1], self.objs[2]],
+        )
+
+    def test_startswith(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__startswith=0),
+            [self.objs[0]],
+        )
+
+    def test_endswith(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__endswith=0),
+            [self.objs[2]],
+        )
 
 
 @skipUnlessPG92
