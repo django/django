@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.postgres import lookups
 from django.db import models
 from django.utils import six
 
@@ -88,117 +89,63 @@ class DateRangeField(RangeField):
         return 'daterange'
 
 
-@RangeField.register_lookup
-class RangeContainsLookup(models.Lookup):
-    lookup_name = 'contains'
-
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
-        return '%s @> %s' % (lhs, rhs), params
+RangeField.register_lookup(lookups.DataContains)
+RangeField.register_lookup(lookups.ContainedBy)
+RangeField.register_lookup(lookups.Overlap)
 
 
 @RangeField.register_lookup
-class RangeContainedByLookup(models.Lookup):
-    lookup_name = 'contained_by'
-
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
-        return '%s <@ %s' % (lhs, rhs), params
-
-
-@RangeField.register_lookup
-class RangeOverlapLookup(models.Lookup):
-    lookup_name = 'overlap'
-
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
-        return '%s && %s' % (lhs, rhs), params
-
-
-@RangeField.register_lookup
-class FullyLessThanLookup(models.Lookup):
+class FullyLessThan(lookups.PostgresSimpleLookup):
     lookup_name = 'fully_lt'
-
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
-        return '%s << %s' % (lhs, rhs), params
+    operator = '<<'
 
 
 @RangeField.register_lookup
-class FullGreaterThanLookup(models.Lookup):
+class FullGreaterThan(lookups.PostgresSimpleLookup):
     lookup_name = 'fully_gt'
-
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
-        return '%s >> %s' % (lhs, rhs), params
+    operator = '>>'
 
 
 @RangeField.register_lookup
-class NotLessThanLookup(models.Lookup):
+class NotLessThan(lookups.PostgresSimpleLookup):
     lookup_name = 'not_lt'
-
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
-        return '%s &> %s' % (lhs, rhs), params
+    operator = '&>'
 
 
 @RangeField.register_lookup
-class NotGreaterThanLookup(models.Lookup):
+class NotGreaterThan(lookups.PostgresSimpleLookup):
     lookup_name = 'not_gt'
-
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
-        return '%s &< %s' % (lhs, rhs), params
+    operator = '&<'
 
 
 @RangeField.register_lookup
-class AdjacentToLookup(models.Lookup):
+class AdjacentToLookup(lookups.PostgresSimpleLookup):
     lookup_name = 'adjacent_to'
-
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
-        return '%s -|- %s' % (lhs, rhs), params
+    operator = '-|-'
 
 
 @RangeField.register_lookup
-class RangeStartsWithTransform(models.Transform):
+class RangeStartsWith(lookups.FunctionTransform):
     lookup_name = 'startswith'
+    function = 'lower'
 
-    def as_sql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
-        return "lower(%s)" % lhs, params
+    @property
+    def output_field(self):
+        return self.lhs.output_field.base_field
 
 
 @RangeField.register_lookup
-class RangeEndsWithTransform(models.Transform):
+class RangeEndsWith(lookups.FunctionTransform):
     lookup_name = 'endswith'
+    function = 'upper'
 
-    def as_sql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
-        return "upper(%s)" % lhs, params
+    @property
+    def output_field(self):
+        return self.lhs.output_field.base_field
 
 
 @RangeField.register_lookup
-class RangeIsEmptyTransform(models.Transform):
+class IsEmpty(lookups.FunctionTransform):
     lookup_name = 'isempty'
-    output_type = models.BooleanField()
-
-    def as_sql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
-        return "isempty(%s)" % lhs, params
+    function = 'isempty'
+    output_field = models.BooleanField()

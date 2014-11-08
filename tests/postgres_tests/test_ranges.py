@@ -179,6 +179,12 @@ class TestQuerying(TestCase):
             [self.objs[2]],
         )
 
+    def test_startswith_chaining(self):
+        self.assertSequenceEqual(
+            RangesModel.objects.filter(ints__startswith__gte=0),
+            [self.objs[0], self.objs[1]],
+        )
+
 
 @skipUnlessPG92
 class TestSerialization(TestCase):
