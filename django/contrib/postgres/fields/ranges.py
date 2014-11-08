@@ -28,6 +28,8 @@ class RangeField(models.Field):
     def to_python(self, value):
         if isinstance(value, six.string_types):
             value = self.range_type(**json.loads(value))
+        elif isinstance(value, (list, tuple)):
+            value = self.range_type(value[0], value[1])
         return value
 
     def value_to_string(self, obj):

@@ -2,7 +2,8 @@ import datetime
 import json
 import unittest
 
-from django.core import serializers
+from django.contrib.postgres.validators import RangeMaxValueValidator, RangeMinValueValidator
+from django.core import exceptions, serializers
 from django.db import connection
 from django.test import TestCase
 from django.utils import timezone
@@ -200,3 +201,22 @@ class TestSerialization(TestCase):
         self.assertEqual(instance.ints, NumericRange(0, 10))
         self.assertEqual(instance.floats, NumericRange(empty=True))
         self.assertEqual(instance.dates, None)
+
+
+class TestValidators(TestCase):
+
+    def test_max(self):
+        validator = RangeMaxValueValidator(5)
+        validator(NumericRange(0, 5))
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            validator(NumericRange(0, 10))
+        self.assertEqual(cm.exception.messages[0], 'Ensure that this range is completely less than or equal to 5.')
+        self.assertEqual(cm.exception.code, 'max_value')
+
+    def test_min(self):
+        validator = RangeMinValueValidator(5)
+        validator(NumericRange(10, 15))
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            validator(NumericRange(0, 10))
+        self.assertEqual(cm.exception.messages[0], 'Ensure that this range is completely greater than or equal to 5.')
+        self.assertEqual(cm.exception.code, 'min_value')
