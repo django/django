@@ -12,7 +12,16 @@ from psycopg2.extras import NumericRange, DateTimeTZRange, DateRange
 from .models import RangesModel
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
+def skipUnlessPG92(test):
+    if not connection.vendor == 'postgresql':
+        return unittest.skip('PostgreSQL required')(test)
+    PG_VERSION = connection.pg_version
+    if PG_VERSION < 90200:
+        return unittest.skip('PostgreSQL >= 9.2 required')(test)
+    return test
+
+
+@skipUnlessPG92
 class TestSaveLoad(TestCase):
 
     def test_all_fields(self):
@@ -74,12 +83,12 @@ class TestSaveLoad(TestCase):
         self.assertEqual(None, loaded.ints)
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
+@skipUnlessPG92
 class TestQuerying(TestCase):
     pass
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
+@skipUnlessPG92
 class TestSerialization(TestCase):
     test_data = '[{"fields": {"ints": "{\\"upper\\": 10, \\"lower\\": 0, \\"bounds\\": \\"[)\\"}", "floats": "{\\"empty\\": true}", "bigints": null, "timestamps": null, "dates": null}, "model": "postgres_tests.rangesmodel", "pk": null}]'
 
