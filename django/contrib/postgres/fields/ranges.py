@@ -16,12 +16,6 @@ __all__ = [
 class RangeField(models.Field):
     empty_strings_allowed = False
 
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-        if lookup_type == 'contains':
-            return [self.get_prep_value(value)]
-        return super(RangeField, self).get_db_prep_lookup(lookup_type, value,
-                connection, prepared=False)
-
     def get_prep_value(self, value):
         if value is None:
             return None

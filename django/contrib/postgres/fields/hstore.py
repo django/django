@@ -21,12 +21,6 @@ class HStoreField(Field):
     def db_type(self, connection):
         return 'hstore'
 
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-        if lookup_type == 'contains':
-            return [self.get_prep_value(value)]
-        return super(HStoreField, self).get_db_prep_lookup(lookup_type, value,
-                connection, prepared=False)
-
     def get_transform(self, name):
         transform = super(HStoreField, self).get_transform(name)
         if transform:

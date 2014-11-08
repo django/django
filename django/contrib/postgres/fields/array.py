@@ -75,12 +75,6 @@ class ArrayField(Field):
             return [self.base_field.get_prep_value(i) for i in value]
         return value
 
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-        if lookup_type == 'contains':
-            return [self.get_prep_value(value)]
-        return super(ArrayField, self).get_db_prep_lookup(lookup_type, value,
-                connection, prepared=False)
-
     def deconstruct(self):
         name, path, args, kwargs = super(ArrayField, self).deconstruct()
         if path == 'django.contrib.postgres.fields.array.ArrayField':
