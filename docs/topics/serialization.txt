@@ -47,6 +47,8 @@ This is useful if you want to serialize data directly to a file-like object
     :ref:`format <serialization-formats>` will raise a
     ``django.core.serializers.SerializerDoesNotExist`` exception.
 
+.. _subset-of-fields:
+
 Subset of fields
 ~~~~~~~~~~~~~~~~
 
@@ -256,6 +258,9 @@ In particular, :ref:`lazy translation objects <lazy-translations>` need a
             if isinstance(obj, Promise):
                 return force_text(obj)
             return super(LazyEncoder, self).default(obj)
+
+Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
+</ref/contrib/gis/serializers>`.
 
 .. _special encoder: http://docs.python.org/library/json.html#encoders-and-decoders
 .. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15

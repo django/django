@@ -46,6 +46,12 @@ class Track(NamedModel):
     line = models.LineStringField()
 
 
+class MultiFields(NamedModel):
+    city = models.ForeignKey(City)
+    point = models.PointField()
+    poly = models.PolygonField()
+
+
 class Truth(models.Model):
     val = models.BooleanField(default=False)
 
