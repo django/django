@@ -131,11 +131,14 @@ Minor features
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
-  Django 1.2 have been removed.
+* A new :doc:`GeoJSON serializer </ref/contrib/gis/serializers>` is now
+  available.
 
 * The Spatialite backend now supports ``Collect`` and ``Extent`` aggregates
   when the database version is 3.0 or later.
+
+* Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
+  Django 1.2 have been removed.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

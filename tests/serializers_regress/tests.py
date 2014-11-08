@@ -578,7 +578,7 @@ def naturalKeyTest(format, self):
 
 
 for format in [f for f in serializers.get_serializer_formats()
-               if not isinstance(serializers.get_serializer(f), serializers.BadSerializer)]:
+               if not isinstance(serializers.get_serializer(f), serializers.BadSerializer) and not f == 'geojson']:
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_natural_key_serializer', curry(naturalKeySerializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_serializer_fields', curry(fieldsTest, format))
