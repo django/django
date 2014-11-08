@@ -24,7 +24,7 @@ class Serializer(PythonSerializer):
     """
     internal_use_only = False
 
-    def start_serialization(self):
+    def _init_options(self):
         if json.__version__.split('.') >= ['2', '1', '3']:
             # Use JS strings to represent Python Decimal instances (ticket #16850)
             self.options.update({'use_decimal': False})
@@ -35,6 +35,9 @@ class Serializer(PythonSerializer):
         if self.options.get('indent'):
             # Prevent trailing spaces
             self.json_kwargs['separators'] = (',', ': ')
+
+    def start_serialization(self):
+        self._init_options()
         self.stream.write("[")
 
     def end_serialization(self):
