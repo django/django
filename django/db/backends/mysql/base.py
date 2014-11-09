@@ -194,15 +194,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
         with self.connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
-            # This command is MySQL specific; the second column
-            # will tell you the default table type of the created
-            # table. Since all Django's test tables will have the same
-            # table type, that's enough to evaluate the feature.
-            cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
+            cursor.execute("SELECT ENGINE FROM INFORMATION_SCHEMA.ENGINES WHERE SUPPORT = 'DEFAULT'")
             result = cursor.fetchone()
-            cursor.execute('DROP TABLE INTROSPECT_TEST')
-        return result[1]
+        return result[0]
 
     @cached_property
     def can_introspect_foreign_keys(self):
