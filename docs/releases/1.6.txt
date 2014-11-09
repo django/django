@@ -1021,7 +1021,7 @@ tags render their arguments as-is.
 Django 1.6 starts a process to correct this inconsistency. The ``future``
 template library provides alternate implementations of :ttag:`cycle` and
 :ttag:`firstof` that autoescape their inputs. If you're using these tags,
-you're encourage to include the following line at the top of your templates to
+you're encouraged to include the following line at the top of your templates to
 enable the new behavior::
 
     {% load cycle from future %}
