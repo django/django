@@ -58,24 +58,6 @@ def to_list(value):
         value = [value]
     return value
 
-real_commit = transaction.commit
-real_rollback = transaction.rollback
-
-
-def nop(*args, **kwargs):
-    return
-
-
-def disable_transaction_methods():
-    transaction.commit = nop
-    transaction.rollback = nop
-
-
-def restore_transaction_methods():
-    transaction.commit = real_commit
-    transaction.rollback = real_rollback
-
-
 def assert_and_parse_html(self, html, user_msg, msg):
     try:
         dom = parse_html(html)
@@ -933,8 +915,6 @@ class TestCase(TransactionTestCase):
         for db_name in self._databases_names():
             self.atomics[db_name] = transaction.atomic(using=db_name)
             self.atomics[db_name].__enter__()
-        # Remove this when the legacy transaction management goes away.
-        disable_transaction_methods()
 
         for db_name in self._databases_names(include_mirrors=False):
             if self.fixtures:
@@ -953,11 +933,8 @@ class TestCase(TransactionTestCase):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
 
-        # Remove this when the legacy transaction management goes away.
-        restore_transaction_methods()
         for db_name in reversed(self._databases_names()):
-            # Hack to force a rollback
-            connections[db_name].needs_rollback = True
+            transaction.set_rollback(True, using=db_name)
             self.atomics[db_name].__exit__(None, None, None)
 
 
