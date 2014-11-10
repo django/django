@@ -233,6 +233,12 @@ class TemplateResponseTest(TestCase):
                                   Context({'foo': 'bar'})).render()
         self.assertEqual(response.content, b'bar')
 
+    def test_context_processor_priority(self):
+        # context processors should be overridden by passed-in context
+        response = self._response('{{ foo }}{{ processors }}',
+                                  {'processors': 'no'}).render()
+        self.assertEqual(response.content, b'no')
+
     def test_kwargs(self):
         response = self._response(content_type='application/json',
                                   status=504)

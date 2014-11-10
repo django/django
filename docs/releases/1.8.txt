@@ -640,6 +640,20 @@ run this query::
   the serialization framework, that means that ``dumpdata`` output will now
   contain the SRID value of geometry objects.
 
+Priority of context processors for ``TemplateResponse`` brought in line with ``render``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :class:`~django.template.response.TemplateResponse` constructor is designed to be a
+drop-in replacement for the :func:`~django.shortcuts.render` function. However,
+it had a slight incompatibility, in that for ``TemplateResponse``, context data
+from the passed in context dictionary could be shadowed by context data returned
+from context processors, whereas for ``render`` it was the other way
+around. This was a bug, and the behaviour of ``render`` is more appropriate,
+since it allows the globally defined context processors to be overridden locally
+in the view. If you were relying on the fact context data in a
+``TemplateResponse`` could be overridden using a context processor, you will
+need to change your code.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
