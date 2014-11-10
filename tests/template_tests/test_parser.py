@@ -5,8 +5,8 @@ from __future__ import unicode_literals
 
 from unittest import TestCase
 
-from django.template import (TokenParser, FilterExpression, Parser, Variable,
-    Template, TemplateSyntaxError, Library)
+from django.template import Library, Template, TemplateSyntaxError
+from django.template.base import FilterExpression, Parser, TokenParser, Variable
 from django.test import override_settings
 from django.utils import six
 
