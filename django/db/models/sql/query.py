@@ -1109,28 +1109,48 @@ class Query(object):
                     self.check_query_object_type(v, opts)
 
     def build_lookup(self, lookups, lhs, rhs):
+        """
+        Tries to extract transforms and lookup from given lhs.
+
+        The lhs value is something that works like SQLExpression.
+        The rhs value is what the lookup is going to compare against.
+        The lookups is a list of names to extract using get_lookup()
+        and get_transform().
+        """
         lookups = lookups[:]
         bilaterals = []
         while lookups:
-            lookup = lookups[0]
+            name = lookups[0]
+            # If there is just one part left, try first get_lookup() so
+            # that if the lhs supports both transform and lookup for the
+            # name, then lookup will be picked.
             if len(lookups) == 1:
-                final_lookup = lhs.get_lookup(lookup)
-                if final_lookup:
-                    return final_lookup(lhs, rhs, bilaterals)
-                # We didn't find a lookup, so we are going to try get_transform
-                # + get_lookup('exact').
-                lookups.append('exact')
-            next = lhs.get_transform(lookup)
-            if next:
-                lhs = next(lhs, lookups)
-                if getattr(next, 'bilateral', False):
-                    bilaterals.append((next, lookups))
-            else:
-                raise FieldError(
-                    "Unsupported lookup '%s' for %s or join on the field not "
-                    "permitted." %
-                    (lookup, lhs.output_field.__class__.__name__))
+                final_lookup = lhs.get_lookup(name)
+                if not final_lookup:
+                    # We didn't find a lookup. We are going to interpret
+                    # the name as transform, and do an Exact lookup against
+                    # it.
+                    lhs = self.try_transform(lhs, name, lookups, bilaterals)
+                    final_lookup = lhs.get_lookup('exact')
+                return final_lookup(lhs, rhs, bilaterals)
+            lhs = self.try_transform(lhs, name, lookups, bilaterals)
             lookups = lookups[1:]
+
+    def try_transform(self, lhs, name, rest_of_lookups, bilaterals):
+        """
+        Helper method for build_lookup. Tries to fetch and initialize
+        a transform for name parameter from lhs.
+        """
+        next = lhs.get_transform(name)
+        if next:
+            if getattr(next, 'bilateral', False):
+                bilaterals.append((next, rest_of_lookups))
+            return next(lhs, rest_of_lookups)
+        else:
+            raise FieldError(
+                "Unsupported lookup '%s' for %s or join on the field not "
+                "permitted." %
+                (name, lhs.output_field.__class__.__name__))
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
                      can_reuse=None, connector=AND):
