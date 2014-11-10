@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
 import datetime
-import time
 
 from django.core import signing
 from django.test import TestCase
+from django.test.utils import freeze_time
 from django.utils.encoding import force_str
 from django.utils import six
 
@@ -117,23 +117,15 @@ class TestTimestampSigner(TestCase):
 
     def test_timestamp_signer(self):
         value = 'hello'
-        _time = time.time
-        time.time = lambda: 123456789
-        try:
+        with freeze_time(123456789):
             signer = signing.TimestampSigner('predictable-key')
             ts = signer.sign(value)
             self.assertNotEqual(ts,
                 signing.Signer('predictable-key').sign(value))
-
             self.assertEqual(signer.unsign(ts), value)
-            time.time = lambda: 123456800
-            self.assertEqual(signer.unsign(ts, max_age=13), value)
+
+        with freeze_time(123456800):
             self.assertEqual(signer.unsign(ts, max_age=12), value)
             # max_age parameter can also accept a datetime.timedelta object
             self.assertEqual(signer.unsign(ts, max_age=datetime.timedelta(seconds=11)), value)
-            self.assertRaises(
-                signing.SignatureExpired, signer.unsign, ts, max_age=10)
-            with self.assertRaises(signing.SignatureExpired):
-                self.assertEqual(signer.unsign(ts, max_age=datetime.timedelta(seconds=10)), value)
-        finally:
-            time.time = _time
+            self.assertRaises(signing.SignatureExpired, signer.unsign, ts, max_age=10)
