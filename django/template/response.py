@@ -154,4 +154,7 @@ class TemplateResponse(SimpleTemplateResponse):
         """
         if isinstance(context, Context):
             return context
-        return RequestContext(self._request, context, current_app=self._current_app)
+        context_instance = RequestContext(self._request, current_app=self._current_app)
+        if context:
+            context_instance.push(context)
+        return context_instance
