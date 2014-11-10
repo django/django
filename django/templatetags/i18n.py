@@ -3,9 +3,8 @@ import re
 import sys
 
 from django.conf import settings
-from django.template import (Node, Variable, TemplateSyntaxError,
-    TokenParser, Library, TOKEN_TEXT, TOKEN_VAR)
-from django.template.base import render_value_in_context
+from django.template import Library, Node, TemplateSyntaxError, Variable
+from django.template.base import render_value_in_context, TokenParser, TOKEN_TEXT, TOKEN_VAR
 from django.template.defaulttags import token_kwargs
 from django.utils import six
 from django.utils import translation

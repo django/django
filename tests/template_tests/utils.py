@@ -6,7 +6,7 @@ import functools
 
 from django import template
 from django.template import Library
-from django.template.base import Context
+from django.template.base import Context, libraries
 from django.template.engine import Engine
 from django.template.loader import get_template
 from django.test.utils import override_settings
@@ -100,9 +100,11 @@ def upper(value):
 def register_test_tags(func):
     @functools.wraps(func)
     def inner(self):
-        template.libraries['testtags'] = register
-        func(self)
-        del template.libraries['testtags']
+        libraries['testtags'] = register
+        try:
+            func(self)
+        finally:
+            del libraries['testtags']
     return inner
 
 
