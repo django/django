@@ -563,8 +563,15 @@ Python logging module.
     By default, an instance of the email backend specified in
     :setting:`EMAIL_BACKEND` will be used.
 
-.. _Sentry: https://pypi.python.org/pypi/sentry
+    .. method:: send_mail(subject, message, *args, **kwargs)
 
+        .. versionadded:: 1.8
+
+        Sends emails to admin users. To customize this behavior, you can
+        subclass the :class:`~django.utils.log.AdminEmailHandler` class and
+        override this method.
+
+.. _Sentry: https://pypi.python.org/pypi/sentry
 
 Filters
 -------

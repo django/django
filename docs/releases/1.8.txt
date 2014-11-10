@@ -271,6 +271,13 @@ Internationalization
   reusable apps. It also allows overriding those custom formats in your main
   Django project.
 
+Logging
+^^^^^^^
+
+* The :class:`django.utils.log.AdminEmailHandler` class now has a
+  :meth:`~django.utils.log.AdminEmailHandler.send_mail` method to make it more
+  subclass friendly.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 

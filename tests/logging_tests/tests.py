@@ -10,8 +10,9 @@ from django.test import TestCase, RequestFactory, override_settings
 from django.test.utils import patch_logger
 from django.utils.encoding import force_text
 from django.utils.deprecation import RemovedInNextVersionWarning
-from django.utils.log import (CallbackFilter, RequireDebugFalse,
-    RequireDebugTrue)
+from django.utils.log import (
+    AdminEmailHandler, CallbackFilter, RequireDebugFalse, RequireDebugTrue,
+)
 from django.utils.six import StringIO
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -340,6 +341,22 @@ class AdminEmailHandlerTest(TestCase):
         self.assertEqual(msg.to, ['admin@example.com'])
         self.assertEqual(msg.subject, "[Django] ERROR (EXTERNAL IP): message")
         self.assertIn("path:%s" % url_path, msg.body)
+
+    @override_settings(
+        MANAGERS=(('manager', 'manager@example.com'),),
+        DEBUG=False,
+    )
+    def test_customize_send_mail_method(self):
+        class ManagerEmailHandler(AdminEmailHandler):
+            def send_mail(self, subject, message, *args, **kwargs):
+                mail.mail_managers(subject, message, *args, connection=self.connection(), **kwargs)
+
+        handler = ManagerEmailHandler()
+        record = self.logger.makeRecord('name', logging.ERROR, 'function', 'lno', 'message', None, None)
+        self.assertEqual(len(mail.outbox), 0)
+        handler.emit(record)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['manager@example.com'])
 
 
 class SettingsConfigTest(AdminScriptTestCase):
