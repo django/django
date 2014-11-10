@@ -8,7 +8,8 @@ import unittest
 from django import template
 from django.contrib.auth.models import Group
 from django.core import urlresolvers
-from django.template import loader, Context, RequestContext, Template, TemplateSyntaxError
+from django.template import (base as template_base, loader,
+    Context, RequestContext, Template, TemplateSyntaxError)
 from django.template.engine import Engine
 from django.template.loaders import app_directories, filesystem
 from django.test import RequestFactory, SimpleTestCase
@@ -245,7 +246,7 @@ class TemplateRegressionTests(SimpleTestCase):
 
     def test_token_smart_split(self):
         # Regression test for #7027
-        token = template.Token(template.TOKEN_BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
+        token = template_base.Token(template_base.TOKEN_BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
         split = token.split_contents()
         self.assertEqual(split, ["sometag", '_("Page not found")', 'value|yesno:_("yes,no")'])
 

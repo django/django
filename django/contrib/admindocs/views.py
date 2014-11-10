@@ -3,7 +3,6 @@ import inspect
 import os
 import re
 
-from django import template
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -13,6 +12,8 @@ from django.core.exceptions import ViewDoesNotExist
 from django.http import Http404
 from django.core import urlresolvers
 from django.contrib.admindocs import utils
+from django.template.base import (builtins, get_library,
+    get_templatetags_modules, InvalidTemplateLibrary, libraries)
 from django.template.engine import Engine
 from django.utils.decorators import method_decorator
 from django.utils._os import upath
@@ -61,8 +62,8 @@ class TemplateTagIndexView(BaseAdminDocsView):
         load_all_installed_template_libraries()
 
         tags = []
-        app_libs = list(six.iteritems(template.libraries))
-        builtin_libs = [(None, lib) for lib in template.builtins]
+        app_libs = list(six.iteritems(libraries))
+        builtin_libs = [(None, lib) for lib in builtins]
         for module_name, library in builtin_libs + app_libs:
             for tag_name, tag_func in library.tags.items():
                 title, body, metadata = utils.parse_docstring(tag_func.__doc__)
@@ -72,7 +73,7 @@ class TemplateTagIndexView(BaseAdminDocsView):
                     body = utils.parse_rst(body, 'tag', _('tag:') + tag_name)
                 for key in metadata:
                     metadata[key] = utils.parse_rst(metadata[key], 'tag', _('tag:') + tag_name)
-                if library in template.builtins:
+                if library in builtins:
                     tag_library = ''
                 else:
                     tag_library = module_name.split('.')[-1]
@@ -94,8 +95,8 @@ class TemplateFilterIndexView(BaseAdminDocsView):
         load_all_installed_template_libraries()
 
         filters = []
-        app_libs = list(six.iteritems(template.libraries))
-        builtin_libs = [(None, lib) for lib in template.builtins]
+        app_libs = list(six.iteritems(libraries))
+        builtin_libs = [(None, lib) for lib in builtins]
         for module_name, library in builtin_libs + app_libs:
             for filter_name, filter_func in library.filters.items():
                 title, body, metadata = utils.parse_docstring(filter_func.__doc__)
@@ -105,7 +106,7 @@ class TemplateFilterIndexView(BaseAdminDocsView):
                     body = utils.parse_rst(body, 'filter', _('filter:') + filter_name)
                 for key in metadata:
                     metadata[key] = utils.parse_rst(metadata[key], 'filter', _('filter:') + filter_name)
-                if library in template.builtins:
+                if library in builtins:
                     tag_library = ''
                 else:
                     tag_library = module_name.split('.')[-1]
@@ -313,7 +314,7 @@ class TemplateDetailView(BaseAdminDocsView):
 
 def load_all_installed_template_libraries():
     # Load/register all template tag libraries from installed apps.
-    for module_name in template.get_templatetags_modules():
+    for module_name in get_templatetags_modules():
         mod = import_module(module_name)
         if not hasattr(mod, '__file__'):
             # e.g. packages installed as eggs
@@ -330,8 +331,8 @@ def load_all_installed_template_libraries():
         else:
             for library_name in libraries:
                 try:
-                    template.get_library(library_name)
-                except template.InvalidTemplateLibrary:
+                    get_library(library_name)
+                except InvalidTemplateLibrary:
                     pass
 
 
