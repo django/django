@@ -58,6 +58,7 @@ def to_list(value):
         value = [value]
     return value
 
+
 def assert_and_parse_html(self, html, user_msg, msg):
     try:
         dom = parse_html(html)
