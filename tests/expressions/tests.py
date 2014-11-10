@@ -13,9 +13,9 @@ from django.utils import six
 from .models import Company, Employee, Number, Experiment
 
 
-class ExpressionsTests(TestCase):
-
-    def test_filter(self):
+class BasicExpressionsTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
         Company.objects.create(
             name="Example Inc.", num_employees=2300, num_chairs=5,
             ceo=Employee.objects.create(firstname="Joe", lastname="Smith")
@@ -29,16 +29,19 @@ class ExpressionsTests(TestCase):
             ceo=Employee.objects.create(firstname="Max", lastname="Mustermann")
         )
 
-        company_query = Company.objects.values(
+    def setUp(self):
+        self.company_query = Company.objects.values(
             "name", "num_employees", "num_chairs"
         ).order_by(
             "name", "num_employees", "num_chairs"
         )
 
-        # We can filter for companies where the number of employees is greater
+    def test_filter_inter_attribute(self):
+        # We can filter on attribute relationships on same model obj, e.g.
+        # find companies where the number of employees is greater
         # than the number of chairs.
         self.assertQuerysetEqual(
-            company_query.filter(num_employees__gt=F("num_chairs")), [
+            self.company_query.filter(num_employees__gt=F("num_chairs")), [
                 {
                     "num_chairs": 5,
                     "name": "Example Inc.",
@@ -53,11 +56,12 @@ class ExpressionsTests(TestCase):
             lambda o: o
         )
 
+    def test_update(self):
         # We can set one field to have the value of another field
         # Make sure we have enough chairs
-        company_query.update(num_chairs=F("num_employees"))
+        self.company_query.update(num_chairs=F("num_employees"))
         self.assertQuerysetEqual(
-            company_query, [
+            self.company_query, [
                 {
                     "num_chairs": 2300,
                     "name": "Example Inc.",
@@ -77,11 +81,12 @@ class ExpressionsTests(TestCase):
             lambda o: o
         )
 
+    def test_arithmetic(self):
         # We can perform arithmetic operations in expressions
         # Make sure we have 2 spare chairs
-        company_query.update(num_chairs=F("num_employees") + 2)
+        self.company_query.update(num_chairs=F("num_employees") + 2)
         self.assertQuerysetEqual(
-            company_query, [
+            self.company_query, [
                 {
                     'num_chairs': 2302,
                     'name': 'Example Inc.',
@@ -101,12 +106,13 @@ class ExpressionsTests(TestCase):
             lambda o: o,
         )
 
+    def test_order_of_operations(self):
         # Law of order of operations is followed
-        company_query.update(
+        self. company_query.update(
             num_chairs=F('num_employees') + 2 * F('num_employees')
         )
         self.assertQuerysetEqual(
-            company_query, [
+            self.company_query, [
                 {
                     'num_chairs': 6900,
                     'name': 'Example Inc.',
@@ -126,12 +132,13 @@ class ExpressionsTests(TestCase):
             lambda o: o,
         )
 
+    def test_parenthesis_priority(self):
         # Law of order of operations can be overridden by parentheses
-        company_query.update(
+        self.company_query.update(
             num_chairs=((F('num_employees') + 2) * F('num_employees'))
         )
         self.assertQuerysetEqual(
-            company_query, [
+            self.company_query, [
                 {
                     'num_chairs': 5294600,
                     'name': 'Example Inc.',
@@ -151,8 +158,8 @@ class ExpressionsTests(TestCase):
             lambda o: o,
         )
 
-        # The relation of a foreign key can become copied over to an other
-        # foreign key.
+    def test_update_with_fk(self):
+        # ForeignKey can become updated with the value of another ForeignKey.
         self.assertEqual(
             Company.objects.update(point_of_contact=F('ceo')),
             3
@@ -167,11 +174,13 @@ class ExpressionsTests(TestCase):
             ordered=False
         )
 
+    def test_filter_with_join(self):
+        # F Expressions can also span joins
+        Company.objects.update(point_of_contact=F('ceo'))
         c = Company.objects.all()[0]
         c.point_of_contact = Employee.objects.create(firstname="Guido", lastname="van Rossum")
         c.save()
 
-        # F Expressions can also span joins
         self.assertQuerysetEqual(
             Company.objects.filter(ceo__firstname=F("point_of_contact__firstname")), [
                 "Foobar Ltd.",
@@ -197,6 +206,7 @@ class ExpressionsTests(TestCase):
                     ceo__firstname=F('point_of_contact__firstname')
                 ).update(name=F('point_of_contact__lastname'))
 
+    def test_object_update(self):
         # F expressions can be used to update attributes on single objects
         test_gmbh = Company.objects.get(name="Test GmbH")
         self.assertEqual(test_gmbh.num_employees, 32)
@@ -205,11 +215,10 @@ class ExpressionsTests(TestCase):
         test_gmbh = Company.objects.get(pk=test_gmbh.pk)
         self.assertEqual(test_gmbh.num_employees, 36)
 
+    def test_object_update_fk(self):
         # F expressions cannot be used to update attributes which are foreign
         # keys, or attributes which involve joins.
-        test_gmbh.point_of_contact = None
-        test_gmbh.save()
-        self.assertIsNone(test_gmbh.point_of_contact)
+        test_gmbh = Company.objects.get(name="Test GmbH")
 
         def test():
             test_gmbh.point_of_contact = F("ceo")
@@ -220,8 +229,10 @@ class ExpressionsTests(TestCase):
         test_gmbh.name = F("ceo__last_name")
         self.assertRaises(FieldError, test_gmbh.save)
 
+    def test_object_update_unsaved_objects(self):
         # F expressions cannot be used to update attributes on objects which do
         # not yet exist in the database
+        test_gmbh = Company.objects.get(name="Test GmbH")
         acme = Company(
             name="The Acme Widget Co.", num_employees=12, num_chairs=5,
             ceo=test_gmbh.ceo
@@ -286,6 +297,9 @@ class ExpressionsTests(TestCase):
             company_ceo_set__num_employees=F('company_ceo_set__num_employees')
         )
         self.assertEqual(str(qs.query).count('JOIN'), 2)
+
+
+class ExpressionsTests(TestCase):
 
     def test_F_object_deepcopy(self):
         """
