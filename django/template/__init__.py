@@ -1,3 +1,15 @@
+### Multiple Template Engines
+
+from .utils import EngineHandler
+
+
+engines = EngineHandler()
+
+__all__ = ('engines',)
+
+
+### Django Template Language
+
 # Public exceptions
 from .base import (TemplateDoesNotExist, TemplateSyntaxError,           # NOQA
                    VariableDoesNotExist)
@@ -14,4 +26,4 @@ from .base import resolve_variable                                      # NOQA
 from .base import Library                                               # NOQA
 
 
-__all__ = ('Template', 'Context', 'RequestContext')
+__all__ += ('Template', 'Context', 'RequestContext')
