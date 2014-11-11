@@ -719,6 +719,14 @@ a merge.
 The ``--name`` option allows you to give the migration(s) a custom name instead
 of a generated one.
 
+.. django-admin-option:: --exit, -e
+
+.. versionadded:: 1.8
+
+The ``--exit`` option will cause ``makemigrations`` to exit with error code 1
+when no migration are created (or would have been created, if combined with
+``--dry-run``).
+
 migrate [<app_label> [<migrationname>]]
 ---------------------------------------
 
