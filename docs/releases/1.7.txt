@@ -760,7 +760,7 @@ Models
 * Explicit :class:`~django.db.models.OneToOneField` for
   :ref:`multi-table-inheritance` are now discovered in abstract classes.
 
-* Is it now possible to avoid creating a backward relation for
+* It is now possible to avoid creating a backward relation for
   :class:`~django.db.models.OneToOneField` by setting its
   :attr:`~django.db.models.ForeignKey.related_name` to
   ``'+'`` or ending it with ``'+'``.
