@@ -591,7 +591,7 @@ errors. For example, ``{{ form.non_field_errors }}`` would look like:
 
 .. versionchanged:: 1.8
 
-    The "nonfield" class as described in the example above was added.
+    The ``nonfield`` class as described in the example above was added.
 
 See :doc:`/ref/forms/api` for more on errors, styling, and working with form
 attributes in templates.
