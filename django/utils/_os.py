@@ -4,6 +4,7 @@ import sys
 import tempfile
 from os.path import join, normcase, normpath, abspath, isabs, sep, dirname
 
+from django.core.exceptions import SuspiciousFileOperation
 from django.utils.encoding import force_text
 from django.utils import six
 
@@ -77,8 +78,9 @@ def safe_join(base, *paths):
     if (not normcase(final_path).startswith(normcase(base_path + sep)) and
             normcase(final_path) != normcase(base_path) and
             dirname(normcase(base_path)) != normcase(base_path)):
-        raise ValueError('The joined path (%s) is located outside of the base '
-                         'path component (%s)' % (final_path, base_path))
+        raise SuspiciousFileOperation(
+            'The joined path ({}) is located outside of the base path '
+            'component ({})'.format(final_path, base_path))
     return final_path
 
 
