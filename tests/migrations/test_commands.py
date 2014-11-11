@@ -543,3 +543,20 @@ class MakeMigrationsTests(MigrationTestBase):
         content = cmd("0002", migration_name_0002, "--empty")
         self.assertIn("dependencies=[\n('migrations','0001_%s'),\n]" % migration_name_0001, content)
         self.assertIn("operations=[\n]", content)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_changes"})
+    def test_makemigrations_exit_no_changes(self):
+        """
+        Ticket #23728 -- Makes sure that makemigrations --exit exits with
+        sys.exit(1) when there are no changes to an app.
+        """
+        with self.assertRaises(SystemExit):
+            call_command("makemigrations", "--exit", "migrations", verbosity=0)
+
+    def test_makemigrations_exit_with_changes(self):
+        """
+        Ticket #23728 -- Makes sure that makemigrations --exit does not exit
+        when there are changes to an app.
+        """
+        with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
+            call_command("makemigrations", "--exit", "migrations", verbosity=0)
