@@ -100,7 +100,8 @@ class RelatedField(Field):
         errors.extend(self._check_related_name_is_valid())
         errors.extend(self._check_relation_model_exists())
         errors.extend(self._check_referencing_to_swapped_model())
-        errors.extend(self._check_clashes())
+        errors.extend(self._check_clashes(check_related_query_name=False))
+        errors.extend(self._check_clashes(check_related_query_name=True))
         return errors
 
     def _check_related_name_is_valid(self):
@@ -158,7 +159,7 @@ class RelatedField(Field):
             ]
         return []
 
-    def _check_clashes(self):
+    def _check_clashes(self, check_related_query_name=False):
         """ Check accessor and reverse query name clashes. """
 
         from django.db.models.base import ModelBase
@@ -195,8 +196,10 @@ class RelatedField(Field):
 
         rel_opts = self.rel.to._meta
         # rel_opts.object_name == "Target"
-        rel_name = self.related.get_accessor_name()  # i. e. "model_set"
-        rel_query_name = self.related_query_name()  # i. e. "model"
+        if check_related_query_name:
+            rel_name = self.related_query_name()
+        else:
+            rel_name = self.related.get_accessor_name()  # i. e. "model_set"
         field_name = "%s.%s" % (opts.object_name,
             self.name)  # i. e. "Model.field"
 
@@ -208,26 +211,26 @@ class RelatedField(Field):
             clash_name = "%s.%s" % (rel_opts.object_name,
                 clash_field.name)  # i. e. "Target.model_set"
             if clash_field.name == rel_name:
-                errors.append(
-                    checks.Error(
-                        "Reverse accessor for '%s' clashes with field name '%s'." % (field_name, clash_name),
-                        hint=("Rename field '%s', or add/change a related_name "
-                              "argument to the definition for field '%s'.") % (clash_name, field_name),
-                        obj=self,
-                        id='fields.E302',
+                if check_related_query_name:
+                    errors.append(
+                        checks.Error(
+                            "Reverse query name for '%s' clashes with field name '%s'." % (field_name, clash_name),
+                            hint=("Rename field '%s', or add/change a related_name "
+                                  "argument to the definition for field '%s'.") % (clash_name, field_name),
+                            obj=self,
+                            id='fields.E303',
+                        )
                     )
-                )
-
-            if clash_field.name == rel_query_name:
-                errors.append(
-                    checks.Error(
-                        "Reverse query name for '%s' clashes with field name '%s'." % (field_name, clash_name),
-                        hint=("Rename field '%s', or add/change a related_name "
-                              "argument to the definition for field '%s'.") % (clash_name, field_name),
-                        obj=self,
-                        id='fields.E303',
+                else:
+                    errors.append(
+                        checks.Error(
+                            "Reverse accessor for '%s' clashes with field name '%s'." % (field_name, clash_name),
+                            hint=("Rename field '%s', or add/change a related_name "
+                                  "argument to the definition for field '%s'.") % (clash_name, field_name),
+                            obj=self,
+                            id='fields.E302',
+                        )
                     )
-                )
 
         # Check clashes between accessors/reverse query names of `field` and
         # any other field accessor -- i. e. Model.foreign accessor clashes with
@@ -241,27 +244,27 @@ class RelatedField(Field):
                 clash_field.model._meta.object_name,
                 clash_field.field.name)
             if clash_field.get_accessor_name() == rel_name:
-                errors.append(
-                    checks.Error(
-                        "Reverse accessor for '%s' clashes with reverse accessor for '%s'." % (field_name, clash_name),
-                        hint=("Add or change a related_name argument "
-                              "to the definition for '%s' or '%s'.") % (field_name, clash_name),
-                        obj=self,
-                        id='fields.E304',
+                if check_related_query_name:
+                    errors.append(
+                        checks.Error(
+                            "Reverse query name for '%s' clashes with reverse query name for '%s'."
+                            % (field_name, clash_name),
+                            hint=("Add or change a related_name argument "
+                                  "to the definition for '%s' or '%s'.") % (field_name, clash_name),
+                            obj=self,
+                            id='fields.E305',
+                        )
                     )
-                )
-
-            if clash_field.get_accessor_name() == rel_query_name:
-                errors.append(
-                    checks.Error(
-                        "Reverse query name for '%s' clashes with reverse query name for '%s'."
-                        % (field_name, clash_name),
-                        hint=("Add or change a related_name argument "
-                              "to the definition for '%s' or '%s'.") % (field_name, clash_name),
-                        obj=self,
-                        id='fields.E305',
+                else:
+                    errors.append(
+                        checks.Error(
+                            "Reverse accessor for '%s' clashes with reverse accessor for '%s'." % (field_name, clash_name),
+                            hint=("Add or change a related_name argument "
+                                  "to the definition for '%s' or '%s'.") % (field_name, clash_name),
+                            obj=self,
+                            id='fields.E304',
+                        )
                     )
-                )
 
         return errors
 

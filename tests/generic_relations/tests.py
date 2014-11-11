@@ -1,10 +1,13 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.apps import apps
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import FieldError
 from django.db.models import Q
+from django.db import models
 from django.test import TestCase
 from django.utils import six
 
@@ -261,11 +264,56 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(1, bacon.tags.count())
         self.assertEqual(1, qs.count())
 
-    def test_generic_relation_related_name_default(self):
-        # Test that GenericRelation by default isn't usable from
-        # the reverse side.
-        with self.assertRaises(FieldError):
+    def test_generic_relation_related_query_name_default(self):
+        # Test that GenericRelation isn't accessible from the reverse side by
+        # default.
+        with self.assertRaisesMessage(
+                FieldError,
+                "Cannot resolve keyword 'vegetable' into field. Choices are: "
+                "animal, content_type, content_type_id, id, manualpk, "
+                "object_id, tag, valuabletaggeditem"):
             TaggedItem.objects.filter(vegetable__isnull=True)
+
+    def test_generic_relation_related_name_not_allowed(self):
+        # Test that defining related_name in GenericRelation will raise a
+        # TypeError #16920. related_name may no longer be defined for
+        # GenericRelation in Django >= 1.7.
+        with self.assertRaisesMessage(
+                TypeError,
+                "__init__() got an unexpected keyword argument 'related_name'"):
+            class InvalidGenericRelationModel(models.Model):
+                tags = GenericRelation(TaggedItem, related_name='invalid')
+
+    def test_multiple_gen_rel_with_same_class_name(self):
+        # Ensure that two models with the same name, living in separate apps,
+        # can reference the same related model with a GenericRelation #16920
+        # without raising a related_name clash.
+        with self.settings(INSTALLED_APPS=['generic_relations.appone',
+                                           'generic_relations.apptwo']):
+            Post = apps.get_model('appone', 'Post')
+            field = Post._meta.get_field_by_name('topic')[0]
+            errors = field.check(from_model=Post)
+            self.assertEqual(errors, [])
+
+            Post2 = apps.get_model('apptwo', 'Post')
+            field = Post2._meta.get_field_by_name('topic')[0]
+            errors = field.check(from_model=Post2)
+            self.assertEqual(errors, [])
+
+    def test_multiple_gen_rel_with_same_class_name_different_related_query(self):
+        # Tests that two GenericRelated fields referencing the same related
+        # model cannot have the same related_query_name defined #16920.
+        with self.settings(INSTALLED_APPS=['generic_relations.appone',
+                                           'generic_relations.apptwo']):
+            Message = apps.get_model('appone', 'Message')
+            field = Message._meta.get_field_by_name('topic')[0]
+            errors = field.check(from_model=Message)
+            self.assertEqual(errors[0].id, 'fields.E305')
+
+            Message2 = apps.get_model('apptwo', 'Message')
+            field = Message2._meta.get_field_by_name('topic')[0]
+            errors = field.check(from_model=Message2)
+            self.assertEqual(errors[0].id, 'fields.E305')
 
     def test_multiple_gfk(self):
         # Simple tests for multiple GenericForeignKeys

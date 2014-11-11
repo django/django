@@ -1095,19 +1095,20 @@ class ComplexClashTests(IsolatedModelsTestCase):
                 obj=Model._meta.get_field('foreign_1'),
                 id='fields.E302',
             ),
-            Error(
-                "Reverse query name for 'Model.foreign_1' clashes with field name 'Target.id'.",
-                hint=("Rename field 'Target.id', or add/change a related_name "
-                      "argument to the definition for field 'Model.foreign_1'."),
-                obj=Model._meta.get_field('foreign_1'),
-                id='fields.E303',
-            ),
+
             Error(
                 "Reverse accessor for 'Model.foreign_1' clashes with reverse accessor for 'Model.m2m_1'.",
                 hint=("Add or change a related_name argument to "
                       "the definition for 'Model.foreign_1' or 'Model.m2m_1'."),
                 obj=Model._meta.get_field('foreign_1'),
                 id='fields.E304',
+            ),
+            Error(
+                "Reverse query name for 'Model.foreign_1' clashes with field name 'Target.id'.",
+                hint=("Rename field 'Target.id', or add/change a related_name "
+                      "argument to the definition for field 'Model.foreign_1'."),
+                obj=Model._meta.get_field('foreign_1'),
+                id='fields.E303',
             ),
             Error(
                 "Reverse query name for 'Model.foreign_1' clashes with reverse query name for 'Model.m2m_1'.",
@@ -1140,18 +1141,18 @@ class ComplexClashTests(IsolatedModelsTestCase):
                 id='fields.E302',
             ),
             Error(
-                "Reverse query name for 'Model.m2m_1' clashes with field name 'Target.id'.",
-                hint=("Rename field 'Target.id', or add/change a related_name "
-                      "argument to the definition for field 'Model.m2m_1'."),
-                obj=Model._meta.get_field('m2m_1'),
-                id='fields.E303',
-            ),
-            Error(
                 "Reverse accessor for 'Model.m2m_1' clashes with reverse accessor for 'Model.foreign_1'.",
                 hint=("Add or change a related_name argument to the definition "
                       "for 'Model.m2m_1' or 'Model.foreign_1'."),
                 obj=Model._meta.get_field('m2m_1'),
                 id='fields.E304',
+            ),
+            Error(
+                "Reverse query name for 'Model.m2m_1' clashes with field name 'Target.id'.",
+                hint=("Rename field 'Target.id', or add/change a related_name "
+                      "argument to the definition for field 'Model.m2m_1'."),
+                obj=Model._meta.get_field('m2m_1'),
+                id='fields.E303',
             ),
             Error(
                 "Reverse query name for 'Model.m2m_1' clashes with reverse query name for 'Model.foreign_1'.",
