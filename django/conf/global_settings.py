@@ -230,6 +230,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 # Output to use in template system for invalid (e.g. misspelled) variables.
 TEMPLATE_STRING_IF_INVALID = ''
 
+TEMPLATES = []
+
 # Default email address to use for various automated correspondence from
 # the site managers.
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
