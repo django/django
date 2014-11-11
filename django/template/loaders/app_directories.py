@@ -3,6 +3,7 @@ Wrapper for loading templates from "templates" directories in INSTALLED_APPS
 packages.
 """
 
+import io
 import os
 import sys
 
@@ -56,8 +57,8 @@ class Loader(BaseLoader):
     def load_template_source(self, template_name, template_dirs=None):
         for filepath in self.get_template_sources(template_name, template_dirs):
             try:
-                with open(filepath, 'rb') as fp:
-                    return (fp.read().decode(settings.FILE_CHARSET), filepath)
+                with io.open(filepath, encoding=settings.FILE_CHARSET) as fp:
+                    return fp.read(), filepath
             except IOError:
                 pass
         raise TemplateDoesNotExist(template_name)
