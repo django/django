@@ -109,7 +109,7 @@ class Command(BaseCommand):
     def gunicorn_run(self, *args, **options):
         from django.conf import settings
         from django.utils import translation
-        from django.core.servers.gserver import GunicornApplication, get_gunicorn_config
+        from django.core.servers.gserver import GunicornApplication, get_gunicorn_config, run
 
         use_reloader = options.get('use_reloader', True)
         shutdown_message = options.get('shutdown_message', '')
@@ -147,11 +147,8 @@ class Command(BaseCommand):
             bind=(self.addr, int(self.port)),
             reload=use_reloader,
         )
-        wsgiapp = GunicornApplication(
-            self.get_handler(*args, **options), gunicorn_config
-        )
         try:
-            wsgiapp.run()
+            run(self.get_handler(*args, **options), gunicorn_config)
         except KeyboardInterrupt:
             if shutdown_message:
                 self.stdout.write(shutdown_message)

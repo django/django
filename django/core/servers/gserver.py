@@ -90,3 +90,9 @@ class DjangoLogger(glogging.Logger):
             self.access_log.info(msg)
         except:
             self.error(traceback.format_exc())
+
+
+def run(handler, config):
+    from django.core.servers import gserver
+    app = gserver.GunicornApplication(handler, config)
+    app.run()
