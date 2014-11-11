@@ -2288,6 +2288,92 @@ will still be printed, but will not prevent management commands from running.
 
 See also the :doc:`/ref/checks` documentation.
 
+.. setting:: TEMPLATES
+
+TEMPLATES
+---------
+
+.. versionadded:: 1.8
+
+Default:: ``[]`` (Empty list)
+
+A list containing the settings for all template engines to be used with
+Django. Each item of the list is a dictionary containing the options for an
+individual engine.
+
+Here's a simple setup that tells the Django template engine to load templates
+from the ``templates`` subdirectories inside installed applications::
+
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+        },
+    ]
+
+The following options are available for all backends.
+
+.. setting:: TEMPLATES-BACKEND
+
+BACKEND
+~~~~~~~
+
+Default: not defined
+
+The template backend to use. The built-in template backends are:
+
+* ``'django.template.backends.django.DjangoTemplates'``
+* ``'django.template.backends.jinja2.Jinja2'``
+
+You can use a template backend that doesn't ship with Django by setting
+``BACKEND`` to a fully-qualified path (i.e. ``'mypackage.whatever.Backend'``).
+
+.. setting:: TEMPLATES-NAME
+
+NAME
+~~~~
+
+Default: see below
+
+The alias for this particular template engine. It's an identifier that allows
+selecting an engine for rendering. Aliases must be unique across all
+configured template engines.
+
+It defaults to the name of the module defining the engine class, i.e. the
+next to last piece of :setting:`BACKEND <TEMPLATES-BACKEND>`, when it isn't
+provided. For example if the backend is ``'mypackage.whatever.Backend'`` then
+its default name is ``'whatever'``.
+
+.. setting:: TEMPLATES-DIRS
+
+DIRS
+~~~~
+
+Default:: ``[]`` (Empty list)
+
+Directories where the engine should look for template source files, in search
+order.
+
+.. setting:: TEMPLATES-APP_DIRS
+
+APP_DIRS
+~~~~~~~~
+
+Default:: ``False``
+
+Whether the engine should look for template source files inside installed
+applications.
+
+.. setting:: TEMPLATES-OPTIONS
+
+OPTIONS
+~~~~~~~
+
+Default:: ``{}`` (Empty dict)
+
+Extra parameters to pass to the template backend. Available parameters vary
+depending on the template backend.
+
 .. setting:: TEMPLATE_CONTEXT_PROCESSORS
 
 TEMPLATE_CONTEXT_PROCESSORS
@@ -3327,6 +3413,7 @@ Serialization
 Templates
 ---------
 * :setting:`ALLOWED_INCLUDE_ROOTS`
+* :setting:`TEMPLATES`
 * :setting:`TEMPLATE_CONTEXT_PROCESSORS`
 * :setting:`TEMPLATE_DEBUG`
 * :setting:`TEMPLATE_DIRS`
