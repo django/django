@@ -1,6 +1,7 @@
 import os
 import unittest
 
+from django.core.exceptions import SuspiciousFileOperation
 from django.utils._os import safe_join
 
 
@@ -24,3 +25,7 @@ class SafeJoinTests(unittest.TestCase):
             path,
             os.path.sep,
         )
+
+    def test_parent_path(self):
+        with self.assertRaises(SuspiciousFileOperation):
+            safe_join("/abc/", "../def")
