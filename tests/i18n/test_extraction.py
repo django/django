@@ -352,6 +352,7 @@ class JavascriptExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         _, po_contents = self._run_makemessages(domain='djangojs')
         self.assertMsgId('This literal should be included.', po_contents)
+        self.assertMsgId('gettext_noop should, too.', po_contents)
         self.assertMsgId('This one as well.', po_contents)
         self.assertMsgId(r'He said, \"hello\".', po_contents)
         self.assertMsgId("okkkk", po_contents)

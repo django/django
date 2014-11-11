@@ -1,5 +1,6 @@
 // '
 gettext('This literal should be included.')
+gettext_noop('gettext_noop should, too.');
 x = y; // '
 gettext("This one as well.")
 
