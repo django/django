@@ -30,6 +30,8 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.')
         parser.add_argument('-n', '--name', action='store', dest='name', default=None,
             help="Use this name for migration file(s).")
+        parser.add_argument('-e', '--exit', action='store_true', dest='exit_code', default=False,
+            help='Exit with error code 1 if no changes needing migrations are found.')
 
     def handle(self, *app_labels, **options):
 
@@ -39,6 +41,7 @@ class Command(BaseCommand):
         self.merge = options.get('merge', False)
         self.empty = options.get('empty', False)
         self.migration_name = options.get('name', None)
+        self.exit_code = options.get('exit_code', False)
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
@@ -120,15 +123,20 @@ class Command(BaseCommand):
             migration_name=self.migration_name,
         )
 
-        # No changes? Tell them.
-        if not changes and self.verbosity >= 1:
-            if len(app_labels) == 1:
-                self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
-            elif len(app_labels) > 1:
-                self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
+        if not changes:
+            # No changes? Tell them.
+            if self.verbosity >= 1:
+                if len(app_labels) == 1:
+                    self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
+                elif len(app_labels) > 1:
+                    self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
+                else:
+                    self.stdout.write("No changes detected")
+
+            if self.exit_code:
+                sys.exit(1)
             else:
-                self.stdout.write("No changes detected")
-            return
+                return
 
         self.write_migration_files(changes)
 
