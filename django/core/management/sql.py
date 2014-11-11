@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-import codecs
+import io
 import os
 import re
 import warnings
@@ -234,7 +234,7 @@ def custom_sql_for_model(model, style, connection):
         sql_files.append(os.path.join(app_dir, "%s.sql" % opts.model_name))
     for sql_file in sql_files:
         if os.path.exists(sql_file):
-            with codecs.open(sql_file, 'r', encoding=settings.FILE_CHARSET) as fp:
+            with io.open(sql_file, encoding=settings.FILE_CHARSET) as fp:
                 output.extend(connection.ops.prepare_sql_script(fp.read(), _allow_fallback=True))
     return output
 

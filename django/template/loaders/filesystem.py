@@ -2,6 +2,8 @@
 Wrapper for loading templates from the filesystem.
 """
 
+import io
+
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.template.base import TemplateDoesNotExist
@@ -32,8 +34,8 @@ class Loader(BaseLoader):
         tried = []
         for filepath in self.get_template_sources(template_name, template_dirs):
             try:
-                with open(filepath, 'rb') as fp:
-                    return (fp.read().decode(settings.FILE_CHARSET), filepath)
+                with io.open(filepath, encoding=settings.FILE_CHARSET) as fp:
+                    return fp.read(), filepath
             except IOError:
                 tried.append(filepath)
         if tried:

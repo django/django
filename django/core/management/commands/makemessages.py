@@ -90,7 +90,7 @@ class TranslatableFile(object):
             work_file = orig_file
             is_templatized = file_ext in command.extensions
             if is_templatized:
-                with io.open(orig_file, 'r', encoding=settings.FILE_CHARSET) as fp:
+                with io.open(orig_file, encoding=settings.FILE_CHARSET) as fp:
                     src_data = fp.read()
                 content = templatize(src_data, orig_file[2:])
                 work_file = os.path.join(self.dirpath, '%s.py' % self.file)
