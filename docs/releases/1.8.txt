@@ -333,6 +333,9 @@ Management Commands
   :setting:`FIXTURE_DIRS` contains duplicates or a default fixture directory
   path (``app_name/fixtures``), an exception is raised.
 
+* :djadmin:`makemigrations` now supports an :djadminopt:`--exit` option to
+  exit with an error code if no migrations are created.
+
 Middleware
 ^^^^^^^^^^
 
