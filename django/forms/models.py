@@ -329,7 +329,7 @@ class BaseModelForm(BaseForm):
         for field_name in self.fields:
             formfield = self.fields[field_name]
             if hasattr(formfield, 'queryset'):
-                limit_choices_to = formfield.limit_choices_to
+                limit_choices_to = getattr(formfield, 'limit_choices_to', None)
                 if limit_choices_to is not None:
                     if callable(limit_choices_to):
                         limit_choices_to = limit_choices_to()
