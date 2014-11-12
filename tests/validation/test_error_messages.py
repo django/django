@@ -94,8 +94,8 @@ class ValidationMessagesTest(TestCase):
 
     def test_messages_concatenates_error_dict_values(self):
         message_dict = {}
-        with self.assertRaises(TypeError):
-            ValidationError(message_dict).messages
+        exception = ValidationError(message_dict)
+        self.assertEqual(sorted(exception.messages), [])
         message_dict['field1'] = ['E1', 'E2']
         exception = ValidationError(message_dict)
         self.assertEqual(sorted(exception.messages), ['E1', 'E2'])
