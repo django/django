@@ -181,17 +181,6 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
         """
         return {}
 
-    def get_limit_choices_to(self):
-        """
-        Returns ``limit_choices_to`` for this form field.
-
-        If it is a callable, it will be invoked and the result will be
-        returned.
-        """
-        if callable(self.limit_choices_to):
-            return self.limit_choices_to()
-        return self.limit_choices_to
-
     def has_changed(self, initial, data):
         """
         Return True if data differs from initial.

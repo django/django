@@ -52,3 +52,7 @@ Bugfixes
 
 * Fixed a migration serializing bug involving ``float("nan")`` and
   ``float("inf")`` (:ticket:23770:).
+
+* Fixed a regression where custom form fields having a ``queryset`` attribute
+  but no ``limit_choices_to`` could not be used in a
+  :class:`~django.forms.ModelForm` (:ticket:`23795`).

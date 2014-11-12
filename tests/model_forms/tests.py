@@ -2377,6 +2377,17 @@ class StumpJokeForm(forms.ModelForm):
         fields = '__all__'
 
 
+class CustomFieldWithQuerysetButNoLimitChoicesTo(forms.Field):
+    queryset = 42
+
+
+class StumpJokeWithCustomFieldForm(forms.ModelForm):
+    custom = CustomFieldWithQuerysetButNoLimitChoicesTo()
+    class Meta:
+        model = StumpJoke
+        fields = ()  # We don't need any fields from the model
+
+
 class LimitChoicesToTest(TestCase):
     """
     Tests the functionality of ``limit_choices_to``.
@@ -2406,6 +2417,14 @@ class LimitChoicesToTest(TestCase):
         stumpjokeform = StumpJokeForm()
         self.assertIn(self.threepwood, stumpjokeform.fields['has_fooled_today'].queryset)
         self.assertNotIn(self.marley, stumpjokeform.fields['has_fooled_today'].queryset)
+
+    def test_custom_field_with_queryset_but_no_limit_choices_to(self):
+        """
+        Regression test for #23795: Make sure a custom field with a `queryset`
+        attribute but no `limit_choices_to` still works.
+        """
+        f = StumpJokeWithCustomFieldForm()
+        self.assertEqual(f.fields['custom'].queryset, 42)
 
 
 class FormFieldCallbackTests(TestCase):
