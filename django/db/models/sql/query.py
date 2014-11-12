@@ -1478,7 +1478,7 @@ class Query(object):
         # Then, add the path to the query's joins. Note that we can't trim
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
-        for pos, join in enumerate(path):
+        for join in path:
             opts = join.to_opts
             if join.direct:
                 nullable = self.is_nullable(join.join_field)
