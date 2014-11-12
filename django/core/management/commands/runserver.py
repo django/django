@@ -152,11 +152,9 @@ class Command(BaseCommand):
         try:
             args = [b'gunicorn']
             args.extend(gunicorn_args)
-            p = subprocess.Popen(args, shell=False, close_fds=os.name != 'nt', universal_newlines=True, cwd='.')
-            p.communicate()
+            proc = subprocess.Popen(args, shell=False, universal_newlines=True, cwd='.')
+            proc.wait()
         except KeyboardInterrupt:
-            self.stdout.flush()
-            self.stderr.flush()
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
