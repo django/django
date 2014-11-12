@@ -11,23 +11,11 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time, timedelta
 
 from django.test.utils import str_prefix, TZ_SUPPORT
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import timezone
 
-# These two classes are used to test auto-escaping of __unicode__ output.
+from .syntax_tests.utils import SafeClass, UnsafeClass
 
-
-@python_2_unicode_compatible
-class UnsafeClass:
-    def __str__(self):
-        return 'you & me'
-
-
-@python_2_unicode_compatible
-class SafeClass:
-    def __str__(self):
-        return mark_safe('you &gt; me')
 
 # RESULT SYNTAX --
 # 'template_name': ('template contents', 'context dict',
