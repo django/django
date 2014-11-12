@@ -61,24 +61,24 @@ class CheckMessage(object):
 
 class Debug(CheckMessage):
     def __init__(self, *args, **kwargs):
-        return super(Debug, self).__init__(DEBUG, *args, **kwargs)
+        super(Debug, self).__init__(DEBUG, *args, **kwargs)
 
 
 class Info(CheckMessage):
     def __init__(self, *args, **kwargs):
-        return super(Info, self).__init__(INFO, *args, **kwargs)
+        super(Info, self).__init__(INFO, *args, **kwargs)
 
 
 class Warning(CheckMessage):
     def __init__(self, *args, **kwargs):
-        return super(Warning, self).__init__(WARNING, *args, **kwargs)
+        super(Warning, self).__init__(WARNING, *args, **kwargs)
 
 
 class Error(CheckMessage):
     def __init__(self, *args, **kwargs):
-        return super(Error, self).__init__(ERROR, *args, **kwargs)
+        super(Error, self).__init__(ERROR, *args, **kwargs)
 
 
 class Critical(CheckMessage):
     def __init__(self, *args, **kwargs):
-        return super(Critical, self).__init__(CRITICAL, *args, **kwargs)
+        super(Critical, self).__init__(CRITICAL, *args, **kwargs)
