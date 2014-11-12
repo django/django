@@ -74,7 +74,7 @@ def get_random_string(length=12,
                     time.time(),
                     settings.SECRET_KEY)).encode('utf-8')
             ).digest())
-    return ''.join(random.choice(allowed_chars) for i in range(length))
+    return ''.join(random.choice(allowed_chars) for i in xrange(length))
 
 
 if hasattr(hmac, "compare_digest"):
