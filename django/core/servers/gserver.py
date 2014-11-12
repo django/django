@@ -1,45 +1,33 @@
+import shlex
 import sys
 import time
 
-import gunicorn.app.base as gapp
 import gunicorn.glogging as glogging
 
 from django.core.management.color import color_style
 from django.utils import six
 
-__all__ = ['GunicornApplication', 'get_gunicorn_config']
+__all__ = ['get_gunicorn_args']
 
 
-def get_gunicorn_config(**options):
-    return {
-        'bind': '{:s}:{:d}'.format(*options.get('bind')),
-        'reload': options.get('reload'),
-        'worker_class': 'sync',
-        'accesslog': '-',
-        'errorlog': '-',
-        'access_log_format': '%(t)s"%(r)s" %(s)s %(b)s',
-        'logger_class': 'django.core.servers.gserver.DjangoLogger',
-    }
-
-
-class GunicornApplication(gapp.Application):
-
-    def __init__(self, handler, options=None):
-        self.handler = handler
-        self.options = options or {}
-        super(GunicornApplication, self).__init__()
-
-    def load_config(self):
-        normalize_config = {key.lower(): value
-                            for key, value in six.iteritems(self.options)}
-        config = {key: value
-                  for key, value in six.iteritems(normalize_config)
-                  if key in self.cfg.settings and value is not None}
-        for key, value in six.iteritems(config):
-            self.cfg.set(key, value)
-
-    def load(self):
-        return self.handler
+def get_gunicorn_args(**options):
+    config = """\
+    {app_name}
+    --bind {:s}:{:d}
+    {reload}
+    --access-logfile -
+    --error-logfile -
+    --access-logformat '%(t)s"%(r)s" %(s)s %(b)s'
+    --logger-class django.core.servers.gserver.DjangoLogger
+    """.format
+    app_name = options.get('app_name')
+    if ':' not in app_name:
+        app_name = ':'.join(app_name.rsplit('.', 1))
+    return shlex.split(config(
+        *options.get('bind'),
+        app_name=app_name,
+        reload='--reload' if options.get('reload') else ''
+    ))
 
 
 class DjangoLogger(glogging.Logger):
@@ -90,9 +78,3 @@ class DjangoLogger(glogging.Logger):
             self.access_log.info(msg)
         except:
             self.error(traceback.format_exc())
-
-
-def run(handler, config):
-    from django.core.servers import gserver
-    app = gserver.GunicornApplication(handler, config)
-    app.run()

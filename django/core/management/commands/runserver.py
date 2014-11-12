@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import socket
+import subprocess
 
 try:
     import gunicorn
@@ -108,8 +109,8 @@ class Command(BaseCommand):
 
     def gunicorn_run(self, *args, **options):
         from django.conf import settings
+        from django.core.servers.gserver import get_gunicorn_args
         from django.utils import translation
-        from django.core.servers.gserver import GunicornApplication, get_gunicorn_config, run
 
         use_reloader = options.get('use_reloader', True)
         shutdown_message = options.get('shutdown_message', '')
@@ -143,13 +144,19 @@ class Command(BaseCommand):
         # in the "--noreload" case).
         translation.activate(settings.LANGUAGE_CODE)
 
-        gunicorn_config = get_gunicorn_config(
+        gunicorn_args = get_gunicorn_args(
+            app_name=settings.WSGI_APPLICATION,
             bind=(self.addr, int(self.port)),
             reload=use_reloader,
         )
         try:
-            run(self.get_handler(*args, **options), gunicorn_config)
+            args = [b'gunicorn']
+            args.extend(gunicorn_args)
+            p = subprocess.Popen(args, shell=False, close_fds=os.name != 'nt', universal_newlines=True, cwd='.')
+            p.communicate()
         except KeyboardInterrupt:
+            self.stdout.flush()
+            self.stderr.flush()
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
