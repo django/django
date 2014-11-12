@@ -289,9 +289,10 @@ and so on for as many models as you want to join. For example::
     Entry.objects.order_by('blog__name', 'headline')
 
 If you try to order by a field that is a relation to another model, Django will
-use the default ordering on the related model (or order by the related model's
+use the default ordering on the related model, or order by the related model's
 primary key if there is no :attr:`Meta.ordering
-<django.db.models.Options.ordering>` specified. For example::
+<django.db.models.Options.ordering>` specified. For example, since the ``Blog``
+model has no default ordering specified::
 
     Entry.objects.order_by('blog')
 
@@ -299,7 +300,10 @@ primary key if there is no :attr:`Meta.ordering
 
     Entry.objects.order_by('blog__id')
 
-...since the ``Blog`` model has no default ordering specified.
+If ``Blog`` had ``ordering = ['name']``, then the first queryset would be
+identical to::
+
+    Entry.objects.order_by('blog__name')
 
 .. versionadded:: 1.7
 
