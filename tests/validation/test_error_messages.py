@@ -91,3 +91,14 @@ class ValidationMessagesTest(TestCase):
         self._test_validation_messages(f, '25:50',
             ["'25:50' value has the correct format "
              "(HH:MM[:ss[.uuuuuu]]) but it is an invalid time."])
+
+    def test_messages_concatenates_error_dict_values(self):
+        message_dict = {}
+        with self.assertRaises(TypeError):
+            ValidationError(message_dict).messages
+        message_dict['field1'] = ['E1', 'E2']
+        exception = ValidationError(message_dict)
+        self.assertEqual(sorted(exception.messages), ['E1', 'E2'])
+        message_dict['field2'] = ['E3', 'E4']
+        exception = ValidationError(message_dict)
+        self.assertEqual(sorted(exception.messages), ['E1', 'E2', 'E3', 'E4'])
