@@ -1,6 +1,6 @@
+from itertools import takewhile
 import sys
 import os
-import operator
 
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
@@ -11,7 +11,7 @@ from django.db.migrations.questioner import MigrationQuestioner, InteractiveMigr
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
 from django.utils.six import iteritems
-from django.utils.six.moves import reduce
+from django.utils.six.moves import zip
 
 
 class Command(BaseCommand):
@@ -187,24 +187,18 @@ class Command(BaseCommand):
                 migration = loader.get_migration(app_label, migration_name)
                 migration.ancestry = loader.graph.forwards_plan((app_label, migration_name))
                 merge_migrations.append(migration)
-            common_ancestor = None
-            for level in zip(*[m.ancestry for m in merge_migrations]):
-                if reduce(operator.eq, level):
-                    common_ancestor = level[0]
-                else:
-                    break
-            if common_ancestor is None:
+            all_items_equal = lambda seq: all(item == seq[0] for item in seq[1:])
+            merge_migrations_generations = zip(*[m.ancestry for m in merge_migrations])
+            common_ancestor_count = sum(1 for common_ancestor_generation
+                                        in takewhile(all_items_equal, merge_migrations_generations))
+            if not common_ancestor_count:
                 raise ValueError("Could not find common ancestor of %s" % migration_names)
             # Now work out the operations along each divergent branch
             for migration in merge_migrations:
-                migration.branch = migration.ancestry[
-                    (migration.ancestry.index(common_ancestor) + 1):
-                ]
-                migration.merged_operations = []
-                for node_app, node_name in migration.branch:
-                    migration.merged_operations.extend(
-                        loader.get_migration(node_app, node_name).operations
-                    )
+                migration.branch = migration.ancestry[common_ancestor_count:]
+                migrations_ops = (loader.get_migration(node_app, node_name).operations
+                                  for node_app, node_name in migration.branch)
+                migration.merged_operations = sum(migrations_ops, [])
             # In future, this could use some of the Optimizer code
             # (can_optimize_through) to automatically see if they're
             # mergeable. For now, we always just prompt the user.
