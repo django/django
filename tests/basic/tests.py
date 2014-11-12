@@ -701,7 +701,7 @@ class SelectOnSaveTests(TestCase):
         try:
             Article._base_manager.__class__ = FakeManager
             asos = ArticleSelectOnSave.objects.create(pub_date=datetime.now())
-            with self.assertNumQueries(2):
+            with self.assertNumQueries(3):
                 asos.save()
                 self.assertTrue(FakeQuerySet.called)
             # This is not wanted behavior, but this is how Django has always
