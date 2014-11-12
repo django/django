@@ -1787,9 +1787,6 @@ class ForeignKey(ForeignObject):
         column = self.db_column or attname
         return attname, column
 
-    def get_validator_unique_lookup_type(self):
-        return '%s__%s__exact' % (self.name, self.related_field.name)
-
     def get_default(self):
         "Here we check if the default value is an object and return the to_field if so."
         field_default = super(ForeignKey, self).get_default()

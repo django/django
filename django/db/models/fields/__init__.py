@@ -730,9 +730,6 @@ class Field(RegisterLookupMixin):
             return None
         return ""
 
-    def get_validator_unique_lookup_type(self):
-        return '%s__exact' % self.name
-
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
         """Returns choices with a default blank choices included, for use
         as SelectField choices for this field."""
