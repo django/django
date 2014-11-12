@@ -1369,16 +1369,20 @@ class Query(object):
 
     def names_to_path(self, names, opts, allow_many=True, fail_on_missing=False):
         """
-        Walks the names path and turns them PathInfo tuples. Note that a
-        single name in 'names' can generate multiple PathInfos (m2m for
+        Walks the list of names and turns them into PathInfo tuples. Note that
+        a single name in 'names' can generate multiple PathInfos (m2m for
         example).
 
         'names' is the path of names to travel, 'opts' is the model Options we
         start the name resolving from, 'allow_many' is as for setup_joins().
+        If fail_on_missing is set to True, then a name that can't be resolved
+        will generate a FieldError.
 
         Returns a list of PathInfo tuples. In addition returns the final field
         (the last used join field), and target (which is a field guaranteed to
-        contain the same value as the final field).
+        contain the same value as the final field). Finally, the method returns
+        those names that weren't found (which are likely transforms and the
+        final lookup).
         """
         path, names_with_path = [], []
         for pos, name in enumerate(names):
