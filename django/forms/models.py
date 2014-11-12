@@ -328,11 +328,9 @@ class BaseModelForm(BaseForm):
         # Apply ``limit_choices_to`` to each field.
         for field_name in self.fields:
             formfield = self.fields[field_name]
-            if hasattr(formfield, 'queryset'):
-                limit_choices_to = formfield.limit_choices_to
+            if hasattr(formfield, 'queryset') and hasattr(formfield, 'get_limit_choices_to'):
+                limit_choices_to = formfield.get_limit_choices_to()
                 if limit_choices_to is not None:
-                    if callable(limit_choices_to):
-                        limit_choices_to = limit_choices_to()
                     formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)
 
     def _get_validation_exclusions(self):
@@ -1132,6 +1130,17 @@ class ModelChoiceField(ChoiceField):
         self.limit_choices_to = limit_choices_to   # limit the queryset later.
         self.choice_cache = None
         self.to_field_name = to_field_name
+
+    def get_limit_choices_to(self):
+        """
+        Returns ``limit_choices_to`` for this form field.
+
+        If it is a callable, it will be invoked and the result will be
+        returned.
+        """
+        if callable(self.limit_choices_to):
+            return self.limit_choices_to()
+        return self.limit_choices_to
 
     def __deepcopy__(self, memo):
         result = super(ChoiceField, self).__deepcopy__(memo)
