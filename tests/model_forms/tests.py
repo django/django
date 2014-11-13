@@ -2351,6 +2351,7 @@ class CustomFieldWithQuerysetButNoLimitChoicesTo(forms.Field):
 
 class StumpJokeWithCustomFieldForm(forms.ModelForm):
     custom = CustomFieldWithQuerysetButNoLimitChoicesTo()
+
     class Meta:
         model = StumpJoke
         fields = ()  # We don't need any fields from the model
