@@ -425,6 +425,9 @@ attributes, as follows:
         was_published_recently.boolean = True
         was_published_recently.short_description = 'Published recently?'
 
+For more information on these method properties, see
+:attr:`~django.contrib.admin.ModelAdmin.list_display`.
+
 Edit your :file:`polls/admin.py` file again and add an improvement to the
 ``Question`` change list page: filters using the
 :attr:`~django.contrib.admin.ModelAdmin.list_filter`. Add the following line to
