@@ -659,24 +659,26 @@ The Python API
     the template with the given name. If the template doesn't exist, it raises
     ``django.template.TemplateDoesNotExist``.
 
-    To override the :setting:`TEMPLATE_DIRS` setting, use the ``dirs``
-    parameter. The ``dirs`` parameter may be a tuple or list.
-
     .. versionchanged:: 1.7
 
        The ``dirs`` parameter was added.
+
+    .. versionchanged:: 1.8
+
+       The ``dirs`` parameter was deprecated.
 
 .. function:: select_template(template_name_list[, dirs])
 
     ``select_template`` is just like ``get_template``, except it takes a list
     of template names. Of the list, it returns the first template that exists.
 
-    To override the :setting:`TEMPLATE_DIRS` setting, use the ``dirs``
-    parameter. The ``dirs`` parameter may be a tuple or list.
-
     .. versionchanged:: 1.7
 
        The ``dirs`` parameter was added.
+
+    .. versionchanged:: 1.8
+
+       The ``dirs`` parameter was deprecated.
 
 For example, if you call ``get_template('story_detail.html')`` and have the
 above :setting:`TEMPLATE_DIRS` setting, here are the files Django will look for,

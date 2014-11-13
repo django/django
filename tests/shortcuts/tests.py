@@ -1,3 +1,5 @@
+import warnings
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.test import TestCase, override_settings
 
 
@@ -27,7 +29,9 @@ class ShortcutTests(TestCase):
         self.assertEqual(response['Content-Type'], 'application/x-rendertest')
 
     def test_render_to_response_with_dirs(self):
-        response = self.client.get('/render_to_response/dirs/')
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            response = self.client.get('/render_to_response/dirs/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'spam eggs\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
@@ -70,7 +74,9 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.context.current_app, "foobar_app")
 
     def test_render_with_dirs(self):
-        response = self.client.get('/render/dirs/')
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            response = self.client.get('/render/dirs/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'spam eggs\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
