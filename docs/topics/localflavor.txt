@@ -2,10 +2,10 @@
 The "local flavor" add-ons
 ==========================
 
-Historically, Django has shipped with ``django.contrib.localflavor`` --
+Historically, Django shipped with ``django.contrib.localflavor`` --
 assorted pieces of code that are useful for particular countries or cultures.
-This code is now distributed separately from Django, for easier maintenance
-and to trim the size of Django's codebase.
+For easier maintenance and to trim the size of Django's codebase,
+this code is now distributed separately.
 
 The new localflavor package is named ``django-localflavor``, with a main
 module called ``localflavor`` and many subpackages using an
@@ -80,9 +80,5 @@ functionality. Only the imports have changed.
 Deprecation policy
 ==================
 
-In Django 1.5, importing from ``django.contrib.localflavor`` will result in a
-``DeprecationWarning``. This means your code will still work, but you should
-change it as soon as possible.
-
-In Django 1.6, importing from ``django.contrib.localflavor`` will no longer
-work.
+``django.contrib.localflavor`` was deprecated in Django 1.5 and was removed
+in Django 1.6.
