@@ -25,6 +25,7 @@ from django.template.loaders.eggs import Loader as EggLoader
 from django.template.loaders.utils import find_template_loader
 from django.template import loader
 from django.test import TestCase, override_settings
+from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils import six
 from django.utils._os import upath
 from django.utils.six import StringIO
@@ -185,7 +186,7 @@ class RenderToStringTest(TestCase):
             loader.render_to_string('test_context_stack.html', context_instance=Context()).strip())
 
 
-class TemplateDirsOverrideTest(unittest.TestCase):
+class TemplateDirsOverrideTest(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
 
     dirs_tuple = (os.path.join(os.path.dirname(upath(__file__)), 'other_templates'),)
     dirs_list = list(dirs_tuple)
