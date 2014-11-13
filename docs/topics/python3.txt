@@ -398,10 +398,6 @@ extras.
     ``testcase.assertRegex`` on Python 3. ``assertRegexpMatches`` still
     exists in current Python 3 versions, but issues a warning.
 
-
-In addition to six' defaults moves, Django's version provides ``thread`` as
-``_thread`` and ``dummy_thread`` as ``_dummy_thread``.
-
 .. _unicode: http://docs.python.org/2/library/functions.html#unicode
 .. _ __unicode__(): https://docs.python.org/2/reference/datamodel.html#object.__unicode__
 .. _basestring: http://docs.python.org/2/library/functions.html#basestring
