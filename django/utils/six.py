@@ -794,7 +794,3 @@ def assertRaisesRegex(self, *args, **kwargs):
 
 def assertRegex(self, *args, **kwargs):
     return getattr(self, _assertRegex)(*args, **kwargs)
-
-
-add_move(MovedModule("_dummy_thread", "dummy_thread"))
-add_move(MovedModule("_thread", "thread"))
