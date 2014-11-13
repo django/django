@@ -1053,6 +1053,17 @@ The decorators :func:`~django.test.override_settings` and
 class decorators. As a consequence, when overriding ``setUpClass()`` or
 ``tearDownClass()``, the ``super`` implementation should always be called.
 
+``dirs`` argument of template-finding functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following functions no longer accept a ``dirs`` parameter to override
+:setting:`TEMPLATE_DIRS`:
+
+* :func:`django.template.loader.get_template()`
+* :func:`django.template.loader.select_template()`
+* :func:`django.shortcuts.render()`
+* :func:`django.shortcuts.render_to_response()`
+
 ``django.template.loader.BaseLoader``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

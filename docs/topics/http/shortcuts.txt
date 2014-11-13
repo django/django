@@ -63,12 +63,13 @@ Optional arguments
     :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`
     for more information.
 
-``dirs``
-    A tuple or list of values to override the :setting:`TEMPLATE_DIRS` setting.
-
 .. versionchanged:: 1.7
 
    The ``dirs`` parameter was added.
+
+.. versionchanged:: 1.8
+
+   The ``dirs`` parameter was deprecated.
 
 Example
 -------
@@ -94,15 +95,6 @@ This example is equivalent to::
         c = RequestContext(request, {'foo': 'bar'})
         return HttpResponse(t.render(c),
             content_type="application/xhtml+xml")
-
-If you want to override the :setting:`TEMPLATE_DIRS` setting, use the
-``dirs`` parameter::
-
-    from django.shortcuts import render
-
-    def my_view(request):
-        # View code here...
-        return render(request, 'index.html', dirs=('custom_templates',))
 
 ``render_to_response``
 ======================
@@ -145,12 +137,13 @@ Optional arguments
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
-``dirs``
-    A tuple or list of values to override the :setting:`TEMPLATE_DIRS` setting.
-
 .. versionchanged:: 1.7
 
    The ``dirs`` parameter was added.
+
+.. versionchanged:: 1.8
+
+   The ``dirs`` parameter was deprecated.
 
 Example
 -------
@@ -176,15 +169,6 @@ This example is equivalent to::
         c = Context({'foo': 'bar'})
         return HttpResponse(t.render(c),
             content_type="application/xhtml+xml")
-
-If you want to override the :setting:`TEMPLATE_DIRS` setting, use the
-``dirs`` parameter::
-
-    from django.shortcuts import render_to_response
-
-    def my_view(request):
-        # View code here...
-        return render_to_response('index.html', dirs=('custom_templates',))
 
 ``redirect``
 ============

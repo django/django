@@ -6,6 +6,9 @@ from django.template.loaders.utils import get_template_loaders
 from django.utils.deprecation import RemovedInDjango20Warning
 
 
+_dirs_undefined = object()
+
+
 class LoaderOrigin(Origin):
     def __init__(self, display_name, loader, name, dirs):
         super(LoaderOrigin, self).__init__(display_name)
@@ -32,11 +35,18 @@ def find_template(name, dirs=None):
     raise TemplateDoesNotExist(name)
 
 
-def get_template(template_name, dirs=None):
+def get_template(template_name, dirs=_dirs_undefined):
     """
     Returns a compiled Template object for the given template name,
     handling template inheritance recursively.
     """
+    if dirs is _dirs_undefined:
+        dirs = None
+    else:
+        warnings.warn(
+            "The dirs argument of get_template is deprecated.",
+            RemovedInDjango20Warning, stacklevel=2)
+
     template, origin = find_template(template_name, dirs)
     if not hasattr(template, 'render'):
         # template needs to be compiled
@@ -53,13 +63,22 @@ def get_template_from_string(source, origin=None, name=None):
 
 
 def render_to_string(template_name, dictionary=None, context_instance=None,
-                     dirs=None):
+                     dirs=_dirs_undefined):
     """
     Loads the given template_name and renders it with the given dictionary as
     context. The template_name may be a string to load a single template using
     get_template, or it may be a tuple to use select_template to find one of
     the templates in the list. Returns a string.
     """
+    if dirs is _dirs_undefined:
+        # Do not set dirs to None here to avoid triggering the deprecation
+        # warning in select_template or get_template.
+        pass
+    else:
+        warnings.warn(
+            "The dirs argument of render_to_string is deprecated.",
+            RemovedInDjango20Warning, stacklevel=2)
+
     if isinstance(template_name, (list, tuple)):
         t = select_template(template_name, dirs)
     else:
@@ -79,8 +98,17 @@ def render_to_string(template_name, dictionary=None, context_instance=None,
         return t.render(context_instance)
 
 
-def select_template(template_name_list, dirs=None):
+def select_template(template_name_list, dirs=_dirs_undefined):
     "Given a list of template names, returns the first that can be loaded."
+    if dirs is _dirs_undefined:
+        # Do not set dirs to None here to avoid triggering the deprecation
+        # warning in get_template.
+        pass
+    else:
+        warnings.warn(
+            "The dirs argument of select_template is deprecated.",
+            RemovedInDjango20Warning, stacklevel=2)
+
     if not template_name_list:
         raise TemplateDoesNotExist("No template names provided")
     not_found = []
