@@ -90,7 +90,7 @@ class AdminViewBasicTestCase(TestCase):
         content.
         """
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.content.index(force_bytes(text1)) < response.content.index(force_bytes(text2)),
+        self.assertLess(response.content.index(force_bytes(text1)), response.content.index(force_bytes(text2)),
             failing_msg)
 
 
@@ -479,7 +479,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get('/test_admin/%s/admin_views/thing/' % self.urlbit, {'notarealfield': '5'})
         self.assertRedirects(response, '/test_admin/%s/admin_views/thing/?e=1' % self.urlbit)
 
-        # Spanning relationships through an inexistant related object (Refs #16716)
+        # Spanning relationships through a nonexistent related object (Refs #16716)
         response = self.client.get('/test_admin/%s/admin_views/thing/' % self.urlbit, {'notarealfield__whatever': '5'})
         self.assertRedirects(response, '/test_admin/%s/admin_views/thing/?e=1' % self.urlbit)
 
@@ -605,7 +605,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(calls), 1)
 
-        # Specifying a field that is not refered by any other model registered
+        # Specifying a field that is not referred by any other model registered
         # to this admin site should raise an exception.
         with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
             response = self.client.get("/test_admin/admin/admin_views/section/", {TO_FIELD_VAR: 'name'})
@@ -624,12 +624,12 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get("/test_admin/admin/admin_views/ingredient/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
-        # #23329 - Specifying a field that is not refered by any other model directly registered
+        # #23329 - Specifying a field that is not referred by any other model directly registered
         # to this admin site but registered through inheritance should be allowed.
         response = self.client.get("/test_admin/admin/admin_views/referencedbyparent/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
-        # #23431 - Specifying a field that is only refered to by a inline of a registered
+        # #23431 - Specifying a field that is only referred to by a inline of a registered
         # model should be allowed.
         response = self.client.get("/test_admin/admin/admin_views/referencedbyinline/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
@@ -866,7 +866,7 @@ class AdminViewFormUrlTest(TestCase):
         Tests whether change_view has form_url in response.context
         """
         response = self.client.get('/test_admin/%s/admin_views/section/1/' % self.urlbit)
-        self.assertTrue('form_url' in response.context, msg='form_url not present in response.context')
+        self.assertIn('form_url', response.context, msg='form_url not present in response.context')
         self.assertEqual(response.context['form_url'], 'pony')
 
     def test_initial_data_can_be_overridden(self):
@@ -4123,7 +4123,7 @@ class UserAdminTest(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         adminform = response.context['adminform']
-        self.assertTrue('password' not in adminform.form.errors)
+        self.assertNotIn('password', adminform.form.errors)
         self.assertEqual(adminform.form.errors['password2'],
             ["The two password fields didn't match."])
 
@@ -5040,7 +5040,7 @@ class AdminViewOnSiteTests(TestCase):
 
         # just verifying the parent form failed validation, as expected --
         # this isn't the regression test
-        self.assertTrue('some_required_info' in response.context['adminform'].form.errors)
+        self.assertIn('some_required_info', response.context['adminform'].form.errors)
 
         # actual regression test
         for error_set in response.context['inline_admin_formset'].formset.errors:
@@ -5070,7 +5070,7 @@ class AdminViewOnSiteTests(TestCase):
 
         # just verifying the parent form failed validation, as expected --
         # this isn't the regression test
-        self.assertTrue('some_required_info' in response.context['adminform'].form.errors)
+        self.assertIn('some_required_info', response.context['adminform'].form.errors)
 
         # actual regression test
         for error_set in response.context['inline_admin_formset'].formset.errors:

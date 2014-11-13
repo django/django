@@ -1776,7 +1776,7 @@ class ForeignKey(ForeignObject):
                 params={
                     'model': self.rel.to._meta.verbose_name, 'pk': value,
                     'field': self.rel.field_name, 'value': value,
-                },  # 'pk' is included for backwards compatibilty
+                },  # 'pk' is included for backwards compatibility
             )
 
     def get_attname(self):
@@ -1786,9 +1786,6 @@ class ForeignKey(ForeignObject):
         attname = self.get_attname()
         column = self.db_column or attname
         return attname, column
-
-    def get_validator_unique_lookup_type(self):
-        return '%s__%s__exact' % (self.name, self.related_field.name)
 
     def get_default(self):
         "Here we check if the default value is an object and return the to_field if so."

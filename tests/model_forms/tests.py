@@ -258,7 +258,7 @@ class ModelFormBaseTest(TestCase):
         except FieldError as e:
             # Make sure the exception contains some reference to the
             # field responsible for the problem.
-            self.assertTrue('no-field' in e.args[0])
+            self.assertIn('no-field', e.args[0])
         else:
             self.fail('Invalid "no-field" field not caught')
 
@@ -1116,7 +1116,7 @@ class ModelFormBasicTests(TestCase):
         self.assertEqual(f.cleaned_data['slug'], 'entertainment')
         self.assertEqual(f.cleaned_data['url'], 'entertainment')
         c1 = f.save()
-        # Testing wether the same object is returned from the
+        # Testing whether the same object is returned from the
         # ORM... not the fastest way...
 
         self.assertEqual(Category.objects.count(), 1)
@@ -1464,8 +1464,8 @@ class ModelChoiceFieldTests(TestCase):
         field1 = form1.fields['category']
         # To allow the widget to change the queryset of field1.widget.choices correctly,
         # without affecting other forms, the following must hold:
-        self.assertTrue(field1 is not ModelChoiceForm.base_fields['category'])
-        self.assertTrue(field1.widget.choices.field is field1)
+        self.assertIsNot(field1, ModelChoiceForm.base_fields['category'])
+        self.assertIs(field1.widget.choices.field, field1)
 
     def test_modelchoicefield_22745(self):
         """
@@ -1764,14 +1764,14 @@ class FileAndImageFieldTests(TestCase):
                 fields = '__all__'
 
         form = DocumentForm()
-        self.assertTrue('name="myfile"' in six.text_type(form))
-        self.assertTrue('myfile-clear' not in six.text_type(form))
+        self.assertIn('name="myfile"', six.text_type(form))
+        self.assertNotIn('myfile-clear', six.text_type(form))
         form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', b'content')})
         self.assertTrue(form.is_valid())
         doc = form.save(commit=False)
         self.assertEqual(doc.myfile.name, 'something.txt')
         form = DocumentForm(instance=doc)
-        self.assertTrue('myfile-clear' in six.text_type(form))
+        self.assertIn('myfile-clear', six.text_type(form))
         form = DocumentForm(instance=doc, data={'myfile-clear': 'true'})
         doc = form.save(commit=False)
         self.assertEqual(bool(doc.myfile), False)
@@ -1797,8 +1797,8 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(form.errors['myfile'],
                          ['Please either submit a file or check the clear checkbox, not both.'])
         rendered = six.text_type(form)
-        self.assertTrue('something.txt' in rendered)
-        self.assertTrue('myfile-clear' in rendered)
+        self.assertIn('something.txt', rendered)
+        self.assertIn('myfile-clear', rendered)
 
     def test_file_field_data(self):
         # Test conditions when files is either not given or empty.
@@ -2377,6 +2377,17 @@ class StumpJokeForm(forms.ModelForm):
         fields = '__all__'
 
 
+class CustomFieldWithQuerysetButNoLimitChoicesTo(forms.Field):
+    queryset = 42
+
+
+class StumpJokeWithCustomFieldForm(forms.ModelForm):
+    custom = CustomFieldWithQuerysetButNoLimitChoicesTo()
+    class Meta:
+        model = StumpJoke
+        fields = ()  # We don't need any fields from the model
+
+
 class LimitChoicesToTest(TestCase):
     """
     Tests the functionality of ``limit_choices_to``.
@@ -2407,6 +2418,14 @@ class LimitChoicesToTest(TestCase):
         self.assertIn(self.threepwood, stumpjokeform.fields['has_fooled_today'].queryset)
         self.assertNotIn(self.marley, stumpjokeform.fields['has_fooled_today'].queryset)
 
+    def test_custom_field_with_queryset_but_no_limit_choices_to(self):
+        """
+        Regression test for #23795: Make sure a custom field with a `queryset`
+        attribute but no `limit_choices_to` still works.
+        """
+        f = StumpJokeWithCustomFieldForm()
+        self.assertEqual(f.fields['custom'].queryset, 42)
+
 
 class FormFieldCallbackTests(TestCase):
 
@@ -2421,7 +2440,7 @@ class FormFieldCallbackTests(TestCase):
                 fields = "__all__"
 
         Form = modelform_factory(Person, form=BaseForm)
-        self.assertTrue(Form.base_fields['name'].widget is widget)
+        self.assertIs(Form.base_fields['name'].widget, widget)
 
     def test_factory_with_widget_argument(self):
         """ Regression for #15315: modelform_factory should accept widgets

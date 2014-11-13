@@ -1109,28 +1109,48 @@ class Query(object):
                     self.check_query_object_type(v, opts)
 
     def build_lookup(self, lookups, lhs, rhs):
+        """
+        Tries to extract transforms and lookup from given lhs.
+
+        The lhs value is something that works like SQLExpression.
+        The rhs value is what the lookup is going to compare against.
+        The lookups is a list of names to extract using get_lookup()
+        and get_transform().
+        """
         lookups = lookups[:]
         bilaterals = []
         while lookups:
-            lookup = lookups[0]
+            name = lookups[0]
+            # If there is just one part left, try first get_lookup() so
+            # that if the lhs supports both transform and lookup for the
+            # name, then lookup will be picked.
             if len(lookups) == 1:
-                final_lookup = lhs.get_lookup(lookup)
-                if final_lookup:
-                    return final_lookup(lhs, rhs, bilaterals)
-                # We didn't find a lookup, so we are going to try get_transform
-                # + get_lookup('exact').
-                lookups.append('exact')
-            next = lhs.get_transform(lookup)
-            if next:
-                lhs = next(lhs, lookups)
-                if getattr(next, 'bilateral', False):
-                    bilaterals.append((next, lookups))
-            else:
-                raise FieldError(
-                    "Unsupported lookup '%s' for %s or join on the field not "
-                    "permitted." %
-                    (lookup, lhs.output_field.__class__.__name__))
+                final_lookup = lhs.get_lookup(name)
+                if not final_lookup:
+                    # We didn't find a lookup. We are going to interpret
+                    # the name as transform, and do an Exact lookup against
+                    # it.
+                    lhs = self.try_transform(lhs, name, lookups, bilaterals)
+                    final_lookup = lhs.get_lookup('exact')
+                return final_lookup(lhs, rhs, bilaterals)
+            lhs = self.try_transform(lhs, name, lookups, bilaterals)
             lookups = lookups[1:]
+
+    def try_transform(self, lhs, name, rest_of_lookups, bilaterals):
+        """
+        Helper method for build_lookup. Tries to fetch and initialize
+        a transform for name parameter from lhs.
+        """
+        next = lhs.get_transform(name)
+        if next:
+            if getattr(next, 'bilateral', False):
+                bilaterals.append((next, rest_of_lookups))
+            return next(lhs, rest_of_lookups)
+        else:
+            raise FieldError(
+                "Unsupported lookup '%s' for %s or join on the field not "
+                "permitted." %
+                (name, lhs.output_field.__class__.__name__))
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
                      can_reuse=None, connector=AND):
@@ -1349,16 +1369,20 @@ class Query(object):
 
     def names_to_path(self, names, opts, allow_many=True, fail_on_missing=False):
         """
-        Walks the names path and turns them PathInfo tuples. Note that a
-        single name in 'names' can generate multiple PathInfos (m2m for
+        Walks the list of names and turns them into PathInfo tuples. Note that
+        a single name in 'names' can generate multiple PathInfos (m2m for
         example).
 
         'names' is the path of names to travel, 'opts' is the model Options we
         start the name resolving from, 'allow_many' is as for setup_joins().
+        If fail_on_missing is set to True, then a name that can't be resolved
+        will generate a FieldError.
 
         Returns a list of PathInfo tuples. In addition returns the final field
         (the last used join field), and target (which is a field guaranteed to
-        contain the same value as the final field).
+        contain the same value as the final field). Finally, the method returns
+        those names that weren't found (which are likely transforms and the
+        final lookup).
         """
         path, names_with_path = [], []
         for pos, name in enumerate(names):
@@ -1454,7 +1478,7 @@ class Query(object):
         # Then, add the path to the query's joins. Note that we can't trim
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
-        for pos, join in enumerate(path):
+        for join in path:
             opts = join.to_opts
             if join.direct:
                 nullable = self.is_nullable(join.join_field)

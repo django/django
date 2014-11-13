@@ -28,6 +28,7 @@ from django.middleware.csrf import CsrfViewMiddleware
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
+from django.test.signals import setting_changed
 from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
 from django.utils import timezone
@@ -1144,8 +1145,12 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
     def setUp(self):
         super(FileBasedCacheTests, self).setUp()
         self.dirname = tempfile.mkdtemp()
+        # Caches location cannot be modified through override_settings / modify_settings,
+        # hence settings are manipulated directly here and the setting_changed signal
+        # is triggered manually.
         for cache_params in settings.CACHES.values():
             cache_params.update({'LOCATION': self.dirname})
+        setting_changed.send(self.__class__, setting='CACHES', enter=False)
 
     def tearDown(self):
         super(FileBasedCacheTests, self).tearDown()
@@ -2084,7 +2089,7 @@ class CacheHandlerTest(TestCase):
         cache1 = caches['default']
         cache2 = caches['default']
 
-        self.assertTrue(cache1 is cache2)
+        self.assertIs(cache1, cache2)
 
     def test_per_thread(self):
         """
@@ -2101,4 +2106,4 @@ class CacheHandlerTest(TestCase):
             t.start()
             t.join()
 
-        self.assertFalse(c[0] is c[1])
+        self.assertIsNot(c[0], c[1])

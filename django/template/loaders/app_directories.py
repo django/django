@@ -3,11 +3,13 @@ Wrapper for loading templates from "templates" directories in INSTALLED_APPS
 packages.
 """
 
+import io
 import os
 import sys
 
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import SuspiciousFileOperation
 from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
 from django.utils._os import safe_join
@@ -47,18 +49,16 @@ class Loader(BaseLoader):
         for template_dir in template_dirs:
             try:
                 yield safe_join(template_dir, template_name)
-            except UnicodeDecodeError:
-                # The template dir name was a bytestring that wasn't valid UTF-8.
-                raise
-            except ValueError:
-                # The joined path was located outside of template_dir.
+            except SuspiciousFileOperation:
+                # The joined path was located outside of this template_dir
+                # (it might be inside another one, so this isn't fatal).
                 pass
 
     def load_template_source(self, template_name, template_dirs=None):
         for filepath in self.get_template_sources(template_name, template_dirs):
             try:
-                with open(filepath, 'rb') as fp:
-                    return (fp.read().decode(settings.FILE_CHARSET), filepath)
+                with io.open(filepath, encoding=settings.FILE_CHARSET) as fp:
+                    return fp.read(), filepath
             except IOError:
                 pass
         raise TemplateDoesNotExist(template_name)

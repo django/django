@@ -123,7 +123,6 @@ class InitialSQLTests(TestCase):
         out = StringIO()
         management.call_command("sqlcustom", "fixtures_model_package", stdout=out)
         output = out.getvalue()
-        self.assertTrue("INSERT INTO fixtures_model_package_book (name) "
-                        "VALUES ('My Book')" in output)
+        self.assertIn("INSERT INTO fixtures_model_package_book (name) VALUES ('My Book')", output)
         # value from deprecated search path models/sql (remove in Django 1.9)
-        self.assertTrue("Deprecated Book" in output)
+        self.assertIn("Deprecated Book", output)

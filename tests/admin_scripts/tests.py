@@ -195,12 +195,12 @@ class AdminScriptTestCase(unittest.TestCase):
             self.assertIsNotNone(re.search(msg, stream),
                 "'%s' does not match actual output text '%s'" % (msg, stream))
         else:
-            self.assertTrue(msg in stream, "'%s' does not match actual output text '%s'" % (msg, stream))
+            self.assertIn(msg, stream, "'%s' does not match actual output text '%s'" % (msg, stream))
 
     def assertNotInOutput(self, stream, msg):
         "Utility assertion: assert that the given message doesn't exist in the output"
         stream = force_text(stream)
-        self.assertFalse(msg in stream, "'%s' matches actual output text '%s'" % (msg, stream))
+        self.assertNotIn(msg, stream, "'%s' matches actual output text '%s'" % (msg, stream))
 
 ##########################################################################
 # DJANGO ADMIN TESTS
@@ -909,7 +909,7 @@ class ManageAlternateSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         expected = ('create table %s'
                     % connection.ops.quote_name('admin_scripts_article'))
-        self.assertTrue(expected.lower() in out.lower())
+        self.assertIn(expected.lower(), out.lower())
         self.assertNoOutput(err)
 
     def test_builtin_with_environment(self):
@@ -918,7 +918,7 @@ class ManageAlternateSettings(AdminScriptTestCase):
         out, err = self.run_manage(args, 'alternate_settings')
         expected = ('create table %s'
                     % connection.ops.quote_name('admin_scripts_article'))
-        self.assertTrue(expected.lower() in out.lower())
+        self.assertIn(expected.lower(), out.lower())
         self.assertNoOutput(err)
 
     def test_builtin_with_bad_settings(self):

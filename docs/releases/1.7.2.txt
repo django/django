@@ -6,6 +6,9 @@ Django 1.7.2 release notes
 
 Django 1.7.2 fixes several bugs in 1.7.1.
 
+Additionally, Django's vendored version of six, :mod:`django.utils.six`, has
+been upgraded to the latest release (1.8.0).
+
 Bugfixes
 ========
 
@@ -46,3 +49,10 @@ Bugfixes
 
 * Allowed usage of ``DateTimeField()`` as ``Transform.output_field``
   (:ticket:`23420`).
+
+* Fixed a migration serializing bug involving ``float("nan")`` and
+  ``float("inf")`` (:ticket:23770:).
+
+* Fixed a regression where custom form fields having a ``queryset`` attribute
+  but no ``limit_choices_to`` could not be used in a
+  :class:`~django.forms.ModelForm` (:ticket:`23795`).

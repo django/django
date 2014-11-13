@@ -417,10 +417,10 @@ class ManyToOneTests(TestCase):
         r2 = Reporter.objects.create(first_name='John')
 
         # Same twice
-        self.assertTrue(r1.article_set.__class__ is r1.article_set.__class__)
+        self.assertIs(r1.article_set.__class__, r1.article_set.__class__)
 
         # Same as each other
-        self.assertTrue(r1.article_set.__class__ is r2.article_set.__class__)
+        self.assertIs(r1.article_set.__class__, r2.article_set.__class__)
 
     def test_create_relation_with_ugettext_lazy(self):
         reporter = Reporter.objects.create(first_name='John',
@@ -456,28 +456,28 @@ class ManyToOneTests(TestCase):
         p = c.parent
 
         # Accessing the related object again returns the exactly same object.
-        self.assertTrue(c.parent is p)
+        self.assertIs(c.parent, p)
 
         # But if we kill the cache, we get a new object.
         del c._parent_cache
-        self.assertFalse(c.parent is p)
+        self.assertIsNot(c.parent, p)
 
         # Assigning a new object results in that object getting cached immediately.
         p2 = Parent.objects.create(name="Parent 2")
         c.parent = p2
-        self.assertTrue(c.parent is p2)
+        self.assertIs(c.parent, p2)
 
         # Assigning None succeeds if field is null=True.
         p.bestchild = None
-        self.assertTrue(p.bestchild is None)
+        self.assertIsNone(p.bestchild)
 
         # bestchild should still be None after saving.
         p.save()
-        self.assertTrue(p.bestchild is None)
+        self.assertIsNone(p.bestchild)
 
         # bestchild should still be None after fetching the object again.
         p = Parent.objects.get(name="Parent")
-        self.assertTrue(p.bestchild is None)
+        self.assertIsNone(p.bestchild)
 
         # Assigning None fails: Child.parent is null=False.
         self.assertRaises(ValueError, setattr, c, "parent", None)
@@ -493,7 +493,7 @@ class ManyToOneTests(TestCase):
         # Creation using keyword argument should cache the related object.
         p = Parent.objects.get(name="Parent")
         c = Child(parent=p)
-        self.assertTrue(c.parent is p)
+        self.assertIs(c.parent, p)
 
         # Creation using keyword argument and unsaved related instance (#8070).
         p = Parent()
@@ -511,7 +511,7 @@ class ManyToOneTests(TestCase):
         # related object to be fetched.
         p = Parent.objects.get(name="Parent")
         c = Child(parent_id=p.id)
-        self.assertFalse(c.parent is p)
+        self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
 
     def test_multiple_foreignkeys(self):

@@ -6,13 +6,14 @@ Welcome to Django 1.8!
 
 These release notes cover the `new features`_, as well as some `backwards
 incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.6 or older versions. We've also dropped some features, which are detailed in
-:ref:`our deprecation plan <deprecation-removed-in-1.8>`, and we've `begun the
-deprecation process for some features`_.
+1.6 or older versions. We've also `begun the deprecation process for some
+features`_, and some features have reached the end of their deprecation process
+and `have been removed`_.
 
 .. _`new features`: `What's new in Django 1.8`_
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.8`_
 .. _`begun the deprecation process for some features`: `Features deprecated in 1.8`_
+.. _`have been removed`: `Features removed in 1.8`_
 
 Python compatibility
 ====================
@@ -34,6 +35,14 @@ check your production settings file for ways to increase the security of your
 site.
 
 .. _django-secure: https://pypi.python.org/pypi/django-secure
+
+New PostgreSQL specific functionality
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django now has a module with extensions for PostgreSQL specific features, such
+as :class:`~django.contrib.postgres.fields.ArrayField` and
+:class:`~django.contrib.postgres.fields.HStoreField`. A full breakdown of the
+features is available :doc:`in the documentation</ref/contrib/postgres/index>`.
 
 New data types
 ~~~~~~~~~~~~~~
@@ -75,6 +84,11 @@ Minor features
 * You can now specify :attr:`ModelAdmin.show_full_result_count
   <django.contrib.admin.ModelAdmin.show_full_result_count>` to control whether
   or not the full count of objects should be displayed on a filtered admin page.
+
+:mod:`django.contrib.admindocs`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* reStructuredText is now parsed in model docstrings.
 
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -227,6 +241,9 @@ Forms
   will also update ``UploadedFile.content_type`` with the image's content type
   as determined by Pillow.
 
+* You can now pass a callable that returns an iterable of choices when
+  instantiating a :class:`~django.forms.ChoiceField`.
+
 Generic Views
 ^^^^^^^^^^^^^
 
@@ -288,10 +305,12 @@ Management Commands
   :setting:`FIXTURE_DIRS` contains duplicates or a default fixture directory
   path (``app_name/fixtures``), an exception is raised.
 
-* :djadmin:`runserver` now uses gunicorn_ as development server if it's
-  installed.
+Middleware
+^^^^^^^^^^
 
-.. _gunicorn: http://gunicorn.org/
+* The :attr:`CommonMiddleware.response_redirect_class
+  <django.middleware.common.CommonMiddleware.response_redirect_class>`
+  attribute allows you to customize the redirects issued by the middleware.
 
 Migrations
 ^^^^^^^^^^
@@ -345,6 +364,11 @@ Signals
   the request, was added to the :data:`~django.core.signals.request_started`
   signal.
 
+System Check Framework
+^^^^^^^^^^^^^^^^^^^^^^
+
+* :attr:`~django.core.checks.register` can now be used as a function.
+
 Templates
 ^^^^^^^^^
 
@@ -389,6 +413,10 @@ Requests and Responses
 * The :meth:`HttpRequest.get_full_path()
   <django.http.HttpRequest.get_full_path>` method now escapes unsafe characters
   from the path portion of a Uniform Resource Identifier (URI) properly.
+
+* :class:`~django.http.HttpResponse` now implements a few additional methods
+  like :meth:`~django.http.HttpResponse.getvalue` so that instances can be used
+  as stream objects.
 
 Tests
 ^^^^^
@@ -616,6 +644,20 @@ run this query::
   WKT to EWKT format (including the SRID). As this representation is used in
   the serialization framework, that means that ``dumpdata`` output will now
   contain the SRID value of geometry objects.
+
+Priority of context processors for ``TemplateResponse`` brought in line with ``render``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :class:`~django.template.response.TemplateResponse` constructor is designed to be a
+drop-in replacement for the :func:`~django.shortcuts.render` function. However,
+it had a slight incompatibility, in that for ``TemplateResponse``, context data
+from the passed in context dictionary could be shadowed by context data returned
+from context processors, whereas for ``render`` it was the other way
+around. This was a bug, and the behavior of ``render`` is more appropriate,
+since it allows the globally defined context processors to be overridden locally
+in the view. If you were relying on the fact context data in a
+``TemplateResponse`` could be overridden using a context processor, you will
+need to change your code.
 
 Miscellaneous
 ~~~~~~~~~~~~~
@@ -920,3 +962,88 @@ to construct the "view on site" URL. This URL is now accessible using the
 ``FormMixin`` subclasses that override the ``get_form()`` method should make
 sure to provide a default value for the ``form_class`` argument since it's
 now optional.
+
+Overriding ``setUpClass`` / ``tearDownClass`` in test cases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The decorators :func:`~django.test.override_settings` and
+:func:`~django.test.modify_settings` now act at the class level when used as
+class decorators. As a consequence, when overriding ``setUpClass()`` or
+``tearDownClass()``, the ``super`` implementation should always be called.
+
+.. removed-features-1.8:
+
+Features removed in 1.8
+=======================
+
+These features have reached the end of their deprecation cycle and so have been
+removed in Django 1.8 (please see the :ref:`deprecation timeline
+<deprecation-removed-in-1.8>` for more details):
+
+* ``django.contrib.comments`` is removed.
+
+* The following transaction management APIs are removed:
+
+  - ``TransactionMiddleware``
+  - the decorators and context managers ``autocommit``, ``commit_on_success``,
+    and ``commit_manually``, defined in ``django.db.transaction``
+  - the functions ``commit_unless_managed`` and ``rollback_unless_managed``,
+    also defined in ``django.db.transaction``
+  - the ``TRANSACTIONS_MANAGED`` setting
+
+* The :ttag:`cycle` and :ttag:`firstof` template tags auto-escape their
+  arguments.
+
+* The ``SEND_BROKEN_LINK_EMAILS`` setting is removed.
+
+* ``django.middleware.doc.XViewMiddleware`` is removed.
+
+* The ``Model._meta.module_name`` alias is removed.
+
+* The backward compatible shims introduced to rename ``get_query_set``
+  and similar queryset methods are removed. This affects the following classes:
+  ``BaseModelAdmin``, ``ChangeList``, ``BaseCommentNode``,
+  ``GenericForeignKey``, ``Manager``, ``SingleRelatedObjectDescriptor`` and
+  ``ReverseSingleRelatedObjectDescriptor``.
+
+* The backward compatible shims introduced to rename the attributes
+  ``ChangeList.root_query_set`` and ``ChangeList.query_set`` are removed.
+
+* ``django.views.defaults.shortcut`` and ``django.conf.urls.shortcut`` are
+  removed.
+
+* Support for the Python Imaging Library (PIL) module is removed.
+
+* The following private APIs are removed:
+
+  - ``django.db.backend``
+  - ``django.db.close_connection()``
+  - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
+  - ``django.db.transaction.is_managed()``
+  - ``django.db.transaction.managed()``
+
+* ``django.forms.widgets.RadioInput`` is removed.
+
+* The module ``django.test.simple`` and the class
+  ``django.test.simple.DjangoTestSuiteRunner`` are removed.
+
+* The module ``django.test._doctest`` is removed.
+
+* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting is removed.
+
+* Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
+  more than one.* string to override or append to user-provided ``help_text`` in
+  forms for ``ManyToMany`` model fields is not be performed by Django anymore
+  either at the model or forms layer.
+
+* The ``Model._meta.get_(add|change|delete)_permission`` methods are removed.
+
+* The session key ``django_language`` is no longer read for backwards
+  compatibility.
+
+* Geographic Sitemaps are removed
+  (``django.contrib.gis.sitemaps.views.index`` and
+  ``django.contrib.gis.sitemaps.views.sitemap``).
+
+* ``django.utils.html.fix_ampersands``, the ``fix_ampersands`` template filter,
+  and ``django.utils.html.clean_html`` are removed.
