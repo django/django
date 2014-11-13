@@ -1907,6 +1907,9 @@ class OneToOneField(ForeignKey):
         else:
             setattr(instance, self.attname, data)
 
+    def _check_unique(self, **kwargs):
+        return []
+
 
 def create_many_to_many_intermediary_model(field, klass):
     from django.db import models

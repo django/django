@@ -105,6 +105,7 @@ class IsolatedModelsTestCase(TestCase):
         apps.clear_cache()
 
 
+@override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342',])
 class GenericForeignKeyTests(IsolatedModelsTestCase):
 
     def test_str(self):

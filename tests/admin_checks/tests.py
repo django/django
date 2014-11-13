@@ -8,6 +8,7 @@ from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
 
@@ -34,6 +35,7 @@ class ValidFormFieldsets(admin.ModelAdmin):
     )
 
 
+@override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342',])
 class SystemChecksTestCase(TestCase):
 
     def test_checks_are_performed(self):
