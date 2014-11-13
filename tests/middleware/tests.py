@@ -18,6 +18,7 @@ from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddlewar
 from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
 from django.test import TestCase, RequestFactory, override_settings
+from django.test.utils import patch_logger
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
@@ -237,6 +238,15 @@ class CommonMiddlewareTest(TestCase):
             'http://www.testserver/customurlconf/slash/')
 
     # Other tests
+
+    @override_settings(DISALLOWED_USER_AGENTS=[re.compile(r'foo')])
+    def test_disallowed_user_agents(self):
+        with patch_logger('django.request', 'warning') as log_messages:
+            request = self._get_request('slash')
+            request.META['HTTP_USER_AGENT'] = 'foo'
+            r = CommonMiddleware().process_request(request)
+            self.assertEqual(r.status_code, 403)
+            self.assertEqual(log_messages, ['Forbidden (User agent): /slash'])
 
     def test_non_ascii_query_string_does_not_crash(self):
         """Regression test for #15152"""
