@@ -13,6 +13,7 @@ try:
 except ImportError:
     gunicorn = None
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import run, get_internal_wsgi_application
 from django.db import connections, DEFAULT_DB_ALIAS
@@ -144,6 +145,8 @@ class Command(BaseCommand):
         # in the "--noreload" case).
         translation.activate(settings.LANGUAGE_CODE)
 
+        if settings.WSGI_APPLICATION is None:
+            raise ImproperlyConfigured('Gunicorn needs a WSGI_APPLICATION setting to be run correctly.')
         gunicorn_args = get_gunicorn_args(
             app_name=settings.WSGI_APPLICATION,
             bind=(self.addr, int(self.port)),
