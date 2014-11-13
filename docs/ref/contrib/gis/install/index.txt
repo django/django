@@ -340,15 +340,12 @@ Fink
 ^^^^
 
 `Kurt Schwehr`__ has been gracious enough to create GeoDjango packages for users
-of the `Fink`__ package system.  The following packages are available, depending
-on which version of Python you want to use:
-
-* ``django-gis-py26``
-* ``django-gis-py25``
-* ``django-gis-py24``
+of the `Fink`__ package system. `Different packages are available`__ (starting
+with "django-gis"), depending on which version of Python you want to use.
 
 __ http://schwehr.org/blog/
 __ http://www.finkproject.org/
+__ http://pdb.finkproject.org/pdb/browse.php?summary=django-gis
 
 .. _macports:
 
