@@ -168,7 +168,8 @@ that might occur as a result of a version upgrade.
 
 * **1_6.W001**: Some project unit tests may not execute as expected. *This
   check was removed in Django 1.8 due to false positives*.
-* **1_6.W002**: ``BooleanField`` does not have a default value.
+* **1_6.W002**: ``BooleanField`` does not have a default value. *This
+  check was removed in Django 1.8 due to false positives*.
 * **1_7.W001**:  Django 1.7 changed the global defaults for the
   ``MIDDLEWARE_CLASSES.``
   ``django.contrib.sessions.middleware.SessionMiddleware``,
