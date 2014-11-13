@@ -6,6 +6,9 @@ from __future__ import unicode_literals
 
 import random
 
+from django.utils.six.moves import range
+
+
 COMMON_P = (
     'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod '
     'tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim '

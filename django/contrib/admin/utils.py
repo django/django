@@ -15,6 +15,7 @@ from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.encoding import force_str, force_text, smart_text
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse, NoReverseMatch
 

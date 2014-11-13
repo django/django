@@ -9,6 +9,7 @@ from django.http import Http404
 from django.template.response import TemplateResponse
 from django.utils import six
 from django.utils.http import http_date
+from django.utils.six.moves import range
 
 
 def x_robots_tag(func):

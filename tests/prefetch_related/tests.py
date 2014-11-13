@@ -8,6 +8,7 @@ from django.db.models.query import get_prefetcher
 from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils.encoding import force_text
+from django.utils.six.moves import range
 
 from .models import (Author, Bio, Book, Reader, Qualification, Teacher, Department,
     TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,

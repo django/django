@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.db.migrations.graph import CircularDependencyError, MigrationGraph, NodeNotFoundError
+from django.utils.six.moves import range
 
 
 class GraphTests(TestCase):

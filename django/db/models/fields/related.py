@@ -16,6 +16,7 @@ from django.db.models.query import QuerySet
 from django.db.models.sql.datastructures import Col
 from django.utils.encoding import force_text, smart_text
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
 from django.core import exceptions

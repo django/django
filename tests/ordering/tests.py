@@ -4,6 +4,7 @@ from datetime import datetime
 from operator import attrgetter
 
 from django.test import TestCase
+from django.utils.six.moves import range
 
 from .models import Article, Author
 

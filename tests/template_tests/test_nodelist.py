@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from django.template import Context, Template, VariableNode
 from django.test import override_settings
+from django.utils.six.moves import range
 
 
 class NodelistTest(TestCase):

@@ -14,6 +14,7 @@ from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.utils import formats
 from django.utils import six
+from django.utils.six.moves import range
 
 from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,

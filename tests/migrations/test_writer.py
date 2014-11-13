@@ -16,6 +16,7 @@ from django.test import TestCase
 from django.conf import settings
 from django.utils import datetime_safe, six
 from django.utils.deconstruct import deconstructible
+from django.utils.six.moves import range
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import get_default_timezone, utc, FixedOffset
 

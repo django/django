@@ -21,6 +21,7 @@ from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six, lru_cache
 from django.utils.six import StringIO
+from django.utils.six.moves import range
 from django.utils.translation import TranslatorCommentWarning, trim_whitespace, LANGUAGE_SESSION_KEY
 
 # Translations are cached in a dictionary for every language.

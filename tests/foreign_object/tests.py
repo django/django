@@ -6,6 +6,7 @@ from .models import (
     ArticleTranslation, ArticleTag, ArticleIdea, NewsArticle)
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils.translation import activate
+from django.utils.six.moves import range
 from django.core.exceptions import FieldError
 from django import forms
 

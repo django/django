@@ -18,6 +18,7 @@ from django.utils.encoding import force_text
 from django.utils.functional import empty
 from django.utils._os import rmtree_errorhandler, upath, symlinks_supported
 from django.utils import six
+from django.utils.six.moves import range
 
 from django.contrib.staticfiles import finders, storage
 from django.contrib.staticfiles.management.commands import collectstatic

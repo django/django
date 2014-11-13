@@ -13,6 +13,7 @@ from django.db.migrations.migration import Migration
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.operations.models import AlterModelOptions
+from django.utils.six.moves import range
 
 
 class MigrationAutodetector(object):

@@ -10,6 +10,7 @@ from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils.datastructures import (DictWrapper, ImmutableList,
     MultiValueDict, MultiValueDictKeyError, MergeDict, OrderedSet, SortedDict)
 from django.utils import six
+from django.utils.six.moves import range
 
 
 class SortedDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):

@@ -5,6 +5,8 @@
 import unittest
 from unittest import skipUnless
 
+from django.utils.six.moves import range
+
 from .. import HAS_GEOS
 
 if HAS_GEOS:

@@ -62,6 +62,7 @@ from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.db.backends.oracle.schema import DatabaseSchemaEditor
 from django.db.utils import InterfaceError
 from django.utils import six, timezone
+from django.utils.six.moves import range
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 

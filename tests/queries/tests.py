@@ -16,6 +16,7 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
+from django.utils.six.moves import range
 
 from .models import (
     Annotation, Article, Author, Celebrity, Child, Cover, Detail, DumbCategory,
@@ -2471,7 +2472,7 @@ class ConditionalTests(BaseQuerysetTest):
         # Test that the "in" lookup works with lists of 1000 items or more.
         # The numbers amount is picked to force three different IN batches
         # for Oracle, yet to be less than 2100 parameter limit for MSSQL.
-        numbers = range(2050)
+        numbers = list(range(2050))
         Number.objects.all().delete()
         Number.objects.bulk_create(Number(num=num) for num in numbers)
         self.assertEqual(

@@ -7,6 +7,7 @@ from django.core.paginator import (Paginator, EmptyPage, InvalidPage,
     PageNotAnInteger)
 from django.test import TestCase
 from django.utils import six
+from django.utils.six.moves import range
 
 from .models import Article
 from .custom import ValidAdjacentNumsPaginator

@@ -20,6 +20,7 @@ from django.db.models.sql.constants import CURSOR
 from django.db.models import sql
 from django.utils.functional import partition
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils import timezone
 from django.utils.version import get_version
 

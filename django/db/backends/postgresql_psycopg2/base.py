@@ -17,7 +17,9 @@ from django.db.utils import InterfaceError
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeText, SafeBytes
+from django.utils.six.moves import range
 from django.utils.timezone import utc
+
 
 try:
     import psycopg2 as Database

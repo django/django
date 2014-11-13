@@ -11,8 +11,8 @@ from django.db.models.fields import DateField, DateTimeField, FieldDoesNotExist
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS, SelectInfo
 from django.db.models.sql.datastructures import Date, DateTime
 from django.db.models.sql.query import Query
-from django.utils import six
-from django.utils import timezone
+from django.utils import six, timezone
+from django.utils.six.moves import range
 
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',

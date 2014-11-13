@@ -10,6 +10,7 @@ from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
 from django.test import modify_settings, override_settings
+from django.utils.six.moves import range
 from django.utils.translation import ugettext_lazy
 
 

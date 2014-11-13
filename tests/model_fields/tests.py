@@ -19,6 +19,7 @@ from django.db.models.fields import (
     TimeField, URLField)
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils.functional import lazy
 
 from .models import (

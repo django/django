@@ -17,6 +17,7 @@ from django.contrib.gis.gdal.field import (
     OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime)
 from django.db import models, transaction
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils.encoding import force_text
 
 

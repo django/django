@@ -11,6 +11,7 @@ from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet, MAX_GET_RESULTS
 from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils.translation import ugettext_lazy
 
 from .models import Article, SelfRef, ArticleSelectOnSave
