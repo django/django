@@ -39,7 +39,12 @@ You can evaluate a ``QuerySet`` in the following ways:
   ``QuerySet`` usually returns another unevaluated ``QuerySet``, but Django
   will execute the database query if you use the "step" parameter of slice
   syntax, and will return a list. Slicing a ``QuerySet`` that has been
-  evaluated (partially or fully) also returns a list.
+  evaluated also returns a list.
+
+  Also note that even though slicing an unevaluated ``QuerySet`` returns
+  another unevaluated ``QuerySet``, modifying it further (e.g., adding
+  more filters, or modifying ordering) is not allowed, since that does not
+  translate well into SQL and it would not have a clear meaning either.
 
 * **Pickling/Caching.** See the following section for details of what
   is involved when `pickling QuerySets`_. The important thing for the
@@ -62,11 +67,6 @@ You can evaluate a ``QuerySet`` in the following ways:
   it. For example::
 
       entry_list = list(Entry.objects.all())
-
-  Be warned, though, that this could have a large memory overhead, because
-  Django will load each element of the list into memory. In contrast,
-  iterating over a ``QuerySet`` will take advantage of your database to
-  load data and instantiate objects only as you need them.
 
 * **bool().** Testing a ``QuerySet`` in a boolean context, such as using
   ``bool()``, ``or``, ``and`` or an ``if`` statement, will cause the query
