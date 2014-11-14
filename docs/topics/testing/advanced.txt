@@ -263,10 +263,11 @@ Here an example of a Python script::
 
     # runtests.py
     # equivalent to running:
-    # ./manage.py test my_app --liveserver=127.0.0.1:8082
+    # ./manage.py test [labels] --liveserver=127.0.0.1:8082
 
-    import os
     import django
+    import os
+    import sys
     from django.test.runner import DiscoverRunner
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'my_project.settings'
@@ -274,11 +275,11 @@ Here an example of a Python script::
 
     django.setup()
     runner = DiscoverRunner()
-    runner.run_tests(['my_app'])
+    runner.run_tests(sys.argv[1:])
 
 That you can invoke like this::
 
-    PYTHONPATH=/path/to/my_project:$PYTHONPATH ./runtests.py
+    PYTHONPATH=/path/to/my_project:$PYTHONPATH ./runtests.py [labels]
 
 .. _other-testing-frameworks:
 
