@@ -1,7 +1,11 @@
 from __future__ import unicode_literals
+from collections import namedtuple
 
 from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
 from django.utils.encoding import force_text
+
+
+FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -28,6 +32,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     ignored_tables = []
 
+    def get_field_type(self, data_type, description):
+        field_type = super(DatabaseIntrospection, self).get_field_type(data_type, description)
+        if field_type == 'IntegerField' and description.default and 'nextval' in description.default:
+            return 'AutoField'
+        return field_type
+
     def get_table_list(self, cursor):
         """
         Returns a list of table and view names in the current database.
@@ -48,12 +58,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # As cursor.description does not return reliably the nullable property,
         # we have to query the information_schema (#7783)
         cursor.execute("""
-            SELECT column_name, is_nullable
+            SELECT column_name, is_nullable, column_default
             FROM information_schema.columns
             WHERE table_name = %s""", [table_name])
-        null_map = dict(cursor.fetchall())
+        field_map = dict((line[0], line[1:]) for line in cursor.fetchall())
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [FieldInfo(*((force_text(line[0]),) + line[1:6] + (null_map[force_text(line[0])] == 'YES',)))
+        return [FieldInfo(*((force_text(line[0]),) + line[1:6]
+                            + (field_map[force_text(line[0])][0] == 'YES', field_map[force_text(line[0])][1])))
                 for line in cursor.description]
 
     def get_relations(self, cursor, table_name):
