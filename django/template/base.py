@@ -124,7 +124,7 @@ class StringOrigin(Origin):
 
 
 class Template(object):
-    def __init__(self, template_string, origin=None, name=None):
+    def __init__(self, template_string, origin=None, name=None, engine=None):
         try:
             template_string = force_text(template_string)
         except UnicodeDecodeError:
@@ -132,9 +132,13 @@ class Template(object):
                                         "from unicode or UTF-8 strings.")
         if settings.TEMPLATE_DEBUG and origin is None:
             origin = StringOrigin(template_string)
+        if engine is None:
+            from .engine import Engine
+            engine = Engine.get_default()
         self.nodelist = compile_string(template_string, origin)
         self.name = name
         self.origin = origin
+        self.engine = engine
 
     def __iter__(self):
         for node in self.nodelist:
