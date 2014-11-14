@@ -173,6 +173,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_binary_field = six.PY2
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
+    can_introspect_autofield = True
     can_introspect_binary_field = False
     can_introspect_small_integer_field = True
     supports_timezones = False
