@@ -1,8 +1,9 @@
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function
 
 from datetime import datetime
 import errno
 import os
+import pprint
 import re
 import sys
 import socket
@@ -155,6 +156,9 @@ class Command(BaseCommand):
         try:
             args = [b'gunicorn']
             args.extend(gunicorn_args)
+            print('[DEBUG OUTPUT STARTS]')
+            pprint.pprint(args)
+            print('[DEBUG OUTPUT END]')
             proc = subprocess.Popen(args, shell=False, universal_newlines=True, cwd='.')
             proc.wait()
         except KeyboardInterrupt:
