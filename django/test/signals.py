@@ -78,6 +78,19 @@ def update_connections_time_zone(**kwargs):
 
 
 @receiver(setting_changed)
+def reset_default_template_engine(**kwargs):
+    if kwargs['setting'] in {
+        'TEMPLATE_DIRS',
+        'ALLOWED_INCLUDE_ROOTS',
+        'TEMPLATE_CONTEXT_PROCESSORS',
+        'TEMPLATE_LOADERS',
+        'TEMPLATE_STRING_IF_INVALID',
+    }:
+        from django.template.engine import Engine
+        Engine.get_default.cache_clear()
+
+
+@receiver(setting_changed)
 def clear_context_processors_cache(**kwargs):
     if kwargs['setting'] == 'TEMPLATE_CONTEXT_PROCESSORS':
         from django.template.context import get_standard_processors
