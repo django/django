@@ -55,6 +55,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_release_savepoints = True
     supports_tablespaces = True
     supports_transactions = True
+    can_introspect_autofield = True
     can_introspect_ip_address_field = True
     can_introspect_small_integer_field = True
     can_distinct_on_fields = True

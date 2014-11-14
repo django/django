@@ -320,7 +320,9 @@ Management Commands
 
 * :djadmin:`runserver` now uses daemon threads for faster reloading.
 
-* :djadmin:`inspectdb` now outputs ``Meta.unique_together``.
+* :djadmin:`inspectdb` now outputs ``Meta.unique_together``. It is also able to
+  introspect :class:`~django.db.models.AutoField` for MySQL and PostgreSQL
+  databases.
 
 * When calling management commands from code through :ref:`call_command
   <call-command>` and passing options, the option name can match the command
