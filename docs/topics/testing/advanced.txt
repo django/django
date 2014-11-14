@@ -268,6 +268,7 @@ Here an example of a Python script::
     import django
     import os
     import sys
+    from django.apps import apps
     from django.test.runner import DiscoverRunner
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'my_project.settings'
@@ -275,7 +276,7 @@ Here an example of a Python script::
 
     django.setup()
     runner = DiscoverRunner()
-    runner.run_tests(sys.argv[1:])
+    runner.run_tests(sys.argv[1:] or [a.name for a in apps.get_app_configs()])
 
 That you can invoke like this::
 
