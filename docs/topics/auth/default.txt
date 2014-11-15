@@ -1035,6 +1035,11 @@ patterns.
 
     **URL name:** ``password_reset_done``
 
+    .. note::
+
+        If the email address provided does not exist in the system, the user is inactive, or has an unusable password,
+        the user will still be redirected to this view but no email will be sent.
+
     **Optional arguments:**
 
     * ``template_name``: The full name of a template to use.
