@@ -79,7 +79,15 @@ class SessionStore(SessionBase):
 
     @classmethod
     def clear_expired(cls):
-        Session.objects.filter(expire_date__lt=timezone.now()).delete()
+        qs = Session.objects.filter(
+            expire_date__lt=timezone.now()
+        ).values_list('session_key', flat=True)
+
+        while True:
+            to_delete = qs[:10000]
+            if len(to_delete) == 0:
+                break
+            Session.objects.filter(session_key__in=to_delete).delete()
 
 
 # At bottom to avoid circular import
