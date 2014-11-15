@@ -366,17 +366,11 @@ class MigrationAutodetector(object):
             )
         # Field is removed and part of an index/unique_together
         elif dependency[2] is not None and dependency[3] == "foo_together_change":
-            if operation.name.lower() == dependency[1].lower():
-                return (
-                    (
-                        isinstance(operation, operations.AlterUniqueTogether) and
-                        any(dependency[2] not in t for t in operation.unique_together)
-                    ) or
-                    (
-                        isinstance(operation, operations.AlterIndexTogether) and
-                        any(dependency[2] not in t for t in operation.index_together)
-                    )
-                )
+            return (
+                isinstance(operation, (operations.AlterUniqueTogether,
+                                       operations.AlterIndexTogether)) and
+                operation.name.lower() == dependency[1].lower()
+            )
         # Unknown dependency. Raise an error.
         else:
             raise ValueError("Can't handle dependency %r" % (dependency, ))
