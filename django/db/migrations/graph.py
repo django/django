@@ -116,8 +116,8 @@ class MigrationGraph(object):
             visited.insert(0, node)
             children = sorted(get_children(node))
 
-            if not children:
-                path = []
+            if path[-1] == node:
+                path.pop()
 
             stack = children + stack
 
