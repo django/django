@@ -487,11 +487,11 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
 
 .. function:: ping_google(sitemap_url=None, ping_url=PING_URL)
 
-    :func:`ping_google` takes two optional argument. The first one, ``sitemap_url``,
-    should be the absolute path to your site's sitemap (e.g.,
-    :file:`'/sitemap.xml'`). If this argument isn't provided,
-    :func:`ping_google` will attempt to figure out your
-    sitemap by performing a reverse looking in your URLconf.
+    :func:`ping_google` takes two optional arguments. The first one,
+    ``sitemap_url``, should be the absolute path to your site's sitemap (e.g.,
+    :file:`'/sitemap.xml'`). If this argument isn't provided, :func:`ping_google`
+    will attempt to figure out your sitemap by performing a reverse looking in your
+    URLconf.
 
     The second argument, ``ping_url``, can be used to customize the URL that
     should be requested. The :obj:`~django.contrib.sitemaps.PING_URL` constant is
