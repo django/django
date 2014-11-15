@@ -14,11 +14,10 @@ from django.core import mail
 from django.core.signals import request_started
 from django.db import reset_queries
 from django.http import request
-from django.template import Template, loader
-from django.template.loaders import cached, locmem
+from django.template import Template
+from django.template.loaders import locmem
 from django.test.signals import template_rendered, setting_changed
 from django.utils import six
-from django.utils.decorators import ContextDecorator
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
@@ -31,7 +30,6 @@ __all__ = (
     'setup_test_environment', 'teardown_test_environment',
 )
 
-RESTORE_LOADERS_ATTR = '_original_template_source_loaders'
 TZ_SUPPORT = hasattr(time, 'tzset')
 
 
@@ -147,48 +145,6 @@ def get_runner(settings, test_runner_class=None):
     return test_runner
 
 
-class override_template_loaders(ContextDecorator):
-    """
-    Acts as a function decorator, context manager or start/end manager and
-    override the template loaders. It could be used in the following ways:
-
-    @override_template_loaders(SomeLoader())
-    def test_function(self):
-        ...
-
-    with override_template_loaders(SomeLoader(), OtherLoader()) as loaders:
-        ...
-
-    loaders = override_template_loaders.override(SomeLoader())
-    ...
-    override_template_loaders.restore()
-    """
-    def __init__(self, *loaders):
-        self.loaders = loaders
-        self.old_loaders = []
-
-    def __enter__(self):
-        self.old_loaders = loader.template_source_loaders
-        loader.template_source_loaders = self.loaders
-        return self.loaders
-
-    def __exit__(self, type, value, traceback):
-        loader.template_source_loaders = self.old_loaders
-
-    @classmethod
-    def override(cls, *loaders):
-        if hasattr(loader, RESTORE_LOADERS_ATTR):
-            raise Exception("loader.%s already exists" % RESTORE_LOADERS_ATTR)
-        setattr(loader, RESTORE_LOADERS_ATTR, loader.template_source_loaders)
-        loader.template_source_loaders = loaders
-        return loaders
-
-    @classmethod
-    def restore(cls):
-        loader.template_source_loaders = getattr(loader, RESTORE_LOADERS_ATTR)
-        delattr(loader, RESTORE_LOADERS_ATTR)
-
-
 class TestTemplateLoader(locmem.Loader):
 
     def __init__(self, *args, **kwargs):
@@ -197,46 +153,6 @@ class TestTemplateLoader(locmem.Loader):
             "django.template.loaders.locmem.Loader.",
             RemovedInDjango19Warning, stacklevel=2)
         super(TestTemplateLoader, self).__init__(*args, **kwargs)
-
-
-class override_with_test_loader(override_template_loaders):
-    """
-    Acts as a function decorator, context manager or start/end manager and
-    override the template loaders with the test loader. It could be used in the
-    following ways:
-
-    @override_with_test_loader(templates_dict, use_cached_loader=True)
-    def test_function(self):
-        ...
-
-    with override_with_test_loader(templates_dict) as test_loader:
-        ...
-
-    test_loader = override_with_test_loader.override(templates_dict)
-    ...
-    override_with_test_loader.restore()
-    """
-
-    def __init__(self, templates_dict, use_cached_loader=False):
-        self.loader = self._get_loader(templates_dict, use_cached_loader)
-        super(override_with_test_loader, self).__init__(self.loader)
-
-    def __enter__(self):
-        return super(override_with_test_loader, self).__enter__()[0]
-
-    @classmethod
-    def override(cls, templates_dict, use_cached_loader=False):
-        loader = cls._get_loader(templates_dict, use_cached_loader)
-        return super(override_with_test_loader, cls).override(loader)[0]
-
-    @classmethod
-    def _get_loader(cls, templates_dict, use_cached_loader=False):
-        if use_cached_loader:
-            loader = cached.Loader(['django.template.loaders.locmem.Loader'])
-            loader._cached_loaders = [locmem.Loader(templates_dict)]
-            return loader
-        else:
-            return locmem.Loader(templates_dict)
 
 
 class override_settings(object):
