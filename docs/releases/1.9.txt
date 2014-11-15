@@ -172,6 +172,8 @@ Requests and Responses
   ``status_code`` outside of the constructor will also modify the value of
   ``reason_phrase``.
 
+* The debug view now shows details of chained exceptions on Python 3.
+
 Tests
 ^^^^^
 
