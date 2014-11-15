@@ -28,6 +28,9 @@ from ..views import (
     sensitive_kwargs_function_caller, sensitive_method_view, sensitive_view,
 )
 
+if six.PY3:
+    from .py3_test_debug import Py3ExceptionReporterTests  # NOQA
+
 
 class CallableSettingWrapperTests(TestCase):
     """ Unittests for CallableSettingWrapper
