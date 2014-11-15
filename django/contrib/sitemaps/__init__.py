@@ -14,13 +14,7 @@ class SitemapNotFound(Exception):
     pass
 
 
-def ping_google(sitemap_url=None, site_domain=None, is_secure=False, ping_url=PING_URL):
-    """
-    Alerts Google that the sitemap for the current site has been updated.
-    If sitemap_url is provided, it should be an absolute path to the sitemap
-    for this site -- e.g., '/sitemap.xml'. If sitemap_url is not provided, this
-    function will attempt to deduce it by using urlresolvers.reverse().
-    """
+def _get_sitemap_url(sitemap_url=None, site_domain=None, is_secure=False):
     if sitemap_url is None:
         try:
             # First, try to get the "index" sitemap URL.
@@ -43,9 +37,19 @@ def ping_google(sitemap_url=None, site_domain=None, is_secure=False, ping_url=PI
         domain = current_site.domain
     else:
         domain = site_domain
-    url = "%s://%s%s" % ('https' if is_secure else 'http', domain, sitemap_url)
-    params = urlencode({'sitemap': url})
-    urlopen("%s?%s" % (ping_url, params))
+    return "%s://%s%s" % ('https' if is_secure else 'http', domain, sitemap_url)
+
+
+def ping_google(sitemap_url=None, ping_url=PING_URL, site_domain=None,
+        is_secure=False):
+    """
+    Alerts Google that the sitemap for the current site has been updated.
+    If sitemap_url is provided, it should be an absolute path to the sitemap
+    for this site -- e.g., '/sitemap.xml'. If sitemap_url is not provided, this
+    function will attempt to deduce it by using urlresolvers.reverse().
+    """
+    sitemap_url = _get_sitemap_url(sitemap_url, site_domain, is_secure)
+    urlopen("%s?%s" % (ping_url, urlencode({'sitemap': sitemap_url})))
 
 
 class Sitemap(object):
