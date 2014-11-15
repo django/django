@@ -26,6 +26,7 @@ class Command(BaseCommand):
 
         self.verbosity = options.get('verbosity')
         self.interactive = options.get('interactive')
+        self.no_optimize = options.get('no_optimize')
         app_label, migration_name = options['app_label'], options['migration_name']
 
         # Load the current graph state, check the app and migration they asked for exists
@@ -98,17 +99,22 @@ class Command(BaseCommand):
         if self.verbosity > 0:
             self.stdout.write(self.style.MIGRATE_HEADING("Optimizing..."))
 
-        optimizer = MigrationOptimizer()
-        new_operations = optimizer.optimize(operations, migration.app_label)
+        if self.no_optimize:
+            if self.verbosity > 0:
+                self.stdout.write("  No optimizations required.")
+            new_operations = operations
+        else:
+            optimizer = MigrationOptimizer()
+            new_operations = optimizer.optimize(operations, migration.app_label)
 
-        if self.verbosity > 0:
-            if len(new_operations) == len(operations):
-                self.stdout.write("  No optimizations possible.")
-            else:
-                self.stdout.write(
-                    "  Optimized from %s operations to %s operations." %
-                    (len(operations), len(new_operations))
-                )
+            if self.verbosity > 0:
+                if len(new_operations) == len(operations):
+                    self.stdout.write("  No optimizations possible.")
+                else:
+                    self.stdout.write(
+                        "  Optimized from %s operations to %s operations." %
+                        (len(operations), len(new_operations))
+                    )
 
         # Work out the value of replaces (any squashed ones we're re-squashing)
         # need to feed their replaces into ours
