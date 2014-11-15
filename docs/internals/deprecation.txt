@@ -85,6 +85,8 @@ details on these changes.
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` will
   be removed.
 
+* Support for function-based template loaders will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
