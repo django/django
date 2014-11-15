@@ -1077,7 +1077,6 @@ class Query(object):
         and get_transform().
         """
         lookups = lookups[:]
-        bilaterals = []
         while lookups:
             name = lookups[0]
             # If there is just one part left, try first get_lookup() so
@@ -1089,21 +1088,19 @@ class Query(object):
                     # We didn't find a lookup. We are going to interpret
                     # the name as transform, and do an Exact lookup against
                     # it.
-                    lhs = self.try_transform(lhs, name, lookups, bilaterals)
+                    lhs = self.try_transform(lhs, name, lookups)
                     final_lookup = lhs.get_lookup('exact')
-                return final_lookup(lhs, rhs, bilaterals)
-            lhs = self.try_transform(lhs, name, lookups, bilaterals)
+                return final_lookup(lhs, rhs)
+            lhs = self.try_transform(lhs, name, lookups)
             lookups = lookups[1:]
 
-    def try_transform(self, lhs, name, rest_of_lookups, bilaterals):
+    def try_transform(self, lhs, name, rest_of_lookups):
         """
         Helper method for build_lookup. Tries to fetch and initialize
         a transform for name parameter from lhs.
         """
         next = lhs.get_transform(name)
         if next:
-            if getattr(next, 'bilateral', False):
-                bilaterals.append((next, rest_of_lookups))
             return next(lhs, rest_of_lookups)
         else:
             raise FieldError(
