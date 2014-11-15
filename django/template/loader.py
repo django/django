@@ -37,6 +37,12 @@ def find_template_loader(loader):
         if hasattr(TemplateLoader, 'load_template_source'):
             func = TemplateLoader(*args)
         else:
+            warnings.warn(
+                "Function-based template loaders are deprecated. Please use "
+                "class-based template loaders instead. Inherit base.Loader "
+                "and provide a load_template_source() method.",
+                RemovedInDjango20Warning, stacklevel=2)
+
             # Try loading module the old way - string is full path to callable
             if args:
                 raise ImproperlyConfigured(
