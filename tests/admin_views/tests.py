@@ -40,9 +40,11 @@ from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes, force_text
 from django.utils.html import escape
 from django.utils.http import urlencode
+from django.utils.six.moves import range
 from django.utils.six.moves.urllib.parse import parse_qsl, urljoin, urlparse
 from django.utils._os import upath
 from django.utils import six
+
 
 # local test models
 from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,

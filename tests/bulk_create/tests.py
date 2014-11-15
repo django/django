@@ -5,6 +5,7 @@ from operator import attrgetter
 from django.db import connection
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test import override_settings
+from django.utils.six.moves import range
 
 from .models import Country, Restaurant, Pizzeria, State, TwoFields
 

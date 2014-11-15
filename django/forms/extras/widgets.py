@@ -13,6 +13,7 @@ from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.formats import get_format
 from django.utils import six
+from django.utils.six.moves import range
 from django.conf import settings
 
 __all__ = ('SelectDateWidget',)

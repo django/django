@@ -7,6 +7,7 @@ from django.contrib.messages.tests.test_cookie import (set_cookie_data,
 from django.contrib.messages.tests.test_session import (set_session_data,
     stored_session_messages_count)
 from django.test import TestCase
+from django.utils.six.moves import range
 
 
 class FallbackTest(BaseTests, TestCase):

@@ -21,6 +21,7 @@ from django.utils.encoding import smart_str, force_text
 from django.utils.functional import lazy
 from django.utils._os import upath
 from django.utils import six
+from django.utils.six.moves import range
 
 lazystr = lazy(force_text, six.text_type)
 

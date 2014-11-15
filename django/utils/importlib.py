@@ -3,6 +3,7 @@ import warnings
 import sys
 
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils.deprecation import RemovedInDjango19Warning
 
 

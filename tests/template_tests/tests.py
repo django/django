@@ -24,6 +24,7 @@ from django.utils.formats import date_format
 from django.utils._os import upath
 from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils.six.moves.urllib.parse import urljoin
 from django.utils import translation
 

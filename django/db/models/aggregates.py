@@ -2,6 +2,7 @@
 Classes to represent the definitions of aggregate functions.
 """
 from django.db.models.constants import LOOKUP_SEP
+from django.utils.six.moves import range
 
 __all__ = [
     'Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',

@@ -6,6 +6,7 @@ from django.contrib.gis.tests.utils import (oracle, postgis, spatialite,
 from django.db import connection
 from django.test import skipUnlessDBFeature
 from django.utils import six
+from django.utils.six.moves import range
 
 
 test_srs = ({

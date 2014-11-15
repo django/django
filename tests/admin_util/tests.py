@@ -15,6 +15,7 @@ from django.test import SimpleTestCase, TestCase
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.six.moves import range
 
 from .models import Article, Count, Event, Location, EventGuide, Vehicle, Car
 

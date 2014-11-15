@@ -10,6 +10,7 @@ from django.db import transaction
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
+from django.utils.six.moves import range
 
 from .models import Company, Employee, Number, Experiment
 

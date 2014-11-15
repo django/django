@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db import transaction, DEFAULT_DB_ALIAS, models
 from django.db.utils import ConnectionHandler
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.utils.six.moves import range
 
 from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
     PlayedWithNote, Email, Researcher, Food, Eaten, Policy, Version, Location,

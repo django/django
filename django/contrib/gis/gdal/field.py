@@ -4,6 +4,7 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import OGRException
 from django.contrib.gis.gdal.prototypes import ds as capi
 from django.utils.encoding import force_text
+from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:

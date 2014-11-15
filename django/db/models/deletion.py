@@ -4,6 +4,7 @@ from operator import attrgetter
 from django.db import connections, transaction, IntegrityError
 from django.db.models import signals, sql
 from django.utils import six
+from django.utils.six.moves import range
 
 
 class ProtectedError(IntegrityError):

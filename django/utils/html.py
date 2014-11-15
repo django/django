@@ -12,6 +12,7 @@ from django.utils.functional import allow_lazy
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils.six.moves.urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 from django.utils.text import normalize_newlines
 

@@ -11,6 +11,7 @@ from django.contrib.gis.tests.utils import no_oracle, oracle, postgis, spatialit
 from django.core.management import call_command
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
+from django.utils.six.moves import range
 
 if HAS_GEOS:
     from django.contrib.gis.geos import (fromstr, GEOSGeometry,

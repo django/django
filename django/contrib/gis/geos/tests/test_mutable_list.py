@@ -8,6 +8,7 @@ import unittest
 
 from django.contrib.gis.geos.mutable_list import ListMixin
 from django.utils import six
+from django.utils.six.moves import range
 
 
 class UserListA(ListMixin):

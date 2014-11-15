@@ -6,6 +6,7 @@ import unittest
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
 from django.test.utils import override_settings
+from django.utils.six.moves import range
 from django.utils.timezone import now
 
 from .base import IsolatedModelsTestCase

@@ -17,6 +17,7 @@ from django.db.migrations.loader import MigrationLoader
 from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
+from django.utils.six.moves import range
 from django.utils.timezone import utc
 
 

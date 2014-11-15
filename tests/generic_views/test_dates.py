@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import requires_tz_support
 from django.utils import timezone
+from django.utils.six.moves import range
 
 from .models import Book, BookSigning
 

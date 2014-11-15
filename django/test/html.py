@@ -8,6 +8,7 @@ import re
 from django.utils.encoding import force_text
 from django.utils.html_parser import HTMLParser, HTMLParseError
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils.encoding import python_2_unicode_compatible
 
 

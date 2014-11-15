@@ -1,6 +1,7 @@
 import unittest
 
 from django.utils.functional import lazy, lazy_property, cached_property
+from django.utils.six.moves import range
 
 
 class FunctionalTestCase(unittest.TestCase):

@@ -12,6 +12,7 @@ from django.http import (
 from django.shortcuts import render_to_response
 from django.template import Context, Template
 from django.utils.decorators import method_decorator
+from django.utils.six.moves import range
 from django.utils.six.moves.urllib.parse import urlencode
 
 

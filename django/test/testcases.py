@@ -38,6 +38,7 @@ from django.test.utils import (CaptureQueriesContext, ContextList,
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit, urlparse, unquote
 from django.utils.six.moves.urllib.request import url2pathname
 from django.views.static import serve

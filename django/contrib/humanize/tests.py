@@ -12,6 +12,7 @@ from django.contrib.humanize.templatetags import humanize
 from django.template import Template, Context, defaultfilters
 from django.test import TestCase, override_settings
 from django.utils.html import escape
+from django.utils.six.moves import range
 from django.utils.timezone import utc, get_fixed_timezone
 from django.utils import translation
 from django.utils.translation import ugettext as _

@@ -17,6 +17,7 @@ from django.template import Template, Context
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils._os import upath
 from django.utils import six
+from django.utils.six.moves import range
 
 from .models import (Article, ArticleStatus, Author, Author1, BetterWriter, BigInt, Book,
     Category, CommaSeparatedInteger, CustomFF, CustomFieldForExclusionModel,

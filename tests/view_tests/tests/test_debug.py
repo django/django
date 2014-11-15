@@ -20,6 +20,7 @@ from django.test import TestCase, RequestFactory, override_settings
 from django.test.utils import override_with_test_loader
 from django.utils.encoding import force_text, force_bytes
 from django.utils import six
+from django.utils.six.moves import range
 from django.views.debug import CallableSettingWrapper, ExceptionReporter
 
 from .. import BrokenException, except_args

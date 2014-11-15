@@ -24,6 +24,7 @@ from django.core.files.uploadedfile import (InMemoryUploadedFile, SimpleUploaded
 from django.test import LiveServerTestCase, SimpleTestCase
 from django.test import override_settings
 from django.utils import six
+from django.utils.six.moves import range
 from django.utils.six.moves.urllib.request import urlopen
 from django.utils._os import upath
 

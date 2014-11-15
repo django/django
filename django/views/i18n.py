@@ -13,6 +13,7 @@ from django.utils.formats import get_format_modules, get_format
 from django.utils._os import upath
 from django.utils.http import is_safe_url
 from django.utils import six
+from django.utils.six.moves import range
 
 
 def set_language(request):

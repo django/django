@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
 from django.views.generic.base import View
 from django.utils.encoding import force_str
+from django.utils.six.moves import range
 
 from .models import Author, Artist, Book
 
