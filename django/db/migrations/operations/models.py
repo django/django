@@ -141,11 +141,11 @@ class RenameModel(Operation):
             state.models[related_key].fields = new_fields
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        old_apps = from_state.render()
         new_apps = to_state.render()
-        old_model = old_apps.get_model(app_label, self.old_name)
         new_model = new_apps.get_model(app_label, self.new_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
+            old_apps = from_state.render()
+            old_model = old_apps.get_model(app_label, self.old_name)
             # Move the main table
             schema_editor.alter_db_table(
                 new_model,
@@ -202,11 +202,11 @@ class AlterModelTable(Operation):
         state.models[app_label, self.name.lower()].options["db_table"] = self.table
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        old_apps = from_state.render()
         new_apps = to_state.render()
-        old_model = old_apps.get_model(app_label, self.name)
         new_model = new_apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
+            old_apps = from_state.render()
+            old_model = old_apps.get_model(app_label, self.name)
             schema_editor.alter_db_table(
                 new_model,
                 old_model._meta.db_table,
@@ -248,11 +248,11 @@ class AlterUniqueTogether(Operation):
         model_state.options[self.option_name] = self.unique_together
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        old_apps = from_state.render()
         new_apps = to_state.render()
-        old_model = old_apps.get_model(app_label, self.name)
         new_model = new_apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
+            old_apps = from_state.render()
+            old_model = old_apps.get_model(app_label, self.name)
             schema_editor.alter_unique_together(
                 new_model,
                 getattr(old_model._meta, self.option_name, set()),
@@ -286,11 +286,11 @@ class AlterIndexTogether(Operation):
         model_state.options[self.option_name] = self.index_together
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        old_apps = from_state.render()
         new_apps = to_state.render()
-        old_model = old_apps.get_model(app_label, self.name)
         new_model = new_apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
+            old_apps = from_state.render()
+            old_model = old_apps.get_model(app_label, self.name)
             schema_editor.alter_index_together(
                 new_model,
                 getattr(old_model._meta, self.option_name, set()),
@@ -321,9 +321,9 @@ class AlterOrderWithRespectTo(Operation):
         model_state.options['order_with_respect_to'] = self.order_with_respect_to
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        from_model = from_state.render().get_model(app_label, self.name)
         to_model = to_state.render().get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+            from_model = from_state.render().get_model(app_label, self.name)
             # Remove a field if we need to
             if from_model._meta.order_with_respect_to and not to_model._meta.order_with_respect_to:
                 schema_editor.remove_field(from_model, from_model._meta.get_field_by_name("_order")[0])
