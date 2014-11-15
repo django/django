@@ -78,14 +78,25 @@ class Transform(RegisterLookupMixin):
     def get_group_by_cols(self):
         return self.lhs.get_group_by_cols()
 
+    def get_bilateral_transforms(self):
+        if hasattr(self.lhs, 'get_bilateral_transforms'):
+            bilateral_transforms = self.lhs.get_bilateral_transforms()
+        else:
+            bilateral_transforms = []
+        if self.bilateral:
+            bilateral_transforms.append((self.__class__, self.init_lookups))
+        return bilateral_transforms
+
 
 class Lookup(RegisterLookupMixin):
     lookup_name = None
 
-    def __init__(self, lhs, rhs, bilateral_transforms=None):
+    def __init__(self, lhs, rhs):
         self.lhs, self.rhs = lhs, rhs
         self.rhs = self.get_prep_lookup()
-        if bilateral_transforms is None:
+        if hasattr(self.lhs, 'get_bilateral_transforms'):
+            bilateral_transforms = self.lhs.get_bilateral_transforms()
+        else:
             bilateral_transforms = []
         if bilateral_transforms:
             # We should warn the user as soon as possible if he is trying to apply
