@@ -224,7 +224,15 @@ Email
 File Storage
 ^^^^^^^^^^^^
 
-* ...
+* The :class:`~django.core.files.storage.Storage` API now supports an
+  ``aware`` parameter to the ``accessed_time``, ``created_time`` and
+  ``modified_time`` methods, to return a timezone-aware ``datetime``
+  object.
+
+  People implementing third-party storage systems should add the same
+  parameter with the same semantics: ``True`` means return aware
+  objects, ``False`` means return naive objects, and ``None`` (the
+  default) is deprecated and means return naive objects.
 
 File Uploads
 ^^^^^^^^^^^^
@@ -1028,6 +1036,17 @@ The decorators :func:`~django.test.override_settings` and
 :func:`~django.test.modify_settings` now act at the class level when used as
 class decorators. As a consequence, when overriding ``setUpClass()`` or
 ``tearDownClass()``, the ``super`` implementation should always be called.
+
+``Storage`` API datetime calls
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+With the introduction of the ``aware`` parameter to the
+``accessed_time``, ``created_time`` and ``modified_time`` methods of
+the :class:`~django.core.files.storage.Storage` API, the behavior of
+getting naive objects when not specifying ``aware`` is
+deprecated. Users should start passing the ``aware`` parameter
+explicitly to get their desired behavior.
+
 
 .. removed-features-1.8:
 

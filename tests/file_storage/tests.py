@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
 import errno
 import os
 import shutil
@@ -25,6 +26,7 @@ from django.test import LiveServerTestCase, SimpleTestCase
 from django.test import override_settings
 from django.utils import six
 from django.utils.six.moves.urllib.request import urlopen
+from django.utils import timezone
 from django.utils._os import upath
 
 from .models import Storage, temp_storage, temp_storage_location
@@ -141,6 +143,8 @@ class FileStorageTests(unittest.TestCase):
         self.assertLess(datetime.now() - self.storage.accessed_time(f_name), timedelta(seconds=2))
         self.storage.delete(f_name)
 
+        self._test_file_time_timezone(self.storage.accessed_time)
+
     def test_file_created_time(self):
         """
         File storage returns a Datetime object for the creation time of
@@ -158,6 +162,8 @@ class FileStorageTests(unittest.TestCase):
 
         self.storage.delete(f_name)
 
+        self._test_file_time_timezone(self.storage.created_time)
+
     def test_file_modified_time(self):
         """
         File storage returns a Datetime object for the last modified time of
@@ -174,6 +180,91 @@ class FileStorageTests(unittest.TestCase):
         self.assertLess(datetime.now() - self.storage.modified_time(f_name), timedelta(seconds=2))
 
         self.storage.delete(f_name)
+
+        self._test_file_time_timezone(self.storage.modified_time)
+
+    @override_settings(USE_TZ=True, TIME_ZONE='Africa/Algiers')
+    def _test_file_time_timezone(self, time_getter):
+        """
+        File storage (currently) returns a naive datetime, in the
+        system timezone. However if you set a valid TIME_ZONE in
+        settings, this will be used to populate the system timezone
+        (in os.environ['TZ']).
+
+        We set the Django TZ (and hence the system TZ) to
+        Africa/Algiers, which is UTC+1 and has no DST change.
+        Then we can set the Django TZ to something else so
+        UTC, Django and system are all reliably different.
+
+        We're also introducing timezone awareness to the Storage
+        API, off by default (but with a deprecation warning), so
+        we want to test that this works as well.
+        """
+
+        # Ensure that TZ was set from our TIME_ZONE, because
+        # if it isn't then we aren't testing that our Storage
+        # instance is returning in local tz (os.environ['TZ'])
+        # rather than Django's (TIME_ZONE).
+        self.assertEqual(os.environ['TZ'], 'Africa/Algiers')
+        now_in_algiers = timezone.make_aware(datetime.now())
+
+        # Use a fixed offset timezone so we don't need pytz.
+        timezone.activate(timezone.get_fixed_timezone(-300))
+        try:
+            # At this point the system TZ is +1 and the Django TZ
+            # is -5.
+            now = timezone.now() # in UTC
+
+            self.assertFalse(self.storage.exists('test.file'))
+
+            f = ContentFile('custom contents')
+            f_name = self.storage.save('test.file', f)
+            mtime = time_getter(f_name)
+            mtime_aware = self.storage.modified_time(f_name, aware=True)
+            mtime_unaware = self.storage.modified_time(f_name, aware=False)
+
+            self.assertTrue(timezone.is_naive(mtime))
+            self.assertTrue(timezone.is_naive(mtime_unaware))
+            self.assertTrue(timezone.is_aware(mtime_aware))
+
+            self.assertEqual(mtime, mtime_unaware)
+
+            # Check that the three timezones we're operating in
+            # are indeed distinct.
+            naive_now = datetime.now()
+            algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
+            django_offset = timezone.get_current_timezone().utcoffset(naive_now)
+            utc_offset = timezone.utc.utcoffset(naive_now)
+            self.assertGreater(algiers_offset, utc_offset)
+            self.assertLess(django_offset, utc_offset)
+
+            # now is UTC, now_in_algiers +1 (both aware)
+            # mtime is naive with effective +1
+            # mtime_aware is aware +1.
+            #
+            # (Nothing should be in the Django timezone of -5.)
+
+            # mtime_aware and now_in_algiers should be almost the same.
+            self.assertEqual(
+                now_in_algiers.tzname(),
+                mtime_aware.tzname()
+            )
+            self.assertLess(
+                mtime_aware - now_in_algiers,
+                timedelta(seconds=2)
+            )
+
+            # mtime and mtime_aware should be the same effective
+            # time. If we convert mtime to an aware object using
+            # the Algiers timezone then they should compare equal.
+            _mtime = timezone.make_aware(
+                mtime,
+                now_in_algiers.tzinfo
+            )
+            self.assertEqual(mtime_aware, _mtime)
+        finally:
+            timezone.deactivate()
+            self.storage.delete(f_name)
 
     def test_file_save_without_name(self):
         """

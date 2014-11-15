@@ -82,25 +82,36 @@ The Storage Class
     behaviors that all other storage systems can inherit or override
     as necessary.
 
-    .. note::
-        For methods returning naive ``datetime`` objects, the
-        effective timezone used will be the current value of
-        ``os.environ['TZ']``; note that this is usually set from
-        Django's :setting:`TIME_ZONE`.
+    .. versionchanged:: 1.8
 
-    .. method:: accessed_time(name)
+        The ``aware`` attribute was added to methods returning
+        ``datetime`` objects. Naive objects will use the current
+        value of ``os.environ['TZ']`` as their effective timezone.
+        Note that ``os.environ['TZ']`` is usually set from Django's
+        :setting:`TIME_ZONE`.
 
-        Returns a naive ``datetime`` object containing the last
-        accessed time of the file. For storage systems that aren't
-        able to return the last accessed time this will raise
+    .. method:: accessed_time(name, aware=None)
+
+        Returns a ``datetime`` object containing the last accessed
+        time of the file. For storage systems that aren't able to
+        return the last accessed time this will raise
         ``NotImplementedError`` instead.
 
-    .. method:: created_time(name)
+        .. deprecated:: 1.8
 
-        Returns a naive ``datetime`` object containing the creation
-        time of the file.  For storage systems that aren't able to
-        return the creation time this will raise
-        ``NotImplementedError`` instead.
+            You should explicitly pass ``aware=False`` to receive
+            naive ``datetime`` objects.
+
+    .. method:: created_time(name, aware=None)
+
+        Returns a ``datetime`` object containing the creation time of
+        the file.  For storage systems that aren't able to return the
+        creation time this will raise ``NotImplementedError`` instead.
+
+        .. deprecated:: 1.8
+
+            You should explicitly pass ``aware=False`` to receive
+            naive ``datetime`` objects.
 
     .. method:: delete(name)
 
@@ -145,12 +156,17 @@ The Storage Class
         storage systems that aren't able to provide such a listing, this will
         raise a ``NotImplementedError`` instead.
 
-    .. method:: modified_time(name)
+    .. method:: modified_time(name, aware=None)
 
-        Returns a naive ``datetime`` object containing the last
-        modified time. For storage systems that aren't able to return
-        the last modified time, this will raise
-        ``NotImplementedError`` instead.
+        Returns a ``datetime`` object containing the last modified
+        time. For storage systems that aren't able to return the last
+        modified time, this will raise ``NotImplementedError``
+        instead.
+
+        .. deprecated:: 1.8
+
+            You should explicitly pass ``aware=False`` to receive
+            naive ``datetime`` objects.
 
     .. method:: open(name, mode='rb')
 

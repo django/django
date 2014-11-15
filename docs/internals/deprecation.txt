@@ -82,6 +82,11 @@ details on these changes.
 * The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
   defined with no default value for its ``form_class`` argument will be removed.
 
+* The ``accessed_time``, ``created_time`` and ``modified_time``
+  methods of the :class:`~django.core.files.storage.Storage` API, as
+  called without the ``aware`` parameter, will no longer return naive
+  ``datetime`` objects.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
