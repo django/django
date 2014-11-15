@@ -171,10 +171,6 @@ manipulation of form data.
   :doc:`Formsets <topics/forms/formsets>` |
   :doc:`Customizing validation <ref/forms/validation>`
 
-* **Extras:**
-  :doc:`Form preview <ref/contrib/formtools/form-preview>` |
-  :doc:`Form wizard <ref/contrib/formtools/form-wizard>`
-
 The development process
 =======================
 
@@ -242,7 +238,6 @@ regions:
   :doc:`Internationalization <topics/i18n/translation>` |
   :ref:`Localization <how-to-create-language-files>` |
   :doc:`Localized Web UI formatting and form input <topics/i18n/formatting>`
-* :doc:`"Local flavor" <topics/localflavor>`
 * :doc:`Time zones </topics/i18n/timezones>`
 
 Performance and optimization
