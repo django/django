@@ -14,8 +14,6 @@ from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.operations.models import AlterModelOptions
 
-from .topological_sort import stable_topological_sort
-
 
 class MigrationAutodetector(object):
     """
@@ -193,19 +191,28 @@ class MigrationAutodetector(object):
         # isn't bad, but we need to pull a few things around so FKs work nicely
         # inside the same app
         for app_label, ops in sorted(self.generated_operations.items()):
-
-            # construct a dependency-graph for in-app dependencies
-            dependency_graph = dict((op, set()) for op in ops)
-            for op in ops:
-                for dep in op._auto_deps:
-                    if dep[0] == app_label:
-                        for op2 in ops:
-                            if self.check_dependency(op2, dep):
-                                dependency_graph[op].add(op2)
-
-            # we use a stable sort for deterministic tests & general behavior
-            self.generated_operations[app_label] = stable_topological_sort(
-                ops, dependency_graph)
+            for i in range(10000):
+                found = False
+                for i, op in enumerate(ops):
+                    for dep in op._auto_deps:
+                        if dep[0] == app_label:
+                            # Alright, there's a dependency on the same app.
+                            for j, op2 in enumerate(ops):
+                                if j > i and self.check_dependency(op2, dep):
+                                    # shift the operation from position i after
+                                    # the operation at position j
+                                    ops = ops[:i] + ops[i + 1:j + 1] + [op] + ops[j + 1:]
+                                    found = True
+                                    break
+                        if found:
+                            break
+                    if found:
+                        break
+                if not found:
+                    break
+            else:
+                raise ValueError("Infinite loop caught in operation dependency resolution")
+            self.generated_operations[app_label] = ops
 
         # Now, we need to chop the lists of operations up into migrations with
         # dependencies on each other.
