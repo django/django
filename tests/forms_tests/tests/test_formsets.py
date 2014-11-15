@@ -1091,6 +1091,20 @@ class FormsFormsetTestCase(TestCase):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertEqual(formset.total_error_count(), 2)
 
+    def test_invalid_management_form_works(self):
+        class CheckForm(Form):
+            field = IntegerField()
+
+        data = {
+            'broken-TOTAL_FORMS': '',
+            'broken-INITIAL_FORMS': '',
+            'broken-MAX_NUM_FORMS': '',
+            'broken-0-field': '1'
+        }
+        CheckFormSet = formset_factory(CheckForm, max_num=1)
+        formset = CheckFormSet(data, prefix='broken')
+        self.assertFalse(formset.is_valid())
+
 
 data = {
     'choices-TOTAL_FORMS': '1',  # the number of forms rendered
@@ -1138,10 +1152,6 @@ ArticleFormSet = formset_factory(ArticleForm)
 
 
 class TestIsBoundBehavior(TestCase):
-    def test_no_data_raises_validation_error(self):
-        with self.assertRaises(ValidationError):
-            ArticleFormSet({}).is_valid()
-
     def test_with_management_data_attrs_work_fine(self):
         data = {
             'form-TOTAL_FORMS': '1',
