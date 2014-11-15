@@ -119,8 +119,8 @@ class MigrationGraph(object):
             # reverse sorting is needed because prepending using deque.extendleft
             # also effectively reverses values
 
-            if not children:
-                path = []
+            if path[-1] == node:
+                path.pop()
 
             stack.extendleft(children)
 
