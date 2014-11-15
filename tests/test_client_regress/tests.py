@@ -8,8 +8,7 @@ import os
 import itertools
 
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template import (TemplateSyntaxError,
-    Context, Template, loader)
+from django.template import TemplateSyntaxError, Context, Template
 import django.template.context
 from django.test import Client, TestCase, override_settings
 from django.test.client import encode_file, RequestFactory
@@ -902,13 +901,6 @@ class ExceptionTests(TestCase):
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class TemplateExceptionTests(TestCase):
 
-    def setUp(self):
-        # Reset the loaders so they don't try to render cached templates.
-        if loader.template_source_loaders is not None:
-            for template_loader in loader.template_source_loaders:
-                if hasattr(template_loader, 'reset'):
-                    template_loader.reset()
-
     @override_settings(
         TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'bad_templates'),)
     )
@@ -916,9 +908,10 @@ class TemplateExceptionTests(TestCase):
         "Errors found when rendering 404 error templates are re-raised"
         try:
             self.client.get("/no_such_view/")
-            self.fail("Should get error about syntax error in template")
         except TemplateSyntaxError:
             pass
+        else:
+            self.fail("Should get error about syntax error in template")
 
 
 # We need two different tests to check URLconf substitution -  one to check

@@ -5,7 +5,8 @@ to load templates from them in order, caching the result.
 
 import hashlib
 from django.template.base import TemplateDoesNotExist
-from django.template.loader import get_template_from_string, find_template_loader, make_origin
+from django.template.loader import get_template_from_string, make_origin
+from django.template.loaders.utils import find_template_loader
 from django.utils.encoding import force_bytes
 
 from .base import Loader as BaseLoader

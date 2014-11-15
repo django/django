@@ -12,6 +12,7 @@ from django.http import (HttpResponse, HttpResponseNotFound, HttpRequest,
     build_request_repr)
 from django.template import Template, Context, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
+from django.template.loaders.utils import get_template_loaders
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.encoding import force_bytes, smart_text
@@ -279,14 +280,15 @@ class ExceptionReporter(object):
         """Return a dictionary containing traceback information."""
 
         if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
-            from django.template.loader import template_source_loaders
             self.template_does_not_exist = True
             self.loader_debug_info = []
-            # If the template_source_loaders haven't been populated yet, you need
-            # to provide an empty list for this for loop to not fail.
-            if template_source_loaders is None:
-                template_source_loaders = []
-            for loader in template_source_loaders:
+            # If Django fails in get_template_loaders, provide an empty list
+            # for the following loop to not fail.
+            try:
+                template_loaders = get_template_loaders()
+            except Exception:
+                template_loaders = []
+            for loader in template_loaders:
                 try:
                     source_list_func = loader.get_template_sources
                     # NOTE: This assumes exc_value is the name of the template that

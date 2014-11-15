@@ -1,13 +1,9 @@
 import warnings
 
-from django.core.exceptions import ImproperlyConfigured
-from django.template.base import Origin, Template, Context, TemplateDoesNotExist
 from django.conf import settings
+from django.template.base import Origin, Template, Context, TemplateDoesNotExist
+from django.template.loaders.utils import get_template_loaders
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.module_loading import import_string
-from django.utils import six
-
-template_source_loaders = None
 
 
 class LoaderOrigin(Origin):
@@ -26,58 +22,8 @@ def make_origin(display_name, loader, name, dirs):
         return None
 
 
-def find_template_loader(loader):
-    if isinstance(loader, (tuple, list)):
-        loader, args = loader[0], loader[1:]
-    else:
-        args = []
-    if isinstance(loader, six.string_types):
-        TemplateLoader = import_string(loader)
-
-        if hasattr(TemplateLoader, 'load_template_source'):
-            func = TemplateLoader(*args)
-        else:
-            warnings.warn(
-                "Function-based template loaders are deprecated. Please use "
-                "class-based template loaders instead. Inherit base.Loader "
-                "and provide a load_template_source() method.",
-                RemovedInDjango20Warning, stacklevel=2)
-
-            # Try loading module the old way - string is full path to callable
-            if args:
-                raise ImproperlyConfigured(
-                    "Error importing template source loader %s - can't pass "
-                    "arguments to function-based loader." % loader
-                )
-            func = TemplateLoader
-
-        if not func.is_usable:
-            import warnings
-            warnings.warn(
-                "Your TEMPLATE_LOADERS setting includes %r, but your Python "
-                "installation doesn't support that type of template loading. "
-                "Consider removing that line from TEMPLATE_LOADERS." % loader
-            )
-            return None
-        else:
-            return func
-    else:
-        raise ImproperlyConfigured('Loader does not define a "load_template" callable template source loader')
-
-
 def find_template(name, dirs=None):
-    # Calculate template_source_loaders the first time the function is executed
-    # because putting this logic in the module-level namespace may cause
-    # circular import errors. See Django ticket #1292.
-    global template_source_loaders
-    if template_source_loaders is None:
-        loaders = []
-        for loader_name in settings.TEMPLATE_LOADERS:
-            loader = find_template_loader(loader_name)
-            if loader is not None:
-                loaders.append(loader)
-        template_source_loaders = tuple(loaders)
-    for loader in template_source_loaders:
+    for loader in get_template_loaders():
         try:
             source, display_name = loader(name, dirs)
             return (source, make_origin(display_name, loader, name, dirs))
