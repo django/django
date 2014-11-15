@@ -1,6 +1,7 @@
 import unittest
 
-from django.utils.functional import lazy, lazy_property, cached_property
+from django.http import HttpResponseRedirect
+from django.utils.functional import lazy, lazy_property, cached_property, SimpleLazyObject
 
 
 class FunctionalTestCase(unittest.TestCase):
@@ -91,3 +92,14 @@ class FunctionalTestCase(unittest.TestCase):
 
         self.assertEqual(lazy_a(), lazy_b())
         self.assertNotEqual(lazy_b(), lazy_c())
+
+    def test_simple_lazy_object_contains(self):
+        """
+        Tests that __contains__ operator work correctly for Simple Lazy Object.
+        Related trac ticket: https://code.djangoproject.com/ticket/23782
+        """
+        
+        simple_lazy_object = SimpleLazyObject(lambda: "test string")
+        self.assertIn('test', simple_lazy_object)
+        simple_lazy_object_2 = SimpleLazyObject(lambda: HttpResponseRedirect('/'))
+        self.assertIn('location', simple_lazy_object_2)
