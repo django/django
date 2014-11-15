@@ -336,6 +336,9 @@ Management Commands
   :setting:`FIXTURE_DIRS` contains duplicates or a default fixture directory
   path (``app_name/fixtures``), an exception is raised.
 
+* :djadmin:`compilemessages` now has ``--use-fuzzy`` or ``-f`` option which
+  includes fuzzy translations into compiled files.
+
 Middleware
 ^^^^^^^^^^
 
