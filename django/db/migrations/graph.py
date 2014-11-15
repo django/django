@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from collections import deque
 
 from django.db.migrations.state import ProjectState
 from django.utils.datastructures import OrderedSet
@@ -100,26 +101,28 @@ class MigrationGraph(object):
 
     def dfs(self, start, get_children):
         """
-        Dynamic programming based depth first search, for finding dependencies.
+        Iterative depth first search, for finding dependencies.
         """
-        visited = []
+        visited = deque()
         visited.append(start)
         path = [start]
-        stack = sorted(get_children(start))
+        stack = deque(sorted(get_children(start)))
         while stack:
-            node = stack.pop(0)
+            node = stack.popleft()
 
             if node in path:
                 raise CircularDependencyError()
             path.append(node)
 
-            visited.insert(0, node)
-            children = sorted(get_children(node))
+            visited.appendleft(node)
+            children = sorted(get_children(node), reverse=True)
+            # reverse sorting is needed because prepending using deque.extendleft
+            # also effectively reverses values
 
             if not children:
                 path = []
 
-            stack = children + stack
+            stack.extendleft(children)
 
         return list(OrderedSet(visited))
 
