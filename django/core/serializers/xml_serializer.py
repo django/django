@@ -175,6 +175,10 @@ class Deserializer(base.Deserializer):
         # Look up the model using the model loading mechanism. If this fails,
         # bail.
         Model = self._get_model_from_node(node, "model")
+        field_names = (
+            f.name if not f.is_reverse_object else f.field.related_query_name()
+            for f in Model._meta.get_fields(forward=True, reverse=True)
+        )
 
         # Start building a data dictionary from the object.
         data = {}
@@ -197,7 +201,7 @@ class Deserializer(base.Deserializer):
             # Get the field from the Model. This will raise a
             # FieldDoesNotExist if, well, the field doesn't exist, which will
             # be propagated correctly unless ignorenonexistent=True is used.
-            if self.ignore and field_name not in Model._meta.field_names:
+            if self.ignore and field_name not in field_names:
                 continue
             field = Model._meta.get_field(field_name)
 

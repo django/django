@@ -1455,7 +1455,7 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Any field name that is not present in field_names does not exist.
         # Also, ordering by m2m fields is not allowed.
-        valid_fields = cls._meta.field_names - {f.name for f in cls._meta.many_to_many}
+        valid_fields = {f.name for f in cls._meta.fields}
         invalid_fields.extend(fields - valid_fields)
 
         for invalid_field in invalid_fields:

@@ -101,11 +101,15 @@ def Deserializer(object_list, **options):
         if 'pk' in d:
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
         m2m_data = {}
+        field_names = (
+            f.name if not f.is_reverse_object else f.field.related_query_name()
+            for f in Model._meta.get_fields(forward=True, reverse=True)
+        )
 
         # Handle each field
         for (field_name, field_value) in six.iteritems(d["fields"]):
 
-            if ignore and field_name not in Model._meta.field_names:
+            if ignore and field_name not in field_names:
                 # skip fields no longer on model
                 continue
 
