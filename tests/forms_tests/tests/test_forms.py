@@ -2176,6 +2176,42 @@ class FormsTestCase(TestCase):
         form = SomeForm()
         self.assertHTMLEqual(form.as_p(), '<p id="p_some_field"></p>')
 
+    def test_field_name_with_hidden_input(self):
+        """#23712 BaseForm._html_output() uses inconsistent formatting for normal row"""
+        class SomeForm(Form):
+            some_field = CharField()
+            hidden_field = CharField(widget=HiddenInput)
+
+            def as_p(self):
+                return self._html_output(
+                    normal_row='<p%(html_class_attr)s>%(field)s %(field_name)s</p>',
+                    error_row='%s',
+                    row_ender='</p>',
+                    help_text_html='<span>%(help_text)s</span>',
+                    errors_on_separate_row=True)
+
+        form = SomeForm()
+        self.assertEqual(form.as_p(), '<p><input id="id_some_field" name="some_field" type="text" /> some_field'
+                                      '<input id="id_hidden_field" name="hidden_field" type="hidden" /></p>')
+
+    def test_field_name_with_hidden_input_and_non_matching_row_ender(self):
+        """#23712 BaseForm._html_output() uses inconsistent formatting for normal row"""
+        class SomeForm(Form):
+            some_field = CharField()
+            hidden_field = CharField(widget=HiddenInput)
+
+            def as_p(self):
+                return self._html_output(
+                    normal_row='<p%(html_class_attr)s>%(field)s %(field_name)s</p>',
+                    error_row='%s',
+                    row_ender='</a>',
+                    help_text_html='<span>%(help_text)s</span>',
+                    errors_on_separate_row=True)
+
+        form = SomeForm()
+        self.assertEqual(form.as_p(), '<p><input id="id_some_field" name="some_field" type="text" /> some_field</p>\n'
+                                      '<p> <input id="id_hidden_field" name="hidden_field" type="hidden" /></a>')
+
     def test_error_dict(self):
         class MyForm(Form):
             foo = CharField()
