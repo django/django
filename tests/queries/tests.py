@@ -380,6 +380,30 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Item: four>']
         )
 
+    def test_avoid_infinite_loop_on_too_many_subqueries(self):
+        x = Tag.objects.filter(pk=1)
+        local_recursion_limit = 127
+        with self.assertRaises(RuntimeError) as context:
+            for i in six.moves.range(local_recursion_limit * 2):
+                x = Tag.objects.filter(pk__in=x)
+        self.assertEqual(
+            six.text_type(context.exception),
+            'Maximum recursion depth exceeded: too many subqueries.'
+        )
+
+    def test_reasonable_number_of_subq_aliases(self):
+        i = 0
+        x = Tag.objects.filter(pk=1)
+        while i < 20:
+            x = Tag.objects.filter(pk__in=x)
+            i += 1
+        self.assertEqual(
+            x.query.subq_aliases, {
+                'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD',
+                'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN'
+            }
+        )
+
     def test_heterogeneous_qs_combination(self):
         # Combining querysets built on different models should behave in a well-defined
         # fashion. We raise an error.
