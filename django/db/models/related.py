@@ -19,7 +19,7 @@ class RelatedObject(object):
         self.model = model
         self.opts = model._meta
         self.field = field
-        self.name = '%s:%s' % (self.opts.app_label, self.opts.model_name)
+        self.name = self.field.related_query_name()
         self.var_name = self.opts.model_name
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
