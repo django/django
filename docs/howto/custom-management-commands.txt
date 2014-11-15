@@ -202,6 +202,7 @@ redirected into a ``StringIO`` instance.
 
 ::
 
+    from django.test import TestCase
     from django.core.management import call_command
     from django.utils.six import StringIO
 
