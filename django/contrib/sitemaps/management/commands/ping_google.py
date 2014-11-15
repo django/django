@@ -11,5 +11,5 @@ class Command(BaseCommand):
         parser.add_argument('-s', '--is_secure', default=False, action='store_true')
 
     def handle(self, *args, **options):
-        ping_google(sitemap_url=options['sitemap_url'], site_domain=options['site_domain'],
-                    is_secure=options['is_secure'])
+        ping_google(sitemap_url=options['sitemap_url'],
+            site_domain=options['site_domain'], is_secure=options['is_secure'])
