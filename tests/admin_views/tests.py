@@ -634,6 +634,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get("/test_admin/admin/admin_views/referencedbyinline/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
+        # #23839 - Primary key should always be allowed, even if the referenced model isn't registered as an inline.
+        response = self.client.get("/test_admin/admin/admin_views/stuff/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
         # We also want to prevent the add and change view from leaking a
         # disallowed field value.
         with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
