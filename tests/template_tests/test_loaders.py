@@ -22,6 +22,7 @@ except ImportError:
 
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
+from django.template.loaders.utils import find_template_loader
 from django.template import loader
 from django.test import TestCase, override_settings
 from django.utils import six
@@ -127,7 +128,7 @@ class CachedLoader(TestCase):
 
     def test_missing_template_is_cached(self):
         "#19949 -- Check that the missing template is cached."
-        template_loader = loader.find_template_loader(settings.TEMPLATE_LOADERS[0])
+        template_loader = find_template_loader(settings.TEMPLATE_LOADERS[0])
         # Empty cache, which may be filled from previous tests.
         template_loader.reset()
         # Check that 'missing.html' isn't already in cache before 'missing.html' is loaded

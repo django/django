@@ -14,7 +14,8 @@ from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
     RequestContext, Template, TemplateSyntaxError)
-from django.template.loaders import app_directories, filesystem, cached
+from django.template.loaders import app_directories, filesystem
+from django.template.loaders.utils import get_template_loaders
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings, extend_sys_path
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
@@ -218,21 +219,27 @@ class TemplateLoaderTests(TestCase):
     @override_settings(TEMPLATE_DEBUG=True)
     def test_loader_debug_origin(self):
         # We rely on the fact that runtests.py sets up TEMPLATE_DIRS to
-        # point to a directory containing a login.html file. Also that
-        # the file system and app directories loaders both inherit the
-        # load_template method from the base Loader class, so we only need
-        # to test one of them.
+        # point to a directory containing a login.html file.
         load_name = 'login.html'
+
+        # We also rely on the fact the file system and app directories loaders
+        # both inherit the load_template method from the base Loader class, so
+        # we only need to test one of them.
         template = loader.get_template(load_name)
         template_name = template.nodelist[0].source[0].name
         self.assertTrue(template_name.endswith(load_name),
             'Template loaded by filesystem loader has incorrect name for debug page: %s' % template_name)
 
-        # Also test the cached loader, since it overrides load_template
-        cache_loader = cached.Loader(('',))
-        cache_loader._cached_loaders = loader.template_source_loaders
-        loader.template_source_loaders = (cache_loader,)
+    @override_settings(TEMPLATE_LOADERS=[
+        ('django.template.loaders.cached.Loader',
+            ['django.template.loaders.filesystem.Loader']),
+    ])
+    @override_settings(TEMPLATE_DEBUG=True)
+    def test_cached_loader_debug_origin(self):
+        # Same comment as in test_loader_debug_origin.
+        load_name = 'login.html'
 
+        # Test the cached loader separately since it overrides load_template.
         template = loader.get_template(load_name)
         template_name = template.nodelist[0].source[0].name
         self.assertTrue(template_name.endswith(load_name),
@@ -243,15 +250,15 @@ class TemplateLoaderTests(TestCase):
         self.assertTrue(template_name.endswith(load_name),
             'Cached template loaded through cached loader has incorrect name for debug page: %s' % template_name)
 
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_loader_origin(self):
-        with self.settings(TEMPLATE_DEBUG=True):
-            template = loader.get_template('login.html')
-            self.assertEqual(template.origin.loadname, 'login.html')
+        template = loader.get_template('login.html')
+        self.assertEqual(template.origin.loadname, 'login.html')
 
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_string_origin(self):
-        with self.settings(TEMPLATE_DEBUG=True):
-            template = Template('string template')
-            self.assertEqual(template.origin.source, 'string template')
+        template = Template('string template')
+        self.assertEqual(template.origin.source, 'string template')
 
     def test_debug_false_origin(self):
         template = loader.get_template('login.html')
@@ -613,7 +620,9 @@ class TemplateTests(TestCase):
                                 if output != result:
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Expected %r, got %r" % (is_cached, invalid_str, template_debug, name, result, output))
 
-                    loader.template_source_loaders[0].reset()
+                    # This relies on get_template_loaders() memoizing its
+                    # result. All callers get the same iterable of loaders.
+                    get_template_loaders()[0].reset()
 
                 if template_base.invalid_var_format_string:
                     expected_invalid_str = 'INVALID'

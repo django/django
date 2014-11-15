@@ -87,8 +87,8 @@ def clear_context_processors_cache(**kwargs):
 @receiver(setting_changed)
 def clear_template_loaders_cache(**kwargs):
     if kwargs['setting'] == 'TEMPLATE_LOADERS':
-        from django.template import loader
-        loader.template_source_loaders = None
+        from django.template.loaders.utils import get_template_loaders
+        get_template_loaders.cache_clear()
 
 
 @receiver(setting_changed)
