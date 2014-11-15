@@ -187,7 +187,7 @@ def password_reset_done(request,
                         template_name='registration/password_reset_done.html',
                         current_app=None, extra_context=None):
     context = {
-        'title': _('Password reset successful'),
+        'title': _('Password reset sent'),
     }
     if extra_context is not None:
         context.update(extra_context)
