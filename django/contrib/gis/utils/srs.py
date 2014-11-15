@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.contrib.gis.gdal import SpatialReference
 from django.db import connections, DEFAULT_DB_ALIAS
 
@@ -62,10 +64,16 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
 
     # Backend-specific fields for the SpatialRefSys model.
 
-    srs_field_names = (
-        f.name if not f.is_reverse_object else f.field.related_query_name()
-        for f in SpatialRefSys._meta.get_fields(forward=True, reverse=True)
+    opts = SpatialRefSys._meta
+    fields_names_iterator = chain.from_iterable(
+        (f.name,) if not f.is_reverse_object else (f.field.related_query_name(),)
+        for f in opts.get_fields(reverse=True)
     )
+    srs_field_names = set(
+        field_name for field_name in fields_names_iterator
+        if not field_name.endswith('_id')
+    )
+
     if 'srtext' in srs_field_names:
         kwargs['srtext'] = srs.wkt
     if 'ref_sys_name' in srs_field_names:

@@ -3,6 +3,7 @@ XML serializer.
 """
 
 from __future__ import unicode_literals
+from itertools import chain
 
 from django.apps import apps
 from django.conf import settings
@@ -175,9 +176,13 @@ class Deserializer(base.Deserializer):
         # Look up the model using the model loading mechanism. If this fails,
         # bail.
         Model = self._get_model_from_node(node, "model")
-        field_names = (
-            f.name if not f.is_reverse_object else f.field.related_query_name()
-            for f in Model._meta.get_fields(forward=True, reverse=True)
+        fields_names_iterator = chain.from_iterable(
+            (f.name,) if not f.is_reverse_object else (f.field.related_query_name(),)
+            for f in Model._meta.get_fields(reverse=True)
+        )
+        field_names = set(
+            field_name for field_name in fields_names_iterator
+            if not field_name.endswith('_id')
         )
 
         # Start building a data dictionary from the object.

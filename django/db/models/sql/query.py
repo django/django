@@ -9,6 +9,7 @@ all about the internals of models in order to get the information it needs.
 
 from collections import Mapping, OrderedDict
 import copy
+from itertools import chain
 import warnings
 
 from django.core.exceptions import FieldError
@@ -1378,10 +1379,15 @@ class Query(object):
                 # one step.
                 pos -= 1
                 if pos == -1 or fail_on_missing:
-                    field_names = (
-                        f.name if not f.is_reverse_object else f.field.related_query_name()
-                        for f in opts.get_fields(forward=True, reverse=True)
+                    fields_names_iterator = chain.from_iterable(
+                        (f.name,) if not f.is_reverse_object else (f.field.related_query_name(),)
+                        for f in opts.get_fields(reverse=True)
                     )
+                    field_names = set(
+                        field_name for field_name in fields_names_iterator
+                        if not field_name.endswith('_id')
+                    )
+
                     available = sorted(list(field_names) + list(self.aggregate_select))
                     raise FieldError("Cannot resolve keyword %r into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))

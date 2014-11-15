@@ -4,6 +4,7 @@ and from basic Python data types (lists, dicts, strings, etc.). Useful as a basi
 other serializers.
 """
 from __future__ import unicode_literals
+from itertools import chain
 
 from django.apps import apps
 from django.conf import settings
@@ -101,9 +102,14 @@ def Deserializer(object_list, **options):
         if 'pk' in d:
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
         m2m_data = {}
-        field_names = (
-            f.name if not f.is_reverse_object else f.field.related_query_name()
+
+        fields_names_iterator = chain.from_iterable(
+            (f.name,) if not f.is_reverse_object else (f.field.related_query_name(),)
             for f in Model._meta.get_fields(forward=True, reverse=True)
+        )
+        field_names = set(
+            field_name for field_name in fields_names_iterator
+            if not field_name.endswith('_id')
         )
 
         # Handle each field

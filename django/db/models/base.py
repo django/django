@@ -1455,7 +1455,16 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Any field name that is not present in field_names does not exist.
         # Also, ordering by m2m fields is not allowed.
-        valid_fields = {f.name for f in cls._meta.fields}
+        opts = cls._meta
+        fields_names_iterator = chain.from_iterable(
+            (f.name,) if not f.is_reverse_object else (f.field.related_query_name(),)
+            for f in chain(opts.fields, opts.many_to_many, opts.related_objects)
+        )
+        valid_fields = set(
+            field_name for field_name in fields_names_iterator
+            if not field_name.endswith('_id')
+        )
+
         invalid_fields.extend(fields - valid_fields)
 
         for invalid_field in invalid_fields:
