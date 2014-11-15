@@ -25,52 +25,16 @@
 # Python eggs) sets is_usable to False if the "pkg_resources" module isn't
 # installed, because pkg_resources is necessary to read eggs.
 
+import warnings
+
 from django.core.exceptions import ImproperlyConfigured
 from django.template.base import Origin, Template, Context, TemplateDoesNotExist
 from django.conf import settings
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.module_loading import import_string
 from django.utils import six
 
 template_source_loaders = None
-
-
-class BaseLoader(object):
-    is_usable = False
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def __call__(self, template_name, template_dirs=None):
-        return self.load_template(template_name, template_dirs)
-
-    def load_template(self, template_name, template_dirs=None):
-        source, display_name = self.load_template_source(template_name, template_dirs)
-        origin = make_origin(display_name, self.load_template_source, template_name, template_dirs)
-        try:
-            template = get_template_from_string(source, origin, template_name)
-            return template, None
-        except TemplateDoesNotExist:
-            # If compiling the template we found raises TemplateDoesNotExist, back off to
-            # returning the source and display name for the template we were asked to load.
-            # This allows for correct identification (later) of the actual template that does
-            # not exist.
-            return source, display_name
-
-    def load_template_source(self, template_name, template_dirs=None):
-        """
-        Returns a tuple containing the source and origin for the given template
-        name.
-
-        """
-        raise NotImplementedError('subclasses of BaseLoader must provide a load_template_source() method')
-
-    def reset(self):
-        """
-        Resets any state maintained by the loader instance (e.g., cached
-        templates or cached loader modules).
-
-        """
-        pass
 
 
 class LoaderOrigin(Origin):
@@ -199,3 +163,17 @@ def select_template(template_name_list, dirs=None):
             continue
     # If we get here, none of the templates could be loaded
     raise TemplateDoesNotExist(', '.join(not_found))
+
+
+# This line must remain at the bottom to avoid import loops.
+from .loaders import base
+
+
+class BaseLoader(base.Loader):
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.template.loader.BaseLoader was renamed to "
+            "django.template.loaders.base.Loader.",
+            RemovedInDjango20Warning, stacklevel=2)
+        super(BaseLoader, self).__init__(*args, **kwargs)

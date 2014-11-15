@@ -11,9 +11,10 @@ from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.template.base import TemplateDoesNotExist
-from django.template.loader import BaseLoader
 from django.utils._os import safe_join
 from django.utils import six
+
+from .base import Loader as BaseLoader
 
 
 def calculate_app_template_dirs():

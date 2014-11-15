@@ -9,8 +9,9 @@ except ImportError:
 from django.apps import apps
 from django.conf import settings
 from django.template.base import TemplateDoesNotExist
-from django.template.loader import BaseLoader
 from django.utils import six
+
+from .base import Loader as BaseLoader
 
 
 class Loader(BaseLoader):
