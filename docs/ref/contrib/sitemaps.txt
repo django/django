@@ -493,10 +493,10 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
                             :func:`ping_google` will attempt to figure out your
                             sitemap by performing a reverse looking in your URLconf.
 
-         * ``site_domain``, If you are not using ``django.contrib.sites``, use this
-                            to pass your site's domain (e.g., ``example.com``)
+         * ``-d --site_domain``, If you are not using ``django.contrib.sites``, use this
+                                 to pass your site's domain (e.g., ``example.com``)
 
-         * ``is_secure``, A boolean. Use this if your site is running on ``https://``, defaults
+         * ``-s --is_secure``, A boolean. Use this if your site is running on ``https://``, defaults
                           to ``False``.
 
     :func:`ping_google` raises the exception
