@@ -2,9 +2,11 @@ import datetime
 import json
 import unittest
 
+from django.contrib.postgres import forms as pg_forms
 from django.contrib.postgres.validators import RangeMaxValueValidator, RangeMinValueValidator
 from django.core import exceptions, serializers
 from django.db import connection
+from django import forms
 from django.test import TestCase
 from django.utils import timezone
 
@@ -220,3 +222,125 @@ class TestValidators(TestCase):
             validator(NumericRange(0, 10))
         self.assertEqual(cm.exception.messages[0], 'Ensure that this range is completely greater than or equal to 5.')
         self.assertEqual(cm.exception.code, 'min_value')
+
+
+class TestFormField(TestCase):
+
+    def test_valid_integer(self):
+        field = pg_forms.IntegerRangeField()
+        value = field.clean(['1', '2'])
+        self.assertEqual(value, NumericRange(1, 2))
+
+    def test_valid_floats(self):
+        field = pg_forms.FloatRangeField()
+        value = field.clean(['1.12345', '2.001'])
+        self.assertEqual(value, NumericRange(1.12345, 2.001))
+
+    def test_valid_timestamps(self):
+        field = pg_forms.DateTimeRangeField()
+        value = field.clean(['01/01/2014 00:00:00', '02/02/2014 12:12:12'])
+        lower = datetime.datetime(2014, 1, 1, 0, 0, 0)
+        upper = datetime.datetime(2014, 2, 2, 12, 12, 12)
+        self.assertEqual(value, DateTimeTZRange(lower, upper))
+
+    def test_valid_dates(self):
+        field = pg_forms.DateRangeField()
+        value = field.clean(['01/01/2014', '02/02/2014'])
+        lower = datetime.date(2014, 1, 1)
+        upper = datetime.date(2014, 2, 2)
+        self.assertEqual(value, DateRange(lower, upper))
+
+    def test_using_split_datetime_widget(self):
+        class SplitForm(forms.Form):
+            field = pg_forms.DateTimeRangeField(widget=forms.MultiWidget([forms.SplitDateTimeWidget, forms.SplitDateTimeWidget]))
+
+        form = SplitForm()
+        self.assertHTMLEqual(str(form), '''
+            <tr>
+                <th>
+                <label for="id_field_0">Field:</label>
+                </th>
+                <td>
+                    <input id="id_field_0_0" name="field_0_0" type="text" />
+                    <input id="id_field_0_1" name="field_0_1" type="text" />
+                    <input id="id_field_1_0" name="field_1_0" type="text" />
+                    <input id="id_field_1_1" name="field_1_1" type="text" />
+                </td>
+            </tr>
+        ''')
+        form = SplitForm({
+            'field_0_0': '01/01/2014',
+            'field_0_1': '00:00:00',
+            'field_1_0': '02/02/2014',
+            'field_1_1': '12:12:12',
+        })
+        self.assertTrue(form.is_valid())
+        lower = datetime.datetime(2014, 1, 1, 0, 0, 0)
+        upper = datetime.datetime(2014, 2, 2, 12, 12, 12)
+        self.assertEqual(form.cleaned_data['field'], DateTimeTZRange(lower, upper))
+
+    def test_none(self):
+        field = pg_forms.IntegerRangeField(required=False)
+        value = field.clean(['', ''])
+        self.assertEqual(value, None)
+
+    def test_rendering(self):
+        class RangeForm(forms.Form):
+            ints = pg_forms.IntegerRangeField()
+
+        self.assertHTMLEqual(str(RangeForm()), '''
+        <tr>
+            <th><label for="id_ints_0">Ints:</label></th>
+            <td>
+                <input id="id_ints_0" name="ints_0" type="number" />
+                <input id="id_ints_1" name="ints_1" type="number" />
+            </td>
+        </tr>
+        ''')
+
+    def test_lower_bound_higher(self):
+        field = pg_forms.IntegerRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['10', '2'])
+        self.assertEqual(cm.exception.messages[0], 'The start of the range must not exceed the end of the range.')
+        self.assertEqual(cm.exception.code, 'bound_order')
+
+    def test_open(self):
+        field = pg_forms.IntegerRangeField()
+        value = field.clean(['', '0'])
+        self.assertEqual(value, NumericRange(None, 0))
+
+    def test_too_many_args(self):
+        field = pg_forms.IntegerRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['1', '2', '3'])
+        self.assertEqual(cm.exception.messages[0], 'Enter two valid values.')
+        self.assertEqual(cm.exception.code, 'invalid')
+
+    def test_not_enough_args(self):
+        field = pg_forms.IntegerRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['1'])
+        self.assertEqual(cm.exception.messages[0], 'Enter two valid values.')
+        self.assertEqual(cm.exception.code, 'invalid')
+
+    def test_incorrect_data_type(self):
+        field = pg_forms.IntegerRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean('1')
+        self.assertEqual(cm.exception.messages[0], 'Enter two valid values.')
+        self.assertEqual(cm.exception.code, 'invalid')
+
+    def test_invalid_lower(self):
+        field = pg_forms.IntegerRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['a', '2'])
+        self.assertEqual(cm.exception.messages[0], 'Enter a valid start value: Enter a whole number.')
+        self.assertEqual(cm.exception.code, 'lower_invalid')
+
+    def test_invalid_upper(self):
+        field = pg_forms.IntegerRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['1', 'b'])
+        self.assertEqual(cm.exception.messages[0], 'Enter a valid end value: Enter a whole number.')
+        self.assertEqual(cm.exception.code, 'upper_invalid')
