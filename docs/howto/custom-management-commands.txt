@@ -208,7 +208,7 @@ redirected into a ``StringIO`` instance.
     class SomeTest(TestCase):
         def test_command(self):
             out = StringIO()
-            call_command('your_command', stdout=out)
+            call_command('closepoll', stdout=out)
             self.assertIn('Expected output', out.getvalue())
 
 Command objects
