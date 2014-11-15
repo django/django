@@ -6,10 +6,10 @@ to load templates from them in order, caching the result.
 import hashlib
 from django.template.base import TemplateDoesNotExist
 from django.template.loader import get_template_from_string, make_origin
-from django.template.loaders.utils import find_template_loader
 from django.utils.encoding import force_bytes
 
 from .base import Loader as BaseLoader
+from .utils import _get_template_loaders
 
 
 class Loader(BaseLoader):
@@ -18,20 +18,9 @@ class Loader(BaseLoader):
     def __init__(self, loaders):
         self.template_cache = {}
         self.find_template_cache = {}
-        self._loaders = loaders
-        self._cached_loaders = []
-
-    @property
-    def loaders(self):
-        # Resolve loaders on demand to avoid circular imports
-        if not self._cached_loaders:
-            # Set self._cached_loaders atomically. Otherwise, another thread
-            # could see an incomplete list. See #17303.
-            cached_loaders = []
-            for loader in self._loaders:
-                cached_loaders.append(find_template_loader(loader))
-            self._cached_loaders = cached_loaders
-        return self._cached_loaders
+        # Use the private, non-caching version of get_template_loaders
+        # in case loaders isn't hashable.
+        self.loaders = _get_template_loaders(loaders)
 
     def cache_key(self, template_name, template_dirs):
         if template_dirs:
