@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+import os
+import os.path
 
 from django.test import TestCase
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db import migrations
 from django.db import models
+from unittest.mock import patch
+from django.test import override_settings
 
 
 class OptimizerTests(TestCase):
@@ -385,3 +389,44 @@ class OptimizerTests(TestCase):
                 migrations.CreateModel("Bar", [("width", models.IntegerField())]),
             ],
         )
+
+
+@override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+class OptimizerCommandTests(TestCase):
+    """
+    This test case actually runs the management command. It checks that
+    commands takes into account all it's options properly.
+
+    Since the squashmigrations commands is being run, we need to clean up all
+    squashed migrations after.
+    """
+    def setUp(self):
+        root_dir = os.path.dirname(__file__)
+        self.migrations_dir = os.path.join(root_dir, 'test_migrations')
+        self.original_content = os.listdir(self.migrations_dir)
+
+    def tearDown(self):
+        # Delete everything what wasn't in `migrations` folder at the beginning
+        # of the test run.
+        for filename in os.listdir(self.migrations_dir):
+            if filename not in self.original_content:
+                os.remove(os.path.join(self.migrations_dir, filename))
+
+    @patch('django.db.migrations.optimizer.MigrationOptimizer')
+    def test_no_optimize(self, mock_optimizer):
+        """
+        Checks that squashing doesn't optimize if the option --no-optimize
+        is passed in the management command.
+        """
+        from django.core.management.commands.squashmigrations import Command as SquashCommand
+        sqcmd = SquashCommand()
+        options = {
+                   'no_optimize': True,
+                   'app_label': 'migrations',
+                   'migration_name': '0002',
+                   'interactive': False,
+                   'verbosity': 0,
+        }
+        sqcmd.handle(**options)
+        assert 0 == mock_optimizer.call_count
+        assert 0 == mock_optimizer.return_value.optimize.call_count
