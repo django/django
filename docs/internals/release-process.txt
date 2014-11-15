@@ -134,7 +134,11 @@ regardless of the pace of releases afterwards.
 
 The follow releases have been designated for long-term support:
 
-* Django 1.4, supported until at least March 2015.
+* Django 1.8, supported for at least 3 years after its release (scheduled for
+  April 2015).
+* Django 1.4, supported for 6 months after the release of Django 1.8. As
+  Django 1.8 is scheduled to be released around April 2015, support for 1.4
+  will end around October 2015.
 
 .. _release-process:
 
