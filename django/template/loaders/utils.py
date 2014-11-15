@@ -10,9 +10,13 @@ from django.utils.module_loading import import_string
 
 @lru_cache.lru_cache()
 def get_template_loaders():
+    return _get_template_loaders(settings.TEMPLATE_LOADERS)
+
+
+def _get_template_loaders(template_loaders=None):
     loaders = []
-    for loader_name in settings.TEMPLATE_LOADERS:
-        loader = find_template_loader(loader_name)
+    for template_loader in template_loaders:
+        loader = find_template_loader(template_loader)
         if loader is not None:
             loaders.append(loader)
     # Immutable return value because it will be cached and shared by callers.
