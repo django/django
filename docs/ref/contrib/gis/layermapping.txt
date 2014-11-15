@@ -141,8 +141,8 @@ Keyword Arguments
                        associated with the unique model.  Forces
                        the transaction mode to be ``'autocommit'``.
 
-``using``              New in version 1.2.  Sets the database to use when
-                       importing spatial data.  Default is ``'default'``
+``using``              Sets the database to use when importing spatial data.
+                       Default is ``'default'``.
 =====================  =====================================================
 
 ``save()`` Keyword Arguments
