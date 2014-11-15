@@ -74,3 +74,6 @@ Bugfixes
 
 * Fixed a rare query error when using deeply nested subqueries
   (:ticket:`23605`).
+
+* Fixed a crash in migrations when deleting a field that is part of a
+  ``index/unique_together`` constraint (:ticket:`23794`).
