@@ -60,6 +60,7 @@ from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.db.backends.oracle.schema import DatabaseSchemaEditor
+from django.db.backends.oracle import lookups  # NOQA -- import for registering backend-specific lookups
 from django.db.utils import InterfaceError
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text

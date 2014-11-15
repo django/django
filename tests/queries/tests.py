@@ -1671,6 +1671,22 @@ class Queries5Tests(TestCase):
         )
 
 
+class TextFieldComparisonTests(TestCase):
+    """Test for ticket #11580: Unable to query TextField against oracle nclob"""
+    ascii_chars = u'ABC'
+    non_ascii_char = u'\xb1'  # plus-minus
+
+    def setUp(self):
+        Page.objects.create(text=(self.ascii_chars + self.non_ascii_char) * 4000)
+
+    def test_contains(self):
+        qset = Page.objects.filter(text__contains='ABC')
+        self.assertEqual(len(qset), 1)
+        self.assertEqual(len(qset[0].text), 4 * 4000)
+        qset = Page.objects.filter(text__contains=F('id'))
+        self.assertEqual(len(qset), 0)
+
+
 class SelectRelatedTests(TestCase):
     def test_tickets_3045_3288(self):
         # Once upon a time, select_related() with circular relations would loop

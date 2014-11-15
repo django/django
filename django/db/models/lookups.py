@@ -10,12 +10,13 @@ from .query_utils import QueryWrapper
 
 
 class RegisterLookupMixin(object):
-    def _get_lookup(self, lookup_name):
+    @classmethod
+    def _get_lookup(cls, lookup_name):
         try:
-            return self.class_lookups[lookup_name]
+            return cls.class_lookups[lookup_name]
         except KeyError:
             # To allow for inheritance, check parent class' class_lookups.
-            for parent in inspect.getmro(self.__class__):
+            for parent in inspect.getmro(cls):
                 if 'class_lookups' not in parent.__dict__:
                     continue
                 if lookup_name in parent.class_lookups:
