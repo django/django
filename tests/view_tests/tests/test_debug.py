@@ -17,7 +17,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.template.base import TemplateDoesNotExist
 from django.test import TestCase, RequestFactory, override_settings
-from django.test.utils import override_with_test_loader
 from django.utils.encoding import force_text, force_bytes
 from django.utils import six
 from django.views.debug import CallableSettingWrapper, ExceptionReporter
@@ -66,14 +65,17 @@ class DebugViewTests(TestCase):
 
     def test_403(self):
         # Ensure no 403.html template exists to test the default case.
-        with override_with_test_loader({}):
+        with override_settings(TEMPLATE_LOADERS=[]):
             response = self.client.get('/raises403/')
             self.assertContains(response, '<h1>403 Forbidden</h1>', status_code=403)
 
     def test_403_template(self):
         # Set up a test 403.html template.
-        with override_with_test_loader({'403.html': 'This is a test template '
-                                        'for a 403 Forbidden error.'}):
+        with override_settings(TEMPLATE_LOADERS=[
+            ('django.template.loaders.locmem.Loader', {
+                '403.html': 'This is a test template for a 403 Forbidden error.',
+            })
+        ]):
             response = self.client.get('/raises403/')
             self.assertContains(response, 'test template', status_code=403)
 
