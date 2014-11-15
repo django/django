@@ -183,3 +183,6 @@ Bugfixes
   convention in the template engine (:ticket:`23831`).
 
 * Prevented extraneous ``DROP DEFAULT`` SQL in migrations (:ticket:`23581`).
+
+* Restored the ability to use more than five levels of subqueries
+  (:ticket:`23758`).
