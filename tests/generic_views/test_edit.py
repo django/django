@@ -14,6 +14,7 @@ from django.views.generic.edit import FormMixin, ModelFormMixin, CreateView
 
 from . import views
 from .models import Artist, Author
+from .test_forms import AuthorForm
 
 
 class FormMixinTests(TestCase):
@@ -203,6 +204,16 @@ class CreateViewTests(TestCase):
             "Using ModelFormMixin (base class of MyCreateView) without the "
             "'fields' attribute is prohibited."
         )
+        with self.assertRaisesMessage(ImproperlyConfigured, message):
+            MyCreateView().get_form_class()
+
+    def test_define_both_fields_and_form_class(self):
+        class MyCreateView(CreateView):
+            model = Author
+            form_class = AuthorForm
+            fields = ['name']
+
+        message = "Specifying both 'fields' and 'form_class' is not permitted."
         with self.assertRaisesMessage(ImproperlyConfigured, message):
             MyCreateView().get_form_class()
 

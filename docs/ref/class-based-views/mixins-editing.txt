@@ -115,6 +115,17 @@ ModelFormMixin
     :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` attributes,
     describing the type of object that the ``ModelForm`` is manipulating.
 
+    If you specify both the
+    :attr:`~django.views.generic.edit.ModelFormMixin.fields` and
+    :attr:`~django.views.generic.edit.FormMixin.form_class` attributes, an
+    :exc:`~django.core.exceptions.ImproperlyConfigured` exception will be
+    raised.
+
+    .. versionchanged:: 1.8
+
+        Previously if both ``fields`` and ``form_class`` were specified,
+        ``fields`` was silently ignored.
+
     **Mixins**
 
     * :class:`django.views.generic.edit.FormMixin`
