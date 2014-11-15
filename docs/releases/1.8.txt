@@ -1029,6 +1029,13 @@ The decorators :func:`~django.test.override_settings` and
 class decorators. As a consequence, when overriding ``setUpClass()`` or
 ``tearDownClass()``, the ``super`` implementation should always be called.
 
+``django.template.loader.BaseLoader``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.template.loader.BaseLoader`` was renamed to
+``django.template.loaders.base.Loader``. If you've written a custom template
+loader that inherits ``BaseLoader``, you must inherit ``Loader`` instead.
+
 .. removed-features-1.8:
 
 Features removed in 1.8
