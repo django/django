@@ -826,10 +826,10 @@ class Model(six.with_metaclass(ModelBase)):
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
-    def prepare_database_save(self, unused):
+    def prepare_database_save(self, field):
         if self.pk is None:
             raise ValueError("Unsaved model instance %r cannot be used in an ORM query." % self)
-        return self.pk
+        return getattr(self, field.rel.field_name)
 
     def clean(self):
         """

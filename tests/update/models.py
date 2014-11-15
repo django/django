@@ -42,3 +42,11 @@ class C(models.Model):
 
 class D(C):
     a = models.ForeignKey(A)
+
+
+class Foo(models.Model):
+    target = models.CharField(max_length=10, unique=True)
+
+
+class Bar(models.Model):
+    foo = models.ForeignKey(Foo, to_field='target')
