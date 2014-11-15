@@ -958,6 +958,10 @@ If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 (default in new projects) the :djadmin:`runserver` command will be overridden
 with its own :ref:`runserver<staticfiles-runserver>` command.
 
+.. versionadded:: 1.7
+
+If :djadmin:`migrate` was not executed before, a table for migrations will be created at first run of runserver.
+
 .. django-admin-option:: --noreload
 
 Use the ``--noreload`` option to disable the use of the auto-reloader. This
