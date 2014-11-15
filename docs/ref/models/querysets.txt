@@ -220,9 +220,18 @@ annotate
 
 .. method:: annotate(*args, **kwargs)
 
-Annotates each object in the ``QuerySet`` with the provided list of
-aggregate values (averages, sums, etc) that have been computed over
-the objects that are related to the objects in the ``QuerySet``.
+Annotates each object in the ``QuerySet`` with the provided list of :doc:`query
+expressions </ref/models/expressions>`. An expression may be a simple value, a
+reference to a field on the model (or any related models), or an aggregate
+expression (averages, sums, etc) that has been computed over the objects that
+are related to the objects in the ``QuerySet``.
+
+.. versionadded:: 1.8
+
+    Previous versions of Django only allowed aggregate functions to be used as
+    annotations. It is now possible to annotate a model with all kinds of
+    expressions.
+
 Each argument to ``annotate()`` is an annotation that will be added
 to each object in the ``QuerySet`` that is returned.
 
@@ -232,7 +241,9 @@ in `Aggregation Functions`_ below.
 Annotations specified using keyword arguments will use the keyword as
 the alias for the annotation. Anonymous arguments will have an alias
 generated for them based upon the name of the aggregate function and
-the model field that is being aggregated.
+the model field that is being aggregated. Only aggregate expressions
+that reference a single field can be anonymous arguments. Everything
+else must be a keyword argument.
 
 For example, if you were manipulating a list of blogs, you may want
 to determine how many entries have been made in each blog::
@@ -1886,12 +1897,15 @@ the ``QuerySet``. Each argument to ``aggregate()`` specifies a value that will
 be included in the dictionary that is returned.
 
 The aggregation functions that are provided by Django are described in
-`Aggregation Functions`_ below.
+`Aggregation Functions`_ below. Since aggregates are also :doc:`query
+expressions </ref/models/expressions>`, you may combine aggregates with other
+aggregates or values to create complex aggregates.
 
 Aggregates specified using keyword arguments will use the keyword as the name
 for the annotation. Anonymous arguments will have a name generated for them
 based upon the name of the aggregate function and the model field that is being
-aggregated.
+aggregated. Complex aggregates cannot use anonymous arguments and must specify
+a keyword argument as an alias.
 
 For example, when you are working with blog entries, you may want to know the
 number of authors that have contributed blog entries::
@@ -2667,8 +2681,9 @@ Aggregation functions
 
 Django provides the following aggregation functions in the
 ``django.db.models`` module. For details on how to use these
-aggregate functions, see
-:doc:`the topic guide on aggregation </topics/db/aggregation>`.
+aggregate functions, see :doc:`the topic guide on aggregation
+</topics/db/aggregation>`. See the :class:`~django.db.models.Aggregate`
+documentation to learn how to create your aggregates.
 
 .. warning::
 
@@ -2685,12 +2700,47 @@ aggregate functions, see
     instead of ``0`` if the ``QuerySet`` contains no entries. An exception is
     ``Count``, which does return ``0`` if the ``QuerySet`` is empty.
 
+All aggregates have the following parameters in common:
+
+``expression``
+~~~~~~~~~~~~~~
+
+A string that references a field on the model, or a :doc:`query expression
+</ref/models/expressions>`.
+
+.. versionadded:: 1.8
+
+    Aggregate functions are now able to reference multiple fields in complex
+    computations.
+
+``output_field``
+~~~~~~~~~~~~~~~~
+
+An optional argument that represents the :doc:`model field </ref/models/fields>`
+of the return value
+
+.. versionadded:: 1.8
+
+    The ``output_field`` argument was added.
+
+.. note::
+
+    When combining multiple field types, Django can only determine the
+    ``output_field`` if all fields are of the same type. Otherwise, you
+    must provide the ``output_field`` yourself.
+
+``**extra``
+~~~~~~~~~~~
+
+Keyword arguments that can provide extra context for the SQL generated
+by the aggregate.
+
 Avg
 ~~~
 
-.. class:: Avg(field)
+.. class:: Avg(expression, output_field=None, **extra)
 
-    Returns the mean value of the given field, which must be numeric.
+    Returns the mean value of the given expression, which must be numeric.
 
     * Default alias: ``<field>__avg``
     * Return type: ``float``
@@ -2698,9 +2748,10 @@ Avg
 Count
 ~~~~~
 
-.. class:: Count(field, distinct=False)
+.. class:: Count(expression, distinct=False, **extra)
 
-    Returns the number of objects that are related through the provided field.
+    Returns the number of objects that are related through the provided
+    expression.
 
     * Default alias: ``<field>__count``
     * Return type: ``int``
@@ -2716,29 +2767,29 @@ Count
 Max
 ~~~
 
-.. class:: Max(field)
+.. class:: Max(expression, output_field=None, **extra)
 
-    Returns the maximum value of the given field.
+    Returns the maximum value of the given expression.
 
     * Default alias: ``<field>__max``
-    * Return type: same as input field
+    * Return type: same as input field, or ``output_field`` if supplied
 
 Min
 ~~~
 
-.. class:: Min(field)
+.. class:: Min(expression, output_field=None, **extra)
 
-    Returns the minimum value of the given field.
+    Returns the minimum value of the given expression.
 
     * Default alias: ``<field>__min``
-    * Return type: same as input field
+    * Return type: same as input field, or ``output_field`` if supplied
 
 StdDev
 ~~~~~~
 
-.. class:: StdDev(field, sample=False)
+.. class:: StdDev(expression, sample=False, **extra)
 
-    Returns the standard deviation of the data in the provided field.
+    Returns the standard deviation of the data in the provided expression.
 
     * Default alias: ``<field>__stddev``
     * Return type: ``float``
@@ -2760,19 +2811,19 @@ StdDev
 Sum
 ~~~
 
-.. class:: Sum(field)
+.. class:: Sum(expression, output_field=None, **extra)
 
-    Computes the sum of all values of the given field.
+    Computes the sum of all values of the given expression.
 
     * Default alias: ``<field>__sum``
-    * Return type: same as input field
+    * Return type: same as input field, or ``output_field`` if supplied
 
 Variance
 ~~~~~~~~
 
-.. class:: Variance(field, sample=False)
+.. class:: Variance(expression, sample=False, **extra)
 
-    Returns the variance of the data in the provided field.
+    Returns the variance of the data in the provided expression.
 
     * Default alias: ``<field>__variance``
     * Return type: ``float``

@@ -296,6 +296,21 @@ class ExpressionsTests(TestCase):
         g = deepcopy(f)
         self.assertEqual(f.name, g.name)
 
+    def test_f_reuse(self):
+        f = F('id')
+        n = Number.objects.create(integer=-1)
+        c = Company.objects.create(
+            name="Example Inc.", num_employees=2300, num_chairs=5,
+            ceo=Employee.objects.create(firstname="Joe", lastname="Smith")
+        )
+        c_qs = Company.objects.filter(id=f)
+        self.assertEqual(c_qs.get(), c)
+        # Reuse the same F-object for another queryset
+        n_qs = Number.objects.filter(id=f)
+        self.assertEqual(n_qs.get(), n)
+        # The original query still works correctly
+        self.assertEqual(c_qs.get(), c)
+
 
 class ExpressionsNumericTests(TestCase):
 
@@ -362,11 +377,15 @@ class ExpressionsNumericTests(TestCase):
         Complex expressions of different connection types are possible.
         """
         n = Number.objects.create(integer=10, float=123.45)
-        self.assertEqual(Number.objects.filter(pk=n.pk)
-            .update(float=F('integer') + F('float') * 2), 1)
+        self.assertEqual(Number.objects.filter(pk=n.pk).update(
+            float=F('integer') + F('float') * 2), 1)
 
         self.assertEqual(Number.objects.get(pk=n.pk).integer, 10)
         self.assertEqual(Number.objects.get(pk=n.pk).float, Approximate(256.900, places=3))
+
+    def test_incorrect_field_expression(self):
+        with self.assertRaisesRegexp(FieldError, "Cannot resolve keyword u?'nope' into field.*"):
+            list(Employee.objects.filter(firstname=F('nope')))
 
 
 class ExpressionOperatorTests(TestCase):

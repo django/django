@@ -186,7 +186,7 @@ class BaseSpatialOperations(object):
         """
         raise NotImplementedError('Distance operations not available on this spatial backend.')
 
-    def get_geom_placeholder(self, f, value):
+    def get_geom_placeholder(self, f, value, qn):
         """
         Returns the placeholder for the given geometry field with the given
         value.  Depending on the spatial backend, the placeholder may contain a
@@ -194,16 +194,6 @@ class BaseSpatialOperations(object):
         backend.
         """
         raise NotImplementedError('subclasses of BaseSpatialOperations must provide a geo_db_placeholder() method')
-
-    def get_expression_column(self, evaluator):
-        """
-        Helper method to return the quoted column string from the evaluator
-        for its expression.
-        """
-        for expr, col_tup in evaluator.cols:
-            if expr is evaluator.expression:
-                return '%s.%s' % tuple(map(self.quote_name, col_tup))
-        raise Exception("Could not find the column for the expression.")
 
     # Spatial SQL Construction
     def spatial_aggregate_sql(self, agg):

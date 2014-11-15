@@ -205,6 +205,9 @@ both is fine, and will incur minimal overhead.
             # ...
             return render(request, "a_template.html", c)
 
+    If you are using class-based views, you can refer to
+    :ref:`Decorating class-based views<decorating-class-based-views>`.
+
 Rejected requests
 =================
 
@@ -283,8 +286,10 @@ will require a CSRF token to be inserted you should use the
   @cache_page(60 * 15)
   @csrf_protect
   def my_view(request):
-      # ...
+      ...
 
+If you are using class-based views, you can refer to :ref:`Decorating
+class-based views<decorating-class-based-views>`.
 
 Testing
 =======
@@ -326,6 +331,10 @@ section.
 
 Utilities
 ---------
+
+The examples below assume you are using function-based views. If you
+are working with class-based views, you can refer to :ref:`Decorating
+class-based views<decorating-class-based-views>`.
 
 .. function:: csrf_exempt(view)
 
