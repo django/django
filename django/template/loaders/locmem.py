@@ -13,8 +13,7 @@ class Loader(BaseLoader):
     def __init__(self, templates_dict):
         self.templates_dict = templates_dict
 
-    def load_template_source(self, template_name, template_dirs=None,
-                             skip_template=None):
+    def load_template_source(self, template_name, template_dirs=None):
         try:
             return self.templates_dict[template_name], template_name
         except KeyError:
