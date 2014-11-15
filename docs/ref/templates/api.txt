@@ -967,10 +967,15 @@ with the Django loading and rendering system!
 
 The next step is to write a ``Loader`` class that returns instances of our custom
 template class instead of the default :class:`~django.template.Template`. Custom ``Loader``
-classes should inherit from ``django.template.loader.BaseLoader`` and override
+classes should inherit from ``django.template.loaders.base.Loader`` and override
 the ``load_template_source()`` method, which takes a ``template_name`` argument,
 loads the template from disk (or elsewhere), and returns a tuple:
 ``(template_string, template_origin)``.
+
+.. versionchanged:: 1.8
+
+    ``django.template.loaders.base.Loader`` used to be defined at
+    ``django.template.loader.BaseLoader``.
 
 The ``load_template()`` method of the ``Loader`` class retrieves the template
 string by calling ``load_template_source()``, instantiates a ``Template`` from

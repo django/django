@@ -221,7 +221,7 @@ class TemplateLoaderTests(TestCase):
         # We rely on the fact that runtests.py sets up TEMPLATE_DIRS to
         # point to a directory containing a login.html file. Also that
         # the file system and app directories loaders both inherit the
-        # load_template method from the BaseLoader class, so we only need
+        # load_template method from the base Loader class, so we only need
         # to test one of them.
         load_name = 'login.html'
         template = loader.get_template(load_name)
@@ -306,7 +306,7 @@ class TemplateLoaderTests(TestCase):
     def test_extends_include_missing_cachedloader(self):
         """
         Same as test_extends_include_missing_baseloader, only tests
-        behavior of the cached loader instead of BaseLoader.
+        behavior of the cached loader instead of base loader.
         """
         cache_loader = cached.Loader(('',))
         cache_loader._cached_loaders = (app_directories.Loader(),)

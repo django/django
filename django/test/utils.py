@@ -14,8 +14,8 @@ from django.core import mail
 from django.core.signals import request_started
 from django.db import reset_queries
 from django.http import request
-from django.template import Template, loader, TemplateDoesNotExist
-from django.template.loaders import cached
+from django.template import Template, loader
+from django.template.loaders import cached, locmem
 from django.test.signals import template_rendered, setting_changed
 from django.utils import six
 from django.utils.decorators import ContextDecorator
@@ -189,20 +189,14 @@ class override_template_loaders(ContextDecorator):
         delattr(loader, RESTORE_LOADERS_ATTR)
 
 
-class TestTemplateLoader(loader.BaseLoader):
-    "A custom template loader that loads templates from a dictionary."
-    is_usable = True
+class TestTemplateLoader(locmem.Loader):
 
-    def __init__(self, templates_dict):
-        self.templates_dict = templates_dict
-
-    def load_template_source(self, template_name, template_dirs=None,
-                             skip_template=None):
-        try:
-            return (self.templates_dict[template_name],
-                    "test:%s" % template_name)
-        except KeyError:
-            raise TemplateDoesNotExist(template_name)
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.test.utils.TestTemplateLoader was renamed to "
+            "django.template.loaders.locmem.Loader.",
+            RemovedInDjango19Warning, stacklevel=2)
+        super(TestTemplateLoader, self).__init__(*args, **kwargs)
 
 
 class override_with_test_loader(override_template_loaders):
@@ -238,11 +232,11 @@ class override_with_test_loader(override_template_loaders):
     @classmethod
     def _get_loader(cls, templates_dict, use_cached_loader=False):
         if use_cached_loader:
-            loader = cached.Loader(['TestTemplateLoader'])
-            loader._cached_loaders = [TestTemplateLoader(templates_dict)]
+            loader = cached.Loader(['django.template.loaders.locmem.Loader'])
+            loader._cached_loaders = [locmem.Loader(templates_dict)]
             return loader
         else:
-            return TestTemplateLoader(templates_dict)
+            return locmem.Loader(templates_dict)
 
 
 class override_settings(object):
