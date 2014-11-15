@@ -12,6 +12,7 @@ from django.http import (HttpResponse, HttpResponseNotFound, HttpRequest,
     build_request_repr)
 from django.template import Template, Context, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
+from django.views.decorators.csp import csp_exempt
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.encoding import force_bytes, smart_text
@@ -80,6 +81,7 @@ def get_safe_settings():
     return settings_dict
 
 
+@csp_exempt
 def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
     """
     Create a technical server error response. The last three arguments are
@@ -503,6 +505,7 @@ class ExceptionReporter(object):
         return list
 
 
+@csp_exempt
 def technical_404_response(request, exception):
     "Create a technical 404 error response. The exception should be the Http404."
     try:

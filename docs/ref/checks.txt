@@ -461,6 +461,13 @@ of the :djadmin:`check` command:
   ``'DENY'``. The default is ``'SAMEORIGIN'``, but unless there is a good reason
   for your site to serve other parts of itself in a frame, you should change
   it to ``'DENY'``.
+* **security.W020**: Your :setting:`SECURE_CSP` setting is not configured,
+  so your pages will not be served with an ``'content-security-policy'`` header.
+  You should consider enabling this header to activate the browser's
+  Content Security Policy protection.
+* **security.W021**: Your :setting:`SECURE_CSP_REPORT_ONLY` setting is enabled,
+  so browsers will only report Content Security Policy violations but will not
+  enforce the policy set in :setting:`SECURE_CSP`.
 
 Sites
 -----

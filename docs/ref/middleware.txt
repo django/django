@@ -193,6 +193,8 @@ enabled or disabled with a setting.
 * :setting:`SECURE_REDIRECT_EXEMPT`
 * :setting:`SECURE_SSL_HOST`
 * :setting:`SECURE_SSL_REDIRECT`
+* :setting:`SECURE_CSP`
+* :setting:`SECURE_CSP_REPORT_ONLY`
 
 .. _http-strict-transport-security:
 
@@ -334,6 +336,96 @@ in the :setting:`SECURE_REDIRECT_EXEMPT` setting.
     may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
 .. _nginx: http://nginx.org
+
+.. _content-security-policy:
+
+Content Security Policy
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Some browers have the ability to help mitigate certain attacks using the 
+`Content-Security-Policy header`_, including Cross Site Scripting (XSS) and data
+injection attacks.
+
+If you set the :setting:`SECURE_CSP` setting to a dictionary of Content Security
+Policy directives, the ``SecurityMiddleware`` will set the
+`Content-Security-Header` on every response. Example policy::
+
+	SECURE_CSP = {
+		'default-src': "'self' www.djangoproject.com"
+    }
+
+The :setting:`SECURE_CSP_REPORT_ONLY` setting works in the same way but uses
+the `Content-Security-Policy-Report-Only` header, which instructs browsers to
+not enforce the policy and only report violations. One can use both headers to
+enforce one policy and receive violation reports for the other policy. This can
+be used to test (stricter) policies before enforcing them. Example policy::
+
+	SECURE_CSP_REPORT_ONLY = {
+		'default-src': "'self' data:",
+		'report-uri': "/csp-reports/",
+    }
+
+Both settings support the `report-uri` directive, see `Content-Security-Policy
+header`_. The specified URI will receive JSON encoded data with information
+about violations. This data is posted without a CSRF token, so the view needs to
+be exempt from CSRF protection. One could setup a view and serve it on this URI,
+to log all violations::
+
+	import json
+    import logging
+	from django import http
+	from django.views.decorators.csrf import csrf_exempt
+
+    logger = logging.getLogger(__name__)
+
+	@csrf_exempt
+	def csp_report(request):
+		try:
+			data = json.loads(request.body)
+		except json.JSONDecodeError:
+			return http.HttpResponseBadRequest()
+
+		logger.warning(data)
+
+		return http.HttpResponse()
+
+.. function:: csp_exempt(view)
+
+    This decorator marks a view as being exempt from the header set by
+    the middleware. Example::
+
+        from django.views.decorators.csp import csp_exempt
+        from django.http import HttpResponse
+
+        @csp_exempt
+        def my_view(request):
+            return HttpResponse('Hello world')
+
+.. function:: csp_header(policy, report_only=False)
+
+	To apply a custom Content Security Policy to a specific view, one can use
+	the ``csp_header``. For example::
+
+		from django.views.decorators.csp import csp_header
+		from django.http import HttpResponse
+
+		@csp_header({'default-src': "'self'"})
+		def my_view(request):
+			return HttpResponse('Hello world')
+
+	``csp_header`` can also take an optional keyword argument, ``report_only``,
+	which directs the decorator to use use the Content-Security-Policy-Report-Only
+	header::
+
+		from django.views.decorators.csp import csp_header
+		from django.http import HttpResponse
+
+		@csp_header({'default-src': "'self'"}, report_only=True)
+		def my_view(request):
+			return HttpResponse('Hello world')
+
+.. _Content-Security-Policy header: http://www.w3.org/TR/CSP/
+.. _Content Security Policy explained: https://developer.mozilla.org/en-US/docs/Web/Security/CSP
 
 Session middleware
 ------------------
