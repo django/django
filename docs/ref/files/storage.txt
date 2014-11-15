@@ -82,17 +82,25 @@ The Storage Class
     behaviors that all other storage systems can inherit or override
     as necessary.
 
+    .. note::
+        For methods returning naive ``datetime`` objects, the
+        effective timezone used will be the current value of
+        ``os.environ['TZ']``; note that this is usually set from
+        Django's :setting:`TIME_ZONE`.
+
     .. method:: accessed_time(name)
 
-        Returns a ``datetime`` object containing the last accessed time of the
-        file. For storage systems that aren't able to return the last accessed
-        time this will raise ``NotImplementedError`` instead.
+        Returns a naive ``datetime`` object containing the last
+        accessed time of the file. For storage systems that aren't
+        able to return the last accessed time this will raise
+        ``NotImplementedError`` instead.
 
     .. method:: created_time(name)
 
-        Returns a ``datetime`` object containing the creation time of the file.
-        For storage systems that aren't able to return the creation time this
-        will raise ``NotImplementedError`` instead.
+        Returns a naive ``datetime`` object containing the creation
+        time of the file.  For storage systems that aren't able to
+        return the creation time this will raise
+        ``NotImplementedError`` instead.
 
     .. method:: delete(name)
 
@@ -139,9 +147,10 @@ The Storage Class
 
     .. method:: modified_time(name)
 
-        Returns a ``datetime`` object containing the last modified time. For
-        storage systems that aren't able to return the last modified time, this
-        will raise ``NotImplementedError`` instead.
+        Returns a naive ``datetime`` object containing the last
+        modified time. For storage systems that aren't able to return
+        the last modified time, this will raise
+        ``NotImplementedError`` instead.
 
     .. method:: open(name, mode='rb')
 
