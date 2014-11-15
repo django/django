@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import datetime
 import time
 
 from django.core import signing
@@ -126,9 +127,13 @@ class TestTimestampSigner(TestCase):
 
             self.assertEqual(signer.unsign(ts), value)
             time.time = lambda: 123456800
+            self.assertEqual(signer.unsign(ts, max_age=13), value)
             self.assertEqual(signer.unsign(ts, max_age=12), value)
-            self.assertEqual(signer.unsign(ts, max_age=11), value)
+            # max_age parameter can also accept a datetime.timedelta object
+            self.assertEqual(signer.unsign(ts, max_age=datetime.timedelta(seconds=11)), value)
             self.assertRaises(
                 signing.SignatureExpired, signer.unsign, ts, max_age=10)
+            with self.assertRaises(signing.SignatureExpired):
+                self.assertEqual(signer.unsign(ts, max_age=datetime.timedelta(seconds=10)), value)
         finally:
             time.time = _time
