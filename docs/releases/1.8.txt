@@ -312,6 +312,9 @@ Management Commands
   :djadminopt:`--exclude` which allows exclusion of specific locales from
   processing.
 
+* :djadmin:`compilemessages` now has a ``--use-fuzzy`` or ``-f`` option which
+  includes fuzzy translations into compiled files.
+
 * The :djadminopt:`--ignorenonexistent` option of the :djadmin:`loaddata`
   management command now ignores data for models that no longer exist.
 
