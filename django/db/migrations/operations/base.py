@@ -104,10 +104,10 @@ class Operation(object):
         if it's a proxy, if it's managed, and if it's swapped out.
         """
         return (
-            router.allow_migrate(connection_alias, model) and
             not model._meta.proxy and
             not model._meta.swapped and
-            model._meta.managed
+            model._meta.managed and
+            router.allow_migrate(connection_alias, model)
         )
 
     def __repr__(self):
