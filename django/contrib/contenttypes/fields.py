@@ -10,7 +10,7 @@ from django.db.models import signals, FieldDoesNotExist, DO_NOTHING
 from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
-from django.db.models.sql.datastructures import Col
+from django.db.models.expressions import Col
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_text, python_2_unicode_compatible
 

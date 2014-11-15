@@ -178,7 +178,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
             dist_param = value
         return [dist_param]
 
-    def get_geom_placeholder(self, f, value):
+    def get_geom_placeholder(self, f, value, qn):
         """
         Provides a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
@@ -186,14 +186,15 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         """
         def transform_value(value, srid):
             return not (value is None or value.srid == srid)
-        if hasattr(value, 'expression'):
+        if hasattr(value, 'as_sql'):
             if transform_value(value, f.srid):
                 placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
             else:
                 placeholder = '%s'
             # No geometry value used for F expression, substitute in
             # the column name instead.
-            return placeholder % self.get_expression_column(value)
+            sql, _ = qn.compile(value)
+            return placeholder % sql
         else:
             if transform_value(value, f.srid):
                 # Adding Transform() to the SQL placeholder.
@@ -255,7 +256,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         agg_name = agg_name.lower()
         if agg_name == 'union':
             agg_name += 'agg'
-        sql_template = self.select % '%(function)s(%(field)s)'
+        sql_template = self.select % '%(function)s(%(expressions)s)'
         sql_function = getattr(self, agg_name)
         return sql_template, sql_function
 
