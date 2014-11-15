@@ -193,6 +193,24 @@ non-uniform locales, so you might need to:
   differences when locales are changed and evaluate its impact on
   predictable behavior of your command.
 
+Testing Management Commands
+===========================
+
+Management commands can be tested with the
+:func:`django.core.management.call_command` function. The output can be
+redirected into a ``StringIO`` instance.
+
+::
+
+    from django.core.management import call_command
+    from django.utils.six import StringIO
+
+    class SomeTest(TestCase):
+        def test_command(self):
+            out = StringIO()
+            call_command('your_command', stdout=out)
+            self.assertIn('Expected output', out.getvalue())
+
 Command objects
 ===============
 
