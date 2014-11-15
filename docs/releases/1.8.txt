@@ -783,6 +783,11 @@ Miscellaneous
   ``<WSGIRequest: GET '/somepath/'>``). This won't change the behavior of
   the :class:`~django.views.debug.SafeExceptionReporterFilter` class.
 
+* Class-based views that use :class:`~django.views.generic.edit.ModelFormMixin`
+  will raise an :exc:`~django.core.exceptions.ImproperlyConfigured` exception
+  when both the ``fields`` and ``form_class`` attributes are specified.
+  Previously, ``fields`` was silently ignored.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
