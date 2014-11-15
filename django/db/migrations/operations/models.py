@@ -20,6 +20,18 @@ class CreateModel(Operation):
         self.options = options or {}
         self.bases = bases or (models.Model,)
 
+    def deconstruct(self):
+        kwargs = {}
+        if self.options:
+            kwargs['options'] = self.options
+        if self.bases and self.bases != (models.Model,):
+            kwargs['bases'] = self.bases
+        return (
+            self.__class__.__name__,
+            [self.name, self.fields],
+            kwargs
+        )
+
     def state_forwards(self, app_label, state):
         state.models[app_label, self.name.lower()] = ModelState(
             app_label,
@@ -61,15 +73,6 @@ class CreateModel(Operation):
                 return True
         return False
 
-    def __eq__(self, other):
-        return (
-            (self.__class__ == other.__class__) and
-            (self.name == other.name) and
-            (self.options == other.options) and
-            (self.bases == other.bases) and
-            ([(k, f.deconstruct()[1:]) for k, f in self.fields] == [(k, f.deconstruct()[1:]) for k, f in other.fields])
-        )
-
 
 class DeleteModel(Operation):
     """
@@ -78,6 +81,13 @@ class DeleteModel(Operation):
 
     def __init__(self, name):
         self.name = name
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.name],
+            {}
+        )
 
     def state_forwards(self, app_label, state):
         del state.models[app_label, self.name.lower()]
@@ -109,6 +119,13 @@ class RenameModel(Operation):
     def __init__(self, old_name, new_name):
         self.old_name = old_name
         self.new_name = new_name
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.old_name, self.new_name],
+            {}
+        )
 
     def state_forwards(self, app_label, state):
         # Get all of the related objects we need to repoint
@@ -196,6 +213,13 @@ class AlterModelTable(Operation):
         self.name = name
         self.table = table
 
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.name, self.table],
+            {}
+        )
+
     def state_forwards(self, app_label, state):
         state.models[app_label, self.name.lower()].options["db_table"] = self.table
 
@@ -241,6 +265,13 @@ class AlterUniqueTogether(Operation):
         unique_together = normalize_together(unique_together)
         self.unique_together = set(tuple(cons) for cons in unique_together)
 
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.name, self.unique_together],
+            {}
+        )
+
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
         model_state.options[self.option_name] = self.unique_together
@@ -279,6 +310,13 @@ class AlterIndexTogether(Operation):
         index_together = normalize_together(index_together)
         self.index_together = set(tuple(cons) for cons in index_together)
 
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.name, self.index_together],
+            {}
+        )
+
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
         model_state.options[self.option_name] = self.index_together
@@ -313,6 +351,13 @@ class AlterOrderWithRespectTo(Operation):
     def __init__(self, name, order_with_respect_to):
         self.name = name
         self.order_with_respect_to = order_with_respect_to
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.name, self.order_with_respect_to],
+            {}
+        )
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
@@ -365,6 +410,13 @@ class AlterModelOptions(Operation):
     def __init__(self, name, options):
         self.name = name
         self.options = options
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.name, self.options],
+            {}
+        )
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
