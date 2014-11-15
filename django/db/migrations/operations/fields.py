@@ -16,6 +16,16 @@ class AddField(Operation):
         self.field = field
         self.preserve_default = preserve_default
 
+    def deconstruct(self):
+        kwargs = {}
+        if self.preserve_default is not True:
+            kwargs['preserve_default'] = self.preserve_default
+        return (
+            self.__class__.__name__,
+            [self.model_name, self.name, self.field],
+            kwargs
+        )
+
     def state_forwards(self, app_label, state):
         # If preserve default is off, don't use the default for future state
         if not self.preserve_default:
@@ -47,14 +57,6 @@ class AddField(Operation):
     def describe(self):
         return "Add field %s to %s" % (self.name, self.model_name)
 
-    def __eq__(self, other):
-        return (
-            (self.__class__ == other.__class__) and
-            (self.name == other.name) and
-            (self.model_name.lower() == other.model_name.lower()) and
-            (self.field.deconstruct()[1:] == other.field.deconstruct()[1:])
-        )
-
     def references_model(self, name, app_label=None):
         return name.lower() == self.model_name.lower()
 
@@ -70,6 +72,13 @@ class RemoveField(Operation):
     def __init__(self, model_name, name):
         self.model_name = model_name
         self.name = name
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.model_name, self.name],
+            {}
+        )
 
     def state_forwards(self, app_label, state):
         new_fields = []
@@ -110,6 +119,16 @@ class AlterField(Operation):
         self.field = field
         self.preserve_default = preserve_default
 
+    def deconstruct(self):
+        kwargs = {}
+        if self.preserve_default is not True:
+            kwargs['preserve_default'] = self.preserve_default
+        return (
+            self.__class__.__name__,
+            [self.model_name, self.name, self.field],
+            kwargs
+        )
+
     def state_forwards(self, app_label, state):
         if not self.preserve_default:
             field = self.field.clone()
@@ -146,14 +165,6 @@ class AlterField(Operation):
     def describe(self):
         return "Alter field %s on %s" % (self.name, self.model_name)
 
-    def __eq__(self, other):
-        return (
-            (self.__class__ == other.__class__) and
-            (self.name == other.name) and
-            (self.model_name.lower() == other.model_name.lower()) and
-            (self.field.deconstruct()[1:] == other.field.deconstruct()[1:])
-        )
-
     def references_model(self, name, app_label=None):
         return name.lower() == self.model_name.lower()
 
@@ -170,6 +181,13 @@ class RenameField(Operation):
         self.model_name = model_name
         self.old_name = old_name
         self.new_name = new_name
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.model_name, self.old_name, self.new_name],
+            {}
+        )
 
     def state_forwards(self, app_label, state):
         # Rename the field

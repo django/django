@@ -5,6 +5,13 @@ class TestOperation(Operation):
     def __init__(self):
         pass
 
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [],
+            {}
+        )
+
     @property
     def reversible(self):
         return True
