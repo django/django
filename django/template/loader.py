@@ -1,30 +1,3 @@
-# Wrapper for loading templates from storage of some sort (e.g. filesystem, database).
-#
-# This uses the TEMPLATE_LOADERS setting, which is a list of loaders to use.
-# Each loader is expected to have this interface:
-#
-#    callable(name, dirs=[])
-#
-# name is the template name.
-# dirs is an optional list of directories to search instead of TEMPLATE_DIRS.
-#
-# The loader should return a tuple of (template_source, path). The path returned
-# might be shown to the user for debugging purposes, so it should identify where
-# the template was loaded from.
-#
-# A loader may return an already-compiled template instead of the actual
-# template source. In that case the path returned should be None, since the
-# path information is associated with the template during the compilation,
-# which has already been done.
-#
-# Each loader should have an "is_usable" attribute set. This is a boolean that
-# specifies whether the loader can be used in this Python installation. Each
-# loader is responsible for setting this when it's initialized.
-#
-# For example, the eggs loader (which is capable of loading templates from
-# Python eggs) sets is_usable to False if the "pkg_resources" module isn't
-# installed, because pkg_resources is necessary to read eggs.
-
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
