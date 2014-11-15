@@ -48,6 +48,13 @@ class TestSaveLoad(TestCase):
         loaded = IntegerArrayModel.objects.get()
         self.assertEqual(loaded.field, [1])
 
+    def test_default_null(self):
+        instance = NullableIntegerArrayModel()
+        instance.save()
+        loaded = NullableIntegerArrayModel.objects.get(pk=instance.pk)
+        self.assertEqual(loaded.field, None)
+        self.assertEqual(instance.field, loaded.field)
+
     def test_null_handling(self):
         instance = NullableIntegerArrayModel(field=None)
         instance.save()

@@ -100,7 +100,7 @@ class ArrayField(Field):
             if callable(self.default):
                 return self.default()
             return self.default
-        return ''
+        return None
 
     def value_to_string(self, obj):
         values = []
