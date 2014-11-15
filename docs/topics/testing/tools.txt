@@ -1481,6 +1481,25 @@ manually, assign the empty list to ``mail.outbox``::
     # Empty the test outbox
     mail.outbox = []
 
+.. _topics-testing-management-commands:
+
+Management Commands
+-------------------
+
+Management commands can be tested with the
+:func:`~django.core.management.call_command` function. The output can be
+redirected into a ``StringIO`` instance::
+
+    from django.core.management import call_command
+    from django.test import TestCase
+    from django.utils.six import StringIO
+
+    class ClosepollTest(TestCase):
+        def test_command_output(self):
+            out = StringIO()
+            call_command('closepoll', stdout=out)
+            self.assertIn('Expected output', out.getvalue())
+
 .. _skipping-tests:
 
 Skipping tests

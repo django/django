@@ -178,6 +178,12 @@ non-uniform locales, so you might need to:
   differences when locales are changed and evaluate its impact on
   predictable behavior of your command.
 
+Testing
+=======
+
+Information on how to test custom management commands can be found in the
+:ref:`testing docs <topics-testing-management-commands>`.
+
 Command objects
 ===============
 
