@@ -238,9 +238,11 @@ class override_with_test_loader(override_template_loaders):
     @classmethod
     def _get_loader(cls, templates_dict, use_cached_loader=False):
         if use_cached_loader:
-            loader = cached.Loader(('TestTemplateLoader',))
-            loader._cached_loaders = TestTemplateLoader(templates_dict)
-        return TestTemplateLoader(templates_dict)
+            loader = cached.Loader(['TestTemplateLoader'])
+            loader._cached_loaders = [TestTemplateLoader(templates_dict)]
+            return loader
+        else:
+            return TestTemplateLoader(templates_dict)
 
 
 class override_settings(object):
