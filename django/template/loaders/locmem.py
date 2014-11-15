@@ -16,7 +16,6 @@ class Loader(BaseLoader):
     def load_template_source(self, template_name, template_dirs=None,
                              skip_template=None):
         try:
-            return (self.templates_dict[template_name],
-                    "test:%s" % template_name)
+            return self.templates_dict[template_name], template_name
         except KeyError:
             raise TemplateDoesNotExist(template_name)
