@@ -26,9 +26,9 @@ class AddField(Operation):
         state.models[app_label, self.model_name.lower()].fields.append((self.name, field))
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+            from_model = from_state.render().get_model(app_label, self.model_name)
             field = to_model._meta.get_field_by_name(self.name)[0]
             if not self.preserve_default:
                 field.default = self.field.default
@@ -84,9 +84,9 @@ class RemoveField(Operation):
             schema_editor.remove_field(from_model, from_model._meta.get_field_by_name(self.name)[0])
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+            from_model = from_state.render().get_model(app_label, self.model_name)
             schema_editor.add_field(from_model, to_model._meta.get_field_by_name(self.name)[0])
 
     def describe(self):
@@ -121,9 +121,9 @@ class AlterField(Operation):
         ]
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+            from_model = from_state.render().get_model(app_label, self.model_name)
             from_field = from_model._meta.get_field_by_name(self.name)[0]
             to_field = to_model._meta.get_field_by_name(self.name)[0]
             # If the field is a relatedfield with an unresolved rel.to, just
@@ -186,9 +186,9 @@ class RenameField(Operation):
             ]
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+            from_model = from_state.render().get_model(app_label, self.model_name)
             schema_editor.alter_field(
                 from_model,
                 from_model._meta.get_field_by_name(self.old_name)[0],
@@ -196,9 +196,9 @@ class RenameField(Operation):
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+            from_model = from_state.render().get_model(app_label, self.model_name)
             schema_editor.alter_field(
                 from_model,
                 from_model._meta.get_field_by_name(self.new_name)[0],
