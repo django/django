@@ -165,18 +165,23 @@ the builtin gettext support. See :doc:`/topics/i18n/index`.
 Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
 specify the locale(s) to process. If not provided, all locales are processed.
 
-.. versionadded:: 1.8
-
 Use the :djadminopt:`--exclude` option (or its shorter version ``-x``) to
 specify the locale(s) to exclude from processing. If not provided, no locales
 are excluded.
 
+You can pass ``--use-fuzzy`` option (or ``-f``) to include fuzzy translations
+into compiled files.
+
+.. versionchanged:: 1.8
+
+    Added ``--exclude`` and ``--use-fuzzy`` options.
+
 Example usage::
 
     django-admin compilemessages --locale=pt_BR
-    django-admin compilemessages --locale=pt_BR --locale=fr
+    django-admin compilemessages --locale=pt_BR --locale=fr -f
     django-admin compilemessages -l pt_BR
-    django-admin compilemessages -l pt_BR -l fr
+    django-admin compilemessages -l pt_BR -l fr --use-fuzzy
     django-admin compilemessages --exclude=pt_BR
     django-admin compilemessages --exclude=pt_BR --exclude=fr
     django-admin compilemessages -x pt_BR
