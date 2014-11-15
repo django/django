@@ -8,7 +8,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('sitemap_url', nargs='?', default=None)
         parser.add_argument('site_domain', nargs='?', default=None)
-        parser.add_argument('url_scheme', narg='?', default='http')
+        parser.add_argument('is_secure', narg='?', default=False)
 
     def handle(self, *args, **options):
-        ping_google(sitemap_url=options['sitemap_url'], site_domain=options['site_domain'], scheme=options['url_scheme'])
+        ping_google(sitemap_url=options['sitemap_url'], site_domain=options['site_domain'],
+                    is_secure=options['is_secure'])
