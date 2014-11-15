@@ -15,6 +15,18 @@ class SeparateDatabaseAndState(Operation):
         self.database_operations = database_operations or []
         self.state_operations = state_operations or []
 
+    def deconstruct(self):
+        kwargs = {}
+        if self.database_operations:
+            kwargs['database_operations'] = self.database_operations
+        if self.state_operations:
+            kwargs['state_operations'] = self.state_operations
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs
+        )
+
     def state_forwards(self, app_label, state):
         for state_operation in self.state_operations:
             state_operation.state_forwards(app_label, state)
@@ -54,6 +66,18 @@ class RunSQL(Operation):
         self.sql = sql
         self.reverse_sql = reverse_sql
         self.state_operations = state_operations or []
+
+    def deconstruct(self):
+        kwargs = {}
+        if self.reverse_sql is not None:
+            kwargs['reverse_sql'] = self.reverse_sql
+        if self.state_operations:
+            kwargs['state_operations'] = self.state_operations
+        return (
+            self.__class__.__name__,
+            [self.sql],
+            kwargs
+        )
 
     @property
     def reversible(self):
@@ -111,6 +135,18 @@ class RunPython(Operation):
             if not callable(reverse_code):
                 raise ValueError("RunPython must be supplied with callable arguments")
             self.reverse_code = reverse_code
+
+    def deconstruct(self):
+        kwargs = {}
+        if self.reverse_code:
+            kwargs['reverse_code'] = self.reverse_code
+        if self.atomic is not True:
+            kwargs['atomic'] = self.atomic
+        return (
+            self.__class__.__name__,
+            [self.code],
+            kwargs
+        )
 
     @property
     def reversible(self):

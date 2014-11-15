@@ -1268,12 +1268,12 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, [
-            "RemoveField", "RemoveField", "DeleteModel", "RemoveField", "DeleteModel"
+            "RemoveField", "RemoveField", "RemoveField", "DeleteModel", "DeleteModel"
         ])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="publishers", model_name='author')
         self.assertOperationAttributes(changes, "testapp", 0, 1, name="author", model_name='contract')
-        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 3, name="publisher", model_name='contract')
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="publisher", model_name='contract')
+        self.assertOperationAttributes(changes, "testapp", 0, 3, name="Author")
         self.assertOperationAttributes(changes, "testapp", 0, 4, name="Contract")
 
     def test_non_circular_foreignkey_dependency_removal(self):
