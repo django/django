@@ -3,9 +3,7 @@ from django.utils.module_loading import import_string
 
 # Cache of actual callables.
 _standard_context_processors = None
-# We need the CSRF processor no matter what the user has in their settings,
-# because otherwise it is a security vulnerability, and we can't afford to leave
-# this to human error or failure to read migration instructions.
+# Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ('django.core.context_processors.csrf',)
 
 
