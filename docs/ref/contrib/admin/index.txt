@@ -1488,15 +1488,19 @@ templates used by the :class:`ModelAdmin` views:
     Returns a :class:`~django.forms.ModelForm` class for use in the admin add
     and change views, see :meth:`add_view` and :meth:`change_view`.
 
-    If you wanted to hide a field from non-superusers, for example, you could
-    override ``get_form`` as follows::
+    The base implementation uses :func:`~django.forms.models.modelform_factory`
+    to subclass :attr:`~form`, modified by attributes such as :attr:`~fields`
+    and :attr:`~exclude`. So, for example, if you wanted to offer additional
+    fields to superusers, you could swap in a different base form like so::
 
         class MyModelAdmin(admin.ModelAdmin):
             def get_form(self, request, obj=None, **kwargs):
-                self.exclude = []
-                if not request.user.is_superuser:
-                    self.exclude.append('field_to_hide')
+                if request.user.is_superuser:
+                    kwargs['form'] = MySuperuserForm
                 return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
+
+    You may also simply return a custom :class:`~django.forms.ModelForm` class
+    directly.
 
 .. method:: ModelAdmin.get_formsets(request, obj=None)
 
