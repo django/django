@@ -37,6 +37,7 @@ class MigrationOptimizer(object):
         """
         # Internal tracking variable for test assertions about # of loops
         self._iterations = 0
+        self._modification_index = 0
         while True:
             result = self.optimize_inner(operations, app_label)
             self._iterations += 1
@@ -50,14 +51,16 @@ class MigrationOptimizer(object):
         """
         new_operations = []
         for i, operation in enumerate(operations):
-            # Compare it to each operation after it
-            for j, other in enumerate(operations[i + 1:]):
-                result = self.reduce(operation, other, operations[i + 1:i + j + 1])
+            # Pairs before the previous modification have not changed and thus can be skipped.
+            j_start = max(i + 1, self._modification_index)
+            for j, other in enumerate(operations[j_start:]):
+                result = self.reduce(operation, other, operations[i + 1:j_start + j])
                 if result is not None:
                     # Optimize! Add result, then remaining others, then return
+                    self._modification_index = len(new_operations)
                     new_operations.extend(result)
-                    new_operations.extend(operations[i + 1:i + 1 + j])
-                    new_operations.extend(operations[i + j + 2:])
+                    new_operations.extend(operations[i + 1:j_start + j])
+                    new_operations.extend(operations[j_start + j + 1:])
                     return new_operations
                 if not self.can_optimize_through(operation, other, app_label):
                     new_operations.append(operation)
@@ -98,6 +101,11 @@ class MigrationOptimizer(object):
                 migrations.CreateModel,
                 migrations.RenameModel,
                 self.reduce_model_create_rename,
+            ),
+            (
+                migrations.CreateModel,
+                migrations.AlterModelTable,
+                self.reduce_create_model_alter_table,
             ),
             (
                 migrations.RenameModel,
@@ -198,6 +206,19 @@ class MigrationOptimizer(object):
                     other.new_name,
                     fields=operation.fields,
                     options=operation.options,
+                    bases=operation.bases,
+                )
+            ]
+
+    def reduce_create_model_alter_table(self, operation, other, in_between):
+        if operation.name.lower() == other.name.lower():
+            options = operation.options.copy()
+            options['db_table'] = other.table
+            return [
+                migrations.CreateModel(
+                    operation.name,
+                    fields=operation.fields,
+                    options=options,
                     bases=operation.bases,
                 )
             ]
