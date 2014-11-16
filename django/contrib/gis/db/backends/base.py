@@ -186,7 +186,7 @@ class BaseSpatialOperations(object):
         """
         raise NotImplementedError('Distance operations not available on this spatial backend.')
 
-    def get_geom_placeholder(self, f, value, qn):
+    def get_geom_placeholder(self, f, value, compiler):
         """
         Returns the placeholder for the given geometry field with the given
         value.  Depending on the spatial backend, the placeholder may contain a

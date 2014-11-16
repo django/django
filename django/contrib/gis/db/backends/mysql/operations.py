@@ -35,14 +35,14 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
     def geo_db_type(self, f):
         return f.geom_type
 
-    def get_geom_placeholder(self, f, value, qn):
+    def get_geom_placeholder(self, f, value, compiler):
         """
         The placeholder here has to include MySQL's WKT constructor.  Because
         MySQL does not support spatial transformations, there is no need to
         modify the placeholder based on the contents of the given value.
         """
         if hasattr(value, 'as_sql'):
-            placeholder, _ = qn.compile(value)
+            placeholder, _ = compiler.compile(value)
         else:
             placeholder = '%s(%%s)' % self.from_text
         return placeholder
