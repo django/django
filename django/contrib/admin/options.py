@@ -339,9 +339,9 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         except FieldDoesNotExist:
             return False
 
-        # Check whether this model is the origin of a M2M relationship
-        # in which case to_field has to be the pk on this model.
-        if opts.many_to_many and field.primary_key:
+        # Always allow referencing the primary key since it's already possible
+        # to get this information from the change view URL.
+        if field.primary_key:
             return True
 
         # Make sure at least one of the models registered for this site
@@ -352,8 +352,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
             for inline in admin.inlines:
                 registered_models.add(inline.model)
 
-        for related_object in (opts.get_all_related_objects(include_hidden=True) +
-                               opts.get_all_related_many_to_many_objects()):
+        for related_object in opts.get_all_related_objects(include_hidden=True):
             related_model = related_object.model
             if (any(issubclass(model, related_model) for model in registered_models) and
                     related_object.field.rel.get_related_field() == field):

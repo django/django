@@ -591,26 +591,30 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(calls), 1)
 
-        # Specifying a field referenced by another model should be allowed.
-        response = self.client.get("/test_admin/admin/admin_views/section/", {TO_FIELD_VAR: 'id'})
+        # #23839 - Primary key should always be allowed, even if the referenced model isn't registered.
+        response = self.client.get("/test_admin/admin/admin_views/notreferenced/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
         # Specifying a field referenced by another model though a m2m should be allowed.
-        response = self.client.get("/test_admin/admin/admin_views/m2mreference/", {TO_FIELD_VAR: 'id'})
+        # XXX: We're not testing against a non-primary key field since the admin doesn't
+        # support it yet, ref #23862
+        response = self.client.get("/test_admin/admin/admin_views/recipe/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
-        # #23604 - Specifying the pk of this model should be allowed when this model defines a m2m relationship
+        # #23604 - Specifying a field referenced through a reverse m2m relationship should be allowed.
+        # XXX: We're not testing against a non-primary key field since the admin doesn't
+        # support it yet, ref #23862
         response = self.client.get("/test_admin/admin/admin_views/ingredient/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
         # #23329 - Specifying a field that is not refered by any other model directly registered
         # to this admin site but registered through inheritance should be allowed.
-        response = self.client.get("/test_admin/admin/admin_views/referencedbyparent/", {TO_FIELD_VAR: 'id'})
+        response = self.client.get("/test_admin/admin/admin_views/referencedbyparent/", {TO_FIELD_VAR: 'name'})
         self.assertEqual(response.status_code, 200)
 
         # #23431 - Specifying a field that is only refered to by a inline of a registered
         # model should be allowed.
-        response = self.client.get("/test_admin/admin/admin_views/referencedbyinline/", {TO_FIELD_VAR: 'id'})
+        response = self.client.get("/test_admin/admin/admin_views/referencedbyinline/", {TO_FIELD_VAR: 'name'})
         self.assertEqual(response.status_code, 200)
 
     def test_allowed_filtering_15103(self):
