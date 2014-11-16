@@ -1040,13 +1040,6 @@ class decorators. As a consequence, when overriding ``setUpClass()`` or
 ``django.template.loaders.base.Loader``. If you've written a custom template
 loader that inherits ``BaseLoader``, you must inherit ``Loader`` instead.
 
-Function-based template loaders
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In addition to the documented class-based API for custom template loaders,
-Django still supported to some extent an earlier function-based API. This
-private API wasn't maintained or tested. Now it's formally deprecated.
-
 ``django.test.utils.TestTemplateLoader``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
