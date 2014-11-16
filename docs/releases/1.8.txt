@@ -414,6 +414,9 @@ Templates
   its query string as part of the URL (the URL in e.g. ``'djangoproject.com!``
   is ``djangoproject.com``)
 
+* Added a :class:`locmem.Loader <django.template.loaders.locmem.Loader>`
+  class that loads Django templates from a Python dictionary.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
