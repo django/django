@@ -29,7 +29,7 @@ class GeoAggregate(Aggregate):
         if not isinstance(self.source, GeometryField):
             raise ValueError('Geospatial aggregates only allowed on geometry fields.')
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
         "Return the aggregate, rendered as SQL with parameters."
 
         if connection.ops.oracle:
@@ -38,9 +38,9 @@ class GeoAggregate(Aggregate):
         params = []
 
         if hasattr(self.col, 'as_sql'):
-            field_name, params = self.col.as_sql(qn, connection)
+            field_name, params = self.col.as_sql(compiler, connection)
         elif isinstance(self.col, (list, tuple)):
-            field_name = '.'.join(qn(c) for c in self.col)
+            field_name = '.'.join(compiler.quote_name_unless_alias(c) for c in self.col)
         else:
             field_name = self.col
 

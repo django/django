@@ -186,7 +186,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
 
         return [dist_param]
 
-    def get_geom_placeholder(self, f, value, qn):
+    def get_geom_placeholder(self, f, value, compiler):
         """
         Provides a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
@@ -205,7 +205,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
                 placeholder = '%s'
             # No geometry value used for F expression, substitute in
             # the column name instead.
-            sql, _ = qn.compile(value)
+            sql, _ = compiler.compile(value)
             return placeholder % sql
         else:
             if transform_value(value, f.srid):

@@ -32,9 +32,9 @@ straightforward::
   class NotEqual(Lookup):
       lookup_name = 'ne'
 
-      def as_sql(self, qn, connection):
-          lhs, lhs_params = self.process_lhs(qn, connection)
-          rhs, rhs_params = self.process_rhs(qn, connection)
+      def as_sql(self, compiler, connection):
+          lhs, lhs_params = self.process_lhs(compiler, connection)
+          rhs, rhs_params = self.process_rhs(compiler, connection)
           params = lhs_params + rhs_params
           return '%s <> %s' % (lhs, rhs), params
 
@@ -70,12 +70,12 @@ lowercase strings containing only letters, but the only hard requirement is
 that it must not contain the string ``__``.
 
 We then need to define the ``as_sql`` method. This takes a ``SQLCompiler``
-object, called ``qn``,  and the active database connection. ``SQLCompiler``
-objects are not documented, but the only thing we need to know about them is
-that they have a ``compile()`` method which returns a tuple containing a SQL
-string, and the parameters to be interpolated into that string. In most cases,
-you don't need to use it directly and can pass it on to ``process_lhs()`` and
-``process_rhs()``.
+object, called ``compiler``,  and the active database connection.
+``SQLCompiler`` objects are not documented, but the only thing we need to know
+about them is that they have a ``compile()`` method which returns a tuple
+containing a SQL string, and the parameters to be interpolated into that
+string. In most cases, you don't need to use it directly and can pass it on to
+``process_lhs()`` and ``process_rhs()``.
 
 A ``Lookup`` works against two values, ``lhs`` and ``rhs``, standing for
 left-hand side and right-hand side. The left-hand side is usually a field
@@ -86,13 +86,13 @@ reference to the ``name`` field of the ``Author`` model, and ``'Jack'`` is the
 right-hand side.
 
 We call ``process_lhs`` and ``process_rhs`` to convert them into the values we
-need for SQL using the ``qn`` object described before. These methods return
-tuples containing some SQL and the parameters to be interpolated into that SQL,
-just as we need to return from our ``as_sql`` method. In the above example,
-``process_lhs`` returns ``('"author"."name"', [])`` and ``process_rhs`` returns
-``('"%s"', ['Jack'])``. In this example there were no parameters for the left
-hand side, but this would depend on the object we have, so we still need to
-include them in the parameters we return.
+need for SQL using the ``compiler`` object described before. These methods
+return tuples containing some SQL and the parameters to be interpolated into
+that SQL, just as we need to return from our ``as_sql`` method. In the above
+example, ``process_lhs`` returns ``('"author"."name"', [])`` and
+``process_rhs`` returns ``('"%s"', ['Jack'])``. In this example there were no
+parameters for the left hand side, but this would depend on the object we have,
+so we still need to include them in the parameters we return.
 
 Finally we combine the parts into a SQL expression with ``<>``, and supply all
 the parameters for the query. We then return a tuple containing the generated
@@ -123,8 +123,8 @@ function ``ABS()`` to transform the value before comparison::
   class AbsoluteValue(Transform):
       lookup_name = 'abs'
 
-      def as_sql(self, qn, connection):
-          lhs, params = qn.compile(self.lhs)
+      def as_sql(self, compiler, connection):
+          lhs, params = compiler.compile(self.lhs)
           return "ABS(%s)" % lhs, params
 
 Next, let's register it for ``IntegerField``::
@@ -160,8 +160,8 @@ be done by adding an ``output_field`` attribute to the transform::
     class AbsoluteValue(Transform):
         lookup_name = 'abs'
 
-        def as_sql(self, qn, connection):
-            lhs, params = qn.compile(self.lhs)
+        def as_sql(self, compiler, connection):
+            lhs, params = compiler.compile(self.lhs)
             return "ABS(%s)" % lhs, params
 
         @property
@@ -191,9 +191,9 @@ The implementation is::
   class AbsoluteValueLessThan(Lookup):
       lookup_name = 'lt'
 
-      def as_sql(self, qn, connection):
-          lhs, lhs_params = qn.compile(self.lhs.lhs)
-          rhs, rhs_params = self.process_rhs(qn, connection)
+      def as_sql(self, compiler, connection):
+          lhs, lhs_params = compiler.compile(self.lhs.lhs)
+          rhs, rhs_params = self.process_rhs(compiler, connection)
           params = lhs_params + rhs_params + lhs_params + rhs_params
           return '%s < %s AND %s > -%s' % (lhs, rhs, lhs, rhs), params
 
@@ -247,8 +247,8 @@ this transformation should apply to both ``lhs`` and ``rhs``::
       lookup_name = 'upper'
       bilateral = True
 
-      def as_sql(self, qn, connection):
-          lhs, params = qn.compile(self.lhs)
+      def as_sql(self, compiler, connection):
+          lhs, params = compiler.compile(self.lhs)
           return "UPPER(%s)" % lhs, params
 
 Next, let's register it::
@@ -275,9 +275,9 @@ We can change the behavior on a specific backend by creating a subclass of
 ``NotEqual`` with a ``as_mysql`` method::
 
   class MySQLNotEqual(NotEqual):
-      def as_mysql(self, qn, connection):
-          lhs, lhs_params = self.process_lhs(qn, connection)
-          rhs, rhs_params = self.process_rhs(qn, connection)
+      def as_mysql(self, compiler, connection):
+          lhs, lhs_params = self.process_lhs(compiler, connection)
+          rhs, rhs_params = self.process_rhs(compiler, connection)
           params = lhs_params + rhs_params
           return '%s != %s' % (lhs, rhs), params
   Field.register_lookup(MySQLNotExact)

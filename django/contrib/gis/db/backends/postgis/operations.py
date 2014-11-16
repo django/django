@@ -284,7 +284,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             return [dist_param]
 
-    def get_geom_placeholder(self, f, value, qn):
+    def get_geom_placeholder(self, f, value, compiler):
         """
         Provides a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
@@ -300,7 +300,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             # If this is an F expression, then we don't really want
             # a placeholder and instead substitute in the column
             # of the expression.
-            sql, _ = qn.compile(value)
+            sql, _ = compiler.compile(value)
             placeholder = placeholder % sql
 
         return placeholder

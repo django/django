@@ -282,12 +282,12 @@ class GeometryField(Field):
         else:
             return connection.ops.Adapter(self.get_prep_value(value))
 
-    def get_placeholder(self, value, qn, connection):
+    def get_placeholder(self, value, compiler, connection):
         """
         Returns the placeholder for the geometry column for the
         given value.
         """
-        return connection.ops.get_geom_placeholder(self, value, qn)
+        return connection.ops.get_geom_placeholder(self, value, compiler)
 
 
 for klass in gis_lookups.values():

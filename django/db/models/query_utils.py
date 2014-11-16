@@ -29,7 +29,7 @@ class QueryWrapper(object):
     def __init__(self, sql, params):
         self.data = sql, list(params)
 
-    def as_sql(self, qn=None, connection=None):
+    def as_sql(self, compiler=None, connection=None):
         return self.data
 
 

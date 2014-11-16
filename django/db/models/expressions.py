@@ -490,7 +490,8 @@ class Col(ExpressionNode):
         super(Col, self).__init__(output_field=source)
         self.alias, self.target = alias, target
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
+        qn = compiler.quote_name_unless_alias
         return "%s.%s" % (qn(self.alias), qn(self.target.column)), []
 
     def relabeled_clone(self, relabels):
@@ -541,8 +542,8 @@ class Date(ExpressionNode):
     def set_source_expressions(self, exprs):
         self.col, = self.exprs
 
-    def as_sql(self, qn, connection):
-        sql, params = self.col.as_sql(qn, connection)
+    def as_sql(self, compiler, connection):
+        sql, params = self.col.as_sql(compiler, connection)
         assert not(params)
         return connection.ops.date_trunc_sql(self.lookup_type, sql), []
 
@@ -563,7 +564,7 @@ class DateTime(ExpressionNode):
     def set_source_expressions(self, exprs):
         self.col, = exprs
 
-    def as_sql(self, qn, connection):
-        sql, params = self.col.as_sql(qn, connection)
+    def as_sql(self, compiler, connection):
+        sql, params = self.col.as_sql(compiler, connection)
         assert not(params)
         return connection.ops.datetime_trunc_sql(self.lookup_type, sql, self.tzname)
