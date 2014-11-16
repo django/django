@@ -6,7 +6,8 @@ from operator import attrgetter
 from django.test import TestCase
 
 from .models import (Person, Group, Membership, CustomMembership,
-    PersonSelfRefM2M, Friendship, Event, Invitation, Employee, Relationship)
+    PersonSelfRefM2M, Friendship, Event, Invitation, Employee, Relationship,
+    Ingredient, Recipe, RecipeIngredient)
 
 
 class M2mThroughTests(TestCase):
@@ -425,4 +426,31 @@ class M2mThroughReferentialTests(TestCase):
             john.subordinates.all(),
             ['peter', 'mary', 'harry'],
             attrgetter('name')
+        )
+
+
+class M2mThroughToFieldsTests(TestCase):
+    def setUp(self):
+        self.pea = Ingredient.objects.create(iname='pea')
+        self.potato = Ingredient.objects.create(iname='potato')
+        self.tomato = Ingredient.objects.create(iname='tomato')
+        self.curry = Recipe.objects.create(rname='curry')
+        RecipeIngredient.objects.create(recipe=self.curry, ingredient=self.potato)
+        RecipeIngredient.objects.create(recipe=self.curry, ingredient=self.pea)
+        RecipeIngredient.objects.create(recipe=self.curry, ingredient=self.tomato)
+
+    def test_retrieval(self):
+        # Forward retrieval
+        self.assertQuerysetEqual(
+            self.curry.ingredients.all(),
+            [self.pea, self.potato, self.tomato], lambda x: x
+        )
+        # Backward retrieval
+        self.assertEqual(self.tomato.recipes.get(), self.curry)
+
+    def test_choices(self):
+        field = Recipe._meta.get_field('ingredients')
+        self.assertEqual(
+            [choice[0] for choice in field.get_choices(include_blank=False)],
+            ['pea', 'potato', 'tomato']
         )

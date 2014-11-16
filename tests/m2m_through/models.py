@@ -113,3 +113,25 @@ class Relationship(models.Model):
     another = models.ForeignKey(Employee, related_name="rel_another_set", null=True)
     target = models.ForeignKey(Employee, related_name="rel_target_set")
     source = models.ForeignKey(Employee, related_name="rel_source_set")
+
+
+class Ingredient(models.Model):
+    iname = models.CharField(max_length=20, unique=True)
+
+    class Meta:
+        ordering = ('iname',)
+
+
+class Recipe(models.Model):
+    rname = models.CharField(max_length=20, unique=True)
+    ingredients = models.ManyToManyField(
+        Ingredient, through='RecipeIngredient', related_name='recipes',
+    )
+
+    class Meta:
+        ordering = ('rname',)
+
+
+class RecipeIngredient(models.Model):
+    ingredient = models.ForeignKey(Ingredient, to_field='iname')
+    recipe = models.ForeignKey(Recipe, to_field='rname')
