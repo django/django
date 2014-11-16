@@ -1,11 +1,20 @@
 import os
 import errno
 from datetime import datetime
+import warnings
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 from django.conf import settings
 from django.core.files import locks, File
 from django.core.files.move import file_move_safe
+from django.utils import six
+from django.utils import timezone
 from django.utils.crypto import get_random_string
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, filepath_to_uri
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
@@ -121,21 +130,21 @@ class Storage(object):
         """
         raise NotImplementedError('subclasses of Storage must provide a url() method')
 
-    def accessed_time(self, name):
+    def accessed_time(self, name, aware=None):
         """
         Returns the last accessed time (as datetime object) of the file
         specified by name.
         """
         raise NotImplementedError('subclasses of Storage must provide an accessed_time() method')
 
-    def created_time(self, name):
+    def created_time(self, name, aware=None):
         """
         Returns the creation time (as datetime object) of the file
         specified by name.
         """
         raise NotImplementedError('subclasses of Storage must provide a created_time() method')
 
-    def modified_time(self, name):
+    def modified_time(self, name, aware=None):
         """
         Returns the last modified time (as datetime object) of the file
         specified by name.
@@ -286,14 +295,39 @@ class FileSystemStorage(Storage):
             raise ValueError("This file is not accessible via a URL.")
         return urljoin(self.base_url, filepath_to_uri(name))
 
-    def accessed_time(self, name):
-        return datetime.fromtimestamp(os.path.getatime(self.path(name)))
+    def accessed_time(self, name, aware=None):
+        atime = datetime.fromtimestamp(os.path.getatime(self.path(name)))
+        return _possibly_make_aware(atime, aware, 'accessed_time')
 
-    def created_time(self, name):
-        return datetime.fromtimestamp(os.path.getctime(self.path(name)))
+    def created_time(self, name, aware=None):
+        ctime = datetime.fromtimestamp(os.path.getctime(self.path(name)))
+        return _possibly_make_aware(ctime, aware, 'created_time')
 
-    def modified_time(self, name):
-        return datetime.fromtimestamp(os.path.getmtime(self.path(name)))
+    def modified_time(self, name, aware=None):
+        mtime = datetime.fromtimestamp(os.path.getmtime(self.path(name)))
+        return _possibly_make_aware(mtime, aware, 'modified_time')
+
+
+def _possibly_make_aware(dt, aware, method):
+    # Default (with aware=None) means "naive", but this
+    # is deprecated behavior.
+    if aware is None:
+        warnings.warn(
+            'Storage API calls will require an explicit aware '
+            'parameter in Django 2.0. Update your calls to '
+            'Storage.%(method)s to include aware=False, or '
+            'upgrade to using aware=True.' % {
+                'method': method,
+            },
+            RemovedInDjango20Warning, stacklevel=3)
+    if aware:
+        tzname = os.environ['TZ']
+        if isinstance(tzname, six.string_types) and pytz is not None:
+            tz = pytz.timezone(tzname)
+        else:
+            tz = timezone.LocalTimezone()
+        dt = timezone.make_aware(dt, tz)
+    return dt
 
 
 def get_storage_class(import_path=None):
