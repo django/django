@@ -484,6 +484,13 @@ class GeoQuerySetTest(TestCase):
         for val, exp in zip(extent, expected):
             self.assertAlmostEqual(exp, val, 4)
 
+    @skipUnlessDBFeature("supports_extent_aggr")
+    def test_extent_with_limit(self):
+        "Testing if extent supports limit."
+        extent1 = City.objects.all().extent()
+        extent2 = City.objects.all()[:3].extent()
+        self.assertNotEquals(extent1, extent2)
+
     @skipUnlessDBFeature("has_force_rhr_method")
     def test_force_rhr(self):
         "Testing GeoQuerySet.force_rhr()."
