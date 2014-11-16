@@ -83,3 +83,6 @@ Bugfixes
 
 * Added missing context to the admin's ``delete_selected`` view that prevented
   custom site header, etc. from appearing (:ticket:`23898`).
+
+* Fixed a regression with dynamically generated inlines and allowed field
+  references in the admin (:ticket:`23754`).
