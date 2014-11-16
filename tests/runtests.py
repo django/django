@@ -198,7 +198,7 @@ def teardown(state):
         setattr(settings, key, value)
 
 
-def django_tests(verbosity, interactive, failfast, test_labels):
+def django_tests(verbosity, interactive, failfast, keepdb, test_labels):
     state = setup(verbosity, test_labels)
     extra_tests = []
 
@@ -211,6 +211,7 @@ def django_tests(verbosity, interactive, failfast, test_labels):
         verbosity=verbosity,
         interactive=interactive,
         failfast=failfast,
+        keepdb=keepdb,
     )
     # Catch warnings thrown in test DB setup -- remove in Django 1.9
     with warnings.catch_warnings():
@@ -347,6 +348,9 @@ if __name__ == "__main__":
         help='Tells Django to stop running the test suite after first failed '
              'test.')
     parser.add_argument(
+        '-k', '--keepdb', action='store_true', dest='keepdb', default=False,
+        help='Tells Django to preserve the test database between runs.')
+    parser.add_argument(
         '--settings',
         help='Python path to settings module, e.g. "myproject.settings". If '
              'this isn\'t provided, either the DJANGO_SETTINGS_MODULE '
@@ -388,6 +392,7 @@ if __name__ == "__main__":
         paired_tests(options.pair, options, options.modules)
     else:
         failures = django_tests(options.verbosity, options.interactive,
-                                options.failfast, options.modules)
+                                options.failfast, options.keepdb,
+                                options.modules)
         if failures:
             sys.exit(bool(failures))
