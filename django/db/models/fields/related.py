@@ -1348,11 +1348,18 @@ class ManyToManyRel(object):
 
     def get_related_field(self):
         """
-        Returns the field in the to' object to which this relationship is tied
-        (this is always the primary key on the target model). Provided for
-        symmetry with ManyToOneRel.
+        Returns the field in the 'to' object to which this relationship is tied.
+        Provided for symmetry with ManyToOneRel.
         """
-        return self.to._meta.pk
+        opts = self.through._meta
+        if self.through_fields:
+            field = opts.get_field(self.through_fields[0])
+        else:
+            for field in opts.fields:
+                rel = getattr(field, 'rel', None)
+                if rel and rel.to == self.to:
+                    break
+        return field.foreign_related_fields[0]
 
 
 class ForeignObject(RelatedField):
