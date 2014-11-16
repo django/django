@@ -62,3 +62,6 @@ Bugfixes
 
 * Fixed a migration crash when a field is renamed that is part of an
   ``index_together`` (:ticket:`23859`).
+
+* Fixed :djadmin:`squashmigrations` to respect the  ``--no-optimize`` parameter
+  (:ticket:`23799`).
