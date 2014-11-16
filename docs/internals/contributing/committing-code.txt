@@ -21,6 +21,14 @@ best pull requests possible. In practice however, committers - who will likely
 be more familiar with the commit guidelines - may decide to bring a commit up
 to standard themselves.
 
+.. note::
+
+    Before merging, but after reviewing, have Jenkins test the pull request by
+    commenting "buildbot, test this please" on the PR.
+    See our `Jenkins wiki page`_ for more details.
+
+.. _Jenkins wiki page: https://code.djangoproject.com/wiki/Jenkins
+
 Here is one way to commit a pull request::
 
     # Create a new branch tracking upstream/master -- upstream is assumed
