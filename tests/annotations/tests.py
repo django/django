@@ -9,6 +9,7 @@ from django.db.models import (
     IntegerField, BooleanField, CharField)
 from django.db.models.fields import FieldDoesNotExist
 from django.test import TestCase
+from django.utils import six
 
 from .models import Author, Book, Store, DepartmentStore, Company, Employee
 
@@ -75,7 +76,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             self.assertEqual(book.sum_rating, book.rating)
 
     def test_filter_wrong_annotation(self):
-        with self.assertRaisesRegexp(FieldError, "Cannot resolve keyword .*"):
+        with six.assertRaisesRegex(self, FieldError, "Cannot resolve keyword .*"):
             list(Book.objects.annotate(
                 sum_rating=Sum('rating')
             ).filter(sum_rating=F('nope')))
@@ -137,7 +138,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             self.assertEqual(book.rating, 5)
             self.assertEqual(book.other_rating, 4)
 
-        with self.assertRaisesRegexp(FieldDoesNotExist, "\w has no field named u?'other_rating'"):
+        with six.assertRaisesRegex(self, FieldDoesNotExist, "\w has no field named u?'other_rating'"):
             book = qs.defer('other_rating').get(other_rating=4)
 
     def test_mti_annotations(self):

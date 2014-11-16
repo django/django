@@ -15,6 +15,7 @@ from django.db.migrations.state import ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError, DatabaseError
+from django.utils import six
 
 from .test_base import MigrationTestBase
 
@@ -1300,13 +1301,13 @@ class OperationTests(OperationTestBase):
         )
 
         with connection.schema_editor() as editor:
-            self.assertRaisesRegexp(ValueError,
+            six.assertRaisesRegex(self, ValueError,
                 "Expected a 2-tuple but got 1",
                 operation.database_forwards,
                 "test_runsql", editor, project_state, new_state)
 
         with connection.schema_editor() as editor:
-            self.assertRaisesRegexp(ValueError,
+            six.assertRaisesRegex(self, ValueError,
                 "Expected a 2-tuple but got 3",
                 operation.database_backwards,
                 "test_runsql", editor, new_state, project_state)

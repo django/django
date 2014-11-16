@@ -384,7 +384,7 @@ class ExpressionsNumericTests(TestCase):
         self.assertEqual(Number.objects.get(pk=n.pk).float, Approximate(256.900, places=3))
 
     def test_incorrect_field_expression(self):
-        with self.assertRaisesRegexp(FieldError, "Cannot resolve keyword u?'nope' into field.*"):
+        with six.assertRaisesRegex(self, FieldError, "Cannot resolve keyword u?'nope' into field.*"):
             list(Employee.objects.filter(firstname=F('nope')))
 
 
