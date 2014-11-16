@@ -61,8 +61,8 @@ class TranslatableFile(object):
 
         if command.verbosity > 1:
             command.stdout.write('processing file %s in %s\n' % (self.file, self.dirpath))
-        _, file_ext = os.path.splitext(self.file)
-        if domain == 'djangojs' and file_ext in command.extensions:
+        file_ext = os.path.splitext(self.file)[1]
+        if domain == 'djangojs':
             orig_file = os.path.join(self.dirpath, self.file)
             work_file = orig_file
             is_templatized = command.gettext_version < (0, 18, 3)
@@ -85,10 +85,10 @@ class TranslatableFile(object):
                 '--output=-'
             ] + command.xgettext_options
             args.append(work_file)
-        elif domain == 'django' and (file_ext == '.py' or file_ext in command.extensions):
+        elif domain == 'django':
             orig_file = os.path.join(self.dirpath, self.file)
             work_file = orig_file
-            is_templatized = file_ext in command.extensions
+            is_templatized = file_ext != '.py'
             if is_templatized:
                 with io.open(orig_file, encoding=settings.FILE_CHARSET) as fp:
                     src_data = fp.read()
@@ -250,8 +250,8 @@ class Command(BaseCommand):
         if self.domain == 'djangojs':
             exts = extensions if extensions else ['js']
         else:
-            exts = extensions if extensions else ['html', 'txt']
-        self.extensions = handle_extensions(exts)
+            exts = extensions if extensions else ['html', 'txt', 'py']
+        self.extensions = handle_extensions(exts, ignored=())
 
         if (locale is None and not exclude and not process_all) or self.domain is None:
             raise CommandError("Type '%s help %s' for usage information." % (
@@ -394,7 +394,8 @@ class Command(BaseCommand):
                     self.locale_paths.insert(0, os.path.join(os.path.abspath(dirpath), dirname))
             for filename in filenames:
                 file_path = os.path.normpath(os.path.join(dirpath, filename))
-                if is_ignored(file_path, self.ignore_patterns):
+                file_ext = os.path.splitext(filename)[1]
+                if not (file_ext in self.extensions) or is_ignored(file_path, self.ignore_patterns):
                     if self.verbosity > 1:
                         self.stdout.write('ignoring file %s in %s\n' % (filename, dirpath))
                 else:
