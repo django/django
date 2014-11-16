@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import importlib
 import inspect
+import logging
 import os
 import re
 import shutil
@@ -16,15 +17,15 @@ from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.template.base import TemplateDoesNotExist
-from django.test import TestCase, RequestFactory, override_settings
+from django.test import Client, TestCase, RequestFactory, override_settings
 from django.test.utils import override_with_test_loader
 from django.utils.encoding import force_text, force_bytes
 from django.utils import six
 from django.views.debug import CallableSettingWrapper, ExceptionReporter
 
 from .. import BrokenException, except_args
-from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
-    custom_exception_reporter_filter_view, sensitive_method_view,
+from ..views import (SensitiveTestError, sensitive_view, non_sensitive_view,
+    paranoid_view, custom_exception_reporter_filter_view, sensitive_method_view,
     sensitive_args_function_caller, sensitive_kwargs_function_caller,
     multivalue_dict_key_error)
 
@@ -420,6 +421,14 @@ class PlainTextReportTests(TestCase):
         reporter.get_traceback_text()
 
 
+class SensitiveTestClient(Client):
+    # Client which don't re-raises errors
+    def store_exc_info(self, **kwargs):
+        # We raised the error to get the error page, so don't reraise it and
+        # return the response itself.
+        pass
+
+
 class ExceptionReportTestMixin(object):
 
     # Mixin used in the ExceptionReporterFilterTests and
@@ -430,13 +439,15 @@ class ExceptionReportTestMixin(object):
                       'hash-brown-key': 'hash-brown-value',
                       'bacon-key': 'bacon-value'}
 
-    def verify_unsafe_response(self, view, check_for_vars=True,
+    def verify_unsafe_response(self, url, text, check_for_vars=True,
                                check_for_POST_params=True):
         """
         Asserts that potentially sensitive info are displayed in the response.
         """
-        request = self.rf.post('/some_url/', self.breakfast_data)
-        response = view(request)
+        response = self.client.post(url, self.breakfast_data)
+        # Signature of technical 500 error page
+        self.assertContains(response, text, status_code=500)
+
         if check_for_vars:
             # All variables are shown.
             self.assertContains(response, 'cooked_eggs', status_code=500)
@@ -449,59 +460,34 @@ class ExceptionReportTestMixin(object):
                 self.assertContains(response, k, status_code=500)
                 self.assertContains(response, v, status_code=500)
 
-    def verify_safe_response(self, view, check_for_vars=True,
-                             check_for_POST_params=True):
+    def verify_public_response(self, url, text):
         """
-        Asserts that certain sensitive info are not displayed in the response.
+        Asserts that no sensitive info are not displayed in the public response.
         """
-        request = self.rf.post('/some_url/', self.breakfast_data)
-        response = view(request)
-        if check_for_vars:
-            # Non-sensitive variable's name and value are shown.
-            self.assertContains(response, 'cooked_eggs', status_code=500)
-            self.assertContains(response, 'scrambled', status_code=500)
-            # Sensitive variable's name is shown but not its value.
-            self.assertContains(response, 'sauce', status_code=500)
-            self.assertNotContains(response, 'worcestershire', status_code=500)
-        if check_for_POST_params:
-            for k, v in self.breakfast_data.items():
-                # All POST parameters' names are shown.
-                self.assertContains(response, k, status_code=500)
-            # Non-sensitive POST parameters' values are shown.
-            self.assertContains(response, 'baked-beans-value', status_code=500)
-            self.assertContains(response, 'hash-brown-value', status_code=500)
-            # Sensitive POST parameters' values are not shown.
-            self.assertNotContains(response, 'sausage-value', status_code=500)
-            self.assertNotContains(response, 'bacon-value', status_code=500)
+        response = self.client.post(url, self.breakfast_data)
+        self.assertContains(response, '<h1>Server Error (500)</h1>', status_code=500)
+        # Signature of technical 500 error page
+        self.assertNotContains(response, text, status_code=500)
 
-    def verify_paranoid_response(self, view, check_for_vars=True,
-                                 check_for_POST_params=True):
-        """
-        Asserts that no variables or POST parameters are displayed in the response.
-        """
-        request = self.rf.post('/some_url/', self.breakfast_data)
-        response = view(request)
-        if check_for_vars:
-            # Show variable names but not their values.
-            self.assertContains(response, 'cooked_eggs', status_code=500)
-            self.assertNotContains(response, 'scrambled', status_code=500)
-            self.assertContains(response, 'sauce', status_code=500)
-            self.assertNotContains(response, 'worcestershire', status_code=500)
-        if check_for_POST_params:
-            for k, v in self.breakfast_data.items():
-                # All POST parameters' names are shown.
-                self.assertContains(response, k, status_code=500)
-                # No POST parameters' values are shown.
-                self.assertNotContains(response, v, status_code=500)
+        # Public 500 sever error page - no variables and no parameters are shown.
+        self.assertNotContains(response, 'cooked_eggs', status_code=500)
+        self.assertNotContains(response, 'scrambled', status_code=500)
+        self.assertNotContains(response, 'sauce', status_code=500)
+        self.assertNotContains(response, 'worcestershire', status_code=500)
+        for k, v in self.breakfast_data.items():
+            self.assertNotContains(response, k, status_code=500)
+        self.assertNotContains(response, 'baked-beans-value', status_code=500)
+        self.assertNotContains(response, 'hash-brown-value', status_code=500)
+        self.assertNotContains(response, 'sausage-value', status_code=500)
+        self.assertNotContains(response, 'bacon-value', status_code=500)
 
-    def verify_unsafe_email(self, view, check_for_POST_params=True):
+    def verify_unsafe_email(self, url, check_for_POST_params=True):
         """
         Asserts that potentially sensitive info are displayed in the email report.
         """
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
             mail.outbox = []  # Empty outbox
-            request = self.rf.post('/some_url/', self.breakfast_data)
-            view(request)
+            self.client.post(url, self.breakfast_data)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
 
@@ -527,14 +513,13 @@ class ExceptionReportTestMixin(object):
                     self.assertIn(k, body_html)
                     self.assertIn(v, body_html)
 
-    def verify_safe_email(self, view, check_for_POST_params=True):
+    def verify_safe_email(self, url, check_for_POST_params=True):
         """
         Asserts that certain sensitive info are not displayed in the email report.
         """
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
             mail.outbox = []  # Empty outbox
-            request = self.rf.post('/some_url/', self.breakfast_data)
-            view(request)
+            self.client.post(url, self.breakfast_data)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
 
@@ -567,14 +552,13 @@ class ExceptionReportTestMixin(object):
                 self.assertNotIn('sausage-value', body_html)
                 self.assertNotIn('bacon-value', body_html)
 
-    def verify_paranoid_email(self, view):
+    def verify_paranoid_email(self, url):
         """
         Asserts that no variables or POST parameters are displayed in the email report.
         """
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
             mail.outbox = []  # Empty outbox
-            request = self.rf.post('/some_url/', self.breakfast_data)
-            view(request)
+            self.client.post(url, self.breakfast_data)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
@@ -596,72 +580,89 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
     Ensure that sensitive information can be filtered out of error reports.
     Refs #14614.
     """
-    rf = RequestFactory()
+    client_class = SensitiveTestClient
+
+    def setUp(self):
+        logger = logging.getLogger('django.request')
+        log_handler = logger.handlers[0]
+        # Disable filter for DEBUG=True
+        filters = log_handler.filters
+        self.addCleanup(lambda: setattr(log_handler, 'filters', filters))
+        log_handler.filters = []
+        # Set the handler to include HTML
+        include_html = log_handler.include_html
+        self.addCleanup(lambda: setattr(log_handler, 'include_html', include_html))
+        log_handler.include_html = True
 
     def test_non_sensitive_request(self):
         """
         Ensure that everything (request info and frame variables) can bee seen
         in the default error reports for non-sensitive requests.
         """
+        text = 'SensitiveTestError at /sensitive/non_sensitive/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(non_sensitive_view)
-            self.verify_unsafe_email(non_sensitive_view)
+            self.verify_unsafe_response('/sensitive/non_sensitive/', text)
+            self.verify_unsafe_email('/sensitive/non_sensitive/')
 
         with self.settings(DEBUG=False):
-            self.verify_unsafe_response(non_sensitive_view)
-            self.verify_unsafe_email(non_sensitive_view)
+            self.verify_public_response('/sensitive/non_sensitive/', text)
+            self.verify_unsafe_email('/sensitive/non_sensitive/')
 
     def test_sensitive_request(self):
         """
         Ensure that sensitive POST parameters and frame variables cannot be
         seen in the default error reports for sensitive requests.
         """
+        text = 'SensitiveTestError at /sensitive/sensitive/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(sensitive_view)
-            self.verify_unsafe_email(sensitive_view)
+            self.verify_unsafe_response('/sensitive/sensitive/', text)
+            self.verify_unsafe_email('/sensitive/sensitive/')
 
         with self.settings(DEBUG=False):
-            self.verify_safe_response(sensitive_view)
-            self.verify_safe_email(sensitive_view)
+            self.verify_public_response('/sensitive/sensitive/', text)
+            self.verify_safe_email('/sensitive/sensitive/')
 
     def test_paranoid_request(self):
         """
         Ensure that no POST parameters and frame variables can be seen in the
         default error reports for "paranoid" requests.
         """
+        text = 'SensitiveTestError at /sensitive/paranoid/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(paranoid_view)
-            self.verify_unsafe_email(paranoid_view)
+            self.verify_unsafe_response('/sensitive/paranoid/', text)
+            self.verify_unsafe_email('/sensitive/paranoid/')
 
         with self.settings(DEBUG=False):
-            self.verify_paranoid_response(paranoid_view)
-            self.verify_paranoid_email(paranoid_view)
+            self.verify_public_response('/sensitive/paranoid/', text)
+            self.verify_paranoid_email('/sensitive/paranoid/')
 
     def test_multivalue_dict_key_error(self):
         """
         #21098 -- Ensure that sensitive POST parameters cannot be seen in the
         error reports for if request.POST['nonexistent_key'] throws an error.
         """
+        text = 'KeyError at /sensitive/multivalue_dict_key/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(multivalue_dict_key_error)
-            self.verify_unsafe_email(multivalue_dict_key_error)
+            self.verify_unsafe_response('/sensitive/multivalue_dict_key/', text)
+            self.verify_unsafe_email('/sensitive/multivalue_dict_key/')
 
         with self.settings(DEBUG=False):
-            self.verify_safe_response(multivalue_dict_key_error)
-            self.verify_safe_email(multivalue_dict_key_error)
+            self.verify_public_response('/sensitive/multivalue_dict_key/', text)
+            self.verify_safe_email('/sensitive/multivalue_dict_key/')
 
     def test_custom_exception_reporter_filter(self):
         """
         Ensure that it's possible to assign an exception reporter filter to
         the request to bypass the one set in DEFAULT_EXCEPTION_REPORTER_FILTER.
         """
+        text = 'SensitiveTestError at /sensitive/custom_reporter_filter/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(custom_exception_reporter_filter_view)
-            self.verify_unsafe_email(custom_exception_reporter_filter_view)
+            self.verify_unsafe_response('/sensitive/custom_reporter_filter/', text)
+            self.verify_unsafe_email('/sensitive/custom_reporter_filter/')
 
         with self.settings(DEBUG=False):
-            self.verify_unsafe_response(custom_exception_reporter_filter_view)
-            self.verify_unsafe_email(custom_exception_reporter_filter_view)
+            self.verify_public_response('/sensitive/custom_reporter_filter/', text)
+            self.verify_unsafe_email('/sensitive/custom_reporter_filter/')
 
     def test_sensitive_method(self):
         """
@@ -669,16 +670,16 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
         methods.
         Refs #18379.
         """
+        text = 'SensitiveTestError at /sensitive/sensitive_method/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(sensitive_method_view,
+            self.verify_unsafe_response('/sensitive/sensitive_method/', text,
                                         check_for_POST_params=False)
-            self.verify_unsafe_email(sensitive_method_view,
+            self.verify_unsafe_email('/sensitive/sensitive_method/',
                                      check_for_POST_params=False)
 
         with self.settings(DEBUG=False):
-            self.verify_safe_response(sensitive_method_view,
-                                      check_for_POST_params=False)
-            self.verify_safe_email(sensitive_method_view,
+            self.verify_public_response('/sensitive/sensitive_method/', text)
+            self.verify_safe_email('/sensitive/sensitive_method/',
                                    check_for_POST_params=False)
 
     def test_sensitive_function_arguments(self):
@@ -688,13 +689,15 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
         decorated function.
         Refs #19453.
         """
+        text = 'SensitiveTestError at /sensitive/sensitive_args/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(sensitive_args_function_caller)
-            self.verify_unsafe_email(sensitive_args_function_caller)
+            self.verify_unsafe_response('/sensitive/sensitive_args/', text)
+            self.verify_unsafe_email('/sensitive/sensitive_args/')
 
         with self.settings(DEBUG=False):
-            self.verify_safe_response(sensitive_args_function_caller, check_for_POST_params=False)
-            self.verify_safe_email(sensitive_args_function_caller, check_for_POST_params=False)
+            self.verify_public_response('/sensitive/sensitive_args/', text)
+            self.verify_safe_email('/sensitive/sensitive_args/',
+                                   check_for_POST_params=False)
 
     def test_sensitive_function_keyword_arguments(self):
         """
@@ -703,13 +706,30 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
         to the decorated function.
         Refs #19453.
         """
+        text = 'SensitiveTestError at /sensitive/sensitive_kwargs/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(sensitive_kwargs_function_caller)
-            self.verify_unsafe_email(sensitive_kwargs_function_caller)
+            self.verify_unsafe_response('/sensitive/sensitive_kwargs/', text)
+            self.verify_unsafe_email('/sensitive/sensitive_kwargs/')
 
         with self.settings(DEBUG=False):
-            self.verify_safe_response(sensitive_kwargs_function_caller, check_for_POST_params=False)
-            self.verify_safe_email(sensitive_kwargs_function_caller, check_for_POST_params=False)
+            self.verify_public_response('/sensitive/sensitive_kwargs/', text)
+            self.verify_safe_email('/sensitive/sensitive_kwargs/',
+                                   check_for_POST_params=False)
+
+    def test_sensitive_class_view(self):
+        """
+        Ensure that sensitive POST parameters can't be seen in the response
+        when using class based views.
+        Refs #22990.
+        """
+        text = 'SensitiveTestError at /sensitive/sensitive_class/'
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response('/sensitive/sensitive_class/', text)
+            self.verify_unsafe_email('/sensitive/sensitive_class/')
+
+        with self.settings(DEBUG=False):
+            self.verify_public_response('/sensitive/sensitive_class/', text)
+            self.verify_safe_email('/sensitive/sensitive_class/')
 
     def test_callable_settings(self):
         """
@@ -782,6 +802,7 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
                 self.assertNotContains(response, 'should not be displayed', status_code=500)
 
 
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class AjaxResponseExceptionReporterFilter(TestCase, ExceptionReportTestMixin):
     """
     Ensure that sensitive information can be filtered out of error reports.
@@ -792,50 +813,68 @@ class AjaxResponseExceptionReporterFilter(TestCase, ExceptionReportTestMixin):
     the response content because we don't include them in these error pages.
     Refs #14614.
     """
-    rf = RequestFactory(HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    client_class = SensitiveTestClient
+
+    def setUp(self):
+        logger = logging.getLogger('django.request')
+        log_handler = logger.handlers[0]
+        # Disable filter for DEBUG=True
+        filters = log_handler.filters
+        self.addCleanup(lambda: setattr(log_handler, 'filters', filters))
+        log_handler.filters = []
+        # Set the handler to include HTML
+        include_html = log_handler.include_html
+        self.addCleanup(lambda: setattr(log_handler, 'include_html', include_html))
+        log_handler.include_html = True
+
+        # Create client which mocks AJAX requests.
+        self.client = self.client_class(HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
     def test_non_sensitive_request(self):
         """
         Ensure that request info can bee seen in the default error reports for
         non-sensitive requests.
         """
+        text = 'SensitiveTestError at /sensitive/non_sensitive/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(non_sensitive_view, check_for_vars=False)
+            self.verify_unsafe_response('/sensitive/non_sensitive/', text, check_for_vars=False)
 
         with self.settings(DEBUG=False):
-            self.verify_unsafe_response(non_sensitive_view, check_for_vars=False)
+            self.verify_public_response('/sensitive/non_sensitive/', text)
 
     def test_sensitive_request(self):
         """
         Ensure that sensitive POST parameters cannot be seen in the default
         error reports for sensitive requests.
         """
+        text = 'SensitiveTestError at /sensitive/sensitive/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(sensitive_view, check_for_vars=False)
+            self.verify_unsafe_response('/sensitive/sensitive/', text, check_for_vars=False)
 
         with self.settings(DEBUG=False):
-            self.verify_safe_response(sensitive_view, check_for_vars=False)
+            self.verify_public_response('/sensitive/sensitive/', text)
 
     def test_paranoid_request(self):
         """
         Ensure that no POST parameters can be seen in the default error reports
         for "paranoid" requests.
         """
+        text = 'SensitiveTestError at /sensitive/paranoid/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(paranoid_view, check_for_vars=False)
+            self.verify_unsafe_response('/sensitive/paranoid/', text, check_for_vars=False)
 
         with self.settings(DEBUG=False):
-            self.verify_paranoid_response(paranoid_view, check_for_vars=False)
+            self.verify_public_response('/sensitive/paranoid/', text)
 
     def test_custom_exception_reporter_filter(self):
         """
         Ensure that it's possible to assign an exception reporter filter to
         the request to bypass the one set in DEFAULT_EXCEPTION_REPORTER_FILTER.
         """
+        text = 'SensitiveTestError at /sensitive/custom_reporter_filter/'
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(custom_exception_reporter_filter_view,
-                check_for_vars=False)
+            self.verify_unsafe_response('/sensitive/custom_reporter_filter/', text,
+                                        check_for_vars=False)
 
         with self.settings(DEBUG=False):
-            self.verify_unsafe_response(custom_exception_reporter_filter_view,
-                check_for_vars=False)
+            self.verify_public_response('/sensitive/custom_reporter_filter/', text)

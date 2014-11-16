@@ -475,15 +475,22 @@ def build_request_repr(request, path_override=None, GET_override=None,
                else pformat(request.GET))
     except Exception:
         get = '<could not parse>'
+
     if request._post_parse_error:
         post = '<could not parse>'
     else:
         try:
-            post = (pformat(POST_override)
-                    if POST_override is not None
-                    else pformat(request.POST))
+            if POST_override is not None:
+                post = pformat(POST_override)
+            else:
+                # Use the exception reporter filter to return the cleansed POST data
+                from django.views.debug import get_exception_reporter_filter
+                ex_filter = get_exception_reporter_filter(request)
+                cleansed_post = ex_filter.get_post_parameters(request)
+                post = pformat(cleansed_post)
         except Exception:
             post = '<could not parse>'
+
     try:
         cookies = (pformat(COOKIES_override)
                    if COOKIES_override is not None
