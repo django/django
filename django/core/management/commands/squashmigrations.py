@@ -24,7 +24,7 @@ class Command(BaseCommand):
     usage_str = "Usage: ./manage.py squashmigrations app migration_name"
     args = "app_label migration_name"
 
-    def handle(self, app_label=None, migration_name=None, **options):
+    def handle(self, app_label=None, migration_name=None, no_optimize=None, **options):
 
         self.verbosity = int(options.get('verbosity'))
         self.interactive = options.get('interactive')
@@ -87,17 +87,25 @@ class Command(BaseCommand):
                 elif dependency[0] != smigration.app_label:
                     dependencies.add(dependency)
 
-        if self.verbosity > 0:
-            self.stdout.write(self.style.MIGRATE_HEADING("Optimizing..."))
+        if no_optimize:
+            if self.verbosity > 0:
+                self.stdout.write(self.style.MIGRATE_HEADING("(Skipping optimization.)"))
+            new_operations = operations
+        else:
+            if self.verbosity > 0:
+                self.stdout.write(self.style.MIGRATE_HEADING("Optimizing..."))
 
-        optimizer = MigrationOptimizer()
-        new_operations = optimizer.optimize(operations, migration.app_label)
+            optimizer = MigrationOptimizer()
+            new_operations = optimizer.optimize(operations, migration.app_label)
 
-        if self.verbosity > 0:
-            if len(new_operations) == len(operations):
-                self.stdout.write("  No optimizations possible.")
-            else:
-                self.stdout.write("  Optimized from %s operations to %s operations." % (len(operations), len(new_operations)))
+            if self.verbosity > 0:
+                if len(new_operations) == len(operations):
+                    self.stdout.write("  No optimizations possible.")
+                else:
+                    self.stdout.write(
+                        "  Optimized from %s operations to %s operations." %
+                        (len(operations), len(new_operations))
+                    )
 
         # Work out the value of replaces (any squashed ones we're re-squashing)
         # need to feed their replaces into ours

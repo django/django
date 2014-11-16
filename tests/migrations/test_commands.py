@@ -546,3 +546,45 @@ class MakeMigrationsTests(MigrationTestBase):
             questioner.input = old_input
             if os.path.exists(merge_file):
                 os.remove(merge_file)
+
+
+class SquashMigrationsTest(MigrationTestBase):
+    """
+    Tests running the squashmigrations command.
+    """
+
+    path = "migrations/test_migrations/0001_squashed_0002_second.py"
+
+    def tearDown(self):
+        if os.path.exists(self.path):
+            os.remove(self.path)
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_squashmigrations_squashes(self):
+        """
+        Tests that squashmigrations squashes migrations.
+        """
+        call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=0)
+        self.assertTrue(os.path.exists(self.path))
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_squashmigrations_optimizes(self):
+        """
+        Tests that squashmigrations optimizes operations.
+        """
+        out = six.StringIO()
+        call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=1, stdout=out)
+        self.assertIn("Optimized from 7 operations to 5 operations.", out.getvalue())
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_ticket_23799_squashmigrations_no_optimize(self):
+        """
+        Makes sure that squashmigrations --no-optimize really doesn't optimize operations.
+        """
+        out = six.StringIO()
+        call_command("squashmigrations", "migrations", "0002",
+                     interactive=False, verbosity=1, no_optimize=True, stdout=out)
+        self.assertIn("Skipping optimization", out.getvalue())
