@@ -863,8 +863,8 @@ class ComplexAggregateTestCase(TestCase):
     def test_add_implementation(self):
         try:
             # test completely changing how the output is rendered
-            def lower_case_function_override(self, qn, connection):
-                sql, params = qn.compile(self.source_expressions[0])
+            def lower_case_function_override(self, compiler, connection):
+                sql, params = compiler.compile(self.source_expressions[0])
                 substitutions = dict(function=self.function.lower(), expressions=sql)
                 substitutions.update(self.extra)
                 return self.template % substitutions, params
@@ -877,9 +877,9 @@ class ComplexAggregateTestCase(TestCase):
             self.assertEqual(b1.sums, 383)
 
             # test changing the dict and delegating
-            def lower_case_function_super(self, qn, connection):
+            def lower_case_function_super(self, compiler, connection):
                 self.extra['function'] = self.function.lower()
-                return super(Sum, self).as_sql(qn, connection)
+                return super(Sum, self).as_sql(compiler, connection)
             setattr(Sum, 'as_' + connection.vendor, lower_case_function_super)
 
             qs = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
@@ -889,7 +889,7 @@ class ComplexAggregateTestCase(TestCase):
             self.assertEqual(b1.sums, 383)
 
             # test overriding all parts of the template
-            def be_evil(self, qn, connection):
+            def be_evil(self, compiler, connection):
                 substitutions = dict(function='MAX', expressions='2')
                 substitutions.update(self.extra)
                 return self.template % substitutions, ()
@@ -921,8 +921,8 @@ class ComplexAggregateTestCase(TestCase):
         class Greatest(Func):
             function = 'GREATEST'
 
-            def as_sqlite(self, qn, connection):
-                return super(Greatest, self).as_sql(qn, connection, function='MAX')
+            def as_sqlite(self, compiler, connection):
+                return super(Greatest, self).as_sql(compiler, connection, function='MAX')
 
         qs = Publisher.objects.annotate(
             price_or_median=Greatest(Avg('book__rating'), Avg('book__price'))

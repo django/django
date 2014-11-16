@@ -64,8 +64,8 @@ class GISLookup(Lookup):
             params = [connection.ops.Adapter(value)]
         return ('%s', params)
 
-    def process_rhs(self, qn, connection):
-        rhs, rhs_params = super(GISLookup, self).process_rhs(qn, connection)
+    def process_rhs(self, compiler, connection):
+        rhs, rhs_params = super(GISLookup, self).process_rhs(compiler, connection)
 
         geom = self.rhs
         if isinstance(self.rhs, Col):
@@ -80,12 +80,12 @@ class GISLookup(Lookup):
             raise ValueError('Complex expressions not supported for GeometryField')
         elif isinstance(self.rhs, (list, tuple)):
             geom = self.rhs[0]
-        rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, geom, qn)
+        rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, geom, compiler)
         return rhs, rhs_params
 
-    def as_sql(self, qn, connection):
-        lhs_sql, sql_params = self.process_lhs(qn, connection)
-        rhs_sql, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs_sql, sql_params = self.process_lhs(compiler, connection)
+        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
         sql_params.extend(rhs_params)
 
         template_params = {'lhs': lhs_sql, 'rhs': rhs_sql}

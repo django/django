@@ -81,7 +81,7 @@ class WhereNode(tree.Node):
             value = obj.prepare(lookup_type, value)
         return (obj, lookup_type, value_annotation, value)
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
         """
         Returns the SQL version of the where clause and the value to be
         substituted in. Returns '', [] if this node matches everything,
@@ -102,10 +102,10 @@ class WhereNode(tree.Node):
         for child in self.children:
             try:
                 if hasattr(child, 'as_sql'):
-                    sql, params = qn.compile(child)
+                    sql, params = compiler.compile(child)
                 else:
                     # A leaf node in the tree.
-                    sql, params = self.make_atom(child, qn, connection)
+                    sql, params = self.make_atom(child, compiler, connection)
             except EmptyResultSet:
                 nothing_childs += 1
             else:
@@ -165,7 +165,7 @@ class WhereNode(tree.Node):
                     cols.extend(child[3].get_group_by_cols())
         return cols
 
-    def make_atom(self, child, qn, connection):
+    def make_atom(self, child, compiler, connection):
         """
         Turn a tuple (Constraint(table_alias, column_name, db_type),
         lookup_type, value_annotation, params) into valid SQL.
@@ -192,16 +192,16 @@ class WhereNode(tree.Node):
 
         if isinstance(lvalue, tuple):
             # A direct database column lookup.
-            field_sql, field_params = self.sql_for_columns(lvalue, qn, connection, field_internal_type), []
+            field_sql, field_params = self.sql_for_columns(lvalue, compiler, connection, field_internal_type), []
         else:
             # A smart object with an as_sql() method.
-            field_sql, field_params = qn.compile(lvalue)
+            field_sql, field_params = compiler.compile(lvalue)
 
         is_datetime_field = value_annotation is datetime.datetime
         cast_sql = connection.ops.datetime_cast_sql() if is_datetime_field else '%s'
 
         if hasattr(params, 'as_sql'):
-            extra, params = qn.compile(params)
+            extra, params = compiler.compile(params)
             cast_sql = ''
         else:
             extra = ''
@@ -314,7 +314,7 @@ class EmptyWhere(WhereNode):
     def add(self, data, connector):
         return
 
-    def as_sql(self, qn=None, connection=None):
+    def as_sql(self, compiler=None, connection=None):
         raise EmptyResultSet
 
 
@@ -323,7 +323,7 @@ class EverythingNode(object):
     A node that matches everything.
     """
 
-    def as_sql(self, qn=None, connection=None):
+    def as_sql(self, compiler=None, connection=None):
         return '', []
 
 
@@ -331,7 +331,7 @@ class NothingNode(object):
     """
     A node that matches nothing.
     """
-    def as_sql(self, qn=None, connection=None):
+    def as_sql(self, compiler=None, connection=None):
         raise EmptyResultSet
 
 
@@ -340,7 +340,7 @@ class ExtraWhere(object):
         self.sqls = sqls
         self.params = params
 
-    def as_sql(self, qn=None, connection=None):
+    def as_sql(self, compiler=None, connection=None):
         sqls = ["(%s)" % sql for sql in self.sqls]
         return " AND ".join(sqls), list(self.params or ())
 
@@ -402,7 +402,7 @@ class SubqueryConstraint(object):
         self.targets = targets
         self.query_object = query_object
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
         query = self.query_object
 
         # QuerySet was sent
@@ -420,7 +420,7 @@ class SubqueryConstraint(object):
                 query.clear_ordering(True)
 
         query_compiler = query.get_compiler(connection=connection)
-        return query_compiler.as_subquery_condition(self.alias, self.columns, qn)
+        return query_compiler.as_subquery_condition(self.alias, self.columns, compiler)
 
     def relabel_aliases(self, change_map):
         self.alias = change_map.get(self.alias, self.alias)
