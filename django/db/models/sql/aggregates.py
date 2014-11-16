@@ -88,16 +88,16 @@ class Aggregate(RegisterLookupMixin):
             clone.col = (change_map.get(self.col[0], self.col[0]), self.col[1])
         return clone
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
         "Return the aggregate, rendered as SQL with parameters."
         params = []
 
         if hasattr(self.col, 'as_sql'):
-            field_name, params = self.col.as_sql(qn, connection)
+            field_name, params = self.col.as_sql(compiler, connection)
         elif isinstance(self.col, (list, tuple)):
-            field_name = '.'.join(qn(c) for c in self.col)
+            field_name = '.'.join(compiler(c) for c in self.col)
         else:
-            field_name = qn(self.col)
+            field_name = compiler(self.col)
 
         substitutions = {
             'function': self.sql_function,

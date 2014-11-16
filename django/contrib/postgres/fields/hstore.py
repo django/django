@@ -64,9 +64,9 @@ class HStoreField(Field):
 class HStoreContainsLookup(Lookup):
     lookup_name = 'contains'
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
         return '%s @> %s' % (lhs, rhs), params
 
@@ -75,9 +75,9 @@ class HStoreContainsLookup(Lookup):
 class HStoreContainedByLookup(Lookup):
     lookup_name = 'contained_by'
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
         return '%s <@ %s' % (lhs, rhs), params
 
@@ -86,9 +86,9 @@ class HStoreContainedByLookup(Lookup):
 class HasKeyLookup(Lookup):
     lookup_name = 'has_key'
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
         return '%s ? %s' % (lhs, rhs), params
 
@@ -97,9 +97,9 @@ class HasKeyLookup(Lookup):
 class HasKeysLookup(Lookup):
     lookup_name = 'has_keys'
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
         return '%s ?& %s' % (lhs, rhs), params
 
@@ -111,8 +111,8 @@ class KeyTransform(Transform):
         super(KeyTransform, self).__init__(*args, **kwargs)
         self.key_name = key_name
 
-    def as_sql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs, params = compiler.compile(self.lhs)
         return "%s -> '%s'" % (lhs, self.key_name), params
 
 
@@ -130,8 +130,8 @@ class KeysTransform(Transform):
     lookup_name = 'keys'
     output_field = ArrayField(TextField())
 
-    def as_sql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs, params = compiler.compile(self.lhs)
         return 'akeys(%s)' % lhs, params
 
 
@@ -140,6 +140,6 @@ class ValuesTransform(Transform):
     lookup_name = 'values'
     output_field = ArrayField(TextField())
 
-    def as_sql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs, params = compiler.compile(self.lhs)
         return 'avals(%s)' % lhs, params

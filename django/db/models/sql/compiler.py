@@ -1098,13 +1098,13 @@ class SQLUpdateCompiler(SQLCompiler):
 
 
 class SQLAggregateCompiler(SQLCompiler):
-    def as_sql(self, qn=None):
+    def as_sql(self, compiler=None):
         """
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
         """
-        if qn is None:
-            qn = self
+        if compiler is None:
+            compiler = self
 
         sql, params = [], []
         for annotation in self.query.annotation_select.values():
