@@ -898,7 +898,7 @@ class TestLoadFixtureFromOtherAppDirectory(TestCase):
     # fixtures_regress depending on how runtests.py is invoked.
     # All path separators must be / in order to be a proper regression test on
     # Windows, so replace as appropriate.
-    relative_prefix = current_dir.replace(os.getcwd(), '', 1)[1:].replace('\\', '/')
+    relative_prefix = os.path.relpath(current_dir, os.getcwd()).replace('\\', '/')
     fixtures = [relative_prefix + '/fixtures/absolute.json']
 
     def test_fixtures_loaded(self):
