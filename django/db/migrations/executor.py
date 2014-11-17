@@ -36,12 +36,17 @@ class MigrationExecutor(object):
             # If the migration is already applied, do backwards mode,
             # otherwise do forwards mode.
             elif target in applied:
-                backwards_plan = self.loader.graph.backwards_plan(target)[:-1]
-                # We only do this if the migration is not the most recent one
-                # in its app - that is, another migration with the same app
-                # label is in the backwards plan
-                if any(node[0] == target[0] for node in backwards_plan):
-                    for migration in backwards_plan:
+                # Don't migrate backwards all the way to the target node (that
+                # may roll back dependencies in other apps that don't need to
+                # be rolled back); instead roll back through target's immediate
+                # child(ren) in the same app, and no further.
+                next_in_app = sorted(
+                    n for n in
+                    self.loader.graph.dependents.get(target, set())
+                    if n[0] == target[0]
+                )
+                for node in next_in_app:
+                    for migration in self.loader.graph.backwards_plan(node):
                         if migration in applied:
                             plan.append((self.loader.graph.nodes[migration], True))
                             applied.remove(migration)
