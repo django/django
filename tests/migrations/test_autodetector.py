@@ -25,24 +25,78 @@ class AutodetectorTests(TestCase):
     """
 
     author_empty = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))])
-    author_name = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))])
-    author_name_null = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, null=True))])
-    author_name_longer = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=400))])
-    author_name_renamed = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("names", models.CharField(max_length=200))])
-    author_name_default = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default='Ada Lovelace'))])
-    author_name_deconstructable_1 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=DeconstructableObject()))])
-    author_name_deconstructable_2 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=DeconstructableObject()))])
-    author_name_deconstructable_3 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=models.IntegerField()))])
-    author_name_deconstructable_4 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=models.IntegerField()))])
+    author_name = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+    ])
+    author_name_null = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, null=True)),
+    ])
+    author_name_longer = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=400)),
+    ])
+    author_name_renamed = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("names", models.CharField(max_length=200)),
+    ])
+    author_name_default = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, default='Ada Lovelace')),
+    ])
+    author_name_deconstructable_1 = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, default=DeconstructableObject())),
+    ])
+    author_name_deconstructable_2 = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, default=DeconstructableObject())),
+    ])
+    author_name_deconstructable_3 = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, default=models.IntegerField())),
+    ])
+    author_name_deconstructable_4 = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200, default=models.IntegerField())),
+    ])
     author_custom_pk = ModelState("testapp", "Author", [("pk_field", models.IntegerField(primary_key=True))])
-    author_with_book = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
-    author_with_book_order_wrt = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))], options={"order_with_respect_to": "book"})
-    author_renamed_with_book = ModelState("testapp", "Writer", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
-    author_with_publisher_string = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("publisher_name", models.CharField(max_length=200))])
-    author_with_publisher = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("publisher", models.ForeignKey("testapp.Publisher"))])
-    author_with_custom_user = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("user", models.ForeignKey("thirdapp.CustomUser"))])
-    author_proxy = ModelState("testapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
-    author_proxy_options = ModelState("testapp", "AuthorProxy", [], {"proxy": True, "verbose_name": "Super Author"}, ("testapp.author", ))
+    author_with_book = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+        ("book", models.ForeignKey("otherapp.Book")),
+    ])
+    author_with_book_order_wrt = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+        ("book", models.ForeignKey("otherapp.Book")),
+    ], options={"order_with_respect_to": "book"})
+    author_renamed_with_book = ModelState("testapp", "Writer", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+        ("book", models.ForeignKey("otherapp.Book")),
+    ])
+    author_with_publisher_string = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+        ("publisher_name", models.CharField(max_length=200)),
+    ])
+    author_with_publisher = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+        ("publisher", models.ForeignKey("testapp.Publisher")),
+    ])
+    author_with_custom_user = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+        ("user", models.ForeignKey("thirdapp.CustomUser")),
+    ])
+    author_proxy = ModelState("testapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author",))
+    author_proxy_options = ModelState("testapp", "AuthorProxy", [], {
+        "proxy": True,
+        "verbose_name": "Super Author",
+    }, ("testapp.author", ))
     author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
     author_proxy_third = ModelState("thirdapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
     author_proxy_proxy = ModelState("testapp", "AAuthorProxyProxy", [], {"proxy": True}, ("testapp.authorproxy", ))
@@ -56,52 +110,159 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher")),
     ])
-    author_with_m2m_through = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("publishers", models.ManyToManyField("testapp.Publisher", through="testapp.Contract"))])
-    author_with_options = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))], {"verbose_name": "Authi", "permissions": [('can_hire', 'Can hire')]})
+    author_with_m2m_through = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("publishers", models.ManyToManyField("testapp.Publisher", through="testapp.Contract")),
+    ])
+    author_with_options = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+    ], {
+        "permissions": [('can_hire', 'Can hire')],
+        "verbose_name": "Authi",
+    })
     author_with_db_table_options = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True))
+        ("id", models.AutoField(primary_key=True)),
     ], {"db_table": "author_one"})
     author_with_new_db_table_options = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True))
+        ("id", models.AutoField(primary_key=True)),
     ], {"db_table": "author_two"})
     author_renamed_with_db_table_options = ModelState("testapp", "NewAuthor", [
-        ("id", models.AutoField(primary_key=True))
+        ("id", models.AutoField(primary_key=True)),
     ], {"db_table": "author_one"})
-    contract = ModelState("testapp", "Contract", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("publisher", models.ForeignKey("testapp.Publisher"))])
-    publisher = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=100))])
-    publisher_with_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("name", models.CharField(max_length=100))])
-    publisher_with_aardvark_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Aardvark")), ("name", models.CharField(max_length=100))])
-    publisher_with_book = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("otherapp.Book")), ("name", models.CharField(max_length=100))])
-    other_pony = ModelState("otherapp", "Pony", [("id", models.AutoField(primary_key=True))])
+    author_renamed_with_new_db_table_options = ModelState("testapp", "NewAuthor", [
+        ("id", models.AutoField(primary_key=True)),
+    ], {"db_table": "author_three"})
+    contract = ModelState("testapp", "Contract", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.Author")),
+        ("publisher", models.ForeignKey("testapp.Publisher")),
+    ])
+    publisher = ModelState("testapp", "Publisher", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=100)),
+    ])
+    publisher_with_author = ModelState("testapp", "Publisher", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.Author")),
+        ("name", models.CharField(max_length=100)),
+    ])
+    publisher_with_aardvark_author = ModelState("testapp", "Publisher", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.Aardvark")),
+        ("name", models.CharField(max_length=100)),
+    ])
+    publisher_with_book = ModelState("testapp", "Publisher", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("otherapp.Book")),
+        ("name", models.CharField(max_length=100)),
+    ])
+    other_pony = ModelState("otherapp", "Pony", [
+        ("id", models.AutoField(primary_key=True)),
+    ])
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
     third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
-    book = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))])
-    book_proxy_fk = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("thirdapp.AuthorProxy")), ("title", models.CharField(max_length=200))])
-    book_migrations_fk = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("migrations.UnmigratedModel")), ("title", models.CharField(max_length=200))])
-    book_with_no_author = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("title", models.CharField(max_length=200))])
-    book_with_author_renamed = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Writer")), ("title", models.CharField(max_length=200))])
-    book_with_field_and_author_renamed = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("writer", models.ForeignKey("testapp.Writer")), ("title", models.CharField(max_length=200))])
-    book_with_multiple_authors = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("authors", models.ManyToManyField("testapp.Author")), ("title", models.CharField(max_length=200))])
-    book_with_multiple_authors_through_attribution = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("authors", models.ManyToManyField("testapp.Author", through="otherapp.Attribution")), ("title", models.CharField(max_length=200))])
-    book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("author", "title")}})
-    book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("title", "author")}})
-    book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("title", "newfield")}})
-    book_unique_4 = ModelState("otherapp", "Book", [
+    book = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.Author")),
+        ("title", models.CharField(max_length=200)),
+    ])
+    book_proxy_fk = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("thirdapp.AuthorProxy")),
+        ("title", models.CharField(max_length=200)),
+    ])
+    book_migrations_fk = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("migrations.UnmigratedModel")),
+        ("title", models.CharField(max_length=200)),
+    ])
+    book_with_no_author = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("title", models.CharField(max_length=200)),
+    ])
+    book_with_author_renamed = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.Writer")),
+        ("title", models.CharField(max_length=200)),
+    ])
+    book_with_field_and_author_renamed = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("writer", models.ForeignKey("testapp.Writer")),
+        ("title", models.CharField(max_length=200)),
+    ])
+    book_with_multiple_authors = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("authors", models.ManyToManyField("testapp.Author")),
+        ("title", models.CharField(max_length=200)),
+    ])
+    book_with_multiple_authors_through_attribution = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("authors", models.ManyToManyField("testapp.Author", through="otherapp.Attribution")),
+        ("title", models.CharField(max_length=200)),
+    ])
+    book_foo_together = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.Author")),
+        ("title", models.CharField(max_length=200)),
+    ], {
+        "index_together": {("author", "title")},
+        "unique_together": {("author", "title")},
+    })
+    book_foo_together_2 = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.Author")),
+        ("title", models.CharField(max_length=200)),
+    ], {
+        "index_together": {("title", "author")},
+        "unique_together": {("title", "author")},
+    })
+    book_foo_together_3 = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("newfield", models.IntegerField()),
+        ("author", models.ForeignKey("testapp.Author")),
+        ("title", models.CharField(max_length=200)),
+    ], {
+        "index_together": {("title", "newfield")},
+        "unique_together": {("title", "newfield")},
+    })
+    book_foo_together_4 = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
         ("newfield2", models.IntegerField()),
         ("author", models.ForeignKey("testapp.Author")),
         ("title", models.CharField(max_length=200)),
-    ], {"unique_together": {("title", "newfield2")}})
-    attribution = ModelState("otherapp", "Attribution", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("book", models.ForeignKey("otherapp.Book"))])
-    edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
-    custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))], bases=(AbstractBaseUser, ))
-    custom_user_no_inherit = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))])
+    ], {
+        "index_together": {("title", "newfield2")},
+        "unique_together": {("title", "newfield2")},
+    })
+    attribution = ModelState("otherapp", "Attribution", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.Author")),
+        ("book", models.ForeignKey("otherapp.Book")),
+    ])
+    edition = ModelState("thirdapp", "Edition", [
+        ("id", models.AutoField(primary_key=True)),
+        ("book", models.ForeignKey("otherapp.Book")),
+    ])
+    custom_user = ModelState("thirdapp", "CustomUser", [
+        ("id", models.AutoField(primary_key=True)),
+        ("username", models.CharField(max_length=255)),
+    ], bases=(AbstractBaseUser, ))
+    custom_user_no_inherit = ModelState("thirdapp", "CustomUser", [
+        ("id", models.AutoField(primary_key=True)),
+        ("username", models.CharField(max_length=255)),
+    ])
     aardvark = ModelState("thirdapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
     aardvark_testapp = ModelState("testapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
     aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author", ))
-    aardvark_pk_fk_author = ModelState("testapp", "Aardvark", [("id", models.OneToOneField("testapp.Author", primary_key=True))])
+    aardvark_pk_fk_author = ModelState("testapp", "Aardvark", [
+        ("id", models.OneToOneField("testapp.Author", primary_key=True)),
+    ])
     knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
-    rabbit = ModelState("eggs", "Rabbit", [("id", models.AutoField(primary_key=True)), ("knight", models.ForeignKey("eggs.Knight")), ("parent", models.ForeignKey("eggs.Rabbit"))], {"unique_together": {("parent", "knight")}})
+    rabbit = ModelState("eggs", "Rabbit", [
+        ("id", models.AutoField(primary_key=True)),
+        ("knight", models.ForeignKey("eggs.Knight")),
+        ("parent", models.ForeignKey("eggs.Rabbit")),
+    ], {"unique_together": {("parent", "knight")}})
 
     def repr_changes(self, changes):
         output = ""
