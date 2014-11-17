@@ -604,6 +604,7 @@ of three things ``(path, args, kwargs)``:
   ``__init__`` method. Every value should itself be serializable.
 
 .. note::
+
     This return value is different from the ``deconstruct()`` method
     :ref:`for custom fields <custom-field-deconstruct-method>` which returns a
     tuple of four items.
