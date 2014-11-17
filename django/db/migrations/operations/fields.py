@@ -177,13 +177,14 @@ class RenameField(Operation):
             (self.new_name if n == self.old_name else n, f)
             for n, f in state.models[app_label, self.model_name.lower()].fields
         ]
-        # Fix unique_together to refer to the new field
+        # Fix index/unique_together to refer to the new field
         options = state.models[app_label, self.model_name.lower()].options
-        if "unique_together" in options:
-            options['unique_together'] = [
-                [self.new_name if n == self.old_name else n for n in unique]
-                for unique in options['unique_together']
-            ]
+        for option in ('index_together', 'unique_together'):
+            if option in options:
+                options[option] = [
+                    [self.new_name if n == self.old_name else n for n in together]
+                    for together in options[option]
+                ]
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.render().get_model(app_label, self.model_name)
