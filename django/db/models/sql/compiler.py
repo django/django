@@ -37,7 +37,7 @@ class SQLCompiler(object):
         # cleaned. We are not using a clone() of the query here.
         """
         if not self.query.tables:
-            self.query.join((None, self.query.get_meta().db_table, None))
+            self.query.get_initial_alias()
         if (not self.query.select and self.query.default_cols and not
                 self.query.included_inherited_models):
             self.query.setup_inherited_models()
@@ -171,7 +171,6 @@ class SQLCompiler(object):
 
         # Finally do cleanup - get rid of the joins we created above.
         self.query.reset_refcounts(refcounts_before)
-
         return ' '.join(result), tuple(params)
 
     def as_nested_sql(self):
@@ -511,51 +510,27 @@ class SQLCompiler(object):
         ordering and distinct must be done first.
         """
         result = []
-        qn = self.quote_name_unless_alias
-        qn2 = self.connection.ops.quote_name
-        first = True
-        from_params = []
+        params = []
         for alias in self.query.tables:
             if not self.query.alias_refcount[alias]:
                 continue
             try:
-                name, alias, join_type, lhs, join_cols, _, join_field = self.query.alias_map[alias]
+                from_clause = self.query.alias_map[alias]
             except KeyError:
                 # Extra tables can end up in self.tables, but not in the
                 # alias_map if they aren't in a join. That's OK. We skip them.
                 continue
-            alias_str = '' if alias == name else (' %s' % alias)
-            if join_type and not first:
-                extra_cond = join_field.get_extra_restriction(
-                    self.query.where_class, alias, lhs)
-                if extra_cond:
-                    extra_sql, extra_params = self.compile(extra_cond)
-                    extra_sql = 'AND (%s)' % extra_sql
-                    from_params.extend(extra_params)
-                else:
-                    extra_sql = ""
-                result.append('%s %s%s ON ('
-                        % (join_type, qn(name), alias_str))
-                for index, (lhs_col, rhs_col) in enumerate(join_cols):
-                    if index != 0:
-                        result.append(' AND ')
-                    result.append('%s.%s = %s.%s' %
-                    (qn(lhs), qn2(lhs_col), qn(alias), qn2(rhs_col)))
-                result.append('%s)' % extra_sql)
-            else:
-                connector = '' if first else ', '
-                result.append('%s%s%s' % (connector, qn(name), alias_str))
-            first = False
+            clause_sql, clause_params = self.compile(from_clause)
+            result.append(clause_sql)
+            params.extend(clause_params)
         for t in self.query.extra_tables:
             alias, _ = self.query.table_alias(t)
             # Only add the alias if it's not already present (the table_alias()
-            # calls increments the refcount, so an alias refcount of one means
-            # this is the only reference.
+            # call increments the refcount, so an alias refcount of one means
+            # this is the only reference).
             if alias not in self.query.alias_map or self.query.alias_refcount[alias] == 1:
-                connector = '' if first else ', '
-                result.append('%s%s' % (connector, qn(alias)))
-                first = False
-        return result, from_params
+                result.append(', %s' % self.quote_name_unless_alias(alias))
+        return result, params
 
     def get_grouping(self, having_group_by, ordering_group_by):
         """
