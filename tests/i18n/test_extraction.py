@@ -343,7 +343,6 @@ class BasicExtractorTests(ExtractorTests):
             six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #9')
             self.assertMsgId("Translatable literal #9j", po_contents)
 
-
     def test_makemessages_find_files(self):
         """
         Test that find_files only discover files having the proper extensions.
