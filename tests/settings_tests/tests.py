@@ -275,14 +275,6 @@ class SettingsTests(TestCase):
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
         self.assertRaises(AttributeError, getattr, settings, 'TEST2')
 
-    def test_allowed_include_roots_string(self):
-        """
-        ALLOWED_INCLUDE_ROOTS is not allowed to be incorrectly set to a string
-        rather than a tuple.
-        """
-        self.assertRaises(ValueError, setattr, settings,
-            'ALLOWED_INCLUDE_ROOTS', '/var/www/ssi/')
-
 
 class TestComplexSettingOverride(TestCase):
     def setUp(self):
@@ -453,7 +445,12 @@ class TestTupleSettings(unittest.TestCase):
     Make sure settings that should be tuples throw ImproperlyConfigured if they
     are set to a string instead of a tuple.
     """
-    tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS", "LOCALE_PATHS")
+    tuple_settings = (
+        "ALLOWED_INCLUDE_ROOTS",
+        "INSTALLED_APPS",
+        "TEMPLATE_DIRS",
+        "LOCALE_PATHS",
+    )
 
     def test_tuple_settings(self):
         settings_module = ModuleType('fake_settings_module')
