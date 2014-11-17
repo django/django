@@ -26,7 +26,9 @@ class Command(BaseCommand):
 
         self.verbosity = options.get('verbosity')
         self.interactive = options.get('interactive')
-        app_label, migration_name = options['app_label'], options['migration_name']
+        app_label = options['app_label']
+        migration_name = options['migration_name']
+        no_optimize = options['no_optimize']
 
         # Load the current graph state, check the app and migration they asked for exists
         executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
@@ -95,20 +97,25 @@ class Command(BaseCommand):
                 elif dependency[0] != smigration.app_label:
                     dependencies.add(dependency)
 
-        if self.verbosity > 0:
-            self.stdout.write(self.style.MIGRATE_HEADING("Optimizing..."))
+        if no_optimize:
+            if self.verbosity > 0:
+                self.stdout.write(self.style.MIGRATE_HEADING("(Skipping optimization.)"))
+            new_operations = operations
+        else:
+            if self.verbosity > 0:
+                self.stdout.write(self.style.MIGRATE_HEADING("Optimizing..."))
 
-        optimizer = MigrationOptimizer()
-        new_operations = optimizer.optimize(operations, migration.app_label)
+            optimizer = MigrationOptimizer()
+            new_operations = optimizer.optimize(operations, migration.app_label)
 
-        if self.verbosity > 0:
-            if len(new_operations) == len(operations):
-                self.stdout.write("  No optimizations possible.")
-            else:
-                self.stdout.write(
-                    "  Optimized from %s operations to %s operations." %
-                    (len(operations), len(new_operations))
-                )
+            if self.verbosity > 0:
+                if len(new_operations) == len(operations):
+                    self.stdout.write("  No optimizations possible.")
+                else:
+                    self.stdout.write(
+                        "  Optimized from %s operations to %s operations." %
+                        (len(operations), len(new_operations))
+                    )
 
         # Work out the value of replaces (any squashed ones we're re-squashing)
         # need to feed their replaces into ours
