@@ -85,8 +85,7 @@ class TemplateCommand(BaseCommand):
                 raise CommandError("Destination directory '%s' does not "
                                    "exist, please create it first." % top_dir)
 
-        extensions = tuple(
-            handle_extensions(options['extensions'], ignored=()))
+        extensions = tuple(handle_extensions(options['extensions']))
         extra_files = []
         for file in options['files']:
             extra_files.extend(map(lambda x: x.strip(), file.split(',')))
