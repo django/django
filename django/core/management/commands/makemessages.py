@@ -395,7 +395,7 @@ class Command(BaseCommand):
             for filename in filenames:
                 file_path = os.path.normpath(os.path.join(dirpath, filename))
                 file_ext = os.path.splitext(filename)[1]
-                if not (file_ext in self.extensions) or is_ignored(file_path, self.ignore_patterns):
+                if file_ext not in self.extensions or is_ignored(file_path, self.ignore_patterns):
                     if self.verbosity > 1:
                         self.stdout.write('ignoring file %s in %s\n' % (filename, dirpath))
                 else:
