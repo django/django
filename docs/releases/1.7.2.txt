@@ -68,3 +68,6 @@ Bugfixes
 
 * Made :class:`~django.db.migrations.operations.RenameModel` reversible
   (:ticket:`22248`)
+
+* Avoided unnecessary rollbacks of migrations from other apps when migrating
+  backwards (:ticket:`23410`).
