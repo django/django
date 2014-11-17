@@ -251,7 +251,7 @@ class Command(BaseCommand):
             exts = extensions if extensions else ['js']
         else:
             exts = extensions if extensions else ['html', 'txt', 'py']
-        self.extensions = handle_extensions(exts, ignored=())
+        self.extensions = handle_extensions(exts)
 
         if (locale is None and not exclude and not process_all) or self.domain is None:
             raise CommandError("Type '%s help %s' for usage information." % (
