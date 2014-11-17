@@ -59,3 +59,6 @@ Bugfixes
 
 * Fixed a custom field type validation error with MySQL backend when
   ``db_type`` returned ``None`` (:ticket:`23761`).
+
+* Fixed a migration crash when a field is renamed that is part of an
+  ``index_together`` (:ticket:`23859`).

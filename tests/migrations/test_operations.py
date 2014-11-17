@@ -49,7 +49,7 @@ class OperationTestBase(MigrationTestBase):
 
     def set_up_test_model(self, app_label, second_model=False, third_model=False,
             related_model=False, mti_model=False, proxy_model=False,
-            unique_together=False, options=False, db_table=None):
+            unique_together=False, options=False, db_table=None, index_together=False):
         """
         Creates a test model state and database table.
         """
@@ -81,6 +81,7 @@ class OperationTestBase(MigrationTestBase):
         # Make the "current" state
         model_options = {
             "swappable": "TEST_SWAP_MODEL",
+            "index_together": [["pink", "weight"]] if index_together else [],
             "unique_together": [["pink", "weight"]] if unique_together else [],
         }
         if options:
@@ -984,7 +985,7 @@ class OperationTests(OperationTestBase):
         """
         Tests the RenameField operation.
         """
-        project_state = self.set_up_test_model("test_rnfl", unique_together=True)
+        project_state = self.set_up_test_model("test_rnfl", unique_together=True, index_together=True)
         # Test the state alteration
         operation = migrations.RenameField("Pony", "pink", "blue")
         self.assertEqual(operation.describe(), "Rename field pink on Pony to blue")
@@ -995,6 +996,9 @@ class OperationTests(OperationTestBase):
         # Make sure the unique_together has the renamed column too
         self.assertIn("blue", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
         self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
+        # Make sure the index_together has the renamed column too
+        self.assertIn("blue", new_state.models["test_rnfl", "pony"].options['index_together'][0])
+        self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].options['index_together'][0])
         # Test the database alteration
         self.assertColumnExists("test_rnfl_pony", "pink")
         self.assertColumnNotExists("test_rnfl_pony", "blue")
