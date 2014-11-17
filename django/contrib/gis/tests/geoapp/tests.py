@@ -629,7 +629,9 @@ class GeoQuerySetTest(TestCase):
         )
         # We check for equality with a tolerance of 10e-5 which is a lower bound
         # of the precisions of ref_line coordinates
-        self.assertTrue(ref_line.equals_exact(City.objects.make_line(), tolerance=10e-5))
+        line = City.objects.make_line()
+        self.assertTrue(ref_line.equals_exact(line, tolerance=10e-5),
+            "%s != %s" % (ref_line, line))
 
     @skipUnlessDBFeature("has_num_geom_method")
     def test_num_geom(self):
