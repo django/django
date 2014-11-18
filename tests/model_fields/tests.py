@@ -72,6 +72,11 @@ ONE_TO_MANY_CLASSES = set([
     GenericForeignKey,
 ])
 
+MANY_TO_ONE_CLASSES = set([
+    RelatedObject,
+    GenericRelation,
+])
+
 MANY_TO_MANY_CLASSES = set([
     ManyToManyField,
 ])
@@ -801,6 +806,7 @@ class FieldFlagsTests(test.TestCase):
             f.__class__ for f in m2m_type_fields
         ))
 
+        # Ensure all m2m reverses are m2m
         for field in m2m_type_fields:
             reverse_field = field.related
             self.assertTrue(reverse_field.has_relation)
@@ -824,6 +830,24 @@ class FieldFlagsTests(test.TestCase):
                 reverse_field = field.related
                 self.assertTrue(reverse_field.has_relation \
                                 and reverse_field.many_to_one)
+
+    def test_cardinality_m2o(self):
+        m2o_type_fields = [
+            f for f in self.fields_and_reverse_objects
+            if f.has_relation and f.many_to_one
+        ]
+
+        # Test classes are what we expect
+        self.assertEquals(MANY_TO_ONE_CLASSES, set(
+            f.__class__ for f in m2o_type_fields
+        ))
+
+        # Ensure all m2o reverses are o2m
+        for obj in m2o_type_fields:
+            if hasattr(obj, 'field'):
+                reverse_field = obj.field
+                self.assertTrue(reverse_field.has_relation \
+                                and reverse_field.one_to_many)
 
 class GenericIPAddressFieldTests(test.TestCase):
     def test_genericipaddressfield_formfield_protocol(self):
