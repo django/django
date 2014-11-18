@@ -108,21 +108,6 @@ All attributes should be considered read-only, unless stated otherwise below.
 
     Note: ``POST`` does *not* include file-upload information. See ``FILES``.
 
-.. attribute:: HttpRequest.REQUEST
-
-    .. deprecated:: 1.7
-        Use the more explicit ``GET`` and ``POST`` instead.
-
-    For convenience, a dictionary-like object that searches ``POST`` first,
-    then ``GET``. Inspired by PHP's ``$_REQUEST``.
-
-    For example, if ``GET = {"name": "john"}`` and ``POST = {"age": '34'}``,
-    ``REQUEST["name"]`` would be ``"john"``, and ``REQUEST["age"]`` would be
-    ``"34"``.
-
-    It's strongly suggested that you use ``GET`` and ``POST`` instead of
-    ``REQUEST``, because the former are more explicit.
-
 .. attribute:: HttpRequest.COOKIES
 
     A standard Python dictionary containing all cookies. Keys and values are

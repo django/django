@@ -953,14 +953,12 @@ class zzUrlconfSubstitutionTests(TestCase):
 class ContextTests(TestCase):
     fixtures = ['testdata']
 
-    @ignore_warnings(category=RemovedInDjango19Warning)  # `request.REQUEST` is deprecated
     def test_single_context(self):
         "Context variables can be retrieved from a single context"
         response = self.client.get("/request_data/", data={'foo': 'whiz'})
         self.assertEqual(response.context.__class__, Context)
         self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
-        self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'sausage')
 
         try:
@@ -969,7 +967,6 @@ class ContextTests(TestCase):
         except KeyError as e:
             self.assertEqual(e.args[0], 'does-not-exist')
 
-    @ignore_warnings(category=RemovedInDjango19Warning)  # `request.REQUEST` is deprecated
     def test_inherited_context(self):
         "Context variables can be retrieved from a list of contexts"
         response = self.client.get("/request_data_extended/", data={'foo': 'whiz'})
@@ -977,7 +974,6 @@ class ContextTests(TestCase):
         self.assertEqual(len(response.context), 2)
         self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
-        self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'bacon')
 
         try:
@@ -1252,7 +1248,6 @@ class RequestMethodStringDataTests(TestCase):
 @override_settings(ROOT_URLCONF='test_client_regress.urls',)
 class QueryStringTests(TestCase):
 
-    @ignore_warnings(category=RemovedInDjango19Warning)  # `request.REQUEST` is deprecated
     def test_get_like_requests(self):
         # See: https://code.djangoproject.com/ticket/10571.
         for method_name in ('get', 'head'):
@@ -1260,25 +1255,19 @@ class QueryStringTests(TestCase):
             method = getattr(self.client, method_name)
             response = method("/request_data/", data={'foo': 'whiz'})
             self.assertEqual(response.context['get-foo'], 'whiz')
-            self.assertEqual(response.context['request-foo'], 'whiz')
 
             # A GET-like request can pass a query string as part of the URL
             response = method("/request_data/?foo=whiz")
             self.assertEqual(response.context['get-foo'], 'whiz')
-            self.assertEqual(response.context['request-foo'], 'whiz')
 
             # Data provided in the URL to a GET-like request is overridden by actual form data
             response = method("/request_data/?foo=whiz", data={'foo': 'bang'})
             self.assertEqual(response.context['get-foo'], 'bang')
-            self.assertEqual(response.context['request-foo'], 'bang')
 
             response = method("/request_data/?foo=whiz", data={'bar': 'bang'})
             self.assertEqual(response.context['get-foo'], None)
             self.assertEqual(response.context['get-bar'], 'bang')
-            self.assertEqual(response.context['request-foo'], None)
-            self.assertEqual(response.context['request-bar'], 'bang')
 
-    @ignore_warnings(category=RemovedInDjango19Warning)  # `request.REQUEST` is deprecated
     def test_post_like_requests(self):
         # A POST-like request can pass a query string as data
         response = self.client.post("/request_data/", data={'foo': 'whiz'})
@@ -1289,21 +1278,17 @@ class QueryStringTests(TestCase):
         response = self.client.post("/request_data/?foo=whiz")
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['post-foo'], None)
-        self.assertEqual(response.context['request-foo'], 'whiz')
 
         # POST data provided in the URL augments actual form data
         response = self.client.post("/request_data/?foo=whiz", data={'foo': 'bang'})
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['post-foo'], 'bang')
-        self.assertEqual(response.context['request-foo'], 'bang')
 
         response = self.client.post("/request_data/?foo=whiz", data={'bar': 'bang'})
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['get-bar'], None)
         self.assertEqual(response.context['post-foo'], None)
         self.assertEqual(response.context['post-bar'], 'bang')
-        self.assertEqual(response.context['request-foo'], 'whiz')
-        self.assertEqual(response.context['request-bar'], 'bang')
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')

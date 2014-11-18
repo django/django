@@ -4,7 +4,7 @@ import os
 import unittest
 import warnings
 
-from django.test import SimpleTestCase, RequestFactory, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import reset_warning_registry
 from django.utils import six, translation
 from django.utils.deprecation import RenameMethodsBase
@@ -172,26 +172,6 @@ class RenameMethodsTests(SimpleTestCase):
             self.assertEqual(msgs, [
                 '`DeprecatedMixin.old` is deprecated, use `new` instead.',
                 '`RenamedMixin.old` is deprecated, use `new` instead.',
-            ])
-
-
-class DeprecatingRequestMergeDictTest(SimpleTestCase):
-    def test_deprecated_request(self):
-        """
-        Ensure the correct warning is raised when WSGIRequest.REQUEST is
-        accessed.
-        """
-        reset_warning_registry()
-        with warnings.catch_warnings(record=True) as recorded:
-            warnings.simplefilter('always')
-            request = RequestFactory().get('/')
-            request.REQUEST  # evaluate
-
-            msgs = [str(warning.message) for warning in recorded]
-            self.assertEqual(msgs, [
-                '`request.REQUEST` is deprecated, use `request.GET` or '
-                '`request.POST` instead.',
-                '`MergeDict` is deprecated, use `dict.update()` instead.',
             ])
 
 

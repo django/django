@@ -6,15 +6,12 @@ import logging
 import sys
 from io import BytesIO
 from threading import Lock
-import warnings
 
 from django import http
 from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
-from django.utils import datastructures
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import cached_property
 from django.utils import six
@@ -121,13 +118,6 @@ class WSGIRequest(http.HttpRequest):
     def _get_scheme(self):
         return self.environ.get('wsgi.url_scheme')
 
-    def _get_request(self):
-        warnings.warn('`request.REQUEST` is deprecated, use `request.GET` or '
-                      '`request.POST` instead.', RemovedInDjango19Warning, 2)
-        if not hasattr(self, '_request'):
-            self._request = datastructures.MergeDict(self.POST, self.GET)
-        return self._request
-
     @cached_property
     def GET(self):
         # The WSGI spec says 'QUERY_STRING' may be absent.
@@ -154,7 +144,6 @@ class WSGIRequest(http.HttpRequest):
 
     POST = property(_get_post, _set_post)
     FILES = property(_get_files)
-    REQUEST = property(_get_request)
 
 
 class WSGIHandler(base.BaseHandler):
