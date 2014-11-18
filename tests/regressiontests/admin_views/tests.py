@@ -590,9 +590,18 @@ class AdminViewBasicTest(TestCase):
         response = self.client.get("/test_admin/admin/admin_views/m2mreference/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
-        # Specifying a field that is not refered by any other model directly registered
+        # #23604 - Specifying the pk of this model should be allowed when this model defines a m2m relationship
+        response = self.client.get("/test_admin/admin/admin_views/ingredient/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
+        # #23329 - Specifying a field that is not refered by any other model directly registered
         # to this admin site but registered through inheritance should be allowed.
         response = self.client.get("/test_admin/admin/admin_views/referencedbyparent/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
+        # #23431 - Specifying a field that is only refered to by a inline of a registered
+        # model should be allowed.
+        response = self.client.get("/test_admin/admin/admin_views/referencedbyinline/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
     def test_allowed_filtering_15103(self):
