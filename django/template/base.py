@@ -10,6 +10,7 @@ from django.apps import apps
 from django.conf import settings
 from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatibility
     ContextPopException)
+from django.utils import lru_cache
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,
@@ -1296,32 +1297,27 @@ def import_library(taglib_module):
                                      "a variable named 'register'" %
                                      taglib_module)
 
-templatetags_modules = []
 
-
+@lru_cache.lru_cache()
 def get_templatetags_modules():
     """
     Return the list of all available template tag modules.
 
     Caches the result for faster access.
     """
-    global templatetags_modules
-    if not templatetags_modules:
-        _templatetags_modules = []
-        # Populate list once per process. Mutate the local list first, and
-        # then assign it to the global name to ensure there are no cases where
-        # two threads try to populate it simultaneously.
+    templatetags_modules_candidates = ['django.templatetags']
+    templatetags_modules_candidates += [
+        '%s.templatetags' % app_config.name
+        for app_config in apps.get_app_configs()]
 
-        templatetags_modules_candidates = ['django.templatetags']
-        templatetags_modules_candidates += ['%s.templatetags' % app_config.name
-            for app_config in apps.get_app_configs()]
-        for templatetag_module in templatetags_modules_candidates:
-            try:
-                import_module(templatetag_module)
-                _templatetags_modules.append(templatetag_module)
-            except ImportError:
-                continue
-        templatetags_modules = _templatetags_modules
+    templatetags_modules = []
+    for templatetag_module in templatetags_modules_candidates:
+        try:
+            import_module(templatetag_module)
+        except ImportError:
+            continue
+        else:
+            templatetags_modules.append(templatetag_module)
     return templatetags_modules
 
 
