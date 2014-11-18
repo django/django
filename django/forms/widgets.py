@@ -9,7 +9,7 @@ from itertools import chain
 
 from django.conf import settings
 from django.forms.utils import flatatt, to_current_timezone
-from django.utils.datastructures import MultiValueDict, MergeDict
+from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import conditional_escape, format_html
 from django.utils.translation import ugettext_lazy
@@ -319,7 +319,7 @@ class MultipleHiddenInput(HiddenInput):
         return mark_safe('\n'.join(inputs))
 
     def value_from_datadict(self, data, files, name):
-        if isinstance(data, (MultiValueDict, MergeDict)):
+        if isinstance(data, MultiValueDict):
             return data.getlist(name)
         return data.get(name, None)
 
@@ -587,7 +587,7 @@ class SelectMultiple(Select):
         return mark_safe('\n'.join(output))
 
     def value_from_datadict(self, data, files, name):
-        if isinstance(data, (MultiValueDict, MergeDict)):
+        if isinstance(data, MultiValueDict):
             return data.getlist(name)
         return data.get(name, None)
 
