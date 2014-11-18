@@ -1,4 +1,5 @@
 import datetime
+import warnings
 
 from django.conf import settings
 from django.core.exceptions import FieldError
@@ -12,8 +13,9 @@ from django.db.models.sql.query import get_order_dir, Query
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
 from django.utils import six
-from django.utils.six.moves import zip
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.six.moves import zip
 
 
 class SQLCompiler(object):
@@ -47,6 +49,17 @@ class SQLCompiler(object):
 
     def __call__(self, name):
         """
+        Backwards-compatibility shim so that calling a SQLCompiler is equivalent to
+        calling its quote_name_unless_alias method.
+        """
+        warnings.warn(
+            "Calling a SQLCompiler directly is deprecated. "
+            "Call compiler.quote_name_unless_alias instead.",
+            RemovedInDjango20Warning, stacklevel=2)
+        return self.quote_name_unless_alias(name)
+
+    def quote_name_unless_alias(self, name):
+        """
         A wrapper around connection.ops.quote_name that doesn't quote aliases
         for table names. This avoids problems with some SQL dialects that treat
         quoted strings specially (e.g. PostgreSQL).
@@ -60,14 +73,6 @@ class SQLCompiler(object):
         r = self.connection.ops.quote_name(name)
         self.quote_cache[name] = r
         return r
-
-    def quote_name_unless_alias(self, name):
-        """
-        A wrapper around connection.ops.quote_name that doesn't quote aliases
-        for table names. This avoids problems with some SQL dialects that treat
-        quoted strings specially (e.g. PostgreSQL).
-        """
-        return self(name)
 
     def compile(self, node):
         vendor_impl = getattr(
@@ -198,7 +203,7 @@ class SQLCompiler(object):
         (without the table names) are given unique aliases. This is needed in
         some cases to avoid ambiguity with nested queries.
         """
-        qn = self
+        qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in six.iteritems(self.query.extra_select)]
         params = []
@@ -285,7 +290,7 @@ class SQLCompiler(object):
         result = []
         if opts is None:
             opts = self.query.get_meta()
-        qn = self
+        qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         aliases = set()
         only_load = self.deferred_to_columns()
@@ -337,7 +342,7 @@ class SQLCompiler(object):
         Note that this method can alter the tables in the query, and thus it
         must be called before get_from_clause().
         """
-        qn = self
+        qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         result = []
         opts = self.query.get_meta()
@@ -370,7 +375,7 @@ class SQLCompiler(object):
             ordering = (self.query.order_by
                         or self.query.get_meta().ordering
                         or [])
-        qn = self
+        qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         distinct = self.query.distinct
         select_aliases = self._select_aliases
@@ -509,7 +514,7 @@ class SQLCompiler(object):
         ordering and distinct must be done first.
         """
         result = []
-        qn = self
+        qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         first = True
         from_params = []
@@ -559,7 +564,7 @@ class SQLCompiler(object):
         """
         Returns a tuple representing the SQL elements in the "group by" clause.
         """
-        qn = self
+        qn = self.quote_name_unless_alias
         result, params = [], []
         if self.query.group_by is not None:
             select_cols = self.query.select + self.query.related_select_cols
@@ -853,8 +858,9 @@ class SQLCompiler(object):
                 cursor.close()
         return result
 
-    def as_subquery_condition(self, alias, columns, qn):
-        inner_qn = self
+    def as_subquery_condition(self, alias, columns, compiler):
+        qn = compiler.quote_name_unless_alias
+        inner_qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         if len(columns) == 1:
             sql, params = self.as_sql()
@@ -967,7 +973,7 @@ class SQLDeleteCompiler(SQLCompiler):
         """
         assert len(self.query.tables) == 1, \
             "Can only delete from one table at a time."
-        qn = self
+        qn = self.quote_name_unless_alias
         result = ['DELETE FROM %s' % qn(self.query.tables[0])]
         where, params = self.compile(self.query.where)
         if where:
@@ -985,7 +991,7 @@ class SQLUpdateCompiler(SQLCompiler):
         if not self.query.values:
             return '', ()
         table = self.query.tables[0]
-        qn = self
+        qn = self.quote_name_unless_alias
         result = ['UPDATE %s' % qn(table)]
         result.append('SET')
         values, update_params = [], []

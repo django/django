@@ -1049,6 +1049,20 @@ loader that inherits ``BaseLoader``, you must inherit ``Loader`` instead.
 Private API ``django.test.utils.TestTemplateLoader`` is deprecated in favor of
 ``django.template.loaders.locmem.Loader``.
 
+``qn`` replaced by ``compiler``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In previous Django versions, various internal ORM methods (mostly ``as_sql``
+methods) accepted a ``qn`` (for "quote name") argument, which was a reference
+to a function that quoted identifiers for sending to the database. In Django
+1.8, that argument has been renamed to ``compiler`` and is now a full
+``SQLCompiler`` instance. For backwards-compatibility, calling a
+``SQLCompiler`` instance performs the same name-quoting that the ``qn``
+function used to. However, this backwards-compatibility shim is immediately
+deprecated: you should rename your ``qn`` arguments to ``compiler``, and call
+``compiler.quote_name_unless_alias(...)`` where you previously called
+``qn(...)``.
+
 .. removed-features-1.8:
 
 Features removed in 1.8
