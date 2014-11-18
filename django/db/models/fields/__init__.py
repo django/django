@@ -722,7 +722,7 @@ class Field(RegisterLookupMixin):
         if self.has_default():
             if callable(self.default):
                 return self.default()
-            return force_text(self.default, strings_only=True)
+            return self.default
         if (not self.empty_strings_allowed or (self.null and
                    not connection.features.interprets_empty_strings_as_nulls)):
             return None
