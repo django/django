@@ -80,8 +80,8 @@ def update_connections_time_zone(**kwargs):
 @receiver(setting_changed)
 def clear_context_processors_cache(**kwargs):
     if kwargs['setting'] == 'TEMPLATE_CONTEXT_PROCESSORS':
-        from django.template import context
-        context._standard_context_processors = None
+        from django.template.context import get_standard_processors
+        get_standard_processors.cache_clear()
 
 
 @receiver(setting_changed)
