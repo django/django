@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 
 from unittest import skipUnless
 
-from django.conf.global_settings import PASSWORD_HASHERS as default_hashers
+from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth.hashers import (is_password_usable, BasePasswordHasher,
-    check_password, make_password, PBKDF2PasswordHasher, load_hashers, PBKDF2SHA1PasswordHasher,
+    check_password, make_password, PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher,
     get_hasher, identify_hasher, UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH)
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
 from django.utils import six
 
 
@@ -26,10 +27,8 @@ class PBKDF2SingleIterationHasher(PBKDF2PasswordHasher):
     iterations = 1
 
 
+@override_settings(PASSWORD_HASHERS=PASSWORD_HASHERS)
 class TestUtilsHashPass(SimpleTestCase):
-
-    def setUp(self):
-        load_hashers(password_hashers=default_hashers)
 
     def test_simple(self):
         encoded = make_password('lètmein')
@@ -253,8 +252,8 @@ class TestUtilsHashPass(SimpleTestCase):
             self.assertFalse(state['upgraded'])
 
     def test_pbkdf2_upgrade(self):
-        self.assertEqual('pbkdf2_sha256', get_hasher('default').algorithm)
         hasher = get_hasher('default')
+        self.assertEqual('pbkdf2_sha256', hasher.algorithm)
         self.assertNotEqual(hasher.iterations, 1)
 
         old_iterations = hasher.iterations
@@ -284,8 +283,8 @@ class TestUtilsHashPass(SimpleTestCase):
             hasher.iterations = old_iterations
 
     def test_pbkdf2_upgrade_new_hasher(self):
-        self.assertEqual('pbkdf2_sha256', get_hasher('default').algorithm)
         hasher = get_hasher('default')
+        self.assertEqual('pbkdf2_sha256', hasher.algorithm)
         self.assertNotEqual(hasher.iterations, 1)
 
         state = {'upgraded': False}
