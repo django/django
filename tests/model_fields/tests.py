@@ -81,16 +81,22 @@ MANY_TO_MANY_CLASSES = set([
     ManyToManyField,
 ])
 
+ONE_TO_ONE_CLASSES = set([
+    OneToOneField,
+])
+
 FLAG_PROPERTIES = (
     'concrete',
     'editable',
-    #'hidden',
     'has_relation',
-    #'one_to_many',
-    #'many_to_one',
-    'many_to_many',
-    #'one_to_one',
     'model',
+)
+
+FLAG_PROPERTIES_FOR_RELATIONS = (
+    'one_to_many',
+    'many_to_one',
+    'many_to_many',
+    'one_to_one',
     'related_model'
 )
 
@@ -793,6 +799,9 @@ class FieldFlagsTests(test.TestCase):
         for field in self.fields_and_reverse_objects:
             for flag in FLAG_PROPERTIES:
                 self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
+                if field.has_relation:
+                    for flag in FLAG_PROPERTIES_FOR_RELATIONS:
+                        self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
                 #print "%s => %s is %s" % (field, flag, getattr(field, flag))
 
     def test_cardinality_m2m(self):
@@ -848,6 +857,24 @@ class FieldFlagsTests(test.TestCase):
                 reverse_field = obj.field
                 self.assertTrue(reverse_field.has_relation \
                                 and reverse_field.one_to_many)
+
+    def test_cardinality_o2o(self):
+        o2o_type_fields = [
+            f for f in self.all_fields
+            if f.has_relation and f.one_to_one
+        ]
+
+        # Test classes are what we expect
+        self.assertEquals(ONE_TO_ONE_CLASSES, set(
+            f.__class__ for f in o2o_type_fields
+        ))
+
+        # Ensure all o2o reverses are o2o
+        for obj in o2o_type_fields:
+            if hasattr(obj, 'field'):
+                reverse_field = obj.field
+                self.assertTrue(reverse_field.has_relation \
+                                and reverse_field.one_to_one)
 
 class GenericIPAddressFieldTests(test.TestCase):
     def test_genericipaddressfield_formfield_protocol(self):

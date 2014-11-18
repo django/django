@@ -1321,7 +1321,12 @@ class ManyToManyRel(object):
 
 
 class ForeignObject(RelatedField):
+    # Field flags
     one_to_many = True
+    one_to_one = False
+    many_to_many = False
+    many_to_one = False
+
     requires_unique_target = True
     related_accessor_class = ForeignRelatedObjectsDescriptor
 
@@ -1833,6 +1838,7 @@ class OneToOneField(ForeignKey):
     many_to_many = False
     one_to_many = False
     many_to_one = False
+    one_to_one = True
 
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['unique'] = True
@@ -1912,8 +1918,11 @@ def create_many_to_many_intermediary_model(field, klass):
 
 
 class ManyToManyField(RelatedField):
-    many_to_many = True
+    # Field flags
     one_to_many = False
+    one_to_one = False
+    many_to_many = True
+    many_to_one = False
 
     description = _("Many-to-many relationship")
 
