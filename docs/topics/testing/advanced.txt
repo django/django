@@ -259,30 +259,251 @@ tests via Django's test runner.
     If you are not using a management command to invoke the tests, you will
     also need to first setup Django itself using :func:`django.setup()`.
 
-Here an example of a Python script::
-
-    # runtests.py
-    # equivalent to running:
-    # ./manage.py test [labels] --liveserver=127.0.0.1:8082
-
-    import django
-    import os
-    import sys
-    from django.apps import apps
-    from django.test.runner import DiscoverRunner
-
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'my_project.settings'
-    os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = '127.0.0.1:8082'
-
-    django.setup()
-    runner = DiscoverRunner()
-    runner.run_tests(sys.argv[1:] or [a.name for a in apps.get_app_configs()])
-
-That you can invoke like this::
-
-    PYTHONPATH=/path/to/my_project:$PYTHONPATH ./runtests.py [labels]
-
 .. _other-testing-frameworks:
+
+Running tests inside reusable applications
+==========================================
+
+If you are writting a :doc:`reusable application </intro/reusable-apps>` you may want
+to embed a Django test runner in your own test suite and thus benefit from the
+Django machinery.
+
+A common practice is a *tests* directory aside the application code with the
+following structure::
+
+    polls/
+        __init__.py
+        models.py
+        views.py
+        static/
+        templates/
+        ...
+    tests/
+        runtests.py
+        test_sqlite_settings.py
+        test_pgres_settings.py
+        urls.py
+        testing_polls/
+            __init__.py
+            admin.py
+            models.py
+            urls.py
+            views.py
+            tests.py
+            fixtures/
+                testing_polls/
+                    example1.json
+        templates/
+            some.html
+    README
+    LICENCE
+    setup.py
+
+The *testing_polls* directory being a testing application that use and provide
+tests for the *polls* reusable app.
+
+Let's dig into the content of the *tests* directory.
+
+runtests.py
+-----------
+
+This is the script that you invoke to run the test suite. It is responsible for
+setting up the Django environment, creating the test database and running the
+test suite.
+
+In the following example - like the ``manage.py test`` command - you can
+specify test labels, the verbosity level and the setting module.
+
+Of course it is up to you to provide or not such options.
+
+Required settings that are constants for the whole test suite are hard-coded.
+This is the case for some of the ``INSTALLED_APPS`` and the
+``MIDDLEWARE_CLASSES`` declared in ``ALWAYS_*`` variables.
+
+Testing applications (like *testing_polls*) are dynamically loaded in the
+environment according to the optional command-line argument *labels*.
+
+    .. snippet::
+        :filename: runtests.py
+
+        #!/usr/bin/env python
+        from argparse import ArgumentParser
+        import os
+        import sys
+
+        import django
+        from django.apps import apps
+        from django.conf import settings
+        from django.test.utils import get_runner
+        from django.utils._os import upath
+
+
+        TEST_TEMPLATE_DIR = 'templates'
+
+        RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
+
+        DEFAULT_MODULES = [
+            'testing_polls'
+        ]
+
+        ALWAYS_INSTALLED_APPS = [
+            'django.contrib.contenttypes',
+            'django.contrib.auth',
+            'django.contrib.sites',
+            'django.contrib.sessions',
+            'polls',
+        ]
+
+        ALWAYS_MIDDLEWARE_CLASSES = (
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.middleware.common.CommonMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+        )
+
+
+        def setup(verbosity, test_labels):
+            state = {
+                'INSTALLED_APPS': settings.INSTALLED_APPS,
+                'ROOT_URLCONF': getattr(settings, "ROOT_URLCONF", ""),
+                'TEMPLATE_DIRS': settings.TEMPLATE_DIRS,
+                'LANGUAGE_CODE': settings.LANGUAGE_CODE,
+                'STATIC_URL': settings.STATIC_URL,
+                'STATIC_ROOT': settings.STATIC_ROOT,
+                'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES,
+            }
+
+            # Redirect some settings for the duration of these tests.
+            settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
+            settings.ROOT_URLCONF = 'urls'
+            settings.STATIC_URL = '/static/'
+            settings.STATIC_ROOT = ''
+            settings.TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
+            settings.LANGUAGE_CODE = 'en'
+            settings.SITE_ID = 1
+            settings.MIDDLEWARE_CLASSES = ALWAYS_MIDDLEWARE_CLASSES
+            # Ensure the middleware classes are seen as overridden otherwise
+            # we get a compatibility warning.
+            settings._explicit_settings.add('MIDDLEWARE_CLASSES')
+            settings.MIGRATION_MODULES = {
+                # these 'tests.migrations' modules don't actually exist,
+                # but this lets us skip creating migrations for the test models.
+                'auth': 'django.contrib.auth.tests.migrations',
+                'contenttypes': 'django.contrib.contenttypes.tests.migrations',
+            }
+
+            # Load all the ALWAYS_INSTALLED_APPS.
+            django.setup()
+
+            # Load the test model apps.
+            if not test_labels:
+                modules = DEFAULT_MODULES
+            else:
+                modules = set([label.split(".")[0] for label in test_labels])
+
+            for module_label in modules:
+                settings.INSTALLED_APPS.append(module_label)
+            apps.set_installed_apps(settings.INSTALLED_APPS)
+
+            return state
+
+
+        def teardown(state):
+            # Restore the old settings.
+            for key, value in state.items():
+                setattr(settings, key, value)
+
+
+        def django_tests(verbosity, test_labels):
+            state = setup(verbosity, test_labels)
+
+            if not hasattr(settings, 'TEST_RUNNER'):
+                settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+            TestRunner = get_runner(settings)
+            test_runner = TestRunner(verbosity=verbosity)
+            failures = test_runner.run_tests(test_labels or DEFAULT_MODULES)
+
+            teardown(state)
+            return failures
+
+
+        if __name__ == "__main__":
+            parser = ArgumentParser(description="Run the Django test suite.")
+            parser.add_argument(
+                'modules', nargs='*', metavar='module',
+                help='Optional path(s) to test modules; e.g. "testing_polls" or '
+                '"testing_polls.tests.UtilsTestCase.test_that_cool_function".')
+            parser.add_argument(
+                '-v', '--verbosity', default=1, type=int, choices=[0, 1, 2, 3],
+                help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
+            parser.add_argument(
+                '--settings',
+                help='Python path to settings module, e.g. "myproject.settings". If '
+                'this isn\'t provided, either the DJANGO_SETTINGS_MODULE '
+                'environment variable or "test_sqlite_settings" will be used.')
+            options = parser.parse_args()
+
+            # Allow including a trailing slash on app_labels for tab completion convenience
+            options.modules = [os.path.normpath(labels) for labels in options.modules]
+
+            os.environ['DJANGO_SETTINGS_MODULE'] = 'test_settings'
+            failures = django_tests(options.verbosity, options.modules)
+            if failures:
+                sys.exit(bool(failures))
+
+Running this script require to have the source of the reusable app on
+``sys.path``. This can be done by explicitly setting the ``PYTHONPATH``:
+
+.. code-block:: bash
+
+    PYTHONPATH=..:$PYTHONPATH python runtests.py [labels]
+
+Alternatively, you can use the `development mode of setuptools
+<http://pythonhosted.org//setuptools/setuptools.html#development-mode>`_ or
+make an `Editable pip installation
+<http://pip.readthedocs.org/en/latest/reference/pip_install.html#editable-installs>`_.
+
+settings.py files
+-----------------
+
+These are specific setting files to run the test suite against. Useful to say
+change the database engine just by using the ``--settings`` option without
+over-complicated switches into the script.
+
+    .. snippet::
+        :filename: test_sqlite_settings.py
+
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3'
+            },
+            'other': {
+                'ENGINE': 'django.db.backends.sqlite3',
+            }
+        }
+        SECRET_KEY = 'My-supersecret-key'
+        USE_TZ = True
+
+urls.py
+-------
+
+    .. snippet::
+        :filename: tests/url.py
+
+        patterns = []
+
+You do not declare any patterns in that file. It only exists because Django
+expects ``ROOT_URLCONF`` to exist. use *urls.py* files in test directories
+instead and use ``TestCase.urls`` or the ``@override_settings`` decorator:
+
+    .. snippet::
+        :filename: testing_polls/tests.py
+
+        from django.test import TestCase, override_settings
+
+        @override_settings(ROOT_URLCONF="testing_polls.urls")
+        class ManipulatingPollTest(TestCase):
+            fixtures = ["testing_polls/example1.json"]
 
 Using different testing frameworks
 ==================================
