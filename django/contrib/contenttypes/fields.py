@@ -21,6 +21,7 @@ class GenericForeignKey(FieldFlagsMixin):
     Provides a generic relation to any object through content-type/object-id
     fields.
     """
+    related_model = None
     editable = False
     is_reverse_object = False
 

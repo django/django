@@ -66,6 +66,19 @@ IS_REVERSE_OBJECT = (
     RelatedObject,
 )
 
+FLAG_PROPERTIES = (
+    'concrete',
+    'editable',
+    #'hidden',
+    'has_relation',
+    #'one_to_many',
+    #'many_to_one',
+    #'many_to_many',
+    #'one_to_one',
+    'model',
+    'related_model'
+)
+
 
 class BasicFieldTests(test.TestCase):
     def test_show_hidden_initial(self):
@@ -761,6 +774,10 @@ class FieldFlagsTests(test.TestCase):
         for field in self.fields_and_reverse_objects:
             self.assertTrue(field.name)
 
+    def test_all_field_types_should_have_flags(self):
+        for field in self.all_fields:
+            for flag in FLAG_PROPERTIES:
+                self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
 
 class GenericIPAddressFieldTests(test.TestCase):
     def test_genericipaddressfield_formfield_protocol(self):

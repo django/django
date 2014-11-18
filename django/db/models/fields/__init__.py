@@ -51,6 +51,8 @@ class FieldFlagsMixin(object):
     be computed based on the internal attributes defined on the field instance.
     """
 
+    editable = True
+
     @property
     def concrete(self):
         return self.column is not None
@@ -58,6 +60,12 @@ class FieldFlagsMixin(object):
     @property
     def has_relation(self):
         return self.rel is not None
+
+    @property
+    def related_model(self):
+        if self.has_relation:
+            return self.rel.to
+        return None
 
 
 class Empty(object):
