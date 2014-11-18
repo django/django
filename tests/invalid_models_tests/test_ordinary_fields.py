@@ -513,6 +513,25 @@ class ImageFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
+class IntegerFieldTests(IsolatedModelsTestCase):
+
+    def test_max_length_warning(self):
+        class Model(models.Model):
+            value = models.IntegerField(max_length=2)
+
+        value = Model._meta.get_field('value')
+        errors = Model.check()
+        expected = [
+            DjangoWarning(
+                "'max_length' is ignored when used with IntegerField",
+                hint="Remove 'max_length' from field",
+                obj=value,
+                id='fields.W122',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+
 class TimeFieldTests(IsolatedModelsTestCase):
 
     def test_fix_default_value(self):

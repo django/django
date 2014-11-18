@@ -1704,6 +1704,23 @@ class IntegerField(Field):
     }
     description = _("Integer")
 
+    def check(self, **kwargs):
+        errors = super(IntegerField, self).check(**kwargs)
+        errors.extend(self._check_max_length_warning())
+        return errors
+
+    def _check_max_length_warning(self):
+        if self.max_length is not None:
+            return [
+                checks.Warning(
+                    "'max_length' is ignored when used with IntegerField",
+                    hint="Remove 'max_length' from field",
+                    obj=self,
+                    id='fields.W122',
+                )
+            ]
+        return []
+
     @cached_property
     def validators(self):
         # These validators can't be added at field initialization time since
