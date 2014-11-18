@@ -25,6 +25,9 @@ class GenericForeignKey(FieldFlagsMixin):
     editable = False
     is_reverse_object = False
 
+    one_to_many = True
+    many_to_many = False
+
     def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
         self.ct_field = ct_field
         self.fk_field = fk_field

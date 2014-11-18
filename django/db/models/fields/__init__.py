@@ -79,6 +79,18 @@ class FieldFlagsMixin(object):
             return self.field.many_to_many
         return False
 
+    @property
+    def many_to_one(self):
+        if self.is_reverse_object:
+            return self.field.one_to_many
+        return False
+
+    @property
+    def one_to_many(self):
+        if self.is_reverse_object:
+            return self.field.many_to_one
+        return False
+
 
 class Empty(object):
     pass

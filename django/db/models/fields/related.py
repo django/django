@@ -1321,6 +1321,7 @@ class ManyToManyRel(object):
 
 
 class ForeignObject(RelatedField):
+    one_to_many = True
     requires_unique_target = True
     related_accessor_class = ForeignRelatedObjectsDescriptor
 
@@ -1908,6 +1909,8 @@ def create_many_to_many_intermediary_model(field, klass):
 
 class ManyToManyField(RelatedField):
     many_to_many = True
+    one_to_many = False
+
     description = _("Many-to-many relationship")
 
     def __init__(self, to, db_constraint=True, swappable=True, **kwargs):

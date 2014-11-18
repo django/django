@@ -780,13 +780,27 @@ class FieldFlagsTests(test.TestCase):
                 self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
     def test_cardinality_m2m(self):
         m2m_type_fields = (
-            f for f in self.fields_and_reverse_objects
-            if f.has_relation and f.many_to_many and not f.is_reverse_object
+            f for f in self.all_fields
+            if f.has_relation and f.many_to_many
         )
 
         for field in m2m_type_fields:
             reverse_field = field.related
-            self.assertTrue(reverse_field.has_relation and reverse_field.many_to_many)
+            self.assertTrue(reverse_field.has_relation)
+            self.assertTrue(reverse_field.many_to_many)
+            self.assertTrue(reverse_field.related_model)
+
+    def test_cardinality_o2m(self):
+        o2m_type_fields = (
+            f for f in self.fields_and_reverse_objects
+            if f.has_relation and f.one_to_many
+        )
+
+        for field in o2m_type_fields:
+            if hasattr(field, 'related'):
+                reverse_field = field.related
+                self.assertTrue(reverse_field.has_relation \
+                                and reverse_field.many_to_one)
 
 class GenericIPAddressFieldTests(test.TestCase):
     def test_genericipaddressfield_formfield_protocol(self):
