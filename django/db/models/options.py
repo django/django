@@ -572,21 +572,14 @@ class Options(object):
         all_models = self.apps.get_models(include_auto_created=True)
         for model in all_models:
 
-            # Add all fields and virtual fields that are able to generate a reverse
-            # relation towards a model.
-            fields_with_relations = (
-                f for f in chain(model._meta.fields, model._meta.virtual_fields)
-                if f.has_relation and f.generate_reverse_relation
-            )
+            fields = [model._meta.fields, model._meta.virtual_fields]
             if not model._meta.auto_created:
-                # Add all many_to_many fields when the model was created by the user
-                # and filter out fields that are not able to generate a reverse relation
-                # towards a model.
-                fields_with_relations = chain(
-                    fields_with_relations,
-                    (f for f in model._meta.many_to_many
-                     if f.has_relation or f.generate_reverse_relation)
-                )
+                fields.append(model._meta.many_to_many)
+
+            fields_with_relations = (
+                f for f in chain.from_iterable(fields)
+                if f.has_relation and f.related_model != None
+            )
 
             for f in fields_with_relations:
                 if not isinstance(f.rel.to, six.string_types):
