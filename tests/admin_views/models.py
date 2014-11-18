@@ -863,3 +863,8 @@ class Recipe(models.Model):
 class Ingredient(models.Model):
     name = models.CharField(max_length=20)
     recipes = models.ManyToManyField('Recipe', related_name='ingredients')
+
+
+# Model for #23839
+class Stuff(models.Model):
+    pass
