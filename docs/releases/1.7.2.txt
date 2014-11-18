@@ -65,3 +65,6 @@ Bugfixes
 
 * Fixed :djadmin:`squashmigrations` to respect the  ``--no-optimize`` parameter
   (:ticket:`23799`).
+
+* Made :class:`~django.db.migrations.operations.RenameModel` reversible
+  (:ticket:`22248`)
