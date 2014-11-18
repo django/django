@@ -96,14 +96,6 @@ class ArrayField(Field):
             value = [self.base_field.to_python(val) for val in vals]
         return value
 
-    def get_default(self):
-        """Overridden from the default to prevent string-mangling."""
-        if self.has_default():
-            if callable(self.default):
-                return self.default()
-            return self.default
-        return None
-
     def value_to_string(self, obj):
         values = []
         vals = self._get_val_from_obj(obj)
