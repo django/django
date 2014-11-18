@@ -20,20 +20,6 @@ Writing tests
 Django's unit tests use a Python standard library module: :mod:`unittest`. This
 module defines tests using a class-based approach.
 
-.. admonition:: unittest2
-
-    .. deprecated:: 1.7
-
-    Python 2.7 introduced some major changes to the ``unittest`` library,
-    adding some extremely useful features. To ensure that every Django project
-    could benefit from these new features, Django used to ship with a copy of
-    Python 2.7's ``unittest`` backported for Python 2.6 compatibility.
-
-    Since Django no longer supports Python versions older than 2.7,
-    ``django.utils.unittest`` is deprecated. Simply use ``unittest``.
-
-.. _unittest2: https://pypi.python.org/pypi/unittest2
-
 Here is an example which subclasses from :class:`django.test.TestCase`,
 which is a subclass of :class:`unittest.TestCase` that runs each test inside a
 transaction to provide isolation::
