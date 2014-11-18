@@ -9,7 +9,6 @@ import itertools
 
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template import TemplateSyntaxError, Context, Template
-import django.template.context
 from django.test import Client, TestCase, override_settings
 from django.test.client import encode_file, RequestFactory
 from django.test.utils import ContextList, str_prefix
@@ -994,12 +993,11 @@ class ContextTests(TestCase):
         # Need to insert a context processor that assumes certain things about
         # the request instance. This triggers a bug caused by some ways of
         # copying RequestContext.
-        try:
-            django.template.context._standard_context_processors = (lambda request: {'path': request.special_path},)
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=(
+            'test_client_regress.context_processors.special',
+        )):
             response = self.client.get("/request_context_view/")
             self.assertContains(response, 'Path: /request_context_view/')
-        finally:
-            django.template.context._standard_context_processors = None
 
     def test_nested_requests(self):
         """
