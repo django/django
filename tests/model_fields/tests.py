@@ -66,6 +66,16 @@ IS_REVERSE_OBJECT = (
     RelatedObject,
 )
 
+ONE_TO_MANY_CLASSES = set([
+    ForeignObject,
+    ForeignKey,
+    GenericForeignKey,
+])
+
+MANY_TO_MANY_CLASSES = set([
+    ManyToManyField,
+])
+
 FLAG_PROPERTIES = (
     'concrete',
     'editable',
@@ -73,7 +83,7 @@ FLAG_PROPERTIES = (
     'has_relation',
     #'one_to_many',
     #'many_to_one',
-    #'many_to_many',
+    'many_to_many',
     #'one_to_one',
     'model',
     'related_model'
@@ -778,11 +788,18 @@ class FieldFlagsTests(test.TestCase):
         for field in self.fields_and_reverse_objects:
             for flag in FLAG_PROPERTIES:
                 self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
+                #print "%s => %s is %s" % (field, flag, getattr(field, flag))
+
     def test_cardinality_m2m(self):
         m2m_type_fields = (
             f for f in self.all_fields
             if f.has_relation and f.many_to_many
         )
+
+        # Test classes are what we expect
+        self.assertEquals(MANY_TO_MANY_CLASSES, set(
+            f.__class__ for f in m2m_type_fields
+        ))
 
         for field in m2m_type_fields:
             reverse_field = field.related
@@ -791,11 +808,17 @@ class FieldFlagsTests(test.TestCase):
             self.assertTrue(reverse_field.related_model)
 
     def test_cardinality_o2m(self):
-        o2m_type_fields = (
+        o2m_type_fields = [
             f for f in self.fields_and_reverse_objects
             if f.has_relation and f.one_to_many
-        )
+        ]
 
+        # Test classes are what we expect
+        self.assertEquals(ONE_TO_MANY_CLASSES, set(
+            f.__class__ for f in o2m_type_fields
+        ))
+
+        # Ensure all o2m reverses are m2o
         for field in o2m_type_fields:
             if hasattr(field, 'related'):
                 reverse_field = field.related

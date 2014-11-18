@@ -1830,6 +1830,10 @@ class OneToOneField(ForeignKey):
     related_accessor_class = SingleRelatedObjectDescriptor
     description = _("One-to-one relationship")
 
+    many_to_many = False
+    one_to_many = False
+    many_to_one = False
+
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['unique'] = True
         super(OneToOneField, self).__init__(to, to_field, OneToOneRel, **kwargs)

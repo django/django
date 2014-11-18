@@ -27,6 +27,7 @@ class GenericForeignKey(FieldFlagsMixin):
 
     one_to_many = True
     many_to_many = False
+    many_to_one = False
 
     def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
         self.ct_field = ct_field
@@ -254,6 +255,10 @@ class GenericForeignKey(FieldFlagsMixin):
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
     is_reverse_object = False
+
+    one_to_many = False
+    many_to_many = False
+    many_to_one = True
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
