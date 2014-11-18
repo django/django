@@ -59,7 +59,7 @@ def update_connections_time_zone(**kwargs):
             time.tzset()
 
         # Reset local time zone cache
-        timezone._localtime = None
+        timezone.get_default_timezone.cache_clear()
 
     # Reset the database connections' time zone
     if kwargs['setting'] == 'USE_TZ' and settings.TIME_ZONE != 'UTC':
