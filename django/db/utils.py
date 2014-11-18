@@ -319,14 +319,7 @@ class ConnectionRouter(object):
     def allow_migrate(self, db, model, **hints):
         for router in self.routers:
             try:
-                try:
-                    method = router.allow_migrate
-                except AttributeError:
-                    method = router.allow_syncdb
-                    warnings.warn(
-                        'Router.allow_syncdb has been deprecated and will stop working in Django 1.9. '
-                        'Rename the method to allow_migrate.',
-                        RemovedInDjango19Warning, stacklevel=2)
+                method = router.allow_migrate
             except AttributeError:
                 # If the router doesn't have a method, skip to the next one.
                 pass
