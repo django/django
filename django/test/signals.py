@@ -37,8 +37,8 @@ def update_installed_apps(**kwargs):
         from django.core.management import get_commands
         get_commands.cache_clear()
         # Rebuild templatetags module cache.
-        from django.template import base as mod
-        mod.templatetags_modules = []
+        from django.template.base import get_templatetags_modules
+        get_templatetags_modules.cache_clear()
         # Rebuild get_app_template_dirs cache.
         from django.template.utils import get_app_template_dirs
         get_app_template_dirs.cache_clear()
