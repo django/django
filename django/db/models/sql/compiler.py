@@ -698,10 +698,14 @@ class SQLCompiler(object):
         index_extra_select = len(self.query.extra_select)
         for i, field in enumerate(fields):
             if field:
-                backend_converters = self.connection.ops.get_db_converters(field.get_internal_type())
+                try:
+                    output_field = field.output_field
+                except AttributeError:
+                    output_field = field
+                backend_converters = self.connection.ops.get_db_converters(output_field.get_internal_type())
                 field_converters = field.get_db_converters(self.connection)
                 if backend_converters or field_converters:
-                    converters[index_extra_select + i] = (backend_converters, field_converters, field)
+                    converters[index_extra_select + i] = (backend_converters, field_converters, output_field)
         return converters
 
     def apply_converters(self, row, converters):
@@ -756,7 +760,7 @@ class SQLCompiler(object):
                         prepended_cols = len(self.query.extra_select)
                         annotation_start = len(fields) + prepended_cols
                         fields = fields + [
-                            anno.output_field for alias, anno in self.query.annotation_select.items()]
+                            anno for alias, anno in self.query.annotation_select.items()]
                         annotation_end = len(fields) + prepended_cols
 
                     # add related fields
@@ -768,16 +772,6 @@ class SQLCompiler(object):
                     ]
 
                     converters = self.get_converters(fields)
-                    if has_annotation_select:
-                        for (alias, annotation), position in zip(
-                                self.query.annotation_select.items(),
-                                range(annotation_start, annotation_end + 1)):
-                            if position in converters:
-                                # annotation conversions always run first
-                                converters[position][1].insert(0, annotation.convert_value)
-                            else:
-                                converters[position] = ([], [annotation.convert_value], annotation.output_field)
-
                 if converters:
                     row = self.apply_converters(row, converters)
                 yield row
@@ -1120,47 +1114,6 @@ class SQLAggregateCompiler(SQLCompiler):
         sql = 'SELECT %s FROM (%s) subquery' % (sql, self.query.subquery)
         params = params + self.query.sub_params
         return sql, params
-
-
-class SQLDateCompiler(SQLCompiler):
-    def results_iter(self):
-        """
-        Returns an iterator over the results from executing this query.
-        """
-        from django.db.models.fields import DateField
-        converters = self.get_converters([DateField()])
-
-        offset = len(self.query.extra_select)
-        for rows in self.execute_sql(MULTI):
-            for row in rows:
-                date = self.apply_converters(row, converters)[offset]
-                if isinstance(date, datetime.datetime):
-                    date = date.date()
-                yield date
-
-
-class SQLDateTimeCompiler(SQLCompiler):
-    def results_iter(self):
-        """
-        Returns an iterator over the results from executing this query.
-        """
-        from django.db.models.fields import DateTimeField
-        converters = self.get_converters([DateTimeField()])
-
-        offset = len(self.query.extra_select)
-        for rows in self.execute_sql(MULTI):
-            for row in rows:
-                datetime = self.apply_converters(row, converters)[offset]
-                # Datetimes are artificially returned in UTC on databases that
-                # don't support time zone. Restore the zone used in the query.
-                if settings.USE_TZ:
-                    if datetime is None:
-                        raise ValueError("Database returned an invalid value "
-                                         "in QuerySet.datetimes(). Are time zone "
-                                         "definitions for your database and pytz installed?")
-                    datetime = datetime.replace(tzinfo=None)
-                    datetime = timezone.make_aware(datetime, self.query.tzinfo)
-                yield datetime
 
 
 def cursor_iter(cursor, sentinel):
