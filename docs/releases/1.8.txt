@@ -857,6 +857,11 @@ Miscellaneous
   :exc:`~django.test.client.RedirectCycleError` if it detects a loop or hits a
   maximum redirect limit (rather than passing silently).
 
+* Translatable strings set as the ``default`` parameter of the field are cast
+  to concrete strings later, so the return type of ``Field.get_default()`` is
+  different in some cases. There is no change to default values which are the
+  result of a callable.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
