@@ -775,7 +775,7 @@ class FieldFlagsTests(test.TestCase):
             self.assertTrue(field.name)
 
     def test_all_field_types_should_have_flags(self):
-        for field in self.all_fields:
+        for field in self.fields_and_reverse_objects:
             for flag in FLAG_PROPERTIES:
                 self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
 
