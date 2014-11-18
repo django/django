@@ -1121,26 +1121,3 @@ For a complete discussion on the usage of the following see the
 
     Session key under which the active language for the current session is
     stored.
-
-``django.utils.tzinfo``
-=======================
-
-.. deprecated:: 1.7
-    Use :mod:`~django.utils.timezone` instead.
-
-.. module:: django.utils.tzinfo
-   :synopsis: Implementation of ``tzinfo`` classes for use with ``datetime.datetime``.
-
-.. class:: FixedOffset
-
-    Fixed offset in minutes east from UTC.
-
-    .. deprecated:: 1.7
-        Use :func:`~django.utils.timezone.get_fixed_timezone` instead.
-
-.. class:: LocalTimezone
-
-    Proxy timezone information from time module.
-
-    .. deprecated:: 1.7
-        Use :func:`~django.utils.timezone.get_default_timezone` instead.
