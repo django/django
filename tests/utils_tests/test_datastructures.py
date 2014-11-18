@@ -7,7 +7,7 @@ import pickle
 
 from django.test import SimpleTestCase, ignore_warnings
 from django.utils.datastructures import (DictWrapper, ImmutableList,
-    MultiValueDict, MultiValueDictKeyError, MergeDict, OrderedSet, SortedDict)
+    MultiValueDict, MultiValueDictKeyError, OrderedSet, SortedDict)
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
 
@@ -135,77 +135,6 @@ class SortedDictTests(SimpleTestCase):
         self.assertEqual(list(self.d2), [1, 9, 0, 7])
         self.assertEqual(list(reversed(self.d1)), [9, 1, 7])
         self.assertEqual(list(reversed(self.d2)), [7, 0, 9, 1])
-
-
-@ignore_warnings(category=RemovedInDjango19Warning)
-class MergeDictTests(SimpleTestCase):
-
-    def test_simple_mergedict(self):
-        d1 = {'chris': 'cool', 'camri': 'cute', 'cotton': 'adorable',
-              'tulip': 'snuggable', 'twoofme': 'firstone'}
-
-        d2 = {'chris2': 'cool2', 'camri2': 'cute2', 'cotton2': 'adorable2',
-              'tulip2': 'snuggable2'}
-
-        d3 = {'chris3': 'cool3', 'camri3': 'cute3', 'cotton3': 'adorable3',
-              'tulip3': 'snuggable3'}
-
-        md = MergeDict(d1, d2, d3)
-
-        self.assertEqual(md['chris'], 'cool')
-        self.assertEqual(md['camri'], 'cute')
-        self.assertEqual(md['twoofme'], 'firstone')
-
-        md2 = md.copy()
-        self.assertEqual(md2['chris'], 'cool')
-
-    def test_mergedict_merges_multivaluedict(self):
-        """ MergeDict can merge MultiValueDicts """
-
-        multi1 = MultiValueDict({'key1': ['value1'],
-                                 'key2': ['value2', 'value3']})
-
-        multi2 = MultiValueDict({'key2': ['value4'],
-                                 'key4': ['value5', 'value6']})
-
-        mm = MergeDict(multi1, multi2)
-
-        # Although 'key2' appears in both dictionaries,
-        # only the first value is used.
-        self.assertEqual(mm.getlist('key2'), ['value2', 'value3'])
-        self.assertEqual(mm.getlist('key4'), ['value5', 'value6'])
-        self.assertEqual(mm.getlist('undefined'), [])
-
-        self.assertEqual(sorted(six.iterkeys(mm)), ['key1', 'key2', 'key4'])
-        self.assertEqual(len(list(six.itervalues(mm))), 3)
-
-        self.assertIn('value1', six.itervalues(mm))
-
-        self.assertEqual(
-            sorted(six.iteritems(mm), key=lambda k: k[0]),
-            [('key1', 'value1'), ('key2', 'value3'), ('key4', 'value6')]
-        )
-
-        self.assertEqual(
-            [(k, mm.getlist(k)) for k in sorted(mm)],
-            [('key1', ['value1']),
-             ('key2', ['value2', 'value3']),
-             ('key4', ['value5', 'value6'])]
-        )
-
-    def test_bool_casting(self):
-        empty = MergeDict({}, {}, {})
-        not_empty = MergeDict({}, {}, {"key": "value"})
-        self.assertFalse(empty)
-        self.assertTrue(not_empty)
-
-    def test_key_error(self):
-        """
-        Test that the message of KeyError contains the missing key name.
-        """
-        d1 = MergeDict({'key1': 42})
-        with six.assertRaisesRegex(self, KeyError, 'key2'):
-            d1['key2']
 
 
 class OrderedSetTests(SimpleTestCase):

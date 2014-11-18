@@ -18,10 +18,9 @@ from django.forms import (
 from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Template, Context
-from django.test import TestCase, ignore_warnings
+from django.test import TestCase
 from django.test.utils import str_prefix
-from django.utils.datastructures import MultiValueDict, MergeDict
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe, SafeData
@@ -552,11 +551,9 @@ class FormsTestCase(TestCase):
 <li><label for="composers_id_1"><input type="checkbox" name="composers" value="P" id="composers_id_1" /> Paul McCartney</label></li>
 </ul>""")
 
-    @ignore_warnings(category=RemovedInDjango19Warning)  # MergeDict deprecation
     def test_multiple_choice_list_data(self):
-        # Data for a MultipleChoiceField should be a list. QueryDict, MultiValueDict and
-        # MergeDict (when created as a merge of MultiValueDicts) conveniently work with
-        # this.
+        # Data for a MultipleChoiceField should be a list. QueryDict and
+        # MultiValueDict conveniently work with this.
         class SongForm(Form):
             name = CharField()
             composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')], widget=CheckboxSelectMultiple)
@@ -570,11 +567,6 @@ class FormsTestCase(TestCase):
         self.assertEqual(f.errors, {})
 
         data = MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P']))
-        f = SongForm(data)
-        self.assertEqual(f.errors, {})
-
-        # MergeDict is deprecated, but is supported until removed.
-        data = MergeDict(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])))
         f = SongForm(data)
         self.assertEqual(f.errors, {})
 
