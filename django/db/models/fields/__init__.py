@@ -51,6 +51,7 @@ class FieldFlagsMixin(object):
     be computed based on the internal attributes defined on the field instance.
     """
 
+    _FLAGS_ERROR_MESSAGE = "The mandatory field flag '%s' has not been implemented. Please implement it."
     editable = True
 
     @property
@@ -71,25 +72,31 @@ class FieldFlagsMixin(object):
             return self.field.model
         if self.has_relation:
             return self.rel.to
-        return None
+        raise AttributeError(self._FLAGS_ERROR_MESSAGE % "related_model")
 
     @property
     def many_to_many(self):
         if self.is_reverse_object:
             return self.field.many_to_many
-        return False
+        raise AttributeError(self._FLAGS_ERROR_MESSAGE % "many_to_many")
 
     @property
     def many_to_one(self):
         if self.is_reverse_object:
             return self.field.one_to_many
-        return False
+        raise AttributeError(self._FLAGS_ERROR_MESSAGE % "many_to_one")
 
     @property
     def one_to_many(self):
         if self.is_reverse_object:
             return self.field.many_to_one
-        return False
+        raise AttributeError(self._FLAGS_ERROR_MESSAGE % "one_to_many")
+
+    @property
+    def one_to_one(self):
+        if self.is_reverse_object:
+            return self.field.one_to_one
+        raise AttributeError(self._FLAGS_ERROR_MESSAGE % "one_to_one")
 
 
 class Empty(object):
