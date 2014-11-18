@@ -784,7 +784,7 @@ class Query(object):
             ident = (change_map.get(ident[0], ident[0]),) + ident[1:]
             self.join_map[ident] = aliases
         for old_alias, new_alias in six.iteritems(change_map):
-            alias_data = self.alias_map.get(old_alias, None)
+            alias_data = self.alias_map.get(old_alias)
             if alias_data is None:
                 continue
             alias_data = alias_data._replace(rhs_alias=new_alias)
@@ -1014,7 +1014,7 @@ class Query(object):
             value = value()
         elif hasattr(value, 'resolve_expression'):
             value = value.resolve_expression(self, reuse=can_reuse)
-        # Subqueries need to use distinct set of aliases than the
+        # Subqueries need to use a different set of aliases than the
         # outer query. Call bump_prefix to change aliases of the inner
         # query (the value).
         if hasattr(value, 'query') and hasattr(value.query, 'bump_prefix'):
@@ -1581,7 +1581,6 @@ class Query(object):
                                   Col(alias, pk, pk))
             query.where.add(lookup, AND)
             query.external_aliases.add(alias)
-            self._bumpme = True
 
         condition, needed_inner = self.build_filter(
             ('%s__in' % trimmed_prefix, query),
