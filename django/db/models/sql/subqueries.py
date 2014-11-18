@@ -2,21 +2,15 @@
 Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
-from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.query_utils import Q
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Date, DateTime, Col
-from django.db.models.fields import DateField, DateTimeField, FieldDoesNotExist
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS, SelectInfo
 from django.db.models.sql.query import Query
 from django.utils import six
-from django.utils import timezone
 
 
-__all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
-        'DateTimeQuery', 'AggregateQuery']
+__all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
 
 
 class DeleteQuery(Query):
@@ -202,77 +196,6 @@ class InsertQuery(Query):
         self.fields = fields
         self.objs = objs
         self.raw = raw
-
-
-class DateQuery(Query):
-    """
-    A DateQuery is a normal query, except that it specifically selects a single
-    date field. This requires some special handling when converting the results
-    back to Python objects, so we put it in a separate class.
-    """
-
-    compiler = 'SQLDateCompiler'
-
-    def add_select(self, field_name, lookup_type, order='ASC'):
-        """
-        Converts the query into an extraction query.
-        """
-        try:
-            field, _, _, joins, _ = self.setup_joins(
-                field_name.split(LOOKUP_SEP),
-                self.get_meta(),
-                self.get_initial_alias(),
-            )
-        except FieldError:
-            raise FieldDoesNotExist("%s has no field named '%s'" % (
-                self.get_meta().object_name, field_name
-            ))
-        self._check_field(field)                # overridden in DateTimeQuery
-        alias = joins[-1]
-        select = self._get_select(Col(alias, field), lookup_type)
-        self.clear_select_clause()
-        self.select = [SelectInfo(select, None)]
-        self.distinct = True
-        self.order_by = [1] if order == 'ASC' else [-1]
-
-        if field.null:
-            self.add_filter(("%s__isnull" % field_name, False))
-
-    def _check_field(self, field):
-        assert isinstance(field, DateField), \
-            "%r isn't a DateField." % field.name
-        if settings.USE_TZ:
-            assert not isinstance(field, DateTimeField), \
-                "%r is a DateTimeField, not a DateField." % field.name
-
-    def _get_select(self, col, lookup_type):
-        return Date(col, lookup_type)
-
-
-class DateTimeQuery(DateQuery):
-    """
-    A DateTimeQuery is like a DateQuery but for a datetime field. If time zone
-    support is active, the tzinfo attribute contains the time zone to use for
-    converting the values before truncating them. Otherwise it's set to None.
-    """
-
-    compiler = 'SQLDateTimeCompiler'
-
-    def clone(self, klass=None, memo=None, **kwargs):
-        if 'tzinfo' not in kwargs and hasattr(self, 'tzinfo'):
-            kwargs['tzinfo'] = self.tzinfo
-        return super(DateTimeQuery, self).clone(klass, memo, **kwargs)
-
-    def _check_field(self, field):
-        assert isinstance(field, DateTimeField), \
-            "%r isn't a DateTimeField." % field.name
-
-    def _get_select(self, col, lookup_type):
-        if self.tzinfo is None:
-            tzname = None
-        else:
-            tzname = timezone._get_timezone_name(self.tzinfo)
-        return DateTime(col, lookup_type, tzname)
 
 
 class AggregateQuery(Query):

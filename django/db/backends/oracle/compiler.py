@@ -54,11 +54,3 @@ class SQLUpdateCompiler(compiler.SQLUpdateCompiler, SQLCompiler):
 
 class SQLAggregateCompiler(compiler.SQLAggregateCompiler, SQLCompiler):
     pass
-
-
-class SQLDateCompiler(compiler.SQLDateCompiler, SQLCompiler):
-    pass
-
-
-class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, SQLCompiler):
-    pass
