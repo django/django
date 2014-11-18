@@ -1285,6 +1285,9 @@ class BaseDatabaseOperations(object):
         conn = ' %s ' % connector
         return conn.join(sub_expressions)
 
+    def combine_duration_expression(self, connector, sub_expressions):
+        return self.combine_expression(connector, sub_expressions)
+
     def modify_insert_params(self, placeholders, params):
         """Allow modification of insert parameters. Needed for Oracle Spatial
         backend due to #10888.
