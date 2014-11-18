@@ -152,9 +152,10 @@ access to more than a single field::
 Note, however, that like :meth:`Model.full_clean()`, a model's ``clean()``
 method is not invoked when you call your model's :meth:`~Model.save()` method.
 
-Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
-``Model.clean()`` will be stored in a special key error dictionary key,
-:data:`~django.core.exceptions.NON_FIELD_ERRORS`, that is used for errors
+In the above example, the :exc:`~django.core.exceptions.ValidationError`
+exception raised by ``Model.clean()`` was instantiated with a string, so it
+will be stored in a special error dictionary key,
+:data:`~django.core.exceptions.NON_FIELD_ERRORS`. This key is used for errors
 that are tied to the entire model instead of to a specific field::
 
     from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
@@ -162,6 +163,19 @@ that are tied to the entire model instead of to a specific field::
         article.full_clean()
     except ValidationError as e:
         non_field_errors = e.message_dict[NON_FIELD_ERRORS]
+
+To assign exceptions to a specific field, instantiate the
+:exc:`~django.core.exceptions.ValidationError` with a dictionary, where the
+keys are the field names. We could update the previous example to assign the
+error to the ``pub_date`` field::
+
+    class Article(models.Model):
+        ...
+        def clean(self):
+            # Don't allow draft entries to have a pub_date.
+            if self.status == 'draft' and self.pub_date is not None:
+                raise ValidationError({'pub_date': 'Draft entries may not have a publication date.'})
+            ...
 
 Finally, ``full_clean()`` will check any unique constraints on your model.
 

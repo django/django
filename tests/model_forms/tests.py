@@ -2207,6 +2207,13 @@ class ModelFormCustomErrorTests(TestCase):
             str(form.errors['name1']),
             '<ul class="errorlist"><li>Model.clean() error messages.</li></ul>'
         )
+        data = {'name1': 'FORBIDDEN_VALUE2', 'name2': 'ABC'}
+        form = CustomErrorMessageForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertHTMLEqual(
+            str(form.errors['name1']),
+            '<ul class="errorlist"><li>Model.clean() error messages (simpler syntax).</li></ul>'
+        )
         data = {'name1': 'GLOBAL_ERROR', 'name2': 'ABC'}
         form = CustomErrorMessageForm(data)
         self.assertFalse(form.is_valid())
