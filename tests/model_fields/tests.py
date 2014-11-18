@@ -22,8 +22,8 @@ from django.db.models.fields import (
     TimeField, URLField)
 
 from django.db.models.fields.related import (
-    ForeignObject, ForeignKey, OneToOneField, ManyToManyField,
-    RelatedObject,
+    ForeignObject, ForeignKey, OneToOneField, ManyToManyField, RelatedObject,
+    ManyToManyRel
 )
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
@@ -778,6 +778,15 @@ class FieldFlagsTests(test.TestCase):
         for field in self.fields_and_reverse_objects:
             for flag in FLAG_PROPERTIES:
                 self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
+    def test_cardinality_m2m(self):
+        m2m_type_fields = (
+            f for f in self.fields_and_reverse_objects
+            if f.has_relation and f.many_to_many and not f.is_reverse_object
+        )
+
+        for field in m2m_type_fields:
+            reverse_field = field.related
+            self.assertTrue(reverse_field.has_relation and reverse_field.many_to_many)
 
 class GenericIPAddressFieldTests(test.TestCase):
     def test_genericipaddressfield_formfield_protocol(self):

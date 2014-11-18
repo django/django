@@ -73,6 +73,12 @@ class FieldFlagsMixin(object):
             return self.rel.to
         return None
 
+    @property
+    def many_to_many(self):
+        if self.is_reverse_object:
+            return self.field.many_to_many
+        return False
+
 
 class Empty(object):
     pass

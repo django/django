@@ -1907,6 +1907,7 @@ def create_many_to_many_intermediary_model(field, klass):
 
 
 class ManyToManyField(RelatedField):
+    many_to_many = True
     description = _("Many-to-many relationship")
 
     def __init__(self, to, db_constraint=True, swappable=True, **kwargs):
