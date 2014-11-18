@@ -434,8 +434,7 @@ class OperationTests(OperationTestBase):
             self.assertFKNotExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_pony", "id"))
             self.assertFKExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_horse", "id"))
         # And test reversal
-        with connection.schema_editor() as editor:
-            operation.database_backwards("test_rnmo", editor, new_state, project_state)
+        self.unapply_operations("test_rnmo", project_state, [operation])
         self.assertTableExists("test_rnmo_pony")
         self.assertTableNotExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:

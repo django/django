@@ -106,8 +106,6 @@ class RenameModel(Operation):
     Renames a model.
     """
 
-    reversible = False
-
     def __init__(self, old_name, new_name):
         self.old_name = old_name
         self.new_name = new_name
