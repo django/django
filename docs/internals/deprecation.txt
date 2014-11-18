@@ -15,6 +15,9 @@ about each item can often be found in the release notes of two versions prior.
 See the :ref:`Django 1.8 release notes<deprecated-features-1.8>` for more
 details on these changes.
 
+* Support for calling a ``SQLCompiler`` directly as an alias for calling its
+  ``quote_name_unless_alias`` method will be removed.
+
 * ``cycle`` and ``firstof`` template tags will be removed from the ``future``
   template tag library (used during the 1.6/1.7 deprecation period).
 
