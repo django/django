@@ -1638,7 +1638,7 @@ redirected into a ``StringIO`` instance.
     from django.core.management import call_command
     from django.utils.six import StringIO
 
-    class SomeTest(TestCase):
+    class ClosepollTest(TestCase):
         def test_command(self):
             out = StringIO()
             call_command('closepoll', stdout=out)
