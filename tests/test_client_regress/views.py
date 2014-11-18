@@ -38,17 +38,11 @@ get_view = login_required(get_view)
 
 def request_data(request, template='base.html', data='sausage'):
     "A simple view that returns the request data in the context"
-
-    request_foo = request.REQUEST.get('foo')
-    request_bar = request.REQUEST.get('bar')
-
     return render_to_response(template, {
         'get-foo': request.GET.get('foo'),
         'get-bar': request.GET.get('bar'),
         'post-foo': request.POST.get('foo'),
         'post-bar': request.POST.get('bar'),
-        'request-foo': request_foo,
-        'request-bar': request_bar,
         'data': data,
     })
 
