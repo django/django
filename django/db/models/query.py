@@ -18,6 +18,7 @@ from django.db.models.query_utils import (Q, select_related_descend,
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import CURSOR
 from django.db.models import sql
+from django.db.models.expressions import Date, DateTime, F
 from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
@@ -658,8 +659,12 @@ class QuerySet(object):
             "'kind' must be one of 'year', 'month' or 'day'."
         assert order in ('ASC', 'DESC'), \
             "'order' must be either 'ASC' or 'DESC'."
-        return self._clone(klass=DateQuerySet, setup=True,
-             _field_name=field_name, _kind=kind, _order=order)
+        return self.annotate(
+            datefield=Date(field_name, kind),
+            plain_field=F(field_name)
+        ).values_list(
+            'datefield', flat=True
+        ).distinct().filter(plain_field__isnull=False).order_by(('-' if order == 'DESC' else '') + 'datefield')
 
     def datetimes(self, field_name, kind, order='ASC', tzinfo=None):
         """
@@ -675,8 +680,12 @@ class QuerySet(object):
                 tzinfo = timezone.get_current_timezone()
         else:
             tzinfo = None
-        return self._clone(klass=DateTimeQuerySet, setup=True,
-                _field_name=field_name, _kind=kind, _order=order, _tzinfo=tzinfo)
+        return self.annotate(
+            datetimefield=DateTime(field_name, kind, tzinfo),
+            plain_field=F(field_name)
+        ).values_list(
+            'datetimefield', flat=True
+        ).distinct().filter(plain_field__isnull=False).order_by(('-' if order == 'DESC' else '') + 'datetimefield')
 
     def none(self):
         """
@@ -1270,57 +1279,6 @@ class ValuesListQuerySet(ValuesQuerySet):
             # Only assign flat if the clone didn't already get it from kwargs
             clone.flat = self.flat
         return clone
-
-
-class DateQuerySet(QuerySet):
-    def iterator(self):
-        return self.query.get_compiler(self.db).results_iter()
-
-    def _setup_query(self):
-        """
-        Sets up any special features of the query attribute.
-
-        Called by the _clone() method after initializing the rest of the
-        instance.
-        """
-        self.query.clear_deferred_loading()
-        self.query = self.query.clone(klass=sql.DateQuery, setup=True)
-        self.query.select = []
-        self.query.add_select(self._field_name, self._kind, self._order)
-
-    def _clone(self, klass=None, setup=False, **kwargs):
-        c = super(DateQuerySet, self)._clone(klass, False, **kwargs)
-        c._field_name = self._field_name
-        c._kind = self._kind
-        if setup and hasattr(c, '_setup_query'):
-            c._setup_query()
-        return c
-
-
-class DateTimeQuerySet(QuerySet):
-    def iterator(self):
-        return self.query.get_compiler(self.db).results_iter()
-
-    def _setup_query(self):
-        """
-        Sets up any special features of the query attribute.
-
-        Called by the _clone() method after initializing the rest of the
-        instance.
-        """
-        self.query.clear_deferred_loading()
-        self.query = self.query.clone(klass=sql.DateTimeQuery, setup=True, tzinfo=self._tzinfo)
-        self.query.select = []
-        self.query.add_select(self._field_name, self._kind, self._order)
-
-    def _clone(self, klass=None, setup=False, **kwargs):
-        c = super(DateTimeQuerySet, self)._clone(klass, False, **kwargs)
-        c._field_name = self._field_name
-        c._kind = self._kind
-        c._tzinfo = self._tzinfo
-        if setup and hasattr(c, '_setup_query'):
-            c._setup_query()
-        return c
 
 
 def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
