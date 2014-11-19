@@ -50,10 +50,6 @@ from django.utils.safestring import SafeBytes, SafeText
 from django.utils import six
 from django.utils import timezone
 
-# Raise exceptions for database warnings if DEBUG is on
-if settings.DEBUG:
-    warnings.filterwarnings("error", category=Database.Warning)
-
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
