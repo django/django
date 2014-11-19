@@ -55,7 +55,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                         aliases.add(r)
                         col_aliases.add(col[1])
                 else:
-                    col_sql, col_params = col.as_sql(qn, self.connection)
+                    col_sql, col_params = col.as_sql(self, self.connection)
                     result.append(col_sql)
                     params.extend(col_params)
 
