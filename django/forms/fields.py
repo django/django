@@ -258,7 +258,7 @@ class IntegerField(Field):
         if self.localize:
             value = formats.sanitize_separators(value)
         try:
-            value = int(str(value))
+            value = int(smart_text(value))
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
