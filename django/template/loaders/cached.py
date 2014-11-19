@@ -9,7 +9,7 @@ from django.template.loader import get_template_from_string, make_origin
 from django.utils.encoding import force_bytes
 
 from .base import Loader as BaseLoader
-from .utils import _get_template_loaders
+from .utils import get_template_loaders
 
 
 class Loader(BaseLoader):
@@ -20,7 +20,7 @@ class Loader(BaseLoader):
         self.find_template_cache = {}
         # Use the private, non-caching version of get_template_loaders
         # in case loaders isn't hashable.
-        self.loaders = _get_template_loaders(loaders)
+        self.loaders = get_template_loaders(loaders)
 
     def cache_key(self, template_name, template_dirs):
         if template_dirs:

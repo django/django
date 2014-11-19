@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 from django.utils import lru_cache
 
 from .base import Context, Template, TemplateDoesNotExist
-from .loaders.utils import _get_template_loaders
+from .loaders.utils import get_template_loaders
 
 
 _dirs_undefined = object()
@@ -54,7 +54,7 @@ class Engine(object):
 
     @cached_property
     def template_loaders(self):
-        return _get_template_loaders(self.loaders)
+        return get_template_loaders(self.loaders)
 
     def find_template(self, name, dirs=None):
         # Inner import to avoid circular dependency
