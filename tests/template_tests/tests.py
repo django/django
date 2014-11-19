@@ -1855,11 +1855,6 @@ class TemplateTagLoading(TestCase):
 
     def setUp(self):
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
-        self.old_tag_modules = template_base.templatetags_modules
-        template_base.templatetags_modules = []
-
-    def tearDown(self):
-        template_base.templatetags_modules = self.old_tag_modules
 
     def test_load_error(self):
         ttext = "{% load broken_tag %}"

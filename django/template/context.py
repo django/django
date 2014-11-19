@@ -1,8 +1,9 @@
 from copy import copy
+
+from django.conf import settings
+from django.utils import lru_cache
 from django.utils.module_loading import import_string
 
-# Cache of actual callables.
-_standard_context_processors = None
 # Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ('django.core.context_processors.csrf',)
 
@@ -170,21 +171,11 @@ class RenderContext(BaseContext):
         return self.dicts[-1][key]
 
 
-# This is a function rather than module-level procedural code because we only
-# want it to execute if somebody uses RequestContext.
+@lru_cache.lru_cache()
 def get_standard_processors():
-    from django.conf import settings
-    global _standard_context_processors
-    if _standard_context_processors is None:
-        processors = []
-        collect = []
-        collect.extend(_builtin_context_processors)
-        collect.extend(settings.TEMPLATE_CONTEXT_PROCESSORS)
-        for path in collect:
-            func = import_string(path)
-            processors.append(func)
-        _standard_context_processors = tuple(processors)
-    return _standard_context_processors
+    context_processors = _builtin_context_processors
+    context_processors += tuple(settings.TEMPLATE_CONTEXT_PROCESSORS)
+    return tuple(import_string(path) for path in context_processors)
 
 
 class RequestContext(Context):

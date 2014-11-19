@@ -16,6 +16,7 @@ from django.template.loaders.utils import get_template_loaders
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.encoding import force_bytes, smart_text
+from django.utils import lru_cache
 from django.utils.module_loading import import_string
 from django.utils import six
 from django.utils.translation import ugettext as _
@@ -94,20 +95,16 @@ def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
         html = reporter.get_traceback_html()
         return HttpResponse(html, status=status_code, content_type='text/html')
 
-# Cache for the default exception reporter filter instance.
-default_exception_reporter_filter = None
+
+@lru_cache.lru_cache()
+def get_default_exception_reporter_filter():
+    # Instantiate the default filter for the first time and cache it.
+    return import_string(settings.DEFAULT_EXCEPTION_REPORTER_FILTER)()
 
 
 def get_exception_reporter_filter(request):
-    global default_exception_reporter_filter
-    if default_exception_reporter_filter is None:
-        # Load the default filter for the first time and cache it.
-        default_exception_reporter_filter = import_string(
-            settings.DEFAULT_EXCEPTION_REPORTER_FILTER)()
-    if request:
-        return getattr(request, 'exception_reporter_filter', default_exception_reporter_filter)
-    else:
-        return default_exception_reporter_filter
+    default_filter = get_default_exception_reporter_filter()
+    return getattr(request, 'exception_reporter_filter', default_filter)
 
 
 class ExceptionReporterFilter(object):
