@@ -502,8 +502,9 @@ urls.py
         patterns = []
 
 You do not declare any patterns in that file. It only exists because Django
-expects ``ROOT_URLCONF`` to exist. use *urls.py* files in test directories
-instead and use ``TestCase.urls`` or the ``@override_settings`` decorator:
+expects :setting:`ROOT_URLCONF` to exist. Use *urls.py* files in test
+directories instead and the :func:`@override_settings
+<django.test.override_settings>` decorator:
 
     .. snippet::
         :filename: testing_polls/tests.py
