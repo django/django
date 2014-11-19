@@ -251,8 +251,8 @@ takes care of that.
 
 The call to :func:`~django.test.utils.setup_test_environment` is made
 automatically as part of the setup of ``./manage.py test``. You only
-need to manually invoke this method if you're not using running your
-tests via Django's test runner.
+need to manually invoke this method if you're not running your tests via
+Django's test runner.
 
 .. versionchanged:: 1.7
 
