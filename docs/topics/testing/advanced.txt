@@ -254,6 +254,15 @@ automatically as part of the setup of ``./manage.py test``. You only
 need to manually invoke this method if you're not running your tests via
 Django's test runner.
 
+.. note::
+
+    If you are manually running your test suite with
+    :meth:`~django.test.runner.DiscoverRunner.run_tests` - e.g. inside a
+    script - you don't need to call
+    :func:`~django.test.utils.setup_test_environment` nor
+    :func:`~django.test.runner.DiscoverRunner.setup_databases` since it is
+    taken care of in that method.
+
 .. versionchanged:: 1.7
 
     If you are not using a management command to invoke the tests, you will
