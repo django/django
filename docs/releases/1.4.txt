@@ -220,7 +220,7 @@ with the same WSGI configuration that is used for deployment. The new
 :setting:`WSGI_APPLICATION` setting lets you configure which WSGI callable
 :djadmin:`runserver` uses.
 
-(The :djadmin:`runfcgi` management command also internally wraps the WSGI
+(The ``runfcgi`` management command also internally wraps the WSGI
 callable configured via :setting:`WSGI_APPLICATION`.)
 
 ``SELECT FOR UPDATE`` support
