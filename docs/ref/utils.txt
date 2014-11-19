@@ -97,34 +97,6 @@ need to distinguish caches by the ``Accept-language`` header.
     cache, this just means that we have to build the response once to get at
     the Vary header and so at the list of headers to use for the cache key.
 
-``django.utils.datastructures``
-===============================
-
-.. module:: django.utils.datastructures
-   :synopsis: Data structures that aren't in Python's standard library.
-
-.. class:: SortedDict
-
-.. deprecated:: 1.7
-    ``SortedDict`` is deprecated and will be removed in Django 1.9. Use
-    :class:`collections.OrderedDict` instead.
-
-    The :class:`django.utils.datastructures.SortedDict` class is a dictionary
-    that keeps its keys in the order in which they're inserted.
-
-Creating a new SortedDict
--------------------------
-
-Creating a new ``SortedDict`` must be done in a way where ordering is
-guaranteed. For example::
-
-    SortedDict({'b': 1, 'a': 2, 'c': 3})
-
-will not work. Passing in a basic Python ``dict`` could produce unreliable
-results. Instead do::
-
-    SortedDict([('b', 1), ('a', 2), ('c', 3)])
-
 ``django.utils.dateparse``
 ==========================
 
