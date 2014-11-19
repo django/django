@@ -98,13 +98,6 @@ def clear_context_processors_cache(**kwargs):
 
 
 @receiver(setting_changed)
-def clear_template_loaders_cache(**kwargs):
-    if kwargs['setting'] == 'TEMPLATE_LOADERS':
-        from django.template.loaders.utils import get_template_loaders
-        get_template_loaders.cache_clear()
-
-
-@receiver(setting_changed)
 def clear_serializers_cache(**kwargs):
     if kwargs['setting'] == 'SERIALIZATION_MODULES':
         from django.core import serializers

@@ -14,8 +14,8 @@ from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
     RequestContext, Template, TemplateSyntaxError)
+from django.template.engine import Engine
 from django.template.loaders import app_directories, filesystem
-from django.template.loaders.utils import get_template_loaders
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings, extend_sys_path
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
@@ -160,8 +160,8 @@ class UTF8Class:
 class TemplateLoaderTests(TestCase):
 
     def test_loaders_security(self):
-        ad_loader = app_directories.Loader()
-        fs_loader = filesystem.Loader()
+        ad_loader = app_directories.Loader(Engine.get_default())
+        fs_loader = filesystem.Loader(Engine.get_default())
 
         def test_template_sources(path, template_dirs, expected_sources):
             if isinstance(expected_sources, list):
@@ -620,9 +620,7 @@ class TemplateTests(TestCase):
                                 if output != result:
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Expected %r, got %r" % (is_cached, invalid_str, template_debug, name, result, output))
 
-                    # This relies on get_template_loaders() memoizing its
-                    # result. All callers get the same iterable of loaders.
-                    get_template_loaders()[0].reset()
+                    Engine.get_default().template_loaders[0].reset()
 
                 if template_base.invalid_var_format_string:
                     expected_invalid_str = 'INVALID'

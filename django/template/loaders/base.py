@@ -4,10 +4,11 @@ from django.template.loader import get_template_from_string, make_origin
 
 class Loader(object):
     is_usable = False
+    # Only used to raise a deprecation warning. Remove in Django 2.0.
+    _accepts_engine_in_init = True
 
-    def __init__(self, *args, **kwargs):
-        # XXX dropping arguments silently may not be the best idea.
-        pass
+    def __init__(self, engine):
+        self.engine = engine
 
     def __call__(self, template_name, template_dirs=None):
         return self.load_template(template_name, template_dirs)
