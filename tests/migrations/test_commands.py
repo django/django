@@ -72,6 +72,44 @@ class MigrateTests(MigrationTestBase):
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_run_before"})
+    def test_migrate_plan(self):
+        """
+        Tests --show-plan output of migrate command
+        """
+        out = six.StringIO()
+        call_command("migrate", show_plan=True, stdout=out)
+        self.assertIn("[ ]  migrations.0001_initial\n"
+                      "[ ]  migrations.0003_third\n"
+                      "[ ]  migrations.0002_second",
+                      out.getvalue().lower())
+
+        out = six.StringIO()
+        call_command("migrate", show_plan=True, stdout=out, verbosity=2)
+        self.assertIn("[ ]  migrations.0001_initial\n"
+                      "[ ]  migrations.0003_third ... (migrations.0001_initial)\n"
+                      "[ ]  migrations.0002_second ... (migrations.0001_initial)",
+                      out.getvalue().lower())
+
+        call_command("migrate", "migrations", "0003", verbosity=0)
+
+        out = six.StringIO()
+        call_command("migrate", show_plan=True, stdout=out)
+        self.assertIn("[x]  migrations.0001_initial\n"
+                      "[x]  migrations.0003_third\n"
+                      "[ ]  migrations.0002_second",
+                      out.getvalue().lower())
+
+        out = six.StringIO()
+        call_command("migrate", show_plan=True, stdout=out, verbosity=2)
+        self.assertIn("[x]  migrations.0001_initial\n"
+                      "[x]  migrations.0003_third ... (migrations.0001_initial)\n"
+                      "[ ]  migrations.0002_second ... (migrations.0001_initial)",
+                      out.getvalue().lower())
+
+        # Cleanup by unmigrating everything
+        call_command("migrate", "migrations", "zero", verbosity=0)
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_migrate_conflict_exit(self):
         """
