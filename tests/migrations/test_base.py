@@ -1,5 +1,8 @@
-from django.test import TransactionTestCase
+import os
+
 from django.db import connection
+from django.test import TransactionTestCase
+from django.utils._os import upath
 
 
 class MigrationTestBase(TransactionTestCase):
@@ -8,6 +11,7 @@ class MigrationTestBase(TransactionTestCase):
     """
 
     available_apps = ["migrations"]
+    test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
 
     def get_table_description(self, table):
         with connection.cursor() as cursor:
