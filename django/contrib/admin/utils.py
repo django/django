@@ -264,7 +264,7 @@ def model_ngettext(obj, n=None):
 def lookup_field(name, obj, model_admin=None):
     opts = obj._meta
     try:
-        f = opts.get_field(name)
+        f = _get_non_gfk_field(opts, name)
     except models.FieldDoesNotExist:
         # For non-field values, the value is either a method, property or
         # returned via a callable.
@@ -290,6 +290,16 @@ def lookup_field(name, obj, model_admin=None):
     return f, attr, value
 
 
+def _get_non_gfk_field(opts, name):
+    """
+    Due to current implementation of the Admin app, GenericForeignKeys
+    should be treated as not found by the 'label_for_field' function.
+    """
+    field = opts.get_field(name)
+    if hasattr(field, 'is_gfk'):
+        raise models.FieldDoesNotExist()
+    return field
+
 def label_for_field(name, model, model_admin=None, return_attr=False):
     """
     Returns a sensible label for a field name. The name can be a callable,
@@ -300,7 +310,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     """
     attr = None
     try:
-        field = model._meta.get_field(name)
+        field = _get_non_gfk_field(model._meta, name)
         try:
             label = field.verbose_name
         except AttributeError:
