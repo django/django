@@ -714,12 +714,12 @@ Data structures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``django.newforms.forms.SortedDictFromList`` was removed.
-:class:`django.utils.datastructures.SortedDict` can now be instantiated with
+``django.utils.datastructures.SortedDict`` can now be instantiated with
 a sequence of tuples.
 
 To update your code:
 
-1. Use :class:`django.utils.datastructures.SortedDict` wherever you were
+1. Use ``django.utils.datastructures.SortedDict`` wherever you were
    using ``django.newforms.forms.SortedDictFromList``.
 
 2. Because ``django.utils.datastructures.SortedDict.copy`` doesn't
