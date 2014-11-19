@@ -233,13 +233,8 @@ class ManagementUtility(object):
         # special case: the 'help' subcommand has no options
         elif cwords[0] in subcommands and cwords[0] != 'help':
             subcommand_cls = self.fetch_command(cwords[0])
-            # special case: 'runfcgi' stores additional options as
-            # 'key=value' pairs
-            if cwords[0] == 'runfcgi':
-                from django.core.servers.fastcgi import FASTCGI_OPTIONS
-                options.extend((k, 1) for k in FASTCGI_OPTIONS)
             # special case: add the names of installed apps to options
-            elif cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
+            if cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
                     'sqlcustom', 'sqlindexes', 'sqlmigrate', 'sqlsequencereset', 'test'):
                 try:
                     app_configs = apps.get_app_configs()
