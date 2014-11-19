@@ -774,6 +774,9 @@ Miscellaneous
   in ``django.test.utils`` were removed. Override ``TEMPLATE_LOADERS`` with
   ``override_settings`` instead.
 
+* Warnings from the MySQL database backend are no longer converted to
+  exceptions when :setting:`DEBUG` is ``True``.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
