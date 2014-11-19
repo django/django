@@ -308,20 +308,6 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                 'object_id': obj.pk
             })
 
-    @property
-    def declared_fieldsets(self):
-        warnings.warn(
-            "ModelAdmin.declared_fieldsets is deprecated and "
-            "will be removed in Django 1.9.",
-            RemovedInDjango19Warning, stacklevel=2
-        )
-
-        if self.fieldsets:
-            return self.fieldsets
-        elif self.fields:
-            return [(None, {'fields': self.fields})]
-        return None
-
     def get_fields(self, request, obj=None):
         """
         Hook for specifying fields.
@@ -332,22 +318,6 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         """
         Hook for specifying fieldsets.
         """
-        # We access the property and check if it triggers a warning.
-        # If it does, then it's ours and we can safely ignore it, but if
-        # it doesn't then it has been overridden so we must warn about the
-        # deprecation.
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            declared_fieldsets = self.declared_fieldsets
-        if len(w) != 1 or not issubclass(w[0].category, RemovedInDjango19Warning):
-            warnings.warn(
-                "ModelAdmin.declared_fieldsets is deprecated and "
-                "will be removed in Django 1.9.",
-                RemovedInDjango19Warning
-            )
-            if declared_fieldsets:
-                return declared_fieldsets
-
         if self.fieldsets:
             return self.fieldsets
         return [(None, {'fields': self.get_fields(request, obj)})]
