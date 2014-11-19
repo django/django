@@ -270,8 +270,8 @@ Django's test runner.
 
 .. _other-testing-frameworks:
 
-Running tests inside reusable applications
-==========================================
+Using Django test runner in reusable applications
+=================================================
 
 If you are writting a :doc:`reusable application </intro/reusable-apps>` you may want
 to embed a Django test runner in your own test suite and thus benefit from the
