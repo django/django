@@ -2,12 +2,13 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import lru_cache
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
-from django.utils import lru_cache
+from django.utils.module_loading import import_string
 
 from .base import Context, Template, TemplateDoesNotExist
-from .loaders.utils import get_template_loaders
 
 
 _dirs_undefined = object()
@@ -54,7 +55,49 @@ class Engine(object):
 
     @cached_property
     def template_loaders(self):
-        return get_template_loaders(self.loaders)
+        return self.get_template_loaders(self.loaders)
+
+    def get_template_loaders(self, template_loaders):
+        loaders = []
+        for template_loader in template_loaders:
+            loader = self.find_template_loader(template_loader)
+            if loader is not None:
+                loaders.append(loader)
+        return loaders
+
+    def find_template_loader(self, loader):
+        if isinstance(loader, (tuple, list)):
+            args = list(loader[1:])
+            loader = loader[0]
+        else:
+            args = []
+
+        if isinstance(loader, six.string_types):
+            loader_class = import_string(loader)
+
+            if getattr(loader_class, '_accepts_engine_in_init', False):
+                args.insert(0, self)
+            else:
+                warnings.warn(
+                    "%s inherits from django.template.loader.BaseLoader "
+                    "instead of django.template.loaders.base.Loader. " %
+                    loader, RemovedInDjango20Warning, stacklevel=2)
+
+            loader_instance = loader_class(*args)
+
+            if not loader_instance.is_usable:
+                warnings.warn(
+                    "Your template loaders configuration includes %r, but "
+                    "your Python installation doesn't support that type of "
+                    "template loading. Consider removing that line from "
+                    "your settings." % loader)
+                return None
+            else:
+                return loader_instance
+
+        else:
+            raise ImproperlyConfigured(
+                "Invalid value in template loaders configuration: %r" % loader)
 
     def find_template(self, name, dirs=None):
         # Inner import to avoid circular dependency

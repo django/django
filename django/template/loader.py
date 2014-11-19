@@ -48,10 +48,11 @@ from .loaders import base
 
 
 class BaseLoader(base.Loader):
+    _accepts_engine_in_init = False
 
     def __init__(self, *args, **kwargs):
         warnings.warn(
-            "django.template.loader.BaseLoader was renamed to "
+            "django.template.loader.BaseLoader was superseded by "
             "django.template.loaders.base.Loader.",
             RemovedInDjango20Warning, stacklevel=2)
         super(BaseLoader, self).__init__(*args, **kwargs)
