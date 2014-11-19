@@ -26,6 +26,11 @@ from django.utils.timezone import get_default_timezone, is_aware, is_naive
 re_formatchars = re.compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
 
+try:
+    from pytz.exceptions import AmbiguousTimeError
+except ImportError:
+    class AmbiguousTimeError(Exception): pass
+
 
 class Formatter(object):
     def format(self, formatstr):
@@ -134,6 +139,8 @@ class TimeFormat(Formatter):
             return ""
 
         seconds = self.Z()
+        if seconds == "":  # missing timezone or ambiguous data
+            return ""
         sign = '-' if seconds < 0 else '+'
         seconds = abs(seconds)
         return "%s%02d%02d" % (sign, seconds // 3600, (seconds // 60) % 60)
@@ -165,7 +172,11 @@ class TimeFormat(Formatter):
         if not self.timezone:
             return ""
 
-        name = self.timezone.tzname(self.data) if self.timezone else None
+        try:
+            name = self.timezone.tzname(self.data) if self.timezone else None
+        except AmbiguousTimeError:
+            name = None
+
         if name is None:
             name = self.format('O')
         return six.text_type(name)
@@ -186,7 +197,11 @@ class TimeFormat(Formatter):
         if not self.timezone:
             return ""
 
-        offset = self.timezone.utcoffset(self.data)
+        try:
+            offset = self.timezone.utcoffset(self.data)
+        except AmbiguousTimeError:
+            return ""
+
         # `offset` is a datetime.timedelta. For negative values (to the west of
         # UTC) only days can be negative (days=-1) and seconds are always
         # positive. e.g. UTC-1 -> timedelta(days=-1, seconds=82800, microseconds=0)
@@ -226,10 +241,12 @@ class DateFormat(TimeFormat):
 
     def I(self):
         "'1' if Daylight Savings Time, '0' otherwise."
-        if self.timezone and self.timezone.dst(self.data):
-            return '1'
-        else:
-            return '0'
+        try:
+            is_dst = self.timezone and self.timezone.dst(self.data)
+        except AmbiguousTimeError:
+            return ''
+
+        return '1' if is_dst else '0'
 
     def j(self):
         "Day of the month without leading zeros; i.e. '1' to '31'"

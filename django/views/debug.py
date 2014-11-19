@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import datetime
 import os
 import re
 import sys
@@ -18,6 +17,7 @@ from django.utils.html import escape
 from django.utils.encoding import force_bytes, smart_text
 from django.utils.module_loading import import_string
 from django.utils import six
+from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE')
@@ -344,7 +344,7 @@ class ExceptionReporter(object):
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
-            'server_time': datetime.datetime.now(),
+            'server_time': now(),
             'django_version_info': get_version(),
             'sys_path': sys.path,
             'template_info': self.template_info,

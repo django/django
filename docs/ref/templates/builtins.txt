@@ -1397,6 +1397,13 @@ representation of a ``datetime`` value. E.g.::
 
     {{ value|date:"D d M Y" }} {{ value|time:"H:i" }}
 
+.. warning::
+
+    When the datetime being formatted is naive, it contains ambiguous time
+    during DST change. Within this one hour a year, the filter tag returns
+    empty string. Use timezone aware datetimes and set :setting:`USE_TZ` to
+    ``True`` to avoid this.
+
 .. templatefilter:: default
 
 default
