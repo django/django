@@ -12,7 +12,7 @@ from django.http import (HttpResponse, HttpResponseNotFound, HttpRequest,
     build_request_repr)
 from django.template import Template, Context, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
-from django.template.loaders.utils import get_template_loaders
+from django.template.engine import Engine
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.encoding import force_bytes, smart_text
@@ -282,7 +282,8 @@ class ExceptionReporter(object):
             # If Django fails in get_template_loaders, provide an empty list
             # for the following loop to not fail.
             try:
-                template_loaders = get_template_loaders()
+                # TODO: handle multiple template engines.
+                template_loaders = Engine.get_default().template_loaders
             except Exception:
                 template_loaders = []
             for loader in template_loaders:
