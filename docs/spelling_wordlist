@@ -199,9 +199,7 @@ Facebook
 fallback
 fallbacks
 faq
-fastcgi
 FastCGI
-fcgid
 fieldset
 fieldsets
 filesizeformat
@@ -540,7 +538,6 @@ rjust
 roadmap
 Roald
 rss
-runfcgi
 runserver
 SaaS
 safeseq

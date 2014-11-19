@@ -93,12 +93,6 @@ class BashCompletionTests(unittest.TestCase):
         output = self._run_autocomplete()
         self.assertEqual(output, [''])
 
-    def test_runfcgi(self):
-        "Command arguments will be autocompleted"
-        self._user_input('django-admin runfcgi h')
-        output = self._run_autocomplete()
-        self.assertEqual(output, ['host='])
-
     def test_app_completion(self):
         "Application names will be autocompleted for an AppCommand"
         self._user_input('django-admin sqlmigrate a')

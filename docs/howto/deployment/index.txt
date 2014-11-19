@@ -12,13 +12,6 @@ ways to easily deploy Django:
    wsgi/index
    checklist
 
-FastCGI support is deprecated and will be removed in Django 1.9.
-
-.. toctree::
-   :maxdepth: 1
-
-   fastcgi
-
 If you're new to deploying Django and/or Python, we'd recommend you try
 :doc:`mod_wsgi </howto/deployment/wsgi/modwsgi>` first. In most cases it'll be
 the easiest, fastest, and most stable deployment choice.
