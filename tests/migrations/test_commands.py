@@ -11,7 +11,6 @@ from django.core.management import call_command, CommandError
 from django.db.migrations import questioner
 from django.test import override_settings, override_system_checks
 from django.utils import six
-from django.utils._os import upath
 from django.utils.encoding import force_text
 
 from .models import UnicodeModel, UnserializableModel
@@ -153,8 +152,6 @@ class MakeMigrationsTests(MigrationTestBase):
 
     def setUp(self):
         MakeMigrationsTests.creation_counter += 1
-        self._cwd = os.getcwd()
-        self.test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
         self.migration_dir = os.path.join(self.test_dir, 'migrations_%d' % self.creation_counter)
         self.migration_pkg = "migrations.migrations_%d" % self.creation_counter
         self._old_models = apps.app_configs['migrations'].models.copy()
@@ -164,19 +161,21 @@ class MakeMigrationsTests(MigrationTestBase):
         apps.all_models['migrations'] = self._old_models
         apps.clear_cache()
 
+        _cwd = os.getcwd()
         os.chdir(self.test_dir)
         try:
-            self._rmrf(self.migration_dir)
-        except OSError:
-            pass
+            try:
+                self._rmrf(self.migration_dir)
+            except OSError:
+                pass
 
-        try:
-            self._rmrf(os.path.join(self.test_dir,
-                       "test_migrations_path_doesnt_exist"))
-        except OSError:
-            pass
-
-        os.chdir(self._cwd)
+            try:
+                self._rmrf(os.path.join(self.test_dir,
+                           "test_migrations_path_doesnt_exist"))
+            except OSError:
+                pass
+        finally:
+            os.chdir(_cwd)
 
     def _rmrf(self, dname):
         if os.path.commonprefix([self.test_dir, os.path.abspath(dname)]) != self.test_dir:
@@ -553,7 +552,8 @@ class SquashMigrationsTest(MigrationTestBase):
     Tests running the squashmigrations command.
     """
 
-    path = "migrations/test_migrations/0001_squashed_0002_second.py"
+    path = "test_migrations/0001_squashed_0002_second.py"
+    path = os.path.join(MigrationTestBase.test_dir, path)
 
     def tearDown(self):
         if os.path.exists(self.path):
