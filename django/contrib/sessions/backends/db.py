@@ -87,7 +87,7 @@ class SessionStore(SessionBase):
         ).values_list('expire_date', flat=True)
 
         while True:
-            deletable_dates = qs[:10000]
+            deletable_dates = qs[:1000]
             if len(deletable_dates) == 0:
                 break
             Session.objects.filter(expire_date__lte=max(deletable_dates)).delete()
