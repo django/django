@@ -23,6 +23,10 @@ class RelatedObject(FieldFlagsMixin):
         self.name = self.field.related_query_name()
         self.var_name = self.opts.model_name
 
+    @property
+    def hidden(self):
+        return self.field.rel.is_hidden()
+
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
                     limit_to_currently_related=False):
         """Returns choices with a default blank choices included, for use

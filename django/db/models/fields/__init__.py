@@ -53,6 +53,7 @@ class FieldFlagsMixin(object):
 
     _FLAGS_ERROR_MESSAGE = "The mandatory field flag '%s' has not been implemented. Please implement it."
     editable = True
+    hidden = False
 
     @property
     def concrete(self):

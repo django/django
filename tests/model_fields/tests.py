@@ -90,6 +90,7 @@ FLAG_PROPERTIES = (
     'editable',
     'has_relation',
     'model',
+    'hidden',
 )
 
 FLAG_PROPERTIES_FOR_RELATIONS = (
@@ -874,6 +875,19 @@ class FieldFlagsTests(test.TestCase):
                 reverse_field = obj.field
                 self.assertTrue(reverse_field.has_relation \
                                 and reverse_field.one_to_one)
+
+    def test_hidden_flag(self):
+        incl_hidden = set(AllFieldsModel._meta.get_fields(
+                         reverse=True, include_hidden=True))
+        no_hidden = set(AllFieldsModel._meta.get_fields(
+                         reverse=True))
+        fields_that_should_be_hidden = (incl_hidden - no_hidden)
+        for f in incl_hidden:
+            self.assertEquals(
+                f in fields_that_should_be_hidden,
+                f.hidden
+            )
+
 
 class GenericIPAddressFieldTests(test.TestCase):
     def test_genericipaddressfield_formfield_protocol(self):
