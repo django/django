@@ -103,14 +103,7 @@ def Deserializer(object_list, **options):
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
         m2m_data = {}
 
-        fields_names_iterator = chain.from_iterable(
-            (f.name,) if not f.is_reverse_object else (f.field.related_query_name(),)
-            for f in Model._meta.get_fields(forward=True, reverse=True)
-        )
-        field_names = set(
-            field_name for field_name in fields_names_iterator
-            if not field_name.endswith('_id')
-        )
+        field_names = set(f.name for f in Model._meta.get_fields(reverse=True))
 
         # Handle each field
         for (field_name, field_value) in six.iteritems(d["fields"]):

@@ -1379,12 +1379,9 @@ class Query(object):
                 # one step.
                 pos -= 1
                 if pos == -1 or fail_on_missing:
-                    field_names = set(chain.from_iterable(
-                        (f.name, f.attname) if not f.is_reverse_object else (f.field.related_query_name(),)
-                        for f in opts.get_fields(reverse=True)
-                    ))
+                    field_names = [f.name for f in opts.get_fields(reverse=True)]
 
-                    available = sorted(list(field_names) + list(self.aggregate_select))
+                    available = sorted(field_names + list(self.aggregate_select))
                     raise FieldError("Cannot resolve keyword %r into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))
                 break

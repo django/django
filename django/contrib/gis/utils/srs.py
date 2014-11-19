@@ -65,14 +65,7 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
     # Backend-specific fields for the SpatialRefSys model.
 
     opts = SpatialRefSys._meta
-    fields_names_iterator = chain.from_iterable(
-        (f.name,) if not f.is_reverse_object else (f.field.related_query_name(),)
-        for f in opts.get_fields(reverse=True)
-    )
-    srs_field_names = set(
-        field_name for field_name in fields_names_iterator
-        if not field_name.endswith('_id')
-    )
+    srs_field_names = set(f.name for f in opts.get_fields(reverse=True))
 
     if 'srtext' in srs_field_names:
         kwargs['srtext'] = srs.wkt
