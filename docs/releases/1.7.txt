@@ -1511,8 +1511,7 @@ Python versions, this module isn't useful anymore. It has been deprecated. Use
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As :class:`~collections.OrderedDict` was added to the standard library in
-Python 2.7, :class:`~django.utils.datastructures.SortedDict` is no longer
-needed and has been deprecated.
+Python 2.7, ``SortedDict`` is no longer needed and has been deprecated.
 
 Custom SQL location for models package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

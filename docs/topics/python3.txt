@@ -181,7 +181,7 @@ versions of Python.
 
 :meth:`dict.keys`, :meth:`dict.items` and :meth:`dict.values` return lists in
 Python 2 and iterators in Python 3. :class:`~django.http.QueryDict` and the
-:class:`dict`-like classes defined in :mod:`django.utils.datastructures`
+:class:`dict`-like classes defined in ``django.utils.datastructures``
 behave likewise in Python 3.
 
 six_ provides compatibility functions to work around this change:
