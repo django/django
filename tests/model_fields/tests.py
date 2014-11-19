@@ -811,7 +811,7 @@ class FieldFlagsTests(test.TestCase):
         )
 
         # Test classes are what we expect
-        self.assertEquals(MANY_TO_MANY_CLASSES, set(
+        self.assertEqual(MANY_TO_MANY_CLASSES, set(
             f.__class__ for f in m2m_type_fields
         ))
 
@@ -829,7 +829,7 @@ class FieldFlagsTests(test.TestCase):
         ]
 
         # Test classes are what we expect
-        self.assertEquals(ONE_TO_MANY_CLASSES, set(
+        self.assertEqual(ONE_TO_MANY_CLASSES, set(
             f.__class__ for f in o2m_type_fields
         ))
 
@@ -847,7 +847,7 @@ class FieldFlagsTests(test.TestCase):
         ]
 
         # Test classes are what we expect
-        self.assertEquals(MANY_TO_ONE_CLASSES, set(
+        self.assertEqual(MANY_TO_ONE_CLASSES, set(
             f.__class__ for f in m2o_type_fields
         ))
 
@@ -865,7 +865,7 @@ class FieldFlagsTests(test.TestCase):
         ]
 
         # Test classes are what we expect
-        self.assertEquals(ONE_TO_ONE_CLASSES, set(
+        self.assertEqual(ONE_TO_ONE_CLASSES, set(
             f.__class__ for f in o2o_type_fields
         ))
 
@@ -883,7 +883,7 @@ class FieldFlagsTests(test.TestCase):
                          reverse=True))
         fields_that_should_be_hidden = (incl_hidden - no_hidden)
         for f in incl_hidden:
-            self.assertEquals(
+            self.assertEqual(
                 f in fields_that_should_be_hidden,
                 f.hidden
             )

@@ -691,11 +691,13 @@ class Options(object):
             # If the model is a proxy model, then we also add the concrete model.
             all_fields = self._relation_tree if not self.proxy else chain(self._relation_tree,
                                                                    self.concrete_model._meta._relation_tree)
-            for f in all_fields:
+
+            # Pull out all related objects from forward fields
+            for field in (f.related for f in all_fields):
                 # If hidden fields should be included or the relation
                 # is not intentionally hidden, add to the fields dict
-                if include_hidden or not f.related.field.rel.is_hidden():
-                    fields[f.related] = {f.related_query_name()}
+                if include_hidden or not field.hidden:
+                    fields[field] = {field.name}
 
         if forward:
             if include_parents:
