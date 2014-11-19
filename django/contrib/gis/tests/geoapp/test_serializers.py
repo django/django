@@ -6,10 +6,9 @@ from django.contrib.gis.geos import HAS_GEOS
 from django.core import serializers
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import City, MultiFields, PennsylvaniaCity
-
 if HAS_GEOS:
     from django.contrib.gis.geos import LinearRing, Point, Polygon
+    from .models import City, MultiFields, PennsylvaniaCity
 
 
 @skipUnlessDBFeature("gis_enabled")
