@@ -1,25 +1,17 @@
 import warnings
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache
 from django.utils import six
 from django.utils.module_loading import import_string
 
 
-@lru_cache.lru_cache()
-def get_template_loaders():
-    return _get_template_loaders(settings.TEMPLATE_LOADERS)
-
-
-def _get_template_loaders(template_loaders=None):
+def get_template_loaders(template_loaders):
     loaders = []
     for template_loader in template_loaders:
         loader = find_template_loader(template_loader)
         if loader is not None:
             loaders.append(loader)
-    # Immutable return value because it will be cached and shared by callers.
-    return tuple(loaders)
+    return loaders
 
 
 def find_template_loader(loader):
