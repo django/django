@@ -65,3 +65,5 @@ Bugfixes
 
 * Fixed :djadmin:`squashmigrations` to respect the  ``--no-optimize`` parameter
   (:ticket:`23799`).
+
+* Fixed a rare query error when using deeply nested subqueries (:ticket:`23605`).
