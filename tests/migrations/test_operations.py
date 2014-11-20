@@ -81,7 +81,7 @@ class OperationTestBase(MigrationTestBase):
         # Make the "current" state
         model_options = {
             "swappable": "TEST_SWAP_MODEL",
-            "index_together": [["pink", "weight"]] if index_together else [],
+            "index_together": [["weight", "pink"]] if index_together else [],
             "unique_together": [["pink", "weight"]] if unique_together else [],
         }
         if options:
@@ -1012,11 +1012,17 @@ class OperationTests(OperationTestBase):
                 with atomic():
                     cursor.execute("INSERT INTO test_rnfl_pony (blue, weight) VALUES (1, 1)")
             cursor.execute("DELETE FROM test_rnfl_pony")
+        # Ensure the index constraint has been ported over
+        # TODO: Uncomment assert when #23880 is fixed
+        # self.assertIndexExists("test_rnfl_pony", ["weight", "blue"])
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_rnfl", editor, new_state, project_state)
         self.assertColumnExists("test_rnfl_pony", "pink")
         self.assertColumnNotExists("test_rnfl_pony", "blue")
+        # Ensure the index constraint has been reset
+        # TODO: Uncomment assert when #23880 is fixed
+        # self.assertIndexExists("test_rnfl_pony", ["weight", "pink"])
 
     def test_alter_unique_together(self):
         """
