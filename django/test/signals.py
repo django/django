@@ -92,13 +92,6 @@ def reset_default_template_engine(**kwargs):
 
 
 @receiver(setting_changed)
-def clear_context_processors_cache(**kwargs):
-    if kwargs['setting'] == 'TEMPLATE_CONTEXT_PROCESSORS':
-        from django.template.context import get_standard_processors
-        get_standard_processors.cache_clear()
-
-
-@receiver(setting_changed)
 def clear_serializers_cache(**kwargs):
     if kwargs['setting'] == 'SERIALIZATION_MODULES':
         from django.core import serializers
