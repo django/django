@@ -234,12 +234,12 @@ Advanced features of ``TransactionTestCase``
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is an relatively expensive database operation.
 
-Using Django test runner to test reusable applications
-======================================================
+Using the Django test runner to test reusable applications
+==========================================================
 
 If you are writting a :doc:`reusable application </intro/reusable-apps>` you
 may want to use the Django test runner to run your own test suite and thus
-benefit from the Django machinery.
+benefit from the Django testing infrastructure.
 
 A common practice is a *tests* directory next to the application code, with the
 following structure::
@@ -255,7 +255,7 @@ following structure::
         models.py
         tests.py
 
-Let's dig into the content of the *tests* directory.
+Let's dig into the contents of the *tests* directory.
 
 runtests.py
 -----------
@@ -264,9 +264,10 @@ This is the script that you invoke to run the test suite. It is responsible for
 setting up the Django environment, creating the test database and running the
 test suite.
 
-For the sake of clarity, the following example is outrageously hard-coded.
-You'll certainly end up with a full-featured script and nice options controlling
-the verbosity level and such.
+For the sake of clarity, the following example script contains only the bare
+minimum necessary to use the Django test runner. You may want to add
+command-line options for controlling verbosity, passing in specific test labels
+to run, etc.
 
     .. snippet::
         :filename: runtests.py
@@ -299,13 +300,11 @@ context and look no further:
     # Coding...
     python runtests.py
 
-
 or explicitly set the ``PYTHONPATH`` when running the tests:
 
 .. code-block:: bash
 
     PYTHONPATH=..:$PYTHONPATH python runtests.py
-
 
 test_settings.py
 ----------------
