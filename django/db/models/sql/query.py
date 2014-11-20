@@ -313,32 +313,35 @@ class Query(object):
         clone.change_aliases(change_map)
         return clone
 
-    def get_aggregation(self, using, force_subq=False):
+    def get_aggregation(self, using, added_aggregate_names):
         """
         Returns the dictionary with the values of the existing aggregations.
         """
         if not self.annotation_select:
             return {}
-
-        # annotations must be forced into subquery
-        has_annotation = any(
+        has_limit = self.low_mark != 0 or self.high_mark is not None
+        has_existing_annotations = any(
             annotation for alias, annotation
-            in self.annotation_select.items()
-            if not annotation.contains_aggregate)
-
-        # If there is a group by clause, aggregating does not add useful
-        # information but retrieves only the first row. Aggregate
-        # over the subquery instead.
-        if self.group_by is not None or force_subq or has_annotation:
-
+            in self.annotations.items()
+            if alias not in added_aggregate_names
+        )
+        # Decide if we need to use a subquery.
+        #
+        # Existing annotations would cause incorrect results as get_aggregation()
+        # must produce just one result and thus must not use GROUP BY. But we
+        # aren't smart enough to remove the existing annotations from the
+        # query, so those would force us to use GROUP BY.
+        #
+        # If the query has limit or distinct, then those operations must be
+        # done in a subquery so that we are aggregating on the limit and/or
+        # distinct results instead of applying the distinct and limit after the
+        # aggregation.
+        if (self.group_by or has_limit or has_existing_annotations or self.distinct):
             from django.db.models.sql.subqueries import AggregateQuery
             outer_query = AggregateQuery(self.model)
             inner_query = self.clone()
-            if not force_subq:
-                # In forced subq case the ordering and limits will likely
-                # affect the results.
+            if not has_limit and not self.distinct_fields:
                 inner_query.clear_ordering(True)
-                inner_query.clear_limits()
             inner_query.select_for_update = False
             inner_query.select_related = False
             inner_query.related_select_cols = []
@@ -398,34 +401,10 @@ class Query(object):
         Performs a COUNT() query using the current filter constraints.
         """
         obj = self.clone()
-        if len(self.select) > 1 or self.annotation_select or (self.distinct and self.distinct_fields):
-            # If a select clause exists, then the query has already started to
-            # specify the columns that are to be returned.
-            # In this case, we need to use a subquery to evaluate the count.
-            from django.db.models.sql.subqueries import AggregateQuery
-            subquery = obj
-            subquery.clear_ordering(True)
-            subquery.clear_limits()
-
-            obj = AggregateQuery(obj.model)
-            try:
-                obj.add_subquery(subquery, using=using)
-            except EmptyResultSet:
-                # add_subquery evaluates the query, if it's an EmptyResultSet
-                # then there are can be no results, and therefore there the
-                # count is obviously 0
-                return 0
-
-        obj.add_count_column()
-        number = obj.get_aggregation(using=using)[None]
-
-        # Apply offset and limit constraints manually, since using LIMIT/OFFSET
-        # in SQL (in variants that provide them) doesn't change the COUNT
-        # output.
-        number = max(0, number - self.low_mark)
-        if self.high_mark is not None:
-            number = min(number, self.high_mark - self.low_mark)
-
+        obj.add_annotation(Count('*'), alias='__count', is_summary=True)
+        number = obj.get_aggregation(using, ['__count'])['__count']
+        if number is None:
+            number = 0
         return number
 
     def has_filters(self):
@@ -986,9 +965,9 @@ class Query(object):
         warnings.warn(
             "add_aggregate() is deprecated. Use add_annotation() instead.",
             RemovedInDjango20Warning, stacklevel=2)
-        self.add_annotation(aggregate, model, alias, is_summary)
+        self.add_annotation(aggregate, alias, is_summary)
 
-    def add_annotation(self, annotation, model, alias, is_summary):
+    def add_annotation(self, annotation, alias, is_summary):
         """
         Adds a single annotation expression to the Query
         """
@@ -1745,52 +1724,6 @@ class Query(object):
             for alias, annotation in six.iteritems(self.annotations):
                 for col in annotation.get_group_by_cols():
                     self.group_by.append(col)
-
-    def add_count_column(self):
-        """
-        Converts the query to do count(...) or count(distinct(pk)) in order to
-        get its size.
-        """
-        summarize = False
-        if not self.distinct:
-            if not self.select:
-                count = Count('*')
-                summarize = True
-            else:
-                assert len(self.select) == 1, \
-                    "Cannot add count col with multiple cols in 'select': %r" % self.select
-                col = self.select[0].col
-                if isinstance(col, (tuple, list)):
-                    count = Count(col[1])
-                else:
-                    count = Count(col)
-
-        else:
-            opts = self.get_meta()
-            if not self.select:
-                lookup = self.join((None, opts.db_table, None)), opts.pk.column
-                count = Count(lookup[1], distinct=True)
-                summarize = True
-            else:
-                # Because of SQL portability issues, multi-column, distinct
-                # counts need a sub-query -- see get_count() for details.
-                assert len(self.select) == 1, \
-                    "Cannot add count col with multiple cols in 'select'."
-                col = self.select[0].col
-                if isinstance(col, (tuple, list)):
-                    count = Count(col[1], distinct=True)
-                else:
-                    count = Count(col, distinct=True)
-            # Distinct handling is done in Count(), so don't do it at this
-            # level.
-            self.distinct = False
-
-        # Set only aggregate to be the count column.
-        # Clear out the select cache to reflect the new unmasked annotations.
-        count = count.resolve_expression(self, summarize=summarize)
-        self._annotations = {None: count}
-        self.set_annotation_mask(None)
-        self.group_by = None
 
     def add_select_related(self, fields):
         """
