@@ -1738,17 +1738,15 @@ class ForeignKey(ForeignObject):
 
     def _check_unique(self, **kwargs):
         warnings = []
-
         if self.unique:
             warnings.append(
                 checks.Warning(
                     'Setting unique=True on a ForeignKey has the same effect as using a OneToOneField.',
-                    hint='Change the field type from ForeignKey to OneToOneField and remove unique=True.',
+                    hint='ForeignKey(unique=True) is usually better served by a OneToOneField.',
                     obj=self,
                     id='fields.W342',
                 )
             )
-
         return warnings
 
     def deconstruct(self):
