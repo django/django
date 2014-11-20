@@ -150,11 +150,19 @@ class Template(object):
 
     def render(self, context):
         "Display stage -- can be called many times"
+        # Set engine attribute here to avoid changing the signature of either
+        # Context.__init__ or Node.render. The engine is set only on the first
+        # call to render. Further calls e.g. for includes don't override it.
+        toplevel_render = context.engine is None
+        if toplevel_render:
+            context.engine = self.engine
         context.render_context.push()
         try:
             return self._render(context)
         finally:
             context.render_context.pop()
+            if toplevel_render:
+                context.engine = None
 
 
 def compile_string(template_string, origin):
@@ -1236,6 +1244,7 @@ class Library(object):
                         'current_app': context.current_app,
                         'use_l10n': context.use_l10n,
                         'use_tz': context.use_tz,
+                        'engine': context.engine,
                     })
                     # Copy across the CSRF token, if present, because
                     # inclusion tags are often used for forms, and we need
