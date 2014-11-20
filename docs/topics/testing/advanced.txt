@@ -265,8 +265,8 @@ setting up the Django environment, creating the test database and running the
 test suite.
 
 For the sake of clarity, the following example is outrageously hard-coded.
-You'll certainly want to provide options to control the the verbosity level,
-the test labels and such.
+You'll certainly end with a full-featured script and nice options controlling
+the verbosity level and such.
 
     .. snippet::
         :filename: runtests.py
@@ -289,9 +289,9 @@ the test labels and such.
                 sys.exit(bool(failures))
 
 Running this script requires to have the source of the reusable app on
-``sys.path``. Use an `Editable pip installation
+``sys.path``. You can either work in an `editable pip
 <http://pip.readthedocs.org/en/latest/reference/pip_install.html#editable-installs>`_
-and don't worry:
+context and look no further:
 
 .. code-block:: bash
 
@@ -300,7 +300,7 @@ and don't worry:
     python runtests.py
 
 
-Or explicitly set the ``PYTHONPATH`` when running the tests:
+or explicitly set the ``PYTHONPATH`` when running the tests:
 
 .. code-block:: bash
 
@@ -311,7 +311,7 @@ test_settings.py
 ----------------
 
 This is the Django :doc:`setting </topics/settings>` file hosting  your *tests*
-application's configuration to be run against.
+application configuration to be run against during the tests.
 
     .. snippet::
         :filename: test_settings.py
@@ -320,6 +320,11 @@ application's configuration to be run against.
         INSTALLED_APPS = [
             "tests",
         ]
+
+Again, the proposed example has been kept to a minimum on purpose. The
+curious - looking for some more comprehensive code - may read the
+`Django testing source code
+<https://github.com/django/django/tree/master/tests>`_ itest.
 
 .. _other-testing-frameworks:
 
