@@ -1168,3 +1168,17 @@ class JoinPromotionTests(TestCase):
     def test_non_nullable_fk_not_promoted(self):
         qs = Book.objects.annotate(Count('contact__name'))
         self.assertIn(' INNER JOIN ', str(qs.query))
+
+
+class AggregationOnRelationTest(TestCase):
+    def test_aggregate_on_relation(self):
+        # A query with an existing annotation aggregation on a relation should
+        # succeed. The query didn't generate a select for the reffed SQL before,
+        # thus causing a failure.
+        a = Author.objects.create(name='Anssi', age=33)
+        p = Publisher.objects.create(name='Manning', num_awards=3)
+        Book.objects.create(isbn='asdf', name='Foo', pages=10, rating=0.1, price="0.0",
+                            contact=a, publisher=p, pubdate=datetime.date.today())
+        qs = Book.objects.annotate(avg_price=Avg('price')).aggregate(
+            publisher_awards=Sum('publisher__num_awards')
+        )

@@ -313,6 +313,36 @@ class Query(object):
         clone.change_aliases(change_map)
         return clone
 
+    def rewrite_cols(self, annotation, col_cnt):
+        # We must make sure the inner query has the referred columns in it.
+        # If we are aggregating over an annotation, then Django uses Ref()
+        # instances to note this. However, if we are annotating over a column
+        # of a related model, then it might be that column isn't part of the
+        # SELECT clause of the inner query, and we must manually make sure
+        # the column is selected. An example case is .aggregate(
+        #    Sum('author__awards')
+        # )
+        # Resolving this expression results in a join to author, but there
+        # is no guarantee the awards column of author is in the select clause
+        # of the query. Thus we must manually add the column to the inner
+        # query.
+        orig_exprs = annotation.get_source_expressions()
+        new_exprs = []
+        for expr in orig_exprs:
+            if isinstance(expr, Ref):
+                # it already exists in the inner query, no need to readd it.
+                new_exprs.append(expr)
+            elif isinstance(expr, Col):
+                col_cnt += 1
+                self.annotation_select['__col%d' % col_cnt] = expr
+                self.append_annotation_mask(['__col%d' % col_cnt])
+                new_exprs.append(Ref('__col%d' % col_cnt, expr))
+            else:
+                new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
+                new_exprs.append(new_expr)
+        annotation.set_source_expressions(new_exprs)
+        return annotation, col_cnt
+
     def get_aggregation(self, using, force_subq=False):
         """
         Returns the dictionary with the values of the existing aggregations.
@@ -347,10 +377,10 @@ class Query(object):
             relabels[None] = 'subquery'
             # Remove any aggregates marked for reduction from the subquery
             # and move them to the outer AggregateQuery.
+            col_cnt = 0
             for alias, annotation in inner_query.annotation_select.items():
                 if annotation.is_summary:
-                    # The annotation is already referring the subquery alias, so we
-                    # just need to move the annotation to the outer query.
+                    annotation, col_cnt = inner_query.rewrite_cols(annotation, col_cnt)
                     outer_query.annotations[alias] = annotation.relabeled_clone(relabels)
                     del inner_query.annotation_select[alias]
             try:
