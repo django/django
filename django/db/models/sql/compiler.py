@@ -580,10 +580,10 @@ class SQLCompiler(object):
                 if isinstance(col, (list, tuple)):
                     sql = '%s.%s' % (qn(col[0]), qn(col[1]))
                 elif hasattr(col, 'as_sql'):
-                    self.compile(col)
+                    sql, col_params = self.compile(col)
                 else:
                     sql = '(%s)' % str(col)
-                if sql not in seen:
+                if sql not in seen or col_params:
                     result.append(sql)
                     params.extend(col_params)
                     seen.add(sql)
@@ -604,6 +604,14 @@ class SQLCompiler(object):
                 sql = '(%s)' % str(extra_select)
                 result.append(sql)
                 params.extend(extra_params)
+            # Finally, add needed group by cols from annotations
+            for annotation in self.query.annotation_select.values():
+                cols = annotation.get_group_by_cols()
+                for col in cols:
+                    sql = '%s.%s' % (qn(col[0]), qn(col[1]))
+                    if sql not in seen:
+                        result.append(sql)
+                        seen.add(sql)
 
         return result, params
 
