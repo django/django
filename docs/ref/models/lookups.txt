@@ -80,24 +80,24 @@ field references, aggregates, and ``Transform`` are examples that follow this
 API. A class is said to follow the query expression API when it implements the
 following methods:
 
-.. method:: as_sql(self, qn, connection)
+.. method:: as_sql(self, compiler, connection)
 
     Responsible for producing the query string and parameters for the expression.
-    The ``qn`` is an ``SQLCompiler`` object, which has a ``compile()`` method
-    that can be used to compile other expressions. The ``connection`` is the
-    connection used to execute the query.
+    The ``compiler`` is an ``SQLCompiler`` object, which has a ``compile()``
+    method that can be used to compile other expressions. The ``connection`` is
+    the connection used to execute the query.
 
     Calling ``expression.as_sql()`` is usually incorrect - instead
-    ``qn.compile(expression)`` should be used. The ``qn.compile()`` method will
-    take care of calling vendor-specific methods of the expression.
+    ``compiler.compile(expression)`` should be used. The ``compiler.compile()``
+    method will take care of calling vendor-specific methods of the expression.
 
-.. method:: as_vendorname(self, qn, connection)
+.. method:: as_vendorname(self, compiler, connection)
 
     Works like ``as_sql()`` method. When an expression is compiled by
-    ``qn.compile()``, Django will first try to call ``as_vendorname()``, where
-    ``vendorname`` is the vendor name of the backend used for executing the
-    query. The ``vendorname`` is one of ``postgresql``, ``oracle``, ``sqlite``,
-    or ``mysql`` for Django's built-in backends.
+    ``compiler.compile()``, Django will first try to call ``as_vendorname()``,
+    where ``vendorname`` is the vendor name of the backend used for executing
+    the query. The ``vendorname`` is one of ``postgresql``, ``oracle``,
+    ``sqlite``, or ``mysql`` for Django's built-in backends.
 
 .. method:: get_lookup(lookup_name)
 
@@ -200,17 +200,17 @@ Lookup reference
         The name of this lookup, used to identify it on parsing query
         expressions. It cannot contain the string ``"__"``.
 
-    .. method:: process_lhs(qn, connection[, lhs=None])
+    .. method:: process_lhs(compiler, connection[, lhs=None])
 
         Returns a tuple ``(lhs_string, lhs_params)``, as returned by
-        ``qn.compile(lhs)``. This method can be overridden to tune how the
-        ``lhs`` is processed.
+        ``compiler.compile(lhs)``. This method can be overridden to tune how
+        the ``lhs`` is processed.
 
-        ``qn`` is an ``SQLCompiler`` object, to be used like ``qn.compile(lhs)``
-        for compiling ``lhs``. The ``connection`` can be used for compiling
-        vendor specific SQL. If ``lhs`` is not ``None``, use it as the
-        processed ``lhs`` instead of ``self.lhs``.
+        ``compiler`` is an ``SQLCompiler`` object, to be used like
+        ``compiler.compile(lhs)`` for compiling ``lhs``. The ``connection``
+        can be used for compiling vendor specific SQL. If ``lhs`` is not
+        ``None``, use it as the processed ``lhs`` instead of ``self.lhs``.
 
-    .. method:: process_rhs(qn, connection)
+    .. method:: process_rhs(compiler, connection)
 
         Behaves the same way as :meth:`process_lhs`, for the right-hand side.

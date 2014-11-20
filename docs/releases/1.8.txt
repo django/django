@@ -10,6 +10,11 @@ incompatible changes`_ you'll want to be aware of when upgrading from Django
 features`_, and some features have reached the end of their deprecation process
 and `have been removed`_.
 
+Django 1.8 has been designated as Django's second :ref:`"Long-Term Support"
+(LTS) <lts-releases>` release. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 1.4, will
+end 6 months from the release date of Django 1.8.
+
 .. _`new features`: `What's new in Django 1.8`_
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.8`_
 .. _`begun the deprecation process for some features`: `Features deprecated in 1.8`_
@@ -307,6 +312,9 @@ Management Commands
   :djadminopt:`--exclude` which allows exclusion of specific locales from
   processing.
 
+* :djadmin:`compilemessages` now has a ``--use-fuzzy`` or ``-f`` option which
+  includes fuzzy translations into compiled files.
+
 * The :djadminopt:`--ignorenonexistent` option of the :djadmin:`loaddata`
   management command now ignores data for models that no longer exist.
 
@@ -405,6 +413,9 @@ Templates
 * :tfilter:`urlize` doesn't treat exclamation marks at the end of a domain or
   its query string as part of the URL (the URL in e.g. ``'djangoproject.com!``
   is ``djangoproject.com``)
+
+* Added a :class:`locmem.Loader <django.template.loaders.locmem.Loader>`
+  class that loads Django templates from a Python dictionary.
 
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -759,6 +770,13 @@ Miscellaneous
   delete a key if ``set()`` fails. This is necessary to ensure the ``cache_db``
   session store always fetches the most current session data.
 
+* Private APIs ``override_template_loaders`` and ``override_with_test_loader``
+  in ``django.test.utils`` were removed. Override ``TEMPLATE_LOADERS`` with
+  ``override_settings`` instead.
+
+* Warnings from the MySQL database backend are no longer converted to
+  exceptions when :setting:`DEBUG` is ``True``.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
@@ -1023,6 +1041,33 @@ The decorators :func:`~django.test.override_settings` and
 :func:`~django.test.modify_settings` now act at the class level when used as
 class decorators. As a consequence, when overriding ``setUpClass()`` or
 ``tearDownClass()``, the ``super`` implementation should always be called.
+
+``django.template.loader.BaseLoader``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.template.loader.BaseLoader`` was renamed to
+``django.template.loaders.base.Loader``. If you've written a custom template
+loader that inherits ``BaseLoader``, you must inherit ``Loader`` instead.
+
+``django.test.utils.TestTemplateLoader``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Private API ``django.test.utils.TestTemplateLoader`` is deprecated in favor of
+``django.template.loaders.locmem.Loader``.
+
+``qn`` replaced by ``compiler``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In previous Django versions, various internal ORM methods (mostly ``as_sql``
+methods) accepted a ``qn`` (for "quote name") argument, which was a reference
+to a function that quoted identifiers for sending to the database. In Django
+1.8, that argument has been renamed to ``compiler`` and is now a full
+``SQLCompiler`` instance. For backwards-compatibility, calling a
+``SQLCompiler`` instance performs the same name-quoting that the ``qn``
+function used to. However, this backwards-compatibility shim is immediately
+deprecated: you should rename your ``qn`` arguments to ``compiler``, and call
+``compiler.quote_name_unless_alias(...)`` where you previously called
+``qn(...)``.
 
 .. removed-features-1.8:
 

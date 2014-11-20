@@ -59,3 +59,15 @@ Bugfixes
 
 * Fixed a custom field type validation error with MySQL backend when
   ``db_type`` returned ``None`` (:ticket:`23761`).
+
+* Fixed a migration crash when a field is renamed that is part of an
+  ``index_together`` (:ticket:`23859`).
+
+* Fixed :djadmin:`squashmigrations` to respect the  ``--no-optimize`` parameter
+  (:ticket:`23799`).
+
+* Made :class:`~django.db.migrations.operations.RenameModel` reversible
+  (:ticket:`22248`)
+
+* Avoided unnecessary rollbacks of migrations from other apps when migrating
+  backwards (:ticket:`23410`).

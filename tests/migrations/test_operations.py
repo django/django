@@ -15,6 +15,7 @@ from django.db.migrations.state import ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError, DatabaseError
+from django.utils import six
 
 from .test_base import MigrationTestBase
 
@@ -48,7 +49,7 @@ class OperationTestBase(MigrationTestBase):
 
     def set_up_test_model(self, app_label, second_model=False, third_model=False,
             related_model=False, mti_model=False, proxy_model=False,
-            unique_together=False, options=False, db_table=None):
+            unique_together=False, options=False, db_table=None, index_together=False):
         """
         Creates a test model state and database table.
         """
@@ -80,6 +81,7 @@ class OperationTestBase(MigrationTestBase):
         # Make the "current" state
         model_options = {
             "swappable": "TEST_SWAP_MODEL",
+            "index_together": [["pink", "weight"]] if index_together else [],
             "unique_together": [["pink", "weight"]] if unique_together else [],
         }
         if options:
@@ -432,8 +434,7 @@ class OperationTests(OperationTestBase):
             self.assertFKNotExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_pony", "id"))
             self.assertFKExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_horse", "id"))
         # And test reversal
-        with connection.schema_editor() as editor:
-            operation.database_backwards("test_rnmo", editor, new_state, project_state)
+        self.unapply_operations("test_rnmo", project_state, [operation])
         self.assertTableExists("test_rnmo_pony")
         self.assertTableNotExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
@@ -983,7 +984,7 @@ class OperationTests(OperationTestBase):
         """
         Tests the RenameField operation.
         """
-        project_state = self.set_up_test_model("test_rnfl", unique_together=True)
+        project_state = self.set_up_test_model("test_rnfl", unique_together=True, index_together=True)
         # Test the state alteration
         operation = migrations.RenameField("Pony", "pink", "blue")
         self.assertEqual(operation.describe(), "Rename field pink on Pony to blue")
@@ -994,6 +995,9 @@ class OperationTests(OperationTestBase):
         # Make sure the unique_together has the renamed column too
         self.assertIn("blue", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
         self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
+        # Make sure the index_together has the renamed column too
+        self.assertIn("blue", new_state.models["test_rnfl", "pony"].options['index_together'][0])
+        self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].options['index_together'][0])
         # Test the database alteration
         self.assertColumnExists("test_rnfl_pony", "pink")
         self.assertColumnNotExists("test_rnfl_pony", "blue")
@@ -1300,13 +1304,13 @@ class OperationTests(OperationTestBase):
         )
 
         with connection.schema_editor() as editor:
-            self.assertRaisesRegexp(ValueError,
+            six.assertRaisesRegex(self, ValueError,
                 "Expected a 2-tuple but got 1",
                 operation.database_forwards,
                 "test_runsql", editor, project_state, new_state)
 
         with connection.schema_editor() as editor:
-            self.assertRaisesRegexp(ValueError,
+            six.assertRaisesRegex(self, ValueError,
                 "Expected a 2-tuple but got 3",
                 operation.database_backwards,
                 "test_runsql", editor, new_state, project_state)

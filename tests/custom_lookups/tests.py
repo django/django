@@ -14,15 +14,15 @@ from .models import Author, MySQLUnixTimestamp
 class Div3Lookup(models.Lookup):
     lookup_name = 'div3'
 
-    def as_sql(self, qn, connection):
-        lhs, params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params.extend(rhs_params)
         return '(%s) %%%% 3 = %s' % (lhs, rhs), params
 
-    def as_oracle(self, qn, connection):
-        lhs, params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_oracle(self, compiler, connection):
+        lhs, params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params.extend(rhs_params)
         return 'mod(%s, 3) = %s' % (lhs, rhs), params
 
@@ -30,12 +30,12 @@ class Div3Lookup(models.Lookup):
 class Div3Transform(models.Transform):
     lookup_name = 'div3'
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = compiler.compile(self.lhs)
         return '(%s) %%%% 3' % lhs, lhs_params
 
-    def as_oracle(self, qn, connection):
-        lhs, lhs_params = qn.compile(self.lhs)
+    def as_oracle(self, compiler, connection):
+        lhs, lhs_params = compiler.compile(self.lhs)
         return 'mod(%s, 3)' % lhs, lhs_params
 
 
@@ -47,8 +47,8 @@ class Mult3BilateralTransform(models.Transform):
     bilateral = True
     lookup_name = 'mult3'
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = compiler.compile(self.lhs)
         return '3 * (%s)' % lhs, lhs_params
 
 
@@ -56,16 +56,16 @@ class UpperBilateralTransform(models.Transform):
     bilateral = True
     lookup_name = 'upper'
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = compiler.compile(self.lhs)
         return 'UPPER(%s)' % lhs, lhs_params
 
 
 class YearTransform(models.Transform):
     lookup_name = 'year'
 
-    def as_sql(self, qn, connection):
-        lhs_sql, params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs_sql, params = compiler.compile(self.lhs)
         return connection.ops.date_extract_sql('year', lhs_sql), params
 
     @property
@@ -77,11 +77,11 @@ class YearTransform(models.Transform):
 class YearExact(models.lookups.Lookup):
     lookup_name = 'exact'
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
         # We will need to skip the extract part, and instead go
         # directly with the originating field, that is self.lhs.lhs
-        lhs_sql, lhs_params = self.process_lhs(qn, connection, self.lhs.lhs)
-        rhs_sql, rhs_params = self.process_rhs(qn, connection)
+        lhs_sql, lhs_params = self.process_lhs(compiler, connection, self.lhs.lhs)
+        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
         # Note that we must be careful so that we have params in the
         # same order as we have the parts in the SQL.
         params = lhs_params + rhs_params + lhs_params + rhs_params
@@ -98,12 +98,12 @@ class YearLte(models.lookups.LessThanOrEqual):
     The purpose of this lookup is to efficiently compare the year of the field.
     """
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
         # Skip the YearTransform above us (no possibility for efficient
         # lookup otherwise).
         real_lhs = self.lhs.lhs
-        lhs_sql, params = self.process_lhs(qn, connection, real_lhs)
-        rhs_sql, rhs_params = self.process_rhs(qn, connection)
+        lhs_sql, params = self.process_lhs(compiler, connection, real_lhs)
+        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
         params.extend(rhs_params)
         # Build SQL where the integer year is concatenated with last month
         # and day, then convert that to date. (We try to have SQL like:
@@ -117,7 +117,7 @@ class SQLFunc(models.Lookup):
         super(SQLFunc, self).__init__(*args, **kwargs)
         self.name = name
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
         return '%s()', [self.name]
 
     @property
@@ -162,9 +162,9 @@ class InMonth(models.lookups.Lookup):
     """
     lookup_name = 'inmonth'
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         # We need to be careful so that we get the params in right
         # places.
         params = lhs_params + rhs_params + lhs_params + rhs_params
@@ -180,8 +180,8 @@ class DateTimeTransform(models.Transform):
     def output_field(self):
         return models.DateTimeField()
 
-    def as_sql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs, params = compiler.compile(self.lhs)
         return 'from_unixtime({})'.format(lhs), params
 
 
@@ -448,9 +448,9 @@ class YearLteTests(TestCase):
         try:
             # Two ways to add a customized implementation for different backends:
             # First is MonkeyPatch of the class.
-            def as_custom_sql(self, qn, connection):
-                lhs_sql, lhs_params = self.process_lhs(qn, connection, self.lhs.lhs)
-                rhs_sql, rhs_params = self.process_rhs(qn, connection)
+            def as_custom_sql(self, compiler, connection):
+                lhs_sql, lhs_params = self.process_lhs(compiler, connection, self.lhs.lhs)
+                rhs_sql, rhs_params = self.process_rhs(compiler, connection)
                 params = lhs_params + rhs_params + lhs_params + rhs_params
                 return ("%(lhs)s >= str_to_date(concat(%(rhs)s, '-01-01'), '%%%%Y-%%%%m-%%%%d') "
                         "AND %(lhs)s <= str_to_date(concat(%(rhs)s, '-12-31'), '%%%%Y-%%%%m-%%%%d')" %
@@ -468,9 +468,9 @@ class YearLteTests(TestCase):
                 # This method should be named "as_mysql" for MySQL, "as_postgresql" for postgres
                 # and so on, but as we don't know which DB we are running on, we need to use
                 # setattr.
-                def as_custom_sql(self, qn, connection):
-                    lhs_sql, lhs_params = self.process_lhs(qn, connection, self.lhs.lhs)
-                    rhs_sql, rhs_params = self.process_rhs(qn, connection)
+                def as_custom_sql(self, compiler, connection):
+                    lhs_sql, lhs_params = self.process_lhs(compiler, connection, self.lhs.lhs)
+                    rhs_sql, rhs_params = self.process_rhs(compiler, connection)
                     params = lhs_params + rhs_params + lhs_params + rhs_params
                     return ("%(lhs)s >= str_to_date(CONCAT(%(rhs)s, '-01-01'), '%%%%Y-%%%%m-%%%%d') "
                             "AND %(lhs)s <= str_to_date(CONCAT(%(rhs)s, '-12-31'), '%%%%Y-%%%%m-%%%%d')" %
@@ -489,8 +489,8 @@ class TrackCallsYearTransform(YearTransform):
     lookup_name = 'year'
     call_order = []
 
-    def as_sql(self, qn, connection):
-        lhs_sql, params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs_sql, params = compiler.compile(self.lhs)
         return connection.ops.date_extract_sql('year', lhs_sql), params
 
     @property

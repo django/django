@@ -17,6 +17,7 @@ with warnings.catch_warnings(record=True) as w:
 from django.test import TestCase
 from django.test.utils import Approximate
 from django.test.utils import CaptureQueriesContext
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import Author, Publisher, Book, Store
@@ -693,7 +694,7 @@ class ComplexAggregateTestCase(TestCase):
     fixtures = ["aggregation.json"]
 
     def test_nonaggregate_aggregation_throws(self):
-        with self.assertRaisesRegexp(TypeError, 'fail is not an aggregate expression'):
+        with six.assertRaisesRegex(self, TypeError, 'fail is not an aggregate expression'):
             Book.objects.aggregate(fail=F('price'))
 
     def test_nonfield_annotation(self):
@@ -703,7 +704,7 @@ class ComplexAggregateTestCase(TestCase):
         self.assertEqual(book.val, 2)
 
     def test_missing_output_field_raises_error(self):
-        with self.assertRaisesRegexp(FieldError, 'Cannot resolve expression type, unknown output_field'):
+        with six.assertRaisesRegex(self, FieldError, 'Cannot resolve expression type, unknown output_field'):
             Book.objects.annotate(val=Max(Value(2)))[0]
 
     def test_annotation_expressions(self):
@@ -742,7 +743,7 @@ class ComplexAggregateTestCase(TestCase):
         self.assertEqual(p2, {'avg_price': Approximate(53.39, places=2)})
 
     def test_combine_different_types(self):
-        with self.assertRaisesRegexp(FieldError, 'Expression contains mixed types. You must set output_field'):
+        with six.assertRaisesRegex(self, FieldError, 'Expression contains mixed types. You must set output_field'):
             Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price')).get(pk=4)
 
         b1 = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
@@ -758,9 +759,9 @@ class ComplexAggregateTestCase(TestCase):
         self.assertEqual(b3.sums, Decimal("383.69"))
 
     def test_complex_aggregations_require_kwarg(self):
-        with self.assertRaisesRegexp(TypeError, 'Complex expressions require an alias'):
+        with six.assertRaisesRegex(self, TypeError, 'Complex expressions require an alias'):
             Author.objects.annotate(Sum(F('age') + F('friends__age')))
-        with self.assertRaisesRegexp(TypeError, 'Complex aggregates require an alias'):
+        with six.assertRaisesRegex(self, TypeError, 'Complex aggregates require an alias'):
             Author.objects.aggregate(Sum('age') / Count('age'))
 
     def test_aggregate_over_complex_annotation(self):
@@ -856,14 +857,14 @@ class ComplexAggregateTestCase(TestCase):
         self.assertEqual(author.sum_age, other_author.sum_age)
 
     def test_annotated_aggregate_over_annotated_aggregate(self):
-        with self.assertRaisesRegexp(FieldError, "Cannot compute Sum\('id__max'\): 'id__max' is an aggregate"):
+        with six.assertRaisesRegex(self, FieldError, "Cannot compute Sum\('id__max'\): 'id__max' is an aggregate"):
             Book.objects.annotate(Max('id')).annotate(Sum('id__max'))
 
     def test_add_implementation(self):
         try:
             # test completely changing how the output is rendered
-            def lower_case_function_override(self, qn, connection):
-                sql, params = qn.compile(self.source_expressions[0])
+            def lower_case_function_override(self, compiler, connection):
+                sql, params = compiler.compile(self.source_expressions[0])
                 substitutions = dict(function=self.function.lower(), expressions=sql)
                 substitutions.update(self.extra)
                 return self.template % substitutions, params
@@ -876,9 +877,9 @@ class ComplexAggregateTestCase(TestCase):
             self.assertEqual(b1.sums, 383)
 
             # test changing the dict and delegating
-            def lower_case_function_super(self, qn, connection):
+            def lower_case_function_super(self, compiler, connection):
                 self.extra['function'] = self.function.lower()
-                return super(Sum, self).as_sql(qn, connection)
+                return super(Sum, self).as_sql(compiler, connection)
             setattr(Sum, 'as_' + connection.vendor, lower_case_function_super)
 
             qs = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
@@ -888,7 +889,7 @@ class ComplexAggregateTestCase(TestCase):
             self.assertEqual(b1.sums, 383)
 
             # test overriding all parts of the template
-            def be_evil(self, qn, connection):
+            def be_evil(self, compiler, connection):
                 substitutions = dict(function='MAX', expressions='2')
                 substitutions.update(self.extra)
                 return self.template % substitutions, ()
@@ -920,8 +921,8 @@ class ComplexAggregateTestCase(TestCase):
         class Greatest(Func):
             function = 'GREATEST'
 
-            def as_sqlite(self, qn, connection):
-                return super(Greatest, self).as_sql(qn, connection, function='MAX')
+            def as_sqlite(self, compiler, connection):
+                return super(Greatest, self).as_sql(compiler, connection, function='MAX')
 
         qs = Publisher.objects.annotate(
             price_or_median=Greatest(Avg('book__rating'), Avg('book__price'))

@@ -100,13 +100,11 @@ class ModelBase(type):
                 msg = (
                     "Model class %s.%s doesn't declare an explicit app_label "
                     "and either isn't in an application in INSTALLED_APPS or "
-                    "else was imported before its application was loaded. " %
+                    "else was imported before its application was loaded. "
+                    "This will no longer be supported in Django 1.9." %
                     (module, name))
-                if abstract:
-                    msg += "Its app_label will be set to None in Django 1.9."
-                else:
-                    msg += "This will no longer be supported in Django 1.9."
-                warnings.warn(msg, RemovedInDjango19Warning, stacklevel=2)
+                if not abstract:
+                    warnings.warn(msg, RemovedInDjango19Warning, stacklevel=2)
 
                 model_module = sys.modules[new_class.__module__]
                 package_components = model_module.__name__.split('.')
@@ -826,10 +824,10 @@ class Model(six.with_metaclass(ModelBase)):
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
-    def prepare_database_save(self, unused):
+    def prepare_database_save(self, field):
         if self.pk is None:
             raise ValueError("Unsaved model instance %r cannot be used in an ORM query." % self)
-        return self.pk
+        return getattr(self, field.rel.field_name)
 
     def clean(self):
         """

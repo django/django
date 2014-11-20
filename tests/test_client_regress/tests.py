@@ -8,9 +8,7 @@ import os
 import itertools
 
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template import (TemplateSyntaxError,
-    Context, Template, loader)
-import django.template.context
+from django.template import TemplateSyntaxError, Context, Template
 from django.test import Client, TestCase, override_settings
 from django.test.client import encode_file, RequestFactory
 from django.test.utils import ContextList, str_prefix
@@ -902,13 +900,6 @@ class ExceptionTests(TestCase):
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class TemplateExceptionTests(TestCase):
 
-    def setUp(self):
-        # Reset the loaders so they don't try to render cached templates.
-        if loader.template_source_loaders is not None:
-            for template_loader in loader.template_source_loaders:
-                if hasattr(template_loader, 'reset'):
-                    template_loader.reset()
-
     @override_settings(
         TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'bad_templates'),)
     )
@@ -916,9 +907,10 @@ class TemplateExceptionTests(TestCase):
         "Errors found when rendering 404 error templates are re-raised"
         try:
             self.client.get("/no_such_view/")
-            self.fail("Should get error about syntax error in template")
         except TemplateSyntaxError:
             pass
+        else:
+            self.fail("Should get error about syntax error in template")
 
 
 # We need two different tests to check URLconf substitution -  one to check
@@ -1001,12 +993,11 @@ class ContextTests(TestCase):
         # Need to insert a context processor that assumes certain things about
         # the request instance. This triggers a bug caused by some ways of
         # copying RequestContext.
-        try:
-            django.template.context._standard_context_processors = (lambda request: {'path': request.special_path},)
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=(
+            'test_client_regress.context_processors.special',
+        )):
             response = self.client.get("/request_context_view/")
             self.assertContains(response, 'Path: /request_context_view/')
-        finally:
-            django.template.context._standard_context_processors = None
 
     def test_nested_requests(self):
         """

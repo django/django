@@ -150,6 +150,7 @@ HStoreField
         submission to the server.
 
     .. note::
+
         On occasions it may be useful to require or restrict the keys which are
         valid for a given field. This can be done using the
         :class:`~django.contrib.postgres.validators.KeysValidator`.
