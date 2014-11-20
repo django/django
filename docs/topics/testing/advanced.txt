@@ -307,26 +307,19 @@ Or explicitly set the ``PYTHONPATH`` when running the tests:
     PYTHONPATH=..:$PYTHONPATH python runtests.py
 
 
-settings.py files
------------------
+test_settings.py
+----------------
 
-These are specific setting files to run the test suite against. Useful to say
-change the database engine just by using the ``--settings`` option without
-over-complicated switches into the script.
+This is the Django :doc:`setting </topics/settings>` file hosting  your *tests*
+application's configuration to be run against.
 
     .. snippet::
-        :filename: test_sqlite_settings.py
+        :filename: test_settings.py
 
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3'
-            },
-            'other': {
-                'ENGINE': 'django.db.backends.sqlite3',
-            }
-        }
-        SECRET_KEY = 'My-supersecret-key'
-        USE_TZ = True
+        SECRET_KEY = 'my-supersecret-key'
+        INSTALLED_APPS = [
+            "tests",
+        ]
 
 urls.py
 -------
