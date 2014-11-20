@@ -1373,6 +1373,14 @@ class Query(object):
                 name = opts.pk.name
             try:
                 field = opts.get_field(name)
+
+                # Fields like a GenericForeignKey cannot generate reverse relations
+                # therefore they cannote be used for reverse querying.
+                if hasattr(field, 'is_gfk'):
+                    raise FieldError("Field %r is a GenericForeignKey. This field "
+                                      "type does not generate a reverse relation "
+                                      "by default and therefore cannot be used for "
+                                      "reverse querying. Consider using a GenericRelation." % name)
                 model = field.parent_model._meta.concrete_model
             except FieldDoesNotExist:
                 # We didn't find the current field, so move position back

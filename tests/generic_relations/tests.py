@@ -356,7 +356,7 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(tag.content_object.id, diamond.id)
 
     def test_query_content_type(self):
-        with six.assertRaisesRegex(self, FieldError, "^Cannot resolve keyword 'content_object' into field."):
+        with six.assertRaisesRegex(self, FieldError, "^Field 'content_object' is a GenericForeignKey."):
             TaggedItem.objects.get(content_object='')
 
 
