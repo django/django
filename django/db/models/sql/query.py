@@ -313,6 +313,41 @@ class Query(object):
         clone.change_aliases(change_map)
         return clone
 
+    def rewrite_cols(self, annotation, col_cnt):
+        # We must make sure the inner query has the referred columns in it.
+        # If we are aggregating over an annotation, then Django uses Ref()
+        # instances to note this. However, if we are annotating over a column
+        # of a related model, then it might be that column isn't part of the
+        # SELECT clause of the inner query, and we must manually make sure
+        # the column is selected. An example case is:
+        #    .aggregate(Sum('author__awards'))
+        # Resolving this expression results in a join to author, but there
+        # is no guarantee the awards column of author is in the select clause
+        # of the query. Thus we must manually add the column to the inner
+        # query.
+        orig_exprs = annotation.get_source_expressions()
+        new_exprs = []
+        for expr in orig_exprs:
+            if isinstance(expr, Ref):
+                # Its already a Ref to subquery (see resolve_ref() for
+                # details)
+                new_exprs.append(expr)
+            elif isinstance(expr, Col):
+                # Reference to column. Make sure the referenced column
+                # is selected.
+                col_cnt += 1
+                col_alias = '__col%d' % col_cnt
+                self.annotation_select[col_alias] = expr
+                self.append_annotation_mask([col_alias])
+                new_exprs.append(Ref(col_alias, expr))
+            else:
+                # Some other expression not referencing database values
+                # directly. Its subexpression might contain Cols.
+                new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
+                new_exprs.append(new_expr)
+        annotation.set_source_expressions(new_exprs)
+        return annotation, col_cnt
+
     def get_aggregation(self, using, added_aggregate_names):
         """
         Returns the dictionary with the values of the existing aggregations.
@@ -350,11 +385,11 @@ class Query(object):
             relabels[None] = 'subquery'
             # Remove any aggregates marked for reduction from the subquery
             # and move them to the outer AggregateQuery.
-            for alias, annotation in inner_query.annotation_select.items():
-                if annotation.is_summary:
-                    # The annotation is already referring the subquery alias, so we
-                    # just need to move the annotation to the outer query.
-                    outer_query.annotations[alias] = annotation.relabeled_clone(relabels)
+            col_cnt = 0
+            for alias, expression in inner_query.annotation_select.items():
+                if expression.is_summary:
+                    expression, col_cnt = inner_query.rewrite_cols(expression, col_cnt)
+                    outer_query.annotations[alias] = expression.relabeled_clone(relabels)
                     del inner_query.annotation_select[alias]
             try:
                 outer_query.add_subquery(inner_query, using)
@@ -1495,6 +1530,10 @@ class Query(object):
             raise FieldError("Joined field references are not permitted in this query")
         if name in self.annotations:
             if summarize:
+                # Summarize currently means we are doing an aggregate() query
+                # which is executed as a wrapped subquery if any of the
+                # aggregate() elements reference an existing annotation. In
+                # that case we need to return a Ref to the subquery's annotation.
                 return Ref(name, self.annotation_select[name])
             else:
                 return self.annotation_select[name]
