@@ -400,6 +400,9 @@ class Options(object):
         fields = chain(self.get_fields(forward=True, reverse=True, include_hidden=True), self.virtual_fields)
         for field in fields:
             res[field.name] = field
+
+            # Due to the way Django's internals work, get_field() should also be able to fetch a field by attname.
+            # Which in the case of a concrete field with relation, includes the *_id name too
             try:
                 res[field.attname] = field
             except AttributeError:
