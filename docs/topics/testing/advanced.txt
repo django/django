@@ -321,28 +321,6 @@ application's configuration to be run against.
             "tests",
         ]
 
-urls.py
--------
-
-    .. snippet::
-        :filename: tests/url.py
-
-        patterns = []
-
-You do not declare any patterns in that file. It only exists because Django
-expects :setting:`ROOT_URLCONF` to exist. Use *urls.py* files in test
-directories instead and the :func:`@override_settings
-<django.test.override_settings>` decorator:
-
-    .. snippet::
-        :filename: testing_polls/tests.py
-
-        from django.test import TestCase, override_settings
-
-        @override_settings(ROOT_URLCONF="testing_polls.urls")
-        class ManipulatingPollTest(TestCase):
-            fixtures = ["testing_polls/example1.json"]
-
 .. _other-testing-frameworks:
 
 Using different testing frameworks
