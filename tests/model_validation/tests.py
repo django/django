@@ -15,8 +15,11 @@ def on_post_init(**kwargs):
     pass
 
 
-@override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342',])
+@override_settings(
+    INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes'],
+    SILENCED_SYSTEM_CHECKS=['fields.W342'])
 class ModelValidationTest(TestCase):
+
     def test_models_validate(self):
         # All our models should validate properly
         # Validation Tests:
@@ -51,5 +54,4 @@ class ModelValidationTest(TestCase):
             )
         ]
         self.assertEqual(errors, expected)
-
         post_init.unresolved_references = unresolved_references

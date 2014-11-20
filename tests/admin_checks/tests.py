@@ -35,7 +35,9 @@ class ValidFormFieldsets(admin.ModelAdmin):
     )
 
 
-@override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342',])
+@override_settings(
+    SILENCED_SYSTEM_CHECKS=['fields.W342'],
+    INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'admin_checks'])
 class SystemChecksTestCase(TestCase):
 
     def test_checks_are_performed(self):
