@@ -81,7 +81,7 @@ overridden:
   just returns ``self.cleaned_data``).
 
   Since the field validation methods have been run by the time ``clean()`` is
-  called, you also have access to the form's errors attribute which
+  called, you also have access to the form's ``errors`` attribute which
   contains all the errors raised by cleaning of individual fields.
 
   Note that any errors raised by your ``Form.clean()`` override will not
