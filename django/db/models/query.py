@@ -335,12 +335,11 @@ class QuerySet(object):
             kwargs[arg.default_alias] = arg
 
         query = self.query.clone()
-        force_subq = query.low_mark != 0 or query.high_mark is not None
         for (alias, aggregate_expr) in kwargs.items():
-            query.add_annotation(aggregate_expr, self.model, alias, is_summary=True)
+            query.add_annotation(aggregate_expr, alias, is_summary=True)
             if not query.annotations[alias].contains_aggregate:
                 raise TypeError("%s is not an aggregate expression" % alias)
-        return query.get_aggregation(using=self.db, force_subq=force_subq)
+        return query.get_aggregation(self.db, kwargs.keys())
 
     def count(self):
         """
@@ -824,7 +823,7 @@ class QuerySet(object):
             if alias in names:
                 raise ValueError("The annotation '%s' conflicts with a field on "
                                  "the model." % alias)
-            obj.query.add_annotation(annotation, self.model, alias, is_summary=False)
+            obj.query.add_annotation(annotation, alias, is_summary=False)
         # expressions need to be added to the query before we know if they contain aggregates
         added_aggregates = []
         for alias, annotation in obj.query.annotations.items():
