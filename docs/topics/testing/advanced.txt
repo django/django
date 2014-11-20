@@ -291,21 +291,19 @@ to run, etc.
 test_settings.py
 ----------------
 
-This is the Django :doc:`setting </topics/settings>` file hosting  your *tests*
-application configuration to be run against during the tests.
+This file contains the :doc:`Django settings </topics/settings>` needed to run
+your app's tests.
 
     .. snippet::
         :filename: test_settings.py
 
-        SECRET_KEY = 'my-supersecret-key'
+        SECRET_KEY = 'fake-key'
         INSTALLED_APPS = [
             "tests",
         ]
 
-Again, the proposed example has been kept to a minimum on purpose. The
-curious - looking for some more comprehensive code - may read the
-`Django testing source code
-<https://github.com/django/django/tree/master/tests>`_ itest.
+Again, this is a minimal example; your tests may require additional settings
+to run.
 
 .. _other-testing-frameworks:
 
