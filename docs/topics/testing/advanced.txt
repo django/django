@@ -288,17 +288,24 @@ the test labels and such.
             if failures:
                 sys.exit(bool(failures))
 
-Running this script require to have the source of the reusable app on
-``sys.path``. This can be done by explicitly setting the ``PYTHONPATH``:
+Running this script requires to have the source of the reusable app on
+``sys.path``. Use an `Editable pip installation
+<http://pip.readthedocs.org/en/latest/reference/pip_install.html#editable-installs>`_
+and don't worry:
 
 .. code-block:: bash
 
-    PYTHONPATH=..:$PYTHONPATH python runtests.py [labels]
+    pip install -e git+git@your-polls-repo.git
+    # Coding...
+    python runtests.py
 
-Alternatively, you can use the `development mode of setuptools
-<http://pythonhosted.org//setuptools/setuptools.html#development-mode>`_ or
-make an `Editable pip installation
-<http://pip.readthedocs.org/en/latest/reference/pip_install.html#editable-installs>`_.
+
+Or explicitly set the ``PYTHONPATH`` when running the tests:
+
+.. code-block:: bash
+
+    PYTHONPATH=..:$PYTHONPATH python runtests.py
+
 
 settings.py files
 -----------------
