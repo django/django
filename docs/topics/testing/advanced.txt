@@ -288,23 +288,6 @@ to run, etc.
             failures = test_runner.run_tests(["tests"])
             sys.exit(bool(failures))
 
-Running this script requires to have the source of the reusable app on
-``sys.path``. You can either work in an `editable pip
-<http://pip.readthedocs.org/en/latest/reference/pip_install.html#editable-installs>`_
-context and look no further:
-
-.. code-block:: bash
-
-    pip install -e path/to/sources
-    # Coding...
-    python runtests.py
-
-or explicitly set the ``PYTHONPATH`` when running the tests:
-
-.. code-block:: bash
-
-    PYTHONPATH=..:$PYTHONPATH python runtests.py
-
 test_settings.py
 ----------------
 
