@@ -238,42 +238,22 @@ Using Django test runner to test reusable applications
 ======================================================
 
 If you are writting a :doc:`reusable application </intro/reusable-apps>` you
-may want to embed a Django test runner in your own test suite and thus benefit
-from the Django machinery.
+may want to use the Django test runner to run your own test suite and thus
+benefit from the Django machinery.
 
-A common practice is a *tests* directory aside the application code with the
+A common practice is a *tests* directory next to the application code, with the
 following structure::
 
     polls/
         __init__.py
         models.py
-        views.py
-        static/
-        templates/
         ...
     tests/
+        __init__.py
         runtests.py
-        test_sqlite_settings.py
-        test_pgres_settings.py
-        urls.py
-        testing_polls/
-            __init__.py
-            admin.py
-            models.py
-            urls.py
-            views.py
-            tests.py
-            fixtures/
-                testing_polls/
-                    example1.json
-        templates/
-            some.html
-    README
-    LICENCE
-    setup.py
-
-The *testing_polls* directory being a testing application that use and provide
-tests for the *polls* reusable app.
+        test_settings.py
+        models.py
+        tests.py
 
 Let's dig into the content of the *tests* directory.
 
