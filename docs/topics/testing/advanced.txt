@@ -295,7 +295,7 @@ and don't worry:
 
 .. code-block:: bash
 
-    pip install -e git+git@your-polls-repo.git
+    pip install -e path/to/sources
     # Coding...
     python runtests.py
 
