@@ -397,23 +397,13 @@ class Options(object):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = self.get_fields(forward=True, reverse=True, include_hidden=True,
-                                 export_name_map=True, cache_results=False)
-        fields.update(
-            (field, {field.name, field.attname})
-            for field in self.virtual_fields
-            if hasattr(field, 'related')
-        )
-
-        for obj, names in six.iteritems(fields):
-            # Exclude any intentionally hidden related object.
-            if obj.is_reverse_object and hasattr(obj, 'field'):
-                if obj.field.rel.is_hidden() and not obj.field.has_many_values:
-                    continue
-
-            # map each possible name for a field to its field instance
-            for name in names:
-                res[name] = obj
+        fields = chain(self.get_fields(forward=True, reverse=True, include_hidden=True), self.virtual_fields)
+        for field in fields:
+            res[field.name] = field
+            try:
+                res[field.attname] = field
+            except AttributeError:
+                pass
 
         return res
 

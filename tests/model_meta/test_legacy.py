@@ -168,11 +168,6 @@ class GetFieldByNameTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTest
         self.assertEqual(field_info[1:], (None, False, True))
         self.assertIsInstance(field_info[0], related.RelatedObject)
 
-    def test_get_generic_foreign_key(self):
-        # For historic reasons generic foreign keys aren't available.
-        with self.assertRaises(FieldDoesNotExist):
-            Person._meta.get_field_by_name('content_object_base')
-
     def test_get_generic_relation(self):
         field_info = Person._meta.get_field_by_name('generic_relation_base')
         self.assertEqual(field_info[1:], (None, True, False))
