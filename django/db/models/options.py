@@ -706,8 +706,8 @@ class Options(object):
             fields = make_immutable_fields_list("get_fields()", fields.keys())
 
         # Store result into cache for later access
-        if cache_results:
-            self._get_fields_cache[cache_key] = fields
+        #if cache_results:
+            #self._get_fields_cache[cache_key] = fields
         # In order to avoid list manipulation. Always
         # return a shallow copy of the results
         return fields
