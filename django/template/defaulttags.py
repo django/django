@@ -375,9 +375,9 @@ class RegroupNode(Node):
         return ''
 
 
-def include_is_allowed(filepath):
+def include_is_allowed(filepath, allowed_include_roots):
     filepath = os.path.abspath(filepath)
-    for root in settings.ALLOWED_INCLUDE_ROOTS:
+    for root in allowed_include_roots:
         if filepath.startswith(root):
             return True
     return False
@@ -391,7 +391,7 @@ class SsiNode(Node):
     def render(self, context):
         filepath = self.filepath.resolve(context)
 
-        if not include_is_allowed(filepath):
+        if not include_is_allowed(filepath, context.engine.allowed_include_roots):
             if settings.DEBUG:
                 return "[Didn't have permission to include file]"
             else:
