@@ -265,7 +265,7 @@ setting up the Django environment, creating the test database and running the
 test suite.
 
 For the sake of clarity, the following example is outrageously hard-coded.
-You'll certainly end with a full-featured script and nice options controlling
+You'll certainly end up with a full-featured script and nice options controlling
 the verbosity level and such.
 
     .. snippet::
