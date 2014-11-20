@@ -286,8 +286,7 @@ to run, etc.
             TestRunner = get_runner(settings)
             test_runner = TestRunner()
             failures = test_runner.run_tests(["tests"])
-            if failures:
-                sys.exit(bool(failures))
+            sys.exit(bool(failures))
 
 Running this script requires to have the source of the reusable app on
 ``sys.path``. You can either work in an `editable pip
