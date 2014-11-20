@@ -9,6 +9,7 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
 from .base import Context, Lexer, Parser, Template, TemplateDoesNotExist
+from .context import _builtin_context_processors
 
 
 _dirs_undefined = object()
@@ -57,6 +58,12 @@ class Engine(object):
             string_if_invalid=settings.TEMPLATE_STRING_IF_INVALID,
             file_charset=settings.FILE_CHARSET,
         )
+
+    @cached_property
+    def template_context_processors(self):
+        context_processors = _builtin_context_processors
+        context_processors += tuple(self.context_processors)
+        return tuple(import_string(path) for path in context_processors)
 
     @cached_property
     def template_loaders(self):
