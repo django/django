@@ -85,6 +85,7 @@ def reset_default_template_engine(**kwargs):
         'TEMPLATE_CONTEXT_PROCESSORS',
         'TEMPLATE_LOADERS',
         'TEMPLATE_STRING_IF_INVALID',
+        'FILE_CHARSET',
     }:
         from django.template.engine import Engine
         Engine.get_default.cache_clear()

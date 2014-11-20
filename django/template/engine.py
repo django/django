@@ -18,7 +18,8 @@ class Engine(object):
 
     def __init__(self, dirs=None, app_dirs=False,
                  allowed_include_roots=None, context_processors=None,
-                 loaders=None, string_if_invalid=''):
+                 loaders=None, string_if_invalid='',
+                 file_charset=None):
         if dirs is None:
             dirs = []
         if allowed_include_roots is None:
@@ -33,6 +34,8 @@ class Engine(object):
             if app_dirs:
                 raise ImproperlyConfigured(
                     "APP_DIRS must not be set when LOADERS is defined.")
+        if file_charset is None:
+            file_charset = 'utf-8'
 
         self.dirs = dirs
         self.app_dirs = app_dirs
@@ -40,6 +43,7 @@ class Engine(object):
         self.context_processors = context_processors
         self.loaders = loaders
         self.string_if_invalid = string_if_invalid
+        self.file_charset = file_charset
 
     @classmethod
     @lru_cache.lru_cache()
@@ -51,6 +55,7 @@ class Engine(object):
             context_processors=settings.TEMPLATE_CONTEXT_PROCESSORS,
             loaders=settings.TEMPLATE_LOADERS,
             string_if_invalid=settings.TEMPLATE_STRING_IF_INVALID,
+            file_charset=settings.FILE_CHARSET,
         )
 
     @cached_property

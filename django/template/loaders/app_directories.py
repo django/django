@@ -5,7 +5,6 @@ packages.
 
 import io
 
-from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.template.base import TemplateDoesNotExist
 from django.template.utils import get_app_template_dirs
@@ -36,7 +35,7 @@ class Loader(BaseLoader):
     def load_template_source(self, template_name, template_dirs=None):
         for filepath in self.get_template_sources(template_name, template_dirs):
             try:
-                with io.open(filepath, encoding=settings.FILE_CHARSET) as fp:
+                with io.open(filepath, encoding=self.engine.file_charset) as fp:
                     return fp.read(), filepath
             except IOError:
                 pass
