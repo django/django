@@ -777,6 +777,10 @@ Miscellaneous
 * Warnings from the MySQL database backend are no longer converted to
   exceptions when :setting:`DEBUG` is ``True``.
 
+* :class:`~django.http.HttpRequest` now has a simplified ``repr`` (e.g.
+  ``<WSGIRequest: GET '/somepath/'>``). This won't change the behavior of
+  the :class:`~django.views.debug.SafeExceptionReporterFilter` class.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8

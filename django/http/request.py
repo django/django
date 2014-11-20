@@ -64,7 +64,11 @@ class HttpRequest(object):
         self._post_parse_error = False
 
     def __repr__(self):
-        return build_request_repr(self)
+        if self.method is None or not self.get_full_path():
+            return force_str('<%s>' % self.__class__.__name__)
+        return force_str(
+            '<%s: %s %r>' % (self.__class__.__name__, self.method, force_str(self.get_full_path()))
+        )
 
     def get_host(self):
         """Returns the HTTP host using the environment or request headers."""
