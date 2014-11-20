@@ -1,5 +1,14 @@
+from django.core.exceptions import ImproperlyConfigured
+
 # Want to get everything from the 'normal' models package.
 from django.db.models import *  # NOQA
+
+from django.contrib.gis.geos import HAS_GEOS
+
+if not HAS_GEOS:
+    raise ImproperlyConfigured(
+        "GEOS is required and has not been detected. Are you sure it is installed? "
+        "See also https://docs.djangoproject.com/en/stable/ref/contrib/gis/install/geolibs/")
 
 # Geographic aggregate functions
 from django.contrib.gis.db.models.aggregates import *  # NOQA
