@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import logging
+import warnings
 from functools import update_wrapper
 
 from django import http
@@ -8,8 +9,10 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
 from django.utils.decorators import classonlymethod
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
 
+_sentinel = object()
 logger = logging.getLogger('django.request')
 
 
@@ -48,7 +51,6 @@ class View(object):
         """
         Main entry point for a request-response process.
         """
-        # sanitize keyword arguments
         for key in initkwargs:
             if key in cls.http_method_names:
                 raise TypeError("You tried to pass in the %s method name as a "
@@ -159,10 +161,22 @@ class RedirectView(View):
     """
     A view that provides a redirect on any GET request.
     """
-    permanent = True
+    permanent = _sentinel
     url = None
     pattern_name = None
     query_string = False
+
+    def __init__(self, *args, **kwargs):
+        if 'permanent' not in kwargs and self.permanent is _sentinel:
+            warnings.warn(
+                "Default value of 'RedirectView.permanent' will change "
+                "from True to False in Django 1.9. Set an explicit value "
+                "to silence this warning.",
+                RemovedInDjango19Warning,
+                stacklevel=3
+            )
+            self.permanent = True
+        super(RedirectView, self).__init__(*args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         """

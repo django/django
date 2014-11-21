@@ -1097,6 +1097,13 @@ deprecated: you should rename your ``qn`` arguments to ``compiler``, and call
 ``compiler.quote_name_unless_alias(...)`` where you previously called
 ``qn(...)``.
 
+Default value of ``RedirectView.permanent``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default value of the
+:attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
+attribute will change from ``True`` to ``False`` in Django 1.9.
+
 .. removed-features-1.8:
 
 Features removed in 1.8
