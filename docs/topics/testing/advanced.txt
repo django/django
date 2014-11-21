@@ -305,6 +305,12 @@ your app's tests.
 Again, this is a minimal example; your tests may require additional settings
 to run.
 
+tests/models.py
+---------------
+
+Having the *tests* application figuring in :setting:`INSTALLED_APPS`, you
+can define some test-only models in that file.
+
 .. _other-testing-frameworks:
 
 Using different testing frameworks
