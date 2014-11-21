@@ -287,6 +287,10 @@ Generic Views
   require a ``form_class`` to be provided anymore. If not provided ``form_class``
   defaults to :meth:`~django.views.generic.edit.FormMixin.get_form_class()`.
 
+* :class:`~django.views.generic.edit.ModelFormMixin` class will raise an
+  :exc:`~django.core.exceptions.ImproperlyConfigured` exception when both
+  ``fields`` and ``form_class`` attributes are specified.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
