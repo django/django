@@ -794,10 +794,10 @@ class QuerySet(object):
                                  % arg.default_alias)
             kwargs[arg.default_alias] = arg
 
-        names = getattr(self, '_fields', None)
-        if names is None:
-            names = [f.name for f in self.model._meta.get_fields()]
         for aggregate in kwargs:
+            names = getattr(self, '_fields', None)
+            if names is None:
+                names = [f.name for f in self.model._meta.get_fields()]
             if aggregate in names:
                 raise ValueError("The annotation '%s' conflicts with a field on "
                     "the model." % aggregate)

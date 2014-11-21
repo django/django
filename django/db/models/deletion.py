@@ -144,12 +144,11 @@ class Collector(object):
             return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
-        related_opts = chain(
+        related_opts = list(chain(
             get_related_objects_on_proxies(opts),
-            (related for related in opts.get_fields(
-                forward=False, reverse=True, include_hidden=True,
-            ) if not (related.field.has_many_values and related.field.has_relation)),
-        )
+            (field for field in opts.get_fields(include_hidden=True)
+             if field.is_reverse_object and not field.many_to_many
+        )))
 
         for related in related_opts:
             if related.field.rel.on_delete is not DO_NOTHING:
@@ -217,9 +216,8 @@ class Collector(object):
         if collect_related:
             related_opts = chain(
                 get_related_objects_on_proxies(model._meta),
-                (related for related in model._meta.get_fields(
-                    forward=False, reverse=True, include_hidden=True,
-                ) if not (related.field.has_many_values and related.field.has_relation)),
+                (field for field in model._meta.get_fields(include_hidden=True)
+                    if field.is_reverse_object and not field.many_to_many),
             )
             for related in related_opts:
                 field = related.field
