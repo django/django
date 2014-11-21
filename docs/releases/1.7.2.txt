@@ -77,3 +77,6 @@ Bugfixes
 
 * Fixed a crash in migrations when deleting a field that is part of a
   ``index/unique_together`` constraint (:ticket:`23794`).
+
+* Fixed ``django.core.files.File.__repr__()`` when the file's ``name`` contains
+  Unicode characters (:ticket:`23888`).
