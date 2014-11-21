@@ -140,6 +140,11 @@ class ModelInstanceCreationTests(TestCase):
 
 
 class ModelTest(TestCase):
+    def test_object_creation(self):
+        a1 = Article.objects.create(headline='First', pub_date=datetime.now())
+        self.assertEqual(Article.objects.all().count(), 1)
+        self.assertEqual(Article.objects.first().headline, 'First')
+
     def test_objects_attribute_is_only_available_on_the_class_itself(self):
         six.assertRaisesRegex(
             self,
