@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.core.exceptions import SuspiciousOperation
 from django.db import connection, transaction
 from django.http import HttpResponse, StreamingHttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 
 def regular(request):
@@ -24,3 +25,9 @@ def not_in_transaction(request):
 
 def suspicious(request):
     raise SuspiciousOperation('dubious')
+
+
+@csrf_exempt
+def malformed_post(request):
+    request.POST
+    return HttpResponse()
