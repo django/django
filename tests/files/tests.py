@@ -26,13 +26,12 @@ except ImproperlyConfigured:
 
 class FileTests(unittest.TestCase):
     def test_unicode_uploadedfile_name(self):
-        """
-        Regression test for #8156: files with unicode names I can't quite figure
-        out the encoding situation between doctest and this file, but the actual
-        repr doesn't matter; it just shouldn't return a unicode object.
-        """
         uf = UploadedFile(name='¿Cómo?', content_type='text')
-        self.assertEqual(type(uf.__repr__()), str)
+        self.assertIs(type(repr(uf)), str)
+
+    def test_unicode_file_name(self):
+        f = File(None, 'djángö')
+        self.assertIs(type(repr(f)), str)
 
     def test_context_manager(self):
         orig_file = tempfile.TemporaryFile()
