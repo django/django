@@ -313,7 +313,11 @@ fields:
 
     .. attribute:: name
 
-        Required. 50 characters or fewer. Example: ``'Can vote'``.
+        Required. 255 characters or fewer. Example: ``'Can vote'``.
+
+        .. versionchanged:: 1.8
+
+            The ``max_length`` increased from 50 to 255 characters.
 
     .. attribute:: content_type
 
