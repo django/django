@@ -12,7 +12,6 @@
 # Xiang Yu <bupt.aswmtjdsj@gmail.com>, 2014
 # Yin Jifeng <jifeng.yin@gmail.com>, 2013
 # Ziang Song <songziang@gmail.com>, 2011-2012
-# Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
