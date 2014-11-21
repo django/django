@@ -235,30 +235,76 @@ Advanced features of ``TransactionTestCase``
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is an relatively expensive database operation.
 
-Running tests outside the test runner
-=====================================
 
-If you want to run tests outside of ``./manage.py test`` -- for example,
-from a shell prompt -- you will need to set up the test
-environment first. Django provides a convenience method to do this::
+Using the Django test runner to test reusable applications
+==========================================================
 
-    >>> from django.test.utils import setup_test_environment
-    >>> setup_test_environment()
+If you are writing a :doc:`reusable application </intro/reusable-apps>`
+you may want to use the Django test runner to run your own test suite
+and thus benefit from the Django testing infrastructure.
 
-:func:`~django.test.utils.setup_test_environment` puts several Django features
-into modes that allow for repeatable testing, but does not create the test
-databases; :func:`django.test.runner.DiscoverRunner.setup_databases`
-takes care of that.
+A common practice is a *tests* directory next to the application code, with the
+following structure::
 
-The call to :func:`~django.test.utils.setup_test_environment` is made
-automatically as part of the setup of ``./manage.py test``. You only
-need to manually invoke this method if you're not using running your
-tests via Django's test runner.
+    runtests.py
+    polls/
+        __init__.py
+        models.py
+        ...
+    tests/
+        __init__.py
+        models.py
+        test_settings.py
+        tests.py
 
-.. versionchanged:: 1.7
+Let's take a look inside a couple of those files:
 
-    If you are not using a management command to invoke the tests, you will
-    also need to first setup Django itself using :func:`django.setup()`.
+.. snippet::
+    :filename: runtests.py
+
+    #!/usr/bin/env python
+    import os
+    import sys
+
+    import django
+    from django.conf import settings
+    from django.test.utils import get_runner
+
+    if __name__ == "__main__":
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.test_settings'
+        django.setup()
+        TestRunner = get_runner(settings)
+        test_runner = TestRunner()
+        failures = test_runner.run_tests(["tests"])
+        sys.exit(bool(failures))
+
+
+This is the script that you invoke to run the test suite. It sets up the
+Django environment, creates the test database and runs the tests.
+
+For the sake of clarity, this example contains only the bare minimum
+necessary to use the Django test runner. You may want to add
+command-line options for controlling verbosity, passing in specific test
+labels to run, etc.
+
+.. snippet::
+    :filename: tests/test_settings.py
+
+    SECRET_KEY = 'fake-key'
+    INSTALLED_APPS = [
+        "tests",
+    ]
+
+This file contains the :doc:`Django settings </topics/settings>`
+required to run your app's tests.
+
+Again, this is a minimal example; your tests may require additional
+settings to run.
+
+Since the *tests* package is included in :setting:`INSTALLED_APPS` when
+running your tests, you can define test-only models in its ``models.py``
+file.
+
 
 .. _other-testing-frameworks:
 
