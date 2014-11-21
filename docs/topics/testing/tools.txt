@@ -633,10 +633,20 @@ TransactionTestCase
 
 Django's ``TestCase`` class (described below) makes use of database transaction
 facilities to speed up the process of resetting the database to a known state
-at the beginning of each test. A consequence of this, however, is that the
-effects of transaction commit and rollback cannot be tested by a Django
-``TestCase`` class. If your test requires testing of such transactional
-behavior, you should use a Django ``TransactionTestCase``.
+at the beginning of each test. A consequence of this, however, is that some
+database behaviors cannot be tested within a Django ``TestCase`` class. For
+instance, you cannot test that a block of code is executing within a
+transaction, as is required when using
+:meth:`~django.db.models.query.QuerySet.select_for_update()`. In those cases,
+you should use ``TransactionTestCase``.
+
+.. versionchanged:: 1.8
+
+    In older versions of Django, the effects of transaction commit and rollback
+    could not be tested within a ``TestCase``.  With the completion of the
+    deprecation cycle of the old-style transaction management in Django 1.8,
+    transaction management commands (e.g. ``transaction.commit()``) are no
+    longer disabled within ``TestCase``.
 
 ``TransactionTestCase`` and ``TestCase`` are identical except for the manner
 in which the database is reset to a known state and the ability for test code
@@ -648,11 +658,8 @@ to test the effects of commit and rollback:
 
 * A ``TestCase``, on the other hand, does not truncate tables after a test.
   Instead, it encloses the test code in a database transaction that is rolled
-  back at the end of the test. Both explicit commits like
-  ``transaction.commit()`` and implicit ones that may be caused by
-  ``transaction.atomic()`` are replaced with a ``nop`` operation. This
-  guarantees that the rollback at the end of the test restores the database to
-  its initial state.
+  back at the end of the test. This guarantees that the rollback at the end of
+  the test restores the database to its initial state.
 
 .. warning::
 
@@ -665,16 +672,6 @@ to test the effects of commit and rollback:
   if you need this functionality (for example, third-party apps should enable
   this) you can set ``serialized_rollback = True`` inside the
   ``TestCase`` body.
-
-.. warning::
-
-    While ``commit`` and ``rollback`` operations still *appear* to work when
-    used in ``TestCase``, no actual commit or rollback will be performed by the
-    database. This can cause your tests to pass or fail unexpectedly. Always
-    use ``TransactionTestCase`` when testing transactional behavior or any code
-    that can't normally be executed in autocommit mode
-    (:meth:`~django.db.models.query.QuerySet.select_for_update()` is an
-    example).
 
 ``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
 
@@ -700,6 +697,12 @@ additions, including:
 
 * Django-specific assertions for testing for things like redirection and form
   errors.
+
+.. warning::
+
+    If you want to test some specific database transaction behavior, you should
+    use ``TransactionTestCase``, as ``TestCase`` wraps test execution within an
+    :func:`~django.db.transaction.atomic()` block.
 
 ``TestCase`` inherits from :class:`~django.test.TransactionTestCase`.
 
