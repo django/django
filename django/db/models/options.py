@@ -229,7 +229,7 @@ class Options(object):
             query = self.order_with_respect_to
             try:
                 self.order_with_respect_to = next(
-                    f for f in self.get_fields()
+                    f for f in self.get_fields(reverse=False)
                     if f.name == query or f.attname == query
                 )
             except StopIteration:
