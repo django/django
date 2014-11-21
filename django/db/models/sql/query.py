@@ -1387,7 +1387,7 @@ class Query(object):
                 # one step.
                 pos -= 1
                 if pos == -1 or fail_on_missing:
-                    field_names = [f.name for f in opts.get_fields(reverse=True)]
+                    field_names = [f.name for f in opts.get_fields()]
 
                     available = sorted(field_names + list(self.aggregate_select))
                     raise FieldError("Cannot resolve keyword %r into field. "

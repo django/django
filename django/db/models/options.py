@@ -84,7 +84,6 @@ def make_immutable_fields_list(name, data):
 class Options(object):
     def __init__(self, meta, app_label=None):
         self._get_fields_cache = {}
-        self._get_field_cache = {}
         self.proxied_children = []
         self.local_fields = []
         self.local_many_to_many = []
@@ -611,13 +610,12 @@ class Options(object):
             return EMPTY_RELATION_TREE
 
     def _expire_cache(self):
-        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',
-                          'related_objects', 'fields_map',):
+        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'related_objects',
+                          'fields_map', '_relation_tree'):
             try:
                 delattr(self, cache_key)
             except AttributeError:
                 pass
-        self._get_field_cache = {}
         self._get_fields_cache = {}
 
     def get_fields(self, include_parents=True, include_hidden=False, **kwargs):
@@ -706,8 +704,8 @@ class Options(object):
             fields = make_immutable_fields_list("get_fields()", fields.keys())
 
         # Store result into cache for later access
-        #if cache_results:
-            #self._get_fields_cache[cache_key] = fields
+        if cache_results:
+            self._get_fields_cache[cache_key] = fields
         # In order to avoid list manipulation. Always
         # return a shallow copy of the results
         return fields

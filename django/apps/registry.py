@@ -323,25 +323,6 @@ class Apps(object):
         self.apps_ready = self.models_ready = self.ready = True
         self.clear_cache()
 
-    def clear_model_relation_tree(self):
-        """
-        Clears the pre-generated relation tree for all models. This should
-        be used in tests or when a new model is added.
-        """
-        if not self.ready:
-            raise AppRegistryNotReady(
-                "App registry isn't ready yet. Relation tree "
-                "cannot be flushed."
-            )
-        for model in self.get_models(include_auto_created=True):
-            try:
-                del model._meta._relation_tree
-            except AttributeError:
-                pass
-            try:
-                del model._meta.fields_map
-            except AttributeError:
-                pass
 
     def clear_cache(self):
         """
@@ -353,7 +334,8 @@ class Apps(object):
         # the relation tree and the fields cache.
         self.get_models.cache_clear()
         if self.ready:
-            self.clear_model_relation_tree()
+            for model in self.get_models(include_auto_created=True):
+                model._meta._expire_cache()
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 
