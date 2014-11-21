@@ -29,16 +29,17 @@ def flatatt(attrs):
 
     The result is passed through 'mark_safe'.
     """
+    key_value_attrs = []
     boolean_attrs = []
-    for attr, value in list(attrs.items()):
-        if value is True:
-            boolean_attrs.append((attr,))
-            del attrs[attr]
-        elif value is False:
-            del attrs[attr]
+    for attr, value in attrs.items():
+        if isinstance(value, bool):
+            if value:
+                boolean_attrs.append((attr,))
+        else:
+            key_value_attrs.append((attr, value))
 
     return (
-        format_html_join('', ' {0}="{1}"', sorted(attrs.items())) +
+        format_html_join('', ' {0}="{1}"', sorted(key_value_attrs)) +
         format_html_join('', ' {0}', sorted(boolean_attrs))
     )
 
