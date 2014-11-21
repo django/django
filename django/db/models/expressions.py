@@ -521,7 +521,7 @@ class Ref(ExpressionNode):
         return self
 
     def as_sql(self, compiler, connection):
-        return "%s" % compiler(self.refs), []
+        return "%s" % compiler.quote_name_unless_alias(self.refs), []
 
     def get_group_by_cols(self):
         return [(None, self.refs)]
