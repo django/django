@@ -222,6 +222,11 @@ RedirectView
         status code 301. If ``False``, then the redirect will use status code
         302. By default, ``permanent`` is ``True``.
 
+        .. deprecated:: 1.8
+
+            The default value of the ``permanent`` attribute will change from
+            ``True`` to ``False`` in Django 1.9.
+
     .. attribute:: query_string
 
         Whether to pass along the GET query string to the new location. If
