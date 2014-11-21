@@ -313,7 +313,7 @@ fields:
 
     .. attribute:: name
 
-        Required. 50 characters or fewer. Example: ``'Can vote'``.
+        Required. 255 characters or fewer. Example: ``'Can vote'``.
 
     .. attribute:: content_type
 
