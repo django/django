@@ -339,8 +339,8 @@ class Options(object):
         Returns a list of all forward fields on the model and its parents excluding
         ManyToManyFields.
         """
-        return make_immutable_fields_list("fields", (f for f in self.get_fields()
-                                          if not (f.has_many_values and f.has_relation)))
+        return make_immutable_fields_list("fields", (f for f in self.get_fields(reverse=False)
+                                          if not (f.has_relation and f.many_to_many)))
 
     @cached_property
     def concrete_fields(self):
@@ -370,8 +370,8 @@ class Options(object):
         Returns a list of all many to many fields on the model and
         its parents.
         """
-        return make_immutable_fields_list("many_to_many", (f for f in self.get_fields()
-                                          if f.has_many_values and f.has_relation))
+        return make_immutable_fields_list("many_to_many", (f for f in self.get_fields(reverse=False)
+                                          if f.has_relation and f.has_many_values))
 
     @cached_property
     def related_objects(self):
@@ -385,7 +385,7 @@ class Options(object):
         return make_immutable_fields_list(
             "related_objects",
             (obj for obj in all_related_fields
-            if not obj.field.rel.is_hidden() or obj.field.has_many_values)
+            if not obj.hidden or obj.field.has_many_values)
         )
 
     @raise_deprecation(suggested_alternative="get_fields()")
@@ -397,7 +397,7 @@ class Options(object):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = chain(self.get_fields(forward=True, reverse=True, include_hidden=True), self.virtual_fields)
+        fields = chain(self.get_fields(include_hidden=True), self.virtual_fields)
         for field in fields:
             res[field.name] = field
 
@@ -421,7 +421,7 @@ class Options(object):
                 #The Apps registry is still not ready, this means get_field() is not able
                 #to find related objects that point to this model.
                 return next(
-                    f for f in self.get_fields()
+                    f for f in self.get_fields(reverse=False)
                     if f.name == field_name or f.attname == field_name
                 )
             except StopIteration:
@@ -620,15 +620,10 @@ class Options(object):
         self._get_field_cache = {}
         self._get_fields_cache = {}
 
-    def get_fields(self, forward=True, reverse=False,
-                   include_parents=True, include_hidden=False, **kwargs):
+    def get_fields(self, include_parents=True, include_hidden=False, **kwargs):
         """
         Returns a list of fields associated to the model. By default will only return forward fields.
         This can be changed by enabling or disabling field types using the flags available.
-
-        Fields can be any of the following:
-        - forward:          fields that are contained on the current model
-        - reverse:          fields that point to the current model
 
         Options can be any of the following:
         - include_parents:        include fields derived from inheritance
@@ -636,6 +631,8 @@ class Options(object):
         """
 
         # Creates a cache key composed of all arguments
+        forward = kwargs.pop('forward', True)
+        reverse = kwargs.pop('reverse', True)
         cache_results = kwargs.pop('cache_results', True)
         export_name_map = kwargs.pop('export_name_map', False)
         if kwargs:
@@ -696,7 +693,7 @@ class Options(object):
             if include_parents:
                 for parent in self.parents:
                     # Extend the fields dict with all the forward fields of each parent.
-                    fields.update(parent._meta.get_fields(**options))
+                    fields.update(parent._meta.get_fields(reverse=False, **options))
             fields.update(
                 (field, {field.name, field.attname})
                 for field in chain(self.local_fields, self.local_many_to_many)
@@ -714,21 +711,3 @@ class Options(object):
         # In order to avoid list manipulation. Always
         # return a shallow copy of the results
         return fields
-
-    @cached_property
-    def field_names(self):
-        """
-        Returns a list of all field names in the model, all hidden and proxy fields
-        are omitted.
-        """
-        res = set()
-        fields = self.get_fields(reverse=True, export_name_map=True)
-        fields.update(
-            (field, {field.name, field.attname})
-            for field in self.virtual_fields
-            if hasattr(field, 'related')
-        )
-        for _, names in six.iteritems(fields):
-            res.update(name for name in names
-                       if not (name.endswith('+') or name.endswith('_id')))
-        return res

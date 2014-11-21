@@ -345,7 +345,7 @@ class ModelBase(type):
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
-            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join(f.attname for f in opts.fields))
+            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join(f.name for f in opts.fields))
 
         get_absolute_url_override = settings.ABSOLUTE_URL_OVERRIDES.get(
             '%s.%s' % (opts.app_label, opts.model_name)
