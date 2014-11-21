@@ -34,6 +34,13 @@ class FileTests(unittest.TestCase):
         uf = UploadedFile(name='¿Cómo?', content_type='text')
         self.assertEqual(type(uf.__repr__()), str)
 
+    def test_unicode_file_name(self):
+        """
+        Regression test for #23888.
+        """
+        f = File(None, 'djángö')
+        self.assertEqual(type(f.__repr__()), str)
+
     def test_context_manager(self):
         orig_file = tempfile.TemporaryFile()
         base_file = File(orig_file)
