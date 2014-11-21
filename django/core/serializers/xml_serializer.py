@@ -176,7 +176,7 @@ class Deserializer(base.Deserializer):
         # Look up the model using the model loading mechanism. If this fails,
         # bail.
         Model = self._get_model_from_node(node, "model")
-        field_names = set(f.name for f in Model._meta.get_fields(reverse=True))
+        field_names = set(f.name for f in Model._meta.get_fields())
 
         # Start building a data dictionary from the object.
         data = {}

@@ -103,7 +103,7 @@ def Deserializer(object_list, **options):
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
         m2m_data = {}
 
-        field_names = set(f.name for f in Model._meta.get_fields(reverse=True))
+        field_names = set(f.name for f in Model._meta.get_fields())
 
         # Handle each field
         for (field_name, field_value) in six.iteritems(d["fields"]):
