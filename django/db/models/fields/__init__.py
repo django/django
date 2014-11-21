@@ -55,19 +55,19 @@ class FieldFlagsMixin(object):
     editable = True
     hidden = False
 
-    @property
+    @cached_property
     def concrete(self):
         if self.is_reverse_object:
             return False
         return self.column is not None
 
-    @property
+    @cached_property
     def has_relation(self):
         if self.is_reverse_object:
             return True
         return self.rel is not None
 
-    @property
+    @cached_property
     def related_model(self):
         if self.is_reverse_object:
             return self.field.model
@@ -75,25 +75,25 @@ class FieldFlagsMixin(object):
             return self.rel.to
         raise AttributeError(self._FLAGS_ERROR_MESSAGE % "related_model")
 
-    @property
+    @cached_property
     def many_to_many(self):
         if self.is_reverse_object:
             return self.field.many_to_many
         raise AttributeError(self._FLAGS_ERROR_MESSAGE % "many_to_many")
 
-    @property
+    @cached_property
     def many_to_one(self):
         if self.is_reverse_object:
             return self.field.one_to_many
         raise AttributeError(self._FLAGS_ERROR_MESSAGE % "many_to_one")
 
-    @property
+    @cached_property
     def one_to_many(self):
         if self.is_reverse_object:
             return self.field.many_to_one
         raise AttributeError(self._FLAGS_ERROR_MESSAGE % "one_to_many")
 
-    @property
+    @cached_property
     def one_to_one(self):
         if self.is_reverse_object:
             return self.field.one_to_one
