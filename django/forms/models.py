@@ -569,7 +569,7 @@ class BaseModelFormSet(BaseFormSet):
     def _get_to_python(self, field):
         """
         If the field is a related field, fetch the concrete field's (that
-        is, the ultimate pointed-to field's) get_prep_value.
+        is, the ultimate pointed-to field's) to_python.
         """
         while field.rel is not None:
             field = field.rel.get_related_field()
