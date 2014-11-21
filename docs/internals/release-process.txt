@@ -151,7 +151,7 @@ etc.) releases every nine months, or more, depending on features.
 After each release, and after a suitable cooling-off period of a few weeks,
 core developers will examine the landscape and announce a timeline for the
 next release. Most releases will be scheduled in the 6-9 month range, but if
-we have bigger features to development we might schedule a longer period to
+we have bigger features to develop we might schedule a longer period to
 allow for more ambitious work.
 
 Release cycle
