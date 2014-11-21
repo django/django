@@ -459,7 +459,11 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             for inline in admin.inlines:
                 registered_models.add(inline.model)
 
-        for related_object in opts.get_fields(forward=False, reverse=True, include_hidden=True):
+        related_objects = (
+            f for f in opts.get_fields(include_hidden=True)
+            if f.is_reverse_object
+        )
+        for related_object in related_objects:
             related_model = related_object.model
             if (any(issubclass(model, related_model) for model in registered_models) and
                     related_object.field.rel.get_related_field() == field):
