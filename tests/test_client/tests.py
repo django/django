@@ -26,13 +26,14 @@ from django.core import mail
 from django.http import HttpResponse
 from django.test import Client, TestCase, RequestFactory
 from django.test import override_settings
+from django.test.utils import IgnoreDeprecationWarningsMixin
 
 from .views import get_view, post_view, trace_view
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='test_client.urls',)
-class ClientTest(TestCase):
+class ClientTest(IgnoreDeprecationWarningsMixin, TestCase):
     fixtures = ['testdata.json']
 
     def test_get_view(self):
