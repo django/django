@@ -214,6 +214,10 @@ details on these changes.
 * The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
   :class:`~django.forms.ModelMultipleChoiceField` will be removed.
 
+* The default value of the
+  :attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
+  attribute will change from ``True`` to ``False``.
+
 .. _deprecation-removed-in-1.8:
 
 1.8
