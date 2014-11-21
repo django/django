@@ -631,8 +631,8 @@ class Options(object):
         # Creates a cache key composed of all arguments
         forward = kwargs.pop('forward', True)
         reverse = kwargs.pop('reverse', True)
-        cache_results = kwargs.pop('cache_results', True)
         export_name_map = kwargs.pop('export_name_map', False)
+        cache_results = kwargs.pop('cache_results', True)
         if kwargs:
             raise TypeError("'%s' are invalid keyword arguments" % ', '.join(kwargs.keys()))
 
@@ -661,18 +661,17 @@ class Options(object):
                 # Recursively call get_fields on each parent, with the same options provided
                 # in this call
                 for parent in self.parents:
-                    for obj, query_name in six.iteritems(parent._meta.get_fields(forward=False, reverse=True,
-                                                         **options)):
+                    for obj, _ in six.iteritems(parent._meta.get_fields(forward=False, **options)):
 
                         if obj.field.has_many_values:
                             # In order for a reverse ManyToManyRel object to be valid, its creation
                             # counter must be > 0 and must be in the parent list
                             if not (obj.field.creation_counter < 0 and obj.model not in parent_list):
-                                fields[obj] = query_name
+                                fields[obj] = True
 
                         elif not ((obj.field.creation_counter < 0 or obj.field.rel.parent_link)
                                   and obj.model not in parent_list):
-                            fields[obj] = query_name
+                            fields[obj] = True
 
             # Tree is computer once and cached until apps cache is expired. It is composed of
             # a list of fields pointing to the current model from other models.
@@ -685,7 +684,7 @@ class Options(object):
                 # If hidden fields should be included or the relation
                 # is not intentionally hidden, add to the fields dict
                 if include_hidden or not field.hidden:
-                    fields[field] = {field.name}
+                    fields[field] = True
 
         if forward:
             if include_parents:
@@ -693,7 +692,7 @@ class Options(object):
                     # Extend the fields dict with all the forward fields of each parent.
                     fields.update(parent._meta.get_fields(reverse=False, **options))
             fields.update(
-                (field, {field.name, field.attname})
+                (field, True,)
                 for field in chain(self.local_fields, self.local_many_to_many)
             )
 

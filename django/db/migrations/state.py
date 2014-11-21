@@ -91,7 +91,7 @@ class ProjectState(object):
                     else:
                         do_pending_lookups(model)
         try:
-            self.apps.clear_cache()
+            #self.apps.clear_cache()
             return self.apps
         finally:
             if skip_cache:

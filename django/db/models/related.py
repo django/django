@@ -2,6 +2,7 @@ from collections import namedtuple
 
 from django.utils.encoding import smart_text
 from django.db.models.fields import BLANK_CHOICE_DASH, FieldFlagsMixin
+from django.utils.functional import cached_property
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -23,7 +24,7 @@ class RelatedObject(FieldFlagsMixin):
         self.name = self.field.related_query_name()
         self.var_name = self.opts.model_name
 
-    @property
+    @cached_property
     def hidden(self):
         return self.field.rel.is_hidden()
 
