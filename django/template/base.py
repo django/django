@@ -7,7 +7,6 @@ from inspect import getargspec, getcallargs
 import warnings
 
 from django.apps import apps
-from django.conf import settings
 from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatibility
     ContextPopException)
 from django.utils import lru_cache
@@ -126,11 +125,11 @@ class Template(object):
         except UnicodeDecodeError:
             raise TemplateEncodingError("Templates can only be constructed "
                                         "from unicode or UTF-8 strings.")
-        if settings.TEMPLATE_DEBUG and origin is None:
-            origin = StringOrigin(template_string)
         if engine is None:
             from .engine import Engine
             engine = Engine.get_default()
+        if engine.debug and origin is None:
+            origin = StringOrigin(template_string)
         self.nodelist = engine.compile_string(template_string, origin)
         self.name = name
         self.origin = origin
