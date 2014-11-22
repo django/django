@@ -32,6 +32,15 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.content, b'spam eggs\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
+    def test_render_to_response_with_context_instance_misuse(self):
+        """
+        For backwards-compatibility, ensure that it's possible to pass a
+        RequestContext instance in the dictionary argument instead of the
+        context_instance argument.
+        """
+        response = self.client.get('/render_to_response/context_instance_misuse/')
+        self.assertContains(response, 'context processor output')
+
     def test_render(self):
         response = self.client.get('/render/')
         self.assertEqual(response.status_code, 200)
