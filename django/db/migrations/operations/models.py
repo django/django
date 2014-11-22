@@ -14,7 +14,7 @@ class CreateModel(Operation):
 
     serialization_expand_args = ['fields', 'options']
 
-    def __init__(self, name, fields, options=None, bases=None):
+    def __init__(self, name, fields, options=None, bases=None, **kwargs):
         self.name = name
         self.fields = fields
         self.options = options or {}
@@ -79,7 +79,7 @@ class DeleteModel(Operation):
     Drops a model's table.
     """
 
-    def __init__(self, name):
+    def __init__(self, name, **kwargs):
         self.name = name
 
     def deconstruct(self):
@@ -116,7 +116,7 @@ class RenameModel(Operation):
     Renames a model.
     """
 
-    def __init__(self, old_name, new_name):
+    def __init__(self, old_name, new_name, **kwargs):
         self.old_name = old_name
         self.new_name = new_name
 
@@ -209,7 +209,7 @@ class AlterModelTable(Operation):
     Renames a model's table
     """
 
-    def __init__(self, name, table):
+    def __init__(self, name, table, **kwargs):
         self.name = name
         self.table = table
 
@@ -260,7 +260,7 @@ class AlterUniqueTogether(Operation):
     """
     option_name = "unique_together"
 
-    def __init__(self, name, unique_together):
+    def __init__(self, name, unique_together, **kwargs):
         self.name = name
         unique_together = normalize_together(unique_together)
         self.unique_together = set(tuple(cons) for cons in unique_together)
@@ -305,7 +305,7 @@ class AlterIndexTogether(Operation):
     """
     option_name = "index_together"
 
-    def __init__(self, name, index_together):
+    def __init__(self, name, index_together, **kwargs):
         self.name = name
         index_together = normalize_together(index_together)
         self.index_together = set(tuple(cons) for cons in index_together)
@@ -348,7 +348,7 @@ class AlterOrderWithRespectTo(Operation):
     Represents a change with the order_with_respect_to option.
     """
 
-    def __init__(self, name, order_with_respect_to):
+    def __init__(self, name, order_with_respect_to, **kwargs):
         self.name = name
         self.order_with_respect_to = order_with_respect_to
 
@@ -407,7 +407,7 @@ class AlterModelOptions(Operation):
         "verbose_name_plural",
     ]
 
-    def __init__(self, name, options):
+    def __init__(self, name, options, **kwargs):
         self.name = name
         self.options = options
 

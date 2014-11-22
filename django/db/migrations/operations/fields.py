@@ -10,7 +10,7 @@ class AddField(Operation):
     Adds a field to a model.
     """
 
-    def __init__(self, model_name, name, field, preserve_default=True):
+    def __init__(self, model_name, name, field, preserve_default=True, **kwargs):
         self.model_name = model_name
         self.name = name
         self.field = field
@@ -69,7 +69,7 @@ class RemoveField(Operation):
     Removes a field from a model.
     """
 
-    def __init__(self, model_name, name):
+    def __init__(self, model_name, name, **kwargs):
         self.model_name = model_name
         self.name = name
 
@@ -113,7 +113,7 @@ class AlterField(Operation):
     Alters a field's database column (e.g. null, max_length) to the provided new field
     """
 
-    def __init__(self, model_name, name, field, preserve_default=True):
+    def __init__(self, model_name, name, field, preserve_default=True, **kwargs):
         self.model_name = model_name
         self.name = name
         self.field = field
@@ -177,7 +177,7 @@ class RenameField(Operation):
     Renames a field on the model. Might affect db_column too.
     """
 
-    def __init__(self, model_name, old_name, new_name):
+    def __init__(self, model_name, old_name, new_name, **kwargs):
         self.model_name = model_name
         self.old_name = old_name
         self.new_name = new_name
