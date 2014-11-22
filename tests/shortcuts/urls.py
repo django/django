@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^render_to_response/request_context/$', views.render_to_response_view_with_request_context),
     url(r'^render_to_response/content_type/$', views.render_to_response_view_with_content_type),
     url(r'^render_to_response/dirs/$', views.render_to_response_view_with_dirs),
+    url(r'^render_to_response/context_instance_misuse/$', views.render_to_response_with_context_instance_misuse),
     url(r'^render/$', views.render_view),
     url(r'^render/base_context/$', views.render_view_with_base_context),
     url(r'^render/content_type/$', views.render_view_with_content_type),

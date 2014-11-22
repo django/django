@@ -860,9 +860,8 @@ If you do this in your view:
 
 .. code-block:: python
 
-    return render_to_response('mytemplate.html', {
-        'available_languages': ['en', 'es', 'fr'],
-    }, RequestContext(request))
+    context = {'available_languages': ['en', 'es', 'fr']}
+    return render(request, 'mytemplate.html', context)
 
 you can iterate over those languages in the template::
 
