@@ -396,6 +396,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_booleanfield_value)
         if internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
+        if internal_type == 'TextField':
+            converters.append(self.convert_textfield_value)
         return converters
 
     def convert_booleanfield_value(self, value, field):
@@ -406,6 +408,11 @@ class DatabaseOperations(BaseDatabaseOperations):
     def convert_uuidfield_value(self, value, field):
         if value is not None:
             value = uuid.UUID(value)
+        return value
+
+    def convert_textfield_value(self, value, field):
+        if value is not None:
+            value = force_text(value)
         return value
 
 

@@ -87,7 +87,8 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Custom fields <howto/custom-model-fields>` |
   :doc:`Multiple databases <topics/db/multi-db>` |
   :doc:`Custom lookups <howto/custom-lookups>` |
-  :doc:`Query Expressions <ref/models/expressions>`
+  :doc:`Query Expressions <ref/models/expressions>` |
+  :doc:`Database Functions <ref/models/database-functions>`
 
 * **Other:**
   :doc:`Supported databases <ref/databases>` |
