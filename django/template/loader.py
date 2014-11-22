@@ -1,6 +1,5 @@
 import warnings
 
-from django.conf import settings
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .base import Origin
@@ -14,13 +13,6 @@ class LoaderOrigin(Origin):
 
     def reload(self):
         return self.loader(self.loadname, self.dirs)[0]
-
-
-def make_origin(display_name, loader, name, dirs):
-    if settings.TEMPLATE_DEBUG and display_name:
-        return LoaderOrigin(display_name, loader, name, dirs)
-    else:
-        return None
 
 
 def find_template(*args, **kwargs):
