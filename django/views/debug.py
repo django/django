@@ -276,14 +276,16 @@ class ExceptionReporter(object):
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
 
+        # TODO: handle multiple template engines.
+        template_engine = Engine.get_default()
+
         if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
             self.template_does_not_exist = True
             self.loader_debug_info = []
             # If Django fails in get_template_loaders, provide an empty list
             # for the following loop to not fail.
             try:
-                # TODO: handle multiple template engines.
-                template_loaders = Engine.get_default().template_loaders
+                template_loaders = template_engine.template_loaders
             except Exception:
                 template_loaders = []
             for loader in template_loaders:
@@ -302,7 +304,7 @@ class ExceptionReporter(object):
                     'loader': loader_name,
                     'templates': template_list,
                 })
-        if (settings.TEMPLATE_DEBUG and
+        if (template_engine.debug and
                 hasattr(self.exc_value, 'django_template_source')):
             self.get_template_exception_info()
 
