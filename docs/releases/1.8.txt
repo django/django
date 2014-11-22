@@ -66,14 +66,20 @@ New data types
   backends. There is a corresponding :class:`form field
   <django.forms.DurationField>`.
 
-Query Expressions
-~~~~~~~~~~~~~~~~~
+Query Expressions and Database Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :doc:`Query Expressions </ref/models/expressions>` allow users to create,
 customize, and compose complex SQL expressions. This has enabled annotate
 to accept expressions other than aggregates. Aggregates are now able to
 reference multiple fields, as well as perform arithmetic, similar to ``F()``
 objects.
+
+A collection of :doc:`database functions </ref/models/database-functions>` is
+also included with functionality such as
+:class:`~django.db.models.functions.Coalesce`,
+:class:`~django.db.models.functions.Concat`, and
+:class:`~django.db.models.functions.Substr`.
 
 ``TestCase`` data setup
 ~~~~~~~~~~~~~~~~~~~~~~~
