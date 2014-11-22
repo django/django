@@ -42,6 +42,7 @@ def render_to_response_with_context_instance_misuse(request):
     # Incorrect -- context_instance should be passed as a keyword argument.
     return render_to_response('shortcuts/render_test.html', context_instance)
 
+
 def render_view(request):
     return render(request, 'shortcuts/render_test.html', {
         'foo': 'FOO',
