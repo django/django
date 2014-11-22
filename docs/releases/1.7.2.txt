@@ -77,3 +77,6 @@ Bugfixes
 
 * Fixed a crash in migrations when deleting a field that is part of a
   ``index/unique_together`` constraint (:ticket:`23794`).
+
+* Made deconstructible classes, such as migration operations a validators,
+  forwards compatible (:ticket:`23892`).
