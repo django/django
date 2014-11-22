@@ -28,7 +28,7 @@ def remote_user_auth_view(request):
 
 def auth_processor_no_attr_access(request):
     render_to_response('context_processors/auth_attrs_no_access.html',
-        RequestContext(request, {}, processors=[context_processors.auth]))
+        context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
     # *After* rendering, we check whether the session was accessed
     return render_to_response('context_processors/auth_attrs_test_access.html',
         {'session_accessed': request.session.accessed})
@@ -36,30 +36,30 @@ def auth_processor_no_attr_access(request):
 
 def auth_processor_attr_access(request):
     render_to_response('context_processors/auth_attrs_access.html',
-        RequestContext(request, {}, processors=[context_processors.auth]))
+        context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
     return render_to_response('context_processors/auth_attrs_test_access.html',
         {'session_accessed': request.session.accessed})
 
 
 def auth_processor_user(request):
     return render_to_response('context_processors/auth_attrs_user.html',
-        RequestContext(request, {}, processors=[context_processors.auth]))
+        context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
 
 
 def auth_processor_perms(request):
     return render_to_response('context_processors/auth_attrs_perms.html',
-        RequestContext(request, {}, processors=[context_processors.auth]))
+        context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
 
 
 def auth_processor_perm_in_perms(request):
     return render_to_response('context_processors/auth_attrs_perm_in_perms.html',
-        RequestContext(request, {}, processors=[context_processors.auth]))
+        context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
 
 
 def auth_processor_messages(request):
     info(request, "Message 1")
     return render_to_response('context_processors/auth_attrs_messages.html',
-         RequestContext(request, {}, processors=[context_processors.auth]))
+         context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
 
 
 def userpage(request):

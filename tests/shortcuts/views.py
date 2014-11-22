@@ -33,6 +33,15 @@ def render_to_response_view_with_dirs(request):
     return render_to_response('render_dirs_test.html', dirs=dirs)
 
 
+def context_processor(request):
+    return {'bar': 'context processor output'}
+
+
+def render_to_response_with_context_instance_misuse(request):
+    context_instance = RequestContext(request, {}, processors=[context_processor])
+    # Incorrect -- context_instance should be passed as a keyword argument.
+    return render_to_response('shortcuts/render_test.html', context_instance)
+
 def render_view(request):
     return render(request, 'shortcuts/render_test.html', {
         'foo': 'FOO',
