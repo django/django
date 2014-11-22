@@ -184,9 +184,8 @@ class OperationTests(OperationTestBase):
         # And deconstruction
         definition = operation.deconstruct()
         self.assertEqual(definition[0], "CreateModel")
-        self.assertEqual(len(definition[1]), 2)
-        self.assertEqual(len(definition[2]), 0)
-        self.assertEqual(definition[1][0], "Pony")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2].keys()), ["fields", "name"])
 
     def test_create_model_with_unique_after(self):
         """
@@ -331,6 +330,11 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_crprmo", editor, new_state, project_state)
         self.assertTableNotExists("test_crprmo_proxypony")
         self.assertTableExists("test_crprmo_pony")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "CreateModel")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2].keys()), ["bases", "fields", "name", "options"])
 
     def test_create_unmanaged_model(self):
         """
@@ -381,6 +385,11 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_dlmo", editor, new_state, project_state)
         self.assertTableExists("test_dlmo_pony")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "DeleteModel")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(list(definition[2]), ["name"])
 
     def test_delete_proxy_model(self):
         """
@@ -440,6 +449,11 @@ class OperationTests(OperationTestBase):
         if connection.features.supports_foreign_keys:
             self.assertFKExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_pony", "id"))
             self.assertFKNotExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_horse", "id"))
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RenameModel")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'old_name': "Pony", 'new_name': "Horse"})
 
     def test_rename_model_with_self_referential_fk(self):
         """
@@ -520,6 +534,11 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adfl", editor, new_state, project_state)
         self.assertColumnNotExists("test_adfl_pony", "height")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AddField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["field", "model_name", "name"])
 
     def test_add_charfield(self):
         """
@@ -698,6 +717,11 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_forwards("test_adflpd", editor, project_state, new_state)
         self.assertColumnExists("test_adflpd_pony", "height")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AddField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["field", "model_name", "name", "preserve_default"])
 
     def test_add_field_m2m(self):
         """
@@ -818,6 +842,11 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_rmfl", editor, new_state, project_state)
         self.assertColumnExists("test_rmfl_pony", "pink")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RemoveField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': "Pony", 'name': 'pink'})
 
     def test_remove_fk(self):
         """
@@ -859,6 +888,11 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_almota", editor, new_state, project_state)
         self.assertTableExists("test_almota_pony")
         self.assertTableNotExists("test_almota_pony_2")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterModelTable")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'name': "Pony", 'table': "test_almota_pony_2"})
 
     def test_alter_model_table_noop(self):
         """
@@ -932,6 +966,11 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alfl", editor, new_state, project_state)
         self.assertColumnNotNull("test_alfl_pony", "pink")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["field", "model_name", "name"])
 
     def test_alter_field_pk(self):
         """
@@ -1023,6 +1062,11 @@ class OperationTests(OperationTestBase):
         # Ensure the index constraint has been reset
         # TODO: Uncomment assert when #23880 is fixed
         # self.assertIndexExists("test_rnfl_pony", ["weight", "pink"])
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RenameField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': "Pony", 'old_name': "pink", 'new_name': "blue"})
 
     def test_alter_unique_together(self):
         """
@@ -1059,6 +1103,11 @@ class OperationTests(OperationTestBase):
         operation = migrations.AlterUniqueTogether("Pony", ("pink", "weight"))
         operation.state_forwards("test_alunto", new_state)
         self.assertEqual(len(new_state.models["test_alunto", "pony"].options.get("unique_together", set())), 1)
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterUniqueTogether")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'name': "Pony", 'unique_together': {("pink", "weight")}})
 
     def test_alter_unique_together_remove(self):
         operation = migrations.AlterUniqueTogether("Pony", None)
@@ -1086,6 +1135,11 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alinto", editor, new_state, project_state)
         self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterIndexTogether")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'name': "Pony", 'index_together': {("pink", "weight")}})
 
     def test_alter_index_together_remove(self):
         operation = migrations.AlterIndexTogether("Pony", None)
@@ -1104,6 +1158,11 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(project_state.models["test_almoop", "pony"].options.get("permissions", [])), 0)
         self.assertEqual(len(new_state.models["test_almoop", "pony"].options.get("permissions", [])), 1)
         self.assertEqual(new_state.models["test_almoop", "pony"].options["permissions"][0][0], "can_groom")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterModelOptions")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'name': "Pony", 'options': {"permissions": [("can_groom", "Can groom")]}})
 
     def test_alter_model_options_emptying(self):
         """
@@ -1117,6 +1176,11 @@ class OperationTests(OperationTestBase):
         operation.state_forwards("test_almoop", new_state)
         self.assertEqual(len(project_state.models["test_almoop", "pony"].options.get("permissions", [])), 1)
         self.assertEqual(len(new_state.models["test_almoop", "pony"].options.get("permissions", [])), 0)
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterModelOptions")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'name': "Pony", 'options': {}})
 
     def test_alter_order_with_respect_to(self):
         """
@@ -1140,6 +1204,11 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alorwrtto", editor, new_state, project_state)
         self.assertColumnNotExists("test_alorwrtto_rider", "_order")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterOrderWithRespectTo")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'name': "Rider", 'order_with_respect_to': "pony"})
 
     def test_alter_fk(self):
         """
@@ -1239,6 +1308,11 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_runsql", editor, new_state, project_state)
         self.assertTableNotExists("i_love_ponies")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RunSQL")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["reverse_sql", "sql", "state_operations"])
 
     def test_run_sql_params(self):
         """
@@ -1356,7 +1430,12 @@ class OperationTests(OperationTestBase):
         self.assertEqual(project_state.render().get_model("test_runpython", "Pony").objects.count(), 0)
         # Now test we can't use a string
         with self.assertRaises(ValueError):
-            operation = migrations.RunPython("print 'ahahaha'")
+            migrations.RunPython("print 'ahahaha'")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RunPython")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["code", "reverse_code"])
 
         # Also test reversal fails, with an operation identical to above but without reverse_code set
         no_reverse_operation = migrations.RunPython(inner_method)
@@ -1379,6 +1458,11 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_forwards("test_runpython", editor, project_state, new_state)
         self.assertEqual(project_state.render().get_model("test_runpython", "Pony").objects.count(), 4)
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RunPython")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["code"])
 
         def create_shetlandponies(models, schema_editor):
             ShetlandPony = models.get_model("test_runpython", "ShetlandPony")
@@ -1431,6 +1515,11 @@ class OperationTests(OperationTestBase):
                 with connection.schema_editor() as editor:
                     non_atomic_migration.apply(project_state, editor)
             self.assertEqual(project_state.render().get_model("test_runpythonatomic", "Pony").objects.count(), 1)
+        # And deconstruction
+        definition = non_atomic_migration.operations[0].deconstruct()
+        self.assertEqual(definition[0], "RunPython")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["atomic", "code"])
 
     @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_separate_database_and_state(self):
@@ -1464,6 +1553,11 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_separatedatabaseandstate", editor, new_state, project_state)
         self.assertTableNotExists("i_love_ponies")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "SeparateDatabaseAndState")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(sorted(definition[2]), ["database_operations", "state_operations"])
 
 
 class MigrateNothingRouter(object):

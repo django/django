@@ -17,12 +17,16 @@ class AddField(Operation):
         self.preserve_default = preserve_default
 
     def deconstruct(self):
-        kwargs = {}
+        kwargs = {
+            'model_name': self.model_name,
+            'name': self.name,
+            'field': self.field,
+        }
         if self.preserve_default is not True:
             kwargs['preserve_default'] = self.preserve_default
         return (
             self.__class__.__name__,
-            [self.model_name, self.name, self.field],
+            [],
             kwargs
         )
 
@@ -74,10 +78,14 @@ class RemoveField(Operation):
         self.name = name
 
     def deconstruct(self):
+        kwargs = {
+            'model_name': self.model_name,
+            'name': self.name,
+        }
         return (
             self.__class__.__name__,
-            [self.model_name, self.name],
-            {}
+            [],
+            kwargs
         )
 
     def state_forwards(self, app_label, state):
@@ -120,12 +128,16 @@ class AlterField(Operation):
         self.preserve_default = preserve_default
 
     def deconstruct(self):
-        kwargs = {}
+        kwargs = {
+            'model_name': self.model_name,
+            'name': self.name,
+            'field': self.field,
+        }
         if self.preserve_default is not True:
             kwargs['preserve_default'] = self.preserve_default
         return (
             self.__class__.__name__,
-            [self.model_name, self.name, self.field],
+            [],
             kwargs
         )
 
@@ -183,10 +195,15 @@ class RenameField(Operation):
         self.new_name = new_name
 
     def deconstruct(self):
+        kwargs = {
+            'model_name': self.model_name,
+            'old_name': self.old_name,
+            'new_name': self.new_name,
+        }
         return (
             self.__class__.__name__,
-            [self.model_name, self.old_name, self.new_name],
-            {}
+            [],
+            kwargs
         )
 
     def state_forwards(self, app_label, state):

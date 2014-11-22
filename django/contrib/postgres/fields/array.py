@@ -83,8 +83,10 @@ class ArrayField(Field):
     def deconstruct(self):
         name, path, args, kwargs = super(ArrayField, self).deconstruct()
         path = 'django.contrib.postgres.fields.ArrayField'
-        args.insert(0, self.base_field)
-        kwargs['size'] = self.size
+        kwargs.update({
+            'base_field': self.base_field,
+            'size': self.size,
+        })
         return name, path, args, kwargs
 
     def to_python(self, value):
