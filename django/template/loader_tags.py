@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-from django.conf import settings
 from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
     token_kwargs, Variable
 from django.template.loader import get_template
@@ -154,7 +153,7 @@ class IncludeNode(Node):
             with context.push(**values):
                 return template.render(context)
         except Exception:
-            if settings.TEMPLATE_DEBUG:
+            if context.engine.debug:
                 raise
             return ''
 

@@ -83,6 +83,7 @@ def reset_default_template_engine(**kwargs):
         'TEMPLATE_DIRS',
         'ALLOWED_INCLUDE_ROOTS',
         'TEMPLATE_CONTEXT_PROCESSORS',
+        'TEMPLATE_DEBUG',
         'TEMPLATE_LOADERS',
         'TEMPLATE_STRING_IF_INVALID',
         'FILE_CHARSET',

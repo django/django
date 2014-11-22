@@ -210,7 +210,7 @@ class ForNode(Node):
                     context[self.loopvars[0]] = item
                 # In TEMPLATE_DEBUG mode provide source of the node which
                 # actually raised the exception
-                if settings.TEMPLATE_DEBUG:
+                if context.engine.debug:
                     for node in self.nodelist_loop:
                         try:
                             nodelist.append(node.render(context))
