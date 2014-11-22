@@ -13,6 +13,7 @@ from django.core.exceptions import ViewDoesNotExist
 from django.http import Http404
 from django.core import urlresolvers
 from django.contrib.admindocs import utils
+from django.template.engine import Engine
 from django.utils.decorators import method_decorator
 from django.utils._os import upath
 from django.utils import six
@@ -291,13 +292,13 @@ class TemplateDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         template = self.kwargs['template']
         templates = []
-        for dir in settings.TEMPLATE_DIRS:
+        for dir in Engine.get_default().dirs:
             template_file = os.path.join(dir, template)
             templates.append({
                 'file': template_file,
                 'exists': os.path.exists(template_file),
                 'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
-                'order': list(settings.TEMPLATE_DIRS).index(dir),
+                'order': list(Engine.get_default().dirs).index(dir),
             })
         kwargs.update({
             'name': template,
