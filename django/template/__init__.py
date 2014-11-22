@@ -69,7 +69,7 @@ from django.template.base import (Context, FilterExpression, Lexer, Node,  # NOQ
     filter_raw_string)
 
 # Compiling templates
-from django.template.base import (compile_string, resolve_variable,  # NOQA
+from django.template.base import (resolve_variable,  # NOQA
     unescape_string_literal, generic_tag_compiler)
 
 # Library management
@@ -77,4 +77,4 @@ from django.template.base import (Library, add_to_builtins, builtins,  # NOQA
     get_library, get_templatetags_modules, get_text_list, import_library,
     libraries)
 
-__all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
+__all__ = ('Template', 'Context', 'RequestContext')
