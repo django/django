@@ -8,7 +8,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
-from .base import Context, Template, TemplateDoesNotExist
+from .base import Context, Lexer, Parser, Template, TemplateDoesNotExist
 
 
 _dirs_undefined = object()
@@ -200,3 +200,17 @@ class Engine(object):
                 continue
         # If we get here, none of the templates could be loaded
         raise TemplateDoesNotExist(', '.join(not_found))
+
+    def compile_string(self, template_string, origin):
+        """
+        Compiles template_string into a NodeList ready for rendering.
+        """
+        if settings.TEMPLATE_DEBUG:
+            from .debug import DebugLexer, DebugParser
+            lexer_class, parser_class = DebugLexer, DebugParser
+        else:
+            lexer_class, parser_class = Lexer, Parser
+        lexer = lexer_class(template_string, origin)
+        tokens = lexer.tokenize()
+        parser = parser_class(tokens)
+        return parser.parse()

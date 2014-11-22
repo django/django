@@ -135,7 +135,7 @@ class Template(object):
         if engine is None:
             from .engine import Engine
             engine = Engine.get_default()
-        self.nodelist = compile_string(template_string, origin)
+        self.nodelist = engine.compile_string(template_string, origin)
         self.name = name
         self.origin = origin
         self.engine = engine
@@ -163,18 +163,6 @@ class Template(object):
             context.render_context.pop()
             if toplevel_render:
                 context.engine = None
-
-
-def compile_string(template_string, origin):
-    "Compiles template_string into NodeList ready for rendering"
-    if settings.TEMPLATE_DEBUG:
-        from django.template.debug import DebugLexer, DebugParser
-        lexer_class, parser_class = DebugLexer, DebugParser
-    else:
-        lexer_class, parser_class = Lexer, Parser
-    lexer = lexer_class(template_string, origin)
-    parser = parser_class(lexer.tokenize())
-    return parser.parse()
 
 
 class Token(object):
