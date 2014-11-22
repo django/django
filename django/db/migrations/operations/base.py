@@ -37,6 +37,9 @@ class Operation(object):
         self._constructor_args = (args, kwargs)
         return self
 
+    def __init__(self, **kwargs):
+        pass
+
     def deconstruct(self):
         """
         Returns a 3-tuple of class import path (or just name if it lives
