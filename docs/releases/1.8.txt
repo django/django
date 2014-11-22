@@ -471,8 +471,9 @@ Tests
 * The new :meth:`~django.test.SimpleTestCase.assertJSONNotEqual` assertion
   allows you to test that two JSON fragments are not equal.
 
-* Added the ability to preserve the test database by adding the
-  :djadminopt:`--keepdb` flag.
+* Added options to the :djadmin:`test` command to preserve the test database
+  (:djadminopt:`--keepdb`) and to run the test cases in reverse order
+  (:djadminopt:`--reverse`).
 
 * Added the :attr:`~django.test.Response.resolver_match` attribute to test
   client responses.
