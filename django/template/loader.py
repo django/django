@@ -65,7 +65,12 @@ def render_to_string(template_name, dictionary=None, context_instance=None,
     else:
         t = get_template(template_name, dirs)
     if not context_instance:
-        return t.render(Context(dictionary))
+        # Django < 1.8 accepted a Context in `dictionary` even though that's
+        # unintended. Preserve this ability but don't rewrap `dictionary`.
+        if isinstance(dictionary, Context):
+            return t.render(dictionary)
+        else:
+            return t.render(Context(dictionary))
     if not dictionary:
         return t.render(context_instance)
     # Add the dictionary to the context stack, ensuring it gets removed again
