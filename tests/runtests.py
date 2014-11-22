@@ -198,7 +198,7 @@ def teardown(state):
         setattr(settings, key, value)
 
 
-def django_tests(verbosity, interactive, failfast, keepdb, test_labels):
+def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels):
     state = setup(verbosity, test_labels)
     extra_tests = []
 
@@ -212,6 +212,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, test_labels):
         interactive=interactive,
         failfast=failfast,
         keepdb=keepdb,
+        reverse=reverse,
     )
     # Catch warnings thrown in test DB setup -- remove in Django 1.9
     with warnings.catch_warnings():
@@ -361,6 +362,9 @@ if __name__ == "__main__":
     parser.add_argument('--pair',
         help='Run the test suite in pairs with the named test to find problem '
              'pairs.')
+    parser.add_argument('--reverse', action='store_true', default=False,
+        help='Sort test suites and test cases in opposite order to debug '
+             'test side effects not apparent with normal execution lineup.')
     parser.add_argument('--liveserver',
         help='Overrides the default address where the live server (used with '
              'LiveServerTestCase) is expected to run from. The default value '
@@ -393,6 +397,6 @@ if __name__ == "__main__":
     else:
         failures = django_tests(options.verbosity, options.interactive,
                                 options.failfast, options.keepdb,
-                                options.modules)
+                                options.reverse, options.modules)
         if failures:
             sys.exit(bool(failures))

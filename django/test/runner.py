@@ -20,7 +20,7 @@ class DiscoverRunner(object):
     reorder_by = (TestCase, SimpleTestCase)
 
     def __init__(self, pattern=None, top_level=None,
-                 verbosity=1, interactive=True, failfast=False, keepdb=False,
+                 verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False,
                  **kwargs):
 
         self.pattern = pattern
@@ -30,6 +30,7 @@ class DiscoverRunner(object):
         self.interactive = interactive
         self.failfast = failfast
         self.keepdb = keepdb
+        self.reverse = reverse
 
     @classmethod
     def add_arguments(cls, parser):
@@ -41,7 +42,10 @@ class DiscoverRunner(object):
             help='The test matching pattern. Defaults to test*.py.')
         parser.add_argument('-k', '--keepdb', action='store_true', dest='keepdb',
             default=False,
-            help='Preserve the test DB between runs. Defaults to False')
+            help='Preserves the test DB between runs.')
+        parser.add_argument('-r', '--reverse', action='store_true', dest='reverse',
+            default=False,
+            help='Reverses test cases order.')
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment()
@@ -107,7 +111,7 @@ class DiscoverRunner(object):
         for test in extra_tests:
             suite.addTest(test)
 
-        return reorder_suite(suite, self.reorder_by)
+        return reorder_suite(suite, self.reorder_by, self.reverse)
 
     def setup_databases(self, **kwargs):
         return setup_databases(self.verbosity, self.interactive, self.keepdb, **kwargs)
@@ -213,7 +217,7 @@ def dependency_ordered(test_databases, dependencies):
     return ordered_test_databases
 
 
-def reorder_suite(suite, classes):
+def reorder_suite(suite, classes, reverse=False):
     """
     Reorders a test suite by test type.
 
@@ -221,30 +225,36 @@ def reorder_suite(suite, classes):
 
     All tests of type classes[0] are placed first, then tests of type
     classes[1], etc. Tests with no match in classes are placed last.
+
+    If `reverse` is True, tests within classes are sorted in opposite order,
+    but test classes are not reversed.
     """
     class_count = len(classes)
     suite_class = type(suite)
     bins = [suite_class() for i in range(class_count + 1)]
-    partition_suite(suite, classes, bins)
+    partition_suite(suite, classes, bins, reverse=reverse)
     for i in range(class_count):
         bins[0].addTests(bins[i + 1])
     return bins[0]
 
 
-def partition_suite(suite, classes, bins):
+def partition_suite(suite, classes, bins, reverse=False):
     """
     Partitions a test suite by test type. Also prevents duplicated tests.
 
     classes is a sequence of types
     bins is a sequence of TestSuites, one more than classes
+    reverse changes the ordering of tests within bins
 
     Tests of type classes[i] are added to bins[i],
     tests with no match found in classes are place in bins[-1]
     """
     suite_class = type(suite)
+    if reverse:
+        suite = reversed(tuple(suite))
     for test in suite:
         if isinstance(test, suite_class):
-            partition_suite(test, classes, bins)
+            partition_suite(test, classes, bins, reverse=reverse)
         else:
             for i in range(len(classes)):
                 if isinstance(test, classes[i]):

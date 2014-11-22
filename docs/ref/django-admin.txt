@@ -1411,6 +1411,15 @@ test suite. If the test database does not exist, it will be created on the first
 run and then preserved for each subsequent run. Any unapplied migrations will also
 be applied to the test database before running the test suite.
 
+.. django-admin-option:: --reverse
+
+.. versionadded:: 1.8
+
+The ``--reverse`` option can be used to sort test cases in the opposite order.
+This may help in debugging tests that aren't properly isolated and have side
+effects. :ref:`Grouping by test class <order-of-tests>` is preserved when using
+this option.
+
 testserver <fixture fixture ...>
 --------------------------------
 
