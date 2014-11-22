@@ -6,7 +6,6 @@ from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
 from django.core import exceptions, serializers
 from django.core.management import call_command
 from django.db import models, IntegrityError, connection
-from django.db.migrations.writer import MigrationWriter
 from django import forms
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -228,11 +227,6 @@ class TestMigrations(TestCase):
         name, path, args, kwargs = field.deconstruct()
         new = ArrayField(*args, **kwargs)
         self.assertEqual(new.base_field.max_length, field.base_field.max_length)
-
-    def test_makemigrations(self):
-        field = ArrayField(models.CharField(max_length=20))
-        statement, imports = MigrationWriter.serialize(field)
-        self.assertEqual(statement, 'django.contrib.postgres.fields.ArrayField(models.CharField(max_length=20), size=None)')
 
     @override_settings(MIGRATION_MODULES={
         "postgres_tests": "postgres_tests.array_default_migrations",
