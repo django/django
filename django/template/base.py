@@ -71,10 +71,6 @@ libraries = {}
 # global list of libraries to load by default for a new parser
 builtins = []
 
-# True if TEMPLATE_STRING_IF_INVALID contains a format string (%s). None means
-# uninitialized.
-invalid_var_format_string = None
-
 
 class TemplateSyntaxError(Exception):
     pass
@@ -601,15 +597,14 @@ class FilterExpression(object):
                 if ignore_failures:
                     obj = None
                 else:
-                    if settings.TEMPLATE_STRING_IF_INVALID:
-                        global invalid_var_format_string
-                        if invalid_var_format_string is None:
-                            invalid_var_format_string = '%s' in settings.TEMPLATE_STRING_IF_INVALID
-                        if invalid_var_format_string:
-                            return settings.TEMPLATE_STRING_IF_INVALID % self.var
-                        return settings.TEMPLATE_STRING_IF_INVALID
+                    string_if_invalid = context.engine.string_if_invalid
+                    if string_if_invalid:
+                        if '%s' in string_if_invalid:
+                            return string_if_invalid % self.var
+                        else:
+                            return string_if_invalid
                     else:
-                        obj = settings.TEMPLATE_STRING_IF_INVALID
+                        obj = string_if_invalid
         else:
             obj = self.var
         for func, args in self.filters:
@@ -794,7 +789,7 @@ class Variable(object):
                     if getattr(current, 'do_not_call_in_templates', False):
                         pass
                     elif getattr(current, 'alters_data', False):
-                        current = settings.TEMPLATE_STRING_IF_INVALID
+                        current = context.engine.string_if_invalid
                     else:
                         try:  # method call (assuming no args required)
                             current = current()
@@ -802,12 +797,12 @@ class Variable(object):
                             try:
                                 getcallargs(current)
                             except TypeError:  # arguments *were* required
-                                current = settings.TEMPLATE_STRING_IF_INVALID  # invalid method call
+                                current = context.engine.string_if_invalid  # invalid method call
                             else:
                                 raise
         except Exception as e:
             if getattr(e, 'silent_variable_failure', False):
-                current = settings.TEMPLATE_STRING_IF_INVALID
+                current = context.engine.string_if_invalid
             else:
                 raise
 
