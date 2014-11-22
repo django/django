@@ -19,7 +19,7 @@ class Engine(object):
 
     def __init__(self, dirs=None, app_dirs=False,
                  allowed_include_roots=None, context_processors=None,
-                 loaders=None, string_if_invalid='',
+                 debug=False, loaders=None, string_if_invalid='',
                  file_charset=None):
         if dirs is None:
             dirs = []
@@ -42,6 +42,7 @@ class Engine(object):
         self.app_dirs = app_dirs
         self.allowed_include_roots = allowed_include_roots
         self.context_processors = context_processors
+        self.debug = debug
         self.loaders = loaders
         self.string_if_invalid = string_if_invalid
         self.file_charset = file_charset
@@ -54,6 +55,7 @@ class Engine(object):
             dirs=settings.TEMPLATE_DIRS,
             allowed_include_roots=settings.ALLOWED_INCLUDE_ROOTS,
             context_processors=settings.TEMPLATE_CONTEXT_PROCESSORS,
+            debug=settings.TEMPLATE_DEBUG,
             loaders=settings.TEMPLATE_LOADERS,
             string_if_invalid=settings.TEMPLATE_STRING_IF_INVALID,
             file_charset=settings.FILE_CHARSET,
@@ -211,7 +213,7 @@ class Engine(object):
         """
         Compiles template_string into a NodeList ready for rendering.
         """
-        if settings.TEMPLATE_DEBUG:
+        if self.debug:
             from .debug import DebugLexer, DebugParser
             lexer_class, parser_class = DebugLexer, DebugParser
         else:
@@ -222,7 +224,7 @@ class Engine(object):
         return parser.parse()
 
     def make_origin(self, display_name, loader, name, dirs):
-        if settings.TEMPLATE_DEBUG and display_name:
+        if self.debug and display_name:
             # Inner import to avoid circular dependency
             from .loader import LoaderOrigin
             return LoaderOrigin(display_name, loader, name, dirs)
