@@ -269,9 +269,10 @@ Tests that only fail in combination
 In case a test passes when run in isolation but fails within the whole suite,
 we have some tools to help analyze the problem.
 
-The ``--bisect`` option of ``runtests.py`` will run the failing test while halving the test set it
-is run together with on each iteration, often making it possible to identify a
-small number of tests that may be related to the failure.
+The ``--bisect`` option of ``runtests.py`` will run the failing test while
+halving the test set it is run together with on each iteration, often making
+it possible to identify a small number of tests that may be related to the
+failure.
 
 For example, suppose that the failing test that works on its own is
 ``ModelTest.test_eq``, then using:
