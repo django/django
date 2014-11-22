@@ -474,6 +474,9 @@ Tests
 * Added the ability to preserve the test database by adding the
   :djadminopt:`--keepdb` flag.
 
+* Made it possible to reverse test cases execution order using the
+  :djadminopt:`--reverse` flag.
+
 * Added the :attr:`~django.test.Response.resolver_match` attribute to test
   client responses.
 
