@@ -12,8 +12,7 @@ from django import template
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core import urlresolvers
-from django.template import (base as template_base, loader, Context,
-    RequestContext, Template, TemplateSyntaxError)
+from django.template import loader, Context, RequestContext, Template, TemplateSyntaxError
 from django.template.engine import Engine
 from django.template.loaders import app_directories, filesystem
 from django.test import RequestFactory, TestCase
@@ -550,14 +549,15 @@ class TemplateTests(TestCase):
             failures = []
             tests = sorted(template_tests.items())
 
-            # Set TEMPLATE_STRING_IF_INVALID to a known string.
-            expected_invalid_str = 'INVALID'
-
             # Warm the URL reversing cache. This ensures we don't pay the cost
             # warming the cache during one of the tests.
             urlresolvers.reverse('named.client', args=(0,))
 
             for name, vals in tests:
+
+                # Set TEMPLATE_STRING_IF_INVALID to a known string.
+                expected_invalid_str = 'INVALID'
+
                 if isinstance(vals[2], tuple):
                     normal_string_result = vals[2][0]
                     invalid_string_result = vals[2][1]
@@ -565,7 +565,6 @@ class TemplateTests(TestCase):
                     if isinstance(invalid_string_result, tuple):
                         expected_invalid_str = 'INVALID %s'
                         invalid_string_result = invalid_string_result[0] % invalid_string_result[1]
-                        template_base.invalid_var_format_string = True
 
                     try:
                         template_debug_result = vals[2][2]
@@ -621,10 +620,6 @@ class TemplateTests(TestCase):
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Expected %r, got %r" % (is_cached, invalid_str, template_debug, name, result, output))
 
                     Engine.get_default().template_loaders[0].reset()
-
-                if template_base.invalid_var_format_string:
-                    expected_invalid_str = 'INVALID'
-                    template_base.invalid_var_format_string = False
 
         self.assertEqual(failures, [], "Tests failed:\n%s\n%s" %
             ('-' * 70, ("\n%s\n" % ('-' * 70)).join(failures)))
