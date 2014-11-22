@@ -1,5 +1,5 @@
 from django.template.base import TemplateDoesNotExist
-from django.template.loader import get_template_from_string, make_origin
+from django.template.loader import get_template_from_string
 
 
 class Loader(object):
@@ -16,7 +16,7 @@ class Loader(object):
     def load_template(self, template_name, template_dirs=None):
         source, display_name = self.load_template_source(
             template_name, template_dirs)
-        origin = make_origin(
+        origin = self.engine.make_origin(
             display_name, self.load_template_source,
             template_name, template_dirs)
 
