@@ -105,12 +105,11 @@ class Engine(object):
                 "Invalid value in template loaders configuration: %r" % loader)
 
     def find_template(self, name, dirs=None):
-        # Inner import to avoid circular dependency
-        from .loader import make_origin
         for loader in self.template_loaders:
             try:
                 source, display_name = loader(name, dirs)
-                return (source, make_origin(display_name, loader, name, dirs))
+                origin = self.make_origin(display_name, loader, name, dirs)
+                return source, origin
             except TemplateDoesNotExist:
                 pass
         raise TemplateDoesNotExist(name)
@@ -214,3 +213,11 @@ class Engine(object):
         tokens = lexer.tokenize()
         parser = parser_class(tokens)
         return parser.parse()
+
+    def make_origin(self, display_name, loader, name, dirs):
+        if settings.TEMPLATE_DEBUG and display_name:
+            # Inner import to avoid circular dependency
+            from .loader import LoaderOrigin
+            return LoaderOrigin(display_name, loader, name, dirs)
+        else:
+            return None
