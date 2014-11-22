@@ -21,14 +21,17 @@ class CreateModel(Operation):
         self.bases = bases or (models.Model,)
 
     def deconstruct(self):
-        kwargs = {}
+        kwargs = {
+            'name': self.name,
+            'fields': self.fields,
+        }
         if self.options:
             kwargs['options'] = self.options
         if self.bases and self.bases != (models.Model,):
             kwargs['bases'] = self.bases
         return (
             self.__class__.__name__,
-            [self.name, self.fields],
+            [],
             kwargs
         )
 
@@ -83,10 +86,13 @@ class DeleteModel(Operation):
         self.name = name
 
     def deconstruct(self):
+        kwargs = {
+            'name': self.name,
+        }
         return (
             self.__class__.__name__,
-            [self.name],
-            {}
+            [],
+            kwargs
         )
 
     def state_forwards(self, app_label, state):
@@ -121,10 +127,14 @@ class RenameModel(Operation):
         self.new_name = new_name
 
     def deconstruct(self):
+        kwargs = {
+            'old_name': self.old_name,
+            'new_name': self.new_name,
+        }
         return (
             self.__class__.__name__,
-            [self.old_name, self.new_name],
-            {}
+            [],
+            kwargs
         )
 
     def state_forwards(self, app_label, state):
@@ -214,10 +224,14 @@ class AlterModelTable(Operation):
         self.table = table
 
     def deconstruct(self):
+        kwargs = {
+            'name': self.name,
+            'table': self.table,
+        }
         return (
             self.__class__.__name__,
-            [self.name, self.table],
-            {}
+            [],
+            kwargs
         )
 
     def state_forwards(self, app_label, state):
@@ -266,10 +280,14 @@ class AlterUniqueTogether(Operation):
         self.unique_together = set(tuple(cons) for cons in unique_together)
 
     def deconstruct(self):
+        kwargs = {
+            'name': self.name,
+            'unique_together': self.unique_together,
+        }
         return (
             self.__class__.__name__,
-            [self.name, self.unique_together],
-            {}
+            [],
+            kwargs
         )
 
     def state_forwards(self, app_label, state):
@@ -311,10 +329,14 @@ class AlterIndexTogether(Operation):
         self.index_together = set(tuple(cons) for cons in index_together)
 
     def deconstruct(self):
+        kwargs = {
+            'name': self.name,
+            'index_together': self.index_together,
+        }
         return (
             self.__class__.__name__,
-            [self.name, self.index_together],
-            {}
+            [],
+            kwargs
         )
 
     def state_forwards(self, app_label, state):
@@ -353,10 +375,14 @@ class AlterOrderWithRespectTo(Operation):
         self.order_with_respect_to = order_with_respect_to
 
     def deconstruct(self):
+        kwargs = {
+            'name': self.name,
+            'order_with_respect_to': self.order_with_respect_to,
+        }
         return (
             self.__class__.__name__,
-            [self.name, self.order_with_respect_to],
-            {}
+            [],
+            kwargs
         )
 
     def state_forwards(self, app_label, state):
@@ -412,10 +438,14 @@ class AlterModelOptions(Operation):
         self.options = options
 
     def deconstruct(self):
+        kwargs = {
+            'name': self.name,
+            'options': self.options,
+        }
         return (
             self.__class__.__name__,
-            [self.name, self.options],
-            {}
+            [],
+            kwargs
         )
 
     def state_forwards(self, app_label, state):
