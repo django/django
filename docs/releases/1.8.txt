@@ -772,6 +772,8 @@ Miscellaneous
   delete a key if ``set()`` fails. This is necessary to ensure the ``cache_db``
   session store always fetches the most current session data.
 
+* Private API ``django.template.compile_string`` was removed.
+
 * Private APIs ``override_template_loaders`` and ``override_with_test_loader``
   in ``django.test.utils`` were removed. Override ``TEMPLATE_LOADERS`` with
   ``override_settings`` instead.
