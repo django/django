@@ -166,24 +166,27 @@ class SafeMIMEMessage(MIMEMixin, MIMEMessage):
 
 class SafeMIMEText(MIMEMixin, MIMEText):
 
-    def __init__(self, text, subtype, charset):
-        self.encoding = charset
-        if charset == 'utf-8':
+    def __init__(self, _text, _subtype='plain', _charset=None):
+        self.encoding = _charset
+        if _charset == 'utf-8':
             # Unfortunately, Python < 3.5 doesn't support setting a Charset instance
             # as MIMEText init parameter (http://bugs.python.org/issue16324).
             # We do it manually and trigger re-encoding of the payload.
-            MIMEText.__init__(self, text, subtype, None)
+            MIMEText.__init__(self, _text, _subtype, None)
             del self['Content-Transfer-Encoding']
             # Workaround for versions without http://bugs.python.org/issue19063
             if (3, 2) < sys.version_info < (3, 3, 4):
-                payload = text.encode(utf8_charset.output_charset)
+                payload = _text.encode(utf8_charset.output_charset)
                 self._payload = payload.decode('ascii', 'surrogateescape')
                 self.set_charset(utf8_charset)
             else:
-                self.set_payload(text, utf8_charset)
-            self.replace_header('Content-Type', 'text/%s; charset="%s"' % (subtype, charset))
+                self.set_payload(_text, utf8_charset)
+            self.replace_header('Content-Type', 'text/%s; charset="%s"' % (_subtype, _charset))
+        elif _charset is None:
+            # the default value of '_charset' is 'us-ascii' on Python 2
+            MIMEText.__init__(self, _text, _subtype)
         else:
-            MIMEText.__init__(self, text, subtype, charset)
+            MIMEText.__init__(self, _text, _subtype, _charset)
 
     def __setitem__(self, name, val):
         name, val = forbid_multi_line_headers(name, val, self.encoding)
