@@ -96,6 +96,18 @@ W019 = Warning(
     id='security.W019',
 )
 
+W020 = Warning(
+    "You have an empty SECURE_CSP setting. No Content-Security-Policy header "
+    "will be set by Django's SecurityMiddleware.",
+    id='security.W020',
+)
+
+W021 = Warning(
+    "SECURE_CSP_REPORT_ONLY is enabled. Browsers will not enforce your "
+    "SECURE_CSP policy.",
+    id='security.W021',
+)
+
 
 def _security_middleware():
     return "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES
@@ -168,6 +180,19 @@ def check_secret_key(app_configs, **kwargs):
         len(settings.SECRET_KEY) >= SECRET_KEY_MIN_LENGTH
     )
     return [] if passed_check else [W009]
+
+
+@register(Tags.security, deploy=True)
+def check_csp(app_configs, **kwargs):
+    passed_check = not _security_middleware() or settings.SECURE_CSP
+    return [] if passed_check else [W020]
+
+
+@register(Tags.security, deploy=True)
+def check_csp(app_configs, **kwargs):
+    failed_check = (_security_middleware() and settings.SECURE_CSP
+        and settings.SECURE_CSP_REPORT_ONLY)
+    return [W021] if failed_check else []
 
 
 @register(Tags.security, deploy=True)

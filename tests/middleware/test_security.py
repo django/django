@@ -200,3 +200,85 @@ class SecurityMiddlewareTest(TestCase):
         """
         ret = self.process_request("get", "/some/url")
         self.assertEqual(ret, None)
+
+    def test_csp_not_set(self):
+        """ No Content-Security-Policy set, no header must be present
+        """
+        resp = self.process_response()
+        self.assertNotIn("content-security-policy", resp)
+
+    @override_settings(SECURE_CSP={'default-src': "'self'"})
+    def test_csp(self):
+        """ Content security policy set
+        """
+        resp = self.process_response()
+        self.assertIn("content-security-policy", resp)
+        self.assertNotIn("content-security-policy-report-only", resp)
+        self.assertEqual(resp['content-security-policy'], "default-src 'self'")
+
+    @override_settings(SECURE_CSP_REPORT_ONLY={'default-src': "'self'"})
+    def test_csp_report_only(self):
+        """ Content security policy set, but report only
+        """
+        resp = self.process_response()
+        self.assertNotIn("content-security-policy", resp)
+        self.assertIn("content-security-policy-report-only", resp)
+        self.assertEqual(resp['content-security-policy-report-only'],
+                "default-src 'self'")
+
+    @override_settings(SECURE_CSP={'frame-src': "djangoproject.com"})
+    @override_settings(SECURE_CSP_REPORT_ONLY={'default-src': "'self'"})
+    def test_csp_both(self):
+        """ Content security policy set, both headers
+        """
+        resp = self.process_response()
+        self.assertIn("content-security-policy", resp)
+        self.assertIn("content-security-policy-report-only", resp)
+        self.assertEqual(resp['content-security-policy'],
+                "frame-src djangoproject.com")
+        self.assertEqual(resp['content-security-policy-report-only'],
+                "default-src 'self'")
+
+    @override_settings(SECURE_CSP={'default-src': "'self'"})
+    def test_csp_already_present(self):
+        """
+        The middleware will not override a "content-security-policy" header
+        already present in the response.
+        """
+        response = self.process_response(
+            secure=True,
+            headers={"content-security-policy":
+                    "frame-src www.djangoproject.com"})
+        self.assertEqual(response["content-security-policy"],
+                "frame-src www.djangoproject.com")
+
+    @override_settings(SECURE_CSP={'default-src': "'self'"})
+    def test_csp_exempt(self):
+        """ Test view with csp_exempt decorator
+        """
+        from django.views.decorators.csp import csp_exempt
+        @csp_exempt
+        def csp_exempt_response(testcase):
+            return testcase.response()
+
+        request = self.request.get("/some/url")
+        resp = self.middleware.process_response(
+            request, csp_exempt_response(self))
+        self.assertNotIn("content-security-policy", resp)
+
+    @override_settings(SECURE_CSP={'default-src': "'self'"})
+    def test_csp_custom(self):
+        """ Test view with custom CSP using csp_header decorator
+        """
+        from django.views.decorators.csp import csp_header
+
+        @csp_header({'image-src': "data:"})
+        def csp_custom_response(testcase):
+            return testcase.response()
+
+        request = self.request.get("/some/url")
+        resp = self.middleware.process_response(
+            request, csp_custom_response(self))
+        self.assertIn("content-security-policy", resp)
+        self.assertEqual(resp["content-security-policy"],
+                "image-src data:")

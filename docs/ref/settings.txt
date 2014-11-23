@@ -2201,6 +2201,32 @@ those URLs matching a regular expression listed in
    requests; you can correct the problem by finding out what that header is and
    configuring the :setting:`SECURE_PROXY_SSL_HEADER` setting accordingly.
 
+.. setting:: SECURE_CSP
+
+SECURE_CSP
+----------
+
+.. versionadded:: 1.8
+
+Default: ``{}``
+
+If set to a dictionary of :ref:`content-security-policy` directives, the
+:class:`~django.middleware.security.SecurityMiddleware`
+sets the :ref:`content-security-policy` header on all responses that do not
+already have it.
+
+SECURE_CSP_REPORT_ONLY
+----------------------
+
+.. versionadded:: 1.8
+
+Default: ``{}``
+
+If set to a dictionary of :ref:`content-security-policy` directives, the
+:class:`~django.middleware.security.SecurityMiddleware` sets the
+`content-security-policy-report-only` header on all responses that do not
+already have it.
+
 .. setting:: SERIALIZATION_MODULES
 
 SERIALIZATION_MODULES

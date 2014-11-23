@@ -4,6 +4,24 @@ from django.conf import settings
 from django.http import HttpResponsePermanentRedirect
 
 
+def construct_csp_header(policy, report_only=False):
+    """
+    Construct Content Security Policy header from a dictonay with all the
+    individual policy directives.
+    Returns a tuple with the name and value of the header to be set.
+    The value will be set to None for empty policies.
+    """
+    if not policy:
+        return None
+
+    name = ('content-security-policy-report-only'
+            if report_only else 'content-security-policy')
+
+    value = '; '.join(('{} {}'.format(k, v) for k, v in policy.items()))
+
+    return {'name': name, 'value': value}
+
+
 class SecurityMiddleware(object):
     def __init__(self):
         self.sts_seconds = settings.SECURE_HSTS_SECONDS
@@ -13,6 +31,9 @@ class SecurityMiddleware(object):
         self.redirect = settings.SECURE_SSL_REDIRECT
         self.redirect_host = settings.SECURE_SSL_HOST
         self.redirect_exempt = [re.compile(r) for r in settings.SECURE_REDIRECT_EXEMPT]
+        self.csp = construct_csp_header(settings.SECURE_CSP, report_only=False)
+        self.csp_report_only = construct_csp_header(
+                settings.SECURE_CSP_REPORT_ONLY, report_only=True)
 
     def process_request(self, request):
         path = request.path.lstrip("/")
@@ -39,5 +60,14 @@ class SecurityMiddleware(object):
 
         if self.xss_filter and 'x-xss-protection' not in response:
             response["x-xss-protection"] = "1; mode=block"
+
+        csp_exempt = getattr(response, 'csp_exempt', False)
+
+        if self.csp and not csp_exempt and not self.csp['name'] in response:
+            response[self.csp['name']] = self.csp['value']
+
+        if (self.csp_report_only and not csp_exempt and
+                not self.csp_report_only['name'] in response):
+            response[self.csp_report_only['name']] = self.csp_report_only['value']
 
         return response
