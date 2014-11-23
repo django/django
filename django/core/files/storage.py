@@ -150,7 +150,7 @@ class FileSystemStorage(Storage):
     """
 
     def __init__(self, location=None, base_url=None, file_permissions_mode=None,
-            directory_permissions_mode=None, **kwargs):
+            directory_permissions_mode=None):
         if location is None:
             location = settings.MEDIA_ROOT
         self.base_location = location
