@@ -188,6 +188,7 @@ from the request's POST data, sends that to admin@example.com and redirects to
 "/contact/thanks/" when it's done::
 
     from django.core.mail import send_mail, BadHeaderError
+    from django.http import HttpResponse, HttpResponseRedirect
 
     def send_email(request):
         subject = request.POST.get('subject', '')
