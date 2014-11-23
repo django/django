@@ -63,16 +63,17 @@ def delete_selected(modeladmin, request, queryset):
     else:
         title = _("Are you sure?")
 
-    context = {
-        "title": title,
-        "objects_name": objects_name,
-        "deletable_objects": [deletable_objects],
-        'queryset': queryset,
-        "perms_lacking": perms_needed,
-        "protected": protected,
-        "opts": opts,
-        'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
-    }
+    context = dict(
+        modeladmin.admin_site.each_context(),
+        title=title,
+        objects_name=objects_name,
+        deletable_objects=[deletable_objects],
+        queryset=queryset,
+        perms_lacking=perms_needed,
+        protected=protected,
+        opts=opts,
+        action_checkbox_name=helpers.ACTION_CHECKBOX_NAME,
+    )
 
     # Display the confirmation page
     return TemplateResponse(request, modeladmin.delete_selected_confirmation_template or [
