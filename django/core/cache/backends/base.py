@@ -147,6 +147,27 @@ class BaseCache(object):
                 d[k] = val
         return d
 
+    def get_or_set(self, key, default=None, timeout=DEFAULT_TIMEOUT, version=None):
+        """
+        Fetch a given key from the cache. If the key does not exist,
+        the key is added and set to the default value. The default value can
+        also be any callable. If timeout is given, that timeout will be used
+        for the key; otherwise the default cache timeout will be used.
+
+        Returns the value of the key stored or retrieved on success,
+        False on error.
+        """
+        if default is None:
+            raise ValueError('You need to specify a value.')
+        val = self.get(key, version=version)
+        if val is None:
+            if callable(default):
+                default = default()
+            val = self.add(key, default, timeout=timeout, version=version)
+            if val:
+                return self.get(key, version=version)
+        return val
+
     def has_key(self, key, version=None):
         """
         Returns True if the key is in the cache and has not expired.
