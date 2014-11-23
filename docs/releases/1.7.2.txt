@@ -80,3 +80,6 @@ Bugfixes
 
 * Fixed ``django.core.files.File.__repr__()`` when the file's ``name`` contains
   Unicode characters (:ticket:`23888`).
+
+* Added missing context to the admin's ``delete_selected`` view that prevented
+  custom site header, etc. from appearing (:ticket:`23898`).
