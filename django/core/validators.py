@@ -23,7 +23,7 @@ class RegexValidator(object):
     inverse_match = False
     flags = 0
 
-    def __init__(self, regex=None, message=None, code=None, inverse_match=None, flags=None, **kwargs):
+    def __init__(self, regex=None, message=None, code=None, inverse_match=None, flags=None):
         if regex is not None:
             self.regex = regex
         if message is not None:
@@ -134,7 +134,7 @@ class EmailValidator(object):
         re.IGNORECASE)
     domain_whitelist = ['localhost']
 
-    def __init__(self, message=None, code=None, whitelist=None, **kwargs):
+    def __init__(self, message=None, code=None, whitelist=None):
         if message is not None:
             self.message = message
         if code is not None:
@@ -251,7 +251,7 @@ class BaseValidator(object):
     message = _('Ensure this value is %(limit_value)s (it is %(show_value)s).')
     code = 'limit_value'
 
-    def __init__(self, limit_value, message=None, **kwargs):
+    def __init__(self, limit_value, message=None):
         self.limit_value = limit_value
         if message:
             self.message = message

@@ -30,7 +30,7 @@ class KeysValidator(object):
     }
     strict = False
 
-    def __init__(self, keys, strict=False, messages=None, **kwargs):
+    def __init__(self, keys, strict=False, messages=None):
         self.keys = set(keys)
         self.strict = strict
         if messages is not None:

@@ -11,7 +11,7 @@ class SeparateDatabaseAndState(Operation):
     that affect the state or not the database, or so on.
     """
 
-    def __init__(self, database_operations=None, state_operations=None, **kwargs):
+    def __init__(self, database_operations=None, state_operations=None):
         self.database_operations = database_operations or []
         self.state_operations = state_operations or []
 
@@ -62,7 +62,7 @@ class RunSQL(Operation):
     by this SQL change, in case it's custom column/table creation/deletion.
     """
 
-    def __init__(self, sql, reverse_sql=None, state_operations=None, **kwargs):
+    def __init__(self, sql, reverse_sql=None, state_operations=None):
         self.sql = sql
         self.reverse_sql = reverse_sql
         self.state_operations = state_operations or []
@@ -122,7 +122,7 @@ class RunPython(Operation):
 
     reduces_to_sql = False
 
-    def __init__(self, code, reverse_code=None, atomic=True, **kwargs):
+    def __init__(self, code, reverse_code=None, atomic=True):
         self.atomic = atomic
         # Forwards code
         if not callable(code):

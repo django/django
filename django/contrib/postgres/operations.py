@@ -5,7 +5,7 @@ from django.db.migrations.operations.base import Operation
 class CreateExtension(Operation):
     reversible = True
 
-    def __init__(self, name, **kwargs):
+    def __init__(self, name):
         self.name = name
 
     def state_forwards(self, app_label, state):
@@ -23,7 +23,7 @@ class CreateExtension(Operation):
 
 class HStoreExtension(CreateExtension):
 
-    def __init__(self, **kwargs):
+    def __init__(self):
         self.name = 'hstore'
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
