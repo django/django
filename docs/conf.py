@@ -129,6 +129,7 @@ intersphinx_mapping = {
     'python': ('http://docs.python.org/3/', None),
     'sphinx': ('http://sphinx-doc.org/', None),
     'six': ('http://pythonhosted.org/six/', None),
+    'formtools': ('http://django-formtools.readthedocs.org/en/latest/', None),
 }
 
 # Python's docs don't change every week.
