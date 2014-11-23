@@ -74,6 +74,9 @@ def delete_selected(modeladmin, request, queryset):
         "opts": opts,
         'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
     }
+    
+    #populate the context with admin_site's each_context values
+    context.update(modeladmin.admin_site.each_context())
 
     # Display the confirmation page
     return TemplateResponse(request, modeladmin.delete_selected_confirmation_template or [
