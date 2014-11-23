@@ -77,7 +77,3 @@ Bugfixes
 
 * Fixed a crash in migrations when deleting a field that is part of a
   ``index/unique_together`` constraint (:ticket:`23794`).
-
-* Made the initializers of deconstructible classes, such as migration
-  operations and validators, accept kwargs for forwards compatibility
-  (:ticket:`23892`).
