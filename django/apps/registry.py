@@ -333,9 +333,9 @@ class Apps(object):
         # Call expire cache on each model. This will purge
         # the relation tree and the fields cache.
         self.get_models.cache_clear()
-        if self.ready:
-            for model in self.get_models(include_auto_created=True):
-                model._meta._expire_cache()
+        #if self.ready:
+            #for model in self.get_models(include_auto_created=True):
+                #model._meta._expire_cache()
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 
