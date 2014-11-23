@@ -884,6 +884,28 @@ class BaseCacheTests(object):
         with self.assertRaises(pickle.PickleError):
             cache.set('unpickable', Unpickable())
 
+    def test_get_or_set(self):
+        self.assertIsNone(cache.get('projector'))
+        self.assertEqual(cache.get_or_set('projector', 42), 42)
+        self.assertEqual(cache.get('projector'), 42)
+
+    def test_get_or_set_callable(self):
+        def my_callable():
+            return 'value'
+
+        self.assertEqual(cache.get_or_set('mykey', my_callable), 'value')
+
+    def test_get_or_set_version(self):
+        cache.get_or_set('brian', 1979, version=2)
+        with self.assertRaisesMessage(ValueError, 'You need to specify a value.'):
+            cache.get_or_set('brian')
+        with self.assertRaisesMessage(ValueError, 'You need to specify a value.'):
+            cache.get_or_set('brian', version=1)
+        self.assertIsNone(cache.get('brian', version=1))
+        self.assertEqual(cache.get_or_set('brian', 42, version=1), 42)
+        self.assertEqual(cache.get_or_set('brian', 1979, version=2), 1979)
+        self.assertIsNone(cache.get('brian', version=3))
+
 
 @override_settings(CACHES=caches_setting_for_tests(
     BACKEND='django.core.cache.backends.db.DatabaseCache',

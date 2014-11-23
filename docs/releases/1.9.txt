@@ -94,7 +94,8 @@ Minor features
 Cache
 ^^^^^
 
-* ...
+* ``django.core.cache.backends.base.BaseCache`` now has a ``get_or_set()``
+  method.
 
 Email
 ^^^^^
