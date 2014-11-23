@@ -838,6 +838,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
             '_selected_action': group.id
         }
         response = self.client.post('/test_admin/%s/auth/group/' % (self.urlbit), post_data)
+        self.assertEqual(response.context['site_header'], 'Django administration')
         self.assertContains(response, 'bodyclass_consistency_check ')
 
     def test_filter_with_custom_template(self):
