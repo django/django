@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 import re
-import sys
 import warnings
 
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -135,12 +134,7 @@ linebreaks = allow_lazy(linebreaks, six.text_type)
 
 class MLStripper(HTMLParser):
     def __init__(self):
-        # The strict parameter was added in Python 3.2 with a default of True.
-        # The default changed to False in Python 3.3 and was deprecated.
-        if sys.version_info[:2] == (3, 2):
-            HTMLParser.__init__(self, strict=False)
-        else:
-            HTMLParser.__init__(self)
+        HTMLParser.__init__(self)
         self.reset()
         self.fed = []
 
@@ -168,9 +162,7 @@ def _strip_once(value):
         return value
     try:
         s.close()
-    except (HTMLParseError, UnboundLocalError):
-        # UnboundLocalError because of http://bugs.python.org/issue17802
-        # on Python 3.2, triggered by strict=False mode of HTMLParser
+    except HTMLParseError:
         return s.get_data() + s.rawdata
     else:
         return s.get_data()

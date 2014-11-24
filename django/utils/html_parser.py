@@ -4,10 +4,7 @@ import sys
 
 current_version = sys.version_info
 
-use_workaround = (
-    (current_version < (2, 7, 3)) or
-    (current_version >= (3, 0) and current_version < (3, 2, 3))
-)
+use_workaround = current_version < (2, 7, 3)
 
 try:
     HTMLParseError = _html_parser.HTMLParseError
