@@ -25,8 +25,6 @@ def find_commands(management_dir):
     Returns an empty list if no commands are defined.
     """
     command_dir = os.path.join(management_dir, 'commands')
-    # Workaround for a Python 3.2 bug with pkgutil.iter_modules
-    sys.path_importer_cache.pop(command_dir, None)
     return [name for _, name, is_pkg in pkgutil.iter_modules([command_dir])
             if not is_pkg and not name.startswith('_')]
 
