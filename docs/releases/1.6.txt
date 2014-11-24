@@ -1116,10 +1116,35 @@ you should rename the method and conditionally add an alias with the old name::
 If you are writing a library that needs to call the ``get_queryset`` method and
 must support old Django versions, you should write::
 
-    get_queryset = (some_manager.get_queryset
-                    if hasattr(some_manager, 'get_queryset')
-                    else some_manager.get_query_set)
+    get_queryset = (some_manager.get_query_set
+                    if hasattr(some_manager, 'get_query_set')
+                    else some_manager.get_queryset)
     return get_queryset() # etc
+
+In the general case of a custom manager that both implements its own
+``get_queryset`` method and calls that method, and needs to work with older Django
+versions, and libraries that have not been updated yet, it is useful to define
+a ``get_queryset_compat`` method as below and use it internally to your manager::
+
+    class YourCustomManager(models.Manager):
+        def get_queryset(self):
+            return YourCustomQuerySet() # for example
+
+        get_query_set = get_queryset
+
+        def active(self): # for example
+            return self.get_queryset_compat().filter(active=True)
+
+        def get_queryset_compat(self):
+            get_queryset = (self.get_query_set
+                            if hasattr(self, 'get_query_set')
+                            else self.get_queryset)
+            return get_queryset()
+
+This helps to minimize the changes that are needed, but also works correctly in
+the case of subclasses (such as ``RelatedManagers`` from Django 1.5) which might
+override either ``get_query_set`` or ``get_queryset``.
+
 
 ``shortcut`` view and URLconf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
