@@ -307,3 +307,10 @@ the first one:
 .. code-block:: bash
 
    $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
+
+You may also try running the pair tests or the whole suite in ``--reverse`` to
+verify that executing tests in a different order does not cause any trouble:
+
+.. code-block:: bash
+
+   $ ./runtests.py --pair basic.tests.ModelTest.test_eq --reverse
