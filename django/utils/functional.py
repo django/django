@@ -2,10 +2,8 @@ import copy
 import operator
 from functools import wraps
 import sys
-import warnings
 
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.six.moves import copyreg
 
 
@@ -16,29 +14,6 @@ def curry(_curried_func, *args, **kwargs):
     def _curried(*moreargs, **morekwargs):
         return _curried_func(*(args + moreargs), **dict(kwargs, **morekwargs))
     return _curried
-
-
-def memoize(func, cache, num_args):
-    """
-    Wrap a function so that results for any argument tuple are stored in
-    'cache'. Note that the args to the function must be usable as dictionary
-    keys.
-
-    Only the first num_args are considered when creating the key.
-    """
-    warnings.warn("memoize wrapper is deprecated and will be removed in "
-                  "Django 1.9. Use django.utils.lru_cache instead.",
-                  RemovedInDjango19Warning, stacklevel=2)
-
-    @wraps(func)
-    def wrapper(*args):
-        mem_args = args[:num_args]
-        if mem_args in cache:
-            return cache[mem_args]
-        result = func(*args)
-        cache[mem_args] = result
-        return result
-    return wrapper
 
 
 class cached_property(object):
