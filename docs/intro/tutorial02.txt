@@ -257,6 +257,8 @@ aren't commonly used:
             ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
         ]
 
+    admin.site.register(Question, QuestionAdmin)
+
 .. image:: _images/admin09.png
    :alt: Fieldset is initially collapsed
 
