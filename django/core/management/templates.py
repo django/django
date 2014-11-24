@@ -109,6 +109,7 @@ class TemplateCommand(BaseCommand):
             base_name: name,
             base_directory: top_dir,
             'docs_version': docs_version,
+            'django_version': django.__version__,
         }), autoescape=False)
 
         # Setup a stub settings environment for template rendering
