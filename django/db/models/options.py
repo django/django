@@ -610,8 +610,7 @@ class Options(object):
             return EMPTY_RELATION_TREE
 
     def _expire_cache(self):
-        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'related_objects',
-                          'fields_map', '_relation_tree'):
+        for cache_key in ('_relation_tree', 'fields_map',):
             try:
                 delattr(self, cache_key)
             except AttributeError:
