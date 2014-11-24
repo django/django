@@ -22,7 +22,6 @@ from django.utils.six.moves.urllib.parse import parse_qsl, urlencode, quote, url
 
 
 RAISE_ERROR = object()
-absolute_http_url_re = re.compile(r"^https?://", re.I)
 host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9:]+\])(:\d+)?$")
 
 
