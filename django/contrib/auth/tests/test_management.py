@@ -153,7 +153,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
 
 @skipIfCustomUser
-@override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342',])
+@override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])
 class CreatesuperuserManagementCommandTestCase(TestCase):
 
     def test_basic_usage(self):
