@@ -35,31 +35,32 @@ class BadHeaderError(ValueError):
     pass
 
 
-# Copied from Python standard library, with the following modifications:
+# Copied from Python 3.2+ standard library, with the following modifications:
 # * Used cached hostname for performance.
-# * Added try/except to support lack of getpid() in Jython (#5496).
-def make_msgid(idstring=None):
+# TODO: replace with email.utils.make_msgid(.., domain=DNS_NAME) when dropping
+# Python 2 (Python 2's version doesn't have domain parameter) (#23905).
+def make_msgid(idstring=None, domain=None):
     """Returns a string suitable for RFC 2822 compliant Message-ID, e.g:
 
     <20020201195627.33539.96671@nightshade.la.mastaler.com>
 
     Optional idstring if given is a string used to strengthen the
-    uniqueness of the message id.
+    uniqueness of the message id.  Optional domain if given provides the
+    portion of the message id after the '@'.  It defaults to the locally
+    defined hostname.
     """
     timeval = time.time()
     utcdate = time.strftime('%Y%m%d%H%M%S', time.gmtime(timeval))
-    try:
-        pid = os.getpid()
-    except AttributeError:
-        # No getpid() in Jython, for example.
-        pid = 1
+    pid = os.getpid()
     randint = random.randrange(100000)
     if idstring is None:
         idstring = ''
     else:
         idstring = '.' + idstring
-    idhost = DNS_NAME
-    msgid = '<%s.%s.%s%s@%s>' % (utcdate, pid, randint, idstring, idhost)
+    if domain is None:
+        # stdlib uses socket.getfqdn() here instead
+        domain = DNS_NAME
+    msgid = '<%s.%s.%s%s@%s>' % (utcdate, pid, randint, idstring, domain)
     return msgid
 
 
@@ -266,7 +267,8 @@ class EmailMessage(object):
         if 'date' not in header_names:
             msg['Date'] = formatdate()
         if 'message-id' not in header_names:
-            msg['Message-ID'] = make_msgid()
+            # Use cached DNS_NAME for performance
+            msg['Message-ID'] = make_msgid(domain=DNS_NAME)
         for name, value in self.extra_headers.items():
             if name.lower() in ('from', 'to'):  # From and To are already handled
                 continue
