@@ -338,8 +338,16 @@ class Options(object):
         Returns a list of all forward fields on the model and its parents excluding
         ManyToManyFields.
         """
-        return make_immutable_fields_list("fields", (f for f in self.get_fields(reverse=False)
-                                          if not (f.has_relation and f.many_to_many)))
+        # Due to legacy reasons, the fields property should only contain forward
+        # fields that are not virtual or with a m2m cardinality. Therefore we pass
+        # these three filters as filters to the generator.
+        is_not_an_m2m_field = lambda f: not (f.has_relation and f.many_to_many)
+        is_not_a_generic_relation = lambda f: not (f.has_relation and f.many_to_one)
+        is_not_a_generic_foreign_key = lambda f: not hasattr(f, 'is_gfk')
+
+        return make_immutable_fields_list("fields", (f for f in self.get_fields(reverse=False) if
+                                          is_not_an_m2m_field(f) and is_not_a_generic_relation(f)
+                                          and is_not_a_generic_foreign_key(f)))
 
     @cached_property
     def concrete_fields(self):
@@ -396,7 +404,7 @@ class Options(object):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = chain(self.get_fields(include_hidden=True), self.virtual_fields)
+        fields = self.get_fields(include_hidden=True)
         for field in fields:
             res[field.name] = field
 
@@ -421,7 +429,7 @@ class Options(object):
                 #to find related objects that point to this model.
                 return next(
                     f for f in self.get_fields(reverse=False)
-                    if f.name == field_name or f.attname == field_name
+                    if f.name == field_name or hasattr(f, 'attname') and f.attname == field_name
                 )
             except StopIteration:
                 raise FieldDoesNotExist('%s has no field named %r. The app cache isn\'t '
@@ -564,14 +572,13 @@ class Options(object):
         all_models = self.apps.get_models(include_auto_created=True)
         for model in all_models:
 
-            fields = [model._meta.fields, model._meta.virtual_fields]
-            if not model._meta.auto_created:
-                fields.append(model._meta.many_to_many)
-
             fields_with_relations = (
-                f for f in chain.from_iterable(fields)
-                if f.has_relation and f.related_model != None
+                f for f in model._meta.get_fields(reverse=False)
+                if f.has_relation and f.related_model is not None
             )
+            if model._meta.auto_created:
+                fields_with_relations = (f for f in fields_with_relations
+                                         if not f.many_to_many)
 
             for f in fields_with_relations:
                 if not isinstance(f.rel.to, six.string_types):
@@ -610,6 +617,8 @@ class Options(object):
             return EMPTY_RELATION_TREE
 
     def _expire_cache(self):
+        # When a new model is registered, we expire the
+        # relation tree and any attribute that depends on it.
         for cache_key in ('_relation_tree', 'fields_map',):
             try:
                 delattr(self, cache_key)
@@ -699,7 +708,14 @@ class Options(object):
             # By default, fields contains field instances as keys and all possible names
             # if the field instance as values. when get_fields is called, we only want to
             # return field instances, so we just preserve the keys.
-            fields = make_immutable_fields_list("get_fields()", fields.keys())
+            fields = fields.keys()
+
+            # Virtual fields are not inheritable, therefore they are inserted only when the
+            # recursive get_fields() call comes to an end.
+            if forward:
+                fields.extend(self.virtual_fields)
+
+            fields = make_immutable_fields_list("get_fields()", fields)
 
         # Store result into cache for later access
         if cache_results:
