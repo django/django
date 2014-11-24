@@ -1116,8 +1116,10 @@ you should rename the method and conditionally add an alias with the old name::
 If you are writing a library that needs to call the ``get_queryset`` method and
 must support old Django versions, you should write::
 
-    method = getattr(some_manager, 'get_queryset', some_manager.get_query_set)
-    method(params)
+    get_queryset = (some_manager.get_queryset
+                    if hasattr(some_manager, 'get_queryset')
+                    else some_manager.get_query_set)
+    return get_queryset() # etc
 
 ``shortcut`` view and URLconf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
