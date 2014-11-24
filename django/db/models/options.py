@@ -708,7 +708,7 @@ class Options(object):
             # By default, fields contains field instances as keys and all possible names
             # if the field instance as values. when get_fields is called, we only want to
             # return field instances, so we just preserve the keys.
-            fields = fields.keys()
+            fields = list(fields.keys())
 
             # Virtual fields are not inheritable, therefore they are inserted only when the
             # recursive get_fields() call comes to an end.
