@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 import os
 from io import BytesIO, StringIO, UnsupportedOperation
 
-from django.utils.encoding import smart_text
 from django.core.files.utils import FileProxyMixin
 from django.utils import six
+from django.utils.encoding import force_str, smart_text
 from django.utils.encoding import force_bytes, python_2_unicode_compatible
 
 
@@ -25,7 +25,7 @@ class File(FileProxyMixin):
         return smart_text(self.name or '')
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self or "None")
+        return force_str("<%s: %s>" % (self.__class__.__name__, self or "None"))
 
     def __bool__(self):
         return bool(self.name)
