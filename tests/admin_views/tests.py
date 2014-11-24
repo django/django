@@ -4205,6 +4205,10 @@ class GroupAdminTest(TestCase):
 
     def test_group_permission_performance(self):
         g = Group.objects.create(name="test_group")
+
+        # Ensure no queries are skipped due to cached content type for Group.
+        ContentType.objects.clear_cache()
+
         with self.assertNumQueries(8):
             response = self.client.get('/test_admin/admin/auth/group/%s/' % g.pk)
             self.assertEqual(response.status_code, 200)
