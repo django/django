@@ -51,9 +51,9 @@ details on these changes.
 * The following methods and properties of ``django.db.sql.query.Query`` will
   be removed:
 
-    * Properties: ``aggregates`` and ``aggregate_select``
-    * Methods: ``add_aggregate``, ``set_aggregate_mask``, and
-      ``append_aggregate_mask``.
+  * Properties: ``aggregates`` and ``aggregate_select``
+  * Methods: ``add_aggregate``, ``set_aggregate_mask``, and
+    ``append_aggregate_mask``.
 
 * ``django.template.resolve_variable`` will be removed.
 
@@ -87,6 +87,13 @@ details on these changes.
 
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` will
   be removed.
+
+* The ``dirs`` parameter for the following functions will be removed:
+
+  * ``django.template.loader.get_template()``
+  * ``django.template.loader.select_template()``
+  * ``django.shortcuts.render()``
+  * ``django.shortcuts.render_to_response()``
 
 .. _deprecation-removed-in-1.9:
 
