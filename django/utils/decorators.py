@@ -17,7 +17,7 @@ def method_decorator(decorator):
     Converts a function decorator into a method decorator
     """
     # 'func' is a function at the time it is passed to _dec, but will eventually
-    # be a method of the class it is defined it.
+    # be a method of the class it is defined on.
     def _dec(func):
         def _wrapper(self, *args, **kwargs):
             @decorator
