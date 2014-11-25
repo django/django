@@ -134,6 +134,20 @@ class GraphTests(TestCase):
             graph.forwards_plan, ("app_a", "0003"),
         )
 
+    def test_circular_graph_2(self):
+        graph = MigrationGraph()
+        graph.add_node(('A', '0001'), None)
+        graph.add_node(('C', '0001'), None)
+        graph.add_node(('B', '0001'), None)
+        graph.add_dependency('A.0001', ('A', '0001'),('B', '0001'))
+        graph.add_dependency('B.0001', ('B', '0001'),('A', '0001'))
+        graph.add_dependency('C.0001', ('C', '0001'),('B', '0001'))
+
+        self.assertRaises(
+            CircularDependencyError,
+            graph.forwards_plan, ('C', '0001')
+        )
+
     def test_dfs(self):
         graph = MigrationGraph()
         root = ("app_a", "1")
