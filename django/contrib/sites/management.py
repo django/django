@@ -5,7 +5,6 @@ Creates the default Site object.
 from django.apps import apps
 from django.core.management.color import no_style
 from django.db import DEFAULT_DB_ALIAS, connections, router
-from django.db.models import signals
 
 
 def create_default_site(app_config, verbosity=2, interactive=True, db=DEFAULT_DB_ALIAS, **kwargs):
@@ -38,6 +37,3 @@ def create_default_site(app_config, verbosity=2, interactive=True, db=DEFAULT_DB
                     cursor.execute(command)
 
         Site.objects.clear_cache()
-
-
-signals.post_migrate.connect(create_default_site, sender=apps.get_app_config('sites'))
