@@ -278,11 +278,18 @@ All parameters are optional and can be set at any time prior to calling the
 * ``cc``: A list or tuple of recipient addresses used in the "Cc" header
   when sending the email.
 
+* ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
+  header when sending the email.
+
+.. versionchanged:: 1.8
+
+    The ``reply_to`` parameter was added.
+
 For example::
 
     email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
                 ['to1@example.com', 'to2@example.com'], ['bcc@example.com'],
-                headers = {'Reply-To': 'another@example.com'})
+                reply_to=['another@example.com'], headers={'Message-ID': 'foo'})
 
 The class has the following methods:
 

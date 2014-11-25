@@ -214,7 +214,8 @@ class EmailMessage(object):
     encoding = None     # None => use settings default
 
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
-                 connection=None, attachments=None, headers=None, cc=None):
+                 connection=None, attachments=None, headers=None, cc=None,
+                 reply_to=None):
         """
         Initialize a single email message (which can be sent to multiple
         recipients).
@@ -241,6 +242,12 @@ class EmailMessage(object):
             self.bcc = list(bcc)
         else:
             self.bcc = []
+        if reply_to:
+            if isinstance(reply_to, six.string_types):
+                raise TypeError('"reply_to" argument must be a list or tuple')
+            self.reply_to = list(reply_to)
+        else:
+            self.reply_to = []
         self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
         self.subject = subject
         self.body = body
@@ -263,6 +270,8 @@ class EmailMessage(object):
         msg['To'] = self.extra_headers.get('To', ', '.join(self.to))
         if self.cc:
             msg['Cc'] = ', '.join(self.cc)
+        if self.reply_to:
+            msg['Reply-To'] = self.extra_headers.get('Reply-To', ', '.join(self.reply_to))
 
         # Email header names are case-insensitive (RFC 2045), so we have to
         # accommodate that when doing comparisons.
@@ -395,7 +404,7 @@ class EmailMultiAlternatives(EmailMessage):
 
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
             connection=None, attachments=None, headers=None, alternatives=None,
-            cc=None):
+            cc=None, reply_to=None):
         """
         Initialize a single email message (which can be sent to multiple
         recipients).
@@ -405,7 +414,8 @@ class EmailMultiAlternatives(EmailMessage):
         conversions.
         """
         super(EmailMultiAlternatives, self).__init__(
-            subject, body, from_email, to, bcc, connection, attachments, headers, cc
+            subject, body, from_email, to, bcc, connection, attachments,
+            headers, cc, reply_to,
         )
         self.alternatives = alternatives or []
 
