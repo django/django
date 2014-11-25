@@ -4,7 +4,7 @@ Django 1.7.3 release notes
 
 *Under development*
 
-Django 1.7.3 fixes several bugs in 1.7.2.
+Django 1.7.3 fixes several security issues and bugs in 1.7.2.
 
 
 
