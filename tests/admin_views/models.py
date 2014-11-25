@@ -855,13 +855,19 @@ class InlineReferer(models.Model):
     refs = models.ManyToManyField(InlineReference)
 
 
-# Models for #23604
+# Models for #23604 and #23915
 class Recipe(models.Model):
-    pass
+    rname = models.CharField(max_length=20, unique=True)
 
 
 class Ingredient(models.Model):
-    recipes = models.ManyToManyField(Recipe)
+    iname = models.CharField(max_length=20, unique=True)
+    recipes = models.ManyToManyField(Recipe, through='RecipeIngredient')
+
+
+class RecipeIngredient(models.Model):
+    ingredient = models.ForeignKey(Ingredient, to_field='iname')
+    recipe = models.ForeignKey(Recipe, to_field='rname')
 
 
 # Model for #23839
