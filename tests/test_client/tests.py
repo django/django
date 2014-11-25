@@ -26,6 +26,7 @@ import warnings
 
 from django.core import mail
 from django.http import HttpResponse
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.test import Client, TestCase, RequestFactory
 from django.test import override_settings
 
@@ -176,12 +177,14 @@ class ClientTest(TestCase):
 
     def test_permanent_redirect(self):
         "GET a URL that redirects permanently elsewhere"
-        with warnings.catch_warnings(record=True):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
             response = self.client.get('/permanent_redirect_view/')
             # Check that the response was a 301 (permanent redirect)
             self.assertRedirects(response, 'http://testserver/get_view/', status_code=301)
 
-        with warnings.catch_warnings(record=True):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
             client_providing_host = Client(HTTP_HOST='django.testserver')
             response = client_providing_host.get('/permanent_redirect_view/')
             # Check that the response was a 301 (permanent redirect) with absolute URI
@@ -195,7 +198,8 @@ class ClientTest(TestCase):
 
     def test_redirect_to_strange_location(self):
         "GET a URL that redirects to a non-200 page"
-        with warnings.catch_warnings(record=True):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
             response = self.client.get('/double_redirect_view/')
 
             # Check that the response was a 302, and that
@@ -204,20 +208,23 @@ class ClientTest(TestCase):
 
     def test_follow_redirect(self):
         "A URL that redirects can be followed to termination."
-        with warnings.catch_warnings(record=True):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
             response = self.client.get('/double_redirect_view/', follow=True)
             self.assertRedirects(response, 'http://testserver/get_view/', status_code=302, target_status_code=200)
         self.assertEqual(len(response.redirect_chain), 2)
 
     def test_redirect_http(self):
         "GET a URL that redirects to an http URI"
-        with warnings.catch_warnings(record=True):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
             response = self.client.get('/http_redirect_view/', follow=True)
         self.assertFalse(response.test_was_secure_request)
 
     def test_redirect_https(self):
         "GET a URL that redirects to an https URI"
-        with warnings.catch_warnings(record=True):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
             response = self.client.get('/https_redirect_view/', follow=True)
         self.assertTrue(response.test_was_secure_request)
 
