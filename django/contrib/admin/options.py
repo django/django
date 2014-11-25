@@ -459,6 +459,12 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         if field.primary_key:
             return True
 
+        # Allow reverse relationships to models defining m2m fields if they
+        # target the specified field.
+        for many_to_many in opts.many_to_many:
+            if many_to_many.m2m_target_field_name() == to_field:
+                return True
+
         # Make sure at least one of the models registered for this site
         # references this field through a FK or a M2M relationship.
         registered_models = set()
@@ -467,7 +473,8 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             for inline in admin.inlines:
                 registered_models.add(inline.model)
 
-        for related_object in opts.get_all_related_objects(include_hidden=True):
+        for related_object in (opts.get_all_related_objects(include_hidden=True) +
+                               opts.get_all_related_many_to_many_objects()):
             related_model = related_object.model
             if (any(issubclass(model, related_model) for model in registered_models) and
                     related_object.field.rel.get_related_field() == field):
