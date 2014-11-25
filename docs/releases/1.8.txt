@@ -210,6 +210,9 @@ Email
 * The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now supports
   setting the ``timeout`` parameter with the :setting:`EMAIL_TIMEOUT` setting.
 
+* :class:`~django.core.mail.EmailMessage` and ``EmailMultiAlternatives`` now
+  support the ``reply_to`` parameter.
+
 File Storage
 ^^^^^^^^^^^^
 
