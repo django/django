@@ -7,11 +7,10 @@ import getpass
 import unicodedata
 
 from django.apps import apps
-from django.contrib.auth import models as auth_app, get_permission_codename
+from django.contrib.auth import get_permission_codename
 from django.core import exceptions
 from django.core.management.base import CommandError
 from django.db import DEFAULT_DB_ALIAS, router
-from django.db.models import signals
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils import six
 
@@ -149,6 +148,9 @@ def get_default_username(check_db=True):
     :returns: The username, or an empty string if no username can be
         determined.
     """
+    # This file is used in apps.py, it should not trigger models import.
+    from django.contrib.auth import models as auth_app
+
     # If the User model has been swapped out, we can't make any assumptions
     # about the default user name.
     if auth_app.User._meta.swapped:
@@ -177,7 +179,3 @@ def get_default_username(check_db=True):
         else:
             return ''
     return default_username
-
-
-signals.post_migrate.connect(create_permissions,
-    dispatch_uid="django.contrib.auth.management.create_permissions")
