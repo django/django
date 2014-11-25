@@ -99,29 +99,40 @@ class MigrationGraph(object):
                 leaves.add(node)
         return sorted(leaves)
 
+    def ensure_not_cyclic(self, start, get_children):
+        # Algo from GvR:
+        # http://neopythonic.blogspot.co.uk/2009/01/detecting-cycles-in-directed-graph.html
+        todo = set(self.nodes.keys())
+        while todo:
+            node = todo.pop()
+            stack = [node]
+            while stack:
+                top = stack[-1]
+                for node in get_children(top):
+                    if node in stack:
+                        cycle = stack[stack.index(node):]
+                        raise CircularDependencyError(", ".join("%s.%s" % n for n in cycle))
+                    if node in todo:
+                        stack.append(node)
+                        todo.remove(node)
+                        break
+                else:
+                    node = stack.pop()
+
     def dfs(self, start, get_children):
         """
         Iterative depth first search, for finding dependencies.
         """
+        self.ensure_not_cyclic(start, get_children)
         visited = deque()
         visited.append(start)
-        path = [start]
         stack = deque(sorted(get_children(start)))
         while stack:
             node = stack.popleft()
-
-            if node in path:
-                raise CircularDependencyError()
-            path.append(node)
-
             visited.appendleft(node)
             children = sorted(get_children(node), reverse=True)
             # reverse sorting is needed because prepending using deque.extendleft
             # also effectively reverses values
-
-            if path[-1] == node:
-                path.pop()
-
             stack.extendleft(children)
 
         return list(OrderedSet(visited))
