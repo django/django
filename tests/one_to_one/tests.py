@@ -97,9 +97,12 @@ class OneToOneTests(TestCase):
         assert_filter_waiters(restaurant__place__exact=self.p1)
         assert_filter_waiters(restaurant__place__pk=self.p1.pk)
         assert_filter_waiters(restaurant__exact=self.r1.pk)
+        assert_filter_waiters(restaurant__exact=self.r1)
         assert_filter_waiters(restaurant__pk=self.r1.pk)
         assert_filter_waiters(restaurant=self.r1.pk)
         assert_filter_waiters(restaurant=self.r1)
+        assert_filter_waiters(id__exact=w.pk)
+        assert_filter_waiters(pk=w.pk)
         # Delete the restaurant; the waiter should also be removed
         r = Restaurant.objects.get(pk=self.r1.pk)
         r.delete()
