@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^redirect_to_non_existent_view/$', RedirectView.as_view(url='/non_existent_view/')),
     url(r'^redirect_to_non_existent_view2/$', RedirectView.as_view(url='/redirect_to_non_existent_view/')),
     url(r'^redirect_to_self/$', RedirectView.as_view(url='/redirect_to_self/')),
+    url(r'^redirect_to_self_with_changing_query_view/$', views.redirect_to_self_with_changing_query_view),
     url(r'^circular_redirect_1/$', RedirectView.as_view(url='/circular_redirect_2/')),
     url(r'^circular_redirect_2/$', RedirectView.as_view(url='/circular_redirect_3/')),
     url(r'^circular_redirect_3/$', RedirectView.as_view(url='/circular_redirect_1/')),
