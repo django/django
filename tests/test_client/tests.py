@@ -22,18 +22,19 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
+import warnings
+
 from django.core import mail
 from django.http import HttpResponse
 from django.test import Client, TestCase, RequestFactory
 from django.test import override_settings
-from django.test.utils import IgnoreDeprecationWarningsMixin
 
 from .views import get_view, post_view, trace_view
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='test_client.urls',)
-class ClientTest(IgnoreDeprecationWarningsMixin, TestCase):
+class ClientTest(TestCase):
     fixtures = ['testdata.json']
 
     def test_get_view(self):
@@ -175,14 +176,16 @@ class ClientTest(IgnoreDeprecationWarningsMixin, TestCase):
 
     def test_permanent_redirect(self):
         "GET a URL that redirects permanently elsewhere"
-        response = self.client.get('/permanent_redirect_view/')
-        # Check that the response was a 301 (permanent redirect)
-        self.assertRedirects(response, 'http://testserver/get_view/', status_code=301)
+        with warnings.catch_warnings(record=True):
+            response = self.client.get('/permanent_redirect_view/')
+            # Check that the response was a 301 (permanent redirect)
+            self.assertRedirects(response, 'http://testserver/get_view/', status_code=301)
 
-        client_providing_host = Client(HTTP_HOST='django.testserver')
-        response = client_providing_host.get('/permanent_redirect_view/')
-        # Check that the response was a 301 (permanent redirect) with absolute URI
-        self.assertRedirects(response, 'http://django.testserver/get_view/', status_code=301)
+        with warnings.catch_warnings(record=True):
+            client_providing_host = Client(HTTP_HOST='django.testserver')
+            response = client_providing_host.get('/permanent_redirect_view/')
+            # Check that the response was a 301 (permanent redirect) with absolute URI
+            self.assertRedirects(response, 'http://django.testserver/get_view/', status_code=301)
 
     def test_temporary_redirect(self):
         "GET a URL that does a non-permanent redirect"
@@ -192,26 +195,30 @@ class ClientTest(IgnoreDeprecationWarningsMixin, TestCase):
 
     def test_redirect_to_strange_location(self):
         "GET a URL that redirects to a non-200 page"
-        response = self.client.get('/double_redirect_view/')
+        with warnings.catch_warnings(record=True):
+            response = self.client.get('/double_redirect_view/')
 
-        # Check that the response was a 302, and that
-        # the attempt to get the redirection location returned 301 when retrieved
-        self.assertRedirects(response, 'http://testserver/permanent_redirect_view/', target_status_code=301)
+            # Check that the response was a 302, and that
+            # the attempt to get the redirection location returned 301 when retrieved
+            self.assertRedirects(response, 'http://testserver/permanent_redirect_view/', target_status_code=301)
 
     def test_follow_redirect(self):
         "A URL that redirects can be followed to termination."
-        response = self.client.get('/double_redirect_view/', follow=True)
-        self.assertRedirects(response, 'http://testserver/get_view/', status_code=302, target_status_code=200)
+        with warnings.catch_warnings(record=True):
+            response = self.client.get('/double_redirect_view/', follow=True)
+            self.assertRedirects(response, 'http://testserver/get_view/', status_code=302, target_status_code=200)
         self.assertEqual(len(response.redirect_chain), 2)
 
     def test_redirect_http(self):
         "GET a URL that redirects to an http URI"
-        response = self.client.get('/http_redirect_view/', follow=True)
+        with warnings.catch_warnings(record=True):
+            response = self.client.get('/http_redirect_view/', follow=True)
         self.assertFalse(response.test_was_secure_request)
 
     def test_redirect_https(self):
         "GET a URL that redirects to an https URI"
-        response = self.client.get('/https_redirect_view/', follow=True)
+        with warnings.catch_warnings(record=True):
+            response = self.client.get('/https_redirect_view/', follow=True)
         self.assertTrue(response.test_was_secure_request)
 
     def test_notfound_response(self):
