@@ -1697,6 +1697,8 @@ class TemplateTests(TestCase):
                 datetime.now().day, datetime.now().month, datetime.now().year)),
             'now06': ('''{% now "j 'n' Y"%}''', {}, '''%d '%d' %d''' % (
                 datetime.now().day, datetime.now().month, datetime.now().year)),
+            'now07': ('''{% now "j n Y" as N %}-{{N}}-''', {}, '''-%d %d %d-''' % (
+                datetime.now().day, datetime.now().month, datetime.now().year)),
 
             ### URL TAG ########################################################
             # Successes

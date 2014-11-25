@@ -799,6 +799,18 @@ This would display as "It is the 4th of September".
 
         It is {% now "SHORT_DATETIME_FORMAT" %}
 
+
+You can also use the syntax ``{% now "Y" as current_year %}`` to store the
+output inside a variable. This is useful if you want to use ``{% now %}``
+inside a template tag like :ttag:`blocktrans` for example::
+
+    {% now "Y" as current_year %}
+    {% blocktrans %}Copyright {{ current_year }}{% endblocktrans %}
+
+.. versionadded:: 1.8
+
+The ability to use the "as" syntax was added.
+
 .. templatetag:: regroup
 
 regroup
