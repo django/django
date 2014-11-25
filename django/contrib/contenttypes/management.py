@@ -1,6 +1,5 @@
 from django.apps import apps
 from django.db import DEFAULT_DB_ALIAS, router
-from django.db.models import signals
 from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.six.moves import input
@@ -90,9 +89,6 @@ If you're unsure, answer 'no'.
 def update_all_contenttypes(**kwargs):
     for app_config in apps.get_app_configs():
         update_contenttypes(app_config, **kwargs)
-
-
-signals.post_migrate.connect(update_contenttypes)
 
 
 if __name__ == "__main__":
