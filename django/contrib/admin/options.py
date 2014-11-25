@@ -599,6 +599,48 @@ class ModelAdmin(BaseModelAdmin):
 
         return inline_instances
 
+    def get_queryset(self, request):
+        queryset = super(ModelAdmin, self).get_queryset(request)
+        prefetch_lookups = []
+        for inline_class in self.inlines:
+            inline_lookups = self._get_prefetch_lookups(inline_class, request)
+            if inline_lookups:
+                prefetch_lookups.extend(inline_lookups)
+        if prefetch_lookups:
+            queryset = queryset.prefetch_related(*prefetch_lookups)
+        return queryset
+
+    def _get_prefetch_lookups(self, inline_class, request):
+        prefetch_field_names = []
+        inline = inline_class(self.model, self.admin_site)
+        field_names = flatten_fieldsets(inline.get_fieldsets(request))
+        opts = inline.model._meta
+        for field_name in field_names:
+            try:
+                field = opts.get_field(field_name)
+            except FieldDoesNotExist:
+                continue
+            if isinstance(field, (models.ForeignKey, models.ManyToManyField)):
+                if field.rel.to != self.model:
+                    prefetch_field_names.append(field_name)
+        if prefetch_field_names:
+            prefix = self._get_prefetch_lookup_prefix(inline_class)
+            if prefix:
+                return [models.Prefetch('{}__{}'.format(prefix, prefetch_field_name),
+                                        inline.get_queryset(request))
+                        for prefetch_field_name in prefetch_field_names]
+
+    def _get_prefetch_lookup_prefix(self, inline_class):
+        if inline_class.fk_name:
+            return inline_class.fk_name
+        inline_model = inline_class.model
+        opts = self.model._meta
+        related_objects = opts.get_all_related_objects()
+        for related_object in related_objects:
+            related_model = related_object.model
+            if related_model == inline_model:
+                return related_object.get_accessor_name()
+
     def get_urls(self):
         from django.conf.urls import url
 

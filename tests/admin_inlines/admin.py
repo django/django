@@ -8,7 +8,7 @@ from .models import (
     Inner4Tabular, NonAutoPKBook, Novel, ParentModelWithCustomPk, Poll,
     Profile, ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness,
     Sighting, SomeChildModel, SomeParentModel, SottoCapo, Title,
-    TitleCollection,
+    TitleCollection, PrefetchHolder, PrefetchInline
 )
 
 site = admin.AdminSite(name="admin")
@@ -194,6 +194,17 @@ class SomeChildModelInline(admin.TabularInline):
     form = SomeChildModelForm
 
 
+# admin for #5372
+class PrefetchInlineAdmin(admin.TabularInline):
+    model = PrefetchInline
+    extra = 10
+    fields = ('name', 'detail',)
+
+
+class PrefetchHolderAdmin(admin.ModelAdmin):
+    inlines = (PrefetchInlineAdmin,)
+
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -215,3 +226,5 @@ site.register(BinaryTree, inlines=[BinaryTreeAdmin])
 site.register(ExtraTerrestrial, inlines=[SightingInline])
 site.register(SomeParentModel, inlines=[SomeChildModelInline])
 site.register([Question, Inner4Stacked, Inner4Tabular])
+# admin for #5372
+site.register(PrefetchHolder, PrefetchHolderAdmin)

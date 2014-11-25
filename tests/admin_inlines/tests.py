@@ -11,12 +11,13 @@ from django.test import TestCase, override_settings, RequestFactory
 from django.utils.encoding import force_text
 
 # local test models
-from .admin import InnerInline, site as admin_site
+from .admin import InnerInline, PrefetchHolderAdmin, site as admin_site
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
     ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
     Sighting, Novel, Chapter, FootNote, BinaryTree, SomeParentModel,
-    SomeChildModel, Poll, Question, Inner4Stacked, Inner4Tabular, Holder4)
+    SomeChildModel, Poll, Question, Inner4Stacked, Inner4Tabular, Holder4,
+    PrefetchHolder, PrefetchInline, PrefetchInlineDetail)
 
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
 
@@ -832,3 +833,39 @@ class SeleniumChromeTests(SeleniumFirefoxTests):
 
 class SeleniumIETests(SeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF="admin_inlines.urls")
+class TestInlinePrefetch(TestCase):
+    """
+    Make sure the admin prefetches foreign key fields for inline models.
+    Refs #5372.
+
+    """
+
+    def setUp(self):
+        self.detail = PrefetchInlineDetail.objects.create(name='the detail')
+        self.holder = PrefetchHolder.objects.create(name='the holder')
+        self.inline = PrefetchInline.objects.create(
+            name='the inline', holder=self.holder, detail=self.detail)
+        self.change_url = '/admin/admin_inlines/prefetchholder/%i/' % self.holder.id
+        self.user = User(username='admin')
+        self.user.is_staff = True
+        self.user.is_active = True
+        self.user.set_password('secret')
+        self.user.save()
+        self.factory = RequestFactory()
+
+    def test_prefetch(self):
+        """
+        ModelAdmin should prefetch inline foreign key fields.
+        """
+        modeladmin = PrefetchHolderAdmin(PrefetchHolder, admin_site)
+        request = self.factory.get(self.change_url)
+        request.user = self.user
+        queryset = modeladmin.get_queryset(request)
+        lookups = queryset._prefetch_related_lookups
+        self.assertEqual(1, len(lookups))
+        prefetch = lookups[0]
+        self.assertEqual('prefetchinline_set__detail', prefetch.prefetch_to)
