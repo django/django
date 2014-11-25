@@ -419,6 +419,9 @@ Templates
 * Added a :class:`locmem.Loader <django.template.loaders.locmem.Loader>`
   class that loads Django templates from a Python dictionary.
 
+* The :ttag:`now` tag can now store its output in a context variable with the
+  usual syntax: ``{% now 'j n Y' as varname %}``.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
