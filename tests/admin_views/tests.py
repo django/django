@@ -616,16 +616,12 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get("/test_admin/admin/admin_views/notreferenced/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
-        # Specifying a field referenced by another model though a m2m should be allowed.
-        # XXX: We're not testing against a non-primary key field since the admin doesn't
-        # support it yet, ref #23862
-        response = self.client.get("/test_admin/admin/admin_views/recipe/", {TO_FIELD_VAR: 'id'})
+        # #23915 - Specifying a field referenced by another model though a m2m should be allowed.
+        response = self.client.get("/test_admin/admin/admin_views/recipe/", {TO_FIELD_VAR: 'rname'})
         self.assertEqual(response.status_code, 200)
 
-        # #23604 - Specifying a field referenced through a reverse m2m relationship should be allowed.
-        # XXX: We're not testing against a non-primary key field since the admin doesn't
-        # support it yet, ref #23862
-        response = self.client.get("/test_admin/admin/admin_views/ingredient/", {TO_FIELD_VAR: 'id'})
+        # #23604, #23915 - Specifying a field referenced through a reverse m2m relationship should be allowed.
+        response = self.client.get("/test_admin/admin/admin_views/ingredient/", {TO_FIELD_VAR: 'iname'})
         self.assertEqual(response.status_code, 200)
 
         # #23329 - Specifying a field that is not referred by any other model directly registered
