@@ -12,7 +12,7 @@ This document outlines all it can do.
 
 In addition, ``manage.py`` is automatically created in each Django project.
 ``manage.py`` is a thin wrapper around ``django-admin`` that takes care of
-two things for you before delegating to ``django-admin``:
+several things for you before delegating to ``django-admin``:
 
 * It puts your project's package on ``sys.path``.
 
