@@ -1,6 +1,7 @@
 import warnings
 
 from django.conf.urls import patterns, url, include
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .views import (
     absolute_kwargs_view, defaults_view, empty_view, empty_view_partial,
@@ -14,8 +15,8 @@ other_patterns = [
 ]
 
 # test deprecated patterns() function. convert to list of urls() in Django 2.0
-with warnings.catch_warnings(record=True):
-    warnings.filterwarnings('ignore', module='django.conf.urls')
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore', category=RemovedInDjango20Warning)
 
     urlpatterns = patterns('',
         url(r'^places/([0-9]+)/$', empty_view, name='places'),

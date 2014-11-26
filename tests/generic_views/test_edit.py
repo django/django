@@ -62,6 +62,8 @@ class FormMixinTests(TestCase):
 
     def test_get_form_missing_form_class_default_value(self):
         with warnings.catch_warnings(record=True) as w:
+            warnings.filterwarnings('always')
+
             class MissingDefaultValue(FormMixin):
                 request = RequestFactory().get('/')
                 form_class = forms.Form

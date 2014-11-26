@@ -1,14 +1,15 @@
 import warnings
 
 from django.conf.urls import url
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from . import views
 
 # Test deprecated behavior of passing strings as view to url().
 # Some of these can be removed in Django 2.0 as they aren't convertable to
-# callabls.
-with warnings.catch_warnings(record=True):
-    warnings.filterwarnings('ignore', module='django.conf.urls')
+# callables.
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore', category=RemovedInDjango20Warning)
     urlpatterns = [
         # View has erroneous import
         url(r'erroneous_inner/$', views.erroneous_view),
