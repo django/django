@@ -20,8 +20,8 @@ from django.utils._os import upath
 from django.utils import six
 
 
-warnings.simplefilter("default", RemovedInDjango19Warning)
-warnings.simplefilter("default", RemovedInDjango20Warning)
+warnings.simplefilter("error", RemovedInDjango19Warning)
+warnings.simplefilter("error", RemovedInDjango20Warning)
 
 CONTRIB_MODULE_PATH = 'django.contrib'
 

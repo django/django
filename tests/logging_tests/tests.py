@@ -101,6 +101,7 @@ class WarningLoggerTests(TestCase):
         # undocumented and (I assume) brittle.
         self._old_capture_state = bool(getattr(logging, '_warnings_showwarning', False))
         logging.captureWarnings(True)
+        warnings.filterwarnings('always')
 
         # this convoluted setup is to avoid printing this deprecation to
         # stderr during test running - as the test runner forces deprecations
