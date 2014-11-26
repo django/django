@@ -416,6 +416,7 @@ class TestInlineAdminForm(TestCase):
         iaf2 = InlineAdminForm(None, None, {}, {}, poll)
         poll_ct = ContentType.objects.get_for_model(Poll)
         with warnings.catch_warnings(record=True) as recorded:
+            warnings.filterwarnings('always')
             with self.assertRaises(AttributeError):
                 iaf.original_content_type_id
             msg = force_text(recorded.pop().message)

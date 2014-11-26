@@ -176,12 +176,11 @@ There are a couple reasons that code in Django might be deprecated:
 As the :ref:`deprecation policy<internal-release-deprecation-policy>` describes,
 the first release of Django that deprecates a feature (``A.B``) should raise a
 ``RemovedInDjangoXXWarning`` (where XX is the Django version where the feature
-will be removed) when the deprecated feature is invoked. Assuming
-we have a good test coverage, these warnings will be shown by the test suite
-when :ref:`running it <running-unit-tests>` with warnings enabled:
-``python -Wall runtests.py``. This is annoying and the output of the test suite
-should remain clean. Thus, when adding a ``RemovedInDjangoXXWarning`` you need
-to eliminate or silence any warnings generated when running the tests.
+will be removed) when the deprecated feature is invoked. Assuming we have good
+test coverage, these warnings are converted to errors when :ref:`running the
+test suite <running-unit-tests>` with warnings enabled:
+``python -Wall runtests.py``. Thus, when adding a ``RemovedInDjangoXXWarning``
+you need to eliminate or silence any warnings generated when running the tests.
 
 The first step is to remove any use of the deprecated behavior by Django itself.
 Next you can silence warnings in tests that actually test the deprecated
@@ -191,9 +190,11 @@ behavior in one of two ways:
 
     import warnings
 
+    from django.utils.deprecation import RemovedInDjangoXXWarning
+
     def test_foo(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RemovedInDjangoXXWarning)
             # invoke deprecated behavior
         # go ahead with the rest of the test
 
@@ -206,6 +207,20 @@ behavior in one of two ways:
 
     class MyDeprecatedTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
         ...
+
+You can also add a test for the deprecation warning. You'll have to disable the
+"warning as error" behavior in your test by doing::
+
+    import warnings
+
+    def test_foo_deprecation_warning(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')  # prevent warnings from appearing as errors
+            # invoke deprecated behavior
+
+        self.assertEqual(len(warns), 1)
+        msg = str(warns[0].message)
+        self.assertEqual(msg, 'Expected deprecation message')
 
 Finally, there are a couple of updates to Django's documentation to make:
 
