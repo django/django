@@ -134,6 +134,20 @@ class GraphTests(TestCase):
             graph.forwards_plan, ("app_a", "0003"),
         )
 
+    def test_circular_graph_2(self):
+        graph = MigrationGraph()
+        graph.add_node(('A', '0001'), None)
+        graph.add_node(('C', '0001'), None)
+        graph.add_node(('B', '0001'), None)
+        graph.add_dependency('A.0001', ('A', '0001'),('B', '0001'))
+        graph.add_dependency('B.0001', ('B', '0001'),('A', '0001'))
+        graph.add_dependency('C.0001', ('C', '0001'),('B', '0001'))
+
+        self.assertRaises(
+            CircularDependencyError,
+            graph.forwards_plan, ('C', '0001')
+        )
+
     def test_dfs(self):
         graph = MigrationGraph()
         root = ("app_a", "1")
@@ -188,3 +202,30 @@ class GraphTests(TestCase):
         msg = "Migration app_a.0002 dependencies reference nonexistent child node ('app_a', '0002')"
         with self.assertRaisesMessage(KeyError, msg):
             graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
+
+    def test_infinite_loop(self):
+        """
+        Tests a complex dependency graph:
+
+        app_a:        0001 <-
+                             \
+        app_b:        0001 <- x 0002 <-
+                       /               \
+        app_c:   0001<-  <------------- x 0002
+
+        And apply sqashing on app_c.
+        """
+        graph = MigrationGraph()
+
+        graph.add_node(("app_a", "0001"), None)
+        graph.add_node(("app_b", "0001"), None)
+        graph.add_node(("app_b", "0002"), None)
+        graph.add_node(("app_c", "0001_squashed_0002"), None)
+
+        graph.add_dependency("app_b.0001", ("app_b", "0001"), ("app_c", "0001_squashed_0002"))
+        graph.add_dependency("app_b.0002", ("app_b", "0002"), ("app_a", "0001"))
+        graph.add_dependency("app_b.0002", ("app_b", "0002"), ("app_b", "0001"))
+        graph.add_dependency("app_c.0001_squashed_0002", ("app_c", "0001_squashed_0002"), ("app_b", "0002"))
+
+        with self.assertRaises(CircularDependencyError):
+            graph.forwards_plan(("app_c", "0001_squashed_0002"))
