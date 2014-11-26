@@ -1,5 +1,3 @@
-.. _ref-gis-utils:
-
 ===================
 GeoDjango Utilities
 ===================
