@@ -86,3 +86,6 @@ Bugfixes
 
 * Fixed a regression with dynamically generated inlines and allowed field
   references in the admin (:ticket:`23754`).
+
+* Fixed an infinite loop bug for certain cyclic migration dependencies, and made
+  the error message for cyclic dependencies much more helpful.
