@@ -1,5 +1,3 @@
-.. _ref-gis-model-api:
-
 ===================
 GeoDjango Model API
 ===================

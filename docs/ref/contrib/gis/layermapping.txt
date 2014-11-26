@@ -1,5 +1,3 @@
-.. _ref-layermapping:
-
 ====================================
 ``LayerMapping`` data import utility
 ====================================

@@ -370,13 +370,12 @@ methods are new in 1.2:
 * :meth:`~django.contrib.gis.db.models.GeoQuerySet.reverse_geom`
 * :meth:`~django.contrib.gis.db.models.GeoQuerySet.geohash`
 
-The :ref:`GEOS interface <ref-geos>` was updated to use
-thread-safe C library functions when available on the platform.
+The GEOS interface was updated to use thread-safe C library functions when
+available on the platform.
 
-The :ref:`GDAL interface <ref-gdal>` now allows the user to
-set a :attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on
-the features returned when iterating over a
-:class:`~django.contrib.gis.gdal.Layer`.
+The GDAL interface now allows the user to set a
+:attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on the features returned
+when iterating over a :class:`~django.contrib.gis.gdal.Layer`.
 
 Finally, :doc:`GeoDjango's documentation </ref/contrib/gis/index>` is now
 included with Django's and is no longer

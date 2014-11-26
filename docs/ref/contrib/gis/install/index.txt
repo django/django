@@ -1,5 +1,3 @@
-.. _ref-gis-install:
-
 ======================
 GeoDjango Installation
 ======================
@@ -12,7 +10,7 @@ In general, GeoDjango installation requires:
 
 1. :ref:`Python and Django <django>`
 2. :ref:`spatial_database`
-3. :ref:`geospatial_libs`
+3. :doc:`geolibs`
 
 Details for each of the requirements and installation instructions
 are provided in the sections below. In addition, platform-specific
@@ -40,7 +38,6 @@ Python and Django
 Because GeoDjango is included with Django, please refer to Django's
 :ref:`installation instructions <installing-official-release>` for details on
 how to install.
-
 
 .. _spatial_database:
 

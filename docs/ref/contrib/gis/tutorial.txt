@@ -23,7 +23,7 @@ familiarize yourself with Django first.
 .. note::
 
     GeoDjango has additional requirements beyond what Django requires --
-    please consult the :ref:`installation documentation <ref-gis-install>`
+    please consult the :doc:`installation documentation <install/index>`
     for more details.
 
 This tutorial will guide you through the creation of a geographic web
@@ -326,9 +326,9 @@ database:
 Importing Spatial Data
 ======================
 
-This section will show you how to import the world borders
-shapefile into the database via GeoDjango models using the
-:ref:`ref-layermapping`.
+This section will show you how to import the world borders shapefile into the
+database via GeoDjango models using the :doc:`layermapping`.
+
 There are many different ways to import data into a spatial database --
 besides the tools included within GeoDjango, you may also use the following:
 
@@ -530,7 +530,7 @@ Next, import the ``load`` module, call the ``run`` routine, and watch
 Try ``ogrinspect``
 ------------------
 Now that you've seen how to define geographic models and import data with the
-:ref:`ref-layermapping`, it's possible to further automate this process with
+:doc:`layermapping`, it's possible to further automate this process with
 use of the :djadmin:`ogrinspect` management command.  The :djadmin:`ogrinspect`
 command  introspects a GDAL-supported vector data source (e.g., a shapefile)
 and generates a model definition and ``LayerMapping`` dictionary automatically.
@@ -631,7 +631,7 @@ a ``contains`` lookup using the ``pnt_wkt`` as the parameter::
 Here, you retrieved a ``GeoQuerySet`` with only one model: the border of
 the United States (exactly what you would expect).
 
-Similarly, you may also use a :ref:`GEOS geometry object <ref-geos>`.
+Similarly, you may also use a :doc:`GEOS geometry object <geos>`.
 Here, you can combine the ``intersects`` spatial lookup with the ``get``
 method to retrieve only the ``WorldBorder`` instance for San Marino instead
 of a queryset::
@@ -643,7 +643,7 @@ of a queryset::
     <WorldBorder: San Marino>
 
 The ``contains`` and ``intersects`` lookups are just a subset of the
-available queries -- the :ref:`ref-gis-db-api` documentation has more.
+available queries -- the :doc:`db-api` documentation has more.
 
 Automatic Spatial Transformations
 ---------------------------------
@@ -787,7 +787,7 @@ available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
 First, there are some important requirements:
 
 * :class:`~django.contrib.gis.admin.OSMGeoAdmin` requires that
-  :ref:`GDAL <ref-gdal>` is installed. If you are running GDAL 1.6 (uncommon)
+  :doc:`GDAL <gdal>` is installed. If you are running GDAL 1.6 (uncommon)
   you will also need to add the :ref:`spherical mercator projection
   <addgoogleprojection>`  to the ``spatial_ref_sys`` table.
 

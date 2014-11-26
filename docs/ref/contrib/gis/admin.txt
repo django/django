@@ -1,12 +1,9 @@
-.. _ref-gis-admin:
-
 ======================
 GeoDjango's admin site
 ======================
 
 .. module:: django.contrib.gis.admin
    :synopsis: GeoDjango's extensions to the admin site.
-
 
 ``GeoModelAdmin``
 =================

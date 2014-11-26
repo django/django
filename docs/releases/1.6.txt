@@ -131,9 +131,9 @@ binary data in the database.
 GeoDjango form widgets
 ~~~~~~~~~~~~~~~~~~~~~~
 
-GeoDjango now provides :ref:`form fields and widgets <ref-gis-forms-api>` for
-its geo-specialized fields. They are OpenLayers-based by default, but they can
-be customized to use any other JS framework.
+GeoDjango now provides :doc:`form fields and widgets </ref/contrib/gis/forms-api>`
+for its geo-specialized fields. They are OpenLayers-based by default, but they
+can be customized to use any other JS framework.
 
 ``check`` management command added for verifying compatibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

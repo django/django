@@ -1,5 +1,3 @@
-.. _geospatial_libs:
-
 ===============================
 Installing Geospatial libraries
 ===============================
@@ -10,10 +8,10 @@ geospatial libraries:
 ========================  ====================================  ================================  ==========================
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ==========================
-:ref:`GEOS <ref-geos>`    Geometry Engine Open Source           Yes                               3.4, 3.3, 3.2
+:doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.4, 3.3, 3.2
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.8, 4.7, 4.6, 4.5, 4.4
-:ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   Yes (SQLite only)                 1.10, 1.9, 1.8, 1.7
-:ref:`GeoIP <ref-geoip>`  IP-based geolocation library          No                                1.4
+:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes (SQLite only)                 1.10, 1.9, 1.8, 1.7
+:doc:`GeoIP <../geoip>`   IP-based geolocation library          No                                1.4
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.1, 2.0, 1.5
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.1, 4.0, 3.0, 2.4
 ========================  ====================================  ================================  ==========================
@@ -42,7 +40,7 @@ totally fine with GeoDjango. Your mileage may vary.
 .. admonition::  Install GDAL
 
     While :ref:`gdalbuild` is technically not required, it is *recommended*.
-    Important features of GeoDjango (including the :ref:`ref-layermapping`,
+    Important features of GeoDjango (including the :doc:`../layermapping`,
     geometry reprojection, and the geographic admin) depend on its
     functionality.
 
@@ -66,7 +64,7 @@ install, directly or by dependency, the required geospatial libraries:
 
 Optional packages to consider:
 
-* ``libgeoip1``: for :ref:`GeoIP <ref-geoip>` support
+* ``libgeoip1``: for :doc:`GeoIP <../geoip>` support
 * ``gdal-bin``: for GDAL command line programs like ``ogr2ogr``
 * ``python-gdal`` for GDAL's own Python bindings -- includes interfaces for raster manipulation
 
@@ -195,7 +193,7 @@ GDAL
 
 `GDAL`__ is an excellent open source geospatial library that has support for
 reading most vector and raster spatial data formats.  Currently, GeoDjango only
-supports :ref:`GDAL's vector data <ref-gdal>` capabilities [#]_.
+supports :doc:`GDAL's vector data <../gdal>` capabilities [#]_.
 :ref:`geosbuild` and :ref:`proj4` should be installed prior to building GDAL.
 
 First download the latest GDAL release version and untar the archive::
