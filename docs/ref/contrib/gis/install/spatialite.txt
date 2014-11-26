@@ -164,8 +164,14 @@ to build and install::
 Mac OS X-specific instructions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Mac OS X users should follow the instructions in the :ref:`kyngchaos` section,
-as it is much easier than building from source.
+In order to install SpatiaLite library and tools, Mac OS X users can choose
+to use :ref:`kyngchaos` or `Homebrew`__.
+
+
+Kyngchaos
+^^^^^^^^^
+
+Follow the instructions in the :ref:`kyngchaos` section.
 
 When :ref:`create_spatialite_db`, the ``spatialite`` program is required.
 However, instead of attempting to compile the SpatiaLite tools from source,
@@ -183,6 +189,27 @@ add the following to your ``settings.py``::
     SPATIALITE_LIBRARY_PATH='/Library/Frameworks/SQLite3.framework/SQLite3'
 
 __ http://www.gaia-gis.it/spatialite-2.3.1/binaries.html
+__ http://brew.sh/
+
+
+Homebrew
+^^^^^^^^
+
+`Homebrew`__ handles whole SpatiaLite related packages on your behalf, including
+SQLite3, SpatiaLite library, PROJ, and GEOS. GDAL should be installed
+respectively::
+
+    $ brew update
+    $ brew install spatialite-tools
+    $ brew install gdal
+
+Finally, for GeoDjango to be able to find the SpatiaLite library, add the
+following to your ``settings.py``::
+
+    SPATIALITE_LIBRARY_PATH='/usr/local/lib/mod_spatialite.dylib'
+
+__ http://brew.sh/
+
 
 .. _create_spatialite_db:
 
@@ -207,3 +234,17 @@ You can safely ignore the error messages shown.
     The parameter ``geodjango.db`` is the *filename* of the SQLite database
     you want to use.  Use the same in the :setting:`DATABASES` ``"name"`` key
     inside your ``settings.py``.
+
+.. note::
+
+    When running ``manage.py syncdb`` with SQLite (or SpatiaLite) database
+    setting, the database file will be automatically created, if it doesn't
+    exist. In this case, If your model contains any geometry columns, it
+    leads to this error::
+
+        CreateSpatialIndex() error: "no such table: geometry_columns"
+
+    It's because the table creation queries are executed without spatial
+    metadata tables. To avoid this, make the database file before executing
+    ``manage.py syncdb``. Refers to above :ref:`Creating a spatial database
+    for SpatiaLite<create_spatialite_db>`.
