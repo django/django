@@ -1,8 +1,39 @@
+import glob
 import os
+import subprocess
 import sys
 
-from setuptools import setup, find_packages
+from setuptools import Command, setup, find_packages
+from setuptools.command.sdist import sdist as _sdist
+from distutils import log
 from distutils.sysconfig import get_python_lib
+
+
+class CompileMessagesCommand(Command):
+    """
+    Ensure all .po files are properly compiled into .mo files.
+    """
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        log.info("Checking that .po files are compiled...")
+        locale_dirs = [os.path.join('django', 'conf', 'locale')] + glob.glob('django/contrib/*/locale')
+        for locale_dir in locale_dirs:
+            po_files = glob.glob('%s/*/LC_MESSAGES/*.po' % locale_dir)
+            for po_file in po_files:
+                mo_file = '%s.mo' % po_file[:-3]
+                subprocess.check_call(["msgfmt", "-o", mo_file, po_file])
+
+
+class sdist(_sdist):
+    sub_commands = _sdist.sub_commands + [('build_mo', None)]
+
 
 # Warn if we are installing over top of an existing installation. This can
 # cause issues where files that were deleted from a more recent Django are
@@ -31,7 +62,6 @@ EXCLUDE_FROM_PACKAGES = ['django.conf.project_template',
 # Dynamically calculate the version based on django.VERSION.
 version = __import__('django').get_version()
 
-
 setup(
     name='Django',
     version=version,
@@ -49,6 +79,10 @@ setup(
     ]},
     extras_require={
         "bcrypt": ["bcrypt"],
+    },
+    cmdclass={
+        'build_mo': CompileMessagesCommand,
+        'sdist': sdist,
     },
     zip_safe=False,
     classifiers=[
