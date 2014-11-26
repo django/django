@@ -384,10 +384,10 @@ class Query(object):
             # Remove any aggregates marked for reduction from the subquery
             # and move them to the outer AggregateQuery.
             col_cnt = 0
-            for alias, annotation in inner_query.annotation_select.items():
-                if annotation.is_summary:
-                    annotation, col_cnt = inner_query.rewrite_cols(annotation, col_cnt)
-                    outer_query.annotations[alias] = annotation.relabeled_clone(relabels)
+            for alias, expression in inner_query.annotation_select.items():
+                if expression.is_summary:
+                    expression, col_cnt = inner_query.rewrite_cols(expression, col_cnt)
+                    outer_query.annotations[alias] = expression.relabeled_clone(relabels)
                     del inner_query.annotation_select[alias]
             try:
                 outer_query.add_subquery(inner_query, using)
