@@ -166,8 +166,13 @@ to build and install::
 Mac OS X-specific instructions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Mac OS X users should follow the instructions in the :ref:`kyngchaos` section,
-as it is much easier than building from source.
+To install the SpatiaLite library and tools, Mac OS X users can choose between
+:ref:`kyngchaos` and `Homebrew`_.
+
+KyngChaos
+^^^^^^^^^
+
+First, follow the instructions in the :ref:`kyngchaos` section.
 
 When :ref:`create_spatialite_db`, the ``spatialite`` program is required.
 However, instead of attempting to compile the SpatiaLite tools from source,
@@ -187,6 +192,23 @@ add the following to your ``settings.py``:
     SPATIALITE_LIBRARY_PATH='/Library/Frameworks/SQLite3.framework/SQLite3'
 
 __ http://www.gaia-gis.it/spatialite-2.3.1/binaries.html
+
+Homebrew
+^^^^^^^^
+
+`Homebrew`_ handles all the SpatiaLite related packages on your behalf,
+including SQLite3, SpatiaLite, PROJ, and GEOS. Install them like this::
+
+    $ brew update
+    $ brew install spatialite-tools
+    $ brew install gdal
+
+Finally, for GeoDjango to be able to find the SpatiaLite library, add the
+following to your ``settings.py``::
+
+    SPATIALITE_LIBRARY_PATH='/usr/local/lib/mod_spatialite.dylib'
+
+.. _Homebrew: http://brew.sh/
 
 .. _create_spatialite_db:
 
@@ -226,3 +248,16 @@ Then, use the ``spatialite`` command to initialize a spatial database::
     inside your ``settings.py``.
 
 __ http://www.gaia-gis.it/spatialite-2.3.1/resources.html
+
+.. note::
+
+    When running ``manage.py migrate`` with a SQLite (or SpatiaLite) database,
+    the database file will be automatically created if it doesn't exist. In
+    this case, if your models contain any geometry columns, you'll see this
+    error::
+
+        CreateSpatialIndex() error: "no such table: geometry_columns"
+
+    It's because the table creation queries are executed without spatial
+    metadata tables. To avoid this, make the database file before executing
+    ``manage.py migrate`` as described above.
