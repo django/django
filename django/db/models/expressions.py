@@ -552,11 +552,11 @@ class Date(ExpressionNode):
         copy = self.copy()
         copy.col = query.resolve_ref(self.lookup, allow_joins, reuse, summarize)
         field = copy.col.output_field
-        assert isinstance(field, fields.DateField), \
-            "%r isn't a DateField." % field.name
+        assert isinstance(field, fields.DateField), "%r isn't a DateField." % field.name
         if settings.USE_TZ:
-            assert not isinstance(field, fields.DateTimeField), \
+            assert not isinstance(field, fields.DateTimeField), (
                 "%r is a DateTimeField, not a DateField." % field.name
+            )
         return copy
 
     def as_sql(self, compiler, connection):
@@ -620,9 +620,10 @@ class DateTime(ExpressionNode):
     def convert_value(self, value, connection):
         if settings.USE_TZ:
             if value is None:
-                raise ValueError("Database returned an invalid value "
-                                 "in QuerySet.datetimes(). Are time zone "
-                                 "definitions for your database and pytz installed?")
+                raise ValueError(
+                    "Database returned an invalid value in QuerySet.datetimes(). "
+                    "Are time zone definitions for your database and pytz installed?"
+                )
             value = value.replace(tzinfo=None)
             value = timezone.make_aware(value, self.tzinfo)
         return value
