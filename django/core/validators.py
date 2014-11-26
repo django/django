@@ -71,7 +71,7 @@ class URLValidator(RegexValidator):
         r'^(?:[a-z0-9\.\-]*)://'  # scheme is validated separately
         r'(?:\S+(?::\S*)?@)?'  # user:pass authentication
         r'(?:'
-            r'(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'  # IPv4
+            r'(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'  # IPv4
         r'|'
             r'\[[0-9a-f:\.]+\]'  # IPv6 (simple regex, validated later)
         r'|'
