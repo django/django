@@ -1,7 +1,5 @@
-import datetime
 import warnings
 
-from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends.utils import truncate_name
 from django.db.models.constants import LOOKUP_SEP
@@ -13,7 +11,6 @@ from django.db.models.sql.query import get_order_dir, Query
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
 from django.utils import six
-from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six.moves import zip
 
@@ -757,11 +754,8 @@ class SQLCompiler(object):
                     # annotations come before the related cols
                     if has_annotation_select:
                         # extra is always at the start of the field list
-                        prepended_cols = len(self.query.extra_select)
-                        annotation_start = len(fields) + prepended_cols
                         fields = fields + [
                             anno for alias, anno in self.query.annotation_select.items()]
-                        annotation_end = len(fields) + prepended_cols
 
                     # add related fields
                     fields = fields + [
