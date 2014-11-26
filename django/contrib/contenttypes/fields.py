@@ -10,7 +10,7 @@ from django.db.models import signals, FieldDoesNotExist, DO_NOTHING, FieldFlagsM
 from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
-from django.db.models.sql.datastructures import Col
+from django.db.models.expressions import Col
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_text, python_2_unicode_compatible
 
@@ -559,6 +559,20 @@ def create_generic_related_manager(superclass):
             db = router.db_for_write(self.model, instance=self.instance)
             return super(GenericRelatedObjectManager, self).using(db).create(**kwargs)
         create.alters_data = True
+
+        def get_or_create(self, **kwargs):
+            kwargs[self.content_type_field_name] = self.content_type
+            kwargs[self.object_id_field_name] = self.pk_val
+            db = router.db_for_write(self.model, instance=self.instance)
+            return super(GenericRelatedObjectManager, self).using(db).get_or_create(**kwargs)
+        get_or_create.alters_data = True
+
+        def update_or_create(self, **kwargs):
+            kwargs[self.content_type_field_name] = self.content_type
+            kwargs[self.object_id_field_name] = self.pk_val
+            db = router.db_for_write(self.model, instance=self.instance)
+            return super(GenericRelatedObjectManager, self).using(db).update_or_create(**kwargs)
+        update_or_create.alters_data = True
 
     return GenericRelatedObjectManager
 

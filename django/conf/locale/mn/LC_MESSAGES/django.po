@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ankhbayar <ankhaa1002@gmail.com>, 2013
-# Bayarkhuu Bataa <bbayarkhuu@gmail.com>, 2014
+# Bayarkhuu Bataa, 2014
 # Jacara <baskhuujacara@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-08-10 10:43+0000\n"
-"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-08-26 03:33+0000\n"
+"Last-Translator: Bayarkhuu Bataa\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -33,6 +33,10 @@ msgstr "Африк"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Араб"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr ""
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -175,6 +179,10 @@ msgid "Indonesian"
 msgstr "Индонези"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "Исланд"
 
@@ -229,6 +237,10 @@ msgstr "Малайз"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "Монгол"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr ""
 
 #: conf/global_settings.py:102
 msgid "Burmese"
@@ -503,7 +515,7 @@ msgstr "'%(value)s' бүхэл тоо байх ёстой."
 #: db/models/fields/__init__.py:926
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "'%(value)s' заавал True эсвэл False утга авах."
 
 #: db/models/fields/__init__.py:928
 msgid "Boolean (Either True or False)"
@@ -530,7 +542,7 @@ msgstr "'%(value)s' нь буруу байна. Энэ нь ОООО-СС-ӨӨ �
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
-msgstr ""
+msgstr "'%(value)s' утга (YYYY-MM-DD) форматтай байх хэрэгтэй."
 
 #: db/models/fields/__init__.py:1085
 msgid "Date (without time)"
@@ -557,7 +569,7 @@ msgstr "Огноо (цагтай)"
 #: db/models/fields/__init__.py:1297
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "'%(value)s' заавал decimal утга байх."
 
 #: db/models/fields/__init__.py:1299
 msgid "Decimal number"

@@ -8,11 +8,9 @@ import os
 import itertools
 
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template import (TemplateSyntaxError,
-    Context, Template, loader)
-import django.template.context
+from django.template import TemplateSyntaxError, Context, Template
 from django.test import Client, TestCase, override_settings
-from django.test.client import encode_file, RequestFactory
+from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.template.response import SimpleTemplateResponse
 from django.utils._os import upath
@@ -379,15 +377,24 @@ class AssertRedirectsTests(TestCase):
 
     def test_redirect_chain_to_self(self):
         "Redirections to self are caught and escaped"
-        response = self.client.get('/redirect_to_self/', {}, follow=True)
+        with self.assertRaises(RedirectCycleError) as context:
+            self.client.get('/redirect_to_self/', {}, follow=True)
+        response = context.exception.last_response
         # The chain of redirects stops once the cycle is detected.
         self.assertRedirects(response, '/redirect_to_self/',
             status_code=301, target_status_code=301)
         self.assertEqual(len(response.redirect_chain), 2)
 
+    def test_redirect_to_self_with_changing_query(self):
+        "Redirections don't loop forever even if query is changing"
+        with self.assertRaises(RedirectCycleError):
+            self.client.get('/redirect_to_self_with_changing_query_view/', {'counter': '0'}, follow=True)
+
     def test_circular_redirect(self):
         "Circular redirect chains are caught and escaped"
-        response = self.client.get('/circular_redirect_1/', {}, follow=True)
+        with self.assertRaises(RedirectCycleError) as context:
+            self.client.get('/circular_redirect_1/', {}, follow=True)
+        response = context.exception.last_response
         # The chain of redirects will get back to the starting point, but stop there.
         self.assertRedirects(response, '/circular_redirect_2/',
             status_code=301, target_status_code=301)
@@ -902,13 +909,6 @@ class ExceptionTests(TestCase):
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class TemplateExceptionTests(TestCase):
 
-    def setUp(self):
-        # Reset the loaders so they don't try to render cached templates.
-        if loader.template_source_loaders is not None:
-            for template_loader in loader.template_source_loaders:
-                if hasattr(template_loader, 'reset'):
-                    template_loader.reset()
-
     @override_settings(
         TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'bad_templates'),)
     )
@@ -916,9 +916,10 @@ class TemplateExceptionTests(TestCase):
         "Errors found when rendering 404 error templates are re-raised"
         try:
             self.client.get("/no_such_view/")
-            self.fail("Should get error about syntax error in template")
         except TemplateSyntaxError:
             pass
+        else:
+            self.fail("Should get error about syntax error in template")
 
 
 # We need two different tests to check URLconf substitution -  one to check
@@ -955,7 +956,7 @@ class ContextTests(TestCase):
         "Context variables can be retrieved from a single context"
         response = self.client.get("/request_data/", data={'foo': 'whiz'})
         self.assertEqual(response.context.__class__, Context)
-        self.assertTrue('get-foo' in response.context)
+        self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'sausage')
@@ -971,7 +972,7 @@ class ContextTests(TestCase):
         response = self.client.get("/request_data_extended/", data={'foo': 'whiz'})
         self.assertEqual(response.context.__class__, ContextList)
         self.assertEqual(len(response.context), 2)
-        self.assertTrue('get-foo' in response.context)
+        self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'bacon')
@@ -994,19 +995,18 @@ class ContextTests(TestCase):
         # None, True and False are builtins of BaseContext, and present
         # in every Context without needing to be added.
         self.assertEqual({'None', 'True', 'False', 'hello', 'goodbye',
-                              'python', 'dolly'},
+                          'python', 'dolly'},
                          l.keys())
 
     def test_15368(self):
         # Need to insert a context processor that assumes certain things about
         # the request instance. This triggers a bug caused by some ways of
         # copying RequestContext.
-        try:
-            django.template.context._standard_context_processors = (lambda request: {'path': request.special_path},)
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=(
+            'test_client_regress.context_processors.special',
+        )):
             response = self.client.get("/request_context_view/")
             self.assertContains(response, 'Path: /request_context_view/')
-        finally:
-            django.template.context._standard_context_processors = None
 
     def test_nested_requests(self):
         """
@@ -1227,6 +1227,16 @@ class RequestMethodStringDataTests(TestCase):
         response = self.client.patch('/request_methods/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'request method: PATCH')
+
+    def test_empty_string_data(self):
+        "Request a view with empty string data via request method GET/POST/HEAD"
+        # Regression test for #21740
+        response = self.client.get('/body/', data='', content_type='application/json')
+        self.assertEqual(response.content, b'')
+        response = self.client.post('/body/', data='', content_type='application/json')
+        self.assertEqual(response.content, b'')
+        response = self.client.head('/body/', data='', content_type='application/json')
+        self.assertEqual(response.content, b'')
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls',)

@@ -47,6 +47,8 @@ This is useful if you want to serialize data directly to a file-like object
     :ref:`format <serialization-formats>` will raise a
     ``django.core.serializers.SerializerDoesNotExist`` exception.
 
+.. _subset-of-fields:
+
 Subset of fields
 ~~~~~~~~~~~~~~~~
 
@@ -247,7 +249,6 @@ Be aware that not all Django output can be passed unmodified to :mod:`json`.
 In particular, :ref:`lazy translation objects <lazy-translations>` need a
 `special encoder`_ written for them. Something like this will work::
 
-    import json
     from django.utils.functional import Promise
     from django.utils.encoding import force_text
     from django.core.serializers.json import DjangoJSONEncoder
@@ -257,6 +258,9 @@ In particular, :ref:`lazy translation objects <lazy-translations>` need a
             if isinstance(obj, Promise):
                 return force_text(obj)
             return super(LazyEncoder, self).default(obj)
+
+Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
+</ref/contrib/gis/serializers>`.
 
 .. _special encoder: http://docs.python.org/library/json.html#encoders-and-decoders
 .. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
@@ -477,12 +481,12 @@ line flags to generate natural keys.
 
 .. versionchanged:: 1.7
 
-Previously there was only a ``use_natural_keys`` argument for
-``serializers.serialize()`` and the `-n` or `--natural` command line flags.
-These have been deprecated in favor of the ``use_natural_foreign_keys`` and
-``use_natural_primary_keys`` arguments and the corresponding
-:djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary` options
-for :djadmin:`dumpdata`.
+    Previously there was only a ``use_natural_keys`` argument for
+    ``serializers.serialize()`` and the `-n` or `--natural` command line flags.
+    These have been deprecated in favor of the ``use_natural_foreign_keys`` and
+    ``use_natural_primary_keys`` arguments and the corresponding
+    :djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary` options
+    for :djadmin:`dumpdata`.
 
 The original argument and command line flags remain for backwards
 compatibility and map to the new ``use_natural_foreign_keys`` argument and

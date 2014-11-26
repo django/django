@@ -213,8 +213,13 @@ will be.
 
 Be aware, however, that unmigrated apps cannot depend on migrated apps, by the
 very nature of not having migrations. This means that it is not generally
-possible to have an unmigrated app have a ForeignKey or ManyToManyField to
-a migrated app; some cases may work, but it will eventually fail.
+possible to have an unmigrated app have a ``ForeignKey`` or ``ManyToManyField``
+to a migrated app; some cases may work, but it will eventually fail.
+
+.. warning::
+
+    Even if things appear to work with unmigrated apps depending on migrated
+    apps, Django may not generate all the necessary foreign key constraints!
 
 This is particularly apparent if you use swappable models (e.g.
 ``AUTH_USER_MODEL``), as every app that uses swappable models will need
@@ -459,7 +464,7 @@ Once the operation sequence has been reduced as much as possible - the amount
 possible depends on how closely intertwined your models are and if you have
 any :class:`~django.db.migrations.operations.RunSQL`
 or :class:`~django.db.migrations.operations.RunPython` operations (which can't
-be optimized through) - Django will them write it back out into a new set of
+be optimized through) - Django will then write it back out into a new set of
 initial migration files.
 
 These files are marked to say they replace the previously-squashed migrations,
@@ -543,11 +548,16 @@ Django can serialize the following:
 - ``int``, ``long``, ``float``, ``bool``, ``str``, ``unicode``, ``bytes``, ``None``
 - ``list``, ``set``, ``tuple``, ``dict``
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
+  (include those that are timezone-aware)
 - ``decimal.Decimal`` instances
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
+
+.. versionchanged:: 1.7.1
+
+    Support for serializing timezone-aware datetimes was added.
 
 Django can serialize the following on Python 3 only:
 
@@ -594,6 +604,7 @@ of three things ``(path, args, kwargs)``:
   ``__init__`` method. Every value should itself be serializable.
 
 .. note::
+
     This return value is different from the ``deconstruct()`` method
     :ref:`for custom fields <custom-field-deconstruct-method>` which returns a
     tuple of four items.
@@ -667,3 +678,9 @@ your Django migrations in the ``migrations`` directory.
 
 More information is available in the
 `South 1.0 release notes <http://south.readthedocs.org/en/latest/releasenotes/1.0.html#library-migration-path>`_.
+
+.. seealso::
+
+    :doc:`The Migrations Operations Reference </ref/migration-operations>`
+        Covers the schema operations API, special operations, and writing your
+        own operations.

@@ -107,10 +107,10 @@ a flat surface is a straight line, the shortest path between two points on a cur
 surface (such as the earth) is an *arc* of a `great circle`__. [#fnthematic]_  Thus,
 additional computation is required to obtain distances in planar units (e.g.,
 kilometers and miles).  Using a geographic coordinate system may introduce
-complications for the developer later on.  For example, PostGIS versions 1.4
-and below do not have the capability to perform distance calculations between
-non-point geometries using geographic coordinate systems, e.g., constructing a
-query to  find all points within 5 miles of a county boundary stored as WGS84.
+complications for the developer later on. For example, Spatialite does not have
+the capability to perform distance calculations between geometries using
+geographic coordinate systems, e.g. constructing a query to  find all points
+within 5 miles of a county boundary stored as WGS84.
 [#fndist]_
 
 Portions of the earth's surface may projected onto a two-dimensional, or
@@ -124,10 +124,9 @@ calculations.
 .. note::
 
     If you wish to perform arbitrary distance queries using non-point
-    geometries in WGS84, consider upgrading to PostGIS 1.5. For
-    better performance, enable the :attr:`GeometryField.geography`
-    keyword so that :ref:`geography database type <geography-type>`
-    is used instead.
+    geometries in WGS84 in PostGIS and you want decent performance, enable the
+    :attr:`GeometryField.geography` keyword so that :ref:`geography database
+    type <geography-type>` is used instead.
 
 Additional Resources:
 

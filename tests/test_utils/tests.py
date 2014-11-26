@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import unittest
 
 from django.conf.urls import url
+from django.core.files.storage import default_storage
 from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import connection
 from django.forms import EmailField, IntegerField
@@ -14,7 +15,7 @@ from django.test.html import HTMLParseError, parse_html
 from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 
-from .models import Person
+from .models import Car, Person, PossessedCar
 from .views import empty_response
 
 
@@ -176,6 +177,33 @@ class AssertQuerysetEqualTests(TestCase):
         self.assertQuerysetEqual(
             Person.objects.filter(name='p1'),
             [repr(self.p1)]
+        )
+
+    def test_repeated_values(self):
+        """
+        Test that assertQuerysetEqual checks the number of appearance of each item
+        when used with option ordered=False.
+        """
+        batmobile = Car.objects.create(name='Batmobile')
+        k2000 = Car.objects.create(name='K 2000')
+        PossessedCar.objects.bulk_create([
+            PossessedCar(car=batmobile, belongs_to=self.p1),
+            PossessedCar(car=batmobile, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+        ])
+        with self.assertRaises(AssertionError):
+            self.assertQuerysetEqual(
+                self.p1.cars.all(),
+                [repr(batmobile), repr(k2000)],
+                ordered=False
+            )
+        self.assertQuerysetEqual(
+            self.p1.cars.all(),
+            [repr(batmobile)] * 2 + [repr(k2000)] * 4,
+            ordered=False
         )
 
 
@@ -357,6 +385,18 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 
+    def test_assert_used_on_http_response(self):
+        response = HttpResponse()
+        error_msg = (
+            'assertTemplateUsed() and assertTemplateNotUsed() are only '
+            'usable on responses fetched using the Django test Client.'
+        )
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateUsed(response, 'template.html')
+
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateNotUsed(response, 'template.html')
+
 
 class HTMLEqualTests(TestCase):
     def test_html_parser(self):
@@ -514,24 +554,24 @@ class HTMLEqualTests(TestCase):
         # equal html contains each other
         dom1 = parse_html('<p>foo')
         dom2 = parse_html('<p>foo</p>')
-        self.assertTrue(dom1 in dom2)
-        self.assertTrue(dom2 in dom1)
+        self.assertIn(dom1, dom2)
+        self.assertIn(dom2, dom1)
 
         dom2 = parse_html('<div><p>foo</p></div>')
-        self.assertTrue(dom1 in dom2)
-        self.assertTrue(dom2 not in dom1)
+        self.assertIn(dom1, dom2)
+        self.assertNotIn(dom2, dom1)
 
-        self.assertFalse('<p>foo</p>' in dom2)
-        self.assertTrue('foo' in dom2)
+        self.assertNotIn('<p>foo</p>', dom2)
+        self.assertIn('foo', dom2)
 
         # when a root element is used ...
         dom1 = parse_html('<p>foo</p><p>bar</p>')
         dom2 = parse_html('<p>foo</p><p>bar</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>foo</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>bar</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
 
     def test_count(self):
         # equal html contains each other one time
@@ -764,3 +804,41 @@ class OverrideSettingsTests(TestCase):
 
         self.assertRaises(NoReverseMatch, lambda: reverse('first'))
         self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+    def test_override_media_root(self):
+        """
+        Overriding the MEDIA_ROOT setting should be reflected in the
+        base_location attribute of django.core.files.storage.default_storage.
+        """
+        self.assertEqual(default_storage.base_location, '')
+        with self.settings(MEDIA_ROOT='test_value'):
+            self.assertEqual(default_storage.base_location, 'test_value')
+
+    def test_override_media_url(self):
+        """
+        Overriding the MEDIA_URL setting should be reflected in the
+        base_url attribute of django.core.files.storage.default_storage.
+        """
+        self.assertEqual(default_storage.base_location, '')
+        with self.settings(MEDIA_URL='/test_value/'):
+            self.assertEqual(default_storage.base_url, '/test_value/')
+
+    def test_override_file_upload_permissions(self):
+        """
+        Overriding the FILE_UPLOAD_PERMISSIONS setting should be reflected in
+        the file_permissions_mode attribute of
+        django.core.files.storage.default_storage.
+        """
+        self.assertIsNone(default_storage.file_permissions_mode)
+        with self.settings(FILE_UPLOAD_PERMISSIONS=0o777):
+            self.assertEqual(default_storage.file_permissions_mode, 0o777)
+
+    def test_override_file_upload_directory_permissions(self):
+        """
+        Overriding the FILE_UPLOAD_DIRECTORY_PERMISSIONS setting should be
+        reflected in the directory_permissions_mode attribute of
+        django.core.files.storage.default_storage.
+        """
+        self.assertIsNone(default_storage.directory_permissions_mode)
+        with self.settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o777):
+            self.assertEqual(default_storage.directory_permissions_mode, 0o777)

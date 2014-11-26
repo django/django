@@ -257,6 +257,8 @@ aren't commonly used:
             ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
         ]
 
+    admin.site.register(Question, QuestionAdmin)
+
 .. image:: _images/admin09.png
    :alt: Fieldset is initially collapsed
 
@@ -425,6 +427,9 @@ attributes, as follows:
         was_published_recently.boolean = True
         was_published_recently.short_description = 'Published recently?'
 
+For more information on these method properties, see
+:attr:`~django.contrib.admin.ModelAdmin.list_display`.
+
 Edit your :file:`polls/admin.py` file again and add an improvement to the
 ``Question`` change list page: filters using the
 :attr:`~django.contrib.admin.ModelAdmin.list_filter`. Add the following line to
@@ -512,11 +517,18 @@ template directory in the source code of Django itself
         print(django.__path__)"
 
 Then, just edit the file and replace
-``{{ site_header|default:_('Django administration') }}`` with your own site's
-name as you see fit, e.g. ``{{ _('Polls administration') }}``. We use this
-approach to teach you how to override templates. In an actual project, you
-would probably use the :attr:`django.contrib.admin.AdminSite.site_header`
-attribute to more easily make this particular customization.
+``{{ site_header|default:_('Django administration') }}`` (including the curly
+braces) with your own site's name as you see fit. You should end up with
+a line like:
+
+.. code-block:: html+django
+
+    <h1 id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></h1>
+
+We use this approach to teach you how to override templates. In an actual
+project, you would probably use
+the :attr:`django.contrib.admin.AdminSite.site_header` attribute to more easily
+make this particular customization.
 
 This template file contains lots of text like ``{% block branding %}``
 and ``{{ title }}``. The ``{%`` and ``{{`` tags are part of Django's

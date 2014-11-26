@@ -80,6 +80,32 @@ class HandlerTests(TestCase):
         # much more work than fixing #20557. Feel free to remove force_str()!
         self.assertEqual(request.COOKIES['want'], force_str("café"))
 
+    def test_invalid_unicode_cookie(self):
+        """
+        Invalid cookie content should result in an absent cookie, but not in a
+        crash while trying to decode it (#23638).
+        """
+        environ = RequestFactory().get('/').environ
+        environ['HTTP_COOKIE'] = 'x=W\x03c(h]\x8e'
+        request = WSGIRequest(environ)
+        # We don't test COOKIES content, as the result might differ between
+        # Python version because parsing invalid content became stricter in
+        # latest versions.
+        self.assertIsInstance(request.COOKIES, dict)
+
+    @override_settings(ROOT_URLCONF='handlers.urls')
+    def test_invalid_multipart_boundary(self):
+        """
+        Invalid boundary string should produce a "Bad Request" response, not a
+        server error (#23887).
+        """
+        environ = RequestFactory().post('/malformed_post/').environ
+        environ['CONTENT_TYPE'] = 'multipart/form-data; boundary=WRONG\x07'
+        handler = WSGIHandler()
+        response = handler(environ, lambda *a, **k: None)
+        # Expect "bad request" response
+        self.assertEqual(response.status_code, 400)
+
 
 @override_settings(ROOT_URLCONF='handlers.urls')
 class TransactionsPerRequestTests(TransactionTestCase):
@@ -148,3 +174,28 @@ class HandlerSuspiciousOpsTest(TestCase):
     def test_suspiciousop_in_view_returns_400(self):
         response = self.client.get('/suspicious/')
         self.assertEqual(response.status_code, 400)
+
+
+@override_settings(ROOT_URLCONF='handlers.urls')
+class HandlerNotFoundTest(TestCase):
+
+    def test_invalid_urls(self):
+        response = self.client.get('~%A9helloworld')
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, '~%A9helloworld', status_code=404)
+
+        response = self.client.get('d%aao%aaw%aan%aal%aao%aaa%aad%aa/')
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, 'd%AAo%AAw%AAn%AAl%AAo%AAa%AAd%AA', status_code=404)
+
+        response = self.client.get('/%E2%99%E2%99%A5/')
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, '%E2%99\u2665', status_code=404)
+
+        response = self.client.get('/%E2%98%8E%E2%A9%E2%99%A5/')
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, '\u260e%E2%A9\u2665', status_code=404)
+
+    def test_environ_path_info_type(self):
+        environ = RequestFactory().get('/%E2%A8%87%87%A5%E2%A8%A0').environ
+        self.assertIsInstance(environ['PATH_INFO'], six.text_type)

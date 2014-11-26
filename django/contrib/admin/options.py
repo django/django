@@ -417,7 +417,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                     # since it's ignored in ChangeList.get_filters().
                     return True
                 model = field.rel.to
-                rel_name = field.rel.get_related_field().name
+                if hasattr(field.rel, 'get_related_field'):
+                    rel_name = field.rel.get_related_field().name
+                else:
+                    rel_name = None
             elif isinstance(field, RelatedObject):
                 model = field.model
                 rel_name = model._meta.pk.name
@@ -450,6 +453,17 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             field = opts.get_field(to_field)
         except FieldDoesNotExist:
             return False
+
+        # Always allow referencing the primary key since it's already possible
+        # to get this information from the change view URL.
+        if field.primary_key:
+            return True
+
+        # Allow reverse relationships to models defining m2m fields if they
+        # target the specified field.
+        for many_to_many in opts.many_to_many:
+            if many_to_many.m2m_target_field_name() == to_field:
+                return True
 
         # Make sure at least one of the models registered for this site
         # references this field through a FK or a M2M relationship.

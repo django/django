@@ -252,20 +252,3 @@ class RelationTreeTests(test.TestCase):
                     'person', 'relating_basepeople', 'relating_baseperson'])
         )
         self.assertEqual([field.related_query_name() for field in AbstractPerson._meta._relation_tree], [])
-
-    #def test_no_cache_option(self):
-
-        ## Expire all get_fields cache
-        #related_models = [Person, BasePerson, AbstractPerson]
-        #for model in related_models:
-            #model._meta._expire_cache()
-
-        #for model in related_models:
-            #self.assertEqual(0, len(model._meta._get_fields_cache.keys()))
-
-        ## Make an API call with cache_results=False, it should not store
-        ## results on any of the children.
-        #Person._meta.get_fields(cache_results=False)
-        #for model in related_models:
-            #for c in model._meta._get_fields_cache.keys():
-                #self.assertEqual(0, len(model._meta._get_fields_cache.keys()))

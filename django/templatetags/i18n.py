@@ -149,7 +149,7 @@ class BlockTranslateNode(Node):
                 result = translation.pgettext(message_context, singular)
             else:
                 result = translation.ugettext(singular)
-        default_value = settings.TEMPLATE_STRING_IF_INVALID
+        default_value = context.engine.string_if_invalid
 
         def render_value(key):
             if key in context:

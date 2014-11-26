@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# machaku <bmachaku@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:46+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-22 16:28+0000\n"
+"Last-Translator: machaku <bmachaku@gmail.com>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +19,7 @@ msgstr ""
 
 #: contrib/humanize/apps.py:8
 msgid "Humanize"
-msgstr ""
+msgstr "Weka kibinadamu"
 
 #: contrib/humanize/templatetags/humanize.py:30
 msgid "th"
@@ -255,8 +256,8 @@ msgstr "sasa"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Sekunde iliyopita"
+msgstr[1] "Sekunde %(count)s zilizopita"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -264,8 +265,8 @@ msgstr[1] ""
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Dakika iliyopita"
+msgstr[1] "Dakika %(count)s zilizopita"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -273,8 +274,8 @@ msgstr[1] ""
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Saa lililopita"
+msgstr[1] "Masaa %(count)s yaliyopita"
 
 #: contrib/humanize/templatetags/humanize.py:229
 #, python-format
@@ -288,8 +289,8 @@ msgstr "%(delta)s kutoka sasa"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Sekunde moja kutoka sasa"
+msgstr[1] "Sekunde %(count)s kutoka sasa"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -297,8 +298,8 @@ msgstr[1] ""
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Dakika moja kutoka sasa"
+msgstr[1] "Dakika %(count)s kutoka sasa"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -306,5 +307,5 @@ msgstr[1] ""
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Saa limoja kutoka sasa "
+msgstr[1] "Masaa %(count)s kutoka sasa"

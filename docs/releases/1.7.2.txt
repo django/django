@@ -1,0 +1,91 @@
+==========================
+Django 1.7.2 release notes
+==========================
+
+*Under development*
+
+Django 1.7.2 fixes several bugs in 1.7.1.
+
+Additionally, Django's vendored version of six, :mod:`django.utils.six`, has
+been upgraded to the latest release (1.8.0).
+
+Bugfixes
+========
+
+* Fixed migration's renaming of auto-created many-to-many tables when changing
+  :attr:`Meta.db_table <django.db.models.Options.db_table>` (:ticket:`23630`).
+
+* Fixed a migration crash when adding an explicit ``id`` field to a model on
+  SQLite (:ticket:`23702`).
+
+* Added a warning for duplicate models when a module is reloaded. Previously a
+  ``RuntimeError`` was raised every time two models clashed in the app registry.
+  (:ticket:`23621`).
+
+* Prevented :djadmin:`flush` from loading initial data for migrated apps
+  (:ticket:`23699`).
+
+* Fixed a :djadmin:`makemessages` regression in 1.7.1 when
+  :setting:`STATIC_ROOT` has the default ``None`` value (:ticket:`23717`).
+
+* Added GeoDjango compatibility with mysqlclient database driver.
+
+* Fixed MySQL 5.6+ crash with ``GeometryField``\s in migrations
+  (:ticket:`23719`).
+
+* Fixed a migration crash when removing a field that is referenced in
+  ``AlterIndexTogether`` or ``AlterUniqueTogether`` (:ticket:`23614`).
+
+* Updated the first day of the week in the Ukrainian locale to Monday.
+
+* Added support for transactional spatial metadata initialization on
+  SpatiaLite 4.1+ (:ticket:`23152`).
+
+* Fixed a migration crash that prevented changing a nullable field with a
+  default to non-nullable with the same default (:ticket:`23738`).
+
+* Fixed a migrations crash when adding ``GeometryField``\s with ``blank=True``
+  on PostGIS (:ticket:`23731`).
+
+* Allowed usage of ``DateTimeField()`` as ``Transform.output_field``
+  (:ticket:`23420`).
+
+* Fixed a migration serializing bug involving ``float("nan")`` and
+  ``float("inf")`` (:ticket:`23770`).
+
+* Fixed a regression where custom form fields having a ``queryset`` attribute
+  but no ``limit_choices_to`` could not be used in a
+  :class:`~django.forms.ModelForm` (:ticket:`23795`).
+
+* Fixed a custom field type validation error with MySQL backend when
+  ``db_type`` returned ``None`` (:ticket:`23761`).
+
+* Fixed a migration crash when a field is renamed that is part of an
+  ``index_together`` (:ticket:`23859`).
+
+* Fixed :djadmin:`squashmigrations` to respect the  ``--no-optimize`` parameter
+  (:ticket:`23799`).
+
+* Made :class:`~django.db.migrations.operations.RenameModel` reversible
+  (:ticket:`22248`)
+
+* Avoided unnecessary rollbacks of migrations from other apps when migrating
+  backwards (:ticket:`23410`).
+
+* Fixed a rare query error when using deeply nested subqueries
+  (:ticket:`23605`).
+
+* Fixed a crash in migrations when deleting a field that is part of a
+  ``index/unique_together`` constraint (:ticket:`23794`).
+
+* Fixed ``django.core.files.File.__repr__()`` when the file's ``name`` contains
+  Unicode characters (:ticket:`23888`).
+
+* Added missing context to the admin's ``delete_selected`` view that prevented
+  custom site header, etc. from appearing (:ticket:`23898`).
+
+* Fixed a regression with dynamically generated inlines and allowed field
+  references in the admin (:ticket:`23754`).
+
+* Fixed an infinite loop bug for certain cyclic migration dependencies, and made
+  the error message for cyclic dependencies much more helpful.

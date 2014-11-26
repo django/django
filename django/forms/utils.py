@@ -29,16 +29,17 @@ def flatatt(attrs):
 
     The result is passed through 'mark_safe'.
     """
+    key_value_attrs = []
     boolean_attrs = []
-    for attr, value in list(attrs.items()):
-        if value is True:
-            boolean_attrs.append((attr,))
-            del attrs[attr]
-        elif value is False:
-            del attrs[attr]
+    for attr, value in attrs.items():
+        if isinstance(value, bool):
+            if value:
+                boolean_attrs.append((attr,))
+        else:
+            key_value_attrs.append((attr, value))
 
     return (
-        format_html_join('', ' {0}="{1}"', sorted(attrs.items())) +
+        format_html_join('', ' {0}="{1}"', sorted(key_value_attrs)) +
         format_html_join('', ' {0}', sorted(boolean_attrs))
     )
 
@@ -137,6 +138,15 @@ class ErrorList(UserList, list):
         if isinstance(error, ValidationError):
             return list(error)[0]
         return force_text(error)
+
+    def __reduce_ex__(self, *args, **kwargs):
+        # The `list` reduce function returns an iterator as the fourth element
+        # that is normally used for repopulating. Since we only inherit from
+        # `list` for `isinstance` backward compatibility (Refs #17413) we
+        # nullify this iterator as it would otherwise result in duplicate
+        # entries. (Refs #23594)
+        info = super(UserList, self).__reduce_ex__(*args, **kwargs)
+        return info[:3] + (None, None)
 
 
 # Utilities for time zone support in DateTimeField et al.

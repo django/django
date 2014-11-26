@@ -203,7 +203,7 @@ class InlineFormsetTests(TestCase):
         UserFormSet = modelformset_factory(User, fields=())
         formset = UserFormSet()
         for form in formset.forms:
-            self.assertTrue('id' in form.fields)
+            self.assertIn('id', form.fields)
             self.assertEqual(len(form.fields), 1)
 
     def test_save_as_new_with_new_inlines(self):
@@ -247,7 +247,7 @@ class InlineFormsetTests(TestCase):
         formset = FormSet(instance=user, initial=[{'data': 41}, {'data': 42}])
         self.assertEqual(formset.forms[0].initial['data'], 7)
         self.assertEqual(formset.extra_forms[0].initial['data'], 41)
-        self.assertTrue('value="42"' in formset.extra_forms[1].as_p())
+        self.assertIn('value="42"', formset.extra_forms[1].as_p())
 
 
 class FormsetTests(TestCase):
@@ -282,7 +282,7 @@ class FormsetTests(TestCase):
         formset = Formset(initial=[{'username': 'apollo11'}, {'username': 'apollo12'}])
         self.assertEqual(formset.forms[0].initial['username'], "bibi")
         self.assertEqual(formset.extra_forms[0].initial['username'], "apollo11")
-        self.assertTrue('value="apollo12"' in formset.extra_forms[1].as_p())
+        self.assertIn('value="apollo12"', formset.extra_forms[1].as_p())
 
     def test_extraneous_query_is_not_run(self):
         Formset = modelformset_factory(Network, fields="__all__")

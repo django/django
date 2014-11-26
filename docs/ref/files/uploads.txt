@@ -82,10 +82,15 @@ Here are some useful attributes of ``UploadedFile``:
         for line in uploadedfile:
             do_something_with(line)
 
-    However, *unlike* standard Python files, :class:`UploadedFile` only
-    understands ``\n`` (also known as "Unix-style") line endings. If you know
-    that you need to handle uploaded files with different line endings, you'll
-    need to do so in your view.
+    Lines are split using `universal newlines`_. The following are recognized
+    as ending a line: the Unix end-of-line convention ``'\n'``, the Windows
+    convention ``'\r\n'``, and the old Macintosh convention ``'\r'``.
+
+    .. _universal newlines: http://www.python.org/dev/peps/pep-0278
+
+    .. versionchanged:: 1.8
+
+        Previously lines were only split on the Unix end-of-line ``'\n'``.
 
 Subclasses of ``UploadedFile`` include:
 

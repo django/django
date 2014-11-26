@@ -86,7 +86,8 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Aggregation <topics/db/aggregation>` |
   :doc:`Custom fields <howto/custom-model-fields>` |
   :doc:`Multiple databases <topics/db/multi-db>` |
-  :doc:`Custom lookups <howto/custom-lookups>`
+  :doc:`Custom lookups <howto/custom-lookups>` |
+  :doc:`Query Expressions <ref/models/expressions>`
 
 * **Other:**
   :doc:`Supported databases <ref/databases>` |
@@ -171,10 +172,6 @@ manipulation of form data.
   :doc:`Formsets <topics/forms/formsets>` |
   :doc:`Customizing validation <ref/forms/validation>`
 
-* **Extras:**
-  :doc:`Form preview <ref/contrib/formtools/form-preview>` |
-  :doc:`Form wizard <ref/contrib/formtools/form-wizard>`
-
 The development process
 =======================
 
@@ -227,7 +224,7 @@ applications and Django provides multiple protection tools and mechanisms:
 * :doc:`Security overview <topics/security>`
 * :doc:`Disclosed security issues in Django <releases/security>`
 * :doc:`Clickjacking protection <ref/clickjacking>`
-* :doc:`Cross Site Request Forgery protection <ref/contrib/csrf>`
+* :doc:`Cross Site Request Forgery protection <ref/csrf>`
 * :doc:`Cryptographic signing <topics/signing>`
 * :ref:`Security Middleware <security-middleware>`
 

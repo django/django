@@ -12,7 +12,7 @@ collection of objects. This topic guide describes the ways that aggregate values
 can be generated and returned using Django queries.
 
 Throughout this guide, we'll refer to the following models. These models are
-used to track the inventory for a series of online bookstores::
+used to track the inventory for a series of online bookstores:
 
 .. _queryset-model-example:
 
@@ -66,6 +66,11 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     >>> from django.db.models import Max
     >>> Book.objects.all().aggregate(Max('price'))
     {'price__max': Decimal('81.20')}
+
+    # Cost per page
+    >>> Book.objects.all().aggregate(
+    ...    price_per_page=Sum(F('price')/F('pages'), output_field=FloatField()))
+    {'price_per_page': 0.4470664529184653}
 
     # All the following queries involve traversing the Book<->Publisher
     # many-to-many relationship backward

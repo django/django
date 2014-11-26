@@ -9,12 +9,16 @@ from unittest import skipIf
 
 from django.conf import settings
 from django.core import mail
-from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
+from django.http import (
+    HttpRequest, HttpResponse, StreamingHttpResponse, HttpResponsePermanentRedirect,
+    HttpResponseRedirect,
+)
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
 from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
 from django.test import TestCase, RequestFactory, override_settings
+from django.test.utils import patch_logger
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
@@ -162,7 +166,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('customurlconf/slash')
         request.urlconf = 'middleware.extra_urls'
         r = CommonMiddleware().process_request(request)
-        self.assertFalse(r is None,
+        self.assertIsNotNone(r,
             "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, 'http://testserver/customurlconf/slash/')
@@ -198,7 +202,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('customurlconf/needsquoting#')
         request.urlconf = 'middleware.extra_urls'
         r = CommonMiddleware().process_request(request)
-        self.assertFalse(r is None,
+        self.assertIsNotNone(r,
             "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
@@ -235,12 +239,38 @@ class CommonMiddlewareTest(TestCase):
 
     # Other tests
 
+    @override_settings(DISALLOWED_USER_AGENTS=[re.compile(r'foo')])
+    def test_disallowed_user_agents(self):
+        with patch_logger('django.request', 'warning') as log_messages:
+            request = self._get_request('slash')
+            request.META['HTTP_USER_AGENT'] = 'foo'
+            r = CommonMiddleware().process_request(request)
+            self.assertEqual(r.status_code, 403)
+            self.assertEqual(log_messages, ['Forbidden (User agent): /slash'])
+
     def test_non_ascii_query_string_does_not_crash(self):
         """Regression test for #15152"""
         request = self._get_request('slash')
         request.META['QUERY_STRING'] = force_str('drink=café')
         response = CommonMiddleware().process_request(request)
         self.assertEqual(response.status_code, 301)
+
+    def test_response_redirect_class(self):
+        request = self._get_request('slash')
+        r = CommonMiddleware().process_request(request)
+        self.assertEqual(r.status_code, 301)
+        self.assertEqual(r.url, 'http://testserver/slash/')
+        self.assertIsInstance(r, HttpResponsePermanentRedirect)
+
+    def test_response_redirect_class_subclass(self):
+        class MyCommonMiddleware(CommonMiddleware):
+            response_redirect_class = HttpResponseRedirect
+
+        request = self._get_request('slash')
+        r = MyCommonMiddleware().process_request(request)
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r.url, 'http://testserver/slash/')
+        self.assertIsInstance(r, HttpResponseRedirect)
 
 
 @override_settings(
@@ -318,24 +348,24 @@ class ConditionalGetMiddlewareTest(TestCase):
     # Tests for the Date header
 
     def test_date_header_added(self):
-        self.assertFalse('Date' in self.resp)
+        self.assertNotIn('Date', self.resp)
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertTrue('Date' in self.resp)
+        self.assertIn('Date', self.resp)
 
     # Tests for the Content-Length header
 
     def test_content_length_header_added(self):
         content_length = len(self.resp.content)
-        self.assertFalse('Content-Length' in self.resp)
+        self.assertNotIn('Content-Length', self.resp)
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertTrue('Content-Length' in self.resp)
+        self.assertIn('Content-Length', self.resp)
         self.assertEqual(int(self.resp['Content-Length']), content_length)
 
     def test_content_length_header_not_added(self):
         resp = StreamingHttpResponse('content')
-        self.assertFalse('Content-Length' in resp)
+        self.assertNotIn('Content-Length', resp)
         resp = ConditionalGetMiddleware().process_response(self.req, resp)
-        self.assertFalse('Content-Length' in resp)
+        self.assertNotIn('Content-Length', resp)
 
     def test_content_length_header_not_changed(self):
         bad_content_length = len(self.resp.content) + 10

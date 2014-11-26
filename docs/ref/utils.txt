@@ -271,7 +271,20 @@ The functions defined in this module share the following properties:
     since we are assuming input is either UTF-8 or unicode already, we can
     simplify things a little from the full method.
 
-    Returns an ASCII string containing the encoded result.
+    Takes an IRI in UTF-8 bytes and returns ASCII bytes containing the encoded
+    result.
+
+.. function:: uri_to_iri(uri)
+
+    .. versionadded:: 1.8
+
+    Converts a Uniform Resource Identifier into an Internationalized Resource
+    Identifier.
+
+    This is an algorithm from section 3.2 of :rfc:`3987#section-3.2`.
+
+    Takes a URI in ASCII bytes and returns a unicode string containing the
+    encoded result.
 
 .. function:: filepath_to_uri(path)
 
@@ -284,6 +297,13 @@ The functions defined in this module share the following properties:
     ``encodeURIComponent()`` JavaScript function for more details.
 
     Returns an ASCII string containing the encoded result.
+
+.. function:: escape_uri_path(path)
+
+    .. versionadded:: 1.8
+
+    Escapes the unsafe characters from the path portion of a Uniform Resource
+    Identifier (URI).
 
 ``django.utils.feedgenerator``
 ==============================
@@ -685,7 +705,7 @@ escaping HTML.
 .. function:: urlencode(query, doseq=0)
 
     A version of Python's urllib.urlencode() function that can operate on
-    unicode strings. The parameters are first case to UTF-8 encoded strings
+    unicode strings. The parameters are first cast to UTF-8 encoded strings
     and then encoded as per normal.
 
 .. function:: cookie_date(epoch_seconds=None)
@@ -829,9 +849,9 @@ appropriate entities.
 
 .. function:: slugify
 
-    Converts to lowercase, removes non-word characters (alphanumerics and
-    underscores) and converts spaces to hyphens. Also strips leading and
-    trailing whitespace.
+    Converts to ASCII. Converts spaces to hyphens. Removes characters that
+    aren't alphanumerics, underscores, or hyphens. Converts to lowercase. Also
+    strips leading and trailing whitespace.
 
     For example::
 
@@ -941,20 +961,30 @@ appropriate entities.
     Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
     function assumes that ``value`` is a :class:`~datetime.datetime`.
 
-.. function:: make_aware(value, timezone)
+.. function:: make_aware(value, timezone=None)
 
     Returns an aware :class:`~datetime.datetime` that represents the same
     point in time as ``value`` in ``timezone``, ``value`` being a naive
-    :class:`~datetime.datetime`.
+    :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
+    defaults to the :ref:`current time zone <default-current-time-zone>`.
 
     This function can raise an exception if ``value`` doesn't exist or is
     ambiguous because of DST transitions.
 
-.. function:: make_naive(value, timezone)
+    .. versionchanged:: 1.8
+
+        In older versions of Django, ``timezone`` was a required argument.
+
+.. function:: make_naive(value, timezone=None)
 
     Returns an naive :class:`~datetime.datetime` that represents in
     ``timezone``  the same point in time as ``value``, ``value`` being an
-    aware :class:`~datetime.datetime`
+    aware :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
+    defaults to the :ref:`current time zone <default-current-time-zone>`.
+
+    .. versionchanged:: 1.8
+
+        In older versions of Django, ``timezone`` was a required argument.
 
 .. _pytz: http://pytz.sourceforge.net/
 

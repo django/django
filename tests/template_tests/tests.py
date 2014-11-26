@@ -12,12 +12,11 @@ from django import template
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core import urlresolvers
-from django.template import (base as template_base, loader, Context,
-    RequestContext, Template, TemplateSyntaxError)
-from django.template.loaders import app_directories, filesystem, cached
+from django.template import loader, Context, RequestContext, Template, TemplateSyntaxError
+from django.template.engine import Engine
+from django.template.loaders import app_directories, filesystem
 from django.test import RequestFactory, TestCase
-from django.test.utils import (override_settings, override_template_loaders,
-                               override_with_test_loader, extend_sys_path)
+from django.test.utils import override_settings, extend_sys_path
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
@@ -160,8 +159,8 @@ class UTF8Class:
 class TemplateLoaderTests(TestCase):
 
     def test_loaders_security(self):
-        ad_loader = app_directories.Loader()
-        fs_loader = filesystem.Loader()
+        ad_loader = app_directories.Loader(Engine.get_default())
+        fs_loader = filesystem.Loader(Engine.get_default())
 
         def test_template_sources(path, template_dirs, expected_sources):
             if isinstance(expected_sources, list):
@@ -213,27 +212,33 @@ class TemplateLoaderTests(TestCase):
             test_template_sources('/DIR1/index.HTML', template_dirs,
                                   ['/DIR1/index.HTML'])
 
-    @override_template_loaders(filesystem.Loader())
+    @override_settings(TEMPLATE_LOADERS=['django.template.loaders.filesystem.Loader'])
     # Turn TEMPLATE_DEBUG on, so that the origin file name will be kept with
     # the compiled templates.
     @override_settings(TEMPLATE_DEBUG=True)
     def test_loader_debug_origin(self):
         # We rely on the fact that runtests.py sets up TEMPLATE_DIRS to
-        # point to a directory containing a login.html file. Also that
-        # the file system and app directories loaders both inherit the
-        # load_template method from the BaseLoader class, so we only need
-        # to test one of them.
+        # point to a directory containing a login.html file.
         load_name = 'login.html'
+
+        # We also rely on the fact the file system and app directories loaders
+        # both inherit the load_template method from the base Loader class, so
+        # we only need to test one of them.
         template = loader.get_template(load_name)
         template_name = template.nodelist[0].source[0].name
         self.assertTrue(template_name.endswith(load_name),
             'Template loaded by filesystem loader has incorrect name for debug page: %s' % template_name)
 
-        # Also test the cached loader, since it overrides load_template
-        cache_loader = cached.Loader(('',))
-        cache_loader._cached_loaders = loader.template_source_loaders
-        loader.template_source_loaders = (cache_loader,)
+    @override_settings(TEMPLATE_LOADERS=[
+        ('django.template.loaders.cached.Loader',
+            ['django.template.loaders.filesystem.Loader']),
+    ])
+    @override_settings(TEMPLATE_DEBUG=True)
+    def test_cached_loader_debug_origin(self):
+        # Same comment as in test_loader_debug_origin.
+        load_name = 'login.html'
 
+        # Test the cached loader separately since it overrides load_template.
         template = loader.get_template(load_name)
         template_name = template.nodelist[0].source[0].name
         self.assertTrue(template_name.endswith(load_name),
@@ -244,15 +249,15 @@ class TemplateLoaderTests(TestCase):
         self.assertTrue(template_name.endswith(load_name),
             'Cached template loaded through cached loader has incorrect name for debug page: %s' % template_name)
 
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_loader_origin(self):
-        with self.settings(TEMPLATE_DEBUG=True):
-            template = loader.get_template('login.html')
-            self.assertEqual(template.origin.loadname, 'login.html')
+        template = loader.get_template('login.html')
+        self.assertEqual(template.origin.loadname, 'login.html')
 
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_string_origin(self):
-        with self.settings(TEMPLATE_DEBUG=True):
-            template = Template('string template')
-            self.assertEqual(template.origin.source, 'string template')
+        template = Template('string template')
+        self.assertEqual(template.origin.source, 'string template')
 
     def test_debug_false_origin(self):
         template = loader.get_template('login.html')
@@ -264,7 +269,7 @@ class TemplateLoaderTests(TestCase):
     # Test the base loader class via the app loader. load_template
     # from base is used by all shipped loaders excepting cached,
     # which has its own test.
-    @override_template_loaders(app_directories.Loader())
+    @override_settings(TEMPLATE_LOADERS=['django.template.loaders.app_directories.Loader'])
     def test_include_missing_template(self):
         """
         Tests that the correct template is identified as not existing
@@ -285,7 +290,7 @@ class TemplateLoaderTests(TestCase):
     # Test the base loader class via the app loader. load_template
     # from base is used by all shipped loaders excepting cached,
     # which has its own test.
-    @override_template_loaders(app_directories.Loader())
+    @override_settings(TEMPLATE_LOADERS=['django.template.loaders.app_directories.Loader'])
     def test_extends_include_missing_baseloader(self):
         """
         Tests that the correct template is identified as not existing
@@ -306,11 +311,13 @@ class TemplateLoaderTests(TestCase):
     def test_extends_include_missing_cachedloader(self):
         """
         Same as test_extends_include_missing_baseloader, only tests
-        behavior of the cached loader instead of BaseLoader.
+        behavior of the cached loader instead of base loader.
         """
-        cache_loader = cached.Loader(('',))
-        cache_loader._cached_loaders = (app_directories.Loader(),)
-        with override_template_loaders(cache_loader,):
+        with override_settings(TEMPLATE_LOADERS=[
+            ('django.template.loaders.cached.Loader', [
+                'django.template.loaders.app_directories.Loader',
+            ]),
+        ]):
             load_name = 'test_extends_error.html'
             tmpl = loader.get_template(load_name)
             r = None
@@ -403,7 +410,7 @@ class TemplateRegressionTests(TestCase):
             while tb.tb_next is not None:
                 tb = tb.tb_next
                 depth += 1
-            self.assertTrue(depth > 5,
+            self.assertGreater(depth, 5,
                 "The traceback context was lost when reraising the traceback. See #19827")
 
     @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
@@ -534,18 +541,23 @@ class TemplateTests(TestCase):
         template_tests.update(filter_tests)
 
         templates = dict((name, t[0]) for name, t in six.iteritems(template_tests))
-        with override_with_test_loader(templates, use_cached_loader=True) as cache_loader:
+        with override_settings(TEMPLATE_LOADERS=[
+            ('django.template.loaders.cached.Loader', [
+                ('django.template.loaders.locmem.Loader', templates),
+            ]),
+        ]):
             failures = []
             tests = sorted(template_tests.items())
-
-            # Set TEMPLATE_STRING_IF_INVALID to a known string.
-            expected_invalid_str = 'INVALID'
 
             # Warm the URL reversing cache. This ensures we don't pay the cost
             # warming the cache during one of the tests.
             urlresolvers.reverse('named.client', args=(0,))
 
             for name, vals in tests:
+
+                # Set TEMPLATE_STRING_IF_INVALID to a known string.
+                expected_invalid_str = 'INVALID'
+
                 if isinstance(vals[2], tuple):
                     normal_string_result = vals[2][0]
                     invalid_string_result = vals[2][1]
@@ -553,7 +565,6 @@ class TemplateTests(TestCase):
                     if isinstance(invalid_string_result, tuple):
                         expected_invalid_str = 'INVALID %s'
                         invalid_string_result = invalid_string_result[0] % invalid_string_result[1]
-                        template_base.invalid_var_format_string = True
 
                     try:
                         template_debug_result = vals[2][2]
@@ -593,6 +604,13 @@ class TemplateTests(TestCase):
                                             # Ignore deprecations of old style unordered_list
                                             # and removetags.
                                             warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaultfilters")
+                                            # Ignore numpy deprecation warnings (#23890)
+                                            warnings.filterwarnings(
+                                                "ignore",
+                                                "Using a non-integer number instead of an "
+                                                "integer will result in an error in the future",
+                                                DeprecationWarning
+                                            )
                                             output = self.render(test_template, vals)
                                     except ShouldNotExecuteException:
                                         failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
@@ -607,11 +625,8 @@ class TemplateTests(TestCase):
                                     continue
                                 if output != result:
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Expected %r, got %r" % (is_cached, invalid_str, template_debug, name, result, output))
-                    cache_loader.reset()
 
-                if template_base.invalid_var_format_string:
-                    expected_invalid_str = 'INVALID'
-                    template_base.invalid_var_format_string = False
+                    Engine.get_default().template_loaders[0].reset()
 
         self.assertEqual(failures, [], "Tests failed:\n%s\n%s" %
             ('-' * 70, ("\n%s\n" % ('-' * 70)).join(failures)))
@@ -1682,6 +1697,8 @@ class TemplateTests(TestCase):
                 datetime.now().day, datetime.now().month, datetime.now().year)),
             'now06': ('''{% now "j 'n' Y"%}''', {}, '''%d '%d' %d''' % (
                 datetime.now().day, datetime.now().month, datetime.now().year)),
+            'now07': ('''{% now "j n Y" as N %}-{{N}}-''', {}, '''-%d %d %d-''' % (
+                datetime.now().day, datetime.now().month, datetime.now().year)),
 
             ### URL TAG ########################################################
             # Successes
@@ -1840,11 +1857,6 @@ class TemplateTagLoading(TestCase):
 
     def setUp(self):
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
-        self.old_tag_modules = template_base.templatetags_modules
-        template_base.templatetags_modules = []
-
-    def tearDown(self):
-        template_base.templatetags_modules = self.old_tag_modules
 
     def test_load_error(self):
         ttext = "{% load broken_tag %}"
@@ -1852,8 +1864,8 @@ class TemplateTagLoading(TestCase):
         try:
             template.Template(ttext)
         except template.TemplateSyntaxError as e:
-            self.assertTrue('ImportError' in e.args[0])
-            self.assertTrue('Xtemplate' in e.args[0])
+            self.assertIn('ImportError', e.args[0])
+            self.assertIn('Xtemplate', e.args[0])
 
     def test_load_error_egg(self):
         ttext = "{% load broken_egg %}"
@@ -1866,8 +1878,8 @@ class TemplateTagLoading(TestCase):
                 with self.settings(INSTALLED_APPS=['tagsegg']):
                     template.Template(ttext)
             except template.TemplateSyntaxError as e:
-                self.assertTrue('ImportError' in e.args[0])
-                self.assertTrue('Xtemplate' in e.args[0])
+                self.assertIn('ImportError', e.args[0])
+                self.assertIn('Xtemplate', e.args[0])
 
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"
@@ -1880,15 +1892,13 @@ class TemplateTagLoading(TestCase):
 class RequestContextTests(unittest.TestCase):
 
     def setUp(self):
-        templates = {
-            'child': '{{ var|default:"none" }}',
-        }
-        override_with_test_loader.override(templates)
         self.fake_request = RequestFactory().get('/')
 
-    def tearDown(self):
-        override_with_test_loader.restore()
-
+    @override_settings(TEMPLATE_LOADERS=[
+        ('django.template.loaders.locmem.Loader', {
+            'child': '{{ var|default:"none" }}',
+        }),
+    ])
     def test_include_only(self):
         """
         Regression test for #15721, ``{% include %}`` and ``RequestContext``

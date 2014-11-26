@@ -15,6 +15,7 @@ from django.db.migrations.state import ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError, DatabaseError
+from django.utils import six
 
 from .test_base import MigrationTestBase
 
@@ -46,7 +47,9 @@ class OperationTestBase(MigrationTestBase):
         operation.state_forwards(app_label, new_state)
         return project_state, new_state
 
-    def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False, proxy_model=False, unique_together=False, options=False):
+    def set_up_test_model(self, app_label, second_model=False, third_model=False,
+            related_model=False, mti_model=False, proxy_model=False,
+            unique_together=False, options=False, db_table=None, index_together=False):
         """
         Creates a test model state and database table.
         """
@@ -78,10 +81,13 @@ class OperationTestBase(MigrationTestBase):
         # Make the "current" state
         model_options = {
             "swappable": "TEST_SWAP_MODEL",
+            "index_together": [["weight", "pink"]] if index_together else [],
             "unique_together": [["pink", "weight"]] if unique_together else [],
         }
         if options:
             model_options["permissions"] = [("can_groom", "Can groom")]
+        if db_table:
+            model_options["db_table"] = db_table
         operations = [migrations.CreateModel(
             "Pony",
             [
@@ -428,8 +434,7 @@ class OperationTests(OperationTestBase):
             self.assertFKNotExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_pony", "id"))
             self.assertFKExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_horse", "id"))
         # And test reversal
-        with connection.schema_editor() as editor:
-            operation.database_backwards("test_rnmo", editor, new_state, project_state)
+        self.unapply_operations("test_rnmo", project_state, [operation])
         self.assertTableExists("test_rnmo_pony")
         self.assertTableNotExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
@@ -875,6 +880,37 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_almota", editor, new_state, project_state)
         self.assertTableExists("test_almota_pony")
 
+    def test_alter_model_table_m2m(self):
+        """
+        AlterModelTable should rename auto-generated M2M tables.
+        """
+        app_label = "test_talflmltlm2m"
+        pony_db_table = 'pony_foo'
+        project_state = self.set_up_test_model(app_label, second_model=True, db_table=pony_db_table)
+        # Add the M2M field
+        first_state = project_state.clone()
+        operation = migrations.AddField("Pony", "stables", models.ManyToManyField("Stable"))
+        operation.state_forwards(app_label, first_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, first_state)
+        original_m2m_table = "%s_%s" % (pony_db_table, "stables")
+        new_m2m_table = "%s_%s" % (app_label, "pony_stables")
+        self.assertTableExists(original_m2m_table)
+        self.assertTableNotExists(new_m2m_table)
+        # Rename the Pony db_table which should also rename the m2m table.
+        second_state = first_state.clone()
+        operation = migrations.AlterModelTable(name='pony', table=None)
+        operation.state_forwards(app_label, second_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, first_state, second_state)
+        self.assertTableExists(new_m2m_table)
+        self.assertTableNotExists(original_m2m_table)
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, second_state, first_state)
+        self.assertTableExists(original_m2m_table)
+        self.assertTableNotExists(new_m2m_table)
+
     def test_alter_field(self):
         """
         Tests the AlterField operation.
@@ -948,7 +984,7 @@ class OperationTests(OperationTestBase):
         """
         Tests the RenameField operation.
         """
-        project_state = self.set_up_test_model("test_rnfl", unique_together=True)
+        project_state = self.set_up_test_model("test_rnfl", unique_together=True, index_together=True)
         # Test the state alteration
         operation = migrations.RenameField("Pony", "pink", "blue")
         self.assertEqual(operation.describe(), "Rename field pink on Pony to blue")
@@ -959,6 +995,9 @@ class OperationTests(OperationTestBase):
         # Make sure the unique_together has the renamed column too
         self.assertIn("blue", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
         self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
+        # Make sure the index_together has the renamed column too
+        self.assertIn("blue", new_state.models["test_rnfl", "pony"].options['index_together'][0])
+        self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].options['index_together'][0])
         # Test the database alteration
         self.assertColumnExists("test_rnfl_pony", "pink")
         self.assertColumnNotExists("test_rnfl_pony", "blue")
@@ -973,11 +1012,17 @@ class OperationTests(OperationTestBase):
                 with atomic():
                     cursor.execute("INSERT INTO test_rnfl_pony (blue, weight) VALUES (1, 1)")
             cursor.execute("DELETE FROM test_rnfl_pony")
+        # Ensure the index constraint has been ported over
+        # TODO: Uncomment assert when #23880 is fixed
+        # self.assertIndexExists("test_rnfl_pony", ["weight", "blue"])
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_rnfl", editor, new_state, project_state)
         self.assertColumnExists("test_rnfl_pony", "pink")
         self.assertColumnNotExists("test_rnfl_pony", "blue")
+        # Ensure the index constraint has been reset
+        # TODO: Uncomment assert when #23880 is fixed
+        # self.assertIndexExists("test_rnfl_pony", ["weight", "pink"])
 
     def test_alter_unique_together(self):
         """
@@ -1195,6 +1240,87 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_runsql", editor, new_state, project_state)
         self.assertTableNotExists("i_love_ponies")
 
+    def test_run_sql_params(self):
+        """
+        #23426 - RunSQL should accept parameters.
+        """
+        project_state = self.set_up_test_model("test_runsql")
+        # Create the operation
+        operation = migrations.RunSQL(
+            ["CREATE TABLE i_love_ponies (id int, special_thing varchar(15));"],
+            ["DROP TABLE i_love_ponies"],
+        )
+        param_operation = migrations.RunSQL(
+            # forwards
+            (
+                "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'Django');",
+                ["INSERT INTO i_love_ponies (id, special_thing) VALUES (2, %s);", ['Ponies']],
+                ("INSERT INTO i_love_ponies (id, special_thing) VALUES (%s, %s);", (3, 'Python',)),
+            ),
+            # backwards
+            [
+                "DELETE FROM i_love_ponies WHERE special_thing = 'Django';",
+                ["DELETE FROM i_love_ponies WHERE special_thing = 'Ponies';", None],
+                ("DELETE FROM i_love_ponies WHERE id = %s OR special_thing = %s;", [3, 'Python']),
+            ]
+        )
+
+        # Make sure there's no table
+        self.assertTableNotExists("i_love_ponies")
+        new_state = project_state.clone()
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_runsql", editor, project_state, new_state)
+
+        # Test parameter passing
+        with connection.schema_editor() as editor:
+            param_operation.database_forwards("test_runsql", editor, project_state, new_state)
+        # Make sure all the SQL was processed
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM i_love_ponies")
+            self.assertEqual(cursor.fetchall()[0][0], 3)
+
+        with connection.schema_editor() as editor:
+            param_operation.database_backwards("test_runsql", editor, new_state, project_state)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM i_love_ponies")
+            self.assertEqual(cursor.fetchall()[0][0], 0)
+
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_runsql", editor, new_state, project_state)
+        self.assertTableNotExists("i_love_ponies")
+
+    def test_run_sql_params_invalid(self):
+        """
+        #23426 - RunSQL should fail when a list of statements with an incorrect
+        number of tuples is given.
+        """
+        project_state = self.set_up_test_model("test_runsql")
+        new_state = project_state.clone()
+        operation = migrations.RunSQL(
+            # forwards
+            [
+                ["INSERT INTO foo (bar) VALUES ('buz');"]
+            ],
+            # backwards
+            (
+                ("DELETE FROM foo WHERE bar = 'buz';", 'invalid', 'parameter count'),
+            ),
+        )
+
+        with connection.schema_editor() as editor:
+            six.assertRaisesRegex(self, ValueError,
+                "Expected a 2-tuple but got 1",
+                operation.database_forwards,
+                "test_runsql", editor, project_state, new_state)
+
+        with connection.schema_editor() as editor:
+            six.assertRaisesRegex(self, ValueError,
+                "Expected a 2-tuple but got 3",
+                operation.database_backwards,
+                "test_runsql", editor, new_state, project_state)
+
     def test_run_python(self):
         """
         Tests the RunPython operation
@@ -1396,6 +1522,7 @@ class SwappableOperationTests(OperationTestBase):
     available_apps = [
         "migrations",
         "django.contrib.auth",
+        "django.contrib.contenttypes",
     ]
 
     @override_settings(TEST_SWAP_MODEL="migrations.SomeFakeModel")

@@ -13,6 +13,7 @@ from django.core.exceptions import ViewDoesNotExist
 from django.http import Http404
 from django.core import urlresolvers
 from django.contrib.admindocs import utils
+from django.template.engine import Engine
 from django.utils.decorators import method_decorator
 from django.utils._os import upath
 from django.utils import six
@@ -143,10 +144,11 @@ class ViewDetailView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
-        mod, func = urlresolvers.get_mod_func(view)
-        try:
+        urlconf = urlresolvers.get_urlconf()
+        if urlresolvers.get_resolver(urlconf)._is_callback(view):
+            mod, func = urlresolvers.get_mod_func(view)
             view_func = getattr(import_module(mod), func)
-        except (ImportError, AttributeError):
+        else:
             raise Http404
         title, body, metadata = utils.parse_docstring(view_func.__doc__)
         if title:
@@ -177,17 +179,24 @@ class ModelDetailView(BaseAdminDocsView):
     template_name = 'admin_doc/model_detail.html'
 
     def get_context_data(self, **kwargs):
+        model_name = self.kwargs['model_name']
         # Get the model class.
         try:
             app_config = apps.get_app_config(self.kwargs['app_label'])
         except LookupError:
             raise Http404(_("App %(app_label)r not found") % self.kwargs)
         try:
-            model = app_config.get_model(self.kwargs['model_name'])
+            model = app_config.get_model(model_name)
         except LookupError:
             raise Http404(_("Model %(model_name)r not found in app %(app_label)r") % self.kwargs)
 
         opts = model._meta
+
+        title, body, metadata = utils.parse_docstring(model.__doc__)
+        if title:
+            title = utils.parse_rst(title, 'model', _('model:') + model_name)
+        if body:
+            body = utils.parse_rst(body, 'model', _('model:') + model_name)
 
         # Gather fields/field descriptions.
         fields = []
@@ -270,9 +279,8 @@ class ModelDetailView(BaseAdminDocsView):
             })
         kwargs.update({
             'name': '%s.%s' % (opts.app_label, opts.object_name),
-            # Translators: %s is an object type name
-            'summary': _("Attributes on %s objects") % opts.object_name,
-            'description': model.__doc__,
+            'summary': title,
+            'description': body,
             'fields': fields,
         })
         return super(ModelDetailView, self).get_context_data(**kwargs)
@@ -284,13 +292,13 @@ class TemplateDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         template = self.kwargs['template']
         templates = []
-        for dir in settings.TEMPLATE_DIRS:
+        for dir in Engine.get_default().dirs:
             template_file = os.path.join(dir, template)
             templates.append({
                 'file': template_file,
                 'exists': os.path.exists(template_file),
                 'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
-                'order': list(settings.TEMPLATE_DIRS).index(dir),
+                'order': list(Engine.get_default().dirs).index(dir),
             })
         kwargs.update({
             'name': template,

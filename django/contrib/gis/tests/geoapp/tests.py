@@ -1,12 +1,14 @@
 from __future__ import unicode_literals
 
 import re
+from tempfile import NamedTemporaryFile
 import unittest
 
 from django.db import connection
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import no_oracle, oracle, postgis, spatialite
+from django.core.management import call_command
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
@@ -143,7 +145,7 @@ class GeoModelTest(TestCase):
 
         # If the GeometryField SRID is -1, then we shouldn't perform any
         # transformation if the SRID of the input geometry is different.
-        if spatialite and connection.ops.spatial_version < 3:
+        if spatialite and connection.ops.spatial_version < (3, 0, 0):
             # SpatiaLite < 3 does not support missing SRID values.
             return
         m1 = MinusOneSRID(geom=Point(17, 23, srid=4326))
@@ -203,6 +205,24 @@ class GeoModelTest(TestCase):
         self.assertEqual(len(cities1), len(list(cities2)))
         self.assertIsInstance(cities2[0].point, Point)
 
+    def test_dumpdata_loaddata_cycle(self):
+        """
+        Test a dumpdata/loaddata cycle with geographic data.
+        """
+        out = six.StringIO()
+        original_data = list(City.objects.all().order_by('name'))
+        call_command('dumpdata', 'geoapp.City', stdout=out)
+        result = out.getvalue()
+        houston = City.objects.get(name='Houston')
+        self.assertIn('"point": "%s"' % houston.point.ewkt, result)
+
+        # Reload now dumped data
+        with NamedTemporaryFile(mode='w', suffix='.json') as tempfile:
+            tempfile.write(result)
+            tempfile.seek(0)
+            call_command('loaddata', tempfile.name, verbosity=0)
+        self.assertListEqual(original_data, list(City.objects.all().order_by('name')))
+
 
 @skipUnlessDBFeature("gis_enabled")
 class GeoLookupTest(TestCase):
@@ -249,7 +269,7 @@ class GeoLookupTest(TestCase):
         self.assertEqual('New Zealand', nz.name)
 
         # Spatialite 2.3 thinks that Lawrence is in Puerto Rico (a NULL geometry).
-        if not (spatialite and connection.ops.spatial_version < 3):
+        if not (spatialite and connection.ops.spatial_version < (3, 0, 0)):
             ks = State.objects.get(poly__contains=lawrence.point)
             self.assertEqual('Kansas', ks.name)
 
@@ -609,7 +629,9 @@ class GeoQuerySetTest(TestCase):
         )
         # We check for equality with a tolerance of 10e-5 which is a lower bound
         # of the precisions of ref_line coordinates
-        self.assertTrue(ref_line.equals_exact(City.objects.make_line(), tolerance=10e-5))
+        line = City.objects.make_line()
+        self.assertTrue(ref_line.equals_exact(line, tolerance=10e-5),
+            "%s != %s" % (ref_line, line))
 
     @skipUnlessDBFeature("has_num_geom_method")
     def test_num_geom(self):

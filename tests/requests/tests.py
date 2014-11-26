@@ -35,17 +35,41 @@ class RequestsTests(SimpleTestCase):
         # and FILES should be MultiValueDict
         self.assertEqual(request.FILES.getlist('foo'), [])
 
+    def test_httprequest_full_path(self):
+        request = HttpRequest()
+        request.path = request.path_info = '/;some/?awful/=path/foo:bar/'
+        request.META['QUERY_STRING'] = ';some=query&+query=string'
+        expected = '/%3Bsome/%3Fawful/%3Dpath/foo:bar/?;some=query&+query=string'
+        self.assertEqual(request.get_full_path(), expected)
+
+    def test_httprequest_full_path_with_query_string_and_fragment(self):
+        request = HttpRequest()
+        request.path = request.path_info = '/foo#bar'
+        request.META['QUERY_STRING'] = 'baz#quux'
+        self.assertEqual(request.get_full_path(), '/foo%23bar?baz#quux')
+
     def test_httprequest_repr(self):
         request = HttpRequest()
         request.path = '/somepath/'
+        request.method = 'GET'
         request.GET = {'get-key': 'get-value'}
         request.POST = {'post-key': 'post-value'}
         request.COOKIES = {'post-key': 'post-value'}
         request.META = {'post-key': 'post-value'}
-        self.assertEqual(repr(request), str_prefix("<HttpRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
-        self.assertEqual(build_request_repr(request), repr(request))
+        self.assertEqual(repr(request), str_prefix("<HttpRequest: GET '/somepath/'>"))
+        self.assertEqual(build_request_repr(request), str_prefix("<HttpRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
         self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={'a': 'b'}, POST_override={'c': 'd'}, COOKIES_override={'e': 'f'}, META_override={'g': 'h'}),
                          str_prefix("<HttpRequest\npath:/otherpath/,\nGET:{%(_)s'a': %(_)s'b'},\nPOST:{%(_)s'c': %(_)s'd'},\nCOOKIES:{%(_)s'e': %(_)s'f'},\nMETA:{%(_)s'g': %(_)s'h'}>"))
+
+    def test_httprequest_repr_invalid_method_and_path(self):
+        request = HttpRequest()
+        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
+        request = HttpRequest()
+        request.method = "GET"
+        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
+        request = HttpRequest()
+        request.path = ""
+        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
 
     def test_bad_httprequest_repr(self):
         """
@@ -61,7 +85,7 @@ class RequestsTests(SimpleTestCase):
         for attr in ['GET', 'POST', 'COOKIES', 'META']:
             request = HttpRequest()
             setattr(request, attr, {'bomb': bomb})
-            self.assertIn('%s:<could not parse>' % attr, repr(request))
+            self.assertIn('%s:<could not parse>' % attr, build_request_repr(request))
 
     def test_wsgirequest(self):
         request = WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus', 'wsgi.input': BytesIO(b'')})
@@ -112,13 +136,15 @@ class RequestsTests(SimpleTestCase):
             self.assertEqual(request.path, '/FORCED_PREFIX/somepath/')
 
     def test_wsgirequest_repr(self):
+        request = WSGIRequest({'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+        self.assertEqual(repr(request), str_prefix("<WSGIRequest: GET '/'>"))
         request = WSGIRequest({'PATH_INFO': '/somepath/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
         request.GET = {'get-key': 'get-value'}
         request.POST = {'post-key': 'post-value'}
         request.COOKIES = {'post-key': 'post-value'}
         request.META = {'post-key': 'post-value'}
-        self.assertEqual(repr(request), str_prefix("<WSGIRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
-        self.assertEqual(build_request_repr(request), repr(request))
+        self.assertEqual(repr(request), str_prefix("<WSGIRequest: GET '/somepath/'>"))
+        self.assertEqual(build_request_repr(request), str_prefix("<WSGIRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
         self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={'a': 'b'}, POST_override={'c': 'd'}, COOKIES_override={'e': 'f'}, META_override={'g': 'h'}),
                          str_prefix("<WSGIRequest\npath:/otherpath/,\nGET:{%(_)s'a': %(_)s'b'},\nPOST:{%(_)s'c': %(_)s'd'},\nCOOKIES:{%(_)s'e': %(_)s'f'},\nMETA:{%(_)s'g': %(_)s'h'}>"))
 
@@ -191,7 +217,7 @@ class RequestsTests(SimpleTestCase):
         example_cookie = response.cookies['example']
         # A compat cookie may be in use -- check that it has worked
         # both as an output string, and using the cookie attributes
-        self.assertTrue('; httponly' in str(example_cookie))
+        self.assertIn('; httponly', str(example_cookie))
         self.assertTrue(example_cookie['httponly'])
 
     def test_unicode_cookie(self):

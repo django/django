@@ -2,6 +2,9 @@
 Model Form Functions
 ====================
 
+Model Form API reference. For introductory material about model forms, see the
+:doc:`/topics/forms/modelforms` topic guide.
+
 .. module:: django.forms.models
    :synopsis: Django's functions for building model forms and formsets.
 

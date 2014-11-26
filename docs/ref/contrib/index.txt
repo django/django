@@ -25,7 +25,6 @@ those packages have.
    admin/index
    auth
    contenttypes
-   csrf
    flatpages
    formtools/index
    gis/index
@@ -63,13 +62,6 @@ Django model is a separate content type.
 
 See the :doc:`contenttypes documentation </ref/contrib/contenttypes>`.
 
-csrf
-====
-
-A middleware for preventing Cross Site Request Forgeries
-
-See the :doc:`csrf documentation </ref/contrib/csrf>`.
-
 flatpages
 =========
 
@@ -78,27 +70,6 @@ A framework for managing simple "flat" HTML content in a database.
 See the :doc:`flatpages documentation </ref/contrib/flatpages>`.
 
 Requires the sites_ contrib package to be installed as well.
-
-formtools
-=========
-
-A set of high-level abstractions for Django forms (django.forms).
-
-django.contrib.formtools.preview
---------------------------------
-
-An abstraction of the following workflow:
-
-"Display an HTML form, force a preview, then do something with the submission."
-
-See the :doc:`form preview documentation </ref/contrib/formtools/form-preview>`.
-
-django.contrib.formtools.wizard
--------------------------------
-
-Splits forms across multiple Web pages.
-
-See the :doc:`form wizard documentation </ref/contrib/formtools/form-wizard>`.
 
 gis
 ====

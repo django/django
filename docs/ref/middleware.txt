@@ -66,6 +66,14 @@ Adds a few conveniences for perfectionists:
   for each request by MD5-hashing the page content, and it'll take care of
   sending ``Not Modified`` responses, if appropriate.
 
+.. attribute:: CommonMiddleware.response_redirect_class
+
+.. versionadded:: 1.8
+
+Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
+``CommonMiddleware`` and override the attribute to customize the redirects
+issued by the middleware.
+
 .. class:: BrokenLinkEmailsMiddleware
 
 * Sends broken link notification emails to :setting:`MANAGERS` (see
@@ -388,7 +396,7 @@ CSRF protection middleware
 
 Adds protection against Cross Site Request Forgeries by adding hidden form
 fields to POST forms and checking requests for the correct value. See the
-:doc:`Cross Site Request Forgery protection documentation </ref/contrib/csrf>`.
+:doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
 
 X-Frame-Options middleware
 --------------------------

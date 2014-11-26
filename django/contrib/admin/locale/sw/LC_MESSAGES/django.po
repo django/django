@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# machaku <bmachaku@gmail.com>, 2013
+# machaku <bmachaku@gmail.com>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:18+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-22 16:16+0000\n"
+"Last-Translator: machaku <bmachaku@gmail.com>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -38,7 +38,7 @@ msgstr "Futa %(verbose_name_plural)s teule"
 
 #: contrib/admin/apps.py:11
 msgid "Administration"
-msgstr ""
+msgstr "Utawala"
 
 #: contrib/admin/filters.py:104 contrib/admin/filters.py:199
 #: contrib/admin/filters.py:239 contrib/admin/filters.py:276
@@ -84,8 +84,8 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Tafadhali sahihisha %(username)s na nenosiri kwa akaunti ya mfanyakazi. "
-"Kumbuka sehemu zote mbili zinaweza kuwa zinazingatia herufi kubwa na ndogo."
+"Tafadhali ingiza %(username)s na nywila sahihi kwa akaunti ya msimamizi. "
+"Kumbuka kuzingatia herufi kubwa na ndogo."
 
 #: contrib/admin/helpers.py:23
 msgid "Action:"
@@ -155,17 +155,17 @@ msgstr "na"
 #: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr "Ingizo la \"%(object)s\" %(name)s "
+msgstr "Ingizo la %(name)s \"%(object)s\"  limefanyika "
 
 #: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Mabadiliko %(list)s kwa \"%(object)s\\v %(name)s."
+msgstr "Mabadiliko %(list)s yamefanyoka kwa %(object)s \"%(name)s\"."
 
 #: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Kumefutwa \"%(object)s\" %(name)s."
+msgstr "Kumefutwa kwa %(name)s \"%(object)s\" kumefanyika."
 
 #: contrib/admin/options.py:974
 msgid "No fields changed."
@@ -313,7 +313,7 @@ msgstr "Ingia"
 #: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "Utawala wa %(app)s"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -390,12 +390,12 @@ msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
-"Kwanza, ingiza jina lamtumiaji na nenosiri. Kisha, utaweza kuhariri zaidi "
+"Kwanza, ingiza jina lamtumiaji na nywila. Kisha, utaweza kuhariri zaidi "
 "machaguo ya mtumiaji."
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr "Ingiza jina la mtumiaji na nenosiri."
+msgstr "Ingiza jina la mtumiaji na nywila."
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:17
 #: contrib/admin/templates/admin/auth/user/change_password.html:51
@@ -403,7 +403,7 @@ msgstr "Ingiza jina la mtumiaji na nenosiri."
 #: contrib/admin/templates/registration/password_change_done.html:3
 #: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
-msgstr "Badilisha nenosiri"
+msgstr "Badilisha nywila"
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:27
 #: contrib/admin/templates/admin/change_form.html:47
@@ -424,20 +424,20 @@ msgstr "Tafadhali sahihisha makosa yafuatayo."
 #: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "ingiza nenosiri la mtumiaji <strong>%(username)s</strong>."
+msgstr "ingiza nywila ya mtumiaji <strong>%(username)s</strong>."
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:38
 msgid "Password"
-msgstr "Nenosiri"
+msgstr "Nywila"
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:44
 #: contrib/admin/templates/registration/password_change_form.html:42
 msgid "Password (again)"
-msgstr "Nenosiri (tena)"
+msgstr "Nywila (tena)"
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:45
 msgid "Enter the same password as above, for verification."
-msgstr "Ingiza nenosiri linalofanana na la juu, kwa uthibitisho."
+msgstr "Ingiza nywila inayofanana na ya juu, kwa uthibitisho."
 
 #: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
@@ -700,79 +700,79 @@ msgstr "ingia tena"
 #: contrib/admin/templates/registration/password_change_done.html:7
 #: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
-msgstr "Badilisha nenosiri"
+msgstr "Badilisha nywila"
 
 #: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
-msgstr "Nenosiri lako lilibadilishwa"
+msgstr "Nywila yako imebadilishwa"
 
 #: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Tafadhali ingiza nenosiri lako la zamani, kwa ajili ya usalama, kisha ingiza "
-"nenosiri jipya mara mbili ili tuweze kuthibitisha kuwa umelichapisha kwa "
+"Tafadhali ingiza nywila yako ya zamani, kwa ajili ya usalama, kisha ingiza "
+"nywila mpya mara mbili ili tuweze kuthibitisha kuwa umelichapisha kwa "
 "usahihi."
 
 #: contrib/admin/templates/registration/password_change_form.html:32
 msgid "Old password"
-msgstr "Nenosiri la zamani"
+msgstr "Nywila ya zamani"
 
 #: contrib/admin/templates/registration/password_change_form.html:37
 msgid "New password"
-msgstr "Nenosiri jipya"
+msgstr "Nywila mpya"
 
 #: contrib/admin/templates/registration/password_change_form.html:48
 #: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
-msgstr "Badilisha nenosiri langu"
+msgstr "Badilisha nywila yangu"
 
 #: contrib/admin/templates/registration/password_reset_complete.html:7
 #: contrib/admin/templates/registration/password_reset_done.html:7
 #: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
-msgstr "Kuseti upya nenosiri"
+msgstr "Kuseti nywila upya"
 
 #: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Nenosiri lako limesetiwa. Unaweza kuendelea na kuingia sasa."
+msgstr "Nywila yako imesetiwa. Unaweza kuendelea na kuingia sasa."
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
-msgstr "Uthibitisho wa kuseti upya nenosiri"
+msgstr "Uthibitisho wa kuseti nywila  upya"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"Tafadhali ingiza nenosiri mara mbili ili tuweze kuthibitisha kuwa "
+"Tafadhali ingiza nywila mpya mara mbili ili tuweze kuthibitisha kuwa "
 "umelichapisha kwa usahihi."
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
-msgstr "Nenosiri jipya"
+msgstr "Nywila mpya:"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
-msgstr "Thibitisha nenosiri"
+msgstr "Thibitisha nywila"
 
 #: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-"Kiungo cha kuseti upya nenosiri ni batili, inawezekana ni kwa sababu kiungo "
-"hicho tayari kimetumika. tafadhali omba upya kuseti nenosiri"
+"Kiungo cha kuseti nywila upya ni batili, inawezekana ni kwa sababu kiungo "
+"hicho tayari kimetumika. tafadhali omba upya kuseti nywila."
 
 #: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
 "We've emailed you instructions for setting your password. You should be "
 "receiving them shortly."
 msgstr ""
-"Tumekutumia maelekezo ya kuseti nenosiri lako. Unapaswa kuyapata ndani ya "
-"muda mfupi."
+"Tumekutumia maelekezo ya kuseti nywila yako. Unapaswa kuyapata ndani ya muda "
+"mfupi."
 
 #: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
@@ -788,12 +788,12 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Umepata barua pepe hii kwa sababu ulihitaji ku seti upya nenosiri la akaunti "
+"Umepata barua pepe hii kwa sababu ulihitaji ku seti upya nywila ya akaunti "
 "yako ya %(site_name)s."
 
 #: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
-msgstr "Tafadhali nenda ukurasa ufuatao na uchague nenosiri jipya:"
+msgstr "Tafadhali nenda ukurasa ufuatao na uchague nywila mpya:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
@@ -813,8 +813,8 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
-"Umesahau nenosiri? Ingiza anuani ya barua pepe hapo chini, nasi tutakutumia "
-"maelekezo ya kuseti nenosiri jipya. "
+"Umesahau nywila yako? Ingiza anuani yako ya barua pepe hapo chini, nasi "
+"tutakutumia maelekezo ya kuseti nenosiri jipya. "
 
 #: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
@@ -822,7 +822,7 @@ msgstr "Anuani ya barua pepe:"
 
 #: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
-msgstr "Seti upya nenosiri langu"
+msgstr "Seti nywila yangu upya"
 
 #: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"

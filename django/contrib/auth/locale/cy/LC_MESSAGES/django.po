@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-26 13:57+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -42,7 +42,7 @@ msgstr "Newid cyfrinair: %s"
 
 #: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Dilysu ac Awdurdodi"
 
 #: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
 #: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
@@ -223,7 +223,7 @@ msgstr "hawliau defnyddiwr"
 
 #: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Caniatâd penodol ar gyfer y defnyddiwr hwn."
 
 #: contrib/auth/models.py:367
 msgid "username"
@@ -292,28 +292,28 @@ msgstr "Allgofnodwyd"
 
 #: contrib/auth/views.py:169
 msgid "Password reset"
-msgstr ""
+msgstr "Ailosod cyfrinair"
 
 #: contrib/auth/views.py:181
 msgid "Password reset successful"
-msgstr ""
+msgstr "Ailosod cyfrinair yn llwyddianus"
 
 #: contrib/auth/views.py:216
 msgid "Enter new password"
-msgstr ""
+msgstr "Rhowch gyfrinair newydd"
 
 #: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Ailosod y cyfrinair yn aflwyddiannus"
 
 #: contrib/auth/views.py:244
 msgid "Password reset complete"
-msgstr ""
+msgstr "Cwblhawyd ailosod y cyfrinair"
 
 #: contrib/auth/views.py:278
 msgid "Password change"
-msgstr ""
+msgstr "Newid cyfrinair"
 
 #: contrib/auth/views.py:291
 msgid "Password change successful"
-msgstr ""
+msgstr "Newid cyfrinair yn llwyddianus"

@@ -139,10 +139,19 @@ inner ``Meta`` class on :class:`~django.forms.ModelForm`. Unless you define the
 form class in another way, the attribute is required and the view will raise
 an :exc:`~django.core.exceptions.ImproperlyConfigured` exception if it's not.
 
+If you specify both the :attr:`~django.views.generic.edit.ModelFormMixin.fields`
+and :attr:`~django.views.generic.edit.FormMixin.form_class` attributes, an
+:exc:`~django.core.exceptions.ImproperlyConfigured` exception will be raised.
+
 .. versionchanged:: 1.8
 
     Omitting the ``fields`` attribute was previously allowed and resulted in a
     form with all of the model's fields.
+
+.. versionchanged:: 1.8
+
+    Previously if both ``fields`` and ``form_class`` were specified,
+    ``fields`` was silently ignored.
 
 Finally, we hook these new views into the URLconf:
 

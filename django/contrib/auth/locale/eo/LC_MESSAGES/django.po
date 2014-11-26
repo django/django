@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 13:37+0000\n"
+"PO-Revision-Date: 2014-09-25 18:48+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
 "language/eo/)\n"
@@ -241,7 +241,7 @@ msgstr "persona nomo"
 
 #: contrib/auth/models.py:374
 msgid "last name"
-msgstr "famalia nomo"
+msgstr "familia nomo"
 
 #: contrib/auth/models.py:375
 msgid "email address"

@@ -97,8 +97,8 @@ configuration instructions for the `using database-backed sessions`_.
 
 .. versionchanged:: 1.7
 
-Before version 1.7, the ``cached_db`` backend always used the ``default`` cache
-rather than the :setting:`SESSION_CACHE_ALIAS`.
+    Before version 1.7, the ``cached_db`` backend always used the ``default``
+    cache rather than the :setting:`SESSION_CACHE_ALIAS`.
 
 Using file-based sessions
 -------------------------
@@ -291,7 +291,7 @@ You can edit it multiple times.
       - ``modification``: last modification of the session, as a
         :class:`~datetime.datetime` object. Defaults to the current time.
       - ``expiry``: expiry information for the session, as a
-        :class:`~datetime.datetime` object, an :func:`int` (in seconds), or
+        :class:`~datetime.datetime` object, an :class:`int` (in seconds), or
         ``None``. Defaults to the value stored in the session by
         :meth:`set_expiry`, if there is one, or ``None``.
 

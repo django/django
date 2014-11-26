@@ -4,6 +4,7 @@
 # sidewinder <adam.klosiu@gmail.com>, 2014
 # angularcircle, 2011,2013
 # angularcircle, 2011,2013
+# angularcircle, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janusz Harkot <jh@blueice.pl>, 2014
 # Kacper Krupa <pagenoare@gmail.com>, 2013
@@ -13,6 +14,7 @@
 # Łukasz Rekucki <lrekucki@gmail.com>, 2011
 # Michał Pasternak <michal.dtz@gmail.com>, 2013
 # p <inactive+poczciwiec@transifex.com>, 2012
+# Piotr Meuś <piotr.meus@gmail.com>, 2014
 # p <inactive+poczciwiec@transifex.com>, 2012
 # Radek Czajka <radoslaw.czajka@nowoczesnapolska.org.pl>, 2013
 # Radek Czajka <radoslaw.czajka@nowoczesnapolska.org.pl>, 2013
@@ -22,9 +24,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-08-19 11:29+0000\n"
-"Last-Translator: sidewinder <adam.klosiu@gmail.com>\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-09-18 19:35+0000\n"
+"Last-Translator: angularcircle\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/django/language/"
 "pl/)\n"
 "MIME-Version: 1.0\n"
@@ -41,6 +43,10 @@ msgstr "Afryknerski"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "arabski"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr "asturyjski"
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -183,6 +189,10 @@ msgid "Indonesian"
 msgstr "indonezyjski"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr "ido"
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "islandzki"
 
@@ -237,6 +247,10 @@ msgstr "malajski"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "mongolski"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr "marathi"
 
 #: conf/global_settings.py:102
 msgid "Burmese"
@@ -496,6 +510,8 @@ msgstr "%(field_label)s już istnieje w %(model_name)s."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"Wartość pola %(field_label)s musi być unikatowa dla %(date_field_label)s "
+"%(lookup_type)s."
 
 #: db/models/fields/__init__.py:116
 #, python-format

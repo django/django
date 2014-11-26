@@ -20,7 +20,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         This routine is overridden from Query to handle customized selection of
         geometry columns.
         """
-        qn = self
+        qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (self.get_extra_select_format(alias) % col[0], qn2(alias))
                   for alias, col in six.iteritems(self.query.extra_select)]
@@ -55,7 +55,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                         aliases.add(r)
                         col_aliases.add(col[1])
                 else:
-                    col_sql, col_params = col.as_sql(qn, self.connection)
+                    col_sql, col_params = col.as_sql(self, self.connection)
                     result.append(col_sql)
                     params.extend(col_params)
 
@@ -70,8 +70,8 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             aliases.update(new_aliases)
 
         max_name_length = self.connection.ops.max_name_length()
-        for alias, aggregate in self.query.aggregate_select.items():
-            agg_sql, agg_params = aggregate.as_sql(qn, self.connection)
+        for alias, annotation in self.query.annotation_select.items():
+            agg_sql, agg_params = self.compile(annotation)
             if alias is None:
                 result.append(agg_sql)
             else:

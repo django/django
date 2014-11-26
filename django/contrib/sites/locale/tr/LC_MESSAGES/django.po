@@ -2,6 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2014
+# Burak Yavuz, 2014
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-02 10:36+0000\n"
-"Last-Translator: Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>\n"
+"PO-Revision-Date: 2014-09-06 13:04+0000\n"
+"Last-Translator: Burak Yavuz\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -25,11 +26,11 @@ msgstr "Siteler"
 
 #: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
-msgstr "Alan adı, boşluk ya da sekmeler içeremez."
+msgstr "Etki alanı adı, herhangi bir boşluk ya da sekme içeremez."
 
 #: contrib/sites/models.py:67
 msgid "domain name"
-msgstr "alan adı"
+msgstr "etki alanı adı"
 
 #: contrib/sites/models.py:69
 msgid "display name"

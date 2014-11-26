@@ -2,12 +2,15 @@
 Django 1.7.1 release notes
 ==========================
 
-*Under development*
+*October 22, 2014*
 
 Django 1.7.1 fixes several bugs in 1.7.
 
 Bugfixes
 ========
+
+* Allowed related many-to-many fields to be referenced in the admin
+  (:ticket:`23604`).
 
 * Added a more helpful error message if you try to migrate an app without first
   creating the ``contenttypes`` table (:ticket:`22411`).
@@ -86,3 +89,49 @@ Bugfixes
 
 * Fixed ``MigrationWriter`` to handle builtin types without imports
   (:ticket:`23560`).
+
+* Fixed ``deepcopy`` on ``ErrorList`` (:ticket:`23594`).
+
+* Made the :mod:`~django.contrib.admindocs` view to browse view details check
+  if the view specified in the URL exists in the URLconf. Previously it was
+  possible to import arbitrary packages from the Python path. This was not
+  considered a security issue because ``admindocs`` is only accessible to staff
+  users (:ticket:`23601`).
+
+* Fixed ``UnicodeDecodeError`` crash in ``AdminEmailHandler`` with non-ASCII
+  characters in the request (:ticket:`23593`).
+
+* Fixed missing ``get_or_create`` and ``update_or_create`` on related managers
+  causing ``IntegrityError`` (:ticket:`23611`).
+
+* Made :func:`~django.utils.http.urlsafe_base64_decode` return the proper
+  type (byte string) on Python 3 (:ticket:`23333`).
+
+* :djadmin:`makemigrations` can now serialize timezone-aware values
+  (:ticket:`23365`).
+
+* Added a prompt to the migrations questioner when removing the null constraint
+  from a field to prevent an IntegrityError on existing NULL rows
+  (:ticket:`23609`).
+
+* Fixed generic relations in ``ModelAdmin.list_filter`` (:ticket:`23616`).
+
+* Restored RFC compliance for the SMTP backend on Python 3 (:ticket:`23063`).
+
+* Fixed a crash while parsing cookies containing invalid content
+  (:ticket:`23638`).
+
+* The system check framework now raises error **models.E020** when the
+  class method ``Model.check()`` is unreachable (:ticket:`23615`).
+
+* Made the Oracle test database creation drop the test user in the event of an
+  unclean exit of a previous test run (:ticket:`23649`).
+
+* Fixed :djadmin:`makemigrations` to detect changes to
+  :attr:`Meta.db_table <django.db.models.Options.db_table>` (:ticket:`23629`).
+
+* Fixed a regression when feeding the Django test client with an empty data
+  string (:ticket:`21740`).
+
+* Fixed a regression in :djadmin:`makemessages` where static files were
+  unexpectedly ignored (:ticket:`23583`).

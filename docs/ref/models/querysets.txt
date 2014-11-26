@@ -39,7 +39,12 @@ You can evaluate a ``QuerySet`` in the following ways:
   ``QuerySet`` usually returns another unevaluated ``QuerySet``, but Django
   will execute the database query if you use the "step" parameter of slice
   syntax, and will return a list. Slicing a ``QuerySet`` that has been
-  evaluated (partially or fully) also returns a list.
+  evaluated also returns a list.
+
+  Also note that even though slicing an unevaluated ``QuerySet`` returns
+  another unevaluated ``QuerySet``, modifying it further (e.g., adding
+  more filters, or modifying ordering) is not allowed, since that does not
+  translate well into SQL and it would not have a clear meaning either.
 
 * **Pickling/Caching.** See the following section for details of what
   is involved when `pickling QuerySets`_. The important thing for the
@@ -62,11 +67,6 @@ You can evaluate a ``QuerySet`` in the following ways:
   it. For example::
 
       entry_list = list(Entry.objects.all())
-
-  Be warned, though, that this could have a large memory overhead, because
-  Django will load each element of the list into memory. In contrast,
-  iterating over a ``QuerySet`` will take advantage of your database to
-  load data and instantiate objects only as you need them.
 
 * **bool().** Testing a ``QuerySet`` in a boolean context, such as using
   ``bool()``, ``or``, ``and`` or an ``if`` statement, will cause the query
@@ -220,9 +220,18 @@ annotate
 
 .. method:: annotate(*args, **kwargs)
 
-Annotates each object in the ``QuerySet`` with the provided list of
-aggregate values (averages, sums, etc) that have been computed over
-the objects that are related to the objects in the ``QuerySet``.
+Annotates each object in the ``QuerySet`` with the provided list of :doc:`query
+expressions </ref/models/expressions>`. An expression may be a simple value, a
+reference to a field on the model (or any related models), or an aggregate
+expression (averages, sums, etc) that has been computed over the objects that
+are related to the objects in the ``QuerySet``.
+
+.. versionadded:: 1.8
+
+    Previous versions of Django only allowed aggregate functions to be used as
+    annotations. It is now possible to annotate a model with all kinds of
+    expressions.
+
 Each argument to ``annotate()`` is an annotation that will be added
 to each object in the ``QuerySet`` that is returned.
 
@@ -232,7 +241,9 @@ in `Aggregation Functions`_ below.
 Annotations specified using keyword arguments will use the keyword as
 the alias for the annotation. Anonymous arguments will have an alias
 generated for them based upon the name of the aggregate function and
-the model field that is being aggregated.
+the model field that is being aggregated. Only aggregate expressions
+that reference a single field can be anonymous arguments. Everything
+else must be a keyword argument.
 
 For example, if you were manipulating a list of blogs, you may want
 to determine how many entries have been made in each blog::
@@ -289,9 +300,10 @@ and so on for as many models as you want to join. For example::
     Entry.objects.order_by('blog__name', 'headline')
 
 If you try to order by a field that is a relation to another model, Django will
-use the default ordering on the related model (or order by the related model's
+use the default ordering on the related model, or order by the related model's
 primary key if there is no :attr:`Meta.ordering
-<django.db.models.Options.ordering>` specified. For example::
+<django.db.models.Options.ordering>` specified. For example, since the ``Blog``
+model has no default ordering specified::
 
     Entry.objects.order_by('blog')
 
@@ -299,7 +311,10 @@ primary key if there is no :attr:`Meta.ordering
 
     Entry.objects.order_by('blog__id')
 
-...since the ``Blog`` model has no default ordering specified.
+If ``Blog`` had ``ordering = ['name']``, then the first queryset would be
+identical to::
+
+    Entry.objects.order_by('blog__name')
 
 .. versionadded:: 1.7
 
@@ -580,7 +595,7 @@ You can also refer to fields on related models with reverse relations through
 values_list
 ~~~~~~~~~~~
 
-.. method:: values_list(*fields)
+.. method:: values_list(*fields, flat=False)
 
 This is similar to ``values()`` except that instead of returning dictionaries,
 it returns tuples when iterated over. Each tuple contains the value from the
@@ -649,13 +664,13 @@ Examples::
 datetimes
 ~~~~~~~~~
 
-.. method:: datetimes(field, kind, order='ASC', tzinfo=None)
+.. method:: datetimes(field_name, kind, order='ASC', tzinfo=None)
 
 Returns a ``DateTimeQuerySet`` — a ``QuerySet`` that evaluates to a list of
 :class:`datetime.datetime` objects representing all available dates of a
 particular kind within the contents of the ``QuerySet``.
 
-``field`` should be the name of a ``DateTimeField`` of your model.
+``field_name`` should be the name of a ``DateTimeField`` of your model.
 
 ``kind`` should be either ``"year"``, ``"month"``, ``"day"``, ``"hour"``,
 ``"minute"`` or ``"second"``. Each ``datetime.datetime`` object in the result
@@ -750,6 +765,24 @@ And here's ``select_related`` lookup::
     # in the previous query.
     b = e.blog
 
+You can use ``select_related()`` with any queryset of objects::
+
+    from django.utils import timezone
+
+    # Find all the blogs with entries scheduled to be published in the future.
+    blogs = set()
+
+    for e in Entry.objects.filter(pub_date__gt=timezone.now()).select_related('blog'):
+        # Without select_related(), this would make a database query for each
+        # loop iteration in order to fetch the related blog for each entry.
+        blogs.add(e.blog)
+
+The order of ``filter()`` and ``select_related()`` chaining isn't important.
+These querysets are equivalent::
+
+    Entry.objects.filter(pub_date__gt=timezone.now()).selected_related('blog')
+    Entry.objects.selected_related('blog').filter(pub_date__gt=timezone.now())
+
 You can follow foreign keys in a similar way to querying them. If you have the
 following models::
 
@@ -767,10 +800,10 @@ following models::
         # ...
         author = models.ForeignKey(Person)
 
-... then a call to ``Book.objects.select_related('person__city').get(id=4)``
+... then a call to ``Book.objects.select_related('author__hometown').get(id=4)``
 will cache the related ``Person`` *and* the related ``City``::
 
-    b = Book.objects.select_related('person__city').get(id=4)
+    b = Book.objects.select_related('author__hometown').get(id=4)
     p = b.author         # Doesn't hit the database.
     c = p.hometown       # Doesn't hit the database.
 
@@ -801,12 +834,14 @@ If you need to clear the list of related fields added by past calls of
 
    >>> without_relations = queryset.select_related(None)
 
+Chaining ``select_related`` calls works in a similar way to other methods -
+that is that ``select_related('foo', 'bar')`` is equivalent to
+``select_related('foo').select_related('bar')``.
+
 .. versionchanged:: 1.7
 
-Chaining ``select_related`` calls now works in a similar way to other methods -
-that is that ``select_related('foo', 'bar')`` is equivalent to
-``select_related('foo').select_related('bar')``. Previously the latter would
-have been equivalent to ``select_related('bar')``.
+    Previously the latter would have been equivalent to
+    ``select_related('bar')``.
 
 prefetch_related
 ~~~~~~~~~~~~~~~~
@@ -1862,12 +1897,15 @@ the ``QuerySet``. Each argument to ``aggregate()`` specifies a value that will
 be included in the dictionary that is returned.
 
 The aggregation functions that are provided by Django are described in
-`Aggregation Functions`_ below.
+`Aggregation Functions`_ below. Since aggregates are also :doc:`query
+expressions </ref/models/expressions>`, you may combine aggregates with other
+aggregates or values to create complex aggregates.
 
 Aggregates specified using keyword arguments will use the keyword as the name
 for the annotation. Anonymous arguments will have a name generated for them
 based upon the name of the aggregate function and the model field that is being
-aggregated.
+aggregated. Complex aggregates cannot use anonymous arguments and must specify
+a keyword argument as an alias.
 
 For example, when you are working with blog entries, you may want to know the
 number of authors that have contributed blog entries::
@@ -2643,8 +2681,9 @@ Aggregation functions
 
 Django provides the following aggregation functions in the
 ``django.db.models`` module. For details on how to use these
-aggregate functions, see
-:doc:`the topic guide on aggregation </topics/db/aggregation>`.
+aggregate functions, see :doc:`the topic guide on aggregation
+</topics/db/aggregation>`. See the :class:`~django.db.models.Aggregate`
+documentation to learn how to create your aggregates.
 
 .. warning::
 
@@ -2661,12 +2700,47 @@ aggregate functions, see
     instead of ``0`` if the ``QuerySet`` contains no entries. An exception is
     ``Count``, which does return ``0`` if the ``QuerySet`` is empty.
 
+All aggregates have the following parameters in common:
+
+``expression``
+~~~~~~~~~~~~~~
+
+A string that references a field on the model, or a :doc:`query expression
+</ref/models/expressions>`.
+
+.. versionadded:: 1.8
+
+    Aggregate functions are now able to reference multiple fields in complex
+    computations.
+
+``output_field``
+~~~~~~~~~~~~~~~~
+
+An optional argument that represents the :doc:`model field </ref/models/fields>`
+of the return value
+
+.. versionadded:: 1.8
+
+    The ``output_field`` argument was added.
+
+.. note::
+
+    When combining multiple field types, Django can only determine the
+    ``output_field`` if all fields are of the same type. Otherwise, you
+    must provide the ``output_field`` yourself.
+
+``**extra``
+~~~~~~~~~~~
+
+Keyword arguments that can provide extra context for the SQL generated
+by the aggregate.
+
 Avg
 ~~~
 
-.. class:: Avg(field)
+.. class:: Avg(expression, output_field=None, **extra)
 
-    Returns the mean value of the given field, which must be numeric.
+    Returns the mean value of the given expression, which must be numeric.
 
     * Default alias: ``<field>__avg``
     * Return type: ``float``
@@ -2674,9 +2748,10 @@ Avg
 Count
 ~~~~~
 
-.. class:: Count(field, distinct=False)
+.. class:: Count(expression, distinct=False, **extra)
 
-    Returns the number of objects that are related through the provided field.
+    Returns the number of objects that are related through the provided
+    expression.
 
     * Default alias: ``<field>__count``
     * Return type: ``int``
@@ -2692,29 +2767,29 @@ Count
 Max
 ~~~
 
-.. class:: Max(field)
+.. class:: Max(expression, output_field=None, **extra)
 
-    Returns the maximum value of the given field.
+    Returns the maximum value of the given expression.
 
     * Default alias: ``<field>__max``
-    * Return type: same as input field
+    * Return type: same as input field, or ``output_field`` if supplied
 
 Min
 ~~~
 
-.. class:: Min(field)
+.. class:: Min(expression, output_field=None, **extra)
 
-    Returns the minimum value of the given field.
+    Returns the minimum value of the given expression.
 
     * Default alias: ``<field>__min``
-    * Return type: same as input field
+    * Return type: same as input field, or ``output_field`` if supplied
 
 StdDev
 ~~~~~~
 
-.. class:: StdDev(field, sample=False)
+.. class:: StdDev(expression, sample=False, **extra)
 
-    Returns the standard deviation of the data in the provided field.
+    Returns the standard deviation of the data in the provided expression.
 
     * Default alias: ``<field>__stddev``
     * Return type: ``float``
@@ -2736,19 +2811,19 @@ StdDev
 Sum
 ~~~
 
-.. class:: Sum(field)
+.. class:: Sum(expression, output_field=None, **extra)
 
-    Computes the sum of all values of the given field.
+    Computes the sum of all values of the given expression.
 
     * Default alias: ``<field>__sum``
-    * Return type: same as input field
+    * Return type: same as input field, or ``output_field`` if supplied
 
 Variance
 ~~~~~~~~
 
-.. class:: Variance(field, sample=False)
+.. class:: Variance(expression, sample=False, **extra)
 
-    Returns the variance of the data in the provided field.
+    Returns the variance of the data in the provided expression.
 
     * Default alias: ``<field>__variance``
     * Return type: ``float``

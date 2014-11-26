@@ -96,12 +96,15 @@ class OneToOneTests(TestCase):
         assert_filter_waiters(restaurant__place__exact=self.p1.pk)
         assert_filter_waiters(restaurant__place__exact=self.p1)
         assert_filter_waiters(restaurant__place__pk=self.p1.pk)
-        assert_filter_waiters(restaurant__exact=self.p1.pk)
-        assert_filter_waiters(restaurant__pk=self.p1.pk)
-        assert_filter_waiters(restaurant=self.p1.pk)
+        assert_filter_waiters(restaurant__exact=self.r1.pk)
+        assert_filter_waiters(restaurant__exact=self.r1)
+        assert_filter_waiters(restaurant__pk=self.r1.pk)
+        assert_filter_waiters(restaurant=self.r1.pk)
         assert_filter_waiters(restaurant=self.r1)
+        assert_filter_waiters(id__exact=w.pk)
+        assert_filter_waiters(pk=w.pk)
         # Delete the restaurant; the waiter should also be removed
-        r = Restaurant.objects.get(pk=self.p1.pk)
+        r = Restaurant.objects.get(pk=self.r1.pk)
         r.delete()
         self.assertEqual(Waiter.objects.count(), 0)
 
@@ -190,23 +193,23 @@ class OneToOneTests(TestCase):
         r = p.restaurant
 
         # Accessing the related object again returns the exactly same object
-        self.assertTrue(p.restaurant is r)
+        self.assertIs(p.restaurant, r)
 
         # But if we kill the cache, we get a new object
         del p._restaurant_cache
-        self.assertFalse(p.restaurant is r)
+        self.assertIsNot(p.restaurant, r)
 
         # Reassigning the Restaurant object results in an immediate cache update
         # We can't use a new Restaurant because that'll violate one-to-one, but
         # with a new *instance* the is test below will fail if #6886 regresses.
         r2 = Restaurant.objects.get(pk=r.pk)
         p.restaurant = r2
-        self.assertTrue(p.restaurant is r2)
+        self.assertIs(p.restaurant, r2)
 
         # Assigning None succeeds if field is null=True.
         ug_bar = UndergroundBar.objects.create(place=p, serves_cocktails=False)
         ug_bar.place = None
-        self.assertTrue(ug_bar.place is None)
+        self.assertIsNone(ug_bar.place)
 
         # Assigning None fails: Place.restaurant is null=False
         self.assertRaises(ValueError, setattr, p, 'restaurant', None)
@@ -217,13 +220,13 @@ class OneToOneTests(TestCase):
         # Creation using keyword argument should cache the related object.
         p = Place.objects.get(name="Demon Dogs")
         r = Restaurant(place=p)
-        self.assertTrue(r.place is p)
+        self.assertIs(r.place, p)
 
         # Creation using attname keyword argument and an id will cause the related
         # object to be fetched.
         p = Place.objects.get(name="Demon Dogs")
         r = Restaurant(place_id=p.id)
-        self.assertFalse(r.place is p)
+        self.assertIsNot(r.place, p)
         self.assertEqual(r.place, p)
 
     def test_filter_one_to_one_relations(self):

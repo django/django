@@ -12,7 +12,7 @@ This document outlines all it can do.
 
 In addition, ``manage.py`` is automatically created in each Django project.
 ``manage.py`` is a thin wrapper around ``django-admin`` that takes care of
-two things for you before delegating to ``django-admin``:
+several things for you before delegating to ``django-admin``:
 
 * It puts your project's package on ``sys.path``.
 
@@ -165,18 +165,23 @@ the builtin gettext support. See :doc:`/topics/i18n/index`.
 Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
 specify the locale(s) to process. If not provided, all locales are processed.
 
-.. versionadded:: 1.8
-
 Use the :djadminopt:`--exclude` option (or its shorter version ``-x``) to
 specify the locale(s) to exclude from processing. If not provided, no locales
 are excluded.
 
+You can pass ``--use-fuzzy`` option (or ``-f``) to include fuzzy translations
+into compiled files.
+
+.. versionchanged:: 1.8
+
+    Added ``--exclude`` and ``--use-fuzzy`` options.
+
 Example usage::
 
     django-admin compilemessages --locale=pt_BR
-    django-admin compilemessages --locale=pt_BR --locale=fr
+    django-admin compilemessages --locale=pt_BR --locale=fr -f
     django-admin compilemessages -l pt_BR
-    django-admin compilemessages -l pt_BR -l fr
+    django-admin compilemessages -l pt_BR -l fr --use-fuzzy
     django-admin compilemessages --exclude=pt_BR
     django-admin compilemessages --exclude=pt_BR --exclude=fr
     django-admin compilemessages -x pt_BR
@@ -666,6 +671,11 @@ Use the ``--keep-pot`` option to prevent Django from deleting the temporary
 .pot files it generates before creating the .po file. This is useful for
 debugging errors which may prevent the final language files from being created.
 
+.. seealso::
+
+    See :ref:`customizing-makemessages` for instructions on how to customize
+    the keywords that :djadmin:`makemessages` passes to ``xgettext``.
+
 makemigrations [<app_label>]
 ----------------------------
 
@@ -727,10 +737,11 @@ The behavior of this command changes depending on the arguments provided:
 * ``<app_label>``: The specified app has its migrations run, up to the most
   recent migration. This may involve running other apps' migrations too, due
   to dependencies.
-* ``<app_label> <migrationname>``: Brings the database schema to a state where it
-  would have just run the given migration, but no further - this may involve
-  unapplying migrations if you have previously migrated past the named
-  migration. Use the name ``zero`` to unapply all migrations for an app.
+* ``<app_label> <migrationname>``: Brings the database schema to a state where
+  the named migration is applied, but no later migrations in the same app are
+  applied. This may involve unapplying migrations if you have previously
+  migrated past the named migration. Use the name ``zero`` to unapply all
+  migrations for an app.
 
 Unlike ``syncdb``, this command does not prompt you to create a superuser if
 one doesn't exist (assuming you are using :mod:`django.contrib.auth`). Use
@@ -952,6 +963,9 @@ A hostname containing ASCII-only characters can also be used.
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 (default in new projects) the :djadmin:`runserver` command will be overridden
 with its own :ref:`runserver<staticfiles-runserver>` command.
+
+If :djadmin:`migrate` was not previously executed, the table that stores the
+history of migrations is created at first run of ``runserver``.
 
 .. django-admin-option:: --noreload
 
@@ -1396,6 +1410,15 @@ which greatly decreases the time to run tests, especially those in a large
 test suite. If the test database does not exist, it will be created on the first
 run and then preserved for each subsequent run. Any unapplied migrations will also
 be applied to the test database before running the test suite.
+
+.. django-admin-option:: --reverse
+
+.. versionadded:: 1.8
+
+The ``--reverse`` option can be used to sort test cases in the opposite order.
+This may help in debugging tests that aren't properly isolated and have side
+effects. :ref:`Grouping by test class <order-of-tests>` is preserved when using
+this option.
 
 testserver <fixture fixture ...>
 --------------------------------

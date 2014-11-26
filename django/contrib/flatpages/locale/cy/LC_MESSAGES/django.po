@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-26 14:29+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +25,7 @@ msgstr "Opsiynau uwch"
 
 #: contrib/flatpages/apps.py:8
 msgid "Flat Pages"
-msgstr ""
+msgstr "Tudalennau Fflat"
 
 #: contrib/flatpages/forms.py:8 contrib/flatpages/models.py:12
 msgid "URL"

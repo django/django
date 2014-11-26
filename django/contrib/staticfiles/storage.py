@@ -72,7 +72,7 @@ class HashedFilesMixin(object):
 
     def file_hash(self, name, content=None):
         """
-        Retuns a hash of the file with the given name and optional content.
+        Returns a hash of the file with the given name and optional content.
         """
         if content is None:
             return None

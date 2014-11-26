@@ -188,6 +188,7 @@ from the request's POST data, sends that to admin@example.com and redirects to
 "/contact/thanks/" when it's done::
 
     from django.core.mail import send_mail, BadHeaderError
+    from django.http import HttpResponse, HttpResponseRedirect
 
     def send_email(request):
         subject = request.POST.get('subject', '')
@@ -327,15 +328,15 @@ The class has the following methods:
 
     .. versionchanged:: 1.7
 
-      If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
-      :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
+        If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
+        :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
 
-      In addition, ``message/rfc822`` attachments will no longer be
-      base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
-      issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
+        In addition, ``message/rfc822`` attachments will no longer be
+        base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
+        issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
 
-      __ https://bugzilla.gnome.org/show_bug.cgi?id=651197
-      __ https://bugzilla.mozilla.org/show_bug.cgi?id=333880
+        __ https://bugzilla.gnome.org/show_bug.cgi?id=651197
+        __ https://bugzilla.mozilla.org/show_bug.cgi?id=333880
 
 * ``attach_file()`` creates a new attachment using a file from your
   filesystem. Call it with the path of the file to attach and, optionally,

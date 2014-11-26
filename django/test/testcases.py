@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from collections import Counter
 from copy import copy
 import difflib
 import errno
@@ -56,23 +57,6 @@ def to_list(value):
     elif not isinstance(value, list):
         value = [value]
     return value
-
-real_commit = transaction.commit
-real_rollback = transaction.rollback
-
-
-def nop(*args, **kwargs):
-    return
-
-
-def disable_transaction_methods():
-    transaction.commit = nop
-    transaction.rollback = nop
-
-
-def restore_transaction_methods():
-    transaction.commit = real_commit
-    transaction.rollback = real_rollback
 
 
 def assert_and_parse_html(self, html, user_msg, msg):
@@ -160,6 +144,24 @@ class SimpleTestCase(unittest.TestCase):
     _overridden_settings = None
     _modified_settings = None
 
+    @classmethod
+    def setUpClass(cls):
+        if cls._overridden_settings:
+            cls._cls_overridden_context = override_settings(**cls._overridden_settings)
+            cls._cls_overridden_context.enable()
+        if cls._modified_settings:
+            cls._cls_modified_context = modify_settings(cls._modified_settings)
+            cls._cls_modified_context.enable()
+
+    @classmethod
+    def tearDownClass(cls):
+        if hasattr(cls, '_cls_modified_context'):
+            cls._cls_modified_context.disable()
+            delattr(cls, '_cls_modified_context')
+        if hasattr(cls, '_cls_overridden_context'):
+            cls._cls_overridden_context.disable()
+            delattr(cls, '_cls_overridden_context')
+
     def __call__(self, result=None):
         """
         Wrapper around default __call__ method to perform common Django test
@@ -191,24 +193,18 @@ class SimpleTestCase(unittest.TestCase):
         * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
         * Clearing the mail test outbox.
         """
-        if self._overridden_settings:
-            self._overridden_context = override_settings(**self._overridden_settings)
-            self._overridden_context.enable()
-        if self._modified_settings:
-            self._modified_context = modify_settings(self._modified_settings)
-            self._modified_context.enable()
         self.client = self.client_class()
         self._urlconf_setup()
         mail.outbox = []
 
     def _urlconf_setup(self):
-        set_urlconf(None)
         if hasattr(self, 'urls'):
             warnings.warn(
                 "SimpleTestCase.urls is deprecated and will be removed in "
                 "Django 2.0. Use @override_settings(ROOT_URLCONF=...) "
                 "in %s instead." % self.__class__.__name__,
                 RemovedInDjango20Warning, stacklevel=2)
+            set_urlconf(None)
             self._old_root_urlconf = settings.ROOT_URLCONF
             settings.ROOT_URLCONF = self.urls
             clear_url_caches()
@@ -219,14 +215,10 @@ class SimpleTestCase(unittest.TestCase):
         * Putting back the original ROOT_URLCONF if it was changed.
         """
         self._urlconf_teardown()
-        if self._modified_settings:
-            self._modified_context.disable()
-        if self._overridden_settings:
-            self._overridden_context.disable()
 
     def _urlconf_teardown(self):
-        set_urlconf(None)
         if hasattr(self, '_old_root_urlconf'):
+            set_urlconf(None)
             settings.ROOT_URLCONF = self._old_root_urlconf
             clear_url_caches()
 
@@ -508,6 +500,12 @@ class SimpleTestCase(unittest.TestCase):
 
         if msg_prefix:
             msg_prefix += ": "
+
+        if template_name is not None and response is not None and not hasattr(response, 'templates'):
+            raise ValueError(
+                "assertTemplateUsed() and assertTemplateNotUsed() are only "
+                "usable on responses fetched using the Django test Client."
+            )
 
         if not hasattr(response, 'templates') or (response is None and template_name):
             if response:
@@ -829,7 +827,7 @@ class TransactionTestCase(SimpleTestCase):
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
                 call_command('loaddata', *self.fixtures,
-                             **{'verbosity': 0, 'database': db_name, 'skip_checks': True})
+                             **{'verbosity': 0, 'database': db_name})
 
     def _post_teardown(self):
         """Performs any post-test things. This includes:
@@ -863,15 +861,14 @@ class TransactionTestCase(SimpleTestCase):
         for db_name in self._databases_names(include_mirrors=False):
             # Flush the database
             call_command('flush', verbosity=0, interactive=False,
-                         database=db_name, skip_checks=True,
-                         reset_sequences=False,
+                         database=db_name, reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
                          inhibit_post_migrate=self.available_apps is not None)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
         items = six.moves.map(transform, qs)
         if not ordered:
-            return self.assertEqual(set(items), set(values), msg=msg)
+            return self.assertEqual(Counter(items), Counter(values), msg=msg)
         values = list(values)
         # For example qs.iterator() could be passed as qs, but it does not
         # have 'ordered' attribute.
@@ -919,8 +916,6 @@ class TestCase(TransactionTestCase):
         for db_name in self._databases_names():
             self.atomics[db_name] = transaction.atomic(using=db_name)
             self.atomics[db_name].__enter__()
-        # Remove this when the legacy transaction management goes away.
-        disable_transaction_methods()
 
         for db_name in self._databases_names(include_mirrors=False):
             if self.fixtures:
@@ -930,7 +925,6 @@ class TestCase(TransactionTestCase):
                                      'verbosity': 0,
                                      'commit': False,
                                      'database': db_name,
-                                     'skip_checks': True,
                                  })
                 except Exception:
                     self._fixture_teardown()
@@ -940,11 +934,8 @@ class TestCase(TransactionTestCase):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
 
-        # Remove this when the legacy transaction management goes away.
-        restore_transaction_methods()
         for db_name in reversed(self._databases_names()):
-            # Hack to force a rollback
-            connections[db_name].needs_rollback = True
+            transaction.set_rollback(True, using=db_name)
             self.atomics[db_name].__exit__(None, None, None)
 
 
@@ -1170,6 +1161,7 @@ class LiveServerTestCase(TransactionTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(LiveServerTestCase, cls).setUpClass()
         connections_override = {}
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to

@@ -19,7 +19,7 @@ define their own custom node types.
 
 Each Node has a render() method, which takes a Context and returns a string of
 the rendered node. For example, the render() method of a Variable Node returns
-the variable's value as a string. The render() method of an IfNode returns the
+the variable's value as a string. The render() method of a ForNode returns the
 rendered output of whatever was inside the loop, recursively.
 
 The Template class is a convenient wrapper that takes care of template
@@ -69,7 +69,7 @@ from django.template.base import (Context, FilterExpression, Lexer, Node,  # NOQ
     filter_raw_string)
 
 # Compiling templates
-from django.template.base import (compile_string, resolve_variable,  # NOQA
+from django.template.base import (resolve_variable,  # NOQA
     unescape_string_literal, generic_tag_compiler)
 
 # Library management
@@ -77,4 +77,4 @@ from django.template.base import (Library, add_to_builtins, builtins,  # NOQA
     get_library, get_templatetags_modules, get_text_list, import_library,
     libraries)
 
-__all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
+__all__ = ('Template', 'Context', 'RequestContext')

@@ -695,8 +695,6 @@ class Field(RegisterLookupMixin, FieldFlagsMixin):
         """
         Perform preliminary non-db specific lookup checks and conversions
         """
-        if hasattr(value, 'prepare'):
-            return value.prepare()
         if hasattr(value, '_prepare'):
             return value._prepare()
 
@@ -787,9 +785,6 @@ class Field(RegisterLookupMixin, FieldFlagsMixin):
                    not connection.features.interprets_empty_strings_as_nulls)):
             return None
         return ""
-
-    def get_validator_unique_lookup_type(self):
-        return '%s__exact' % self.name
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
         """Returns choices with a default blank choices included, for use
@@ -1464,9 +1459,13 @@ class DateTimeField(DateField):
             # For backwards compatibility, interpret naive datetimes in local
             # time. This won't work during DST change, but we can't do much
             # about it, so we let the exceptions percolate up the call stack.
-            warnings.warn("DateTimeField %s.%s received a naive datetime (%s)"
+            try:
+                name = '%s.%s' % (self.model.__name__, self.name)
+            except AttributeError:
+                name = '(unbound)'
+            warnings.warn("DateTimeField %s received a naive datetime (%s)"
                           " while time zone support is active." %
-                          (self.model.__name__, self.name, value),
+                          (name, value),
                           RuntimeWarning)
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)

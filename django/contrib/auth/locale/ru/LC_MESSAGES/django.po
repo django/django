@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-06-16 20:29+0000\n"
+"PO-Revision-Date: 2014-09-05 11:08+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
 "ru/)\n"
@@ -287,7 +287,7 @@ msgstr "Сброс пароля на %(site_name)s"
 
 #: contrib/auth/tests/test_forms.py:387
 msgid "Enter a valid email address."
-msgstr "Введите корректное имя пользователя."
+msgstr "Введите правильный адрес электронной почты."
 
 #: contrib/auth/views.py:92
 msgid "Logged out"

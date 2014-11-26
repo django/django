@@ -316,6 +316,20 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure`` and ``extra`` arguments act the same as for
         :meth:`Client.get`.
 
+    .. method:: Client.trace(path, follow=False, secure=False, **extra)
+
+        .. versionadded:: 1.8
+
+        Makes a TRACE request on the provided ``path`` and returns a
+        ``Response`` object. Useful for simulating diagnostic probes.
+
+        Unlike the other request methods, ``data`` is not provided as a keyword
+        parameter in order to comply with :rfc:`2616`, which mandates that
+        TRACE requests should not have an entity-body.
+
+        The ``follow``, ``secure``, and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
     .. method:: Client.login(**credentials)
 
         If your site uses Django's :doc:`authentication system</topics/auth/index>`
@@ -593,6 +607,25 @@ then you should use :class:`~django.test.TransactionTestCase` or
 
 ``SimpleTestCase`` inherits from ``unittest.TestCase``.
 
+.. warning::
+
+    ``SimpleTestCase`` and its subclasses (e.g. ``TestCase``, ...) rely on
+    ``setUpClass()`` and ``tearDownClass()`` to perform some class-wide
+    initialization (e.g. overriding settings). If you need to override those
+    methods, don't forget to call the ``super`` implementation::
+
+        class MyTestCase(TestCase):
+
+            @classmethod
+            def setUpClass(cls):
+                super(cls, MyTestCase).setUpClass()     # Call parent first
+                ...
+
+            @classmethod
+            def tearDownClass(cls):
+                ...
+                super(cls, MyTestCase).tearDownClass()  # Call parent last
+
 TransactionTestCase
 ~~~~~~~~~~~~~~~~~~~
 
@@ -600,10 +633,20 @@ TransactionTestCase
 
 Django's ``TestCase`` class (described below) makes use of database transaction
 facilities to speed up the process of resetting the database to a known state
-at the beginning of each test. A consequence of this, however, is that the
-effects of transaction commit and rollback cannot be tested by a Django
-``TestCase`` class. If your test requires testing of such transactional
-behavior, you should use a Django ``TransactionTestCase``.
+at the beginning of each test. A consequence of this, however, is that some
+database behaviors cannot be tested within a Django ``TestCase`` class. For
+instance, you cannot test that a block of code is executing within a
+transaction, as is required when using
+:meth:`~django.db.models.query.QuerySet.select_for_update()`. In those cases,
+you should use ``TransactionTestCase``.
+
+.. versionchanged:: 1.8
+
+    In older versions of Django, the effects of transaction commit and rollback
+    could not be tested within a ``TestCase``.  With the completion of the
+    deprecation cycle of the old-style transaction management in Django 1.8,
+    transaction management commands (e.g. ``transaction.commit()``) are no
+    longer disabled within ``TestCase``.
 
 ``TransactionTestCase`` and ``TestCase`` are identical except for the manner
 in which the database is reset to a known state and the ability for test code
@@ -615,11 +658,8 @@ to test the effects of commit and rollback:
 
 * A ``TestCase``, on the other hand, does not truncate tables after a test.
   Instead, it encloses the test code in a database transaction that is rolled
-  back at the end of the test. Both explicit commits like
-  ``transaction.commit()`` and implicit ones that may be caused by
-  ``transaction.atomic()`` are replaced with a ``nop`` operation. This
-  guarantees that the rollback at the end of the test restores the database to
-  its initial state.
+  back at the end of the test. This guarantees that the rollback at the end of
+  the test restores the database to its initial state.
 
 .. warning::
 
@@ -632,16 +672,6 @@ to test the effects of commit and rollback:
   if you need this functionality (for example, third-party apps should enable
   this) you can set ``serialized_rollback = True`` inside the
   ``TestCase`` body.
-
-.. warning::
-
-    While ``commit`` and ``rollback`` operations still *appear* to work when
-    used in ``TestCase``, no actual commit or rollback will be performed by the
-    database. This can cause your tests to pass or fail unexpectedly. Always
-    use ``TransactionTestCase`` when testing transactional behavior or any code
-    that can't normally be executed in autocommit mode
-    (:meth:`~django.db.models.query.QuerySet.select_for_update()` is an
-    example).
 
 ``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
 
@@ -667,6 +697,12 @@ additions, including:
 
 * Django-specific assertions for testing for things like redirection and form
   errors.
+
+.. warning::
+
+    If you want to test some specific database transaction behavior, you should
+    use ``TransactionTestCase``, as ``TestCase`` wraps test execution within an
+    :func:`~django.db.transaction.atomic()` block.
 
 ``TestCase`` inherits from :class:`~django.test.TransactionTestCase`.
 
@@ -737,8 +773,8 @@ Then, add a ``LiveServerTestCase``-based test to your app's tests module
 
         @classmethod
         def setUpClass(cls):
-            cls.selenium = WebDriver()
             super(MySeleniumTests, cls).setUpClass()
+            cls.selenium = WebDriver()
 
         @classmethod
         def tearDownClass(cls):
@@ -757,7 +793,7 @@ Finally, you may run the test as follows:
 
 .. code-block:: bash
 
-    ./manage.py test myapp.MySeleniumTests.test_login
+    ./manage.py test myapp.tests.MySeleniumTests.test_login
 
 This example will automatically open Firefox then go to the login page, enter
 the credentials and press the "Log in" button. Selenium offers other drivers in
@@ -1046,6 +1082,12 @@ If ``multi_db=True``, fixtures are loaded into all databases.
 
 Overriding settings
 ~~~~~~~~~~~~~~~~~~~
+
+.. warning::
+
+    Use the functions below to temporarily alter the value of settings in tests.
+    Don't manipulate ``django.conf.settings`` directly as Django won't restore
+    the original values after such manipulations.
 
 .. method:: SimpleTestCase.settings()
 
@@ -1497,7 +1539,7 @@ your test suite.
 
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to
-    ``False``, which turns the comparison into a Python set comparison.
+    ``False``, which turns the comparison into a ``collections.Counter`` comparison.
     If the order is undefined (if the given ``qs`` isn't ordered and the
     comparison is against more than one ordered values), a ``ValueError`` is
     raised.
@@ -1583,6 +1625,25 @@ manually, assign the empty list to ``mail.outbox``::
 
     # Empty the test outbox
     mail.outbox = []
+
+.. _topics-testing-management-commands:
+
+Management Commands
+-------------------
+
+Management commands can be tested with the
+:func:`~django.core.management.call_command` function. The output can be
+redirected into a ``StringIO`` instance::
+
+    from django.core.management import call_command
+    from django.test import TestCase
+    from django.utils.six import StringIO
+
+    class ClosepollTest(TestCase):
+        def test_command_output(self):
+            out = StringIO()
+            call_command('closepoll', stdout=out)
+            self.assertIn('Expected output', out.getvalue())
 
 .. _skipping-tests:
 

@@ -18,7 +18,8 @@ Core settings
 
 Here's a list of settings available in Django core and their default values.
 Settings provided by contrib apps are listed below, followed by a topical index
-of the core settings.
+of the core settings. For introductory material, see the :doc:`settings topic
+guide </topics/settings>`.
 
 .. setting:: ABSOLUTE_URL_OVERRIDES
 
@@ -373,7 +374,7 @@ CSRF_COOKIE_NAME
 Default: ``'csrftoken'``
 
 The name of the cookie to use for the CSRF authentication token. This can be whatever you
-want.  See :doc:`/ref/contrib/csrf`.
+want.  See :doc:`/ref/csrf`.
 
 .. setting:: CSRF_COOKIE_PATH
 
@@ -414,7 +415,7 @@ is rejected by the CSRF protection.  The function should have this signature::
 
 where ``reason`` is a short message (intended for developers or logging, not for
 end users) indicating the reason the request was rejected.  See
-:doc:`/ref/contrib/csrf`.
+:doc:`/ref/csrf`.
 
 .. setting:: DATABASES
 
@@ -690,7 +691,7 @@ SERIALIZE
 
 .. versionadded:: 1.7.1
 
-Boolean value to control whether or not the default test runnner serializes the
+Boolean value to control whether or not the default test runner serializes the
 database into an in-memory JSON string before running tests (used to restore
 the database state between tests if you don't have transactions). You can set
 this to ``False`` to speed up creation time if you don't have any test classes
@@ -1679,7 +1680,7 @@ standard domain cookies, existing user cookies that have the old domain
 will not be updated. This will result in site users being unable to switch
 the language as long as these cookies persist. The only safe and reliable
 option to perform the switch is to change the language cookie name
-permanently (via the :setting:`SESSION_COOKIE_NAME` setting) and to add
+permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting) and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the old one.
 
@@ -1715,7 +1716,7 @@ setting to use a deeper path than it previously used, existing user cookies that
 have the old path will not be updated. This will result in site users being
 unable to switch the language as long as these cookies persist. The only safe
 and reliable option to perform the switch is to change the language cookie name
-permanently (via the :setting:`SESSION_COOKIE_NAME` setting), and to add
+permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting), and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the one.
 
@@ -1932,6 +1933,9 @@ drilldown, the header for a given day displays the day and month. Different
 locales have different formats. For example, U.S. English would say
 "January 1," whereas Spanish might say "1 Enero."
 
+Note that if :setting:`USE_L10N` is set to ``True``, then the corresponding
+locale-dictated format has higher precedence and will be applied.
+
 See :tfilter:`allowed date format strings <date>`. See also
 :setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`,
 :setting:`TIME_FORMAT` and :setting:`YEAR_MONTH_FORMAT`.
@@ -2002,6 +2006,29 @@ Django will refuse to start if :setting:`SECRET_KEY` is not set.
     Running Django with a known :setting:`SECRET_KEY` defeats many of Django's
     security protections, and can lead to privilege escalation and remote code
     execution vulnerabilities.
+
+The secret key is used for:
+
+* All :doc:`sessions </topics/http/sessions>` if you are using
+  any other session backend than ``django.contrib.sessions.backends.cache``,
+  or if you use
+  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware`
+  and are using the default
+  :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`.
+* All :doc:`messages </ref/contrib/messages>` if you are using
+  :class:`~django.contrib.messages.storage.cookie.CookieStorage` or
+  :class:`~django.contrib.messages.storage.fallback.FallbackStorage`.
+* :mod:`Form wizard <formtools.wizard.views>` progress when using
+  cookie storage with
+  :class:`formtools.wizard.views.CookieWizardView`.
+* All :func:`~django.contrib.auth.views.password_reset` tokens.
+* All in progress :mod:`form previews <formtools.preview>`.
+* Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
+  different key is provided.
+
+If you rotate your secret key, all of the above will be invalidated.
+Secret keys are not used for passwords of users and key rotation will not
+affect them.
 
 .. setting:: SECURE_BROWSER_XSS_FILTER
 
@@ -2332,7 +2359,7 @@ TEMPLATE_STRING_IF_INVALID
 Default: ``''`` (Empty string)
 
 Output, as a string, that the template system should use for invalid (e.g.
-misspelled) variables. See :ref:`invalid-template-variables`..
+misspelled) variables. See :ref:`invalid-template-variables`.
 
 .. setting:: TEST_RUNNER
 
@@ -2592,6 +2619,9 @@ For example, when a Django admin change-list page is being filtered by a date
 drilldown, the header for a given month displays the month and the year.
 Different locales have different formats. For example, U.S. English would say
 "January 2006," whereas another locale might say "2006/January."
+
+Note that if :setting:`USE_L10N` is set to ``True``, then the corresponding
+locale-dictated format has higher precedence and will be applied.
 
 See :tfilter:`allowed date format strings <date>`. See also
 :setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT`

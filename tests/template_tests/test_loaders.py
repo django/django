@@ -22,8 +22,10 @@ except ImportError:
 
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
+from django.template.engine import Engine
 from django.template import loader
 from django.test import TestCase, override_settings
+from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils import six
 from django.utils._os import upath
 from django.utils.six import StringIO
@@ -84,26 +86,26 @@ class EggLoaderTest(TestCase):
     @override_settings(INSTALLED_APPS=['egg_empty'])
     def test_empty(self):
         "Loading any template on an empty egg should fail"
-        egg_loader = EggLoader()
+        egg_loader = EggLoader(Engine.get_default())
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
 
     @override_settings(INSTALLED_APPS=['egg_1'])
     def test_non_existing(self):
         "Template loading fails if the template is not in the egg"
-        egg_loader = EggLoader()
+        egg_loader = EggLoader(Engine.get_default())
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
 
     @override_settings(INSTALLED_APPS=['egg_1'])
     def test_existing(self):
         "A template can be loaded from an egg"
-        egg_loader = EggLoader()
+        egg_loader = EggLoader(Engine.get_default())
         contents, template_name = egg_loader.load_template_source("y.html")
         self.assertEqual(contents, "y")
         self.assertEqual(template_name, "egg:egg_1:templates/y.html")
 
     def test_not_installed(self):
         "Loading an existent template from an egg not included in any app should fail"
-        egg_loader = EggLoader()
+        egg_loader = EggLoader(Engine.get_default())
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "y.html")
 
 
@@ -127,7 +129,7 @@ class CachedLoader(TestCase):
 
     def test_missing_template_is_cached(self):
         "#19949 -- Check that the missing template is cached."
-        template_loader = loader.find_template_loader(settings.TEMPLATE_LOADERS[0])
+        template_loader = Engine.get_default().template_loaders[0]
         # Empty cache, which may be filled from previous tests.
         template_loader.reset()
         # Check that 'missing.html' isn't already in cache before 'missing.html' is loaded
@@ -184,7 +186,7 @@ class RenderToStringTest(TestCase):
             loader.render_to_string('test_context_stack.html', context_instance=Context()).strip())
 
 
-class TemplateDirsOverrideTest(unittest.TestCase):
+class TemplateDirsOverrideTest(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
 
     dirs_tuple = (os.path.join(os.path.dirname(upath(__file__)), 'other_templates'),)
     dirs_list = list(dirs_tuple)

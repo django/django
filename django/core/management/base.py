@@ -38,6 +38,13 @@ class CommandError(Exception):
     pass
 
 
+class SystemCheckError(CommandError):
+    """
+    The system check framework detected unrecoverable errors.
+    """
+    pass
+
+
 class CommandParser(ArgumentParser):
     """
     Customized ArgumentParser class to improve some error messages and prevent
@@ -79,11 +86,20 @@ class OutputWrapper(object):
     """
     Wrapper around stdout/stderr
     """
+    @property
+    def style_func(self):
+        return self._style_func
+
+    @style_func.setter
+    def style_func(self, style_func):
+        if style_func and hasattr(self._out, 'isatty') and self._out.isatty():
+            self._style_func = style_func
+        else:
+            self._style_func = lambda x: x
+
     def __init__(self, out, style_func=None, ending='\n'):
         self._out = out
         self.style_func = None
-        if hasattr(out, 'isatty') and out.isatty():
-            self.style_func = style_func
         self.ending = ending
 
     def __getattr__(self, name):
@@ -93,8 +109,7 @@ class OutputWrapper(object):
         ending = self.ending if ending is None else ending
         if ending and not msg.endswith(ending):
             msg += ending
-        style_func = [f for f in (style_func, self.style_func, lambda x:x)
-                      if f is not None][0]
+        style_func = style_func or self.style_func
         self._out.write(force_str(style_func(msg)))
 
 
@@ -221,8 +236,14 @@ class BaseCommand(object):
     #
     # requires_system_checks = True
 
-    def __init__(self):
-        self.style = color_style()
+    def __init__(self, stdout=None, stderr=None, no_color=False):
+        self.stdout = OutputWrapper(stdout or sys.stdout)
+        self.stderr = OutputWrapper(stderr or sys.stderr)
+        if no_color:
+            self.style = no_style()
+        else:
+            self.style = color_style()
+            self.stderr.style_func = self.style.ERROR
 
         # `requires_model_validation` is deprecated in favor of
         # `requires_system_checks`. If both options are present, an error is
@@ -299,7 +320,7 @@ class BaseCommand(object):
             parser.add_option('--pythonpath',
                 help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
             parser.add_option('--traceback', action='store_true',
-                help='Raise on exception')
+                help='Raise on CommandError exceptions')
             parser.add_option('--no-color', action='store_true', dest='no_color', default=False,
                 help="Don't colorize the command output.")
             for opt in self.option_list:
@@ -321,7 +342,7 @@ class BaseCommand(object):
             parser.add_argument('--pythonpath',
                 help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".')
             parser.add_argument('--traceback', action='store_true',
-                help='Raise on exception')
+                help='Raise on CommandError exceptions')
             parser.add_argument('--no-color', action='store_true', dest='no_color', default=False,
                 help="Don't colorize the command output.")
             if self.args:
@@ -371,9 +392,11 @@ class BaseCommand(object):
             if options.traceback or not isinstance(e, CommandError):
                 raise
 
-            # self.stderr is not guaranteed to be set here
-            stderr = getattr(self, 'stderr', OutputWrapper(sys.stderr, self.style.ERROR))
-            stderr.write('%s: %s' % (e.__class__.__name__, e))
+            # SystemCheckError takes care of its own formatting.
+            if isinstance(e, SystemCheckError):
+                self.stderr.write(str(e), lambda x: x)
+            else:
+                self.stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
 
     def execute(self, *args, **options):
@@ -382,13 +405,13 @@ class BaseCommand(object):
         controlled by attributes ``self.requires_system_checks`` and
         ``self.requires_model_validation``, except if force-skipped).
         """
-        self.stdout = OutputWrapper(options.get('stdout', sys.stdout))
         if options.get('no_color'):
             self.style = no_style()
-            self.stderr = OutputWrapper(options.get('stderr', sys.stderr))
-            os.environ[str("DJANGO_COLORS")] = str("nocolor")
-        else:
-            self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
+            self.stderr.style_func = None
+        if options.get('stdout'):
+            self.stdout = OutputWrapper(options['stdout'])
+        if options.get('stderr'):
+            self.stderr = OutputWrapper(options.get('stderr'), self.stderr.style_func)
 
         if self.can_import_settings:
             from django.conf import settings  # NOQA
@@ -456,7 +479,7 @@ class BaseCommand(object):
             include_deployment_checks=include_deployment_checks,
         )
 
-        msg = ""
+        header, body, footer = "", "", ""
         visible_issue_count = 0  # excludes silenced warnings
 
         if all_issues:
@@ -477,19 +500,20 @@ class BaseCommand(object):
                 if issues:
                     visible_issue_count += len(issues)
                     formatted = (
-                        color_style().ERROR(force_str(e))
+                        self.style.ERROR(force_str(e))
                         if e.is_serious()
-                        else color_style().WARNING(force_str(e))
+                        else self.style.WARNING(force_str(e))
                         for e in issues)
                     formatted = "\n".join(sorted(formatted))
-                    msg += '\n%s:\n%s\n' % (group_name, formatted)
-            if msg:
-                msg = "System check identified some issues:\n%s" % msg
+                    body += '\n%s:\n%s\n' % (group_name, formatted)
+
+        if visible_issue_count:
+            header = "System check identified some issues:\n"
 
         if display_num_errors:
-            if msg:
-                msg += '\n'
-            msg += "System check identified %s (%s silenced)." % (
+            if visible_issue_count:
+                footer += '\n'
+            footer += "System check identified %s (%s silenced)." % (
                 "no issues" if visible_issue_count == 0 else
                 "1 issue" if visible_issue_count == 1 else
                 "%s issues" % visible_issue_count,
@@ -497,11 +521,16 @@ class BaseCommand(object):
             )
 
         if any(e.is_serious() and not e.is_silenced() for e in all_issues):
-            raise CommandError(msg)
-        elif msg and visible_issue_count:
-            self.stderr.write(msg)
-        elif msg:
-            self.stdout.write(msg)
+            msg = self.style.ERROR("SystemCheckError: %s" % header) + body + footer
+            raise SystemCheckError(msg)
+        else:
+            msg = header + body + footer
+
+        if msg:
+            if visible_issue_count:
+                self.stderr.write(msg, lambda x: x)
+            else:
+                self.stdout.write(msg)
 
     def handle(self, *args, **options):
         """

@@ -238,7 +238,7 @@ class GeoIP(object):
 
     @property
     def city_info(self):
-        "Retuns information about the GeoIP city database."
+        "Returns information about the GeoIP city database."
         if self._city is None:
             ci = 'No GeoIP City data in "%s"' % self._city_file
         else:

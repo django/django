@@ -6,12 +6,13 @@ from __future__ import unicode_literals
 import unittest
 
 from django import db
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.db.backends.dummy.base import DatabaseCreation
-from django.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test.runner import DiscoverRunner, dependency_ordered
 from django.test.testcases import connections_support_transactions
-from django.test.utils import override_system_checks
 from django.utils import six
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -31,7 +32,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'bravo': ['charlie'],
         }
 
-        ordered = runner.dependency_ordered(raw, dependencies=dependencies)
+        ordered = dependency_ordered(raw, dependencies=dependencies)
         ordered_sigs = [sig for sig, value in ordered]
 
         self.assertIn('s1', ordered_sigs)
@@ -51,7 +52,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'bravo': ['charlie'],
         }
 
-        ordered = runner.dependency_ordered(raw, dependencies=dependencies)
+        ordered = dependency_ordered(raw, dependencies=dependencies)
         ordered_sigs = [sig for sig, value in ordered]
 
         self.assertIn('s1', ordered_sigs)
@@ -78,7 +79,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'delta': ['charlie'],
         }
 
-        ordered = runner.dependency_ordered(raw, dependencies=dependencies)
+        ordered = dependency_ordered(raw, dependencies=dependencies)
         ordered_sigs = [sig for sig, aliases in ordered]
 
         self.assertIn('s1', ordered_sigs)
@@ -105,7 +106,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'alpha': ['bravo'],
         }
 
-        self.assertRaises(ImproperlyConfigured, runner.dependency_ordered, raw, dependencies=dependencies)
+        self.assertRaises(ImproperlyConfigured, dependency_ordered, raw, dependencies=dependencies)
 
     def test_own_alias_dependency(self):
         raw = [
@@ -116,7 +117,7 @@ class DependencyOrderingTests(unittest.TestCase):
         }
 
         with self.assertRaises(ImproperlyConfigured):
-            runner.dependency_ordered(raw, dependencies=dependencies)
+            dependency_ordered(raw, dependencies=dependencies)
 
         # reordering aliases shouldn't matter
         raw = [
@@ -124,7 +125,7 @@ class DependencyOrderingTests(unittest.TestCase):
         ]
 
         with self.assertRaises(ImproperlyConfigured):
-            runner.dependency_ordered(raw, dependencies=dependencies)
+            dependency_ordered(raw, dependencies=dependencies)
 
 
 class MockTestRunner(object):
@@ -151,7 +152,7 @@ class ManageCommandTests(unittest.TestCase):
                 testrunner='test_runner.NonExistentRunner')
 
 
-class CustomOptionsTestRunner(runner.DiscoverRunner):
+class CustomOptionsTestRunner(DiscoverRunner):
 
     def __init__(self, verbosity=1, interactive=True, failfast=True, option_a=None, option_b=None, option_c=None, **kwargs):
         super(CustomOptionsTestRunner, self).__init__(verbosity=verbosity, interactive=interactive,
@@ -225,9 +226,6 @@ class Sqlite3InMemoryTestDbs(TestCase):
 
     available_apps = []
 
-    # `setup_databases` triggers system check framework, but we do not want to
-    # perform checks.
-    @override_system_checks([])
     @unittest.skipUnless(all(db.connections[conn].vendor == 'sqlite' for conn in db.connections),
                          "This is an sqlite-specific issue")
     def test_transaction_support(self):
@@ -247,7 +245,7 @@ class Sqlite3InMemoryTestDbs(TestCase):
                     },
                 })
                 other = db.connections['other']
-                runner.DiscoverRunner(verbosity=0).setup_databases()
+                DiscoverRunner(verbosity=0).setup_databases()
                 msg = "DATABASES setting '%s' option set to sqlite3's ':memory:' value shouldn't interfere with transaction support detection." % option_key
                 # Transaction support should be properly initialized for the 'other' DB
                 self.assertTrue(other.features.supports_transactions, msg)
@@ -262,7 +260,7 @@ class DummyBackendTest(unittest.TestCase):
         """
         Test that setup_databases() doesn't fail with dummy database backend.
         """
-        runner_instance = runner.DiscoverRunner(verbosity=0)
+        runner_instance = DiscoverRunner(verbosity=0)
         old_db_connections = db.connections
         try:
             db.connections = db.ConnectionHandler({})
@@ -280,7 +278,7 @@ class AliasedDefaultTestSetupTest(unittest.TestCase):
         """
         Test that setup_datebases() doesn't fail when 'default' is aliased
         """
-        runner_instance = runner.DiscoverRunner(verbosity=0)
+        runner_instance = DiscoverRunner(verbosity=0)
         old_db_connections = db.connections
         try:
             db.connections = db.ConnectionHandler({
@@ -306,7 +304,7 @@ class SetupDatabasesTests(unittest.TestCase):
         self._old_db_connections = db.connections
         self._old_destroy_test_db = DatabaseCreation.destroy_test_db
         self._old_create_test_db = DatabaseCreation.create_test_db
-        self.runner_instance = runner.DiscoverRunner(verbosity=0)
+        self.runner_instance = DiscoverRunner(verbosity=0)
 
     def tearDown(self):
         DatabaseCreation.create_test_db = self._old_create_test_db
@@ -339,6 +337,18 @@ class SetupDatabasesTests(unittest.TestCase):
         self.runner_instance.teardown_databases(old_config)
 
         self.assertEqual(destroyed_names.count('dbname'), 1)
+
+    def test_destroy_test_db_restores_db_name(self):
+        db.connections = db.ConnectionHandler({
+            'default': {
+                'ENGINE': settings.DATABASES[db.DEFAULT_DB_ALIAS]["ENGINE"],
+                'NAME': 'xxx_test_database',
+            },
+        })
+        # Using the real current name as old_name to not mess with the test suite.
+        old_name = settings.DATABASES[db.DEFAULT_DB_ALIAS]["NAME"]
+        db.connections['default'].creation.destroy_test_db(old_name, verbosity=0, keepdb=True)
+        self.assertEqual(db.connections['default'].settings_dict["NAME"], old_name)
 
     def test_serialization(self):
         serialize = []
@@ -390,7 +400,7 @@ class DeprecationDisplayTest(AdminScriptTestCase):
         args = ['test', '--settings=test_project.settings', '--verbosity=0', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
         self.assertIn("Ran 1 test", err)
-        self.assertFalse("warning from test" in err)
+        self.assertNotIn("warning from test", err)
 
 
 class AutoIncrementResetTest(TransactionTestCase):

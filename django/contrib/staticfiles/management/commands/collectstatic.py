@@ -22,7 +22,7 @@ class Command(BaseCommand):
     requires_system_checks = False
 
     def __init__(self, *args, **kwargs):
-        super(BaseCommand, self).__init__(*args, **kwargs)
+        super(Command, self).__init__(*args, **kwargs)
         self.copied_files = []
         self.symlinked_files = []
         self.unmodified_files = []
@@ -314,5 +314,4 @@ class Command(BaseCommand):
             self.log("Copying '%s'" % source_path, level=1)
             with source_storage.open(path) as source_file:
                 self.storage.save(prefixed_path, source_file)
-        if prefixed_path not in self.copied_files:
-            self.copied_files.append(prefixed_path)
+        self.copied_files.append(prefixed_path)

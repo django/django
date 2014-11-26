@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
+from collections import deque
 
-from django.utils.datastructures import OrderedSet
 from django.db.migrations.state import ProjectState
+from django.utils.datastructures import OrderedSet
 
 
 class MigrationGraph(object):
@@ -37,9 +38,15 @@ class MigrationGraph(object):
 
     def add_dependency(self, migration, child, parent):
         if child not in self.nodes:
-            raise KeyError("Migration %s dependencies reference nonexistent child node %r" % (migration, child))
+            raise NodeNotFoundError(
+                "Migration %s dependencies reference nonexistent child node %r" % (migration, child),
+                child
+            )
         if parent not in self.nodes:
-            raise KeyError("Migration %s dependencies reference nonexistent parent node %r" % (migration, parent))
+            raise NodeNotFoundError(
+                "Migration %s dependencies reference nonexistent parent node %r" % (migration, parent),
+                parent
+            )
         self.dependencies.setdefault(child, set()).add(parent)
         self.dependents.setdefault(parent, set()).add(child)
 
@@ -51,7 +58,7 @@ class MigrationGraph(object):
         a database.
         """
         if node not in self.nodes:
-            raise ValueError("Node %r not a valid node" % (node, ))
+            raise NodeNotFoundError("Node %r not a valid node" % (node, ), node)
         return self.dfs(node, lambda x: self.dependencies.get(x, set()))
 
     def backwards_plan(self, node):
@@ -62,7 +69,7 @@ class MigrationGraph(object):
         a database.
         """
         if node not in self.nodes:
-            raise ValueError("Node %r not a valid node" % (node, ))
+            raise NodeNotFoundError("Node %r not a valid node" % (node, ), node)
         return self.dfs(node, lambda x: self.dependents.get(x, set()))
 
     def root_nodes(self, app=None):
@@ -72,7 +79,8 @@ class MigrationGraph(object):
         """
         roots = set()
         for node in self.nodes:
-            if not any(key[0] == node[0] for key in self.dependencies.get(node, set())) and (not app or app == node[0]):
+            if (not any(key[0] == node[0] for key in self.dependencies.get(node, set()))
+                    and (not app or app == node[0])):
                 roots.add(node)
         return sorted(roots)
 
@@ -86,37 +94,54 @@ class MigrationGraph(object):
         """
         leaves = set()
         for node in self.nodes:
-            if not any(key[0] == node[0] for key in self.dependents.get(node, set())) and (not app or app == node[0]):
+            if (not any(key[0] == node[0] for key in self.dependents.get(node, set()))
+                    and (not app or app == node[0])):
                 leaves.add(node)
         return sorted(leaves)
 
+    def ensure_not_cyclic(self, start, get_children):
+        # Algo from GvR:
+        # http://neopythonic.blogspot.co.uk/2009/01/detecting-cycles-in-directed-graph.html
+        todo = set(self.nodes.keys())
+        while todo:
+            node = todo.pop()
+            stack = [node]
+            while stack:
+                top = stack[-1]
+                for node in get_children(top):
+                    if node in stack:
+                        cycle = stack[stack.index(node):]
+                        raise CircularDependencyError(", ".join("%s.%s" % n for n in cycle))
+                    if node in todo:
+                        stack.append(node)
+                        todo.remove(node)
+                        break
+                else:
+                    node = stack.pop()
+
     def dfs(self, start, get_children):
         """
-        Dynamic programming based depth first search, for finding dependencies.
+        Iterative depth first search, for finding dependencies.
         """
-        visited = []
+        self.ensure_not_cyclic(start, get_children)
+        visited = deque()
         visited.append(start)
-        path = [start]
-        stack = sorted(get_children(start))
+        stack = deque(sorted(get_children(start)))
         while stack:
-            node = stack.pop(0)
-
-            if node in path:
-                raise CircularDependencyError()
-            path.append(node)
-
-            visited.insert(0, node)
-            children = sorted(get_children(node))
-
-            if not children:
-                path = []
-
-            stack = children + stack
+            node = stack.popleft()
+            visited.appendleft(node)
+            children = sorted(get_children(node), reverse=True)
+            # reverse sorting is needed because prepending using deque.extendleft
+            # also effectively reverses values
+            stack.extendleft(children)
 
         return list(OrderedSet(visited))
 
     def __str__(self):
-        return "Graph: %s nodes, %s edges" % (len(self.nodes), sum(len(x) for x in self.dependencies.values()))
+        return "Graph: %s nodes, %s edges" % (
+            len(self.nodes),
+            sum(len(x) for x in self.dependencies.values()),
+        )
 
     def make_state(self, nodes=None, at_end=True, real_apps=None):
         """
@@ -151,3 +176,21 @@ class CircularDependencyError(Exception):
     Raised when there's an impossible-to-resolve circular dependency.
     """
     pass
+
+
+class NodeNotFoundError(LookupError):
+    """
+    Raised when an attempt on a node is made that is not available in the graph.
+    """
+
+    def __init__(self, message, node):
+        self.message = message
+        self.node = node
+
+    def __str__(self):
+        return self.message
+
+    __unicode__ = __str__
+
+    def __repr__(self):
+        return "NodeNotFoundError(%r)" % self.node

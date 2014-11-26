@@ -672,8 +672,8 @@ Also note that even an uploaded HTML file, since it can be executed by the
 browser (though not by the server), can pose security threats that are
 equivalent to XSS or CSRF attacks.
 
-By default, :class:`FileField` instances are
-created as ``varchar(100)`` columns in your database. As with other fields, you
+:class:`FileField` instances are created in your database as ``varchar``
+columns with a default max length of 100 characters. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 FileField and FieldFile
@@ -799,8 +799,8 @@ base filename, not the full path. So, this example::
 because the :attr:`~FilePathField.match` applies to the base filename
 (``foo.png`` and ``bar.png``).
 
-By default, :class:`FilePathField` instances are
-created as ``varchar(100)`` columns in your database. As with other fields, you
+:class:`FilePathField` instances are created in your database as ``varchar``
+columns with a default max length of 100 characters. As with other fields, you
 can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 ``FloatField``
@@ -851,9 +851,9 @@ Requires the `Pillow`_ library.
 
 .. _Pillow: http://pillow.readthedocs.org/en/latest/
 
-By default, :class:`ImageField` instances are created as ``varchar(100)``
-columns in your database. As with other fields, you can change the maximum
-length using the :attr:`~CharField.max_length` argument.
+:class:`ImageField` instances are created in your database as ``varchar``
+columns with a default max length of 100 characters. As with other fields, you
+can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 The default form widget for this field is a
 :class:`~django.forms.ClearableFileInput`.
@@ -1012,8 +1012,8 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length` argument. If you don't specify
 :attr:`~CharField.max_length`, a default of 200 is used.
 
-UUIDField
----------
+``UUIDField``
+-------------
 
 .. versionadded:: 1.8
 
@@ -1254,14 +1254,16 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     necessary to avoid executing queries at the time your models.py is
     imported::
 
+        from django.conf import settings
+        from django.contrib.auth import get_user_model
         from django.db import models
-        from django.contrib.auth.models import User
 
         def get_sentinel_user():
-            return User.objects.get_or_create(username='deleted')[0]
+            return get_user_model().objects.get_or_create(username='deleted')[0]
 
         class MyModel(models.Model):
-            user = models.ForeignKey(User, on_delete=models.SET(get_sentinel_user))
+            user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                     on_delete=models.SET(get_sentinel_user))
 
 * .. attribute:: DO_NOTHING
 
@@ -1515,12 +1517,12 @@ as default value.
 
 With the following example::
 
+    from django.conf import settings
     from django.db import models
-    from django.contrib.auth.models import User
 
     class MySpecialUser(models.Model):
-        user = models.OneToOneField(User)
-        supervisor = models.OneToOneField(User, related_name='supervisor_of')
+        user = models.OneToOneField(settings.AUTH_USER_MODEL)
+        supervisor = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='supervisor_of')
 
 your resulting ``User`` model will have the following attributes::
 

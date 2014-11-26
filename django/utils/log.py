@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import logging
 import sys
 import warnings
@@ -6,6 +8,7 @@ from django.conf import settings
 from django.core import mail
 from django.core.mail import get_connection
 from django.utils.deprecation import RemovedInNextVersionWarning
+from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
 
@@ -77,7 +80,7 @@ def configure_logging(logging_config, logging_settings):
         # First find the logging configuration function ...
         logging_config_func = import_string(logging_config)
 
-        logging_config_func(DEFAULT_LOGGING)
+        dictConfig(DEFAULT_LOGGING)
 
         # ... then invoke it with the logging settings
         if logging_settings:
@@ -106,7 +109,7 @@ class AdminEmailHandler(logging.Handler):
                 record.getMessage()
             )
             filter = get_exception_reporter_filter(request)
-            request_repr = '\n{0}'.format(filter.get_request_repr(request))
+            request_repr = '\n{0}'.format(force_text(filter.get_request_repr(request)))
         except Exception:
             subject = '%s: %s' % (
                 record.levelname,
@@ -124,9 +127,10 @@ class AdminEmailHandler(logging.Handler):
         message = "%s\n\nRequest repr(): %s" % (self.format(record), request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
         html_message = reporter.get_traceback_html() if self.include_html else None
-        mail.mail_admins(subject, message, fail_silently=True,
-                         html_message=html_message,
-                         connection=self.connection())
+        self.send_mail(subject, message, fail_silently=True, html_message=html_message)
+
+    def send_mail(self, subject, message, *args, **kwargs):
+        mail.mail_admins(subject, message, *args, connection=self.connection(), **kwargs)
 
     def connection(self):
         return get_connection(backend=self.email_backend, fail_silently=True)

@@ -106,8 +106,18 @@ class ClassDecoratedTestCaseSuper(TestCase):
 
 @override_settings(TEST='override')
 class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
+
+    @classmethod
+    def setUpClass(cls):
+        super(cls, ClassDecoratedTestCase).setUpClass()
+        cls.foo = getattr(settings, 'TEST', 'BUG')
+
     def test_override(self):
         self.assertEqual(settings.TEST, 'override')
+
+    def test_setupclass_override(self):
+        """Test that settings are overriden within setUpClass -- refs #21281"""
+        self.assertEqual(self.foo, 'override')
 
     @override_settings(TEST='override2')
     def test_method_override(self):
@@ -265,14 +275,6 @@ class SettingsTests(TestCase):
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
         self.assertRaises(AttributeError, getattr, settings, 'TEST2')
 
-    def test_allowed_include_roots_string(self):
-        """
-        ALLOWED_INCLUDE_ROOTS is not allowed to be incorrectly set to a string
-        rather than a tuple.
-        """
-        self.assertRaises(ValueError, setattr, settings,
-            'ALLOWED_INCLUDE_ROOTS', '/var/www/ssi/')
-
 
 class TestComplexSettingOverride(TestCase):
     def setUp(self):
@@ -281,7 +283,7 @@ class TestComplexSettingOverride(TestCase):
 
     def tearDown(self):
         signals.COMPLEX_OVERRIDE_SETTINGS = self.old_warn_override_settings
-        self.assertFalse('TEST_WARN' in signals.COMPLEX_OVERRIDE_SETTINGS)
+        self.assertNotIn('TEST_WARN', signals.COMPLEX_OVERRIDE_SETTINGS)
 
     def test_complex_override_warning(self):
         """Regression test for #19031"""
@@ -443,7 +445,12 @@ class TestTupleSettings(unittest.TestCase):
     Make sure settings that should be tuples throw ImproperlyConfigured if they
     are set to a string instead of a tuple.
     """
-    tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS", "LOCALE_PATHS")
+    tuple_settings = (
+        "ALLOWED_INCLUDE_ROOTS",
+        "INSTALLED_APPS",
+        "TEMPLATE_DIRS",
+        "LOCALE_PATHS",
+    )
 
     def test_tuple_settings(self):
         settings_module = ModuleType('fake_settings_module')

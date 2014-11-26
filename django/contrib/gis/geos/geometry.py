@@ -134,8 +134,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
         return self.clone()
 
     def __str__(self):
-        "WKT is used for the string representation."
-        return self.wkt
+        "EWKT is used for the string representation."
+        return self.ewkt
 
     def __repr__(self):
         "Short-hand representation because WKT may be very large."
@@ -376,9 +376,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def ewkt(self):
         """
-        Returns the EWKT (WKT + SRID) of the Geometry.  Note that Z values
-        are *not* included in this representation because GEOS does not yet
-        support serializing them.
+        Returns the EWKT (SRID + WKT) of the Geometry. Note that Z values
+        are only included in this representation if GEOS >= 3.3.0.
         """
         if self.get_srid():
             return 'SRID=%s;%s' % (self.srid, self.wkt)

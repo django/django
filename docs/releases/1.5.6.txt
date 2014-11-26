@@ -51,7 +51,7 @@ Caching of anonymous pages could reveal CSRF token
 
 Django includes both a :doc:`caching framework </topics/cache>` and a system
 for :doc:`preventing cross-site request forgery (CSRF) attacks
-</ref/contrib/csrf/>`. The CSRF-protection system is based on a random nonce
+</ref/csrf/>`. The CSRF-protection system is based on a random nonce
 sent to the client in a cookie which must be sent by the client on future
 requests and, in forms, a hidden value which must be submitted back with the
 form.

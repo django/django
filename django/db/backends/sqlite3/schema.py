@@ -75,10 +75,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 )
         # Add in any altered fields
         for (old_field, new_field) in alter_fields:
-            del body[old_field.name]
-            del mapping[old_field.column]
+            body.pop(old_field.name, None)
+            mapping.pop(old_field.column, None)
             body[new_field.name] = new_field
-            mapping[new_field.column] = self.quote_name(old_field.column)
+            if old_field.null and not new_field.null:
+                case_sql = "coalesce(%(col)s, %(default)s)" % {
+                    'col': self.quote_name(old_field.column),
+                    'default': self.quote_value(self.effective_default(new_field))
+                }
+                mapping[new_field.column] = case_sql
+            else:
+                mapping[new_field.column] = self.quote_name(old_field.column)
             rename_mapping[old_field.name] = new_field.name
         # Remove any deleted fields
         for field in delete_fields:

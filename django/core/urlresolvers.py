@@ -353,6 +353,11 @@ class RegexURLResolver(LocaleRegexProvider):
             self._populate()
         return self._app_dict[language_code]
 
+    def _is_callback(self, name):
+        if not self._populated:
+            self._populate()
+        return name in self._callback_strs
+
     def resolve(self, path):
         path = force_text(path)  # path may be a reverse_lazy object
         tried = []
@@ -430,7 +435,7 @@ class RegexURLResolver(LocaleRegexProvider):
 
         original_lookup = lookup_view
         try:
-            if lookup_view in self._callback_strs:
+            if self._is_callback(lookup_view):
                 lookup_view = get_callable(lookup_view, True)
         except (ImportError, AttributeError) as e:
             raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
@@ -572,9 +577,9 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
         if ns_pattern:
             resolver = get_ns_resolver(ns_pattern, resolver)
 
-    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+    return force_text(iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs)))
 
-reverse_lazy = lazy(reverse, str)
+reverse_lazy = lazy(reverse, six.text_type)
 
 
 def clear_url_caches():

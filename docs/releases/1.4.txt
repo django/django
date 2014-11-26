@@ -358,7 +358,7 @@ more information.
 New form wizard
 ~~~~~~~~~~~~~~~
 
-The previous ``FormWizard`` from :mod:`django.contrib.formtools` has been
+The previous ``FormWizard`` from ``django.contrib.formtools`` has been
 replaced with a new implementation based on the class-based views
 introduced in Django 1.3. It features a pluggable storage API and doesn't
 require the wizard to pass around hidden fields for every previous step.
@@ -367,9 +367,6 @@ Django 1.4 ships with a session-based storage backend and a cookie-based
 storage backend. The latter uses the tools for
 :doc:`cryptographic signing </topics/signing>` also introduced in
 Django 1.4 to store the wizard's state in the user's cookies.
-
-See the :doc:`form wizard </ref/contrib/formtools/form-wizard>` docs for
-more information.
 
 ``reverse_lazy``
 ~~~~~~~~~~~~~~~~
@@ -499,7 +496,7 @@ We've made various improvements to our CSRF features, including the
 help with AJAX-heavy sites; protection for PUT and DELETE requests; and the
 :setting:`CSRF_COOKIE_SECURE` and :setting:`CSRF_COOKIE_PATH` settings, which can
 improve the security and usefulness of CSRF protection. See the :doc:`CSRF
-docs </ref/contrib/csrf>` for more information.
+docs </ref/csrf>` for more information.
 
 Error report filtering
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -996,7 +993,7 @@ expression, such as periods.
 CSRF protection extended to PUT and DELETE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Previously, Django's :doc:`CSRF protection </ref/contrib/csrf/>` provided
+Previously, Django's :doc:`CSRF protection </ref/csrf/>` provided
 protection only against POST requests. Since use of PUT and DELETE methods in
 AJAX applications is becoming more common, we now protect all methods not
 defined as safe by :rfc:`2616` -- i.e., we exempt GET, HEAD, OPTIONS and TRACE,

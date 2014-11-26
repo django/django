@@ -37,11 +37,11 @@ def update_installed_apps(**kwargs):
         from django.core.management import get_commands
         get_commands.cache_clear()
         # Rebuild templatetags module cache.
-        from django.template import base as mod
-        mod.templatetags_modules = []
-        # Rebuild app_template_dirs cache.
-        from django.template.loaders import app_directories as mod
-        mod.app_template_dirs = mod.calculate_app_template_dirs()
+        from django.template.base import get_templatetags_modules
+        get_templatetags_modules.cache_clear()
+        # Rebuild get_app_template_dirs cache.
+        from django.template.utils import get_app_template_dirs
+        get_app_template_dirs.cache_clear()
         # Rebuild translations cache.
         from django.utils.translation import trans_real
         trans_real._translations = {}
@@ -59,7 +59,7 @@ def update_connections_time_zone(**kwargs):
             time.tzset()
 
         # Reset local time zone cache
-        timezone._localtime = None
+        timezone.get_default_timezone.cache_clear()
 
     # Reset the database connections' time zone
     if kwargs['setting'] == 'USE_TZ' and settings.TIME_ZONE != 'UTC':
@@ -78,17 +78,18 @@ def update_connections_time_zone(**kwargs):
 
 
 @receiver(setting_changed)
-def clear_context_processors_cache(**kwargs):
-    if kwargs['setting'] == 'TEMPLATE_CONTEXT_PROCESSORS':
-        from django.template import context
-        context._standard_context_processors = None
-
-
-@receiver(setting_changed)
-def clear_template_loaders_cache(**kwargs):
-    if kwargs['setting'] == 'TEMPLATE_LOADERS':
-        from django.template import loader
-        loader.template_source_loaders = None
+def reset_default_template_engine(**kwargs):
+    if kwargs['setting'] in {
+        'TEMPLATE_DIRS',
+        'ALLOWED_INCLUDE_ROOTS',
+        'TEMPLATE_CONTEXT_PROCESSORS',
+        'TEMPLATE_DEBUG',
+        'TEMPLATE_LOADERS',
+        'TEMPLATE_STRING_IF_INVALID',
+        'FILE_CHARSET',
+    }:
+        from django.template.engine import Engine
+        Engine.get_default.cache_clear()
 
 
 @receiver(setting_changed)
@@ -112,7 +113,15 @@ def language_changed(**kwargs):
 
 @receiver(setting_changed)
 def file_storage_changed(**kwargs):
-    if kwargs['setting'] in ('MEDIA_ROOT', 'DEFAULT_FILE_STORAGE'):
+    file_storage_settings = {
+        'DEFAULT_FILE_STORAGE',
+        'FILE_UPLOAD_DIRECTORY_PERMISSIONS',
+        'FILE_UPLOAD_PERMISSIONS',
+        'MEDIA_ROOT',
+        'MEDIA_URL',
+    }
+
+    if kwargs['setting'] in file_storage_settings:
         from django.core.files.storage import default_storage
         default_storage._wrapped = empty
 

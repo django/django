@@ -181,17 +181,6 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
         """
         return {}
 
-    def get_limit_choices_to(self):
-        """
-        Returns ``limit_choices_to`` for this form field.
-
-        If it is a callable, it will be invoked and the result will be
-        returned.
-        """
-        if callable(self.limit_choices_to):
-            return self.limit_choices_to()
-        return self.limit_choices_to
-
     def has_changed(self, initial, data):
         """
         Return True if data differs from initial.
@@ -798,6 +787,15 @@ class NullBooleanField(BooleanField):
         return initial != data
 
 
+class CallableChoiceIterator(object):
+    def __init__(self, choices_func):
+        self.choices_func = choices_func
+
+    def __iter__(self):
+        for e in self.choices_func():
+            yield e
+
+
 class ChoiceField(Field):
     widget = Select
     default_error_messages = {
@@ -822,7 +820,12 @@ class ChoiceField(Field):
         # Setting choices also sets the choices on the widget.
         # choices can be any iterable, but we call list() on it because
         # it will be consumed more than once.
-        self._choices = self.widget.choices = list(value)
+        if callable(value):
+            value = CallableChoiceIterator(value)
+        else:
+            value = list(value)
+
+        self._choices = self.widget.choices = value
 
     choices = property(_get_choices, _set_choices)
 

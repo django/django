@@ -234,6 +234,12 @@ the Django test runner reorders tests in the following way:
     database by a given :class:`~django.test.TransactionTestCase` test, they
     must be updated to be able to run independently.
 
+.. versionadded:: 1.8
+
+    You may reverse the execution order inside groups by passing
+    :djadminopt:`--reverse` to the test command. This can help with ensuring
+    your tests are independent from each other.
+
 .. _test-case-serialized-rollback:
 
 Rollback emulation
@@ -242,7 +248,9 @@ Rollback emulation
 Any initial data loaded in migrations will only be available in ``TestCase``
 tests and not in ``TransactionTestCase`` tests, and additionally only on
 backends where transactions are supported (the most important exception being
-MyISAM).
+MyISAM). This is also true for tests which rely on ``TransactionTestCase``
+such as :class:`LiveServerTestCase` and
+:class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`.
 
 Django can reload that data for you on a per-testcase basis by
 setting the ``serialized_rollback`` option to ``True`` in the body of the

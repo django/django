@@ -85,8 +85,7 @@ class TemplateCommand(BaseCommand):
                 raise CommandError("Destination directory '%s' does not "
                                    "exist, please create it first." % top_dir)
 
-        extensions = tuple(
-            handle_extensions(options['extensions'], ignored=()))
+        extensions = tuple(handle_extensions(options['extensions']))
         extra_files = []
         for file in options['files']:
             extra_files.extend(map(lambda x: x.strip(), file.split(',')))
@@ -110,6 +109,7 @@ class TemplateCommand(BaseCommand):
             base_name: name,
             base_directory: top_dir,
             'docs_version': docs_version,
+            'django_version': django.__version__,
         }), autoescape=False)
 
         # Setup a stub settings environment for template rendering

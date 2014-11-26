@@ -329,11 +329,9 @@ class BaseModelForm(BaseForm):
         # Apply ``limit_choices_to`` to each field.
         for field_name in self.fields:
             formfield = self.fields[field_name]
-            if hasattr(formfield, 'queryset'):
-                limit_choices_to = formfield.limit_choices_to
+            if hasattr(formfield, 'queryset') and hasattr(formfield, 'get_limit_choices_to'):
+                limit_choices_to = formfield.get_limit_choices_to()
                 if limit_choices_to is not None:
-                    if callable(limit_choices_to):
-                        limit_choices_to = limit_choices_to()
                     formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)
 
     def _get_validation_exclusions(self):
@@ -576,7 +574,7 @@ class BaseModelFormSet(BaseFormSet):
     def _get_to_python(self, field):
         """
         If the field is a related field, fetch the concrete field's (that
-        is, the ultimate pointed-to field's) get_prep_value.
+        is, the ultimate pointed-to field's) to_python.
         """
         while field.rel is not None:
             field = field.rel.get_related_field()
@@ -1084,12 +1082,12 @@ class ModelChoiceIterator(object):
         if self.field.cache_choices:
             if self.field.choice_cache is None:
                 self.field.choice_cache = [
-                    self.choice(obj) for obj in self.queryset.all()
+                    self.choice(obj) for obj in self.queryset.iterator()
                 ]
             for choice in self.field.choice_cache:
                 yield choice
         else:
-            for obj in self.queryset.all():
+            for obj in self.queryset.iterator():
                 yield self.choice(obj)
 
     def __len__(self):
@@ -1133,6 +1131,17 @@ class ModelChoiceField(ChoiceField):
         self.limit_choices_to = limit_choices_to   # limit the queryset later.
         self.choice_cache = None
         self.to_field_name = to_field_name
+
+    def get_limit_choices_to(self):
+        """
+        Returns ``limit_choices_to`` for this form field.
+
+        If it is a callable, it will be invoked and the result will be
+        returned.
+        """
+        if callable(self.limit_choices_to):
+            return self.limit_choices_to()
+        return self.limit_choices_to
 
     def __deepcopy__(self, memo):
         result = super(ChoiceField, self).__deepcopy__(memo)

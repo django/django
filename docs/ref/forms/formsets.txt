@@ -1,6 +1,9 @@
-====================
+=================
 Formset Functions
-====================
+=================
+
+Formset API reference. For introductory material about formsets, see the
+:doc:`/topics/forms/formsets` topic guide.
 
 .. module:: django.forms.formsets
    :synopsis: Django's functions for building formsets.
@@ -13,4 +16,4 @@ Formset Functions
 
     .. versionchanged:: 1.7
 
-    The ``min_num`` and ``validate_min`` parameters were added.
+        The ``min_num`` and ``validate_min`` parameters were added.

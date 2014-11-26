@@ -81,7 +81,7 @@ or for binary data, such as an image. A Web application that uses ``GET``
 requests for admin forms is a security risk: it can be easy for an attacker to
 mimic a form's request to gain access to sensitive parts of the system.
 ``POST``, coupled with other protections like Django's :doc:`CSRF protection
-</ref/contrib/csrf/>` offers more control over access.
+</ref/csrf/>` offers more control over access.
 
 On the other hand, ``GET`` is suitable for things like a web search form,
 because the URLs that represent a ``GET`` request can easily be bookmarked,
@@ -335,7 +335,7 @@ from that ``{{ form }}`` by Django's template language.
 .. admonition:: Forms and Cross Site Request Forgery protection
 
     Django ships with an easy-to-use :doc:`protection against Cross Site Request
-    Forgeries </ref/contrib/csrf>`. When submitting a form via ``POST`` with
+    Forgeries </ref/csrf>`. When submitting a form via ``POST`` with
     CSRF protection enabled you must use the :ttag:`csrf_token` template tag
     as in the preceding example. However, since CSRF protection is not
     directly tied to forms in templates, this tag is omitted from the
@@ -527,24 +527,36 @@ in a Django template, will be rendered appropriately. For example:
     {{ form.non_field_errors }}
     <div class="fieldWrapper">
         {{ form.subject.errors }}
-        <label for="id_subject">Email subject:</label>
+        <label for="{{ form.subject.id_for_label }}">Email subject:</label>
         {{ form.subject }}
     </div>
     <div class="fieldWrapper">
         {{ form.message.errors }}
-        <label for="id_message">Your message:</label>
+        <label for="{{ form.message.id_for_label }}">Your message:</label>
         {{ form.message }}
     </div>
     <div class="fieldWrapper">
         {{ form.sender.errors }}
-        <label for="id_sender">Your email address:</label>
+        <label for="{{ form.sender.id_for_label }}">Your email address:</label>
         {{ form.sender }}
     </div>
     <div class="fieldWrapper">
         {{ form.cc_myself.errors }}
-        <label for="id_cc_myself">CC yourself?</label>
+        <label for="{{ form.cc_myself.id_for_label }}">CC yourself?</label>
         {{ form.cc_myself }}
     </div>
+
+Complete ``<label>`` element can also be generated using the
+:meth:`~django.forms.BoundField.label_tag`. For example:
+
+.. code-block:: html+django
+
+    <div class="fieldWrapper">
+        {{ form.subject.errors }}
+        {{ form.subject.label_tag }}
+        {{ form.subject }}
+    </div>
+
 
 Rendering form error messages
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -578,8 +590,6 @@ over them:
         </ol>
     {% endif %}
 
-.. versionchanged:: 1.8
-
 Non-field errors (and/or hidden field errors that are rendered at the top of
 the form when using helpers like ``form.as_p()``) will be rendered with an
 additional class of ``nonfield`` to help distinguish them from field-specific
@@ -590,6 +600,10 @@ errors. For example, ``{{ form.non_field_errors }}`` would look like:
     <ul class="errorlist nonfield">
         <li>Generic validation error</li>
     </ul>
+
+.. versionchanged:: 1.8
+
+    The ``nonfield`` class as described in the example above was added.
 
 See :doc:`/ref/forms/api` for more on errors, styling, and working with form
 attributes in templates.

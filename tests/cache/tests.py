@@ -28,6 +28,7 @@ from django.middleware.csrf import CsrfViewMiddleware
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
+from django.test.signals import setting_changed
 from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
 from django.utils import timezone
@@ -912,12 +913,9 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self._perform_cull_test(caches['zero_cull'], 50, 18)
 
     def test_second_call_doesnt_crash(self):
-        stdout = six.StringIO()
-        management.call_command(
-            'createcachetable',
-            stdout=stdout
-        )
-        self.assertEqual(stdout.getvalue(),
+        out = six.StringIO()
+        management.call_command('createcachetable', stdout=out)
+        self.assertEqual(out.getvalue(),
             "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
 
     def test_createcachetable_with_table_argument(self):
@@ -926,14 +924,14 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         specifying the table name).
         """
         self.drop_table()
-        stdout = six.StringIO()
+        out = six.StringIO()
         management.call_command(
             'createcachetable',
             'test cache table',
             verbosity=2,
-            stdout=stdout
+            stdout=out,
         )
-        self.assertEqual(stdout.getvalue(),
+        self.assertEqual(out.getvalue(),
             "Cache table 'test cache table' created.\n")
 
     def test_clear_commits_transaction(self):
@@ -1135,6 +1133,24 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
         # culling isn't implemented, memcached deals with it.
         pass
 
+    def test_memcached_deletes_key_on_failed_set(self):
+        # By default memcached allows objects up to 1MB. For the cache_db session
+        # backend to always use the current session, memcached needs to delete
+        # the old key if it fails to set.
+        # pylibmc doesn't seem to have SERVER_MAX_VALUE_LENGTH as far as I can
+        # tell from a quick check of its source code. This is falling back to
+        # the default value exposed by python-memcached on my system.
+        max_value_length = getattr(cache._lib, 'SERVER_MAX_VALUE_LENGTH', 1048576)
+
+        cache.set('small_value', 'a')
+        self.assertEqual(cache.get('small_value'), 'a')
+
+        large_value = 'a' * (max_value_length + 1)
+        cache.set('small_value', large_value)
+        # small_value should be deleted, or set if configured to accept larger values
+        value = cache.get('small_value')
+        self.assertTrue(value is None or value == large_value)
+
 
 @override_settings(CACHES=caches_setting_for_tests(
     BACKEND='django.core.cache.backends.filebased.FileBasedCache',
@@ -1147,8 +1163,12 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
     def setUp(self):
         super(FileBasedCacheTests, self).setUp()
         self.dirname = tempfile.mkdtemp()
+        # Caches location cannot be modified through override_settings / modify_settings,
+        # hence settings are manipulated directly here and the setting_changed signal
+        # is triggered manually.
         for cache_params in settings.CACHES.values():
             cache_params.update({'LOCATION': self.dirname})
+        setting_changed.send(self.__class__, setting='CACHES', enter=False)
 
     def tearDown(self):
         super(FileBasedCacheTests, self).tearDown()
@@ -2058,22 +2078,6 @@ class TestWithTemplateResponse(TestCase):
         self.assertTrue(response.has_header('ETag'))
 
 
-@override_settings(ROOT_URLCONF="admin_views.urls")
-class TestEtagWithAdmin(TestCase):
-    # See https://code.djangoproject.com/ticket/16003
-
-    def test_admin(self):
-        with self.settings(USE_ETAGS=False):
-            response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 302)
-            self.assertFalse(response.has_header('ETag'))
-
-        with self.settings(USE_ETAGS=True):
-            response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 302)
-            self.assertTrue(response.has_header('ETag'))
-
-
 class TestMakeTemplateFragmentKey(TestCase):
     def test_without_vary_on(self):
         key = make_template_fragment_key('a.fragment')
@@ -2103,7 +2107,7 @@ class CacheHandlerTest(TestCase):
         cache1 = caches['default']
         cache2 = caches['default']
 
-        self.assertTrue(cache1 is cache2)
+        self.assertIs(cache1, cache2)
 
     def test_per_thread(self):
         """
@@ -2120,4 +2124,4 @@ class CacheHandlerTest(TestCase):
             t.start()
             t.join()
 
-        self.assertFalse(c[0] is c[1])
+        self.assertIsNot(c[0], c[1])

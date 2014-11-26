@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Burak Yavuz, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2011
 # Murat Çorlu <muratcorlu@gmail.com>, 2012
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-07 13:12+0000\n"
+"Last-Translator: Burak Yavuz\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +23,7 @@ msgstr ""
 #: contrib/admin/static/admin/js/SelectFilter2.js:45
 #, c-format
 msgid "Available %s"
-msgstr "Toplam %s"
+msgstr "Mevcut %s"
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:46
 #, c-format
@@ -30,30 +31,30 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"Bu uygun %s listesidir. Aşağıdaki kutudan bazılarını işaretleyip, iki kutu "
-"arasındaki \"Seç\" okuna basarak seçebilirsiniz."
+"Bu mevcut %s listesidir. Aşağıdaki kutudan bazılarını işaretleyerek ve ondan "
+"sonra iki kutu arasındaki \"Seçin\" okuna tıklayarak seçebilirsiniz."
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr "Uygun %s listesini filtrelemek için bu kutuya yazın."
+msgstr "Mevcut %s listesini süzmek için bu kutu içine yazın."
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:57
 msgid "Filter"
-msgstr "Filtre"
+msgstr "Süzgeç"
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
-msgstr "Hepsini seç"
+msgstr "Tümünü seçin"
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr "Bütün %s bir kerede seçilsin istiyorsanız tıklayın. "
+msgstr "Bir kerede tüm %s seçilmesi için tıklayın."
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr "Seç"
+msgstr "Seçin"
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -70,24 +71,25 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
-"Bu seçili %s listesidir. Aşağıdaki kutudan bazılarını işaretleyip, iki kutu "
-"arasındaki \"Kaldır\" okuna tıklayarak kaldırabilirsiniz."
+"Bu seçilen %s listesidir. Aşağıdaki kutudan bazılarını işaretleyerek ve "
+"ondan sonra iki kutu arasındaki \"Kaldır\" okuna tıklayarak "
+"kaldırabilirsiniz."
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr "Hepsini kaldır"
+msgstr "Tümünü kaldır"
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr "Bütün seçili %s kaldırılsın istiyorsanız tıklayın."
+msgstr "Bir kerede tüm seçilen %s kaldırılması için tıklayın."
 
 #: contrib/admin/static/admin/js/actions.js:22
 #: contrib/admin/static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "%(sel)s / %(cnt)s seçili"
-msgstr[1] "%(sel)s / %(cnt)s seçili"
+msgstr[0] "%(sel)s / %(cnt)s seçildi"
+msgstr[1] "%(sel)s / %(cnt)s seçildi"
 
 #: contrib/admin/static/admin/js/actions.js:114
 #: contrib/admin/static/admin/js/actions.min.js:4
@@ -95,8 +97,8 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
-"Alanlara girilmiş ve henüz kaydedilmemiş değişiklikler mevcut. Eğer devam "
-"ederseniz, kaydedilmemiş değişiklikleriniz yitirilecektir."
+"Bireysel düzenlenebilir alanlarda kaydedilmemiş değişiklikleriniz var. Eğer "
+"bir eylem çalıştırırsanız, kaydedilmemiş değişiklikleriniz kaybolacaktır."
 
 #: contrib/admin/static/admin/js/actions.js:126
 #: contrib/admin/static/admin/js/actions.min.js:5
@@ -105,9 +107,9 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
-"Bir işlem seçtiniz, fakat bazı alanlardaki değişiklikleri henüz "
-"kaydetmediniz. Kaydetmek için lütfen Tamam düğmesine tıklayınız. İşlemi "
-"tekrarlamanız gerekecektir."
+"Bir eylem seçtiniz, fakat henüz bireysel alanlara değişikliklerinizi "
+"kaydetmediniz. Kaydetmek için lütfen TAMAM düğmesine tıklayın. Eylemi "
+"yeniden çalıştırmanız gerekecek."
 
 #: contrib/admin/static/admin/js/actions.js:128
 #: contrib/admin/static/admin/js/actions.min.js:5
@@ -116,22 +118,22 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Bir işlem seçtiniz, fakat hiçbir alan üzerinde değişiklik yapmadınız. Bu "
-"durumda Kaydet düğmesi yerine Git düğmesini kullanmanız önerilir."
+"Bir eylem seçtiniz, fakat bireysel alanlar üzerinde hiçbir değişiklik "
+"yapmadınız. Muhtemelen Kaydet düğmesi yerine Git düğmesini arıyorsunuz."
 
 #: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:79
 #, c-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Not: Sunucu saatinin %s saat ilerisindesiniz."
+msgstr[1] "Not: Sunucu saatinin %s saat ilerisindesiniz."
 
 #: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
 #, c-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Not: Sunucu saatinin %s saat gerisindesiniz."
+msgstr[1] "Not: Sunucu saatinin %s saat gerisindesiniz."
 
 #: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
 #: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
@@ -144,7 +146,7 @@ msgstr "Saat"
 
 #: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
 msgid "Choose a time"
-msgstr "Saat seçin"
+msgstr "Bir saat seçin"
 
 #: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
 msgid "Midnight"

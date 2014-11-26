@@ -462,6 +462,42 @@ Daniele Procida
 
     .. _Michael Manfre: http://manfre.net
 
+`Collin Anderson`_
+    Collin found Django in November 2006. He was in awe of the admin and ORM
+    and was amazed that the documentation was teaching him best web practices
+    like redirecting after a successful POST request. Why had he never learned
+    this before? No one knows to this day.
+
+    He enjoys helping people on the |django-users| mailing list and making
+    Django simple and easy for newcomers.
+
+    Collin lives in South Bend, IN, USA where he uses Django to `increase
+    unity`_.
+
+    .. _Collin Anderson: https://github.com/collinanderson
+    .. _increase unity: http://onetencommunications.com/about/
+
+`Tom Christie`_
+    Tom has background in speech recognition, networking, and web development.
+    He has a particular interest in Web API design and is the original author
+    of `Django REST framework`_.
+
+    Tom lives in the seaside city of Brighton, UK.
+
+    .. _Tom Christie: https://twitter.com/_tomchristie
+    .. _Django REST framework: http://django-rest-framework.org
+
+`Curtis Maloney`_
+    Curtis is a self-taught programmer from Melbourne, Australia, who eschews
+    specialization.  Upon finding Django when it was first open sourced, he
+    realized it was possible to enjoy web development.
+
+    He spends a lot of time helping people on the #django IRC channel, and has
+    authored and released a number of `smaller django apps`_.
+
+    .. _Curtis Maloney: http://musings.tinbrain.net/blog/
+    .. _smaller django apps: https://github.com/funkybob/
+
 Past team members
 =================
 

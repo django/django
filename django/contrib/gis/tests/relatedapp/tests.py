@@ -21,9 +21,9 @@ class RelatedGeoModelTest(TestCase):
 
     def test02_select_related(self):
         "Testing `select_related` on geographic models (see #7126)."
-        qs1 = City.objects.all()
-        qs2 = City.objects.select_related()
-        qs3 = City.objects.select_related('location')
+        qs1 = City.objects.order_by('id')
+        qs2 = City.objects.order_by('id').select_related()
+        qs3 = City.objects.order_by('id').select_related('location')
 
         # Reference data for what's in the fixtures.
         cities = (
@@ -228,8 +228,8 @@ class RelatedGeoModelTest(TestCase):
         combined = qs1 | qs2
         names = [c.name for c in combined]
         self.assertEqual(2, len(names))
-        self.assertTrue('Aurora' in names)
-        self.assertTrue('Kecksburg' in names)
+        self.assertIn('Aurora', names)
+        self.assertIn('Kecksburg', names)
 
     def test11_geoquery_pickle(self):
         "Ensuring GeoQuery objects are unpickled correctly.  See #10839."

@@ -6,6 +6,8 @@ from django.utils.encoding import force_text, force_bytes
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe, mark_for_escaping, SafeData, EscapeData
 from django.utils import six
+from django.utils import text
+from django.utils import html
 
 lazystr = lazy(force_text, six.text_type)
 lazybytes = lazy(force_bytes, bytes)
@@ -47,3 +49,16 @@ class SafeStringTest(TestCase):
     def test_html(self):
         s = '<h1>interop</h1>'
         self.assertEqual(s, mark_safe(s).__html__())
+
+    def test_add_lazy_safe_text_and_safe_text(self):
+        s = html.escape(lazystr('a'))
+        s += mark_safe('&b')
+        self.assertRenderEqual('{{ s }}', 'a&b', s=s)
+
+        s = html.escapejs(lazystr('a'))
+        s += mark_safe('&b')
+        self.assertRenderEqual('{{ s }}', 'a&b', s=s)
+
+        s = text.slugify(lazystr('a'))
+        s += mark_safe('&b')
+        self.assertRenderEqual('{{ s }}', 'a&b', s=s)

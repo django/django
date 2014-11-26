@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import copy
+
 from django.core.exceptions import ValidationError
 from django.forms.utils import flatatt, ErrorDict, ErrorList
 from django.test import TestCase
@@ -24,6 +26,23 @@ class FormsUtilTestCase(TestCase):
         self.assertEqual(flatatt({'class': "news", 'title': "Read this", 'required': True}), ' class="news" title="Read this" required')
         self.assertEqual(flatatt({'class': "news", 'title': "Read this", 'required': False}), ' class="news" title="Read this"')
         self.assertEqual(flatatt({}), '')
+
+    def test_flatatt_no_side_effects(self):
+        """
+        Fixes #23883 -- Check that flatatt does not modify the dict passed in
+        """
+        attrs = {'foo': 'bar', 'true': True, 'false': False}
+        attrs_copy = copy.copy(attrs)
+        self.assertEqual(attrs, attrs_copy)
+
+        first_run = flatatt(attrs)
+        self.assertEqual(attrs, attrs_copy)
+        self.assertEqual(first_run, ' foo="bar" true')
+
+        second_run = flatatt(attrs)
+        self.assertEqual(attrs, attrs_copy)
+
+        self.assertEqual(first_run, second_run)
 
     def test_validation_error(self):
         ###################
@@ -69,3 +88,24 @@ class FormsUtilTestCase(TestCase):
                          '<ul class="errorlist"><li>nameExample of link: &lt;a href=&quot;http://www.example.com/&quot;&gt;example&lt;/a&gt;</li></ul>')
         self.assertHTMLEqual(str(ErrorDict({'name': mark_safe(example)})),
                          '<ul class="errorlist"><li>nameExample of link: <a href="http://www.example.com/">example</a></li></ul>')
+
+    def test_error_dict_copy(self):
+        e = ErrorDict()
+        e['__all__'] = ErrorList([
+            ValidationError(
+                message='message %(i)s',
+                params={'i': 1},
+            ),
+            ValidationError(
+                message='message %(i)s',
+                params={'i': 2},
+            ),
+        ])
+
+        e_copy = copy.copy(e)
+        self.assertEqual(e, e_copy)
+        self.assertEqual(e.as_data(), e_copy.as_data())
+
+        e_deepcopy = copy.deepcopy(e)
+        self.assertEqual(e, e_deepcopy)
+        self.assertEqual(e.as_data(), e_copy.as_data())

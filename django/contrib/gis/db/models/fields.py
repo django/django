@@ -1,9 +1,8 @@
 from django.db.models.fields import Field
-from django.db.models.sql.expressions import SQLEvaluator
+from django.db.models.expressions import ExpressionNode
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis import forms
-from django.contrib.gis.db.models.constants import GIS_LOOKUPS
-from django.contrib.gis.db.models.lookups import GISLookup
+from django.contrib.gis.db.models.lookups import gis_lookups
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.utils import six
@@ -166,7 +165,7 @@ class GeometryField(Field):
         returning to the caller.
         """
         value = super(GeometryField, self).get_prep_value(value)
-        if isinstance(value, SQLEvaluator):
+        if isinstance(value, ExpressionNode):
             return value
         elif isinstance(value, (tuple, list)):
             geom = value[0]
@@ -198,7 +197,7 @@ class GeometryField(Field):
             return geom
 
     def from_db_value(self, value, connection):
-        if value:
+        if value and not isinstance(value, Geometry):
             value = Geometry(value)
         return value
 
@@ -243,16 +242,15 @@ class GeometryField(Field):
         parameters into the correct units for the coordinate system of the
         field.
         """
-        if lookup_type in connection.ops.gis_terms:
-            # special case for isnull lookup
-            if lookup_type == 'isnull':
-                return []
-
+        # special case for isnull lookup
+        if lookup_type == 'isnull':
+            return []
+        elif lookup_type in self.class_lookups:
             # Populating the parameters list, and wrapping the Geometry
             # with the Adapter of the spatial backend.
             if isinstance(value, (tuple, list)):
                 params = [connection.ops.Adapter(value[0])]
-                if lookup_type in connection.ops.distance_functions:
+                if self.class_lookups[lookup_type].distance:
                     # Getting the distance parameter in the units of the field.
                     params += self.get_distance(value[1:], lookup_type, connection)
                 elif lookup_type in connection.ops.truncate_params:
@@ -261,7 +259,7 @@ class GeometryField(Field):
                     pass
                 else:
                     params += value[1:]
-            elif isinstance(value, SQLEvaluator):
+            elif isinstance(value, ExpressionNode):
                 params = []
             else:
                 params = [connection.ops.Adapter(value)]
@@ -279,21 +277,21 @@ class GeometryField(Field):
 
     def get_db_prep_save(self, value, connection):
         "Prepares the value for saving in the database."
-        if value is None:
+        if not value:
             return None
         else:
             return connection.ops.Adapter(self.get_prep_value(value))
 
-    def get_placeholder(self, value, connection):
+    def get_placeholder(self, value, compiler, connection):
         """
         Returns the placeholder for the geometry column for the
         given value.
         """
-        return connection.ops.get_geom_placeholder(self, value)
+        return connection.ops.get_geom_placeholder(self, value, compiler)
 
-for lookup_name in GIS_LOOKUPS:
-    lookup = type(lookup_name, (GISLookup,), {'lookup_name': lookup_name})
-    GeometryField.register_lookup(lookup)
+
+for klass in gis_lookups.values():
+    GeometryField.register_lookup(klass)
 
 
 # The OpenGIS Geometry Type Fields
@@ -337,3 +335,12 @@ class GeometryCollectionField(GeometryField):
     geom_type = 'GEOMETRYCOLLECTION'
     form_class = forms.GeometryCollectionField
     description = _("Geometry collection")
+
+
+class ExtentField(Field):
+    "Used as a return value from an extent aggregate"
+
+    description = _("Extent Aggregate Field")
+
+    def get_internal_type(self):
+        return "ExtentField"

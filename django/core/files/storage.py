@@ -3,7 +3,6 @@ import errno
 from datetime import datetime
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import locks, File
 from django.core.files.move import file_move_safe
 from django.utils.crypto import get_random_string
@@ -277,11 +276,7 @@ class FileSystemStorage(Storage):
         return directories, files
 
     def path(self, name):
-        try:
-            path = safe_join(self.location, name)
-        except ValueError:
-            raise SuspiciousFileOperation("Attempted access to '%s' denied." % name)
-        return os.path.normpath(path)
+        return safe_join(self.location, name)
 
     def size(self, name):
         return os.path.getsize(self.path(name))

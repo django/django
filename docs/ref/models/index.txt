@@ -16,3 +16,4 @@ Model API reference. For introductory material, see :doc:`/topics/db/models`.
    querysets
    queries
    lookups
+   expressions

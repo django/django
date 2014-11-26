@@ -15,6 +15,18 @@ class SeparateDatabaseAndState(Operation):
         self.database_operations = database_operations or []
         self.state_operations = state_operations or []
 
+    def deconstruct(self):
+        kwargs = {}
+        if self.database_operations:
+            kwargs['database_operations'] = self.database_operations
+        if self.state_operations:
+            kwargs['state_operations'] = self.state_operations
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs
+        )
+
     def state_forwards(self, app_label, state):
         for state_operation in self.state_operations:
             state_operation.state_forwards(app_label, state)
@@ -55,6 +67,18 @@ class RunSQL(Operation):
         self.reverse_sql = reverse_sql
         self.state_operations = state_operations or []
 
+    def deconstruct(self):
+        kwargs = {}
+        if self.reverse_sql is not None:
+            kwargs['reverse_sql'] = self.reverse_sql
+        if self.state_operations:
+            kwargs['state_operations'] = self.state_operations
+        return (
+            self.__class__.__name__,
+            [self.sql],
+            kwargs
+        )
+
     @property
     def reversible(self):
         return self.reverse_sql is not None
@@ -64,19 +88,31 @@ class RunSQL(Operation):
             state_operation.state_forwards(app_label, state)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        statements = schema_editor.connection.ops.prepare_sql_script(self.sql)
-        for statement in statements:
-            schema_editor.execute(statement, params=None)
+        self._run_sql(schema_editor, self.sql)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_sql is None:
             raise NotImplementedError("You cannot reverse this operation")
-        statements = schema_editor.connection.ops.prepare_sql_script(self.reverse_sql)
-        for statement in statements:
-            schema_editor.execute(statement, params=None)
+        self._run_sql(schema_editor, self.reverse_sql)
 
     def describe(self):
         return "Raw SQL operation"
+
+    def _run_sql(self, schema_editor, sql):
+        if isinstance(sql, (list, tuple)):
+            for sql in sql:
+                params = None
+                if isinstance(sql, (list, tuple)):
+                    elements = len(sql)
+                    if elements == 2:
+                        sql, params = sql
+                    else:
+                        raise ValueError("Expected a 2-tuple but got %d" % elements)
+                schema_editor.execute(sql, params=params)
+        else:
+            statements = schema_editor.connection.ops.prepare_sql_script(sql)
+            for statement in statements:
+                schema_editor.execute(statement, params=None)
 
 
 class RunPython(Operation):
@@ -99,6 +135,18 @@ class RunPython(Operation):
             if not callable(reverse_code):
                 raise ValueError("RunPython must be supplied with callable arguments")
             self.reverse_code = reverse_code
+
+    def deconstruct(self):
+        kwargs = {}
+        if self.reverse_code:
+            kwargs['reverse_code'] = self.reverse_code
+        if self.atomic is not True:
+            kwargs['atomic'] = self.atomic
+        return (
+            self.__class__.__name__,
+            [self.code],
+            kwargs
+        )
 
     @property
     def reversible(self):

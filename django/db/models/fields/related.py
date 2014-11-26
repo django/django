@@ -13,7 +13,7 @@ from django.db.models.fields import (AutoField, Field, IntegerField,
 from django.db.models.lookups import IsNull
 from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
-from django.db.models.sql.datastructures import Col
+from django.db.models.expressions import Col
 from django.utils.encoding import force_text, smart_text
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
@@ -70,9 +70,9 @@ def add_lazy_relation(cls, field, relation, operation):
             model_name = relation._meta.object_name
 
     # Try to look up the related model, and if it's already loaded resolve the
-    # string right away. If get_model returns None, it means that the related
-    # model isn't loaded yet, so we need to pend the relation until the class
-    # is prepared.
+    # string right away. If get_registered_model raises a LookupError, it means
+    # that the related model isn't loaded yet, so we need to pend the relation
+    # until the class is prepared.
     try:
         model = cls._meta.apps.get_registered_model(app_label, model_name)
     except LookupError:
@@ -99,10 +99,31 @@ class RelatedField(Field):
 
     def check(self, **kwargs):
         errors = super(RelatedField, self).check(**kwargs)
+        errors.extend(self._check_related_name_is_valid())
         errors.extend(self._check_relation_model_exists())
         errors.extend(self._check_referencing_to_swapped_model())
         errors.extend(self._check_clashes())
         return errors
+
+    def _check_related_name_is_valid(self):
+        import re
+        import keyword
+        related_name = self.rel.related_name
+
+        is_valid_id = (related_name and re.match('^[a-zA-Z_][a-zA-Z0-9_]*$', related_name)
+                       and not keyword.iskeyword(related_name))
+        if related_name and not (is_valid_id or related_name.endswith('+')):
+            return [
+                checks.Error(
+                    "The name '%s' is invalid related_name for field %s.%s" %
+                    (self.rel.related_name, self.model._meta.object_name,
+                     self.name),
+                    hint="Related name must be a valid Python identifier or end with a '+'",
+                    obj=self,
+                    id='fields.E306',
+                )
+            ]
+        return []
 
     def _check_relation_model_exists(self):
         rel_is_missing = self.rel.to not in apps.get_models()
@@ -711,12 +732,16 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
         create.alters_data = True
 
         def get_or_create(self, **kwargs):
-            # Update kwargs with the related object that this
-            # ForeignRelatedObjectsDescriptor knows about.
             kwargs[rel_field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).get_or_create(**kwargs)
         get_or_create.alters_data = True
+
+        def update_or_create(self, **kwargs):
+            kwargs[rel_field.name] = self.instance
+            db = router.db_for_write(self.model, instance=self.instance)
+            return super(RelatedManager, self.db_manager(db)).update_or_create(**kwargs)
+        update_or_create.alters_data = True
 
         # remove() and clear() are only provided if the ForeignKey can have a value of null.
         if rel_field.null:
@@ -977,14 +1002,23 @@ def create_many_related_manager(superclass, rel):
 
         def get_or_create(self, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
-            obj, created = \
-                super(ManyRelatedManager, self.db_manager(db)).get_or_create(**kwargs)
+            obj, created = super(ManyRelatedManager, self.db_manager(db)).get_or_create(**kwargs)
             # We only need to add() if created because if we got an object back
             # from get() then the relationship already exists.
             if created:
                 self.add(obj)
             return obj, created
         get_or_create.alters_data = True
+
+        def update_or_create(self, **kwargs):
+            db = router.db_for_write(self.instance.__class__, instance=self.instance)
+            obj, created = super(ManyRelatedManager, self.db_manager(db)).update_or_create(**kwargs)
+            # We only need to add() if created because if we got an object back
+            # from get() then the relationship already exists.
+            if created:
+                self.add(obj)
+            return obj, created
+        update_or_create.alters_data = True
 
         def _add_items(self, source_field_name, target_field_name, *objs):
             # source_field_name: the PK fieldname in join table for the source object
@@ -1313,11 +1347,18 @@ class ManyToManyRel(object):
 
     def get_related_field(self):
         """
-        Returns the field in the to' object to which this relationship is tied
-        (this is always the primary key on the target model). Provided for
-        symmetry with ManyToOneRel.
+        Returns the field in the 'to' object to which this relationship is tied.
+        Provided for symmetry with ManyToOneRel.
         """
-        return self.to._meta.pk
+        opts = self.through._meta
+        if self.through_fields:
+            field = opts.get_field(self.through_fields[0])
+        else:
+            for field in opts.fields:
+                rel = getattr(field, 'rel', None)
+                if rel and rel.to == self.to:
+                    break
+        return field.foreign_related_fields[0]
 
 
 class ForeignObject(RelatedField):
@@ -1523,7 +1564,8 @@ class ForeignObject(RelatedField):
     def get_extra_restriction(self, where_class, alias, related_alias):
         """
         Returns a pair condition used for joining and subquery pushdown. The
-        condition is something that responds to as_sql(qn, connection) method.
+        condition is something that responds to as_sql(compiler, connection)
+        method.
 
         Note that currently referring both the 'alias' and 'related_alias'
         will not work in some conditions, like subquery pushdown.
@@ -1746,7 +1788,7 @@ class ForeignKey(ForeignObject):
                 params={
                     'model': self.rel.to._meta.verbose_name, 'pk': value,
                     'field': self.rel.field_name, 'value': value,
-                },  # 'pk' is included for backwards compatibilty
+                },  # 'pk' is included for backwards compatibility
             )
 
     def get_attname(self):
@@ -1756,9 +1798,6 @@ class ForeignKey(ForeignObject):
         attname = self.get_attname()
         column = self.db_column or attname
         return attname, column
-
-    def get_validator_unique_lookup_type(self):
-        return '%s__%s__exact' % (self.name, self.related_field.name)
 
     def get_default(self):
         "Here we check if the default value is an object and return the to_field if so."

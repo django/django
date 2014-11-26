@@ -28,6 +28,9 @@ output incorrect code.
 All of the core Django operations are available from the
 ``django.db.migrations.operations`` module.
 
+For introductory material, see the :doc:`migrations topic guide
+</topics/migrations>`.
+
 Schema Operations
 =================
 
@@ -134,7 +137,7 @@ or if it is temporary and just for this migration (``False``) - usually
 because the migration is adding a non-nullable field to a table and needs
 a default value to put into existing rows. It does not effect the behavior
 of setting defaults in the database directly - Django never sets database
-defaults, and always applies them in the Django ORM code.
+defaults and always applies them in the Django ORM code.
 
 RemoveField
 -----------
@@ -150,15 +153,27 @@ from any data loss, which of course is irreversible).
 AlterField
 ----------
 
-.. class:: AlterField(model_name, name, field)
+.. class:: AlterField(model_name, name, field, preserve_default=True)
 
 Alters a field's definition, including changes to its type,
 :attr:`~django.db.models.Field.null`, :attr:`~django.db.models.Field.unique`,
 :attr:`~django.db.models.Field.db_column` and other field attributes.
 
+The ``preserve_default`` argument indicates whether the field's default
+value is permanent and should be baked into the project state (``True``),
+or if it is temporary and just for this migration (``False``) - usually
+because the migration is altering a nullable field to a non-nullable one and
+needs a default value to put into existing rows. It does not effect the
+behavior of setting defaults in the database directly - Django never sets
+database defaults and always applies them in the Django ORM code.
+
 Note that not all changes are possible on all databases - for example, you
 cannot change a text-type field like ``models.TextField()`` into a number-type
 field like ``models.IntegerField()`` on most databases.
+
+.. versionchanged:: 1.7.1
+
+    The ``preserve_default`` argument was added.
 
 RenameField
 -----------
@@ -185,6 +200,17 @@ the database. On most database backends (all but PostgreSQL), Django will
 split the SQL into individual statements prior to executing them. This
 requires installing the sqlparse_ Python library.
 
+You can also pass a list of strings or 2-tuples. The latter is used for passing
+queries and parameters in the same way as :ref:`cursor.execute()
+<executing-custom-sql>`. These three operations are equivalent::
+
+    migrations.RunSQL("INSERT INTO musician (name) VALUES ('Reinhardt');")
+    migrations.RunSQL(["INSERT INTO musician (name) VALUES ('Reinhardt');", None])
+    migrations.RunSQL(["INSERT INTO musician (name) VALUES (%s);", ['Reinhardt']])
+
+If you want to include literal percent signs in the query, you have to double
+them if you are passing parameters.
+
 The ``state_operations`` argument is so you can supply operations that are
 equivalent to the SQL in terms of project state; for example, if you are
 manually creating a column, you should pass in a list containing an ``AddField``
@@ -194,8 +220,13 @@ operation that adds that field and so will try to run it again).
 
 .. versionchanged:: 1.7.1
 
-    If you want to include literal percent signs in the query you don't need to
-    double them anymore.
+    If you want to include literal percent signs in a query without parameters
+    you don't need to double them anymore.
+
+.. versionchanged:: 1.8
+
+    The ability to pass parameters to the ``sql`` and ``reverse_sql`` queries
+    was added.
 
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 

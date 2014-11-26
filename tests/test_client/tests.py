@@ -22,11 +22,15 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
+import warnings
+
 from django.core import mail
+from django.http import HttpResponse
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.test import Client, TestCase, RequestFactory
 from django.test import override_settings
 
-from .views import get_view
+from .views import get_view, post_view, trace_view
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
@@ -78,6 +82,13 @@ class ClientTest(TestCase):
         self.assertEqual(response.context['data'], '37')
         self.assertEqual(response.templates[0].name, 'POST Template')
         self.assertContains(response, 'Data received')
+
+    def test_trace(self):
+        """TRACE a view"""
+        response = self.client.trace('/trace_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['method'], 'TRACE')
+        self.assertEqual(response.templates[0].name, 'TRACE Template')
 
     def test_response_headers(self):
         "Check the value of HTTP headers returned in a response"
@@ -166,14 +177,18 @@ class ClientTest(TestCase):
 
     def test_permanent_redirect(self):
         "GET a URL that redirects permanently elsewhere"
-        response = self.client.get('/permanent_redirect_view/')
-        # Check that the response was a 301 (permanent redirect)
-        self.assertRedirects(response, 'http://testserver/get_view/', status_code=301)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
+            response = self.client.get('/permanent_redirect_view/')
+            # Check that the response was a 301 (permanent redirect)
+            self.assertRedirects(response, 'http://testserver/get_view/', status_code=301)
 
-        client_providing_host = Client(HTTP_HOST='django.testserver')
-        response = client_providing_host.get('/permanent_redirect_view/')
-        # Check that the response was a 301 (permanent redirect) with absolute URI
-        self.assertRedirects(response, 'http://django.testserver/get_view/', status_code=301)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
+            client_providing_host = Client(HTTP_HOST='django.testserver')
+            response = client_providing_host.get('/permanent_redirect_view/')
+            # Check that the response was a 301 (permanent redirect) with absolute URI
+            self.assertRedirects(response, 'http://django.testserver/get_view/', status_code=301)
 
     def test_temporary_redirect(self):
         "GET a URL that does a non-permanent redirect"
@@ -183,26 +198,34 @@ class ClientTest(TestCase):
 
     def test_redirect_to_strange_location(self):
         "GET a URL that redirects to a non-200 page"
-        response = self.client.get('/double_redirect_view/')
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
+            response = self.client.get('/double_redirect_view/')
 
-        # Check that the response was a 302, and that
-        # the attempt to get the redirection location returned 301 when retrieved
-        self.assertRedirects(response, 'http://testserver/permanent_redirect_view/', target_status_code=301)
+            # Check that the response was a 302, and that
+            # the attempt to get the redirection location returned 301 when retrieved
+            self.assertRedirects(response, 'http://testserver/permanent_redirect_view/', target_status_code=301)
 
     def test_follow_redirect(self):
         "A URL that redirects can be followed to termination."
-        response = self.client.get('/double_redirect_view/', follow=True)
-        self.assertRedirects(response, 'http://testserver/get_view/', status_code=302, target_status_code=200)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
+            response = self.client.get('/double_redirect_view/', follow=True)
+            self.assertRedirects(response, 'http://testserver/get_view/', status_code=302, target_status_code=200)
         self.assertEqual(len(response.redirect_chain), 2)
 
     def test_redirect_http(self):
         "GET a URL that redirects to an http URI"
-        response = self.client.get('/http_redirect_view/', follow=True)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
+            response = self.client.get('/http_redirect_view/', follow=True)
         self.assertFalse(response.test_was_secure_request)
 
     def test_redirect_https(self):
         "GET a URL that redirects to an https URI"
-        response = self.client.get('/https_redirect_view/', follow=True)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RemovedInDjango19Warning)
+            response = self.client.get('/https_redirect_view/', follow=True)
         self.assertTrue(response.test_was_secure_request)
 
     def test_notfound_response(self):
@@ -552,13 +575,54 @@ class CustomTestClientTest(TestCase):
         self.assertEqual(hasattr(self.client, "i_am_customized"), True)
 
 
+_generic_view = lambda request: HttpResponse(status=200)
+
+
 @override_settings(ROOT_URLCONF='test_client.urls')
 class RequestFactoryTest(TestCase):
+    """Tests for the request factory."""
+
+    # A mapping between names of HTTP/1.1 methods and their test views.
+    http_methods_and_views = (
+        ('get', get_view),
+        ('post', post_view),
+        ('put', _generic_view),
+        ('patch', _generic_view),
+        ('delete', _generic_view),
+        ('head', _generic_view),
+        ('options', _generic_view),
+        ('trace', trace_view),
+    )
+
+    def setUp(self):
+        self.request_factory = RequestFactory()
 
     def test_request_factory(self):
-        factory = RequestFactory()
-        request = factory.get('/somewhere/')
+        """The request factory implements all the HTTP/1.1 methods."""
+        for method_name, view in self.http_methods_and_views:
+            method = getattr(self.request_factory, method_name)
+            request = method('/somewhere/')
+            response = view(request)
+
+            self.assertEqual(response.status_code, 200)
+
+    def test_get_request_from_factory(self):
+        """
+        The request factory returns a templated response for a GET request.
+        """
+        request = self.request_factory.get('/somewhere/')
         response = get_view(request)
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'This is a test')
+
+    def test_trace_request_from_factory(self):
+        """The request factory returns an echo response for a TRACE request."""
+        url_path = '/somewhere/'
+        request = self.request_factory.trace(url_path)
+        response = trace_view(request)
+        protocol = request.META["SERVER_PROTOCOL"]
+        echoed_request_line = "TRACE {} {}".format(url_path, protocol)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, echoed_request_line)

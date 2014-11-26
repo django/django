@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
 
-import datetime
-import inspect
-import decimal
 import collections
+import datetime
+import decimal
 from importlib import import_module
+import inspect
+import math
 import os
 import re
 import sys
@@ -16,6 +17,7 @@ from django.db.migrations.loader import MigrationLoader
 from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
+from django.utils.timezone import utc
 
 
 COMPILED_REGEX_TYPE = type(re.compile(''))
@@ -154,15 +156,31 @@ class MigrationWriter(object):
         imports.discard("from django.db import models")
         items["imports"] = "\n".join(imports) + "\n" if imports else ""
         if migration_imports:
-            items["imports"] += "\n\n# Functions from the following migrations need manual copying.\n# Move them and any dependencies into this file, then update the\n# RunPython operations to refer to the local versions:\n# %s" % (
-                "\n# ".join(migration_imports)
-            )
-
+            items["imports"] += (
+                "\n\n# Functions from the following migrations need manual "
+                "copying.\n# Move them and any dependencies into this file, "
+                "then update the\n# RunPython operations to refer to the local "
+                "versions:\n# %s"
+            ) % "\n# ".join(migration_imports)
         # If there's a replaces, make a string for it
         if self.migration.replaces:
             items['replaces_str'] = "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
 
         return (MIGRATION_TEMPLATE % items).encode("utf8")
+
+    @staticmethod
+    def serialize_datetime(value):
+        """
+        Returns a serialized version of a datetime object that is valid,
+        executable python code. It converts timezone-aware values to utc with
+        an 'executable' utc representation of tzinfo.
+        """
+        if value.tzinfo is not None and value.tzinfo != utc:
+            value = value.astimezone(utc)
+        value_repr = repr(value).replace("<UTC>", "utc")
+        if isinstance(value, datetime_safe.datetime):
+            value_repr = "datetime.%s" % value_repr
+        return value_repr
 
     @property
     def filename(self):
@@ -268,12 +286,11 @@ class MigrationWriter(object):
             return "{%s}" % (", ".join("%s: %s" % (k, v) for k, v in strings)), imports
         # Datetimes
         elif isinstance(value, datetime.datetime):
+            value_repr = cls.serialize_datetime(value)
+            imports = ["import datetime"]
             if value.tzinfo is not None:
-                raise ValueError("Cannot serialize datetime values with timezones. Either use a callable value for default or remove the timezone.")
-            value_repr = repr(value)
-            if isinstance(value, datetime_safe.datetime):
-                value_repr = "datetime.%s" % value_repr
-            return value_repr, {"import datetime"}
+                imports.append("from django.utils.timezone import utc")
+            return value_repr, set(imports)
         # Dates
         elif isinstance(value, datetime.date):
             value_repr = repr(value)
@@ -288,7 +305,11 @@ class MigrationWriter(object):
         elif isinstance(value, SettingsReference):
             return "settings.%s" % value.setting_name, {"from django.conf import settings"}
         # Simple types
-        elif isinstance(value, six.integer_types + (float, bool, type(None))):
+        elif isinstance(value, float):
+            if math.isnan(value) or math.isinf(value):
+                return 'float("{}")'.format(value), set()
+            return repr(value), set()
+        elif isinstance(value, six.integer_types + (bool, type(None))):
             return repr(value), set()
         elif isinstance(value, six.binary_type):
             value_repr = repr(value)
@@ -382,7 +403,11 @@ class MigrationWriter(object):
             return "re.compile(%s)" % ', '.join(args), imports
         # Uh oh.
         else:
-            raise ValueError("Cannot serialize: %r\nThere are some values Django cannot serialize into migration files.\nFor more, see https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing" % value)
+            raise ValueError(
+                "Cannot serialize: %r\nThere are some values Django cannot serialize into "
+                "migration files.\nFor more, see https://docs.djangoproject.com/en/dev/"
+                "topics/migrations/#migration-serializing" % value
+            )
 
 
 MIGRATION_TEMPLATE = """\
