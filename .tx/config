@@ -27,11 +27,6 @@ file_filter = django/contrib/auth/locale/<lang>/LC_MESSAGES/django.po
 source_file = django/contrib/auth/locale/en/LC_MESSAGES/django.po
 source_lang = en
 
-[django.contrib-comments]
-file_filter = django/contrib/comments/locale/<lang>/LC_MESSAGES/django.po
-source_file = django/contrib/comments/locale/en/LC_MESSAGES/django.po
-source_lang = en
-
 [django.contrib-contenttypes]
 file_filter = django/contrib/contenttypes/locale/<lang>/LC_MESSAGES/django.po
 source_file = django/contrib/contenttypes/locale/en/LC_MESSAGES/django.po
