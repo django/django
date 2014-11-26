@@ -320,19 +320,22 @@ class Query(object):
         if not self.annotation_select:
             return {}
         has_limit = self.low_mark != 0 or self.high_mark is not None
-        has_existing_aggregates = any(
+        has_existing_annotations = any(
             annotation for alias, annotation
             in self.annotations.items()
-            if annotation.contains_aggregate
-            and alias not in added_aggregate_names)
+            if alias not in added_aggregate_names)
 
-        # We need to use a subquery in the following cases. Existing aggregation
-        # would cause incorrect results as get_aggregation() must produce just one
-        # result and must thus not use group_by. If the query has limit or distinct,
-        # then those operations must be done in a subquery so that we are aggregating
-        # on the subquery's results instead of applying the distinct and limit after
-        # the aggregtes results are generated.
-        if (self.group_by or has_limit or has_existing_aggregates or self.distinct):
+        # Decide if we need to use a subquery.
+        #
+        # Existing annotations would cause incorrect results as get_aggregation()
+        # must produce just one result and must thus not use GROUP BY. But we aren't
+        # smart enough to remove the existing annotations from the query, so those would
+        # force us to use GROUP BY.
+        #
+        # If the query has limit or distinct, then those operations must be done in a
+        # subquery so that we are aggregating on the limit and/or distinct results
+        # instead of applying the distinct and limit after the aggregation.
+        if (self.group_by or has_limit or has_existing_annotations or self.distinct):
             from django.db.models.sql.subqueries import AggregateQuery
             outer_query = AggregateQuery(self.model)
             inner_query = self.clone()
