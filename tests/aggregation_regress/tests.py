@@ -1171,14 +1171,28 @@ class JoinPromotionTests(TestCase):
 
 
 class AggregationOnRelationTest(TestCase):
+    def setUp(self):
+        self.a = Author.objects.create(name='Anssi', age=33)
+        self.p = Publisher.objects.create(name='Manning', num_awards=3)
+        Book.objects.create(isbn='asdf', name='Foo', pages=10, rating=0.1, price="0.0",
+                            contact=self.a, publisher=self.p, pubdate=datetime.date.today())
+
+    def test_annotate_on_relation(self):
+        qs = Book.objects.annotate(avg_price=Avg('price'), publisher_name=F('publisher__name'))
+        self.assertEqual(qs[0].avg_price, 0.0)
+        self.assertEqual(qs[0].publisher_name, "Manning")
+
     def test_aggregate_on_relation(self):
         # A query with an existing annotation aggregation on a relation should
         # succeed. The query didn't generate a select for the reffed SQL before,
         # thus causing a failure.
-        a = Author.objects.create(name='Anssi', age=33)
-        p = Publisher.objects.create(name='Manning', num_awards=3)
-        Book.objects.create(isbn='asdf', name='Foo', pages=10, rating=0.1, price="0.0",
-                            contact=a, publisher=p, pubdate=datetime.date.today())
         qs = Book.objects.annotate(avg_price=Avg('price')).aggregate(
             publisher_awards=Sum('publisher__num_awards')
         )
+        self.assertEqual(qs['publisher_awards'], 3)
+        Book.objects.create(isbn='asdf', name='Foo', pages=10, rating=0.1, price="0.0",
+                            contact=self.a, publisher=self.p, pubdate=datetime.date.today())
+        qs = Book.objects.annotate(avg_price=Avg('price')).aggregate(
+            publisher_awards=Sum('publisher__num_awards')
+        )
+        self.assertEqual(qs['publisher_awards'], 6)

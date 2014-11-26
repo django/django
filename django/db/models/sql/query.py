@@ -330,14 +330,20 @@ class Query(object):
         new_exprs = []
         for expr in orig_exprs:
             if isinstance(expr, Ref):
-                # it already exists in the inner query, no need to readd it.
+                # Its already a Ref to subquery (see resolve_ref() for
+                # details)
                 new_exprs.append(expr)
             elif isinstance(expr, Col):
+                # Reference to column. Make sure the referenced column
+                # is selected.
                 col_cnt += 1
-                self.annotation_select['__col%d' % col_cnt] = expr
-                self.append_annotation_mask(['__col%d' % col_cnt])
-                new_exprs.append(Ref('__col%d' % col_cnt, expr))
+                col_alias = '__col%d' % col_cnt
+                self.annotation_select[col_alias] = expr
+                self.append_annotation_mask([col_alias])
+                new_exprs.append(Ref(col_alias, expr))
             else:
+                # Some other expression not referencing database values
+                # directly. Its subexpression might contain Cols.
                 new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
                 new_exprs.append(new_expr)
         annotation.set_source_expressions(new_exprs)
@@ -1545,6 +1551,10 @@ class Query(object):
             raise FieldError("Joined field references are not permitted in this query")
         if name in self.annotations:
             if summarize:
+                # Summarize currently means we are doing an aggregate() query
+                # which is executed as wrapped subquery if any of the aggregate()
+                # elements reference an existing annotation. In that case we need
+                # to return a Ref to the subquery's annotation.
                 return Ref(name, self.annotation_select[name])
             else:
                 return self.annotation_select[name]
