@@ -37,11 +37,6 @@ file_filter = django/contrib/flatpages/locale/<lang>/LC_MESSAGES/django.po
 source_file = django/contrib/flatpages/locale/en/LC_MESSAGES/django.po
 source_lang = en
 
-[django.contrib-formtools]
-file_filter = django/contrib/formtools/locale/<lang>/LC_MESSAGES/django.po
-source_file = django/contrib/formtools/locale/en/LC_MESSAGES/django.po
-source_lang = en
-
 [django.contrib-gis]
 file_filter = django/contrib/gis/locale/<lang>/LC_MESSAGES/django.po
 source_file = django/contrib/gis/locale/en/LC_MESSAGES/django.po
