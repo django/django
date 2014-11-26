@@ -26,7 +26,6 @@ class SessionStore(SessionBase):
                 logger = logging.getLogger('django.security.%s' %
                         e.__class__.__name__)
                 logger.warning(force_text(e))
-            self.create()
             return {}
 
     def exists(self, session_key):
