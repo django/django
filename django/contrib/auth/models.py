@@ -83,14 +83,6 @@ class Permission(models.Model):
     natural_key.dependencies = ['contenttypes.contenttype']
 
 
-class GroupManager(models.Manager):
-    """
-    The manager for the auth's Group model.
-    """
-    def get_by_natural_key(self, name):
-        return self.get(name=name)
-
-
 @python_2_unicode_compatible
 class Group(models.Model):
     """
@@ -113,17 +105,13 @@ class Group(models.Model):
     permissions = models.ManyToManyField(Permission,
         verbose_name=_('permissions'), blank=True)
 
-    objects = GroupManager()
-
     class Meta:
         verbose_name = _('group')
         verbose_name_plural = _('groups')
+        natural_key_fields = ('name', )
 
     def __str__(self):
         return self.name
-
-    def natural_key(self):
-        return (self.name,)
 
 
 class BaseUserManager(models.Manager):

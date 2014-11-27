@@ -84,3 +84,19 @@ class Model2(models.Model):
 
 class Model3(models.Model):
     model2 = models.ForeignKey(Model2, unique=True, to_field='model1')
+
+
+class NoNaturalKeys(models.Model):
+    name = models.CharField(max_length=60)
+
+
+class HasNaturalMethodKey(models.Model):
+    name = models.CharField(max_length=60)
+
+    def natural_key(self):
+        return self.name
+
+
+class HasNaturalMetaKey(models.Model):
+    class Meta:
+        natural_key_fields = ('name', )

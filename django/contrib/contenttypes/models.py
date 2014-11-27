@@ -160,6 +160,7 @@ class ContentType(models.Model):
         db_table = 'django_content_type'
         ordering = ('name',)
         unique_together = (('app_label', 'model'),)
+        natural_key_fields = ('app_label', 'model')
 
     def __str__(self):
         # self.name is deprecated in favor of using model's verbose_name, which
@@ -196,6 +197,3 @@ class ContentType(models.Model):
         Returns all objects of this type for the keyword arguments given.
         """
         return self.model_class()._base_manager.using(self._state.db).filter(**kwargs)
-
-    def natural_key(self):
-        return (self.app_label, self.model)

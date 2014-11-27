@@ -185,3 +185,23 @@ class OneToOneRestrictedModel(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class NoNaturalKeys(models.Model):
+    name = models.CharField(max_length=60)
+
+
+class NameNaturalKeyManager(models.Manager):
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
+
+
+class HasNaturalMethodKey(models.Model):
+    name = models.CharField(max_length=60)
+    objects = NameNaturalKeyManager()
+
+
+class HasNaturalMetaKey(models.Model):
+    name = models.CharField(max_length=60)
+    class Meta:
+        natural_key_fields = ('name', )

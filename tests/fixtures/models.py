@@ -62,14 +62,8 @@ class Tag(models.Model):
                                          self.tagged, self.name)
 
 
-class PersonManager(models.Manager):
-    def get_by_natural_key(self, name):
-        return self.get(name=name)
-
-
 @python_2_unicode_compatible
 class Person(models.Model):
-    objects = PersonManager()
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -77,12 +71,10 @@ class Person(models.Model):
 
     class Meta:
         ordering = ('name',)
-
-    def natural_key(self):
-        return (self.name,)
+        natural_key_fields = ('name',)
 
 
-class SpyManager(PersonManager):
+class SpyManager(models.Manager):
     def get_queryset(self):
         return super(SpyManager, self).get_queryset().filter(cover_blown=False)
 

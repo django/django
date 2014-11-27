@@ -4,7 +4,8 @@ from django.test import TestCase
 from django.utils import six
 
 from .models import (Book, Car, FunPerson, OneToOneRestrictedModel, Person,
-    PersonManager, PublishedBookManager, RelatedModel, RestrictedModel)
+    PersonManager, PublishedBookManager, RelatedModel, RestrictedModel,
+    NoNaturalKeys, HasNaturalMethodKey, HasNaturalMetaKey,)
 
 
 class CustomManagerTests(TestCase):
@@ -508,3 +509,14 @@ class CustomManagersRegressTestCase(TestCase):
         obj = RelatedModel.objects.get(name="xyzzy")
         obj.delete()
         self.assertEqual(len(OneToOneRestrictedModel.plain_manager.all()), 0)
+
+
+class NaturalKeyTest(TestCase):
+    def test_no_natural_key_detection(self):
+        self.assertFalse(NoNaturalKeys.objects.has_natural_key())
+
+    def test_method_natural_key_dectection(self):
+        self.assertTrue(HasNaturalMethodKey.objects.has_natural_key())
+
+    def test_meta_natural_key_dectection(self):
+        self.assertTrue(HasNaturalMetaKey.objects.has_natural_key())
