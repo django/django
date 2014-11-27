@@ -590,7 +590,7 @@ subclass::
               color_code = models.CharField(max_length=6)
 
               def colored_name(self):
-                  return format_html('<span style="color: #{0};">{1} {2}</span>',
+                  return format_html('<span style="color: #{};">{} {}</span>',
                                      self.color_code,
                                      self.first_name,
                                      self.last_name)
@@ -647,7 +647,7 @@ subclass::
             color_code = models.CharField(max_length=6)
 
             def colored_first_name(self):
-                return format_html('<span style="color: #{0};">{1}</span>',
+                return format_html('<span style="color: #{};">{}</span>',
                                    self.color_code,
                                    self.first_name)
 
@@ -1060,7 +1060,7 @@ subclass::
                 # line by a linebreak
                 return format_html_join(
                     mark_safe('<br/>'),
-                    '{0}',
+                    '{}',
                     ((line,) for line in instance.get_full_address()),
                 ) or "<span class='errors'>I can't determine this address.</span>"
 

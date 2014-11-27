@@ -319,12 +319,12 @@ class TemplateRegressionTests(TestCase):
             # When the IfChangeNode stores state at 'self' it stays at '3' and skip the last yielded value below.
             iter2 = iter([1, 2, 3])
             output2 = template.render(Context({'foo': range(3), 'get_value': lambda: next(iter2)}))
-            self.assertEqual(output2, '[0,1,2,3]', 'Expected [0,1,2,3] in second parallel template, got {0}'.format(output2))
+            self.assertEqual(output2, '[0,1,2,3]', 'Expected [0,1,2,3] in second parallel template, got {}'.format(output2))
             yield 3
 
         gen1 = gen()
         output1 = template.render(Context({'foo': range(3), 'get_value': lambda: next(gen1)}))
-        self.assertEqual(output1, '[0,1,2,3]', 'Expected [0,1,2,3] in first template, got {0}'.format(output1))
+        self.assertEqual(output1, '[0,1,2,3]', 'Expected [0,1,2,3] in first template, got {}'.format(output1))
 
     def test_cache_regression_20130(self):
         t = Template('{% load cache %}{% cache 1 regression_20130 %}foo{% endcache %}')

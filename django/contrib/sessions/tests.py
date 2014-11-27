@@ -601,7 +601,7 @@ class SessionMiddlewareTests(unittest.TestCase):
         # A deleted cookie header looks like:
         #  Set-Cookie: sessionid=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
         self.assertEqual(
-            'Set-Cookie: {0}=; expires=Thu, 01-Jan-1970 00:00:00 GMT; '
+            'Set-Cookie: {}=; expires=Thu, 01-Jan-1970 00:00:00 GMT; '
             'Max-Age=0; Path=/'.format(settings.SESSION_COOKIE_NAME),
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )

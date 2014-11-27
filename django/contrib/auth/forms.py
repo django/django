@@ -44,12 +44,12 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
                     "Invalid password format or unknown hashing algorithm."))
             else:
                 summary = format_html_join('',
-                                           "<strong>{0}</strong>: {1} ",
+                                           "<strong>{}</strong>: {} ",
                                            ((ugettext(key), value)
                                             for key, value in hasher.safe_summary(encoded).items())
                                            )
 
-        return format_html("<div{0}>{1}</div>", flatatt(final_attrs), summary)
+        return format_html("<div{}>{}</div>", flatatt(final_attrs), summary)
 
 
 class ReadOnlyPasswordHashField(forms.Field):
