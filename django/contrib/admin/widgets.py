@@ -87,7 +87,7 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         forms.MultiWidget.__init__(self, widgets, attrs)
 
     def format_output(self, rendered_widgets):
-        return format_html('<p class="datetime">{0} {1}<br />{2} {3}</p>',
+        return format_html('<p class="datetime">{} {}<br />{} {}</p>',
                            _('Date:'), rendered_widgets[0],
                            _('Time:'), rendered_widgets[1])
 
@@ -95,9 +95,9 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
 class AdminRadioFieldRenderer(RadioFieldRenderer):
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
-        return format_html('<ul{0}>\n{1}\n</ul>',
+        return format_html('<ul{}>\n{}\n</ul>',
                            flatatt(self.attrs),
-                           format_html_join('\n', '<li>{0}</li>',
+                           format_html_join('\n', '<li>{}</li>',
                                             ((force_text(w),) for w in self)))
 
 
@@ -325,7 +325,7 @@ class AdminURLFieldWidget(forms.URLInput):
             value = force_text(self._format_value(value))
             final_attrs = {'href': smart_urlquote(value)}
             html = format_html(
-                '<p class="url">{0} <a{1}>{2}</a><br />{3} {4}</p>',
+                '<p class="url">{} <a{}>{}</a><br />{} {}</p>',
                 _('Currently:'), flatatt(final_attrs), value,
                 _('Change:'), html
             )

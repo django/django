@@ -239,7 +239,7 @@ class FileUploadTests(TestCase):
         for name, filename, _ in cases:
             payload.write("\r\n".join([
                 '--' + client.BOUNDARY,
-                'Content-Disposition: form-data; name="{0}"; filename="{1}"',
+                'Content-Disposition: form-data; name="{}"; filename="{}"',
                 'Content-Type: application/octet-stream',
                 '',
                 'Oops.',
@@ -258,7 +258,7 @@ class FileUploadTests(TestCase):
         result = json.loads(response.content.decode('utf-8'))
         for name, _, expected in cases:
             got = result[name]
-            self.assertEqual(expected, got, 'Mismatch for {0}'.format(name))
+            self.assertEqual(expected, got, 'Mismatch for {}'.format(name))
             self.assertLess(len(got), 256,
                             "Got a long file name (%s characters)." % len(got))
 
