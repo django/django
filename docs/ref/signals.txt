@@ -512,6 +512,15 @@ For example, you could register a callback in an
         def ready(self):
             post_migrate.connect(my_callback, sender=self)
 
+.. note::
+
+    If you provide an :class:`~django.apps.AppConfig` instance as the sender
+    argument, please ensure that the signal is registered in
+    :meth:`~django.apps.AppConfig.ready`. ``AppConfig``\s are recreated for
+    tests that run with a modified set of :setting:`INSTALLED_APPS` (such as
+    when settings are overridden) and such signals should be connected for each
+    new ``AppConfig`` instance.
+
 post_syncdb
 -----------
 

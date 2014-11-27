@@ -153,6 +153,13 @@ Now, our ``my_callback`` function will be called each time a request finishes.
         versions of Django, signal registration usually happened in the
         ``models`` module.
 
+.. note::
+
+    The :meth:`~django.apps.AppConfig.ready` method may be executed more than
+    once during testing, so you may want to :ref:`guard your signals from
+    duplication <preventing-duplicate-signals>`, especially if you're planning
+    to send them within tests.
+
 .. _connecting-to-specific-signals:
 
 Connecting to signals sent by specific senders
