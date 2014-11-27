@@ -201,7 +201,7 @@ class RelationTreeTests(test.TestCase):
     all_models = (Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating)
 
     def setUp(self):
-        apps.clear_cache()
+        apps.clear_cache(True)
 
     def test_clear_cache_clears_relation_tree(self):
         # the apps.clear_cache is setUp() should have deleted all trees.
