@@ -1,6 +1,5 @@
 import warnings
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache
 from django.utils import six
@@ -8,6 +7,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
+from . import engines
 from .base import Context, Lexer, Parser, Template, TemplateDoesNotExist
 from .context import _builtin_context_processors
 
@@ -45,19 +45,38 @@ class Engine(object):
         self.string_if_invalid = string_if_invalid
         self.file_charset = file_charset
 
-    @classmethod
+    @staticmethod
     @lru_cache.lru_cache()
-    def get_default(cls):
-        """Transitional method for refactoring."""
-        return cls(
-            dirs=settings.TEMPLATE_DIRS,
-            allowed_include_roots=settings.ALLOWED_INCLUDE_ROOTS,
-            context_processors=settings.TEMPLATE_CONTEXT_PROCESSORS,
-            debug=settings.TEMPLATE_DEBUG,
-            loaders=settings.TEMPLATE_LOADERS,
-            string_if_invalid=settings.TEMPLATE_STRING_IF_INVALID,
-            file_charset=settings.FILE_CHARSET,
-        )
+    def get_default():
+        """
+        When only one DjangoTemplates backend is configured, returns it.
+
+        Raises ImproperlyConfigured otherwise.
+
+        This is required for preserving historical APIs that rely on a
+        globally available, implicitly configured engine such as:
+
+        >>> from django.template import Context, Template
+        >>> template = Template("Hello {{ name }}!")
+        >>> context = Context({'name': "world"})
+        >>> template.render(context)
+        'Hello world!'
+        """
+        # Since DjangoTemplates is a wrapper around this Engine class, a local
+        # import is mandatory to avoid an import loop.
+        from django.template.backends.django import DjangoTemplates
+        django_engines = [engine for engine in engines.all()
+                          if isinstance(engine, DjangoTemplates)]
+        if len(django_engines) == 1:
+            # Unwrap the Engine instance inside DjangoTemplates
+            return django_engines[0].engine
+        elif len(django_engines) == 0:
+            raise ImproperlyConfigured(
+                "No DjangoTemplates backend is configured.")
+        else:
+            raise ImproperlyConfigured(
+                "Several DjangoTemplates backends are configured. "
+                "You must select one explicitly.")
 
     @cached_property
     def template_context_processors(self):
