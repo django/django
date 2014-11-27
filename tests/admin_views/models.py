@@ -867,3 +867,12 @@ class Ingredient(models.Model):
 class NotReferenced(models.Model):
     # Don't point any FK at this model.
     pass
+
+
+# Models for #23934
+class ExplicitlyProvidedPK(models.Model):
+    name = models.IntegerField(primary_key=True)
+
+
+class ImplicitlyGeneratedPK(models.Model):
+    name = models.IntegerField(unique=True)

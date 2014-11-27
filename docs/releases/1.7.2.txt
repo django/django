@@ -94,3 +94,7 @@ Bugfixes
 
 * Fixed a crash when ``RunSQL`` SQL content was collected by the schema editor,
   typically when using ``sqlmigrate`` (:ticket:`23909`).
+
+* Fixed a regression in ``contrib.admin`` add/change views which caused some
+  ``ModelAdmin`` methods to receive the incorrect ``obj`` value
+  (:ticket:`23934`).
