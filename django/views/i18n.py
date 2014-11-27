@@ -186,7 +186,8 @@ def render_javascript_catalog(catalog=None, plural=None):
         'plural': plural,
     })
 
-    return http.HttpResponse(template.render(context), 'text/javascript')
+    content_type = 'text/javascript; charset=%s' % (settings.DEFAULT_CHARSET)
+    return http.HttpResponse(template.render(context), content_type)
 
 
 def get_javascript_catalog(locale, domain, packages):
