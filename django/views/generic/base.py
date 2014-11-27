@@ -173,10 +173,23 @@ class RedirectView(View):
                 "from True to False in Django 1.9. Set an explicit value "
                 "to silence this warning.",
                 RemovedInDjango19Warning,
-                stacklevel=3
+                stacklevel=2
             )
             self.permanent = True
         super(RedirectView, self).__init__(*args, **kwargs)
+
+    @classonlymethod
+    def as_view(cls, **initkwargs):
+        if 'permanent' not in initkwargs and cls.permanent is _sentinel:
+            warnings.warn(
+                "Default value of 'RedirectView.permanent' will change "
+                "from True to False in Django 1.9. Set an explicit value "
+                "to silence this warning.",
+                RemovedInDjango19Warning,
+                stacklevel=2
+            )
+            initkwargs['permanent'] = True
+        return super(RedirectView, cls).as_view(**initkwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         """
