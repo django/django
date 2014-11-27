@@ -8,7 +8,7 @@ from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.tests.custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.contrib.auth import authenticate, get_user
+from django.contrib.auth import authenticate, BACKEND_SESSION_KEY, get_user
 from django.http import HttpRequest
 from django.test import TestCase, override_settings
 from django.contrib.auth.hashers import MD5PasswordHasher
@@ -608,3 +608,26 @@ class ImproperlyConfiguredUserModelTest(TestCase):
         request.session = self.client.session
 
         self.assertRaises(ImproperlyConfigured, get_user, request)
+
+
+class ImportedModelBackend(ModelBackend):
+    pass
+
+
+class ImportedBackendTests(TestCase):
+    """
+    #23925 - The backend path added to the session should be the same
+    as the one defined in AUTHENTICATION_BACKENDS setting.
+    """
+
+    backend = 'django.contrib.auth.tests.ImportedModelBackend'
+
+    @override_settings(AUTHENTICATION_BACKENDS=(backend, ))
+    def test_backend_path(self):
+        username = 'username'
+        password = 'password'
+        User.objects.create_user(username, 'email', password)
+        self.assertTrue(self.client.login(username=username, password=password))
+        request = HttpRequest()
+        request.session = self.client.session
+        self.assertEqual(request.session[BACKEND_SESSION_KEY], self.backend)
