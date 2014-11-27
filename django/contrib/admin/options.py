@@ -1425,7 +1425,7 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 form_validated = False
                 new_object = form.instance
-            formsets, inline_instances = self._create_formsets(request, new_object)
+            formsets, inline_instances = self._create_formsets(request, new_object, change=not add)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, not add)
                 self.save_related(request, form, formsets, not add)
@@ -1440,10 +1440,10 @@ class ModelAdmin(BaseModelAdmin):
             if add:
                 initial = self.get_changeform_initial_data(request)
                 form = ModelForm(initial=initial)
-                formsets, inline_instances = self._create_formsets(request, self.model())
+                formsets, inline_instances = self._create_formsets(request, self.model(), change=False)
             else:
                 form = ModelForm(instance=obj)
-                formsets, inline_instances = self._create_formsets(request, obj)
+                formsets, inline_instances = self._create_formsets(request, obj, change=True)
 
         adminForm = helpers.AdminForm(
             form,
@@ -1729,13 +1729,13 @@ class ModelAdmin(BaseModelAdmin):
             "admin/object_history.html"
         ], context, current_app=self.admin_site.name)
 
-    def _create_formsets(self, request, obj):
+    def _create_formsets(self, request, obj, change):
         "Helper function to generate formsets for add/change_view."
         formsets = []
         inline_instances = []
         prefixes = {}
         get_formsets_args = [request]
-        if obj.pk:
+        if change:
             get_formsets_args.append(obj)
         for FormSet, inline in self.get_formsets_with_inlines(*get_formsets_args):
             prefix = FormSet.get_default_prefix()
