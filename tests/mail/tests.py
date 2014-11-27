@@ -95,6 +95,14 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message['Cc'], 'cc@example.com, cc.other@example.com')
         self.assertEqual(email.recipients(), ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com', 'bcc@example.com'])
 
+    def test_recipients_as_string(self):
+        with self.assertRaisesMessage(TypeError, '"to" argument must be a list or tuple'):
+            EmailMessage(to='foo@example.com')
+        with self.assertRaisesMessage(TypeError, '"cc" argument must be a list or tuple'):
+            EmailMessage(cc='foo@example.com')
+        with self.assertRaisesMessage(TypeError, '"bcc" argument must be a list or tuple'):
+            EmailMessage(bcc='foo@example.com')
+
     def test_header_injection(self):
         email = EmailMessage('Subject\nInjection Test', 'Content', 'from@example.com', ['to@example.com'])
         self.assertRaises(BadHeaderError, email.message)

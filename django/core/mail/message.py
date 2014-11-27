@@ -224,17 +224,20 @@ class EmailMessage(object):
         necessary encoding conversions.
         """
         if to:
-            assert not isinstance(to, six.string_types), '"to" argument must be a list or tuple'
+            if isinstance(to, six.string_types):
+                raise TypeError('"to" argument must be a list or tuple')
             self.to = list(to)
         else:
             self.to = []
         if cc:
-            assert not isinstance(cc, six.string_types), '"cc" argument must be a list or tuple'
+            if isinstance(cc, six.string_types):
+                raise TypeError('"cc" argument must be a list or tuple')
             self.cc = list(cc)
         else:
             self.cc = []
         if bcc:
-            assert not isinstance(bcc, six.string_types), '"bcc" argument must be a list or tuple'
+            if isinstance(bcc, six.string_types):
+                raise TypeError('"bcc" argument must be a list or tuple')
             self.bcc = list(bcc)
         else:
             self.bcc = []
