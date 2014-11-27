@@ -39,8 +39,8 @@ def flatatt(attrs):
             key_value_attrs.append((attr, value))
 
     return (
-        format_html_join('', ' {0}="{1}"', sorted(key_value_attrs)) +
-        format_html_join('', ' {0}', sorted(boolean_attrs))
+        format_html_join('', ' {}="{}"', sorted(key_value_attrs)) +
+        format_html_join('', ' {}', sorted(boolean_attrs))
     )
 
 
@@ -61,8 +61,8 @@ class ErrorDict(dict):
         if not self:
             return ''
         return format_html(
-            '<ul class="errorlist">{0}</ul>',
-            format_html_join('', '<li>{0}{1}</li>', ((k, force_text(v)) for k, v in self.items()))
+            '<ul class="errorlist">{}</ul>',
+            format_html_join('', '<li>{}{}</li>', ((k, force_text(v)) for k, v in self.items()))
         )
 
     def as_text(self):
@@ -110,9 +110,9 @@ class ErrorList(UserList, list):
             return ''
 
         return format_html(
-            '<ul class="{0}">{1}</ul>',
+            '<ul class="{}">{}</ul>',
             self.error_class,
-            format_html_join('', '<li>{0}</li>', ((force_text(e),) for e in self))
+            format_html_join('', '<li>{}</li>', ((force_text(e),) for e in self))
         )
 
     def as_text(self):

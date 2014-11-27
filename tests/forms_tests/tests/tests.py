@@ -316,7 +316,7 @@ class EmptyLabelTestCase(TestCase):
             m = f.save()
             self.assertEqual(expected, getattr(m, key))
             self.assertEqual('No Preference',
-                             getattr(m, 'get_{0}_display'.format(key))())
+                             getattr(m, 'get_{}_display'.format(key))())
 
     def test_empty_field_integer(self):
         f = EmptyIntegerLabelChoiceForm()
