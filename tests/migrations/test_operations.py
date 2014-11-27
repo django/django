@@ -251,6 +251,7 @@ class OperationTests(OperationTestBase):
         # Make sure the M2M field actually works
         with atomic():
             new_apps = new_state.render()
+            new_apps.clear_cache(True)
             Pony = new_apps.get_model("test_crmomm", "Pony")
             Stable = new_apps.get_model("test_crmomm", "Stable")
             stable = Stable.objects.create()
@@ -552,6 +553,7 @@ class OperationTests(OperationTestBase):
         ])
 
         new_apps = new_state.render()
+        new_apps.clear_cache(True)
         Pony = new_apps.get_model("test_adchfl", "Pony")
         pony = Pony.objects.get(pk=pony.pk)
         self.assertEqual(pony.text, "some text")
@@ -595,6 +597,7 @@ class OperationTests(OperationTestBase):
         ])
 
         new_apps = new_state.render()
+        new_apps.clear_cache(True)
         Pony = new_apps.get_model("test_adtxtfl", "Pony")
         pony = Pony.objects.get(pk=pony.pk)
         self.assertEqual(pony.text, "some text")
@@ -639,6 +642,7 @@ class OperationTests(OperationTestBase):
         ])
 
         new_apps = new_state.render()
+        new_apps.clear_cache(True)
         Pony = new_apps.get_model("test_adbinfl", "Pony")
         pony = Pony.objects.get(pk=pony.pk)
         # SQLite returns buffer/memoryview, cast to bytes for checking.
@@ -713,6 +717,7 @@ class OperationTests(OperationTestBase):
         # Make sure the M2M field actually works
         with atomic():
             new_apps = new_state.render()
+            new_apps.clear_cache(True)
             Pony = new_apps.get_model("test_adflmm", "Pony")
             p = Pony.objects.create(pink=False, weight=4.55)
             p.stables.create()
@@ -755,6 +760,7 @@ class OperationTests(OperationTestBase):
 
         # Ensure the new field actually works
         new_apps = project_state.render()
+        new_apps.clear_cache(True)
         Pony = new_apps.get_model("test_alflmm", "Pony")
         p = Pony.objects.create(pink=False, weight=4.55)
         p.places.create()

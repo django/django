@@ -91,7 +91,6 @@ class ProjectState(object):
                     else:
                         do_pending_lookups(model)
         try:
-            self.apps.clear_cache(expire_reverse_fields=True)
             return self.apps
         finally:
             if skip_cache:
