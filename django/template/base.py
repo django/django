@@ -1264,13 +1264,12 @@ class Library(object):
                     _dict = func(*resolved_args, **resolved_kwargs)
 
                     if not getattr(self, 'nodelist', False):
-                        from django.template.loader import get_template, select_template
                         if isinstance(file_name, Template):
                             t = file_name
                         elif not isinstance(file_name, six.string_types) and is_iterable(file_name):
-                            t = select_template(file_name)
+                            t = context.engine.select_template(file_name)
                         else:
-                            t = get_template(file_name)
+                            t = context.engine.get_template(file_name)
                         self.nodelist = t.nodelist
                     new_context = context_class(_dict, **{
                         'autoescape': context.autoescape,

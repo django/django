@@ -1,5 +1,4 @@
 from django.template.base import TemplateDoesNotExist
-from django.template.loader import get_template_from_string
 
 
 class Loader(object):
@@ -21,7 +20,7 @@ class Loader(object):
             template_name, template_dirs)
 
         try:
-            template = get_template_from_string(source, origin, template_name)
+            template = self.engine.from_string(source, origin, template_name)
         except TemplateDoesNotExist:
             # If compiling the template we found raises TemplateDoesNotExist,
             # back off to returning the source and display name for the
