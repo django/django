@@ -1,8 +1,10 @@
 from __future__ import unicode_literals
 
+from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpRequest
+from django.db.models.signals import post_migrate
 from django.test import TestCase, modify_settings, override_settings
 
 from . import models
@@ -117,6 +119,15 @@ class SitesFrameworkTests(TestCase):
 
         clear_site_cache(Site, instance=self.site)
         self.assertEqual(models.SITE_CACHE, {})
+
+    def test_create_default_site_signal(self):
+        """
+        Checks that sending ``post_migrate`` creates the default site.
+        """
+        Site.objects.all().delete()
+        app_config = apps.get_app_config('sites')
+        post_migrate.send(sender=app_config, app_config=app_config, verbosity=0)
+        self.assertTrue(Site.objects.exists())
 
 
 class MiddlewareTest(TestCase):
