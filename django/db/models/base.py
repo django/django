@@ -1374,8 +1374,8 @@ class Model(six.with_metaclass(ModelBase)):
         errors = []
         for field_name in fields:
             try:
-                field = cls._meta.get_field(field_name)
-            except models.FieldDoesNotExist:
+                field = next(f for f in cls._meta.local_fields if f.name == field_name)
+            except StopIteration:
                 errors.append(
                     checks.Error(
                         "'%s' refers to the non-existent field '%s'." % (option, field_name),

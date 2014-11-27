@@ -400,11 +400,28 @@ class Options(object):
         return [self._map_model(f) for f in self.many_to_many]
 
     @cached_property
+    def _forward_fields_map(self):
+        res = {}
+        # call get_fields with export_name_map=true in order to have a field_instance -> names map
+        fields = self.get_fields(reverse=False)
+        for field in fields:
+            res[field.name] = field
+
+            # Due to the way Django's internals work, get_field() should also be able to fetch a field by attname.
+            # Which in the case of a concrete field with relation, includes the *_id name too
+            try:
+                res[field.attname] = field
+            except AttributeError:
+                pass
+
+        return res
+
+    @cached_property
     def fields_map(self):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = self.get_fields(include_hidden=True)
+        fields = self.get_fields(forward=False, include_hidden=True)
         for field in fields:
             res[field.name] = field
 
@@ -422,16 +439,10 @@ class Options(object):
         Returns a field instance given a field name. The field can be either a forward
         or reverse field
         """
-        if not self.apps.ready:
-
-            try:
-                #The Apps registry is still not ready, this means get_field() is not able
-                #to find related objects that point to this model.
-                return next(
-                    f for f in self.get_fields(reverse=False)
-                    if f.name == field_name or hasattr(f, 'attname') and f.attname == field_name
-                )
-            except StopIteration:
+        try:
+            return self._forward_fields_map[field_name]
+        except KeyError:
+            if not self.apps.ready:
                 raise FieldDoesNotExist('%s has no field named %r. The app cache isn\'t '
                                         'ready yet, so if this is a forward field, it won\'t '
                                         'be available yet.' % (self.object_name, field_name))
