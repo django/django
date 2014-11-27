@@ -400,11 +400,28 @@ class Options(object):
         return [self._map_model(f) for f in self.many_to_many]
 
     @cached_property
+    def _forward_fields_map(self):
+        res = {}
+        # call get_fields with export_name_map=true in order to have a field_instance -> names map
+        fields = self.get_fields(reverse=False)
+        for field in fields:
+            res[field.name] = field
+
+            # Due to the way Django's internals work, get_field() should also be able to fetch a field by attname.
+            # Which in the case of a concrete field with relation, includes the *_id name too
+            try:
+                res[field.attname] = field
+            except AttributeError:
+                pass
+
+        return res
+
+    @cached_property
     def fields_map(self):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = self.get_fields(include_hidden=True)
+        fields = self.get_fields(forward=False, include_hidden=True)
         for field in fields:
             res[field.name] = field
 
@@ -422,42 +439,46 @@ class Options(object):
         Returns a field instance given a field name. The field can be either a forward
         or reverse field
         """
-        if not self.apps.ready:
 
-            try:
-                #The Apps registry is still not ready, this means get_field() is not able
-                #to find related objects that point to this model.
-                return next(
-                    f for f in self.get_fields(reverse=False)
-                    if f.name == field_name or hasattr(f, 'attname') and f.attname == field_name
+        # NOTE: previous get_field API had a many_to_many key. In order to avoid breaking
+        # other's implementation we will catch the use of 'many_to_many'.
+        try:
+            if kwargs['many_to_many'] is False:
+                # We always want to throw a warning if many_to_many is used regardless
+                # of if it alters the return type or not.
+                warnings.warn(
+                    "The 'many_to_many' argument on get_field() is deprecated and will "
+                    "be removed. Please change your implementation accordingly.",
+                    RemovedInDjango20Warning
                 )
-            except StopIteration:
+                try:
+                    field = self._forward_fields_map[field_name]
+                    if not isinstance(field, ManyToManyField):
+                        return field
+                except StopIteration:
+                    pass
+                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+        
+        except KeyError:
+            pass
+
+        # Legacy get_field() handling has finished. If the function gets to this point
+        # this means many_to_many was not supplied.
+        try:
+            # In order to avoid premature loading of the relation tree (expensive) we
+            # prefer checking if the field is a forward field.
+            return self._forward_fields_map[field_name]
+        except KeyError:
+            # If the apps registry is not ready, reverse fields are unavailable, therefore
+            # we throw an FieldDoesNotExist exception.
+            if not self.apps.ready:
                 raise FieldDoesNotExist('%s has no field named %r. The app cache isn\'t '
                                         'ready yet, so if this is a forward field, it won\'t '
                                         'be available yet.' % (self.object_name, field_name))
 
-        fields_map = self.fields_map
-        # NOTE: previous get_field API had a many_to_many key. In order to avoid breaking
-        # other's implementation we will catch the use of 'many_to_many'.
-        if 'many_to_many' in kwargs:
-
-            # If no many_to_many fields are wanted, create a new dictionary with
-            # without ManyToManyField instances.
-            if kwargs['many_to_many'] is False:
-                fields_map = dict((name, field) for name, field in six.iteritems(fields_map)
-                                 if not isinstance(field, ManyToManyField))
-
-            # We always want to throw a warning if many_to_many is used regardless
-            # of if it alters the return type or not.
-            warnings.warn(
-                "The 'many_to_many' argument on get_field() is deprecated and will "
-                "be removed. Please change your implementation accordingly.",
-                RemovedInDjango20Warning
-            )
-
         try:
             # Retreive field instance by name from cached or just-computer field map
-            return fields_map[field_name]
+            return self.fields_map[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
@@ -619,7 +640,8 @@ class Options(object):
     def _expire_cache(self, expire_reverse_fields=False):
         # When a new model is registered, we expire the
         # relation tree and any attribute that depends on it.
-        for cache_key in ('_relation_tree', 'fields_map', 'related_objects',):
+        for cache_key in ('_relation_tree', 'fields_map', '_forward_fields_map',
+                          'related_objects',):
             try:
                 delattr(self, cache_key)
             except AttributeError:

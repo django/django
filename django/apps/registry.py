@@ -341,9 +341,10 @@ class Apps(object):
         # Call expire cache on each model. This will purge
         # the relation tree and the fields cache.
         self.get_models.cache_clear()
-        if self.ready:
+        if expire_reverse_fields:
+            self.check_apps_ready()
             for model in self.get_models(include_auto_created=True):
-                model._meta._expire_cache(expire_reverse_fields=expire_reverse_fields)
+                model._meta._expire_cache()
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 
