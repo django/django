@@ -109,7 +109,7 @@ class AdminEmailHandler(logging.Handler):
                 record.getMessage()
             )
             filter = get_exception_reporter_filter(request)
-            request_repr = '\n{0}'.format(force_text(filter.get_request_repr(request)))
+            request_repr = '\n{}'.format(force_text(filter.get_request_repr(request)))
         except Exception:
             subject = '%s: %s' % (
                 record.levelname,

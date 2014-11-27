@@ -56,7 +56,7 @@ class CsrfTokenNode(Node):
             if csrf_token == 'NOTPROVIDED':
                 return format_html("")
             else:
-                return format_html("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />", csrf_token)
+                return format_html("<input type='hidden' name='csrfmiddlewaretoken' value='{}' />", csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
@@ -195,7 +195,7 @@ class ForNode(Node):
                     # Check loop variable count before unpacking
                     if num_loopvars != len_item:
                         warnings.warn(
-                            "Need {0} values to unpack in for loop; got {1}. "
+                            "Need {} values to unpack in for loop; got {}. "
                             "This will raise an exception in Django 2.0."
                             .format(num_loopvars, len_item),
                             RemovedInDjango20Warning)

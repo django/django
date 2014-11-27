@@ -105,7 +105,7 @@ def format_html_join(sep, format_string, args_generator):
 
     Example:
 
-      format_html_join('\n', "<li>{0} {1}</li>", ((u.first_name, u.last_name)
+      format_html_join('\n', "<li>{} {}</li>", ((u.first_name, u.last_name)
                                                   for u in users))
 
     """
