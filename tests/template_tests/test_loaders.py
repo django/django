@@ -114,10 +114,12 @@ class EggLoaderTest(SimpleTestCase):
 class CachedLoader(SimpleTestCase):
     def test_templatedir_caching(self):
         "Check that the template directories form part of the template cache key. Refs #13573"
+        template_loader = Engine.get_default().template_loaders[0]
+
         # Retrieve a template specifying a template directory to check
-        t1, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'first'),))
+        t1, name = template_loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'first'),))
         # Now retrieve the same template name, but from a different directory
-        t2, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'second'),))
+        t2, name = template_loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'second'),))
 
         # The two templates should not have the same content
         self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
@@ -215,7 +217,7 @@ class PriorityCacheLoader(SimpleTestCase):
         """
         Check that the order of template loader works. Refs #21460.
         """
-        t1, name = loader.find_template('priority/foo.html')
+        t1 = loader.get_template('priority/foo.html')
         self.assertEqual(t1.render(Context({})), 'priority\n')
 
 
@@ -228,5 +230,5 @@ class PriorityLoader(SimpleTestCase):
         """
         Check that the order of template loader works. Refs #21460.
         """
-        t1, name = loader.find_template('priority/foo.html')
+        t1 = loader.get_template('priority/foo.html')
         self.assertEqual(t1.render(Context({})), 'priority\n')

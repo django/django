@@ -17,10 +17,6 @@ class LoaderOrigin(Origin):
         return self.loader(self.loadname, self.dirs)[0]
 
 
-def find_template(*args, **kwargs):
-    return Engine.get_default().find_template(*args, **kwargs)
-
-
 def get_template(template_name, dirs=_dirs_undefined, using=None):
     """
     Loads and returns a template for the given name.
