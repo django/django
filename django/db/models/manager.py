@@ -156,9 +156,14 @@ class BaseManager(object):
         return mgr
 
     def db_manager(self, using=None, hints=None):
+        """
+        Returns a copy of the manager configured to access the specified
+        database.
+        """
         obj = copy.copy(self)
         obj._db = using or self._db
         obj._hints = hints or self._hints
+        obj._set_creation_counter()
         return obj
 
     @property

@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS, transaction
-from django.db.models import signals
+from django.db.models import signals, Manager
 from django.db.utils import ConnectionRouter
 from django.test import TestCase, override_settings
 from django.utils.six import StringIO
@@ -2088,3 +2088,15 @@ class RouteForWriteTestCase(TestCase):
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Book)
             self.assertEqual(e.hints, {'instance': auth})
+
+
+class ManagerTestCase(TestCase):
+    def test_db_manager_counter(self):
+        "Managers created by db_manager() should have greater creation_counter value"
+        manager = Manager()
+        other_manager = manager.db_manager('other')
+
+        self.assertEqual(manager.db, 'default')
+        self.assertEqual(other_manager.db, 'other')
+        self.assertGreater(
+            other_manager.creation_counter, manager.creation_counter)
