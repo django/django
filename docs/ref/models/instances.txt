@@ -136,6 +136,9 @@ following is done:
    be thrown away, and when next accessed it will be reloaded with the value of
    ``obj.author_id``.
 
+Note that only fields of the model are reloaded from the database, but other
+database dependent values (annotations for example) are not reloaded.
+
 The reloading happens from the database the instance was loaded from, or from
 the default database if the instance wasn't loaded from the database. The
 ``using`` argument can be used to force the database used for reloading.
