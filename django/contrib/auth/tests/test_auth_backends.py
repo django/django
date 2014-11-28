@@ -614,32 +614,21 @@ class ImportedModelBackend(ModelBackend):
     pass
 
 
-class RighBackendPathInSessionTest(TestCase):
+class ImportedBackendTests(TestCase):
     """
-    Tests that the backend path added to the session is the same
+    #23925 - The backend path added to the session should be the same
     as the one defined in AUTHENTICATION_BACKENDS setting.
-
-    Regression test for ticket #23925
     """
 
     backend = 'django.contrib.auth.tests.ImportedModelBackend'
-    TEST_USERNAME = 'test_user'
-    TEST_PASSWORD = 'test_password'
-    TEST_EMAIL = 'test@example.com'
-
-    def setUp(self):
-        User.objects.create_user(self.TEST_USERNAME,
-                                 self.TEST_EMAIL,
-                                 self.TEST_PASSWORD)
 
     @override_settings(AUTHENTICATION_BACKENDS=(backend, ))
-    def test_right_backend_path(self):
-        # Get a session for the test user
-        self.assertTrue(self.client.login(
-            username=self.TEST_USERNAME,
-            password=self.TEST_PASSWORD)
-        )
-
+    def test_backend_path(self):
+        username = 'username'
+        password = 'password'
+        user = User.objects.create_user(username, 'email', password)
+        self.assertTrue(self.client.login(username=username, password=password))
         request = HttpRequest()
         request.session = self.client.session
         self.assertEqual(request.session[BACKEND_SESSION_KEY], self.backend)
+        user.delete()

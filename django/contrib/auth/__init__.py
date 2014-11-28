@@ -20,20 +20,20 @@ def load_backend(path):
     return import_string(path)()
 
 
-def _get_backend_tuples():
-    backend_tuples = []
+def get_backends(return_tuples=False):
+    backends = []
     for backend_path in settings.AUTHENTICATION_BACKENDS:
-        backend_tuples.append((load_backend(backend_path), backend_path))
-    if not backend_tuples:
+        backend = load_backend(backend_path)
+        if return_tuples:
+            backends.append((backend, backend_path))
+        else:
+            backends.append(backend)
+    if not backends:
         raise ImproperlyConfigured(
             'No authentication backends have been defined. Does '
             'AUTHENTICATION_BACKENDS contain anything?'
         )
-    return backend_tuples
-
-
-def get_backends():
-    return [backend_tuple[0] for backend_tuple in _get_backend_tuples()]
+    return backends
 
 
 def _clean_credentials(credentials):
@@ -55,7 +55,7 @@ def authenticate(**credentials):
     """
     If the given credentials are valid, return a User object.
     """
-    for backend, backend_path in _get_backend_tuples():
+    for backend, backend_path in get_backends(return_tuples=True):
         try:
             inspect.getcallargs(backend.authenticate, **credentials)
         except TypeError:
