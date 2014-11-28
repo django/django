@@ -890,7 +890,7 @@ When :setting:`TEMPLATE_DEBUG` is ``True`` template objects will have an
 The ``render_to_string`` shortcut
 ===================================
 
-.. function:: loader.render_to_string(template_name, dictionary=None, context_instance=None)
+.. function:: loader.render_to_string(template_name, context=None, context_instance=None)
 
 To cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which largely
@@ -906,15 +906,24 @@ The ``render_to_string`` shortcut takes one required argument --
 and render (or a list of template names, in which case Django will use
 the first template in the list that exists) -- and two optional arguments:
 
-dictionary
+``context``
     A dictionary to be used as variables and values for the
-    template's context. This can also be passed as the second
+    template's context. This should be passed as the second
     positional argument.
 
-context_instance
+    .. versionchanged:: 1.8
+
+       The ``context`` argument used to be called ``dictionary``. That name
+       is deprecated in Django 1.8 and will be removed in Django 2.0.
+
+``context_instance``
     An instance of :class:`~django.template.Context` or a subclass (e.g., an
     instance of :class:`~django.template.RequestContext`) to use as the
     template's context. This can also be passed as the third positional argument.
+
+    .. deprecated:: 1.8
+
+       The ``context_instance`` argument is deprecated. Simply use ``context``.
 
 See also the :func:`~django.shortcuts.render_to_response()` shortcut, which
 calls ``render_to_string`` and feeds the result into an :class:`~django.http.HttpResponse`
