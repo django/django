@@ -126,7 +126,7 @@ class Engine(object):
         Returns a compiled Template object for the given template code,
         handling template inheritance recursively.
         """
-        return Template(source, origin, name)
+        return Template(source, origin, name, engine=self)
 
     def get_template(self, template_name, dirs=_dirs_undefined):
         """
