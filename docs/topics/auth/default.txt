@@ -117,7 +117,7 @@ enabled. See :ref:`session-invalidation-on-password-change` for details.
 Authenticating Users
 --------------------
 
-.. function:: authenticate(\**credentials)
+.. function:: authenticate(authentication_backend=None, \**credentials)
 
     To authenticate a given username and password, use
     :func:`~django.contrib.auth.authenticate()`. It takes credentials in the

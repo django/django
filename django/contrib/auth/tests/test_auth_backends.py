@@ -286,6 +286,33 @@ class CustomUserModelBackendAuthenticateTest(TestCase):
         self.assertEqual(test_user, authenticated_user)
 
 
+class SpecificAuthenticationBackendTest(TestCase):
+    """
+    Tests that the authentication function can accept an authentication_backend
+    argument
+    """
+
+    def setUp(self):
+        self.user = User.objects.create_user('test', 'test@example.com', 'test')
+
+    def test_authentication(self):
+        authenticated_user = authenticate(authentication_backend='django.contrib.auth.backends.ModelBackend', username='test', password='test')
+        self.assertEqual(self.user, authenticated_user)
+
+
+class InvalidSpecificAuthenticationBackendTest(TestCase):
+    """
+    Tests that a valid exception is raised when an invalid authentication
+    backend is provided to the authenticate() function
+    """
+
+    def setUp(self):
+        self.user = User.objects.create_user('test', 'test@example.com', 'test')
+
+    def test_raises_exception(self):
+        self.assertRaises(ImportError, authenticate, authentication_backend='django.contrib.auth.backends.NoSuchBackend', username='test', password='test')
+
+
 class TestObj(object):
     pass
 
