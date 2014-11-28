@@ -1198,6 +1198,20 @@ to construct the "view on site" URL. This URL is now accessible using the
 sure to provide a default value for the ``form_class`` argument since it's
 now optional.
 
+``dictionary`` and ``context_instance`` arguments of rendering functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following functions will no longer accept the ``dictionary`` and
+``context_instance`` parameters in Django 2.0:
+
+* ``django.template.loader.render_to_string()``
+
+Use the ``context`` parameter instead. When ``dictionary`` is passed as a
+positional argument, which is the most common idiom, no changes are needed.
+
+There is no replacement for ``context_instance``. All data must be passed to
+templates through the ``context`` dict.
+
 ``dirs`` argument of template-finding functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

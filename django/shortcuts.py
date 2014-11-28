@@ -3,6 +3,8 @@ This module collects helper functions and classes that "span" multiple levels
 of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
+import warnings
+
 from django.template import loader, RequestContext
 from django.http import HttpResponse, Http404
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
@@ -11,6 +13,7 @@ from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.core import urlresolvers
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 def render_to_response(*args, **kwargs):
@@ -20,7 +23,12 @@ def render_to_response(*args, **kwargs):
     """
     httpresponse_kwargs = {'content_type': kwargs.pop('content_type', None)}
 
-    return HttpResponse(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
+    # TODO: refactor to avoid the deprecated code path.
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+        content = loader.render_to_string(*args, **kwargs)
+
+    return HttpResponse(content, **httpresponse_kwargs)
 
 
 def render(request, *args, **kwargs):
@@ -45,8 +53,12 @@ def render(request, *args, **kwargs):
 
     kwargs['context_instance'] = context_instance
 
-    return HttpResponse(loader.render_to_string(*args, **kwargs),
-                        **httpresponse_kwargs)
+    # TODO: refactor to avoid the deprecated code path.
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+        content = loader.render_to_string(*args, **kwargs)
+
+    return HttpResponse(content, **httpresponse_kwargs)
 
 
 def redirect(to, *args, **kwargs):

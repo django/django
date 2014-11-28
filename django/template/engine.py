@@ -12,6 +12,8 @@ from .base import Context, Lexer, Parser, Template, TemplateDoesNotExist
 from .context import _builtin_context_processors
 
 
+_context_instance_undefined = object()
+_dictionary_undefined = object()
 _dirs_undefined = object()
 
 
@@ -165,14 +167,22 @@ class Engine(object):
             template = Template(template, origin, template_name, engine=self)
         return template
 
-    def render_to_string(self, template_name, dictionary=None, context_instance=None,
-                         dirs=_dirs_undefined):
+    def render_to_string(self, template_name, context=None,
+                         context_instance=_context_instance_undefined,
+                         dirs=_dirs_undefined,
+                         dictionary=_dictionary_undefined):
         """
         Loads the given template_name and renders it with the given dictionary as
         context. The template_name may be a string to load a single template using
         get_template, or it may be a tuple to use select_template to find one of
         the templates in the list. Returns a string.
         """
+        if context_instance is _context_instance_undefined:
+            context_instance = None
+        else:
+            warnings.warn(
+                "The context_instance argument of render_to_string is "
+                "deprecated.", RemovedInDjango20Warning, stacklevel=2)
         if dirs is _dirs_undefined:
             # Do not set dirs to None here to avoid triggering the deprecation
             # warning in select_template or get_template.
@@ -181,23 +191,30 @@ class Engine(object):
             warnings.warn(
                 "The dirs argument of render_to_string is deprecated.",
                 RemovedInDjango20Warning, stacklevel=2)
+        if dictionary is _dictionary_undefined:
+            dictionary = None
+        else:
+            warnings.warn(
+                "The dictionary argument of render_to_string was renamed to "
+                "context.", RemovedInDjango20Warning, stacklevel=2)
+            context = dictionary
 
         if isinstance(template_name, (list, tuple)):
             t = self.select_template(template_name, dirs)
         else:
             t = self.get_template(template_name, dirs)
         if not context_instance:
-            # Django < 1.8 accepted a Context in `dictionary` even though that's
-            # unintended. Preserve this ability but don't rewrap `dictionary`.
-            if isinstance(dictionary, Context):
-                return t.render(dictionary)
+            # Django < 1.8 accepted a Context in `context` even though that's
+            # unintended. Preserve this ability but don't rewrap `context`.
+            if isinstance(context, Context):
+                return t.render(context)
             else:
-                return t.render(Context(dictionary))
-        if not dictionary:
+                return t.render(Context(context))
+        if not context:
             return t.render(context_instance)
-        # Add the dictionary to the context stack, ensuring it gets removed again
+        # Add the context to the context stack, ensuring it gets removed again
         # to keep the context_instance in the same state it started in.
-        with context_instance.push(dictionary):
+        with context_instance.push(context):
             return t.render(context_instance)
 
     def select_template(self, template_name_list, dirs=_dirs_undefined):
