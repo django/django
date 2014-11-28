@@ -60,6 +60,13 @@ def get_internal_wsgi_application():
                     sys.exc_info()[2])
 
 
+def is_broken_pipe_error():
+    exc_type, exc_value = sys.exc_info()[:2]
+    if issubclass(exc_type, socket.error) and exc_value.args[0] == 32:
+        return True
+    return False
+
+
 class WSGIServer(simple_server.WSGIServer, object):
     """BaseHTTPServer that implements the Python WSGI protocol"""
 
@@ -76,19 +83,16 @@ class WSGIServer(simple_server.WSGIServer, object):
         self.setup_environ()
 
     def handle_error(self, request, client_address):
-        exc_type, exc_value = sys.exc_info()[:2]
-        if issubclass(exc_type, socket.error) and exc_value.args[0]==32:
-            sys.stderr.write("- Broken pipe from %s\n" % str(client_address))
+        if is_broken_pipe_error():
+            sys.stderr.write("- Broken pipe from %s\n" % (client_address,))
         else:
             super(WSGIServer, self).handle_error(request, client_address)
 
 
 class ServerHandler(simple_server.ServerHandler):
     def handle_error(self):
-        exc_type, exc_value = sys.exc_info()[:2]
-        if issubclass(exc_type, socket.error) and exc_value.args[0]==32:
-            pass
-        else:
+        # Ignore broken pipe errors, otherwise pass on
+        if not is_broken_pipe_error():
             super(ServerHandler, self).handle_error()
 
 
@@ -161,7 +165,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
             self.send_error(414)
             return
 
-        if not self.parse_request(): # An error code has been sent, just exit
+        if not self.parse_request():  # An error code has been sent, just exit
             return
 
         handler = ServerHandler(
