@@ -403,7 +403,7 @@ class SsiNode(Node):
             output = ''
         if self.parsed:
             try:
-                t = Template(output, name=filepath)
+                t = Template(output, name=filepath, engine=context.engine)
                 return t.render(context)
             except TemplateSyntaxError as e:
                 if settings.DEBUG:
