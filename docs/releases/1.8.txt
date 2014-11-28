@@ -99,6 +99,13 @@ Minor features
   <django.contrib.admin.ModelAdmin.show_full_result_count>` to control whether
   or not the full count of objects should be displayed on a filtered admin page.
 
+* It is now possible to refresh :class:`~django.db.models.Model` instances by
+  using :meth:`Model.refresh_from_db() <django.db.models.Model.refresh_from_db>`.
+
+* You can now get the set of deferred fields for a
+  :class:`~django.db.models.Model` from :meth:`Model.get_deferred_fields()
+  <django.db.models.Model.get_deferred_fields>`.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
