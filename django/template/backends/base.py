@@ -1,3 +1,6 @@
+# Since this package contains a "django" module, this is required on Python 2.
+from __future__ import absolute_import
+
 from django.core.exceptions import (
     ImproperlyConfigured, SuspiciousFileOperation)
 from django.template.utils import get_app_template_dirs
