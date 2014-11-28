@@ -176,6 +176,10 @@ class Template(object):
         except UnicodeDecodeError:
             raise TemplateEncodingError("Templates can only be constructed "
                                         "from unicode or UTF-8 strings.")
+        # If Template is instantiated directly rather than from an Engine and
+        # exactly one Django template engine is configured, use that engine.
+        # This is required to preserve backwards-compatibility for direct use
+        # e.g. Template('...').render(Context({...}))
         if engine is None:
             from .engine import Engine
             engine = Engine.get_default()
