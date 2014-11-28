@@ -639,14 +639,13 @@ class Options(object):
     def _expire_cache(self, expire_reverse_fields=False):
         # When a new model is registered, we expire the
         # relation tree and any attribute that depends on it.
-        for cache_key in ('_relation_tree', 'fields_map', '_forward_fields_map',
-                          'related_objects',):
+        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',
+                          'related_objects', 'fields_map', '_forward_fields_map'):
             try:
                 delattr(self, cache_key)
             except AttributeError:
                 pass
-        if expire_reverse_fields:
-            self._get_fields_cache = {}
+        self._get_fields_cache = {}
 
     def get_fields(self, include_parents=True, include_hidden=False, **kwargs):
         """
