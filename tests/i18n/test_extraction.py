@@ -5,7 +5,6 @@ import io
 import os
 import re
 import shutil
-import sys
 import time
 from unittest import SkipTest, skipUnless
 import warnings
@@ -16,6 +15,7 @@ from django.core.management import execute_from_command_line
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase
 from django.test import override_settings
+from django.test.utils import captured_stderr, captured_stdout
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import six
@@ -632,15 +632,11 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
         self.addCleanup(self._rmrf, os.path.join(self.test_dir, 'locale'))
 
     def test_command_help(self):
-        old_stdout, old_stderr = sys.stdout, sys.stderr
-        sys.stdout, sys.stderr = StringIO(), StringIO()
-        try:
+        with captured_stdout(), captured_stderr():
             # `call_command` bypasses the parser; by calling
             # `execute_from_command_line` with the help subcommand we
             # ensure that there are no issues with the parser itself.
             execute_from_command_line(['django-admin', 'help', 'makemessages'])
-        finally:
-            sys.stdout, sys.stderr = old_stdout, old_stderr
 
     def test_one_locale_excluded(self):
         management.call_command('makemessages', exclude=['it'], stdout=StringIO())

@@ -1,5 +1,4 @@
 import os
-import sys
 import warnings
 
 from django.db import connection
@@ -7,6 +6,7 @@ from django.core import management
 from django.core.management import BaseCommand, CommandError
 from django.core.management.utils import find_command, popen_wrapper
 from django.test import SimpleTestCase
+from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six import StringIO
@@ -42,14 +42,9 @@ class CommandTests(SimpleTestCase):
         """
         with self.assertRaises(CommandError):
             management.call_command('dance', example="raise")
-        old_stderr = sys.stderr
-        sys.stderr = err = StringIO()
-        try:
-            with self.assertRaises(SystemExit):
-                management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
-        finally:
-            sys.stderr = old_stderr
-        self.assertIn("CommandError", err.getvalue())
+        with captured_stderr() as stderr, self.assertRaises(SystemExit):
+            management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
+        self.assertIn("CommandError", stderr.getvalue())
 
     def test_default_en_us_locale_set(self):
         # Forces en_us when set to true
@@ -100,14 +95,9 @@ class CommandTests(SimpleTestCase):
         self.assertEqual(out.getvalue(), "All right, let's dance Rock'n'Roll.\n")
 
         # Simulate command line execution
-        old_stdout, old_stderr = sys.stdout, sys.stderr
-        sys.stdout, sys.stderr = StringIO(), StringIO()
-        try:
+        with captured_stdout() as stdout, captured_stderr():
             management.execute_from_command_line(['django-admin', 'optparse_cmd'])
-        finally:
-            output = sys.stdout.getvalue()
-            sys.stdout, sys.stderr = old_stdout, old_stderr
-        self.assertEqual(output, "All right, let's dance Rock'n'Roll.\n")
+        self.assertEqual(stdout.getvalue(), "All right, let's dance Rock'n'Roll.\n")
 
     def test_calling_a_command_with_only_empty_parameter_should_ends_gracefully(self):
         out = StringIO()

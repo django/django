@@ -3,7 +3,6 @@
 import os
 import shutil
 import stat
-import sys
 import unittest
 import gettext as gettext_module
 
@@ -11,6 +10,7 @@ from django.core.management import call_command, CommandError, execute_from_comm
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase
 from django.test import override_settings
+from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
 from django.utils.translation import ugettext
 from django.utils.encoding import force_text
@@ -145,15 +145,11 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
         self.addCleanup(self._rmrf, os.path.join(self.test_dir, 'locale'))
 
     def test_command_help(self):
-        old_stdout, old_stderr = sys.stdout, sys.stderr
-        sys.stdout, sys.stderr = StringIO(), StringIO()
-        try:
+        with captured_stdout(), captured_stderr():
             # `call_command` bypasses the parser; by calling
             # `execute_from_command_line` with the help subcommand we
             # ensure that there are no issues with the parser itself.
             execute_from_command_line(['django-admin', 'help', 'compilemessages'])
-        finally:
-            sys.stdout, sys.stderr = old_stdout, old_stderr
 
     def test_one_locale_excluded(self):
         call_command('compilemessages', exclude=['it'], stdout=StringIO())
