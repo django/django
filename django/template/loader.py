@@ -24,7 +24,7 @@ def get_template(*args, **kwargs):
 
 
 def get_template_from_string(*args, **kwargs):
-    return Engine.get_default().get_template_from_string(*args, **kwargs)
+    return Engine.get_default().from_string(*args, **kwargs)
 
 
 def render_to_string(*args, **kwargs):
