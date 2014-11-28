@@ -60,10 +60,15 @@ UNKNOWN_SOURCE = '<unknown source>'
 
 # match a variable or block tag and capture the entire tag, including start/end
 # delimiters
-tag_re = (re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
-          (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
-           re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END),
-           re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END))))
+tag_re = re.compile(
+    '|'.join([
+        r'%s\s*(?P<block>.+?)\s*%s' % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END)),
+        r'%s\s*(?P<var>.+?)\s*%s' % (re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END)),
+        r'%s\s*(?P<comment>.+?)\s*%s' % (re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END)),
+    ]),
+    re.DOTALL,
+)
+
 
 # global dictionary of libraries that have been loaded using get_library
 libraries = {}
@@ -199,45 +204,54 @@ class Lexer(object):
         """
         Return a list of tokens from a given template_string.
         """
-        in_tag = False
         result = []
-        for bit in tag_re.split(self.template_string):
-            if bit:
-                result.append(self.create_token(bit, in_tag))
-            in_tag = not in_tag
+        for token in self._tokenize():
+            token.lineno = self.lineno
+            result.append(token)
         return result
 
-    def create_token(self, token_string, in_tag):
-        """
-        Convert the given token string into a new Token object and return it.
-        If in_tag is True, we are processing something that matched a tag,
-        otherwise it should be treated as a literal string.
-        """
-        if in_tag and token_string.startswith(BLOCK_TAG_START):
-            # The [2:-2] ranges below strip off *_TAG_START and *_TAG_END.
-            # We could do len(BLOCK_TAG_START) to be more "correct", but we've
-            # hard-coded the 2s here for performance. And it's not like
-            # the TAG_START values are going to change anytime, anyway.
-            block_content = token_string[2:-2].strip()
-            if self.verbatim and block_content == self.verbatim:
-                self.verbatim = False
-        if in_tag and not self.verbatim:
-            if token_string.startswith(VARIABLE_TAG_START):
-                token = Token(TOKEN_VAR, token_string[2:-2].strip())
-            elif token_string.startswith(BLOCK_TAG_START):
-                if block_content[:9] in ('verbatim', 'verbatim '):
-                    self.verbatim = 'end%s' % block_content
-                token = Token(TOKEN_BLOCK, block_content)
-            elif token_string.startswith(COMMENT_TAG_START):
-                content = ''
-                if token_string.find(TRANSLATOR_COMMENT_MARK):
-                    content = token_string[2:-2].strip()
-                token = Token(TOKEN_COMMENT, content)
-        else:
-            token = Token(TOKEN_TEXT, token_string)
-        token.lineno = self.lineno
-        self.lineno += token_string.count('\n')
+    def _source(self, match, token):
         return token
+
+    def _tokenize(self):
+        """
+        A generator of template Tokens
+        """
+        upto = 0
+        stream = tag_re.finditer(self.template_string)
+        for m in stream:
+            start, end = m.span()
+            if upto < start:
+                text = self.template_string[upto:start]
+                self.lineno += text.count('\n')
+                yield self._source(m, Token(TOKEN_TEXT, text))
+            block, var, comment = m.groups()
+
+            # XXX verbatim handling
+            if var is not None:
+                yield self._source(m, Token(TOKEN_VAR, var))
+            elif block is not None:
+                yield self._source(m, Token(TOKEN_BLOCK, block))
+                if block[:9] in ('verbatim', 'verbatim '):
+                    # Find matching end%s
+                    sentinel = 'end' + block
+                    while True:
+                        m = next(stream)
+                        blk = m.group('block')
+                        if blk and blk.startswith(sentinel):
+                            break
+                        # Should we track line count here?
+                    yield self._source(m, Token(TOKEN_TEXT, self.template_string[end:m.start()]))
+                    end = m.end()
+                    yield self._source(m, Token(TOKEN_BLOCK, blk))
+            elif comment is not None:
+                if not comment.find(TRANSLATOR_COMMENT_MARK):
+                    comment = ''
+                yield self._source(m, Token(TOKEN_COMMENT, comment))
+            self.lineno += self.template_string[upto:end].count('\n')
+            upto = end
+        if upto < len(self.template_string):
+            yield self._source(None, Token(TOKEN_TEXT, self.template_string[upto:]))
 
 
 class Parser(object):
