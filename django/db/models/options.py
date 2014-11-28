@@ -271,7 +271,7 @@ class Options(object):
         else:
             self.local_fields.insert(bisect(self.local_fields, field), field)
             self.setup_pk(field)
-        self._expire_cache(expire_reverse_fields=True)
+        self._expire_cache()
 
     def setup_pk(self, field):
         if not self.pk and field.primary_key:
@@ -636,11 +636,11 @@ class Options(object):
             # this model will be computed properly.
             return EMPTY_RELATION_TREE
 
-    def _expire_cache(self, expire_reverse_fields=False):
+    def _expire_cache(self):
         # When a new model is registered, we expire the
         # relation tree and any attribute that depends on it.
         for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',
-                          'related_objects', 'fields_map', '_forward_fields_map'):
+                          'related_objects', 'fields_map', '_forward_fields_map', '_relation_tree'):
             try:
                 delattr(self, cache_key)
             except AttributeError:
