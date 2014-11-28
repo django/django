@@ -89,6 +89,25 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message['Cc'], 'cc@example.com, cc.other@example.com')
         self.assertEqual(email.recipients(), ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com', 'bcc@example.com'])
 
+    def test_reply_to(self):
+        email = EmailMessage('Subject', 'Content', 'from@example.com',
+                             ['to@example.com'],
+                             reply_to=['reply_to@example.com'])
+        message = email.message()
+        self.assertEqual(message['Reply-To'], 'reply_to@example.com')
+
+        email = EmailMessage('Subject', 'Content', 'from@example.com',
+                             ['to@example.com'],
+                             reply_to=['reply_to1@example.com',
+                                       'reply_to2@example.com'])
+        message = email.message()
+        self.assertEqual(message['Reply-To'],
+                         'reply_to1@example.com, reply_to2@example.com')
+
+        with self.assertRaisesMessage(TypeError, '"reply_to" argument must be a list or tuple'):
+            EmailMessage('Subject', 'Content', 'from@example.com',
+                         ['to@example.com'], reply_to='reply_to@example.com')
+
     def test_recipients_as_tuple(self):
         email = EmailMessage('Subject', 'Content', 'from@example.com', ('to@example.com', 'other@example.com'), cc=('cc@example.com', 'cc.other@example.com'), bcc=('bcc@example.com',))
         message = email.message()
@@ -162,6 +181,16 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         message = email.message()
         self.assertEqual(message['To'], 'list-subscriber@example.com, list-subscriber2@example.com')
         self.assertEqual(email.to, ['list-subscriber@example.com', 'list-subscriber2@example.com'])
+
+    def test_reply_to_header(self):
+        """
+        Make sure we can manually set the Reply-To header (#9214)
+        """
+        email = EmailMessage('Subject', 'Content', 'bounce@example.com',
+                             ['to@example.com'], reply_to=['foo@example.com'],
+                             headers={'Reply-To': 'override@example.com'})
+        message = email.message()
+        self.assertEqual(message['Reply-To'], 'override@example.com')
 
     def test_multiple_message_call(self):
         """
