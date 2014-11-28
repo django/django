@@ -1266,6 +1266,8 @@ class Library(object):
                     if not getattr(self, 'nodelist', False):
                         if isinstance(file_name, Template):
                             t = file_name
+                        elif isinstance(getattr(file_name, 'template', None), Template):
+                            t = file_name.template
                         elif not isinstance(file_name, six.string_types) and is_iterable(file_name):
                             t = context.engine.select_template(file_name)
                         else:
