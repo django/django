@@ -140,12 +140,12 @@ class Engine(object):
                 pass
         raise TemplateDoesNotExist(name)
 
-    def from_string(self, source, origin=None, name=None):
+    def from_string(self, template_code):
         """
         Returns a compiled Template object for the given template code,
         handling template inheritance recursively.
         """
-        return Template(source, origin, name, engine=self)
+        return Template(template_code, engine=self)
 
     def get_template(self, template_name, dirs=_dirs_undefined):
         """
@@ -162,7 +162,7 @@ class Engine(object):
         template, origin = self.find_template(template_name, dirs)
         if not hasattr(template, 'render'):
             # template needs to be compiled
-            template = self.from_string(template, origin, template_name)
+            template = Template(template, origin, template_name, engine=self)
         return template
 
     def render_to_string(self, template_name, dictionary=None, context_instance=None,
