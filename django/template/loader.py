@@ -75,10 +75,6 @@ def select_template(template_name_list, dirs=_dirs_undefined, using=None):
         raise TemplateDoesNotExist("No template names provided")
 
 
-def get_template_from_string(*args, **kwargs):
-    return Engine.get_default().from_string(*args, **kwargs)
-
-
 def render_to_string(*args, **kwargs):
     return Engine.get_default().render_to_string(*args, **kwargs)
 

@@ -838,8 +838,9 @@ Cleanup of the ``django.template`` namespace
 If you've been relying on private APIs exposed in the ``django.template``
 module, you may have to import them from ``django.template.base`` instead.
 
-Also private APIs ``django.template.base.compile_string()`` and
-``django.template.loader.find_template()`` were removed.
+Also private APIs ``django.template.base.compile_string()``,
+``django.template.loader.find_template()``, and
+``django.template.loader.get_template_from_string()`` were removed.
 
 Miscellaneous
 ~~~~~~~~~~~~~
