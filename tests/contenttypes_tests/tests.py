@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import sys
-
 from django.apps.registry import Apps, apps
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
@@ -12,9 +10,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.db import connections, models, router
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import captured_stdout, override_settings
 from django.utils.encoding import force_str
-from django.utils.six import StringIO
 
 from .models import Author, Article, SchemeIncludedURL
 
@@ -369,11 +366,6 @@ class UpdateContentTypesTests(TestCase):
         self.before_count = ContentType.objects.count()
         ContentType.objects.create(name='fake', app_label='contenttypes_tests', model='Fake')
         self.app_config = apps.get_app_config('contenttypes_tests')
-        self.old_stdout = sys.stdout
-        sys.stdout = StringIO()
-
-    def tearDown(self):
-        sys.stdout = self.old_stdout
 
     def test_interactive_true(self):
         """
@@ -381,8 +373,9 @@ class UpdateContentTypesTests(TestCase):
         stale contenttypes.
         """
         management.input = lambda x: force_str("yes")
-        management.update_contenttypes(self.app_config)
-        self.assertIn("Deleting stale content type", sys.stdout.getvalue())
+        with captured_stdout() as stdout:
+            management.update_contenttypes(self.app_config)
+        self.assertIn("Deleting stale content type", stdout.getvalue())
         self.assertEqual(ContentType.objects.count(), self.before_count)
 
     def test_interactive_false(self):
@@ -390,8 +383,9 @@ class UpdateContentTypesTests(TestCase):
         non-interactive mode of update_contenttypes() shouldn't delete stale
         content types.
         """
-        management.update_contenttypes(self.app_config, interactive=False)
-        self.assertIn("Stale content types remain.", sys.stdout.getvalue())
+        with captured_stdout() as stdout:
+            management.update_contenttypes(self.app_config, interactive=False)
+        self.assertIn("Stale content types remain.", stdout.getvalue())
         self.assertEqual(ContentType.objects.count(), self.before_count + 1)
 
 

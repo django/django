@@ -7,7 +7,7 @@ import unittest
 
 from django.apps import apps
 from django.core.management import ManagementUtility
-from django.utils.six import StringIO
+from django.test.utils import captured_stdout
 
 
 class BashCompletionTests(unittest.TestCase):
@@ -20,12 +20,8 @@ class BashCompletionTests(unittest.TestCase):
     def setUp(self):
         self.old_DJANGO_AUTO_COMPLETE = os.environ.get('DJANGO_AUTO_COMPLETE')
         os.environ['DJANGO_AUTO_COMPLETE'] = '1'
-        self.output = StringIO()
-        self.old_stdout = sys.stdout
-        sys.stdout = self.output
 
     def tearDown(self):
-        sys.stdout = self.old_stdout
         if self.old_DJANGO_AUTO_COMPLETE:
             os.environ['DJANGO_AUTO_COMPLETE'] = self.old_DJANGO_AUTO_COMPLETE
         else:
@@ -53,11 +49,12 @@ class BashCompletionTests(unittest.TestCase):
 
     def _run_autocomplete(self):
         util = ManagementUtility(argv=sys.argv)
-        try:
-            util.autocomplete()
-        except SystemExit:
-            pass
-        return self.output.getvalue().strip().split('\n')
+        with captured_stdout() as stdout:
+            try:
+                util.autocomplete()
+            except SystemExit:
+                pass
+        return stdout.getvalue().strip().split('\n')
 
     def test_django_admin_py(self):
         "django_admin.py will autocomplete option flags"
