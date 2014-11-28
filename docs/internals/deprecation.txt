@@ -88,6 +88,11 @@ details on these changes.
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` will
   be removed.
 
+* The ``dictionary`` and ``context_instance`` parameters for the following
+  functions will be removed:
+
+  * ``django.template.loader.render_to_string()``
+
 * The ``dirs`` parameter for the following functions will be removed:
 
   * ``django.template.loader.get_template()``

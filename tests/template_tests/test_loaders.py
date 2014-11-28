@@ -153,13 +153,6 @@ class RenderToStringTest(SimpleTestCase):
         self.assertEqual(loader.render_to_string('test_context.html',
                                                  {'obj': 'test'}), 'obj:test\n')
 
-    def test_existing_context_kept_clean(self):
-        context = Context({'obj': 'before'})
-        output = loader.render_to_string('test_context.html', {'obj': 'after'},
-                                         context_instance=context)
-        self.assertEqual(output, 'obj:after\n')
-        self.assertEqual(context['obj'], 'before')
-
     def test_empty_list(self):
         six.assertRaisesRegex(self, TemplateDoesNotExist,
             'No template names provided$',
@@ -169,6 +162,21 @@ class RenderToStringTest(SimpleTestCase):
         six.assertRaisesRegex(self, TemplateDoesNotExist,
             'No template names provided$',
             loader.select_template, [])
+
+
+@override_settings(
+    TEMPLATE_DIRS=(
+        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
+    )
+)
+class DeprecatedRenderToStringTest(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
+
+    def test_existing_context_kept_clean(self):
+        context = Context({'obj': 'before'})
+        output = loader.render_to_string('test_context.html', {'obj': 'after'},
+                                         context_instance=context)
+        self.assertEqual(output, 'obj:after\n')
+        self.assertEqual(context['obj'], 'before')
 
     def test_no_empty_dict_pushed_to_stack(self):
         """

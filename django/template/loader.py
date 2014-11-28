@@ -5,7 +5,8 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from . import engines
 from .backends.django import DjangoTemplates
 from .base import Origin, TemplateDoesNotExist
-from .engine import _dirs_undefined, Engine
+from .engine import (
+    _context_instance_undefined, _dictionary_undefined, _dirs_undefined)
 
 
 class LoaderOrigin(Origin):
@@ -75,8 +76,61 @@ def select_template(template_name_list, dirs=_dirs_undefined, using=None):
         raise TemplateDoesNotExist("No template names provided")
 
 
-def render_to_string(*args, **kwargs):
-    return Engine.get_default().render_to_string(*args, **kwargs)
+def render_to_string(template_name, context=None,
+                     context_instance=_context_instance_undefined,
+                     dirs=_dirs_undefined,
+                     dictionary=_dictionary_undefined,
+                     using=None):
+    """
+    Loads a template and renders it with a context. Returns a string.
+
+    template_name may be a string or a list of strings.
+    """
+    if (context_instance is _context_instance_undefined
+            and dirs is _dirs_undefined
+            and dictionary is _dictionary_undefined):
+        # No deprecated arguments were passed - use the new code path
+        if isinstance(template_name, (list, tuple)):
+            template = select_template(template_name, using=using)
+        else:
+            template = get_template(template_name, using=using)
+        return template.render(context)
+
+    else:
+        # Some deprecated arguments were passed - use the legacy code path
+        for engine in _engine_list(using):
+            try:
+                # This is required for deprecating arguments specific to Django
+                # templates. Simply return engine.render_to_string(template_name,
+                # context) in Django 2.0.
+                if isinstance(engine, DjangoTemplates):
+                    # Hack -- use the internal Engine instance of DjangoTemplates.
+                    return engine.engine.render_to_string(
+                        template_name, context, context_instance, dirs, dictionary)
+                elif context_instance is not _context_instance_undefined:
+                    warnings.warn(
+                        "Skipping template backend %s because its render_to_string "
+                        "method doesn't support the context_instance argument." %
+                        engine.name, stacklevel=2)
+                elif dirs is not _dirs_undefined:
+                    warnings.warn(
+                        "Skipping template backend %s because its render_to_string "
+                        "method doesn't support the dirs argument." % engine.name,
+                        stacklevel=2)
+                elif dictionary is not _dictionary_undefined:
+                    warnings.warn(
+                        "Skipping template backend %s because its render_to_string "
+                        "method doesn't support the dictionary argument." %
+                        engine.name, stacklevel=2)
+            except TemplateDoesNotExist:
+                continue
+
+        if template_name:
+            if isinstance(template_name, (list, tuple)):
+                template_name = ', '.join(template_name)
+            raise TemplateDoesNotExist(template_name)
+        else:
+            raise TemplateDoesNotExist("No template names provided")
 
 
 def _engine_list(using=None):
