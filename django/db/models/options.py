@@ -458,7 +458,7 @@ class Options(object):
                 except StopIteration:
                     pass
                 raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
-        
+
         except KeyError:
             pass
 
@@ -519,8 +519,7 @@ class Options(object):
                 self.get_all_related_objects(
                     local_only=local_only,
                     include_hidden=include_hidden,
-                    include_proxy_eq=include_proxy_eq,
-                )]
+                    include_proxy_eq=include_proxy_eq)]
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_many_to_many_objects(self, local_only=False):

@@ -1,5 +1,3 @@
-from itertools import chain
-
 from django.contrib.gis.gdal import SpatialReference
 from django.db import connections, DEFAULT_DB_ALIAS
 

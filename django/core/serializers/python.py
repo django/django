@@ -4,7 +4,6 @@ and from basic Python data types (lists, dicts, strings, etc.). Useful as a basi
 other serializers.
 """
 from __future__ import unicode_literals
-from itertools import chain
 
 from django.apps import apps
 from django.conf import settings

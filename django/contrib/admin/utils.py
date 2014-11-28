@@ -300,6 +300,7 @@ def _get_non_gfk_field(opts, name):
         raise models.FieldDoesNotExist()
     return field
 
+
 def label_for_field(name, model, model_admin=None, return_attr=False):
     """
     Returns a sensible label for a field name. The name can be a callable,

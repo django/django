@@ -24,7 +24,6 @@ from django.db.models.fields import (
 
 from django.db.models.fields.related import (
     ForeignObject, ForeignKey, OneToOneField, ManyToManyField, RelatedObject,
-    ManyToManyRel
 )
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
@@ -855,7 +854,7 @@ class FieldFlagsTests(test.TestCase):
         for field in o2m_type_fields:
             if hasattr(field, 'related'):
                 reverse_field = field.related
-                self.assertTrue(reverse_field.has_relation \
+                self.assertTrue(reverse_field.has_relation
                                 and reverse_field.many_to_one)
 
     def test_cardinality_m2o(self):
@@ -873,7 +872,7 @@ class FieldFlagsTests(test.TestCase):
         for obj in m2o_type_fields:
             if hasattr(obj, 'field'):
                 reverse_field = obj.field
-                self.assertTrue(reverse_field.has_relation \
+                self.assertTrue(reverse_field.has_relation
                                 and reverse_field.one_to_many)
 
     def test_cardinality_o2o(self):
@@ -891,14 +890,12 @@ class FieldFlagsTests(test.TestCase):
         for obj in o2o_type_fields:
             if hasattr(obj, 'field'):
                 reverse_field = obj.field
-                self.assertTrue(reverse_field.has_relation \
+                self.assertTrue(reverse_field.has_relation
                                 and reverse_field.one_to_one)
 
     def test_hidden_flag(self):
-        incl_hidden = set(AllFieldsModel._meta.get_fields(
-                         reverse=True, include_hidden=True))
-        no_hidden = set(AllFieldsModel._meta.get_fields(
-                         reverse=True))
+        incl_hidden = set(AllFieldsModel._meta.get_fields(reverse=True, include_hidden=True))
+        no_hidden = set(AllFieldsModel._meta.get_fields(reverse=True))
         fields_that_should_be_hidden = (incl_hidden - no_hidden)
         for f in incl_hidden:
             self.assertEqual(

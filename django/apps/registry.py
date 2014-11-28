@@ -331,7 +331,6 @@ class Apps(object):
         self.apps_ready = self.models_ready = self.ready = True
         self.clear_cache()
 
-
     def clear_cache(self, expire_reverse_fields=False):
         """
         Clears all internal caches, for methods that alter the app registry.

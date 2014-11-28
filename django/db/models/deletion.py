@@ -147,8 +147,8 @@ class Collector(object):
         related_opts = list(chain(
             get_related_objects_on_proxies(opts),
             (field for field in opts.get_fields(include_hidden=True)
-             if field.is_reverse_object and not field.many_to_many
-        )))
+             if field.is_reverse_object and not field.many_to_many)
+        ))
 
         for related in related_opts:
             if related.field.rel.on_delete is not DO_NOTHING:

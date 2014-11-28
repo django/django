@@ -9,7 +9,6 @@ all about the internals of models in order to get the information it needs.
 
 from collections import Mapping, OrderedDict
 import copy
-from itertools import chain
 import warnings
 
 from django.core.exceptions import FieldError
@@ -1395,7 +1394,8 @@ class Query(object):
                     raise FieldError("Field %r is a GenericForeignKey. This field "
                                       "type does not generate a reverse relation "
                                       "by default and therefore cannot be used for "
-                                      "reverse querying. Consider using a GenericRelation." % name)
+                                      "reverse querying. Consider using a "
+                                      "GenericRelation." % name)
                 model = field.parent_model._meta.concrete_model
             except FieldDoesNotExist:
                 # is it an annotation?
