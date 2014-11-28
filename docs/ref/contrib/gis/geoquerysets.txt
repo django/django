@@ -1,5 +1,3 @@
-.. _ref-geoquerysets:
-
 =========================
 GeoQuerySet API Reference
 =========================
@@ -7,7 +5,6 @@ GeoQuerySet API Reference
 .. currentmodule:: django.contrib.gis.db.models
 
 .. class:: GeoQuerySet([model=None])
-
 
 .. _spatial-lookups:
 
@@ -730,7 +727,7 @@ the distance from the `Tasmanian`__ city of Hobart to every other
     :class:`~django.contrib.gis.measure.Distance` object, you can easily express
     the value in the units of your choice.  For example, ``city.distance.mi`` is
     the distance value in miles and ``city.distance.km`` is the distance value
-    in kilometers.  See the :ref:`ref-measure` for usage details and the list of
+    in kilometers.  See :doc:`measure` for usage details and the list of
     :ref:`supported_units`.
 
 __ https://github.com/django/django/blob/master/django/contrib/gis/tests/distapp/models.py

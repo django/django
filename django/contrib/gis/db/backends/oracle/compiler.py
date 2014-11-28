@@ -22,11 +22,3 @@ class SQLUpdateCompiler(compiler.SQLUpdateCompiler, GeoSQLCompiler):
 
 class SQLAggregateCompiler(compiler.SQLAggregateCompiler, GeoSQLCompiler):
     pass
-
-
-class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
-    pass
-
-
-class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, GeoSQLCompiler):
-    pass

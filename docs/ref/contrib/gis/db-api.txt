@@ -1,5 +1,3 @@
-.. _ref-gis-db-api:
-
 ======================
 GeoDjango Database API
 ======================
@@ -100,7 +98,7 @@ GeoDjango are only available on geometry fields.
 Filters on 'normal' fields (e.g. :class:`~django.db.models.CharField`)
 may be chained with those on geographic fields.  Thus, geographic queries
 take the following general form (assuming  the ``Zipcode`` model used in the
-:ref:`ref-gis-model-api`)::
+:doc:`model-api`)::
 
     >>> qs = Zipcode.objects.filter(<field>__<lookup_type>=<parameter>)
     >>> qs = Zipcode.objects.exclude(...)
@@ -135,7 +133,7 @@ Distance calculations with spatial data is tricky because, unfortunately,
 the Earth is not flat.  Some distance queries with fields in a geographic
 coordinate system may have to be expressed differently because of
 limitations in PostGIS.  Please see the :ref:`selecting-an-srid` section
-in the :ref:`ref-gis-model-api` documentation for more details.
+in the :doc:`model-api` documentation for more details.
 
 .. _distance-lookups-intro:
 

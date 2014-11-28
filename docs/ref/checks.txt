@@ -82,6 +82,7 @@ Fields
 * **fields.E110**: ``BooleanField``\s do not accept null values.
 * **fields.E120**: ``CharField``\s must define a ``max_length`` attribute.
 * **fields.E121**: ``max_length`` must be a positive integer.
+* **fields.W122**: ``max_length`` is ignored when used with ``IntegerField``.
 * **fields.E130**: ``DecimalField``\s must define a ``decimal_places`` attribute.
 * **fields.E131**: ``decimal_places`` must be a non-negative integer.
 * **fields.E132**: ``DecimalField``\s must define a ``max_digits`` attribute.
@@ -153,6 +154,8 @@ Related Fields
 * **fields.E339**: ``<model>.<field name>`` is not a foreign key to ``<model>``.
 * **fields.W340**: ``null`` has no effect on ``ManyToManyField``.
 * **fields.W341**: ``ManyToManyField`` does not support ``validators``.
+* **fields.W342**: Setting ``unique=True`` on a ``ForeignKey`` has the same
+  effect as using a ``OneToOneField``.
 
 Signals
 ~~~~~~~

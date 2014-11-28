@@ -1714,6 +1714,7 @@ class ForeignKey(ForeignObject):
     def check(self, **kwargs):
         errors = super(ForeignKey, self).check(**kwargs)
         errors.extend(self._check_on_delete())
+        errors.extend(self._check_unique())
         return errors
 
     def _check_on_delete(self):
@@ -1738,6 +1739,16 @@ class ForeignKey(ForeignObject):
             ]
         else:
             return []
+
+    def _check_unique(self, **kwargs):
+        return [
+            checks.Warning(
+                'Setting unique=True on a ForeignKey has the same effect as using a OneToOneField.',
+                hint='ForeignKey(unique=True) is usually better served by a OneToOneField.',
+                obj=self,
+                id='fields.W342',
+            )
+        ] if self.unique else []
 
     def deconstruct(self):
         name, path, args, kwargs = super(ForeignKey, self).deconstruct()
@@ -1899,6 +1910,10 @@ class OneToOneField(ForeignKey):
             setattr(instance, self.name, data)
         else:
             setattr(instance, self.attname, data)
+
+    def _check_unique(self, **kwargs):
+        # override ForeignKey since check isn't applicable here
+        return []
 
 
 def create_many_to_many_intermediary_model(field, klass):
