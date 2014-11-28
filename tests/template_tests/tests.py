@@ -85,7 +85,7 @@ class TemplateLoaderTests(SimpleTestCase):
         # We also rely on the fact the file system and app directories loaders
         # both inherit the load_template method from the base Loader class, so
         # we only need to test one of them.
-        template = loader.get_template(load_name)
+        template = loader.get_template(load_name).template
         template_name = template.nodelist[0].source[0].name
         self.assertTrue(template_name.endswith(load_name),
             'Template loaded by filesystem loader has incorrect name for debug page: %s' % template_name)
@@ -100,12 +100,12 @@ class TemplateLoaderTests(SimpleTestCase):
         load_name = 'login.html'
 
         # Test the cached loader separately since it overrides load_template.
-        template = loader.get_template(load_name)
+        template = loader.get_template(load_name).template
         template_name = template.nodelist[0].source[0].name
         self.assertTrue(template_name.endswith(load_name),
             'Template loaded through cached loader has incorrect name for debug page: %s' % template_name)
 
-        template = loader.get_template(load_name)
+        template = loader.get_template(load_name).template
         template_name = template.nodelist[0].source[0].name
         self.assertTrue(template_name.endswith(load_name),
             'Cached template loaded through cached loader has incorrect name for debug page: %s' % template_name)
