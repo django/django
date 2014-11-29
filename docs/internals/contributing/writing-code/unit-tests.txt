@@ -24,6 +24,11 @@ Running the unit tests
 Quickstart
 ~~~~~~~~~~
 
+If you are on Python < 3.3, you'll first need to install a backport of the
+``unittest.mock`` module that's available in Python 3.3+. See
+:ref:`running-unit-tests-dependencies` for details on installing `mock`_ and
+the other optional test dependencies.
+
 Running the tests requires a Django settings module that defines the
 databases to use. To make it easy to get started, Django provides and uses a
 sample settings module that uses the SQLite database. To run the tests:
@@ -166,6 +171,7 @@ dependencies:
 *  pytz_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
+*  mock_ (for Python < 3.3)
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
 *  sqlparse_
@@ -176,7 +182,7 @@ like so:
 
 .. code-block:: bash
 
-   $ pip install -r tests/requirements/py2.txt  # Python 3: py3.txt
+   $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
 
 You can also install the database adapter(s) of your choice using
 ``oracle.txt``, ``mysql.txt``, or ``postgres.txt``.
@@ -198,6 +204,7 @@ associated tests will be skipped.
 .. _pytz: https://pypi.python.org/pypi/pytz/
 .. _setuptools: https://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
+.. _mock: https://pypi.python.org/pypi/mock
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: https://pypi.python.org/pypi/selenium
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse

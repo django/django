@@ -1,5 +1,7 @@
 bcrypt
 docutils
+# move to py2.txt when dropping Python 3.2
+mock
 numpy
 Pillow
 PyYAML
