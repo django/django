@@ -414,6 +414,9 @@ class StreamingHttpResponse(HttpResponseBase):
     def streaming_content(self, value):
         # Ensure we can never iterate on "value" more than once.
         self._iterator = iter(value)
+        self.file = None
+        if hasattr(value, 'read'):
+            self.file = value
         if hasattr(value, 'close'):
             self._closable_objects.append(value)
 
