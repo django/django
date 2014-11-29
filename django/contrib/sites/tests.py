@@ -6,8 +6,10 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.signals import post_migrate
 from django.http import HttpRequest
 from django.test import TestCase, modify_settings, override_settings
+from django.test.utils import captured_stdout
 
 from . import models
+from .management import create_default_site
 from .middleware import CurrentSiteMiddleware
 from .models import clear_site_cache, Site
 from .requests import RequestSite
@@ -24,12 +26,6 @@ class SitesFrameworkTests(TestCase):
             name="example.com",
         )
         self.site.save()
-
-    def test_save_another(self):
-        # Regression for #17415
-        # On some backends the sequence needs reset after save with explicit ID.
-        # Test that there is no sequence collisions by saving another site.
-        Site(domain="example2.com", name="example2.com").save()
 
     def test_site_manager(self):
         # Make sure that get_current() does not return a deleted Site object.
@@ -120,13 +116,64 @@ class SitesFrameworkTests(TestCase):
         clear_site_cache(Site, instance=self.site)
         self.assertEqual(models.SITE_CACHE, {})
 
-    def test_create_default_site_signal(self):
-        """
-        Checks that sending ``post_migrate`` creates the default site.
-        """
+
+class JustOtherRouter(object):
+    def allow_migrate(self, db, model):
+        return db == 'other'
+
+
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
+class CreateDefaultSiteTests(TestCase):
+    multi_db = True
+
+    def setUp(self):
+        self.app_config = apps.get_app_config('sites')
+        # Delete the site created as part of the default migration process.
         Site.objects.all().delete()
-        app_config = apps.get_app_config('sites')
-        post_migrate.send(sender=app_config, app_config=app_config, verbosity=0)
+
+    def test_basic(self):
+        """
+        #15346, #15573 - create_default_site() creates an example site only if
+        none exist.
+        """
+        with captured_stdout() as stdout:
+            create_default_site(self.app_config)
+        self.assertEqual(Site.objects.count(), 1)
+        self.assertIn("Creating example.com", stdout.getvalue())
+
+        with captured_stdout() as stdout:
+            create_default_site(self.app_config)
+        self.assertEqual(Site.objects.count(), 1)
+        self.assertEqual("", stdout.getvalue())
+
+    @override_settings(DATABASE_ROUTERS=[JustOtherRouter()])
+    def test_multi_db(self):
+        """
+        #16353, #16828 - The default site creation should respect db routing.
+        """
+        create_default_site(self.app_config, db='default', verbosity=0)
+        create_default_site(self.app_config, db='other', verbosity=0)
+        self.assertFalse(Site.objects.using('default').exists())
+        self.assertTrue(Site.objects.using('other').exists())
+
+    def test_save_another(self):
+        """
+        #17415 - Another site can be created right after the default one.
+
+        On some backends the sequence needs to be reset after saving with an
+        explicit ID. Test that there isn't a sequence collisions by saving
+        another site. This test is only meaningful with databases that use
+        sequences for automatic primary keys such as PostgreSQL and Oracle.
+        """
+        create_default_site(self.app_config, verbosity=0)
+        Site(domain='example2.com', name='example2.com').save()
+
+    def test_signal(self):
+        """
+        #23641 - Sending the ``post_migrate`` signal triggers creation of the
+        default site.
+        """
+        post_migrate.send(sender=self.app_config, app_config=self.app_config, verbosity=0)
         self.assertTrue(Site.objects.exists())
 
 
