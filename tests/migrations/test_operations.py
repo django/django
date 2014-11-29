@@ -1562,7 +1562,7 @@ class OperationTests(OperationTestBase):
 
 class MigrateNothingRouter(object):
     """
-    A router that sends all writes to the other database.
+    A router that doesn't allow storing any model in any database.
     """
     def allow_migrate(self, db, model):
         return False
