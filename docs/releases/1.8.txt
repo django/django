@@ -100,6 +100,9 @@ Minor features
   <django.contrib.admin.ModelAdmin.show_full_result_count>` to control whether
   or not the full count of objects should be displayed on a filtered admin page.
 
+* The ``AdminSite.password_change()`` method now has an ``extra_context``
+  parameter.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
