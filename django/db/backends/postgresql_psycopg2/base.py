@@ -216,7 +216,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @cached_property
     def psycopg2_version(self):
         version = psycopg2.__version__.split(' ', 1)[0]
-        return tuple(int(v) for v in version.split('.'))
+        return tuple(int(v) for v in version.split('.') if v.isdigit())
 
     @cached_property
     def pg_version(self):
