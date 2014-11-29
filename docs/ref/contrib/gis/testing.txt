@@ -80,18 +80,6 @@ is done from an existing superuser account)::
 
     postgres# ALTER ROLE <user_name> SUPERUSER;
 
-
-Create local PostgreSQL database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-1. Initialize database: ``initdb -D /path/to/user/db``
-
-2. If there's already a Postgres instance on the machine, it will need
-   to use a different TCP port than 5432. Edit ``postgresql.conf`` (in
-   ``/path/to/user/db``) to change the database port (e.g. ``port = 5433``).
-
-3. Start this database ``pg_ctl -D /path/to/user/db start``
-
 Create a database using PostGIS version 2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
