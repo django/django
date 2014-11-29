@@ -17,7 +17,7 @@ from django.test import TestCase, client
 from django.test import override_settings
 from django.utils.encoding import force_bytes
 from django.utils.http import urlquote
-from django.utils.six import StringIO
+from django.utils.six import BytesIO, StringIO
 
 from . import uploadhandler
 from .models import FileModel
@@ -261,6 +261,34 @@ class FileUploadTests(TestCase):
             self.assertEqual(expected, got, 'Mismatch for {}'.format(name))
             self.assertLess(len(got), 256,
                             "Got a long file name (%s characters)." % len(got))
+
+    def test_file_content(self):
+        tdir = tempfile.gettempdir()
+
+        file = tempfile.NamedTemporaryFile
+        with file(suffix=".ctype_extra", dir=tdir) as no_content_type, \
+                file(suffix=".ctype_extra", dir=tdir) as simple_file:
+            no_content_type.write(b'no content')
+            no_content_type.seek(0)
+
+            simple_file.write(b'text content')
+            simple_file.seek(0)
+            simple_file.content_type = 'text/plain'
+
+            string_io = StringIO('string content')
+            bytes_io = BytesIO(b'binary content')
+
+            response = self.client.post('/echo_content/', {
+                'no_content_type': no_content_type,
+                'simple_file': simple_file,
+                'string': string_io,
+                'binary': bytes_io,
+            })
+            received = json.loads(response.content.decode('utf-8'))
+            self.assertEqual(received['no_content_type'], 'no content')
+            self.assertEqual(received['simple_file'], 'text content')
+            self.assertEqual(received['string'], 'string content')
+            self.assertEqual(received['binary'], 'binary content')
 
     def test_content_type_extra(self):
         """Uploaded files may have content type parameters available."""

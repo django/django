@@ -195,20 +195,25 @@ def encode_multipart(boundary, data):
 
 def encode_file(boundary, key, file):
     to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
+    filename = os.path.basename(file.name) if hasattr(file, 'name') else ''
     if hasattr(file, 'content_type'):
         content_type = file.content_type
+    elif filename:
+        content_type = mimetypes.guess_type(filename)[0]
     else:
-        content_type = mimetypes.guess_type(file.name)[0]
+        content_type = None
 
     if content_type is None:
         content_type = 'application/octet-stream'
+    if not filename:
+        filename = key
     return [
         to_bytes('--%s' % boundary),
         to_bytes('Content-Disposition: form-data; name="%s"; filename="%s"'
-                 % (key, os.path.basename(file.name))),
+                 % (key, filename)),
         to_bytes('Content-Type: %s' % content_type),
         b'',
-        file.read()
+        to_bytes(file.read())
     ]
 
 
