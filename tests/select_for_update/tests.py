@@ -6,9 +6,10 @@ import unittest
 from django.conf import settings
 from django.db import transaction, connection, router
 from django.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
-from django.test import (TransactionTestCase, skipIfDBFeature,
-    skipUnlessDBFeature)
-from django.test import override_settings
+from django.test import (
+    TransactionTestCase, override_settings, skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 
 from multiple_database.routers import TestRouter
 
@@ -257,14 +258,10 @@ class SelectForUpdateTests(TransactionTestCase):
         self.assertIsInstance(status[-1], DatabaseError)
 
     @skipUnlessDBFeature('has_select_for_update')
+    @override_settings(DATABASE_ROUTERS=[TestRouter()])
     def test_select_for_update_on_multidb(self):
-        old_routers = router.routers
-        try:
-            router.routers = [TestRouter()]
-            query = Person.objects.select_for_update()
-            self.assertEqual(router.db_for_write(Person), query.db)
-        finally:
-            router.routers = old_routers
+        query = Person.objects.select_for_update()
+        self.assertEqual(router.db_for_write(Person), query.db)
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_select_for_update_with_get(self):
