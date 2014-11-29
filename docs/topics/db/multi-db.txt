@@ -187,6 +187,8 @@ cases, no instance hint will be provided at all. The router checks for
 the existence of an instance hint, and determine if that hint should be
 used to alter routing behavior.
 
+.. _topics-db-multi-db-routers:
+
 Using routers
 -------------
 

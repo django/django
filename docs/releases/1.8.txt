@@ -500,6 +500,10 @@ Tests
   for Oracle: :setting:`DATAFILE`, :setting:`DATAFILE_TMP`,
   :setting:`DATAFILE_MAXSIZE` and :setting:`DATAFILE_TMP_MAXSIZE`.
 
+* Made the :func:`~django.test.override_settings` decorator with the
+  :setting:`DATABASE_ROUTERS` affect the master
+  :ref:`router <topics-db-multi-db-routers>`.
+
 Validators
 ^^^^^^^^^^
 
