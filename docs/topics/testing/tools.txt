@@ -238,6 +238,13 @@ Use the ``django.test.Client`` class to make requests.
         (The name ``attachment`` here is not relevant; use whatever name your
         file-processing code expects.)
 
+        You may also provide any file-like object (e.g., :class:`~io.StringIO` or
+        :class:`~io.BytesIO`) as a file handle.
+
+        .. versionadded:: 1.8
+
+            The ability to use a file-like object was added.
+
         Note that if you wish to use the same file handle for multiple
         ``post()`` calls then you will need to manually reset the file
         pointer between posts. The easiest way to do this is to
