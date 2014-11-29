@@ -6,7 +6,7 @@ import unittest
 from django.conf.urls import url
 from django.core.files.storage import default_storage
 from django.core.urlresolvers import NoReverseMatch, reverse
-from django.db import connection
+from django.db import connection, router
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -842,3 +842,11 @@ class OverrideSettingsTests(TestCase):
         self.assertIsNone(default_storage.directory_permissions_mode)
         with self.settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o777):
             self.assertEqual(default_storage.directory_permissions_mode, 0o777)
+
+    def test_override_database_routers(self):
+        """
+        Overriding DATABASE_ROUTERS should update the master router.
+        """
+        test_routers = (object(),)
+        with self.settings(DATABASE_ROUTERS=test_routers):
+            self.assertSequenceEqual(router.routers, test_routers)
