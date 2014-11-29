@@ -8,9 +8,9 @@ from django.contrib.contenttypes.fields import (
 from django.contrib.contenttypes import management
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
-from django.db import connections, models, router
-from django.test import TestCase
-from django.test.utils import captured_stdout, override_settings
+from django.db import connections, models
+from django.test import TestCase, override_settings
+from django.test.utils import captured_stdout
 from django.utils.encoding import force_str
 
 from .models import Author, Article, SchemeIncludedURL
@@ -397,12 +397,10 @@ class TestRouter(object):
         return 'default'
 
 
+@override_settings(DATABASE_ROUTERS=[TestRouter()])
 class ContentTypesMultidbTestCase(TestCase):
 
     def setUp(self):
-        self.old_routers = router.routers
-        router.routers = [TestRouter()]
-
         # Whenever a test starts executing, only the "default" database is
         # connected. We explicitly connect to the "other" database here. If we
         # don't do it, then it will be implicitly connected later when we query
@@ -410,9 +408,6 @@ class ContentTypesMultidbTestCase(TestCase):
         # extra queries upon connecting (notably mysql executes
         # "SET SQL_AUTO_IS_NULL = 0"), which will affect assertNumQueries().
         connections['other'].ensure_connection()
-
-    def tearDown(self):
-        router.routers = self.old_routers
 
     def test_multidb(self):
         """

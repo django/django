@@ -19,7 +19,7 @@ from django.core import management
 from django.core.cache import (cache, caches, CacheKeyWarning,
     InvalidCacheBackendError, DEFAULT_CACHE_ALIAS)
 from django.core.context_processors import csrf
-from django.db import connection, connections, router, transaction
+from django.db import connection, connections, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import HttpResponse, StreamingHttpResponse
 from django.middleware.cache import (FetchFromCacheMiddleware,
@@ -974,29 +974,25 @@ class DBCacheRouter(object):
 class CreateCacheTableForDBCacheTests(TestCase):
     multi_db = True
 
+    @override_settings(DATABASE_ROUTERS=[DBCacheRouter()])
     def test_createcachetable_observes_database_router(self):
-        old_routers = router.routers
-        try:
-            router.routers = [DBCacheRouter()]
-            # cache table should not be created on 'default'
-            with self.assertNumQueries(0, using='default'):
-                management.call_command('createcachetable',
-                                        database='default',
-                                        verbosity=0, interactive=False)
-            # cache table should be created on 'other'
-            # Queries:
-            #   1: check table doesn't already exist
-            #   2: create savepoint (if transactional DDL is supported)
-            #   3: create the table
-            #   4: create the index
-            #   5: release savepoint (if transactional DDL is supported)
-            num = 5 if connections['other'].features.can_rollback_ddl else 3
-            with self.assertNumQueries(num, using='other'):
-                management.call_command('createcachetable',
-                                        database='other',
-                                        verbosity=0, interactive=False)
-        finally:
-            router.routers = old_routers
+        # cache table should not be created on 'default'
+        with self.assertNumQueries(0, using='default'):
+            management.call_command('createcachetable',
+                                    database='default',
+                                    verbosity=0, interactive=False)
+        # cache table should be created on 'other'
+        # Queries:
+        #   1: check table doesn't already exist
+        #   2: create savepoint (if transactional DDL is supported)
+        #   3: create the table
+        #   4: create the index
+        #   5: release savepoint (if transactional DDL is supported)
+        num = 5 if connections['other'].features.can_rollback_ddl else 3
+        with self.assertNumQueries(num, using='other'):
+            management.call_command('createcachetable',
+                                    database='other',
+                                    verbosity=0, interactive=False)
 
 
 class PicklingSideEffect(object):
