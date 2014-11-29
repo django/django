@@ -1,10 +1,13 @@
 from __future__ import unicode_literals
 
+from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db import router
 from django.http import HttpRequest
 from django.test import TestCase, modify_settings, override_settings
 
+from .management import create_default_site
 from .middleware import CurrentSiteMiddleware
 from .models import Site
 from .requests import RequestSite
@@ -16,12 +19,6 @@ class SitesFrameworkTests(TestCase):
 
     def setUp(self):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
-
-    def test_save_another(self):
-        # Regression for #17415
-        # On some backends the sequence needs reset after save with explicit ID.
-        # Test that there is no sequence collisions by saving another site.
-        Site(domain="example2.com", name="example2.com").save()
 
     def test_site_manager(self):
         # Make sure that get_current() does not return a deleted Site object.
@@ -80,6 +77,58 @@ class SitesFrameworkTests(TestCase):
         self.assertRaises(ValidationError, site.full_clean)
         site.domain = "test\ntest"
         self.assertRaises(ValidationError, site.full_clean)
+
+
+class JustOtherRouter(object):
+    def allow_migrate(self, db, model):
+        return db == 'other'
+
+
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
+class CreateDefaultSiteTests(TestCase):
+    multi_db = True
+
+    def setUp(self):
+        self.app_config = apps.get_app_config('sites')
+        # Delete the site created as part of the default migration process.
+        Site.objects.all().delete()
+
+    def test_basic(self):
+        """
+        #15346, #15573 - create_default_site() creates an example site only if
+        none exist.
+        """
+        create_default_site(self.app_config, verbosity=0)
+        self.assertEqual(Site.objects.count(), 1)
+
+        create_default_site(self.app_config, verbosity=0)
+        self.assertEqual(Site.objects.count(), 1)
+
+    def test_multi_db(self):
+        """
+        #16353, #16828 - The default site creation should respect db routing.
+        """
+        old_routers = router.routers
+        router.routers = [JustOtherRouter()]
+        try:
+            create_default_site(self.app_config, db='default', verbosity=0)
+            create_default_site(self.app_config, db='other', verbosity=0)
+            self.assertFalse(Site.objects.using('default').exists())
+            self.assertTrue(Site.objects.using('other').exists())
+        finally:
+            router.routers = old_routers
+
+    def test_save_another(self):
+        """
+        #17415 - Another site can be created right after the default one.
+
+        On some backends the sequence needs to be reset after saving with an
+        explicit ID. Test that there isn't a sequence collisions by saving
+        another site. This test is only meaningful with databases that use
+        sequences for automatic primary keys such as PostgreSQL and Oracle.
+        """
+        create_default_site(self.app_config, verbosity=0)
+        Site(domain='example2.com', name='example2.com').save()
 
 
 class MiddlewareTest(TestCase):
