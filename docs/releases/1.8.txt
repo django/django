@@ -511,6 +511,8 @@ Tests
   :meth:`TestCase.setUpTestData() <django.test.TestCase.setUpTestData>`. Using
   this technique can speed up the tests as compared to using ``setUp()``.
 
+* Added test client support for file uploads with file-like objects.
+
 Validators
 ^^^^^^^^^^
 
