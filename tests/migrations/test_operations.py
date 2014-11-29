@@ -8,13 +8,13 @@ except ImportError:
     sqlparse = None
 
 from django import test
-from django.test import override_settings
-from django.db import connection, migrations, models, router
+from django.db import connection, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError, DatabaseError
+from django.test import override_settings
 from django.utils import six
 
 from .test_base import MigrationTestBase
@@ -1566,17 +1566,9 @@ class MigrateNothingRouter(object):
         return False
 
 
+@override_settings(DATABASE_ROUTERS=[MigrateNothingRouter()])
 class MultiDBOperationTests(MigrationTestBase):
     multi_db = True
-
-    def setUp(self):
-        # Make the 'other' database appear to be a replica of the 'default'
-        self.old_routers = router.routers
-        router.routers = [MigrateNothingRouter()]
-
-    def tearDown(self):
-        # Restore the 'other' database as an independent database
-        router.routers = self.old_routers
 
     def test_create_model(self):
         """
