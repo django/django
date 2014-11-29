@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.db.backends.dummy.base import DatabaseCreation
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import TestCase, TransactionTestCase, mock, skipUnlessDBFeature
 from django.test.runner import DiscoverRunner, dependency_ordered
 from django.test.testcases import connections_support_transactions
 from django.utils import six
@@ -129,13 +129,10 @@ class DependencyOrderingTests(unittest.TestCase):
 
 
 class MockTestRunner(object):
-    invoked = False
-
     def __init__(self, *args, **kwargs):
         pass
 
-    def run_tests(self, test_labels, extra_tests=None, **kwargs):
-        MockTestRunner.invoked = True
+MockTestRunner.run_tests = mock.Mock(return_value=[])
 
 
 class ManageCommandTests(unittest.TestCase):
@@ -143,8 +140,7 @@ class ManageCommandTests(unittest.TestCase):
     def test_custom_test_runner(self):
         call_command('test', 'sites',
                      testrunner='test_runner.tests.MockTestRunner')
-        self.assertTrue(MockTestRunner.invoked,
-                        "The custom test runner has not been invoked")
+        MockTestRunner.run_tests.assert_called_with(('sites',))
 
     def test_bad_test_runner(self):
         with self.assertRaises(AttributeError):
