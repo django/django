@@ -1493,7 +1493,6 @@ class AntiPetRouter(object):
     # passing pets to the 'other' database
 
     def allow_migrate(self, db, model):
-        "Make sure the auth app only appears on the 'other' db"
         if db == 'other':
             return model._meta.object_name == 'Pet'
         else:
