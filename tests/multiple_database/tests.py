@@ -1806,7 +1806,6 @@ class RouterUsed(Exception):
 
 class RouteForWriteTestCase(TestCase):
     multi_db = True
-    RAISE_MSG = 'Db for write called'
 
     class WriteCheckRouter(object):
         def db_for_write(self, model, **hints):
@@ -1921,7 +1920,6 @@ class RouteForWriteTestCase(TestCase):
         book = Book.objects.create(title="Pro Django",
                                    published=datetime.date(2008, 12, 16))
         book.authors.add(auth)
-        self.assertRaisesMessage(AttributeError, self.RAISE_MSG, )
         try:
             with self.override_router():
                 book.authors.remove(auth)
