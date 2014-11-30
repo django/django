@@ -375,7 +375,7 @@ def display_for_field(value, field):
     elif isinstance(field, (models.DateField, models.TimeField)):
         return formats.localize(value)
     elif isinstance(field, models.DecimalField):
-        return formats.number_format(value, field.decimal_places)
+        return formats.number_format(format(value, 'f'), field.decimal_places)
     elif isinstance(field, models.FloatField):
         return formats.number_format(value)
     else:
