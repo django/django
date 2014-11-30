@@ -184,6 +184,17 @@ of the ``annotate()`` clause is a ``QuerySet``; this ``QuerySet`` can be
 modified using any other ``QuerySet`` operation, including ``filter()``,
 ``order_by()``, or even additional calls to ``annotate()``.
 
+.. admonition:: If in doubt, inspect the SQL query!
+
+    In order to understand what happens in your query, consider inspecting the
+    ``query`` property of your ``QuerySet``.
+
+    For instance, combining multiple aggregations with ``annotate()`` will
+    yield the wrong results, as `multiple tables are the cross joined`_,
+    resulting in duplicate row aggregations.
+
+.. _multiple tables are the cross joined: https://code.djangoproject.com/ticket/10060
+
 Joins and aggregates
 ====================
 
