@@ -3,6 +3,7 @@ Creates the default Site object.
 """
 
 from django.apps import apps
+from django.conf import settings
 from django.core.management.color import no_style
 from django.db import DEFAULT_DB_ALIAS, connections, router
 
@@ -24,7 +25,7 @@ def create_default_site(app_config, verbosity=2, interactive=True, db=DEFAULT_DB
         # can also crop up outside of tests - see #15346.
         if verbosity >= 2:
             print("Creating example.com Site object")
-        Site(pk=1, domain="example.com", name="example.com").save(using=db)
+        Site(pk=settings.SITE_ID, domain="example.com", name="example.com").save(using=db)
 
         # We set an explicit pk instead of relying on auto-incrementation,
         # so we need to reset the database sequence. See #17415.
