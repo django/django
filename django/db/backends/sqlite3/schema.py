@@ -43,7 +43,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
-    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], override_uniques=None):
+    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], override_uniques=None,
+                      override_indexes=None):
         """
         Shortcut to transform a model from old_model into new_model
         """
@@ -110,11 +111,20 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 for unique in model._meta.unique_together
             ]
 
+        # Work out the new value for index_together, taking renames into
+        # account
+        if override_indexes is None:
+            override_indexes = [
+                [rename_mapping.get(n, n) for n in index]
+                for index in model._meta.index_together
+            ]
+
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
             'db_table': model._meta.db_table + "__new",
             'unique_together': override_uniques,
+            'index_together': override_indexes,
             'apps': apps,
         }
         meta = type("Meta", tuple(), meta_contents)
@@ -189,6 +199,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """Actually perform a "physical" (non-ManyToMany) field update."""
         # Alter by remaking table
         self._remake_table(model, alter_fields=[(old_field, new_field)])
+
+    def alter_index_together(self, model, old_index_together, new_index_together):
+        """
+        Deals with a model changing its index_together.
+        Note: The input index_togethers must be doubly-nested, not the single-
+        nested ["foo", "bar"] format.
+        """
+        self._remake_table(model, override_indexes=new_index_together)
 
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
         """

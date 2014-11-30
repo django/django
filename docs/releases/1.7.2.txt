@@ -89,3 +89,5 @@ Bugfixes
 
 * Fixed an infinite loop bug for certain cyclic migration dependencies, and made
   the error message for cyclic dependencies much more helpful.
+
+* Added missing ``index_together`` handling for SQLite (:ticket:`23880`).
