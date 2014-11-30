@@ -168,6 +168,10 @@ Minor features
   <django.http.HttpRequest.get_host>` if the :setting:`SITE_ID` setting is not
   defined.
 
+* The default :class:`~django.contrib.sites.models.Site` created when running
+  ``migrate`` now respects the :setting:`SITE_ID` setting (instead of always
+  using ``pk=1``).
+
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
