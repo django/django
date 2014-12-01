@@ -277,9 +277,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return converters
 
     def convert_decimalfield_value(self, value, field):
-        if value is not None:
-            value = backend_utils.typecast_decimal(field.format_number(value))
-        return value
+        return backend_utils.typecast_decimal(field.format_number(value))
 
     def convert_datefield_value(self, value, field):
         if value is not None and not isinstance(value, datetime.date):
