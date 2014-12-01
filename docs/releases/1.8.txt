@@ -1492,6 +1492,12 @@ absolute path. This is of limited use in most deployment situations, and
 the :ttag:`include` tag often makes more sense. This tag is now deprecated and
 will be removed in Django 2.0.
 
+``=`` as comparison operator in ``if`` template tag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Using a single equals sign with the ``{% if %}`` template tag for equality
+testing was undocumented and untested. It's now deprecated in favor of ``==``.
+
 .. removed-features-1.8:
 
 Features removed in 1.8
