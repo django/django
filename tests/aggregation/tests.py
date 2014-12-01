@@ -17,7 +17,7 @@ with warnings.catch_warnings(record=True) as w:
 from django.test import TestCase
 from django.test.utils import Approximate
 from django.test.utils import CaptureQueriesContext
-from django.utils import six
+from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import Author, Publisher, Book, Store
@@ -689,6 +689,19 @@ class BaseAggregateTestCase(TestCase):
                 self.assertNotIn('order by', qstr)
             self.assertEqual(qstr.count(' join '), 0)
 
+    def test_decimal_max_digits_has_no_effect(self):
+        Book.objects.all().delete()
+        a1 = Author.objects.first()
+        p1 = Publisher.objects.first()
+        thedate = timezone.now()
+        for i in range(10):
+            Book.objects.create(
+                isbn="abcde{}".format(i), name="none", pages=10, rating=4.0,
+                price=9999.98, contact=a1, publisher=p1, pubdate=thedate)
+
+        book = Book.objects.aggregate(price_sum=Sum('price'))
+        self.assertEqual(book['price_sum'], Decimal("99999.80"))
+
 
 class ComplexAggregateTestCase(TestCase):
     fixtures = ["aggregation.json"]
@@ -755,8 +768,8 @@ class ComplexAggregateTestCase(TestCase):
         self.assertEqual(b2.sums, 383.69)
 
         b3 = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
-                                   output_field=DecimalField(max_digits=6, decimal_places=2))).get(pk=4)
-        self.assertEqual(b3.sums, Decimal("383.69"))
+                                   output_field=DecimalField())).get(pk=4)
+        self.assertEqual(b3.sums, Approximate(Decimal("383.69"), places=2))
 
     def test_complex_aggregations_require_kwarg(self):
         with six.assertRaisesRegex(self, TypeError, 'Complex expressions require an alias'):

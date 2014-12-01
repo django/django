@@ -312,9 +312,7 @@ WHEN (new.%(col_name)s IS NULL)
         return value
 
     def convert_decimalfield_value(self, value, field):
-        if value is not None:
-            value = backend_utils.typecast_decimal(field.format_number(value))
-        return value
+        return backend_utils.typecast_decimal(field.format_number(value))
 
     # cx_Oracle always returns datetime.datetime objects for
     # DATE and TIMESTAMP columns, but Django wants to see a
