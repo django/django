@@ -268,8 +268,9 @@ WHEN (new.%(col_name)s IS NULL)
             sql = field_name    # Cast to DATE removes sub-second precision.
         return sql, []
 
-    def get_db_converters(self, internal_type):
-        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+    def get_db_converters(self, expression):
+        converters = super(DatabaseOperations, self).get_db_converters(expression)
+        internal_type = expression.output_field.get_internal_type()
         if internal_type == 'TextField':
             converters.append(self.convert_textfield_value)
         elif internal_type == 'BinaryField':
@@ -285,28 +286,29 @@ WHEN (new.%(col_name)s IS NULL)
         converters.append(self.convert_empty_values)
         return converters
 
-    def convert_empty_values(self, value, field):
+    def convert_empty_values(self, value, expression, context):
         # Oracle stores empty strings as null. We need to undo this in
         # order to adhere to the Django convention of using the empty
         # string instead of null, but only if the field accepts the
         # empty string.
+        field = expression.output_field
         if value is None and field.empty_strings_allowed:
             value = ''
             if field.get_internal_type() == 'BinaryField':
                 value = b''
         return value
 
-    def convert_textfield_value(self, value, field):
+    def convert_textfield_value(self, value, expression, context):
         if isinstance(value, Database.LOB):
             value = force_text(value.read())
         return value
 
-    def convert_binaryfield_value(self, value, field):
+    def convert_binaryfield_value(self, value, expression, context):
         if isinstance(value, Database.LOB):
             value = force_bytes(value.read())
         return value
 
-    def convert_booleanfield_value(self, value, field):
+    def convert_booleanfield_value(self, value, expression, context):
         if value in (1, 0):
             value = bool(value)
         return value
@@ -314,16 +316,16 @@ WHEN (new.%(col_name)s IS NULL)
     # cx_Oracle always returns datetime.datetime objects for
     # DATE and TIMESTAMP columns, but Django wants to see a
     # python datetime.date, .time, or .datetime.
-    def convert_datefield_value(self, value, field):
+    def convert_datefield_value(self, value, expression, context):
         if isinstance(value, Database.Timestamp):
             return value.date()
 
-    def convert_timefield_value(self, value, field):
+    def convert_timefield_value(self, value, expression, context):
         if isinstance(value, Database.Timestamp):
             value = value.time()
         return value
 
-    def convert_uuidfield_value(self, value, field):
+    def convert_uuidfield_value(self, value, expression, context):
         if value is not None:
             value = uuid.UUID(value)
         return value

@@ -333,6 +333,28 @@ class Field(RegisterLookupMixin):
             ]
         return []
 
+    def get_col(self, alias, source=None):
+        if source is None:
+            source = self
+        if alias != self.model._meta.db_table or source != self:
+            from django.db.models.expressions import Col
+            return Col(alias, self, source)
+        else:
+            return self.cached_col
+
+    @cached_property
+    def cached_col(self):
+        from django.db.models.expressions import Col
+        return Col(self.model._meta.db_table, self)
+
+    def select_format(self, compiler, sql, params):
+        """
+        Custom format for select clauses. For example, GIS columns need to be
+        selected as AsText(table.col) on MySQL as the table.col data can't be used
+        by Django.
+        """
+        return sql, params
+
     def deconstruct(self):
         """
         Returns enough information to recreate the field as a 4-tuple:

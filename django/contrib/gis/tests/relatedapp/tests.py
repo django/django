@@ -231,15 +231,6 @@ class RelatedGeoModelTest(TestCase):
         self.assertIn('Aurora', names)
         self.assertIn('Kecksburg', names)
 
-    def test11_geoquery_pickle(self):
-        "Ensuring GeoQuery objects are unpickled correctly.  See #10839."
-        import pickle
-        from django.contrib.gis.db.models.sql import GeoQuery
-        qs = City.objects.all()
-        q_str = pickle.dumps(qs.query)
-        q = pickle.loads(q_str)
-        self.assertEqual(GeoQuery, q.__class__)
-
     # TODO: fix on Oracle -- get the following error because the SQL is ordered
     # by a geometry object, which Oracle apparently doesn't like:
     #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type

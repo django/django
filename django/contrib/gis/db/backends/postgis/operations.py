@@ -44,7 +44,6 @@ class PostGISDistanceOperator(PostGISOperator):
 
 
 class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
-    compiler_module = 'django.contrib.gis.db.models.sql.compiler'
     name = 'postgis'
     postgis = True
     geography = True
@@ -188,7 +187,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         agg_name = aggregate.__class__.__name__
         return agg_name in self.valid_aggregates
 
-    def convert_extent(self, box):
+    def convert_extent(self, box, srid):
         """
         Returns a 4-tuple extent for the `Extent` aggregate by converting
         the bounding box text returned by PostGIS (`box` argument), for
@@ -199,7 +198,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         xmax, ymax = map(float, ur.split())
         return (xmin, ymin, xmax, ymax)
 
-    def convert_extent3d(self, box3d):
+    def convert_extent3d(self, box3d, srid):
         """
         Returns a 6-tuple extent for the `Extent3D` aggregate by converting
         the 3d bounding-box text returned by PostGIS (`box3d` argument), for
