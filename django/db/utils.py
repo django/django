@@ -216,7 +216,7 @@ class ConnectionHandler(object):
             else:
                 test_settings.update(old_test_settings)
                 for key, _ in six.iteritems(old_test_settings):
-                    warnings.warn("In Django 1.9 the %s connection setting will be moved "
+                    warnings.warn("In Django 1.9 the TEST_%s connection setting will be moved "
                                   "to a %s entry in the TEST setting" %
                                   (self.TEST_SETTING_RENAMES_REVERSE.get(key, key), key),
                                   RemovedInDjango19Warning, stacklevel=2)
