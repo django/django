@@ -2,8 +2,8 @@
  This module contains functions that generate ctypes prototypes for the
  GDAL routines.
 """
-
 from ctypes import c_char_p, c_double, c_int, c_void_p
+from functools import partial
 from django.contrib.gis.gdal.prototypes.errcheck import (
     check_arg_errcode, check_errcode, check_geom, check_geom_offset,
     check_pointer, check_srs, check_str_arg, check_string, check_const_string)
@@ -13,12 +13,12 @@ class gdal_char_p(c_char_p):
     pass
 
 
-def double_output(func, argtypes, errcheck=False, strarg=False):
+def double_output(func, argtypes, errcheck=False, strarg=False, cpl=False):
     "Generates a ctypes function that returns a double value."
     func.argtypes = argtypes
     func.restype = c_double
     if errcheck:
-        func.errcheck = check_arg_errcode
+        func.errcheck = partial(check_arg_errcode, cpl=cpl)
     if strarg:
         func.errcheck = check_str_arg
     return func
@@ -66,7 +66,7 @@ def srs_output(func, argtypes):
     return func
 
 
-def const_string_output(func, argtypes, offset=None, decoding=None):
+def const_string_output(func, argtypes, offset=None, decoding=None, cpl=False):
     func.argtypes = argtypes
     if offset:
         func.restype = c_int
@@ -74,7 +74,7 @@ def const_string_output(func, argtypes, offset=None, decoding=None):
         func.restype = c_char_p
 
     def _check_const(result, func, cargs):
-        res = check_const_string(result, func, cargs, offset=offset)
+        res = check_const_string(result, func, cargs, offset=offset, cpl=cpl)
         if res and decoding:
             res = res.decode(decoding)
         return res
@@ -112,7 +112,7 @@ def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     return func
 
 
-def void_output(func, argtypes, errcheck=True):
+def void_output(func, argtypes, errcheck=True, cpl=False):
     """
     For functions that don't only return an error code that needs to
     be examined.
@@ -123,7 +123,7 @@ def void_output(func, argtypes, errcheck=True):
         # `errcheck` keyword may be set to False for routines that
         # return void, rather than a status code.
         func.restype = c_int
-        func.errcheck = check_errcode
+        func.errcheck = partial(check_errcode, cpl=cpl)
     else:
         func.restype = None
 
