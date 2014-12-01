@@ -5207,3 +5207,53 @@ class TestEtagWithAdminView(TestCase):
             response = self.client.get('/test_admin/admin/')
             self.assertEqual(response.status_code, 302)
             self.assertTrue(response.has_header('ETag'))
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF="admin_views.urls")
+class GetFormsetsWithInlinesArgumentTest(TestCase):
+    """
+    When adding a new model instance in the admin, the 'obj' argument passed
+    to get_formsets_with_inlines should be None. When changing, it should
+    be equal to the already existing model instance.
+    The GetFormsetsArgumentCheckingAdmin ModelAdmin subclass throws an exception
+    if obj is not None during add_view or obj is None during change_view.
+    See ticket #23934.
+    """
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_explicitly_provided_pk(self):
+        post_data = {"name": "1"}
+        try:
+            response = self.client.post('/test_admin/admin/admin_views/explicitlyprovidedpk/add/', post_data)
+        except Exception as e:
+            self.fail(e)
+        self.assertEqual(response.status_code, 302)
+
+        post_data = {"name": "2"}
+        try:
+            response = self.client.post('/test_admin/admin/admin_views/explicitlyprovidedpk/1/', post_data)
+        except Exception as e:
+            self.fail(e)
+        self.assertEqual(response.status_code, 302)
+
+    def test_implicitly_generated_pk(self):
+        post_data = {"name": "1"}
+        try:
+            response = self.client.post('/test_admin/admin/admin_views/implicitlygeneratedpk/add/', post_data)
+        except Exception as e:
+            self.fail(e)
+        self.assertEqual(response.status_code, 302)
+
+        post_data = {"name": "2"}
+        try:
+            response = self.client.post('/test_admin/admin/admin_views/implicitlygeneratedpk/1/', post_data)
+        except Exception as e:
+            self.fail(e)
+        self.assertEqual(response.status_code, 302)
