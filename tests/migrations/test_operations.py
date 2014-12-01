@@ -1289,6 +1289,12 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(new_state.models["test_runsql", "somethingelse"].fields), 1)
         # Make sure there's no table
         self.assertTableNotExists("i_love_ponies")
+        # Test SQL collection
+        with connection.schema_editor(collect_sql=True) as editor:
+            operation.database_forwards("test_runsql", editor, project_state, new_state)
+            self.assertIn("LIKE '%%ponies';", "\n".join(editor.collected_sql))
+            operation.database_backwards("test_runsql", editor, project_state, new_state)
+            self.assertIn("LIKE '%%Ponies%%';", "\n".join(editor.collected_sql))
         # Test the database alteration
         with connection.schema_editor() as editor:
             operation.database_forwards("test_runsql", editor, project_state, new_state)

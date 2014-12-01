@@ -91,3 +91,6 @@ Bugfixes
   the error message for cyclic dependencies much more helpful.
 
 * Added missing ``index_together`` handling for SQLite (:ticket:`23880`).
+
+* Fixed a crash when ``RunSQL`` SQL content was collected by the schema editor,
+  typically when using ``sqlmigrate`` (:ticket:`23909`).
