@@ -127,7 +127,7 @@ class ExpressionNode(CombinableMixin):
     is_summary = False
 
     def get_db_converters(self, connection):
-        return [self.convert_value]
+        return [self.convert_value] + self.output_field.get_db_converters(connection)
 
     def __init__(self, output_field=None):
         self._output_field = output_field
@@ -240,7 +240,7 @@ class ExpressionNode(CombinableMixin):
                         raise FieldError(
                             "Expression contains mixed types. You must set output_field")
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         """
         Expressions provide their own converters because users have the option
         of manually specifying the output_field which may be a different type
@@ -305,6 +305,8 @@ class ExpressionNode(CombinableMixin):
         return self
 
     def get_group_by_cols(self):
+        if not self.contains_aggregate:
+            return [self]
         cols = []
         for source in self.get_source_expressions():
             cols.extend(source.get_group_by_cols())
@@ -490,6 +492,9 @@ class Value(ExpressionNode):
             return 'NULL', []
         return '%s', [self.value]
 
+    def get_group_by_cols(self):
+        return []
+
 
 class DurationValue(Value):
     def as_sql(self, compiler, connection):
@@ -497,6 +502,37 @@ class DurationValue(Value):
                 connection.features.driver_supports_timedelta_args):
             return super(DurationValue, self).as_sql(compiler, connection)
         return connection.ops.date_interval_sql(self.value)
+
+
+class RawSQL(ExpressionNode):
+    def __init__(self, sql, params, output_field=None):
+        if output_field is None:
+            output_field = fields.Field()
+        self.sql, self.params = sql, params
+        super(RawSQL, self).__init__(output_field=output_field)
+
+    def as_sql(self, compiler, connection):
+        return '(%s)' % self.sql, self.params
+
+    def get_group_by_cols(self):
+        return [self]
+
+
+class Random(ExpressionNode):
+    def __init__(self):
+        super(Random, self).__init__(output_field=fields.FloatField())
+
+    def as_sql(self, compiler, connection):
+        return connection.ops.random_function_sql(), []
+
+
+class ColIndexRef(ExpressionNode):
+    def __init__(self, idx):
+        self.idx = idx
+        super(ColIndexRef, self).__init__()
+
+    def as_sql(self, compiler, connection):
+        return str(self.idx), []
 
 
 class Col(ExpressionNode):
@@ -515,6 +551,9 @@ class Col(ExpressionNode):
 
     def get_group_by_cols(self):
         return [self]
+
+    def get_db_converters(self, connection):
+        return self.output_field.get_db_converters(connection)
 
 
 class Ref(ExpressionNode):
@@ -537,7 +576,7 @@ class Ref(ExpressionNode):
         return self
 
     def as_sql(self, compiler, connection):
-        return "%s" % compiler.quote_name_unless_alias(self.refs), []
+        return "%s" % connection.ops.quote_name(self.refs), []
 
     def get_group_by_cols(self):
         return [self]
@@ -581,7 +620,7 @@ class Date(ExpressionNode):
         copy.lookup_type = self.lookup_type
         return copy
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         if isinstance(value, datetime.datetime):
             value = value.date()
         return value
@@ -629,7 +668,7 @@ class DateTime(ExpressionNode):
         copy.tzname = self.tzname
         return copy
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         if settings.USE_TZ:
             if value is None:
                 raise ValueError(

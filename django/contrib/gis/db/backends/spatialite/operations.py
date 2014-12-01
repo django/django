@@ -14,7 +14,6 @@ from django.utils.functional import cached_property
 
 
 class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
-    compiler_module = 'django.contrib.gis.db.models.sql.compiler'
     name = 'spatialite'
     spatialite = True
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
@@ -131,11 +130,11 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         agg_name = aggregate.__class__.__name__
         return agg_name in self.valid_aggregates
 
-    def convert_extent(self, box):
+    def convert_extent(self, box, srid):
         """
         Convert the polygon data received from Spatialite to min/max values.
         """
-        shell = Geometry(box).shell
+        shell = Geometry(box, srid).shell
         xmin, ymin = shell[0][:2]
         xmax, ymax = shell[2][:2]
         return (xmin, ymin, xmax, ymax)
@@ -256,7 +255,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         agg_name = agg_name.lower()
         if agg_name == 'union':
             agg_name += 'agg'
-        sql_template = self.select % '%(function)s(%(expressions)s)'
+        sql_template = '%(function)s(%(expressions)s)'
         sql_function = getattr(self, agg_name)
         return sql_template, sql_function
 
@@ -268,3 +267,16 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     def spatial_ref_sys(self):
         from django.contrib.gis.db.backends.spatialite.models import SpatialiteSpatialRefSys
         return SpatialiteSpatialRefSys
+
+    def get_db_converters(self, expression):
+        converters = super(SpatiaLiteOperations, self).get_db_converters(expression)
+        if hasattr(expression.output_field, 'geom_type'):
+            converters.append(self.convert_geometry)
+        return converters
+
+    def convert_geometry(self, value, expression, context):
+        if value:
+            value = Geometry(value)
+            if 'transformed_srid' in context:
+                value.srid = context['transformed_srid']
+        return value

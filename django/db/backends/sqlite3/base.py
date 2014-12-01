@@ -269,8 +269,9 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         return six.text_type(value)
 
-    def get_db_converters(self, internal_type):
-        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+    def get_db_converters(self, expression):
+        converters = super(DatabaseOperations, self).get_db_converters(expression)
+        internal_type = expression.output_field.get_internal_type()
         if internal_type == 'DateTimeField':
             converters.append(self.convert_datetimefield_value)
         elif internal_type == 'DateField':
@@ -283,25 +284,25 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_uuidfield_value)
         return converters
 
-    def convert_decimalfield_value(self, value, field):
-        return backend_utils.typecast_decimal(field.format_number(value))
+    def convert_decimalfield_value(self, value, expression, context):
+        return backend_utils.typecast_decimal(expression.output_field.format_number(value))
 
-    def convert_datefield_value(self, value, field):
+    def convert_datefield_value(self, value, expression, context):
         if value is not None and not isinstance(value, datetime.date):
             value = parse_date(value)
         return value
 
-    def convert_datetimefield_value(self, value, field):
+    def convert_datetimefield_value(self, value, expression, context):
         if value is not None and not isinstance(value, datetime.datetime):
             value = parse_datetime_with_timezone_support(value)
         return value
 
-    def convert_timefield_value(self, value, field):
+    def convert_timefield_value(self, value, expression, context):
         if value is not None and not isinstance(value, datetime.time):
             value = parse_time(value)
         return value
 
-    def convert_uuidfield_value(self, value, field):
+    def convert_uuidfield_value(self, value, expression, context):
         if value is not None:
             value = uuid.UUID(value)
         return value
