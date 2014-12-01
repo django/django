@@ -87,7 +87,7 @@ class Avg(Aggregate):
     def __init__(self, expression, **extra):
         super(Avg, self).__init__(expression, output_field=FloatField(), **extra)
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         if value is None:
             return value
         return float(value)
@@ -105,7 +105,7 @@ class Count(Aggregate):
         super(Count, self).__init__(
             expression, distinct='DISTINCT ' if distinct else '', output_field=IntegerField(), **extra)
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         if value is None:
             return 0
         return int(value)
@@ -128,7 +128,7 @@ class StdDev(Aggregate):
         self.function = 'STDDEV_SAMP' if sample else 'STDDEV_POP'
         super(StdDev, self).__init__(expression, output_field=FloatField(), **extra)
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         if value is None:
             return value
         return float(value)
@@ -146,7 +146,7 @@ class Variance(Aggregate):
         self.function = 'VAR_SAMP' if sample else 'VAR_POP'
         super(Variance, self).__init__(expression, output_field=FloatField(), **extra)
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         if value is None:
             return value
         return float(value)

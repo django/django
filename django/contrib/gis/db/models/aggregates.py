@@ -28,7 +28,7 @@ class GeoAggregate(Aggregate):
             raise ValueError('Geospatial aggregates only allowed on geometry fields.')
         return c
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         return connection.ops.convert_geom(value, self.output_field)
 
 
@@ -43,8 +43,8 @@ class Extent(GeoAggregate):
     def __init__(self, expression, **extra):
         super(Extent, self).__init__(expression, output_field=ExtentField(), **extra)
 
-    def convert_value(self, value, connection):
-        return connection.ops.convert_extent(value)
+    def convert_value(self, value, connection, context):
+        return connection.ops.convert_extent(value, context.get('transformed_srid'))
 
 
 class Extent3D(GeoAggregate):
@@ -54,8 +54,8 @@ class Extent3D(GeoAggregate):
     def __init__(self, expression, **extra):
         super(Extent3D, self).__init__(expression, output_field=ExtentField(), **extra)
 
-    def convert_value(self, value, connection):
-        return connection.ops.convert_extent3d(value)
+    def convert_value(self, value, connection, context):
+        return connection.ops.convert_extent3d(value, context.get('transformed_srid'))
 
 
 class MakeLine(GeoAggregate):

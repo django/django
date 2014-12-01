@@ -83,6 +83,7 @@ class ReverseSelectRelatedTestCase(TestCase):
             stat = UserStat.objects.select_related('user', 'advanceduserstat').get(posts=200)
             self.assertEqual(stat.advanceduserstat.posts, 200)
             self.assertEqual(stat.user.username, 'bob')
+        with self.assertNumQueries(1):
             self.assertEqual(stat.advanceduserstat.user.username, 'bob')
 
     def test_nullable_relation(self):

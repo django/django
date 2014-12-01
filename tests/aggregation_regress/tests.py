@@ -490,9 +490,10 @@ class AggregationTests(TestCase):
 
         # Regression for #15709 - Ensure each group_by field only exists once
         # per query
-        qs = Book.objects.values('publisher').annotate(max_pages=Max('pages')).order_by()
-        grouping, gb_params = qs.query.get_compiler(qs.db).get_grouping([], [])
-        self.assertEqual(len(grouping), 1)
+        qstr = str(Book.objects.values('publisher').annotate(max_pages=Max('pages')).order_by().query)
+        # Check that there is just one GROUP BY clause (zero commas means at
+        # most one clause)
+        self.assertEqual(qstr[qstr.index('GROUP BY'):].count(', '), 0)
 
     def test_duplicate_alias(self):
         # Regression for #11256 - duplicating a default alias raises ValueError.
@@ -924,14 +925,11 @@ class AggregationTests(TestCase):
 
         # There should only be one GROUP BY clause, for the `id` column.
         # `name` and `age` should not be grouped on.
-        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([], [])
-        self.assertEqual(len(grouping), 1)
-        assert 'id' in grouping[0]
-        assert 'name' not in grouping[0]
-        assert 'age' not in grouping[0]
-
-        # The query group_by property should also only show the `id`.
-        self.assertEqual(results.query.group_by, [('aggregation_regress_author', 'id')])
+        _, _, group_by = results.query.get_compiler(using='default').pre_sql_setup()
+        self.assertEqual(len(group_by), 1)
+        self.assertIn('id', group_by[0][0])
+        self.assertNotIn('name', group_by[0][0])
+        self.assertNotIn('age', group_by[0][0])
 
         # Ensure that we get correct results.
         self.assertEqual(
@@ -953,14 +951,11 @@ class AggregationTests(TestCase):
     def test_aggregate_duplicate_columns_only(self):
         # Works with only() too.
         results = Author.objects.only('id', 'name').annotate(num_contacts=Count('book_contact_set'))
-        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([], [])
+        _, _, grouping = results.query.get_compiler(using='default').pre_sql_setup()
         self.assertEqual(len(grouping), 1)
-        assert 'id' in grouping[0]
-        assert 'name' not in grouping[0]
-        assert 'age' not in grouping[0]
-
-        # The query group_by property should also only show the `id`.
-        self.assertEqual(results.query.group_by, [('aggregation_regress_author', 'id')])
+        self.assertIn('id', grouping[0][0])
+        self.assertNotIn('name', grouping[0][0])
+        self.assertNotIn('age', grouping[0][0])
 
         # Ensure that we get correct results.
         self.assertEqual(
@@ -983,14 +978,11 @@ class AggregationTests(TestCase):
         # And select_related()
         results = Book.objects.select_related('contact').annotate(
             num_authors=Count('authors'))
-        grouping, gb_params = results.query.get_compiler(using='default').get_grouping([], [])
+        _, _, grouping = results.query.get_compiler(using='default').pre_sql_setup()
         self.assertEqual(len(grouping), 1)
-        assert 'id' in grouping[0]
-        assert 'name' not in grouping[0]
-        assert 'contact' not in grouping[0]
-
-        # The query group_by property should also only show the `id`.
-        self.assertEqual(results.query.group_by, [('aggregation_regress_book', 'id')])
+        self.assertIn('id', grouping[0][0])
+        self.assertNotIn('name', grouping[0][0])
+        self.assertNotIn('contact', grouping[0][0])
 
         # Ensure that we get correct results.
         self.assertEqual(

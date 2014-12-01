@@ -3563,8 +3563,10 @@ class Ticket20955Tests(TestCase):
         # version's queries.
         task_get.creator.staffuser.staff
         task_get.owner.staffuser.staff
-        task_select_related = Task.objects.select_related(
-            'creator__staffuser__staff', 'owner__staffuser__staff').get(pk=task.pk)
+        qs = Task.objects.select_related(
+            'creator__staffuser__staff', 'owner__staffuser__staff')
+        self.assertEqual(str(qs.query).count(' JOIN '), 6)
+        task_select_related = qs.get(pk=task.pk)
         with self.assertNumQueries(0):
             self.assertEqual(task_select_related.creator.staffuser.staff,
                              task_get.creator.staffuser.staff)

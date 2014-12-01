@@ -112,7 +112,7 @@ class TeamField(models.CharField):
             return value
         return Team(value)
 
-    def from_db_value(self, value, connection):
+    def from_db_value(self, value, connection, context):
         return Team(value)
 
     def value_to_string(self, obj):

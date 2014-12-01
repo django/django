@@ -15,7 +15,6 @@ from django.db.models.fields import (AutoField, Field, IntegerField,
 from django.db.models.lookups import IsNull
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo
-from django.db.models.expressions import Col
 from django.utils.encoding import force_text, smart_text
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -1738,26 +1737,26 @@ class ForeignObject(RelatedField):
                                                    [source.name for source in sources], raw_value),
                                 AND)
         elif lookup_type == 'isnull':
-            root_constraint.add(IsNull(Col(alias, targets[0], sources[0]), raw_value), AND)
+            root_constraint.add(IsNull(targets[0].get_col(alias, sources[0]), raw_value), AND)
         elif (lookup_type == 'exact' or (lookup_type in ['gt', 'lt', 'gte', 'lte']
                                          and not is_multicolumn)):
             value = get_normalized_value(raw_value)
             for target, source, val in zip(targets, sources, value):
                 lookup_class = target.get_lookup(lookup_type)
                 root_constraint.add(
-                    lookup_class(Col(alias, target, source), val), AND)
+                    lookup_class(target.get_col(alias, source), val), AND)
         elif lookup_type in ['range', 'in'] and not is_multicolumn:
             values = [get_normalized_value(value) for value in raw_value]
             value = [val[0] for val in values]
             lookup_class = targets[0].get_lookup(lookup_type)
-            root_constraint.add(lookup_class(Col(alias, targets[0], sources[0]), value), AND)
+            root_constraint.add(lookup_class(targets[0].get_col(alias, sources[0]), value), AND)
         elif lookup_type == 'in':
             values = [get_normalized_value(value) for value in raw_value]
             for value in values:
                 value_constraint = constraint_class()
                 for source, target, val in zip(sources, targets, value):
                     lookup_class = target.get_lookup('exact')
-                    lookup = lookup_class(Col(alias, target, source), val)
+                    lookup = lookup_class(target.get_col(alias, source), val)
                     value_constraint.add(lookup, AND)
                 root_constraint.add(value_constraint, OR)
         else:

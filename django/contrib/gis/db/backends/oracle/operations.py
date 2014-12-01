@@ -52,7 +52,6 @@ class SDORelate(SpatialOperator):
 
 
 class OracleOperations(DatabaseOperations, BaseSpatialOperations):
-    compiler_module = "django.contrib.gis.db.backends.oracle.compiler"
 
     name = 'oracle'
     oracle = True
@@ -111,8 +110,9 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     def geo_quote_name(self, name):
         return super(OracleOperations, self).geo_quote_name(name).upper()
 
-    def get_db_converters(self, internal_type):
-        converters = super(OracleOperations, self).get_db_converters(internal_type)
+    def get_db_converters(self, expression):
+        converters = super(OracleOperations, self).get_db_converters(expression)
+        internal_type = expression.output_field.get_internal_type()
         geometry_fields = (
             'PointField', 'GeometryField', 'LineStringField',
             'PolygonField', 'MultiPointField', 'MultiLineStringField',
@@ -121,14 +121,23 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         )
         if internal_type in geometry_fields:
             converters.append(self.convert_textfield_value)
+        if hasattr(expression.output_field, 'geom_type'):
+            converters.append(self.convert_geometry)
         return converters
 
-    def convert_extent(self, clob):
+    def convert_geometry(self, value, expression, context):
+        if value:
+            value = Geometry(value)
+            if 'transformed_srid' in context:
+                value.srid = context['transformed_srid']
+        return value
+
+    def convert_extent(self, clob, srid):
         if clob:
             # Generally, Oracle returns a polygon for the extent -- however,
             # it can return a single point if there's only one Point in the
             # table.
-            ext_geom = Geometry(clob.read())
+            ext_geom = Geometry(clob.read(), srid)
             gtype = str(ext_geom.geom_type)
             if gtype == 'Polygon':
                 # Construct the 4-tuple from the coordinates in the polygon.
@@ -226,7 +235,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             sql_template = '%(function)s(SDOAGGRTYPE(%(expressions)s,%(tolerance)s))'
         sql_function = getattr(self, agg_name)
-        return self.select % sql_template, sql_function
+        return sql_template, sql_function
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):

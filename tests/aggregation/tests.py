@@ -679,7 +679,7 @@ class BaseAggregateTestCase(TestCase):
                 # the only "ORDER BY" clause present in the query.
                 self.assertEqual(
                     re.findall(r'order by (\w+)', qstr),
-                    [', '.join(forced_ordering).lower()]
+                    [', '.join(f[1][0] for f in forced_ordering).lower()]
                 )
             else:
                 self.assertNotIn('order by', qstr)

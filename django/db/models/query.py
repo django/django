@@ -13,8 +13,7 @@ from django.db import (connections, router, transaction, IntegrityError,
     DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import AutoField, Empty
-from django.db.models.query_utils import (Q, select_related_descend,
-    deferred_class_factory, InvalidQuery)
+from django.db.models.query_utils import Q, deferred_class_factory, InvalidQuery
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import CURSOR
 from django.db.models import sql
@@ -233,76 +232,34 @@ class QuerySet(object):
         An iterator over the results from applying this QuerySet to the
         database.
         """
-        fill_cache = False
-        if connections[self.db].features.supports_select_related:
-            fill_cache = self.query.select_related
-        if isinstance(fill_cache, dict):
-            requested = fill_cache
-        else:
-            requested = None
-        max_depth = self.query.max_depth
-
-        extra_select = list(self.query.extra_select)
-        annotation_select = list(self.query.annotation_select)
-
-        only_load = self.query.get_loaded_field_names()
-        fields = self.model._meta.concrete_fields
-
-        load_fields = []
-        # If only/defer clauses have been specified,
-        # build the list of fields that are to be loaded.
-        if only_load:
-            for field in self.model._meta.concrete_fields:
-                model = field.model._meta.model
-                try:
-                    if field.name in only_load[model]:
-                        # Add a field that has been explicitly included
-                        load_fields.append(field.name)
-                except KeyError:
-                    # Model wasn't explicitly listed in the only_load table
-                    # Therefore, we need to load all fields from this model
-                    load_fields.append(field.name)
-
-        skip = None
-        if load_fields:
-            # Some fields have been deferred, so we have to initialize
-            # via keyword arguments.
-            skip = set()
-            init_list = []
-            for field in fields:
-                if field.name not in load_fields:
-                    skip.add(field.attname)
-                else:
-                    init_list.append(field.attname)
-            model_cls = deferred_class_factory(self.model, skip)
-        else:
-            model_cls = self.model
-            init_list = [f.attname for f in fields]
-
-        # Cache db and model outside the loop
         db = self.db
         compiler = self.query.get_compiler(using=db)
-        index_start = len(extra_select)
-        annotation_start = index_start + len(init_list)
-
-        if fill_cache:
-            klass_info = get_klass_info(model_cls, max_depth=max_depth,
-                                        requested=requested, only_load=only_load)
-        for row in compiler.results_iter():
-            if fill_cache:
-                obj, _ = get_cached_row(row, index_start, db, klass_info,
-                                        offset=len(annotation_select))
-            else:
-                obj = model_cls.from_db(db, init_list, row[index_start:annotation_start])
-
-            if extra_select:
-                for i, k in enumerate(extra_select):
-                    setattr(obj, k, row[i])
-
-            # Add the annotations to the model
-            if annotation_select:
-                for i, annotation in enumerate(annotation_select):
-                    setattr(obj, annotation, row[i + annotation_start])
+        # Execute the query. This will also fill compiler.select, klass_info,
+        # and annotations.
+        results = compiler.execute_sql()
+        select, klass_info, annotation_col_map = (compiler.select, compiler.klass_info,
+                                                  compiler.annotation_col_map)
+        if klass_info is None:
+            return
+        model_cls = klass_info['model']
+        select_fields = klass_info['select_fields']
+        model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
+        init_list = [f[0].output_field.attname
+                     for f in select[model_fields_start:model_fields_end]]
+        if len(init_list) != len(model_cls._meta.concrete_fields):
+            init_set = set(init_list)
+            skip = [f.attname for f in model_cls._meta.concrete_fields
+                    if f.attname not in init_set]
+            model_cls = deferred_class_factory(model_cls, skip)
+        related_populators = get_related_populators(klass_info, select, db)
+        for row in compiler.results_iter(results):
+            obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
+            if related_populators:
+                for rel_populator in related_populators:
+                    rel_populator.populate(row, obj)
+            if annotation_col_map:
+                for attr_name, col_pos in annotation_col_map.items():
+                    setattr(obj, attr_name, row[col_pos])
 
             # Add the known related objects to the model, if there are any
             if self._known_related_objects:
@@ -1032,11 +989,8 @@ class QuerySet(object):
         """
         Prepare the query for computing a result that contains aggregate annotations.
         """
-        opts = self.model._meta
         if self.query.group_by is None:
-            field_names = [f.attname for f in opts.concrete_fields]
-            self.query.add_fields(field_names, False)
-            self.query.set_group_by()
+            self.query.group_by = True
 
     def _prepare(self):
         return self
@@ -1135,9 +1089,11 @@ class ValuesQuerySet(QuerySet):
         Called by the _clone() method after initializing the rest of the
         instance.
         """
+        if self.query.group_by is True:
+            self.query.add_fields([f.attname for f in self.model._meta.concrete_fields], False)
+            self.query.set_group_by()
         self.query.clear_deferred_loading()
         self.query.clear_select_fields()
-
         if self._fields:
             self.extra_names = []
             self.annotation_names = []
@@ -1246,11 +1202,12 @@ class ValuesQuerySet(QuerySet):
 
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
+        compiler = self.query.get_compiler(self.db)
         if self.flat and len(self._fields) == 1:
-            for row in self.query.get_compiler(self.db).results_iter():
+            for row in compiler.results_iter():
                 yield row[0]
         elif not self.query.extra_select and not self.query.annotation_select:
-            for row in self.query.get_compiler(self.db).results_iter():
+            for row in compiler.results_iter():
                 yield tuple(row)
         else:
             # When extra(select=...) or an annotation is involved, the extra
@@ -1269,7 +1226,7 @@ class ValuesListQuerySet(ValuesQuerySet):
             else:
                 fields = names
 
-            for row in self.query.get_compiler(self.db).results_iter():
+            for row in compiler.results_iter():
                 data = dict(zip(names, row))
                 yield tuple(data[f] for f in fields)
 
@@ -1279,244 +1236,6 @@ class ValuesListQuerySet(ValuesQuerySet):
             # Only assign flat if the clone didn't already get it from kwargs
             clone.flat = self.flat
         return clone
-
-
-def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
-                   only_load=None, from_parent=None):
-    """
-    Helper function that recursively returns an information for a klass, to be
-    used in get_cached_row.  It exists just to compute this information only
-    once for entire queryset. Otherwise it would be computed for each row, which
-    leads to poor performance on large querysets.
-
-    Arguments:
-     * klass - the class to retrieve (and instantiate)
-     * max_depth - the maximum depth to which a select_related()
-       relationship should be explored.
-     * cur_depth - the current depth in the select_related() tree.
-       Used in recursive calls to determine if we should dig deeper.
-     * requested - A dictionary describing the select_related() tree
-       that is to be retrieved. keys are field names; values are
-       dictionaries describing the keys on that related object that
-       are themselves to be select_related().
-     * only_load - if the query has had only() or defer() applied,
-       this is the list of field names that will be returned. If None,
-       the full field list for `klass` can be assumed.
-     * from_parent - the parent model used to get to this model
-
-    Note that when travelling from parent to child, we will only load child
-    fields which aren't in the parent.
-    """
-    if max_depth and requested is None and cur_depth > max_depth:
-        # We've recursed deeply enough; stop now.
-        return None
-
-    if only_load:
-        load_fields = only_load.get(klass) or set()
-        # When we create the object, we will also be creating populating
-        # all the parent classes, so traverse the parent classes looking
-        # for fields that must be included on load.
-        for parent in klass._meta.get_parent_list():
-            fields = only_load.get(parent)
-            if fields:
-                load_fields.update(fields)
-    else:
-        load_fields = None
-
-    if load_fields:
-        # Handle deferred fields.
-        skip = set()
-        init_list = []
-        # Build the list of fields that *haven't* been requested
-        for field in klass._meta.concrete_fields:
-            model = field.model._meta.concrete_model
-            if from_parent and model and issubclass(from_parent, model):
-                # Avoid loading fields already loaded for parent model for
-                # child models.
-                continue
-            elif field.name not in load_fields:
-                skip.add(field.attname)
-            else:
-                init_list.append(field.attname)
-        # Retrieve all the requested fields
-        field_count = len(init_list)
-        if skip:
-            klass = deferred_class_factory(klass, skip)
-            field_names = init_list
-        else:
-            field_names = ()
-    else:
-        # Load all fields on klass
-
-        field_count = len(klass._meta.concrete_fields)
-        # Check if we need to skip some parent fields.
-        if from_parent and len(klass._meta.local_concrete_fields) != len(klass._meta.concrete_fields):
-            # Only load those fields which haven't been already loaded into
-            # 'from_parent'.
-            non_seen_models = [p for p in klass._meta.get_parent_list()
-                               if not issubclass(from_parent, p)]
-            # Load local fields, too...
-            non_seen_models.append(klass)
-            field_names = [f.attname for f in klass._meta.concrete_fields
-                           if f.model in non_seen_models]
-            field_count = len(field_names)
-        # Try to avoid populating field_names variable for performance reasons.
-        # If field_names variable is set, we use **kwargs based model init
-        # which is slower than normal init.
-        if field_count == len(klass._meta.concrete_fields):
-            field_names = ()
-
-    restricted = requested is not None
-
-    related_fields = []
-    for f in klass._meta.fields:
-        if select_related_descend(f, restricted, requested, load_fields):
-            if restricted:
-                next = requested[f.name]
-            else:
-                next = None
-            klass_info = get_klass_info(f.rel.to, max_depth=max_depth, cur_depth=cur_depth + 1,
-                                        requested=next, only_load=only_load)
-            related_fields.append((f, klass_info))
-
-    reverse_related_fields = []
-    if restricted:
-        for o in klass._meta.related_objects:
-            if o.field.unique and select_related_descend(o.field, restricted, requested,
-                                                         only_load.get(o.related_model), reverse=True):
-                next = requested[o.field.related_query_name()]
-                parent = klass if issubclass(o.related_model, klass) else None
-                klass_info = get_klass_info(o.related_model, max_depth=max_depth, cur_depth=cur_depth + 1,
-                                            requested=next, only_load=only_load, from_parent=parent)
-                reverse_related_fields.append((o.field, klass_info))
-    if field_names:
-        pk_idx = field_names.index(klass._meta.pk.attname)
-    else:
-        meta = klass._meta
-        pk_idx = meta.concrete_fields.index(meta.pk)
-
-    return klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx
-
-
-def reorder_for_init(model, field_names, values):
-    """
-    Reorders given field names and values for those fields
-    to be in the same order as model.__init__() expects to find them.
-    """
-    new_names, new_values = [], []
-    for f in model._meta.concrete_fields:
-        if f.attname not in field_names:
-            continue
-        new_names.append(f.attname)
-        new_values.append(values[field_names.index(f.attname)])
-    assert len(new_names) == len(field_names)
-    return new_names, new_values
-
-
-def get_cached_row(row, index_start, using, klass_info, offset=0,
-                   parent_data=()):
-    """
-    Helper function that recursively returns an object with the specified
-    related attributes already populated.
-
-    This method may be called recursively to populate deep select_related()
-    clauses.
-
-    Arguments:
-         * row - the row of data returned by the database cursor
-         * index_start - the index of the row at which data for this
-           object is known to start
-         * offset - the number of additional fields that are known to
-           exist in row for `klass`. This usually means the number of
-           annotated results on `klass`.
-         * using - the database alias on which the query is being executed.
-         * klass_info - result of the get_klass_info function
-         * parent_data - parent model data in format (field, value). Used
-           to populate the non-local fields of child models.
-    """
-    if klass_info is None:
-        return None
-    klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx = klass_info
-
-    fields = row[index_start:index_start + field_count]
-    # If the pk column is None (or the equivalent '' in the case the
-    # connection interprets empty strings as nulls), then the related
-    # object must be non-existent - set the relation to None.
-    if (fields[pk_idx] is None or
-        (connections[using].features.interprets_empty_strings_as_nulls and
-         fields[pk_idx] == '')):
-        obj = None
-    elif field_names:
-        values = list(fields)
-        parent_values = []
-        parent_field_names = []
-        for rel_field, value in parent_data:
-            parent_field_names.append(rel_field.attname)
-            parent_values.append(value)
-        field_names, values = reorder_for_init(
-            klass, parent_field_names + field_names,
-            parent_values + values)
-        obj = klass.from_db(using, field_names, values)
-    else:
-        field_names = [f.attname for f in klass._meta.concrete_fields]
-        obj = klass.from_db(using, field_names, fields)
-    # Instantiate related fields
-    index_end = index_start + field_count + offset
-    # Iterate over each related object, populating any
-    # select_related() fields
-    for f, klass_info in related_fields:
-        # Recursively retrieve the data for the related object
-        cached_row = get_cached_row(row, index_end, using, klass_info)
-        # If the recursive descent found an object, populate the
-        # descriptor caches relevant to the object
-        if cached_row:
-            rel_obj, index_end = cached_row
-            if obj is not None:
-                # If the base object exists, populate the
-                # descriptor cache
-                setattr(obj, f.get_cache_name(), rel_obj)
-            if f.unique and rel_obj is not None:
-                # If the field is unique, populate the
-                # reverse descriptor cache on the related object
-                setattr(rel_obj, f.rel.get_cache_name(), obj)
-
-    # Now do the same, but for reverse related objects.
-    # Only handle the restricted case - i.e., don't do a depth
-    # descent into reverse relations unless explicitly requested
-    for f, klass_info in reverse_related_fields:
-        # Transfer data from this object to childs.
-        parent_data = []
-        for rel_field in klass_info[0]._meta.fields:
-            rel_model = rel_field.model._meta.concrete_model
-            if rel_model == klass_info[0]._meta.model:
-                rel_model = None
-            if rel_model is not None and isinstance(obj, rel_model):
-                parent_data.append((rel_field, getattr(obj, rel_field.attname)))
-        # Recursively retrieve the data for the related object
-        cached_row = get_cached_row(row, index_end, using, klass_info,
-                                    parent_data=parent_data)
-        # If the recursive descent found an object, populate the
-        # descriptor caches relevant to the object
-        if cached_row:
-            rel_obj, index_end = cached_row
-            if obj is not None:
-                # populate the reverse descriptor cache
-                setattr(obj, f.rel.get_cache_name(), rel_obj)
-            if rel_obj is not None:
-                # If the related object exists, populate
-                # the descriptor cache.
-                setattr(rel_obj, f.get_cache_name(), obj)
-                # Populate related object caches using parent data.
-                for rel_field, _ in parent_data:
-                    if rel_field.rel:
-                        setattr(rel_obj, rel_field.attname, getattr(obj, rel_field.attname))
-                        try:
-                            cached_obj = getattr(obj, rel_field.get_cache_name())
-                            setattr(rel_obj, rel_field.get_cache_name(), cached_obj)
-                        except AttributeError:
-                            # Related object hasn't been cached yet
-                            pass
-    return obj, index_end
 
 
 class RawQuerySet(object):
@@ -1569,7 +1288,9 @@ class RawQuerySet(object):
             else:
                 model_cls = self.model
             fields = [self.model_fields.get(c, None) for c in self.columns]
-            converters = compiler.get_converters(fields)
+            converters = compiler.get_converters([
+                f.get_col(f.model._meta.db_table) if f else None for f in fields
+            ])
             for values in query:
                 if converters:
                     values = compiler.apply_converters(values, converters)
@@ -1920,3 +1641,120 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
                 qs._prefetch_done = True
                 obj._prefetched_objects_cache[cache_name] = qs
     return all_related_objects, additional_lookups
+
+
+class RelatedPopulator(object):
+    """
+    RelatedPopulator is used for select_related() object instantiation.
+
+    The idea is that each select_related() model will be populated by a
+    different RelatedPopulator instance. The RelatedPopulator instances get
+    klass_info and select (computed in SQLCompiler) plus the used db as
+    input for initialization. That data is used to compute which columns
+    to use, how to instantiate the model, and how to populate the links
+    between the objects.
+
+    The actual creation of the objects is done in populate() method. This
+    method gets row and from_obj as input and populates the select_related()
+    model instance.
+    """
+    def __init__(self, klass_info, select, db):
+        self.db = db
+        # Pre-compute needed attributes. The attributes are:
+        #  - model_cls: the possibly deferred model class to instantiate
+        #  - either:
+        #    - cols_start, cols_end: usually the columns in the row are
+        #      in the same order model_cls.__init__ expects them, so we
+        #      can instantiate by model_cls(*row[cols_start:cols_end])
+        #    - reorder_for_init: When select_related descends to a child
+        #      class, then we want to reuse the already selected parent
+        #      data. However, in this case the parent data isn't necessarily
+        #      in the same order that Model.__init__ expects it to be, so
+        #      we have to reorder the parent data. The reorder_for_init
+        #      attribute contains a function used to reorder the field data
+        #      in the order __init__ expects it.
+        #  - pk_idx: the index of the primary key field in the reordered
+        #    model data. Used to check if a related object exists at all.
+        #  - init_list: the field attnames fetched from the database. For
+        #    deferred models this isn't the same as all attnames of the
+        #    model's fields.
+        #  - related_populators: a list of RelatedPopulator instances if
+        #    select_related() descends to related models from this model.
+        #  - cache_name, reverse_cache_name: the names to use for setattr
+        #    when assigning the fetched object to the from_obj. If the
+        #    reverse_cache_name is set, then we also set the reverse link.
+        select_fields = klass_info['select_fields']
+        from_parent = klass_info['from_parent']
+        if not from_parent:
+            self.cols_start = select_fields[0]
+            self.cols_end = select_fields[-1] + 1
+            self.init_list = [
+                f[0].output_field.attname for f in select[self.cols_start:self.cols_end]
+            ]
+            self.reorder_for_init = None
+        else:
+            model_init_attnames = [
+                f.attname for f in klass_info['model']._meta.concrete_fields
+            ]
+            reorder_map = []
+            for idx in select_fields:
+                field = select[idx][0].output_field
+                init_pos = model_init_attnames.index(field.attname)
+                reorder_map.append((init_pos, field.attname, idx))
+            reorder_map.sort()
+            self.init_list = [v[1] for v in reorder_map]
+            pos_list = [row_pos for _, _, row_pos in reorder_map]
+
+            def reorder_for_init(row):
+                return [row[row_pos] for row_pos in pos_list]
+            self.reorder_for_init = reorder_for_init
+
+        self.model_cls = self.get_deferred_cls(klass_info, self.init_list)
+        self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
+        self.related_populators = get_related_populators(klass_info, select, self.db)
+        field = klass_info['field']
+        reverse = klass_info['reverse']
+        self.reverse_cache_name = None
+        if reverse:
+            self.cache_name = field.rel.get_cache_name()
+            self.reverse_cache_name = field.get_cache_name()
+        else:
+            self.cache_name = field.get_cache_name()
+            if field.unique:
+                self.reverse_cache_name = field.rel.get_cache_name()
+
+    def get_deferred_cls(self, klass_info, init_list):
+        model_cls = klass_info['model']
+        if len(init_list) != len(model_cls._meta.concrete_fields):
+            init_set = set(init_list)
+            skip = [
+                f.attname for f in model_cls._meta.concrete_fields
+                if f.attname not in init_set
+            ]
+            model_cls = deferred_class_factory(model_cls, skip)
+        return model_cls
+
+    def populate(self, row, from_obj):
+        if self.reorder_for_init:
+            obj_data = self.reorder_for_init(row)
+        else:
+            obj_data = row[self.cols_start:self.cols_end]
+        if obj_data[self.pk_idx] is None:
+            obj = None
+        else:
+            obj = self.model_cls.from_db(self.db, self.init_list, obj_data)
+        if obj and self.related_populators:
+            for rel_iter in self.related_populators:
+                rel_iter.populate(row, obj)
+        setattr(from_obj, self.cache_name, obj)
+        if obj and self.reverse_cache_name:
+            setattr(obj, self.reverse_cache_name, from_obj)
+
+
+def get_related_populators(klass_info, select, db):
+    iterators = []
+    related_klass_infos = klass_info.get('related_klass_infos', [])
+    for rel_klass_info in related_klass_infos:
+        rel_cls = RelatedPopulator(rel_klass_info, select, db)
+        iterators.append(rel_cls)
+    return iterators

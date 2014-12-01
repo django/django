@@ -158,10 +158,10 @@ class BaseSpatialOperations(object):
 
     # Default conversion functions for aggregates; will be overridden if implemented
     # for the spatial backend.
-    def convert_extent(self, box):
+    def convert_extent(self, box, srid):
         raise NotImplementedError('Aggregate extent not implemented for this spatial backend.')
 
-    def convert_extent3d(self, box):
+    def convert_extent3d(self, box, srid):
         raise NotImplementedError('Aggregate 3D extent not implemented for this spatial backend.')
 
     def convert_geom(self, geom_val, geom_field):

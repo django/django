@@ -1262,7 +1262,7 @@ class BaseDatabaseOperations(object):
             second = timezone.make_aware(second, tz)
         return [first, second]
 
-    def get_db_converters(self, internal_type):
+    def get_db_converters(self, expression):
         """Get a list of functions needed to convert field data.
 
         Some field types on some backends do not provide data in the correct
@@ -1270,7 +1270,7 @@ class BaseDatabaseOperations(object):
         """
         return []
 
-    def convert_durationfield_value(self, value, field):
+    def convert_durationfield_value(self, value, expression, context):
         if value is not None:
             value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
             value = parse_duration(value)
