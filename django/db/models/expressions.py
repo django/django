@@ -255,7 +255,7 @@ class ExpressionNode(CombinableMixin):
         elif internal_type.endswith('IntegerField'):
             return int(value)
         elif internal_type == 'DecimalField':
-            return backend_utils.typecast_decimal(field.format_number(value))
+            return backend_utils.typecast_decimal(value)
         return value
 
     def get_lookup(self, lookup):

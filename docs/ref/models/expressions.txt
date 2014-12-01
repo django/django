@@ -259,6 +259,13 @@ The ``output_field`` argument requires a model field instance, like
 ``IntegerField()`` or ``BooleanField()``, into which Django will load the value
 after it's retrieved from the database.
 
+.. note::
+
+    When instantiating a model field for use as the output_field parameter,
+    usually no arguments are needed. Any arguments relating to data validation
+    (max_length, max_digits, etc.) will not be enforced on the expression's output
+    value.
+
 Note that ``output_field`` is only required when Django is unable to determine
 what field type the result should be. Complex expressions that mix field types
 should define the desired ``output_field``. For example, adding an
@@ -319,6 +326,13 @@ values into their corresponding database type.
 The ``output_field`` argument should be a model field instance, like
 ``IntegerField()`` or ``BooleanField()``, into which Django will load the value
 after it's retrieved from the database.
+
+.. note::
+
+    When instantiating a model field for use as the output_field parameter,
+    usually no arguments are needed. Any arguments relating to data validation
+    (max_length, max_digits, etc.) will not be enforced on the expression's output
+    value.
 
 
 Technical Information
