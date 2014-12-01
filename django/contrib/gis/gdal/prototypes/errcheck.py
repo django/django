@@ -22,12 +22,12 @@ def ptr_byref(args, offset=-1):
 
 
 ### String checking Routines ###
-def check_const_string(result, func, cargs, offset=None):
+def check_const_string(result, func, cargs, offset=None, cpl=False):
     """
     Similar functionality to `check_string`, but does not free the pointer.
     """
     if offset:
-        check_err(result)
+        check_err(result, cpl=cpl)
         ptr = ptr_byref(cargs, offset)
         return ptr.value
     else:
@@ -101,20 +101,20 @@ def check_srs(result, func, cargs):
 
 
 ### Other error-checking routines ###
-def check_arg_errcode(result, func, cargs):
+def check_arg_errcode(result, func, cargs, cpl=False):
     """
     The error code is returned in the last argument, by reference.
     Check its value with `check_err` before returning the result.
     """
-    check_err(arg_byref(cargs))
+    check_err(arg_byref(cargs), cpl=cpl)
     return result
 
 
-def check_errcode(result, func, cargs):
+def check_errcode(result, func, cargs, cpl=False):
     """
     Check the error code returned (c_int).
     """
-    check_err(result)
+    check_err(result, cpl=cpl)
 
 
 def check_pointer(result, func, cargs):
