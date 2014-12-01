@@ -140,6 +140,9 @@ details on these changes.
 
 * The ``ssi`` template tag will be removed.
 
+* Support for the ``=`` comparison operator in the ``if`` template tag will be
+  removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

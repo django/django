@@ -18,7 +18,7 @@ from django.utils.safestring import mark_safe
 ROOT = os.path.dirname(os.path.abspath(upath(__file__)))
 
 
-def setup(templates, *args):
+def setup(templates, *args, **kwargs):
     """
     Runs test method multiple times in the following order:
 
@@ -31,6 +31,9 @@ def setup(templates, *args):
     True        False
     True        True
     """
+    # when testing deprecation warnings, it's useful to run just one test since
+    # the message won't be displayed multiple times
+    test_once = kwargs.get('test_once', False)
 
     for arg in args:
         templates.update(arg)
@@ -57,6 +60,8 @@ def setup(templates, *args):
                 loaders=loaders,
             )
             func(self)
+            if test_once:
+                return
             func(self)
 
             self.engine = Engine(
