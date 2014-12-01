@@ -209,8 +209,11 @@ skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 @unittest.skipIf(skip_selenium, 'Selenium tests not requested')
 class JavascriptI18nTests(LiveServerTestCase):
 
-    # The test cases use translations from these apps.
-    available_apps = ['django.contrib.admin', 'view_tests']
+    # The test cases use fixtures & translations from these apps.
+    available_apps = [
+        'django.contrib.admin', 'django.contrib.auth',
+        'django.contrib.contenttypes', 'view_tests',
+    ]
     urls = 'view_tests.urls'
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
