@@ -5,7 +5,7 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.query_utils import Q
-from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS, SelectInfo
+from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS
 from django.db.models.sql.query import Query
 from django.utils import six
 
@@ -71,7 +71,7 @@ class DeleteQuery(Query):
             else:
                 innerq.clear_select_clause()
                 innerq.select = [
-                    SelectInfo((self.get_initial_alias(), pk.column), None)
+                    pk.get_col(self.get_initial_alias())
                 ]
                 values = innerq
             self.where = self.where_class()

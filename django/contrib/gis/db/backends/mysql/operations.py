@@ -7,7 +7,6 @@ from django.contrib.gis.db.backends.utils import SpatialOperator
 
 class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
 
-    compiler_module = 'django.contrib.gis.db.models.sql.compiler'
     mysql = True
     name = 'mysql'
     select = 'AsText(%s)'
