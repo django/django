@@ -82,6 +82,10 @@ def make_immutable_fields_list(name, data):
 
 @python_2_unicode_compatible
 class Options(object):
+    FORWARD_PROPERTIES = ('fields', 'many_to_many', 'concrete_fields',
+                          'local_concrete_fields', '_forward_fields_map',)
+    REVERSE_PROPERTIES = ('related_objects', 'fields_map', '_relation_tree',)
+
     def __init__(self, meta, app_label=None):
         self._get_fields_cache = {}
         self.proxied_children = []
@@ -271,7 +275,13 @@ class Options(object):
         else:
             self.local_fields.insert(bisect(self.local_fields, field), field)
             self.setup_pk(field)
-        self._expire_cache()
+
+        if field.has_relation and field.related_model:
+            try:
+                field.related_model._meta._expire_cache(forward=False)
+            except AttributeError:
+                pass
+        self._expire_cache(reverse=False)
 
     def setup_pk(self, field):
         if not self.pk and field.primary_key:
@@ -636,15 +646,22 @@ class Options(object):
             # this model will be computed properly.
             return EMPTY_RELATION_TREE
 
-    def _expire_cache(self):
+    def _expire_cache(self, forward=True, reverse=True):
+
+        properties_to_expire = []
+        if forward:
+            properties_to_expire.extend(self.FORWARD_PROPERTIES)
+        if reverse:
+            properties_to_expire.extend(self.REVERSE_PROPERTIES)
+
         # When a new model is registered, we expire the
         # relation tree and any attribute that depends on it.
-        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',
-                          'related_objects', 'fields_map', '_forward_fields_map', '_relation_tree'):
+        for cache_key in properties_to_expire:
             try:
                 delattr(self, cache_key)
             except AttributeError:
                 pass
+
         self._get_fields_cache = {}
 
     def get_fields(self, include_parents=True, include_hidden=False, **kwargs):
