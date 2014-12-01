@@ -176,6 +176,14 @@ class CreateDefaultSiteTests(TestCase):
         post_migrate.send(sender=self.app_config, app_config=self.app_config, verbosity=0)
         self.assertTrue(Site.objects.exists())
 
+    @override_settings(SITE_ID=35696)
+    def test_custom_site_id(self):
+        """
+        #23945 - The configured ``SITE_ID`` should be respected.
+        """
+        create_default_site(self.app_config, verbosity=0)
+        self.assertEqual(Site.objects.get().pk, 35696)
+
 
 class MiddlewareTest(TestCase):
 
