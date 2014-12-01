@@ -3827,7 +3827,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     def test_cancel_delete_confirmation(self):
         "Cancelling the deletion of an object takes the user back one page."
-        pizza = Pizza.objects.create(name="Panucci's Double Cheese")
+        pizza = Pizza.objects.create(name="Double Cheese")
         url = reverse('admin:admin_views_pizza_change', args=(pizza.id,))
         full_url = '%s%s' % (self.live_server_url, url)
         self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
@@ -3842,7 +3842,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         Cancelling the deletion of an object with relations takes the user back
         one page.
         """
-        pizza = Pizza.objects.create(name="Panucci's Double Cheese")
+        pizza = Pizza.objects.create(name="Double Cheese")
         topping1 = Topping.objects.create(name="Cheddar")
         topping2 = Topping.objects.create(name="Mozzarella")
         pizza.toppings.add(topping1, topping2)
