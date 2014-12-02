@@ -4344,7 +4344,7 @@ class ValidXHTMLTests(TestCase):
 
     @override_settings(
         TEMPLATE_CONTEXT_PROCESSORS=filter(
-            lambda t: t != 'django.core.context_processors.i18n',
+            lambda t: t != 'django.template.context_processors.i18n',
             global_settings.TEMPLATE_CONTEXT_PROCESSORS),
         USE_I18N=False,
     )

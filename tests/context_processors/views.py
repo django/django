@@ -1,5 +1,5 @@
-from django.core import context_processors
 from django.shortcuts import render_to_response
+from django.template import context_processors
 from django.template.context import RequestContext
 
 from .models import DebugObject

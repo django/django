@@ -1863,7 +1863,7 @@ to a non-empty value. You will need to :ref:`configure these files to be served
 <serving-uploaded-files-in-development>` in both development and production.
 
 In order to use ``{{ MEDIA_URL }}`` in your templates, you must have
-``'django.core.context_processors.media'`` in your
+``'django.template.context_processors.media'`` in your
 :setting:`TEMPLATE_CONTEXT_PROCESSORS`. It's there by default, but be sure
 to include it if you override that setting and want this behavior.
 
@@ -2382,11 +2382,11 @@ TEMPLATE_CONTEXT_PROCESSORS
 Default::
 
     ("django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
+    "django.template.context_processors.debug",
+    "django.template.context_processors.i18n",
+    "django.template.context_processors.media",
+    "django.template.context_processors.static",
+    "django.template.context_processors.tz",
     "django.contrib.messages.context_processors.messages")
 
 A tuple of callables that are used to populate the context in ``RequestContext``.
