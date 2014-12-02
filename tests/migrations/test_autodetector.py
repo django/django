@@ -126,6 +126,10 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher", through="testapp.Contract")),
     ])
+    author_with_former_m2m = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("publishers", models.CharField(max_length=100)),
+    ])
     author_with_options = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
     ], {
@@ -1325,6 +1329,39 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 2, name="publisher", model_name='contract')
         self.assertOperationAttributes(changes, "testapp", 0, 3, name="Author")
         self.assertOperationAttributes(changes, "testapp", 0, 4, name="Contract")
+
+    def test_concrete_field_changed_to_many_to_many(self):
+        """
+        #23938 - Tests that changing a concrete field into a ManyToManyField
+        first removes the concrete field and then adds the m2m field.
+        """
+        before = self.make_project_state([self.author_with_former_m2m])
+        after = self.make_project_state([self.author_with_m2m, self.publisher])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["CreateModel", "RemoveField", "AddField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name='Publisher')
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="publishers", model_name='author')
+        self.assertOperationAttributes(changes, 'testapp', 0, 2, name="publishers", model_name='author')
+
+    def test_many_to_many_changed_to_concrete_field(self):
+        """
+        #23938 - Tests that changing a ManyToManyField into a concrete field
+        first removes the m2m field and then adds the concrete field.
+        """
+        before = self.make_project_state([self.author_with_m2m, self.publisher])
+        after = self.make_project_state([self.author_with_former_m2m])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "AddField", "DeleteModel"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="publishers", model_name='author')
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="publishers", model_name='author')
+        self.assertOperationAttributes(changes, 'testapp', 0, 2, name='Publisher')
+        self.assertOperationFieldAttributes(changes, 'testapp', 0, 1, max_length=100)
 
     def test_non_circular_foreignkey_dependency_removal(self):
         """
