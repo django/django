@@ -94,3 +94,7 @@ Bugfixes
 
 * Fixed a crash when ``RunSQL`` SQL content was collected by the schema editor,
   typically when using ``sqlmigrate`` (:ticket:`23909`).
+
+* Fixed a bug in ``django.contrib.admin.options._create_formsets`` which caused
+  some ``ModelAdmin`` methods to receive invalid argument values
+  (:ticket:`23934`).
