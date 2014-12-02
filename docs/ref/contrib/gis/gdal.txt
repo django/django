@@ -18,8 +18,8 @@ of vector spatial data.
 .. note::
 
      Although the module is named ``gdal``, GeoDjango only supports
-     some of the capabilities of OGR.  Thus, none of GDAL's features
-     with respect to raster (image) data are supported at this time.
+     some of the capabilities of OGR.  Thus, GDAL's features with respect to
+     raster (image) data are minimally supported (read-only) at this time.
 
 __ http://www.gdal.org/
 __ http://www.gdal.org/ogr/
@@ -1080,6 +1080,140 @@ the same coordinate transformation repeatedly on different geometries::
     >>> for feat in layer:
     ...     geom = feat.geom # getting clone of feature geometry
     ...     geom.transform(ct) # transforming
+
+.. _raster-data-source-objects:
+
+Raster Data Objects
+===================
+
+.. versionadded:: 1.8
+
+``GDALRaster``
+----------------
+
+:class:`GDALRaster` is a wrapper for the GDAL raster source object that
+supports reading data from a variety of GDAL-supported geospatial file
+formats and data sources using a simple, consistent interface.  Each
+data source is represented by a :class:`GDALRaster` object which contains
+one or more layers of data named bands.  Each band, represented by a
+:class:`GDALBand` object, contains georeferenced image data. For exemple, an RGB
+image is represented as three bands: one for red, one for green, and one for
+blue.
+
+.. class:: GDALRaster(ds_input)
+
+    The constructor for ``GDALRaster`` accepts a single parameter: the path of
+    the file you want to read.
+
+    .. attribute:: name
+
+        The name of the source which is equivalent to the input file path.
+
+    .. attribute:: driver
+
+        The name of the GDAL driver used to handle the input file. For example,
+        ``GTiff`` for a ``GeoTiff`` file. See also the `GDAL Raster Formats`__
+        list.
+
+        __ http://www.gdal.org/formats_list.html
+
+    .. attribute:: width
+
+       The width of the source in pixels (X-axis).
+
+    .. attribute:: height
+
+        The height of the source in pixels (Y-axis).
+
+    .. attribute:: srs
+
+        The spatial reference system of the source, as a
+        :class:`SpatialReference` instance.
+
+    .. attribute:: geotransform
+
+        The affine transformation matrix used to georeference the source, as a
+        tuple of six coefficients which map pixel/line coordinates into
+        georeferenced space using the following relationship::
+
+            Xgeo = GT(0) + Xpixel*GT(1) + Yline*GT(2)
+            Ygeo = GT(3) + Xpixel*GT(4) + Yline*GT(5)
+
+        The same values can be retrieved by accessing the :attr:`origin`
+        (indices 0 and 3), :attr:`scale` (indices 1 and 5) and :attr:`skew`
+        (indices 2 and 4) properties.
+
+    .. attribute:: origin
+
+        Coordinates of the top left origin of the raster in the spatial
+        reference system of the source, as a point object with ``x`` and ``y``
+        members.
+
+    .. attribute:: scale
+
+        Pixel width and height used for georeferencing the raster, as a as a
+        point object with ``x`` and ``y``  members. See :attr:`geotransform`
+        for more information.
+
+    .. attribute:: skew
+
+        Skew coefficients used to georeference the raster, as a point object
+        with ``x`` and ``y``  members. In case of north up images, these
+        coefficients are both ``0``.
+
+    .. attribute:: extent
+
+        Extent (boundary values) of the raster source, as a 4-tuple
+        ``(xmin, ymin, xmax, ymax)`` in the spatial reference system of the
+        source.
+
+    .. attribute:: bands
+
+        List of all bands of the source, as :class:`GDALBand` instances.
+
+``GDALBand``
+------------
+
+.. class:: GDALBand
+
+    ``GDALBand`` instances are not created explicitely, but rather obtained
+    from a :class:`GDALRaster` object, through its :attr:`~GDALRaster.bands`
+    attribute.
+
+    .. attribute:: description
+
+        The name or description of the band, if any.
+
+    .. attribute:: width
+
+        The width of the band in pixels (X-axis).
+
+    .. attribute:: height
+
+        The height of the band in pixels (Y-axis).
+
+    .. attribute:: min
+
+        The minimum pixel value of the band (excluding the "no data" value).
+
+    .. attribute:: max
+
+        The maximum pixel value of the band (excluding the "no data" value).
+
+    .. attribute:: nodata_value
+
+        The "no data" value for a band is generally a special marker value used
+        to mark pixels that are not valid data. Such pixels should generally not
+        be displayed, nor contribute to analysis operations.
+
+    .. method:: datatype([as_string=False])
+
+        The data type contained in the band, as an integer constant between 0
+        (Unknown) and 11. If ``as_string`` is ``True``, the data type is
+        returned as a string with the following possible values:
+        ``GDT_Unknown``, ``GDT_Byte``, ``GDT_UInt16``, ``GDT_Int16``,
+        ``GDT_UInt32``, ``GDT_Int32``, ``GDT_Float32``, ``GDT_Float64``,
+        ``GDT_CInt16``, ``GDT_CInt32``, ``GDT_CFloat32``, and ``GDT_CFloat64``.
 
 Settings
 ========
