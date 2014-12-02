@@ -1,8 +1,10 @@
+import warnings
+
 from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.crypto import constant_time_compare
+from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.functional import SimpleLazyObject
 
 
@@ -25,20 +27,18 @@ class AuthenticationMiddleware(object):
 
 class SessionAuthenticationMiddleware(object):
     """
-    Middleware for invalidating a user's sessions that don't correspond to the
-    user's current session authentication hash (generated based on the user's
-    password for AbstractUser).
+    Formerly, a middleware for invalidating a user's sessions that don't
+    correspond to the user's current session authentication hash.
+
+    Now a backwards compatibility shim that enables session verification in
+    auth.get_user() if this middleware is in MIDDLEWARE_CLASSES.
     """
     def process_request(self, request):
-        user = request.user
-        if user and hasattr(user, 'get_session_auth_hash'):
-            session_hash = request.session.get(auth.HASH_SESSION_KEY)
-            session_hash_verified = session_hash and constant_time_compare(
-                session_hash,
-                user.get_session_auth_hash()
-            )
-            if not session_hash_verified:
-                auth.logout(request)
+        warnings.warn(
+            'SessionAuthenticationMiddleware is deprecated. Please remove it '
+            'from your MIDDLEWARE_CLASSES and set AUTH_VERIFY_SESSION = True '
+            'in your settings instead.', RemovedInDjango18Warning
+        )
 
 
 class RemoteUserMiddleware(object):

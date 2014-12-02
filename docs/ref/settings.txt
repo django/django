@@ -147,6 +147,20 @@ The :setting:`APPEND_SLASH` setting is only used if
 :class:`~django.middleware.common.CommonMiddleware` is installed
 (see :doc:`/topics/http/middleware`). See also :setting:`PREPEND_WWW`.
 
+.. setting:: AUTH_VERIFY_SESSION
+
+AUTH_VERIFY_SESSION
+-------------------
+
+.. versionadded:: 1.7.2
+
+Default: ``False``
+
+Allows a user's sessions to be invalidated when their password changes. Session
+verification will become mandatory in Django 1.9 at which point this setting
+will be removed. Please set it to ``True`` sometime before then after reading
+the :ref:`upgrade considerations <session-invalidation-on-password-change>`.
+
 .. setting:: CACHES
 
 CACHES
@@ -1906,9 +1920,8 @@ The secret key is used for:
 
 * All :doc:`sessions </topics/http/sessions>` if you are using
   any other session backend than ``django.contrib.sessions.backends.cache``,
-  or if you use
-  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware`
-  and are using the default
+  or if you using :ref:`session verification
+  <session-invalidation-on-password-change>` and the default
   :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`.
 * All :doc:`messages </ref/contrib/messages>` if you are using
   :class:`~django.contrib.messages.storage.cookie.CookieStorage` or

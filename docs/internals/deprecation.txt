@@ -124,6 +124,9 @@ details on these changes.
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, will no longer be supported.
 
+* Session verification will become mandatory and the ``AUTH_VERIFY_SESSION``
+  setting will be removed.
+
 .. _deprecation-removed-in-1.8:
 
 1.8
@@ -217,6 +220,9 @@ details on these changes.
 
 * ``django.utils.html.fix_ampersands``, the ``fix_ampersands`` template filter and
   ``django.utils.html.clean_html`` will be removed following an accelerated deprecation.
+
+* The ``django.contrib.auth.middleware.SessionAuthenticationMiddleware`` will
+  be removed.
 
 .. _deprecation-removed-in-1.7:
 

@@ -514,6 +514,8 @@ PROFANITIES_LIST = ()
 
 AUTH_USER_MODEL = 'auth.User'
 
+AUTH_VERIFY_SESSION = False
+
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
 LOGIN_URL = '/accounts/login/'
