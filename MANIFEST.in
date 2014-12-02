@@ -26,6 +26,7 @@ recursive-include django/contrib/formtools/tests/templates *
 recursive-include django/contrib/formtools/tests/wizard/wizardtests/templates *
 recursive-include django/contrib/flatpages/fixtures *
 recursive-include django/contrib/flatpages/tests/templates *
+recursive-include django/contrib/gis/gdal/tests/data *
 recursive-include django/contrib/gis/static *
 recursive-include django/contrib/gis/templates *
 recursive-include django/contrib/gis/tests/data *

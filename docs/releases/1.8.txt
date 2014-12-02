@@ -166,6 +166,9 @@ Minor features
   ``SELECT InitSpatialMetaData`` initialization commands are now automatically
   run by :djadmin:`migrate`.
 
+* The GDAL interface now supports retrieving properties of
+  :ref:`raster (image) data file <raster-data-source-objects>`.
+
 * Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
   Django 1.2 have been removed.
 
