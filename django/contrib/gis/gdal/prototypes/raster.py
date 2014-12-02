@@ -54,8 +54,8 @@ get_band_ds = voidptr_output(lgdal.GDALGetBandDataset, [c_void_p])
 get_band_datatype = int_output(lgdal.GDALGetRasterDataType, [c_void_p])
 get_band_nodata_value = double_output(lgdal.GDALGetRasterNoDataValue, [c_void_p, POINTER(c_int)])
 set_band_nodata_value = void_output(lgdal.GDALSetRasterNoDataValue, [c_void_p, c_double])
-get_band_minimum = double_output(lgdal.GDALGetRasterMinimum, [c_void_p])
-get_band_maximum = double_output(lgdal.GDALGetRasterMaximum, [c_void_p])
+get_band_minimum = double_output(lgdal.GDALGetRasterMinimum, [c_void_p, POINTER(c_int)])
+get_band_maximum = double_output(lgdal.GDALGetRasterMaximum, [c_void_p, POINTER(c_int)])
 
 ### Reprojection routine ###
 reproject_image = void_output(lgdal.GDALReprojectImage, [c_void_p, c_char_p, c_void_p, c_char_p,
