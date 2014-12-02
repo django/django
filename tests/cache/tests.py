@@ -20,7 +20,6 @@ from django.core import signals
 from django.core.cache import (cache, caches, CacheKeyWarning,
     InvalidCacheBackendError, DEFAULT_CACHE_ALIAS, get_cache,
     close_caches)
-from django.core.context_processors import csrf
 from django.db import connection, connections, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import HttpResponse, StreamingHttpResponse
@@ -28,6 +27,7 @@ from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
 from django.middleware.csrf import CsrfViewMiddleware
 from django.template import Template
+from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
 from django.test.signals import setting_changed

@@ -44,6 +44,8 @@ details on these changes.
   :class:`~django.core.management.BaseCommand` instead, which takes no arguments
   by default.
 
+* ``django.core.context_processors`` module will be removed.
+
 * ``django.db.models.sql.aggregates`` module will be removed.
 
 * ``django.contrib.gis.db.models.sql.aggregates`` module will be removed.

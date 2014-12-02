@@ -932,7 +932,7 @@ class TemplateTests(TestCase):
     @skipIf(sys.platform.startswith('win'), "Windows uses non-standard time zone names")
     def test_tz_template_context_processor(self):
         """
-        Test the django.core.context_processors.tz template context processor.
+        Test the django.template.context_processors.tz template context processor.
         """
         tpl = Template("{{ TIME_ZONE }}")
         self.assertEqual(tpl.render(Context()), "")
