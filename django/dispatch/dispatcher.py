@@ -60,7 +60,7 @@ class Signal(object):
                 A function or an instance method which is to receive signals.
                 Receivers must be hashable objects.
 
-                If weak is True, then receiver must be weak-referencable.
+                If weak is True, then receiver must be weak referenceable.
 
                 Receivers must be able to accept keyword arguments.
 
