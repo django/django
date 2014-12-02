@@ -2,7 +2,6 @@ from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils import six
 from decimal import Decimal
-import __builtin__
 
 
 def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
@@ -25,7 +24,7 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
     # sign
     sign = ''
     if isinstance(number, Decimal):
-        str_number = __builtin__.format(number, "f")
+        str_number = '{:f}'.format(number)
     else:
         str_number = six.text_type(number)
     if str_number[0] == '-':
