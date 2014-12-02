@@ -773,73 +773,71 @@ class MigrationAutodetector(object):
         Fields that have been added
         """
         for app_label, model_name, field_name in sorted(self.new_field_keys - self.old_field_keys):
-            field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
-            # Fields that are foreignkeys/m2ms depend on stuff
-            dependencies = []
-            if field.rel and field.rel.to:
-                # Account for FKs to swappable models
-                swappable_setting = getattr(field, 'swappable_setting', None)
-                if swappable_setting is not None:
-                    dep_app_label = "__setting__"
-                    dep_object_name = swappable_setting
-                else:
-                    dep_app_label = field.rel.to._meta.app_label
-                    dep_object_name = field.rel.to._meta.object_name
-                dependencies = [(dep_app_label, dep_object_name, None, True)]
-                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
-                    dependencies.append((
-                        field.rel.through._meta.app_label,
-                        field.rel.through._meta.object_name,
-                        None,
-                        True
-                    ))
-            # You can't just add NOT NULL fields with no default or fields
-            # which don't allow empty strings as default.
-            if (not field.null and not field.has_default() and
-                    not isinstance(field, models.ManyToManyField) and
-                    not (field.blank and field.empty_strings_allowed)):
-                field = field.clone()
-                field.default = self.questioner.ask_not_null_addition(field_name, model_name)
-                self.add_operation(
-                    app_label,
-                    operations.AddField(
-                        model_name=model_name,
-                        name=field_name,
-                        field=field,
-                        preserve_default=False,
-                    ),
-                    dependencies=dependencies,
-                )
+            self._generate_added_field(app_label, model_name, field_name)
+
+    def _generate_added_field(self, app_label, model_name, field_name):
+        field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+        # Fields that are foreignkeys/m2ms depend on stuff
+        dependencies = []
+        if field.rel and field.rel.to:
+            # Account for FKs to swappable models
+            swappable_setting = getattr(field, 'swappable_setting', None)
+            if swappable_setting is not None:
+                dep_app_label = "__setting__"
+                dep_object_name = swappable_setting
             else:
-                self.add_operation(
-                    app_label,
-                    operations.AddField(
-                        model_name=model_name,
-                        name=field_name,
-                        field=field,
-                    ),
-                    dependencies=dependencies,
-                )
+                dep_app_label = field.rel.to._meta.app_label
+                dep_object_name = field.rel.to._meta.object_name
+            dependencies = [(dep_app_label, dep_object_name, None, True)]
+            if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                dependencies.append((
+                    field.rel.through._meta.app_label,
+                    field.rel.through._meta.object_name,
+                    None,
+                    True,
+                ))
+        # You can't just add NOT NULL fields with no default or fields
+        # which don't allow empty strings as default.
+        preserve_default = True
+        if (not field.null and not field.has_default() and
+                not isinstance(field, models.ManyToManyField) and
+                not (field.blank and field.empty_strings_allowed)):
+            field = field.clone()
+            field.default = self.questioner.ask_not_null_addition(field_name, model_name)
+            preserve_default = False
+        self.add_operation(
+            app_label,
+            operations.AddField(
+                model_name=model_name,
+                name=field_name,
+                field=field,
+                preserve_default=preserve_default,
+            ),
+            dependencies=dependencies,
+        )
 
     def generate_removed_fields(self):
         """
         Fields that have been removed.
         """
         for app_label, model_name, field_name in sorted(self.old_field_keys - self.new_field_keys):
-            self.add_operation(
-                app_label,
-                operations.RemoveField(
-                    model_name=model_name,
-                    name=field_name,
-                ),
-                # We might need to depend on the removal of an
-                # order_with_respect_to or index/unique_together operation;
-                # this is safely ignored if there isn't one
-                dependencies=[
-                    (app_label, model_name, field_name, "order_wrt_unset"),
-                    (app_label, model_name, field_name, "foo_together_change"),
-                ],
-            )
+            self._generate_removed_field(app_label, model_name, field_name)
+
+    def _generate_removed_field(self, app_label, model_name, field_name):
+        self.add_operation(
+            app_label,
+            operations.RemoveField(
+                model_name=model_name,
+                name=field_name,
+            ),
+            # We might need to depend on the removal of an
+            # order_with_respect_to or index/unique_together operation;
+            # this is safely ignored if there isn't one
+            dependencies=[
+                (app_label, model_name, field_name, "order_wrt_unset"),
+                (app_label, model_name, field_name, "foo_together_change"),
+            ],
+        )
 
     def generate_altered_fields(self):
         """
@@ -863,25 +861,30 @@ class MigrationAutodetector(object):
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
             if old_field_dec != new_field_dec:
-                preserve_default = True
-                if (old_field.null and not new_field.null and not new_field.has_default() and
+                if (not isinstance(old_field, models.ManyToManyField) and
                         not isinstance(new_field, models.ManyToManyField)):
-                    field = new_field.clone()
-                    new_default = self.questioner.ask_not_null_alteration(field_name, model_name)
-                    if new_default is not models.NOT_PROVIDED:
-                        field.default = new_default
-                        preserve_default = False
-                else:
-                    field = new_field
-                self.add_operation(
-                    app_label,
-                    operations.AlterField(
-                        model_name=model_name,
-                        name=field_name,
-                        field=field,
-                        preserve_default=preserve_default,
+                    preserve_default = True
+                    if (old_field.null and not new_field.null and not new_field.has_default() and
+                            not isinstance(new_field, models.ManyToManyField)):
+                        field = new_field.clone()
+                        new_default = self.questioner.ask_not_null_alteration(field_name, model_name)
+                        if new_default is not models.NOT_PROVIDED:
+                            field.default = new_default
+                            preserve_default = False
+                    else:
+                        field = new_field
+                    self.add_operation(
+                        app_label,
+                        operations.AlterField(
+                            model_name=model_name,
+                            name=field_name,
+                            field=field,
+                            preserve_default=preserve_default,
+                        )
                     )
-                )
+                else:
+                    self._generate_removed_field(app_label, model_name, field_name)
+                    self._generate_added_field(app_label, model_name, field_name)
 
     def _generate_altered_foo_together(self, operation):
         option_name = operation.option_name
