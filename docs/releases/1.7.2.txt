@@ -98,3 +98,6 @@ Bugfixes
 * Fixed a regression in ``contrib.admin`` add/change views which caused some
   ``ModelAdmin`` methods to receive the incorrect ``obj`` value
   (:ticket:`23934`).
+
+* Fixed ``runserver`` crash when socket error message contained Unicode
+  characters (:ticket:`23946`).
