@@ -68,14 +68,16 @@ class RunSQL(Operation):
         self.state_operations = state_operations or []
 
     def deconstruct(self):
-        kwargs = {}
+        kwargs = {
+            'sql': self.sql,
+        }
         if self.reverse_sql is not None:
             kwargs['reverse_sql'] = self.reverse_sql
         if self.state_operations:
             kwargs['state_operations'] = self.state_operations
         return (
             self.__class__.__name__,
-            [self.sql],
+            [],
             kwargs
         )
 
@@ -137,14 +139,16 @@ class RunPython(Operation):
             self.reverse_code = reverse_code
 
     def deconstruct(self):
-        kwargs = {}
-        if self.reverse_code:
+        kwargs = {
+            'code': self.code,
+        }
+        if self.reverse_code is not None:
             kwargs['reverse_code'] = self.reverse_code
         if self.atomic is not True:
             kwargs['atomic'] = self.atomic
         return (
             self.__class__.__name__,
-            [self.code],
+            [],
             kwargs
         )
 

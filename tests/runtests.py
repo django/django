@@ -20,8 +20,8 @@ from django.utils._os import upath
 from django.utils import six
 
 
-warnings.simplefilter("default", RemovedInDjango19Warning)
-warnings.simplefilter("default", RemovedInDjango20Warning)
+warnings.simplefilter("error", RemovedInDjango19Warning)
+warnings.simplefilter("error", RemovedInDjango20Warning)
 
 CONTRIB_MODULE_PATH = 'django.contrib'
 
@@ -373,6 +373,16 @@ if __name__ == "__main__":
         '--selenium', action='store_true', dest='selenium', default=False,
         help='Run the Selenium tests as well (if Selenium is installed)')
     options = parser.parse_args()
+
+    # mock is a required dependency
+    try:
+        from django.test import mock  # NOQA
+    except ImportError:
+        print(
+            "Please install test dependencies first: \n"
+            "$ pip install -r requirements/py%s.txt" % sys.version_info.major
+        )
+        sys.exit(1)
 
     # Allow including a trailing slash on app_labels for tab completion convenience
     options.modules = [os.path.normpath(labels) for labels in options.modules]

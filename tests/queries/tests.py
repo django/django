@@ -11,6 +11,7 @@ from django.core.exceptions import FieldError
 from django.db import connection, DEFAULT_DB_ALIAS
 from django.db.models import Count, F, Q
 from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
+from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
@@ -128,7 +129,7 @@ class Queries1Tests(BaseQuerysetTest):
     def test_ticket2306(self):
         # Checking that no join types are "left outer" joins.
         query = Item.objects.filter(tags=self.t2).query
-        self.assertNotIn(query.LOUTER, [x[2] for x in query.alias_map.values()])
+        self.assertNotIn(LOUTER, [x.join_type for x in query.alias_map.values()])
 
         self.assertQuerysetEqual(
             Item.objects.filter(Q(tags=self.t1)).order_by('name'),
@@ -336,7 +337,7 @@ class Queries1Tests(BaseQuerysetTest):
 
         # Excluding from a relation that cannot be NULL should not use outer joins.
         query = Item.objects.exclude(creator__in=[self.a1, self.a2]).query
-        self.assertNotIn(query.LOUTER, [x[2] for x in query.alias_map.values()])
+        self.assertNotIn(LOUTER, [x.join_type for x in query.alias_map.values()])
 
         # Similarly, when one of the joins cannot possibly, ever, involve NULL
         # values (Author -> ExtraInfo, in the following), it should never be
@@ -344,7 +345,7 @@ class Queries1Tests(BaseQuerysetTest):
         # involve one "left outer" join (Author -> Item is 0-to-many).
         qs = Author.objects.filter(id=self.a1.id).filter(Q(extra__note=self.n1) | Q(item__note=self.n3))
         self.assertEqual(
-            len([x[2] for x in qs.query.alias_map.values() if x[2] == query.LOUTER and qs.query.alias_refcount[x[1]]]),
+            len([x for x in qs.query.alias_map.values() if x.join_type == LOUTER and qs.query.alias_refcount[x.table_alias]]),
             1
         )
 
@@ -855,7 +856,7 @@ class Queries1Tests(BaseQuerysetTest):
         )
         q = Note.objects.filter(Q(extrainfo__author=self.a1) | Q(extrainfo=xx)).query
         self.assertEqual(
-            len([x[2] for x in q.alias_map.values() if x[2] == q.LOUTER and q.alias_refcount[x[1]]]),
+            len([x for x in q.alias_map.values() if x.join_type == LOUTER and q.alias_refcount[x.table_alias]]),
             1
         )
 

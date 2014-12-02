@@ -4,7 +4,8 @@ import threading
 import warnings
 
 from django.conf import settings
-from django.db import connections
+from django.db import connections, router
+from django.db.utils import ConnectionRouter
 from django.dispatch import receiver, Signal
 from django.utils import timezone
 from django.utils.functional import empty
@@ -75,6 +76,12 @@ def update_connections_time_zone(**kwargs):
         tz_sql = conn.ops.set_time_zone_sql()
         if tz_sql:
             conn.cursor().execute(tz_sql, [tz])
+
+
+@receiver(setting_changed)
+def clear_routers_cache(**kwargs):
+    if kwargs['setting'] == 'DATABASE_ROUTERS':
+        router.routers = ConnectionRouter().routers
 
 
 @receiver(setting_changed)

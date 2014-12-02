@@ -238,6 +238,7 @@ class DeprecatingSimpleTestCaseUrls(unittest.TestCase):
                 pass
 
         with warnings.catch_warnings(record=True) as recorded:
+            warnings.filterwarnings('always')
             suite = unittest.TestLoader().loadTestsFromTestCase(TempTestCase)
             with open(os.devnull, 'w') as devnull:
                 unittest.TextTestRunner(stream=devnull, verbosity=2).run(suite)

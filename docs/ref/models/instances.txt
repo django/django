@@ -116,6 +116,73 @@ The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would of course be possible to just use ``super()`` call
 in the ``from_db()`` method.
 
+Refreshing objects from database
+================================
+
+.. method:: Model.refresh_from_db(using=None, fields=None, **kwargs)
+
+.. versionadded:: 1.8
+
+If you need to reload a model's values from the database, you can use the
+``refresh_from_db()`` method. When this method is called without arguments the
+following is done:
+
+1. All non-deferred fields of the model are updated to the values currently
+   present in the database.
+2. The previously loaded related instances for which the relation's value is no
+   longer valid are removed from the reloaded instance. For example, if you have
+   a foreign key from the reloaded instance to another model with name
+   ``Author``, then if ``obj.author_id != obj.author.id``, ``obj.author`` will
+   be thrown away, and when next accessed it will be reloaded with the value of
+   ``obj.author_id``.
+
+Note that only fields of the model are reloaded from the database. Other
+database dependent values such as annotations are not reloaded.
+
+The reloading happens from the database the instance was loaded from, or from
+the default database if the instance wasn't loaded from the database. The
+``using`` argument can be used to force the database used for reloading.
+
+It is possible to force the set of fields to be loaded by using the ``fields``
+argument.
+
+For example, to test that an ``update()`` call resulted in the expected
+update, you could write a test similar to this::
+
+    def test_update_result(self):
+        obj = MyModel.objects.create(val=1)
+        MyModel.objects.filter(pk=obj.pk).update(val=F('val') + 1)
+        # At this point obj.val is still 1, but the value in the database
+        # was updated to 2. The object's updated value needs to be reloaded
+        # from the database.
+        obj.refresh_from_db()
+        self.assertEqual(obj.val, 2)
+
+Note that when deferred fields are accessed, the loading of the deferred
+field's value happens through this method. Thus it is possible to customize
+the way deferred loading happens. The example below shows how one can reload
+all of the instance's fields when a deferred field is reloaded::
+
+    class ExampleModel(models.Model):
+        def refresh_from_db(self, using=None, fields=None, **kwargs):
+            # fields contains the name of the deferred field to be
+            # loaded.
+            if fields is not None:
+                fields = set(fields)
+                deferred_fields = self.get_deferred_fields()
+                # If any deferred field is going to be loaded
+                if fields.intersection(deferred_fields):
+                    # then load all of them
+                    fields = fields.union(deferred_fields)
+            super(ExampleModel, self).refresh_from_db(using, fields, **kwargs)
+
+.. method:: Model.get_deferred_fields()
+
+.. versionadded:: 1.8
+
+A helper method that returns a set containing the attribute names of all those
+fields that are currently deferred for this model.
+
 .. _validating-objects:
 
 Validating objects

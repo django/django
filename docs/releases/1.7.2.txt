@@ -89,3 +89,12 @@ Bugfixes
 
 * Fixed an infinite loop bug for certain cyclic migration dependencies, and made
   the error message for cyclic dependencies much more helpful.
+
+* Added missing ``index_together`` handling for SQLite (:ticket:`23880`).
+
+* Fixed a crash when ``RunSQL`` SQL content was collected by the schema editor,
+  typically when using ``sqlmigrate`` (:ticket:`23909`).
+
+* Fixed a regression in ``contrib.admin`` add/change views which caused some
+  ``ModelAdmin`` methods to receive the incorrect ``obj`` value
+  (:ticket:`23934`).

@@ -1012,6 +1012,12 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
         self.assertTemplateUsed(response, 'custom_admin/password_change_form.html')
         self.assertContains(response, 'Hello from a custom password change form template')
 
+    def test_custom_admin_site_password_change_with_extra_context(self):
+        response = self.client.get('/test_admin/admin2/password_change/')
+        self.assertIsInstance(response, TemplateResponse)
+        self.assertTemplateUsed(response, 'custom_admin/password_change_form.html')
+        self.assertContains(response, 'eggs')
+
     def test_custom_admin_site_password_change_done_template(self):
         response = self.client.get('/test_admin/admin2/password_change/done/')
         self.assertIsInstance(response, TemplateResponse)
@@ -3821,7 +3827,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     def test_cancel_delete_confirmation(self):
         "Cancelling the deletion of an object takes the user back one page."
-        pizza = Pizza.objects.create(name="Panucci's Double Cheese")
+        pizza = Pizza.objects.create(name="Double Cheese")
         url = reverse('admin:admin_views_pizza_change', args=(pizza.id,))
         full_url = '%s%s' % (self.live_server_url, url)
         self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
@@ -3836,7 +3842,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         Cancelling the deletion of an object with relations takes the user back
         one page.
         """
-        pizza = Pizza.objects.create(name="Panucci's Double Cheese")
+        pizza = Pizza.objects.create(name="Double Cheese")
         topping1 = Topping.objects.create(name="Cheddar")
         topping2 = Topping.objects.create(name="Mozzarella")
         pizza.toppings.add(topping1, topping2)
@@ -5201,3 +5207,51 @@ class TestEtagWithAdminView(TestCase):
             response = self.client.get('/test_admin/admin/')
             self.assertEqual(response.status_code, 302)
             self.assertTrue(response.has_header('ETag'))
+
+
+@override_settings(
+    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF="admin_views.urls",
+)
+class GetFormsetsWithInlinesArgumentTest(TestCase):
+    """
+    #23934 - When adding a new model instance in the admin, the 'obj' argument
+    of get_formsets_with_inlines() should be None. When changing, it should be
+    equal to the existing model instance.
+    The GetFormsetsArgumentCheckingAdmin ModelAdmin throws an exception
+    if obj is not None during add_view or obj is None during change_view.
+    """
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def test_explicitly_provided_pk(self):
+        post_data = {'name': '1'}
+        try:
+            response = self.client.post('/test_admin/admin/admin_views/explicitlyprovidedpk/add/', post_data)
+        except Exception as e:
+            self.fail(e)
+        self.assertEqual(response.status_code, 302)
+
+        post_data = {'name': '2'}
+        try:
+            response = self.client.post('/test_admin/admin/admin_views/explicitlyprovidedpk/1/', post_data)
+        except Exception as e:
+            self.fail(e)
+        self.assertEqual(response.status_code, 302)
+
+    def test_implicitly_generated_pk(self):
+        post_data = {'name': '1'}
+        try:
+            response = self.client.post('/test_admin/admin/admin_views/implicitlygeneratedpk/add/', post_data)
+        except Exception as e:
+            self.fail(e)
+        self.assertEqual(response.status_code, 302)
+
+        post_data = {'name': '2'}
+        try:
+            response = self.client.post('/test_admin/admin/admin_views/implicitlygeneratedpk/1/', post_data)
+        except Exception as e:
+            self.fail(e)
+        self.assertEqual(response.status_code, 302)

@@ -84,9 +84,10 @@ New PostgreSQL specific functionality
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django now has a module with extensions for PostgreSQL specific features, such
-as :class:`~django.contrib.postgres.fields.ArrayField` and
-:class:`~django.contrib.postgres.fields.HStoreField`. A full breakdown of the
-features is available :doc:`in the documentation</ref/contrib/postgres/index>`.
+as :class:`~django.contrib.postgres.fields.ArrayField`,
+:class:`~django.contrib.postgres.fields.HStoreField`, and :lookup:`unaccent`
+lookup. A full breakdown of the features is available :doc:`in the
+documentation </ref/contrib/postgres/index>`.
 
 New data types
 ~~~~~~~~~~~~~~
@@ -137,6 +138,9 @@ Minor features
 * You can now specify :attr:`ModelAdmin.show_full_result_count
   <django.contrib.admin.ModelAdmin.show_full_result_count>` to control whether
   or not the full count of objects should be displayed on a filtered admin page.
+
+* The ``AdminSite.password_change()`` method now has an ``extra_context``
+  parameter.
 
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -203,6 +207,10 @@ Minor features
   <django.http.HttpRequest.get_host>` if the :setting:`SITE_ID` setting is not
   defined.
 
+* The default :class:`~django.contrib.sites.models.Site` created when running
+  ``migrate`` now respects the :setting:`SITE_ID` setting (instead of always
+  using ``pk=1``).
+
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -248,6 +256,9 @@ Email
 
 * The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now supports
   setting the ``timeout`` parameter with the :setting:`EMAIL_TIMEOUT` setting.
+
+* :class:`~django.core.mail.EmailMessage` and ``EmailMultiAlternatives`` now
+  support the ``reply_to`` parameter.
 
 File Storage
 ^^^^^^^^^^^^
@@ -369,6 +380,9 @@ Management Commands
   :setting:`FIXTURE_DIRS` contains duplicates or a default fixture directory
   path (``app_name/fixtures``), an exception is raised.
 
+* :djadmin:`makemigrations` now supports an :djadminopt:`--exit` option to
+  exit with an error code if no migrations are created.
+
 Middleware
 ^^^^^^^^^^
 
@@ -420,6 +434,18 @@ Models
   attribute allows creating bilateral transformations. These transformations
   are applied to both ``lhs`` and ``rhs`` when used in a lookup expression,
   providing opportunities for more sophisticated lookups.
+
+* SQL special characters (\, %, _) are now escaped properly when a pattern
+  lookup (e.g. ``contains``, ``startswith``, etc.) is used with an ``F()``
+  expression as the right-hand side. In those cases, the escaping is performed
+  by the database, which can lead to somewhat complex queries involving nested
+  ``REPLACE`` function calls.
+
+* You can now refresh model instances by using :meth:`Model.refresh_from_db()
+  <django.db.models.Model.refresh_from_db>`.
+
+* You can now get the set of deferred fields for a model using
+  :meth:`Model.get_deferred_fields() <django.db.models.Model.get_deferred_fields>`.
 
 Signals
 ^^^^^^^
@@ -516,6 +542,9 @@ Tests
 * Added several settings that allow customization of test tablespace parameters
   for Oracle: :setting:`DATAFILE`, :setting:`DATAFILE_TMP`,
   :setting:`DATAFILE_MAXSIZE` and :setting:`DATAFILE_TMP_MAXSIZE`.
+
+* The :func:`~django.test.override_settings` decorator can now affect the
+  master router in :setting:`DATABASE_ROUTERS`.
 
 Validators
 ^^^^^^^^^^
