@@ -1,9 +1,8 @@
-import warnings
-from django.utils.deprecation import RemovedInDjango20Warning
-
 """
 Parser and utilities for the smart 'if' tag
 """
+import warnings
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 # Using a simple top down parser, as described here:
@@ -180,7 +179,7 @@ class IfParser(object):
         else:
             if token == '=':
                 warnings.warn(
-                    "Operator ``=`` is deprecated and will be removed in Django 2.0. Use ``==`` instead.",
+                    "Operator '=' is deprecated and will be removed in Django 2.0. Use '==' instead.",
                     RemovedInDjango20Warning, stacklevel=2
                 )
             return op()
