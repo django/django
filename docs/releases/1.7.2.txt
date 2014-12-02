@@ -44,7 +44,7 @@ Bugfixes
 * Fixed a migration crash that prevented changing a nullable field with a
   default to non-nullable with the same default (:ticket:`23738`).
 
-* Fixed a migrations crash when adding ``GeometryField``\s with ``blank=True``
+* Fixed a migration crash when adding ``GeometryField``\s with ``blank=True``
   on PostGIS (:ticket:`23731`).
 
 * Allowed usage of ``DateTimeField()`` as ``Transform.output_field``
@@ -63,7 +63,7 @@ Bugfixes
 * Fixed a migration crash when a field is renamed that is part of an
   ``index_together`` (:ticket:`23859`).
 
-* Fixed :djadmin:`squashmigrations` to respect the  ``--no-optimize`` parameter
+* Fixed :djadmin:`squashmigrations` to respect the ``--no-optimize`` parameter
   (:ticket:`23799`).
 
 * Made :class:`~django.db.migrations.operations.RenameModel` reversible
@@ -144,7 +144,7 @@ Bugfixes
 * ``makemigrations`` no longer prompts for a default value when adding
   ``TextField()`` or ``CharField()`` without a ``default`` (:ticket:`23405`).
 
-* Fixed migration crash when adding ``order_with_respect_to`` to a table
+* Fixed a migration crash when adding ``order_with_respect_to`` to a table
   with existing rows (:ticket:`23983`).
 
 * Restored the ``pre_migrate`` signal if all apps have migrations
@@ -181,3 +181,6 @@ Bugfixes
 
 * Supported strings escaped by third-party libraries with the ``__html__``
   convention in the template engine (:ticket:`23831`).
+
+* Fixed a migration crash when changing a ``ManyToManyField`` into a concrete
+  field and vice versa (:ticket:`23938`).
