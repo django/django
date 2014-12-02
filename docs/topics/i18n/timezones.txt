@@ -311,7 +311,7 @@ time zone is unset, the default time zone applies.
 get_current_timezone
 ~~~~~~~~~~~~~~~~~~~~
 
-When the ``django.core.context_processors.tz`` context processor is
+When the ``django.template.context_processors.tz`` context processor is
 enabled -- by default, it is -- each :class:`~django.template.RequestContext`
 contains a ``TIME_ZONE`` variable that provides the name of the current time
 zone.

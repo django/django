@@ -381,7 +381,7 @@ There are a few other helpers outside of the
 :mod:`staticfiles <django.contrib.staticfiles>` app to work with static
 files:
 
-- The :func:`django.core.context_processors.static` context processor
+- The :func:`django.template.context_processors.static` context processor
   which adds :setting:`STATIC_URL` to every template context rendered
   with :class:`~django.template.RequestContext` contexts.
 

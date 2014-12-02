@@ -46,11 +46,11 @@ To take advantage of CSRF protection in your views, follow these steps:
    that would cause the CSRF token to be leaked, leading to a vulnerability.
 
 3. In the corresponding view functions, ensure that the
-   ``'django.core.context_processors.csrf'`` context processor is
+   ``'django.template.context_processors.csrf'`` context processor is
    being used. Usually, this can be done in one of two ways:
 
    1. Use RequestContext, which always uses
-      ``'django.core.context_processors.csrf'`` (no matter what your
+      ``'django.template.context_processors.csrf'`` (no matter what your
       TEMPLATE_CONTEXT_PROCESSORS setting).  If you are using
       generic views or contrib apps, you are covered already, since these
       apps use RequestContext throughout.
@@ -58,8 +58,8 @@ To take advantage of CSRF protection in your views, follow these steps:
    2. Manually import and use the processor to generate the CSRF token and
       add it to the template context. e.g.::
 
-          from django.core.context_processors import csrf
           from django.shortcuts import render_to_response
+          from django.template.context_processors import csrf
 
           def my_view(request):
               c = {}

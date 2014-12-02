@@ -1014,6 +1014,12 @@ Related to the previous item, referencing views as strings in the ``url()``
 function is deprecated. Pass the callable view as described in the previous
 section instead.
 
+``django.core.context_processors``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Built-in template context processors have been moved to
+``django.template.context_processors``.
+
 ``django.test.SimpleTestCase.urls``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

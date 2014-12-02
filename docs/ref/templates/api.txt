@@ -457,15 +457,15 @@ and return a dictionary of items to be merged into the context. By default,
 :setting:`TEMPLATE_CONTEXT_PROCESSORS` is set to::
 
     ("django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
+    "django.template.context_processors.debug",
+    "django.template.context_processors.i18n",
+    "django.template.context_processors.media",
+    "django.template.context_processors.static",
+    "django.template.context_processors.tz",
     "django.contrib.messages.context_processors.messages")
 
 In addition to these, ``RequestContext`` always uses
-``django.core.context_processors.csrf``.  This is a security
+``django.template.context_processors.csrf``.  This is a security
 related context processor required by the admin and other contrib apps, and,
 in case of accidental misconfiguration, it is deliberately hardcoded in and
 cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
@@ -526,10 +526,10 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
   ``django.contrib.auth.context_processors.PermWrapper``, representing the
   permissions that the currently logged-in user has.
 
-.. currentmodule:: django.core.context_processors
+.. currentmodule:: django.template.context_processors
 
-django.core.context_processors.debug
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.debug
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain these two variables -- but only if your
@@ -543,8 +543,8 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
   and how long it took. The list is in order by query and lazily generated
   on access.
 
-django.core.context_processors.i18n
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.i18n
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain these two variables:
@@ -555,15 +555,15 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 
 See :doc:`/topics/i18n/index` for more.
 
-django.core.context_processors.media
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.media
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
 value of the :setting:`MEDIA_URL` setting.
 
-django.core.context_processors.static
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.static
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: static
 
@@ -571,15 +571,15 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``STATIC_URL``, providing the
 value of the :setting:`STATIC_URL` setting.
 
-django.core.context_processors.csrf
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.csrf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
 </ref/csrf>`.
 
-django.core.context_processors.request
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.request
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``request``, which is the current

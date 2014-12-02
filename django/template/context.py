@@ -2,7 +2,7 @@ from copy import copy
 
 
 # Hard-coded processor for easier use of CSRF protection.
-_builtin_context_processors = ('django.core.context_processors.csrf',)
+_builtin_context_processors = ('django.template.context_processors.csrf',)
 
 
 class ContextPopException(Exception):
