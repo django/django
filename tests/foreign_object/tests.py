@@ -5,7 +5,7 @@ from .models import (
     Country, Person, Group, Membership, Friendship, Article,
     ArticleTranslation, ArticleTag, ArticleIdea, NewsArticle)
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils.translation import activate
+from django.utils import translation
 from django.core.exceptions import FieldError
 from django import forms
 
@@ -309,8 +309,8 @@ class MultiColumnFKTests(TestCase):
         normal_groups_lists = [list(p.groups.all()) for p in Person.objects.all()]
         self.assertEqual(groups_lists, normal_groups_lists)
 
+    @translation.override('fi')
     def test_translations(self):
-        activate('fi')
         a1 = Article.objects.create(pub_date=datetime.date.today())
         at1_fi = ArticleTranslation(article=a1, lang='fi', title='Otsikko', body='Diipadaapa')
         at1_fi.save()
@@ -338,10 +338,11 @@ class MultiColumnFKTests(TestCase):
             list(Article.objects.filter(active_translation__abstract=None,
                                         active_translation__pk__isnull=False)),
             [a1])
-        activate('en')
-        self.assertEqual(
-            list(Article.objects.filter(active_translation__abstract=None)),
-            [a1, a2])
+
+        with translation.override('en'):
+            self.assertEqual(
+                list(Article.objects.filter(active_translation__abstract=None)),
+                [a1, a2])
 
     def test_foreign_key_raises_informative_does_not_exist(self):
         referrer = ArticleTranslation()
@@ -365,8 +366,8 @@ class MultiColumnFKTests(TestCase):
         with self.assertRaises(FieldError):
             Article.objects.filter(ideas__name="idea1")
 
+    @translation.override('fi')
     def test_inheritance(self):
-        activate("fi")
         na = NewsArticle.objects.create(pub_date=datetime.date.today())
         ArticleTranslation.objects.create(
             article=na, lang="fi", title="foo", body="bar")
