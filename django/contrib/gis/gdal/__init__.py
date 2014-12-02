@@ -47,6 +47,7 @@ try:
     from django.contrib.gis.gdal.driver import Driver  # NOQA
     from django.contrib.gis.gdal.datasource import DataSource  # NOQA
     from django.contrib.gis.gdal.libgdal import gdal_version, gdal_full_version, GDAL_VERSION  # NOQA
+    from django.contrib.gis.gdal.raster.source import GDALRaster  # NOQA
     from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform  # NOQA
     from django.contrib.gis.gdal.geometries import OGRGeometry  # NOQA
     HAS_GDAL = True
