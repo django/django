@@ -4,10 +4,37 @@ Django 1.7.2 release notes
 
 *Under development*
 
-Django 1.7.2 fixes several bugs in 1.7.1.
+Django 1.7.2 fixes several bugs in 1.7.1. This includes a change you may need
+to make to avoid a new deprecation warning.
 
 Additionally, Django's vendored version of six, :mod:`django.utils.six`, has
 been upgraded to the latest release (1.8.0).
+
+``SessionAuthenticationMiddleware`` causes ``"Vary: Cookie"`` on all requests
+=============================================================================
+
+The new ``SessionAuthenticationMiddleware`` in Django 1.7 set a
+``"Vary: Cookie"`` header on all responses. Adding this header to all responses
+prevents caching of requests that otherwise would not vary per-user. The
+approach to session verification has been reworked to fix this issue.
+The ``SessionAuthenticationMiddleware`` has been stripped of its functionality
+and a new setting :setting:`AUTH_VERIFY_SESSION` has been added.
+
+For backwards compatibility, if
+``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` appears
+in :setting:`MIDDLEWARE_CLASSES`, the new session verification will be activated
+(the same as if :setting:`AUTH_VERIFY_SESSION` were ``True``). You should set
+``AUTH_VERIFY_SESSION = True`` in your settings and remove
+``SessionAuthenticationMiddleware`` from your ``MIDDLEWARE_CLASSES`` to silence
+the deprecation warning.
+
+The ``SessionAuthenticationMiddleware`` stub will be removed in Django 1.8.
+Session verification will become mandatory in Django 1.9, so you should
+activate it sometime before then after reading the :ref:`upgrade considerations
+<session-invalidation-on-password-change>`.
+
+``SessionAuthenticationMiddleware`` has been removed from the ``startproject``
+template and replaced by ``AUTH_VERIFY_SESSION = True``.
 
 Bugfixes
 ========
