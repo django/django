@@ -895,7 +895,7 @@ For each field, we describe the default widget used if you don't specify
     These are the same as ``CharField.max_length`` and ``CharField.min_length``.
 
 ``UUIDField``
--------------
+~~~~~~~~~~~~~
 
 .. versionadded:: 1.8
 
