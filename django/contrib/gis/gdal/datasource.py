@@ -67,10 +67,7 @@ class DataSource(GDALBase):
         # See also http://trac.osgeo.org/gdal/wiki/rfc23_ogr_unicode
         self.encoding = encoding
 
-        # Registering all the drivers, this needs to be done
-        #  _before_ we try to open up a data source.
-        if not capi.get_driver_count():
-            capi.register_all()
+        Driver.ensure_registered()
 
         if isinstance(ds_input, six.string_types):
             # The data source driver is a void pointer.
