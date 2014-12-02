@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
-from decimal import Decimal
 
 from django.conf import settings
 from django.contrib import admin
@@ -169,29 +168,6 @@ class UtilTests(SimpleTestCase):
 
         display_value = display_for_field(None, models.FloatField())
         self.assertEqual(display_value, EMPTY_CHANGELIST_VALUE)
-
-    def test_decimal_display_for_field(self):
-        """
-        Regression test for #23935: display_for_field should keep decimals
-        in fixed point string (not exponential notation).
-        """
-        display_value = display_for_field(Decimal("1"), models.DecimalField())
-        self.assertEqual(display_value, "1")
-
-        display_value = display_for_field(Decimal("0.1"), models.DecimalField())
-        self.assertEqual(display_value, "0.1")
-
-        display_value = display_for_field(Decimal("0.000001"), models.DecimalField())
-        self.assertEqual(display_value, "0.000001")
-
-        display_value = display_for_field(Decimal("0.0000001"), models.DecimalField())
-        self.assertEqual(display_value, "0.0000001")
-
-        display_value = display_for_field(Decimal("0.0000000000001"), models.DecimalField())
-        self.assertEqual(display_value, "0.0000000000001")
-
-        display_value = display_for_field(Decimal("10000000000000.000000000"), models.DecimalField())
-        self.assertEqual(display_value, "10000000000000.000000000")
 
     def test_label_for_field(self):
         """
