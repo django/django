@@ -1,6 +1,7 @@
 from unittest import TestCase
 from django.utils.numberformat import format as nformat
 from sys import float_info
+from decimal import Decimal
 
 
 class TestNumberFormat(TestCase):
@@ -45,3 +46,12 @@ class TestNumberFormat(TestCase):
         self.assertEqual(nformat(0 - int_max, '.'), most_max.format('-', '8'))
         self.assertEqual(nformat(-1 - int_max, '.'), most_max.format('-', '9'))
         self.assertEqual(nformat(-2 * int_max, '.'), most_max2.format('-'))
+
+    def test_decimal_numbers(self):
+        self.assertEqual(nformat(Decimal('1234'), '.'), '1234')
+        self.assertEqual(nformat(Decimal('1234.2'), '.'), '1234.2')
+        self.assertEqual(nformat(Decimal('1234'), '.', decimal_pos=2), '1234.00')
+        self.assertEqual(nformat(Decimal('1234'), '.', grouping=2, thousand_sep=','), '1234')
+        self.assertEqual(nformat(Decimal('1234'), '.', grouping=2, thousand_sep=',', force_grouping=True), '12,34')
+        self.assertEqual(nformat(Decimal('-1234.33'), '.', decimal_pos=1), '-1234.3')
+        self.assertEqual(nformat(Decimal('0.00000001'), '.', decimal_pos=8), '0.00000001')
