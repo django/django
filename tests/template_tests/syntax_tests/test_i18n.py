@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
 from .utils import render, setup
 
 
-class I18nTagTests(TestCase):
+class I18nTagTests(SimpleTestCase):
 
     @setup({'i18n01': '{% load i18n %}{% trans \'xxxyyyxxx\' %}'})
     def test_i18n01(self):

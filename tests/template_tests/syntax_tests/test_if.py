@@ -1,11 +1,11 @@
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup, TestObj
 
 
-class IfTagTests(TestCase):
+class IfTagTests(SimpleTestCase):
 
     @setup({'if-tag01': '{% if foo %}yes{% else %}no{% endif %}'})
     def test_if_tag01(self):

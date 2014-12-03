@@ -1,11 +1,11 @@
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class NamedEndblockTests(TestCase):
+class NamedEndblockTests(SimpleTestCase):
 
     @setup({'namedendblocks01': '1{% block first %}_{% block second %}'
                                 '2{% endblock second %}_{% endblock first %}3'})

@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.template.base import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .test_extends import inheritance_templates
 from .utils import render, setup
 
 
-class ExceptionsTests(TestCase):
+class ExceptionsTests(SimpleTestCase):
 
     @setup({'exception01': "{% extends 'nonexistent' %}"})
     def test_exception01(self):

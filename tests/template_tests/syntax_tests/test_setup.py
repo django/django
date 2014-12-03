@@ -1,10 +1,10 @@
 from django.conf import settings
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import setup
 
 
-class SetupTests(TestCase):
+class SetupTests(SimpleTestCase):
 
     def test_setup(self):
         """

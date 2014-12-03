@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
@@ -13,7 +13,7 @@ gentlemen.
 """
 
 
-class MultilineTests(TestCase):
+class MultilineTests(SimpleTestCase):
 
     @setup({'multiline01': multiline_string})
     def test_multiline01(self):

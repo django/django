@@ -2,13 +2,13 @@ import warnings
 
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .utils import render, setup
 
 
-class FirstOfTagTests(TestCase):
+class FirstOfTagTests(SimpleTestCase):
 
     @setup({'firstof01': '{% firstof a b c %}'})
     def test_firstof01(self):

@@ -2,13 +2,13 @@ import warnings
 
 from django.conf import settings
 from django.template.base import TemplateSyntaxError
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .utils import render, setup
 
 
-class ForTagTests(TestCase):
+class ForTagTests(SimpleTestCase):
 
     @setup({'for-tag01': '{% for val in values %}{{ val }}{% endfor %}'})
     def test_for_tag01(self):

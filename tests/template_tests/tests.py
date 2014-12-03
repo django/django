@@ -13,7 +13,7 @@ from django.core import urlresolvers
 from django.template import loader, Context, RequestContext, Template, TemplateSyntaxError
 from django.template.engine import Engine
 from django.template.loaders import app_directories, filesystem
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, SimpleTestCase
 from django.test.utils import override_settings, extend_sys_path
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils._os import upath
@@ -28,7 +28,7 @@ class ContextStackException(Exception):
     pass
 
 
-class TemplateLoaderTests(TestCase):
+class TemplateLoaderTests(SimpleTestCase):
 
     def test_loaders_security(self):
         ad_loader = app_directories.Loader(Engine.get_default())
@@ -253,7 +253,7 @@ class TemplateLoaderTests(TestCase):
         )
 
 
-class TemplateRegressionTests(TestCase):
+class TemplateRegressionTests(SimpleTestCase):
 
     def test_token_smart_split(self):
         # Regression test for #7027
@@ -395,7 +395,7 @@ class TemplateRegressionTests(TestCase):
 
 # Set ALLOWED_INCLUDE_ROOTS so that ssi works.
 @override_settings(TEMPLATE_DEBUG=False, ROOT_URLCONF='template_tests.urls')
-class TemplateTests(TestCase):
+class TemplateTests(SimpleTestCase):
 
     @register_test_tags
     def test_templates(self):
@@ -501,7 +501,7 @@ class TemplateTests(TestCase):
         return output
 
 
-class TemplateTagLoading(TestCase):
+class TemplateTagLoading(SimpleTestCase):
 
     def setUp(self):
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
@@ -585,7 +585,7 @@ class RequestContextTests(unittest.TestCase):
         )
 
 
-class SSITests(TestCase):
+class SSITests(SimpleTestCase):
     def setUp(self):
         self.this_dir = os.path.dirname(os.path.abspath(upath(__file__)))
         self.ssi_dir = os.path.join(self.this_dir, "templates", "first")
