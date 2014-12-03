@@ -1,12 +1,12 @@
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils import six
 
 from .utils import render, setup
 
 
-class WidthRatioTagTests(TestCase):
+class WidthRatioTagTests(SimpleTestCase):
 
     @setup({'widthratio01': '{% widthratio a b 0 %}'})
     def test_widthratio01(self):

@@ -1,9 +1,9 @@
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class BuiltinsTests(TestCase):
+class BuiltinsTests(SimpleTestCase):
 
     @setup({'builtins01': '{{ True }}'})
     def test_builtins01(self):

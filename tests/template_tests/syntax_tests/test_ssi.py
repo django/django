@@ -1,7 +1,7 @@
 import os
 import warnings
 
-from django.test import override_settings, TestCase
+from django.test import override_settings, SimpleTestCase
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango19Warning
 
@@ -13,7 +13,7 @@ root = os.path.abspath(os.path.join(cwd, ".."))
 
 
 @override_settings(ALLOWED_INCLUDE_ROOTS=(root))
-class SsiTagTests(TestCase):
+class SsiTagTests(SimpleTestCase):
 
     # Test normal behavior
     @setup({'ssi01': '{%% ssi "%s" %%}' % os.path.join(

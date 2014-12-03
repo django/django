@@ -1,9 +1,9 @@
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class IfEqualTagTests(TestCase):
+class IfEqualTagTests(SimpleTestCase):
 
     @setup({'ifequal01': '{% ifequal a b %}yes{% endifequal %}'})
     def test_ifequal01(self):
@@ -194,7 +194,7 @@ class IfEqualTagTests(TestCase):
         self.assertEqual(output, 'x')
 
 
-class IfNotEqualTagTests(TestCase):
+class IfNotEqualTagTests(SimpleTestCase):
 
     @setup({'ifnotequal01': '{% ifnotequal a b %}yes{% endifnotequal %}'})
     def test_ifnotequal01(self):

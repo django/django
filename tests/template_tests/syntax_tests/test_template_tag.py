@@ -1,11 +1,11 @@
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class TemplateTagTests(TestCase):
+class TemplateTagTests(SimpleTestCase):
 
     @setup({'templatetag01': '{% templatetag openblock %}'})
     def test_templatetag01(self):

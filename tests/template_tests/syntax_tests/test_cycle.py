@@ -2,13 +2,13 @@ import warnings
 
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .utils import render, setup
 
 
-class CycleTagTests(TestCase):
+class CycleTagTests(SimpleTestCase):
 
     @setup({'cycle01': '{% cycle a %}'})
     def test_cycle01(self):

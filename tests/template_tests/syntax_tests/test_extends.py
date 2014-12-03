@@ -1,5 +1,5 @@
 from django.template.base import Template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
@@ -57,7 +57,7 @@ inheritance_templates = {
 }
 
 
-class InheritanceTests(TestCase):
+class InheritanceTests(SimpleTestCase):
 
     @setup(inheritance_templates)
     def test_inheritance01(self):

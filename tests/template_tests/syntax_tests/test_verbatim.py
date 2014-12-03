@@ -1,11 +1,11 @@
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class VerbatimTagTests(TestCase):
+class VerbatimTagTests(SimpleTestCase):
 
     @setup({'verbatim-tag01': '{% verbatim %}{{bare   }}{% endverbatim %}'})
     def test_verbatim_tag01(self):

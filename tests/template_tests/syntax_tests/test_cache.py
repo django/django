@@ -1,12 +1,12 @@
 from django.core.cache import cache
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class CacheTagTests(TestCase):
+class CacheTagTests(SimpleTestCase):
 
     def tearDown(self):
         cache.clear()

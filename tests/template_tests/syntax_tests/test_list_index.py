@@ -1,10 +1,10 @@
 from django.conf import settings
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class ListIndexTests(TestCase):
+class ListIndexTests(SimpleTestCase):
 
     @setup({'list-index01': '{{ var.1 }}'})
     def test_list_index01(self):

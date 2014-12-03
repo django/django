@@ -1,9 +1,9 @@
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class CommentSyntaxTests(TestCase):
+class CommentSyntaxTests(SimpleTestCase):
 
     @setup({'comment-syntax01': '{# this is hidden #}hello'})
     def test_comment_syntax01(self):
