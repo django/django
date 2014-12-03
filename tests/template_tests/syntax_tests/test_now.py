@@ -1,12 +1,12 @@
 from datetime import datetime
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.formats import date_format
 
 from .utils import render, setup
 
 
-class NowTagTests(TestCase):
+class NowTagTests(SimpleTestCase):
 
     @setup({'now01': '{% now "j n Y" %}'})
     def test_now01(self):

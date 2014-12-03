@@ -1,10 +1,10 @@
 from django.conf import settings
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class InvalidStringTests(TestCase):
+class InvalidStringTests(SimpleTestCase):
 
     @setup({'invalidstr01': '{{ var|default:"Foo" }}'})
     def test_invalidstr01(self):

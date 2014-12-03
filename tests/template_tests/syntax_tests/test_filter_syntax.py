@@ -5,13 +5,13 @@ import warnings
 from django.conf import settings
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .utils import render, setup, SomeClass, SomeOtherException, UTF8Class
 
 
-class FilterSyntaxTests(TestCase):
+class FilterSyntaxTests(SimpleTestCase):
 
     @setup({'filter-syntax01': '{{ var|upper }}'})
     def test_filter_syntax01(self):

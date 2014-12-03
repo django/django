@@ -1,11 +1,11 @@
 from django.template.base import TemplateSyntaxError
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
 from .utils import render, setup, SafeClass, UnsafeClass
 
 
-class AutoescapeTagTests(TestCase):
+class AutoescapeTagTests(SimpleTestCase):
 
     @setup({'autoescape-tag01': '{% autoescape off %}hello{% endautoescape %}'})
     def test_autoescape_tag01(self):

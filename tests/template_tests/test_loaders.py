@@ -24,7 +24,7 @@ from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template.engine import Engine
 from django.template import loader
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils import six
 from django.utils._os import upath
@@ -52,7 +52,7 @@ def create_egg(name, resources):
 
 
 @unittest.skipUnless(pkg_resources, 'setuptools is not installed')
-class EggLoaderTest(TestCase):
+class EggLoaderTest(SimpleTestCase):
     def setUp(self):
         # Defined here b/c at module scope we may not have pkg_resources
         class MockProvider(pkg_resources.NullProvider):
@@ -116,7 +116,7 @@ class EggLoaderTest(TestCase):
         )),
     )
 )
-class CachedLoader(TestCase):
+class CachedLoader(SimpleTestCase):
     def test_templatedir_caching(self):
         "Check that the template directories form part of the template cache key. Refs #13573"
         # Retrieve a template specifying a template directory to check
@@ -148,7 +148,7 @@ class CachedLoader(TestCase):
         os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     )
 )
-class RenderToStringTest(TestCase):
+class RenderToStringTest(SimpleTestCase):
     def test_basic(self):
         self.assertEqual(loader.render_to_string('test_context.html'), 'obj:\n')
 
@@ -215,7 +215,7 @@ class TemplateDirsOverrideTest(IgnorePendingDeprecationWarningsMixin, unittest.T
         )),
     )
 )
-class PriorityCacheLoader(TestCase):
+class PriorityCacheLoader(SimpleTestCase):
     def test_basic(self):
         """
         Check that the order of template loader works. Refs #21460.
@@ -228,7 +228,7 @@ class PriorityCacheLoader(TestCase):
     TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',
                       'django.template.loaders.app_directories.Loader',),
 )
-class PriorityLoader(TestCase):
+class PriorityLoader(SimpleTestCase):
     def test_basic(self):
         """
         Check that the order of template loader works. Refs #21460.

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.template.base import Context, TemplateDoesNotExist, TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .test_basic import basic_templates
 from .utils import render, setup
@@ -13,7 +13,7 @@ include_fail_templates = {
 }
 
 
-class IncludeTagTests(TestCase):
+class IncludeTagTests(SimpleTestCase):
 
     @setup({'include01': '{% include "basic-syntax01" %}'}, basic_templates)
     def test_include01(self):
