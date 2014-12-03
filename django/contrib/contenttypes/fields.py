@@ -6,7 +6,7 @@ from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db import models, router, transaction, DEFAULT_DB_ALIAS
-from django.db.models import signals, FieldDoesNotExist, DO_NOTHING
+from django.db.models import signals, FieldDoesNotExist, DO_NOTHING, FieldFlagsMixin
 from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
@@ -16,23 +16,40 @@ from django.utils.encoding import smart_text, python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
-class GenericForeignKey(object):
+class GenericForeignKey(FieldFlagsMixin):
     """
     Provides a generic relation to any object through content-type/object-id
     fields.
     """
+    # Adding a specific flag to identify GenericForeignKey without having to
+    # import base class and do instance check
+    is_gfk = True
+
+    related_model = None
+    editable = False
+    is_reverse_object = False
+
+    one_to_many = True
+    many_to_many = False
+    many_to_one = False
+    one_to_one = False
 
     def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
+        self.generate_reverse_relation = False
         self.editable = False
+        self.rel = True
+        self.column = None
+        self.has_many_values = False
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
         self.model = cls
+
         self.cache_attr = "_%s_cache" % name
-        cls._meta.add_virtual_field(self)
+        cls._meta.add_field(self, virtual=True)
 
         # Only run pre-initialization field assignment on non-abstract models
         if not cls._meta.abstract:
@@ -242,6 +259,12 @@ class GenericForeignKey(object):
 
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
+    is_reverse_object = False
+
+    many_to_one = True
+    one_to_many = False
+    many_to_many = False
+    one_to_one = False
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
@@ -302,12 +325,11 @@ class GenericRelation(ForeignObject):
 
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
-        return [(self.rel.to._meta.get_field_by_name(self.object_id_field_name)[0],
-                 self.model._meta.pk)]
+        return [(self.rel.to._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
 
     def get_path_info(self):
         opts = self.rel.to._meta
-        target = opts.get_field_by_name(self.object_id_field_name)[0]
+        target = opts.get_field(self.object_id_field_name)
         return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
 
     def get_reverse_path_info(self):
@@ -327,6 +349,7 @@ class GenericRelation(ForeignObject):
         super(GenericRelation, self).contribute_to_class(cls, name, **kwargs)
         # Save a reference to which model this class is on for future use
         self.model = cls
+        self.parent_model = cls
         # Add the descriptor for the relation
         setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self, self.for_concrete_model))
 
@@ -344,7 +367,7 @@ class GenericRelation(ForeignObject):
                                                  for_concrete_model=self.for_concrete_model)
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
-        field = self.rel.to._meta.get_field_by_name(self.content_type_field_name)[0]
+        field = self.rel.to._meta.get_field(self.content_type_field_name)
         contenttype_pk = self.get_content_type().pk
         cond = where_class()
         lookup = field.get_lookup('exact')(Col(remote_alias, field, field), contenttype_pk)

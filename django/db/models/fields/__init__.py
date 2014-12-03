@@ -37,12 +37,67 @@ __all__ = [str(x) for x in (
     'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
     'BooleanField', 'CharField', 'CommaSeparatedIntegerField', 'DateField',
     'DateTimeField', 'DecimalField', 'EmailField', 'Empty', 'Field',
-    'FieldDoesNotExist', 'FilePathField', 'FloatField',
+    'FieldDoesNotExist', 'FieldFlagsMixin', 'FilePathField', 'FloatField',
     'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
     'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
     'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
     'UUIDField',
 )]
+
+
+class FieldFlagsMixin(object):
+    """
+    Base mixin class for model fields types. This allows required field flags to
+    be computed based on the internal attributes defined on the field instance.
+    """
+
+    _FLAGS_ERROR_MESSAGE = "The mandatory field flag '%s' has not been implemented. Please implement it."
+    editable = True
+    hidden = False
+
+    @cached_property
+    def concrete(self):
+        if self.is_reverse_object:
+            return False
+        return self.column is not None
+
+    @cached_property
+    def has_relation(self):
+        if self.is_reverse_object:
+            return True
+        return self.rel is not None
+
+    @cached_property
+    def related_model(self):
+        if self.is_reverse_object:
+            return self.field.model
+        if self.has_relation:
+            return self.rel.to
+        raise AttributeError(self._FLAGS_ERROR_MESSAGE % "related_model")
+
+    @cached_property
+    def many_to_many(self):
+        if self.is_reverse_object:
+            return self.field.many_to_many
+        raise AttributeError(self._FLAGS_ERROR_MESSAGE % "many_to_many")
+
+    @cached_property
+    def many_to_one(self):
+        if self.is_reverse_object:
+            return self.field.one_to_many
+        raise AttributeError(self._FLAGS_ERROR_MESSAGE % "many_to_one")
+
+    @cached_property
+    def one_to_many(self):
+        if self.is_reverse_object:
+            return self.field.many_to_one
+        raise AttributeError(self._FLAGS_ERROR_MESSAGE % "one_to_many")
+
+    @cached_property
+    def one_to_one(self):
+        if self.is_reverse_object:
+            return self.field.one_to_one
+        raise AttributeError(self._FLAGS_ERROR_MESSAGE % "one_to_one")
 
 
 class Empty(object):
@@ -58,7 +113,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 
 def _load_field(app_label, model_name, field_name):
-    return apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+    return apps.get_model(app_label, model_name)._meta.get_field(field_name)
 
 
 class FieldDoesNotExist(Exception):
@@ -88,7 +143,7 @@ def _empty(of_cls):
 
 @total_ordering
 @python_2_unicode_compatible
-class Field(RegisterLookupMixin):
+class Field(RegisterLookupMixin, FieldFlagsMixin):
     """Base class for all field types"""
 
     # Designates whether empty strings fundamentally are allowed at the
@@ -114,6 +169,7 @@ class Field(RegisterLookupMixin):
                              "%(date_field_label)s %(lookup_type)s."),
     }
     class_lookups = default_lookups.copy()
+    is_reverse_object = False
 
     # Generic field type description, usually overridden by subclasses
     def _description(self):
@@ -128,7 +184,7 @@ class Field(RegisterLookupMixin):
             serialize=True, unique_for_date=None, unique_for_month=None,
             unique_for_year=None, choices=None, help_text='', db_column=None,
             db_tablespace=None, auto_created=False, validators=[],
-            error_messages=None):
+            error_messages=None, has_many_values=False):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -137,6 +193,7 @@ class Field(RegisterLookupMixin):
         self.blank, self.null = blank, null
         self.rel = rel
         self.default = default
+        self.has_many_values = has_many_values
         self.editable = editable
         self.serialize = serialize
         self.unique_for_date = unique_for_date
@@ -579,8 +636,9 @@ class Field(RegisterLookupMixin):
     def contribute_to_class(self, cls, name, virtual_only=False):
         self.set_attributes_from_name(name)
         self.model = cls
+        self.parent_model = cls
         if virtual_only:
-            cls._meta.add_virtual_field(self)
+            cls._meta.add_field(self, virtual=True)
         else:
             cls._meta.add_field(self)
         if self.choices:
@@ -1070,6 +1128,10 @@ class CharField(Field):
 class CommaSeparatedIntegerField(CharField):
     default_validators = [validators.validate_comma_separated_integer_list]
     description = _("Comma-separated integers")
+
+    def __init__(self, *args, **kwargs):
+        kwargs['has_many_values'] = True
+        return super(CommaSeparatedIntegerField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         defaults = {

@@ -3,7 +3,9 @@ from __future__ import unicode_literals
 
 from itertools import chain
 
-from django.contrib.admin.utils import get_fields_from_path, NotRelationField, flatten
+from django.contrib.admin.utils import (
+    get_fields_from_path, flatten, NotRelationField,
+)
 from django.core import checks
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
@@ -765,7 +767,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_list_editable_item(self, cls, model, field_name, label):
         try:
-            field = model._meta.get_field_by_name(field_name)[0]
+            field = model._meta.get_field(field_name)
         except models.FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E121')

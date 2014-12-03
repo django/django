@@ -123,8 +123,8 @@ class StateTests(TestCase):
         ))
 
         new_apps = project_state.render()
-        self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field_by_name("name")[0].max_length, 100)
-        self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field_by_name("hidden")[0].null, False)
+        self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field("name").max_length, 100)
+        self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field("hidden").null, False)
         self.assertEqual(len(new_apps.get_model("migrations", "SubTag")._meta.local_fields), 2)
 
     def test_render_model_inheritance(self):

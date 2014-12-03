@@ -1,7 +1,8 @@
 from collections import namedtuple
 
 from django.utils.encoding import smart_text
-from django.db.models.fields import BLANK_CHOICE_DASH
+from django.db.models.fields import BLANK_CHOICE_DASH, FieldFlagsMixin
+from django.utils.functional import cached_property
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -11,14 +12,21 @@ PathInfo = namedtuple('PathInfo',
                       'm2m direct')
 
 
-class RelatedObject(object):
+class RelatedObject(FieldFlagsMixin):
+    is_reverse_object = True
+    editable = False
+
     def __init__(self, parent_model, model, field):
         self.parent_model = parent_model
         self.model = model
         self.opts = model._meta
         self.field = field
-        self.name = '%s:%s' % (self.opts.app_label, self.opts.model_name)
+        self.name = self.field.related_query_name()
         self.var_name = self.opts.model_name
+
+    @cached_property
+    def hidden(self):
+        return self.field.rel.is_hidden()
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
                     limit_to_currently_related=False):

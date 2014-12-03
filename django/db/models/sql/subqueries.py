@@ -120,13 +120,15 @@ class UpdateQuery(Query):
         """
         values_seq = []
         for name, val in six.iteritems(values):
-            field, model, direct, m2m = self.get_meta().get_field_by_name(name)
-            if not direct or m2m:
+            field = self.get_meta().get_field(name)
+            direct = not field.is_reverse_object or not field.concrete
+            model = field.parent_model._meta.concrete_model
+            if not direct or (field.has_many_values and field.has_relation):
                 raise FieldError(
                     'Cannot update model field %r (only non-relations and '
                     'foreign keys permitted).' % field
                 )
-            if model:
+            if model is not self.get_meta().model:
                 self.add_related_update(model, field, val)
                 continue
             values_seq.append((field, model, val))

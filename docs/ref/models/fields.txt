@@ -1764,3 +1764,68 @@ Field API reference
 
         This method must be added to fields prior to 1.7 to migrate its data
         using :doc:`/topics/migrations`.
+
+.. _field-attributes:
+
+Field attribute reference
+=========================
+
+.. class:: Field
+
+    Every ``Field`` instance contains several attributes that allow
+    introspecting its behavior. Use these attributes instead of ``isinstance``
+    checks when you need to write code that depends on a field's functionality.
+    These attributes can be used together with the :ref:`Model._meta APIs
+    <model-meta-field-apis>` to narrow down a search for specific model fields.
+    Custom model fields should implement these flags.
+
+    Attributes for forward fields
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    .. attribute:: concrete
+
+        A concrete field has a database column associated with it. Concrete
+        fields require a database migration and always contain state.
+
+    .. attribute:: editable
+
+        An editable field is a field thats data can be manipulated in a model
+        or form. An ``Autofield``, for example, should generally not be
+        manipulated and therefore this attribute is ``False``.
+
+    .. attribute:: has_many_values
+
+        A field that can contain 1 or more values. This does not necessarily
+        need to  be a ``ManyToMany`` field, but can also be a
+        ``CommaSeparatedIntegerField`` for example.
+
+    .. attribute:: has_relation
+
+        A field has a relation when it depends on one or more models. It may
+        also generate :ref:`reverse relations <model-meta-field-types>` on the
+        pointed model.
+
+    .. attribute:: generate_reverse_relation
+
+        Not all fields with relations should generate forward objects for other
+        models. This attribute tells Django to not generate such relations
+        automatically and to let the class iself handle the relations manually.
+
+    .. attribute:: model
+
+        Returns the model that is pointed by the object. In the case of a forward
+        field, this is the model where the field was defined (in order of inheritance).
+        In case of a reverse field, this is the model that the forward relation points
+        to.
+
+    .. attribute:: parent_model
+
+        Returns the model where the relation is stored. In the case of a forward
+        field, this is the model where the field was defined (in order of inheritance).
+        In case of a reverse field, this is the model where the associated forward field
+        was defined.
+
+    .. attribute:: is_related_object
+
+        A very simple way to query if an object returned from ``get_field()``
+        or ``get_fields()`` is a reverse object or a forward object.

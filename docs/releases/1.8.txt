@@ -29,6 +29,45 @@ Like Django 1.7, Django 1.8 requires Python 2.7 or above, though we
 What's new in Django 1.8
 ========================
 
+``Model._meta`` API
+~~~~~~~~~~~~~~~~~~~
+
+Django now has an official API for ``Model._meta`` in the
+:class:`~django.db.models.options.Options` class, as well as formalized
+documentation for :ref:`field types <model-meta-field-types>` and
+:ref:`field attributes <field-attributes>`.
+
+The new API is composed of 3 main endpoints:
+
+* :meth:`Options.get_field() <django.db.models.options.Options.get_field()>`
+  retrieves a field by name. This endpoint replaces:
+
+  * ``get_field_by_name()``
+
+* :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
+  retrieves a list of fields given a specific filter criteria. This endpoint
+  replaces:
+
+  * ``get_fields_with_model()``
+  * ``get_concrete_fields_with_model()``
+  * ``get_m2m_with_model()``
+  * ``get_all_related_objects()``
+  * ``get_all_related_objects_with_model()``
+  * ``get_all_related_many_to_many_objects()``
+  * ``get_all_related_m2m_objects_with_model()``
+
+* :attr:`Options.related_objects <django.db.models.options.Options.related_objects>`
+  returns a list of related objects that point to the current model. This endpoint
+  is a cached property of :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
+  with only the ``reverse`` flag enabled.
+
+* :attr:`Options.field_names <django.db.models.options.Options.field_names>`
+  retrieves all the field names of a model. This endpoint replaces:
+
+  * ``get_all_field_names()``
+
+More details can be found in the :doc:`/ref/models/meta` docs.
+
 Security enhancements
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -855,6 +894,24 @@ Miscellaneous
 
 Features deprecated in 1.8
 ==========================
+
+Selected methods in ``django.db.models.options.Options``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following undocumented methods in the ``Model._meta`` API (from the
+:class:`django.db.models.options.Options` class) have been deprecated and will
+be removed in in Django 2.0. Use the methods and properties documented in
+:doc:`/ref/models/meta` instead.
+
+* ``get_field_by_name()``
+* ``get_all_field_names()``
+* ``get_fields_with_model()``
+* ``get_concrete_fields_with_model()``
+* ``get_m2m_with_model()``
+* ``get_all_related_objects()``
+* ``get_all_related_objects_with_model()``
+* ``get_all_related_many_to_many_objects()``
+* ``get_all_related_m2m_objects_with_model()``
 
 Loading ``cycle`` and ``firstof`` template tags from ``future`` library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

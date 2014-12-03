@@ -7,6 +7,9 @@ import warnings
 
 from django import test
 from django import forms
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
 from django.core import validators
 from django.core import checks
 from django.core.exceptions import ValidationError
@@ -18,6 +21,10 @@ from django.db.models.fields import (
     GenericIPAddressField, NOT_PROVIDED, NullBooleanField, PositiveIntegerField,
     PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
     TimeField, URLField)
+
+from django.db.models.fields.related import (
+    ForeignObject, ForeignKey, OneToOneField, ManyToManyField, RelatedObject,
+)
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
 from django.utils.functional import lazy
@@ -28,7 +35,72 @@ from .models import (
     BooleanModel, PrimaryKeyCharModel, DataModel, Document, RenamedField,
     DateTimeModel, VerboseNameField, FksToBooleans, FkToChar, FloatModel,
     SmallIntegerModel, IntegerModel, PositiveSmallIntegerModel, PositiveIntegerModel,
-    WhizIter, WhizIterEmpty)
+    WhizIter, WhizIterEmpty, AllFieldsModel)
+
+NON_CONCRETE_FIELDS = (
+    ForeignObject,
+    GenericForeignKey,
+    GenericRelation,
+)
+
+NON_EDITABLE_FIELDS = (
+    BinaryField,
+    GenericForeignKey,
+    GenericRelation,
+)
+
+RELATION_FIELDS = (
+    ForeignKey,
+    ForeignObject,
+    ManyToManyField,
+    OneToOneField,
+    GenericForeignKey,
+    GenericRelation,
+)
+
+HAS_MANY_VALUES = (
+    CommaSeparatedIntegerField,
+    ManyToManyField,
+)
+
+IS_REVERSE_OBJECT = (
+    RelatedObject,
+)
+
+ONE_TO_MANY_CLASSES = set([
+    ForeignObject,
+    ForeignKey,
+    GenericForeignKey,
+])
+
+MANY_TO_ONE_CLASSES = set([
+    RelatedObject,
+    GenericRelation,
+])
+
+MANY_TO_MANY_CLASSES = set([
+    ManyToManyField,
+])
+
+ONE_TO_ONE_CLASSES = set([
+    OneToOneField,
+])
+
+FLAG_PROPERTIES = (
+    'concrete',
+    'editable',
+    'has_relation',
+    'model',
+    'hidden',
+)
+
+FLAG_PROPERTIES_FOR_RELATIONS = (
+    'one_to_many',
+    'many_to_one',
+    'many_to_many',
+    'one_to_one',
+    'related_model'
+)
 
 
 class BasicFieldTests(test.TestCase):
@@ -671,6 +743,165 @@ class BinaryFieldTests(test.TestCase):
     def test_max_length(self):
         dm = DataModel(short_data=self.binary_data * 4)
         self.assertRaises(ValidationError, dm.full_clean)
+
+
+class FieldFlagsTests(test.TestCase):
+
+    def setUp(self):
+        self.fields = list(AllFieldsModel._meta.fields) + \
+            list(AllFieldsModel._meta.virtual_fields)
+
+        self.all_fields = self.fields + \
+            list(AllFieldsModel._meta.many_to_many) + \
+            list(AllFieldsModel._meta.virtual_fields)
+
+        self.fields_and_reverse_objects = self.all_fields + \
+            list(AllFieldsModel._meta.related_objects)
+
+    def test_each_field_should_have_a_concrete_attribute(self):
+        self.assertTrue(all(f.concrete.__class__ == bool
+                        for f in self.fields))
+
+    def test_each_field_should_have_an_editable_attribute(self):
+        self.assertTrue(all(f.editable.__class__ == bool
+                        for f in self.all_fields))
+
+    def test_each_field_should_have_a_has_rel_attribute(self):
+        self.assertTrue(all(f.has_relation.__class__ == bool
+                        for f in self.all_fields))
+
+    def test_each_object_should_have_is_reverse_object(self):
+        self.assertTrue(all(f.is_reverse_object.__class__ == bool
+                        for f in self.fields_and_reverse_objects))
+
+    def test_non_concrete_fields(self):
+        for field in self.fields:
+            if type(field) in NON_CONCRETE_FIELDS:
+                self.assertFalse(field.concrete)
+            else:
+                self.assertTrue(field.concrete)
+
+    def test_non_editable_fields(self):
+        for field in self.all_fields:
+            if type(field) in NON_EDITABLE_FIELDS:
+                self.assertFalse(field.editable)
+            else:
+                self.assertTrue(field.editable)
+
+    def test_related_fields(self):
+        for field in self.all_fields:
+            if type(field) in RELATION_FIELDS:
+                self.assertTrue(field.has_relation)
+            else:
+                self.assertFalse(field.has_relation)
+
+    def test_field_with_multiple_values(self):
+        for field in self.all_fields:
+            if type(field) in HAS_MANY_VALUES:
+                self.assertTrue(field.has_many_values)
+            else:
+                self.assertFalse(field.has_many_values)
+
+    def test_reverse_object_fields(self):
+        for field in self.fields_and_reverse_objects:
+            if type(field) in IS_REVERSE_OBJECT:
+                self.assertTrue(field.is_reverse_object)
+            else:
+                self.assertFalse(field.is_reverse_object)
+
+    def test_field_names_should_always_be_available(self):
+        for field in self.fields_and_reverse_objects:
+            self.assertTrue(field.name)
+
+    def test_all_field_types_should_have_flags(self):
+        for field in self.fields_and_reverse_objects:
+            for flag in FLAG_PROPERTIES:
+                self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
+            if field.has_relation:
+                for flag in FLAG_PROPERTIES_FOR_RELATIONS:
+                    self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
+
+    def test_cardinality_m2m(self):
+        m2m_type_fields = (
+            f for f in self.all_fields
+            if f.has_relation and f.many_to_many
+        )
+
+        # Test classes are what we expect
+        self.assertEqual(MANY_TO_MANY_CLASSES, set(
+            f.__class__ for f in m2m_type_fields
+        ))
+
+        # Ensure all m2m reverses are m2m
+        for field in m2m_type_fields:
+            reverse_field = field.related
+            self.assertTrue(reverse_field.has_relation)
+            self.assertTrue(reverse_field.many_to_many)
+            self.assertTrue(reverse_field.related_model)
+
+    def test_cardinality_o2m(self):
+        o2m_type_fields = [
+            f for f in self.fields_and_reverse_objects
+            if f.has_relation and f.one_to_many
+        ]
+
+        # Test classes are what we expect
+        self.assertEqual(ONE_TO_MANY_CLASSES, set(
+            f.__class__ for f in o2m_type_fields
+        ))
+
+        # Ensure all o2m reverses are m2o
+        for field in o2m_type_fields:
+            if hasattr(field, 'related'):
+                reverse_field = field.related
+                self.assertTrue(reverse_field.has_relation
+                                and reverse_field.many_to_one)
+
+    def test_cardinality_m2o(self):
+        m2o_type_fields = [
+            f for f in self.fields_and_reverse_objects
+            if f.has_relation and f.many_to_one
+        ]
+
+        # Test classes are what we expect
+        self.assertEqual(MANY_TO_ONE_CLASSES, set(
+            f.__class__ for f in m2o_type_fields
+        ))
+
+        # Ensure all m2o reverses are o2m
+        for obj in m2o_type_fields:
+            if hasattr(obj, 'field'):
+                reverse_field = obj.field
+                self.assertTrue(reverse_field.has_relation
+                                and reverse_field.one_to_many)
+
+    def test_cardinality_o2o(self):
+        o2o_type_fields = [
+            f for f in self.all_fields
+            if f.has_relation and f.one_to_one
+        ]
+
+        # Test classes are what we expect
+        self.assertEqual(ONE_TO_ONE_CLASSES, set(
+            f.__class__ for f in o2o_type_fields
+        ))
+
+        # Ensure all o2o reverses are o2o
+        for obj in o2o_type_fields:
+            if hasattr(obj, 'field'):
+                reverse_field = obj.field
+                self.assertTrue(reverse_field.has_relation
+                                and reverse_field.one_to_one)
+
+    def test_hidden_flag(self):
+        incl_hidden = set(AllFieldsModel._meta.get_fields(reverse=True, include_hidden=True))
+        no_hidden = set(AllFieldsModel._meta.get_fields(reverse=True))
+        fields_that_should_be_hidden = (incl_hidden - no_hidden)
+        for f in incl_hidden:
+            self.assertEqual(
+                f in fields_that_should_be_hidden,
+                f.hidden
+            )
 
 
 class GenericIPAddressFieldTests(test.TestCase):
