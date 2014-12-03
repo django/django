@@ -1,7 +1,7 @@
 from unittest import skipIf
 
 from django.conf import settings
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
@@ -12,7 +12,7 @@ except ImportError:
 
 
 @skipIf(numpy is False, "Numpy must be installed to run these tests.")
-class NumpyTests(TestCase):
+class NumpyTests(SimpleTestCase):
 
     @setup({'numpy-array-index01': '{{ var.1 }}'})
     def test_numpy_array_index01(self):

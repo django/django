@@ -4,14 +4,14 @@ import warnings
 from django.core.urlresolvers import NoReverseMatch
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import override_settings, TestCase
+from django.test import override_settings, SimpleTestCase
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .utils import render, setup
 
 
 @override_settings(ROOT_URLCONF='template_tests.urls')
-class UrlTagTests(TestCase):
+class UrlTagTests(SimpleTestCase):
 
     # Successes
     @setup({'url01': '{% url "template_tests.views.client" client.id %}'})

@@ -1,11 +1,11 @@
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class FilterTagTests(TestCase):
+class FilterTagTests(SimpleTestCase):
 
     @setup({'filter01': '{% filter upper %}{% endfilter %}'})
     def test_filter01(self):

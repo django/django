@@ -1,9 +1,9 @@
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class SpacelessTagTests(TestCase):
+class SpacelessTagTests(SimpleTestCase):
 
     @setup({'spaceless01': "{% spaceless %} <b>    <i> text </i>    </b> {% endspaceless %}"})
     def test_spaceless01(self):

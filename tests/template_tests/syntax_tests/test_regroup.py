@@ -2,12 +2,12 @@ from datetime import date
 
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class RegroupTagTests(TestCase):
+class RegroupTagTests(SimpleTestCase):
 
     @setup({'regroup01': ''
                          '{% regroup data by bar as grouped %}'

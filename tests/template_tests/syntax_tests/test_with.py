@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.template.base import TemplateSyntaxError
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class WithTagTests(TestCase):
+class WithTagTests(SimpleTestCase):
 
     @setup({'with01': '{% with key=dict.key %}{{ key }}{% endwith %}'})
     def test_with01(self):

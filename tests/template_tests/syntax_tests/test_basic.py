@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.template.base import Context, TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup, SilentGetItemClass, SilentAttrClass, SomeClass
 
@@ -13,7 +13,7 @@ basic_templates = {
 }
 
 
-class BasicSyntaxTests(TestCase):
+class BasicSyntaxTests(SimpleTestCase):
 
     @setup(basic_templates)
     def test_basic_syntax01(self):

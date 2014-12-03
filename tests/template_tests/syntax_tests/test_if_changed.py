@@ -1,9 +1,9 @@
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class IfChangedTagTests(TestCase):
+class IfChangedTagTests(SimpleTestCase):
 
     @setup({'ifchanged01': '{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}'})
     def test_ifchanged01(self):

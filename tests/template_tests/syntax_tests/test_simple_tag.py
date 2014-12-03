@@ -1,11 +1,11 @@
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .utils import render, setup
 
 
-class SimpleTagTests(TestCase):
+class SimpleTagTests(SimpleTestCase):
 
     @setup({'simpletag-renamed01': '{% load custom %}{% minusone 7 %}'})
     def test_simpletag_renamed01(self):
