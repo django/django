@@ -1461,8 +1461,8 @@ Miscellaneous
 
 * With the addition of the
   :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` to
-  the default project template, a database must be created before accessing
-  a page using :djadmin:`runserver`.
+  the default project template (pre-1.7.2 only), a database must be created
+  before accessing a page using :djadmin:`runserver`.
 
 .. _deprecated-features-1.7:
 
