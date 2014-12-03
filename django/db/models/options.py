@@ -281,7 +281,9 @@ class Options(object):
                 field.related_model._meta._expire_cache(forward=False)
             except AttributeError:
                 pass
-        self._expire_cache(reverse=False)
+            self._expire_cache()
+        else:
+            self._expire_cache(reverse=False)
 
     def setup_pk(self, field):
         if not self.pk and field.primary_key:
