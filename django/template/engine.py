@@ -20,7 +20,7 @@ class Engine(object):
     def __init__(self, dirs=None, app_dirs=False,
                  allowed_include_roots=None, context_processors=None,
                  debug=False, loaders=None, string_if_invalid='',
-                 file_charset=None):
+                 file_charset='utf-8'):
         if dirs is None:
             dirs = []
         if allowed_include_roots is None:
@@ -35,8 +35,6 @@ class Engine(object):
             if app_dirs:
                 raise ImproperlyConfigured(
                     "APP_DIRS must not be set when LOADERS is defined.")
-        if file_charset is None:
-            file_charset = 'utf-8'
 
         self.dirs = dirs
         self.app_dirs = app_dirs
