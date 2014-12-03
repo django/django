@@ -52,6 +52,7 @@ def setup(templates, *args):
                 ('django.template.loaders.locmem.Loader', templates),
             ]),
         ])
+        @functools.wraps(func)
         def inner(self):
             loader = Engine.get_default().template_loaders[0]
 
