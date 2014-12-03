@@ -329,6 +329,20 @@ class MigrationWriter(object):
         elif isinstance(value, models.Field):
             attr_name, path, args, kwargs = value.deconstruct()
             return cls.serialize_deconstructed(path, args, kwargs)
+        # Classes
+        elif isinstance(value, type):
+            special_cases = [
+                (models.Model, "models.Model", []),
+            ]
+            for case, string, imports in special_cases:
+                if case is value:
+                    return string, set(imports)
+            if hasattr(value, "__module__"):
+                module = value.__module__
+                if module == six.moves.builtins.__name__:
+                    return value.__name__, set()
+                else:
+                    return "%s.%s" % (module, value.__name__), {"import %s" % module}
         # Anything that knows how to deconstruct itself.
         elif hasattr(value, 'deconstruct'):
             return cls.serialize_deconstructed(*value.deconstruct())
@@ -362,20 +376,6 @@ class MigrationWriter(object):
                     "For more information, see https://docs.djangoproject.com/en/1.7/topics/migrations/#serializing-values"
                     % (value.__name__, module_name))
             return "%s.%s" % (module_name, value.__name__), set(["import %s" % module_name])
-        # Classes
-        elif isinstance(value, type):
-            special_cases = [
-                (models.Model, "models.Model", []),
-            ]
-            for case, string, imports in special_cases:
-                if case is value:
-                    return string, set(imports)
-            if hasattr(value, "__module__"):
-                module = value.__module__
-                if module == six.moves.builtins.__name__:
-                    return value.__name__, set()
-                else:
-                    return "%s.%s" % (module, value.__name__), set(["import %s" % module])
         # Other iterables
         elif isinstance(value, collections.Iterable):
             imports = set()
