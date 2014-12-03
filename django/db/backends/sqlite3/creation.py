@@ -1,6 +1,7 @@
 import os
 import sys
 
+from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.creation import BaseDatabaseCreation
 from django.utils.six.moves import input
 
@@ -51,14 +52,22 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _get_test_db_name(self):
         test_database_name = self.connection.settings_dict['TEST']['NAME']
         if test_database_name and test_database_name != ':memory:':
+            if 'mode=memory' in test_database_name:
+                raise ImproperlyConfigured(
+                    "Using `mode=memory` parameter in the database name is not allowed, "
+                    "use `:memory:` instead."
+                )
             return test_database_name
+        if self.connection.features.can_share_in_memory_db:
+            return 'file:memorydb_%s?mode=memory&cache=shared' % self.connection.alias
         return ':memory:'
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         test_database_name = self._get_test_db_name()
+
         if keepdb:
             return test_database_name
-        if test_database_name != ':memory:':
+        if not self.connection.is_in_memory_db(test_database_name):
             # Erase the old test database
             if verbosity >= 1:
                 print("Destroying old test database '%s'..." % self.connection.alias)
@@ -80,7 +89,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         return test_database_name
 
     def _destroy_test_db(self, test_database_name, verbosity):
-        if test_database_name and test_database_name != ":memory:":
+        if test_database_name and not self.connection.is_in_memory_db(test_database_name):
             # Remove the SQLite database file
             os.remove(test_database_name)
 
@@ -92,8 +101,8 @@ class DatabaseCreation(BaseDatabaseCreation):
         SQLite since the databases will be distinct despite having the same
         TEST NAME. See http://www.sqlite.org/inmemorydb.html
         """
-        test_dbname = self._get_test_db_name()
+        test_database_name = self._get_test_db_name()
         sig = [self.connection.settings_dict['NAME']]
-        if test_dbname == ':memory:':
+        if self.connection.is_in_memory_db(test_database_name):
             sig.append(self.connection.alias)
         return tuple(sig)
