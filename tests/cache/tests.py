@@ -941,6 +941,24 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         transaction.rollback()
         self.assertIsNone(cache.get("key1"))
 
+    def test_incr_reuses_timeout(self):
+        """
+        Incr shouldn't alter the expiration time. (#23326)
+        """
+        db = router.db_for_read(cache.cache_model_class)
+        table = connections[db].ops.quote_name(cache._table)
+
+        def get_expires(key):
+            key = cache.make_key(key)
+            with connections[db].cursor() as cursor:
+                cursor.execute("SELECT expires FROM %s "
+                               "WHERE cache_key = %%s" % table, [key])
+                return cursor.fetchone()[0]
+        cache.set('answer', 41)
+        expires = get_expires('answer')
+        self.assertEqual(cache.incr('answer'), 42)
+        self.assertEqual(expires, get_expires('answer'))
+
 
 @override_settings(USE_TZ=True)
 class DBCacheWithTimeZoneTests(DBCacheTests):
