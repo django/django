@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 import re
+import sys
 import uuid
 import warnings
 
@@ -122,6 +123,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def can_release_savepoints(self):
         return self.uses_savepoints
+
+    @cached_property
+    def can_share_in_memory_db(self):
+        return (
+            sys.version_info[:2] >= (3, 4) and
+            Database.__name__ == 'sqlite3.dbapi2' and
+            Database.sqlite_version_info >= (3, 7, 13)
+        )
 
     @cached_property
     def supports_stddev(self):
@@ -405,6 +414,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 RuntimeWarning
             )
         kwargs.update({'check_same_thread': False})
+        if self.features.can_share_in_memory_db:
+            kwargs.update({'uri': True})
         return kwargs
 
     def get_new_connection(self, conn_params):
@@ -429,7 +440,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # If database is in memory, closing the connection destroys the
         # database. To prevent accidental data loss, ignore close requests on
         # an in-memory db.
-        if self.settings_dict['NAME'] != ":memory:":
+        if not self.is_in_memory_db(self.settings_dict['NAME']):
             BaseDatabaseWrapper.close(self)
 
     def _savepoint_allowed(self):
@@ -504,6 +515,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         savepoints when autocommit is disabled.
         """
         self.cursor().execute("BEGIN")
+
+    def is_in_memory_db(self, name):
+        return name == ":memory:" or "mode=memory" in name
 
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')

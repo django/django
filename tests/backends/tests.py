@@ -6,6 +6,7 @@ import copy
 import datetime
 from decimal import Decimal, Rounded
 import re
+import sys
 import threading
 import unittest
 import warnings
@@ -1201,3 +1202,21 @@ class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):
     def test_empty_settings(self):
         with override_settings(DATABASES=self.db_settings):
             self.handler.prepare_test_settings('default')
+
+
+@unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite specific test.')
+@skipUnlessDBFeature('can_share_in_memory_db')
+class TestSqliteThreadSharing(TransactionTestCase):
+    available_apps = ['backends']
+
+    def test_database_sharing_in_threads(self):
+        def create_object():
+            models.Object.objects.create()
+
+        create_object()
+
+        thread = threading.Thread(target=create_object)
+        thread.start()
+        thread.join()
+
+        self.assertEqual(models.Object.objects.count(), 2)

@@ -573,6 +573,10 @@ Tests
 
 * Added test client support for file uploads with file-like objects.
 
+* A shared cache is now used when testing with a SQLite in-memory database when
+  using Python 3.4+ and SQLite 3.7.13+. This allows sharing the database
+  between threads.
+
 Validators
 ^^^^^^^^^^
 
