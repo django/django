@@ -406,7 +406,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         rel_name = None
         for part in parts[:-1]:
             try:
-                field, _, _, _ = model._meta.get_field_by_name(part)
+                field = model._meta.get_field(part)
             except FieldDoesNotExist:
                 # Lookups on non-existent fields are ok, since they're ignored
                 # later.
@@ -473,8 +473,11 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             for inline in admin.inlines:
                 registered_models.add(inline.model)
 
-        for related_object in (opts.get_all_related_objects(include_hidden=True) +
-                               opts.get_all_related_many_to_many_objects()):
+        related_objects = (
+            f for f in opts.get_fields(include_hidden=True)
+            if f.is_reverse_object
+        )
+        for related_object in related_objects:
             related_model = related_object.model
             if (any(issubclass(model, related_model) for model in registered_models) and
                     related_object.field.rel.get_related_field() == field):

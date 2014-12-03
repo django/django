@@ -95,6 +95,8 @@ signals.class_prepared.connect(do_pending_lookups)
 
 
 class RelatedField(Field):
+    generate_reverse_relation = True
+
     def check(self, **kwargs):
         errors = super(RelatedField, self).check(**kwargs)
         errors.extend(self._check_related_name_is_valid())
@@ -232,10 +234,7 @@ class RelatedField(Field):
         # Check clashes between accessors/reverse query names of `field` and
         # any other field accessor -- i. e. Model.foreign accessor clashes with
         # Model.m2m accessor.
-        potential_clashes = rel_opts.get_all_related_many_to_many_objects()
-        potential_clashes += rel_opts.get_all_related_objects()
-        potential_clashes = (r for r in potential_clashes
-            if r.field is not self)
+        potential_clashes = (r for r in rel_opts.related_objects if r.field is not self)
         for clash_field in potential_clashes:
             clash_name = "%s.%s" % (  # i. e. "Model.m2m"
                 clash_field.model._meta.object_name,
@@ -1266,7 +1265,7 @@ class ForeignObjectRel(object):
 
     def is_hidden(self):
         "Should the related object be hidden?"
-        return self.related_name and self.related_name[-1] == '+'
+        return bool(self.related_name and self.related_name[-1] == '+')
 
     def get_joining_columns(self):
         return self.field.get_reverse_joining_columns()
@@ -1303,11 +1302,11 @@ class ManyToOneRel(ForeignObjectRel):
         Returns the Field in the 'to' object to which this relationship is
         tied.
         """
-        data = self.to._meta.get_field_by_name(self.field_name)
-        if not data[2]:
+        field = self.to._meta.get_field(self.field_name)
+        if not field.concrete:
             raise FieldDoesNotExist("No related field named '%s'" %
                     self.field_name)
-        return data[0]
+        return field
 
     def set_field_name(self):
         self.field_name = self.field_name or self.to._meta.pk.name
@@ -1344,7 +1343,7 @@ class ManyToManyRel(object):
 
     def is_hidden(self):
         "Should the related object be hidden?"
-        return self.related_name and self.related_name[-1] == '+'
+        return bool(self.related_name and self.related_name[-1] == '+')
 
     def get_related_field(self):
         """
@@ -1363,8 +1362,13 @@ class ManyToManyRel(object):
 
 
 class ForeignObject(RelatedField):
+    # Field flags
+    one_to_many = True
+    one_to_one = False
+    many_to_many = False
+    many_to_one = False
+
     requires_unique_target = True
-    generate_reverse_relation = True
     related_accessor_class = ForeignRelatedObjectsDescriptor
 
     def __init__(self, to, from_fields, to_fields, swappable=True, **kwargs):
@@ -1483,9 +1487,9 @@ class ForeignObject(RelatedField):
             from_field_name = self.from_fields[index]
             to_field_name = self.to_fields[index]
             from_field = (self if from_field_name == 'self'
-                          else self.opts.get_field_by_name(from_field_name)[0])
+                          else self.opts.get_field(from_field_name))
             to_field = (self.rel.to._meta.pk if to_field_name is None
-                        else self.rel.to._meta.get_field_by_name(to_field_name)[0])
+                        else self.rel.to._meta.get_field(to_field_name))
             related_fields.append((from_field, to_field))
         return related_fields
 
@@ -1881,6 +1885,11 @@ class OneToOneField(ForeignKey):
     related_accessor_class = SingleRelatedObjectDescriptor
     description = _("One-to-one relationship")
 
+    many_to_many = False
+    one_to_many = False
+    many_to_one = False
+    one_to_one = True
+
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['unique'] = True
         super(OneToOneField, self).__init__(to, to_field, OneToOneRel, **kwargs)
@@ -1963,6 +1972,12 @@ def create_many_to_many_intermediary_model(field, klass):
 
 
 class ManyToManyField(RelatedField):
+    # Field flags
+    one_to_many = False
+    one_to_one = False
+    many_to_many = True
+    many_to_one = False
+
     description = _("Many-to-many relationship")
 
     def __init__(self, to, db_constraint=True, swappable=True, **kwargs):
@@ -1978,6 +1993,7 @@ class ManyToManyField(RelatedField):
             # here to break early if there's a problem.
             to = str(to)
 
+        kwargs['has_many_values'] = True
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = ManyToManyRel(to,
             related_name=kwargs.pop('related_name', None),
@@ -2283,8 +2299,8 @@ class ManyToManyField(RelatedField):
         """
         pathinfos = []
         int_model = self.rel.through
-        linkfield1 = int_model._meta.get_field_by_name(self.m2m_field_name())[0]
-        linkfield2 = int_model._meta.get_field_by_name(self.m2m_reverse_field_name())[0]
+        linkfield1 = int_model._meta.get_field(self.m2m_field_name())
+        linkfield2 = int_model._meta.get_field(self.m2m_reverse_field_name())
         if direct:
             join1infos = linkfield1.get_reverse_path_info()
             join2infos = linkfield2.get_path_info()

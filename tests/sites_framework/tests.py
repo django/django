@@ -20,7 +20,7 @@ class SitesFrameworkTestCase(TestCase):
     def tearDown(self):
         apps.app_configs['sites_framework'].models = self._old_models
         apps.all_models['sites_framework'] = self._old_models
-        apps.clear_cache()
+        apps.clear_cache(True)
 
     def test_site_fk(self):
         article = ExclusiveArticle.objects.create(title="Breaking News!", site_id=settings.SITE_ID)

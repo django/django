@@ -331,13 +331,19 @@ class Apps(object):
         self.apps_ready = self.models_ready = self.ready = True
         self.clear_cache()
 
-    def clear_cache(self):
+    def clear_cache(self, expire_models_cache=False):
         """
         Clears all internal caches, for methods that alter the app registry.
 
         This is mostly used in tests.
         """
+        # Call expire cache on each model. This will purge
+        # the relation tree and the fields cache.
         self.get_models.cache_clear()
+        if expire_models_cache:
+            self.check_apps_ready()
+            for model in self.get_models(include_auto_created=True):
+                model._meta._expire_cache()
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 
