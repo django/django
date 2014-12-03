@@ -1156,6 +1156,13 @@ The default value of the
 :attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
 attribute will change from ``True`` to ``False`` in Django 1.9.
 
+``=`` as comparison operator in ``if`` template tag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There was an undocumented and untested feature introduced in Django 1.2 that allowed
+ you to use both ``==`` and ``=`` to check if objects are equal in ``if`` template tag.
+It's now deprecated in favor of ``==``.
+
 .. removed-features-1.8:
 
 Features removed in 1.8

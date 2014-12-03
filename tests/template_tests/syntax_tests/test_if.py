@@ -1,6 +1,7 @@
 from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .utils import render, setup, TestObj
 
@@ -108,6 +109,62 @@ class IfTagTests(TestCase):
     def test_if_tag_eq05(self):
         output = render('if-tag-eq05')
         self.assertEqual(output, 'no')
+
+    # This five following tests should be changed to template.TemplateSyntaxError when deprication path ends in Django 2.0
+    @setup({'if-tag-eq06': '{% if foo = bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_eq06(self):
+        with self.assertRaises(RemovedInDjango20Warning):
+            output = render('if-tag-eq06', {'foo': 1})
+            self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-eq07': '{% if foo = bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_eq07(self):
+        with self.assertRaises(RemovedInDjango20Warning):
+            output = render('if-tag-eq07', {'foo': 1})
+            self.assertEqual(output, 'no')
+
+    @setup({'if-tag-eq08': '{% if foo = bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_eq08(self):
+        with self.assertRaises(RemovedInDjango20Warning):
+            output = render('if-tag-eq08', {'foo': 1, 'bar': 1})
+            self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-eq09': '{% if foo = bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_eq09(self):
+        with self.assertRaises(RemovedInDjango20Warning):
+            output = render('if-tag-eq09', {'foo': 1, 'bar': 2})
+            self.assertEqual(output, 'no')
+
+    @setup({'if-tag-eq10': '{% if foo = '' %}yes{% else %}no{% endif %}'})
+    def test_if_tag_eq10(self):
+        with self.assertRaises(RemovedInDjango20Warning):
+            output = render('if-tag-eq10')
+            self.assertEqual(output, 'no')
+
+    @setup({'if-tag-eq11': '{% if foo=bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_eq11(self):
+        with self.assertRaises(TemplateSyntaxError):
+            render('if-tag-eq11', {'foo': 1})
+
+    @setup({'if-tag-eq12': '{% if foo=bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_eq12(self):
+        with self.assertRaises(TemplateSyntaxError):
+            render('if-tag-eq12', {'foo': 1})
+
+    @setup({'if-tag-eq13': '{% if foo=bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_eq13(self):
+        with self.assertRaises(TemplateSyntaxError):
+            render('if-tag-eq13', {'foo': 1, 'bar': 1})
+
+    @setup({'if-tag-eq14': '{% if foo=bar %}yes{% else %}no{% endif %}'})
+    def test_if_tag_eq14(self):
+        with self.assertRaises(TemplateSyntaxError):
+            render('if-tag-eq14', {'foo': 1, 'bar': 2})
+
+    @setup({'if-tag-eq15': '{% if foo='' %}yes{% else %}no{% endif %}'})
+    def test_if_tag_eq15(self):
+        with self.assertRaises(TemplateSyntaxError):
+            render('if-tag-eq15')
 
     # Comparison
     @setup({'if-tag-gt-01': '{% if 2 > 1 %}yes{% else %}no{% endif %}'})

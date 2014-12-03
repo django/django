@@ -95,6 +95,8 @@ details on these changes.
   * ``django.shortcuts.render()``
   * ``django.shortcuts.render_to_response()``
 
+* The ``=`` comparison operator in ``if`` template tag will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

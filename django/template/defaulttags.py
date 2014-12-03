@@ -992,7 +992,9 @@ def do_if(parser, token):
     ``{% if 1>2 %}`` is not a valid if tag.
 
     All supported operators are: ``or``, ``and``, ``in``, ``not in``
-    ``==`` (or ``=``), ``!=``, ``>``, ``>=``, ``<`` and ``<=``.
+    ``==``, ``!=``, ``>``, ``>=``, ``<`` and ``<=``.
+
+    Operator ``=`` is deprecated and will be removed in Django 2.0
 
     Operator precedence follows Python.
     """
