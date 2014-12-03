@@ -39,55 +39,56 @@ class BaseQuerysetTest(TestCase):
 
 
 class Queries1Tests(BaseQuerysetTest):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         generic = NamedCategory.objects.create(name="Generic")
-        self.t1 = Tag.objects.create(name='t1', category=generic)
-        self.t2 = Tag.objects.create(name='t2', parent=self.t1, category=generic)
-        self.t3 = Tag.objects.create(name='t3', parent=self.t1)
-        t4 = Tag.objects.create(name='t4', parent=self.t3)
-        self.t5 = Tag.objects.create(name='t5', parent=self.t3)
+        cls.t1 = Tag.objects.create(name='t1', category=generic)
+        cls.t2 = Tag.objects.create(name='t2', parent=cls.t1, category=generic)
+        cls.t3 = Tag.objects.create(name='t3', parent=cls.t1)
+        t4 = Tag.objects.create(name='t4', parent=cls.t3)
+        cls.t5 = Tag.objects.create(name='t5', parent=cls.t3)
 
-        self.n1 = Note.objects.create(note='n1', misc='foo', id=1)
+        cls.n1 = Note.objects.create(note='n1', misc='foo', id=1)
         n2 = Note.objects.create(note='n2', misc='bar', id=2)
-        self.n3 = Note.objects.create(note='n3', misc='foo', id=3)
+        cls.n3 = Note.objects.create(note='n3', misc='foo', id=3)
 
-        ann1 = Annotation.objects.create(name='a1', tag=self.t1)
-        ann1.notes.add(self.n1)
+        ann1 = Annotation.objects.create(name='a1', tag=cls.t1)
+        ann1.notes.add(cls.n1)
         ann2 = Annotation.objects.create(name='a2', tag=t4)
-        ann2.notes.add(n2, self.n3)
+        ann2.notes.add(n2, cls.n3)
 
         # Create these out of order so that sorting by 'id' will be different to sorting
         # by 'info'. Helps detect some problems later.
-        self.e2 = ExtraInfo.objects.create(info='e2', note=n2, value=41)
-        e1 = ExtraInfo.objects.create(info='e1', note=self.n1, value=42)
+        cls.e2 = ExtraInfo.objects.create(info='e2', note=n2, value=41)
+        e1 = ExtraInfo.objects.create(info='e1', note=cls.n1, value=42)
 
-        self.a1 = Author.objects.create(name='a1', num=1001, extra=e1)
-        self.a2 = Author.objects.create(name='a2', num=2002, extra=e1)
-        a3 = Author.objects.create(name='a3', num=3003, extra=self.e2)
-        self.a4 = Author.objects.create(name='a4', num=4004, extra=self.e2)
+        cls.a1 = Author.objects.create(name='a1', num=1001, extra=e1)
+        cls.a2 = Author.objects.create(name='a2', num=2002, extra=e1)
+        a3 = Author.objects.create(name='a3', num=3003, extra=cls.e2)
+        cls.a4 = Author.objects.create(name='a4', num=4004, extra=cls.e2)
 
-        self.time1 = datetime.datetime(2007, 12, 19, 22, 25, 0)
-        self.time2 = datetime.datetime(2007, 12, 19, 21, 0, 0)
+        cls.time1 = datetime.datetime(2007, 12, 19, 22, 25, 0)
+        cls.time2 = datetime.datetime(2007, 12, 19, 21, 0, 0)
         time3 = datetime.datetime(2007, 12, 20, 22, 25, 0)
         time4 = datetime.datetime(2007, 12, 20, 21, 0, 0)
-        self.i1 = Item.objects.create(name='one', created=self.time1, modified=self.time1, creator=self.a1, note=self.n3)
-        self.i1.tags = [self.t1, self.t2]
-        self.i2 = Item.objects.create(name='two', created=self.time2, creator=self.a2, note=n2)
-        self.i2.tags = [self.t1, self.t3]
-        self.i3 = Item.objects.create(name='three', created=time3, creator=self.a2, note=self.n3)
-        i4 = Item.objects.create(name='four', created=time4, creator=self.a4, note=self.n3)
+        cls.i1 = Item.objects.create(name='one', created=cls.time1, modified=cls.time1, creator=cls.a1, note=cls.n3)
+        cls.i1.tags = [cls.t1, cls.t2]
+        cls.i2 = Item.objects.create(name='two', created=cls.time2, creator=cls.a2, note=n2)
+        cls.i2.tags = [cls.t1, cls.t3]
+        cls.i3 = Item.objects.create(name='three', created=time3, creator=cls.a2, note=cls.n3)
+        i4 = Item.objects.create(name='four', created=time4, creator=cls.a4, note=cls.n3)
         i4.tags = [t4]
 
-        self.r1 = Report.objects.create(name='r1', creator=self.a1)
+        cls.r1 = Report.objects.create(name='r1', creator=cls.a1)
         Report.objects.create(name='r2', creator=a3)
         Report.objects.create(name='r3')
 
         # Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the Meta.ordering
         # will be rank3, rank2, rank1.
-        self.rank1 = Ranking.objects.create(rank=2, author=self.a2)
+        cls.rank1 = Ranking.objects.create(rank=2, author=cls.a2)
 
         Cover.objects.create(title="first", item=i4)
-        Cover.objects.create(title="second", item=self.i2)
+        Cover.objects.create(title="second", item=cls.i2)
 
     def test_subquery_condition(self):
         qs1 = Tag.objects.filter(pk__lte=0)
@@ -1156,7 +1157,8 @@ class Queries1Tests(BaseQuerysetTest):
 
 
 class Queries2Tests(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         Number.objects.create(num=4)
         Number.objects.create(num=8)
         Number.objects.create(num=12)
@@ -1290,9 +1292,10 @@ class Queries3Tests(BaseQuerysetTest):
 
 
 class Queries4Tests(BaseQuerysetTest):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         generic = NamedCategory.objects.create(name="Generic")
-        self.t1 = Tag.objects.create(name='t1', category=generic)
+        cls.t1 = Tag.objects.create(name='t1', category=generic)
 
         n1 = Note.objects.create(note='n1', misc='foo', id=1)
         n2 = Note.objects.create(note='n2', misc='bar', id=2)
@@ -1300,15 +1303,15 @@ class Queries4Tests(BaseQuerysetTest):
         e1 = ExtraInfo.objects.create(info='e1', note=n1)
         e2 = ExtraInfo.objects.create(info='e2', note=n2)
 
-        self.a1 = Author.objects.create(name='a1', num=1001, extra=e1)
-        self.a3 = Author.objects.create(name='a3', num=3003, extra=e2)
+        cls.a1 = Author.objects.create(name='a1', num=1001, extra=e1)
+        cls.a3 = Author.objects.create(name='a3', num=3003, extra=e2)
 
-        self.r1 = Report.objects.create(name='r1', creator=self.a1)
-        self.r2 = Report.objects.create(name='r2', creator=self.a3)
-        self.r3 = Report.objects.create(name='r3')
+        cls.r1 = Report.objects.create(name='r1', creator=cls.a1)
+        cls.r2 = Report.objects.create(name='r2', creator=cls.a3)
+        cls.r3 = Report.objects.create(name='r3')
 
-        Item.objects.create(name='i1', created=datetime.datetime.now(), note=n1, creator=self.a1)
-        Item.objects.create(name='i2', created=datetime.datetime.now(), note=n1, creator=self.a3)
+        Item.objects.create(name='i1', created=datetime.datetime.now(), note=n1, creator=cls.a1)
+        Item.objects.create(name='i2', created=datetime.datetime.now(), note=n1, creator=cls.a3)
 
     def test_ticket11811(self):
         unsaved_category = NamedCategory(name="Other")
@@ -1545,7 +1548,8 @@ class Queries4Tests(BaseQuerysetTest):
 
 
 class Queries5Tests(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the
         # Meta.ordering will be rank3, rank2, rank1.
         n1 = Note.objects.create(note='n1', misc='foo', id=1)
@@ -1555,7 +1559,7 @@ class Queries5Tests(TestCase):
         a1 = Author.objects.create(name='a1', num=1001, extra=e1)
         a2 = Author.objects.create(name='a2', num=2002, extra=e1)
         a3 = Author.objects.create(name='a3', num=3003, extra=e2)
-        self.rank1 = Ranking.objects.create(rank=2, author=a2)
+        cls.rank1 = Ranking.objects.create(rank=2, author=a2)
         Ranking.objects.create(rank=1, author=a3)
         Ranking.objects.create(rank=3, author=a1)
 
@@ -1738,9 +1742,10 @@ class NullableRelOrderingTests(TestCase):
 
 
 class DisjunctiveFilterTests(TestCase):
-    def setUp(self):
-        self.n1 = Note.objects.create(note='n1', misc='foo', id=1)
-        ExtraInfo.objects.create(info='e1', note=self.n1)
+    @classmethod
+    def setUpTestData(cls):
+        cls.n1 = Note.objects.create(note='n1', misc='foo', id=1)
+        ExtraInfo.objects.create(info='e1', note=cls.n1)
 
     def test_ticket7872(self):
         # Another variation on the disjunctive filtering theme.
@@ -1767,7 +1772,8 @@ class DisjunctiveFilterTests(TestCase):
 
 
 class Queries6Tests(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         generic = NamedCategory.objects.create(name="Generic")
         t1 = Tag.objects.create(name='t1', category=generic)
         Tag.objects.create(name='t2', parent=t1, category=generic)
@@ -1966,7 +1972,8 @@ class QuerysetOrderedTests(unittest.TestCase):
 
 @skipUnlessDBFeature('allow_sliced_subqueries')
 class SubqueryTests(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         DumbCategory.objects.create(id=1)
         DumbCategory.objects.create(id=2)
         DumbCategory.objects.create(id=3)
@@ -2105,9 +2112,10 @@ class EmptyQuerySetTests(TestCase):
 
 
 class ValuesQuerysetTests(BaseQuerysetTest):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         Number.objects.create(num=72)
-        self.identity = lambda x: x
+        cls.identity = staticmethod(lambda x: x)
 
     def test_flat_values_list(self):
         qs = Number.objects.values_list("num")
@@ -2192,7 +2200,8 @@ class ValuesQuerysetTests(BaseQuerysetTest):
 
 class QuerySetSupportsPythonIdioms(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         some_date = datetime.datetime(2014, 5, 16, 12, 1)
         for i in range(1, 8):
             Article.objects.create(
@@ -2314,7 +2323,8 @@ class QuerySetSupportsPythonIdioms(TestCase):
 
 
 class WeirdQuerysetSlicingTests(BaseQuerysetTest):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         Number.objects.create(num=1)
         Number.objects.create(num=2)
 
@@ -2419,7 +2429,8 @@ class ConditionalTests(BaseQuerysetTest):
     """Tests whose execution depend on different environment conditions like
     Python version or DB backend features"""
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         generic = NamedCategory.objects.create(name="Generic")
         t1 = Tag.objects.create(name='t1', category=generic)
         Tag.objects.create(name='t2', parent=t1, category=generic)
@@ -2498,7 +2509,8 @@ class UnionTests(unittest.TestCase):
     """
     Tests for the union of two querysets. Bug #12252.
     """
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         objectas = []
         objectbs = []
         objectcs = []
@@ -2564,7 +2576,8 @@ class DefaultValuesInsertTest(TestCase):
 
 
 class ExcludeTests(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         f1 = Food.objects.create(name='apples')
         Food.objects.create(name='oranges')
         Eaten.objects.create(food=f1, meal='dinner')
@@ -2622,30 +2635,30 @@ class ExcludeTest17600(TestCase):
     Some regressiontests for ticket #17600. Some of these likely duplicate
     other existing tests.
     """
-
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Create a few Orders.
-        self.o1 = Order.objects.create(pk=1)
-        self.o2 = Order.objects.create(pk=2)
-        self.o3 = Order.objects.create(pk=3)
+        cls.o1 = Order.objects.create(pk=1)
+        cls.o2 = Order.objects.create(pk=2)
+        cls.o3 = Order.objects.create(pk=3)
 
         # Create some OrderItems for the first order with homogeneous
         # status_id values
-        self.oi1 = OrderItem.objects.create(order=self.o1, status=1)
-        self.oi2 = OrderItem.objects.create(order=self.o1, status=1)
-        self.oi3 = OrderItem.objects.create(order=self.o1, status=1)
+        cls.oi1 = OrderItem.objects.create(order=cls.o1, status=1)
+        cls.oi2 = OrderItem.objects.create(order=cls.o1, status=1)
+        cls.oi3 = OrderItem.objects.create(order=cls.o1, status=1)
 
         # Create some OrderItems for the second order with heterogeneous
         # status_id values
-        self.oi4 = OrderItem.objects.create(order=self.o2, status=1)
-        self.oi5 = OrderItem.objects.create(order=self.o2, status=2)
-        self.oi6 = OrderItem.objects.create(order=self.o2, status=3)
+        cls.oi4 = OrderItem.objects.create(order=cls.o2, status=1)
+        cls.oi5 = OrderItem.objects.create(order=cls.o2, status=2)
+        cls.oi6 = OrderItem.objects.create(order=cls.o2, status=3)
 
         # Create some OrderItems for the second order with heterogeneous
         # status_id values
-        self.oi7 = OrderItem.objects.create(order=self.o3, status=2)
-        self.oi8 = OrderItem.objects.create(order=self.o3, status=3)
-        self.oi9 = OrderItem.objects.create(order=self.o3, status=4)
+        cls.oi7 = OrderItem.objects.create(order=cls.o3, status=2)
+        cls.oi8 = OrderItem.objects.create(order=cls.o3, status=3)
+        cls.oi9 = OrderItem.objects.create(order=cls.o3, status=4)
 
     def test_exclude_plain(self):
         """
@@ -2731,7 +2744,8 @@ class Exclude15786(TestCase):
 
 
 class NullInExcludeTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         NullableName.objects.create(name='i1')
         NullableName.objects.create()
 
@@ -2780,9 +2794,9 @@ class EmptyStringsAsNullTest(TestCase):
     The reason for these tests is that Oracle treats '' as NULL, and this
     can cause problems in query construction. Refs #17957.
     """
-
-    def setUp(self):
-        self.nc = NamedCategory.objects.create(name='')
+    @classmethod
+    def setUpTestData(cls):
+        cls.nc = NamedCategory.objects.create(name='')
 
     def test_direct_exclude(self):
         self.assertQuerysetEqual(
@@ -2911,13 +2925,14 @@ class IteratorExceptionsTest(TestCase):
 
 
 class NullJoinPromotionOrTest(TestCase):
-    def setUp(self):
-        self.d1 = ModelD.objects.create(name='foo')
+    @classmethod
+    def setUpTestData(cls):
+        cls.d1 = ModelD.objects.create(name='foo')
         d2 = ModelD.objects.create(name='bar')
-        self.a1 = ModelA.objects.create(name='a1', d=self.d1)
+        cls.a1 = ModelA.objects.create(name='a1', d=cls.d1)
         c = ModelC.objects.create(name='c')
         b = ModelB.objects.create(name='b', c=c)
-        self.a2 = ModelA.objects.create(name='a2', b=b, d=d2)
+        cls.a2 = ModelA.objects.create(name='a2', b=b, d=d2)
 
     def test_ticket_17886(self):
         # The first Q-object is generating the match, the rest of the filters
@@ -3408,15 +3423,16 @@ class Ticket12807Tests(TestCase):
 class RelatedLookupTypeTests(TestCase):
     error = 'Cannot query "%s": Must be "%s" instance.'
 
-    def setUp(self):
-        self.oa = ObjectA.objects.create(name="oa")
-        self.poa = ProxyObjectA.objects.get(name="oa")
-        self.coa = ChildObjectA.objects.create(name="coa")
-        self.wrong_type = Order.objects.create(id=self.oa.pk)
-        self.ob = ObjectB.objects.create(name="ob", objecta=self.oa, num=1)
-        ProxyObjectB.objects.create(name="pob", objecta=self.oa, num=2)
-        self.pob = ProxyObjectB.objects.all()
-        ObjectC.objects.create(childobjecta=self.coa)
+    @classmethod
+    def setUpTestData(cls):
+        cls.oa = ObjectA.objects.create(name="oa")
+        cls.poa = ProxyObjectA.objects.get(name="oa")
+        cls.coa = ChildObjectA.objects.create(name="coa")
+        cls.wrong_type = Order.objects.create(id=cls.oa.pk)
+        cls.ob = ObjectB.objects.create(name="ob", objecta=cls.oa, num=1)
+        ProxyObjectB.objects.create(name="pob", objecta=cls.oa, num=2)
+        cls.pob = ProxyObjectB.objects.all()
+        ObjectC.objects.create(childobjecta=cls.coa)
 
     def test_wrong_type_lookup(self):
         """
