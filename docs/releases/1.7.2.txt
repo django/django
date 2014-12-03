@@ -104,3 +104,7 @@ Bugfixes
 
 * Fixed serialization of ``type`` when adding a ``deconstruct()`` method
   (:ticket:`23950`).
+
+* Prevented the
+  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` from
+  setting a ``"Vary: Cookie"`` header on all responses.
