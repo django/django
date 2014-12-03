@@ -4,9 +4,10 @@ import re
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.middleware.csrf import rotate_token
+from django.utils.crypto import constant_time_compare
 from django.utils.module_loading import import_string
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.middleware.csrf import rotate_token
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -156,6 +157,18 @@ def get_user(request):
         if backend_path in settings.AUTHENTICATION_BACKENDS:
             backend = load_backend(backend_path)
             user = backend.get_user(user_id)
+            # Verify the session
+            if ('django.contrib.auth.middleware.SessionAuthenticationMiddleware'
+                    in settings.MIDDLEWARE_CLASSES and hasattr(user, 'get_session_auth_hash')):
+                session_hash = request.session.get(HASH_SESSION_KEY)
+                session_hash_verified = session_hash and constant_time_compare(
+                    session_hash,
+                    user.get_session_auth_hash()
+                )
+                if not session_hash_verified:
+                    request.session.flush()
+                    user = None
+
     return user or AnonymousUser()
 
 
