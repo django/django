@@ -272,6 +272,7 @@ def is_safe_url(url, host=None):
     """
     if not url:
         return False
+    url = url.strip()
     # Chrome treats \ completely as /
     url = url.replace('\\', '/')
     # Chrome considers any URL with more than two slashes to be absolute, but

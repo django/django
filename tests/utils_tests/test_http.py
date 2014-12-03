@@ -107,7 +107,8 @@ class TestUtilsHttp(unittest.TestCase):
                         'http:/\//example.com',
                         'http:\/example.com',
                         'http:/\example.com',
-                        'javascript:alert("XSS")'):
+                        'javascript:alert("XSS")',
+                        '\njavascript:alert(x)'):
             self.assertFalse(http.is_safe_url(bad_url, host='testserver'), "%s should be blocked" % bad_url)
         for good_url in ('/view/?param=http://example.com',
                      '/view/?param=https://example.com',
