@@ -393,7 +393,7 @@ a subclass of dictionary. Exceptions are outlined here:
    Instantiates a ``QueryDict`` object based on ``query_string``.
 
           >>> QueryDict('a=1&a=2&c=3')
-          <QueryDict: {u'a': [u'1', u'2'], u'b': [u'1']}>
+          <QueryDict: {'a': ['1', '2'], 'c': ['3']}>
 
    Most ``QueryDict``\ s you encounter, and in particular those at
    ``request.POST`` and ``request.GET``, will be immutable. If you are
