@@ -191,6 +191,12 @@ and other advanced settings.
    setting used to be separate options in the database settings dictionary,
    prefixed with ``TEST_``.
 
+.. versionadded:: 1.8
+
+   If using SQLite in-memory database with Python 3.4+ and SQLite 3.7.13+,
+   shared cache will be enabled, so you can write tests with ability to
+   share database between threads.
+
 .. admonition:: Finding data from your production database when running tests?
 
     If your code attempts to access the database when its modules are compiled,

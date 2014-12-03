@@ -561,6 +561,9 @@ Tests
 
 * Added test client support for file uploads with file-like objects.
 
+* Added ability to share SQLite3 in-memory database between threads, when
+  using Python 3.4+ and SQLite3 3.7.13+
+
 Validators
 ^^^^^^^^^^
 
