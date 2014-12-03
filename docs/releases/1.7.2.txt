@@ -101,3 +101,6 @@ Bugfixes
 
 * Fixed ``runserver`` crash when socket error message contained Unicode
   characters (:ticket:`23946`).
+
+* Fixed serialization of ``type`` when adding a ``deconstruct()`` method
+  (:ticket:`23950`).
