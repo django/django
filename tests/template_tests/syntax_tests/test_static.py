@@ -2,7 +2,7 @@ from django.conf import settings
 from django.test import override_settings, SimpleTestCase
 from django.utils.six.moves.urllib.parse import urljoin
 
-from .utils import render, setup
+from ..utils import render, setup
 
 
 @override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")

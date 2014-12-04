@@ -3,7 +3,7 @@ from datetime import datetime
 from django.test import SimpleTestCase
 from django.utils.formats import date_format
 
-from .utils import render, setup
+from ..utils import render, setup
 
 
 class NowTagTests(SimpleTestCase):
