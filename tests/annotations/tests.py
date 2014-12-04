@@ -181,7 +181,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             other_chain=F('chain'),
             is_open=Value(True, BooleanField()),
             book_isbn=F('books__isbn')
-        ).select_related('store').order_by('book_isbn').filter(chain='Westfield')
+        ).order_by('book_isbn').filter(chain='Westfield')
 
         self.assertQuerysetEqual(
             qs, [
