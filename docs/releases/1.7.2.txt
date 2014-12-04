@@ -101,3 +101,7 @@ Bugfixes
 
 * Fixed ``runserver`` crash when socket error message contained Unicode
   characters (:ticket:`23946`).
+
+* Fixed index creation by the migration infrastructure, particularly when
+  dealing with PostgreSQL specific {text|varchar}_pattern_ops indexes
+  (:ticket:`23954`).
