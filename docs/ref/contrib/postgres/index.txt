@@ -1,6 +1,8 @@
 ``django.contrib.postgres``
 ===========================
 
+.. versionadded:: 1.8
+
 PostgreSQL has a number of features which are not shared by the other databases
 Django supports. This optional module contains model fields and form fields for
 a number of PostgreSQL specific data types.
