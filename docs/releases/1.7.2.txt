@@ -102,6 +102,7 @@ Bugfixes
 * Fixed ``runserver`` crash when socket error message contained Unicode
   characters (:ticket:`23946`).
 
+<<<<<<< HEAD
 * Fixed serialization of ``type`` when adding a ``deconstruct()`` method
   (:ticket:`23950`).
 
@@ -111,3 +112,7 @@ Bugfixes
 
 * Fixed a crash when adding ``blank=True`` to ``TextField()`` on MySQL
   (:ticket:`23920`).
+
+* Fixed index creation by the migration infrastructure, particularly when
+  dealing with PostgreSQL specific {text|varchar}_pattern_ops indexes
+  (:ticket:`23954`).
