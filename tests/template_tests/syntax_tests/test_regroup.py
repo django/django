@@ -4,7 +4,7 @@ from django.template.base import TemplateSyntaxError
 from django.template.loader import get_template
 from django.test import SimpleTestCase
 
-from .utils import render, setup
+from ..utils import render, setup
 
 
 class RegroupTagTests(SimpleTestCase):

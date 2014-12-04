@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from .utils import render, setup
+from ..utils import render, setup
 
 
 class BuiltinsTests(SimpleTestCase):

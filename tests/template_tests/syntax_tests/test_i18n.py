@@ -5,7 +5,7 @@ from django.conf import settings
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
-from .utils import render, setup
+from ..utils import render, setup
 
 
 class I18nTagTests(SimpleTestCase):
