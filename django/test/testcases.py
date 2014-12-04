@@ -915,24 +915,46 @@ class TestCase(TransactionTestCase):
     On database backends with no transaction support, TestCase behaves as
     TransactionTestCase.
     """
+    @classmethod
+    def _enter_atomics(cls):
+        """Helper method to open atomic blocks for multiple databases"""
+        atomics = {}
+        for db_name in cls._databases_names():
+            atomics[db_name] = transaction.atomic(using=db_name)
+            atomics[db_name].__enter__()
+        return atomics
+
+    @classmethod
+    def _rollback_atomics(cls, atomics):
+        """Rollback atomic blocks opened through the previous method"""
+        for db_name in reversed(cls._databases_names()):
+            transaction.set_rollback(True, using=db_name)
+            atomics[db_name].__exit__(None, None, None)
 
     @classmethod
     def setUpClass(cls):
         super(TestCase, cls).setUpClass()
         if not connections_support_transactions():
             return
-        cls.cls_atomics = {}
-        for db_name in cls._databases_names():
-            cls.cls_atomics[db_name] = transaction.atomic(using=db_name)
-            cls.cls_atomics[db_name].__enter__()
+        cls.cls_atomics = cls._enter_atomics()
+
+        if cls.fixtures:
+            for db_name in cls._databases_names(include_mirrors=False):
+                    try:
+                        call_command('loaddata', *cls.fixtures, **{
+                            'verbosity': 0,
+                            'commit': False,
+                            'database': db_name,
+                        })
+                    except Exception:
+                        cls._rollback_atomics(cls.cls_atomics)
+                        raise
         cls.setUpTestData()
 
     @classmethod
     def tearDownClass(cls):
         if connections_support_transactions():
-            for db_name in reversed(cls._databases_names()):
-                transaction.set_rollback(True, using=db_name)
-                cls.cls_atomics[db_name].__exit__(None, None, None)
+            cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all():
                 conn.close()
         super(TestCase, cls).tearDownClass()
@@ -955,32 +977,12 @@ class TestCase(TransactionTestCase):
             return super(TestCase, self)._fixture_setup()
 
         assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
-
-        self.atomics = {}
-        for db_name in self._databases_names():
-            self.atomics[db_name] = transaction.atomic(using=db_name)
-            self.atomics[db_name].__enter__()
-
-        for db_name in self._databases_names(include_mirrors=False):
-            if self.fixtures:
-                try:
-                    call_command('loaddata', *self.fixtures,
-                                 **{
-                                     'verbosity': 0,
-                                     'commit': False,
-                                     'database': db_name,
-                                 })
-                except Exception:
-                    self._fixture_teardown()
-                    raise
+        self.atomics = self._enter_atomics()
 
     def _fixture_teardown(self):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
-
-        for db_name in reversed(self._databases_names()):
-            transaction.set_rollback(True, using=db_name)
-            self.atomics[db_name].__exit__(None, None, None)
+        self._rollback_atomics(self.atomics)
 
 
 class CheckCondition(object):
