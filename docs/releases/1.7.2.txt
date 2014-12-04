@@ -121,3 +121,6 @@ Bugfixes
   model (:ticket:`23956`).
 
 * Fixed a crash when a ``MultiValueField`` has invalid data (:ticket:`23674`).
+
+* Fixed a crash in the admin when using "Save as new" and also deleting a
+  related inline (:ticket:`23857`).
