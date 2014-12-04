@@ -190,7 +190,7 @@ modified using any other ``QuerySet`` operation, including ``filter()``,
     ``query`` property of your ``QuerySet``.
 
     For instance, combining multiple aggregations with ``annotate()`` will
-    yield the wrong results, as `multiple tables are the cross joined`_,
+    yield the wrong results, as `multiple tables are cross joined`_,
     resulting in duplicate row aggregations.
 
 .. _multiple tables are the cross joined: https://code.djangoproject.com/ticket/10060
