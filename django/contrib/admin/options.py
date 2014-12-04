@@ -1829,6 +1829,8 @@ class InlineModelAdmin(BaseModelAdmin):
                 if self.cleaned_data.get(DELETION_FIELD_NAME, False):
                     using = router.db_for_write(self._meta.model)
                     collector = NestedObjects(using=using)
+                    if self.instance.pk is None:
+                        return
                     collector.collect([self.instance])
                     if collector.protected:
                         objs = []
