@@ -11,7 +11,7 @@ from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.contrib.sites.models import Site
 from django.db import models, DEFAULT_DB_ALIAS
 from django import forms
-from django.test import SimpleTestCase, TestCase
+from django.test import TestCase
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -91,7 +91,7 @@ class NestedObjectsTests(TestCase):
         n.collect([Vehicle.objects.first()])
 
 
-class UtilTests(SimpleTestCase):
+class UtilTests(TestCase):
     def test_values_from_lookup_field(self):
         """
         Regression test for #12654: lookup_field
