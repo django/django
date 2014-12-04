@@ -1,3 +1,4 @@
+from itertools import chain
 import warnings
 
 from django.core.exceptions import FieldError
@@ -599,6 +600,14 @@ class SQLCompiler(object):
         (for example, cur_depth=1 means we are looking at models with direct
         connections to the root model).
         """
+        def _get_field_choices():
+            direct_choices = (f.name for (f, _) in opts.get_fields_with_model() if f.rel)
+            reverse_choices = (
+                f.field.related_query_name()
+                for f in opts.get_all_related_objects() if f.field.unique
+            )
+            return chain(direct_choices, reverse_choices)
+
         if not restricted and self.query.max_depth and cur_depth > self.query.max_depth:
             # We've recursed far enough; bail out.
             return
@@ -611,6 +620,7 @@ class SQLCompiler(object):
 
         # Setup for the case when only particular related fields should be
         # included in the related selection.
+        fields_found = set()
         if requested is None:
             if isinstance(self.query.select_related, dict):
                 requested = self.query.select_related
@@ -619,6 +629,24 @@ class SQLCompiler(object):
                 restricted = False
 
         for f, model in opts.get_fields_with_model():
+            fields_found.add(f.name)
+
+            if restricted:
+                next = requested.get(f.name, {})
+                if not f.rel:
+                    # If a non-related field is used like a relation,
+                    # or if a single non-relational field is given.
+                    if next or (cur_depth == 1 and f.name in requested):
+                        raise FieldError(
+                            "Non-relational field given in select_related: '%s'. "
+                            "Choices are: %s" % (
+                                f.name,
+                                ", ".join(_get_field_choices()) or '(none)',
+                            )
+                        )
+            else:
+                next = False
+
             # The get_fields_with_model() returns None for fields that live
             # in the field's local model. So, for those fields we want to use
             # the f.model - that is the field's local model.
@@ -632,13 +660,9 @@ class SQLCompiler(object):
             columns, _ = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(
-                SelectInfo((col[0], col[1].column), col[1]) for col in columns)
-            if restricted:
-                next = requested.get(f.name, {})
-            else:
-                next = False
-            self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
-                    next, restricted)
+                SelectInfo((col[0], col[1].column), col[1]) for col in columns
+            )
+            self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1, next, restricted)
 
         if restricted:
             related_fields = [
@@ -651,8 +675,10 @@ class SQLCompiler(object):
                                               only_load.get(model), reverse=True):
                     continue
 
-                _, _, _, joins, _ = self.query.setup_joins(
-                    [f.related_query_name()], opts, root_alias)
+                related_field_name = f.related_query_name()
+                fields_found.add(related_field_name)
+
+                _, _, _, joins, _ = self.query.setup_joins([related_field_name], opts, root_alias)
                 alias = joins[-1]
                 from_parent = (opts.model if issubclass(model, opts.model)
                                else None)
@@ -663,6 +689,17 @@ class SQLCompiler(object):
                 next = requested.get(f.related_query_name(), {})
                 self.fill_related_selections(model._meta, alias, cur_depth + 1,
                                              next, restricted)
+
+            fields_not_found = set(requested.keys()).difference(fields_found)
+            if fields_not_found:
+                invalid_fields = ("'%s'" % s for s in fields_not_found)
+                raise FieldError(
+                    'Invalid field name(s) given in select_related: %s. '
+                    'Choices are: %s' % (
+                        ', '.join(invalid_fields),
+                        ', '.join(_get_field_choices()) or '(none)',
+                    )
+                )
 
     def deferred_to_columns(self):
         """
