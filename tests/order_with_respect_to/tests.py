@@ -10,12 +10,14 @@ from .models import Post, Question, Answer
 
 
 class OrderWithRespectToTests(TestCase):
-    def setUp(self):
-        self.q1 = Question.objects.create(text="Which Beatle starts with the letter 'R'?")
-        Answer.objects.create(text="John", question=self.q1)
-        Answer.objects.create(text="Paul", question=self.q1)
-        Answer.objects.create(text="George", question=self.q1)
-        Answer.objects.create(text="Ringo", question=self.q1)
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.q1 = Question.objects.create(text="Which Beatle starts with the letter 'R'?")
+        Answer.objects.create(text="John", question=cls.q1)
+        Answer.objects.create(text="Paul", question=cls.q1)
+        Answer.objects.create(text="George", question=cls.q1)
+        Answer.objects.create(text="Ringo", question=cls.q1)
 
     def test_default_to_insertion_order(self):
         """
