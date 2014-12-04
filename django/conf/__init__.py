@@ -9,9 +9,11 @@ a list of all possible variables.
 import importlib
 import os
 import time     # Needed for Windows
+import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import LazyObject, empty
 from django.utils import six
 
@@ -109,6 +111,16 @@ class Settings(BaseSettings):
 
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+
+        if ('django.contrib.auth.middleware.AuthenticationMiddleware' in self.MIDDLEWARE_CLASSES and
+                'django.contrib.auth.middleware.SessionAuthenticationMiddleware' not in self.MIDDLEWARE_CLASSES):
+            warnings.warn(
+                "Session verification will become mandatory in Django 2.0. "
+                "Please add 'django.contrib.auth.middleware.SessionAuthenticationMiddleware' "
+                "to your MIDDLEWARE_CLASSES setting when you are ready to opt-in after "
+                "reading the upgrade considerations in the 1.8 release notes.",
+                RemovedInDjango20Warning
+            )
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
