@@ -3,7 +3,7 @@ from django.template.loader import get_template
 from django.test import SimpleTestCase
 from django.utils import six
 
-from .utils import render, setup
+from ..utils import render, setup
 
 
 class WidthRatioTagTests(SimpleTestCase):

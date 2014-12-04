@@ -2,7 +2,7 @@ from django.conf import settings
 from django.template.base import TemplateSyntaxError
 from django.test import SimpleTestCase
 
-from .utils import render, setup
+from ..utils import render, setup
 
 
 class WithTagTests(SimpleTestCase):

@@ -5,7 +5,7 @@ from django.test import override_settings, SimpleTestCase
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango19Warning
 
-from .utils import render, setup
+from ..utils import render, setup
 
 
 cwd = os.path.dirname(os.path.abspath(upath(__file__)))

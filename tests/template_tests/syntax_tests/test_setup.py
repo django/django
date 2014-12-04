@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.test import SimpleTestCase
 
-from .utils import setup
+from ..utils import setup
 
 
 class SetupTests(SimpleTestCase):

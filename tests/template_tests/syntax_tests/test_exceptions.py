@@ -4,7 +4,7 @@ from django.template.loader import get_template
 from django.test import SimpleTestCase
 
 from .test_extends import inheritance_templates
-from .utils import render, setup
+from ..utils import render, setup
 
 
 class ExceptionsTests(SimpleTestCase):
