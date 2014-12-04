@@ -63,7 +63,6 @@ class OrderWithRespectToTests(TestCase):
         """
         The ordering can be altered
         """
-
         a5 = Answer.objects.create(text="Number five", question=self.q1)
 
         # Swap the last two items in the order list
@@ -83,6 +82,9 @@ class OrderWithRespectToTests(TestCase):
             ],
             attrgetter("text")
         )
+
+
+class BasicOrderWithRespectToTests(TestCase):
 
     def test_recursive_ordering(self):
         p1 = Post.objects.create(title='1')
