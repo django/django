@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import unittest
 
+from django.core.exceptions import FieldError
 from django.test import TestCase
 
 from .models import (User, UserProfile, UserStat, UserStatResult, StatDetails,
@@ -208,3 +209,21 @@ class ReverseSelectRelatedTestCase(TestCase):
             self.assertEqual(p.child1.name1, 'n1')
         with self.assertNumQueries(1):
             self.assertEqual(p.child1.child4.name1, 'n1')
+
+
+class ReverseSelectRelatedValidationTests(TestCase):
+    """
+    Rverse related fields should be listed in the validation message when an
+    invalid field is given in select_related().
+    """
+    non_relational_error = "Non-relational field given in select_related: '%s'. Choices are: %s"
+    invalid_error = "Invalid field name(s) given in select_related: '%s'. Choices are: %s"
+
+    def test_reverse_related_validation(self):
+        fields = 'userprofile, userstat'
+
+        with self.assertRaisesMessage(FieldError, self.invalid_error % ('foobar', fields)):
+            list(User.objects.select_related('foobar'))
+
+        with self.assertRaisesMessage(FieldError, self.non_relational_error % ('username', fields)):
+            list(User.objects.select_related('username'))

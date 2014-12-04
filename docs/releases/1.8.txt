@@ -681,6 +681,24 @@ lookups::
     ...
     ValueError: Cannot query "<Book: Django>": Must be "Author" instance.
 
+``select_related()`` now checks given fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``select_related()`` now validates that the given fields actually exist.
+Previously, nonexistent fields were silently ignored. Now, an error is raised::
+
+    >>> book = Book.objects.select_related('nonexistent_field')
+    Traceback (most recent call last):
+    ...
+    FieldError: Invalid field name(s) given in select_related: 'nonexistent_field'
+
+The validation also makes sure that the given field is relational::
+
+    >>> book = Book.objects.select_related('name')
+    Traceback (most recent call last):
+    ...
+    FieldError: Non-relational field given in select_related: 'name'
+
 Default ``EmailField.max_length`` increased to 254
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
