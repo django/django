@@ -552,7 +552,7 @@ class BaseDatabaseSchemaEditor(object):
         # Default change?
         old_default = self.effective_default(old_field)
         new_default = self.effective_default(new_field)
-        if old_default != new_default:
+        if old_default != new_default and not self.skip_default(new_field):
             if new_default is None:
                 actions.append((
                     self.sql_alter_column_no_default % {
