@@ -610,6 +610,7 @@ class SQLCompiler(object):
 
         # Setup for the case when only particular related fields should be
         # included in the related selection.
+        fields_found = set()
         if requested is None:
             if isinstance(self.query.select_related, dict):
                 requested = self.query.select_related
@@ -618,6 +619,18 @@ class SQLCompiler(object):
                 restricted = False
 
         for f, model in opts.get_fields_with_model():
+            fields_found.add(f.name)
+
+            if restricted:
+                next = requested.get(f.name, {})
+                if not f.rel:
+                    # If a non-related field is used like a relation,
+                    # or if a single non-relational field is given.
+                    if next or (cur_depth == 1 and f.name in requested):
+                        raise ValueError("Non-relational field given in select_related: '%s'" % f.name)
+            else:
+                next = False
+
             # The get_fields_with_model() returns None for fields that live
             # in the field's local model. So, for those fields we want to use
             # the f.model - that is the field's local model.
@@ -625,6 +638,7 @@ class SQLCompiler(object):
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):
                 continue
+
             _, _, _, joins, _ = self.query.setup_joins(
                 [f.name], opts, root_alias)
             alias = joins[-1]
@@ -632,12 +646,8 @@ class SQLCompiler(object):
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(
                 SelectInfo((col[0], col[1].column), col[1]) for col in columns)
-            if restricted:
-                next = requested.get(f.name, {})
-            else:
-                next = False
-            self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
-                    next, restricted)
+
+            self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1, next, restricted)
 
         if restricted:
             related_fields = [
@@ -645,13 +655,16 @@ class SQLCompiler(object):
                 for o in opts.get_all_related_objects()
                 if o.field.unique
             ]
+
             for f, model in related_fields:
                 if not select_related_descend(f, restricted, requested,
                                               only_load.get(model), reverse=True):
                     continue
 
-                _, _, _, joins, _ = self.query.setup_joins(
-                    [f.related_query_name()], opts, root_alias)
+                related_field_name = f.related_query_name()
+                fields_found.add(related_field_name)
+
+                _, _, _, joins, _ = self.query.setup_joins([related_field_name], opts, root_alias)
                 alias = joins[-1]
                 from_parent = (opts.model if issubclass(model, opts.model)
                                else None)
@@ -662,6 +675,12 @@ class SQLCompiler(object):
                 next = requested.get(f.related_query_name(), {})
                 self.fill_related_selections(model._meta, alias, cur_depth + 1,
                                              next, restricted)
+
+            fields_not_found = set(requested.keys()).difference(fields_found)
+            if fields_not_found:
+                field_descriptions = ["'%s'" % s for s in fields_not_found]
+                raise ValueError('Invalid field name(s) given in select_related: %s' %
+                                 (', '.join(field_descriptions)))
 
     def deferred_to_columns(self):
         """

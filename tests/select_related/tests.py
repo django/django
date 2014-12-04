@@ -2,7 +2,8 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species, HybridSpecies
+from .models import (Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species, HybridSpecies,
+                     Pizza, TaggedItem, Bookmark)
 
 
 class SelectRelatedTests(TestCase):
@@ -126,6 +127,13 @@ class SelectRelatedTests(TestCase):
             orders = [o.genus.family.order.name for o in world]
             self.assertEqual(orders, ['Agaricales'])
 
+    def test_single_related_field(self):
+        with self.assertNumQueries(1):
+            species = Species.objects.select_related('genus__name')
+            names = [s.genus.name for s in species]
+
+            self.assertEqual(sorted(names), ['Amanita', 'Drosophila', 'Homo', 'Pisum'])
+
     def test_field_traversal(self):
         with self.assertNumQueries(1):
             s = (Species.objects.all()
@@ -152,3 +160,41 @@ class SelectRelatedTests(TestCase):
             obj = queryset[0]
             self.assertEqual(obj.parent_1, parent_1)
             self.assertEqual(obj.parent_2, parent_2)
+
+
+class SelectRelatedValidationTests(TestCase):
+    """
+    Test validation of fields that does not exist or cannot be used
+    with select_related (such as non-relational fields).
+    """
+    non_relational_error = "Non-relational field given in select_related: '%s'"
+    invalid_error = "Invalid field name(s) given in select_related: '%s'"
+
+    def test_non_relational_field(self):
+        with self.assertRaisesMessage(ValueError, self.non_relational_error % 'name'):
+            list(Species.objects.select_related('name__some_field'))
+
+        with self.assertRaisesMessage(ValueError, self.non_relational_error % 'name'):
+            list(Species.objects.select_related('name'))
+
+    def test_many_to_many_field(self):
+        with self.assertRaisesMessage(ValueError, self.invalid_error % 'toppings'):
+            list(Pizza.objects.select_related('toppings'))
+
+    def test_reverse_relational_field(self):
+        with self.assertRaisesMessage(ValueError, self.invalid_error % 'child_1'):
+            list(Species.objects.select_related('child_1'))
+
+    def test_invalid_field(self):
+        with self.assertRaisesMessage(ValueError, self.invalid_error % 'invalid_field'):
+            list(Species.objects.select_related('invalid_field'))
+
+        with self.assertRaisesMessage(ValueError, self.invalid_error % 'related_invalid_field'):
+            list(Species.objects.select_related('genus__related_invalid_field'))
+
+    def test_generic_relations(self):
+        with self.assertRaisesMessage(ValueError, self.invalid_error % 'tags'):
+            list(Bookmark.objects.select_related('tags'))
+
+        with self.assertRaisesMessage(ValueError, self.invalid_error % 'content_object'):
+            list(TaggedItem.objects.select_related('content_object'))
