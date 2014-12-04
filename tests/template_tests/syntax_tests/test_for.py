@@ -5,7 +5,7 @@ from django.template.base import TemplateSyntaxError
 from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from .utils import render, setup
+from ..utils import render, setup
 
 
 class ForTagTests(SimpleTestCase):

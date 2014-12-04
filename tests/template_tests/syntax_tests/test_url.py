@@ -7,7 +7,7 @@ from django.template.loader import get_template
 from django.test import override_settings, SimpleTestCase
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from .utils import render, setup
+from ..utils import render, setup
 
 
 @override_settings(ROOT_URLCONF='template_tests.urls')

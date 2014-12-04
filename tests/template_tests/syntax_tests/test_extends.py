@@ -1,7 +1,7 @@
 from django.template.base import Template
 from django.test import SimpleTestCase
 
-from .utils import render, setup
+from ..utils import render, setup
 
 
 inheritance_templates = {

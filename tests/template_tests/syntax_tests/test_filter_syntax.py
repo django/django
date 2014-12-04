@@ -8,7 +8,7 @@ from django.template.loader import get_template
 from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from .utils import render, setup, SomeClass, SomeOtherException, UTF8Class
+from ..utils import render, setup, SomeClass, SomeOtherException, UTF8Class
 
 
 class FilterSyntaxTests(SimpleTestCase):

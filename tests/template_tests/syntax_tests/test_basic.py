@@ -3,7 +3,7 @@ from django.template.base import Context, TemplateSyntaxError
 from django.template.loader import get_template
 from django.test import SimpleTestCase
 
-from .utils import render, setup, SilentGetItemClass, SilentAttrClass, SomeClass
+from ..utils import render, setup, SilentGetItemClass, SilentAttrClass, SomeClass
 
 
 basic_templates = {

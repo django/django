@@ -3,9 +3,7 @@ from __future__ import unicode_literals
 
 import os
 import sys
-import traceback
 import unittest
-import warnings
 
 from django import template
 from django.contrib.auth.models import Group
@@ -15,17 +13,7 @@ from django.template.engine import Engine
 from django.template.loaders import app_directories, filesystem
 from django.test import RequestFactory, SimpleTestCase
 from django.test.utils import override_settings, extend_sys_path
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils._os import upath
-from django.utils import six
-from django.utils import translation
-
-from . import filters
-from .syntax_tests.utils import register_test_tags, ShouldNotExecuteException
-
-
-class ContextStackException(Exception):
-    pass
 
 
 class TemplateLoaderTests(SimpleTestCase):
@@ -391,114 +379,6 @@ class TemplateRegressionTests(SimpleTestCase):
         c1 = Context({"objs": Group.objects.all()})
         t1 = Template('{% debug %}')
         self.assertIn("清風", t1.render(c1))
-
-
-# Set ALLOWED_INCLUDE_ROOTS so that ssi works.
-@override_settings(TEMPLATE_DEBUG=False, ROOT_URLCONF='template_tests.urls')
-class TemplateTests(SimpleTestCase):
-
-    @register_test_tags
-    def test_templates(self):
-        template_tests = filters.get_filter_tests()
-
-        templates = dict((name, t[0]) for name, t in six.iteritems(template_tests))
-        with override_settings(TEMPLATE_LOADERS=[
-            ('django.template.loaders.cached.Loader', [
-                ('django.template.loaders.locmem.Loader', templates),
-            ]),
-        ]):
-            failures = []
-            tests = sorted(template_tests.items())
-
-            # Warm the URL reversing cache. This ensures we don't pay the cost
-            # warming the cache during one of the tests.
-            urlresolvers.reverse('named.client', args=(0,))
-
-            for name, vals in tests:
-
-                # Set TEMPLATE_STRING_IF_INVALID to a known string.
-                expected_invalid_str = 'INVALID'
-
-                if isinstance(vals[2], tuple):
-                    normal_string_result = vals[2][0]
-                    invalid_string_result = vals[2][1]
-
-                    if isinstance(invalid_string_result, tuple):
-                        expected_invalid_str = 'INVALID %s'
-                        invalid_string_result = invalid_string_result[0] % invalid_string_result[1]
-
-                    try:
-                        template_debug_result = vals[2][2]
-                    except IndexError:
-                        template_debug_result = normal_string_result
-
-                else:
-                    normal_string_result = vals[2]
-                    invalid_string_result = vals[2]
-                    template_debug_result = vals[2]
-
-                with translation.override(vals[1].get('LANGUAGE_CODE', 'en-us')):
-                    for invalid_str, template_debug, result in [
-                            ('', False, normal_string_result),
-                            (expected_invalid_str, False, invalid_string_result),
-                            ('', True, template_debug_result)
-                    ]:
-                        with override_settings(TEMPLATE_STRING_IF_INVALID=invalid_str,
-                                               TEMPLATE_DEBUG=template_debug):
-                            for is_cached in (False, True):
-                                try:
-                                    try:
-                                        with warnings.catch_warnings():
-                                            # Ignore pending deprecations of loading 'ssi' and 'url' tags from future.
-                                            warnings.filterwarnings("ignore", category=RemovedInDjango19Warning, module='django.templatetags.future')
-                                            # Ignore deprecations of loading 'cycle' and 'firstof' tags from future.
-                                            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.templatetags.future")
-                                            test_template = loader.get_template(name)
-                                    except ShouldNotExecuteException:
-                                        failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
-
-                                    try:
-                                        with warnings.catch_warnings():
-                                            # Ignore deprecations of using the wrong number of variables with the 'for' tag.
-                                            # and warnings for {% url %} reversing by dotted path
-                                            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaulttags")
-                                            # Ignore deprecations of old style unordered_list
-                                            # and removetags.
-                                            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaultfilters")
-                                            # Ignore numpy deprecation warnings (#23890)
-                                            warnings.filterwarnings(
-                                                "ignore",
-                                                "Using a non-integer number instead of an "
-                                                "integer will result in an error in the future",
-                                                DeprecationWarning
-                                            )
-                                            output = self.render(test_template, vals)
-                                    except ShouldNotExecuteException:
-                                        failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
-                                except ContextStackException:
-                                    failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Context stack was left imbalanced" % (is_cached, invalid_str, template_debug, name))
-                                    continue
-                                except Exception:
-                                    exc_type, exc_value, exc_tb = sys.exc_info()
-                                    if exc_type != result:
-                                        tb = '\n'.join(traceback.format_exception(exc_type, exc_value, exc_tb))
-                                        failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Got %s, exception: %s\n%s" % (is_cached, invalid_str, template_debug, name, exc_type, exc_value, tb))
-                                    continue
-                                if output != result:
-                                    failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Expected %r, got %r" % (is_cached, invalid_str, template_debug, name, result, output))
-
-                    Engine.get_default().template_loaders[0].reset()
-
-        self.assertEqual(failures, [], "Tests failed:\n%s\n%s" %
-            ('-' * 70, ("\n%s\n" % ('-' * 70)).join(failures)))
-
-    def render(self, test_template, vals):
-        context = template.Context(vals[1])
-        before_stack_size = len(context.dicts)
-        output = test_template.render(context)
-        if len(context.dicts) != before_stack_size:
-            raise ContextStackException
-        return output
 
 
 class TemplateTagLoading(SimpleTestCase):
