@@ -95,6 +95,10 @@ details on these changes.
   * ``django.shortcuts.render()``
   * ``django.shortcuts.render_to_response()``
 
+* Session verification will be enabled regardless of whether or not
+  ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` is in
+  ``MIDDLEWARE_CLASSES``.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
