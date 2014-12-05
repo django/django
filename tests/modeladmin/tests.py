@@ -1625,10 +1625,15 @@ class ModelAdminPermissionTests(TestCase):
         self.assertTrue(ma.has_module_permission(request))
         request.user = self.MockDeleteUser()
         self.assertTrue(ma.has_module_permission(request))
-        ma.opts.app_label = "anotherapp"
-        request.user = self.MockAddUser()
-        self.assertFalse(ma.has_module_permission(request))
-        request.user = self.MockChangeUser()
-        self.assertFalse(ma.has_module_permission(request))
-        request.user = self.MockDeleteUser()
-        self.assertFalse(ma.has_module_permission(request))
+
+        original_app_label = ma.opts.app_label
+        ma.opts.app_label = 'anotherapp'
+        try:
+            request.user = self.MockAddUser()
+            self.assertFalse(ma.has_module_permission(request))
+            request.user = self.MockChangeUser()
+            self.assertFalse(ma.has_module_permission(request))
+            request.user = self.MockDeleteUser()
+            self.assertFalse(ma.has_module_permission(request))
+        finally:
+            ma.opts.app_label = original_app_label
