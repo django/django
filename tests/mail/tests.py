@@ -886,12 +886,11 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
             self.join()
 
 
-class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
-    email_backend = 'django.core.mail.backends.smtp.EmailBackend'
+class SMTPBackendTestsBase(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(SMTPBackendTests, cls).setUpClass()
+        super(SMTPBackendTestsBase, cls).setUpClass()
         cls.server = FakeSMTPServer(('127.0.0.1', 0), None)
         cls._settings_override = override_settings(
             EMAIL_HOST="127.0.0.1",
@@ -903,7 +902,11 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
     def tearDownClass(cls):
         cls._settings_override.disable()
         cls.server.stop()
-        super(SMTPBackendTests, cls).tearDownClass()
+        super(SMTPBackendTestsBase, cls).tearDownClass()
+
+
+class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
+    email_backend = 'django.core.mail.backends.smtp.EmailBackend'
 
     def setUp(self):
         super(SMTPBackendTests, self).setUp()
@@ -965,19 +968,6 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         opened = backend.open()
         backend.close()
         self.assertTrue(opened)
-
-    def test_server_stopped(self):
-        """
-        Test that closing the backend while the SMTP server is stopped doesn't
-        raise an exception.
-        """
-        backend = smtp.EmailBackend(username='', password='')
-        backend.open()
-        self.server.stop()
-        try:
-            backend.close()
-        except Exception as e:
-            self.fail("close() unexpectedly raised an exception: %s" % e)
 
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_use_settings(self):
@@ -1110,3 +1100,24 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
         finally:
             SMTP.send = send
+
+
+class SMTPBackendStoppedServerTest(SMTPBackendTestsBase):
+    """
+    This test requires a separate class, because it shuts down the
+    FakeSMTPServer started in setUpClass(). It cannot be restarted
+    ("RuntimeError: threads can only be started once").
+    """
+
+    def test_server_stopped(self):
+        """
+        Test that closing the backend while the SMTP server is stopped doesn't
+        raise an exception.
+        """
+        backend = smtp.EmailBackend(username='', password='')
+        backend.open()
+        self.server.stop()
+        try:
+            backend.close()
+        except Exception as e:
+            self.fail("close() unexpectedly raised an exception: %s" % e)
