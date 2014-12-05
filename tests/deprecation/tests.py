@@ -5,6 +5,7 @@ import unittest
 import warnings
 
 from django.test import SimpleTestCase, RequestFactory, override_settings
+from django.test.utils import reset_warning_registry
 from django.utils import six, translation
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import force_text
@@ -28,6 +29,7 @@ class RenameMethodsTests(SimpleTestCase):
         Ensure a warning is raised upon class definition to suggest renaming
         the faulty method.
         """
+        reset_warning_registry()
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('always')
 
