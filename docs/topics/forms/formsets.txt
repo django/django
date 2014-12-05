@@ -631,9 +631,9 @@ If you manually render fields in the template, you can render
     <form method="post" action="">
         {{ formset.management_form }}
         {% for form in formset %}
-            {{ form.id }}
             <ul>
                 <li>{{ form.title }}</li>
+                <li>{{ form.pub_date }}</li>
                 {% if formset.can_delete %}
                     <li>{{ form.DELETE }}</li>
                 {% endif %}
