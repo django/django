@@ -257,7 +257,7 @@ form data has been changed from the initial data.
     ...         'message': 'Hi there',
     ...         'sender': 'foo@example.com',
     ...         'cc_myself': True}
-    >>> f = ContactForm(initial=data)
+    >>> f = ContactForm(data, initial=data)
     >>> f.has_changed()
     False
 
