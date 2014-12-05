@@ -203,7 +203,7 @@ dictionary key, of course), regardless of your database engine.  Such
 placeholders will be replaced with parameters from the ``params``
 argument.
 
-.. note:: Dictionary params not supported with SQLite
+.. note::
 
    Dictionary params are not supported with the SQLite backend; with
    this backend, you must pass parameters as a list.
