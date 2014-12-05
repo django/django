@@ -541,3 +541,15 @@ def captured_stdin():
        self.assertEqual(captured, "hello")
     """
     return captured_output("stdin")
+
+
+def reset_warning_registry():
+    """
+    Clear warning registry for all match modules. This is required
+    because of a warnings.catch_warnings bug.
+    The bug was fixed in Pyhton 3.4.2.
+    """
+    key = "__warningregistry__"
+    for mod in sys.modules.values():
+        if hasattr(mod, key) and re.match(".*", mod.__name__):
+            getattr(mod, key).clear()

@@ -5,6 +5,7 @@ import unittest
 import warnings
 
 from django.test import SimpleTestCase, RequestFactory, override_settings
+from django.test.utils import reset_warning_registry
 from django.utils import six, translation
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import force_text
@@ -22,6 +23,10 @@ class RenameMethodsTests(SimpleTestCase):
     Tests the `RenameMethodsBase` type introduced to rename `get_query_set`
     to `get_queryset` across the code base following #15363.
     """
+
+    def setUp(self):
+        super(RenameMethodsTests, self).setUp()
+        reset_warning_registry()
 
     def test_class_definition_warnings(self):
         """
