@@ -5,6 +5,7 @@ from unittest import skipUnless
 import warnings
 
 from django.test import SimpleTestCase
+from django.test.utils import reset_warning_registry
 from django.utils import six, text
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
@@ -219,6 +220,7 @@ class TestUtilsText(SimpleTestCase):
             self.assertEqual(text.javascript_quote(input), output)
 
     def test_deprecation(self):
+        reset_warning_registry()
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             text.javascript_quote('thingy')
