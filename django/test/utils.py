@@ -231,7 +231,7 @@ class modify_settings(override_settings):
     """
     def __init__(self, *args, **kwargs):
         if args:
-            # Hack used when instantiating from SimpleTestCase._pre_setup.
+            # Hack used when instantiating from SimpleTestCase.setUpClass.
             assert not kwargs
             self.operations = args[0]
         else:
@@ -250,7 +250,7 @@ class modify_settings(override_settings):
         self.options = {}
         for name, operations in self.operations:
             try:
-                # When called from SimpleTestCase._pre_setup, values may be
+                # When called from SimpleTestCase.setUpClass, values may be
                 # overridden several times; cumulate changes.
                 value = self.options[name]
             except KeyError:
