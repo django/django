@@ -62,7 +62,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT column_name, data_type, character_maximum_length, numeric_precision, numeric_scale, extra
             FROM information_schema.columns
             WHERE table_name = %s AND table_schema = DATABASE()""", [table_name])
-        field_info = dict((line[0], InfoLine(*line)) for line in cursor.fetchall())
+        field_info = {line[0]: InfoLine(*line) for line in cursor.fetchall()}
 
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         to_int = lambda i: int(i) if i is not None else i
@@ -85,7 +85,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Returns a dictionary of {field_name: field_index} for the given table.
         Indexes are 0-based.
         """
-        return dict((d[0], i) for i, d in enumerate(self.get_table_description(cursor, table_name)))
+        return {d[0]: i for i, d in enumerate(self.get_table_description(cursor, table_name))}
 
     def get_relations(self, cursor, table_name):
         """

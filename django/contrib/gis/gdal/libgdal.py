@@ -91,7 +91,7 @@ def gdal_version_info():
     m = version_regex.match(ver)
     if not m:
         raise OGRException('Could not parse GDAL version string "%s"' % ver)
-    return dict((key, m.group(key)) for key in ('major', 'minor', 'subminor'))
+    return {key: m.group(key) for key in ('major', 'minor', 'subminor')}
 
 _verinfo = gdal_version_info()
 GDAL_MAJOR_VERSION = int(_verinfo['major'])

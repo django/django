@@ -653,9 +653,9 @@ class DefaultManagerTests(TestCase):
             # the default manager on teachers to immediately get all the related
             # qualifications, since this will do one query per teacher.
             qs = Department.objects.prefetch_related('teachers')
-            depts = "".join(["%s department: %s\n" %
-                             (dept.name, ", ".join(six.text_type(t) for t in dept.teachers.all()))
-                             for dept in qs])
+            depts = "".join("%s department: %s\n" %
+                            (dept.name, ", ".join(six.text_type(t) for t in dept.teachers.all()))
+                            for dept in qs)
 
             self.assertEqual(depts,
                              "English department: Mr Cleese (BA, BSci, MA, PhD), Mr Idle (BA)\n"
@@ -990,9 +990,9 @@ class MultiDbTests(TestCase):
         # Forward
         qs1 = B.prefetch_related('authors')
         with self.assertNumQueries(2, using='other'):
-            books = "".join(["%s (%s)\n" %
-                             (book.title, ", ".join(a.name for a in book.authors.all()))
-                             for book in qs1])
+            books = "".join("%s (%s)\n" %
+                            (book.title, ", ".join(a.name for a in book.authors.all()))
+                            for book in qs1)
         self.assertEqual(books,
                          "Poems (Charlotte, Anne, Emily)\n"
                          "Jane Eyre (Charlotte)\n"
@@ -1002,9 +1002,9 @@ class MultiDbTests(TestCase):
         # Reverse
         qs2 = A.prefetch_related('books')
         with self.assertNumQueries(2, using='other'):
-            authors = "".join(["%s: %s\n" %
-                               (author.name, ", ".join(b.title for b in author.books.all()))
-                               for author in qs2])
+            authors = "".join("%s: %s\n" %
+                              (author.name, ", ".join(b.title for b in author.books.all()))
+                              for author in qs2)
         self.assertEqual(authors,
                          "Charlotte: Poems, Jane Eyre\n"
                          "Anne: Poems\n"

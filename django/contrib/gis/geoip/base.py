@@ -48,7 +48,7 @@ class GeoIP(object):
     GEOIP_CHECK_CACHE = 2
     GEOIP_INDEX_CACHE = 4
     GEOIP_MMAP_CACHE = 8
-    cache_options = dict((opt, None) for opt in (0, 1, 2, 4, 8))
+    cache_options = {opt: None for opt in (0, 1, 2, 4, 8)}
 
     # Paths to the city & country binary databases.
     _city_file = ''

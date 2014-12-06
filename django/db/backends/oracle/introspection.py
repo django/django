@@ -74,7 +74,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Returns a dictionary of {field_name: field_index} for the given table.
         Indexes are 0-based.
         """
-        return dict((d[0], i) for i, d in enumerate(self.get_table_description(cursor, table_name)))
+        return {d[0]: i for i, d in enumerate(self.get_table_description(cursor, table_name))}
 
     def get_relations(self, cursor, table_name):
         """

@@ -918,7 +918,7 @@ class BaseDatabaseOperations(object):
         elif params is None:
             u_params = ()
         else:
-            u_params = dict((to_unicode(k), to_unicode(v)) for k, v in params.items())
+            u_params = {to_unicode(k): to_unicode(v) for k, v in params.items()}
 
         return six.text_type("QUERY = %r - PARAMS = %r") % (sql, u_params)
 
@@ -1302,8 +1302,8 @@ class BaseDatabaseIntrospection(object):
         in sorting order between databases.
         """
         def get_names(cursor):
-            return sorted([ti.name for ti in self.get_table_list(cursor)
-                           if include_views or ti.type == 't'])
+            return sorted(ti.name for ti in self.get_table_list(cursor)
+                          if include_views or ti.type == 't')
         if cursor is None:
             with self.connection.cursor() as cursor:
                 return get_names(cursor)

@@ -405,7 +405,7 @@ class SingleRelatedObjectDescriptor(object):
 
         rel_obj_attr = attrgetter(self.related.field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
-        instances_dict = dict((instance_attr(inst), inst) for inst in instances)
+        instances_dict = {instance_attr(inst): inst for inst in instances}
         query = {'%s__in' % self.related.field.name: instances}
         queryset = queryset.filter(**query)
 
@@ -536,7 +536,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
 
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
-        instances_dict = dict((instance_attr(inst), inst) for inst in instances)
+        instances_dict = {instance_attr(inst): inst for inst in instances}
         related_field = self.field.foreign_related_fields[0]
 
         # FIXME: This will need to be revisited when we introduce support for
@@ -570,9 +570,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
             if None in val:
                 rel_obj = None
             else:
-                params = dict(
-                    (rh_field.attname, getattr(instance, lh_field.attname))
-                    for lh_field, rh_field in self.field.related_fields)
+                params = {
+                    rh_field.attname: getattr(instance, lh_field.attname)
+                    for lh_field, rh_field in self.field.related_fields}
                 qs = self.get_queryset(instance=instance)
                 extra_filter = self.field.get_extra_descriptor_filter(instance)
                 if isinstance(extra_filter, dict):
@@ -702,7 +702,7 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
 
             rel_obj_attr = rel_field.get_local_related_value
             instance_attr = rel_field.get_foreign_related_value
-            instances_dict = dict((instance_attr(inst), inst) for inst in instances)
+            instances_dict = {instance_attr(inst): inst for inst in instances}
             query = {'%s__in' % rel_field.name: instances}
             queryset = queryset.filter(**query)
 
@@ -927,9 +927,9 @@ def create_many_related_manager(superclass, rel):
             join_table = self.through._meta.db_table
             connection = connections[queryset.db]
             qn = connection.ops.quote_name
-            queryset = queryset.extra(select=dict(
-                ('_prefetch_related_val_%s' % f.attname,
-                '%s.%s' % (qn(join_table), qn(f.column))) for f in fk.local_related_fields))
+            queryset = queryset.extra(select={
+                '_prefetch_related_val_%s' % f.attname:
+                '%s.%s' % (qn(join_table), qn(f.column)) for f in fk.local_related_fields})
             return (
                 queryset,
                 lambda result: tuple(
