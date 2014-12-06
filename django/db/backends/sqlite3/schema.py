@@ -49,10 +49,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         Shortcut to transform a model from old_model into new_model
         """
         # Work out the new fields dict / mapping
-        body = dict((f.name, f) for f in model._meta.local_fields)
+        body = {f.name: f for f in model._meta.local_fields}
         # Since mapping might mix column names and default values,
         # its values must be already quoted.
-        mapping = dict((f.column, self.quote_name(f.column)) for f in model._meta.local_fields)
+        mapping = {f.column: self.quote_name(f.column) for f in model._meta.local_fields}
         # This maps field names (not columns) for things like unique_together
         rename_mapping = {}
         # If any of the new or altered fields is introducing a new PK,

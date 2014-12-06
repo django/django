@@ -63,10 +63,10 @@ class MigrationAutodetector(object):
         return (
             path,
             [self.deep_deconstruct(value) for value in args],
-            dict(
-                (key, self.deep_deconstruct(value))
+            {
+                key: self.deep_deconstruct(value)
                 for key, value in kwargs.items()
-            ),
+            },
         )
 
     def only_relation_agnostic_fields(self, fields):

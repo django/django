@@ -35,7 +35,7 @@ class ProjectState(object):
     def clone(self):
         "Returns an exact copy of this ProjectState"
         return ProjectState(
-            models=dict((k, v.clone()) for k, v in self.models.items()),
+            models={k: v.clone() for k, v in self.models.items()},
             real_apps=self.real_apps,
         )
 
@@ -271,10 +271,10 @@ class ModelState(object):
         elif isinstance(value, set):
             return set(cls.force_text_recursive(x) for x in value)
         elif isinstance(value, dict):
-            return dict(
-                (cls.force_text_recursive(k), cls.force_text_recursive(v))
+            return {
+                cls.force_text_recursive(k): cls.force_text_recursive(v)
                 for k, v in value.items()
-            )
+            }
         return value
 
     def construct_fields(self):

@@ -26,7 +26,7 @@ class SimpleArrayField(forms.CharField):
 
     def prepare_value(self, value):
         if isinstance(value, list):
-            return self.delimiter.join([six.text_type(self.base_field.prepare_value(v)) for v in value])
+            return self.delimiter.join(six.text_type(self.base_field.prepare_value(v)) for v in value)
         return value
 
     def to_python(self, value):

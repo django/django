@@ -438,10 +438,10 @@ class FormfieldShouldDeleteFormTests(TestCase):
         # pass standard data dict & see none updated
         data = dict(self.data)
         data['form-INITIAL_FORMS'] = 4
-        data.update(dict(
-            ('form-%d-id' % i, user.pk)
+        data.update({
+            'form-%d-id' % i: user.pk
             for i, user in enumerate(User.objects.all())
-        ))
+        })
         formset = self.NormalFormset(data, queryset=User.objects.all())
         self.assertTrue(formset.is_valid())
         self.assertEqual(len(formset.save()), 0)
@@ -455,10 +455,10 @@ class FormfieldShouldDeleteFormTests(TestCase):
         # create data dict with all fields marked for deletion
         data = dict(self.data)
         data['form-INITIAL_FORMS'] = 4
-        data.update(dict(
-            ('form-%d-id' % i, user.pk)
+        data.update({
+            'form-%d-id' % i: user.pk
             for i, user in enumerate(User.objects.all())
-        ))
+        })
         data.update(self.delete_all_ids)
         formset = self.NormalFormset(data, queryset=User.objects.all())
         self.assertTrue(formset.is_valid())
@@ -474,10 +474,10 @@ class FormfieldShouldDeleteFormTests(TestCase):
         # create data dict with all fields marked for deletion
         data = dict(self.data)
         data['form-INITIAL_FORMS'] = 4
-        data.update(dict(
-            ('form-%d-id' % i, user.pk)
+        data.update({
+            'form-%d-id' % i: user.pk
             for i, user in enumerate(User.objects.all())
-        ))
+        })
         data.update(self.delete_all_ids)
         formset = self.DeleteFormset(data, queryset=User.objects.all())
 

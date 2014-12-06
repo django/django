@@ -25,18 +25,18 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
 
     app_label = app_config.label
 
-    app_models = dict(
-        (model._meta.model_name, model)
-        for model in app_config.get_models())
+    app_models = {
+        model._meta.model_name: model
+        for model in app_config.get_models()}
 
     if not app_models:
         return
 
     # Get all the content types
-    content_types = dict(
-        (ct.model, ct)
+    content_types = {
+        ct.model: ct
         for ct in ContentType.objects.using(using).filter(app_label=app_label)
-    )
+    }
     to_remove = [
         ct
         for (model_name, ct) in six.iteritems(content_types)

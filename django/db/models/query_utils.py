@@ -205,7 +205,7 @@ def deferred_class_factory(model, attrs):
             proxy = True
             app_label = model._meta.app_label
 
-        overrides = dict((attr, DeferredAttribute(attr, model)) for attr in attrs)
+        overrides = {attr: DeferredAttribute(attr, model) for attr in attrs}
         overrides["Meta"] = Meta
         overrides["__module__"] = model.__module__
         overrides["_deferred"] = True

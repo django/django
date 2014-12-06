@@ -28,7 +28,7 @@ class OGRGeomType(object):
               7 + wkb25bit: 'GeometryCollection25D',
               }
     # Reverse type dictionary, keyed by lower-case of the name.
-    _str_types = dict((v.lower(), k) for k, v in _types.items())
+    _str_types = {v.lower(): k for k, v in _types.items()}
 
     def __init__(self, type_input):
         "Figures out the correct OGR Type based upon the input."

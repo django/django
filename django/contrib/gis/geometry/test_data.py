@@ -24,7 +24,7 @@ def tuplize(seq):
 
 def strconvert(d):
     "Converts all keys in dictionary to str type."
-    return dict((str(k), v) for k, v in six.iteritems(d))
+    return {str(k): v for k, v in six.iteritems(d)}
 
 
 def get_ds_file(name, ext):

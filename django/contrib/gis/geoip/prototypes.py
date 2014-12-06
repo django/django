@@ -58,7 +58,7 @@ def check_record(result, func, cargs):
         # Checking the pointer to the C structure, if valid pull out elements
         # into a dictionary.
         rec = result.contents
-        record = dict((fld, getattr(rec, fld)) for fld, ctype in rec._fields_)
+        record = {fld: getattr(rec, fld) for fld, ctype in rec._fields_}
 
         # Now converting the strings to unicode using the proper encoding.
         encoding = geoip_encodings[record['charset']]

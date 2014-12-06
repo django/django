@@ -377,7 +377,7 @@ class Query(object):
             inner_query.select_related = False
             inner_query.related_select_cols = []
 
-            relabels = dict((t, 'subquery') for t in inner_query.tables)
+            relabels = {t: 'subquery' for t in inner_query.tables}
             relabels[None] = 'subquery'
             # Remove any aggregates marked for reduction from the subquery
             # and move them to the outer AggregateQuery.
@@ -390,10 +390,10 @@ class Query(object):
             try:
                 outer_query.add_subquery(inner_query, using)
             except EmptyResultSet:
-                return dict(
-                    (alias, None)
+                return {
+                    alias: None
                     for alias in outer_query.annotation_select
-                )
+                }
         else:
             outer_query = self
             self.select = []
@@ -421,11 +421,11 @@ class Query(object):
                 converters[position] = ([], [annotation.convert_value], annotation.output_field)
         result = compiler.apply_converters(result, converters)
 
-        return dict(
-            (alias, val)
+        return {
+            alias: val
             for (alias, annotation), val
             in zip(outer_query.annotation_select.items(), result)
-        )
+        }
 
     def get_count(self, using):
         """

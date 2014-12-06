@@ -145,8 +145,8 @@ def geos_version_info():
     m = version_regex.match(ver)
     if not m:
         raise GEOSException('Could not parse version info string "%s"' % ver)
-    return dict((key, m.group(key)) for key in (
-        'version', 'release_candidate', 'capi_version', 'major', 'minor', 'subminor'))
+    return {key: m.group(key) for key in (
+        'version', 'release_candidate', 'capi_version', 'major', 'minor', 'subminor')}
 
 # Version numbers and whether or not prepared geometry support is available.
 _verinfo = geos_version_info()

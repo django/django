@@ -103,9 +103,9 @@ def call_command(name, *args, **options):
     parser = command.create_parser('', name)
     if command.use_argparse:
         # Use the `dest` option name from the parser option
-        opt_mapping = dict((sorted(s_opt.option_strings)[0].lstrip('-').replace('-', '_'), s_opt.dest)
-                           for s_opt in parser._actions if s_opt.option_strings)
-        arg_options = dict((opt_mapping.get(key, key), value) for key, value in options.items())
+        opt_mapping = {sorted(s_opt.option_strings)[0].lstrip('-').replace('-', '_'): s_opt.dest
+                       for s_opt in parser._actions if s_opt.option_strings}
+        arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
         defaults = parser.parse_args(args=args)
         defaults = dict(defaults._get_kwargs(), **arg_options)
         # Move positional args out of options to mimic legacy optparse
@@ -237,25 +237,25 @@ class ManagementUtility(object):
             # 'key=value' pairs
             if cwords[0] == 'runfcgi':
                 from django.core.servers.fastcgi import FASTCGI_OPTIONS
-                options += [(k, 1) for k in FASTCGI_OPTIONS]
+                options.extend((k, 1) for k in FASTCGI_OPTIONS)
             # special case: add the names of installed apps to options
             elif cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
                     'sqlcustom', 'sqlindexes', 'sqlsequencereset', 'test'):
                 try:
                     app_configs = apps.get_app_configs()
                     # Get the last part of the dotted path as the app name.
-                    options += [(app_config.label, 0) for app_config in app_configs]
+                    options.extend((app_config.label, 0) for app_config in app_configs)
                 except ImportError:
                     # Fail silently if DJANGO_SETTINGS_MODULE isn't set. The
                     # user will find out once they execute the command.
                     pass
             parser = subcommand_cls.create_parser('', cwords[0])
             if subcommand_cls.use_argparse:
-                options += [(sorted(s_opt.option_strings)[0], s_opt.nargs != 0) for s_opt in
-                            parser._actions if s_opt.option_strings]
+                options.extend((sorted(s_opt.option_strings)[0], s_opt.nargs != 0) for s_opt in
+                               parser._actions if s_opt.option_strings)
             else:
-                options += [(s_opt.get_opt_string(), s_opt.nargs) for s_opt in
-                            parser.option_list]
+                options.extend((s_opt.get_opt_string(), s_opt.nargs) for s_opt in
+                               parser.option_list)
             # filter out previously specified options from available options
             prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
             options = [opt for opt in options if opt[0] not in prev_opts]

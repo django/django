@@ -491,7 +491,7 @@ class QuerySet(object):
         for f in self.model._meta.fields:
             if f.attname in lookup:
                 lookup[f.name] = lookup.pop(f.attname)
-        params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
+        params = {k: v for k, v in kwargs.items() if LOOKUP_SEP not in k}
         params.update(defaults)
         return lookup, params
 
@@ -545,7 +545,7 @@ class QuerySet(object):
         if not id_list:
             return {}
         qs = self.filter(pk__in=id_list).order_by()
-        return dict((obj._get_pk_val(), obj) for obj in qs)
+        return {obj._get_pk_val(): obj for obj in qs}
 
     def delete(self):
         """

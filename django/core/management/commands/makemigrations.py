@@ -66,10 +66,10 @@ class Command(BaseCommand):
 
         # If app_labels is specified, filter out conflicting migrations for unspecified apps
         if app_labels:
-            conflicts = dict(
-                (app_label, conflict) for app_label, conflict in iteritems(conflicts)
+            conflicts = {
+                app_label: conflict for app_label, conflict in iteritems(conflicts)
                 if app_label in app_labels
-            )
+            }
 
         if conflicts and not self.merge:
             name_str = "; ".join(
@@ -103,10 +103,10 @@ class Command(BaseCommand):
             if not app_labels:
                 raise CommandError("You must supply at least one app label when using --empty.")
             # Make a fake changes() result we can pass to arrange_for_graph
-            changes = dict(
-                (app, [Migration("custom", app)])
+            changes = {
+                app: [Migration("custom", app)]
                 for app in app_labels
-            )
+            }
             changes = autodetector.arrange_for_graph(
                 changes=changes,
                 graph=loader.graph,
@@ -224,7 +224,7 @@ class Command(BaseCommand):
                     for migration in merge_migrations
                 ]
                 try:
-                    biggest_number = max([x for x in numbers if x is not None])
+                    biggest_number = max(x for x in numbers if x is not None)
                 except ValueError:
                     biggest_number = 1
                 subclass = type("Migration", (Migration, ), {

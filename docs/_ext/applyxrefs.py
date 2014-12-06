@@ -53,7 +53,7 @@ def main(argv=None):
     files = []
     for root in argv[1:]:
         for (dirpath, dirnames, filenames) in os.walk(root):
-            files.extend([(dirpath, f) for f in filenames])
+            files.extend((dirpath, f) for f in filenames)
     files.sort()
     files = [os.path.join(p, fn) for p, fn in files if fn.endswith('.txt')]
     #print files
