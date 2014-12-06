@@ -17,6 +17,8 @@ from .admin import MediaInline, MediaPermanentInline, site as admin_site
 from .models import Episode, Media, EpisodePermanent, Category
 
 
+# Set TEMPLATE_DEBUG to True to ensure {% include %} will raise exceptions.
+# That is how inlines are rendered and #9498 will bubble up if it is an issue.
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
                    TEMPLATE_DEBUG=True,
                    ROOT_URLCONF="generic_inline_admin.urls")
@@ -24,10 +26,6 @@ class GenericAdminViewTest(TestCase):
     fixtures = ['users.xml']
 
     def setUp(self):
-        # set TEMPLATE_DEBUG to True to ensure {% include %} will raise
-        # exceptions since that is how inlines are rendered and #9498 will
-        # bubble up if it is an issue.
-
         self.client.login(username='super', password='secret')
 
         # Can't load content via a fixture (since the GenericForeignKey
