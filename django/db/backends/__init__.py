@@ -430,6 +430,18 @@ class BaseDatabaseWrapper(object):
                 "thread id %s."
                 % (self.alias, self._thread_ident, thread.get_ident()))
 
+    ##### Pre-migration job handling #####
+
+    def pre_migration(self):
+        """
+        Some database (like spatialite) backends has its special requirements
+        to be done before migration. This method will be called right before
+        `manage.py migrate` (or formerly, syncdb) command. Therefore, each
+        database wrapper can do special requirements, such as making metadata
+        tables and user defined functions.
+        """
+        pass
+
     ##### Miscellaneous #####
 
     @cached_property
