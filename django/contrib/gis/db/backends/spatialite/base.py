@@ -79,3 +79,16 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
         cur.close()
         return conn
+
+    def pre_migration(self):
+        try:
+            cur = self.connection.cursor()
+            r = cur.execute("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='spatial_ref_sys';")
+            if r.next()[0] == 0:
+                cur.execute("SELECT InitSpatialMetaData();")
+        except Exception as msg:
+            new_msg = (
+                'An exception occurs during initializing spatial metadata: '
+                '%s') % (msg)
+            six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
+

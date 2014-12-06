@@ -217,6 +217,10 @@ class Command(BaseCommand):
 
     def sync_apps(self, connection, app_labels):
         "Runs the old syncdb-style operation on a list of app_labels."
+        # If there are special requirements for the backend of this database
+        # connection, let it do.
+        connection.pre_migration()
+
         cursor = connection.cursor()
 
         try:
