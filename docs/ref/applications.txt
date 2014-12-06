@@ -361,7 +361,7 @@ processes all applications in the order of :setting:`INSTALLED_APPS`.
    the order of :setting:`INSTALLED_APPS`, it's strongly recommended not
    import any models at this stage.
 
-   Once this stage completes, APIs that operate of application configurations
+   Once this stage completes, APIs that operate on application configurations
    such as :meth:`~apps.get_app_config()` become usable.
 
 #. Then Django attempts to import the ``models`` submodule of each application,
