@@ -68,6 +68,12 @@ spatial functionality::
 No PostGIS topology functionalities are yet available from GeoDjango, so the
 creation of the ``postgis_topology`` extension is entirely optional.
 
+.. versionchanged:: 1.8
+
+    The ``CREATE EXTENSION postgis`` command is now automatically run during
+    the :djadmin:`migrate` process. You can still create it manually if you
+    wish.
+
 .. _spatialdb_template_earlier:
 
 Creating a spatial database template for earlier versions

@@ -135,6 +135,10 @@ Minor features
 * The Spatialite backend now supports ``Collect`` and ``Extent`` aggregates
   when the database version is 3.0 or later.
 
+* The PostGIS 2 ``CREATE EXTENSION postgis`` and the Spatialite
+  ``SELECT InitSpatialMetaData`` initialization commands are now automatically
+  run by :djadmin:`migrate`.
+
 * Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
   Django 1.2 have been removed.
 
