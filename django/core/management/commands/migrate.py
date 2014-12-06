@@ -64,6 +64,8 @@ class Command(BaseCommand):
         if options.get("list", False):
             return self.show_migration_list(connection, [options['app_label']] if options['app_label'] else None)
 
+        # Hook for backends needing any database preparation
+        connection.prepare_database()
         # Work out which apps have migrations and which do not
         executor = MigrationExecutor(connection, self.migration_progress_callback)
 
