@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import TestCase, mock, override_settings
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ProjectState, ModelState
@@ -64,6 +64,16 @@ class AutodetectorTests(TestCase):
         ("name", models.CharField(max_length=200, default=models.IntegerField())),
     ])
     author_custom_pk = ModelState("testapp", "Author", [("pk_field", models.IntegerField(primary_key=True))])
+    author_with_biography_non_blank = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField()),
+        ("biography", models.TextField()),
+    ])
+    author_with_biography_blank = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(blank=True)),
+        ("biography", models.TextField(blank=True)),
+    ])
     author_with_book = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
@@ -1711,3 +1721,37 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'a', 1)
         self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
         self.assertMigrationDependencies(changes, 'a', 0, [])
+
+    def test_add_blank_textfield_and_charfield(self):
+        """
+        #23405 - Adding a NOT NULL and blank `CharField` or `TextField`
+        without default should not prompt for a default.
+        """
+        class CustomQuestioner(MigrationQuestioner):
+            def ask_not_null_addition(self, field_name, model_name):
+                raise Exception("Should not have prompted for not null addition")
+
+        before = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.author_with_biography_blank])
+        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0)
+
+    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition')
+    def test_add_non_blank_textfield_and_charfield(self, mocked_ask_method):
+        """
+        #23405 - Adding a NOT NULL and non-blank `CharField` or `TextField`
+        without default should prompt for a default.
+        """
+        before = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.author_with_biography_non_blank])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner())
+        changes = autodetector._detect_changes()
+        # need to check for questioner call
+        self.assertTrue(mocked_ask_method.called)
+        self.assertEqual(mocked_ask_method.call_count, 2)
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0)
