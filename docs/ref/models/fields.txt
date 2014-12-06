@@ -685,8 +685,9 @@ FileField and FieldFile
 
 When you access a :class:`~django.db.models.FileField` on a model, you are
 given an instance of :class:`FieldFile` as a proxy for accessing the underlying
-file. This class has several attributes and methods that can be used to
-interact with file data:
+file. In addition to the functionality inherited from
+:class:`django.core.files.File`, this class has several attributes and methods
+that can be used to interact with file data:
 
 .. attribute:: FieldFile.url
 
