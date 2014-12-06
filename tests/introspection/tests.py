@@ -29,12 +29,9 @@ class IntrospectionTests(TransactionTestCase):
 
     def test_django_table_names_retval_type(self):
         # Ticket #15216
-        with connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
-
+        # Table name is a list
         tl = connection.introspection.django_table_names(only_existing=True)
         self.assertIs(type(tl), list)
-
         tl = connection.introspection.django_table_names(only_existing=False)
         self.assertIs(type(tl), list)
 

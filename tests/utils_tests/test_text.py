@@ -5,6 +5,7 @@ from unittest import skipUnless
 import warnings
 
 from django.test import SimpleTestCase
+from django.test.utils import reset_warning_registry
 from django.utils import six, text
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
@@ -17,6 +18,10 @@ IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
 
 
 class TestUtilsText(SimpleTestCase):
+
+    def setUp(self):
+        super(TestUtilsText, self).setUp()
+        reset_warning_registry()
 
     def test_get_text_list(self):
         self.assertEqual(text.get_text_list(['a', 'b', 'c', 'd']), 'a, b, c or d')
