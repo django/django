@@ -140,3 +140,6 @@ Bugfixes
   a user specified ``default``. For example, a ``CharField`` with ``blank=True``
   didn't set existing rows to an empty string which resulted in a crash when
   adding the ``NOT NULL`` constraint (:ticket:`23987`).
+
+* ``makemigrations`` no longer prompts for a default value when adding
+  ``TextField()`` or ``CharField()`` without a ``default`` (:ticket:`23405`).

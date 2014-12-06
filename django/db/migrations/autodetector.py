@@ -797,8 +797,11 @@ class MigrationAutodetector(object):
                         None,
                         True
                     ))
-            # You can't just add NOT NULL fields with no default
-            if not field.null and not field.has_default() and not isinstance(field, models.ManyToManyField):
+            # You can't just add NOT NULL fields with no default or fields
+            # which don't allow empty strings as default.
+            if (not field.null and not field.has_default() and
+                    not isinstance(field, models.ManyToManyField) and
+                    not (field.blank and field.empty_strings_allowed)):
                 field = field.clone()
                 field.default = self.questioner.ask_not_null_addition(field_name, model_name)
                 self.add_operation(
