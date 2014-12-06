@@ -4,6 +4,7 @@ from django.contrib.contenttypes.fields import (
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils import timezone
 
 
 class Episode(models.Model):
@@ -56,3 +57,8 @@ class Contact(models.Model):
 #
 class EpisodePermanent(Episode):
     pass
+
+
+#model wit default column
+class Event(models.Model):
+    creation_date = models.DateTimeField(default=timezone.now)

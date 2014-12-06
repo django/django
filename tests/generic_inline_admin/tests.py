@@ -14,7 +14,7 @@ from django.utils.deprecation import RemovedInDjango19Warning
 
 # local test models
 from .admin import MediaInline, MediaPermanentInline, site as admin_site
-from .models import Episode, Media, EpisodePermanent, Category
+from .models import Episode, Media, EpisodePermanent, Category, Event
 
 
 # Set TEMPLATE_DEBUG to True to ensure {% include %} will raise exceptions.
@@ -92,6 +92,24 @@ class GenericAdminViewTest(TestCase):
         url = '/generic_inline_admin/admin/generic_inline_admin/episode/%d/' % self.episode_pk
         response = self.client.post(url, post_data)
         self.assertEqual(response.status_code, 302)  # redirect somewhere
+
+    def test_issue_23674(self):
+        """
+        test for #23674
+        basically if form doesn't pass validation it should not use malformed data as initial
+        """
+        maxDiff = self.maxDiff
+        self.maxDiff = None
+        event = Event.objects.create()
+        post_data = {
+            'creation_date_0': '14-12-06',
+            'creation_date_1': '21:23:22'
+        }
+        url = '/generic_inline_admin/admin/generic_inline_admin/event/%d/' % event.pk
+        response = self.client.post(url, post_data)
+        self.assertHTMLEqual(response.context['adminform'].form.as_table(), u'<tr><th><label for="id_creation_date_0">Creation date:</label></th><td><ul class="errorlist"><li>Enter a valid date.</li></ul><p class="datetime">Date: <input class="vDateField" id="id_creation_date_0" name="creation_date_0" size="10" type="text" value="14-12-06" /><br />Time: <input class="vTimeField" id="id_creation_date_1" name="creation_date_1" size="8" type="text" value="21:23:22" /></p><input id="initial-id_creation_date_0" name="initial-creation_date_0" type="hidden" value="%s" /><input id="initial-id_creation_date_1" name="initial-creation_date_1" type="hidden" value="%s" /></td></tr>' % (event.creation_date.date().strftime("%Y-%m-%d") , event.creation_date.time().strftime("%H:%M:%S")))
+        self.assertEqual(response.status_code, 200)
+        self.maxDiff = maxDiff
 
     def test_generic_inline_formset(self):
         EpisodeMediaFormSet = generic_inlineformset_factory(Media, can_delete=False, exclude=['description', 'keywords'], extra=3)

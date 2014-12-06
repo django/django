@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
 
 from .models import (Media, PhoneNumber, Episode, Contact,
-    Category, EpisodePermanent)
+    Category, EpisodePermanent, Event)
 
 
 site = admin.AdminSite(name="admin")
@@ -30,4 +30,5 @@ class MediaPermanentInline(GenericTabularInline):
 site.register(Episode, EpisodeAdmin)
 site.register(Contact, inlines=[PhoneNumberInline])
 site.register(Category)
+site.register(Event)
 site.register(EpisodePermanent, inlines=[MediaPermanentInline])
