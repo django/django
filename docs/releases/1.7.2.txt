@@ -128,3 +128,6 @@ Bugfixes
 * Always converted ``related_name`` to text (unicode), since that is required
   on Python 3 for interpolation. Removed conversion of ``related_name`` to text
   in migration deconstruction (:ticket:`23455` and :ticket:`23982`).
+
+* ``makemigrations`` no longer prompts for a default value when adding
+  ``TextField()`` or ``CharField()`` without a default (:ticket:`23405`).
