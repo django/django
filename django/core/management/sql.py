@@ -62,8 +62,8 @@ def sql_create(app_config, style, connection):
     if not_installed_models:
         alter_sql = []
         for model in not_installed_models:
-            alter_sql.extend(['-- ' + sql for sql in
-                connection.creation.sql_for_pending_references(model, style, pending_references)])
+            alter_sql.extend('-- ' + sql for sql in
+                connection.creation.sql_for_pending_references(model, style, pending_references))
         if alter_sql:
             final_output.append('-- The following references should be added but depend on non-existent tables:')
             final_output.extend(alter_sql)
