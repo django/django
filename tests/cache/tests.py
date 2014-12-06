@@ -16,8 +16,10 @@ import warnings
 
 from django.conf import settings
 from django.core import management
+from django.core import signals
 from django.core.cache import (cache, caches, CacheKeyWarning,
-    InvalidCacheBackendError, DEFAULT_CACHE_ALIAS)
+    InvalidCacheBackendError, DEFAULT_CACHE_ALIAS, get_cache,
+    close_caches)
 from django.core.context_processors import csrf
 from django.db import connection, connections, transaction
 from django.core.cache.utils import make_template_fragment_key
@@ -1221,7 +1223,6 @@ class CustomCacheKeyValidationTests(TestCase):
 class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
 
     def test_simple(self):
-        from django.core.cache import caches, get_cache
         self.assertIsInstance(
             caches[DEFAULT_CACHE_ALIAS],
             get_cache('default').__class__
@@ -1236,18 +1237,20 @@ class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
         self.assertRaises(InvalidCacheBackendError, get_cache, 'does_not_exist')
 
     def test_close(self):
-        from django.core import signals
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
 
     def test_close_deprecated(self):
-        from django.core.cache import get_cache
-        from django.core import signals
         cache = get_cache('cache.closeable_cache.CacheClass')
         self.assertFalse(cache.closed)
-        signals.request_finished.send(self.__class__)
-        self.assertTrue(cache.closed)
+        # Ensure that we don't close the global cache instances.
+        signals.request_finished.disconnect(close_caches)
+        try:
+            signals.request_finished.send(self.__class__)
+            self.assertTrue(cache.closed)
+        finally:
+            signals.request_finished.connect(close_caches)
 
 
 DEFAULT_MEMORY_CACHES_SETTINGS = {
@@ -1378,9 +1381,8 @@ class CacheUtils(TestCase):
     def test_get_cache_key(self):
         request = self.factory.get(self.path)
         response = HttpResponse()
-        key_prefix = 'localprefix'
         # Expect None if no headers have been set yet.
-        self.assertIsNone(get_cache_key(request))
+        self.assertIsNone(get_cache_key(request, response))
         # Set headers to an empty list.
         learn_cache_key(request, response)
 
@@ -1390,6 +1392,7 @@ class CacheUtils(TestCase):
             '18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e'
         )
         # Verify that a specified key_prefix is taken into account.
+        key_prefix = 'localprefix'
         learn_cache_key(request, response, key_prefix=key_prefix)
         self.assertEqual(
             get_cache_key(request, key_prefix=key_prefix),
