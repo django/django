@@ -432,6 +432,13 @@ class BaseDatabaseWrapper(object):
 
     ##### Miscellaneous #####
 
+    def prepare_database(self):
+        """
+        Hook to do any database check or preparation, generally called before
+        migrating a project or an app.
+        """
+        pass
+
     @cached_property
     def wrap_database_errors(self):
         """
