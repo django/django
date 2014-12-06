@@ -38,7 +38,7 @@ city_data = (
 )
 
 # Reference mapping of city name to its altitude (Z value).
-city_dict = dict((name, coords) for name, coords in city_data)
+city_dict = {name: coords for name, coords in city_data}
 
 # 3D freeway data derived from the National Elevation Dataset:
 #  http://seamless.usgs.gov/products/9arc.php

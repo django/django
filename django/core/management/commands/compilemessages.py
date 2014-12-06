@@ -60,7 +60,7 @@ class Command(BaseCommand):
         basedirs = [os.path.join('conf', 'locale'), 'locale']
         if os.environ.get('DJANGO_SETTINGS_MODULE'):
             from django.conf import settings
-            basedirs.extend([upath(path) for path in settings.LOCALE_PATHS])
+            basedirs.extend(upath(path) for path in settings.LOCALE_PATHS)
 
         # Gather existing directories.
         basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))

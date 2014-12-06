@@ -64,13 +64,13 @@ class SchemaTests(TransactionTestCase):
 
     def column_classes(self, model):
         with connection.cursor() as cursor:
-            columns = dict(
-                (d[0], (connection.introspection.get_field_type(d[1], d), d))
+            columns = {
+                d[0]: (connection.introspection.get_field_type(d[1], d), d)
                 for d in connection.introspection.get_table_description(
                     cursor,
                     model._meta.db_table,
                 )
-            )
+            }
         # SQLite has a different format for field_type
         for name, (type, desc) in columns.items():
             if isinstance(type, tuple):
