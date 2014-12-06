@@ -211,34 +211,11 @@ following to your ``settings.py``::
 Creating a spatial database for SpatiaLite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After you've installed SpatiaLite, you'll need to create a number of spatial
-metadata tables in your database in order to perform spatial queries.
+When running ``manage.py migrate`` with a SQLite or SpatiaLite database, the
+database file will be automatically created if it doesn't exist. Django will
+also ensure that the spatial metadata are initialized in the database.
 
-Use the ``spatialite`` utility to call the ``InitSpatialMetaData()`` function,
-like this::
+.. versionchanged:: 1.8
 
-   $ spatialite geodjango.db "SELECT InitSpatialMetaData();"
-   the SPATIAL_REF_SYS table already contains some row(s)
-    InitSpatiaMetaData ()error:"table spatial_ref_sys already exists"
-   0
-
-You can safely ignore the error messages shown.
-
-.. note::
-
-    The parameter ``geodjango.db`` is the *filename* of the SQLite database
-    you want to use.  Use the same in the :setting:`DATABASES` ``"name"`` key
-    inside your ``settings.py``.
-
-.. note::
-
-    When running ``manage.py migrate`` with a SQLite (or SpatiaLite) database,
-    the database file will be automatically created if it doesn't exist. In
-    this case, if your models contain any geometry columns, you'll see this
-    error::
-
-        CreateSpatialIndex() error: "no such table: geometry_columns"
-
-    It's because the table creation queries are executed without spatial
-    metadata tables. To avoid this, make the database file before executing
-    ``manage.py migrate`` as described above.
+    Prior to Django 1.8, you had to intialize spatial metadata tables yourself
+    by manually running the "SELECT InitSpatialMetaData();" query.
