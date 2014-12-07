@@ -350,7 +350,7 @@ class ListFiltersTests(TestCase):
         )
 
         request = self.request_factory.get('/', {
-            'date_registered__isnull': str(True),
+            'date_registered__isnull': str(1),
         })
         changelist = self.get_changelist(request, Book, modeladmin)
 
@@ -364,10 +364,10 @@ class ListFiltersTests(TestCase):
         self.assertEqual(force_text(filterspec.title), 'date registered')
         choice = select_by(filterspec.choices(changelist), "display", "No Date")
         self.assertEqual(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?date_registered__isnull=True')
+        self.assertEqual(choice['query_string'], '?date_registered__isnull=1')
 
         request = self.request_factory.get('/', {
-            'date_registered__isnull': str(False),
+            'date_registered__isnull': str(0),
         })
         changelist = self.get_changelist(request, Book, modeladmin)
 
@@ -381,7 +381,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(force_text(filterspec.title), 'date registered')
         choice = select_by(filterspec.choices(changelist), "display", "Has Date")
         self.assertEqual(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?date_registered__isnull=False')
+        self.assertEqual(choice['query_string'], '?date_registered__isnull=0')
 
     @override_settings(USE_TZ=True)
     def test_datefieldlistfilter_with_time_zone_support(self):

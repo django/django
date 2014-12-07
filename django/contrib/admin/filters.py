@@ -337,10 +337,10 @@ class DateFieldListFilter(FieldListFilter):
         if field.null:
             self.links += (
                 (_('No Date'), {
-                    self.field_generic + 'isnull': str(True),
+                    self.field_generic + 'isnull': str(1),
                 }),
                 (_('Has Date'), {
-                    self.field_generic + 'isnull': str(False),
+                    self.field_generic + 'isnull': str(0)
                 }),
             )
         super(DateFieldListFilter, self).__init__(
