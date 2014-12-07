@@ -222,6 +222,9 @@ details on these changes.
   :attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
   attribute will change from ``True`` to ``False``.
 
+* ``django.contrib.sitemaps.FlatPageSitemap`` will be removed in favor of
+  ``django.contrib.flatpages.sitemaps.FlatPageSitemap``.
+
 .. _deprecation-removed-in-1.8:
 
 1.8

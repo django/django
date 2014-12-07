@@ -293,3 +293,42 @@ For example:
     {% get_flatpages '/about/' as about_pages %}
     {% get_flatpages about_prefix as about_pages %}
     {% get_flatpages '/about/' for someuser as about_pages %}
+
+Integrating with :mod:`django.contrib.sitemaps`
+===============================================
+
+.. currentmodule:: django.contrib.flatpages.sitemaps
+
+.. class:: FlatPageSitemap
+
+    .. versionadded:: 1.8
+
+    The :class:`sitemaps.FlatPageSitemap <django.contrib.flatpages.sitemaps.FlatPageSitemap>`
+    class looks at all publicly visible :mod:`~django.contrib.flatpages` defined
+    for the current :setting:`SITE_ID` (see the
+    :mod:`sites documentation <django.contrib.sites>`) and creates an entry in
+    the sitemap. These entries include only the
+    :attr:`~django.contrib.sitemaps.Sitemap.location` attribute -- not
+    :attr:`~django.contrib.sitemaps.Sitemap.lastmod`,
+    :attr:`~django.contrib.sitemaps.Sitemap.changefreq` or
+    :attr:`~django.contrib.sitemaps.Sitemap.priority`.
+
+Example
+-------
+
+Here's an example of a :doc:`URLconf </topics/http/urls>` using
+:class:`FlatPageSitemap`::
+
+    from django.conf.urls import url
+    from django.contrib.flatpages.sitemaps import FlatPageSitemap
+    from django.contrib.sitemaps.views import sitemap
+    from blog.models import Entry
+
+    urlpatterns = [
+        # ...
+
+        # the sitemap
+        url(r'^sitemap\.xml$', sitemap,
+            {'sitemaps': {'flatpages': FlatPageSitemap}},
+            name='django.contrib.sitemaps.views.sitemap'),
+    ]

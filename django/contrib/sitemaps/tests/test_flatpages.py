@@ -1,9 +1,12 @@
 from __future__ import unicode_literals
 
 from unittest import skipUnless
+import warnings
 
 from django.apps import apps
 from django.conf import settings
+from django.contrib.sitemaps import FlatPageSitemap
+from django.test import SimpleTestCase
 
 from .base import SitemapTestsBase
 
@@ -40,3 +43,18 @@ class FlatpagesSitemapTests(SitemapTestsBase):
         self.assertContains(response, '<loc>%s%s</loc>' % (self.base_url, public.url))
         # Private flatpage should not be in the sitemap
         self.assertNotContains(response, '<loc>%s%s</loc>' % (self.base_url, private.url))
+
+
+class FlatpagesSitemapDeprecationTests(SimpleTestCase):
+
+    def test_deprecation(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            FlatPageSitemap()
+
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            str(warns[0].message),
+            "'django.contrib.sitemaps.FlatPageSitemap' is deprecated. "
+            "Use 'django.contrib.flatpages.sitemaps.FlatPageSitemap' instead.",
+        )
