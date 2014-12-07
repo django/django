@@ -362,7 +362,7 @@ class ListFiltersTests(TestCase):
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
         self.assertEqual(force_text(filterspec.title), 'date registered')
-        choice = select_by(filterspec.choices(changelist), "display", "None")
+        choice = select_by(filterspec.choices(changelist), "display", "No Date")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?date_registered__isnull=True')
 
@@ -379,7 +379,7 @@ class ListFiltersTests(TestCase):
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
         self.assertEqual(force_text(filterspec.title), 'date registered')
-        choice = select_by(filterspec.choices(changelist), "display", "Not None")
+        choice = select_by(filterspec.choices(changelist), "display", "Has Date")
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?date_registered__isnull=False')
 

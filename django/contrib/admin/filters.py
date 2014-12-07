@@ -336,10 +336,10 @@ class DateFieldListFilter(FieldListFilter):
         )
         if field.null:
             self.links += (
-                (_('None'), {
+                (_('No Date'), {
                     self.field_generic + 'isnull': str(True),
                 }),
-                (_('Not None'), {
+                (_('Has Date'), {
                     self.field_generic + 'isnull': str(False),
                 }),
             )
