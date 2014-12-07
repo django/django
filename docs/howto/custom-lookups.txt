@@ -230,7 +230,8 @@ We can change the behavior on a specific backend by creating a subclass of
           rhs, rhs_params = self.process_rhs(qn, connection)
           params = lhs_params + rhs_params
           return '%s != %s' % (lhs, rhs), params
-  Field.register_lookup(MySQLNotExact)
+
+  Field.register_lookup(MySQLNotEqual)
 
 We can then register it with ``Field``. It takes the place of the original
 ``NotEqual`` class as it has the same ``lookup_name``.
