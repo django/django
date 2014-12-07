@@ -2,7 +2,7 @@ from django.template.defaultfilters import linenumbers
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
-from ..utils import render, setup
+from ..utils import setup
 
 
 class LinenumbersTests(SimpleTestCase):
@@ -13,7 +13,7 @@ class LinenumbersTests(SimpleTestCase):
 
     @setup({'linenumbers01': '{{ a|linenumbers }} {{ b|linenumbers }}'})
     def test_linenumbers01(self):
-        output = render(
+        output = self.engine.render_to_string(
             'linenumbers01',
             {'a': 'one\n<two>\nthree', 'b': mark_safe('one\n&lt;two&gt;\nthree')},
         )
@@ -23,7 +23,7 @@ class LinenumbersTests(SimpleTestCase):
     @setup({'linenumbers02':
         '{% autoescape off %}{{ a|linenumbers }} {{ b|linenumbers }}{% endautoescape %}'})
     def test_linenumbers02(self):
-        output = render(
+        output = self.engine.render_to_string(
             'linenumbers02',
             {'a': 'one\n<two>\nthree', 'b': mark_safe('one\n&lt;two&gt;\nthree')},
         )
