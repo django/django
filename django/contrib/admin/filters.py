@@ -334,6 +334,15 @@ class DateFieldListFilter(FieldListFilter):
                 self.lookup_kwarg_until: str(next_year),
             }),
         )
+        if field.null:
+            self.links += (
+                (_('None'), {
+                    self.field_generic + 'isnull': str(True),
+                }),
+                (_('Not None'), {
+                    self.field_generic + 'isnull': str(False),
+                }),
+            )
         super(DateFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
 
