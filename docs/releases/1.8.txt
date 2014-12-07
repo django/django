@@ -1204,6 +1204,13 @@ In Django 2.0, session verification will be enabled regardless of whether or not
 to your ``MIDDLEWARE_CLASSES`` sometime before then to opt-in. Please read the
 :ref:`upgrade considerations <session-invalidation-on-password-change>` first.
 
+``django.contrib.sitemaps.FlatPageSitemap``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.contrib.sitemaps.FlatPageSitemap`` has moved to
+``django.contrib.flatpages.sitemaps.FlatPageSitemap``. The old import location
+is deprecated and will be removed in Django 1.9.
+
 .. removed-features-1.8:
 
 Features removed in 1.8
