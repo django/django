@@ -1,7 +1,6 @@
-from django.conf import settings
 from django.test import SimpleTestCase
 
-from ..utils import render, setup
+from ..utils import setup
 
 
 class ListIndexTests(SimpleTestCase):
@@ -12,7 +11,7 @@ class ListIndexTests(SimpleTestCase):
         List-index syntax allows a template to access a certain item of a
         subscriptable object.
         """
-        output = render('list-index01', {'var': ['first item', 'second item']})
+        output = self.engine.render_to_string('list-index01', {'var': ['first item', 'second item']})
         self.assertEqual(output, 'second item')
 
     @setup({'list-index02': '{{ var.5 }}'})
@@ -20,8 +19,8 @@ class ListIndexTests(SimpleTestCase):
         """
         Fail silently when the list index is out of range.
         """
-        output = render('list-index02', {'var': ['first item', 'second item']})
-        if settings.TEMPLATE_STRING_IF_INVALID:
+        output = self.engine.render_to_string('list-index02', {'var': ['first item', 'second item']})
+        if self.engine.string_if_invalid:
             self.assertEqual(output, 'INVALID')
         else:
             self.assertEqual(output, '')
@@ -31,8 +30,8 @@ class ListIndexTests(SimpleTestCase):
         """
         Fail silently when the list index is out of range.
         """
-        output = render('list-index03', {'var': None})
-        if settings.TEMPLATE_STRING_IF_INVALID:
+        output = self.engine.render_to_string('list-index03', {'var': None})
+        if self.engine.string_if_invalid:
             self.assertEqual(output, 'INVALID')
         else:
             self.assertEqual(output, '')
@@ -42,8 +41,8 @@ class ListIndexTests(SimpleTestCase):
         """
         Fail silently when variable is a dict without the specified key.
         """
-        output = render('list-index04', {'var': {}})
-        if settings.TEMPLATE_STRING_IF_INVALID:
+        output = self.engine.render_to_string('list-index04', {'var': {}})
+        if self.engine.string_if_invalid:
             self.assertEqual(output, 'INVALID')
         else:
             self.assertEqual(output, '')
@@ -53,7 +52,7 @@ class ListIndexTests(SimpleTestCase):
         """
         Dictionary lookup wins out when dict's key is a string.
         """
-        output = render('list-index05', {'var': {'1': "hello"}})
+        output = self.engine.render_to_string('list-index05', {'var': {'1': "hello"}})
         self.assertEqual(output, 'hello')
 
     @setup({'list-index06': '{{ var.1 }}'})
@@ -63,7 +62,7 @@ class ListIndexTests(SimpleTestCase):
         behind the scenes is really a dictionary lookup (for a dict)
         after converting the key to an int.
         """
-        output = render('list-index06', {"var": {1: "hello"}})
+        output = self.engine.render_to_string('list-index06', {"var": {1: "hello"}})
         self.assertEqual(output, 'hello')
 
     @setup({'list-index07': '{{ var.1 }}'})
@@ -72,5 +71,5 @@ class ListIndexTests(SimpleTestCase):
         Dictionary lookup wins out when there is a string and int version
         of the key.
         """
-        output = render('list-index07', {"var": {'1': "hello", 1: "world"}})
+        output = self.engine.render_to_string('list-index07', {"var": {'1': "hello", 1: "world"}})
         self.assertEqual(output, 'hello')
