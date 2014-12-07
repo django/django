@@ -5,7 +5,7 @@ from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.safestring import mark_safe
 
-from ..utils import render, setup
+from ..utils import setup
 
 
 class RemovetagsTests(SimpleTestCase):
@@ -14,7 +14,7 @@ class RemovetagsTests(SimpleTestCase):
     def test_removetags01(self):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', RemovedInDjango20Warning)
-            output = render(
+            output = self.engine.render_to_string(
                 'removetags01',
                 {
                     'a': '<a>x</a> <p><b>y</b></p>',
@@ -28,7 +28,7 @@ class RemovetagsTests(SimpleTestCase):
     def test_removetags02(self):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', RemovedInDjango20Warning)
-            output = render(
+            output = self.engine.render_to_string(
                 'removetags02',
                 {
                     'a': '<a>x</a> <p><b>y</b></p>',

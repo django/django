@@ -1,9 +1,8 @@
 from django.core.cache import cache
-from django.template.base import TemplateSyntaxError
-from django.template.loader import get_template
+from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase
 
-from ..utils import render, setup
+from ..utils import setup
 
 
 class CacheTagTests(SimpleTestCase):
@@ -13,7 +12,7 @@ class CacheTagTests(SimpleTestCase):
 
     @setup({'cache03': '{% load cache %}{% cache 2 test %}cache03{% endcache %}'})
     def test_cache03(self):
-        output = render('cache03')
+        output = self.engine.render_to_string('cache03')
         self.assertEqual(output, 'cache03')
 
     @setup({
@@ -21,18 +20,18 @@ class CacheTagTests(SimpleTestCase):
         'cache04': '{% load cache %}{% cache 2 test %}cache04{% endcache %}',
     })
     def test_cache04(self):
-        render('cache03')
-        output = render('cache04')
+        self.engine.render_to_string('cache03')
+        output = self.engine.render_to_string('cache04')
         self.assertEqual(output, 'cache03')
 
     @setup({'cache05': '{% load cache %}{% cache 2 test foo %}cache05{% endcache %}'})
     def test_cache05(self):
-        output = render('cache05', {'foo': 1})
+        output = self.engine.render_to_string('cache05', {'foo': 1})
         self.assertEqual(output, 'cache05')
 
     @setup({'cache06': '{% load cache %}{% cache 2 test foo %}cache06{% endcache %}'})
     def test_cache06(self):
-        output = render('cache06', {'foo': 2})
+        output = self.engine.render_to_string('cache06', {'foo': 2})
         self.assertEqual(output, 'cache06')
 
     @setup({
@@ -41,8 +40,8 @@ class CacheTagTests(SimpleTestCase):
     })
     def test_cache07(self):
         context = {'foo': 1}
-        render('cache05', context)
-        output = render('cache07', context)
+        self.engine.render_to_string('cache05', context)
+        output = self.engine.render_to_string('cache07', context)
         self.assertEqual(output, 'cache05')
 
     @setup({
@@ -54,42 +53,42 @@ class CacheTagTests(SimpleTestCase):
         Allow first argument to be a variable.
         """
         context = {'foo': 2, 'time': 2}
-        render('cache06', context)
-        output = render('cache08', context)
+        self.engine.render_to_string('cache06', context)
+        output = self.engine.render_to_string('cache08', context)
         self.assertEqual(output, 'cache06')
 
     # Raise exception if we don't have at least 2 args, first one integer.
     @setup({'cache11': '{% load cache %}{% cache %}{% endcache %}'})
     def test_cache11(self):
         with self.assertRaises(TemplateSyntaxError):
-            get_template('cache11')
+            self.engine.get_template('cache11')
 
     @setup({'cache12': '{% load cache %}{% cache 1 %}{% endcache %}'})
     def test_cache12(self):
         with self.assertRaises(TemplateSyntaxError):
-            get_template('cache12')
+            self.engine.get_template('cache12')
 
     @setup({'cache13': '{% load cache %}{% cache foo bar %}{% endcache %}'})
     def test_cache13(self):
         with self.assertRaises(TemplateSyntaxError):
-            render('cache13')
+            self.engine.render_to_string('cache13')
 
     @setup({'cache14': '{% load cache %}{% cache foo bar %}{% endcache %}'})
     def test_cache14(self):
         with self.assertRaises(TemplateSyntaxError):
-            render('cache14', {'foo': 'fail'})
+            self.engine.render_to_string('cache14', {'foo': 'fail'})
 
     @setup({'cache15': '{% load cache %}{% cache foo bar %}{% endcache %}'})
     def test_cache15(self):
         with self.assertRaises(TemplateSyntaxError):
-            render('cache15', {'foo': []})
+            self.engine.render_to_string('cache15', {'foo': []})
 
     @setup({'cache16': '{% load cache %}{% cache 1 foo bar %}{% endcache %}'})
     def test_cache16(self):
         """
         Regression test for #7460.
         """
-        output = render('cache16', {'foo': 'foo', 'bar': 'with spaces'})
+        output = self.engine.render_to_string('cache16', {'foo': 'foo', 'bar': 'with spaces'})
         self.assertEqual(output, '')
 
     @setup({'cache17': '{% load cache %}{% cache 10 long_cache_key poem %}Some Content{% endcache %}'})
@@ -97,7 +96,7 @@ class CacheTagTests(SimpleTestCase):
         """
         Regression test for #11270.
         """
-        output = render('cache17', {'poem': 'Oh freddled gruntbuggly/'
+        output = self.engine.render_to_string('cache17', {'poem': 'Oh freddled gruntbuggly/'
                                             'Thy micturations are to me/'
                                             'As plurdled gabbleblotchits/'
                                             'On a lurgid bee/'
@@ -114,5 +113,5 @@ class CacheTagTests(SimpleTestCase):
         """
         Test whitespace in filter arguments
         """
-        output = render('cache18')
+        output = self.engine.render_to_string('cache18')
         self.assertEqual(output, 'cache18')

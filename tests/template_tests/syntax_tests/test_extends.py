@@ -1,7 +1,6 @@
-from django.template.base import Template
 from django.test import SimpleTestCase
 
-from ..utils import render, setup
+from ..utils import setup
 
 
 inheritance_templates = {
@@ -64,7 +63,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Standard template with no inheritance
         """
-        output = render('inheritance01')
+        output = self.engine.render_to_string('inheritance01')
         self.assertEqual(output, '1&3_')
 
     @setup(inheritance_templates)
@@ -72,7 +71,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Standard two-level inheritance
         """
-        output = render('inheritance02')
+        output = self.engine.render_to_string('inheritance02')
         self.assertEqual(output, '1234')
 
     @setup(inheritance_templates)
@@ -80,7 +79,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Three-level with no redefinitions on third level
         """
-        output = render('inheritance03')
+        output = self.engine.render_to_string('inheritance03')
         self.assertEqual(output, '1234')
 
     @setup(inheritance_templates)
@@ -88,7 +87,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Two-level with no redefinitions on second level
         """
-        output = render('inheritance04')
+        output = self.engine.render_to_string('inheritance04')
         self.assertEqual(output, '1&3_')
 
     @setup(inheritance_templates)
@@ -96,7 +95,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Two-level with double quotes instead of single quotes
         """
-        output = render('inheritance05')
+        output = self.engine.render_to_string('inheritance05')
         self.assertEqual(output, '1234')
 
     @setup(inheritance_templates)
@@ -104,7 +103,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Three-level with variable parent-template name
         """
-        output = render('inheritance06', {'foo': 'inheritance02'})
+        output = self.engine.render_to_string('inheritance06', {'foo': 'inheritance02'})
         self.assertEqual(output, '1234')
 
     @setup(inheritance_templates)
@@ -112,7 +111,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Two-level with one block defined, one block not defined
         """
-        output = render('inheritance07')
+        output = self.engine.render_to_string('inheritance07')
         self.assertEqual(output, '1&35')
 
     @setup(inheritance_templates)
@@ -121,7 +120,7 @@ class InheritanceTests(SimpleTestCase):
         Three-level with one block defined on this level, two blocks
         defined next level
         """
-        output = render('inheritance08')
+        output = self.engine.render_to_string('inheritance08')
         self.assertEqual(output, '1235')
 
     @setup(inheritance_templates)
@@ -129,7 +128,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Three-level with second and third levels blank
         """
-        output = render('inheritance09')
+        output = self.engine.render_to_string('inheritance09')
         self.assertEqual(output, '1&3_')
 
     @setup(inheritance_templates)
@@ -137,7 +136,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Three-level with space NOT in a block -- should be ignored
         """
-        output = render('inheritance10')
+        output = self.engine.render_to_string('inheritance10')
         self.assertEqual(output, '1&3_')
 
     @setup(inheritance_templates)
@@ -146,7 +145,7 @@ class InheritanceTests(SimpleTestCase):
         Three-level with both blocks defined on this level, but none on
         second level
         """
-        output = render('inheritance11')
+        output = self.engine.render_to_string('inheritance11')
         self.assertEqual(output, '1234')
 
     @setup(inheritance_templates)
@@ -155,7 +154,7 @@ class InheritanceTests(SimpleTestCase):
         Three-level with this level providing one and second level
         providing the other
         """
-        output = render('inheritance12')
+        output = self.engine.render_to_string('inheritance12')
         self.assertEqual(output, '1235')
 
     @setup(inheritance_templates)
@@ -163,7 +162,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Three-level with this level overriding second level
         """
-        output = render('inheritance13')
+        output = self.engine.render_to_string('inheritance13')
         self.assertEqual(output, '1a3b')
 
     @setup(inheritance_templates)
@@ -171,7 +170,7 @@ class InheritanceTests(SimpleTestCase):
         """
         A block defined only in a child template shouldn't be displayed
         """
-        output = render('inheritance14')
+        output = self.engine.render_to_string('inheritance14')
         self.assertEqual(output, '1&3_')
 
     @setup(inheritance_templates)
@@ -179,7 +178,7 @@ class InheritanceTests(SimpleTestCase):
         """
         A block within another block
         """
-        output = render('inheritance15')
+        output = self.engine.render_to_string('inheritance15')
         self.assertEqual(output, '12inner3_')
 
     @setup(inheritance_templates)
@@ -187,7 +186,7 @@ class InheritanceTests(SimpleTestCase):
         """
         A block within another block (level 2)
         """
-        output = render('inheritance16')
+        output = self.engine.render_to_string('inheritance16')
         self.assertEqual(output, '12out3_')
 
     @setup(inheritance_templates)
@@ -195,7 +194,7 @@ class InheritanceTests(SimpleTestCase):
         """
         {% load %} tag (parent -- setup for exception04)
         """
-        output = render('inheritance17')
+        output = self.engine.render_to_string('inheritance17')
         self.assertEqual(output, '1234')
 
     @setup(inheritance_templates)
@@ -203,7 +202,7 @@ class InheritanceTests(SimpleTestCase):
         """
         {% load %} tag (standard usage, without inheritance)
         """
-        output = render('inheritance18')
+        output = self.engine.render_to_string('inheritance18')
         self.assertEqual(output, 'this that theother5678')
 
     @setup(inheritance_templates)
@@ -211,7 +210,7 @@ class InheritanceTests(SimpleTestCase):
         """
         {% load %} tag (within a child template)
         """
-        output = render('inheritance19')
+        output = self.engine.render_to_string('inheritance19')
         self.assertEqual(output, '140056783_')
 
     @setup(inheritance_templates)
@@ -219,7 +218,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Two-level inheritance with {{ block.super }}
         """
-        output = render('inheritance20')
+        output = self.engine.render_to_string('inheritance20')
         self.assertEqual(output, '1&a3_')
 
     @setup(inheritance_templates)
@@ -227,7 +226,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Three-level inheritance with {{ block.super }} from parent
         """
-        output = render('inheritance21')
+        output = self.engine.render_to_string('inheritance21')
         self.assertEqual(output, '12a34')
 
     @setup(inheritance_templates)
@@ -235,7 +234,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Three-level inheritance with {{ block.super }} from grandparent
         """
-        output = render('inheritance22')
+        output = self.engine.render_to_string('inheritance22')
         self.assertEqual(output, '1&a3_')
 
     @setup(inheritance_templates)
@@ -244,7 +243,7 @@ class InheritanceTests(SimpleTestCase):
         Three-level inheritance with {{ block.super }} from parent and
         grandparent
         """
-        output = render('inheritance23')
+        output = self.engine.render_to_string('inheritance23')
         self.assertEqual(output, '1&ab3_')
 
     @setup(inheritance_templates)
@@ -252,9 +251,8 @@ class InheritanceTests(SimpleTestCase):
         """
         Inheritance from local context without use of template loader
         """
-        output = render('inheritance24', {
-            'context_template': Template("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")
-        })
+        context_template = self.engine.from_string("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")
+        output = self.engine.render_to_string('inheritance24', {'context_template': context_template})
         self.assertEqual(output, '1234')
 
     @setup(inheritance_templates)
@@ -262,12 +260,11 @@ class InheritanceTests(SimpleTestCase):
         """
         Inheritance from local context with variable parent template
         """
-        output = render('inheritance25', {
-            'context_template': [
-                Template("Wrong"),
-                Template("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}"),
-            ],
-        })
+        context_template = [
+            self.engine.from_string("Wrong"),
+            self.engine.from_string("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}"),
+        ]
+        output = self.engine.render_to_string('inheritance25', {'context_template': context_template})
         self.assertEqual(output, '1234')
 
     @setup(inheritance_templates)
@@ -275,7 +272,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Set up a base template to extend
         """
-        output = render('inheritance26')
+        output = self.engine.render_to_string('inheritance26')
         self.assertEqual(output, 'no tags')
 
     @setup(inheritance_templates)
@@ -283,7 +280,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Inheritance from a template that doesn't have any blocks
         """
-        output = render('inheritance27')
+        output = self.engine.render_to_string('inheritance27')
         self.assertEqual(output, 'no tags')
 
     @setup(inheritance_templates)
@@ -291,7 +288,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Set up a base template with a space in it.
         """
-        output = render('inheritance 28')
+        output = self.engine.render_to_string('inheritance 28')
         self.assertEqual(output, '!')
 
     @setup(inheritance_templates)
@@ -299,7 +296,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Inheritance from a template with a space in its name should work.
         """
-        output = render('inheritance29')
+        output = self.engine.render_to_string('inheritance29')
         self.assertEqual(output, '!')
 
     @setup(inheritance_templates)
@@ -307,19 +304,19 @@ class InheritanceTests(SimpleTestCase):
         """
         Base template, putting block in a conditional {% if %} tag
         """
-        output = render('inheritance30', {'optional': True})
+        output = self.engine.render_to_string('inheritance30', {'optional': True})
         self.assertEqual(output, '123')
 
     # Inherit from a template with block wrapped in an {% if %} tag
     # (in parent), still gets overridden
     @setup(inheritance_templates)
     def test_inheritance31(self):
-        output = render('inheritance31', {'optional': True})
+        output = self.engine.render_to_string('inheritance31', {'optional': True})
         self.assertEqual(output, '1two3')
 
     @setup(inheritance_templates)
     def test_inheritance32(self):
-        output = render('inheritance32')
+        output = self.engine.render_to_string('inheritance32')
         self.assertEqual(output, '13')
 
     @setup(inheritance_templates)
@@ -327,7 +324,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Base template, putting block in a conditional {% ifequal %} tag
         """
-        output = render('inheritance33', {'optional': 1})
+        output = self.engine.render_to_string('inheritance33', {'optional': 1})
         self.assertEqual(output, '123')
 
     @setup(inheritance_templates)
@@ -336,7 +333,7 @@ class InheritanceTests(SimpleTestCase):
         Inherit from a template with block wrapped in an {% ifequal %} tag
         (in parent), still gets overridden
         """
-        output = render('inheritance34', {'optional': 1})
+        output = self.engine.render_to_string('inheritance34', {'optional': 1})
         self.assertEqual(output, '1two3')
 
     @setup(inheritance_templates)
@@ -345,7 +342,7 @@ class InheritanceTests(SimpleTestCase):
         Inherit from a template with block wrapped in an {% ifequal %} tag
         (in parent), still gets overridden
         """
-        output = render('inheritance35', {'optional': 2})
+        output = self.engine.render_to_string('inheritance35', {'optional': 2})
         self.assertEqual(output, '13')
 
     @setup(inheritance_templates)
@@ -353,7 +350,7 @@ class InheritanceTests(SimpleTestCase):
         """
         Base template, putting block in a {% for %} tag
         """
-        output = render('inheritance36', {'numbers': '123'})
+        output = self.engine.render_to_string('inheritance36', {'numbers': '123'})
         self.assertEqual(output, '_1_2_3_')
 
     @setup(inheritance_templates)
@@ -362,7 +359,7 @@ class InheritanceTests(SimpleTestCase):
         Inherit from a template with block wrapped in an {% for %} tag
         (in parent), still gets overridden
         """
-        output = render('inheritance37', {'numbers': '123'})
+        output = self.engine.render_to_string('inheritance37', {'numbers': '123'})
         self.assertEqual(output, '_X_X_X_')
 
     @setup(inheritance_templates)
@@ -371,23 +368,23 @@ class InheritanceTests(SimpleTestCase):
         Inherit from a template with block wrapped in an {% for %} tag
         (in parent), still gets overridden
         """
-        output = render('inheritance38')
+        output = self.engine.render_to_string('inheritance38')
         self.assertEqual(output, '_')
 
     # The super block will still be found.
     @setup(inheritance_templates)
     def test_inheritance39(self):
-        output = render('inheritance39', {'optional': True})
+        output = self.engine.render_to_string('inheritance39', {'optional': True})
         self.assertEqual(output, '1new23')
 
     @setup(inheritance_templates)
     def test_inheritance40(self):
-        output = render('inheritance40', {'optional': 1})
+        output = self.engine.render_to_string('inheritance40', {'optional': 1})
         self.assertEqual(output, '1new23')
 
     @setup(inheritance_templates)
     def test_inheritance41(self):
-        output = render('inheritance41', {'numbers': '123'})
+        output = self.engine.render_to_string('inheritance41', {'numbers': '123'})
         self.assertEqual(output, '_new1_new2_new3_')
 
     @setup(inheritance_templates)
@@ -395,5 +392,5 @@ class InheritanceTests(SimpleTestCase):
         """
         Expression starting and ending with a quote
         """
-        output = render('inheritance42')
+        output = self.engine.render_to_string('inheritance42')
         self.assertEqual(output, '1234')

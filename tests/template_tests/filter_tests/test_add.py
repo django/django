@@ -3,7 +3,7 @@ from datetime import date, timedelta
 from django.template.defaultfilters import add
 from django.test import SimpleTestCase
 
-from ..utils import render, setup
+from ..utils import setup
 
 
 class AddTests(SimpleTestCase):
@@ -13,37 +13,37 @@ class AddTests(SimpleTestCase):
 
     @setup({'add01': '{{ i|add:"5" }}'})
     def test_add01(self):
-        output = render('add01', {'i': 2000})
+        output = self.engine.render_to_string('add01', {'i': 2000})
         self.assertEqual(output, '2005')
 
     @setup({'add02': '{{ i|add:"napis" }}'})
     def test_add02(self):
-        output = render('add02', {'i': 2000})
+        output = self.engine.render_to_string('add02', {'i': 2000})
         self.assertEqual(output, '')
 
     @setup({'add03': '{{ i|add:16 }}'})
     def test_add03(self):
-        output = render('add03', {'i': 'not_an_int'})
+        output = self.engine.render_to_string('add03', {'i': 'not_an_int'})
         self.assertEqual(output, '')
 
     @setup({'add04': '{{ i|add:"16" }}'})
     def test_add04(self):
-        output = render('add04', {'i': 'not_an_int'})
+        output = self.engine.render_to_string('add04', {'i': 'not_an_int'})
         self.assertEqual(output, 'not_an_int16')
 
     @setup({'add05': '{{ l1|add:l2 }}'})
     def test_add05(self):
-        output = render('add05', {'l1': [1, 2], 'l2': [3, 4]})
+        output = self.engine.render_to_string('add05', {'l1': [1, 2], 'l2': [3, 4]})
         self.assertEqual(output, '[1, 2, 3, 4]')
 
     @setup({'add06': '{{ t1|add:t2 }}'})
     def test_add06(self):
-        output = render('add06', {'t1': (3, 4), 't2': (1, 2)})
+        output = self.engine.render_to_string('add06', {'t1': (3, 4), 't2': (1, 2)})
         self.assertEqual(output, '(3, 4, 1, 2)')
 
     @setup({'add07': '{{ d|add:t }}'})
     def test_add07(self):
-        output = render('add07', {'d': date(2000, 1, 1), 't': timedelta(10)})
+        output = self.engine.render_to_string('add07', {'d': date(2000, 1, 1), 't': timedelta(10)})
         self.assertEqual(output, 'Jan. 11, 2000')
 
 

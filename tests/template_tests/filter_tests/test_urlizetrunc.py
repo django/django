@@ -2,7 +2,7 @@ from django.template.defaultfilters import urlizetrunc
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
-from ..utils import render, setup
+from ..utils import setup
 
 
 class UrlizetruncTests(SimpleTestCase):
@@ -10,7 +10,7 @@ class UrlizetruncTests(SimpleTestCase):
     @setup({'urlizetrunc01':
         '{% autoescape off %}{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}{% endautoescape %}'})
     def test_urlizetrunc01(self):
-        output = render(
+        output = self.engine.render_to_string(
             'urlizetrunc01',
             {
                 'a': '"Unsafe" http://example.com/x=&y=',
@@ -25,7 +25,7 @@ class UrlizetruncTests(SimpleTestCase):
 
     @setup({'urlizetrunc02': '{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}'})
     def test_urlizetrunc02(self):
-        output = render(
+        output = self.engine.render_to_string(
             'urlizetrunc02',
             {
                 'a': '"Unsafe" http://example.com/x=&y=',

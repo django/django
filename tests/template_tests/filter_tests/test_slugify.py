@@ -5,7 +5,7 @@ from django.template.defaultfilters import slugify
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
-from ..utils import render, setup
+from ..utils import setup
 
 
 class SlugifyTests(SimpleTestCase):
@@ -16,12 +16,12 @@ class SlugifyTests(SimpleTestCase):
 
     @setup({'slugify01': '{% autoescape off %}{{ a|slugify }} {{ b|slugify }}{% endautoescape %}'})
     def test_slugify01(self):
-        output = render('slugify01', {'a': 'a & b', 'b': mark_safe('a &amp; b')})
+        output = self.engine.render_to_string('slugify01', {'a': 'a & b', 'b': mark_safe('a &amp; b')})
         self.assertEqual(output, 'a-b a-amp-b')
 
     @setup({'slugify02': '{{ a|slugify }} {{ b|slugify }}'})
     def test_slugify02(self):
-        output = render('slugify02', {'a': 'a & b', 'b': mark_safe('a &amp; b')})
+        output = self.engine.render_to_string('slugify02', {'a': 'a & b', 'b': mark_safe('a &amp; b')})
         self.assertEqual(output, 'a-b a-amp-b')
 
 
