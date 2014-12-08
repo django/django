@@ -715,8 +715,9 @@ method is used to persist that file data.
 
 Takes two required arguments: ``name`` which is the name of the file, and
 ``content`` which is an object containing the file's contents.  The
-optional ``save`` argument controls whether or not the instance is
-saved after the file has been altered. Defaults to ``True``.
+optional ``save`` argument controls whether or not the model instance is
+saved after the file associated with this field has been altered. Defaults to
+``True``.
 
 Note that the ``content`` argument should be an instance of
 :class:`django.core.files.File`, not Python's built-in file object.
@@ -741,8 +742,9 @@ Deletes the file associated with this instance and clears all attributes on
 the field. Note: This method will close the file if it happens to be open when
 ``delete()`` is called.
 
-The optional ``save`` argument controls whether or not the instance is saved
-after the file has been deleted. Defaults to ``True``.
+The optional ``save`` argument controls whether or not the model instance is
+saved after the file associated with this field has been deleted. Defaults to
+``True``.
 
 Note that when a model is deleted, related files are not deleted. If you need
 to cleanup orphaned files, you'll need to handle it yourself (for instance,
