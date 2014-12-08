@@ -119,3 +119,5 @@ Bugfixes
 * Fixed bug in ``makemigrations`` that created broken migration files when
   dealing with multiple table inheritance and inheriting from more than one
   model (:ticket:`23956`).
+
+* Fixed a crash when a ``MultiValueField`` has invalid data (:ticket:`23674`).
