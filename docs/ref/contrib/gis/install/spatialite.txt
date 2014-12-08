@@ -217,5 +217,5 @@ also ensure that the spatial metadata are initialized in the database.
 
 .. versionchanged:: 1.8
 
-    Prior to Django 1.8, you had to intialize spatial metadata tables yourself
+    Prior to Django 1.8, you had to initialize spatial metadata tables yourself
     by manually running the "SELECT InitSpatialMetaData();" query.
