@@ -1767,65 +1767,86 @@ Field API reference
 
 .. _field-attributes:
 
+=========================
 Field attribute reference
 =========================
 
-.. class:: Field
+Every ``Field`` instance contains several attributes that allow
+introspecting its behavior. Use these attributes instead of ``isinstance``
+checks when you need to write code that depends on a field's functionality.
+These attributes can be used together with the :ref:`Model._meta APIs
+<model-meta-field-apis>` to narrow down a search for specific field types.
+Custom model fields should implement these flags.
 
-    Every ``Field`` instance contains several attributes that allow
-    introspecting its behavior. Use these attributes instead of ``isinstance``
-    checks when you need to write code that depends on a field's functionality.
-    These attributes can be used together with the :ref:`Model._meta APIs
-    <model-meta-field-apis>` to narrow down a search for specific model fields.
-    Custom model fields should implement these flags.
+Attributes for fields
+=====================
 
-    Attributes for forward fields
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. attribute:: concrete
 
-    .. attribute:: concrete
+    A concrete field has a database column associated with it. Concrete
+    fields require a database migration and always contain state.
 
-        A concrete field has a database column associated with it. Concrete
-        fields require a database migration and always contain state.
+.. attribute:: editable
 
-    .. attribute:: editable
+    An editable field contains data can be manipulated in a model
+    or form. An ``Autofield``, for example, should generally not be
+    manipulated and therefore this attribute is ``False``.
 
-        An editable field is a field thats data can be manipulated in a model
-        or form. An ``Autofield``, for example, should generally not be
-        manipulated and therefore this attribute is ``False``.
+.. attribute:: has_relation
 
-    .. attribute:: has_many_values
+    A field has a relation when it depends on one or more models.
 
-        A field that can contain 1 or more values. This does not necessarily
-        need to  be a ``ManyToMany`` field, but can also be a
-        ``CommaSeparatedIntegerField`` for example.
+.. attribute:: model
 
-    .. attribute:: has_relation
+    Returns the model that owns the current field (in order of inheritance).
 
-        A field has a relation when it depends on one or more models. It may
-        also generate :ref:`reverse relations <model-meta-field-types>` on the
-        pointed model.
+.. attribute:: hidden
 
-    .. attribute:: generate_reverse_relation
+    Responds truthfully if the field is a hidden field. Hidden fields are fields
+    that concretely exist, but that are used to back other field's functionality
+    (look at ``GenericForeignKey``).
 
-        Not all fields with relations should generate forward objects for other
-        models. This attribute tells Django to not generate such relations
-        automatically and to let the class iself handle the relations manually.
+    .. note::
+        The default flags for ``get_fields()`` automatically exclude hidden fields,
+        so you may never need to use this flag. In case you allow hidden fields
+        (by using the ``include_hidden`` flag in ``get_fields()``), they you can use
+        this flag for further filtering.
 
-    .. attribute:: model
 
-        Returns the model that is pointed by the object. In the case of a forward
-        field, this is the model where the field was defined (in order of inheritance).
-        In case of a reverse field, this is the model that the forward relation points
-        to.
+Attributes for fields with relations
+====================================
 
-    .. attribute:: parent_model
+If a field responds truthfully to the ``has_relation`` attribute, it must
+also necessarily respond to the attributes for relational fields.
+These attributes are used inside and outside Django to query for the
+cardinality and other details of a relation.
 
-        Returns the model where the relation is stored. In the case of a forward
-        field, this is the model where the field was defined (in order of inheritance).
-        In case of a reverse field, this is the model where the associated forward field
-        was defined.
+.. note::
+    These attribute will not be present on fields that do not have a
+    relation.
 
-    .. attribute:: is_related_object
+.. attribute:: related_model
 
-        A very simple way to query if an object returned from ``get_field()``
-        or ``get_fields()`` is a reverse object or a forward object.
+    Points to the model it relates to. If a field has a generic
+    relation (such as a ``GenericForeignKey`` or a ``GenericRelation``) then
+    ``related_model`` will be ``None``.
+
+.. attribute:: one_to_one
+
+    Responds truthfully if the field has a one-to-one relation with
+    the related model, such as a ``OneToOneField``.
+
+.. attribute:: many_to_one
+
+    Responds truthfully if the field has a many-to-one relation with
+    the related model, such as a ``GenericRelation``.
+
+.. attribute:: one_to_many
+
+    Responds truthfully if the field has a one-to-many relation with
+    the related model, such as a ``ForeignKey``.
+
+.. attribute:: many_to_many
+
+    Responds truthfully if the field has a many-to-many relation with
+    the related model, such as a ``ManyToManyField``.
