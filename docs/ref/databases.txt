@@ -384,6 +384,14 @@ because it is more accurate.
 
 .. _MySQL Unicode Character Sets: http://dev.mysql.com/doc/refman/5.7/en/charset-unicode-sets.html
 
+.. warning::
+
+    Model formsets validate unique fields in a case-sensitive manner. When
+    using a case-insensitive collation with unique fields, a formset will not
+    correctly validate duplicate entered values that differ by case. The
+    formset will appear valid, but upon calling ``save()``, an
+    ``IntegrityError`` will be raised.
+
 Connecting to the database
 --------------------------
 
