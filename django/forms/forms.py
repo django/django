@@ -582,7 +582,7 @@ class BoundField(object):
             name = self.html_name
         else:
             name = self.html_initial_name
-        return force_text(widget.render(name, self.value(), attrs=attrs))
+        return force_text(widget.render(name, self.value(only_initial), attrs=attrs))
 
     def as_text(self, attrs=None, **kwargs):
         """
@@ -607,12 +607,13 @@ class BoundField(object):
         """
         return self.field.widget.value_from_datadict(self.form.data, self.form.files, self.html_name)
 
-    def value(self):
+    def value(self, only_initial=False):
         """
         Returns the value for this BoundField, using the initial value if
-        the form is not bound or the data otherwise.
+        the form is not bound or if we want value for initial field
+        then we check does form is bound and passed validation otherwise we return the data.
         """
-        if not self.form.is_bound:
+        if not self.form.is_bound or (only_initial and self.form.is_bound and not self.form.is_valid()):
             data = self.form.initial.get(self.name, self.field.initial)
             if callable(data):
                 data = data()
