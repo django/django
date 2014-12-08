@@ -186,6 +186,11 @@ class SimpleTestCase(unittest.TestCase):
                 result.addError(self, sys.exc_info())
                 return
 
+    def _clear_caches(self):
+        """Clear various caches after each test"""
+        from django.contrib.sites.models import Site
+        Site.objects.clear_cache()
+
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
 
@@ -214,6 +219,7 @@ class SimpleTestCase(unittest.TestCase):
 
         * Putting back the original ROOT_URLCONF if it was changed.
         """
+        self._clear_caches()
         self._urlconf_teardown()
 
     def _urlconf_teardown(self):
