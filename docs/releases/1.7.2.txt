@@ -146,3 +146,6 @@ Bugfixes
 
 * Fixed migration crash when adding ``order_with_respect_to`` to a table
   with existing rows (:ticket:`23983`).
+
+* Restored the ``pre_migrate`` signal if all apps have migrations
+  (:ticket:`23975`).
