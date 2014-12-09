@@ -91,6 +91,9 @@ class Migration(migrations.Migration):
             options=None,
             bases=None,
         ),
+    ]
+
+    pg_92_operations = [
         migrations.CreateModel(
             name='RangesModel',
             fields=[
@@ -106,3 +109,9 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
     ]
+
+    def apply(self, project_state, schema_editor, collect_sql=False):
+        PG_VERSION = schema_editor.connection.pg_version
+        if PG_VERSION >= 90200:
+            self.operations = self.operations + self.pg_92_operations
+        return super(Migration, self).apply(project_state, schema_editor, collect_sql)
