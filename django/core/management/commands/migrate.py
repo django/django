@@ -156,6 +156,7 @@ class Command(BaseCommand):
             created_models = self.sync_apps(connection, executor.loader.unmigrated_apps)
         else:
             created_models = []
+            emit_pre_migrate_signal([], self.verbosity, self.interactive, connection.alias)
 
         # The test runner requires us to flush after a syncdb but before migrations,
         # so do that here.
