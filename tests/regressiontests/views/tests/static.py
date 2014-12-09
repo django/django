@@ -7,6 +7,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.test import TestCase
 from django.http import HttpResponseNotModified
+from django.views.static import STREAM_CHUNK_SIZE
 
 from .. import urls
 from ..urls import media_dir
@@ -29,9 +30,18 @@ class StaticTests(TestCase):
         for filename in media_files:
             response = self.client.get('/views/%s/%s' % (self.prefix, filename))
             file_path = path.join(media_dir, filename)
-            self.assertEqual(open(file_path).read(), response.content)
-            self.assertEqual(len(response.content), int(response['Content-Length']))
+            content = response.content
+            self.assertEqual(open(file_path).read(), content)
+            self.assertEqual(len(content), int(response['Content-Length']))
             self.assertEqual(mimetypes.guess_type(file_path)[1], response.get('Content-Encoding', None))
+
+    def test_chunked(self):
+        "The static view should stream files in chunks to avoid large memory usage"
+        response = self.client.get('/views/%s/%s' % (self.prefix, 'long-line.txt'))
+        first_chunk = iter(response).next()
+        self.assertEqual(len(first_chunk), STREAM_CHUNK_SIZE)
+        second_chunk = response.next()
+        self.assertEqual(len(second_chunk), 1451)
 
     def test_unknown_mime_type(self):
         response = self.client.get('/views/%s/file.unknown' % self.prefix)
@@ -71,9 +81,9 @@ class StaticTests(TestCase):
         response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         file = open(path.join(media_dir, file_name))
-        self.assertEqual(file.read(), response.content)
-        self.assertEqual(len(response.content),
-                          int(response['Content-Length']))
+        content = response.content
+        self.assertEqual(file.read(), content)
+        self.assertEqual(len(content), int(response['Content-Length']))
 
     def test_invalid_if_modified_since2(self):
         """Handle even more bogus If-Modified-Since values gracefully
@@ -86,9 +96,9 @@ class StaticTests(TestCase):
         response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         file = open(path.join(media_dir, file_name))
-        self.assertEqual(file.read(), response.content)
-        self.assertEqual(len(response.content),
-                          int(response['Content-Length']))
+        content = response.content
+        self.assertEqual(file.read(), content)
+        self.assertEqual(len(content), int(response['Content-Length']))
 
 
 class StaticHelperTest(StaticTests):

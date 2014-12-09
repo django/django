@@ -16,6 +16,9 @@ from django.template import loader, Template, Context, TemplateDoesNotExist
 from django.utils.http import http_date, parse_http_date
 from django.utils.translation import ugettext as _, ugettext_noop
 
+STREAM_CHUNK_SIZE = 4096
+
+
 def serve(request, path, document_root=None, show_indexes=False):
     """
     Serve static files below a given point in the directory structure.
@@ -59,8 +62,8 @@ def serve(request, path, document_root=None, show_indexes=False):
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified(mimetype=mimetype)
-    with open(fullpath, 'rb') as f:
-        response = HttpResponse(f.read(), mimetype=mimetype)
+    f = open(fullpath, 'rb')
+    response = HttpResponse(iter(lambda: f.read(STREAM_CHUNK_SIZE), ''), mimetype=mimetype)
     response["Last-Modified"] = http_date(statobj.st_mtime)
     if stat.S_ISREG(statobj.st_mode):
         response["Content-Length"] = statobj.st_size
