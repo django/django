@@ -197,6 +197,8 @@ class WSGIHandler(base.BaseHandler):
         for c in response.cookies.values():
             response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
         start_response(force_str(status), response_headers)
+        if getattr(response, 'file', None) is not None and environ.get('wsgi.file_wrapper'):
+            response = environ['wsgi.file_wrapper'](response.file)
         return response
 
 
