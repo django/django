@@ -327,8 +327,8 @@ class Contains(PatternLookup):
     lookup_name = 'contains'
 
     def process_rhs(self, qn, connection):
-        rhs, params = super(IContains, self).process_rhs(qn, connection)
-        if params:
+        rhs, params = super(Contains, self).process_rhs(qn, connection)
+        if params and not self.bilateral_transforms:
             params[0] = "%%%s%%" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
 
@@ -348,7 +348,7 @@ class StartsWith(PatternLookup):
 
     def process_rhs(self, qn, connection):
         rhs, params = super(StartsWith, self).process_rhs(qn, connection)
-        if params:
+        if params and not self.bilateral_transforms:
             params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
 
@@ -361,7 +361,7 @@ class IStartsWith(PatternLookup):
 
     def process_rhs(self, qn, connection):
         rhs, params = super(IStartsWith, self).process_rhs(qn, connection)
-        if params:
+        if params and not self.bilateral_transforms:
             params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
 
@@ -374,7 +374,7 @@ class EndsWith(PatternLookup):
 
     def process_rhs(self, qn, connection):
         rhs, params = super(EndsWith, self).process_rhs(qn, connection)
-        if params:
+        if params and not self.bilateral_transforms:
             params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
 
@@ -387,7 +387,7 @@ class IEndsWith(PatternLookup):
 
     def process_rhs(self, qn, connection):
         rhs, params = super(IEndsWith, self).process_rhs(qn, connection)
-        if params:
+        if params and not self.bilateral_transforms:
             params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
 
