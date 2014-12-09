@@ -45,6 +45,21 @@ from a XSS attack. This bug doesn't affect Django currently, since we only put
 this URL into the ``Location`` response header and browsers seem to ignore
 JavaScript there.
 
+Denial-of-service attack against ``django.views.static.serve``
+==============================================================
+
+In older versions of Django, the :func:`django.views.static.serve` view read
+the files it served one line at a time. Therefore, a big file with no newlines
+would result in memory usage equal to the size of that file. An attacker could
+exploit this and launch a denial-of-service attack by simultaneously requesting
+many large files. This view now reads the file in chunks to prevent large
+memory usage.
+
+Note, however, that this view has always carried a warning that it is not
+hardened for production use and should be used only as a development aid. Now
+may be a good time to audit your project and serve your files in production
+using a real front-end web server if you are not doing so.
+
 Bugfixes
 ========
 
