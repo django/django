@@ -177,10 +177,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
 
     def date_interval_sql(self, timedelta):
-        """
-        We don't transform the value to a string here so we can detect it later
-        when combining expressions.
-        """
         return "'%s'" % duration_string(timedelta), []
 
     def format_for_duration_arithmetic(self, sql):

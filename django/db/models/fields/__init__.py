@@ -1609,7 +1609,7 @@ class DurationField(Field):
         )
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if connection.features.supports_duration_field:
+        if connection.features.has_native_duration_field:
             return value
         return value.total_seconds() * 1000000
 

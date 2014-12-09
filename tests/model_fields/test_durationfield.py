@@ -19,8 +19,9 @@ class TestSaveLoad(TestCase):
 
 class TestQuerying(TestCase):
 
-    def setUp(self):
-        self.objs = [
+    @classmethod
+    def setUpTestData(cls):
+        cls.objs = [
             DurationModel.objects.create(field=datetime.timedelta(days=1)),
             DurationModel.objects.create(field=datetime.timedelta(seconds=1)),
             DurationModel.objects.create(field=datetime.timedelta(seconds=-1)),
@@ -59,4 +60,7 @@ class TestValidation(TestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('not a datetime', None)
         self.assertEqual(cm.exception.code, 'invalid')
-        self.assertEqual(cm.exception.message % cm.exception.params, "'not a datetime' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[.uuuuuu] format.")
+        self.assertEqual(cm.exception.message % cm.exception.params,
+            "'not a datetime' value has an invalid format. "
+            "It must be in [DD] [HH:[MM:]]ss[.uuuuuu] format."
+        )

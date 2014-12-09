@@ -777,7 +777,7 @@ class FTimeDeltaTests(TestCase):
             Experiment.objects.filter(end__gte=F('start') + F('estimated_time') + datetime.timedelta(hours=1))]
         self.assertEqual(delta_math, ['e4'])
 
-    @skipUnlessDBFeature("supports_duration_field")
+    @skipUnlessDBFeature("has_native_duration_field")
     def test_date_subtraction(self):
         under_estimate = [e.name for e in
             Experiment.objects.filter(estimated_time__gt=F('end') - F('start'))]

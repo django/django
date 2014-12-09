@@ -341,7 +341,7 @@ class Expression(ExpressionNode):
             rhs_output = self.rhs.output_field
         except FieldError:
             rhs_output = None
-        if (not connection.features.supports_duration_field and
+        if (not connection.features.has_native_duration_field and
                 ((lhs_output and lhs_output.get_internal_type() == 'DurationField')
                 or (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
             return DurationExpression(self.lhs, self.connector, self.rhs).as_sql(compiler, connection)
@@ -488,7 +488,7 @@ class Value(ExpressionNode):
 
 class DurationValue(Value):
     def as_sql(self, compiler, connection):
-        if connection.features.supports_duration_field:
+        if connection.features.has_native_duration_field:
             return super(DurationValue, self).as_sql(compiler, connection)
         return connection.ops.date_interval_sql(self.value)
 

@@ -578,7 +578,7 @@ class BaseDatabaseFeatures(object):
     supports_binary_field = True
 
     # Is there a true datatype for timedeltas?
-    supports_duration_field = False
+    has_native_duration_field = False
 
     # Do time/datetime fields have microsecond precision?
     supports_microsecond_precision = True
@@ -1256,7 +1256,7 @@ class BaseDatabaseOperations(object):
         Some field types on some backends do not provide data in the correct
         format, this is the hook for coverter functions.
         """
-        if not self.connection.features.supports_duration_field and internal_type == 'DurationField':
+        if not self.connection.features.has_native_duration_field and internal_type == 'DurationField':
             return [self.convert_durationfield_value]
         return []
 

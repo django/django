@@ -615,15 +615,28 @@ class FieldsTests(SimpleTestCase):
     def test_durationfield_1(self):
         f = DurationField()
         self.assertEqual(datetime.timedelta(seconds=30), f.clean('30'))
-        self.assertEqual(datetime.timedelta(minutes=15, seconds=30), f.clean('15:30'))
-        self.assertEqual(datetime.timedelta(hours=1, minutes=15, seconds=30), f.clean('1:15:30'))
-        self.assertEqual(datetime.timedelta(days=1, hours=1, minutes=15, seconds=30, milliseconds=300), f.clean('1 1:15:30.3'))
+        self.assertEqual(
+            datetime.timedelta(minutes=15, seconds=30),
+            f.clean('15:30')
+        )
+        self.assertEqual(
+            datetime.timedelta(hours=1, minutes=15, seconds=30),
+            f.clean('1:15:30')
+        )
+        self.assertEqual(
+            datetime.timedelta(
+                days=1, hours=1, minutes=15, seconds=30, milliseconds=300),
+            f.clean('1 1:15:30.3')
+        )
 
     def test_durationfield_2(self):
         class DurationForm(Form):
             duration = DurationField(initial=datetime.timedelta(hours=1))
         f = DurationForm()
-        self.assertHTMLEqual('<input id="id_duration" type="text" name="duration" value="01:00:00">', str(f['duration']))
+        self.assertHTMLEqual(
+            '<input id="id_duration" type="text" name="duration" value="01:00:00">',
+            str(f['duration'])
+        )
 
     def test_regexfield_1(self):
         f = RegexField('^[0-9][A-F][0-9]$')
