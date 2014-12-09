@@ -438,6 +438,10 @@ def hashed_file_path(test, path):
 class TestHashedFiles(object):
     hashed_file_path = hashed_file_path
 
+    def tearDown(self):
+        # Clear hashed files to avoid side effects among tests.
+        storage.staticfiles_storage.hashed_files.clear()
+
     def test_template_tag_return(self):
         """
         Test the CachedStaticFilesStorage backend.
