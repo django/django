@@ -47,7 +47,7 @@ class BaseRangeField(forms.Field):
             raise exceptions.ValidationError(message, code='upper_invalid')
         if lower is None and upper is None:
             return None
-        if lower > upper:
+        if lower is not None and upper is not None and lower > upper:
             raise exceptions.ValidationError(self.error_messages['bound_order'],
                     code='bound_order')
         try:
