@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db.backends.creation import NO_DB_ALIAS
+from django.db.backends import NO_DB_ALIAS
 from django.db.backends.postgresql_psycopg2.base import (
     DatabaseWrapper as Psycopg2DatabaseWrapper,
     DatabaseFeatures as Psycopg2DatabaseFeatures
@@ -31,7 +31,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
     @cached_property
     def template_postgis(self):
         template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
-        with self.cursor() as cursor:
+        with self._nodb_connection.cursor() as cursor:
             cursor.execute('SELECT 1 FROM pg_database WHERE datname = %s LIMIT 1;', (template_postgis,))
             if cursor.fetchone():
                 return template_postgis
@@ -43,4 +43,3 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
             # Check that postgis extension is installed on PostGIS >= 2
             with self.cursor() as cursor:
                 cursor.execute("CREATE EXTENSION IF NOT EXISTS postgis")
-                cursor.connection.commit()
