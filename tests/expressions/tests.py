@@ -4,7 +4,7 @@ from copy import deepcopy
 import datetime
 
 from django.core.exceptions import FieldError
-from django.db import connection, transaction
+from django.db import connection, transaction, DatabaseError
 from django.db.models import F
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
@@ -761,7 +761,7 @@ class FTimeDeltaTests(TestCase):
             self.assertEqual(expected_durations, new_durations)
 
     def test_invalid_operator(self):
-        with self.assertRaises(Exception):
+        with self.assertRaises(DatabaseError):
             list(Experiment.objects.filter(start=F('start') * datetime.timedelta(0)))
 
     def test_durationfield_add(self):
