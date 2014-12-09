@@ -1809,8 +1809,8 @@ Example::
 
 In this case, migrations pertaining to the ``blog`` app will be contained in the ``blog.db_migrations`` package.
 
-:djadmin:`makemigrations` will automatically create the package if it doesn't
-already exist.
+If you provide the ``app_label`` argument, :djadmin:`makemigrations` will
+automatically create the package if it doesn't already exist.
 
 .. setting:: MONTH_DAY_FORMAT
 
