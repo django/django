@@ -15,6 +15,14 @@ class Advertisement(models.Model):
 
 
 class ModelPackageTests(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super(ModelPackageTests, cls).setUpClass()
+        # This cleanup is necessary because contrib.sites cache
+        # makes tests interfere with each other, see #11505
+        Site.objects.clear_cache()
+
     def test_m2m_tables_in_subpackage_models(self):
         """
         Regression for #12168: models split into subpackages still get M2M
