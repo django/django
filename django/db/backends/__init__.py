@@ -30,6 +30,8 @@ TableInfo = namedtuple('TableInfo', ['name', 'type'])
 FieldInfo = namedtuple('FieldInfo',
     'name type_code display_size internal_size precision scale null_ok')
 
+NO_DB_ALIAS = '__no_db__'
+
 
 class BaseDatabaseWrapper(object):
     """
@@ -476,6 +478,24 @@ class BaseDatabaseWrapper(object):
             cursor.close()
             if must_close:
                 self.close()
+
+    @cached_property
+    def _nodb_connection(self):
+        """
+        Alternative connection to be used when there is no need to access
+        the main database, specifically for test db creation/deletion.
+        This also prevents the production database from being exposed to
+        potential child threads while (or after) the test database is destroyed.
+        Refs #10868, #17786, #16969.
+        """
+        settings_dict = self.settings_dict.copy()
+        settings_dict['NAME'] = None
+        #backend = load_backend(settings_dict['ENGINE'])
+        nodb_connection = self.__class__(
+            settings_dict,
+            alias=NO_DB_ALIAS,
+            allow_thread_sharing=False)
+        return nodb_connection
 
     def _start_transaction_under_autocommit(self):
         """
