@@ -58,6 +58,13 @@ New data types
   <django.forms.UUIDField>`. It is stored as the native ``uuid`` data type on
   PostgreSQL and as a fixed length character field on other backends.
 
+* Django now has a :class:`~django.db.models.DurationField` for storing periods
+  of time - modeled in Python by :class:`~python:datetime.timedelta`. There is
+  a corresponding :class:`form field <django.forms.DurationField>`. It is
+  stored in the native ``interval`` data type on PostgreSQL and as a ``bigint``
+  of microseconds on other backends. Date and time related arithmetic has also
+  been improved on all backends.
+
 Query Expressions
 ~~~~~~~~~~~~~~~~~
 
