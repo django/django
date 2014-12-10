@@ -1058,7 +1058,7 @@ class TagHelperNode(Node):
         resolved_args = [var.resolve(context) for var in self.args]
         if self.takes_context:
             resolved_args = [context] + resolved_args
-        resolved_kwargs = dict((k, v.resolve(context)) for k, v in self.kwargs.items())
+        resolved_kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
         return resolved_args, resolved_kwargs
 
 
@@ -1301,9 +1301,9 @@ def get_templatetags_modules():
     Caches the result for faster access.
     """
     templatetags_modules_candidates = ['django.templatetags']
-    templatetags_modules_candidates += [
+    templatetags_modules_candidates.extend(
         '%s.templatetags' % app_config.name
-        for app_config in apps.get_app_configs()]
+        for app_config in apps.get_app_configs())
 
     templatetags_modules = []
     for templatetag_module in templatetags_modules_candidates:

@@ -61,7 +61,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT column_name, is_nullable, column_default
             FROM information_schema.columns
             WHERE table_name = %s""", [table_name])
-        field_map = dict((line[0], line[1:]) for line in cursor.fetchall())
+        field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [FieldInfo(*((force_text(line[0]),) + line[1:6]
                             + (field_map[force_text(line[0])][0] == 'YES', field_map[force_text(line[0])][1])))

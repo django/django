@@ -105,8 +105,8 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
             # working unicode method. Try to handle this without raising a
             # further exception by individually forcing the exception args
             # to unicode.
-            s = ' '.join([force_text(arg, encoding, strings_only,
-                    errors) for arg in s])
+            s = ' '.join(force_text(arg, encoding, strings_only, errors)
+                         for arg in s)
     return s
 
 
@@ -152,8 +152,8 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
                 # An Exception subclass containing non-ASCII data that doesn't
                 # know how to print itself properly. We shouldn't raise a
                 # further exception.
-                return b' '.join([force_bytes(arg, encoding, strings_only,
-                        errors) for arg in s])
+                return b' '.join(force_bytes(arg, encoding, strings_only, errors)
+                                 for arg in s)
             return six.text_type(s).encode(encoding, errors)
     else:
         return s.encode(encoding, errors)

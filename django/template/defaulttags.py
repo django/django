@@ -562,8 +562,8 @@ class WithNode(Node):
         return "<WithNode>"
 
     def render(self, context):
-        values = dict((key, val.resolve(context)) for key, val in
-                      six.iteritems(self.extra_context))
+        values = {key: val.resolve(context) for key, val in
+                  six.iteritems(self.extra_context)}
         with context.push(**values):
             return self.nodelist.render(context)
 

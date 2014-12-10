@@ -371,8 +371,6 @@ class BaseDatabaseCreation(object):
         settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
         self.connection.settings_dict["NAME"] = test_database_name
 
-        self._create_test_db_pre_migrate_sql()
-
         # We report migrate messages at one level lower than that requested.
         # This ensures we don't get flooded with messages during testing
         # (unless you really ask to be flooded).
@@ -397,12 +395,6 @@ class BaseDatabaseCreation(object):
         self.connection.ensure_connection()
 
         return test_database_name
-
-    def _create_test_db_pre_migrate_sql(self):
-        """
-        Hook for databases to load SQL before creating the test DB.
-        """
-        pass
 
     def serialize_db_to_string(self):
         """

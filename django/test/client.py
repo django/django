@@ -172,19 +172,19 @@ def encode_multipart(boundary, data):
                 if is_file(item):
                     lines.extend(encode_file(boundary, key, item))
                 else:
-                    lines.extend([to_bytes(val) for val in [
+                    lines.extend(to_bytes(val) for val in [
                         '--%s' % boundary,
                         'Content-Disposition: form-data; name="%s"' % key,
                         '',
                         item
-                    ]])
+                    ])
         else:
-            lines.extend([to_bytes(val) for val in [
+            lines.extend(to_bytes(val) for val in [
                 '--%s' % boundary,
                 'Content-Disposition: form-data; name="%s"' % key,
                 '',
                 value
-            ]])
+            ])
 
     lines.extend([
         to_bytes('--%s--' % boundary),

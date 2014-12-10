@@ -135,6 +135,10 @@ Minor features
 * The Spatialite backend now supports ``Collect`` and ``Extent`` aggregates
   when the database version is 3.0 or later.
 
+* The PostGIS 2 ``CREATE EXTENSION postgis`` and the Spatialite
+  ``SELECT InitSpatialMetaData`` initialization commands are now automatically
+  run by :djadmin:`migrate`.
+
 * Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
   Django 1.2 have been removed.
 
@@ -852,6 +856,11 @@ Miscellaneous
 * When following redirects, the test client now raises
   :exc:`~django.test.client.RedirectCycleError` if it detects a loop or hits a
   maximum redirect limit (rather than passing silently).
+
+* Translatable strings set as the ``default`` parameter of the field are cast
+  to concrete strings later, so the return type of ``Field.get_default()`` is
+  different in some cases. There is no change to default values which are the
+  result of a callable.
 
 .. _deprecated-features-1.8:
 

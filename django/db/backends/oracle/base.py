@@ -886,7 +886,7 @@ class FormatStylePlaceholderCursor(object):
 
     def _format_params(self, params):
         try:
-            return dict((k, OracleParam(v, self, True)) for k, v in params.items())
+            return {k: OracleParam(v, self, True) for k, v in params.items()}
         except AttributeError:
             return tuple(OracleParam(p, self, True) for p in params)
 
@@ -911,7 +911,7 @@ class FormatStylePlaceholderCursor(object):
     def _param_generator(self, params):
         # Try dict handling; if that fails, treat as sequence
         if hasattr(params, 'items'):
-            return dict((k, v.force_bytes) for k, v in params.items())
+            return {k: v.force_bytes for k, v in params.items()}
         else:
             return [p.force_bytes for p in params]
 
@@ -927,7 +927,7 @@ class FormatStylePlaceholderCursor(object):
             query = convert_unicode(query, self.charset)
         elif hasattr(params, 'keys'):
             # Handle params as dict
-            args = dict((k, ":%s" % k) for k in params.keys())
+            args = {k: ":%s" % k for k in params.keys()}
             query = convert_unicode(query % args, self.charset)
         else:
             # Handle params as sequence
