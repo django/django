@@ -294,6 +294,9 @@ class BaseFormSet(object):
         if not self.is_bound:
             return False
         if not self.management_form.is_valid():
+            error = _(
+                'Management form data is missing or has been tampered with.')
+            self._non_form_errors = self.error_class([error])
             return False
         # We loop over every form.errors here rather than short circuiting on the
         # first failure to make sure validation gets triggered for every form.
