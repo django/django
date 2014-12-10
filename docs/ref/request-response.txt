@@ -708,6 +708,12 @@ Methods
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
 
+.. method:: HttpResponse.setdefault(header, value)
+
+    .. versionadded:: 1.8
+
+    Sets a header unless it has already been set.
+
 .. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
 
     Sets a cookie. The parameters are the same as in the

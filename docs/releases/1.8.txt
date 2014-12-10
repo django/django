@@ -483,6 +483,10 @@ Requests and Responses
   like :meth:`~django.http.HttpResponse.getvalue` so that instances can be used
   as stream objects.
 
+* The new :meth:`HttpResponse.setdefault()
+  <django.http.HttpResponse.setdefault>` method allows setting a header unless
+  it has already been set.
+
 Tests
 ^^^^^
 
