@@ -33,6 +33,20 @@ class HttpResponseBaseTests(SimpleTestCase):
         with self.assertRaisesMessage(IOError, 'This HttpResponseBase instance cannot tell its position'):
             r.tell()
 
+    def test_setdefault(self):
+        """
+        HttpResponseBase.setdefault() should not change an existing header
+        and should be case insensitive.
+        """
+        r = HttpResponseBase()
+
+        r['Header'] = 'Value'
+        r.setdefault('header', 'changed')
+        self.assertEqual(r['header'], 'Value')
+
+        r.setdefault('x-header', 'DefaultValue')
+        self.assertEqual(r['X-Header'], 'DefaultValue')
+
 
 class HttpResponseTests(SimpleTestCase):
     def test_status_code(self):
