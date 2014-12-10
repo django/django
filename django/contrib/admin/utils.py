@@ -296,7 +296,7 @@ def _get_non_gfk_field(opts, name):
     should be treated as not found by the 'label_for_field' function.
     """
     field = opts.get_field(name)
-    if hasattr(field, 'is_gfk'):
+    if getattr(field, 'is_gfk', False):
         raise models.FieldDoesNotExist()
     return field
 
@@ -359,7 +359,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
 def help_text_for_field(name, model):
     help_text = ""
     try:
-        field = model._meta.get_field(name)
+        field = _get_non_gfk_field(model._meta, name)
     except models.FieldDoesNotExist:
         pass
     else:

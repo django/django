@@ -187,7 +187,7 @@ class Deserializer(base.Deserializer):
         # {m2m_accessor_attribute : [list_of_related_objects]})
         m2m_data = {}
 
-        # Deseralize each field.
+        # Deserialize each field.
         for field_node in node.getElementsByTagName("field"):
             # If the field is missing the name attribute, bail (are you
             # sensing a pattern here?)

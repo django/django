@@ -120,7 +120,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             seen[None] = start_alias
         for field in opts.concrete_fields:
             model = field.parent_model._meta.concrete_model
-            if model == opts.model:
+            if model is opts.model:
                 model = None
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.

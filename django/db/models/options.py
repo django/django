@@ -146,7 +146,7 @@ class Options(object):
     def _map_model(self, link):
         direct = not (link.is_reverse_object and link.field.generate_reverse_relation)
         model = link.model if direct else link.parent_model._meta.concrete_model
-        if model == self.model:
+        if model is self.model:
             model = None
         return link, model
 
@@ -154,7 +154,7 @@ class Options(object):
     def _map_model_details(self, link):
         direct = not (link.is_reverse_object and link.field.generate_reverse_relation)
         model = link.model if direct else link.parent_model._meta.concrete_model
-        if model == self.model:
+        if model is self.model:
             model = None
 
         field = link if direct else link.field
@@ -414,7 +414,7 @@ class Options(object):
     @cached_property
     def _forward_fields_map(self):
         res = {}
-        # call get_fields with export_name_map=true in order to have a field_instance -> names map
+        # call get_fields with export_ordered_set=True in order to have a field_instance -> names map
         fields = self.get_fields(reverse=False)
         for field in fields:
             res[field.name] = field
@@ -432,7 +432,7 @@ class Options(object):
     def fields_map(self):
         res = {}
 
-        # call get_fields with export_name_map=true in order to have a field_instance -> names map
+        # call get_fields with export_ordered_set=True in order to have a field_instance -> names map
         fields = self.get_fields(forward=False, include_hidden=True)
         for field in fields:
             res[field.name] = field
@@ -679,12 +679,12 @@ class Options(object):
         # Creates a cache key composed of all arguments
         forward = kwargs.pop('forward', True)
         reverse = kwargs.pop('reverse', True)
-        export_name_map = kwargs.pop('export_name_map', False)
+        export_ordered_set = kwargs.pop('export_ordered_set', False)
         cache_results = kwargs.pop('cache_results', True)
         if kwargs:
             raise TypeError("'%s' are invalid keyword arguments" % ', '.join(kwargs.keys()))
 
-        cache_key = (forward, reverse, include_parents, include_hidden, export_name_map)
+        cache_key = (forward, reverse, include_parents, include_hidden, export_ordered_set)
         try:
             # In order to avoid list manipulation. Always return a shallow copy
             # of the results
@@ -699,7 +699,7 @@ class Options(object):
         options = {
             'include_parents': include_parents,
             'include_hidden': include_hidden,
-            'export_name_map': True,
+            'export_ordered_set': True,
             'cache_results': cache_results,
         }
 
@@ -744,7 +744,7 @@ class Options(object):
                 for field in chain(self.local_fields, self.local_many_to_many)
             )
 
-        if not export_name_map:
+        if not export_ordered_set:
             # By default, fields contains field instances as keys and all possible names
             # if the field instance as values. when get_fields is called, we only want to
             # return field instances, so we just preserve the keys.
