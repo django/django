@@ -438,7 +438,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Author,
-                Author._meta.get_field_by_name("height")[0],
+                Author._meta.get_field("height"),
                 new_field
             )
         # Ensure the field is right afterwards
@@ -466,7 +466,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 AuthorWithDefaultHeight,
-                AuthorWithDefaultHeight._meta.get_field_by_name("height")[0],
+                AuthorWithDefaultHeight._meta.get_field("height"),
                 new_field,
             )
         # Ensure the field is right afterwards
@@ -529,7 +529,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Author,
-                Author._meta.get_field_by_name("id")[0],
+                Author._meta.get_field("id"),
                 new_field,
                 strict=True,
             )

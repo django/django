@@ -11,6 +11,11 @@ from django.utils import six
 logger = getLogger('django.db.backends.schema')
 
 
+def _related_non_m2m_objects(opts):
+    # filters out m2m objects from reverse relations.
+    return (obj for obj in opts.related_objects if not obj.field.many_to_many)
+
+
 class BaseDatabaseSchemaEditor(object):
     """
     This class (and its subclasses) are responsible for emitting schema-changing
@@ -498,7 +503,7 @@ class BaseDatabaseSchemaEditor(object):
         # to change.
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
             # '_meta.related_field' contains also M2M reverse fields, these will be filtered out
-            for rel in (obj for obj in new_field.model._meta.related_objects if not obj.field.has_many_values):
+            for rel in _related_non_m2m_objects(new_field.model._meta):
                 rel_fk_names = self._constraint_names(rel.model, [rel.field.column], foreign_key=True)
                 for fk_name in rel_fk_names:
                     self.execute(self._delete_constraint_sql(self.sql_delete_fk, rel.model, fk_name))
@@ -657,7 +662,7 @@ class BaseDatabaseSchemaEditor(object):
         # referring to us.
         rels_to_update = []
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
-            rels_to_update.extend(obj for obj in new_field.model._meta.related_objects if not obj.field.has_many_values)
+            rels_to_update.extend(_related_non_m2m_objects(new_field.model._meta))
         # Changed to become primary key?
         # Note that we don't detect unsetting of a PK, as we assume another field
         # will always come along and replace it.
@@ -680,7 +685,7 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
             # Update all referencing columns
-            rels_to_update.extend(obj for obj in new_field.model._meta.related_objects if not obj.field.has_many_values)
+            rels_to_update.extend(_related_non_m2m_objects(new_field.model._meta))
         # Handle our type alters on the other end of rels from the PK stuff above
         for rel in rels_to_update:
             rel_db_params = rel.field.db_parameters(connection=self.connection)
