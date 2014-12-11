@@ -1381,6 +1381,27 @@ class OldFormForXTests(TestCase):
 </select></p>
 <p><label for="id_age">Age:</label> <input type="number" name="age" value="65" id="id_age" min="0" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
 
+    def test_show_hidden_initial_changed_queries_efficiently(self):
+        class WriterForm(forms.Form):
+            persons = forms.ModelMultipleChoiceField(
+                show_hidden_initial=True, queryset=Writer.objects.all())
+
+        writers = (Writer.objects.create(name=str(x)) for x in range(0, 50))
+        writer_pks = tuple(x.pk for x in writers)
+        form = WriterForm(data={'initial-persons': writer_pks})
+        with self.assertNumQueries(1):
+            self.assertTrue(form.has_changed())
+
+    def test_clean_does_deduplicate_values(self):
+        class WriterForm(forms.Form):
+            persons = forms.ModelMultipleChoiceField(queryset=Writer.objects.all())
+
+        person1 = Writer.objects.create(name="Person 1")
+        form = WriterForm(data={})
+        queryset = form.fields['persons'].clean([str(person1.pk)] * 50)
+        sql, params = queryset.query.sql_with_params()
+        self.assertEqual(len(params), 1)
+
     def test_file_field(self):
         # Test conditions when files is either not given or empty.
 
