@@ -115,3 +115,7 @@ Bugfixes
 * Fixed index creation by the migration infrastructure, particularly when
   dealing with PostgreSQL specific {text|varchar}_pattern_ops indexes
   (:ticket:`23954`).
+
+* Fixed bug in ``makemigrations`` that created broken migration files when
+  dealing with multiple table inheritance and inheriting from more than one
+  model (:ticket:`23956`).
