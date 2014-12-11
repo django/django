@@ -707,7 +707,7 @@ class BaseDatabaseSchemaEditor(object):
         # Rebuild FKs that pointed to us if we previously had to drop them
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
             for rel in new_field.model._meta.related_objects:
-                if not rel.field.has_many_values:
+                if not rel.many_to_many:
                     self.execute(self._create_fk_sql(rel.model, rel.field, "_fk"))
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:

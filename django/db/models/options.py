@@ -390,7 +390,7 @@ class Options(object):
         its parents.
         """
         return make_immutable_fields_list("many_to_many", (f for f in self.get_fields(reverse=False)
-                                          if f.has_relation and f.has_many_values))
+                                          if f.has_relation and f.many_to_many))
 
     @cached_property
     def related_objects(self):
@@ -404,7 +404,7 @@ class Options(object):
         return make_immutable_fields_list(
             "related_objects",
             (obj for obj in all_related_fields
-            if not obj.hidden or obj.field.has_many_values)
+            if not obj.hidden or obj.field.many_to_many)
         )
 
     @raise_deprecation(suggested_alternative="get_fields()")
@@ -711,7 +711,7 @@ class Options(object):
                 for parent in self.parents:
                     for obj, _ in six.iteritems(parent._meta.get_fields(forward=False, **options)):
 
-                        if obj.field.has_many_values:
+                        if obj.many_to_many:
                             # In order for a reverse ManyToManyRel object to be valid, its creation
                             # counter must be > 0 and must be in the parent list
                             if not (obj.field.creation_counter < 0 and obj.model not in parent_list):

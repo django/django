@@ -82,7 +82,7 @@ class M2MTests(OptionsBaseTests):
             fields = model._meta.many_to_many
             self.assertEqual([f.attname for f in fields], expected_result)
             for f in fields:
-                self.assertTrue(f.has_many_values and f.has_relation)
+                self.assertTrue(f.many_to_many and f.has_relation)
 
     def test_many_to_many_with_model(self):
         for model, expected_result in TEST_RESULTS['many_to_many_with_model'].items():
