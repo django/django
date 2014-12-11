@@ -95,6 +95,13 @@ class CustomManagerTests(TestCase):
         self.assertQuerysetEqual(queryset, ["Bugs Bunny"], six.text_type)
         self.assertEqual(queryset._filter_CustomManager, True)
 
+    def test_related_manager(self):
+        """
+        The related managers extend the default manager.
+        """
+        self.assertIsInstance(self.droopy.books, PublishedBookManager)
+        self.assertIsInstance(self.b2.authors, PersonManager)
+
     def test_no_objects(self):
         """
         The default manager, "objects", doesn't exist, because a custom one
