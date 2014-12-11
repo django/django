@@ -261,6 +261,11 @@ class HttpResponseBase(six.Iterator):
         if httponly:
             self.cookies[key]['httponly'] = True
 
+    def setdefault(self, key, value):
+        """Sets a header unless it has already been set."""
+        if key not in self:
+            self[key] = value
+
     def set_signed_cookie(self, key, value, salt='', **kwargs):
         value = signing.get_cookie_signer(salt=key + salt).sign(value)
         return self.set_cookie(key, value, **kwargs)
