@@ -42,7 +42,6 @@ class GenericForeignKey(FieldFlagsMixin):
         self.editable = False
         self.rel = True
         self.column = None
-        self.has_many_values = False
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name

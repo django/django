@@ -184,7 +184,7 @@ class Field(RegisterLookupMixin, FieldFlagsMixin):
             serialize=True, unique_for_date=None, unique_for_month=None,
             unique_for_year=None, choices=None, help_text='', db_column=None,
             db_tablespace=None, auto_created=False, validators=[],
-            error_messages=None, has_many_values=False):
+            error_messages=None):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -193,7 +193,6 @@ class Field(RegisterLookupMixin, FieldFlagsMixin):
         self.blank, self.null = blank, null
         self.rel = rel
         self.default = default
-        self.has_many_values = has_many_values
         self.editable = editable
         self.serialize = serialize
         self.unique_for_date = unique_for_date
@@ -1128,10 +1127,6 @@ class CharField(Field):
 class CommaSeparatedIntegerField(CharField):
     default_validators = [validators.validate_comma_separated_integer_list]
     description = _("Comma-separated integers")
-
-    def __init__(self, *args, **kwargs):
-        kwargs['has_many_values'] = True
-        return super(CommaSeparatedIntegerField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         defaults = {

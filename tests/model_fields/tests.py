@@ -58,11 +58,6 @@ RELATION_FIELDS = (
     GenericRelation,
 )
 
-HAS_MANY_VALUES = (
-    CommaSeparatedIntegerField,
-    ManyToManyField,
-)
-
 IS_REVERSE_OBJECT = (
     RelatedObject,
 )
@@ -794,13 +789,6 @@ class FieldFlagsTests(test.TestCase):
                 self.assertTrue(field.has_relation)
             else:
                 self.assertFalse(field.has_relation)
-
-    def test_field_with_multiple_values(self):
-        for field in self.all_fields:
-            if type(field) in HAS_MANY_VALUES:
-                self.assertTrue(field.has_many_values)
-            else:
-                self.assertFalse(field.has_many_values)
 
     def test_reverse_object_fields(self):
         for field in self.fields_and_reverse_objects:
