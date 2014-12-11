@@ -463,7 +463,7 @@ class MigrationAutodetector(object):
                     if field.rel.to:
                         if field.primary_key:
                             primary_key_rel = field.rel.to
-                        else:
+                        elif not field.rel.parent_link:
                             related_fields[field.name] = field
                     # through will be none on M2Ms on swapped-out models;
                     # we can treat lack of through as auto_created=True, though.
