@@ -638,6 +638,26 @@ The decorator adds logic to capture and preserve the arguments on their
 way into your constructor, and then returns those arguments exactly when
 deconstruct() is called.
 
+Supporting Python 2 and 3
+-------------------------
+
+In order to generate migrations that support both Python 2 and 3, all string
+literals used in your models and fields (e.g. ``verbose_name``,
+``related_name``, etc.), must be consistently either bytestrings or text
+(unicode) strings in both Python 2 and 3 (rather than bytes in Python 2 and
+text in Python 3, the default situation for unmarked string literals.)
+Otherwise running :djadmin:`makemigrations` under Python 3 will generate
+spurious new migrations to convert all these string attributes to text.
+
+The easiest way to achieve this is to follow the advice in Django's
+:doc:`Python 3 porting guide </topics/python3>` and make sure that all your
+modules begin with ``from __future__ import unicode_literals``, so that all
+unmarked string literals are always unicode, regardless of Python version. When
+you add this to an app with existing migrations generated on Python 2, your
+next run of :djadmin:`makemigrations` on Python 3 will likely generate many
+changes as it converts all the bytestring attributes to text strings; this is
+normal and should only happen once.
+
 .. _upgrading-from-south:
 
 Upgrading from South
