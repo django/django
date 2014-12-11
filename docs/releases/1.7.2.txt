@@ -113,7 +113,7 @@ Bugfixes
   (:ticket:`23920`).
 
 * Fixed index creation by the migration infrastructure, particularly when
-  dealing with PostgreSQL specific {text|varchar}_pattern_ops indexes
+  dealing with PostgreSQL specific ``{text|varchar}_pattern_ops`` indexes
   (:ticket:`23954`).
 
 * Fixed bug in ``makemigrations`` that created broken migration files when
