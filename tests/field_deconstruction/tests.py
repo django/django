@@ -211,12 +211,6 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.Permission", "related_name": "foobar"})
-        # Test related_name unicode conversion
-        field = models.ForeignKey("auth.Permission", related_name=b"foobar")
-        name, path, args, kwargs = field.deconstruct()
-        self.assertEqual(path, "django.db.models.ForeignKey")
-        self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "related_name": "foobar"})
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_foreign_key_swapped(self):
@@ -293,12 +287,6 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(kwargs, {"to": "auth.Permission", "db_table": "custom_table"})
         # Test related_name
         field = models.ManyToManyField("auth.Permission", related_name="custom_table")
-        name, path, args, kwargs = field.deconstruct()
-        self.assertEqual(path, "django.db.models.ManyToManyField")
-        self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "related_name": "custom_table"})
-        # Test related_name unicode conversion
-        field = models.ManyToManyField("auth.Permission", related_name=b"custom_table")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
