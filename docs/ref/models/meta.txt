@@ -85,13 +85,13 @@ Retrieving all field instances of a model
     Available parameters are:
 
     ``include_parents``
-        Searches recursively through all parents, if disabled it will only search for 
-        fields declared directly on the current model.
+        Searches recursively through all parents. If set to ``False`` it will
+        only search for fields declared directly on the current model.
         Fields from models that directly inherit from abstract models or
         proxy classes are still local.
 
     ``include_hidden``
-        By enabling this option, ``get_fields()`` will also include fields that
+        If set to ``True``, ``get_fields()`` will also include fields that
         concretely exist, but that are used to back other field's functionality.
         This will also exclude any fields that have a ``related_name`` argument
         (such as :class:`django.db.models.ManyToManyField`, or

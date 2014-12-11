@@ -1802,15 +1802,13 @@ Attributes for fields
 
 .. attribute:: hidden
 
-    Responds truthfully if the field is a hidden field. Hidden fields are fields
-    that concretely exist, but that are used to back other field's functionality
-    (look at ``GenericForeignKey``).
+    Hidden fields are fields that concretely exist, but that
+    are used to back other field's functionality (e.g. ``GenericForeignKey``).
 
     .. note::
-        The default flags for ``get_fields()`` automatically exclude hidden fields,
-        so you may never need to use this flag. In case you allow hidden fields
-        (by using the ``include_hidden`` flag in ``get_fields()``), they you can use
-        this flag for further filtering.
+        get_fields() excludes hidden fields by default. Pass in
+        include_hidden=True to return hidden fields. In case you allow hidden
+        fields then you can use this flag for further filtering.
 
 
 Attributes for fields with relations
