@@ -267,16 +267,16 @@ class Options(object):
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
+        field_has_relation = field.has_relation
         if virtual:
             self.virtual_fields.append(field)
-
-        elif field.rel and isinstance(field.rel, ManyToManyRel):
+        elif field_has_relation and field.many_to_many:
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
         else:
             self.local_fields.insert(bisect(self.local_fields, field), field)
             self.setup_pk(field)
 
-        if field.has_relation and field.related_model:
+        if field_has_relation and field.related_model:
             try:
                 field.related_model._meta._expire_cache(forward=False)
             except AttributeError:
