@@ -52,13 +52,18 @@ def DO_NOTHING(collector, field, sub_objs, using):
     pass
 
 
-def get_related_objects_on_proxies(opts):
-    return (
+def get_candidates_to_delete(opts):
+    related_objects_on_proxies = (
         f for f in chain.from_iterable(
             c.related_objects for c in opts.concrete_model._meta.proxied_children
             if c is not opts
         )
     )
+    related_objects_without_m2ms = (
+        f for f in opts.get_fields(include_hidden=True)
+        if f.is_reverse_object and not f.many_to_many
+    )
+    return chain(related_objects_on_proxies, related_objects_without_m2ms)
 
 
 class Collector(object):
@@ -144,13 +149,7 @@ class Collector(object):
             return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
-        related_opts = list(chain(
-            get_related_objects_on_proxies(opts),
-            (field for field in opts.get_fields(include_hidden=True)
-             if field.is_reverse_object and not field.many_to_many)
-        ))
-
-        for related in related_opts:
+        for related in get_candidates_to_delete(opts):
             if related.field.rel.on_delete is not DO_NOTHING:
                 return False
         for field in model._meta.virtual_fields:
@@ -214,12 +213,7 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-            related_opts = chain(
-                get_related_objects_on_proxies(model._meta),
-                (field for field in model._meta.get_fields(include_hidden=True)
-                    if field.is_reverse_object and not field.many_to_many),
-            )
-            for related in related_opts:
+            for related in get_candidates_to_delete(model._meta):
                 field = related.field
                 if field.rel.on_delete == DO_NOTHING:
                     continue
