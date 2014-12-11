@@ -135,7 +135,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         if cls.validator_class:
             warnings.warn(
                 'ModelAdmin.validator_class is deprecated. '
-                'ModeAdmin validators must be converted to use '
+                'ModelAdmin validators must be converted to use '
                 'the system check framework.',
                 RemovedInDjango19Warning)
             validator = cls.validator_class()
