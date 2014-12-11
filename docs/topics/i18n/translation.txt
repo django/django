@@ -872,7 +872,7 @@ There are also simple filters available for convenience:
 
 * ``{{ LANGUAGE_CODE|language_name }}`` ("German")
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
-* ``{{ LANGUAGE_CODE|bidi }}`` (False)
+* ``{{ LANGUAGE_CODE|language_bidi }}`` (False)
 
 .. _Django templates: ../templates_python/
 
