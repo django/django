@@ -59,6 +59,15 @@ hardened for production use and should be used only as a development aid. Now
 may be a good time to audit your project and serve your files in production
 using a real front-end web server if you are not doing so.
 
+Database denial-of-service with ``ModelMultipleChoiceField``
+============================================================
+
+Given a form that uses ``ModelMultipleChoiceField`` and
+``show_hidden_initial=True`` (not a documented API), it was possible for a user
+to cause an unreasonable number of SQL queries by submitting duplicate values
+for the field's data. The validation logic in ``ModelMultipleChoiceField`` now
+deduplicates submitted values to address this issue.
+
 Bugfixes
 ========
 
