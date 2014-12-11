@@ -144,21 +144,18 @@ class Options(object):
 
     @lru_cache(maxsize=None)
     def _map_model(self, link):
-        direct = not (link.is_reverse_object and link.field.generate_reverse_relation)
-        model = link.model if direct else link.parent_model._meta.concrete_model
+        model = link.model if not link.is_reverse_object else link.parent_model._meta.concrete_model
         if model is self.model:
             model = None
         return link, model
 
     @lru_cache(maxsize=None)
     def _map_model_details(self, link):
-        direct = not (link.is_reverse_object and link.field.generate_reverse_relation)
+        direct = not link.is_reverse_object
         model = link.model if direct else link.parent_model._meta.concrete_model
         if model is self.model:
             model = None
-
-        field = link if direct else link.field
-        m2m = isinstance(field, ManyToManyField)
+        m2m = link.has_relation and link.many_to_many
         return link, model, direct, m2m
 
     @property
