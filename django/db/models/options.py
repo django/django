@@ -7,7 +7,7 @@ import warnings
 
 from django.apps import apps
 from django.conf import settings
-from django.db.models.fields.related import ManyToManyRel, ManyToManyField
+from django.db.models.fields.related import ManyToManyField
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
@@ -144,6 +144,10 @@ class Options(object):
 
     @lru_cache(maxsize=None)
     def _map_model(self, link):
+        # This helper function is used to allow backwards compatibility with the previous API.
+        # No future methods should link to this function.
+        # This function maps a field to (field, model or related_model,) depending on the field
+        # type.
         model = link.model if not link.is_reverse_object else link.parent_model._meta.concrete_model
         if model is self.model:
             model = None
@@ -151,6 +155,10 @@ class Options(object):
 
     @lru_cache(maxsize=None)
     def _map_model_details(self, link):
+        # This helper function is used to allow backwards compatibility with the previous API.
+        # No future methods should link to this function.
+        # This function maps a field to (field, model or related_model, direct, is_m2m) depending
+        # on the field type.
         direct = not link.is_reverse_object
         model = link.model if direct else link.parent_model._meta.concrete_model
         if model is self.model:
