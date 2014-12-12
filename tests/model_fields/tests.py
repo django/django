@@ -181,6 +181,10 @@ class ForeignKeyTests(test.TestCase):
         fk_model_empty = FkToChar.objects.select_related('out').get(id=fk_model_empty.pk)
         self.assertEqual(fk_model_empty.out, char_model_empty)
 
+    def test_related_name_converted_to_text(self):
+        rel_name = Bar._meta.get_field_by_name('a')[0].rel.related_name
+        self.assertIsInstance(rel_name, six.text_type)
+
 
 class DateTimeFieldTests(unittest.TestCase):
     def test_datetimefield_to_python_usecs(self):

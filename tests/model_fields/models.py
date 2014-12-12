@@ -26,7 +26,7 @@ def get_foo():
 
 class Bar(models.Model):
     b = models.CharField(max_length=10)
-    a = models.ForeignKey(Foo, default=get_foo)
+    a = models.ForeignKey(Foo, default=get_foo, related_name=b'bars')
 
 
 class Whiz(models.Model):
