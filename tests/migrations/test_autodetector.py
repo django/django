@@ -9,6 +9,8 @@ from django.db.migrations.loader import MigrationLoader
 from django.db import models, connection
 from django.contrib.auth.models import AbstractBaseUser
 
+from .models import FoodManager, FoodQuerySet
+
 
 class DeconstructableObject(object):
     """
@@ -158,6 +160,13 @@ class AutodetectorTests(TestCase):
     ])
     other_pony = ModelState("otherapp", "Pony", [
         ("id", models.AutoField(primary_key=True)),
+    ])
+    other_pony_food = ModelState("otherapp", "Pony", [
+        ("id", models.AutoField(primary_key=True)),
+    ], managers=[
+        ('food_qs', FoodQuerySet.as_manager()),
+        ('food_mgr', FoodManager('a', 'b')),
+        ('food_mgr_kwargs', FoodManager('x', 'y', 3, 4)),
     ])
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
     third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
@@ -456,13 +465,15 @@ class AutodetectorTests(TestCase):
         """Tests autodetection of new models."""
         # Make state
         before = self.make_project_state([])
-        after = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.other_pony_food])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number/type of migrations?
-        self.assertNumberMigrations(changes, 'testapp', 1)
-        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ["CreateModel"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="Pony")
+        self.assertEqual([name for name, mgr in changes['otherapp'][0].operations[0].managers],
+                         ['food_qs', 'food_mgr', 'food_mgr_kwargs'])
 
     def test_old_model(self):
         """Tests deletion of old models."""
@@ -1405,6 +1416,24 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "AlterOrderWithRespectTo"])
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author", order_with_respect_to="book")
         self.assertNotIn("_order", [name for name, field in changes['testapp'][0].operations[0].fields])
+
+    def test_alter_model_managers(self):
+        """
+        Tests that changing the model managers adds a new operation.
+        """
+        # Make state
+        before = self.make_project_state([self.other_pony])
+        after = self.make_project_state([self.other_pony_food])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ["AlterModelManagers"])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="pony")
+        self.assertEqual([name for name, mgr in changes['otherapp'][0].operations[0].managers],
+                         ['food_qs', 'food_mgr', 'food_mgr_kwargs'])
+        self.assertEqual(changes['otherapp'][0].operations[0].managers[1][1].args, ('a', 'b', 1, 2))
+        self.assertEqual(changes['otherapp'][0].operations[0].managers[2][1].args, ('x', 'y', 3, 4))
 
     def test_swappable_first_inheritance(self):
         """Tests that swappable models get their CreateModel first."""

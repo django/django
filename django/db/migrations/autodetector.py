@@ -178,6 +178,7 @@ class MigrationAutodetector(object):
         self.generate_deleted_proxies()
         self.generate_created_proxies()
         self.generate_altered_options()
+        self.generate_altered_managers()
 
         # Generate field operations
         self.generate_renamed_fields()
@@ -503,6 +504,7 @@ class MigrationAutodetector(object):
                     fields=[d for d in model_state.fields if d[0] not in related_fields],
                     options=model_state.options,
                     bases=model_state.bases,
+                    managers=model_state.managers,
                 ),
                 dependencies=dependencies,
                 beginning=True,
@@ -607,6 +609,7 @@ class MigrationAutodetector(object):
                     fields=[],
                     options=model_state.options,
                     bases=model_state.bases,
+                    managers=model_state.managers,
                 ),
                 # Depend on the deletion of any possible non-proxy version of us
                 dependencies=dependencies,
@@ -988,6 +991,20 @@ class MigrationAutodetector(object):
                         order_with_respect_to=new_model_state.options.get('order_with_respect_to', None),
                     ),
                     dependencies=dependencies,
+                )
+
+    def generate_altered_managers(self):
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            if old_model_state.managers != new_model_state.managers:
+                self.add_operation(
+                    app_label,
+                    operations.AlterModelManagers(
+                        name=model_name,
+                        managers=new_model_state.managers,
+                    )
                 )
 
     def arrange_for_graph(self, changes, graph, migration_name=None):

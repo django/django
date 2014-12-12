@@ -67,7 +67,9 @@ class QuerySet(object):
     def as_manager(cls):
         # Address the circular dependency between `Queryset` and `Manager`.
         from django.db.models.manager import Manager
-        return Manager.from_queryset(cls)()
+        manager = Manager.from_queryset(cls)()
+        manager._built_as_manager = True
+        return manager
     as_manager.queryset_only = True
     as_manager = classmethod(as_manager)
 
