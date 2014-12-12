@@ -125,6 +125,6 @@ Bugfixes
 * Fixed a crash in the admin when using "Save as new" and also deleting a
   related inline (:ticket:`23857`).
 
-* Removed auto-conversion of ``related_name`` to unicode in field
-  deconstruction, to maintain consistency of bytes/text in migrations matching
-  the original values (:ticket:`23455` and :ticket:`23982`).
+* Always converted ``related_name`` to text (unicode), since that is required
+  on Python 3 for interpolation. Removed conversion of ``related_name`` to text
+  in migration deconstruction (:ticket:`23455` and :ticket:`23982`).

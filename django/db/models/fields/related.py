@@ -14,7 +14,7 @@ from django.db.models.lookups import IsNull
 from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
 from django.db.models.expressions import Col
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text, smart_text
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
@@ -280,7 +280,7 @@ class RelatedField(Field):
             sup.contribute_to_class(cls, name, virtual_only=virtual_only)
 
         if not cls._meta.abstract and self.rel.related_name:
-            related_name = self.rel.related_name % {
+            related_name = force_text(self.rel.related_name) % {
                 'class': cls.__name__.lower(),
                 'app_label': cls._meta.app_label.lower()
             }
