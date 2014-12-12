@@ -387,6 +387,9 @@ Migrations
 * It is now possible to have migrations (most probably :ref:`data migrations
   <data-migrations>`) for applications without models.
 
+* Migrations can now :ref:`serialize model managers
+  <using-managers-in-migrations>` as part of the model state.
+
 Models
 ^^^^^^
 

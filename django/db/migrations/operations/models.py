@@ -12,13 +12,14 @@ class CreateModel(Operation):
     Create a model's table.
     """
 
-    serialization_expand_args = ['fields', 'options']
+    serialization_expand_args = ['fields', 'options', 'managers']
 
-    def __init__(self, name, fields, options=None, bases=None):
+    def __init__(self, name, fields, options=None, bases=None, managers=None):
         self.name = name
         self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model,)
+        self.managers = managers or []
 
     def deconstruct(self):
         kwargs = {
@@ -29,6 +30,8 @@ class CreateModel(Operation):
             kwargs['options'] = self.options
         if self.bases and self.bases != (models.Model,):
             kwargs['bases'] = self.bases
+        if self.managers and self.managers != [('objects', models.Manager())]:
+            kwargs['managers'] = self.managers
         return (
             self.__class__.__name__,
             [],
@@ -42,6 +45,7 @@ class CreateModel(Operation):
             list(self.fields),
             dict(self.options),
             tuple(self.bases),
+            list(self.managers),
         )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -467,3 +471,38 @@ class AlterModelOptions(Operation):
 
     def describe(self):
         return "Change Meta options on %s" % (self.name, )
+
+
+class AlterModelManagers(Operation):
+    """
+    Alters the model's managers
+    """
+
+    serialization_expand_args = ['managers']
+
+    def __init__(self, name, managers):
+        self.name = name
+        self.managers = managers
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.name, self.managers],
+            {}
+        )
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.name.lower()]
+        model_state.managers = list(self.managers)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name.lower()
+
+    def describe(self):
+        return "Change managers on %s" % (self.name, )
