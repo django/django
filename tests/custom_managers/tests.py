@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 
+from django.db import models
 from django.test import TestCase
 from django.utils import six
 
-from .models import (Book, Car, FunPerson, OneToOneRestrictedModel, Person,
+from .models import (Book, Car, CustomManager, CustomQuerySet,
+    DeconstructibleCustomManager, FunPerson, OneToOneRestrictedModel, Person,
     PersonManager, PublishedBookManager, RelatedModel, RestrictedModel)
 
 
@@ -469,6 +471,44 @@ class CustomManagerTests(TestCase):
             lambda c: c.first_name,
             ordered=False,
         )
+
+    def test_deconstruct_default(self):
+        mgr = models.Manager()
+        as_manager, mgr_path, qs_path, args, kwargs = mgr.deconstruct()
+        self.assertFalse(as_manager)
+        self.assertEqual(mgr_path, 'django.db.models.manager.Manager')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {})
+
+    def test_deconstruct_as_manager(self):
+        mgr = CustomQuerySet.as_manager()
+        as_manager, mgr_path, qs_path, args, kwargs = mgr.deconstruct()
+        self.assertTrue(as_manager)
+        self.assertEqual(qs_path, 'custom_managers.models.CustomQuerySet')
+
+    def test_deconstruct_from_queryset(self):
+        mgr = DeconstructibleCustomManager('a', 'b')
+        as_manager, mgr_path, qs_path, args, kwargs = mgr.deconstruct()
+        self.assertFalse(as_manager)
+        self.assertEqual(mgr_path, 'custom_managers.models.DeconstructibleCustomManager')
+        self.assertEqual(args, ('a', 'b',))
+        self.assertEqual(kwargs, {})
+
+        mgr = DeconstructibleCustomManager('x', 'y', c=3, d=4)
+        as_manager, mgr_path, qs_path, args, kwargs = mgr.deconstruct()
+        self.assertFalse(as_manager)
+        self.assertEqual(mgr_path, 'custom_managers.models.DeconstructibleCustomManager')
+        self.assertEqual(args, ('x', 'y',))
+        self.assertEqual(kwargs, {'c': 3, 'd': 4})
+
+    def test_deconstruct_from_queryset_failing(self):
+        mgr = CustomManager('arg')
+        msg = ("Could not find manager BaseCustomManagerFromCustomQuerySet in "
+               "django.db.models.manager.\n"
+               "Please note that you need to inherit from managers you "
+               "dynamically generated with 'from_queryset()'.")
+        with self.assertRaisesMessage(ValueError, msg):
+            mgr.deconstruct()
 
 
 class TestCars(TestCase):

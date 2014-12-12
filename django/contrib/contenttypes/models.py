@@ -9,6 +9,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 class ContentTypeManager(models.Manager):
+    use_in_migrations = True
 
     # Cache to avoid re-looking up ContentType objects all over the place.
     # This cache is shared by all the get_for_* methods.

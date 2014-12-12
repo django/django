@@ -50,3 +50,21 @@ class UnmigratedModel(models.Model):
     if its migrations directory has not been repointed)
     """
     pass
+
+
+class FoodQuerySet(models.query.QuerySet):
+    pass
+
+
+class BaseFoodManager(models.Manager):
+    def __init__(self, a, b, c=1, d=2):
+        super(BaseFoodManager, self).__init__()
+        self.args = (a, b, c, d)
+
+
+class FoodManager(BaseFoodManager.from_queryset(FoodQuerySet)):
+    use_in_migrations = True
+
+
+class NoMigrationFoodManager(BaseFoodManager.from_queryset(FoodQuerySet)):
+    pass

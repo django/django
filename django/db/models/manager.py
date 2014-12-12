@@ -1,4 +1,5 @@
 import copy
+from importlib import import_module
 import inspect
 
 from django.db import router
@@ -58,6 +59,16 @@ class BaseManager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
+    #: If set to True the manager will be serialized into migrations and will
+    #: thus be available in e.g. RunPython operations
+    use_in_migrations = False
+
+    def __new__(cls, *args, **kwargs):
+        # We capture the arguments to make returning them trivial
+        obj = super(BaseManager, cls).__new__(cls)
+        obj._constructor_args = (args, kwargs)
+        return obj
+
     def __init__(self):
         super(BaseManager, self).__init__()
         self._set_creation_counter()
@@ -72,6 +83,43 @@ class BaseManager(object):
         model = self.model
         app = model._meta.app_label
         return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+
+    def deconstruct(self):
+        """
+        Returns a 5-tuple of the form (as_manager (True), manager_class,
+        queryset_class, args, kwargs).
+
+        Raises a ValueError if the manager is dynamically generated.
+        """
+        qs_class = self._queryset_class
+        if getattr(self, '_built_as_manager', False):
+            # using MyQuerySet.as_manager()
+            return (
+                True,  # as_manager
+                None,  # manager_class
+                '%s.%s' % (qs_class.__module__, qs_class.__name__),  # qs_class
+                None,  # args
+                None,  # kwargs
+            )
+        else:
+            module_name = self.__module__
+            name = self.__class__.__name__
+            # Make sure it's actually there and not an inner class
+            module = import_module(module_name)
+            if not hasattr(module, name):
+                raise ValueError(
+                    "Could not find manager %s in %s.\n"
+                    "Please note that you need to inherit from managers you "
+                    "dynamically generated with 'from_queryset()'."
+                    % (name, module_name)
+                )
+            return (
+                False,  # as_manager
+                '%s.%s' % (module_name, name),  # manager_class
+                None,  # qs_class
+                self._constructor_args[0],  # args
+                self._constructor_args[1],  # kwargs
+            )
 
     def check(self, **kwargs):
         return []
@@ -182,6 +230,15 @@ class BaseManager(object):
         # implementation of `RelatedManager.get_queryset()` for a better
         # understanding of how this comes into play.
         return self.get_queryset()
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__) and
+            self._constructor_args == other._constructor_args
+        )
+
+    def __ne__(self, other):
+        return not (self == other)
 
 
 class Manager(BaseManager.from_queryset(QuerySet)):

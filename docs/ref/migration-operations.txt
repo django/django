@@ -37,7 +37,7 @@ Schema Operations
 CreateModel
 -----------
 
-.. class:: CreateModel(name, fields, options=None, bases=None)
+.. class:: CreateModel(name, fields, options=None, bases=None, managers=None)
 
 Creates a new model in the project history and a corresponding table in the
 database to match it.
@@ -55,6 +55,14 @@ it can contain both class objects as well as strings in the format
 ``"appname.ModelName"`` if you want to depend on another model (so you inherit
 from the historical version). If it's not supplied, it defaults to just
 inheriting from the standard ``models.Model``.
+
+``managers`` takes a list of 2-tuples of ``(manager_name, manager_instance)``.
+The first manager in the list will be the default manager for this model during
+migrations.
+
+.. versionchanged:: 1.8
+
+    The ``managers`` argument was added.
 
 DeleteModel
 -----------
@@ -120,6 +128,15 @@ Stores changes to miscellaneous model options (settings on a model's ``Meta``)
 like ``permissions`` and ``verbose_name``. Does not affect the database, but
 persists these changes for :class:`RunPython` instances to use. ``options``
 should be a dictionary mapping option names to values.
+
+AlterModelManagers
+------------------
+
+.. versionadded:: 1.8
+
+.. class:: AlterModelManagers(name, managers)
+
+Alters the managers that are available during migrations.
 
 AddField
 --------
