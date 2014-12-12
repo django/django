@@ -1195,8 +1195,6 @@ class BaseDatabaseOperations(object):
         Transform a decimal.Decimal value to an object compatible with what is
         expected by the backend driver for decimal (numeric) columns.
         """
-        if value is None:
-            return None
         return utils.format_number(value, max_digits, decimal_places)
 
     def year_lookup_bounds_for_date_field(self, value):
