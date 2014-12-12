@@ -19,6 +19,7 @@ from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import get_default_timezone, utc, FixedOffset
 
+from custom_managers import models as custom_manager_models
 import custom_migration_operations.operations
 import custom_migration_operations.more_operations
 
@@ -351,3 +352,12 @@ class WriterTests(TestCase):
 
         string = MigrationWriter.serialize(models.CharField(default=DeconstructableInstances))[0]
         self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructableInstances)")
+
+    def test_serialize_managers(self):
+        self.assertSerializedEqual(models.Manager())
+        self.assertSerializedResultEqual(
+            custom_manager_models.CustomQuerySet.as_manager(),
+            ('custom_managers.models.CustomQuerySet.as_manager()', {'import custom_managers.models'})
+        )
+        self.assertSerializedEqual(custom_manager_models.DeconstructibleCustomManager('a', 'b'))
+        self.assertSerializedEqual(custom_manager_models.DeconstructibleCustomManager('x', 'y', c=3, d=4))

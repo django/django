@@ -223,13 +223,7 @@ class MigrationWriter(object):
 
     @classmethod
     def serialize_deconstructed(cls, path, args, kwargs):
-        module, name = path.rsplit(".", 1)
-        if module == "django.db.models":
-            imports = {"from django.db import models"}
-            name = "models.%s" % name
-        else:
-            imports = {"import %s" % module}
-            name = path
+        name, imports = cls._serialize_path(path)
         strings = []
         for arg in args:
             arg_string, arg_imports = cls.serialize(arg)
@@ -240,6 +234,17 @@ class MigrationWriter(object):
             imports.update(arg_imports)
             strings.append("%s=%s" % (kw, arg_string))
         return "%s(%s)" % (name, ", ".join(strings)), imports
+
+    @classmethod
+    def _serialize_path(cls, path):
+        module, name = path.rsplit(".", 1)
+        if module == "django.db.models":
+            imports = {"from django.db import models"}
+            name = "models.%s" % name
+        else:
+            imports = {"import %s" % module}
+            name = path
+        return name, imports
 
     @classmethod
     def serialize(cls, value):
@@ -344,6 +349,13 @@ class MigrationWriter(object):
                     return value.__name__, set()
                 else:
                     return "%s.%s" % (module, value.__name__), {"import %s" % module}
+        elif isinstance(value, models.manager.BaseManager):
+            as_manager, manager_path, qs_path, args, kwargs = value.deconstruct()
+            if as_manager:
+                name, imports = cls._serialize_path(qs_path)
+                return "%s.as_manager()" % name, imports
+            else:
+                return cls.serialize_deconstructed(manager_path, args, kwargs)
         # Anything that knows how to deconstruct itself.
         elif hasattr(value, 'deconstruct'):
             return cls.serialize_deconstructed(*value.deconstruct())

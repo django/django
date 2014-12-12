@@ -149,12 +149,13 @@ class ModelState(object):
     assign new ones, as these are not detached during a clone.
     """
 
-    def __init__(self, app_label, name, fields, options=None, bases=None):
+    def __init__(self, app_label, name, fields, options=None, bases=None, managers=None):
         self.app_label = app_label
         self.name = force_text(name)
         self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model, )
+        self.managers = managers or []
         # Sanity-check that fields is NOT a dict. It must be ordered.
         if isinstance(self.fields, dict):
             raise ValueError("ModelState.fields cannot be a dict - it must be a list of 2-tuples.")
@@ -252,12 +253,51 @@ class ModelState(object):
         # Ensure at least one base inherits from models.Model
         if not any((isinstance(base, six.string_types) or issubclass(base, models.Model)) for base in bases):
             bases = (models.Model,)
+
+        # Constructs all managers on the model
+        managers = {}
+
+        def reconstruct_manager(mgr):
+            as_manager, manager_path, qs_path, args, kwargs = mgr.deconstruct()
+            if as_manager:
+                qs_class = import_string(qs_path)
+                instance = qs_class.as_manager()
+            else:
+                manager_class = import_string(manager_path)
+                instance = manager_class(*args, **kwargs)
+            # We rely on the ordering of the creation_counter of the original
+            # instance
+            managers[mgr.name] = (mgr.creation_counter, instance)
+
+        default_manager_name = model._default_manager.name
+        # Make sure the default manager is always the first
+        if model._default_manager.use_in_migrations:
+            reconstruct_manager(model._default_manager)
+        else:
+            # Force this manager to be the first and thus default
+            managers[default_manager_name] = (0, models.Manager())
+        # Sort all managers by their creation counter
+        for _, manager, _ in sorted(model._meta.managers):
+            if manager.name == '_base_manager' or not manager.use_in_migrations:
+                continue
+            reconstruct_manager(manager)
+        # Sort all managers by their creation counter but take only name and
+        # instance for further processing
+        managers = [
+            (name, instance) for name, (cc, instance) in
+            sorted(managers.items(), key=lambda v: v[1])
+        ]
+        if managers == [(default_manager_name, models.Manager())]:
+            managers = []
+
+        # Construct the new ModelState
         return cls(
             model._meta.app_label,
             model._meta.object_name,
             fields,
             options,
             bases,
+            managers,
         )
 
     @classmethod
@@ -292,6 +332,7 @@ class ModelState(object):
             fields=list(self.construct_fields()),
             options=dict(self.options),
             bases=self.bases,
+            managers=self.managers,
         )
 
     def render(self, apps):
@@ -312,6 +353,11 @@ class ModelState(object):
         body = dict(self.construct_fields())
         body['Meta'] = meta
         body['__module__'] = "__fake__"
+
+        # Restore managers
+        for mgr_name, manager in self.managers:
+            body[mgr_name] = manager
+
         # Then, make a Model object
         return type(
             str(self.name),
@@ -336,7 +382,8 @@ class ModelState(object):
             all((k1 == k2 and (f1.deconstruct()[1:] == f2.deconstruct()[1:]))
                 for (k1, f1), (k2, f2) in zip(self.fields, other.fields)) and
             (self.options == other.options) and
-            (self.bases == other.bases)
+            (self.bases == other.bases) and
+            (self.managers == other.managers)
         )
 
     def __ne__(self, other):
