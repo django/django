@@ -1242,41 +1242,41 @@ msgstr ","
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] "%d "
+msgstr[0] "%d 년"
 
 #: utils/timesince.py:26
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "%d 2개월"
+msgstr[0] "%d 개월"
 
 #: utils/timesince.py:27
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] "%d "
+msgstr[0] "%d 주"
 
 #: utils/timesince.py:28
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%d "
+msgstr[0] "%d 일"
 
 #: utils/timesince.py:29
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%d "
+msgstr[0] "%d 시간"
 
 #: utils/timesince.py:30
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d "
+msgstr[0] "%d 분"
 
 #: utils/timesince.py:46
 msgid "0 minutes"
-msgstr "0"
+msgstr "0 분"
 
 #: views/csrf.py:105
 msgid "Forbidden"
