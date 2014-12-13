@@ -23,7 +23,7 @@ except NotImplementedError:
 from django.conf import settings
 from django.utils.encoding import force_bytes
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 def salted_hmac(key_salt, value, secret=None):
@@ -179,7 +179,7 @@ else:
         def F(i):
             u = salt + struct.pack(b'>I', i)
             result = 0
-            for j in xrange(int(iterations)):
+            for j in range(int(iterations)):
                 dig1, dig2 = inner.copy(), outer.copy()
                 dig1.update(u)
                 dig2.update(dig1.digest())

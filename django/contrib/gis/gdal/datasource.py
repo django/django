@@ -47,7 +47,7 @@ from django.contrib.gis.gdal.prototypes import ds as capi
 
 from django.utils.encoding import force_bytes, force_text
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
@@ -98,7 +98,7 @@ class DataSource(GDALBase):
 
     def __iter__(self):
         "Allows for iteration over the layers in a data source."
-        for i in xrange(self.layer_count):
+        for i in range(self.layer_count):
             yield self[i]
 
     def __getitem__(self, index):

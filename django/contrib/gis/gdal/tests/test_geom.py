@@ -9,7 +9,7 @@ from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import TestDataMixin
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import (OGRGeometry, OGRGeomType,
@@ -355,7 +355,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test10_difference(self):
         "Testing difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             d1 = OGRGeometry(self.geometries.diff_geoms[i].wkt)
@@ -367,7 +367,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test11_intersection(self):
         "Testing intersects() and intersection()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             i1 = OGRGeometry(self.geometries.intersect_geoms[i].wkt)
@@ -380,7 +380,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test12_symdifference(self):
         "Testing sym_difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             d1 = OGRGeometry(self.geometries.sdiff_geoms[i].wkt)
@@ -392,7 +392,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test13_union(self):
         "Testing union()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             u1 = OGRGeometry(self.geometries.union_geoms[i].wkt)

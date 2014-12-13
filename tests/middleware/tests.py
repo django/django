@@ -21,7 +21,7 @@ from django.test import TestCase, RequestFactory, override_settings
 from django.test.utils import patch_logger
 from django.utils import six
 from django.utils.encoding import force_str
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 @override_settings(ROOT_URLCONF='middleware.urls')
@@ -602,7 +602,7 @@ class GZipMiddlewareTest(TestCase):
     """
     short_string = b"This string is too short to be worth compressing."
     compressible_string = b'a' * 500
-    uncompressible_string = b''.join(six.int2byte(random.randint(0, 255)) for _ in xrange(500))
+    uncompressible_string = b''.join(six.int2byte(random.randint(0, 255)) for _ in range(500))
     sequence = [b'a' * 500, b'b' * 200, b'a' * 300]
 
     def setUp(self):

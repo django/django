@@ -11,7 +11,7 @@ from django.conf import settings
 from django.db.models.fields import DateTimeField, Field
 from django.db.models.sql.datastructures import EmptyResultSet, Empty
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 from django.utils import timezone
 from django.utils import tree
 
@@ -228,7 +228,7 @@ class WhereNode(tree.Node):
             if max_in_list_size and len(params) > max_in_list_size:
                 # Break up the params list into an OR of manageable chunks.
                 in_clause_elements = ['(']
-                for offset in xrange(0, len(params), max_in_list_size):
+                for offset in range(0, len(params), max_in_list_size):
                     if offset > 0:
                         in_clause_elements.append(' OR ')
                     in_clause_elements.append('%s IN (' % field_sql)

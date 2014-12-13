@@ -4,7 +4,7 @@ import inspect
 from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 from .query_utils import QueryWrapper
 
@@ -275,7 +275,7 @@ class In(BuiltinLookup):
             rhs, rhs_params = self.batch_process_rhs(compiler, connection)
             in_clause_elements = ['(']
             params = []
-            for offset in xrange(0, len(rhs_params), max_in_list_size):
+            for offset in range(0, len(rhs_params), max_in_list_size):
                 if offset > 0:
                     in_clause_elements.append(' OR ')
                 in_clause_elements.append('%s IN (' % lhs)
