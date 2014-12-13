@@ -4,6 +4,8 @@ from copy import copy
 # Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ('django.template.context_processors.csrf',)
 
+_current_app_undefined = object()
+
 
 class ContextPopException(Exception):
     "pop() has been called more times than push()"
@@ -117,8 +119,11 @@ class BaseContext(object):
 
 class Context(BaseContext):
     "A stack container for variable context"
-    def __init__(self, dict_=None, autoescape=True, current_app=None,
+    def __init__(self, dict_=None, autoescape=True,
+            current_app=_current_app_undefined,
             use_l10n=None, use_tz=None, engine=None):
+        if current_app is _current_app_undefined:
+            current_app = None
         self.autoescape = autoescape
         self.current_app = current_app
         self.use_l10n = use_l10n
@@ -176,7 +181,8 @@ class RequestContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
-    def __init__(self, request, dict_=None, processors=None, current_app=None,
+    def __init__(self, request, dict_=None, processors=None,
+            current_app=_current_app_undefined,
             use_l10n=None, use_tz=None, engine=None):
         Context.__init__(self, dict_, current_app=current_app,
                 use_l10n=use_l10n, use_tz=use_tz, engine=engine)
