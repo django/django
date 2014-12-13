@@ -358,7 +358,10 @@ The ``long`` type no longer exists in Python 3. ``1L`` is a syntax error. Use
 ``xrange``
 ~~~~~~~~~~
 
-Import ``six.moves.xrange`` wherever you use ``xrange``.
+If you use ``xrange`` on Python 2, import ``six.moves.range`` and use that
+instead. You can also import ``six.moves.xrange`` (it's equivalent to
+``six.moves.range``) but the first technique allows you to simply drop the
+import when dropping support for Python 2.
 
 Moved modules
 ~~~~~~~~~~~~~
