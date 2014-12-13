@@ -274,8 +274,6 @@ WHEN (new.%(col_name)s IS NULL)
             converters.append(self.convert_binaryfield_value)
         elif internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
-        elif internal_type == 'DecimalField':
-            converters.append(self.convert_decimalfield_value)
         elif internal_type == 'DateField':
             converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
@@ -310,9 +308,6 @@ WHEN (new.%(col_name)s IS NULL)
         if value in (1, 0):
             value = bool(value)
         return value
-
-    def convert_decimalfield_value(self, value, field):
-        return backend_utils.typecast_decimal(field.format_number(value))
 
     # cx_Oracle always returns datetime.datetime objects for
     # DATE and TIMESTAMP columns, but Django wants to see a
