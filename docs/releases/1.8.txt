@@ -827,8 +827,8 @@ Miscellaneous
 * Seconds have been removed from any locales that had them in ``TIME_FORMAT``,
   ``DATETIME_FORMAT``, or ``SHORT_DATETIME_FORMAT``.
 
-* The default max size of the Oracle test tablespace has increased from 200M
-  to 500M.
+* The default max size of the Oracle test tablespace has increased from 300M
+  (or 200M, before 1.7.2) to 500M.
 
 * :func:`~django.core.urlresolvers.reverse` and
   :func:`~django.core.urlresolvers.reverse_lazy` now return Unicode strings
