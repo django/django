@@ -4,11 +4,6 @@ Test cases for the template loaders
 Note: This test requires setuptools!
 """
 
-from django.conf import settings
-
-if __name__ == '__main__':
-    settings.configure()
-
 import os.path
 import sys
 import types
