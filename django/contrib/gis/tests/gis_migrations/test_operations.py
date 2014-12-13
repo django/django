@@ -8,11 +8,8 @@ from django.test import skipUnlessDBFeature, TransactionTestCase
 
 if connection.features.gis_enabled:
     from django.contrib.gis.db.models import fields
-    try:
-        GeometryColumns = connection.ops.geometry_columns()
-        HAS_GEOMETRY_COLUMNS = True
-    except NotImplementedError:
-        HAS_GEOMETRY_COLUMNS = False
+    from django.contrib.gis.models import GeometryColumns
+    HAS_GEOMETRY_COLUMNS = GeometryColumns is not None
 
 
 @skipUnlessDBFeature("gis_enabled")
