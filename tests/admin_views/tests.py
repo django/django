@@ -1804,8 +1804,8 @@ class AdminViewDeletedObjectsTest(TestCase):
 
         """
         plot = Plot.objects.get(pk=3)
-        FunkyTag.objects.create(content_object=plot, name='hott')
-        should_contain = """<li>Funky tag: <a href="/test_admin/admin/admin_views/funkytag/1/">hott"""
+        tag = FunkyTag.objects.create(content_object=plot, name='hott')
+        should_contain = """<li>Funky tag: <a href="/test_admin/admin/admin_views/funkytag/%s/">hott""" % tag.id
         response = self.client.get('/test_admin/admin/admin_views/plot/%s/delete/' % quote(3))
         self.assertContains(response, should_contain)
 
