@@ -2011,7 +2011,7 @@ class SubqueryTests(TestCase):
         Related objects constraints can safely contain sliced subqueries.
         refs #22434
         """
-        generic = NamedCategory.objects.create(name="Generic")
+        generic = NamedCategory.objects.create(id=5, name="Generic")
         t1 = Tag.objects.create(name='t1', category=generic)
         t2 = Tag.objects.create(name='t2', category=generic)
         ManagedModel.objects.create(data='mm1', tag=t1, public=True)
