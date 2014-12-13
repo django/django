@@ -3,7 +3,7 @@ from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos import prototypes as capi
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 class Point(GEOSGeometry):
@@ -71,7 +71,7 @@ class Point(GEOSGeometry):
 
     def __iter__(self):
         "Allows iteration over coordinates of this Point."
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             yield self[i]
 
     def __len__(self):

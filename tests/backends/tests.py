@@ -26,7 +26,7 @@ from django.test import (TestCase, TransactionTestCase, mock, override_settings,
     skipUnlessDBFeature, skipIfDBFeature)
 from django.test.utils import str_prefix, IgnoreAllDeprecationWarningsMixin
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 from . import models
 
@@ -76,7 +76,7 @@ class OracleTests(unittest.TestCase):
         # than 4000 chars and read it properly
         with connection.cursor() as cursor:
             cursor.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-            long_str = ''.join(six.text_type(x) for x in xrange(4000))
+            long_str = ''.join(six.text_type(x) for x in range(4000))
             cursor.execute('INSERT INTO ltext VALUES (%s)', [long_str])
             cursor.execute('SELECT text FROM ltext')
             row = cursor.fetchone()

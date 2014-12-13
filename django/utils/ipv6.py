@@ -3,7 +3,7 @@
 # Licensed under the Apache License, Version 2.0 (the "License").
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 def clean_ipv6_address(ip_str, unpack_ipv4=False,
@@ -239,7 +239,7 @@ def _explode_shorthand_ip_string(ip_str):
         sep = len(hextet[0].split(':')) + len(hextet[1].split(':'))
         new_ip = hextet[0].split(':')
 
-        for __ in xrange(fill_to - sep):
+        for __ in range(fill_to - sep):
             new_ip.append('0000')
         new_ip += hextet[1].split(':')
 

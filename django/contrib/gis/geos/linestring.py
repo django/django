@@ -4,7 +4,7 @@ from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos import prototypes as capi
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 class LineString(GEOSGeometry):
@@ -40,7 +40,7 @@ class LineString(GEOSGeometry):
                 raise TypeError('Cannot initialize on empty sequence.')
             self._checkdim(ndim)
             # Incrementing through each of the coordinates and verifying
-            for i in xrange(1, ncoords):
+            for i in range(1, ncoords):
                 if not isinstance(coords[i], (tuple, list, Point)):
                     raise TypeError('each coordinate should be a sequence (list or tuple)')
                 if len(coords[i]) != ndim:
@@ -61,7 +61,7 @@ class LineString(GEOSGeometry):
         # set the points using GEOSCoordSeq.__setitem__().
         cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=bool(ndim == 3))
 
-        for i in xrange(ncoords):
+        for i in range(ncoords):
             if numpy_coords:
                 cs[i] = coords[i, :]
             elif isinstance(coords[i], Point):
@@ -78,7 +78,7 @@ class LineString(GEOSGeometry):
 
     def __iter__(self):
         "Allows iteration over this LineString."
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             yield self[i]
 
     def __len__(self):
@@ -128,7 +128,7 @@ class LineString(GEOSGeometry):
         Internal routine that returns a sequence (list) corresponding with
         the given function.  Will return a numpy array if possible.
         """
-        lst = [func(i) for i in xrange(len(self))]
+        lst = [func(i) for i in range(len(self))]
         if numpy:
             return numpy.array(lst)  # ARRRR!
         else:

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline, GMarker
 
@@ -192,7 +192,7 @@ class GoogleMapSet(GoogleMap):
             self.maps = args
 
         # Generating DOM ids for each of the maps in the set.
-        self.dom_ids = ['map%d' % i for i in xrange(len(self.maps))]
+        self.dom_ids = ['map%d' % i for i in range(len(self.maps))]
 
     def load_map_js(self):
         """

@@ -8,7 +8,7 @@ from django.contrib.gis.geos.base import GEOSBase, numpy
 from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
 from django.contrib.gis.geos.libgeos import CS_PTR
 from django.contrib.gis.geos import prototypes as capi
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 class GEOSCoordSeq(GEOSBase):
@@ -26,7 +26,7 @@ class GEOSCoordSeq(GEOSBase):
 
     def __iter__(self):
         "Iterates over each point in the coordinate sequence."
-        for i in xrange(self.size):
+        for i in range(self.size):
             yield self[i]
 
     def __len__(self):
@@ -151,7 +151,7 @@ class GEOSCoordSeq(GEOSBase):
         else:
             substr = '%s,%s,0 '
         return '<coordinates>%s</coordinates>' % \
-            ''.join(substr % self[i] for i in xrange(len(self))).strip()
+            ''.join(substr % self[i] for i in range(len(self))).strip()
 
     @property
     def tuple(self):
@@ -160,4 +160,4 @@ class GEOSCoordSeq(GEOSBase):
         if n == 1:
             return self[0]
         else:
-            return tuple(self[i] for i in xrange(n))
+            return tuple(self[i] for i in range(n))

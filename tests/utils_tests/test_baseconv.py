@@ -1,13 +1,13 @@
 from unittest import TestCase
 
 from django.utils.baseconv import base2, base16, base36, base56, base62, base64, BaseConverter
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 class TestBaseConv(TestCase):
 
     def test_baseconv(self):
-        nums = [-10 ** 10, 10 ** 10] + list(xrange(-100, 100))
+        nums = [-10 ** 10, 10 ** 10] + list(range(-100, 100))
         for converter in [base2, base16, base36, base56, base62, base64]:
             for i in nums:
                 self.assertEqual(i, converter.decode(converter.encode(i)))
