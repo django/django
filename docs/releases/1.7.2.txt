@@ -128,3 +128,8 @@ Bugfixes
 * Always converted ``related_name`` to text (unicode), since that is required
   on Python 3 for interpolation. Removed conversion of ``related_name`` to text
   in migration deconstruction (:ticket:`23455` and :ticket:`23982`).
+
+* Enlarged the sizes of tablespaces which are created by default for testing
+  on Oracle (the main tablespace was increased from 200M to 300M and the
+  temporary tablespace from 100M to 150M). This was required to accomodate
+  growth in Django's own test suite (:ticket:`23969`).
