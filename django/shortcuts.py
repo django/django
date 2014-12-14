@@ -3,8 +3,6 @@ This module collects helper functions and classes that "span" multiple levels
 of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
-import warnings
-
 from django.template import loader, RequestContext
 from django.template.context import _current_app_undefined
 from django.template.engine import (
@@ -16,44 +14,57 @@ from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.core import urlresolvers
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 
 
-def render_to_response(template_name, dictionary=_dictionary_undefined,
+def render_to_response(template_name, context=None,
                        context_instance=_context_instance_undefined,
-                       content_type=None, dirs=_dirs_undefined):
+                       content_type=None, status=None, dirs=_dirs_undefined,
+                       dictionary=_dictionary_undefined):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
-    # TODO: refactor to avoid the deprecated code path.
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
-        content = loader.render_to_string(template_name, dictionary, context_instance, dirs)
+    if (context_instance is _context_instance_undefined
+            and dirs is _dirs_undefined
+            and dictionary is _dictionary_undefined):
+        # No deprecated arguments were passed - use the new code path
+        content = loader.get_template(template_name).render(context)
 
-    return HttpResponse(content, content_type)
+    else:
+        # Some deprecated arguments were passed - use the legacy code path
+        content = loader.render_to_string(
+            template_name, context, context_instance, dirs, dictionary)
+
+    return HttpResponse(content, content_type, status)
 
 
-def render(request, template_name, dictionary=_dictionary_undefined,
+def render(request, template_name, context=None,
            context_instance=_context_instance_undefined,
            content_type=None, status=None, current_app=_current_app_undefined,
-           dirs=_dirs_undefined):
+           dirs=_dirs_undefined, dictionary=_dictionary_undefined):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     Uses a RequestContext by default.
     """
-    if context_instance is not _context_instance_undefined:
-        if current_app is not _current_app_undefined:
-            raise ValueError('If you provide a context_instance you must '
-                             'set its current_app before calling render()')
-    else:
-        context_instance = RequestContext(request, current_app=current_app)
+    if (context_instance is _context_instance_undefined
+            and current_app is _current_app_undefined
+            and dirs is _dirs_undefined
+            and dictionary is _dictionary_undefined):
+        # No deprecated arguments were passed - use the new code path
+        content = loader.get_template(template_name).render(context, request)
 
-    # TODO: refactor to avoid the deprecated code path.
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
-        content = loader.render_to_string(template_name, dictionary, context_instance, dirs)
+    else:
+        # Some deprecated arguments were passed - use the legacy code path
+        if context_instance is not _context_instance_undefined:
+            if current_app is not _current_app_undefined:
+                raise ValueError('If you provide a context_instance you must '
+                                 'set its current_app before calling render()')
+        else:
+            context_instance = RequestContext(request, current_app=current_app)
+
+        content = loader.render_to_string(
+            template_name, context, context_instance, dirs, dictionary)
 
     return HttpResponse(content, content_type, status)
 

@@ -93,6 +93,8 @@ details on these changes.
 * The ``dictionary`` and ``context_instance`` parameters for the following
   functions will be removed:
 
+  * ``django.shortcuts.render()``
+  * ``django.shortcuts.render_to_response()``
   * ``django.template.loader.render_to_string()``
 
 * The ``dirs`` parameter for the following functions will be removed:

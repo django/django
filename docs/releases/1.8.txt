@@ -1210,6 +1210,8 @@ now optional.
 The following functions will no longer accept the ``dictionary`` and
 ``context_instance`` parameters in Django 2.0:
 
+* ``django.shortcuts.render()``
+* ``django.shortcuts.render_to_response()``
 * ``django.template.loader.render_to_string()``
 
 Use the ``context`` parameter instead. When ``dictionary`` is passed as a

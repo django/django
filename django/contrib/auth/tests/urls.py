@@ -1,13 +1,12 @@
 from django.conf.urls import url, include
 from django.contrib import admin
-from django.contrib.auth import context_processors
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.urls import urlpatterns
 from django.contrib.auth import views
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.api import info
 from django.http import HttpResponse, HttpRequest
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import Template, RequestContext
 from django.views.decorators.cache import never_cache
 
@@ -27,39 +26,35 @@ def remote_user_auth_view(request):
 
 
 def auth_processor_no_attr_access(request):
-    render_to_response('context_processors/auth_attrs_no_access.html',
-        context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
+    render(request, 'context_processors/auth_attrs_no_access.html')
     # *After* rendering, we check whether the session was accessed
-    return render_to_response('context_processors/auth_attrs_test_access.html',
-        {'session_accessed': request.session.accessed})
+    return render(request,
+                  'context_processors/auth_attrs_test_access.html',
+                  {'session_accessed': request.session.accessed})
 
 
 def auth_processor_attr_access(request):
-    render_to_response('context_processors/auth_attrs_access.html',
-        context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
-    return render_to_response('context_processors/auth_attrs_test_access.html',
-        {'session_accessed': request.session.accessed})
+    render(request, 'context_processors/auth_attrs_access.html')
+    return render(request,
+                  'context_processors/auth_attrs_test_access.html',
+                  {'session_accessed': request.session.accessed})
 
 
 def auth_processor_user(request):
-    return render_to_response('context_processors/auth_attrs_user.html',
-        context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
+    return render(request, 'context_processors/auth_attrs_user.html')
 
 
 def auth_processor_perms(request):
-    return render_to_response('context_processors/auth_attrs_perms.html',
-        context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
+    return render(request, 'context_processors/auth_attrs_perms.html')
 
 
 def auth_processor_perm_in_perms(request):
-    return render_to_response('context_processors/auth_attrs_perm_in_perms.html',
-        context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
+    return render(request, 'context_processors/auth_attrs_perm_in_perms.html')
 
 
 def auth_processor_messages(request):
     info(request, "Message 1")
-    return render_to_response('context_processors/auth_attrs_messages.html',
-         context_instance=RequestContext(request, {}, processors=[context_processors.auth]))
+    return render(request, 'context_processors/auth_attrs_messages.html')
 
 
 def userpage(request):

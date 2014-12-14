@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import os
 import itertools
+import warnings
 
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template import TemplateSyntaxError, Context, Template
@@ -14,6 +15,7 @@ from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.template.response import SimpleTemplateResponse
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
 from django.http import HttpResponse
 from django.contrib.auth.signals import user_logged_out, user_logged_in
@@ -999,14 +1001,16 @@ class ContextTests(TestCase):
                          l.keys())
 
     def test_15368(self):
-        # Need to insert a context processor that assumes certain things about
-        # the request instance. This triggers a bug caused by some ways of
-        # copying RequestContext.
-        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=(
-            'test_client_regress.context_processors.special',
-        )):
-            response = self.client.get("/request_context_view/")
-            self.assertContains(response, 'Path: /request_context_view/')
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            # Need to insert a context processor that assumes certain things about
+            # the request instance. This triggers a bug caused by some ways of
+            # copying RequestContext.
+            with self.settings(TEMPLATE_CONTEXT_PROCESSORS=(
+                'test_client_regress.context_processors.special',
+            )):
+                response = self.client.get("/request_context_view/")
+                self.assertContains(response, 'Path: /request_context_view/')
 
     def test_nested_requests(self):
         """
