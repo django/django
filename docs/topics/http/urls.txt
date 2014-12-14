@@ -633,10 +633,16 @@ the fully qualified name into parts and then tries the following lookup:
 
 2. If there is a *current* application defined, Django finds and returns
    the URL resolver for that instance. The *current* application can be
-   specified as an attribute on the template context - applications that
-   expect to have multiple deployments should set the ``current_app``
-   attribute on any :class:`~django.template.Context` or
-   :class:`~django.template.RequestContext` that is used to render a template.
+   specified as an attribute on the request. Applications that expect to
+   have multiple deployments should set the ``current_app`` attribute on
+   the ``request`` being processed.
+
+   .. versionchanged:: 1.8
+
+      In previous versions of Django, you had to set the ``current_app``
+      attribute on any :class:`~django.template.Context` or
+      :class:`~django.template.RequestContext` that is used to render a
+      template.
 
    The current application can also be specified manually as an argument
    to the :func:`~django.core.urlresolvers.reverse` function.
@@ -707,10 +713,10 @@ Using this setup, the following lookups are possible:
     {% url 'polls:index' %}
 
   Note that reversing in the template requires the ``current_app`` be added as
-  an attribute to the template context like this::
+  an attribute to the ``request`` like this::
 
     def render_to_response(self, context, **response_kwargs):
-        response_kwargs['current_app'] = self.request.resolver_match.namespace
+        self.request.current_app = self.request.resolver_match.namespace
         return super(DetailView, self).render_to_response(context, **response_kwargs)
 
 * If there is no current instance - say, if we were rendering a page

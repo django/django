@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 
+from datetime import datetime
 import os
 import pickle
 import time
-from datetime import datetime
+import warnings
 
 from django.test import RequestFactory, SimpleTestCase
 from django.conf import settings
@@ -12,6 +13,7 @@ from django.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
 from django.test import override_settings
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 def test_processor(request):
@@ -252,11 +254,13 @@ class TemplateResponseTest(SimpleTestCase):
         self.assertEqual(response.status_code, 504)
 
     def test_custom_app(self):
-        response = self._response('{{ foo }}', current_app="foobar")
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            response = self._response('{{ foo }}', current_app="foobar")
 
         rc = response.resolve_context(response.context_data)
 
-        self.assertEqual(rc.current_app, 'foobar')
+        self.assertEqual(rc.request.current_app, 'foobar')
 
     def test_pickling(self):
         # Create a template response. The context is

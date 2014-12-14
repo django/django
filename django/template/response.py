@@ -1,6 +1,10 @@
+import warnings
+
 from django.http import HttpResponse
 from django.template import loader, Context, RequestContext
+from django.template.context import _current_app_undefined
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 class ContentNotRenderedError(Exception):
@@ -137,14 +141,19 @@ class TemplateResponse(SimpleTemplateResponse):
     rendering_attrs = SimpleTemplateResponse.rendering_attrs + ['_request', '_current_app']
 
     def __init__(self, request, template, context=None, content_type=None,
-            status=None, current_app=None, charset=None):
+            status=None, current_app=_current_app_undefined, charset=None):
         # self.request gets over-written by django.test.client.Client - and
         # unlike context_data and template_name the _request should not
         # be considered part of the public API.
         self._request = request
         # As a convenience we'll allow callers to provide current_app without
         # having to avoid needing to create the RequestContext directly
-        self._current_app = current_app
+        if current_app is not _current_app_undefined:
+            warnings.warn(
+                "The current_app argument of TemplateResponse is deprecated. "
+                "Set the current_app attribute of its request instead.",
+                RemovedInDjango20Warning, stacklevel=2)
+            request.current_app = current_app
         super(TemplateResponse, self).__init__(
             template, context, content_type, status, charset)
 
@@ -154,7 +163,7 @@ class TemplateResponse(SimpleTemplateResponse):
         """
         if isinstance(context, Context):
             return context
-        context_instance = RequestContext(self._request, current_app=self._current_app)
+        context_instance = RequestContext(self._request)
         if context:
             context_instance.push(context)
         return context_instance

@@ -54,7 +54,7 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'FOO.BAR../path/to/static/media/\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-        self.assertEqual(response.context.current_app, None)
+        self.assertFalse(hasattr(response.context.request, 'current_app'))
 
     def test_render_with_base_context(self):
         with warnings.catch_warnings():
@@ -79,7 +79,7 @@ class ShortcutTests(TestCase):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
             response = self.client.get('/render/current_app/')
-        self.assertEqual(response.context.current_app, "foobar_app")
+        self.assertEqual(response.context.request.current_app, "foobar_app")
 
     def test_render_with_dirs(self):
         with warnings.catch_warnings():
