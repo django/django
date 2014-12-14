@@ -11,12 +11,9 @@ from django.forms.models import BaseModelForm, _get_foreign_key, BaseModelFormSe
 
 
 def check_admin_app(**kwargs):
-    from django.contrib.admin.sites import site
+    from django.contrib.admin.sites import system_check_errors
 
-    return list(chain.from_iterable(
-        model_admin.check(model, **kwargs)
-        for model, model_admin in site._registry.items()
-    ))
+    return system_check_errors
 
 
 class BaseModelAdminChecks(object):

@@ -149,3 +149,5 @@ Bugfixes
 
 * Restored the ``pre_migrate`` signal if all apps have migrations
   (:ticket:`23975`).
+
+* Made admin system checks run for custom ``AdminSite``\s (:ticket:`23497`).
