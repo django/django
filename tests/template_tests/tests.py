@@ -258,7 +258,13 @@ class TemplateRegressionTests(SimpleTestCase):
         with self.assertRaises(urlresolvers.NoReverseMatch):
             t.render(c)
 
-    @override_settings(TEMPLATE_STRING_IF_INVALID='%s is invalid', SETTINGS_MODULE='also_something')
+    @override_settings(
+        TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {'string_if_invalid': '%s is invalid'},
+        }],
+        SETTINGS_MODULE='also_something',
+    )
     def test_url_reverse_view_name(self):
         # Regression test for #19827
         t = Template('{% url will_not_match %}')

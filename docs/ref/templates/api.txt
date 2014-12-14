@@ -171,7 +171,7 @@ straight lookups. Here are some things to keep in mind:
   ``silent_variable_failure`` whose value is ``True``. If the exception
   *does* have a ``silent_variable_failure`` attribute whose value is
   ``True``, the variable will render as the value of the
-  :setting:`TEMPLATE_STRING_IF_INVALID` setting (an empty string, by default).
+  ``string_if_invalid`` configuration option (an empty string, by default).
   Example::
 
     >>> t = Template("My name is {{ person.first_name }}.")
@@ -200,7 +200,7 @@ straight lookups. Here are some things to keep in mind:
   silently.
 
 * A variable can only be called if it has no required arguments. Otherwise,
-  the system will return the value of :setting:`TEMPLATE_STRING_IF_INVALID`.
+  the system will return the value of the ``string_if_invalid`` option.
 
 .. _alters-data-description:
 
@@ -217,7 +217,7 @@ straight lookups. Here are some things to keep in mind:
   To prevent this, set an ``alters_data`` attribute on the callable
   variable. The template system won't call a variable if it has
   ``alters_data=True`` set, and will instead replace the variable with
-  :setting:`TEMPLATE_STRING_IF_INVALID`, unconditionally.  The
+  ``string_if_invalid``, unconditionally.  The
   dynamically-generated :meth:`~django.db.models.Model.delete` and
   :meth:`~django.db.models.Model.save` methods on Django model objects get
   ``alters_data=True`` automatically. Example::
@@ -239,36 +239,34 @@ How invalid variables are handled
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Generally, if a variable doesn't exist, the template system inserts the
-value of the :setting:`TEMPLATE_STRING_IF_INVALID` setting, which is set to
+value of the ``string_if_invalid`` configuration option, which is set to
 ``''`` (the empty string) by default.
 
 Filters that are applied to an invalid variable will only be applied if
-:setting:`TEMPLATE_STRING_IF_INVALID` is set to ``''`` (the empty string). If
-:setting:`TEMPLATE_STRING_IF_INVALID` is set to any other value, variable
-filters will be ignored.
+``string_if_invalid`` is set to ``''`` (the empty string). If
+``string_if_invalid`` is set to any other value, variable filters will be
+ignored.
 
 This behavior is slightly different for the ``if``, ``for`` and ``regroup``
 template tags. If an invalid variable is provided to one of these template
 tags, the variable will be interpreted as ``None``. Filters are always
 applied to invalid variables within these template tags.
 
-If :setting:`TEMPLATE_STRING_IF_INVALID` contains a ``'%s'``, the format marker will
-be replaced with the name of the invalid variable.
+If ``string_if_invalid`` contains a ``'%s'``, the format marker will be
+replaced with the name of the invalid variable.
 
 .. admonition:: For debug purposes only!
 
-    While :setting:`TEMPLATE_STRING_IF_INVALID` can be a useful debugging tool,
-    it is a bad idea to turn it on as a 'development default'.
+    While ``string_if_invalid`` can be a useful debugging tool, it is a bad
+    idea to turn it on as a 'development default'.
 
-    Many templates, including those in the Admin site, rely upon the
-    silence of the template system when a non-existent variable is
-    encountered. If you assign a value other than ``''`` to
-    :setting:`TEMPLATE_STRING_IF_INVALID`, you will experience rendering
-    problems with these templates and sites.
+    Many templates, including those in the Admin site, rely upon the silence
+    of the template system when a non-existent variable is encountered. If you
+    assign a value other than ``''`` to ``string_if_invalid``, you will
+    experience rendering problems with these templates and sites.
 
-    Generally, :setting:`TEMPLATE_STRING_IF_INVALID` should only be enabled
-    in order to debug a specific template problem, then cleared
-    once debugging is complete.
+    Generally, ``string_if_invalid`` should only be enabled in order to debug
+    a specific template problem, then cleared once debugging is complete.
 
 Builtin variables
 ~~~~~~~~~~~~~~~~~

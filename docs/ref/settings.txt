@@ -2452,6 +2452,11 @@ TEMPLATE_STRING_IF_INVALID
 
 Default: ``''`` (Empty string)
 
+.. deprecated:: 1.8
+
+    Set the ``'string_if_invalid'`` option in the :setting:`OPTIONS
+    <TEMPLATES-OPTIONS>` of a ``DjangoTemplates`` backend instead.
+
 Output, as a string, that the template system should use for invalid (e.g.
 misspelled) variables. See :ref:`invalid-template-variables`.
 
