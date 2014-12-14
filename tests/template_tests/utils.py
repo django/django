@@ -22,14 +22,14 @@ def setup(templates, *args):
     """
     Runs test method multiple times in the following order:
 
-    TEMPLATE_DEBUG      CACHED      TEMPLATE_STRING_IF_INVALID
-    --------------      ------      --------------------------
-    False               False
-    False               True
-    False               False       INVALID
-    False               True        INVALID
-    True                False
-    True                True
+    debug       cached      string_if_invalid
+    -----       ------      -----------------
+    False       False
+    False       True
+    False       False       INVALID
+    False       True        INVALID
+    True        False
+    True        True
     """
 
     for arg in args:

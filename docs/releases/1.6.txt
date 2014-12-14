@@ -233,7 +233,7 @@ Minor features
   PostgreSQL.
 
 * The :ttag:`blocktrans` template tag now respects
-  :setting:`TEMPLATE_STRING_IF_INVALID` for variables not present in the
+  ``TEMPLATE_STRING_IF_INVALID`` for variables not present in the
   context, just like other template constructs.
 
 * ``SimpleLazyObject``\s will now present more helpful representations in shell
