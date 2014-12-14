@@ -1204,6 +1204,21 @@ to construct the "view on site" URL. This URL is now accessible using the
 sure to provide a default value for the ``form_class`` argument since it's
 now optional.
 
+``current_app`` argument of template-related APIs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following functions and classes will no longer accept a ``current_app``
+parameter to set an URL namespace in Django 2.0:
+
+* ``django.shortcuts.render()``
+* ``django.template.Context()``
+* ``django.template.RequestContext()``
+* ``django.template.response.TemplateResponse()``
+
+Set ``request.current_app`` instead, where ``request`` is the first argument
+to these functions or classes. If you're using a plain ``Context``, use a
+``RequestContext`` instead.
+
 ``dictionary`` and ``context_instance`` arguments of rendering functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

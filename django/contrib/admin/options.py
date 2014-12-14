@@ -1120,11 +1120,13 @@ class ModelAdmin(BaseModelAdmin):
         else:
             form_template = self.change_form_template
 
+        request.current_app = self.admin_site.name
+
         return TemplateResponse(request, form_template or [
             "admin/%s/%s/change_form.html" % (app_label, opts.model_name),
             "admin/%s/change_form.html" % app_label,
             "admin/change_form.html"
-        ], context, current_app=self.admin_site.name)
+        ], context)
 
     def response_add(self, request, obj, post_url_continue=None):
         """
@@ -1349,12 +1351,14 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.model._meta
         app_label = opts.app_label
 
+        request.current_app = self.admin_site.name
+
         return TemplateResponse(request,
             self.delete_confirmation_template or [
                 "admin/{}/{}/delete_confirmation.html".format(app_label, opts.model_name),
                 "admin/{}/delete_confirmation.html".format(app_label),
                 "admin/delete_confirmation.html"
-            ], context, current_app=self.admin_site.name)
+            ], context)
 
     def get_inline_formsets(self, request, formsets, inline_instances,
                             obj=None):
@@ -1632,11 +1636,13 @@ class ModelAdmin(BaseModelAdmin):
         )
         context.update(extra_context or {})
 
+        request.current_app = self.admin_site.name
+
         return TemplateResponse(request, self.change_list_template or [
             'admin/%s/%s/change_list.html' % (app_label, opts.model_name),
             'admin/%s/change_list.html' % app_label,
             'admin/change_list.html'
-        ], context, current_app=self.admin_site.name)
+        ], context)
 
     @csrf_protect_m
     @transaction.atomic
@@ -1723,11 +1729,14 @@ class ModelAdmin(BaseModelAdmin):
             preserved_filters=self.get_preserved_filters(request),
         )
         context.update(extra_context or {})
+
+        request.current_app = self.admin_site.name
+
         return TemplateResponse(request, self.object_history_template or [
             "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
-        ], context, current_app=self.admin_site.name)
+        ], context)
 
     def _create_formsets(self, request, obj, change):
         "Helper function to generate formsets for add/change_view."

@@ -90,6 +90,14 @@ details on these changes.
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` will
   be removed.
 
+* The ``current_app`` parameter for the following function and classes will be
+  removed:
+
+  * ``django.shortcuts.render()``
+  * ``django.template.Context()``
+  * ``django.template.RequestContext()``
+  * ``django.template.response.TemplateResponse()``
+
 * The ``dictionary`` and ``context_instance`` parameters for the following
   functions will be removed:
 

@@ -3,6 +3,9 @@ This module collects helper functions and classes that "span" multiple levels
 of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
+
+import warnings
+
 from django.template import loader, RequestContext
 from django.template.context import _current_app_undefined
 from django.template.engine import (
@@ -14,6 +17,7 @@ from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.core import urlresolvers
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 def render_to_response(template_name, context=None,
@@ -61,7 +65,16 @@ def render(request, template_name, context=None,
                 raise ValueError('If you provide a context_instance you must '
                                  'set its current_app before calling render()')
         else:
-            context_instance = RequestContext(request, current_app=current_app)
+            context_instance = RequestContext(request)
+            if current_app is not _current_app_undefined:
+                warnings.warn(
+                    "The current_app argument of render is deprecated. "
+                    "Set the current_app attribute of request instead.",
+                    RemovedInDjango20Warning, stacklevel=2)
+                request.current_app = current_app
+                # Directly set the private attribute to avoid triggering the
+                # warning in RequestContext.__init__.
+                context_instance._current_app = current_app
 
         content = loader.render_to_string(
             template_name, context, context_instance, dirs, dictionary)

@@ -1,4 +1,7 @@
 from copy import copy
+import warnings
+
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 # Hard-coded processor for easier use of CSRF protection.
@@ -122,15 +125,22 @@ class Context(BaseContext):
     def __init__(self, dict_=None, autoescape=True,
             current_app=_current_app_undefined,
             use_l10n=None, use_tz=None, engine=None):
-        if current_app is _current_app_undefined:
-            current_app = None
+        if current_app is not _current_app_undefined:
+            warnings.warn(
+                "The current_app argument of Context is deprecated. Use "
+                "RequestContext and set the current_app attribute of its "
+                "request instead.", RemovedInDjango20Warning, stacklevel=2)
         self.autoescape = autoescape
-        self.current_app = current_app
+        self._current_app = current_app
         self.use_l10n = use_l10n
         self.use_tz = use_tz
         self.engine = engine
         self.render_context = RenderContext()
         super(Context, self).__init__(dict_)
+
+    @property
+    def current_app(self):
+        return None if self._current_app is _current_app_undefined else self._current_app
 
     def __copy__(self):
         duplicate = super(Context, self).__copy__()
@@ -184,9 +194,17 @@ class RequestContext(Context):
     def __init__(self, request, dict_=None, processors=None,
             current_app=_current_app_undefined,
             use_l10n=None, use_tz=None, engine=None):
-        Context.__init__(self, dict_, current_app=current_app,
-                use_l10n=use_l10n, use_tz=use_tz, engine=engine)
-        self._request = request
+        # current_app isn't passed here to avoid triggering the deprecation
+        # warning in Context.__init__.
+        super(RequestContext, self).__init__(
+            dict_, use_l10n=use_l10n, use_tz=use_tz, engine=engine)
+        if current_app is not _current_app_undefined:
+            warnings.warn(
+                "The current_app argument of RequestContext is deprecated. "
+                "Set the current_app attribute of its request instead.",
+                RemovedInDjango20Warning, stacklevel=2)
+        self._current_app = current_app
+        self.request = request
         self._processors = () if processors is None else tuple(processors)
         self._processors_index = len(self.dicts)
         self.update({})         # placeholder for context processors output
@@ -207,7 +225,7 @@ class RequestContext(Context):
                 # Set context processors for this engine.
                 updates = {}
                 for processor in engine.template_context_processors + self._processors:
-                    updates.update(processor(self._request))
+                    updates.update(processor(self.request))
                 self.dicts[self._processors_index] = updates
 
     def new(self, values=None):
