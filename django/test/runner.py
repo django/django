@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
+from django.utils.datastructures import OrderedSet
 
 
 class DiscoverRunner(object):
@@ -231,11 +232,12 @@ def reorder_suite(suite, classes, reverse=False):
     """
     class_count = len(classes)
     suite_class = type(suite)
-    bins = [suite_class() for i in range(class_count + 1)]
+    bins = [OrderedSet() for i in range(class_count + 1)]
     partition_suite(suite, classes, bins, reverse=reverse)
-    for i in range(class_count):
-        bins[0].addTests(bins[i + 1])
-    return bins[0]
+    reordered_suite = suite_class()
+    for i in range(class_count + 1):
+        reordered_suite.addTests(bins[i])
+    return reordered_suite
 
 
 def partition_suite(suite, classes, bins, reverse=False):
@@ -258,12 +260,10 @@ def partition_suite(suite, classes, bins, reverse=False):
         else:
             for i in range(len(classes)):
                 if isinstance(test, classes[i]):
-                    if test not in bins[i]:
-                        bins[i].addTest(test)
+                    bins[i].add(test)
                     break
             else:
-                if test not in bins[-1]:
-                    bins[-1].addTest(test)
+                bins[-1].add(test)
 
 
 def setup_databases(verbosity, interactive, keepdb=False, **kwargs):
