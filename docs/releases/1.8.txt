@@ -291,6 +291,9 @@ Forms
 * You can now pass a callable that returns an iterable of choices when
   instantiating a :class:`~django.forms.ChoiceField`.
 
+* :class:`~django.forms.SlugField` now accepts a
+  :attr:`~django.forms.SlugField.unicode` argument to create unicode slugs.
+
 Generic Views
 ^^^^^^^^^^^^^
 
@@ -431,6 +434,9 @@ Models
 * You can now get the set of deferred fields for a model using
   :meth:`Model.get_deferred_fields() <django.db.models.Model.get_deferred_fields>`.
 
+* :class:`~django.models.SlugField` now accepts a
+  :attr:`~django.models.SlugField.unicode` argument to create unicode slugs.
+
 Signals
 ^^^^^^^
 
@@ -539,7 +545,8 @@ Tests
 Validators
 ^^^^^^^^^^
 
-* ...
+* :mod:`~django.core.validators` module now has a
+  :func:`~django.core.validators.validate_unicode_slug` validator.
 
 Backwards incompatible changes in 1.8
 =====================================

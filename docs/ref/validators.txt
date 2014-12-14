@@ -178,6 +178,15 @@ to, or in lieu of custom ``field.clean()`` methods.
     A :class:`RegexValidator` instance that ensures a value consists of only
     letters, numbers, underscores or hyphens.
 
+``validate_unicode_slug``
+-------------------------
+.. data:: validate_slug
+
+    .. versionadded:: 1.8
+
+    A :class:`RegexValidator` instance that ensures a value consists of only
+    unicode letters, numbers, underscores or hyphens.
+
 ``validate_ipv4_address``
 -------------------------
 .. data:: validate_ipv4_address

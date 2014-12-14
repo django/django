@@ -14,7 +14,7 @@ from django.core.validators import (
     MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
     validate_comma_separated_integer_list, validate_email, validate_integer,
     validate_ipv46_address, validate_ipv4_address, validate_ipv6_address,
-    validate_slug,
+    validate_slug, validate_unicode_slug,
 )
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
@@ -78,13 +78,33 @@ TEST_DATA = [
     (validate_slug, 'longer-slug-still-ok', None),
     (validate_slug, '--------', None),
     (validate_slug, 'nohyphensoranything', None),
+    (validate_slug, 'a', None),
+    (validate_slug, '1', None),
+    (validate_slug, 'a1', None),
 
     (validate_slug, '', ValidationError),
     (validate_slug, ' text ', ValidationError),
     (validate_slug, ' ', ValidationError),
     (validate_slug, 'some@mail.com', ValidationError),
     (validate_slug, '你好', ValidationError),
+    (validate_slug, '你 好', ValidationError),
     (validate_slug, '\n', ValidationError),
+
+    (validate_unicode_slug, 'slug-ok', None),
+    (validate_unicode_slug, 'longer-slug-still-ok', None),
+    (validate_unicode_slug, '--------', None),
+    (validate_unicode_slug, 'nohyphensoranything', None),
+    (validate_unicode_slug, 'a', None),
+    (validate_unicode_slug, '1', None),
+    (validate_unicode_slug, 'a1', None),
+    (validate_unicode_slug, '你好', None),
+
+    (validate_unicode_slug, '', ValidationError),
+    (validate_unicode_slug, ' text ', ValidationError),
+    (validate_unicode_slug, ' ', ValidationError),
+    (validate_unicode_slug, 'some@mail.com', ValidationError),
+    (validate_unicode_slug, '\n', ValidationError),
+    (validate_unicode_slug, '你 好', ValidationError),
 
     (validate_ipv4_address, '1.1.1.1', None),
     (validate_ipv4_address, '255.0.0.0', None),

@@ -80,6 +80,10 @@ class BigS(models.Model):
     s = models.SlugField(max_length=255)
 
 
+class UnicodeSlugField(models.Model):
+    s = models.SlugField(max_length=255, unicode=True)
+
+
 class SmallIntegerModel(models.Model):
     value = models.SmallIntegerField()
 
