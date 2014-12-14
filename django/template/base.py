@@ -1257,7 +1257,7 @@ class Library(object):
         else:
             raise TemplateSyntaxError("Invalid arguments provided to assignment_tag")
 
-    def inclusion_tag(self, file_name, context_class=Context, takes_context=False, name=None):
+    def inclusion_tag(self, file_name, takes_context=False, name=None):
         def dec(func):
             params, varargs, varkw, defaults = getargspec(func)
 
@@ -1277,13 +1277,7 @@ class Library(object):
                         else:
                             t = context.engine.get_template(file_name)
                         self.nodelist = t.nodelist
-                    new_context = context_class(_dict, **{
-                        'autoescape': context.autoescape,
-                        'current_app': context.current_app,
-                        'use_l10n': context.use_l10n,
-                        'use_tz': context.use_tz,
-                        'engine': context.engine,
-                    })
+                    new_context = context.new(_dict)
                     # Copy across the CSRF token, if present, because
                     # inclusion tags are often used for forms, and we need
                     # instructions for using CSRF protection to be as simple
