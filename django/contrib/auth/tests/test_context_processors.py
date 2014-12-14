@@ -65,6 +65,10 @@ class PermWrapperTests(TestCase):
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
+    TEMPLATE_CONTEXT_PROCESSORS=(
+        'django.contrib.auth.context_processors.auth',
+        'django.contrib.messages.context_processors.messages'
+    ),
     ROOT_URLCONF='django.contrib.auth.tests.urls',
     USE_TZ=False,                           # required for loading the fixture
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
@@ -80,9 +84,6 @@ class AuthContextProcessorTests(TestCase):
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
         ),
-        TEMPLATE_CONTEXT_PROCESSORS=(
-            'django.contrib.auth.context_processors.auth',
-        ),
     )
     def test_session_not_accessed(self):
         """
@@ -96,9 +97,6 @@ class AuthContextProcessorTests(TestCase):
         MIDDLEWARE_CLASSES=(
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
-        ),
-        TEMPLATE_CONTEXT_PROCESSORS=(
-            'django.contrib.auth.context_processors.auth',
         ),
     )
     def test_session_is_accessed(self):

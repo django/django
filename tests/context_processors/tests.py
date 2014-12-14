@@ -4,7 +4,10 @@ Tests for Django's bundled context processors.
 from django.test import TestCase, override_settings
 
 
-@override_settings(ROOT_URLCONF='context_processors.urls')
+@override_settings(
+    ROOT_URLCONF='context_processors.urls',
+    TEMPLATE_CONTEXT_PROCESSORS=('django.template.context_processors.request',),
+)
 class RequestContextProcessorTests(TestCase):
     """
     Tests for the ``django.template.context_processors.request`` processor.
@@ -35,7 +38,12 @@ class RequestContextProcessorTests(TestCase):
         self.assertContains(response, url)
 
 
-@override_settings(ROOT_URLCONF='context_processors.urls', DEBUG=True, INTERNAL_IPS=('127.0.0.1',))
+@override_settings(
+    DEBUG=True,
+    INTERNAL_IPS=('127.0.0.1',),
+    ROOT_URLCONF='context_processors.urls',
+    TEMPLATE_CONTEXT_PROCESSORS=('django.template.context_processors.debug',),
+)
 class DebugContextProcessorTests(TestCase):
     """
     Tests for the ``django.template.context_processors.debug`` processor.

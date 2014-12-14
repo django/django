@@ -17,7 +17,9 @@ class ShortcutTests(TestCase):
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
     def test_render_to_response_with_request_context(self):
-        response = self.client.get('/render_to_response/request_context/')
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            response = self.client.get('/render_to_response/request_context/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'FOO.BAR../path/to/static/media/\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
@@ -42,7 +44,9 @@ class ShortcutTests(TestCase):
         RequestContext instance in the dictionary argument instead of the
         context_instance argument.
         """
-        response = self.client.get('/render_to_response/context_instance_misuse/')
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            response = self.client.get('/render_to_response/context_instance_misuse/')
         self.assertContains(response, 'context processor output')
 
     def test_render(self):
@@ -53,7 +57,9 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.context.current_app, None)
 
     def test_render_with_base_context(self):
-        response = self.client.get('/render/base_context/')
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            response = self.client.get('/render/base_context/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'FOO.BAR..\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
@@ -70,7 +76,9 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.content, b'FOO.BAR../path/to/static/media/\n')
 
     def test_render_with_current_app(self):
-        response = self.client.get('/render/current_app/')
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            response = self.client.get('/render/current_app/')
         self.assertEqual(response.context.current_app, "foobar_app")
 
     def test_render_with_dirs(self):
@@ -83,4 +91,6 @@ class ShortcutTests(TestCase):
 
     def test_render_with_current_app_conflict(self):
         with self.assertRaises(ValueError):
-            self.client.get('/render/current_app_conflict/')
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+                self.client.get('/render/current_app_conflict/')
