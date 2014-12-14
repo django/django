@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 
 from unittest import TestCase
+import warnings
 
 from django import template
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .templatetags import custom
 
@@ -253,8 +255,10 @@ class CustomTagTests(TestCase):
         t = template.Template('{% load custom %}{% inclusion_tag_current_app %}')
         self.assertEqual(t.render(c).strip(), 'None')
 
-        c.current_app = 'advanced'
-        self.assertEqual(t.render(c).strip(), 'advanced')
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            c = template.Context({}, current_app='advanced')
+            self.assertEqual(t.render(c).strip(), 'advanced')
 
     def test_15070_use_l10n(self):
         """

@@ -436,9 +436,11 @@ class AdminSite(object):
             app_list=app_list,
         )
         context.update(extra_context or {})
+
+        request.current_app = self.name
+
         return TemplateResponse(request, self.index_template or
-                                'admin/index.html', context,
-                                current_app=self.name)
+                                'admin/index.html', context)
 
     def app_index(self, request, app_label, extra_context=None):
         app_name = apps.get_app_config(app_label).verbose_name
@@ -494,10 +496,12 @@ class AdminSite(object):
         )
         context.update(extra_context or {})
 
+        request.current_app = self.name
+
         return TemplateResponse(request, self.app_index_template or [
             'admin/%s/app_index.html' % app_label,
             'admin/app_index.html'
-        ], context, current_app=self.name)
+        ], context)
 
 # This global object represents the default admin site, for the common case.
 # You can instantiate AdminSite in your own code to create a custom admin site.
