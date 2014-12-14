@@ -5,13 +5,14 @@
 # Jaehong Kim <mixe@korea.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeong Seongtae <magno79@gmail.com>, 2014
+# JuneHyeon Bae <devunt@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-08-23 14:10+0200\n"
-"PO-Revision-Date: 2014-08-24 08:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-12-14 04:22+0000\n"
+"Last-Translator: JuneHyeon Bae <devunt@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
 "ko/)\n"
 "MIME-Version: 1.0\n"
@@ -1242,41 +1243,41 @@ msgstr ","
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] "%d "
+msgstr[0] "%d년"
 
 #: utils/timesince.py:26
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "%d 2개월"
+msgstr[0] "%d개월"
 
 #: utils/timesince.py:27
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] "%d "
+msgstr[0] "%d주"
 
 #: utils/timesince.py:28
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%d "
+msgstr[0] "%d일"
 
 #: utils/timesince.py:29
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%d "
+msgstr[0] "%d시간"
 
 #: utils/timesince.py:30
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d "
+msgstr[0] "%d분"
 
 #: utils/timesince.py:46
 msgid "0 minutes"
-msgstr "0"
+msgstr "0분"
 
 #: views/csrf.py:105
 msgid "Forbidden"
