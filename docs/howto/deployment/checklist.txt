@@ -232,14 +232,6 @@ details about the default templates:
 * :ref:`http_forbidden_view`
 * :ref:`http_bad_request_view`
 
-Miscellaneous
-=============
-
-:setting:`ALLOWED_INCLUDE_ROOTS`
---------------------------------
-
-This setting is required if you're using the :ttag:`ssi` template tag.
-
 Python Options
 ==============
 

@@ -1014,6 +1014,14 @@ Related to the previous item, referencing views as strings in the ``url()``
 function is deprecated. Pass the callable view as described in the previous
 section instead.
 
+Template-related settings
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As a consequence of the multiple template engines refactor, several settings
+are deprecated in favor of :setting:`TEMPLATES`:
+
+* ``ALLOWED_INCLUDE_ROOTS``
+
 ``django.core.context_processors``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
