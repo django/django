@@ -996,8 +996,8 @@ file are evaluated as template code, within the current context::
     {% ssi '/home/html/ljworld.com/includes/right_generic.html' parsed %}
 
 Note that if you use ``{% ssi %}``, you'll need to define
-:setting:`ALLOWED_INCLUDE_ROOTS` in your Django settings, as a security
-measure.
+``'allowed_include_roots'`` in the :setting:`OPTIONS <TEMPLATES-OPTIONS>` of
+your template engine, as a security measure.
 
 .. note::
     With the :ttag:`ssi` tag and the ``parsed`` parameter
