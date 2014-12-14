@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from django.test import override_settings, TestCase
 
 from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
 
@@ -34,14 +34,16 @@ class ValidFormFieldsets(admin.ModelAdmin):
     )
 
 
+class MyAdmin(admin.ModelAdmin):
+    @classmethod
+    def check(cls, model, **kwargs):
+        return ['error!']
+
+
 class SystemChecksTestCase(TestCase):
 
+    @override_settings(DEBUG=True)
     def test_checks_are_performed(self):
-        class MyAdmin(admin.ModelAdmin):
-            @classmethod
-            def check(self, model, **kwargs):
-                return ['error!']
-
         admin.site.register(Song, MyAdmin)
         try:
             errors = checks.run_checks()
@@ -49,6 +51,22 @@ class SystemChecksTestCase(TestCase):
             self.assertEqual(errors, expected)
         finally:
             admin.site.unregister(Song)
+            admin.sites.system_check_errors = []
+
+    @override_settings(DEBUG=True)
+    def test_custom_adminsite(self):
+        class CustomAdminSite(admin.AdminSite):
+            pass
+
+        custom_site = CustomAdminSite()
+        custom_site.register(Song, MyAdmin)
+        try:
+            errors = checks.run_checks()
+            expected = ['error!']
+            self.assertEqual(errors, expected)
+        finally:
+            custom_site.unregister(Song)
+            admin.sites.system_check_errors = []
 
     def test_readonly_and_editable(self):
         class SongAdmin(admin.ModelAdmin):

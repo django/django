@@ -14,6 +14,8 @@ from django.utils.translation import ugettext_lazy, ugettext as _
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 
+system_check_errors = []
+
 
 class AlreadyRegistered(Exception):
     pass
@@ -96,7 +98,7 @@ class AdminSite(object):
                     admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
                 if admin_class is not ModelAdmin and settings.DEBUG:
-                    admin_class.check(model)
+                    system_check_errors.extend(admin_class.check(model))
 
                 # Instantiate the admin class to save in the registry
                 self._registry[model] = admin_class(model, self)
