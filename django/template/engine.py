@@ -36,7 +36,11 @@ class Engine(object):
         else:
             if app_dirs:
                 raise ImproperlyConfigured(
-                    "APP_DIRS must not be set when LOADERS is defined.")
+                    "app_dirs must not be set when loaders is defined.")
+
+        if isinstance(allowed_include_roots, six.string_types):
+            raise ImproperlyConfigured(
+                "allowed_include_roots must be a tuple, not a string.")
 
         self.dirs = dirs
         self.app_dirs = app_dirs
