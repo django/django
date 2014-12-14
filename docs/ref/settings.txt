@@ -123,6 +123,11 @@ ALLOWED_INCLUDE_ROOTS
 
 Default: ``()`` (Empty tuple)
 
+.. deprecated:: 1.8
+
+    Set the ``'allowed_include_roots'`` option in the :setting:`OPTIONS
+    <TEMPLATES-OPTIONS>` of a ``DjangoTemplates`` backend instead.
+
 A tuple of strings representing allowed prefixes for the ``{% ssi %}`` template
 tag. This is a security measure, so that template authors can't access files
 that they shouldn't be accessing.

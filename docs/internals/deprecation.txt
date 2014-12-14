@@ -87,6 +87,10 @@ details on these changes.
 * The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
   defined with no default value for its ``form_class`` argument will be removed.
 
+* The following settings will be removed:
+
+  * ``ALLOWED_INCLUDE_ROOTS``
+
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` will
   be removed.
 
