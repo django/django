@@ -1196,4 +1196,4 @@ class SchemaTests(TransactionTestCase):
         with connection.cursor() as cursor:
             cursor.execute("SELECT surname FROM schema_author;")
             item = cursor.fetchall()[0]
-            self.assertEqual(item[0], '')
+            self.assertEqual(item[0], None if connection.features.interprets_empty_strings_as_nulls else '')
