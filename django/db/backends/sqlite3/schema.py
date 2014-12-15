@@ -69,8 +69,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Add in any created fields
         for field in create_fields:
             body[field.name] = field
-            # If there's a default, insert it into the copy map
-            if field.has_default():
+            # Choose a default and insert it into the copy map
+            if not isinstance(field, ManyToManyField):
                 mapping[field.column] = self.quote_value(
                     self.effective_default(field)
                 )

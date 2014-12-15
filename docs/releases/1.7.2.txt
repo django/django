@@ -135,3 +135,8 @@ Bugfixes
   growth in Django's own test suite (:ticket:`23969`).
 
 * Fixed timesince filter translations in Korean (:ticket:`23989`).
+
+* Fixed the SQLite ``SchemaEditor`` to properly add defaults in the absence of
+  a user specified ``default``. For example, a ``CharField`` with ``blank=True``
+  didn't set existing rows to an empty string which resulted in a crash when
+  adding the ``NOT NULL`` constraint (:ticket:`23987`).
