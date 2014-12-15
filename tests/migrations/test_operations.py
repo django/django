@@ -9,11 +9,12 @@ except ImportError:
 
 from django import test
 from django.db import connection, migrations, models
+from django.db import OperationalError, ProgrammingError
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
-from django.db.utils import IntegrityError, DatabaseError
+from django.db.utils import IntegrityError
 from django.test import override_settings
 from django.utils import six
 
@@ -55,30 +56,17 @@ class OperationTestBase(MigrationTestBase):
         Creates a test model state and database table.
         """
         # Delete the tables if they already exist
+        table_names = ['_pony_vans', '_pony', '_stable', '_van']
+        tables = [(app_label + table_name) for table_name in table_names]
         with connection.cursor() as cursor:
-            # Start with ManyToMany tables
-            try:
-                cursor.execute("DROP TABLE %s_pony_stables" % app_label)
-            except DatabaseError:
-                pass
-            try:
-                cursor.execute("DROP TABLE %s_pony_vans" % app_label)
-            except DatabaseError:
-                pass
+            for table in tables:
+                try:
+                    cursor.execute(connection.schema_editor().sql_delete_table % {
+                        "table": connection.ops.quote_name(table),
+                    })
+                except (OperationalError, ProgrammingError):
+                    pass
 
-            # Then standard model tables
-            try:
-                cursor.execute("DROP TABLE %s_pony" % app_label)
-            except DatabaseError:
-                pass
-            try:
-                cursor.execute("DROP TABLE %s_stable" % app_label)
-            except DatabaseError:
-                pass
-            try:
-                cursor.execute("DROP TABLE %s_van" % app_label)
-            except DatabaseError:
-                pass
         # Make the "current" state
         model_options = {
             "swappable": "TEST_SWAP_MODEL",
