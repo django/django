@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 
+from django.template.defaultfilters import add
 from django.test import SimpleTestCase
 
 from ..utils import render, setup
@@ -44,3 +45,9 @@ class AddTests(SimpleTestCase):
     def test_add07(self):
         output = render('add07', {'d': date(2000, 1, 1), 't': timedelta(10)})
         self.assertEqual(output, 'Jan. 11, 2000')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_add(self):
+        self.assertEqual(add('1', '2'), 3)
