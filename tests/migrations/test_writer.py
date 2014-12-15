@@ -19,9 +19,10 @@ from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import get_default_timezone, utc, FixedOffset
 
-from custom_managers import models as custom_manager_models
 import custom_migration_operations.operations
 import custom_migration_operations.more_operations
+
+from .models import FoodQuerySet, FoodManager
 
 
 class TestModel1(object):
@@ -356,8 +357,8 @@ class WriterTests(TestCase):
     def test_serialize_managers(self):
         self.assertSerializedEqual(models.Manager())
         self.assertSerializedResultEqual(
-            custom_manager_models.CustomQuerySet.as_manager(),
-            ('custom_managers.models.CustomQuerySet.as_manager()', {'import custom_managers.models'})
+            FoodQuerySet.as_manager(),
+            ('migrations.models.FoodQuerySet.as_manager()', {'import migrations.models'})
         )
-        self.assertSerializedEqual(custom_manager_models.DeconstructibleCustomManager('a', 'b'))
-        self.assertSerializedEqual(custom_manager_models.DeconstructibleCustomManager('x', 'y', c=3, d=4))
+        self.assertSerializedEqual(FoodManager('a', 'b'))
+        self.assertSerializedEqual(FoodManager('x', 'y', c=3, d=4))
