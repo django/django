@@ -131,10 +131,10 @@ Bugfixes
 
 * Enlarged the sizes of tablespaces which are created by default for testing
   on Oracle (the main tablespace was increased from 200M to 300M and the
-  temporary tablespace from 100M to 150M). This was required to accomodate
+  temporary tablespace from 100M to 150M). This was required to accommodate
   growth in Django's own test suite (:ticket:`23969`).
 
-* Fixed timesince filter translations in Korean (:ticket:`23989`).
+* Fixed ``timesince`` filter translations in Korean (:ticket:`23989`).
 
 * Fixed the SQLite ``SchemaEditor`` to properly add defaults in the absence of
   a user specified ``default``. For example, a ``CharField`` with ``blank=True``
