@@ -1,3 +1,4 @@
+from django.template.defaultfilters import striptags
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -27,3 +28,15 @@ class StriptagsTests(SimpleTestCase):
             },
         )
         self.assertEqual(output, 'x y x y')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_strip(self):
+        self.assertEqual(
+            striptags('some <b>html</b> with <script>alert("You smell")</script> disallowed <img /> tags'),
+            'some html with alert("You smell") disallowed  tags',
+        )
+
+    def test_non_string_input(self):
+        self.assertEqual(striptags(123), '123')

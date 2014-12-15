@@ -1,3 +1,4 @@
+from django.template.defaultfilters import linenumbers
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -28,3 +29,18 @@ class LinenumbersTests(SimpleTestCase):
         )
         self.assertEqual(output, '1. one\n2. <two>\n3. three '
                                  '1. one\n2. &lt;two&gt;\n3. three')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_linenumbers(self):
+        self.assertEqual(linenumbers('line 1\nline 2'), '1. line 1\n2. line 2')
+
+    def test_linenumbers2(self):
+        self.assertEqual(
+            linenumbers('\n'.join(['x'] * 10)),
+            '01. x\n02. x\n03. x\n04. x\n05. x\n06. x\n07. x\n08. x\n09. x\n10. x',
+        )
+
+    def test_non_string_input(self):
+        self.assertEqual(linenumbers(123), '1. 123')

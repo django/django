@@ -1,4 +1,9 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.template.defaultfilters import force_escape
 from django.test import SimpleTestCase
+from django.utils.safestring import SafeData
 
 from ..utils import render, setup
 
@@ -50,3 +55,17 @@ class ForceEscapeTests(SimpleTestCase):
     def test_force_escape08(self):
         output = render('force-escape08', {"a": "x&y"})
         self.assertEqual(output, "x&amp;y")
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_escape(self):
+        escaped = force_escape('<some html & special characters > here')
+        self.assertEqual(escaped, '&lt;some html &amp; special characters &gt; here')
+        self.assertIsInstance(escaped, SafeData)
+
+    def test_unicode(self):
+        self.assertEqual(
+            force_escape('<some html & special characters > here ĐÅ€£'),
+            '&lt;some html &amp; special characters &gt; here \u0110\xc5\u20ac\xa3',
+        )

@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 
+from django.template.defaultfilters import timeuntil_filter
+from django.test import SimpleTestCase
 from django.test.utils import requires_tz_support
 
 from .timezone_utils import TimezoneTestCase
@@ -92,3 +94,12 @@ class TimeuntilTests(TimezoneTestCase):
     def test_timeuntil14(self):
         output = render('timeuntil14', {'a': self.today, 'b': self.today - timedelta(hours=24)})
         self.assertEqual(output, '1\xa0day')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_until_now(self):
+        self.assertEqual(timeuntil_filter(datetime.now() + timedelta(1, 1)), '1\xa0day')
+
+    def test_explicit_date(self):
+        self.assertEqual(timeuntil_filter(datetime(2005, 12, 30), datetime(2005, 12, 29)), '1\xa0day')

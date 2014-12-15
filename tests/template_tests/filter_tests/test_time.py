@@ -1,5 +1,7 @@
 from datetime import time
 
+from django.template.defaultfilters import time as time_filter
+from django.test import SimpleTestCase
 from django.utils import timezone
 
 from .timezone_utils import TimezoneTestCase
@@ -40,3 +42,10 @@ class TimeTests(TimezoneTestCase):
     def test_time06(self):
         output = render('time06', {'obj': 'non-datetime-value'})
         self.assertEqual(output, '')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_inputs(self):
+        self.assertEqual(time_filter(time(13), 'h'), '01')
+        self.assertEqual(time_filter(time(0), 'h'), '12')

@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 
+from django.template.defaultfilters import timesince_filter
+from django.test import SimpleTestCase
 from django.test.utils import requires_tz_support
 
 from .timezone_utils import TimezoneTestCase
@@ -116,3 +118,12 @@ class TimesinceTests(TimezoneTestCase):
     def test_timesince18(self):
         output = render('timesince18', {'a': self.today, 'b': self.today + timedelta(hours=24)})
         self.assertEqual(output, '1\xa0day')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_since_now(self):
+        self.assertEqual(timesince_filter(datetime.now() - timedelta(1)), '1\xa0day')
+
+    def test_explicit_date(self):
+        self.assertEqual(timesince_filter(datetime(2005, 12, 29), datetime(2005, 12, 30)), '1\xa0day')

@@ -1,3 +1,4 @@
+from django.template.defaultfilters import escape
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -31,3 +32,9 @@ class EscapeTests(SimpleTestCase):
     def test_escape04(self):
         output = render('escape04', {"a": "x&y"})
         self.assertEqual(output, "x&amp;y")
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_non_string_input(self):
+        self.assertEqual(escape(123), '123')
