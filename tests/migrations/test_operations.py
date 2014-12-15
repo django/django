@@ -8,12 +8,12 @@ except ImportError:
     sqlparse = None
 
 from django import test
-from django.db import connection, migrations, models
+from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
-from django.db.utils import IntegrityError, DatabaseError
+from django.db.utils import IntegrityError
 from django.test import override_settings
 from django.utils import six
 
@@ -55,30 +55,25 @@ class OperationTestBase(MigrationTestBase):
         Creates a test model state and database table.
         """
         # Delete the tables if they already exist
-        with connection.cursor() as cursor:
+        table_names = [
             # Start with ManyToMany tables
-            try:
-                cursor.execute("DROP TABLE %s_pony_stables" % app_label)
-            except DatabaseError:
-                pass
-            try:
-                cursor.execute("DROP TABLE %s_pony_vans" % app_label)
-            except DatabaseError:
-                pass
-
+            '_pony_stables', '_pony_vans',
             # Then standard model tables
-            try:
-                cursor.execute("DROP TABLE %s_pony" % app_label)
-            except DatabaseError:
-                pass
-            try:
-                cursor.execute("DROP TABLE %s_stable" % app_label)
-            except DatabaseError:
-                pass
-            try:
-                cursor.execute("DROP TABLE %s_van" % app_label)
-            except DatabaseError:
-                pass
+            '_pony', '_stable', '_van',
+        ]
+        tables = [(app_label + table_name) for table_name in table_names]
+        with connection.cursor() as cursor:
+            table_names = connection.introspection.table_names(cursor)
+            connection.disable_constraint_checking()
+            sql_delete_table = connection.schema_editor().sql_delete_table
+            with transaction.atomic():
+                for table in tables:
+                    if table in table_names:
+                        cursor.execute(sql_delete_table % {
+                            "table": connection.ops.quote_name(table),
+                        })
+            connection.enable_constraint_checking()
+
         # Make the "current" state
         model_options = {
             "swappable": "TEST_SWAP_MODEL",
