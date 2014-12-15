@@ -620,7 +620,7 @@ class ImportedBackendTests(TestCase):
     as the one defined in AUTHENTICATION_BACKENDS setting.
     """
 
-    backend = 'django.contrib.auth.tests.ImportedModelBackend'
+    backend = 'django.contrib.auth.tests.backend_alias.ImportedModelBackend'
 
     @override_settings(AUTHENTICATION_BACKENDS=(backend, ))
     def test_backend_path(self):
