@@ -1,3 +1,4 @@
+from django.template.defaultfilters import center
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -16,3 +17,12 @@ class CenterTests(SimpleTestCase):
     def test_center02(self):
         output = render('center02', {"a": "a&b", "b": mark_safe("a&b")})
         self.assertEqual(output, ". a&amp;b . . a&b .")
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_center(self):
+        self.assertEqual(center('test', 6), ' test ')
+
+    def test_non_string_input(self):
+        self.assertEqual(center(123, 5), ' 123 ')
