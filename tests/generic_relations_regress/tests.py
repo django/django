@@ -228,7 +228,7 @@ class GenericRelationTests(TestCase):
         # then wrong results are produced here as the link to b will also match
         # (b and hs1 have equal pks).
         self.assertEqual(qs.count(), 1)
-        self.assertEqual(qs[0].links__sum, l.id)
+        self.assertEqual(qs[0].links__sum, hs1.id)
         l.delete()
         # Now if we don't have proper left join, we will not produce any
         # results at all here.
