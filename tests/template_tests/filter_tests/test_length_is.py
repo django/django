@@ -1,3 +1,4 @@
+from django.template.defaultfilters import length_is
 from django.test import SimpleTestCase
 
 from ..utils import render, setup
@@ -61,3 +62,14 @@ class LengthIsTests(SimpleTestCase):
     def test_length_is11(self):
         output = render('length_is11', {'none': None})
         self.assertEqual(output, '')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_empty_list(self):
+        self.assertEqual(length_is([], 0), True)
+        self.assertEqual(length_is([], 1), False)
+
+    def test_string(self):
+        self.assertEqual(length_is('a', 1), True)
+        self.assertEqual(length_is('a', 10), False)

@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.template.defaultfilters import iriencode, urlencode
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -28,3 +32,12 @@ class IriencodeTests(SimpleTestCase):
     def test_iriencode04(self):
         output = render('iriencode04', {'url': mark_safe('?test=1&me=2')})
         self.assertEqual(output, '?test=1&me=2')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_unicode(self):
+        self.assertEqual(iriencode('S\xf8r-Tr\xf8ndelag'), 'S%C3%B8r-Tr%C3%B8ndelag')
+
+    def test_urlencoded(self):
+        self.assertEqual(iriencode(urlencode('fran\xe7ois & jill')), 'fran%C3%A7ois%20%26%20jill')

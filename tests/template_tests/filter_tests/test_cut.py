@@ -1,3 +1,4 @@
+from django.template.defaultfilters import cut
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -37,3 +38,18 @@ class CutTests(SimpleTestCase):
     def test_cut06(self):
         output = render('cut06', {"a": "x&y", "b": mark_safe("x&amp;y")})
         self.assertEqual(output, "x&amp;y x&amp;ampy")
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_character(self):
+        self.assertEqual(cut('a string to be mangled', 'a'), ' string to be mngled')
+
+    def test_characters(self):
+        self.assertEqual(cut('a string to be mangled', 'ng'), 'a stri to be maled')
+
+    def test_non_matching_string(self):
+        self.assertEqual(cut('a string to be mangled', 'strings'), 'a string to be mangled')
+
+    def test_non_string_input(self):
+        self.assertEqual(cut(123, '2'), '13')

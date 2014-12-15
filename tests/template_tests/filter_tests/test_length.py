@@ -1,3 +1,4 @@
+from django.template.defaultfilters import length
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -41,3 +42,15 @@ class LengthTests(SimpleTestCase):
     def test_length07(self):
         output = render('length07', {'None': None})
         self.assertEqual(output, '0')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_string(self):
+        self.assertEqual(length('1234'), 4)
+
+    def test_safestring(self):
+        self.assertEqual(length(mark_safe('1234')), 4)
+
+    def test_list(self):
+        self.assertEqual(length([1, 2, 3, 4]), 4)

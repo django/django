@@ -1,5 +1,7 @@
 from datetime import datetime, time
 
+from django.template.defaultfilters import date
+from django.test import SimpleTestCase
 from django.utils import timezone
 
 from .timezone_utils import TimezoneTestCase
@@ -58,3 +60,12 @@ class DateTests(TimezoneTestCase):
     def test_date09(self):
         output = render('date09', {'t': time(0, 0)})
         self.assertEqual(output, '00:00')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_date(self):
+        self.assertEqual(date(datetime(2005, 12, 29), "d F Y"), '29 December 2005')
+
+    def test_escape_characters(self):
+        self.assertEqual(date(datetime(2005, 12, 29), r'jS \o\f F'), '29th of December')

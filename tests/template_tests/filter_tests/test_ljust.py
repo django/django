@@ -1,3 +1,4 @@
+from django.template.defaultfilters import ljust
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -15,3 +16,16 @@ class LjustTests(SimpleTestCase):
     def test_ljust02(self):
         output = render('ljust02', {"a": "a&b", "b": mark_safe("a&b")})
         self.assertEqual(output, ".a&amp;b  . .a&b  .")
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_ljust(self):
+        self.assertEqual(ljust('test', 10), 'test      ')
+        self.assertEqual(ljust('test', 3), 'test')
+
+    def test_less_than_string_length(self):
+        self.assertEqual(ljust('test', 3), 'test')
+
+    def test_non_string_input(self):
+        self.assertEqual(ljust(123, 4), '123 ')

@@ -1,3 +1,4 @@
+from django.template.defaultfilters import default
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -45,3 +46,15 @@ class DefaultIfNoneTests(SimpleTestCase):
     def test_default_if_none02(self):
         output = render('default_if_none02', {"a": None})
         self.assertEqual(output, "x<")
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_value(self):
+        self.assertEqual(default('val', 'default'), 'val')
+
+    def test_none(self):
+        self.assertEqual(default(None, 'default'), 'default')
+
+    def test_empty_string(self):
+        self.assertEqual(default('', 'default'), 'default')

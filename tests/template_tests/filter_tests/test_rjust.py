@@ -1,3 +1,4 @@
+from django.template.defaultfilters import rjust
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -15,3 +16,15 @@ class RjustTests(SimpleTestCase):
     def test_rjust02(self):
         output = render('rjust02', {"a": "a&b", "b": mark_safe("a&b")})
         self.assertEqual(output, ".  a&amp;b. .  a&b.")
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_rjust(self):
+        self.assertEqual(rjust('test', 10), '      test')
+
+    def test_less_than_string_length(self):
+        self.assertEqual(rjust('test', 3), 'test')
+
+    def test_non_string_input(self):
+        self.assertEqual(rjust(123, 4), ' 123')

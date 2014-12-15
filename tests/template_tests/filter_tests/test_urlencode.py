@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.template.defaultfilters import urlencode
 from django.test import SimpleTestCase
 
 from ..utils import render, setup
@@ -14,3 +18,12 @@ class UrlencodeTests(SimpleTestCase):
     def test_urlencode02(self):
         output = render('urlencode02', {'urlbit': 'escape/slash'})
         self.assertEqual(output, '/test/escape%2Fslash/')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_urlencode(self):
+        self.assertEqual(urlencode('fran\xe7ois & jill'), 'fran%C3%A7ois%20%26%20jill')
+
+    def test_non_string_input(self):
+        self.assertEqual(urlencode(1), '1')

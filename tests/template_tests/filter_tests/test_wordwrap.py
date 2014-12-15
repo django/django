@@ -1,3 +1,4 @@
+from django.template.defaultfilters import wordwrap
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -16,3 +17,27 @@ class WordwrapTests(SimpleTestCase):
     def test_wordwrap02(self):
         output = render('wordwrap02', {'a': 'a & b', 'b': mark_safe('a & b')})
         self.assertEqual(output, 'a &amp;\nb a &\nb')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_wrap(self):
+        self.assertEqual(
+            wordwrap('this is a long paragraph of text that really needs to be wrapped I\'m afraid', 14),
+            'this is a long\nparagraph of\ntext that\nreally needs\nto be wrapped\nI\'m afraid',
+        )
+
+    def test_indent(self):
+        self.assertEqual(
+            wordwrap('this is a short paragraph of text.\n  But this line should be indented', 14),
+            'this is a\nshort\nparagraph of\ntext.\n  But this\nline should be\nindented',
+        )
+
+    def test_indent2(self):
+        self.assertEqual(
+            wordwrap('this is a short paragraph of text.\n  But this line should be indented', 15),
+            'this is a short\nparagraph of\ntext.\n  But this line\nshould be\nindented',
+        )
+
+    def test_non_string_input(self):
+        self.assertEqual(wordwrap(123, 2), '123')

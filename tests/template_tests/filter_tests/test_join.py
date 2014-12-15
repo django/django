@@ -1,3 +1,4 @@
+from django.template.defaultfilters import join
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -47,3 +48,9 @@ class JoinTests(SimpleTestCase):
     def test_join08(self):
         output = render('join08', {'a': ['Alpha', 'Beta & me'], 'var': mark_safe(' & ')})
         self.assertEqual(output, 'alpha & beta &amp; me')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_list(self):
+        self.assertEqual(join([0, 1, 2], 'glue'), '0glue1glue2')

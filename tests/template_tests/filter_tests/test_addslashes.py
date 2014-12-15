@@ -1,3 +1,4 @@
+from django.template.defaultfilters import addslashes
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -15,3 +16,18 @@ class AddslashesTests(SimpleTestCase):
     def test_addslashes02(self):
         output = render('addslashes02', {"a": "<a>'", "b": mark_safe("<a>'")})
         self.assertEqual(output, r"&lt;a&gt;\&#39; <a>\'")
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_quotes(self):
+        self.assertEqual(
+            addslashes('"double quotes" and \'single quotes\''),
+            '\\"double quotes\\" and \\\'single quotes\\\'',
+        )
+
+    def test_backslashes(self):
+        self.assertEqual(addslashes(r'\ : backslashes, too'), '\\\\ : backslashes, too')
+
+    def test_non_string_input(self):
+        self.assertEqual(addslashes(123), '123')

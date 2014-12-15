@@ -1,3 +1,4 @@
+from django.template.defaultfilters import phone2numeric_filter
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -33,3 +34,9 @@ class Phone2numericTests(SimpleTestCase):
             output,
             '469 729672225-5867464 37647 226 53835 749 747833 49662787!'
         )
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_phone2numeric(self):
+        self.assertEqual(phone2numeric_filter('0800 flowers'), '0800 3569377')

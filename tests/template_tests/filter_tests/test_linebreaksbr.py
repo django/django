@@ -1,3 +1,4 @@
+from django.template.defaultfilters import linebreaksbr
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -20,3 +21,18 @@ class LinebreaksbrTests(SimpleTestCase):
     def test_linebreaksbr02(self):
         output = render('linebreaksbr02', {"a": "x&\ny", "b": mark_safe("x&\ny")})
         self.assertEqual(output, "x&<br />y x&<br />y")
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_newline(self):
+        self.assertEqual(linebreaksbr('line 1\nline 2'), 'line 1<br />line 2')
+
+    def test_carriage(self):
+        self.assertEqual(linebreaksbr('line 1\rline 2'), 'line 1<br />line 2')
+
+    def test_carriage_newline(self):
+        self.assertEqual(linebreaksbr('line 1\r\nline 2'), 'line 1<br />line 2')
+
+    def test_non_string_input(self):
+        self.assertEqual(linebreaksbr(123), '123')
