@@ -190,9 +190,6 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     def setUp(self):
         self.client.login(username="super", password="secret")
 
-    def tearDown(self):
-        self.client.logout()
-
     def test_changelist_ForeignKey(self):
         response = self.client.get('/admin_widgets/car/')
         self.assertContains(response, '/auth/user/add/')
@@ -205,9 +202,6 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
 
     def setUp(self):
         self.client.login(username="super", password="secret")
-
-    def tearDown(self):
-        self.client.logout()
 
     def test_nonexistent_target_id(self):
         band = models.Band.objects.create(name='Bogey Blues')
