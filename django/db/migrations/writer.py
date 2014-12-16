@@ -299,7 +299,9 @@ class MigrationWriter(object):
         # Times
         elif isinstance(value, datetime.time):
             value_repr = repr(value)
-            return value_repr, set(["import datetime"])
+            if isinstance(value, datetime_safe.time):
+                value_repr = "datetime.%s" % value_repr
+            return value_repr, {"import datetime"}
         # Settings references
         elif isinstance(value, SettingsReference):
             return "settings.%s" % value.setting_name, set(["from django.conf import settings"])
