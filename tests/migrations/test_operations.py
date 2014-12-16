@@ -1237,10 +1237,19 @@ class OperationTests(OperationTestBase):
         self.assertEqual(new_state.models["test_alorwrtto", "rider"].options.get("order_with_respect_to", None), "pony")
         # Make sure there's no matching index
         self.assertColumnNotExists("test_alorwrtto_rider", "_order")
+        # Create some rows before alteration
+        rendered_state = project_state.render()
+        pony = rendered_state.get_model("test_alorwrtto", "Pony").objects.create(weight=50)
+        rendered_state.get_model("test_alorwrtto", "Rider").objects.create(pony=pony, friend_id=1)
+        rendered_state.get_model("test_alorwrtto", "Rider").objects.create(pony=pony, friend_id=2)
         # Test the database alteration
         with connection.schema_editor() as editor:
             operation.database_forwards("test_alorwrtto", editor, project_state, new_state)
         self.assertColumnExists("test_alorwrtto_rider", "_order")
+        # Check for correct value in rows
+        updated_riders = new_state.render().get_model("test_alorwrtto", "Rider").objects.all()
+        self.assertEqual(updated_riders[0]._order, 0)
+        self.assertEqual(updated_riders[1]._order, 0)
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alorwrtto", editor, new_state, project_state)

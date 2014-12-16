@@ -404,6 +404,8 @@ class AlterOrderWithRespectTo(Operation):
             # it's likely a rename)
             elif to_model._meta.order_with_respect_to and not from_model._meta.order_with_respect_to:
                 field = to_model._meta.get_field_by_name("_order")[0]
+                if not field.has_default():
+                    field.default = 0
                 schema_editor.add_field(
                     from_model,
                     field,

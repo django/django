@@ -143,3 +143,6 @@ Bugfixes
 
 * ``makemigrations`` no longer prompts for a default value when adding
   ``TextField()`` or ``CharField()`` without a ``default`` (:ticket:`23405`).
+
+* Fixed migration crash when adding ``order_with_respect_to`` to a table
+  with existing rows (:ticket:`23983`).
