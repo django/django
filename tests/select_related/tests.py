@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
+from django.core.exceptions import FieldError
 
 from .models import (Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species, HybridSpecies,
                      Pizza, TaggedItem, Bookmark)
@@ -171,30 +172,30 @@ class SelectRelatedValidationTests(TestCase):
     invalid_error = "Invalid field name(s) given in select_related: '%s'"
 
     def test_non_relational_field(self):
-        with self.assertRaisesMessage(ValueError, self.non_relational_error % 'name'):
+        with self.assertRaisesMessage(FieldError, self.non_relational_error % 'name'):
             list(Species.objects.select_related('name__some_field'))
 
-        with self.assertRaisesMessage(ValueError, self.non_relational_error % 'name'):
+        with self.assertRaisesMessage(FieldError, self.non_relational_error % 'name'):
             list(Species.objects.select_related('name'))
 
     def test_many_to_many_field(self):
-        with self.assertRaisesMessage(ValueError, self.invalid_error % 'toppings'):
+        with self.assertRaisesMessage(FieldError, self.invalid_error % 'toppings'):
             list(Pizza.objects.select_related('toppings'))
 
     def test_reverse_relational_field(self):
-        with self.assertRaisesMessage(ValueError, self.invalid_error % 'child_1'):
+        with self.assertRaisesMessage(FieldError, self.invalid_error % 'child_1'):
             list(Species.objects.select_related('child_1'))
 
     def test_invalid_field(self):
-        with self.assertRaisesMessage(ValueError, self.invalid_error % 'invalid_field'):
+        with self.assertRaisesMessage(FieldError, self.invalid_error % 'invalid_field'):
             list(Species.objects.select_related('invalid_field'))
 
-        with self.assertRaisesMessage(ValueError, self.invalid_error % 'related_invalid_field'):
+        with self.assertRaisesMessage(FieldError, self.invalid_error % 'related_invalid_field'):
             list(Species.objects.select_related('genus__related_invalid_field'))
 
     def test_generic_relations(self):
-        with self.assertRaisesMessage(ValueError, self.invalid_error % 'tags'):
+        with self.assertRaisesMessage(FieldError, self.invalid_error % 'tags'):
             list(Bookmark.objects.select_related('tags'))
 
-        with self.assertRaisesMessage(ValueError, self.invalid_error % 'content_object'):
+        with self.assertRaisesMessage(FieldError, self.invalid_error % 'content_object'):
             list(TaggedItem.objects.select_related('content_object'))

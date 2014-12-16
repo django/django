@@ -627,7 +627,7 @@ class SQLCompiler(object):
                     # If a non-related field is used like a relation,
                     # or if a single non-relational field is given.
                     if next or (cur_depth == 1 and f.name in requested):
-                        raise ValueError("Non-relational field given in select_related: '%s'" % f.name)
+                        raise FieldError("Non-relational field given in select_related: '%s'" % f.name)
             else:
                 next = False
 
@@ -679,7 +679,7 @@ class SQLCompiler(object):
             fields_not_found = set(requested.keys()).difference(fields_found)
             if fields_not_found:
                 field_descriptions = ["'%s'" % s for s in fields_not_found]
-                raise ValueError('Invalid field name(s) given in select_related: %s' %
+                raise FieldError('Invalid field name(s) given in select_related: %s' %
                                  (', '.join(field_descriptions)))
 
     def deferred_to_columns(self):
