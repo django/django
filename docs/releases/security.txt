@@ -349,9 +349,9 @@ Additional hardening of redirect validation. `Full description <https://www.djan
 Versions affected
 -----------------
 
-    * Django 1.3: `(patch) <https://github.com/django/django/commit/1515eb46daa0897ba5ad5f0a2db8969255f1b343>`__
+* Django 1.3: `(patch) <https://github.com/django/django/commit/1515eb46daa0897ba5ad5f0a2db8969255f1b343>`__
 
-    * Django 1.4: `(patch) <https://github.com/django/django/commit/b2ae0a63aeec741f1e51bac9a95a27fd635f9652>`__
+* Django 1.4: `(patch) <https://github.com/django/django/commit/b2ae0a63aeec741f1e51bac9a95a27fd635f9652>`__
 
 February 19, 2013 - No CVE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
