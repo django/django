@@ -305,6 +305,8 @@ class MigrationWriter(object):
         # Times
         elif isinstance(value, datetime.time):
             value_repr = repr(value)
+            if isinstance(value, datetime_safe.time):
+                value_repr = "datetime.%s" % value_repr
             return value_repr, {"import datetime"}
         # Settings references
         elif isinstance(value, SettingsReference):
