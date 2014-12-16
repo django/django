@@ -22,9 +22,6 @@ class AdminCustomUrlsTest(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
 
-    def tearDown(self):
-        self.client.logout()
-
     def test_basic_add_GET(self):
         """
         Ensure GET on the add_view works.
@@ -90,9 +87,6 @@ class CustomRedirects(TestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
-
-    def tearDown(self):
-        self.client.logout()
 
     def test_post_save_add_redirect(self):
         """

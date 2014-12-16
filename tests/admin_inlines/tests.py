@@ -36,9 +36,6 @@ class TestInline(TestCase):
         self.assertEqual(result, True)
         self.factory = RequestFactory()
 
-    def tearDown(self):
-        self.client.logout()
-
     def test_can_delete(self):
         """
         can_delete should be passed to inlineformset factory.
@@ -359,9 +356,6 @@ class TestInlineMedia(TestCase):
         result = self.client.login(username='super', password='secret')
         self.assertEqual(result, True)
 
-    def tearDown(self):
-        self.client.logout()
-
     def test_inline_media_only_base(self):
         holder = Holder(dummy=13)
         holder.save()
@@ -438,9 +432,6 @@ class TestInlineProtectedOnDelete(TestCase):
         result = self.client.login(username='super', password='secret')
         self.assertEqual(result, True)
 
-    def tearDown(self):
-        self.client.logout()
-
     def test_deleting_inline_with_protected_delete_does_not_validate(self):
         lotr = Novel.objects.create(name='Lord of the rings')
         chapter = Chapter.objects.create(novel=lotr, name='Many Meetings')
@@ -513,9 +504,6 @@ class TestInlinePermissions(TestCase):
         self.assertEqual(
             self.client.login(username='admin', password='secret'),
             True)
-
-    def tearDown(self):
-        self.client.logout()
 
     def test_inline_add_m2m_noperm(self):
         response = self.client.get('/admin/admin_inlines/author/add/')
