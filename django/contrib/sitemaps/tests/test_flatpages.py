@@ -38,7 +38,9 @@ class FlatpagesSitemapTests(SitemapTestsBase):
             registration_required=True
         )
         private.sites.add(settings.SITE_ID)
-        response = self.client.get('/flatpages/sitemap.xml')
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            response = self.client.get('/flatpages/sitemap.xml')
         # Public flatpage should be in the sitemap
         self.assertContains(response, '<loc>%s%s</loc>' % (self.base_url, public.url))
         # Private flatpage should not be in the sitemap
