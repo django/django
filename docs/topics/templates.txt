@@ -11,7 +11,7 @@ The Django template language
 Django's template language is designed to strike a balance between power and
 ease. It's designed to feel comfortable to those used to working with HTML. If
 you have any exposure to other text-based template languages, such as Smarty_
-or CheetahTemplate_, you should feel right at home with Django's templates.
+or Jinja2_, you should feel right at home with Django's templates.
 
 .. admonition:: Philosophy
 
@@ -31,7 +31,7 @@ or CheetahTemplate_, you should feel right at home with Django's templates.
 
 .. _`The Django template language: For Python programmers`: ../templates_python/
 .. _Smarty: http://www.smarty.net/
-.. _CheetahTemplate: http://www.cheetahtemplate.org/
+.. _Jinja2: http://jinja.pocoo.org/
 
 Templates
 =========
@@ -74,7 +74,7 @@ explained later in this document.
     JavaScript and CSV. You can use the template language for any text-based
     format.
 
-    Oh, and one more thing: Making humans edit XML is sadistic!
+    Oh, and one more thing: making humans edit XML is sadistic!
 
 Variables
 =========
@@ -95,13 +95,15 @@ Use a dot (``.``) to access attributes of a variable.
     following lookups, in this order:
 
     * Dictionary lookup
-    * Attribute lookup
-    * Method call
-    * List-index lookup
+    * Attribute or method lookup
+    * Numeric index lookup
 
-    This can cause some unexpected behavior with objects that override
-    dictionary lookup. For example, consider the following code snippet that
-    attempts to loop over a ``collections.defaultdict``::
+    If the resulting value is callable, it is called with no arguments. The
+    result of the call becomes the template value.
+
+    This lookup order can cause some unexpected behavior with objects that
+    override dictionary lookup. For example, consider the following code snippet
+    that attempts to loop over a ``collections.defaultdict``::
 
         {% for k, v in defaultdict.iteritems %}
             Do something with k and v here...
@@ -140,18 +142,16 @@ bio|truncatewords:30 }}``. This will display the first 30 words of the ``bio``
 variable.
 
 Filter arguments that contain spaces must be quoted; for example, to join a
-list with commas and spaced you'd use ``{{ list|join:", " }}``.
+list with commas and spaces you'd use ``{{ list|join:", " }}``.
 
-Django provides about thirty built-in template filters. You can read all about
+Django provides about sixty built-in template filters. You can read all about
 them in the :ref:`built-in filter reference <ref-templates-builtins-filters>`.
 To give you a taste of what's available, here are some of the more commonly
 used template filters:
 
 :tfilter:`default`
     If a variable is false or empty, use given default. Otherwise, use the
-    value of the variable
-
-    For example::
+    value of the variable. For example::
 
         {{ value|default:"nothing" }}
 
@@ -159,20 +159,20 @@ used template filters:
     "``nothing``".
 
 :tfilter:`length`
-    Returns the length of the value. This works for both strings and lists;
-    for example::
+    Returns the length of the value. This works for both strings and lists.
+    For example::
 
         {{ value|length }}
 
     If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
 
-:tfilter:`striptags`
-    Strips all [X]HTML tags. For example::
+:tfilter:`filesizeformat`
+    Formats the value like a "human-readable" file size (i.e. ``'13 KB'``,
+    ``'4.1 MB'``, ``'102 bytes'``, etc). For example::
 
-        {{ value|striptags }}
+        {{ value|filesizeformat }}
 
-    If ``value`` is ``"<b>Joel</b> <button>is</button> a
-    <span>slug</span>"``, the output will be ``"Joel is a slug"``.
+    If ``value`` is 123456789, the output would be ``117.7 MB``.
 
 Again, these are just a few examples; see the :ref:`built-in filter reference
 <ref-templates-builtins-filters>` for the complete list.
@@ -434,7 +434,7 @@ When generating HTML from templates, there's always a risk that a variable will
 include characters that affect the resulting HTML. For example, consider this
 template fragment::
 
-    Hello, {{ name }}.
+    Hello, {{ name }}
 
 At first, this seems like a harmless way to display a user's name, but consider
 what would happen if the user entered their name as this::
@@ -547,9 +547,10 @@ disabled. Here is an example template::
 
 The auto-escaping tag passes its effect onto templates that extend the
 current one as well as templates included via the :ttag:`include` tag,
-just like all block tags. For example::
+just like all block tags. For example:
 
-    # base.html
+.. snippet::
+    :filename: base.html
 
     {% autoescape off %}
     <h1>{% block title %}{% endblock %}</h1>
@@ -557,18 +558,18 @@ just like all block tags. For example::
     {% endblock %}
     {% endautoescape %}
 
-
-    # child.html
+.. snippet::
+    :filename: child.html
 
     {% extends "base.html" %}
-    {% block title %}This & that{% endblock %}
+    {% block title %}This &amp; that{% endblock %}
     {% block content %}{{ greeting }}{% endblock %}
 
 Because auto-escaping is turned off in the base template, it will also be
 turned off in the child template, resulting in the following rendered
 HTML when the ``greeting`` variable contains the string ``<b>Hello!</b>``::
 
-    <h1>This & that</h1>
+    <h1>This &amp; that</h1>
     <b>Hello!</b>
 
 Notes
@@ -604,9 +605,9 @@ This means you would write ::
 
     {{ data|default:"3 &lt; 2" }}
 
-...rather than ::
+...rather than::
 
-    {{ data|default:"3 < 2" }}  <-- Bad! Don't do this.
+    {{ data|default:"3 < 2" }}  {# Bad! Don't do this. #}
 
 This doesn't affect what happens to data coming from the variable itself.
 The variable's contents are still automatically escaped, if necessary, because
@@ -636,14 +637,18 @@ of all comments related to the current task with::
     {{ task.comment_set.all.count }}
 
 And of course you can easily access methods you've explicitly defined on your
-own models::
+own models:
 
-    # In model
+.. snippet::
+    :filename: models.py
+
     class Task(models.Model):
         def foo(self):
             return "bar"
 
-    # In template
+.. snippet::
+    :filename: template.html
+
     {{ task.foo }}
 
 Because Django intentionally limits the amount of logic processing available
@@ -657,20 +662,23 @@ Custom tag and filter libraries
 ===============================
 
 Certain applications provide custom tag and filter libraries. To access them in
-a template, use the :ttag:`load` tag::
+a template, ensure the application is in :setting:`INSTALLED_APPS` (we'd add
+``'django.contrib.humanize'`` for this example), and then use the :ttag:`load`
+tag in a template::
 
-    {% load comments %}
+    {% load humanize %}
 
-    {% comment_form for blogs.entries entry.id with is_public yes %}
+    {{ 45000|intcomma }}
 
-In the above, the :ttag:`load` tag loads the ``comments`` tag library, which then
-makes the ``comment_form`` tag available for use. Consult the documentation
-area in your admin to find the list of custom libraries in your installation.
+In the above, the :ttag:`load` tag loads the ``humanize`` tag library, which then
+makes the ``intcomma`` filter available for use. If you've enabled
+:mod:`django.contrib.admindocs`, you can consult the documentation area in your
+admin to find the list of custom libraries in your installation.
 
 The :ttag:`load` tag can take multiple library names, separated by spaces.
 Example::
 
-    {% load comments i18n %}
+    {% load humanize i18n %}
 
 See :doc:`/howto/custom-template-tags` for information on writing your own custom
 template libraries.
@@ -682,9 +690,15 @@ When you load a custom tag or filter library, the tags/filters are only made
 available to the current template -- not any parent or child templates along
 the template-inheritance path.
 
-For example, if a template ``foo.html`` has ``{% load comments %}``, a child
+For example, if a template ``foo.html`` has ``{% load humanize %}``, a child
 template (e.g., one that has ``{% extends "foo.html" %}``) will *not* have
-access to the comments template tags and filters. The child template is
-responsible for its own ``{% load comments %}``.
+access to the humanize template tags and filters. The child template is
+responsible for its own ``{% load humanize %}``.
 
 This is a feature for the sake of maintainability and sanity.
+
+.. seealso::
+
+    :doc:`The Templates Reference </ref/templates/index>`
+        Covers built-in tags, built-in filters, using an alternative template,
+        language, and more.

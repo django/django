@@ -71,6 +71,9 @@ are required.
   :mimetype:`text/plain` content type and ``html_message`` as the
   :mimetype:`text/html` content type.
 
+The return value will be the number of successfully delivered messages (which
+can be ``0`` or ``1`` since it can only send one message).
+
 .. versionadded:: 1.7
 
     The ``html_message`` parameter was added.
@@ -101,6 +104,8 @@ mail server would be opened::
     message1 = ('Subject here', 'Here is the message', 'from@example.com', ['first@example.com', 'other@example.com'])
     message2 = ('Another Subject', 'Here is another message', 'from@example.com', ['second@test.com'])
     send_mass_mail((message1, message2), fail_silently=False)
+
+The return value will be the number of successfully delivered messages.
 
 send_mass_mail() vs. send_mail()
 --------------------------------
@@ -183,6 +188,7 @@ from the request's POST data, sends that to admin@example.com and redirects to
 "/contact/thanks/" when it's done::
 
     from django.core.mail import send_mail, BadHeaderError
+    from django.http import HttpResponse, HttpResponseRedirect
 
     def send_email(request):
         subject = request.POST.get('subject', '')
@@ -272,11 +278,18 @@ All parameters are optional and can be set at any time prior to calling the
 * ``cc``: A list or tuple of recipient addresses used in the "Cc" header
   when sending the email.
 
+* ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
+  header when sending the email.
+
+.. versionchanged:: 1.8
+
+    The ``reply_to`` parameter was added.
+
 For example::
 
     email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
                 ['to1@example.com', 'to2@example.com'], ['bcc@example.com'],
-                headers = {'Reply-To': 'another@example.com'})
+                reply_to=['another@example.com'], headers={'Message-ID': 'foo'})
 
 The class has the following methods:
 
@@ -284,7 +297,8 @@ The class has the following methods:
   specified when the email was constructed, that connection will be used.
   Otherwise, an instance of the default backend will be instantiated and
   used. If the keyword argument ``fail_silently`` is ``True``, exceptions
-  raised while sending the message will be quashed.
+  raised while sending the message will be quashed. An empty list of
+  recipients will not raise an exception.
 
 * ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
   subclass of Python's ``email.MIMEText.MIMEText`` class) or a
@@ -321,15 +335,15 @@ The class has the following methods:
 
     .. versionchanged:: 1.7
 
-      If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
-      :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
+        If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
+        :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
 
-      In addition, ``message/rfc822`` attachments will no longer be
-      base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
-      issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
+        In addition, ``message/rfc822`` attachments will no longer be
+        base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
+        issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
 
-      __ https://bugzilla.gnome.org/show_bug.cgi?id=651197
-      __ https://bugzilla.mozilla.org/show_bug.cgi?id=333880
+        __ https://bugzilla.gnome.org/show_bug.cgi?id=651197
+        __ https://bugzilla.mozilla.org/show_bug.cgi?id=333880
 
 * ``attach_file()`` creates a new attachment using a file from your
   filesystem. Call it with the path of the file to attach and, optionally,
@@ -383,7 +397,7 @@ The actual sending of an email is handled by the email backend.
 
 The email backend class has the following methods:
 
-* ``open()`` instantiates an long-lived email-sending connection.
+* ``open()`` instantiates a long-lived email-sending connection.
 
 * ``close()`` closes the current email-sending connection.
 
@@ -392,6 +406,21 @@ The email backend class has the following methods:
   not open, this call will implicitly open the connection, and close the
   connection afterwards. If the connection is already open, it will be
   left open after mail has been sent.
+
+It can also be used as a context manager, which will automatically call
+``open()`` and ``close()`` as needed::
+
+    from django.core import mail
+
+    with mail.get_connection() as connection:
+        mail.EmailMessage(subject1, body1, from1, [to1],
+                          connection=connection).send()
+        mail.EmailMessage(subject2, body2, from2, [to2],
+                          connection=connection).send()
+
+.. versionadded:: 1.8
+
+    The context manager protocol was added.
 
 Obtaining an instance of an email backend
 -----------------------------------------
@@ -424,38 +453,33 @@ can :ref:`write your own email backend <topic-custom-email-backend>`.
 SMTP backend
 ~~~~~~~~~~~~
 
-.. class:: backends.smtp.EmailBackend([host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, **kwargs])
+.. class:: backends.smtp.EmailBackend([host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs])
 
     This is the default backend. Email will be sent through a SMTP server.
     The server address and authentication credentials are set in the
     :setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
-    :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS` and
-    :setting:`EMAIL_USE_SSL` settings in your settings file.
+    :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS`,
+    :setting:`EMAIL_USE_SSL`, :setting:`EMAIL_TIMEOUT`,
+    :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE` settings
+    in your settings file.
 
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
 
         EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-    Here is an attribute which doesn't have a corresponding setting like the
-    others described above:
+    .. versionadded:: 1.7
 
-    .. attribute:: timeout
+        The ``timeout`` parameter was added. If unspecified, the default
+        ``timeout`` will be the one provided by
+        :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no
+        timeout).
 
-        .. versionadded:: 1.7
+    .. versionchanged:: 1.8
 
-        This backend contains a ``timeout`` parameter, which can be set with
-        the following sample code::
-
-            from django.core.mail.backends import smtp
-
-            class MyEmailBackend(smtp.EmailBackend):
-              def __init__(self, *args, **kwargs):
-                  kwargs.setdefault('timeout', 42)
-                  super(MyEmailBackend, self).__init__(*args, **kwargs)
-
-        Then point the :setting:`EMAIL_BACKEND` setting at your custom backend as
-        described above.
+        The ``ssl_keyfile``, and ``ssl_certfile`` parameters and corresponding
+        settings were added. The ability to customize ``timeout`` using
+        a setting (:setting:`EMAIL_TIMEOUT`) was added.
 
 .. _topic-email-console-backend:
 

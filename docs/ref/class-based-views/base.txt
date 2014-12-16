@@ -39,13 +39,13 @@ View
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import MyView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^mine/$', MyView.as_view(), name='my-view'),
-        )
+        ]
 
     **Attributes**
 
@@ -131,13 +131,13 @@ TemplateView
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import HomePageView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^$', HomePageView.as_view(), name='home'),
-        )
+        ]
 
     **Context**
 
@@ -186,23 +186,22 @@ RedirectView
             pattern_name = 'article-detail'
 
             def get_redirect_url(self, *args, **kwargs):
-                article = get_object_or_404(Article, pk=pk)
+                article = get_object_or_404(Article, pk=kwargs['pk'])
                 article.update_counter()
                 return super(ArticleCounterRedirectView, self).get_redirect_url(*args, **kwargs)
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         from django.views.generic.base import RedirectView
 
         from article.views import ArticleCounterRedirectView, ArticleDetail
 
-        urlpatterns = patterns('',
-
-            url(r'^counter/(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
-            url(r'^details/(?P<pk>\d+)/$', ArticleDetail.as_view(), name='article-detail'),
+        urlpatterns = [
+            url(r'^counter/(?P<pk>[0-9]+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^details/(?P<pk>[0-9]+)/$', ArticleDetail.as_view(), name='article-detail'),
             url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
-        )
+        ]
 
     **Attributes**
 
@@ -213,8 +212,6 @@ RedirectView
 
     .. attribute:: pattern_name
 
-        .. versionadded:: 1.6
-
         The name of the URL pattern to redirect to. Reversing will be done
         using the same args and kwargs as are passed in for this view.
 
@@ -224,6 +221,11 @@ RedirectView
         the HTTP status code returned. If ``True``, then the redirect will use
         status code 301. If ``False``, then the redirect will use status code
         302. By default, ``permanent`` is ``True``.
+
+        .. deprecated:: 1.8
+
+            The default value of the ``permanent`` attribute will change from
+            ``True`` to ``False`` in Django 1.9.
 
     .. attribute:: query_string
 
@@ -237,10 +239,6 @@ RedirectView
     .. method:: get_redirect_url(*args, **kwargs)
 
         Constructs the target URL for redirection.
-
-        .. versionchanged:: 1.6
-
-            The signature of this method was changed to include ``*args``.
 
         The default implementation uses :attr:`url` as a starting
         string and performs expansion of ``%`` named parameters in that string

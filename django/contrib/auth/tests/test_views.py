@@ -2,6 +2,7 @@ from importlib import import_module
 import itertools
 import os
 import re
+import warnings
 
 from django.apps import apps
 from django.conf import global_settings, settings
@@ -41,26 +42,26 @@ from django.contrib.auth.views import login as login_view
     ),
     USE_TZ=False,
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='django.contrib.auth.tests.urls',
 )
 class AuthViewsTestCase(TestCase):
     """
     Helper base class for all the follow test cases.
     """
     fixtures = ['authtestdata.json']
-    urls = 'django.contrib.auth.tests.urls'
 
-    def login(self, password='password'):
+    def login(self, username='testclient', password='password'):
         response = self.client.post('/login/', {
-            'username': 'testclient',
+            'username': username,
             'password': password,
         })
-        self.assertTrue(SESSION_KEY in self.client.session)
+        self.assertIn(SESSION_KEY, self.client.session)
         return response
 
     def logout(self):
         response = self.client.get('/admin/logout/')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(SESSION_KEY not in self.client.session)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
     def assertFormError(self, response, error):
         """Assert that error is found in response.context['form'] errors"""
@@ -86,8 +87,8 @@ class AuthViewsTestCase(TestCase):
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.auth.urls')
 class AuthViewNamedURLTests(AuthViewsTestCase):
-    urls = 'django.contrib.auth.urls'
 
     def test_named_urls(self):
         "Named URLs should be reversible"
@@ -128,7 +129,7 @@ class PasswordResetTest(AuthViewsTestCase):
         response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertTrue("http://" in mail.outbox[0].body)
+        self.assertIn("http://", mail.outbox[0].body)
         self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
         # optional multipart text/html email has been added.  Make sure original,
         # default functionality is 100% the same
@@ -147,8 +148,8 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertTrue(message.is_multipart())
         self.assertEqual(message.get_payload(0).get_content_type(), 'text/plain')
         self.assertEqual(message.get_payload(1).get_content_type(), 'text/html')
-        self.assertTrue('<html>' not in message.get_payload(0).get_payload())
-        self.assertTrue('<html>' in message.get_payload(1).get_payload())
+        self.assertNotIn('<html>', message.get_payload(0).get_payload())
+        self.assertIn('<html>', message.get_payload(1).get_payload())
 
     def test_email_found_custom_from(self):
         "Email is sent if a valid email address is provided for password reset when a custom from_email is provided."
@@ -160,13 +161,15 @@ class PasswordResetTest(AuthViewsTestCase):
     @override_settings(ALLOWED_HOSTS=['adminsite.com'])
     def test_admin_reset(self):
         "If the reset view is marked as being for admin, the HTTP_HOST header is used for a domain override."
-        response = self.client.post('/admin_password_reset/',
-            {'email': 'staffmember@example.com'},
-            HTTP_HOST='adminsite.com'
-        )
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            response = self.client.post('/admin_password_reset/',
+                {'email': 'staffmember@example.com'},
+                HTTP_HOST='adminsite.com'
+            )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertTrue("http://adminsite.com" in mail.outbox[0].body)
+        self.assertIn("http://adminsite.com", mail.outbox[0].body)
         self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
 
     # Skip any 500 handler action (like sending more mail...)
@@ -212,7 +215,7 @@ class PasswordResetTest(AuthViewsTestCase):
 
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
-        self.assertTrue(urlmatch is not None, "No URL found in sent email")
+        self.assertIsNotNone(urlmatch, "No URL found in sent email")
         return urlmatch.group(), urlmatch.groups()[0]
 
     def test_confirm_valid(self):
@@ -231,7 +234,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_invalid_user(self):
-        # Ensure that we get a 200 response for a non-existant user, not a 404
+        # Ensure that we get a 200 response for a non-existent user, not a 404
         response = self.client.get('/reset/123456/1-1/')
         self.assertContains(response, "The password reset link was invalid")
 
@@ -343,7 +346,7 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
 
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
-        self.assertTrue(urlmatch is not None, "No URL found in sent email")
+        self.assertIsNotNone(urlmatch, "No URL found in sent email")
         return urlmatch.group(), urlmatch.groups()[0]
 
     def test_confirm_valid_custom_user(self):
@@ -443,6 +446,25 @@ class ChangePasswordTest(AuthViewsTestCase):
         self.assertURLEqual(response.url, '/password_reset/')
 
 
+@override_settings(MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
+])
+class SessionAuthenticationTests(AuthViewsTestCase):
+    def test_user_password_change_updates_session(self):
+        """
+        #21649 - Ensure contrib.auth.views.password_change updates the user's
+        session auth hash after a password change so the session isn't logged out.
+        """
+        self.login()
+        response = self.client.post('/password_change/', {
+            'old_password': 'password',
+            'new_password1': 'password1',
+            'new_password2': 'password1',
+        })
+        # if the hash isn't updated, retrieving the redirection page will fail.
+        self.assertRedirects(response, '/password_change/done/')
+
+
 @skipIfCustomUser
 class LoginTest(AuthViewsTestCase):
 
@@ -456,16 +478,17 @@ class LoginTest(AuthViewsTestCase):
             self.assertEqual(response.context['site_name'], site.name)
         else:
             self.assertIsInstance(response.context['site'], RequestSite)
-        self.assertTrue(isinstance(response.context['form'], AuthenticationForm),
-                     'Login form is not an AuthenticationForm')
+        self.assertIsInstance(response.context['form'], AuthenticationForm)
 
     def test_security_check(self, password='password'):
         login_url = reverse('login')
 
         # Those URLs should not pass the security check
         for bad_url in ('http://example.com',
+                        'http:///example.com',
                         'https://example.com',
                         'ftp://exampel.com',
+                        '///example.com',
                         '//example.com',
                         'javascript:alert("XSS")'):
 
@@ -479,7 +502,7 @@ class LoginTest(AuthViewsTestCase):
                 'password': password,
             })
             self.assertEqual(response.status_code, 302)
-            self.assertFalse(bad_url in response.url,
+            self.assertNotIn(bad_url, response.url,
                              "%s should be blocked" % bad_url)
 
         # These URLs *should* still pass the security check
@@ -487,8 +510,8 @@ class LoginTest(AuthViewsTestCase):
                          '/view/?param=https://example.com',
                          '/view?param=ftp://exampel.com',
                          'view/?param=//example.com',
-                         'https:///',
-                         'HTTPS:///',
+                         'https://testserver/',
+                         'HTTPS://testserver/',
                          '//testserver/',
                          '/url%20with%20spaces/'):  # see ticket #12534
             safe_url = '%(url)s?%(next)s=%(good_url)s' % {
@@ -501,8 +524,7 @@ class LoginTest(AuthViewsTestCase):
                 'password': password,
             })
             self.assertEqual(response.status_code, 302)
-            self.assertTrue(good_url in response.url,
-                            "%s should be allowed" % good_url)
+            self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
 
     def test_login_form_contains_request(self):
         # 15198
@@ -545,6 +567,52 @@ class LoginTest(AuthViewsTestCase):
 
         # Check the CSRF token switched
         self.assertNotEqual(token1, token2)
+
+    def test_session_key_flushed_on_login(self):
+        """
+        To avoid reusing another user's session, ensure a new, empty session is
+        created if the existing session corresponds to a different authenticated
+        user.
+        """
+        self.login()
+        original_session_key = self.client.session.session_key
+
+        self.login(username='staff')
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
+
+    def test_session_key_flushed_on_login_after_password_change(self):
+        """
+        As above, but same user logging in after a password change.
+        """
+        self.login()
+        original_session_key = self.client.session.session_key
+
+        # If no password change, session key should not be flushed.
+        self.login()
+        self.assertEqual(original_session_key, self.client.session.session_key)
+
+        user = User.objects.get(username='testclient')
+        user.set_password('foobar')
+        user.save()
+
+        self.login(password='foobar')
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
+
+    def test_login_session_without_hash_session_key(self):
+        """
+        Session without django.contrib.auth.HASH_SESSION_KEY should login
+        without an exception.
+        """
+        user = User.objects.get(username='testclient')
+        engine = import_module(settings.SESSION_ENGINE)
+        session = engine.SessionStore()
+        session[SESSION_KEY] = user.id
+        session.save()
+        original_session_key = session.session_key
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = original_session_key
+
+        self.login()
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
 
 
 @skipIfCustomUser
@@ -614,7 +682,7 @@ class LoginRedirectUrlTest(AuthViewsTestCase):
 class LogoutTest(AuthViewsTestCase):
 
     def confirm_logged_out(self):
-        self.assertTrue(SESSION_KEY not in self.client.session)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
     def test_logout_default(self):
         "Logout without next_page option renders the default template"
@@ -627,7 +695,7 @@ class LogoutTest(AuthViewsTestCase):
         # Bug 14377
         self.login()
         response = self.client.get('/logout/')
-        self.assertTrue('site' in response.context)
+        self.assertIn('site', response.context)
 
     def test_logout_with_overridden_redirect_url(self):
         # Bug 11223
@@ -679,8 +747,10 @@ class LogoutTest(AuthViewsTestCase):
 
         # Those URLs should not pass the security check
         for bad_url in ('http://example.com',
+                        'http:///example.com',
                         'https://example.com',
                         'ftp://exampel.com',
+                        '///example.com',
                         '//example.com',
                         'javascript:alert("XSS")'):
             nasty_url = '%(url)s?%(next)s=%(bad_url)s' % {
@@ -691,7 +761,7 @@ class LogoutTest(AuthViewsTestCase):
             self.login()
             response = self.client.get(nasty_url)
             self.assertEqual(response.status_code, 302)
-            self.assertFalse(bad_url in response.url,
+            self.assertNotIn(bad_url, response.url,
                              "%s should be blocked" % bad_url)
             self.confirm_logged_out()
 
@@ -700,8 +770,8 @@ class LogoutTest(AuthViewsTestCase):
                          '/view/?param=https://example.com',
                          '/view?param=ftp://exampel.com',
                          'view/?param=//example.com',
-                         'https:///',
-                         'HTTPS:///',
+                         'https://testserver/',
+                         'HTTPS://testserver/',
                          '//testserver/',
                          '/url%20with%20spaces/'):  # see ticket #12534
             safe_url = '%(url)s?%(next)s=%(good_url)s' % {
@@ -712,8 +782,7 @@ class LogoutTest(AuthViewsTestCase):
             self.login()
             response = self.client.get(safe_url)
             self.assertEqual(response.status_code, 302)
-            self.assertTrue(good_url in response.url,
-                            "%s should be allowed" % good_url)
+            self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
             self.confirm_logged_out()
 
     def test_logout_preserve_language(self):
@@ -731,10 +800,15 @@ class LogoutTest(AuthViewsTestCase):
 
 @skipIfCustomUser
 @override_settings(
+    # Redirect in test_user_change_password will fail if session auth hash
+    # isn't updated after password change (#21649)
+    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+        'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
+    ],
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='django.contrib.auth.tests.urls_admin',
 )
 class ChangelistTests(AuthViewsTestCase):
-    urls = 'django.contrib.auth.tests.urls_admin'
 
     def setUp(self):
         # Make me a superuser before logging in.
@@ -797,3 +871,15 @@ class ChangelistTests(AuthViewsTestCase):
         self.assertEqual(row.change_message, 'Changed password.')
         self.logout()
         self.login(password='password1')
+
+    def test_user_change_different_user_password(self):
+        u = User.objects.get(email='staffmember@example.com')
+        response = self.client.post('/admin/auth/user/%s/password/' % u.pk, {
+            'password1': 'password1',
+            'password2': 'password1',
+        })
+        self.assertRedirects(response, '/admin/auth/user/%s/' % u.pk)
+        row = LogEntry.objects.latest('id')
+        self.assertEqual(row.user_id, self.admin.pk)
+        self.assertEqual(row.object_id, str(u.pk))
+        self.assertEqual(row.change_message, 'Changed password.')

@@ -24,30 +24,37 @@ Running the unit tests
 Quickstart
 ~~~~~~~~~~
 
+If you are on Python < 3.3, you'll first need to install a backport of the
+``unittest.mock`` module that's available in Python 3.3+. See
+:ref:`running-unit-tests-dependencies` for details on installing `mock`_ and
+the other optional test dependencies.
+
 Running the tests requires a Django settings module that defines the
 databases to use. To make it easy to get started, Django provides and uses a
 sample settings module that uses the SQLite database. To run the tests:
 
 .. code-block:: bash
 
-   $ git clone git@github.com:django/django.git django-repo
+   $ git clone https://github.com/django/django.git django-repo
    $ cd django-repo/tests
    $ PYTHONPATH=..:$PYTHONPATH ./runtests.py
 
 .. versionchanged:: 1.7
 
-Older versions of Django required specifying a settings file:
+    Older versions of Django required specifying a settings file:
 
-.. code-block:: bash
+    .. code-block:: bash
 
-   $ PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
+        $ PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
 
-``runtests.py`` now uses ``test_sqlite`` by default if settings aren't provided
-through either ``--settings`` or :envvar:`DJANGO_SETTINGS_MODULE`.
+    ``runtests.py`` now uses ``test_sqlite`` by default if settings aren't
+    provided through either ``--settings`` or :envvar:`DJANGO_SETTINGS_MODULE`.
 
 You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
 checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
 See :ref:`installing-development-version`.
+
+Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 
 .. _running-unit-tests-settings:
 
@@ -98,6 +105,8 @@ You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
 you will need to include a value for :setting:`TEST_CHARSET` in the settings
 dictionary for the applicable database.
+
+.. _runtests-specifying-labels:
 
 Running only some of the tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,8 +171,10 @@ dependencies:
 *  pytz_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
+*  mock_ (for Python < 3.3)
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
+*  sqlparse_
 
 You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
@@ -171,7 +182,7 @@ like so:
 
 .. code-block:: bash
 
-   $ pip install -r tests/requirements/py2.txt  # Python 3: py3.txt
+   $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
 
 You can also install the database adapter(s) of your choice using
 ``oracle.txt``, ``mysql.txt``, or ``postgres.txt``.
@@ -193,9 +204,11 @@ associated tests will be skipped.
 .. _pytz: https://pypi.python.org/pypi/pytz/
 .. _setuptools: https://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
+.. _mock: https://pypi.python.org/pypi/mock
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: https://pypi.python.org/pypi/selenium
-.. _pip requirements files: http://www.pip-installer.org/en/latest/cookbook.html#requirements-files
+.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+.. _pip requirements files: http://www.pip-installer.org/en/latest/user_guide.html#requirements-files
 
 Code coverage
 ~~~~~~~~~~~~~
@@ -238,3 +251,78 @@ method as above:
 .. code-block:: bash
 
    $ ./runtests.py --settings=settings django.contrib.auth
+
+.. _troubleshooting-unit-tests:
+
+Troubleshooting
+---------------
+
+Many test failures with ``UnicodeEncodeError``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the ``locales`` package is not installed, some tests will fail with a
+``UnicodeEncodeError``.
+
+You can resolve this on Debian-based systems, for example, by running:
+
+.. code-block:: bash
+
+    $ apt-get install locales
+    $ dpkg-reconfigure locales
+
+Tests that only fail in combination
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In case a test passes when run in isolation but fails within the whole suite,
+we have some tools to help analyze the problem.
+
+The ``--bisect`` option of ``runtests.py`` will run the failing test while
+halving the test set it is run together with on each iteration, often making
+it possible to identify a small number of tests that may be related to the
+failure.
+
+For example, suppose that the failing test that works on its own is
+``ModelTest.test_eq``, then using:
+
+.. code-block:: bash
+
+   $ ./runtests.py --bisect basic.tests.ModelTest.test_eq
+
+will try to determine a test that interferes with the given one. First, the
+test is run with the first half of the test suite. If a failure occurs, the
+first half of the test suite is split in two groups and each group is then run
+with the specified test. If there is no failure with the first half of the test
+suite, the second half of the test suite is run with the specified test and
+split appropriately as described earlier. The process repeats until the set of
+failing tests is minimized.
+
+The ``--pair`` option runs the given test alongside every other test from the
+suite, letting you check if another test has side-effects that cause the
+failure. So:
+
+.. code-block:: bash
+
+   $ ./runtests.py --pair basic.tests.ModelTest.test_eq
+
+will pair ``test_eq`` with every test label.
+
+With both ``--bisect`` and ``--pair``, if you already suspect which cases
+might be responsible for the failure, you may limit tests to be cross-analyzed
+by :ref:`specifying further test labels <runtests-specifying-labels>` after
+the first one:
+
+.. code-block:: bash
+
+   $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
+
+You can also try running any set of tests in reverse using the ``--reverse``
+option in order to verify that executing tests in a different order does not
+cause any trouble:
+
+.. code-block:: bash
+
+   $ ./runtests.py basic --reverse
+
+.. versionadded:: 1.8
+
+    The ``--reverse`` option was added.

@@ -135,7 +135,6 @@ blockquote {
 
 code, pre {
     font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
-    background: inherit;
     color: #666;
     font-size: 11px;
 }
@@ -411,7 +410,7 @@ table.orderable-initalized .order-cell, body>tr>td.order-cell {
 
 /* FORM DEFAULTS */
 
-input, textarea, select, .form-row p {
+input, textarea, select, .form-row p, form .button {
     margin: 2px 0;
     padding: 2px 3px;
     vertical-align: middle;
@@ -431,12 +430,16 @@ textarea, select, .vTextField {
 
 /* FORM BUTTONS */
 
-.button, input[type=submit], input[type=button], .submit-row input {
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
     background: #fff url(../img/nav-bg.gif) bottom repeat-x;
     padding: 3px 5px;
     color: black;
     border: 1px solid #bbb;
     border-color: #ddd #aaa #aaa #ddd;
+}
+
+a.button {
+    padding: 4px 5px;
 }
 
 .button:active, input[type=submit]:active, input[type=button]:active {
@@ -633,7 +636,7 @@ div.breadcrumbs {
     background: url(../img/icon_addlink.gif) 0 .2em no-repeat;
 }
 
-.changelink {
+.changelink, .inlinechangelink {
     padding-left: 12px;
     background: url(../img/icon_changelink.gif) 0 .2em no-repeat;
 }

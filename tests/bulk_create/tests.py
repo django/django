@@ -91,7 +91,7 @@ class BulkCreateTests(TestCase):
 
     def test_large_batch(self):
         with override_settings(DEBUG=True):
-            connection.queries = []
+            connection.queries_log.clear()
             TwoFields.objects.bulk_create([
                 TwoFields(f1=i, f2=i + 1) for i in range(0, 1001)
             ])
@@ -112,11 +112,11 @@ class BulkCreateTests(TestCase):
     @skipUnlessDBFeature('has_bulk_insert')
     def test_large_batch_efficiency(self):
         with override_settings(DEBUG=True):
-            connection.queries = []
+            connection.queries_log.clear()
             TwoFields.objects.bulk_create([
                 TwoFields(f1=i, f2=i + 1) for i in range(0, 1001)
             ])
-            self.assertTrue(len(connection.queries) < 10)
+            self.assertLess(len(connection.queries), 10)
 
     def test_large_batch_mixed(self):
         """
@@ -124,7 +124,7 @@ class BulkCreateTests(TestCase):
         mixed together with objects without PK set.
         """
         with override_settings(DEBUG=True):
-            connection.queries = []
+            connection.queries_log.clear()
             TwoFields.objects.bulk_create([
                 TwoFields(id=i if i % 2 == 0 else None, f1=i, f2=i + 1)
                 for i in range(100000, 101000)])
@@ -142,11 +142,11 @@ class BulkCreateTests(TestCase):
         mixed together with objects without PK set.
         """
         with override_settings(DEBUG=True):
-            connection.queries = []
+            connection.queries_log.clear()
             TwoFields.objects.bulk_create([
                 TwoFields(id=i if i % 2 == 0 else None, f1=i, f2=i + 1)
                 for i in range(100000, 101000)])
-            self.assertTrue(len(connection.queries) < 10)
+            self.assertLess(len(connection.queries), 10)
 
     def test_explicit_batch_size(self):
         objs = [TwoFields(f1=i, f2=i) for i in range(0, 4)]

@@ -1,13 +1,11 @@
 import hashlib
 import logging
 import re
-import warnings
 
 from django.conf import settings
 from django.core.mail import mail_managers
 from django.core import urlresolvers
 from django import http
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils import six
@@ -32,10 +30,15 @@ class CommonMiddleware(object):
               urlpatterns, then an HTTP-redirect is returned to this new URL;
               otherwise the initial URL is processed as usual.
 
+          This behavior can be customized by subclassing CommonMiddleware and
+          overriding the response_redirect_class attribute.
+
         - ETags: If the USE_ETAGS setting is set, ETags will be calculated from
           the entire page content and Not Modified responses will be returned
           appropriately.
     """
+
+    response_redirect_class = http.HttpResponsePermanentRedirect
 
     def process_request(self, request):
         """
@@ -102,18 +105,12 @@ class CommonMiddleware(object):
                     newurl += '?' + request.META['QUERY_STRING'].decode()
                 except UnicodeDecodeError:
                     pass
-        return http.HttpResponsePermanentRedirect(newurl)
+        return self.response_redirect_class(newurl)
 
     def process_response(self, request, response):
         """
         Calculate the ETag, if needed.
         """
-        if settings.SEND_BROKEN_LINK_EMAILS:
-            warnings.warn("SEND_BROKEN_LINK_EMAILS is deprecated. "
-                "Use BrokenLinkEmailsMiddleware instead.",
-                RemovedInDjango18Warning, stacklevel=2)
-            BrokenLinkEmailsMiddleware().process_response(request, response)
-
         if settings.USE_ETAGS:
             if response.has_header('ETag'):
                 etag = response['ETag']

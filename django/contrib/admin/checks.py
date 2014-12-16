@@ -287,7 +287,8 @@ class BaseModelAdminChecks(object):
             if not (isinstance(field, models.ForeignKey) or field.choices):
                 return [
                     checks.Error(
-                        "The value of '%s' refers to '%s', which is not an instance of ForeignKey, and does not have a 'choices' definition." % (
+                        "The value of '%s' refers to '%s', which is not an "
+                        "instance of ForeignKey, and does not have a 'choices' definition." % (
                             label, field_name
                         ),
                         hint=None,
@@ -592,7 +593,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             if field is None:
                 return [
                     checks.Error(
-                        "The value of '%s' refers to '%s', which is not a callable, an attribute of '%s', or an attribute or method on '%s.%s'." % (
+                        "The value of '%s' refers to '%s', which is not a "
+                        "callable, an attribute of '%s', or an attribute or method on '%s.%s'." % (
                             label, item, cls.__name__, model._meta.app_label, model._meta.object_name
                         ),
                         hint=None,
@@ -619,7 +621,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     # This is a deliberate repeat of E108; there's more than one path
                     # required to test this condition.
                     checks.Error(
-                        "The value of '%s' refers to '%s', which is not a callable, an attribute of '%s', or an attribute or method on '%s.%s'." % (
+                        "The value of '%s' refers to '%s', which is not a callable, "
+                        "an attribute of '%s', or an attribute or method on '%s.%s'." % (
                             label, item, cls.__name__, model._meta.app_label, model._meta.object_name
                         ),
                         hint=None,
@@ -779,7 +782,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     obj=cls,
                     id='admin.E122',
                 ),
-            elif field_name in cls.list_display_links:
+            elif cls.list_display_links and field_name in cls.list_display_links:
                 return [
                     checks.Error(
                         "The value of '%s' cannot be in both 'list_editable' and 'list_display_links'." % field_name,
@@ -788,7 +791,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         id='admin.E123',
                     )
                 ]
-            elif not cls.list_display_links and cls.list_display[0] in cls.list_editable:
+            # Check that list_display_links is set, and that the first values of list_editable and list_display are
+            # not the same. See ticket #22792 for the use case relating to this.
+            elif (cls.list_display[0] in cls.list_editable and cls.list_display[0] != cls.list_editable[0] and
+                  cls.list_display_links is not None):
                 return [
                     checks.Error(
                         "The value of '%s' refers to the first field in 'list_display' ('%s'), "
@@ -850,6 +856,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         errors.extend(self._check_exclude_of_parent_model(cls, parent_model))
         errors.extend(self._check_extra(cls))
         errors.extend(self._check_max_num(cls))
+        errors.extend(self._check_min_num(cls))
         errors.extend(self._check_formset(cls))
         return errors
 
@@ -909,12 +916,22 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         else:
             return []
 
+    def _check_min_num(self, cls):
+        """ Check that min_num is an integer. """
+
+        if cls.min_num is None:
+            return []
+        elif not isinstance(cls.min_num, int):
+            return must_be('an integer', option='min_num', obj=cls, id='admin.E205')
+        else:
+            return []
+
     def _check_formset(self, cls):
         """ Check formset is a subclass of BaseModelFormSet. """
 
         if not issubclass(cls.formset, BaseModelFormSet):
             return must_inherit_from(parent='BaseModelFormSet', option='formset',
-                                     obj=cls, id='admin.E205')
+                                     obj=cls, id='admin.E206')
         else:
             return []
 

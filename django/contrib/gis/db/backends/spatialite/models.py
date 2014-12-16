@@ -7,34 +7,38 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
-class GeometryColumns(models.Model):
+class SpatialiteGeometryColumns(models.Model):
     """
     The 'geometry_columns' table from SpatiaLite.
     """
     f_table_name = models.CharField(max_length=256)
     f_geometry_column = models.CharField(max_length=256)
-    type = models.CharField(max_length=30)
+    if connection.ops.spatial_version[0] >= 4:
+        type = models.IntegerField(db_column='geometry_type')
+    else:
+        type = models.CharField(max_length=30)
     coord_dimension = models.IntegerField()
     srid = models.IntegerField(primary_key=True)
     spatial_index_enabled = models.IntegerField()
 
     class Meta:
+        app_label = 'gis'
         db_table = 'geometry_columns'
         managed = False
 
     @classmethod
     def table_name_col(cls):
         """
-        Returns the name of the metadata column used to store the
-        the feature table name.
+        Returns the name of the metadata column used to store the feature table
+        name.
         """
         return 'f_table_name'
 
     @classmethod
     def geom_col_name(cls):
         """
-        Returns the name of the metadata column used to store the
-        the feature geometry column.
+        Returns the name of the metadata column used to store the feature
+        geometry column.
         """
         return 'f_geometry_column'
 
@@ -44,7 +48,7 @@ class GeometryColumns(models.Model):
                 self.coord_dimension, self.type, self.srid)
 
 
-class SpatialRefSys(models.Model, SpatialRefSysMixin):
+class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
     """
     The 'spatial_ref_sys' table from SpatiaLite.
     """
@@ -64,5 +68,6 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
         return SpatialReference(self.proj4text).wkt
 
     class Meta:
+        app_label = 'gis'
         db_table = 'spatial_ref_sys'
         managed = False

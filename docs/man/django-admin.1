@@ -1,8 +1,8 @@
-.TH "django-admin.py" "1" "March 2008" "Django Project" ""
+.TH "django-admin" "1" "March 2008" "Django Project" ""
 .SH "NAME"
-django\-admin.py \- Utility script for the Django Web framework
+django\-admin \- Utility script for the Django Web framework
 .SH "SYNOPSIS"
-.B django\-admin.py
+.B django\-admin
 .I <action>
 .B [options]
 .sp
@@ -21,7 +21,7 @@ script found at the top level of each Django project directory.
 .BI cleanup
 Cleans out old data from the database (only expired sessions at the moment).
 .TP
-.BI "compilemessages [" "\-\-locale=LOCALE" "]"
+.BI "compilemessages [" "\-\-locale=LOCALE" "] [" "\-\-exclude=LOCALE" "] [" "\-\-use\-fuzzy" "]"
 Compiles .po files to .mo files for use with builtin gettext support.
 .TP
 .BI "createcachetable [" "tablename" "]"
@@ -59,7 +59,7 @@ Executes
 .B sqlall
 for the given app(s) in the current database.
 .TP
-.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "] [" "\-\-symlinks" "] [" "\-\-ignore=PATTERN" "] [" "\-\-no\-default\-ignore" "] [" "\-\-no\-wrap" "] [" "\-\-no\-location" "]"
+.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-exclude=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "] [" "\-\-symlinks" "] [" "\-\-ignore=PATTERN" "] [" "\-\-no\-default\-ignore" "] [" "\-\-no\-wrap" "] [" "\-\-no\-location" "]"
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
 conf/locale (in the django tree) or locale (for project and application) directory.
@@ -97,9 +97,6 @@ Prints the SQL statements that would be executed for the "flush" command.
 .TP
 .BI "sqlindexes [" "app_label ..." "]"
 Prints the CREATE INDEX SQL statements for the given model module name(s).
-.TP
-.BI "sqlinitialdata [" "app_label ..." "]"
-Prints the initial INSERT SQL statements for the given app name(s).
 .TP
 .BI "sqlsequencereset [" "app_label ..." "]"
 Prints the SQL statements for resetting PostgreSQL sequences for the
@@ -169,12 +166,15 @@ Enables IPv6 addresses.
 Verbosity level: 0=minimal output, 1=normal output, 2=all output.
 .TP
 .I \-\-traceback
-By default, django-admin.py will show a simple error message whenever an
-error occurs. If you specify this option, django-admin.py  will
+By default, django-admin will show a simple error message whenever an
+error occurs. If you specify this option, django-admin  will
 output a full stack trace whenever an exception is raised.
 .TP
 .I \-l, \-\-locale=LOCALE
 The locale to process when using makemessages or compilemessages.
+.TP
+.I \-x, \-\-exclude=LOCALE
+The locale to exclude from processing when using makemessages or compilemessages.
 .TP
 .I \-d, \-\-domain=DOMAIN
 The domain of the message files (default: "django") when using makemessages.
@@ -235,4 +235,3 @@ AUTHORS file in the Django distribution for contributors.
 .SH "LICENSE"
 New BSD license. For the full license text refer to the LICENSE file in the
 Django distribution.
-

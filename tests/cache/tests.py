@@ -16,18 +16,22 @@ import warnings
 
 from django.conf import settings
 from django.core import management
+from django.core import signals
 from django.core.cache import (cache, caches, CacheKeyWarning,
-    InvalidCacheBackendError, DEFAULT_CACHE_ALIAS)
-from django.db import connection, router, transaction
+    InvalidCacheBackendError, DEFAULT_CACHE_ALIAS, get_cache,
+    close_caches)
+from django.core.context_processors import csrf
+from django.db import connection, connections, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import HttpResponse, StreamingHttpResponse
 from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
+from django.middleware.csrf import CsrfViewMiddleware
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
-from django.test.utils import (IgnoreDeprecationWarningsMixin,
-    IgnorePendingDeprecationWarningsMixin)
+from django.test.signals import setting_changed
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
 from django.utils import timezone
 from django.utils import translation
@@ -71,18 +75,18 @@ class DummyCacheTests(TestCase):
     def test_simple(self):
         "Dummy cache backend ignores cache set calls"
         cache.set("key", "value")
-        self.assertEqual(cache.get("key"), None)
+        self.assertIsNone(cache.get("key"))
 
     def test_add(self):
         "Add doesn't do anything in dummy cache backend"
         cache.add("addkey1", "value")
         result = cache.add("addkey1", "newvalue")
-        self.assertEqual(result, True)
-        self.assertEqual(cache.get("addkey1"), None)
+        self.assertTrue(result)
+        self.assertIsNone(cache.get("addkey1"))
 
     def test_non_existent(self):
         "Non-existent keys aren't found in the dummy cache backend"
-        self.assertEqual(cache.get("does_not_exist"), None)
+        self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
 
     def test_get_many(self):
@@ -98,22 +102,22 @@ class DummyCacheTests(TestCase):
         "Cache deletion is transparently ignored on the dummy cache backend"
         cache.set("key1", "spam")
         cache.set("key2", "eggs")
-        self.assertEqual(cache.get("key1"), None)
+        self.assertIsNone(cache.get("key1"))
         cache.delete("key1")
-        self.assertEqual(cache.get("key1"), None)
-        self.assertEqual(cache.get("key2"), None)
+        self.assertIsNone(cache.get("key1"))
+        self.assertIsNone(cache.get("key2"))
 
     def test_has_key(self):
         "The has_key method doesn't ever return True for the dummy cache backend"
         cache.set("hello1", "goodbye1")
-        self.assertEqual(cache.has_key("hello1"), False)
-        self.assertEqual(cache.has_key("goodbye1"), False)
+        self.assertFalse(cache.has_key("hello1"))
+        self.assertFalse(cache.has_key("goodbye1"))
 
     def test_in(self):
         "The in operator doesn't ever return True for the dummy cache backend"
         cache.set("hello2", "goodbye2")
-        self.assertEqual("hello2" in cache, False)
-        self.assertEqual("goodbye2" in cache, False)
+        self.assertNotIn("hello2", cache)
+        self.assertNotIn("goodbye2", cache)
 
     def test_incr(self):
         "Dummy cache values can't be incremented"
@@ -139,7 +143,7 @@ class DummyCacheTests(TestCase):
             'class': C,
         }
         cache.set("stuff", stuff)
-        self.assertEqual(cache.get("stuff"), None)
+        self.assertIsNone(cache.get("stuff"))
 
     def test_expiration(self):
         "Expiration has no effect on the dummy cache"
@@ -148,11 +152,11 @@ class DummyCacheTests(TestCase):
         cache.set('expire3', 'very quickly', 1)
 
         time.sleep(2)
-        self.assertEqual(cache.get("expire1"), None)
+        self.assertIsNone(cache.get("expire1"))
 
         cache.add("expire2", "newvalue")
-        self.assertEqual(cache.get("expire2"), None)
-        self.assertEqual(cache.has_key("expire3"), False)
+        self.assertIsNone(cache.get("expire2"))
+        self.assertFalse(cache.has_key("expire3"))
 
     def test_unicode(self):
         "Unicode values are ignored by the dummy cache"
@@ -164,7 +168,7 @@ class DummyCacheTests(TestCase):
         }
         for (key, value) in stuff.items():
             cache.set(key, value)
-            self.assertEqual(cache.get(key), None)
+            self.assertIsNone(cache.get(key))
 
     def test_set_many(self):
         "set_many does nothing for the dummy cache backend"
@@ -215,7 +219,7 @@ def caches_setting_for_tests(base=None, **params):
     # This results in the following search order:
     # params -> _caches_setting_base -> base
     base = base or {}
-    setting = dict((k, base.copy()) for k in _caches_setting_base.keys())
+    setting = {k: base.copy() for k in _caches_setting_base.keys()}
     for key, cache_params in setting.items():
         cache_params.update(_caches_setting_base[key])
         cache_params.update(params)
@@ -240,7 +244,7 @@ class BaseCacheTests(object):
         # A key can be added to a cache
         cache.add("addkey1", "value")
         result = cache.add("addkey1", "newvalue")
-        self.assertEqual(result, False)
+        self.assertFalse(result)
         self.assertEqual(cache.get("addkey1"), "value")
 
     def test_prefix(self):
@@ -258,7 +262,7 @@ class BaseCacheTests(object):
     def test_non_existent(self):
         # Non-existent cache keys return as None/default
         # get with non-existent keys
-        self.assertEqual(cache.get("does_not_exist"), None)
+        self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
 
     def test_get_many(self):
@@ -267,8 +271,8 @@ class BaseCacheTests(object):
         cache.set('b', 'b')
         cache.set('c', 'c')
         cache.set('d', 'd')
-        self.assertEqual(cache.get_many(['a', 'c', 'd']), {'a': 'a', 'c': 'c', 'd': 'd'})
-        self.assertEqual(cache.get_many(['a', 'b', 'e']), {'a': 'a', 'b': 'b'})
+        self.assertDictEqual(cache.get_many(['a', 'c', 'd']), {'a': 'a', 'c': 'c', 'd': 'd'})
+        self.assertDictEqual(cache.get_many(['a', 'b', 'e']), {'a': 'a', 'b': 'b'})
 
     def test_delete(self):
         # Cache keys can be deleted
@@ -276,20 +280,22 @@ class BaseCacheTests(object):
         cache.set("key2", "eggs")
         self.assertEqual(cache.get("key1"), "spam")
         cache.delete("key1")
-        self.assertEqual(cache.get("key1"), None)
+        self.assertIsNone(cache.get("key1"))
         self.assertEqual(cache.get("key2"), "eggs")
 
     def test_has_key(self):
         # The cache can be inspected for cache keys
         cache.set("hello1", "goodbye1")
-        self.assertEqual(cache.has_key("hello1"), True)
-        self.assertEqual(cache.has_key("goodbye1"), False)
+        self.assertTrue(cache.has_key("hello1"))
+        self.assertFalse(cache.has_key("goodbye1"))
+        cache.set("no_expiry", "here", None)
+        self.assertTrue(cache.has_key("no_expiry"))
 
     def test_in(self):
         # The in operator can be used to inspect cache contents
         cache.set("hello2", "goodbye2")
-        self.assertEqual("hello2" in cache, True)
-        self.assertEqual("goodbye2" in cache, False)
+        self.assertIn("hello2", cache)
+        self.assertNotIn("goodbye2", cache)
 
     def test_incr(self):
         # Cache values can be incremented
@@ -377,11 +383,11 @@ class BaseCacheTests(object):
         cache.set('expire3', 'very quickly', 1)
 
         time.sleep(2)
-        self.assertEqual(cache.get("expire1"), None)
+        self.assertIsNone(cache.get("expire1"))
 
         cache.add("expire2", "newvalue")
         self.assertEqual(cache.get("expire2"), "newvalue")
-        self.assertEqual(cache.has_key("expire3"), False)
+        self.assertFalse(cache.has_key("expire3"))
 
     def test_unicode(self):
         # Unicode values can be cached
@@ -443,8 +449,8 @@ class BaseCacheTests(object):
         # set_many takes a second ``timeout`` parameter
         cache.set_many({"key1": "spam", "key2": "eggs"}, 1)
         time.sleep(2)
-        self.assertEqual(cache.get("key1"), None)
-        self.assertEqual(cache.get("key2"), None)
+        self.assertIsNone(cache.get("key1"))
+        self.assertIsNone(cache.get("key2"))
 
     def test_delete_many(self):
         # Multiple keys can be deleted using delete_many
@@ -452,8 +458,8 @@ class BaseCacheTests(object):
         cache.set("key2", "eggs")
         cache.set("key3", "ham")
         cache.delete_many(["key1", "key2"])
-        self.assertEqual(cache.get("key1"), None)
-        self.assertEqual(cache.get("key2"), None)
+        self.assertIsNone(cache.get("key1"))
+        self.assertIsNone(cache.get("key2"))
         self.assertEqual(cache.get("key3"), "ham")
 
     def test_clear(self):
@@ -461,8 +467,8 @@ class BaseCacheTests(object):
         cache.set("key1", "spam")
         cache.set("key2", "eggs")
         cache.clear()
-        self.assertEqual(cache.get("key1"), None)
-        self.assertEqual(cache.get("key2"), None)
+        self.assertIsNone(cache.get("key1"))
+        self.assertIsNone(cache.get("key2"))
 
     def test_long_timeout(self):
         '''
@@ -489,6 +495,9 @@ class BaseCacheTests(object):
 
         cache.add('key2', 'ham', None)
         self.assertEqual(cache.get('key2'), 'ham')
+        added = cache.add('key1', 'new eggs', None)
+        self.assertEqual(added, False)
+        self.assertEqual(cache.get('key1'), 'eggs')
 
         cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, None)
         self.assertEqual(cache.get('key3'), 'sausage')
@@ -499,14 +508,14 @@ class BaseCacheTests(object):
         Passing in zero into timeout results in a value that is not cached
         '''
         cache.set('key1', 'eggs', 0)
-        self.assertEqual(cache.get('key1'), None)
+        self.assertIsNone(cache.get('key1'))
 
         cache.add('key2', 'ham', 0)
-        self.assertEqual(cache.get('key2'), None)
+        self.assertIsNone(cache.get('key2'))
 
         cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 0)
-        self.assertEqual(cache.get('key3'), None)
-        self.assertEqual(cache.get('key4'), None)
+        self.assertIsNone(cache.get('key3'))
+        self.assertIsNone(cache.get('key4'))
 
     def test_float_timeout(self):
         # Make sure a timeout given as a float doesn't crash anything.
@@ -568,51 +577,51 @@ class BaseCacheTests(object):
         cache.set('answer1', 42)
         self.assertEqual(cache.get('answer1'), 42)
         self.assertEqual(cache.get('answer1', version=1), 42)
-        self.assertEqual(cache.get('answer1', version=2), None)
+        self.assertIsNone(cache.get('answer1', version=2))
 
-        self.assertEqual(caches['v2'].get('answer1'), None)
+        self.assertIsNone(caches['v2'].get('answer1'))
         self.assertEqual(caches['v2'].get('answer1', version=1), 42)
-        self.assertEqual(caches['v2'].get('answer1', version=2), None)
+        self.assertIsNone(caches['v2'].get('answer1', version=2))
 
         # set, default version = 1, but manually override version = 2
         cache.set('answer2', 42, version=2)
-        self.assertEqual(cache.get('answer2'), None)
-        self.assertEqual(cache.get('answer2', version=1), None)
+        self.assertIsNone(cache.get('answer2'))
+        self.assertIsNone(cache.get('answer2', version=1))
         self.assertEqual(cache.get('answer2', version=2), 42)
 
         self.assertEqual(caches['v2'].get('answer2'), 42)
-        self.assertEqual(caches['v2'].get('answer2', version=1), None)
+        self.assertIsNone(caches['v2'].get('answer2', version=1))
         self.assertEqual(caches['v2'].get('answer2', version=2), 42)
 
         # v2 set, using default version = 2
         caches['v2'].set('answer3', 42)
-        self.assertEqual(cache.get('answer3'), None)
-        self.assertEqual(cache.get('answer3', version=1), None)
+        self.assertIsNone(cache.get('answer3'))
+        self.assertIsNone(cache.get('answer3', version=1))
         self.assertEqual(cache.get('answer3', version=2), 42)
 
         self.assertEqual(caches['v2'].get('answer3'), 42)
-        self.assertEqual(caches['v2'].get('answer3', version=1), None)
+        self.assertIsNone(caches['v2'].get('answer3', version=1))
         self.assertEqual(caches['v2'].get('answer3', version=2), 42)
 
         # v2 set, default version = 2, but manually override version = 1
         caches['v2'].set('answer4', 42, version=1)
         self.assertEqual(cache.get('answer4'), 42)
         self.assertEqual(cache.get('answer4', version=1), 42)
-        self.assertEqual(cache.get('answer4', version=2), None)
+        self.assertIsNone(cache.get('answer4', version=2))
 
-        self.assertEqual(caches['v2'].get('answer4'), None)
+        self.assertIsNone(caches['v2'].get('answer4'))
         self.assertEqual(caches['v2'].get('answer4', version=1), 42)
-        self.assertEqual(caches['v2'].get('answer4', version=2), None)
+        self.assertIsNone(caches['v2'].get('answer4', version=2))
 
     def test_cache_versioning_add(self):
 
         # add, default version = 1, but manually override version = 2
         cache.add('answer1', 42, version=2)
-        self.assertEqual(cache.get('answer1', version=1), None)
+        self.assertIsNone(cache.get('answer1', version=1))
         self.assertEqual(cache.get('answer1', version=2), 42)
 
         cache.add('answer1', 37, version=2)
-        self.assertEqual(cache.get('answer1', version=1), None)
+        self.assertIsNone(cache.get('answer1', version=1))
         self.assertEqual(cache.get('answer1', version=2), 42)
 
         cache.add('answer1', 37, version=1)
@@ -621,11 +630,11 @@ class BaseCacheTests(object):
 
         # v2 add, using default version = 2
         caches['v2'].add('answer2', 42)
-        self.assertEqual(cache.get('answer2', version=1), None)
+        self.assertIsNone(cache.get('answer2', version=1))
         self.assertEqual(cache.get('answer2', version=2), 42)
 
         caches['v2'].add('answer2', 37)
-        self.assertEqual(cache.get('answer2', version=1), None)
+        self.assertIsNone(cache.get('answer2', version=1))
         self.assertEqual(cache.get('answer2', version=2), 42)
 
         caches['v2'].add('answer2', 37, version=1)
@@ -635,11 +644,11 @@ class BaseCacheTests(object):
         # v2 add, default version = 2, but manually override version = 1
         caches['v2'].add('answer3', 42, version=1)
         self.assertEqual(cache.get('answer3', version=1), 42)
-        self.assertEqual(cache.get('answer3', version=2), None)
+        self.assertIsNone(cache.get('answer3', version=2))
 
         caches['v2'].add('answer3', 37, version=1)
         self.assertEqual(cache.get('answer3', version=1), 42)
-        self.assertEqual(cache.get('answer3', version=2), None)
+        self.assertIsNone(cache.get('answer3', version=2))
 
         caches['v2'].add('answer3', 37)
         self.assertEqual(cache.get('answer3', version=1), 42)
@@ -661,25 +670,25 @@ class BaseCacheTests(object):
         cache.set('answer1', 37, version=1)
         cache.set('answer1', 42, version=2)
         cache.delete('answer1')
-        self.assertEqual(cache.get('answer1', version=1), None)
+        self.assertIsNone(cache.get('answer1', version=1))
         self.assertEqual(cache.get('answer1', version=2), 42)
 
         cache.set('answer2', 37, version=1)
         cache.set('answer2', 42, version=2)
         cache.delete('answer2', version=2)
         self.assertEqual(cache.get('answer2', version=1), 37)
-        self.assertEqual(cache.get('answer2', version=2), None)
+        self.assertIsNone(cache.get('answer2', version=2))
 
         cache.set('answer3', 37, version=1)
         cache.set('answer3', 42, version=2)
         caches['v2'].delete('answer3')
         self.assertEqual(cache.get('answer3', version=1), 37)
-        self.assertEqual(cache.get('answer3', version=2), None)
+        self.assertIsNone(cache.get('answer3', version=2))
 
         cache.set('answer4', 37, version=1)
         cache.set('answer4', 42, version=2)
         caches['v2'].delete('answer4', version=1)
-        self.assertEqual(cache.get('answer4', version=1), None)
+        self.assertIsNone(cache.get('answer4', version=1))
         self.assertEqual(cache.get('answer4', version=2), 42)
 
     def test_cache_versioning_incr_decr(self):
@@ -722,103 +731,103 @@ class BaseCacheTests(object):
     def test_cache_versioning_get_set_many(self):
         # set, using default version = 1
         cache.set_many({'ford1': 37, 'arthur1': 42})
-        self.assertEqual(cache.get_many(['ford1', 'arthur1']),
+        self.assertDictEqual(cache.get_many(['ford1', 'arthur1']),
                          {'ford1': 37, 'arthur1': 42})
-        self.assertEqual(cache.get_many(['ford1', 'arthur1'], version=1),
+        self.assertDictEqual(cache.get_many(['ford1', 'arthur1'], version=1),
                          {'ford1': 37, 'arthur1': 42})
-        self.assertEqual(cache.get_many(['ford1', 'arthur1'], version=2), {})
+        self.assertDictEqual(cache.get_many(['ford1', 'arthur1'], version=2), {})
 
-        self.assertEqual(caches['v2'].get_many(['ford1', 'arthur1']), {})
-        self.assertEqual(caches['v2'].get_many(['ford1', 'arthur1'], version=1),
+        self.assertDictEqual(caches['v2'].get_many(['ford1', 'arthur1']), {})
+        self.assertDictEqual(caches['v2'].get_many(['ford1', 'arthur1'], version=1),
                          {'ford1': 37, 'arthur1': 42})
-        self.assertEqual(caches['v2'].get_many(['ford1', 'arthur1'], version=2), {})
+        self.assertDictEqual(caches['v2'].get_many(['ford1', 'arthur1'], version=2), {})
 
         # set, default version = 1, but manually override version = 2
         cache.set_many({'ford2': 37, 'arthur2': 42}, version=2)
-        self.assertEqual(cache.get_many(['ford2', 'arthur2']), {})
-        self.assertEqual(cache.get_many(['ford2', 'arthur2'], version=1), {})
-        self.assertEqual(cache.get_many(['ford2', 'arthur2'], version=2),
+        self.assertDictEqual(cache.get_many(['ford2', 'arthur2']), {})
+        self.assertDictEqual(cache.get_many(['ford2', 'arthur2'], version=1), {})
+        self.assertDictEqual(cache.get_many(['ford2', 'arthur2'], version=2),
                          {'ford2': 37, 'arthur2': 42})
 
-        self.assertEqual(caches['v2'].get_many(['ford2', 'arthur2']),
+        self.assertDictEqual(caches['v2'].get_many(['ford2', 'arthur2']),
                          {'ford2': 37, 'arthur2': 42})
-        self.assertEqual(caches['v2'].get_many(['ford2', 'arthur2'], version=1), {})
-        self.assertEqual(caches['v2'].get_many(['ford2', 'arthur2'], version=2),
+        self.assertDictEqual(caches['v2'].get_many(['ford2', 'arthur2'], version=1), {})
+        self.assertDictEqual(caches['v2'].get_many(['ford2', 'arthur2'], version=2),
                          {'ford2': 37, 'arthur2': 42})
 
         # v2 set, using default version = 2
         caches['v2'].set_many({'ford3': 37, 'arthur3': 42})
-        self.assertEqual(cache.get_many(['ford3', 'arthur3']), {})
-        self.assertEqual(cache.get_many(['ford3', 'arthur3'], version=1), {})
-        self.assertEqual(cache.get_many(['ford3', 'arthur3'], version=2),
+        self.assertDictEqual(cache.get_many(['ford3', 'arthur3']), {})
+        self.assertDictEqual(cache.get_many(['ford3', 'arthur3'], version=1), {})
+        self.assertDictEqual(cache.get_many(['ford3', 'arthur3'], version=2),
                          {'ford3': 37, 'arthur3': 42})
 
-        self.assertEqual(caches['v2'].get_many(['ford3', 'arthur3']),
+        self.assertDictEqual(caches['v2'].get_many(['ford3', 'arthur3']),
                          {'ford3': 37, 'arthur3': 42})
-        self.assertEqual(caches['v2'].get_many(['ford3', 'arthur3'], version=1), {})
-        self.assertEqual(caches['v2'].get_many(['ford3', 'arthur3'], version=2),
+        self.assertDictEqual(caches['v2'].get_many(['ford3', 'arthur3'], version=1), {})
+        self.assertDictEqual(caches['v2'].get_many(['ford3', 'arthur3'], version=2),
                          {'ford3': 37, 'arthur3': 42})
 
         # v2 set, default version = 2, but manually override version = 1
         caches['v2'].set_many({'ford4': 37, 'arthur4': 42}, version=1)
-        self.assertEqual(cache.get_many(['ford4', 'arthur4']),
+        self.assertDictEqual(cache.get_many(['ford4', 'arthur4']),
                          {'ford4': 37, 'arthur4': 42})
-        self.assertEqual(cache.get_many(['ford4', 'arthur4'], version=1),
+        self.assertDictEqual(cache.get_many(['ford4', 'arthur4'], version=1),
                          {'ford4': 37, 'arthur4': 42})
-        self.assertEqual(cache.get_many(['ford4', 'arthur4'], version=2), {})
+        self.assertDictEqual(cache.get_many(['ford4', 'arthur4'], version=2), {})
 
-        self.assertEqual(caches['v2'].get_many(['ford4', 'arthur4']), {})
-        self.assertEqual(caches['v2'].get_many(['ford4', 'arthur4'], version=1),
+        self.assertDictEqual(caches['v2'].get_many(['ford4', 'arthur4']), {})
+        self.assertDictEqual(caches['v2'].get_many(['ford4', 'arthur4'], version=1),
                          {'ford4': 37, 'arthur4': 42})
-        self.assertEqual(caches['v2'].get_many(['ford4', 'arthur4'], version=2), {})
+        self.assertDictEqual(caches['v2'].get_many(['ford4', 'arthur4'], version=2), {})
 
     def test_incr_version(self):
         cache.set('answer', 42, version=2)
-        self.assertEqual(cache.get('answer'), None)
-        self.assertEqual(cache.get('answer', version=1), None)
+        self.assertIsNone(cache.get('answer'))
+        self.assertIsNone(cache.get('answer', version=1))
         self.assertEqual(cache.get('answer', version=2), 42)
-        self.assertEqual(cache.get('answer', version=3), None)
+        self.assertIsNone(cache.get('answer', version=3))
 
         self.assertEqual(cache.incr_version('answer', version=2), 3)
-        self.assertEqual(cache.get('answer'), None)
-        self.assertEqual(cache.get('answer', version=1), None)
-        self.assertEqual(cache.get('answer', version=2), None)
+        self.assertIsNone(cache.get('answer'))
+        self.assertIsNone(cache.get('answer', version=1))
+        self.assertIsNone(cache.get('answer', version=2))
         self.assertEqual(cache.get('answer', version=3), 42)
 
         caches['v2'].set('answer2', 42)
         self.assertEqual(caches['v2'].get('answer2'), 42)
-        self.assertEqual(caches['v2'].get('answer2', version=1), None)
+        self.assertIsNone(caches['v2'].get('answer2', version=1))
         self.assertEqual(caches['v2'].get('answer2', version=2), 42)
-        self.assertEqual(caches['v2'].get('answer2', version=3), None)
+        self.assertIsNone(caches['v2'].get('answer2', version=3))
 
         self.assertEqual(caches['v2'].incr_version('answer2'), 3)
-        self.assertEqual(caches['v2'].get('answer2'), None)
-        self.assertEqual(caches['v2'].get('answer2', version=1), None)
-        self.assertEqual(caches['v2'].get('answer2', version=2), None)
+        self.assertIsNone(caches['v2'].get('answer2'))
+        self.assertIsNone(caches['v2'].get('answer2', version=1))
+        self.assertIsNone(caches['v2'].get('answer2', version=2))
         self.assertEqual(caches['v2'].get('answer2', version=3), 42)
 
         self.assertRaises(ValueError, cache.incr_version, 'does_not_exist')
 
     def test_decr_version(self):
         cache.set('answer', 42, version=2)
-        self.assertEqual(cache.get('answer'), None)
-        self.assertEqual(cache.get('answer', version=1), None)
+        self.assertIsNone(cache.get('answer'))
+        self.assertIsNone(cache.get('answer', version=1))
         self.assertEqual(cache.get('answer', version=2), 42)
 
         self.assertEqual(cache.decr_version('answer', version=2), 1)
         self.assertEqual(cache.get('answer'), 42)
         self.assertEqual(cache.get('answer', version=1), 42)
-        self.assertEqual(cache.get('answer', version=2), None)
+        self.assertIsNone(cache.get('answer', version=2))
 
         caches['v2'].set('answer2', 42)
         self.assertEqual(caches['v2'].get('answer2'), 42)
-        self.assertEqual(caches['v2'].get('answer2', version=1), None)
+        self.assertIsNone(caches['v2'].get('answer2', version=1))
         self.assertEqual(caches['v2'].get('answer2', version=2), 42)
 
         self.assertEqual(caches['v2'].decr_version('answer2'), 1)
-        self.assertEqual(caches['v2'].get('answer2'), None)
+        self.assertIsNone(caches['v2'].get('answer2'))
         self.assertEqual(caches['v2'].get('answer2', version=1), 42)
-        self.assertEqual(caches['v2'].get('answer2', version=2), None)
+        self.assertIsNone(caches['v2'].get('answer2', version=2))
 
         self.assertRaises(ValueError, cache.decr_version, 'does_not_exist', version=2)
 
@@ -826,11 +835,11 @@ class BaseCacheTests(object):
         # Two caches with different key functions aren't visible to each other
         cache.set('answer1', 42)
         self.assertEqual(cache.get('answer1'), 42)
-        self.assertEqual(caches['custom_key'].get('answer1'), None)
-        self.assertEqual(caches['custom_key2'].get('answer1'), None)
+        self.assertIsNone(caches['custom_key'].get('answer1'))
+        self.assertIsNone(caches['custom_key2'].get('answer1'))
 
         caches['custom_key'].set('answer2', 42)
-        self.assertEqual(cache.get('answer2'), None)
+        self.assertIsNone(cache.get('answer2'))
         self.assertEqual(caches['custom_key'].get('answer2'), 42)
         self.assertEqual(caches['custom_key2'].get('answer2'), 42)
 
@@ -844,7 +853,7 @@ class BaseCacheTests(object):
         request = self.factory.get('/cache/test')
         request._cache_update_cache = True
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        self.assertEqual(get_cache_data, None)
+        self.assertIsNone(get_cache_data)
 
         response = HttpResponse()
         content = 'Testing cookie serialization.'
@@ -854,13 +863,13 @@ class BaseCacheTests(object):
         update_middleware.process_response(request, response)
 
         get_cache_data = fetch_middleware.process_request(request)
-        self.assertNotEqual(get_cache_data, None)
+        self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, content.encode('utf-8'))
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
         update_middleware.process_response(request, get_cache_data)
         get_cache_data = fetch_middleware.process_request(request)
-        self.assertNotEqual(get_cache_data, None)
+        self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, content.encode('utf-8'))
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
@@ -906,12 +915,9 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self._perform_cull_test(caches['zero_cull'], 50, 18)
 
     def test_second_call_doesnt_crash(self):
-        stdout = six.StringIO()
-        management.call_command(
-            'createcachetable',
-            stdout=stdout
-        )
-        self.assertEqual(stdout.getvalue(),
+        out = six.StringIO()
+        management.call_command('createcachetable', stdout=out)
+        self.assertEqual(out.getvalue(),
             "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
 
     def test_createcachetable_with_table_argument(self):
@@ -920,14 +926,14 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         specifying the table name).
         """
         self.drop_table()
-        stdout = six.StringIO()
+        out = six.StringIO()
         management.call_command(
             'createcachetable',
             'test cache table',
             verbosity=2,
-            stdout=stdout
+            stdout=out,
         )
-        self.assertEqual(stdout.getvalue(),
+        self.assertEqual(out.getvalue(),
             "Cache table 'test cache table' created.\n")
 
     def test_clear_commits_transaction(self):
@@ -935,7 +941,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         cache.set("key1", "spam")
         cache.clear()
         transaction.rollback()
-        self.assertEqual(cache.get("key1"), None)
+        self.assertIsNone(cache.get("key1"))
 
 
 @override_settings(USE_TZ=True)
@@ -970,26 +976,25 @@ class DBCacheRouter(object):
 class CreateCacheTableForDBCacheTests(TestCase):
     multi_db = True
 
+    @override_settings(DATABASE_ROUTERS=[DBCacheRouter()])
     def test_createcachetable_observes_database_router(self):
-        old_routers = router.routers
-        try:
-            router.routers = [DBCacheRouter()]
-            # cache table should not be created on 'default'
-            with self.assertNumQueries(0, using='default'):
-                management.call_command('createcachetable',
-                                        database='default',
-                                        verbosity=0, interactive=False)
-            # cache table should be created on 'other'
-            # Queries:
-            #   1: check table doesn't already exist
-            #   2: create the table
-            #   3: create the index
-            with self.assertNumQueries(3, using='other'):
-                management.call_command('createcachetable',
-                                        database='other',
-                                        verbosity=0, interactive=False)
-        finally:
-            router.routers = old_routers
+        # cache table should not be created on 'default'
+        with self.assertNumQueries(0, using='default'):
+            management.call_command('createcachetable',
+                                    database='default',
+                                    verbosity=0, interactive=False)
+        # cache table should be created on 'other'
+        # Queries:
+        #   1: check table doesn't already exist
+        #   2: create savepoint (if transactional DDL is supported)
+        #   3: create the table
+        #   4: create the index
+        #   5: release savepoint (if transactional DDL is supported)
+        num = 5 if connections['other'].features.can_rollback_ddl else 3
+        with self.assertNumQueries(num, using='other'):
+            management.call_command('createcachetable',
+                                    database='other',
+                                    verbosity=0, interactive=False)
 
 
 class PicklingSideEffect(object):
@@ -1037,7 +1042,7 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         "Check that multiple locmem caches are isolated"
         cache.set('value', 42)
         self.assertEqual(caches['default'].get('value'), 42)
-        self.assertEqual(caches['other'].get('value'), None)
+        self.assertIsNone(caches['other'].get('value'))
 
     def test_locking_on_pickle(self):
         """#20613/#18541 -- Ensures pickling is done outside of the lock."""
@@ -1069,6 +1074,12 @@ for _cache_params in settings.CACHES.values():
     if _cache_params['BACKEND'].startswith('django.core.cache.backends.memcached.'):
         memcached_params = _cache_params
 
+memcached_never_expiring_params = memcached_params.copy()
+memcached_never_expiring_params['TIMEOUT'] = None
+
+memcached_far_future_params = memcached_params.copy()
+memcached_far_future_params['TIMEOUT'] = 31536000  # 60*60*24*365, 1 year
+
 
 @unittest.skipUnless(memcached_params, "memcached not available")
 @override_settings(CACHES=caches_setting_for_tests(base=memcached_params))
@@ -1095,10 +1106,22 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
         "cache with python-memcached library not available")
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
-        for cache_key, cache in settings.CACHES.items():
-            if cache['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache':
+        for cache_key, cache_config in settings.CACHES.items():
+            if cache_config['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache':
                 self.assertEqual(caches[cache_key]._cache.pickleProtocol,
                                  pickle.HIGHEST_PROTOCOL)
+
+    @override_settings(CACHES=caches_setting_for_tests(base=memcached_never_expiring_params))
+    def test_default_never_expiring_timeout(self):
+        # Regression test for #22845
+        cache.set('infinite_foo', 'bar')
+        self.assertEqual(cache.get('infinite_foo'), 'bar')
+
+    @override_settings(CACHES=caches_setting_for_tests(base=memcached_far_future_params))
+    def test_default_far_future_timeout(self):
+        # Regression test for #22845
+        cache.set('future_foo', 'bar')
+        self.assertEqual(cache.get('future_foo'), 'bar')
 
     def test_cull(self):
         # culling isn't implemented, memcached deals with it.
@@ -1107,6 +1130,24 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
     def test_zero_cull(self):
         # culling isn't implemented, memcached deals with it.
         pass
+
+    def test_memcached_deletes_key_on_failed_set(self):
+        # By default memcached allows objects up to 1MB. For the cache_db session
+        # backend to always use the current session, memcached needs to delete
+        # the old key if it fails to set.
+        # pylibmc doesn't seem to have SERVER_MAX_VALUE_LENGTH as far as I can
+        # tell from a quick check of its source code. This is falling back to
+        # the default value exposed by python-memcached on my system.
+        max_value_length = getattr(cache._lib, 'SERVER_MAX_VALUE_LENGTH', 1048576)
+
+        cache.set('small_value', 'a')
+        self.assertEqual(cache.get('small_value'), 'a')
+
+        large_value = 'a' * (max_value_length + 1)
+        cache.set('small_value', large_value)
+        # small_value should be deleted, or set if configured to accept larger values
+        value = cache.get('small_value')
+        self.assertTrue(value is None or value == large_value)
 
 
 @override_settings(CACHES=caches_setting_for_tests(
@@ -1120,12 +1161,17 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
     def setUp(self):
         super(FileBasedCacheTests, self).setUp()
         self.dirname = tempfile.mkdtemp()
+        # Caches location cannot be modified through override_settings / modify_settings,
+        # hence settings are manipulated directly here and the setting_changed signal
+        # is triggered manually.
         for cache_params in settings.CACHES.values():
             cache_params.update({'LOCATION': self.dirname})
+        setting_changed.send(self.__class__, setting='CACHES', enter=False)
 
     def tearDown(self):
-        shutil.rmtree(self.dirname)
         super(FileBasedCacheTests, self).tearDown()
+        # Call parent first, as cache.clear() may recreate cache base directory
+        shutil.rmtree(self.dirname)
 
     def test_ignores_non_cache_files(self):
         fname = os.path.join(self.dirname, 'not-a-cache-file')
@@ -1174,10 +1220,9 @@ class CustomCacheKeyValidationTests(TestCase):
         }
     }
 )
-class GetCacheTests(IgnorePendingDeprecationWarningsMixin, TestCase):
+class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
 
     def test_simple(self):
-        from django.core.cache import caches, get_cache
         self.assertIsInstance(
             caches[DEFAULT_CACHE_ALIAS],
             get_cache('default').__class__
@@ -1192,18 +1237,20 @@ class GetCacheTests(IgnorePendingDeprecationWarningsMixin, TestCase):
         self.assertRaises(InvalidCacheBackendError, get_cache, 'does_not_exist')
 
     def test_close(self):
-        from django.core import signals
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
 
     def test_close_deprecated(self):
-        from django.core.cache import get_cache
-        from django.core import signals
         cache = get_cache('cache.closeable_cache.CacheClass')
         self.assertFalse(cache.closed)
-        signals.request_finished.send(self.__class__)
-        self.assertTrue(cache.closed)
+        # Ensure that we don't close the global cache instances.
+        signals.request_finished.disconnect(close_caches)
+        try:
+            signals.request_finished.send(self.__class__)
+            self.assertTrue(cache.closed)
+        finally:
+            signals.request_finished.connect(close_caches)
 
 
 DEFAULT_MEMORY_CACHES_SETTINGS = {
@@ -1254,8 +1301,8 @@ class DefaultNonExpiringCacheKeyTests(TestCase):
         This means "no timeout".
         """
         cache = caches[DEFAULT_CACHE_ALIAS]
-        self.assertIs(None, cache.default_timeout)
-        self.assertEqual(None, cache.get_backend_timeout())
+        self.assertIsNone(cache.default_timeout)
+        self.assertIsNone(cache.get_backend_timeout())
 
     @override_settings(CACHES=DEFAULT_MEMORY_CACHES_SETTINGS)
     def test_caches_with_unset_timeout_set_expiring_key(self):
@@ -1267,7 +1314,7 @@ class DefaultNonExpiringCacheKeyTests(TestCase):
         cache = caches[DEFAULT_CACHE_ALIAS]
         cache.set(key, value)
         cache_key = cache.make_key(key)
-        self.assertNotEqual(None, cache._expire_info[cache_key])
+        self.assertIsNotNone(cache._expire_info[cache_key])
 
     @override_settings(CACHES=NEVER_EXPIRING_CACHES_SETTINGS)
     def text_caches_set_with_timeout_as_none_set_non_expiring_key(self):
@@ -1279,7 +1326,7 @@ class DefaultNonExpiringCacheKeyTests(TestCase):
         cache = caches[DEFAULT_CACHE_ALIAS]
         cache.set(key, value)
         cache_key = cache.make_key(key)
-        self.assertEqual(None, cache._expire_info[cache_key])
+        self.assertIsNone(cache._expire_info[cache_key])
 
 
 @override_settings(
@@ -1334,9 +1381,8 @@ class CacheUtils(TestCase):
     def test_get_cache_key(self):
         request = self.factory.get(self.path)
         response = HttpResponse()
-        key_prefix = 'localprefix'
         # Expect None if no headers have been set yet.
-        self.assertEqual(get_cache_key(request), None)
+        self.assertIsNone(get_cache_key(request, response))
         # Set headers to an empty list.
         learn_cache_key(request, response)
 
@@ -1346,6 +1392,7 @@ class CacheUtils(TestCase):
             '18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e'
         )
         # Verify that a specified key_prefix is taken into account.
+        key_prefix = 'localprefix'
         learn_cache_key(request, response, key_prefix=key_prefix)
         self.assertEqual(
             get_cache_key(request, key_prefix=key_prefix),
@@ -1357,7 +1404,7 @@ class CacheUtils(TestCase):
         request = self.factory.get(self.path, {'test': 1})
         response = HttpResponse()
         # Expect None if no headers have been set yet.
-        self.assertEqual(get_cache_key(request), None)
+        self.assertIsNone(get_cache_key(request))
         # Set headers to an empty list.
         learn_cache_key(request, response)
         # Verify that the querystring is taken into account.
@@ -1376,7 +1423,7 @@ class CacheUtils(TestCase):
         learn_cache_key(request1, HttpResponse())
         request2 = self.factory.get(self.path, HTTP_HOST='sub-2.example.com')
         learn_cache_key(request2, HttpResponse())
-        self.assertTrue(get_cache_key(request1) != get_cache_key(request2))
+        self.assertNotEqual(get_cache_key(request1), get_cache_key(request2))
 
     def test_learn_cache_key(self):
         request = self.factory.head(self.path)
@@ -1394,16 +1441,16 @@ class CacheUtils(TestCase):
     def test_patch_cache_control(self):
         tests = (
             # Initial Cache-Control, kwargs to patch_cache_control, expected Cache-Control parts
-            (None, {'private': True}, set(['private'])),
+            (None, {'private': True}, {'private'}),
 
             # Test whether private/public attributes are mutually exclusive
-            ('private', {'private': True}, set(['private'])),
-            ('private', {'public': True}, set(['public'])),
-            ('public', {'public': True}, set(['public'])),
-            ('public', {'private': True}, set(['private'])),
-            ('must-revalidate,max-age=60,private', {'public': True}, set(['must-revalidate', 'max-age=60', 'public'])),
-            ('must-revalidate,max-age=60,public', {'private': True}, set(['must-revalidate', 'max-age=60', 'private'])),
-            ('must-revalidate,max-age=60', {'public': True}, set(['must-revalidate', 'max-age=60', 'public'])),
+            ('private', {'private': True}, {'private'}),
+            ('private', {'public': True}, {'public'}),
+            ('public', {'public': True}, {'public'}),
+            ('public', {'private': True}, {'private'}),
+            ('must-revalidate,max-age=60,private', {'public': True}, {'must-revalidate', 'max-age=60', 'public'}),
+            ('must-revalidate,max-age=60,public', {'private': True}, {'must-revalidate', 'max-age=60', 'private'}),
+            ('must-revalidate,max-age=60', {'public': True}, {'must-revalidate', 'max-age=60', 'public'}),
         )
 
         cc_delim_re = re.compile(r'\s*,\s*')
@@ -1462,7 +1509,7 @@ class CacheHEADTest(TestCase):
         request = self.factory.head(self.path)
         request._cache_update_cache = True
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        self.assertNotEqual(get_cache_data, None)
+        self.assertIsNotNone(get_cache_data)
         self.assertEqual(test_content.encode(), get_cache_data.content)
 
     def test_head_with_cached_get(self):
@@ -1474,7 +1521,7 @@ class CacheHEADTest(TestCase):
 
         request = self.factory.head(self.path)
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        self.assertNotEqual(get_cache_data, None)
+        self.assertIsNotNone(get_cache_data)
         self.assertEqual(test_content.encode(), get_cache_data.content)
 
 
@@ -1651,20 +1698,20 @@ class CacheI18nTest(TestCase):
 
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         # first access, cache must return None
-        self.assertEqual(get_cache_data, None)
+        self.assertIsNone(get_cache_data)
         response = HttpResponse()
         content = 'Check for cache with QUERY_STRING'
         response.content = content
         UpdateCacheMiddleware().process_response(request, response)
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         # cache must return content
-        self.assertNotEqual(get_cache_data, None)
+        self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, content.encode())
         # different QUERY_STRING, cache must be empty
         request = self.factory.get(self.path, {'foo': 'bar', 'somethingelse': 'true'})
         request._cache_update_cache = True
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        self.assertEqual(get_cache_data, None)
+        self.assertIsNone(get_cache_data)
 
         # i18n tests
         en_message = "Hello world!"
@@ -1675,7 +1722,7 @@ class CacheI18nTest(TestCase):
         set_cache(request, 'en', en_message)
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         # Check that we can recover the cache
-        self.assertNotEqual(get_cache_data, None)
+        self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, en_message.encode())
         # Check that we use etags
         self.assertTrue(get_cache_data.has_header('ETag'))
@@ -1739,11 +1786,14 @@ def hello_world_view(request, value):
     return HttpResponse('Hello World %s' % value)
 
 
+def csrf_view(request):
+    return HttpResponse(csrf(request)['csrf_token'])
+
+
 @override_settings(
     CACHE_MIDDLEWARE_ALIAS='other',
     CACHE_MIDDLEWARE_KEY_PREFIX='middlewareprefix',
     CACHE_MIDDLEWARE_SECONDS=30,
-    CACHE_MIDDLEWARE_ANONYMOUS_ONLY=False,
     CACHES={
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -1755,7 +1805,7 @@ def hello_world_view(request, value):
         },
     },
 )
-class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
+class CacheMiddlewareTest(TestCase):
 
     def setUp(self):
         super(CacheMiddlewareTest, self).setUp()
@@ -1781,7 +1831,6 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         self.assertEqual(middleware.cache_timeout, 30)
         self.assertEqual(middleware.key_prefix, 'middlewareprefix')
         self.assertEqual(middleware.cache_alias, 'other')
-        self.assertEqual(middleware.cache_anonymous_only, False)
 
         # If arguments are being passed in construction, it's being used as a decorator.
         # First, test with "defaults":
@@ -1790,15 +1839,13 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         self.assertEqual(as_view_decorator.cache_timeout, 30)  # Timeout value for 'default' cache, i.e. 30
         self.assertEqual(as_view_decorator.key_prefix, '')
         self.assertEqual(as_view_decorator.cache_alias, 'default')  # Value of DEFAULT_CACHE_ALIAS from django.core.cache
-        self.assertEqual(as_view_decorator.cache_anonymous_only, False)
 
         # Next, test with custom values:
-        as_view_decorator_with_custom = CacheMiddleware(cache_anonymous_only=True, cache_timeout=60, cache_alias='other', key_prefix='foo')
+        as_view_decorator_with_custom = CacheMiddleware(cache_timeout=60, cache_alias='other', key_prefix='foo')
 
         self.assertEqual(as_view_decorator_with_custom.cache_timeout, 60)
         self.assertEqual(as_view_decorator_with_custom.key_prefix, 'foo')
         self.assertEqual(as_view_decorator_with_custom.cache_alias, 'other')
-        self.assertEqual(as_view_decorator_with_custom.cache_anonymous_only, True)
 
     def test_middleware(self):
         middleware = CacheMiddleware()
@@ -1809,7 +1856,7 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
 
         # Put the request through the request middleware
         result = middleware.process_request(request)
-        self.assertEqual(result, None)
+        self.assertIsNone(result)
 
         response = hello_world_view(request, '1')
 
@@ -1818,68 +1865,17 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
 
         # Repeating the request should result in a cache hit
         result = middleware.process_request(request)
-        self.assertNotEqual(result, None)
+        self.assertIsNotNone(result)
         self.assertEqual(result.content, b'Hello World 1')
 
         # The same request through a different middleware won't hit
         result = prefix_middleware.process_request(request)
-        self.assertEqual(result, None)
+        self.assertIsNone(result)
 
         # The same request with a timeout _will_ hit
         result = timeout_middleware.process_request(request)
-        self.assertNotEqual(result, None)
+        self.assertIsNotNone(result)
         self.assertEqual(result.content, b'Hello World 1')
-
-    @override_settings(CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True)
-    def test_cache_middleware_anonymous_only_wont_cause_session_access(self):
-        """ The cache middleware shouldn't cause a session access due to
-        CACHE_MIDDLEWARE_ANONYMOUS_ONLY if nothing else has accessed the
-        session. Refs 13283 """
-
-        from django.contrib.sessions.middleware import SessionMiddleware
-        from django.contrib.auth.middleware import AuthenticationMiddleware
-
-        middleware = CacheMiddleware()
-        session_middleware = SessionMiddleware()
-        auth_middleware = AuthenticationMiddleware()
-
-        request = self.factory.get('/view_anon/')
-
-        # Put the request through the request middleware
-        session_middleware.process_request(request)
-        auth_middleware.process_request(request)
-        result = middleware.process_request(request)
-        self.assertEqual(result, None)
-
-        response = hello_world_view(request, '1')
-
-        # Now put the response through the response middleware
-        session_middleware.process_response(request, response)
-        response = middleware.process_response(request, response)
-
-        self.assertEqual(request.session.accessed, False)
-
-    @override_settings(CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True)
-    def test_cache_middleware_anonymous_only_with_cache_page(self):
-        """CACHE_MIDDLEWARE_ANONYMOUS_ONLY should still be effective when used
-        with the cache_page decorator: the response to a request from an
-        authenticated user should not be cached."""
-
-        request = self.factory.get('/view_anon/')
-
-        class MockAuthenticatedUser(object):
-            def is_authenticated(self):
-                return True
-
-        class MockAccessedSession(object):
-            accessed = True
-
-        request.user = MockAuthenticatedUser()
-        request.session = MockAccessedSession()
-
-        response = cache_page(60)(hello_world_view)(request, '1')
-
-        self.assertFalse("Cache-Control" in response)
 
     def test_view_decorator(self):
         # decorate the same view with different cache decorators
@@ -1958,6 +1954,27 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         response = other_with_prefix_view(request, '16')
         self.assertEqual(response.content, b'Hello World 16')
 
+    def test_sensitive_cookie_not_cached(self):
+        """
+        Django must prevent caching of responses that set a user-specific (and
+        maybe security sensitive) cookie in response to a cookie-less request.
+        """
+        csrf_middleware = CsrfViewMiddleware()
+        cache_middleware = CacheMiddleware()
+
+        request = self.factory.get('/view/')
+        self.assertIsNone(cache_middleware.process_request(request))
+
+        csrf_middleware.process_view(request, csrf_view, (), {})
+
+        response = csrf_view(request)
+
+        response = csrf_middleware.process_response(request, response)
+        response = cache_middleware.process_response(request, response)
+
+        # Inserting a CSRF cookie in a cookie-less request prevented caching.
+        self.assertIsNone(cache_middleware.process_request(request))
+
 
 @override_settings(
     CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
@@ -2010,7 +2027,7 @@ class TestWithTemplateResponse(TestCase):
         response = TemplateResponse(HttpResponse(), Template("This is a test"))
         key_prefix = 'localprefix'
         # Expect None if no headers have been set yet.
-        self.assertEqual(get_cache_key(request), None)
+        self.assertIsNone(get_cache_key(request))
         # Set headers to an empty list.
         learn_cache_key(request, response)
 
@@ -2031,7 +2048,7 @@ class TestWithTemplateResponse(TestCase):
         request = self.factory.get(self.path, {'test': 1})
         response = TemplateResponse(HttpResponse(), Template("This is a test"))
         # Expect None if no headers have been set yet.
-        self.assertEqual(get_cache_key(request), None)
+        self.assertIsNone(get_cache_key(request))
         # Set headers to an empty list.
         learn_cache_key(request, response)
         # Verify that the querystring is taken into account.
@@ -2058,22 +2075,6 @@ class TestWithTemplateResponse(TestCase):
         self.assertFalse(response.has_header('ETag'))
         response = response.render()
         self.assertTrue(response.has_header('ETag'))
-
-
-class TestEtagWithAdmin(TestCase):
-    # See https://code.djangoproject.com/ticket/16003
-    urls = "admin_views.urls"
-
-    def test_admin(self):
-        with self.settings(USE_ETAGS=False):
-            response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 302)
-            self.assertFalse(response.has_header('ETag'))
-
-        with self.settings(USE_ETAGS=True):
-            response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 302)
-            self.assertTrue(response.has_header('ETag'))
 
 
 class TestMakeTemplateFragmentKey(TestCase):
@@ -2105,7 +2106,7 @@ class CacheHandlerTest(TestCase):
         cache1 = caches['default']
         cache2 = caches['default']
 
-        self.assertTrue(cache1 is cache2)
+        self.assertIs(cache1, cache2)
 
     def test_per_thread(self):
         """
@@ -2122,4 +2123,4 @@ class CacheHandlerTest(TestCase):
             t.start()
             t.join()
 
-        self.assertFalse(c[0] is c[1])
+        self.assertIsNot(c[0], c[1])

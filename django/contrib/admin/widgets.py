@@ -87,7 +87,7 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         forms.MultiWidget.__init__(self, widgets, attrs)
 
     def format_output(self, rendered_widgets):
-        return format_html('<p class="datetime">{0} {1}<br />{2} {3}</p>',
+        return format_html('<p class="datetime">{} {}<br />{} {}</p>',
                            _('Date:'), rendered_widgets[0],
                            _('Time:'), rendered_widgets[1])
 
@@ -95,9 +95,9 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
 class AdminRadioFieldRenderer(RadioFieldRenderer):
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
-        return format_html('<ul{0}>\n{1}\n</ul>',
+        return format_html('<ul{}>\n{}\n</ul>',
                            flatatt(self.attrs),
-                           format_html_join('\n', '<li>{0}</li>',
+                           format_html_join('\n', '<li>{}</li>',
                                             ((force_text(w),) for w in self)))
 
 
@@ -170,10 +170,8 @@ class ForeignKeyRawIdWidget(forms.TextInput):
                 attrs['class'] = 'vForeignKeyRawIdAdminField'  # The JavaScript code looks for this hook.
             # TODO: "lookup_id_" is hard-coded here. This should instead use
             # the correct API to determine the ID dynamically.
-            extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' %
-                (related_url, url, name))
-            extra.append('<img src="%s" width="16" height="16" alt="%s" /></a>' %
-                (static('admin/img/selector-search.gif'), _('Lookup')))
+            extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" title="%s"></a>' %
+                (related_url, url, name, _('Lookup')))
         output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)] + extra
         if value:
             output.append(self.label_for_value(value))
@@ -265,19 +263,17 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     def render(self, name, value, *args, **kwargs):
         from django.contrib.admin.views.main import TO_FIELD_VAR
-        rel_to = self.rel.to
-        info = (rel_to._meta.app_label, rel_to._meta.model_name)
         self.widget.choices = self.choices
         output = [self.widget.render(name, value, *args, **kwargs)]
         if self.can_add_related:
+            rel_to = self.rel.to
+            info = (rel_to._meta.app_label, rel_to._meta.model_name)
             related_url = reverse('admin:%s_%s_add' % info, current_app=self.admin_site.name)
             url_params = '?%s=%s' % (TO_FIELD_VAR, self.rel.get_related_field().name)
             # TODO: "add_id_" is hard-coded here. This should instead use the
             # correct API to determine the ID dynamically.
-            output.append('<a href="%s%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> '
-                          % (related_url, url_params, name))
-            output.append('<img src="%s" width="10" height="10" alt="%s"/></a>'
-                          % (static('admin/img/icon_addlink.gif'), _('Add Another')))
+            output.append('<a href="%s%s" class="add-another" id="add_id_%s" title="%s"></a>'
+                          % (related_url, url_params, name, _('Add Another')))
         return mark_safe(''.join(output))
 
     def build_attrs(self, extra_attrs=None, **kwargs):
@@ -329,7 +325,7 @@ class AdminURLFieldWidget(forms.URLInput):
             value = force_text(self._format_value(value))
             final_attrs = {'href': smart_urlquote(value)}
             html = format_html(
-                '<p class="url">{0} <a{1}>{2}</a><br />{3} {4}</p>',
+                '<p class="url">{} <a{}>{}</a><br />{} {}</p>',
                 _('Currently:'), flatatt(final_attrs), value,
                 _('Change:'), html
             )

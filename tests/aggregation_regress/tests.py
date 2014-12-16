@@ -133,7 +133,7 @@ class AggregationTests(TestCase):
             rating=3.0
         )
         # Different DB backends return different types for the extra select computation
-        self.assertTrue(obj.manufacture_cost == 11.545 or obj.manufacture_cost == Decimal('11.545'))
+        self.assertIn(obj.manufacture_cost, (11.545, Decimal('11.545')))
 
         # Order of the annotate/extra in the query doesn't matter
         obj = Book.objects.extra(select={'manufacture_cost': 'price * .5'}).annotate(mean_auth_age=Avg('authors__age')).get(pk=2)
@@ -150,12 +150,12 @@ class AggregationTests(TestCase):
             rating=3.0
         )
         # Different DB backends return different types for the extra select computation
-        self.assertTrue(obj.manufacture_cost == 11.545 or obj.manufacture_cost == Decimal('11.545'))
+        self.assertIn(obj.manufacture_cost, (11.545, Decimal('11.545')))
 
         # Values queries can be combined with annotate and extra
         obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost': 'price * .5'}).values().get(pk=2)
         manufacture_cost = obj['manufacture_cost']
-        self.assertTrue(manufacture_cost == 11.545 or manufacture_cost == Decimal('11.545'))
+        self.assertIn(manufacture_cost, (11.545, Decimal('11.545')))
         del obj['manufacture_cost']
         self.assertEqual(obj, {
             "contact_id": 3,
@@ -174,7 +174,7 @@ class AggregationTests(TestCase):
         # matter
         obj = Book.objects.values().annotate(mean_auth_age=Avg('authors__age')).extra(select={'manufacture_cost': 'price * .5'}).get(pk=2)
         manufacture_cost = obj['manufacture_cost']
-        self.assertTrue(manufacture_cost == 11.545 or manufacture_cost == Decimal('11.545'))
+        self.assertIn(manufacture_cost, (11.545, Decimal('11.545')))
         del obj['manufacture_cost']
         self.assertEqual(obj, {
             'contact_id': 3,
@@ -740,6 +740,17 @@ class AggregationTests(TestCase):
             list(qs), list(Book.objects.values_list("name", flat=True))
         )
 
+    def test_values_list_annotation_args_ordering(self):
+        """
+        Annotate *args ordering should be preserved in values_list results.
+        **kwargs comes after *args.
+        Regression test for #23659.
+        """
+        books = Book.objects.values_list("publisher__name").annotate(
+            Count("id"), Avg("price"), Avg("authors__age"), avg_pgs=Avg("pages")
+            ).order_by("-publisher__name")
+        self.assertEqual(books[0], ('Sams', 1, 23.09, 45.0, 528.0))
+
     def test_annotation_disjunction(self):
         qs = Book.objects.annotate(n_authors=Count("authors")).filter(
             Q(n_authors=2) | Q(name="Python Web Development with Django")
@@ -892,18 +903,6 @@ class AggregationTests(TestCase):
             qs,
             ['Peter Norvig'],
             lambda b: b.name
-        )
-
-    def test_type_conversion(self):
-        # The database backend convert_values function should not try to covert
-        # CharFields to float. Refs #13844.
-        from django.db.models import CharField
-        from django.db import connection
-        testData = 'not_a_float_value'
-        testField = CharField()
-        self.assertEqual(
-            connection.ops.convert_values(testData, testField),
-            testData
         )
 
     def test_annotate_joins(self):
@@ -1157,15 +1156,42 @@ class JoinPromotionTests(TestCase):
     def test_existing_join_not_promoted(self):
         # No promotion for existing joins
         qs = Charlie.objects.filter(alfa__name__isnull=False).annotate(Count('alfa__name'))
-        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        self.assertIn(' INNER JOIN ', str(qs.query))
         # Also, the existing join is unpromoted when doing filtering for already
         # promoted join.
         qs = Charlie.objects.annotate(Count('alfa__name')).filter(alfa__name__isnull=False)
-        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        self.assertIn(' INNER JOIN ', str(qs.query))
         # But, as the join is nullable first use by annotate will be LOUTER
         qs = Charlie.objects.annotate(Count('alfa__name'))
-        self.assertTrue(' LEFT OUTER JOIN ' in str(qs.query))
+        self.assertIn(' LEFT OUTER JOIN ', str(qs.query))
 
     def test_non_nullable_fk_not_promoted(self):
         qs = Book.objects.annotate(Count('contact__name'))
-        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        self.assertIn(' INNER JOIN ', str(qs.query))
+
+
+class AggregationOnRelationTest(TestCase):
+    def setUp(self):
+        self.a = Author.objects.create(name='Anssi', age=33)
+        self.p = Publisher.objects.create(name='Manning', num_awards=3)
+        Book.objects.create(isbn='asdf', name='Foo', pages=10, rating=0.1, price="0.0",
+                            contact=self.a, publisher=self.p, pubdate=datetime.date.today())
+
+    def test_annotate_on_relation(self):
+        qs = Book.objects.annotate(avg_price=Avg('price'), publisher_name=F('publisher__name'))
+        self.assertEqual(qs[0].avg_price, 0.0)
+        self.assertEqual(qs[0].publisher_name, "Manning")
+
+    def test_aggregate_on_relation(self):
+        # A query with an existing annotation aggregation on a relation should
+        # succeed.
+        qs = Book.objects.annotate(avg_price=Avg('price')).aggregate(
+            publisher_awards=Sum('publisher__num_awards')
+        )
+        self.assertEqual(qs['publisher_awards'], 3)
+        Book.objects.create(isbn='asdf', name='Foo', pages=10, rating=0.1, price="0.0",
+                            contact=self.a, publisher=self.p, pubdate=datetime.date.today())
+        qs = Book.objects.annotate(avg_price=Avg('price')).aggregate(
+            publisher_awards=Sum('publisher__num_awards')
+        )
+        self.assertEqual(qs['publisher_awards'], 6)

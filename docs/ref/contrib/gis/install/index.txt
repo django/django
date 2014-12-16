@@ -1,5 +1,3 @@
-.. _ref-gis-install:
-
 ======================
 GeoDjango Installation
 ======================
@@ -12,7 +10,7 @@ In general, GeoDjango installation requires:
 
 1. :ref:`Python and Django <django>`
 2. :ref:`spatial_database`
-3. :ref:`geospatial_libs`
+3. :doc:`geolibs`
 
 Details for each of the requirements and installation instructions
 are provided in the sections below. In addition, platform-specific
@@ -41,7 +39,6 @@ Because GeoDjango is included with Django, please refer to Django's
 :ref:`installation instructions <installing-official-release>` for details on
 how to install.
 
-
 .. _spatial_database:
 
 Spatial database
@@ -61,9 +58,9 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, PROJ.4, PostGIS           8.4+                Requires PostGIS.
-MySQL               GEOS                            5.x                 Not OGC-compliant; :ref:`limited functionality <mysql-spatial-limitations>`.
-Oracle              GEOS                            10.2, 11            XE not supported; not tested with 9.
+PostgreSQL          GEOS, PROJ.4, PostGIS           9.0+                Requires PostGIS.
+MySQL               GEOS                            5.5+                Not OGC-compliant; :ref:`limited functionality <mysql-spatial-limitations>`.
+Oracle              GEOS                            11.1+               XE not supported.
 SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+
 ==================  ==============================  ==================  =========================================
 
@@ -107,8 +104,7 @@ Add Google projection to ``spatial_ref_sys`` table
 
 .. note::
 
-    If you're running PostGIS 1.4 or above, you can skip this step. The entry
-    is already included in the default ``spatial_ref_sys`` table.
+    If you're running GDAL 1.7 or above (most users), you can skip this step.
 
 In order to conduct database transformations to the so-called "Google"
 projection (a spherical mercator projection used by Google Maps),
@@ -327,7 +323,7 @@ psycopg2
 After you've installed the KyngChaos binaries and modified your ``PATH``, as
 described above, ``psycopg2`` may be installed using the following command::
 
-    $ sudo pip install psycopg2
+    $ pip install psycopg2
 
 .. note::
 
@@ -340,15 +336,12 @@ Fink
 ^^^^
 
 `Kurt Schwehr`__ has been gracious enough to create GeoDjango packages for users
-of the `Fink`__ package system.  The following packages are available, depending
-on which version of Python you want to use:
-
-* ``django-gis-py26``
-* ``django-gis-py25``
-* ``django-gis-py24``
+of the `Fink`__ package system. `Different packages are available`__ (starting
+with "django-gis"), depending on which version of Python you want to use.
 
 __ http://schwehr.org/blog/
 __ http://www.finkproject.org/
+__ http://pdb.finkproject.org/pdb/browse.php?summary=django-gis
 
 .. _macports:
 
@@ -361,7 +354,7 @@ the `Apple Developer Tools`_ are required.
 
 Summary::
 
-    $ sudo port install postgresql83-server
+    $ sudo port install postgresql93-server
     $ sudo port install geos
     $ sudo port install proj
     $ sudo port install postgis
@@ -373,12 +366,12 @@ Summary::
     You will also have to modify the ``PATH`` in your ``.profile`` so
     that the MacPorts programs are accessible from the command-line::
 
-        export PATH=/opt/local/bin:/opt/local/lib/postgresql83/bin
+        export PATH=/opt/local/bin:/opt/local/lib/postgresql93/bin
 
     In addition, add the ``DYLD_FALLBACK_LIBRARY_PATH`` setting so that
     the libraries can be found by Python::
 
-        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql83
+        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql93
 
 __ http://www.macports.org/
 

@@ -21,29 +21,52 @@ class ModelBackend(object):
             # difference between an existing and a non-existing user (#20760).
             UserModel().set_password(password)
 
-    def get_group_permissions(self, user_obj, obj=None):
+    def _get_user_permissions(self, user_obj):
+        return user_obj.user_permissions.all()
+
+    def _get_group_permissions(self, user_obj):
+        user_groups_field = get_user_model()._meta.get_field('groups')
+        user_groups_query = 'group__%s' % user_groups_field.related_query_name()
+        return Permission.objects.filter(**{user_groups_query: user_obj})
+
+    def _get_permissions(self, user_obj, obj, from_name):
         """
-        Returns a set of permission strings that this user has through his/her
-        groups.
+        Returns the permissions of `user_obj` from `from_name`. `from_name` can
+        be either "group" or "user" to return permissions from
+        `_get_group_permissions` or `_get_user_permissions` respectively.
         """
-        if user_obj.is_anonymous() or obj is not None:
+        if not user_obj.is_active or user_obj.is_anonymous() or obj is not None:
             return set()
-        if not hasattr(user_obj, '_group_perm_cache'):
+
+        perm_cache_name = '_%s_perm_cache' % from_name
+        if not hasattr(user_obj, perm_cache_name):
             if user_obj.is_superuser:
                 perms = Permission.objects.all()
             else:
-                user_groups_field = get_user_model()._meta.get_field('groups')
-                user_groups_query = 'group__%s' % user_groups_field.related_query_name()
-                perms = Permission.objects.filter(**{user_groups_query: user_obj})
+                perms = getattr(self, '_get_%s_permissions' % from_name)(user_obj)
             perms = perms.values_list('content_type__app_label', 'codename').order_by()
-            user_obj._group_perm_cache = set("%s.%s" % (ct, name) for ct, name in perms)
-        return user_obj._group_perm_cache
+            setattr(user_obj, perm_cache_name, set("%s.%s" % (ct, name) for ct, name in perms))
+        return getattr(user_obj, perm_cache_name)
+
+    def get_user_permissions(self, user_obj, obj=None):
+        """
+        Returns a set of permission strings the user `user_obj` has from their
+        `user_permissions`.
+        """
+        return self._get_permissions(user_obj, obj, 'user')
+
+    def get_group_permissions(self, user_obj, obj=None):
+        """
+        Returns a set of permission strings the user `user_obj` has from the
+        groups they belong.
+        """
+        return self._get_permissions(user_obj, obj, 'group')
 
     def get_all_permissions(self, user_obj, obj=None):
-        if user_obj.is_anonymous() or obj is not None:
+        if not user_obj.is_active or user_obj.is_anonymous() or obj is not None:
             return set()
         if not hasattr(user_obj, '_perm_cache'):
-            user_obj._perm_cache = set("%s.%s" % (p.content_type.app_label, p.codename) for p in user_obj.user_permissions.select_related())
+            user_obj._perm_cache = self.get_user_permissions(user_obj)
             user_obj._perm_cache.update(self.get_group_permissions(user_obj))
         return user_obj._perm_cache
 
@@ -106,14 +129,14 @@ class RemoteUserBackend(ModelBackend):
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
         if self.create_unknown_user:
-            user, created = UserModel.objects.get_or_create(**{
+            user, created = UserModel._default_manager.get_or_create(**{
                 UserModel.USERNAME_FIELD: username
             })
             if created:
                 user = self.configure_user(user)
         else:
             try:
-                user = UserModel.objects.get_by_natural_key(username)
+                user = UserModel._default_manager.get_by_natural_key(username)
             except UserModel.DoesNotExist:
                 pass
         return user

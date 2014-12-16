@@ -17,8 +17,32 @@ class Author(models.Model):
         apps = new_apps
 
 
+class AuthorWithDefaultHeight(models.Model):
+    name = models.CharField(max_length=255)
+    height = models.PositiveIntegerField(null=True, blank=True, default=42)
+
+    class Meta:
+        apps = new_apps
+
+
 class AuthorWithM2M(models.Model):
     name = models.CharField(max_length=255)
+
+    class Meta:
+        apps = new_apps
+
+
+class AuthorWithM2MThrough(models.Model):
+    name = models.CharField(max_length=255)
+    tags = models.ManyToManyField("schema.TagM2MTest", related_name="authors", through="AuthorTag")
+
+    class Meta:
+        apps = new_apps
+
+
+class AuthorTag(models.Model):
+    author = models.ForeignKey("schema.AuthorWithM2MThrough")
+    tag = models.ForeignKey("schema.TagM2MTest")
 
     class Meta:
         apps = new_apps
@@ -29,6 +53,15 @@ class Book(models.Model):
     title = models.CharField(max_length=100, db_index=True)
     pub_date = models.DateTimeField()
     # tags = models.ManyToManyField("Tag", related_name="books")
+
+    class Meta:
+        apps = new_apps
+
+
+class BookWeak(models.Model):
+    author = models.ForeignKey(Author, db_constraint=False)
+    title = models.CharField(max_length=100, db_index=True)
+    pub_date = models.DateTimeField()
 
     class Meta:
         apps = new_apps
@@ -113,8 +146,16 @@ class UniqueTest(models.Model):
         unique_together = ["year", "slug"]
 
 
+class AuthorWithEvenLongerName(models.Model):
+    name = models.CharField(max_length=255)
+    height = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        apps = new_apps
+
+
 class BookWithLongName(models.Model):
-    author_foreign_key_with_really_long_field_name = models.ForeignKey(Author)
+    author_foreign_key_with_really_long_field_name = models.ForeignKey(AuthorWithEvenLongerName)
 
     class Meta:
         apps = new_apps
@@ -130,3 +171,7 @@ class Thing(models.Model):
 
     def __str__(self):
         return self.when
+
+
+class Note(models.Model):
+    info = models.TextField()

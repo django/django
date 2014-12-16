@@ -8,6 +8,7 @@ from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
 
@@ -34,6 +35,10 @@ class ValidFormFieldsets(admin.ModelAdmin):
     )
 
 
+@override_settings(
+    SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
+    INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'admin_checks']
+)
 class SystemChecksTestCase(TestCase):
 
     def test_checks_are_performed(self):
@@ -407,9 +412,9 @@ class SystemChecksTestCase(TestCase):
         errors = SongAdmin.check(model=Song)
         self.assertEqual(errors, [])
 
-    def test_nonexistant_field(self):
+    def test_nonexistent_field(self):
         class SongAdmin(admin.ModelAdmin):
-            readonly_fields = ("title", "nonexistant")
+            readonly_fields = ("title", "nonexistent")
 
         errors = SongAdmin.check(model=Song)
         expected = [
@@ -423,7 +428,7 @@ class SystemChecksTestCase(TestCase):
         ]
         self.assertEqual(errors, expected)
 
-    def test_nonexistant_field_on_inline(self):
+    def test_nonexistent_field_on_inline(self):
         class CityInline(admin.TabularInline):
             model = City
             readonly_fields = ['i_dont_exist']  # Missing attribute

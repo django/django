@@ -1,8 +1,9 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import os
 import sys
 from unittest import skipUnless
+import warnings
 
 from django.apps import apps, AppConfig
 from django.apps.registry import Apps
@@ -166,6 +167,14 @@ class AppsTests(TestCase):
             with self.settings(INSTALLED_APPS=['apps.apps.RelabeledAppsConfig', 'apps']):
                 pass
 
+    def test_import_exception_is_not_masked(self):
+        """
+        App discovery should preserve stack traces. Regression test for #22920.
+        """
+        with six.assertRaisesRegex(self, ImportError, "Oops"):
+            with self.settings(INSTALLED_APPS=['apps.failing_app']):
+                pass
+
     def test_models_py(self):
         """
         Tests that the models in the models.py file were loaded correctly.
@@ -199,6 +208,45 @@ class AppsTests(TestCase):
         with self.assertRaises(LookupError):
             apps.get_model("apps", "SouthPonies")
         self.assertEqual(new_apps.get_model("apps", "SouthPonies"), temp_model)
+
+    def test_model_clash(self):
+        """
+        Test for behavior when two models clash in the app registry.
+        """
+        new_apps = Apps(["apps"])
+        meta_contents = {
+            'app_label': "apps",
+            'apps': new_apps,
+        }
+
+        body = {}
+        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['__module__'] = TotallyNormal.__module__
+        type(str("SouthPonies"), (models.Model,), body)
+
+        # When __name__ and __module__ match we assume the module
+        # was reloaded and issue a warning. This use-case is
+        # useful for REPL. Refs #23621.
+        body = {}
+        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['__module__'] = TotallyNormal.__module__
+        with warnings.catch_warnings(record=True) as w:
+            type(str("SouthPonies"), (models.Model,), body)
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[-1].category, RuntimeWarning))
+            self.assertEqual(str(w[-1].message),
+                 "Model 'southponies.apps' was already registered. "
+                 "Reloading models is not advised as it can lead to inconsistencies, "
+                 "most notably with related models.")
+
+        # If it doesn't appear to be a reloaded module then we expect
+        # a RuntimeError.
+        body = {}
+        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['__module__'] = TotallyNormal.__module__ + '.whatever'
+        with six.assertRaisesRegex(self, RuntimeError,
+                "Conflicting 'southponies' models in application 'apps':.*"):
+            type(str("SouthPonies"), (models.Model,), body)
 
 
 class Stub(object):

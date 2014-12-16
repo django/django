@@ -37,7 +37,7 @@ Installing the contenttypes framework
 =====================================
 
 The contenttypes framework is included in the default
-:setting:`INSTALLED_APPS` list created by ``django-admin.py startproject``,
+:setting:`INSTALLED_APPS` list created by ``django-admin startproject``,
 but if you've removed it or if you manually set up your
 :setting:`INSTALLED_APPS` list, you can enable it by adding
 ``'django.contrib.contenttypes'`` to your :setting:`INSTALLED_APPS` setting.
@@ -50,9 +50,6 @@ installed; several of Django's other bundled applications require it:
 
 * Django's :mod:`authentication framework <django.contrib.auth>` uses it
   to tie user permissions to specific models.
-
-* Django's comments system (:mod:`django.contrib.comments`) uses it to
-  "attach" comments to any installed model.
 
 .. currentmodule:: django.contrib.contenttypes.models
 
@@ -294,8 +291,6 @@ model:
 
     .. attribute:: GenericForeignKey.for_concrete_model
 
-       .. versionadded:: 1.6
-
        If ``False``, the field will be able to reference proxy models. Default
        is ``True``. This mirrors the ``for_concrete_model`` argument to
        :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`.
@@ -442,8 +437,8 @@ same types of lookups manually::
 Note that if the model in a
 :class:`~django.contrib.contenttypes.fields.GenericRelation` uses a
 non-default value for ``ct_field`` or ``fk_field`` in its
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey` (e.g. the
-:mod:`django.contrib.comments` app uses ``ct_field="object_pk"``),
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey` (for example, if
+you had a ``Comment`` model that uses ``ct_field="object_pk"``),
 you'll need to set ``content_type_field`` and/or ``object_id_field`` in
 the :class:`~django.contrib.contenttypes.fields.GenericRelation` to
 match the ``ct_field`` and ``fk_field``, respectively, in the
@@ -500,7 +495,7 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
 
         This class used to be defined in ``django.contrib.contenttypes.generic``.
 
-.. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True)
+.. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True, min_num=None, validate_min=False)
 
     Returns a ``GenericInlineFormSet`` using
     :func:`~django.forms.models.modelformset_factory`.
@@ -511,15 +506,17 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
     :func:`~django.forms.models.modelformset_factory` and
     :func:`~django.forms.models.inlineformset_factory`.
 
-    .. versionadded:: 1.6
-
-        The ``for_concrete_model`` argument corresponds to the
-        :class:`~django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model`
-        argument on ``GenericForeignKey``.
+    The ``for_concrete_model`` argument corresponds to the
+    :class:`~django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model`
+    argument on ``GenericForeignKey``.
 
     .. versionchanged:: 1.7
 
         This function used to be defined in ``django.contrib.contenttypes.generic``.
+
+    .. versionchanged:: 1.7
+
+        ``min_num`` and ``validate_min`` were added.
 
 
 .. module:: django.contrib.contenttypes.admin

@@ -12,6 +12,93 @@ about each item can often be found in the release notes of two versions prior.
 2.0
 ---
 
+See the :ref:`Django 1.8 release notes<deprecated-features-1.8>` for more
+details on these changes.
+
+* Support for calling a ``SQLCompiler`` directly as an alias for calling its
+  ``quote_name_unless_alias`` method will be removed.
+
+* ``cycle`` and ``firstof`` template tags will be removed from the ``future``
+  template tag library (used during the 1.6/1.7 deprecation period).
+
+* ``django.conf.urls.patterns()`` will be removed.
+
+* Support for the ``prefix`` argument to
+  ``django.conf.urls.i18n.i18n_patterns()`` will be removed.
+
+* ``SimpleTestCase.urls`` will be removed.
+
+* Using an incorrect count of unpacked values in the ``for`` template tag
+  will raise an exception rather than fail silently.
+
+* The ``DatabaseCreation`` class on each database backend will be removed,
+  and all table/schema editing will be moved to be via ``SchemaEditor`` instead.
+
+* The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
+  Python path will be removed.
+
+* Support for :py:mod:`optparse` will be dropped for custom management commands
+  (replaced by :py:mod:`argparse`).
+
+* The class :class:`~django.core.management.NoArgsCommand` will be removed. Use
+  :class:`~django.core.management.BaseCommand` instead, which takes no arguments
+  by default.
+
+* ``django.db.models.sql.aggregates`` module will be removed.
+
+* ``django.contrib.gis.db.models.sql.aggregates`` module will be removed.
+
+* The following methods and properties of ``django.db.sql.query.Query`` will
+  be removed:
+
+  * Properties: ``aggregates`` and ``aggregate_select``
+  * Methods: ``add_aggregate``, ``set_aggregate_mask``, and
+    ``append_aggregate_mask``.
+
+* ``django.template.resolve_variable`` will be removed.
+
+* The ``error_message`` argument of ``django.forms.RegexField`` will be removed.
+
+* The ``unordered_list`` filter will no longer support old style lists.
+
+* Support for string ``view`` arguments to ``url()`` will be removed.
+
+* The backward compatible shim  to rename ``django.forms.Form._has_changed()``
+  to ``has_changed()`` will be removed.
+
+* The ``removetags`` template filter will be removed.
+
+* The ``remove_tags()`` and ``strip_entities()`` functions in
+  ``django.utils.html`` will be removed.
+
+* The ``is_admin_site`` argument to
+  ``django.contrib.auth.views.password_reset()`` will be removed.
+
+* ``django.db.models.field.subclassing.SubfieldBase`` will be removed.
+
+* ``django.utils.checksums`` will be removed; its functionality is included
+  in django-localflavor 1.1+.
+
+* The ``original_content_type_id`` attribute on
+  ``django.contrib.admin.helpers.InlineAdminForm`` will be removed.
+
+* The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
+  defined with no default value for its ``form_class`` argument will be removed.
+
+* The backwards compatibility alias ``django.template.loader.BaseLoader`` will
+  be removed.
+
+* The ``dirs`` parameter for the following functions will be removed:
+
+  * ``django.template.loader.get_template()``
+  * ``django.template.loader.select_template()``
+  * ``django.shortcuts.render()``
+  * ``django.shortcuts.render_to_response()``
+
+* Session verification will be enabled regardless of whether or not
+  ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` is in
+  ``MIDDLEWARE_CLASSES``.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
@@ -35,6 +122,10 @@ details on these changes.
 
 * ``allow_syncdb`` on database routers will no longer automatically become
   ``allow_migrate``.
+
+* The legacy method of syncing apps without migrations will be removed,
+  and migrations will become compulsory for all apps. This includes automatic
+  loading of ``initial_data`` fixtures and support for initial SQL data.
 
 * All models will need to be defined inside an installed application or
   declare an explicit :attr:`~django.db.models.Options.app_label`.
@@ -124,6 +215,16 @@ details on these changes.
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, will no longer be supported.
 
+* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+  :class:`~django.forms.ModelMultipleChoiceField` will be removed.
+
+* The default value of the
+  :attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
+  attribute will change from ``True`` to ``False``.
+
+* ``django.contrib.sitemaps.FlatPageSitemap`` will be removed in favor of
+  ``django.contrib.flatpages.sitemaps.FlatPageSitemap``.
+
 .. _deprecation-removed-in-1.8:
 
 1.8
@@ -153,6 +254,9 @@ details on these changes.
 * The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
   your :setting:`MIDDLEWARE_CLASSES` setting instead.
+
+* ``django.middleware.doc.XViewMiddleware`` will be removed. Use
+  ``django.contrib.admindocs.middleware.XViewMiddleware`` instead.
 
 * ``Model._meta.module_name`` was renamed to ``model_name``.
 
@@ -278,6 +382,10 @@ details on these changes.
   not, then any password reset links generated before you upgrade to Django 1.7
   won't work after the upgrade.
 
+* The ``django.utils.encoding.StrAndUnicode`` mix-in will be removed.
+  Define a ``__str__`` method and apply the
+  :func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.
+
 .. _deprecation-removed-in-1.6:
 
 1.6
@@ -318,9 +426,8 @@ details on these changes.
   superseded by :setting:`IGNORABLE_404_URLS` in the 1.4 release. They will be
   removed.
 
-* The :doc:`form wizard </ref/contrib/formtools/form-wizard>` has been
-  refactored to use class-based views with pluggable backends in 1.4.
-  The previous implementation will be removed.
+* The form wizard has been refactored to use class-based views with pluggable
+  backends in 1.4. The previous implementation will be removed.
 
 * Legacy ways of calling
   :func:`~django.views.decorators.cache.cache_page` will be removed.

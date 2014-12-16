@@ -2,7 +2,6 @@ from importlib import import_module
 import inspect
 import os
 import re
-import warnings
 
 from django import template
 from django.apps import apps
@@ -14,8 +13,8 @@ from django.core.exceptions import ViewDoesNotExist
 from django.http import Http404
 from django.core import urlresolvers
 from django.contrib.admindocs import utils
+from django.template.engine import Engine
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils._os import upath
 from django.utils import six
 from django.utils.translation import ugettext as _
@@ -23,11 +22,6 @@ from django.views.generic import TemplateView
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
-
-if getattr(settings, 'ADMIN_FOR', None):
-    warnings.warn('The ADMIN_FOR setting has been removed, you can remove '
-                  'this setting from your configuration.', RemovedInDjango18Warning,
-                  stacklevel=2)
 
 
 class BaseAdminDocsView(TemplateView):
@@ -150,10 +144,11 @@ class ViewDetailView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
-        mod, func = urlresolvers.get_mod_func(view)
-        try:
+        urlconf = urlresolvers.get_urlconf()
+        if urlresolvers.get_resolver(urlconf)._is_callback(view):
+            mod, func = urlresolvers.get_mod_func(view)
             view_func = getattr(import_module(mod), func)
-        except (ImportError, AttributeError):
+        else:
             raise Http404
         title, body, metadata = utils.parse_docstring(view_func.__doc__)
         if title:
@@ -184,17 +179,24 @@ class ModelDetailView(BaseAdminDocsView):
     template_name = 'admin_doc/model_detail.html'
 
     def get_context_data(self, **kwargs):
+        model_name = self.kwargs['model_name']
         # Get the model class.
         try:
             app_config = apps.get_app_config(self.kwargs['app_label'])
         except LookupError:
             raise Http404(_("App %(app_label)r not found") % self.kwargs)
         try:
-            model = app_config.get_model(self.kwargs['model_name'])
+            model = app_config.get_model(model_name)
         except LookupError:
             raise Http404(_("Model %(model_name)r not found in app %(app_label)r") % self.kwargs)
 
         opts = model._meta
+
+        title, body, metadata = utils.parse_docstring(model.__doc__)
+        if title:
+            title = utils.parse_rst(title, 'model', _('model:') + model_name)
+        if body:
+            body = utils.parse_rst(body, 'model', _('model:') + model_name)
 
         # Gather fields/field descriptions.
         fields = []
@@ -225,7 +227,10 @@ class ModelDetailView(BaseAdminDocsView):
         for field in opts.many_to_many:
             data_type = field.rel.to.__name__
             app_label = field.rel.to._meta.app_label
-            verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': app_label, 'object_name': data_type}
+            verbose = _("related `%(app_label)s.%(object_name)s` objects") % {
+                'app_label': app_label,
+                'object_name': data_type,
+            }
             fields.append({
                 'name': "%s.all" % field.name,
                 "data_type": 'List',
@@ -257,7 +262,10 @@ class ModelDetailView(BaseAdminDocsView):
 
         # Gather related objects
         for rel in opts.get_all_related_objects() + opts.get_all_related_many_to_many_objects():
-            verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': rel.opts.app_label, 'object_name': rel.opts.object_name}
+            verbose = _("related `%(app_label)s.%(object_name)s` objects") % {
+                'app_label': rel.opts.app_label,
+                'object_name': rel.opts.object_name,
+            }
             accessor = rel.get_accessor_name()
             fields.append({
                 'name': "%s.all" % accessor,
@@ -271,9 +279,8 @@ class ModelDetailView(BaseAdminDocsView):
             })
         kwargs.update({
             'name': '%s.%s' % (opts.app_label, opts.object_name),
-            # Translators: %s is an object type name
-            'summary': _("Attributes on %s objects") % opts.object_name,
-            'description': model.__doc__,
+            'summary': title,
+            'description': body,
             'fields': fields,
         })
         return super(ModelDetailView, self).get_context_data(**kwargs)
@@ -285,13 +292,13 @@ class TemplateDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         template = self.kwargs['template']
         templates = []
-        for dir in settings.TEMPLATE_DIRS:
+        for dir in Engine.get_default().dirs:
             template_file = os.path.join(dir, template)
             templates.append({
                 'file': template_file,
                 'exists': os.path.exists(template_file),
                 'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
-                'order': list(settings.TEMPLATE_DIRS).index(dir),
+                'order': list(Engine.get_default().dirs).index(dir),
             })
         kwargs.update({
             'name': template,

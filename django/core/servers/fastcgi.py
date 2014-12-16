@@ -3,7 +3,7 @@ FastCGI (or SCGI, or AJP1.3 ...) server that implements the WSGI protocol.
 
 Uses the flup python package: http://www.saddi.com/software/flup/
 
-This is a adaptation of the flup package to add FastCGI server support
+This is an adaptation of the flup package to add FastCGI server support
 to run Django apps from Web servers that support the FastCGI protocol.
 This module can be run standalone or from the django-admin / manage.py
 scripts using the "runfcgi" directive.

@@ -62,6 +62,127 @@ that, you need to :meth:`~Model.save()`.
 
         book = Book.objects.create_book("Pride and Prejudice")
 
+Customizing model loading
+-------------------------
+
+.. classmethod:: Model.from_db(db, field_names, values)
+
+.. versionadded:: 1.8
+
+The ``from_db()`` method can be used to customize model instance creation
+when loading from the database.
+
+The ``db`` argument contains the database alias for the database the model
+is loaded from, ``field_names`` contains the names of all loaded fields, and
+``values`` contains the loaded values for each field in ``field_names``. The
+``field_names`` are in the same order as the ``values``, so it is possible to
+use ``cls(**(zip(field_names, values)))`` to instantiate the object. If all
+of the model's fields are present, then ``values`` are guaranteed to be in
+the order ``__init__()`` expects them. That is, the instance can be created
+by ``cls(*values)``. It is possible to check if all fields are present by
+consulting ``cls._deferred`` - if ``False``, then all fields have been loaded
+from the database.
+
+In addition to creating the new model, the ``from_db()`` method must set the
+``adding`` and ``db`` flags in the new instance's ``_state`` attribute.
+
+Below is an example showing how to record the initial values of fields that
+are loaded from the database::
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        # default implementation of from_db() (could be replaced
+        # with super())
+        if cls._deferred:
+            instance = cls(**zip(field_names, values))
+        else:
+            instance = cls(*values)
+        instance._state.adding = False
+        instance._state.db = db
+        # customization to store the original field values on the instance
+        instance._loaded_values = zip(field_names, values)
+        return instance
+
+    def save(self, *args, **kwargs):
+        # Check how the current values differ from ._loaded_values. For example,
+        # prevent changing the creator_id of the model. (This example doesn't
+        # support cases where 'creator_id' is deferred).
+        if not self._state.adding and (
+                self.creator_id != self._loaded_values['creator_id']):
+            raise ValueError("Updating the value of creator isn't allowed")
+        super(...).save(*args, **kwargs)
+
+The example above shows a full ``from_db()`` implementation to clarify how that
+is done. In this case it would of course be possible to just use ``super()`` call
+in the ``from_db()`` method.
+
+Refreshing objects from database
+================================
+
+.. method:: Model.refresh_from_db(using=None, fields=None, **kwargs)
+
+.. versionadded:: 1.8
+
+If you need to reload a model's values from the database, you can use the
+``refresh_from_db()`` method. When this method is called without arguments the
+following is done:
+
+1. All non-deferred fields of the model are updated to the values currently
+   present in the database.
+2. The previously loaded related instances for which the relation's value is no
+   longer valid are removed from the reloaded instance. For example, if you have
+   a foreign key from the reloaded instance to another model with name
+   ``Author``, then if ``obj.author_id != obj.author.id``, ``obj.author`` will
+   be thrown away, and when next accessed it will be reloaded with the value of
+   ``obj.author_id``.
+
+Note that only fields of the model are reloaded from the database. Other
+database dependent values such as annotations are not reloaded.
+
+The reloading happens from the database the instance was loaded from, or from
+the default database if the instance wasn't loaded from the database. The
+``using`` argument can be used to force the database used for reloading.
+
+It is possible to force the set of fields to be loaded by using the ``fields``
+argument.
+
+For example, to test that an ``update()`` call resulted in the expected
+update, you could write a test similar to this::
+
+    def test_update_result(self):
+        obj = MyModel.objects.create(val=1)
+        MyModel.objects.filter(pk=obj.pk).update(val=F('val') + 1)
+        # At this point obj.val is still 1, but the value in the database
+        # was updated to 2. The object's updated value needs to be reloaded
+        # from the database.
+        obj.refresh_from_db()
+        self.assertEqual(obj.val, 2)
+
+Note that when deferred fields are accessed, the loading of the deferred
+field's value happens through this method. Thus it is possible to customize
+the way deferred loading happens. The example below shows how one can reload
+all of the instance's fields when a deferred field is reloaded::
+
+    class ExampleModel(models.Model):
+        def refresh_from_db(self, using=None, fields=None, **kwargs):
+            # fields contains the name of the deferred field to be
+            # loaded.
+            if fields is not None:
+                fields = set(fields)
+                deferred_fields = self.get_deferred_fields()
+                # If any deferred field is going to be loaded
+                if fields.intersection(deferred_fields):
+                    # then load all of them
+                    fields = fields.union(deferred_fields)
+            super(ExampleModel, self).refresh_from_db(using, fields, **kwargs)
+
+.. method:: Model.get_deferred_fields()
+
+.. versionadded:: 1.8
+
+A helper method that returns a set containing the attribute names of all those
+fields that are currently deferred for this model.
+
 .. _validating-objects:
 
 Validating objects
@@ -86,14 +207,8 @@ validation errors yourself, or if you have excluded fields from the
 
 .. method:: Model.full_clean(exclude=None, validate_unique=True)
 
-.. versionchanged:: 1.6
-
-  The ``validate_unique`` parameter was added to allow skipping
-  :meth:`Model.validate_unique()`. Previously, :meth:`Model.validate_unique()`
-  was always called by ``full_clean``.
-
 This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`, and
-:meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``, in that
+:meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``), in that
 order and raises a :exc:`~django.core.exceptions.ValidationError` that has a
 ``message_dict`` attribute containing errors from all three stages.
 
@@ -149,9 +264,13 @@ access to more than a single field::
             if self.status == 'published' and self.pub_date is None:
                 self.pub_date = datetime.date.today()
 
-Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
-``Model.clean()`` will be stored in a special key error dictionary key,
-:data:`~django.core.exceptions.NON_FIELD_ERRORS`, that is used for errors
+Note, however, that like :meth:`Model.full_clean()`, a model's ``clean()``
+method is not invoked when you call your model's :meth:`~Model.save()` method.
+
+In the above example, the :exc:`~django.core.exceptions.ValidationError`
+exception raised by ``Model.clean()`` was instantiated with a string, so it
+will be stored in a special error dictionary key,
+:data:`~django.core.exceptions.NON_FIELD_ERRORS`. This key is used for errors
 that are tied to the entire model instead of to a specific field::
 
     from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
@@ -159,6 +278,19 @@ that are tied to the entire model instead of to a specific field::
         article.full_clean()
     except ValidationError as e:
         non_field_errors = e.message_dict[NON_FIELD_ERRORS]
+
+To assign exceptions to a specific field, instantiate the
+:exc:`~django.core.exceptions.ValidationError` with a dictionary, where the
+keys are the field names. We could update the previous example to assign the
+error to the ``pub_date`` field::
+
+    class Article(models.Model):
+        ...
+        def clean(self):
+            # Don't allow draft entries to have a pub_date.
+            if self.status == 'draft' and self.pub_date is not None:
+                raise ValidationError({'pub_date': 'Draft entries may not have a publication date.'})
+            ...
 
 Finally, ``full_clean()`` will check any unique constraints on your model.
 
@@ -310,17 +442,15 @@ value explicitly when saving new objects, if you cannot guarantee the
 primary-key value is unused. For more on this nuance, see `Explicitly specifying
 auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
 
-.. versionchanged:: 1.6
-
-    Previously Django did a ``SELECT`` when the primary key attribute was set.
-    If the ``SELECT`` found a row, then Django did an ``UPDATE``, otherwise it
-    did an ``INSERT``. The old algorithm results in one more query in the
-    ``UPDATE`` case. There are some rare cases where the database doesn't
-    report that a row was updated even if the database contains a row for the
-    object's primary key value. An example is the PostgreSQL ``ON UPDATE``
-    trigger which returns ``NULL``. In such cases it is possible to revert to the
-    old algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
-    option to ``True``.
+In Django 1.5 and earlier, Django did a ``SELECT`` when the primary key
+attribute was set. If the ``SELECT`` found a row, then Django did an ``UPDATE``,
+otherwise it did an ``INSERT``. The old algorithm results in one more query in
+the ``UPDATE`` case. There are some rare cases where the database doesn't
+report that a row was updated even if the database contains a row for the
+object's primary key value. An example is the PostgreSQL ``ON UPDATE`` trigger
+which returns ``NULL``. In such cases it is possible to revert to the old
+algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
+option to ``True``.
 
 .. _ref-models-force-insert:
 
@@ -414,6 +544,28 @@ For more details, including how to delete objects in bulk, see
 
 If you want customized deletion behavior, you can override the ``delete()``
 method. See :ref:`overriding-model-methods` for more details.
+
+Pickling objects
+================
+
+When you :mod:`pickle` a model, its current state is pickled. When you unpickle
+it, it'll contain the model instance at the moment it was pickled, rather than
+the data that's currently in the database.
+
+.. admonition:: You can't share pickles between versions
+
+    Pickles of models are only valid for the version of Django that
+    was used to generate them. If you generate a pickle using Django
+    version N, there is no guarantee that pickle will be readable with
+    Django version N+1. Pickles should not be used as part of a long-term
+    archival strategy.
+
+    .. versionadded:: 1.8
+
+    Since pickle compatibility errors can be difficult to diagnose, such as
+    silently corrupted objects, a ``RuntimeWarning`` is raised when you try to
+    unpickle a model in a Django version that is different than the one in
+    which it was pickled.
 
 .. _model-instance-methods:
 
@@ -514,7 +666,7 @@ for all other models it is simply the model's class.
 
 For example::
 
-    form django.db import models
+    from django.db import models
 
     class MyModel(models.Model):
         id = models.AutoField(primary_key=True)
@@ -533,8 +685,8 @@ For example::
 
 .. versionchanged:: 1.7
 
-  In previous versions only instances of the exact same class and same
-  primary key value were considered equal.
+    In previous versions only instances of the exact same class and same
+    primary key value were considered equal.
 
 ``__hash__``
 ------------
@@ -550,8 +702,8 @@ in Python`_).
 
 .. versionchanged:: 1.7
 
-  In previous versions instance's without primary key value were
-  hashable.
+    In previous versions instance's without primary key value were
+    hashable.
 
 .. _is forbidden in Python: http://docs.python.org/reference/datamodel.html#object.__hash__
 
@@ -589,6 +741,19 @@ framework </ref/contrib/syndication>`, use ``get_absolute_url()`` when it is
 defined. If it makes sense for your model's instances to each have a unique
 URL, you should define ``get_absolute_url()``.
 
+.. warning::
+
+    You should avoid building the URL from unvalidated user input, in order to
+    reduce possibilities of link or redirect poisoning::
+
+        def get_absolute_url(self):
+            return '/%s/' % self.name
+
+    If ``self.name`` is ``'/example.com'`` this returns ``'//example.com/'``
+    which, in turn, is a valid schema relative URL but not the expected
+    ``'/%2Fexample.com/'``.
+
+
 It's good practice to use ``get_absolute_url()`` in templates, instead of
 hard-coding your objects' URLs. For example, this template code is bad:
 
@@ -619,93 +784,6 @@ in ``get_absolute_url()`` and have all your other code call that one place.
     are using unicode strings containing characters outside the ASCII range at
     all.
 
-The ``permalink`` decorator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. warning::
-
-    The ``permalink`` decorator is no longer recommended. You should use
-    :func:`~django.core.urlresolvers.reverse` in the body of your
-    ``get_absolute_url`` method instead.
-
-In early versions of Django, there wasn't an easy way to use URLs defined in
-URLconf file inside :meth:`~django.db.models.Model.get_absolute_url`. That
-meant you would need to define the URL both in URLConf and
-:meth:`~django.db.models.Model.get_absolute_url`. The ``permalink`` decorator
-was added to overcome this DRY principle violation. However, since the
-introduction of :func:`~django.core.urlresolvers.reverse` there is no
-reason to use ``permalink`` any more.
-
-.. function:: permalink()
-
-This decorator takes the name of a URL pattern (either a view name or a URL
-pattern name) and a list of position or keyword arguments and uses the URLconf
-patterns to construct the correct, full URL. It returns a string for the
-correct URL, with all parameters substituted in the correct positions.
-
-The ``permalink`` decorator is a Python-level equivalent to the :ttag:`url`
-template tag and a high-level wrapper for the
-:func:`~django.core.urlresolvers.reverse` function.
-
-An example should make it clear how to use ``permalink()``. Suppose your URLconf
-contains a line such as::
-
-    (r'^people/(\d+)/$', 'people.views.details'),
-
-...your model could have a :meth:`~django.db.models.Model.get_absolute_url`
-method that looked like this::
-
-    from django.db import models
-
-    @models.permalink
-    def get_absolute_url(self):
-        return ('people.views.details', [str(self.id)])
-
-Similarly, if you had a URLconf entry that looked like::
-
-    (r'/archive/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/$', archive_view)
-
-...you could reference this using ``permalink()`` as follows::
-
-    @models.permalink
-    def get_absolute_url(self):
-        return ('archive_view', (), {
-            'year': self.created.year,
-            'month': self.created.strftime('%m'),
-            'day': self.created.strftime('%d')})
-
-Notice that we specify an empty sequence for the second parameter in this case,
-because we only want to pass keyword parameters, not positional ones.
-
-In this way, you're associating the model's absolute path with the view that is
-used to display it, without repeating the view's URL information anywhere. You
-can still use the :meth:`~django.db.models.Model.get_absolute_url()` method in
-templates, as before.
-
-In some cases, such as the use of generic views or the re-use of custom views
-for multiple models, specifying the view function may confuse the reverse URL
-matcher (because multiple patterns point to the same view). For that case,
-Django has :ref:`named URL patterns <naming-url-patterns>`. Using a named URL
-pattern, it's possible to give a name to a pattern, and then reference the name
-rather than the view function. A named URL pattern is defined by replacing the
-pattern tuple by a call to the ``url`` function)::
-
-    from django.conf.urls import url
-
-    url(r'^people/(\d+)/$', 'blog_views.generic_detail', name='people_view'),
-
-...and then using that name to perform the reverse URL resolution instead
-of the view name::
-
-    from django.db import models
-
-    @models.permalink
-    def get_absolute_url(self):
-        return ('people_view', [str(self.id)])
-
-More details on named URL patterns are in the :doc:`URL dispatch documentation
-</topics/http/urls>`.
-
 Extra instance methods
 ======================
 
@@ -724,9 +802,9 @@ For example::
 
     class Person(models.Model):
         SHIRT_SIZES = (
-            (u'S', u'Small'),
-            (u'M', u'Medium'),
-            (u'L', u'Large'),
+            ('S', 'Small'),
+            ('M', 'Medium'),
+            ('L', 'Large'),
         )
         name = models.CharField(max_length=60)
         shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
@@ -736,9 +814,9 @@ For example::
     >>> p = Person(name="Fred Flintstone", shirt_size="L")
     >>> p.save()
     >>> p.shirt_size
-    u'L'
+    'L'
     >>> p.get_shirt_size_display()
-    u'Large'
+    'Large'
 
 .. method:: Model.get_next_by_FOO(\**kwargs)
 .. method:: Model.get_previous_by_FOO(\**kwargs)

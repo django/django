@@ -1,5 +1,3 @@
-from optparse import make_option
-
 from django.conf import settings
 from django.core.cache import caches
 from django.core.cache.backends.db import BaseDatabaseCache
@@ -12,14 +10,16 @@ from django.utils.encoding import force_text
 class Command(BaseCommand):
     help = "Creates the tables needed to use the SQL cache backend."
 
-    option_list = BaseCommand.option_list + (
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database onto '
-                'which the cache tables will be installed. '
-                'Defaults to the "default" database.'),
-    )
-
     requires_system_checks = False
+
+    def add_arguments(self, parser):
+        parser.add_argument('args', metavar='table_name', nargs='*',
+            help='Optional table names. Otherwise, settings.CACHES is used to '
+            'find cache tables.')
+        parser.add_argument('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS,
+            help='Nominates a database onto which the cache tables will be '
+            'installed. Defaults to the "default" database.')
 
     def handle(self, *tablenames, **options):
         db = options.get('database')
@@ -71,7 +71,9 @@ class Command(BaseCommand):
         for i, line in enumerate(table_output):
             full_statement.append('    %s%s' % (line, ',' if i < len(table_output) - 1 else ''))
         full_statement.append(');')
-        with transaction.commit_on_success_unless_managed():
+
+        with transaction.atomic(using=database,
+                                savepoint=connection.features.can_rollback_ddl):
             with connection.cursor() as curs:
                 try:
                     curs.execute("\n".join(full_statement))
@@ -81,5 +83,6 @@ class Command(BaseCommand):
                         (tablename, force_text(e)))
                 for statement in index_output:
                     curs.execute(statement)
+
         if self.verbosity > 1:
             self.stdout.write("Cache table '%s' created." % tablename)

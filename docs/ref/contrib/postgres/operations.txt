@@ -1,0 +1,35 @@
+Database migration operations
+=============================
+
+All of these :doc:`operations </ref/migration-operations>` are available from
+the ``django.contrib.postgres.operations`` module.
+
+.. currentmodule:: django.contrib.postgres.operations
+
+CreateExtension
+---------------
+
+.. class:: CreateExtension(name)
+
+    An ``Operation`` subclass which installs PostgreSQL extensions.
+
+    .. attribute:: name
+
+        This is a required argument. The name of the extension to be installed.
+
+HStoreExtension
+---------------
+
+.. class:: HStoreExtension()
+
+    A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
+    which will install the ``hstore`` extension and also immediately set up the
+    connection to interpret hstore data.
+
+UnaccentExtension
+-----------------
+
+.. class:: UnaccentExtension()
+
+    A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
+    which will install the ``unaccent`` extension.

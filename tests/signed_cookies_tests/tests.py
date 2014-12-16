@@ -2,10 +2,9 @@ from __future__ import unicode_literals
 
 import time
 
-from django.conf import settings
 from django.core import signing
 from django.http import HttpRequest, HttpResponse
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 
 class SignedCookieTest(TestCase):
@@ -38,7 +37,7 @@ class SignedCookieTest(TestCase):
         self.assertRaises(signing.BadSignature,
             request.get_signed_cookie, 'c')
 
-    def test_default_argument_supresses_exceptions(self):
+    def test_default_argument_suppresses_exceptions(self):
         response = HttpResponse()
         response.set_signed_cookie('c', 'hello')
         request = HttpRequest()
@@ -64,14 +63,8 @@ class SignedCookieTest(TestCase):
         finally:
             time.time = _time
 
+    @override_settings(SECRET_KEY=b'\xe7')
     def test_signed_cookies_with_binary_key(self):
-        def restore_secret_key(prev):
-            settings.SECRET_KEY = prev
-
-        self.addCleanup(restore_secret_key, settings.SECRET_KEY)
-
-        settings.SECRET_KEY = b'\xe7'
-
         response = HttpResponse()
         response.set_signed_cookie('c', 'hello')
 

@@ -1,6 +1,6 @@
-# encoding: utf8
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from optparse import make_option
+
 from collections import OrderedDict
 from importlib import import_module
 import itertools
@@ -20,29 +20,35 @@ from django.utils.module_loading import module_has_submodule
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--noinput', action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.'),
-        make_option('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
-            help='Tells Django not to load any initial data after database synchronization.'),
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
-                'Defaults to the "default" database.'),
-        make_option('--fake', action='store_true', dest='fake', default=False,
-            help='Mark migrations as run without actually running them'),
-        make_option('--list', '-l', action='store_true', dest='list', default=False,
-            help='Show a list of all known migrations and which are applied'),
-    )
-
     help = "Updates database schema. Manages both apps with migrations and those without."
+
+    def add_arguments(self, parser):
+        parser.add_argument('app_label', nargs='?',
+            help='App label of an application to synchronize the state.')
+        parser.add_argument('migration_name', nargs='?',
+            help=(
+                'Database state will be brought to the state after that '
+                'migration. Use the name "zero" to unapply all migrations.'
+            ),
+        )
+        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
+            help='Tells Django to NOT prompt the user for input of any kind.')
+        parser.add_argument('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
+            help='Tells Django not to load any initial data after database synchronization.')
+        parser.add_argument('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
+                'Defaults to the "default" database.')
+        parser.add_argument('--fake', action='store_true', dest='fake', default=False,
+            help='Mark migrations as run without actually running them')
+        parser.add_argument('--list', '-l', action='store_true', dest='list', default=False,
+            help='Show a list of all known migrations and which are applied')
 
     def handle(self, *args, **options):
 
-        self.verbosity = int(options.get('verbosity'))
+        self.verbosity = options.get('verbosity')
         self.interactive = options.get('interactive')
         self.show_traceback = options.get('traceback')
         self.load_initial_data = options.get('load_initial_data')
-        self.test_database = options.get('test_database', False)
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
@@ -56,8 +62,10 @@ class Command(BaseCommand):
 
         # If they asked for a migration listing, quit main execution flow and show it
         if options.get("list", False):
-            return self.show_migration_list(connection, args)
+            return self.show_migration_list(connection, [options['app_label']] if options['app_label'] else None)
 
+        # Hook for backends needing any database preparation
+        connection.prepare_database()
         # Work out which apps have migrations and which do not
         executor = MigrationExecutor(connection, self.migration_progress_callback)
 
@@ -69,32 +77,44 @@ class Command(BaseCommand):
                 "%s in %s" % (", ".join(names), app)
                 for app, names in conflicts.items()
             )
-            raise CommandError("Conflicting migrations detected (%s).\nTo fix them run 'python manage.py makemigrations --merge'" % name_str)
+            raise CommandError(
+                "Conflicting migrations detected (%s).\nTo fix them run "
+                "'python manage.py makemigrations --merge'" % name_str
+            )
 
         # If they supplied command line arguments, work out what they mean.
         run_syncdb = False
         target_app_labels_only = True
-        if len(args) > 2:
-            raise CommandError("Too many command-line arguments (expecting 'app_label' or 'app_label migrationname')")
-        elif len(args) == 2:
-            app_label, migration_name = args
+        if options['app_label'] and options['migration_name']:
+            app_label, migration_name = options['app_label'], options['migration_name']
             if app_label not in executor.loader.migrated_apps:
-                raise CommandError("App '%s' does not have migrations (you cannot selectively sync unmigrated apps)" % app_label)
+                raise CommandError(
+                    "App '%s' does not have migrations (you cannot selectively "
+                    "sync unmigrated apps)" % app_label
+                )
             if migration_name == "zero":
                 targets = [(app_label, None)]
             else:
                 try:
                     migration = executor.loader.get_migration_by_prefix(app_label, migration_name)
                 except AmbiguityError:
-                    raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (app_label, migration_name))
+                    raise CommandError(
+                        "More than one migration matches '%s' in app '%s'. "
+                        "Please be more specific." %
+                        (migration_name, app_label)
+                    )
                 except KeyError:
-                    raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (app_label, migration_name))
+                    raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (
+                        migration_name, app_label))
                 targets = [(app_label, migration.name)]
             target_app_labels_only = False
-        elif len(args) == 1:
-            app_label = args[0]
+        elif options['app_label']:
+            app_label = options['app_label']
             if app_label not in executor.loader.migrated_apps:
-                raise CommandError("App '%s' does not have migrations (you cannot selectively sync unmigrated apps)" % app_label)
+                raise CommandError(
+                    "App '%s' does not have migrations (you cannot selectively "
+                    "sync unmigrated apps)" % app_label
+                )
             targets = [key for key in executor.loader.graph.leaf_nodes() if key[0] == app_label]
         else:
             targets = executor.loader.graph.leaf_nodes()
@@ -105,42 +125,72 @@ class Command(BaseCommand):
         # Print some useful info
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
-            if run_syncdb:
-                self.stdout.write(self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") + (", ".join(executor.loader.unmigrated_apps) or "(none)"))
+            if run_syncdb and executor.loader.unmigrated_apps:
+                self.stdout.write(
+                    self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
+                    (", ".join(executor.loader.unmigrated_apps))
+                )
             if target_app_labels_only:
-                self.stdout.write(self.style.MIGRATE_LABEL("  Apply all migrations: ") + (", ".join(set(a for a, n in targets)) or "(none)"))
+                self.stdout.write(
+                    self.style.MIGRATE_LABEL("  Apply all migrations: ") +
+                    (", ".join(set(a for a, n in targets)) or "(none)")
+                )
             else:
                 if targets[0][1] is None:
-                    self.stdout.write(self.style.MIGRATE_LABEL("  Unapply all migrations: ") + "%s" % (targets[0][0], ))
+                    self.stdout.write(self.style.MIGRATE_LABEL(
+                        "  Unapply all migrations: ") + "%s" % (targets[0][0], )
+                    )
                 else:
-                    self.stdout.write(self.style.MIGRATE_LABEL("  Target specific migration: ") + "%s, from %s" % (targets[0][1], targets[0][0]))
+                    self.stdout.write(self.style.MIGRATE_LABEL(
+                        "  Target specific migration: ") + "%s, from %s"
+                        % (targets[0][1], targets[0][0])
+                    )
 
         # Run the syncdb phase.
         # If you ever manage to get rid of this, I owe you many, many drinks.
         # Note that pre_migrate is called from inside here, as it needs
         # the list of models about to be installed.
-        if run_syncdb:
+        if run_syncdb and executor.loader.unmigrated_apps:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
             created_models = self.sync_apps(connection, executor.loader.unmigrated_apps)
         else:
             created_models = []
 
+        # The test runner requires us to flush after a syncdb but before migrations,
+        # so do that here.
+        if options.get("test_flush", False):
+            call_command(
+                'flush',
+                verbosity=max(self.verbosity - 1, 0),
+                interactive=False,
+                database=db,
+                reset_sequences=False,
+                inhibit_post_migrate=True,
+            )
+
         # Migrate!
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Running migrations:"))
         if not plan:
             if self.verbosity >= 1:
-                self.stdout.write("  No migrations needed.")
+                self.stdout.write("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them how to fix it.
                 autodetector = MigrationAutodetector(
-                    executor.loader.graph.project_state(),
+                    executor.loader.project_state(),
                     ProjectState.from_apps(apps),
                 )
                 changes = autodetector.changes(graph=executor.loader.graph)
                 if changes:
-                    self.stdout.write(self.style.NOTICE("  Your models have changes that are not yet reflected in a migration, and so won't be applied."))
-                    self.stdout.write(self.style.NOTICE("  Run 'manage.py makemigrations' to make new migrations, and then re-run 'manage.py migrate' to apply them."))
+                    self.stdout.write(self.style.NOTICE(
+                        "  Your models have changes that are not yet reflected "
+                        "in a migration, and so won't be applied."
+                    ))
+                    self.stdout.write(self.style.NOTICE(
+                        "  Run 'manage.py makemigrations' to make new "
+                        "migrations, and then re-run 'manage.py migrate' to "
+                        "apply them."
+                    ))
         else:
             executor.migrate(targets, plan, fake=options.get("fake", False))
 
@@ -204,29 +254,35 @@ class Command(BaseCommand):
             # Create the tables for each model
             if self.verbosity >= 1:
                 self.stdout.write("  Creating tables...\n")
-            with transaction.atomic(using=connection.alias, savepoint=False):
+            with transaction.atomic(using=connection.alias, savepoint=connection.features.can_rollback_ddl):
                 for app_name, model_list in manifest.items():
                     for model in model_list:
                         # Create the model's database table, if it doesn't already exist.
                         if self.verbosity >= 3:
-                            self.stdout.write("    Processing %s.%s model\n" % (app_name, model._meta.object_name))
+                            self.stdout.write(
+                                "    Processing %s.%s model\n" % (app_name, model._meta.object_name)
+                            )
                         sql, references = connection.creation.sql_create_model(model, no_style(), seen_models)
                         seen_models.add(model)
                         created_models.add(model)
                         for refto, refs in references.items():
                             pending_references.setdefault(refto, []).extend(refs)
                             if refto in seen_models:
-                                sql.extend(connection.creation.sql_for_pending_references(refto, no_style(), pending_references))
-                        sql.extend(connection.creation.sql_for_pending_references(model, no_style(), pending_references))
+                                sql.extend(
+                                    connection.creation.sql_for_pending_references(
+                                        refto, no_style(), pending_references,
+                                    )
+                                )
+                        sql.extend(
+                            connection.creation.sql_for_pending_references(
+                                model, no_style(), pending_references
+                            )
+                        )
                         if self.verbosity >= 1 and sql:
                             self.stdout.write("    Creating table %s\n" % model._meta.db_table)
                         for statement in sql:
                             cursor.execute(statement)
                         tables.append(connection.introspection.table_name_converter(model._meta.db_table))
-
-            # We force a commit here, as that was the previous behavior.
-            # If you can prove we don't need this, remove it.
-            transaction.set_dirty(using=connection.alias)
         finally:
             cursor.close()
 
@@ -243,18 +299,27 @@ class Command(BaseCommand):
                         custom_sql = custom_sql_for_model(model, no_style(), connection)
                         if custom_sql:
                             if self.verbosity >= 2:
-                                self.stdout.write("    Installing custom SQL for %s.%s model\n" % (app_name, model._meta.object_name))
+                                self.stdout.write(
+                                    "    Installing custom SQL for %s.%s model\n" %
+                                    (app_name, model._meta.object_name)
+                                )
                             try:
-                                with transaction.commit_on_success_unless_managed(using=connection.alias):
+                                with transaction.atomic(using=connection.alias):
                                     for sql in custom_sql:
                                         cursor.execute(sql)
                             except Exception as e:
-                                self.stderr.write("    Failed to install custom SQL for %s.%s model: %s\n" % (app_name, model._meta.object_name, e))
+                                self.stderr.write(
+                                    "    Failed to install custom SQL for %s.%s model: %s\n"
+                                    % (app_name, model._meta.object_name, e)
+                                )
                                 if self.show_traceback:
                                     traceback.print_exc()
                         else:
                             if self.verbosity >= 3:
-                                self.stdout.write("    No custom SQL for %s.%s model\n" % (app_name, model._meta.object_name))
+                                self.stdout.write(
+                                    "    No custom SQL for %s.%s model\n" %
+                                    (app_name, model._meta.object_name)
+                                )
 
             if self.verbosity >= 1:
                 self.stdout.write("  Installing indexes...\n")
@@ -266,20 +331,31 @@ class Command(BaseCommand):
                         index_sql = connection.creation.sql_indexes_for_model(model, no_style())
                         if index_sql:
                             if self.verbosity >= 2:
-                                self.stdout.write("    Installing index for %s.%s model\n" % (app_name, model._meta.object_name))
+                                self.stdout.write(
+                                    "    Installing index for %s.%s model\n" %
+                                    (app_name, model._meta.object_name)
+                                )
+                            savepoint = connection.features.can_rollback_ddl
                             try:
-                                with transaction.commit_on_success_unless_managed(using=connection.alias):
+                                with transaction.atomic(using=connection.alias, savepoint=savepoint):
                                     for sql in index_sql:
                                         cursor.execute(sql)
                             except Exception as e:
-                                self.stderr.write("    Failed to install index for %s.%s model: %s\n" % (app_name, model._meta.object_name, e))
+                                self.stderr.write(
+                                    "    Failed to install index for %s.%s model: %s\n" %
+                                    (app_name, model._meta.object_name, e)
+                                )
         finally:
             cursor.close()
 
         # Load initial_data fixtures (unless that has been disabled)
         if self.load_initial_data:
             for app_label in app_labels:
-                call_command('loaddata', 'initial_data', verbosity=self.verbosity, database=connection.alias, skip_validation=True, app_label=app_label, hide_empty=True)
+                call_command(
+                    'loaddata', 'initial_data', verbosity=self.verbosity,
+                    database=connection.alias, app_label=app_label,
+                    hide_empty=True,
+                )
 
         return created_models
 

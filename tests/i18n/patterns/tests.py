@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import os
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, clear_url_caches
+from django.core.urlresolvers import reverse, clear_url_caches, set_script_prefix
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
 from django.test import TestCase, override_settings
@@ -34,12 +34,12 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ),
+    ROOT_URLCONF='i18n.patterns.urls.default',
 )
 class URLTestCaseBase(TestCase):
     """
     TestCase base-class for the URL tests.
     """
-    urls = 'i18n.patterns.urls.default'
 
     def setUp(self):
         # Make sure the cache is empty before we are doing our tests.
@@ -73,8 +73,8 @@ class URLPrefixTests(URLTestCaseBase):
         self.assertRaises(ImproperlyConfigured, lambda: reverse('account:register'))
 
 
+@override_settings(ROOT_URLCONF='i18n.patterns.urls.disabled')
 class URLDisabledTests(URLTestCaseBase):
-    urls = 'i18n.patterns.urls.disabled'
 
     @override_settings(USE_I18N=False)
     def test_prefixed_i18n_disabled(self):
@@ -84,12 +84,12 @@ class URLDisabledTests(URLTestCaseBase):
             self.assertEqual(reverse('prefixed'), '/prefixed/')
 
 
+@override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')
 class PathUnusedTests(URLTestCaseBase):
     """
     Check that if no i18n_patterns is used in root urlconfs, then no
     language activation happens based on url prefix.
     """
-    urls = 'i18n.patterns.urls.path_unused'
 
     def test_no_lang_activate(self):
         response = self.client.get('/nl/foo/')
@@ -288,6 +288,25 @@ class URLResponseTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['content-language'], 'pt-br')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'pt-br')
+
+
+class URLRedirectWithScriptAliasTests(URLTestCaseBase):
+    """
+    #21579 - LocaleMiddleware should respect the script prefix.
+    """
+    def setUp(self):
+        super(URLRedirectWithScriptAliasTests, self).setUp()
+        self.script_prefix = '/script_prefix'
+        set_script_prefix(self.script_prefix)
+
+    def tearDown(self):
+        super(URLRedirectWithScriptAliasTests, self).tearDown()
+        # reset script prefix
+        set_script_prefix('')
+
+    def test_language_prefix_with_script_prefix(self):
+        response = self.client.get('/prefixed/', HTTP_ACCEPT_LANGUAGE='en', SCRIPT_NAME=self.script_prefix)
+        self.assertRedirects(response, '%s/en/prefixed/' % self.script_prefix, target_status_code=404)
 
 
 class URLTagTests(URLTestCaseBase):

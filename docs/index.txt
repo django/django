@@ -61,12 +61,14 @@ manipulating the data of your Web application. Learn more about it below:
 * **Models:**
   :doc:`Model syntax <topics/db/models>` |
   :doc:`Field types <ref/models/fields>` |
-  :doc:`Meta options <ref/models/options>`
+  :doc:`Meta options <ref/models/options>` |
+  :doc:`Model class <ref/models/class>`
 
 * **QuerySets:**
   :doc:`Executing queries <topics/db/queries>` |
   :doc:`QuerySet method reference <ref/models/querysets>` |
-  :doc:`Query-related classes <ref/models/queries>`
+  :doc:`Query-related classes <ref/models/queries>` |
+  :doc:`Lookup expressions <ref/models/lookups>`
 
 * **Model instances:**
   :doc:`Instance methods <ref/models/instances>` |
@@ -84,13 +86,15 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Aggregation <topics/db/aggregation>` |
   :doc:`Custom fields <howto/custom-model-fields>` |
   :doc:`Multiple databases <topics/db/multi-db>` |
-  :doc:`Custom lookups <ref/models/custom-lookups>`
+  :doc:`Custom lookups <howto/custom-lookups>` |
+  :doc:`Query Expressions <ref/models/expressions>`
 
 * **Other:**
   :doc:`Supported databases <ref/databases>` |
   :doc:`Legacy databases <howto/legacy-databases>` |
   :doc:`Providing initial data <howto/initial-data>` |
-  :doc:`Optimize database access <topics/db/optimization>`
+  :doc:`Optimize database access <topics/db/optimization>` |
+  :doc:`PostgreSQL specific features <ref/contrib/postgres/index>`
 
 The view layer
 ==============
@@ -168,10 +172,6 @@ manipulation of form data.
   :doc:`Formsets <topics/forms/formsets>` |
   :doc:`Customizing validation <ref/forms/validation>`
 
-* **Extras:**
-  :doc:`Form preview <ref/contrib/formtools/form-preview>` |
-  :doc:`Form wizard <ref/contrib/formtools/form-wizard>`
-
 The development process
 =======================
 
@@ -188,13 +188,14 @@ testing of Django applications:
 * **Exceptions:**
   :doc:`Overview <ref/exceptions>`
 
-* **django-admin.py and manage.py:**
+* **django-admin and manage.py:**
   :doc:`Overview <ref/django-admin>` |
   :doc:`Adding custom commands <howto/custom-management-commands>`
 
 * **Testing:**
   :doc:`Introduction <topics/testing/index>` |
   :doc:`Writing and running tests <topics/testing/overview>` |
+  :doc:`Included testing tools <topics/testing/tools>` |
   :doc:`Advanced topics <topics/testing/advanced>`
 
 * **Deployment:**
@@ -223,8 +224,9 @@ applications and Django provides multiple protection tools and mechanisms:
 * :doc:`Security overview <topics/security>`
 * :doc:`Disclosed security issues in Django <releases/security>`
 * :doc:`Clickjacking protection <ref/clickjacking>`
-* :doc:`Cross Site Request Forgery protection <ref/contrib/csrf>`
+* :doc:`Cross Site Request Forgery protection <ref/csrf>`
 * :doc:`Cryptographic signing <topics/signing>`
+* :ref:`Security Middleware <security-middleware>`
 
 Internationalization and localization
 =====================================
@@ -306,7 +308,9 @@ you can contribute:
 * **Community:**
   :doc:`How to get involved <internals/contributing/index>` |
   :doc:`The release process <internals/release-process>` |
-  :doc:`Team of committers <internals/committers>` |
+  :doc:`Team organization <internals/organization>` |
+  :doc:`Meet the team <internals/team>` |
+  :doc:`Current roles <internals/roles>` |
   :doc:`The Django source code repository <internals/git>` |
   :doc:`Security policies <internals/security>` |
   :doc:`Mailing lists <internals/mailing-lists>`

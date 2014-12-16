@@ -65,7 +65,7 @@ class CookieTest(BaseTests, TestCase):
         response = self.get_response()
         storage.add(constants.INFO, 'test')
         storage.update(response)
-        self.assertTrue('test' in response.cookies['messages'].value)
+        self.assertIn('test', response.cookies['messages'].value)
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], '')
         self.assertEqual(response.cookies['messages']['secure'], True)
@@ -114,7 +114,7 @@ class CookieTest(BaseTests, TestCase):
         self.assertEqual(cookie_storing, 4)
 
         self.assertEqual(len(unstored_messages), 1)
-        self.assertTrue(unstored_messages[0].message == '0' * msg_size)
+        self.assertEqual(unstored_messages[0].message, '0' * msg_size)
 
     def test_json_encoder_decoder(self):
         """
@@ -153,3 +153,25 @@ class CookieTest(BaseTests, TestCase):
             encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
         self.assertNotIsInstance(
             encode_decode("<b>Hello Django!</b>"), SafeData)
+
+    def test_pre_1_5_message_format(self):
+        """
+        For ticket #22426. Tests whether messages that were set in the cookie
+        before the addition of is_safedata are decoded correctly.
+        """
+
+        # Encode the messages using the current encoder.
+        messages = [Message(constants.INFO, 'message %s') for x in range(5)]
+        encoder = MessageEncoder(separators=(',', ':'))
+        encoded_messages = encoder.encode(messages)
+
+        # Remove the is_safedata flag from the messages in order to imitate
+        # the behavior of before 1.5 (monkey patching).
+        encoded_messages = json.loads(encoded_messages)
+        for obj in encoded_messages:
+            obj.pop(1)
+        encoded_messages = json.dumps(encoded_messages, separators=(',', ':'))
+
+        # Decode the messages in the old format (without is_safedata)
+        decoded_messages = json.loads(encoded_messages, cls=MessageDecoder)
+        self.assertEqual(messages, decoded_messages)

@@ -85,29 +85,29 @@ if os.name == 'nt':
         overlapped = OVERLAPPED()
         ret = UnlockFileEx(hfile, 0, 0, 0xFFFF0000, byref(overlapped))
         return bool(ret)
+else:
+    try:
+        import fcntl
+        LOCK_SH = fcntl.LOCK_SH  # shared lock
+        LOCK_NB = fcntl.LOCK_NB  # non-blocking
+        LOCK_EX = fcntl.LOCK_EX
+    except (ImportError, AttributeError):
+        # File locking is not supported.
+        LOCK_EX = LOCK_SH = LOCK_NB = 0
 
-elif os.name == 'posix':
-    import fcntl
-    LOCK_SH = fcntl.LOCK_SH  # shared lock
-    LOCK_NB = fcntl.LOCK_NB  # non-blocking
-    LOCK_EX = fcntl.LOCK_EX
+        # Dummy functions that don't do anything.
+        def lock(f, flags):
+            # File is not locked
+            return False
 
-    def lock(f, flags):
-        ret = fcntl.flock(_fd(f), flags)
-        return (ret == 0)
+        def unlock(f):
+            # File is unlocked
+            return True
+    else:
+        def lock(f, flags):
+            ret = fcntl.flock(_fd(f), flags)
+            return (ret == 0)
 
-    def unlock(f):
-        ret = fcntl.flock(_fd(f), fcntl.LOCK_UN)
-        return (ret == 0)
-
-else:  # File locking is not supported.
-    LOCK_EX = LOCK_SH = LOCK_NB = 0
-
-    # Dummy functions that don't do anything.
-    def lock(f, flags):
-        # File is not locked
-        return False
-
-    def unlock(f):
-        # File is unlocked
-        return True
+        def unlock(f):
+            ret = fcntl.flock(_fd(f), fcntl.LOCK_UN)
+            return (ret == 0)

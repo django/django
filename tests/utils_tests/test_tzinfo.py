@@ -6,7 +6,7 @@ import time
 import unittest
 import warnings
 
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils.deprecation import RemovedInDjango19Warning
 
 
@@ -16,10 +16,11 @@ with warnings.catch_warnings():
     from django.utils.tzinfo import FixedOffset, LocalTimezone
 
 
-class TzinfoTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
+class TzinfoTests(IgnoreDeprecationWarningsMixin, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(TzinfoTests, cls).setUpClass()
         cls.old_TZ = os.environ.get('TZ')
         os.environ['TZ'] = 'US/Eastern'
 
@@ -41,6 +42,7 @@ class TzinfoTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
         # Cleanup - force re-evaluation of TZ environment variable.
         if cls.tz_tests:
             time.tzset()
+        super(TzinfoTests, cls).tearDownClass()
 
     def test_fixedoffset(self):
         self.assertEqual(repr(FixedOffset(0)), '+0000')

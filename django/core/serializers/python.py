@@ -90,7 +90,13 @@ def Deserializer(object_list, **options):
 
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
-        Model = _get_model(d["model"])
+        try:
+            Model = _get_model(d["model"])
+        except base.DeserializationError:
+            if ignore:
+                continue
+            else:
+                raise
         data = {}
         if 'pk' in d:
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
@@ -105,7 +111,9 @@ def Deserializer(object_list, **options):
                 continue
 
             if isinstance(field_value, str):
-                field_value = smart_text(field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True)
+                field_value = smart_text(
+                    field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True
+                )
 
             field = Model._meta.get_field(field_name)
 

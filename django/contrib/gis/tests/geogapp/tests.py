@@ -1,5 +1,5 @@
 """
-Tests for geography support in PostGIS 1.5+
+Tests for geography support in PostGIS
 """
 from __future__ import unicode_literals
 
@@ -9,21 +9,23 @@ from unittest import skipUnless
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D
-from django.contrib.gis.tests.utils import postgis
-from django.test import TestCase
+from django.contrib.gis.tests.utils import oracle, postgis
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils._os import upath
 
 if HAS_GEOS:
     from .models import City, County, Zipcode
 
 
-@skipUnless(HAS_GEOS and postgis, "Geos and postgis are required.")
+@skipUnlessDBFeature("gis_enabled")
 class GeographyTest(TestCase):
+    fixtures = ['initial']
 
     def test01_fixture_load(self):
         "Ensure geography features loaded properly."
         self.assertEqual(8, City.objects.count())
 
+    @skipUnlessDBFeature("supports_distances_lookups", "supports_distance_geodetic")
     def test02_distance_lookup(self):
         "Testing GeoQuerySet distance lookup support on non-point geography fields."
         z = Zipcode.objects.get(code='77002')
@@ -38,12 +40,14 @@ class GeographyTest(TestCase):
         for cities in [cities1, cities2]:
             self.assertEqual(['Dallas', 'Houston', 'Oklahoma City'], cities)
 
+    @skipUnlessDBFeature("has_distance_method", "supports_distance_geodetic")
     def test03_distance_method(self):
         "Testing GeoQuerySet.distance() support on non-point geography fields."
         # `GeoQuerySet.distance` is not allowed geometry fields.
         htown = City.objects.get(name='Houston')
         Zipcode.objects.distance(htown.point)
 
+    @skipUnless(postgis, "This is a PostGIS-specific test")
     def test04_invalid_operators_functions(self):
         "Ensuring exceptions are raised for operators & functions invalid on geography fields."
         # Only a subset of the geometry functions & operator are available
@@ -88,10 +92,11 @@ class GeographyTest(TestCase):
             self.assertEqual(name, c.name)
             self.assertEqual(state, c.state)
 
+    @skipUnlessDBFeature("has_area_method", "supports_distance_geodetic")
     def test06_geography_area(self):
         "Testing that Area calculations work on geography columns."
         # SELECT ST_Area(poly) FROM geogapp_zipcode WHERE code='77002';
-        ref_area = 5439084.70637573
+        ref_area = 5439100.95415646 if oracle else 5439084.70637573
         tol = 5
         z = Zipcode.objects.area().get(code='77002')
         self.assertAlmostEqual(z.area.sq_m, ref_area, tol)

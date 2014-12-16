@@ -1,7 +1,9 @@
 import copy
 import datetime
+import binascii
 
 from django.utils import six
+from django.utils.text import force_text
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.utils import DatabaseError
 
@@ -21,7 +23,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
             return "'%s'" % value
         elif isinstance(value, six.string_types):
-            return repr(value)
+            return "'%s'" % six.text_type(value).replace("\'", "\'\'")
+        elif isinstance(value, six.buffer_types):
+            return "'%s'" % force_text(binascii.hexlify(value))
         elif isinstance(value, bool):
             return "1" if value else "0"
         else:
@@ -89,7 +93,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def normalize_name(self, name):
         """
-        Get the properly shortened and uppercased identifier as returned by quote_name(), but without the actual quotes.
+        Get the properly shortened and uppercased identifier as returned by
+        quote_name(), but without the actual quotes.
         """
         nn = self.quote_name(name)
         if nn[0] == '"' and nn[-1] == '"':

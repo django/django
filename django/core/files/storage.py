@@ -1,18 +1,18 @@
 import os
 import errno
-import itertools
 from datetime import datetime
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import locks, File
 from django.core.files.move import file_move_safe
+from django.utils.crypto import get_random_string
 from django.utils.encoding import force_text, filepath_to_uri
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
 from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
 from django.utils._os import safe_join, abspathu
+from django.utils.deconstruct import deconstructible
 
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
@@ -68,13 +68,12 @@ class Storage(object):
         """
         dir_name, file_name = os.path.split(name)
         file_root, file_ext = os.path.splitext(file_name)
-        # If the filename already exists, add an underscore and a number (before
-        # the file extension, if one exists) to the filename until the generated
-        # filename doesn't exist.
-        count = itertools.count(1)
+        # If the filename already exists, add an underscore and a random 7
+        # character alphanumeric string (before the file extension, if one
+        # exists) to the filename until the generated filename doesn't exist.
         while self.exists(name):
             # file_ext includes the dot.
-            name = os.path.join(dir_name, "%s_%s%s" % (file_root, next(count), file_ext))
+            name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
 
         return name
 
@@ -100,7 +99,7 @@ class Storage(object):
         Returns True if a file referenced by the given name already exists in the
         storage system, or False if the name is available for a new file.
         """
-        raise NotImplementedError('subclasses of Storage must provide a exists() method')
+        raise NotImplementedError('subclasses of Storage must provide an exists() method')
 
     def listdir(self, path):
         """
@@ -144,6 +143,7 @@ class Storage(object):
         raise NotImplementedError('subclasses of Storage must provide a modified_time() method')
 
 
+@deconstructible
 class FileSystemStorage(Storage):
     """
     Standard filesystem storage
@@ -157,6 +157,8 @@ class FileSystemStorage(Storage):
         self.location = abspathu(self.base_location)
         if base_url is None:
             base_url = settings.MEDIA_URL
+        elif not base_url.endswith('/'):
+            base_url += '/'
         self.base_url = base_url
         self.file_permissions_mode = (
             file_permissions_mode if file_permissions_mode is not None
@@ -207,7 +209,6 @@ class FileSystemStorage(Storage):
                 # This file has a file path that we can move.
                 if hasattr(content, 'temporary_file_path'):
                     file_move_safe(content.temporary_file_path(), full_path)
-                    content.close()
 
                 # This is a normal uploadedfile that we can stream.
                 else:
@@ -226,7 +227,6 @@ class FileSystemStorage(Storage):
                                 _file = os.fdopen(fd, mode)
                             _file.write(chunk)
                     finally:
-                        content.close()
                         locks.unlock(fd)
                         if _file is not None:
                             _file.close()
@@ -276,11 +276,7 @@ class FileSystemStorage(Storage):
         return directories, files
 
     def path(self, name):
-        try:
-            path = safe_join(self.location, name)
-        except ValueError:
-            raise SuspiciousFileOperation("Attempted access to '%s' denied." % name)
-        return os.path.normpath(path)
+        return safe_join(self.location, name)
 
     def size(self, name):
         return os.path.getsize(self.path(name))

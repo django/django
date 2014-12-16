@@ -38,12 +38,12 @@ URLconf. If you're only changing a few simple attributes on a class-based view,
 you can simply pass them into the
 :meth:`~django.views.generic.base.View.as_view` method call itself::
 
-    from django.conf.urls import patterns
+    from django.conf.urls import url
     from django.views.generic import TemplateView
 
-    urlpatterns = patterns('',
-        (r'^about/', TemplateView.as_view(template_name="about.html")),
-    )
+    urlpatterns = [
+        url(r'^about/', TemplateView.as_view(template_name="about.html")),
+    ]
 
 Any arguments passed to :meth:`~django.views.generic.base.View.as_view` will
 override attributes set on the class. In this example, we set ``template_name``
@@ -75,12 +75,12 @@ class method instead, which provides a function-like entry to class-based
 views::
 
     # urls.py
-    from django.conf.urls import patterns
+    from django.conf.urls import url
     from some_app.views import AboutView
 
-    urlpatterns = patterns('',
-        (r'^about/', AboutView.as_view()),
-    )
+    urlpatterns = [
+        url(r'^about/', AboutView.as_view()),
+    ]
 
 
 For more information on how to use the built in generic views, consult the next
@@ -100,12 +100,12 @@ preferable to ask the API when the most recent book was published.
 
 We map the URL to book list view in the URLconf::
 
-    from django.conf.urls import patterns
+    from django.conf.urls import url
     from books.views import BookListView
 
-    urlpatterns = patterns('',
-        (r'^books/$', BookListView.as_view()),
-    )
+    urlpatterns = [
+        url(r'^books/$', BookListView.as_view()),
+    ]
 
 And the view::
 

@@ -4,7 +4,6 @@ import os
 from django import forms
 from django.db.models.fields import Field
 from django.core import checks
-from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import File
 from django.core.files.storage import default_storage
 from django.core.files.images import ImageFile
@@ -301,8 +300,8 @@ class FileField(Field):
             file.save(file.name, file, save=False)
         return file
 
-    def contribute_to_class(self, cls, name):
-        super(FileField, self).contribute_to_class(cls, name)
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(FileField, self).contribute_to_class(cls, name, **kwargs)
         setattr(cls, self.name, self.descriptor_class(self))
 
     def get_directory_name(self):
@@ -386,13 +385,13 @@ class ImageField(FileField):
 
     def _check_image_library_installed(self):
         try:
-            from django.utils.image import Image  # NOQA
-        except ImproperlyConfigured:
+            from PIL import Image  # NOQA
+        except ImportError:
             return [
                 checks.Error(
                     'Cannot use ImageField because Pillow is not installed.',
                     hint=('Get Pillow at https://pypi.python.org/pypi/Pillow '
-                          'or run command "pip install pillow".'),
+                          'or run command "pip install Pillow".'),
                     obj=self,
                     id='fields.E210',
                 )
@@ -408,8 +407,8 @@ class ImageField(FileField):
             kwargs['height_field'] = self.height_field
         return name, path, args, kwargs
 
-    def contribute_to_class(self, cls, name):
-        super(ImageField, self).contribute_to_class(cls, name)
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(ImageField, self).contribute_to_class(cls, name, **kwargs)
         # Attach update_dimension_fields so that dimension fields declared
         # after their corresponding image field don't stay cleared by
         # Model.__init__, see bug #11196.
@@ -430,7 +429,7 @@ class ImageField(FileField):
         Dimensions can be forced to update with force=True, which is how
         ImageFileDescriptor.__set__ calls this method.
         """
-        # Nothing to update if the field doesn't have have dimension fields.
+        # Nothing to update if the field doesn't have dimension fields.
         has_dimension_fields = self.width_field or self.height_field
         if not has_dimension_fields:
             return

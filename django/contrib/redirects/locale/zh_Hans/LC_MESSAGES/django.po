@@ -1,0 +1,51 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# ouyanghongyu <ouyanghongyu@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-09-04 10:33+0000\n"
+"Last-Translator: ouyanghongyu <ouyanghongyu@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"language/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contrib/redirects/apps.py:8
+msgid "Redirects"
+msgstr "重定向"
+
+#: contrib/redirects/models.py:10
+msgid "redirect from"
+msgstr "重定向自"
+
+#: contrib/redirects/models.py:11
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr "应该是一个绝对路径，不包括域名。例如：'/events/search/'。"
+
+#: contrib/redirects/models.py:12
+msgid "redirect to"
+msgstr "重定向到"
+
+#: contrib/redirects/models.py:13
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr "可以是绝对路径（同上）或以'http://'起始的全URL。"
+
+#: contrib/redirects/models.py:16
+msgid "redirect"
+msgstr "重定向"
+
+#: contrib/redirects/models.py:17
+msgid "redirects"
+msgstr "重定向"

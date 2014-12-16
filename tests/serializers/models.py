@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-42. Serialization
+Serialization
 
 ``django.core.serializers`` provides interfaces to converting Django
 ``QuerySet`` objects to and from "flat" data (i.e. strings).
@@ -99,7 +99,7 @@ class Team(object):
         return "%s" % self.title
 
 
-class TeamField(six.with_metaclass(models.SubfieldBase, models.CharField)):
+class TeamField(models.CharField):
 
     def __init__(self):
         super(TeamField, self).__init__(max_length=100)
@@ -110,6 +110,9 @@ class TeamField(six.with_metaclass(models.SubfieldBase, models.CharField)):
     def to_python(self, value):
         if isinstance(value, Team):
             return value
+        return Team(value)
+
+    def from_db_value(self, value, connection):
         return Team(value)
 
     def value_to_string(self, obj):

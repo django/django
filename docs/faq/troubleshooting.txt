@@ -5,47 +5,66 @@ Troubleshooting
 This page contains some advice about errors and problems commonly encountered
 during the development of Django applications.
 
-.. _troubleshooting-django-admin-py:
+.. _troubleshooting-django-admin:
 
-Problems running django-admin.py
-================================
+Problems running django-admin
+=============================
 
-"command not found: django-admin.py"
+"command not found: django-admin"
 ------------------------------------
 
-:doc:`django-admin.py </ref/django-admin>` should be on your system path if you
+:doc:`django-admin </ref/django-admin>` should be on your system path if you
 installed Django via ``python setup.py``. If it's not on your path, you can
 find it in ``site-packages/django/bin``, where ``site-packages`` is a directory
-within your Python installation. Consider symlinking to :doc:`django-admin.py
+within your Python installation. Consider symlinking to :doc:`django-admin
 </ref/django-admin>` from some place on your path, such as
 :file:`/usr/local/bin`.
 
-Script name may differ in distribution packages
------------------------------------------------
-
-If you installed Django using a Linux distribution's package manager
-(e.g. ``apt-get`` or ``yum``) ``django-admin.py`` may have been renamed to
-``django-admin``; use that instead.
+If ``django-admin`` doesn't work but ``django-admin.py`` does, you're probably
+using a version of Django that doesn't match the version of this documentation.
+``django-admin`` is new in Django 1.7.
 
 Mac OS X permissions
 --------------------
 
 If you're using Mac OS X, you may see the message "permission denied" when
-you try to run ``django-admin.py``. This is because, on Unix-based systems like
+you try to run ``django-admin``. This is because, on Unix-based systems like
 OS X, a file must be marked as "executable" before it can be run as a program.
 To do this, open Terminal.app and navigate (using the ``cd`` command) to the
-directory where :doc:`django-admin.py </ref/django-admin>` is installed, then
-run the command ``sudo chmod +x django-admin.py``.
+directory where :doc:`django-admin </ref/django-admin>` is installed, then
+run the command ``sudo chmod +x django-admin``.
 
-Running virtualenv on Windows
------------------------------
+Miscellaneous
+=============
 
-If you used virtualenv_ to :ref:`install Django <installing-official-release>`
-on Windows, you may get an ``ImportError`` when you try to run
-``django-admin.py``. This is because Windows does not run the
-Python interpreter from your virtual environment unless you invoke it
-directly. Instead, prefix all commands that use .py files with ``python`` and
-use the full path to the file, like so:
-``python C:\pythonXY\Scripts\django-admin.py``.
+I'm getting a ``UnicodeDecodeError``. What am I doing wrong?
+------------------------------------------------------------
 
-.. _virtualenv: http://www.virtualenv.org/
+This class of errors happen when a bytestring containing non-ASCII sequences is
+transformed into a Unicode string and the specified encoding is incorrect. The
+output generally looks like this::
+
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0x?? in position ?:
+    ordinal not in range(128)
+
+The resolution mostly depends on the context, however here are two common
+pitfalls producing this error:
+
+* Your system locale may be a default ASCII locale, like the "C" locale on
+  UNIX-like systems (can be checked by the ``locale`` command). If it's the
+  case, please refer to your system documentation to learn how you can change
+  this to a UTF-8 locale.
+
+* You created raw bytestrings, which is easy to do on Python 2::
+
+      my_string = 'café'
+
+  Either use the ``u''`` prefix or even better, add the
+  ``from __future__ import unicode_literals`` line at the top of your file
+  so that your code will be compatible with Python 3.2 which doesn't support
+  the ``u''`` prefix.
+
+Related resources:
+
+* :doc:`Unicode in Django </ref/unicode>`
+* https://wiki.python.org/moin/UnicodeDecodeError

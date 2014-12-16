@@ -31,6 +31,7 @@ class CountyFeat(NamedModel):
 
 class City(NamedModel):
     name_txt = models.TextField(default='')
+    name_short = models.CharField(max_length=5)
     population = models.IntegerField()
     density = models.DecimalField(max_digits=7, decimal_places=1)
     dt = models.DateField()
@@ -71,10 +72,12 @@ class Invalid(models.Model):
 
 
 # Mapping dictionaries for the models above.
-co_mapping = {'name': 'Name',
-              'state': {'name': 'State'},  # ForeignKey's use another mapping dictionary for the _related_ Model (State in this case).
-              'mpoly': 'MULTIPOLYGON',  # Will convert POLYGON features into MULTIPOLYGONS.
-              }
+co_mapping = {
+    'name': 'Name',
+    # ForeignKey's use another mapping dictionary for the _related_ Model (State in this case).
+    'state': {'name': 'State'},
+    'mpoly': 'MULTIPOLYGON',  # Will convert POLYGON features into MULTIPOLYGONS.
+}
 
 cofeat_mapping = {'name': 'Name',
                   'poly': 'POLYGON',

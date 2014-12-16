@@ -3,30 +3,88 @@ from __future__ import unicode_literals
 
 import unittest
 
-from django.conf.urls import patterns, url
-from django.core.urlresolvers import reverse
-from django.db import connection
+from django.conf.urls import url
+from django.core.files.storage import default_storage
+from django.core.urlresolvers import NoReverseMatch, reverse
+from django.db import connection, router
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
-from django.test.utils import (CaptureQueriesContext,
-    IgnoreAllDeprecationWarningsMixin, override_settings)
+from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 
-from .models import Person
+from .models import Car, Person, PossessedCar
+from .views import empty_response
 
 
 class SkippingTestCase(TestCase):
+    def _assert_skipping(self, func, expected_exc):
+        # We cannot simply use assertRaises because a SkipTest exception will go unnoticed
+        try:
+            func()
+        except expected_exc:
+            pass
+        except Exception as e:
+            self.fail("No %s exception should have been raised for %s." % (
+                e.__class__.__name__, func.__name__))
+
     def test_skip_unless_db_feature(self):
-        "A test that might be skipped is actually called."
+        """
+        Testing the django.test.skipUnlessDBFeature decorator.
+        """
         # Total hack, but it works, just want an attribute that's always true.
         @skipUnlessDBFeature("__class__")
         def test_func():
             raise ValueError
 
-        self.assertRaises(ValueError, test_func)
+        @skipUnlessDBFeature("notprovided")
+        def test_func2():
+            raise ValueError
+
+        @skipUnlessDBFeature("__class__", "__class__")
+        def test_func3():
+            raise ValueError
+
+        @skipUnlessDBFeature("__class__", "notprovided")
+        def test_func4():
+            raise ValueError
+
+        self._assert_skipping(test_func, ValueError)
+        self._assert_skipping(test_func2, unittest.SkipTest)
+        self._assert_skipping(test_func3, ValueError)
+        self._assert_skipping(test_func4, unittest.SkipTest)
+
+    def test_skip_if_db_feature(self):
+        """
+        Testing the django.test.skipIfDBFeature decorator.
+        """
+        @skipIfDBFeature("__class__")
+        def test_func():
+            raise ValueError
+
+        @skipIfDBFeature("notprovided")
+        def test_func2():
+            raise ValueError
+
+        @skipIfDBFeature("__class__", "__class__")
+        def test_func3():
+            raise ValueError
+
+        @skipIfDBFeature("__class__", "notprovided")
+        def test_func4():
+            raise ValueError
+
+        @skipIfDBFeature("notprovided", "notprovided")
+        def test_func5():
+            raise ValueError
+
+        self._assert_skipping(test_func, unittest.SkipTest)
+        self._assert_skipping(test_func2, ValueError)
+        self._assert_skipping(test_func3, unittest.SkipTest)
+        self._assert_skipping(test_func4, unittest.SkipTest)
+        self._assert_skipping(test_func5, ValueError)
 
 
 class SkippingClassTestCase(TestCase):
@@ -52,8 +110,8 @@ class SkippingClassTestCase(TestCase):
         self.assertEqual(len(result.skipped), 1)
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertNumQueriesTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_assert_num_queries(self):
         def test_func():
@@ -121,9 +179,36 @@ class AssertQuerysetEqualTests(TestCase):
             [repr(self.p1)]
         )
 
+    def test_repeated_values(self):
+        """
+        Test that assertQuerysetEqual checks the number of appearance of each item
+        when used with option ordered=False.
+        """
+        batmobile = Car.objects.create(name='Batmobile')
+        k2000 = Car.objects.create(name='K 2000')
+        PossessedCar.objects.bulk_create([
+            PossessedCar(car=batmobile, belongs_to=self.p1),
+            PossessedCar(car=batmobile, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+        ])
+        with self.assertRaises(AssertionError):
+            self.assertQuerysetEqual(
+                self.p1.cars.all(),
+                [repr(batmobile), repr(k2000)],
+                ordered=False
+            )
+        self.assertQuerysetEqual(
+            self.p1.cars.all(),
+            [repr(batmobile)] * 2 + [repr(k2000)] * 4,
+            ordered=False
+        )
 
+
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class CaptureQueriesContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def setUp(self):
         self.person_pk = six.text_type(Person.objects.create(name='test').pk)
@@ -176,8 +261,8 @@ class CaptureQueriesContextManagerTests(TestCase):
         self.assertIn(self.person_pk, captured_queries[1]['sql'])
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertNumQueriesContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_simple(self):
         with self.assertNumQueries(0):
@@ -215,8 +300,8 @@ class AssertNumQueriesContextManagerTests(TestCase):
             self.client.get("/test_utils/get_person/%s/" % person.pk)
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertTemplateUsedContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_usage(self):
         with self.assertTemplateUsed('template_used/base.html'):
@@ -299,6 +384,18 @@ class AssertTemplateUsedContextManagerTests(TestCase):
         with self.assertRaises(AssertionError):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
+
+    def test_assert_used_on_http_response(self):
+        response = HttpResponse()
+        error_msg = (
+            'assertTemplateUsed() and assertTemplateNotUsed() are only '
+            'usable on responses fetched using the Django test Client.'
+        )
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateUsed(response, 'template.html')
+
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateNotUsed(response, 'template.html')
 
 
 class HTMLEqualTests(TestCase):
@@ -457,24 +554,24 @@ class HTMLEqualTests(TestCase):
         # equal html contains each other
         dom1 = parse_html('<p>foo')
         dom2 = parse_html('<p>foo</p>')
-        self.assertTrue(dom1 in dom2)
-        self.assertTrue(dom2 in dom1)
+        self.assertIn(dom1, dom2)
+        self.assertIn(dom2, dom1)
 
         dom2 = parse_html('<div><p>foo</p></div>')
-        self.assertTrue(dom1 in dom2)
-        self.assertTrue(dom2 not in dom1)
+        self.assertIn(dom1, dom2)
+        self.assertNotIn(dom2, dom1)
 
-        self.assertFalse('<p>foo</p>' in dom2)
-        self.assertTrue('foo' in dom2)
+        self.assertNotIn('<p>foo</p>', dom2)
+        self.assertIn('foo', dom2)
 
         # when a root element is used ...
         dom1 = parse_html('<p>foo</p><p>bar</p>')
         dom2 = parse_html('<p>foo</p><p>bar</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>foo</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>bar</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
 
     def test_count(self):
         # equal html contains each other one time
@@ -541,6 +638,51 @@ class HTMLEqualTests(TestCase):
     def test_unicode_handling(self):
         response = HttpResponse('<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>')
         self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
+
+
+class JSONEqualTests(TestCase):
+    def test_simple_equal(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr1": "foo", "attr2":"baz"}'
+        self.assertJSONEqual(json1, json2)
+
+    def test_simple_equal_unordered(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr2":"baz", "attr1": "foo"}'
+        self.assertJSONEqual(json1, json2)
+
+    def test_simple_equal_raise(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONEqual(json1, json2)
+
+    def test_equal_parsing_errors(self):
+        invalid_json = '{"attr1": "foo, "attr2":"baz"}'
+        valid_json = '{"attr1": "foo", "attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONEqual(invalid_json, valid_json)
+        with self.assertRaises(AssertionError):
+            self.assertJSONEqual(valid_json, invalid_json)
+
+    def test_simple_not_equal(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr2":"baz"}'
+        self.assertJSONNotEqual(json1, json2)
+
+    def test_simple_not_equal_raise(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr1": "foo", "attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONNotEqual(json1, json2)
+
+    def test_not_equal_parsing_errors(self):
+        invalid_json = '{"attr1": "foo, "attr2":"baz"}'
+        valid_json = '{"attr1": "foo", "attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONNotEqual(invalid_json, valid_json)
+        with self.assertRaises(AssertionError):
+            self.assertJSONNotEqual(valid_json, invalid_json)
 
 
 class XMLEqualTests(TestCase):
@@ -623,39 +765,88 @@ class AssertFieldOutputTests(SimpleTestCase):
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
 
-class DoctestNormalizerTest(IgnoreAllDeprecationWarningsMixin, SimpleTestCase):
-
-    def test_normalizer(self):
-        from django.test.simple import make_doctest
-        suite = make_doctest("test_utils.doctest_output")
-        failures = unittest.TextTestRunner(stream=six.StringIO()).run(suite)
-        self.assertEqual(failures.failures, [])
-
-
-# for OverrideSettingsTests
-def fake_view(request):
-    pass
-
-
 class FirstUrls:
-    urlpatterns = patterns('', url(r'first/$', fake_view, name='first'))
+    urlpatterns = [url(r'first/$', empty_response, name='first')]
 
 
 class SecondUrls:
-    urlpatterns = patterns('', url(r'second/$', fake_view, name='second'))
+    urlpatterns = [url(r'second/$', empty_response, name='second')]
 
 
 class OverrideSettingsTests(TestCase):
-    """
-    #21518 -- If neither override_settings nor a settings_changed receiver
-    clears the URL cache between tests, then one of these two test methods will
-    fail.
-    """
+
+    # #21518 -- If neither override_settings nor a settings_changed receiver
+    # clears the URL cache between tests, then one of test_first or
+    # test_second will fail.
 
     @override_settings(ROOT_URLCONF=FirstUrls)
-    def test_first(self):
+    def test_urlconf_first(self):
         reverse('first')
 
     @override_settings(ROOT_URLCONF=SecondUrls)
-    def test_second(self):
+    def test_urlconf_second(self):
         reverse('second')
+
+    def test_urlconf_cache(self):
+        self.assertRaises(NoReverseMatch, lambda: reverse('first'))
+        self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+        with override_settings(ROOT_URLCONF=FirstUrls):
+            self.client.get(reverse('first'))
+            self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+            with override_settings(ROOT_URLCONF=SecondUrls):
+                self.assertRaises(NoReverseMatch, lambda: reverse('first'))
+                self.client.get(reverse('second'))
+
+            self.client.get(reverse('first'))
+            self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+        self.assertRaises(NoReverseMatch, lambda: reverse('first'))
+        self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+    def test_override_media_root(self):
+        """
+        Overriding the MEDIA_ROOT setting should be reflected in the
+        base_location attribute of django.core.files.storage.default_storage.
+        """
+        self.assertEqual(default_storage.base_location, '')
+        with self.settings(MEDIA_ROOT='test_value'):
+            self.assertEqual(default_storage.base_location, 'test_value')
+
+    def test_override_media_url(self):
+        """
+        Overriding the MEDIA_URL setting should be reflected in the
+        base_url attribute of django.core.files.storage.default_storage.
+        """
+        self.assertEqual(default_storage.base_location, '')
+        with self.settings(MEDIA_URL='/test_value/'):
+            self.assertEqual(default_storage.base_url, '/test_value/')
+
+    def test_override_file_upload_permissions(self):
+        """
+        Overriding the FILE_UPLOAD_PERMISSIONS setting should be reflected in
+        the file_permissions_mode attribute of
+        django.core.files.storage.default_storage.
+        """
+        self.assertIsNone(default_storage.file_permissions_mode)
+        with self.settings(FILE_UPLOAD_PERMISSIONS=0o777):
+            self.assertEqual(default_storage.file_permissions_mode, 0o777)
+
+    def test_override_file_upload_directory_permissions(self):
+        """
+        Overriding the FILE_UPLOAD_DIRECTORY_PERMISSIONS setting should be
+        reflected in the directory_permissions_mode attribute of
+        django.core.files.storage.default_storage.
+        """
+        self.assertIsNone(default_storage.directory_permissions_mode)
+        with self.settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o777):
+            self.assertEqual(default_storage.directory_permissions_mode, 0o777)
+
+    def test_override_database_routers(self):
+        """
+        Overriding DATABASE_ROUTERS should update the master router.
+        """
+        test_routers = (object(),)
+        with self.settings(DATABASE_ROUTERS=test_routers):
+            self.assertSequenceEqual(router.routers, test_routers)

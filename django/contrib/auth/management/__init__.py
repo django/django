@@ -7,15 +7,12 @@ import getpass
 import unicodedata
 
 from django.apps import apps
-from django.contrib.auth import (models as auth_app, get_permission_codename,
-    get_user_model)
+from django.contrib.auth import get_permission_codename
 from django.core import exceptions
 from django.core.management.base import CommandError
 from django.db import DEFAULT_DB_ALIAS, router
-from django.db.models import signals
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils import six
-from django.utils.six.moves import input
 
 
 def _get_all_permissions(opts, ctype):
@@ -97,9 +94,9 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     ))
 
     perms = [
-        Permission(codename=codename, name=name, content_type=ctype)
-        for ctype, (codename, name) in searched_perms
-        if (ctype.pk, codename) not in all_perms
+        Permission(codename=codename, name=name, content_type=ct)
+        for ct, (codename, name) in searched_perms
+        if (ct.pk, codename) not in all_perms
     ]
     # Validate the permissions before bulk_creation to avoid cryptic
     # database error when the verbose_name is longer than 50 characters
@@ -117,30 +114,6 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     if verbosity >= 2:
         for perm in perms:
             print("Adding permission '%s'" % perm)
-
-
-def create_superuser(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
-    try:
-        apps.get_model('auth', 'Permission')
-    except LookupError:
-        return
-
-    UserModel = get_user_model()
-
-    from django.core.management import call_command
-
-    if not UserModel.objects.exists() and interactive:
-        msg = ("\nYou have installed Django's auth system, and "
-            "don't have any superusers defined.\nWould you like to create one "
-            "now? (yes/no): ")
-        confirm = input(msg)
-        while 1:
-            if confirm not in ('yes', 'no'):
-                confirm = input('Please enter either "yes" or "no": ')
-                continue
-            if confirm == 'yes':
-                call_command("createsuperuser", interactive=True, database=using)
-            break
 
 
 def get_system_username():
@@ -175,6 +148,9 @@ def get_default_username(check_db=True):
     :returns: The username, or an empty string if no username can be
         determined.
     """
+    # This file is used in apps.py, it should not trigger models import.
+    from django.contrib.auth import models as auth_app
+
     # If the User model has been swapped out, we can't make any assumptions
     # about the default user name.
     if auth_app.User._meta.swapped:
@@ -203,10 +179,3 @@ def get_default_username(check_db=True):
         else:
             return ''
     return default_username
-
-
-signals.post_migrate.connect(create_permissions,
-    dispatch_uid="django.contrib.auth.management.create_permissions")
-signals.post_migrate.connect(create_superuser,
-    sender=apps.get_app_config('auth'),
-    dispatch_uid="django.contrib.auth.management.create_superuser")

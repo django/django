@@ -4,13 +4,13 @@ import os
 import re
 
 from django import forms
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
     PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm,
     ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
+from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import Field, CharField
 from django.test import TestCase, override_settings
 from django.utils.encoding import force_text
@@ -35,7 +35,7 @@ class UserCreationFormTest(TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["username"].errors,
-                         [force_text(form.error_messages['duplicate_username'])])
+                         [force_text(User._meta.get_field('username').error_messages['unique'])])
 
     def test_invalid_data(self):
         data = {
@@ -45,8 +45,8 @@ class UserCreationFormTest(TestCase):
         }
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form["username"].errors,
-                         [force_text(form.fields['username'].error_messages['invalid'])])
+        validator = next(v for v in User._meta.get_field('username').validators if v.code == 'invalid')
+        self.assertEqual(form["username"].errors, [force_text(validator.message)])
 
     def test_password_verification(self):
         # The verification password is incorrect.
@@ -150,8 +150,8 @@ class AuthenticationFormTest(TestCase):
         class PickyAuthenticationForm(AuthenticationForm):
             def confirm_login_allowed(self, user):
                 if user.username == "inactive":
-                    raise forms.ValidationError(_("This user is disallowed."))
-                raise forms.ValidationError(_("Sorry, nobody's allowed in."))
+                    raise forms.ValidationError("This user is disallowed.")
+                raise forms.ValidationError("Sorry, nobody's allowed in.")
 
         form = PickyAuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
@@ -189,8 +189,7 @@ class AuthenticationFormTest(TestCase):
             username = CharField()
 
         form = CustomAuthenticationForm()
-        UserModel = get_user_model()
-        username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+        username_field = User._meta.get_field(User.USERNAME_FIELD)
         self.assertEqual(form.fields['username'].label, capfirst(username_field.verbose_name))
 
     def test_username_field_label_empty_string(self):
@@ -290,8 +289,8 @@ class UserChangeFormTest(TestCase):
         data = {'username': 'not valid'}
         form = UserChangeForm(data, instance=user)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form['username'].errors,
-                         [force_text(form.fields['username'].error_messages['invalid'])])
+        validator = next(v for v in User._meta.get_field('username').validators if v.code == 'invalid')
+        self.assertEqual(form["username"].errors, [force_text(validator.message)])
 
     def test_bug_14242(self):
         # A regression test, introduce by adding an optimization for the
@@ -386,9 +385,9 @@ class PasswordResetFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form['email'].errors, [_('Enter a valid email address.')])
 
-    def test_nonexistant_email(self):
+    def test_nonexistent_email(self):
         """
-        Test nonexistant email address. This should not fail because it would
+        Test nonexistent email address. This should not fail because it would
         expose information about registered users.
         """
         data = {'email': 'foo@bar.com'}
@@ -415,6 +414,35 @@ class PasswordResetFormTest(TestCase):
         form.save(domain_override='example.com')
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Custom password reset on example.com')
+
+    def test_custom_email_constructor(self):
+        template_path = os.path.join(os.path.dirname(__file__), 'templates')
+        with self.settings(TEMPLATE_DIRS=(template_path,)):
+            data = {'email': 'testclient@example.com'}
+
+            class CustomEmailPasswordResetForm(PasswordResetForm):
+                def send_mail(self, subject_template_name, email_template_name,
+                              context, from_email, to_email,
+                              html_email_template_name=None):
+                    EmailMultiAlternatives(
+                        "Forgot your password?",
+                        "Sorry to hear you forgot your password.",
+                        None, [to_email],
+                        ['site_monitor@example.com'],
+                        headers={'Reply-To': 'webmaster@example.com'},
+                        alternatives=[("Really sorry to hear you forgot your password.",
+                                       "text/html")]).send()
+
+            form = CustomEmailPasswordResetForm(data)
+            self.assertTrue(form.is_valid())
+            # Since we're not providing a request object, we must provide a
+            # domain_override to prevent the save operation from failing in the
+            # potential case where contrib.sites is not installed. Refs #16412.
+            form.save(domain_override='example.com')
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertEqual(mail.outbox[0].subject, 'Forgot your password?')
+            self.assertEqual(mail.outbox[0].bcc, ['site_monitor@example.com'])
+            self.assertEqual(mail.outbox[0].content_subtype, "plain")
 
     def test_preserve_username_case(self):
         """
@@ -491,7 +519,10 @@ class PasswordResetFormTest(TestCase):
         self.assertEqual(message.get_payload(1).get_content_type(), 'text/html')
         self.assertEqual(message.get_all('to'), [email])
         self.assertTrue(re.match(r'^http://example.com/reset/[\w/-]+', message.get_payload(0).get_payload()))
-        self.assertTrue(re.match(r'^<html><a href="http://example.com/reset/[\w/-]+/">Link</a></html>$', message.get_payload(1).get_payload()))
+        self.assertTrue(
+            re.match(r'^<html><a href="http://example.com/reset/[\w/-]+/">Link</a></html>$',
+            message.get_payload(1).get_payload())
+        )
 
 
 class ReadOnlyPasswordHashTest(TestCase):
@@ -505,4 +536,4 @@ class ReadOnlyPasswordHashTest(TestCase):
 
     def test_readonly_field_has_changed(self):
         field = ReadOnlyPasswordHashField()
-        self.assertFalse(field._has_changed('aaa', 'bbb'))
+        self.assertFalse(field.has_changed('aaa', 'bbb'))

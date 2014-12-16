@@ -2,13 +2,9 @@
 One-to-one relationships
 ########################
 
-.. highlight:: pycon
-
 To define a one-to-one relationship, use :ref:`ref-onetoone`.
 
-In this example, a ``Place`` optionally can be a ``Restaurant``:
-
-.. code-block:: python
+In this example, a ``Place`` optionally can be a ``Restaurant``::
 
     from django.db import models
 
@@ -21,8 +17,8 @@ In this example, a ``Place`` optionally can be a ``Restaurant``:
 
     class Restaurant(models.Model):
         place = models.OneToOneField(Place, primary_key=True)
-        serves_hot_dogs = models.BooleanField()
-        serves_pizza = models.BooleanField()
+        serves_hot_dogs = models.BooleanField(default=False)
+        serves_pizza = models.BooleanField(default=False)
 
         def __str__(self):              # __unicode__ on Python 2
             return "%s the restaurant" % self.place.name
@@ -36,6 +32,8 @@ In this example, a ``Place`` optionally can be a ``Restaurant``:
 
 What follows are examples of operations that can be performed using the Python
 API facilities.
+
+.. highlight:: pycon
 
 Create a couple of Places::
 
@@ -61,10 +59,17 @@ A Place can access its restaurant, if available::
 
 p2 doesn't have an associated restaurant::
 
-    >>> p2.restaurant
-    Traceback (most recent call last):
-        ...
-    DoesNotExist: Restaurant matching query does not exist.
+    >>> from django.core.exceptions import ObjectDoesNotExist
+    >>> try:
+    >>>     p2.restaurant
+    >>> except ObjectDoesNotExist:
+    >>>     print("There is no restaurant here.")
+    There is no restaurant here.
+
+You can also use ``hasattr`` to avoid the need for exception catching::
+
+    >>> hasattr(p2, 'restaurant')
+    False
 
 Set the place using assignment notation. Because place is the primary key on
 Restaurant, the save will create a new restaurant::
@@ -81,6 +86,25 @@ Set the place back again, using assignment in the reverse direction::
     >>> p1.restaurant = r
     >>> p1.restaurant
     <Restaurant: Demon Dogs the restaurant>
+
+Note that you must save an object before it can be assigned to a one-to-one
+relationship. For example, creating an ``Restaurant`` with unsaved ``Place``
+raises ``ValueError``::
+
+    >>> p3 = Place(name='Demon Dogs', address='944 W. Fullerton')
+    >>> Restaurant(place=p3, serves_hot_dogs=True, serves_pizza=False)
+    Traceback (most recent call last):
+    ...
+    ValueError: 'Cannot assign "<Place: Demon Dogs>": "Place" instance isn't saved in the database.'
+    >>> p.restaurant = Restaurant(place=p, serves_hot_dogs=True, serves_pizza=False)
+    Traceback (most recent call last):
+    ...
+    ValueError: 'Cannot assign "<Restaurant: Demon Dogs the restaurant>": "Restaurant" instance isn't saved in the database.'
+
+.. versionchanged:: 1.8
+
+    Previously, assigning unsaved objects did not raise an error and could
+    result in silent data loss.
 
 Restaurant.objects.all() just returns the Restaurants, not the Places.  Note
 that there are two restaurants - Ace Hardware the Restaurant was created in the

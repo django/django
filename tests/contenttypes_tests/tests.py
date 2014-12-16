@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.apps.registry import Apps, apps
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
+from django.contrib.contenttypes import management
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
-from django.db import models
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.db import connections, models
+from django.test import TestCase, override_settings
+from django.test.utils import captured_stdout
 from django.utils.encoding import force_str
 
 from .models import Author, Article, SchemeIncludedURL
 
 
+@override_settings(ROOT_URLCONF='contenttypes_tests.urls')
 class ContentTypesViewsTests(TestCase):
     fixtures = ['testdata.json']
-    urls = 'contenttypes_tests.urls'
 
     def test_shortcut_with_absolute_url(self):
         "Can view a shortcut for an Author object that has a get_absolute_url method"
@@ -101,6 +102,7 @@ class IsolatedModelsTestCase(TestCase):
         apps.clear_cache()
 
 
+@override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)
 class GenericForeignKeyTests(IsolatedModelsTestCase):
 
     def test_str(self):
@@ -198,6 +200,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    @override_settings(INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'contenttypes_tests'])
     def test_generic_foreign_key_checks_are_performed(self):
         class MyGenericForeignKey(GenericForeignKey):
             def check(self, **kwargs):
@@ -208,6 +211,27 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
 
         errors = checks.run_checks()
         self.assertEqual(errors, ['performed!'])
+
+    def test_unsaved_instance_on_generic_foreign_key(self):
+        """
+        #10811 -- Assigning an unsaved object to GenericForeignKey
+        should raise an exception.
+        """
+        class Model(models.Model):
+            content_type = models.ForeignKey(ContentType, null=True)
+            object_id = models.PositiveIntegerField(null=True)
+            content_object = GenericForeignKey('content_type', 'object_id')
+
+        author = Author(name='Author')
+        model = Model()
+        model.content_object = None   # no error here as content_type allows None
+        with self.assertRaisesMessage(ValueError,
+                                    'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
+                                    % (author, author._meta.object_name)):
+            model.content_object = author   # raised ValueError here as author is unsaved
+
+        author.save()
+        model.content_object = author   # no error because the instance is saved
 
 
 class GenericRelationshipTests(IsolatedModelsTestCase):
@@ -335,3 +359,63 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+
+class UpdateContentTypesTests(TestCase):
+    def setUp(self):
+        self.before_count = ContentType.objects.count()
+        ContentType.objects.create(name='fake', app_label='contenttypes_tests', model='Fake')
+        self.app_config = apps.get_app_config('contenttypes_tests')
+
+    def test_interactive_true(self):
+        """
+        interactive mode of update_contenttypes() (the default) should delete
+        stale contenttypes.
+        """
+        management.input = lambda x: force_str("yes")
+        with captured_stdout() as stdout:
+            management.update_contenttypes(self.app_config)
+        self.assertIn("Deleting stale content type", stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count)
+
+    def test_interactive_false(self):
+        """
+        non-interactive mode of update_contenttypes() shouldn't delete stale
+        content types.
+        """
+        with captured_stdout() as stdout:
+            management.update_contenttypes(self.app_config, interactive=False)
+        self.assertIn("Stale content types remain.", stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count + 1)
+
+
+class TestRouter(object):
+    def db_for_read(self, model, **hints):
+        return 'other'
+
+    def db_for_write(self, model, **hints):
+        return 'default'
+
+
+@override_settings(DATABASE_ROUTERS=[TestRouter()])
+class ContentTypesMultidbTestCase(TestCase):
+
+    def setUp(self):
+        # Whenever a test starts executing, only the "default" database is
+        # connected. We explicitly connect to the "other" database here. If we
+        # don't do it, then it will be implicitly connected later when we query
+        # it, but in that case some database backends may automatically perform
+        # extra queries upon connecting (notably mysql executes
+        # "SET SQL_AUTO_IS_NULL = 0"), which will affect assertNumQueries().
+        connections['other'].ensure_connection()
+
+    def test_multidb(self):
+        """
+        Test that, when using multiple databases, we use the db_for_read (see
+        #20401).
+        """
+        ContentType.objects.clear_cache()
+
+        with self.assertNumQueries(0, using='default'), \
+                self.assertNumQueries(1, using='other'):
+            ContentType.objects.get_for_model(Author)

@@ -1,6 +1,11 @@
+import warnings
+
 from django.apps import apps as django_apps
+from django.conf import settings
 from django.core import urlresolvers, paginator
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import translation
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.six.moves.urllib.parse import urlencode
 from django.utils.six.moves.urllib.request import urlopen
 
@@ -86,9 +91,25 @@ class Sitemap(object):
                 except Site.DoesNotExist:
                     pass
             if site is None:
-                raise ImproperlyConfigured("To use sitemaps, either enable the sites framework or pass a Site/RequestSite object in your view.")
+                raise ImproperlyConfigured(
+                    "To use sitemaps, either enable the sites framework or pass "
+                    "a Site/RequestSite object in your view."
+                )
         domain = site.domain
 
+        if getattr(self, 'i18n', False):
+            urls = []
+            current_lang_code = translation.get_language()
+            for lang_code, lang_name in settings.LANGUAGES:
+                translation.activate(lang_code)
+                urls += self._urls(page, protocol, domain)
+            translation.activate(current_lang_code)
+        else:
+            urls = self._urls(page, protocol, domain)
+
+        return urls
+
+    def _urls(self, page, protocol, domain):
         urls = []
         latest_lastmod = None
         all_items_lastmod = True  # track if all items have a lastmod
@@ -115,9 +136,21 @@ class Sitemap(object):
 
 
 class FlatPageSitemap(Sitemap):
+    # This class is not a subclass of
+    # django.contrib.flatpages.sitemaps.FlatPageSitemap to avoid a
+    # circular import problem.
+
+    def __init__(self):
+        warnings.warn(
+            "'django.contrib.sitemaps.FlatPageSitemap' is deprecated. "
+            "Use 'django.contrib.flatpages.sitemaps.FlatPageSitemap' instead.",
+            RemovedInDjango19Warning,
+            stacklevel=2
+        )
+
     def items(self):
         if not django_apps.is_installed('django.contrib.sites'):
-            raise ImproperlyConfigured("ping_google requires django.contrib.sites, which isn't installed.")
+            raise ImproperlyConfigured("FlatPageSitemap requires django.contrib.sites, which isn't installed.")
         Site = django_apps.get_model('sites.Site')
         current_site = Site.objects.get_current()
         return current_site.flatpage_set.filter(registration_required=False)

@@ -33,6 +33,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'SmallIntegerField': 'smallint',
         'TextField': 'text',
         'TimeField': 'time',
+        'UUIDField': 'char(32)',
     }
     data_types_suffix = {
         'AutoField': 'AUTOINCREMENT',
@@ -52,15 +53,20 @@ class DatabaseCreation(BaseDatabaseCreation):
             return test_database_name
         return ':memory:'
 
-    def _create_test_db(self, verbosity, autoclobber):
+    def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         test_database_name = self._get_test_db_name()
+        if keepdb:
+            return test_database_name
         if test_database_name != ':memory:':
             # Erase the old test database
             if verbosity >= 1:
                 print("Destroying old test database '%s'..." % self.connection.alias)
             if os.access(test_database_name, os.F_OK):
                 if not autoclobber:
-                    confirm = input("Type 'yes' if you would like to try deleting the test database '%s', or 'no' to cancel: " % test_database_name)
+                    confirm = input(
+                        "Type 'yes' if you would like to try deleting the test "
+                        "database '%s', or 'no' to cancel: " % test_database_name
+                    )
                 if autoclobber or confirm == 'yes':
                     try:
                         os.remove(test_database_name)

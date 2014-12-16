@@ -1,25 +1,22 @@
 from __future__ import unicode_literals
 
-import unittest
-
 from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
+from django.db.utils import DatabaseError
+from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import Reporter, Article
 
-if connection.vendor == 'oracle':
-    expectedFailureOnOracle = unittest.expectedFailure
-else:
-    expectedFailureOnOracle = lambda f: f
 
+class IntrospectionTests(TransactionTestCase):
 
-class IntrospectionTests(TestCase):
+    available_apps = ['introspection']
+
     def test_table_names(self):
         tl = connection.introspection.table_names()
         self.assertEqual(tl, sorted(tl))
-        self.assertTrue(Reporter._meta.db_table in tl,
+        self.assertIn(Reporter._meta.db_table, tl,
                      "'%s' isn't in table_list()." % Reporter._meta.db_table)
-        self.assertTrue(Article._meta.db_table in tl,
+        self.assertIn(Article._meta.db_table, tl,
                      "'%s' isn't in table_list()." % Article._meta.db_table)
 
     def test_django_table_names(self):
@@ -27,29 +24,42 @@ class IntrospectionTests(TestCase):
             cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
             tl = connection.introspection.django_table_names()
             cursor.execute("DROP TABLE django_ixn_test_table;")
-            self.assertTrue('django_ixn_testcase_table' not in tl,
-                         "django_table_names() returned a non-Django table")
+            self.assertNotIn('django_ixn_test_table', tl,
+                             "django_table_names() returned a non-Django table")
 
     def test_django_table_names_retval_type(self):
-        # Ticket #15216
-        with connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
-
+        #15216 - Table name is a list
         tl = connection.introspection.django_table_names(only_existing=True)
         self.assertIs(type(tl), list)
-
         tl = connection.introspection.django_table_names(only_existing=False)
         self.assertIs(type(tl), list)
+
+    def test_table_names_with_views(self):
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute(
+                    'CREATE VIEW introspection_article_view AS SELECT headline '
+                    'from introspection_article;')
+            except DatabaseError as e:
+                if 'insufficient privileges' in str(e):
+                    self.fail("The test user has no CREATE VIEW privileges")
+                else:
+                    raise
+
+        self.assertIn('introspection_article_view',
+                      connection.introspection.table_names(include_views=True))
+        self.assertNotIn('introspection_article_view',
+                         connection.introspection.table_names())
 
     def test_installed_models(self):
         tables = [Article._meta.db_table, Reporter._meta.db_table]
         models = connection.introspection.installed_models(tables)
-        self.assertEqual(models, set([Article, Reporter]))
+        self.assertEqual(models, {Article, Reporter})
 
     def test_sequence_list(self):
         sequences = connection.introspection.sequence_list()
         expected = {'table': Reporter._meta.db_table, 'column': 'id'}
-        self.assertTrue(expected in sequences,
+        self.assertIn(expected, sequences,
                      'Reporter sequence not found in sequence_list()')
 
     def test_get_table_description_names(self):
@@ -61,37 +71,34 @@ class IntrospectionTests(TestCase):
     def test_get_table_description_types(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
-        # The MySQL exception is due to the cursor.description returning the same constant for
-        # text and blob columns. TODO: use information_schema database to retrieve the proper
-        # field type on MySQL
         self.assertEqual(
             [datatype(r[1], r) for r in desc],
             ['AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
-             'CharField', 'CharField', 'CharField', 'BigIntegerField',
-             'BinaryField' if connection.vendor != 'mysql' else 'TextField']
+             'CharField', 'CharField', 'CharField',
+             'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
+             'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
+             'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField']
         )
 
     # The following test fails on Oracle due to #17202 (can't correctly
     # inspect the length of character columns).
-    @expectedFailureOnOracle
+    @skipUnlessDBFeature('can_introspect_max_length')
     def test_get_table_description_col_lengths(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
             [r[3] for r in desc if datatype(r[1], r) == 'CharField'],
-            [30, 30, 75]
+            [30, 30, 254]
         )
 
-    # Oracle forces null=True under the hood in some cases (see
-    # https://docs.djangoproject.com/en/dev/ref/databases/#null-and-empty-strings)
-    # so its idea about null_ok in cursor.description is different from ours.
-    @skipIfDBFeature('interprets_empty_strings_as_nulls')
+    @skipUnlessDBFeature('can_introspect_null')
     def test_get_table_description_nullable(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
+        nullable_by_backend = connection.features.interprets_empty_strings_as_nulls
         self.assertEqual(
             [r[6] for r in desc],
-            [False, False, False, False, True, True]
+            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False]
         )
 
     # Regression test for #9991 - 'real' types in postgres
@@ -121,8 +128,8 @@ class IntrospectionTests(TestCase):
             key_columns = connection.introspection.get_key_columns(cursor, Article._meta.db_table)
         self.assertEqual(
             set(key_columns),
-            set([('reporter_id', Reporter._meta.db_table, 'id'),
-                 ('response_to_id', Article._meta.db_table, 'id')]))
+            {('reporter_id', Reporter._meta.db_table, 'id'),
+             ('response_to_id', Article._meta.db_table, 'id')})
 
     def test_get_primary_key_column(self):
         with connection.cursor() as cursor:

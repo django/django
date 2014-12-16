@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011.
+# Bayarkhuu Bataa, 2014
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:40+0000\n"
-"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-22 07:39+0000\n"
+"Last-Translator: Bayarkhuu Bataa\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -18,22 +19,26 @@ msgstr ""
 "Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:38
+#: contrib/sessions/apps.py:8
+msgid "Sessions"
+msgstr "Сэшнүүд"
+
+#: contrib/sessions/models.py:38
 msgid "session key"
 msgstr "session түлхүүр"
 
-#: models.py:40
+#: contrib/sessions/models.py:40
 msgid "session data"
 msgstr "session өгөгдөл"
 
-#: models.py:41
+#: contrib/sessions/models.py:41
 msgid "expire date"
 msgstr "дуусах хугацаа"
 
-#: models.py:46
+#: contrib/sessions/models.py:46
 msgid "session"
 msgstr "session"
 
-#: models.py:47
+#: contrib/sessions/models.py:47
 msgid "sessions"
 msgstr "session-ууд"

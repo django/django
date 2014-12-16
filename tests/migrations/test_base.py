@@ -1,5 +1,8 @@
-from django.test import TransactionTestCase
+import os
+
 from django.db import connection
+from django.test import TransactionTestCase
+from django.utils._os import upath
 
 
 class MigrationTestBase(TransactionTestCase):
@@ -8,6 +11,7 @@ class MigrationTestBase(TransactionTestCase):
     """
 
     available_apps = ["migrations"]
+    test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
 
     def get_table_description(self, table):
         with connection.cursor() as cursor:
@@ -15,11 +19,11 @@ class MigrationTestBase(TransactionTestCase):
 
     def assertTableExists(self, table):
         with connection.cursor() as cursor:
-            self.assertIn(table, connection.introspection.get_table_list(cursor))
+            self.assertIn(table, connection.introspection.table_names(cursor))
 
     def assertTableNotExists(self, table):
         with connection.cursor() as cursor:
-            self.assertNotIn(table, connection.introspection.get_table_list(cursor))
+            self.assertNotIn(table, connection.introspection.table_names(cursor))
 
     def assertColumnExists(self, table, column):
         self.assertIn(column, [c.name for c in self.get_table_description(table)])
@@ -46,3 +50,17 @@ class MigrationTestBase(TransactionTestCase):
 
     def assertIndexNotExists(self, table, columns):
         return self.assertIndexExists(table, columns, False)
+
+    def assertFKExists(self, table, columns, to, value=True):
+        with connection.cursor() as cursor:
+            self.assertEqual(
+                value,
+                any(
+                    c["foreign_key"] == to
+                    for c in connection.introspection.get_constraints(cursor, table).values()
+                    if c['columns'] == list(columns)
+                ),
+            )
+
+    def assertFKNotExists(self, table, columns, to, value=True):
+        return self.assertFKExists(table, columns, to, False)

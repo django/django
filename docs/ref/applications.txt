@@ -172,7 +172,7 @@ Configurable attributes
 .. attribute:: AppConfig.path
 
     Filesystem path to the application directory, e.g.
-    ``'/usr/lib/python2.7/dist-packages/django/contrib/admin'``.
+    ``'/usr/lib/python3.4/dist-packages/django/contrib/admin'``.
 
     In most cases, Django can automatically detect and set this, but you can
     also provide an explicit override as a class attribute on your
@@ -209,8 +209,8 @@ Methods
 .. method:: AppConfig.get_model(model_name)
 
     Returns the :class:`~django.db.models.Model` with the given
-    ``model_name``. Raises :exc:`~exceptions.LookupError` if no such model
-    exists. ``model_name`` is case-insensitive.
+    ``model_name``. Raises :exc:`LookupError` if no such model exists.
+    ``model_name`` is case-insensitive.
 
 .. method:: AppConfig.ready()
 
@@ -237,6 +237,15 @@ Methods
         command. For example, even though the test database configuration is
         separate from the production settings, ``manage.py test`` would still
         execute some queries against your **production** database!
+
+    .. note::
+
+        In the usual initialization process, the ``ready`` method is only called
+        once by Django. But in some corner cases, particularly in tests which
+        are fiddling with installed applications, ``ready`` might be called more
+        than once. In that case, either write idempotents methods, or put a flag
+        on your ``AppConfig`` classes to prevent re-running code which should
+        be executed exactly one time.
 
 .. _namespace package:
 
@@ -284,17 +293,13 @@ Application registry
 .. method:: apps.get_app_config(app_label)
 
     Returns an :class:`~django.apps.AppConfig` for the application with the
-    given ``app_label``. Raises :exc:`~exceptions.LookupError` if no such
-    application exists.
+    given ``app_label``. Raises :exc:`LookupError` if no such application
+    exists.
 
 .. method:: apps.is_installed(app_name)
 
     Checks whether an application with the given name exists in the registry.
     ``app_name`` is the full name of the app, e.g. ``'django.contrib.admin'``.
-
-    Unlike :meth:`~django.apps.apps.get_app_config`, this method can be called
-    safely at import time. If the registry is still being populated, it may
-    return ``False``, even though the app will become available later.
 
 .. method:: apps.get_model(app_label, model_name)
 
@@ -303,6 +308,115 @@ Application registry
     argument in the form ``app_label.model_name``. ``model_name`` is case-
     insensitive.
 
-    Raises :exc:`~exceptions.LookupError` if no such application or model
-    exists. Raises :exc:`~exceptions.ValueError` when called with a single
-    argument that doesn't contain exactly one dot.
+    Raises :exc:`LookupError` if no such application or model exists. Raises
+    :exc:`ValueError` when called with a single argument that doesn't contain
+    exactly one dot.
+
+Initialization process
+======================
+
+How applications are loaded
+---------------------------
+
+When Django starts, :func:`django.setup()` is responsible for populating the
+application registry.
+
+.. currentmodule:: django
+
+.. function:: setup()
+
+    Configures Django by:
+
+    * Loading the settings.
+    * Setting up logging.
+    * Initializing the application registry.
+
+    This function is called automatically:
+
+    * When running an HTTP server via Django's WSGI support.
+    * When invoking a management command.
+
+    It must be called explicitly in other cases, for instance in plain Python
+    scripts.
+
+.. currentmodule:: django.apps
+
+The application registry is initialized in three stages. At each stage, Django
+processes all applications in the order of :setting:`INSTALLED_APPS`.
+
+#. First Django imports each item in :setting:`INSTALLED_APPS`.
+
+   If it's an application configuration class, Django imports the root package
+   of the application, defined by its :attr:`~AppConfig.name` attribute. If
+   it's a Python package, Django creates a default application configuration.
+
+   *At this stage, your code shouldn't import any models!*
+
+   In other words, your applications' root packages and the modules that
+   define your application configuration classes shouldn't import any models,
+   even indirectly.
+
+   Strictly speaking, Django allows importing models once their application
+   configuration is loaded. However, in order to avoid needless constraints on
+   the order of :setting:`INSTALLED_APPS`, it's strongly recommended not
+   import any models at this stage.
+
+   Once this stage completes, APIs that operate on application configurations
+   such as :meth:`~apps.get_app_config()` become usable.
+
+#. Then Django attempts to import the ``models`` submodule of each application,
+   if there is one.
+
+   You must define or import all models in your application's ``models.py`` or
+   ``models/__init__.py``. Otherwise, the application registry may not be fully
+   populated at this point, which could cause the ORM to malfunction.
+
+   Once this stage completes, APIs that operate on models such as
+   :meth:`~apps.get_model()` become usable.
+
+#. Finally Django runs the :meth:`~AppConfig.ready()` method of each application
+   configuration.
+
+.. _applications-troubleshooting:
+
+Troubleshooting
+---------------
+
+Here are some common problems that you may encounter during initialization:
+
+* ``AppRegistryNotReady`` This happens when importing an application
+  configuration or a models module triggers code that depends on the app
+  registry.
+
+  For example, :func:`~django.utils.translation.ugettext()` uses the app
+  registry to look up translation catalogs in applications. To translate at
+  import time, you need :func:`~django.utils.translation.ugettext_lazy()`
+  instead. (Using :func:`~django.utils.translation.ugettext()` would be a bug,
+  because the translation would happen at import time, rather than at each
+  request depending on the active language.)
+
+  Executing database queries with the ORM at import time in models modules
+  will also trigger this exception. The ORM cannot function properly until all
+  models are available.
+
+  Another common culprit is :func:`django.contrib.auth.get_user_model()`. Use
+  the :setting:`AUTH_USER_MODEL` setting to reference the User model at import
+  time.
+
+  This exception also happens if you forget to call :func:`django.setup()` in
+  a standalone Python script.
+
+* ``ImportError: cannot import name ...`` This happens if the import sequence
+  ends up in a loop.
+
+  To eliminate such problems, you should minimize dependencies between your
+  models modules and do as little work as possible at import time. To avoid
+  executing code at import time, you can move it into a function and cache its
+  results. The code will be executed when you first need its results. This
+  concept is known as "lazy evaluation".
+
+* ``django.contrib.admin`` automatically performs autodiscovery of ``admin``
+  modules in installed applications. To prevent it, change your
+  :setting:`INSTALLED_APPS` to contain
+  ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
+  ``'django.contrib.admin'``.

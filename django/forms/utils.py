@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import json
 import sys
-import warnings
 
 try:
     from collections import UserList
@@ -10,7 +9,6 @@ except ImportError:  # Python 2
     from UserList import UserList
 
 from django.conf import settings
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import format_html, format_html_join, escape
 from django.utils import timezone
@@ -31,19 +29,19 @@ def flatatt(attrs):
 
     The result is passed through 'mark_safe'.
     """
-    for attr_name, value in attrs.items():
-        if type(value) is bool:
-            warnings.warn(
-                "In Django 1.8, widget attribute %(attr_name)s=%(bool_value)s "
-                "will %(action)s. To preserve current behavior, use the "
-                "string '%(bool_value)s' instead of the boolean value." % {
-                    'attr_name': attr_name,
-                    'action': "be rendered as '%s'" % attr_name if value else "not be rendered",
-                    'bool_value': value,
-                },
-                RemovedInDjango18Warning
-            )
-    return format_html_join('', ' {0}="{1}"', sorted(attrs.items()))
+    key_value_attrs = []
+    boolean_attrs = []
+    for attr, value in attrs.items():
+        if isinstance(value, bool):
+            if value:
+                boolean_attrs.append((attr,))
+        else:
+            key_value_attrs.append((attr, value))
+
+    return (
+        format_html_join('', ' {}="{}"', sorted(key_value_attrs)) +
+        format_html_join('', ' {}', sorted(boolean_attrs))
+    )
 
 
 @python_2_unicode_compatible
@@ -63,8 +61,8 @@ class ErrorDict(dict):
         if not self:
             return ''
         return format_html(
-            '<ul class="errorlist">{0}</ul>',
-            format_html_join('', '<li>{0}{1}</li>', ((k, force_text(v)) for k, v in self.items()))
+            '<ul class="errorlist">{}</ul>',
+            format_html_join('', '<li>{}{}</li>', ((k, force_text(v)) for k, v in self.items()))
         )
 
     def as_text(self):
@@ -83,6 +81,14 @@ class ErrorList(UserList, list):
     """
     A collection of errors that knows how to display itself in various formats.
     """
+    def __init__(self, initlist=None, error_class=None):
+        super(ErrorList, self).__init__(initlist)
+
+        if error_class is None:
+            self.error_class = 'errorlist'
+        else:
+            self.error_class = 'errorlist {}'.format(error_class)
+
     def as_data(self):
         return ValidationError(self.data).error_list
 
@@ -102,9 +108,11 @@ class ErrorList(UserList, list):
     def as_ul(self):
         if not self.data:
             return ''
+
         return format_html(
-            '<ul class="errorlist">{0}</ul>',
-            format_html_join('', '<li>{0}</li>', ((force_text(e),) for e in self))
+            '<ul class="{}">{}</ul>',
+            self.error_class,
+            format_html_join('', '<li>{}</li>', ((force_text(e),) for e in self))
         )
 
     def as_text(self):
@@ -130,6 +138,15 @@ class ErrorList(UserList, list):
         if isinstance(error, ValidationError):
             return list(error)[0]
         return force_text(error)
+
+    def __reduce_ex__(self, *args, **kwargs):
+        # The `list` reduce function returns an iterator as the fourth element
+        # that is normally used for repopulating. Since we only inherit from
+        # `list` for `isinstance` backward compatibility (Refs #17413) we
+        # nullify this iterator as it would otherwise result in duplicate
+        # entries. (Refs #23594)
+        info = super(UserList, self).__reduce_ex__(*args, **kwargs)
+        return info[:3] + (None, None)
 
 
 # Utilities for time zone support in DateTimeField et al.

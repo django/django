@@ -1,7 +1,7 @@
 """
 Utility functions for handling images.
 
-Requires Pillow (or PIL), as you might imagine.
+Requires Pillow as you might imagine.
 """
 import zlib
 
@@ -35,9 +35,9 @@ def get_image_dimensions(file_or_path, close=False):
     'close' to True to close the file at the end if it is initially in an open
     state.
     """
-    from django.utils.image import ImageFile as PILImageFile
+    from PIL import ImageFile as PillowImageFile
 
-    p = PILImageFile.Parser()
+    p = PillowImageFile.Parser()
     if hasattr(file_or_path, 'read'):
         file = file_or_path
         file_pos = file.tell()
@@ -46,9 +46,9 @@ def get_image_dimensions(file_or_path, close=False):
         file = open(file_or_path, 'rb')
         close = True
     try:
-        # Most of the time PIL only needs a small chunk to parse the image and
-        # get the dimensions, but with some TIFF files PIL needs to parse the
-        # whole file.
+        # Most of the time Pillow only needs a small chunk to parse the image
+        # and get the dimensions, but with some TIFF files Pillow needs to
+        # parse the whole file.
         chunk_size = 1024
         while 1:
             data = file.read(chunk_size)

@@ -27,26 +27,6 @@ class Media(models.Model):
     def __str__(self):
         return self.url
 
-#
-# These models let us test the different GenericInline settings at
-# different urls in the admin site.
-#
-
-#
-# Generic inline with extra = 0
-#
-
-
-class EpisodeExtra(Episode):
-    pass
-
-
-#
-# Generic inline with extra and max_num
-#
-class EpisodeMaxNum(Episode):
-    pass
-
 
 #
 # Generic inline with unique_together

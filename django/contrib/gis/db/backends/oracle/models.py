@@ -13,7 +13,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
-class GeometryColumns(models.Model):
+class OracleGeometryColumns(models.Model):
     "Maps to the Oracle USER_SDO_GEOM_METADATA table."
     table_name = models.CharField(max_length=32)
     column_name = models.CharField(max_length=1024)
@@ -21,22 +21,23 @@ class GeometryColumns(models.Model):
     # TODO: Add support for `diminfo` column (type MDSYS.SDO_DIM_ARRAY).
 
     class Meta:
+        app_label = 'gis'
         db_table = 'USER_SDO_GEOM_METADATA'
         managed = False
 
     @classmethod
     def table_name_col(cls):
         """
-        Returns the name of the metadata column used to store the
-        the feature table name.
+        Returns the name of the metadata column used to store the feature table
+        name.
         """
         return 'table_name'
 
     @classmethod
     def geom_col_name(cls):
         """
-        Returns the name of the metadata column used to store the
-        the feature geometry column.
+        Returns the name of the metadata column used to store the feature
+        geometry column.
         """
         return 'column_name'
 
@@ -44,7 +45,7 @@ class GeometryColumns(models.Model):
         return '%s - %s (SRID: %s)' % (self.table_name, self.column_name, self.srid)
 
 
-class SpatialRefSys(models.Model, SpatialRefSysMixin):
+class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
     "Maps to the Oracle MDSYS.CS_SRS table."
     cs_name = models.CharField(max_length=68)
     srid = models.IntegerField(primary_key=True)
@@ -57,6 +58,7 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
     objects = models.GeoManager()
 
     class Meta:
+        app_label = 'gis'
         db_table = 'CS_SRS'
         managed = False
 

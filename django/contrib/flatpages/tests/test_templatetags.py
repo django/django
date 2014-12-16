@@ -14,6 +14,7 @@ from django.test import TestCase, override_settings
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     ),
+    ROOT_URLCONF='django.contrib.flatpages.tests.urls',
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
@@ -21,7 +22,6 @@ from django.test import TestCase, override_settings
 )
 class FlatpageTemplateTagTests(TestCase):
     fixtures = ['sample_flatpages']
-    urls = 'django.contrib.flatpages.tests.urls'
 
     def test_get_flatpages_tag(self):
         "The flatpage template tag retrives unregistered prefixed flatpages by default"
@@ -125,10 +125,10 @@ class FlatpageTemplateTagTests(TestCase):
         self.assertRaises(TemplateSyntaxError, render,
                           "{% load flatpages %}{% get_flatpages cheesecake flatpages %}")
         self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages as flatpages asdf%}")
+                          "{% load flatpages %}{% get_flatpages as flatpages asdf %}")
         self.assertRaises(TemplateSyntaxError, render,
                           "{% load flatpages %}{% get_flatpages cheesecake user as flatpages %}")
         self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages for user as flatpages asdf%}")
+                          "{% load flatpages %}{% get_flatpages for user as flatpages asdf %}")
         self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages prefix for user as flatpages asdf%}")
+                          "{% load flatpages %}{% get_flatpages prefix for user as flatpages asdf %}")

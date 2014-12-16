@@ -4,10 +4,12 @@ from __future__ import unicode_literals
 from contextlib import contextmanager
 import datetime
 import decimal
+import gettext as gettext_module
 from importlib import import_module
 import os
 import pickle
 from threading import local
+from unittest import skipUnless
 
 from django.conf import settings
 from django.template import Template, Context
@@ -25,11 +27,11 @@ from django.utils.six import PY3
 from django.utils.translation import (activate, deactivate,
     get_language, get_language_from_request, get_language_info,
     to_locale, trans_real,
-    gettext_lazy,
+    gettext, gettext_lazy,
     ugettext, ugettext_lazy,
     ngettext_lazy,
     ungettext_lazy,
-    pgettext,
+    pgettext, pgettext_lazy,
     npgettext, npgettext_lazy,
     check_for_language,
     string_concat, LANGUAGE_SESSION_KEY)
@@ -71,6 +73,44 @@ class TranslationTests(TestCase):
         finally:
             deactivate()
 
+    def test_override_decorator(self):
+
+        @translation.override('pl')
+        def func_pl():
+            self.assertEqual(get_language(), 'pl')
+
+        @translation.override(None)
+        def func_none():
+            self.assertEqual(get_language(), settings.LANGUAGE_CODE)
+
+        try:
+            activate('de')
+            func_pl()
+            self.assertEqual(get_language(), 'de')
+            func_none()
+            self.assertEqual(get_language(), 'de')
+        finally:
+            deactivate()
+
+    def test_override_exit(self):
+        """
+        Test that the language restored is the one used when the function was
+        called, not the one used when the decorator was initialized. refs #23381
+        """
+        activate('fr')
+
+        @translation.override('pl')
+        def func_pl():
+            pass
+        deactivate()
+
+        try:
+            activate('en')
+            func_pl()
+            self.assertEqual(get_language(), 'en')
+        finally:
+            deactivate()
+
     def test_lazy_objects(self):
         """
         Format string interpolation should work with *_lazy objects.
@@ -93,9 +133,20 @@ class TranslationTests(TestCase):
         s4 = ugettext_lazy('Some other string')
         self.assertEqual(False, s == s4)
 
-        if six.PY2:
-            # On Python 2, gettext_lazy should not transform a bytestring to unicode
-            self.assertEqual(gettext_lazy(b"test").upper(), b"TEST")
+    @skipUnless(six.PY2, "No more bytestring translations on PY3")
+    def test_lazy_and_bytestrings(self):
+        # On Python 2, (n)gettext_lazy should not transform a bytestring to unicode
+        self.assertEqual(gettext_lazy(b"test").upper(), b"TEST")
+        self.assertEqual((ngettext_lazy(b"%d test", b"%d tests") % 1).upper(), b"1 TEST")
+
+        # Other versions of lazy functions always return unicode
+        self.assertEqual(ugettext_lazy(b"test").upper(), "TEST")
+        self.assertEqual((ungettext_lazy(b"%d test", b"%d tests") % 1).upper(), "1 TEST")
+        self.assertEqual(pgettext_lazy(b"context", b"test").upper(), "TEST")
+        self.assertEqual(
+            (npgettext_lazy(b"context", b"%d test", b"%d tests") % 1).upper(),
+            "1 TEST"
+        )
 
     def test_lazy_pickle(self):
         s1 = ugettext_lazy("test")
@@ -141,6 +192,17 @@ class TranslationTests(TestCase):
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 5}, 'Willkommen Jim, 5 guten Resultate')
             with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
                 complex_context_deferred % {'name': 'Jim'}
+
+    @skipUnless(six.PY2, "PY3 doesn't have distinct int and long types")
+    def test_ungettext_lazy_long(self):
+        """
+        Regression test for #22820: int and long should be treated alike in ungettext_lazy.
+        """
+        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', 4)
+        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
+        # Now with a long
+        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', long(4))
+        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
@@ -282,6 +344,16 @@ class TranslationTests(TestCase):
         six.text_type(string_concat(...)) should not raise a TypeError - #4796
         """
         self.assertEqual('django', six.text_type(string_concat("dja", "ngo")))
+
+    def test_empty_value(self):
+        """
+        Empty value must stay empty after being translated (#23196).
+        """
+        with translation.override('de'):
+            self.assertEqual("", ugettext(""))
+            self.assertEqual(str(""), gettext(str("")))
+            s = mark_safe("")
+            self.assertEqual(s, ugettext(s))
 
     def test_safe_status(self):
         """
@@ -515,7 +587,7 @@ class FormattingTests(TestCase):
             self.assertEqual('j \d\e F \d\e Y', get_format('DATE_FORMAT'))
             self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual(',', get_format('DECIMAL_SEPARATOR'))
-            self.assertEqual('10:15:48', time_format(self.t))
+            self.assertEqual('10:15', time_format(self.t))
             self.assertEqual('31 de desembre de 2009', date_format(self.d))
             self.assertEqual('desembre del 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
             self.assertEqual('31/12/2009 20:50', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
@@ -563,7 +635,7 @@ class FormattingTests(TestCase):
                 self.assertEqual('31 de desembre de 2009 a les 20:50', Template('{{ dt }}').render(self.ctxt))
                 self.assertEqual('66666,67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
                 self.assertEqual('100000,0', Template('{{ f|floatformat }}').render(self.ctxt))
-                self.assertEqual('10:15:48', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
+                self.assertEqual('10:15', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
                 self.assertEqual('31/12/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
                 self.assertEqual('31/12/2009 20:50', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
                 self.assertEqual(date_format(datetime.datetime.now(), "DATE_FORMAT"),
@@ -721,15 +793,37 @@ class FormattingTests(TestCase):
             with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=False):
                 self.assertEqual(sanitize_separators('12\xa0345'), '12\xa0345')
 
+        with patch_formats(get_language(), THOUSAND_SEPARATOR='.', DECIMAL_SEPARATOR=','):
+            with self.settings(USE_THOUSAND_SEPARATOR=True):
+                self.assertEqual(sanitize_separators('10.234'), '10234')
+                # Suspicion that user entered dot as decimal separator (#22171)
+                self.assertEqual(sanitize_separators('10.10'), '10.10')
+
     def test_iter_format_modules(self):
         """
         Tests the iter_format_modules function.
         """
+        # Importing some format modules so that we can compare the returned
+        # modules with these expected modules
+        default_mod = import_module('django.conf.locale.de.formats')
+        test_mod = import_module('i18n.other.locale.de.formats')
+        test_mod2 = import_module('i18n.other2.locale.de.formats')
+
         with translation.override('de-at', deactivate=True):
-            de_format_mod = import_module('django.conf.locale.de.formats')
-            self.assertEqual(list(iter_format_modules('de')), [de_format_mod])
-            test_de_format_mod = import_module('i18n.other.locale.de.formats')
-            self.assertEqual(list(iter_format_modules('de', 'i18n.other.locale')), [test_de_format_mod, de_format_mod])
+            # Should return the correct default module when no setting is set
+            self.assertEqual(list(iter_format_modules('de')), [default_mod])
+
+            # When the setting is a string, should return the given module and
+            # the default module
+            self.assertEqual(
+                list(iter_format_modules('de', 'i18n.other.locale')),
+                [test_mod, default_mod])
+
+            # When setting is a list of strings, should return the given
+            # modules and the default module
+            self.assertEqual(
+                list(iter_format_modules('de', ['i18n.other.locale', 'i18n.other2.locale'])),
+                [test_mod, test_mod2, default_mod])
 
     def test_iter_format_modules_stability(self):
         """
@@ -954,6 +1048,16 @@ class MiscTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-tw,en'}
         self.assertEqual(g(r), 'zh-tw')
 
+    def test_special_fallback_language(self):
+        """
+        Some languages may have special fallbacks that don't follow the simple
+        'fr-ca' -> 'fr' logic (notably Chinese codes).
+        """
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-my,en'}
+        self.assertEqual(get_language_from_request(r), 'zh-hans')
+
     def test_parse_language_cookie(self):
         """
         Now test that we parse language preferences stored in a cookie correctly.
@@ -1049,7 +1153,7 @@ class ResolutionOrderI18NTests(TestCase):
 
     def assertUgettext(self, msgid, msgstr):
         result = ugettext(msgid)
-        self.assertTrue(msgstr in result, ("The string '%s' isn't in the "
+        self.assertIn(msgstr, result, ("The string '%s' isn't in the "
             "translation of '%s'; the actual result is '%s'." % (msgstr, msgid, result)))
 
 
@@ -1126,6 +1230,16 @@ class TestLanguageInfo(TestCase):
 
     def test_unknown_language_code_and_country_code(self):
         six.assertRaisesRegex(self, KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')
+
+    def test_fallback_language_code(self):
+        """
+        get_language_info return the first fallback language info if the lang_info
+        struct does not contain the 'name' key.
+        """
+        li = get_language_info('zh-my')
+        self.assertEqual(li['code'], 'zh-hans')
+        li = get_language_info('zh-cn')
+        self.assertEqual(li['code'], 'zh-cn')
 
 
 class MultipleLocaleActivationTests(TestCase):
@@ -1261,10 +1375,9 @@ class MultipleLocaleActivationTests(TestCase):
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ),
+    ROOT_URLCONF='i18n.urls',
 )
 class LocaleMiddlewareTests(TestCase):
-
-    urls = 'i18n.urls'
 
     def test_streaming_response(self):
         # Regression test for #5241
@@ -1299,10 +1412,9 @@ class LocaleMiddlewareTests(TestCase):
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ),
+    ROOT_URLCONF='i18n.urls'
 )
 class CountrySpecificLanguageTests(TestCase):
-
-    urls = 'i18n.urls'
 
     def setUp(self):
         super(CountrySpecificLanguageTests, self).setUp()
@@ -1340,3 +1452,26 @@ class CountrySpecificLanguageTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
         lang = get_language_from_request(r)
         self.assertEqual('pt-br', lang)
+
+
+class TranslationFilesMissing(TestCase):
+
+    def setUp(self):
+        super(TranslationFilesMissing, self).setUp()
+        self.gettext_find_builtin = gettext_module.find
+
+    def tearDown(self):
+        gettext_module.find = self.gettext_find_builtin
+        super(TranslationFilesMissing, self).tearDown()
+
+    def patchGettextFind(self):
+        gettext_module.find = lambda *args, **kw: None
+
+    def test_failure_finding_default_mo_files(self):
+        '''
+        Ensure IOError is raised if the default language is unparseable.
+        Refs: #18192
+        '''
+        self.patchGettextFind()
+        trans_real._translations = {}
+        self.assertRaises(IOError, activate, 'en')

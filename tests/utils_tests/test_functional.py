@@ -20,7 +20,7 @@ class FunctionalTestCase(unittest.TestCase):
             pass
 
         t = lazy(lambda: Klazz(), Klazz)()
-        self.assertTrue('base_method' in dir(t))
+        self.assertIn('base_method', dir(t))
 
     def test_lazy_property(self):
 
@@ -50,7 +50,16 @@ class FunctionalTestCase(unittest.TestCase):
 
             @cached_property
             def value(self):
+                """Here is the docstring..."""
                 return 1, object()
+
+            def other_value(self):
+                return 1
+
+            other = cached_property(other_value, name='other')
+
+        # docstring should be preserved
+        self.assertEqual(A.value.__doc__, "Here is the docstring...")
 
         a = A()
 
@@ -66,6 +75,10 @@ class FunctionalTestCase(unittest.TestCase):
 
         # check that it behaves like a property when there's no instance
         self.assertIsInstance(A.value, cached_property)
+
+        # check that overriding name works
+        self.assertEqual(a.other, 1)
+        self.assertTrue(callable(a.other_value))
 
     def test_lazy_equality(self):
         """

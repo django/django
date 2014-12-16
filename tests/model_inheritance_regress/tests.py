@@ -165,7 +165,7 @@ class ModelInheritanceTest(TestCase):
             serves_hot_dogs=True,
             serves_pizza=False)
 
-        # This should delete both Restuarants, plus the related places, plus
+        # This should delete both Restaurants, plus the related places, plus
         # the ItalianRestaurant.
         Restaurant.objects.all().delete()
 
@@ -258,7 +258,7 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(m2mchildren, [])
 
         # Ordering should not include any database column more than once (this
-        # is most likely to ocurr naturally with model inheritance, so we
+        # is most likely to occur naturally with model inheritance, so we
         # check it here). Regression test for #9390. This necessarily pokes at
         # the SQL string for the query, since the duplicate problems are only
         # apparent at that late stage.
@@ -363,10 +363,10 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(parties, [bachelor])
 
         # Check that a subclass of a subclass of an abstract model doesn't get
-        # it's own accessor.
+        # its own accessor.
         self.assertFalse(hasattr(p2, 'messybachelorparty_set'))
 
-        # ... but it does inherit the m2m from it's parent
+        # ... but it does inherit the m2m from its parent
         messy = MessyBachelorParty.objects.create(
             name='Bachelor party for Dave')
         messy.attendees = [p4]
@@ -466,3 +466,25 @@ class ModelInheritanceTest(TestCase):
                                   serves_pizza=True, serves_hot_dogs=True)
         p = Place.objects.all().select_related('restaurant')[0]
         self.assertIsInstance(p.restaurant.serves_pizza, bool)
+
+    def test_inheritance_select_related(self):
+        # Regression test for #7246
+        r1 = Restaurant.objects.create(
+            name="Nobu", serves_hot_dogs=True, serves_pizza=False
+        )
+        r2 = Restaurant.objects.create(
+            name="Craft", serves_hot_dogs=False, serves_pizza=True
+        )
+        Supplier.objects.create(name="John", restaurant=r1)
+        Supplier.objects.create(name="Jane", restaurant=r2)
+
+        self.assertQuerysetEqual(
+            Supplier.objects.order_by("name").select_related(), [
+                "Jane",
+                "John",
+            ],
+            attrgetter("name")
+        )
+
+        jane = Supplier.objects.order_by("name").select_related("restaurant")[0]
+        self.assertEqual(jane.restaurant.name, "Craft")

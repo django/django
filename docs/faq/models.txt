@@ -32,6 +32,12 @@ same interface on each member of the ``connections`` dictionary::
     >>> from django.db import connections
     >>> connections['my_db_alias'].queries
 
+If you need to clear the query list manually at any point in your functions,
+just call ``reset_queries()``, like this::
+
+    from django.db import reset_queries
+    reset_queries()
+
 Can I use Django with a pre-existing database?
 ----------------------------------------------
 
@@ -59,39 +65,28 @@ uniqueness at that level. Single-column primary keys are needed for things such
 as the admin interface to work; e.g., you need a simple way of being able to
 specify an object to edit or delete.
 
+Does Django support NoSQL databases?
+------------------------------------
+
+NoSQL databases are not officially supported by Django itself. There are,
+however, a number of side project and forks which allow NoSQL functionality in
+Django, like `Django non-rel`_.
+
+You can also take a look on `the wiki page`_ which discusses some alternatives.
+
+.. _`Django non-rel`: http://django-nonrel.org/
+.. _`the wiki page`: https://code.djangoproject.com/wiki/NoSqlSupport
+
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
 ------------------------------------------------------------------------------------------------------------------
 
 We try to avoid adding special cases in the Django code to accommodate all the
 database-specific options such as table type, etc. If you'd like to use any of
-these options, create an :ref:`SQL initial data file <initial-sql>` that
-contains ``ALTER TABLE`` statements that do what you want to do. The initial
-data files are executed in your database after the ``CREATE TABLE`` statements.
+these options, create a migration with a
+:class:`~django.db.migrations.operations.RunSQL` operation that contains
+``ALTER TABLE`` statements that do what you want to do.
 
 For example, if you're using MySQL and want your tables to use the MyISAM table
-type, create an initial data file and put something like this in it::
+type, use the following SQL::
 
     ALTER TABLE myapp_mytable ENGINE=MyISAM;
-
-As explained in the :ref:`SQL initial data file <initial-sql>` documentation,
-this SQL file can contain arbitrary SQL, so you can make any sorts of changes
-you need to make.
-
-Why is Django leaking memory?
------------------------------
-
-Django isn't known to leak memory. If you find your Django processes are
-allocating more and more memory, with no sign of releasing it, check to make
-sure your :setting:`DEBUG` setting is set to ``False``. If :setting:`DEBUG`
-is ``True``, then Django saves a copy of every SQL statement it has executed.
-
-(The queries are saved in ``django.db.connection.queries``. See
-`How can I see the raw SQL queries Django is running?`_.)
-
-To fix the problem, set :setting:`DEBUG` to ``False``.
-
-If you need to clear the query list manually at any point in your functions,
-just call ``reset_queries()``, like this::
-
-    from django import db
-    db.reset_queries()

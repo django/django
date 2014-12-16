@@ -61,7 +61,7 @@ created a URLconf for the polls application that includes this line:
 .. snippet::
     :filename: polls/urls.py
 
-    url(r'^(?P<question_id>\d+)/vote/$', views.vote, name='vote'),
+    url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
 
 We also created a dummy implementation of the ``vote()`` function. Let's
 create a real version. Add the following to ``polls/views.py``:
@@ -72,6 +72,7 @@ create a real version. Add the following to ``polls/views.py``:
     from django.shortcuts import get_object_or_404, render
     from django.http import HttpResponseRedirect, HttpResponse
     from django.core.urlresolvers import reverse
+
     from polls.models import Choice, Question
     # ...
     def vote(request, question_id):
@@ -106,9 +107,9 @@ This code includes a few things we haven't covered yet in this tutorial:
   <django.http.HttpRequest.POST>` in our code, to ensure that data is only
   altered via a POST call.
 
-* ``request.POST['choice']`` will raise :exc:`~exceptions.KeyError` if
+* ``request.POST['choice']`` will raise :exc:`KeyError` if
   ``choice`` wasn't provided in POST data. The above code checks for
-  :exc:`~exceptions.KeyError` and redisplays the question form with an error
+  :exc:`KeyError` and redisplays the question form with an error
   message if ``choice`` isn't given.
 
 * After incrementing the choice count, the code returns an
@@ -181,7 +182,7 @@ Use generic views: Less code is better
 ======================================
 
 The ``detail()`` (from :doc:`Tutorial 3 </intro/tutorial03>`) and ``results()``
-views are stupidly simple -- and, as mentioned above, redundant. The ``index()``
+views are very simple -- and, as mentioned above, redundant. The ``index()``
 view (also from Tutorial 3), which displays a list of polls, is similar.
 
 These views represent a common case of basic Web development: getting data from
@@ -222,16 +223,21 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 .. snippet::
     :filename: polls/urls.py
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
 
     from polls import views
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^$', views.IndexView.as_view(), name='index'),
-        url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
-        url(r'^(?P<pk>\d+)/results/$', views.ResultsView.as_view(), name='results'),
-        url(r'^(?P<question_id>\d+)/vote/$', views.vote, name='vote'),
-    )
+        url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name='detail'),
+        url(r'^(?P<pk>[0-9]+)/results/$', views.ResultsView.as_view(), name='results'),
+        url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
+    ]
+
+Note that the name of the matched pattern in the regexes of the second and third
+patterns has changed from ``<question_id>`` to ``<pk>``.
+
+.. _tutorial04-amend-views:
 
 Amend views
 -----------
@@ -271,7 +277,7 @@ views and use Django's generic views instead. To do so, open the
 
 
     def vote(request, question_id):
-        ....
+        ... # same as above
 
 We're using two generic views here:
 :class:`~django.views.generic.list.ListView` and

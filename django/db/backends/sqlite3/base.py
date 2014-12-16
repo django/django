@@ -8,8 +8,9 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
-import warnings
 import re
+import uuid
+import warnings
 
 from django.conf import settings
 from django.db import utils
@@ -19,8 +20,7 @@ from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
-from django.db.models import fields
-from django.db.models.sql import aggregates
+from django.db.models import fields, aggregates
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
@@ -103,15 +103,24 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
     supports_foreign_keys = False
-    supports_check_constraints = False
+    supports_column_check_constraints = False
     autocommits_when_autocommit_is_off = True
+    can_introspect_decimal_field = False
+    can_introspect_positive_integer_field = True
+    can_introspect_small_integer_field = True
+    supports_transactions = True
     atomic_transactions = False
+    can_rollback_ddl = True
     supports_paramstyle_pyformat = False
     supports_sequence_reset = False
 
     @cached_property
     def uses_savepoints(self):
         return Database.sqlite_version_info >= (3, 6, 8)
+
+    @cached_property
+    def can_release_savepoints(self):
+        return self.uses_savepoints
 
     @cached_property
     def supports_stddev(self):
@@ -153,8 +162,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         bad_fields = (fields.DateField, fields.DateTimeField, fields.TimeField)
         bad_aggregates = (aggregates.Sum, aggregates.Avg,
                           aggregates.Variance, aggregates.StdDev)
-        if (isinstance(aggregate.source, bad_fields) and
-                isinstance(aggregate, bad_aggregates)):
+        if aggregate.refs_field(bad_aggregates, bad_fields):
             raise NotImplementedError(
                 'You cannot use Sum, Avg, StdDev and Variance aggregations '
                 'on date/time fields in sqlite3 '
@@ -254,27 +262,41 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         return six.text_type(value)
 
-    def convert_values(self, value, field):
-        """SQLite returns floats when it should be returning decimals,
-        and gets dates and datetimes wrong.
-        For consistency with other backends, coerce when required.
-        """
-        if value is None:
-            return None
-
-        internal_type = field.get_internal_type()
-        if internal_type == 'DecimalField':
-            return backend_utils.typecast_decimal(field.format_number(value))
-        elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
-            return int(value)
+    def get_db_converters(self, internal_type):
+        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+        if internal_type == 'DateTimeField':
+            converters.append(self.convert_datetimefield_value)
         elif internal_type == 'DateField':
-            return parse_date(value)
-        elif internal_type == 'DateTimeField':
-            return parse_datetime_with_timezone_support(value)
+            converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
-            return parse_time(value)
+            converters.append(self.convert_timefield_value)
+        elif internal_type == 'DecimalField':
+            converters.append(self.convert_decimalfield_value)
+        elif internal_type == 'UUIDField':
+            converters.append(self.convert_uuidfield_value)
+        return converters
 
-        # No field, or the field isn't known to be a decimal or integer
+    def convert_decimalfield_value(self, value, field):
+        return backend_utils.typecast_decimal(field.format_number(value))
+
+    def convert_datefield_value(self, value, field):
+        if value is not None and not isinstance(value, datetime.date):
+            value = parse_date(value)
+        return value
+
+    def convert_datetimefield_value(self, value, field):
+        if value is not None and not isinstance(value, datetime.datetime):
+            value = parse_datetime_with_timezone_support(value)
+        return value
+
+    def convert_timefield_value(self, value, field):
+        if value is not None and not isinstance(value, datetime.time):
+            value = parse_time(value)
+        return value
+
+    def convert_uuidfield_value(self, value, field):
+        if value is not None:
+            value = uuid.UUID(value)
         return value
 
     def bulk_insert_sql(self, fields, num_values):
@@ -291,6 +313,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         if connector == '^':
             return 'django_power(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+
+    def integer_field_range(self, internal_type):
+        # SQLite doesn't enforce any integer constraints
+        return (None, None)
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -315,12 +341,26 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE %s ESCAPE '\\'",
     }
 
+    # The patterns below are used to generate SQL pattern lookup clauses when
+    # the right-hand side of the lookup isn't a raw string (it might be an expression
+    # or the result of a bilateral transformation).
+    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
+    # escaped on database side.
+    #
+    # Note: we use str.format() here for readability as '%' is used as a wildcard for
+    # the LIKE operator.
+    pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\', '\\'), '%%', '\%%'), '_', '\_')"
     pattern_ops = {
-        'startswith': "LIKE %s || '%%%%'",
-        'istartswith': "LIKE UPPER(%s) || '%%%%'",
+        'contains': r"LIKE '%%' || {} || '%%' ESCAPE '\'",
+        'icontains': r"LIKE '%%' || UPPER({}) || '%%' ESCAPE '\'",
+        'startswith': r"LIKE {} || '%%' ESCAPE '\'",
+        'istartswith': r"LIKE UPPER({}) || '%%' ESCAPE '\'",
+        'endswith': r"LIKE '%%' || {} ESCAPE '\'",
+        'iendswith': r"LIKE '%%' || UPPER({}) ESCAPE '\'",
     }
 
     Database = Database
+    SchemaEditorClass = DatabaseSchemaEditor
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
@@ -407,19 +447,23 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             level = ''
         # 'isolation_level' is a misleading API.
         # SQLite always runs at the SERIALIZABLE isolation level.
-        self.connection.isolation_level = level
+        with self.wrap_database_errors:
+            self.connection.isolation_level = level
 
     def check_constraints(self, table_names=None):
         """
-        Checks each table name in `table_names` for rows with invalid foreign key references. This method is
-        intended to be used in conjunction with `disable_constraint_checking()` and `enable_constraint_checking()`, to
-        determine if rows with invalid references were entered while constraint checks were off.
+        Checks each table name in `table_names` for rows with invalid foreign
+        key references. This method is intended to be used in conjunction with
+        `disable_constraint_checking()` and `enable_constraint_checking()`, to
+        determine if rows with invalid references were entered while constraint
+        checks were off.
 
-        Raises an IntegrityError on the first invalid foreign key reference encountered (if any) and provides
-        detailed information about the invalid reference in the error message.
+        Raises an IntegrityError on the first invalid foreign key reference
+        encountered (if any) and provides detailed information about the
+        invalid reference in the error message.
 
-        Backends can override this method if they can more directly apply constraint checking (e.g. via "SET CONSTRAINTS
-        ALL IMMEDIATE")
+        Backends can override this method if they can more directly apply
+        constraint checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE")
         """
         cursor = self.cursor()
         if table_names is None:
@@ -455,9 +499,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         self.cursor().execute("BEGIN")
 
-    def schema_editor(self, *args, **kwargs):
-        "Returns a new instance of this backend's SchemaEditor"
-        return DatabaseSchemaEditor(self, *args, **kwargs)
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
 

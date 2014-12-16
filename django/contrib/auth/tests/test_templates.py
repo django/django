@@ -15,9 +15,9 @@ from django.utils.http import urlsafe_base64_encode
 @skipIfCustomUser
 @override_settings(
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='django.contrib.auth.tests.urls',
 )
 class AuthTemplateTests(TestCase):
-    urls = 'django.contrib.auth.tests.urls'
 
     def test_titles(self):
         rf = RequestFactory()
@@ -31,8 +31,8 @@ class AuthTemplateTests(TestCase):
         self.assertContains(response, '<h1>Password reset</h1>')
 
         response = password_reset_done(request)
-        self.assertContains(response, '<title>Password reset successful</title>')
-        self.assertContains(response, '<h1>Password reset successful</h1>')
+        self.assertContains(response, '<title>Password reset sent</title>')
+        self.assertContains(response, '<h1>Password reset sent</h1>')
 
         # password_reset_confirm invalid token
         response = password_reset_confirm(request, uidb64='Bad', token='Bad', post_reset_redirect='dummy/')

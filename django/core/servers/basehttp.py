@@ -9,27 +9,21 @@ been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 
 from __future__ import unicode_literals
 
-from io import BytesIO
 import socket
 import sys
-import traceback
 from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # NOQA: for backwards compatibility
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.handlers.wsgi import ISO_8859_1, UTF_8
 from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
 from django.utils import six
+from django.utils.encoding import uri_to_iri
 from django.utils.module_loading import import_string
 from django.utils.six.moves import socketserver
 
-__all__ = ('WSGIServer', 'WSGIRequestHandler', 'MAX_SOCKET_CHUNK_SIZE')
-
-
-# If data is too large, socket will choke, so write chunks no larger than 32MB
-# at a time. The rationale behind the 32MB can be found on Django's Trac:
-# https://code.djangoproject.com/ticket/5596#comment:4
-MAX_SOCKET_CHUNK_SIZE = 32 * 1024 * 1024  # 32 MB
+__all__ = ('WSGIServer', 'WSGIRequestHandler')
 
 
 def get_internal_wsgi_application():
@@ -66,44 +60,9 @@ def get_internal_wsgi_application():
                     sys.exc_info()[2])
 
 
-class ServerHandler(simple_server.ServerHandler, object):
-    error_status = str("500 INTERNAL SERVER ERROR")
-
-    def write(self, data):
-        """'write()' callable as specified by PEP 3333"""
-
-        assert isinstance(data, bytes), "write() argument must be bytestring"
-
-        if not self.status:
-            raise AssertionError("write() before start_response()")
-
-        elif not self.headers_sent:
-            # Before the first output, send the stored headers
-            self.bytes_sent = len(data)    # make sure we know content-length
-            self.send_headers()
-        else:
-            self.bytes_sent += len(data)
-
-        # XXX check Content-Length and truncate if too many bytes written?
-        data = BytesIO(data)
-        for chunk in iter(lambda: data.read(MAX_SOCKET_CHUNK_SIZE), b''):
-            self._write(chunk)
-            self._flush()
-
-    def error_output(self, environ, start_response):
-        super(ServerHandler, self).error_output(environ, start_response)
-        return ['\n'.join(traceback.format_exception(*sys.exc_info()))]
-
-    # Backport of http://hg.python.org/cpython/rev/d5af1b235dab. See #16241.
-    # This can be removed when support for Python <= 2.7.3 is deprecated.
-    def finish_response(self):
-        try:
-            if not self.result_is_file() or not self.sendfile():
-                for data in self.result:
-                    self.write(data)
-                self.finish_content()
-        finally:
-            self.close()
+def is_broken_pipe_error():
+    exc_type, exc_value = sys.exc_info()[:2]
+    return issubclass(exc_type, socket.error) and exc_value.args[0] == 32
 
 
 class WSGIServer(simple_server.WSGIServer, object):
@@ -121,6 +80,19 @@ class WSGIServer(simple_server.WSGIServer, object):
         super(WSGIServer, self).server_bind()
         self.setup_environ()
 
+    def handle_error(self, request, client_address):
+        if is_broken_pipe_error():
+            sys.stderr.write("- Broken pipe from %s\n" % (client_address,))
+        else:
+            super(WSGIServer, self).handle_error(request, client_address)
+
+
+class ServerHandler(simple_server.ServerHandler):
+    def handle_error(self):
+        # Ignore broken pipe errors, otherwise pass on
+        if not is_broken_pipe_error():
+            super(ServerHandler, self).handle_error()
+
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 
@@ -133,7 +105,13 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         return self.client_address[0]
 
     def log_message(self, format, *args):
-        msg = "[%s] %s\n" % (self.log_date_time_string(), format % args)
+
+        msg = "[%s]" % self.log_date_time_string()
+        try:
+            msg += "%s\n" % (format % args)
+        except UnicodeDecodeError:
+            # e.g. accessing the server via SSL on Python 2
+            msg += "\n"
 
         # Utilize terminal colors, if available
         if args[1][0] == '2':
@@ -148,12 +126,51 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         elif args[1] == '404':
             msg = self.style.HTTP_NOT_FOUND(msg)
         elif args[1][0] == '4':
+            # 0x16 = Handshake, 0x03 = SSL 3.0 or TLS 1.x
+            if args[0].startswith(str('\x16\x03')):
+                msg = ("You're accessing the developement server over HTTPS, "
+                    "but it only supports HTTP.\n")
             msg = self.style.HTTP_BAD_REQUEST(msg)
         else:
             # Any 5XX, or any other response
             msg = self.style.HTTP_SERVER_ERROR(msg)
 
         sys.stderr.write(msg)
+
+    def get_environ(self):
+        env = super(WSGIRequestHandler, self).get_environ()
+
+        path = self.path
+        if '?' in path:
+            path = path.partition('?')[0]
+
+        path = uri_to_iri(path).encode(UTF_8)
+        # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
+        # decoded with ISO-8859-1. We replicate this behavior here.
+        # Refs comment in `get_bytes_from_wsgi()`.
+        env['PATH_INFO'] = path.decode(ISO_8859_1) if six.PY3 else path
+
+        return env
+
+    def handle(self):
+        """Copy of WSGIRequestHandler, but with different ServerHandler"""
+
+        self.raw_requestline = self.rfile.readline(65537)
+        if len(self.raw_requestline) > 65536:
+            self.requestline = ''
+            self.request_version = ''
+            self.command = ''
+            self.send_error(414)
+            return
+
+        if not self.parse_request():  # An error code has been sent, just exit
+            return
+
+        handler = ServerHandler(
+            self.rfile, self.wfile, self.get_stderr(), self.get_environ()
+        )
+        handler.request_handler = self      # backpointer for logging
+        handler.run(self.server.get_app())
 
 
 def run(addr, port, wsgi_handler, ipv6=False, threading=False):
@@ -163,5 +180,13 @@ def run(addr, port, wsgi_handler, ipv6=False, threading=False):
     else:
         httpd_cls = WSGIServer
     httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)
+    if threading:
+        # ThreadingMixIn.daemon_threads indicates how threads will behave on an
+        # abrupt shutdown; like quitting the server by the user or restarting
+        # by the auto-reloader. True means the server will not wait for thread
+        # termination before it quits. This will make auto-reloader faster
+        # and will prevent the need to kill the server manually if a thread
+        # isn't terminating correctly.
+        httpd.daemon_threads = True
     httpd.set_app(wsgi_handler)
     httpd.serve_forever()

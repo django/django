@@ -190,9 +190,9 @@ ones:
         >>> p = Person(name="Fred Flintstone", shirt_size="L")
         >>> p.save()
         >>> p.shirt_size
-        u'L'
+        'L'
         >>> p.get_shirt_size_display()
-        u'Large'
+        'Large'
 
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
@@ -541,7 +541,7 @@ querying the ``Membership`` model::
     >>> ringos_membership.date_joined
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
-    u'Needed a new drummer.'
+    'Needed a new drummer.'
 
 Another way to access the same information is by querying the
 :ref:`many-to-many reverse relationship<m2m-reverse-relationships>` from a
@@ -551,7 +551,7 @@ Another way to access the same information is by querying the
     >>> ringos_membership.date_joined
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
-    u'Needed a new drummer.'
+    'Needed a new drummer.'
 
 
 One-to-one relationships
@@ -681,8 +681,9 @@ Model attributes
     :class:`~django.db.models.Manager`. It's the interface through which
     database query operations are provided to Django models and is used to
     :ref:`retrieve the instances <retrieving-objects>` from the database. If no
-    custom ``Manager`` is defined, the default name is ``objects``. Managers
-    are only accessible via model classes, not the model instances.
+    custom ``Manager`` is defined, the default name is
+    :attr:`~django.db.models.Model.objects`. Managers are only accessible via
+    model classes, not the model instances.
 
 .. _model-methods:
 
@@ -704,9 +705,6 @@ For example, this model has a few custom methods::
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
         birth_date = models.DateField()
-        address = models.CharField(max_length=100)
-        city = models.CharField(max_length=50)
-        state = models.CharField(max_length=2)      # yes, this is America-centric
 
         def baby_boomer_status(self):
             "Returns the person's baby-boomer status."
@@ -717,10 +715,6 @@ For example, this model has a few custom methods::
                 return "Baby boomer"
             else:
                 return "Post-boomer"
-
-        def is_midwestern(self):
-            "Returns True if this person is from the Midwest."
-            return self.state in ('IL', 'WI', 'MI', 'IN', 'OH', 'IA', 'MO')
 
         def _get_full_name(self):
             "Returns the person's full name."
@@ -838,11 +832,14 @@ Model inheritance
 =================
 
 Model inheritance in Django works almost identically to the way normal
-class inheritance works in Python. The only decision you have to make
-is whether you want the parent models to be models in their own right
-(with their own database tables), or if the parents are just holders
-of common information that will only be visible through the child
-models.
+class inheritance works in Python, but the basics at the beginning of the page
+should still be followed. That means the base class should subclass
+:class:`django.db.models.Model`.
+
+The only decision you have to make is whether you want the parent models to be
+models in their own right (with their own database tables), or if the parents
+are just holders of common information that will only be visible through the
+child models.
 
 There are three styles of inheritance that are possible in Django.
 
@@ -1009,8 +1006,8 @@ For example::
         address = models.CharField(max_length=80)
 
     class Restaurant(Place):
-        serves_hot_dogs = models.BooleanField()
-        serves_pizza = models.BooleanField()
+        serves_hot_dogs = models.BooleanField(default=False)
+        serves_pizza = models.BooleanField(default=False)
 
 All of the fields of ``Place`` will also be available in ``Restaurant``,
 although the data will reside in a different database table. So these are both
@@ -1069,19 +1066,27 @@ as in the above example. However, this uses up the name that is the
 default :attr:`~django.db.models.ForeignKey.related_name` value for
 :class:`~django.db.models.ForeignKey` and
 :class:`~django.db.models.ManyToManyField` relations.  If you
-are putting those types of relations on a subclass of another model,
-you **must** specify the
-:attr:`~django.db.models.ForeignKey.related_name` attribute on each
-such field. If you forget, Django will raise an error when you run
-:djadmin:`check` or :djadmin:`migrate`.
+are putting those types of relations on a subclass of the parent model, you
+**must** specify the :attr:`~django.db.models.ForeignKey.related_name`
+attribute on each such field. If you forget, Django will raise a validation
+error.
 
 For example, using the above ``Place`` class again, let's create another
 subclass with a :class:`~django.db.models.ManyToManyField`::
 
     class Supplier(Place):
-        # Must specify related_name on all relations.
-        customers = models.ManyToManyField(Restaurant, related_name='provider')
+        customers = models.ManyToManyField(Place)
 
+This results in the error::
+
+    Reverse query name for 'Supplier.customers' clashes with reverse query
+    name for 'Supplier.place_ptr'.
+
+    HINT: Add or change a related_name argument to the definition for
+    'Supplier.customers' or 'Supplier.place_ptr'.
+
+Adding ``related_name`` to the ``customers`` field as follows would resolve the
+error: ``models.ManyToManyField(Place, related_name='provider')``.
 
 Specifying the parent link field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1262,6 +1267,8 @@ So, the general rules are:
    This sets things up so that the proxy model is an exact copy of the
    storage structure of the original model when data is saved.
 
+.. _model-multiple-inheritance-topic:
+
 Multiple inheritance
 --------------------
 
@@ -1278,6 +1285,67 @@ field or method to every class that inherits the mix-in. Try to keep your
 inheritance hierarchies as simple and straightforward as possible so that you
 won't have to struggle to work out where a particular piece of information is
 coming from.
+
+.. versionchanged:: 1.7
+
+Before Django 1.7, inheriting from multiple models that had an ``id`` primary
+key field did not raise an error, but could result in data loss. For example,
+consider these models (which no longer validate due to the clashing ``id``
+fields)::
+
+    class Article(models.Model):
+        headline = models.CharField(max_length=50)
+        body = models.TextField()
+
+    class Book(models.Model):
+        title = models.CharField(max_length=50)
+
+    class BookReview(Book, Article):
+        pass
+
+This snippet demonstrates how creating a child object overwrote the value of a
+previously created parent object::
+
+    >>> article = Article.objects.create(headline='Some piece of news.')
+    >>> review = BookReview.objects.create(
+    ...     headline='Review of Little Red Riding Hood.',
+    ...     title='Little Red Riding Hood')
+    >>>
+    >>> assert Article.objects.get(pk=article.pk).headline == article.headline
+    Traceback (most recent call last):
+      File "<console>", line 1, in <module>
+    AssertionError
+    >>> # the "Some piece of news." headline has been overwritten.
+    >>> Article.objects.get(pk=article.pk).headline
+    'Review of Little Red Riding Hood.'
+
+To properly use multiple inheritance, you can use an explicit
+:class:`~django.db.models.AutoField` in the base models::
+
+    class Article(models.Model):
+        article_id = models.AutoField(primary_key=True)
+        ...
+
+    class Book(models.Model):
+        book_id = models.AutoField(primary_key=True)
+        ...
+
+    class BookReview(Book, Article):
+        pass
+
+Or use a common ancestor to hold the :class:`~django.db.models.AutoField`::
+
+    class Piece(models.Model):
+        pass
+
+    class Article(Piece):
+        ...
+
+    class Book(Piece):
+        ...
+
+    class BookReview(Book, Article):
+        pass
 
 Field name "hiding" is not permitted
 -------------------------------------
@@ -1306,3 +1374,9 @@ different database tables).
 
 Django will raise a :exc:`~django.core.exceptions.FieldError` if you override
 any model field in any ancestor model.
+
+.. seealso::
+
+    :doc:`The Models Reference </ref/models/index>`
+        Covers all the model related APIs including model fields, related
+        objects, and ``QuerySet``.

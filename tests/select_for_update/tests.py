@@ -6,9 +6,10 @@ import unittest
 from django.conf import settings
 from django.db import transaction, connection, router
 from django.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
-from django.test import (TransactionTestCase, skipIfDBFeature,
-    skipUnlessDBFeature)
-from django.test import override_settings
+from django.test import (
+    TransactionTestCase, override_settings, skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 
 from multiple_database.routers import TestRouter
 
@@ -31,34 +32,24 @@ class SelectForUpdateTests(TransactionTestCase):
     available_apps = ['select_for_update']
 
     def setUp(self):
-        transaction.enter_transaction_management()
+        # This is executed in autocommit mode so that code in
+        # run_select_for_update can see this data.
         self.person = Person.objects.create(name='Reinhardt')
 
-        # We have to commit here so that code in run_select_for_update can
-        # see this data.
-        transaction.commit()
-
-        # We need another database connection to test that one connection
-        # issuing a SELECT ... FOR UPDATE will block.
+        # We need another database connection in transaction to test that one
+        # connection issuing a SELECT ... FOR UPDATE will block.
         new_connections = ConnectionHandler(settings.DATABASES)
         self.new_connection = new_connections[DEFAULT_DB_ALIAS]
-        self.new_connection.enter_transaction_management()
 
     def tearDown(self):
-        try:
-            # We don't really care if this fails - some of the tests will set
-            # this in the course of their run.
-            transaction.abort()
-            self.new_connection.abort()
-        except transaction.TransactionManagementError:
-            pass
-        self.new_connection.close()
         try:
             self.end_blocking_transaction()
         except (DatabaseError, AttributeError):
             pass
+        self.new_connection.close()
 
     def start_blocking_transaction(self):
+        self.new_connection.set_autocommit(False)
         # Start a blocking transaction. At some point,
         # end_blocking_transaction() should be called.
         self.cursor = self.new_connection.cursor()
@@ -72,6 +63,7 @@ class SelectForUpdateTests(TransactionTestCase):
     def end_blocking_transaction(self):
         # Roll back the blocking transaction.
         self.new_connection.rollback()
+        self.new_connection.set_autocommit(True)
 
     def has_for_update_sql(self, tested_connection, nowait=False):
         # Examine the SQL that was executed to determine whether it
@@ -86,7 +78,8 @@ class SelectForUpdateTests(TransactionTestCase):
         Test that the backend's FOR UPDATE variant appears in
         generated SQL when select_for_update is invoked.
         """
-        list(Person.objects.all().select_for_update())
+        with transaction.atomic():
+            list(Person.objects.all().select_for_update())
         self.assertTrue(self.has_for_update_sql(connection))
 
     @skipUnlessDBFeature('has_select_for_update_nowait')
@@ -95,7 +88,8 @@ class SelectForUpdateTests(TransactionTestCase):
         Test that the backend's FOR UPDATE NOWAIT variant appears in
         generated SQL when select_for_update is invoked.
         """
-        list(Person.objects.all().select_for_update(nowait=True))
+        with transaction.atomic():
+            list(Person.objects.all().select_for_update(nowait=True))
         self.assertTrue(self.has_for_update_sql(connection, nowait=True))
 
     @requires_threading
@@ -134,6 +128,26 @@ class SelectForUpdateTests(TransactionTestCase):
             Person.objects.all().select_for_update(nowait=True)
         )
 
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_for_update_requires_transaction(self):
+        """
+        Test that a TransactionManagementError is raised
+        when a select_for_update query is executed outside of a transaction.
+        """
+        with self.assertRaises(transaction.TransactionManagementError):
+            list(Person.objects.all().select_for_update())
+
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_for_update_requires_transaction_only_in_execution(self):
+        """
+        Test that no TransactionManagementError is raised
+        when select_for_update is invoked outside of a transaction -
+        only when the query is executed.
+        """
+        people = Person.objects.all().select_for_update()
+        with self.assertRaises(transaction.TransactionManagementError):
+            list(people)
+
     def run_select_for_update(self, status, nowait=False):
         """
         Utility method that runs a SELECT FOR UPDATE against all
@@ -146,19 +160,17 @@ class SelectForUpdateTests(TransactionTestCase):
         try:
             # We need to enter transaction management again, as this is done on
             # per-thread basis
-            transaction.enter_transaction_management()
-            people = list(
-                Person.objects.all().select_for_update(nowait=nowait)
-            )
-            people[0].name = 'Fred'
-            people[0].save()
-            transaction.commit()
+            with transaction.atomic():
+                people = list(
+                    Person.objects.all().select_for_update(nowait=nowait)
+                )
+                people[0].name = 'Fred'
+                people[0].save()
         except DatabaseError as e:
             status.append(e)
         finally:
             # This method is run in a separate thread. It uses its own
             # database connection. Close it without waiting for the GC.
-            transaction.abort()
             connection.close()
 
     @requires_threading
@@ -246,21 +258,13 @@ class SelectForUpdateTests(TransactionTestCase):
         self.assertIsInstance(status[-1], DatabaseError)
 
     @skipUnlessDBFeature('has_select_for_update')
-    def test_transaction_dirty_managed(self):
-        """ Check that a select_for_update sets the transaction to be
-        dirty when executed under txn management. Setting the txn dirty
-        means that it will be either committed or rolled back by Django,
-        which will release any locks held by the SELECT FOR UPDATE.
-        """
-        list(Person.objects.select_for_update())
-        self.assertTrue(transaction.is_dirty())
+    @override_settings(DATABASE_ROUTERS=[TestRouter()])
+    def test_select_for_update_on_multidb(self):
+        query = Person.objects.select_for_update()
+        self.assertEqual(router.db_for_write(Person), query.db)
 
     @skipUnlessDBFeature('has_select_for_update')
-    def test_select_for_update_on_multidb(self):
-        old_routers = router.routers
-        try:
-            router.routers = [TestRouter()]
-            query = Person.objects.select_for_update()
-            self.assertEqual(router.db_for_write(Person), query.db)
-        finally:
-            router.routers = old_routers
+    def test_select_for_update_with_get(self):
+        with transaction.atomic():
+            person = Person.objects.select_for_update().get(name='Reinhardt')
+        self.assertEqual(person.name, 'Reinhardt')

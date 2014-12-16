@@ -23,11 +23,11 @@ if lib_path:
     lib_names = None
 elif os.name == 'nt':
     # Windows NT shared libraries
-    lib_names = ['gdal19', 'gdal18', 'gdal17', 'gdal16', 'gdal15']
+    lib_names = ['gdal111', 'gdal110', 'gdal19', 'gdal18', 'gdal17']
 elif os.name == 'posix':
     # *NIX library names.
-    lib_names = ['gdal', 'GDAL', 'gdal1.9.0', 'gdal1.8.0', 'gdal1.7.0',
-        'gdal1.6.0', 'gdal1.5.0']
+    lib_names = ['gdal', 'GDAL', 'gdal1.11.0', 'gdal1.10.0', 'gdal1.9.0',
+        'gdal1.8.0', 'gdal1.7.0']
 else:
     raise OGRException('Unsupported OS "%s"' % os.name)
 
@@ -36,7 +36,7 @@ else:
 if lib_names:
     for lib_name in lib_names:
         lib_path = find_library(lib_name)
-        if not lib_path is None:
+        if lib_path is not None:
             break
 
 if lib_path is None:
@@ -91,7 +91,7 @@ def gdal_version_info():
     m = version_regex.match(ver)
     if not m:
         raise OGRException('Could not parse GDAL version string "%s"' % ver)
-    return dict((key, m.group(key)) for key in ('major', 'minor', 'subminor'))
+    return {key: m.group(key) for key in ('major', 'minor', 'subminor')}
 
 _verinfo = gdal_version_info()
 GDAL_MAJOR_VERSION = int(_verinfo['major'])

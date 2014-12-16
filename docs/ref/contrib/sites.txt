@@ -18,9 +18,6 @@ The sites framework is mainly based on a simple model:
 .. class:: models.Site
 
     A model for storing the ``domain`` and ``name`` attributes of a Web site.
-    The :setting:`SITE_ID` setting specifies the database ID of the
-    :class:`~django.contrib.sites.models.Site` object associated with that
-    particular settings file.
 
     .. attribute:: domain
 
@@ -29,6 +26,14 @@ The sites framework is mainly based on a simple model:
     .. attribute:: name
 
         A human-readable "verbose" name for the Web site.
+
+The :setting:`SITE_ID` setting specifies the database ID of the
+:class:`~django.contrib.sites.models.Site` object associated with that
+particular settings file. If the setting is omitted, the
+:func:`~django.contrib.sites.shortcuts.get_current_site` function will
+try to get the current site by comparing the
+:attr:`~django.contrib.sites.models.Site.domain` with the host name from
+the :meth:`request.get_host() <django.http.HttpRequest.get_host>` method.
 
 How you use this is up to you, but Django uses it in a couple of ways
 automatically via simple conventions.
@@ -249,10 +254,6 @@ To do this, you can use the sites framework. A simple example::
 Enabling the sites framework
 ============================
 
-.. versionchanged:: 1.6
-
-    In previous versions, the sites framework was enabled by default.
-
 To enable the sites framework, follow these steps:
 
 1. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS`
@@ -268,8 +269,13 @@ To enable the sites framework, follow these steps:
 :data:`~django.db.models.signals.post_migrate` signal handler which creates a
 default site named ``example.com`` with the domain ``example.com``. This site
 will also be created after Django creates the test database. To set the
-correct name and domain for your project, you can use an :doc:`initial data
-fixture </howto/initial-data>`.
+correct name and domain for your project, you can use a :ref:`data migration
+<data-migrations>`.
+
+In order to serve different sites in production, you'd create a separate
+settings file with each ``SITE_ID`` (perhaps importing from a common settings
+file to avoid duplicating shared settings) and then specify the appropriate
+:envvar:`DJANGO_SETTINGS_MODULE` for each site.
 
 Caching the current ``Site`` object
 ===================================
@@ -305,6 +311,11 @@ application, consider using the helpful
 model(s). It's a model :doc:`manager </topics/db/managers>` that
 automatically filters its queries to include only objects associated
 with the current :class:`~django.contrib.sites.models.Site`.
+
+.. admonition:: Mandatory :setting:`SITE_ID`
+
+    The ``CurrentSiteManager`` is only usable when the :setting:`SITE_ID`
+    setting is defined in your settings.
 
 Use :class:`~django.contrib.sites.managers.CurrentSiteManager` by adding it to
 your model explicitly. For example::
@@ -389,7 +400,7 @@ If you often use this pattern::
         ...
 
 there is simple way to avoid repetitions. Add
-:class:`django.contrib.site.middleware.CurrentSiteMiddleware` to
+:class:`django.contrib.sites.middleware.CurrentSiteMiddleware` to
 :setting:`MIDDLEWARE_CLASSES`. The middleware sets the ``site`` attribute on
 every request object, so you can use ``request.site`` to get the current site.
 
@@ -407,12 +418,6 @@ Here's how Django uses the sites framework:
 * In the :mod:`redirects framework <django.contrib.redirects>`, each
   redirect object is associated with a particular site. When Django searches
   for a redirect, it takes into account the current site.
-
-* In the comments framework, each comment is associated with a particular
-  site. When a comment is posted, its
-  :class:`~django.contrib.sites.models.Site` is set to the current site,
-  and when comments are listed via the appropriate template tag, only the
-  comments for the current site are displayed.
 
 * In the :mod:`flatpages framework <django.contrib.flatpages>`, each
   flatpage is associated with a particular site. When a flatpage is created,
@@ -469,7 +474,7 @@ a fallback when the database-backed sites framework is not available.
 
     .. versionchanged:: 1.7
 
-      This class used to be defined in ``django.contrib.sites.models``.
+        This class used to be defined in ``django.contrib.sites.models``.
 
 A :class:`~django.contrib.sites.requests.RequestSite` object has a similar
 interface to a normal :class:`~django.contrib.sites.models.Site` object,
@@ -478,7 +483,7 @@ method takes an :class:`~django.http.HttpRequest` object. It's able to deduce
 the ``domain`` and ``name`` by looking at the request's domain. It has
 ``save()`` and ``delete()`` methods to match the interface of
 :class:`~django.contrib.sites.models.Site`, but the methods raise
-:exc:`~exceptions.NotImplementedError`..
+:exc:`NotImplementedError`.
 
 ``get_current_site`` shortcut
 =============================
@@ -486,7 +491,7 @@ the ``domain`` and ``name`` by looking at the request's domain. It has
 Finally, to avoid repetitive fallback code, the framework provides a
 :func:`django.contrib.sites.shortcuts.get_current_site` function.
 
-.. function:: shortcuts.get_current_site
+.. function:: shortcuts.get_current_site(request)
 
     A function that checks if ``django.contrib.sites`` is installed and
     returns either the current :class:`~django.contrib.sites.models.Site`
@@ -495,4 +500,10 @@ Finally, to avoid repetitive fallback code, the framework provides a
 
     .. versionchanged:: 1.7
 
-      This function used to be defined in ``django.contrib.sites.models``.
+        This function used to be defined in ``django.contrib.sites.models``.
+
+    .. versionchanged:: 1.8
+
+        This function will now lookup the current site based on
+        :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
+        :setting:`SITE_ID` setting is not defined.

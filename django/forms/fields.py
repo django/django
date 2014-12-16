@@ -9,6 +9,7 @@ import datetime
 import os
 import re
 import sys
+import uuid
 import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
@@ -25,7 +26,7 @@ from django.forms.widgets import (
 from django.utils import formats
 from django.utils.encoding import smart_text, force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning, RenameMethodsBase
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
@@ -41,11 +42,17 @@ __all__ = (
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField', 'IPAddressField', 'GenericIPAddressField', 'FilePathField',
-    'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField'
+    'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField', 'UUIDField',
 )
 
 
-class Field(object):
+class RenameFieldMethods(RenameMethodsBase):
+    renamed_methods = (
+        ('_has_changed', 'has_changed', RemovedInDjango20Warning),
+    )
+
+
+class Field(six.with_metaclass(RenameFieldMethods, object)):
     widget = TextInput  # Default widget to use when rendering this type of Field.
     hidden_widget = HiddenInput  # Default widget to use when rendering this as "hidden".
     default_validators = []  # Default set of validators
@@ -61,7 +68,7 @@ class Field(object):
 
     def __init__(self, required=True, widget=None, label=None, initial=None,
                  help_text='', error_messages=None, show_hidden_initial=False,
-                 validators=[], localize=False):
+                 validators=[], localize=False, label_suffix=None):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
         # widget -- A Widget class, or instance of a Widget class, that should
@@ -79,11 +86,14 @@ class Field(object):
         #                   messages that the field will raise.
         # show_hidden_initial -- Boolean that specifies if it is needed to render a
         #                        hidden widget with initial value after widget.
-        # validators -- List of addtional validators to use
+        # validators -- List of additional validators to use
         # localize -- Boolean that specifies if the field should be localized.
+        # label_suffix -- Suffix to be added to the label. Overrides
+        #                 form's label_suffix.
         self.required, self.label, self.initial = required, label, initial
         self.show_hidden_initial = show_hidden_initial
         self.help_text = help_text
+        self.label_suffix = label_suffix
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
@@ -171,23 +181,12 @@ class Field(object):
         """
         return {}
 
-    def get_limit_choices_to(self):
-        """
-        Returns ``limit_choices_to`` for this form field.
-
-        If it is a callable, it will be invoked and the result will be
-        returned.
-        """
-        if callable(self.limit_choices_to):
-            return self.limit_choices_to()
-        return self.limit_choices_to
-
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         """
         Return True if data differs from initial.
         """
         # For purposes of seeing whether something has changed, None is
-        # the same as an empty string, if the data or inital value we get
+        # the same as an empty string, if the data or initial value we get
         # is None, replace it w/ ''.
         initial_value = initial if initial is not None else ''
         try:
@@ -527,7 +526,12 @@ class RegexField(CharField):
         'Enter a valid value' is too generic for you.
         """
         # error_message is just kept for backwards compatibility:
-        if error_message:
+        if error_message is not None:
+            warnings.warn(
+                "The 'error_message' argument is deprecated. Use "
+                "Field.error_messages['invalid'] instead.",
+                RemovedInDjango20Warning, stacklevel=2
+            )
             error_messages = kwargs.get('error_messages') or {}
             error_messages['invalid'] = error_message
             kwargs['error_messages'] = error_messages
@@ -621,7 +625,7 @@ class FileField(Field):
             return initial
         return data
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if data is None:
             return False
         return True
@@ -629,7 +633,10 @@ class FileField(Field):
 
 class ImageField(FileField):
     default_error_messages = {
-        'invalid_image': _("Upload a valid image. The file you uploaded was either not an image or a corrupted image."),
+        'invalid_image': _(
+            "Upload a valid image. The file you uploaded was either not an "
+            "image or a corrupted image."
+        ),
     }
 
     def to_python(self, data):
@@ -641,7 +648,7 @@ class ImageField(FileField):
         if f is None:
             return None
 
-        from django.utils.image import Image
+        from PIL import Image
 
         # We need to get a file object for Pillow. We might have a path or we might
         # have to read the data into memory.
@@ -656,10 +663,15 @@ class ImageField(FileField):
         try:
             # load() could spot a truncated JPEG, but it loads the entire
             # image in memory, which is a DoS vector. See #3848 and #18520.
+            image = Image.open(file)
             # verify() must be called immediately after the constructor.
-            Image.open(file).verify()
+            image.verify()
+
+            # Annotating so subclasses can reuse it for their own validation
+            f.image = image
+            f.content_type = Image.MIME[image.format]
         except Exception:
-            # Pillow (or PIL) doesn't recognize it as an image.
+            # Pillow doesn't recognize it as an image.
             six.reraise(ValidationError, ValidationError(
                 self.error_messages['invalid_image'],
                 code='invalid_image',
@@ -704,9 +716,6 @@ class URLField(CharField):
                 # Rebuild the url_fields list, since the domain segment may now
                 # contain the path too.
                 url_fields = split_url(urlunsplit(url_fields))
-            if not url_fields[2]:
-                # the path portion may need to be added before query params
-                url_fields[2] = '/'
             value = urlunsplit(url_fields)
         return value
 
@@ -734,7 +743,7 @@ class BooleanField(Field):
         if not value and self.required:
             raise ValidationError(self.error_messages['required'], code='required')
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         # Sometimes data or initial could be None or '' which should be the
         # same thing as False.
         if initial == 'False':
@@ -753,13 +762,15 @@ class NullBooleanField(BooleanField):
     def to_python(self, value):
         """
         Explicitly checks for the string 'True' and 'False', which is what a
-        hidden field will submit for True and False, and for '1' and '0', which
-        is what a RadioField will submit. Unlike the Booleanfield we need to
-        explicitly check for True, because we are not using the bool() function
+        hidden field will submit for True and False, for 'true' and 'false',
+        which are likely to be returned by JavaScript serializations of forms,
+        and for '1' and '0', which is what a RadioField will submit. Unlike
+        the Booleanfield we need to explicitly check for True, because we are
+        not using the bool() function
         """
-        if value in (True, 'True', '1'):
+        if value in (True, 'True', 'true', '1'):
             return True
-        elif value in (False, 'False', '0'):
+        elif value in (False, 'False', 'false', '0'):
             return False
         else:
             return None
@@ -767,13 +778,22 @@ class NullBooleanField(BooleanField):
     def validate(self, value):
         pass
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         # None (unknown) and False (No) are not the same
         if initial is not None:
             initial = bool(initial)
         if data is not None:
             data = bool(data)
         return initial != data
+
+
+class CallableChoiceIterator(object):
+    def __init__(self, choices_func):
+        self.choices_func = choices_func
+
+    def __iter__(self):
+        for e in self.choices_func():
+            yield e
 
 
 class ChoiceField(Field):
@@ -800,7 +820,12 @@ class ChoiceField(Field):
         # Setting choices also sets the choices on the widget.
         # choices can be any iterable, but we call list() on it because
         # it will be consumed more than once.
-        self._choices = self.widget.choices = list(value)
+        if callable(value):
+            value = CallableChoiceIterator(value)
+        else:
+            value = list(value)
+
+        self._choices = self.widget.choices = value
 
     choices = property(_get_choices, _set_choices)
 
@@ -894,7 +919,7 @@ class MultipleChoiceField(ChoiceField):
                     params={'value': val},
                 )
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if initial is None:
             initial = []
         if data is None:
@@ -1003,7 +1028,7 @@ class MultiValueField(Field):
 
     def __deepcopy__(self, memo):
         result = super(MultiValueField, self).__deepcopy__(memo)
-        result.fields = tuple([x.__deepcopy__(memo) for x in self.fields])
+        result.fields = tuple(x.__deepcopy__(memo) for x in self.fields)
         return result
 
     def validate(self, value):
@@ -1072,14 +1097,18 @@ class MultiValueField(Field):
         """
         raise NotImplementedError('Subclasses must implement this method.')
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if initial is None:
             initial = ['' for x in range(0, len(data))]
         else:
             if not isinstance(initial, list):
                 initial = self.widget.decompress(initial)
         for field, initial, data in zip(self.fields, initial, data):
-            if field._has_changed(field.to_python(initial), data):
+            try:
+                initial = field.to_python(initial)
+            except ValidationError:
+                return True
+            if field.has_changed(initial, data):
                 return True
         return False
 
@@ -1203,3 +1232,25 @@ class SlugField(CharField):
     def clean(self, value):
         value = self.to_python(value).strip()
         return super(SlugField, self).clean(value)
+
+
+class UUIDField(CharField):
+    default_error_messages = {
+        'invalid': _('Enter a valid UUID.'),
+    }
+
+    def prepare_value(self, value):
+        if isinstance(value, uuid.UUID):
+            return value.hex
+        return value
+
+    def to_python(self, value):
+        value = super(UUIDField, self).to_python(value)
+        if value in self.empty_values:
+            return None
+        if not isinstance(value, uuid.UUID):
+            try:
+                value = uuid.UUID(value)
+            except ValueError:
+                raise ValidationError(self.error_messages['invalid'], code='invalid')
+        return value

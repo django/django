@@ -1,15 +1,15 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.views.generic.base import View
 
 from .models import Artist, Author, Page
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class DetailViewTest(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_simple_object(self):
         res = self.client.get('/detail/obj/')
@@ -53,6 +53,34 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
 
+    def test_detail_by_pk_ignore_slug(self):
+        author = Author.objects.get(pk=1)
+        res = self.client.get('/detail/author/bypkignoreslug/1-roberto-bolano/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], author)
+        self.assertEqual(res.context['author'], author)
+        self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+
+    def test_detail_by_pk_ignore_slug_mismatch(self):
+        author = Author.objects.get(pk=1)
+        res = self.client.get('/detail/author/bypkignoreslug/1-scott-rosenberg/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], author)
+        self.assertEqual(res.context['author'], author)
+        self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+
+    def test_detail_by_pk_and_slug(self):
+        author = Author.objects.get(pk=1)
+        res = self.client.get('/detail/author/bypkandslug/1-roberto-bolano/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], author)
+        self.assertEqual(res.context['author'], author)
+        self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+
+    def test_detail_by_pk_and_slug_mismatch_404(self):
+        res = self.client.get('/detail/author/bypkandslug/1-scott-rosenberg/')
+        self.assertEqual(res.status_code, 404)
+
     def test_verbose_name(self):
         res = self.client.get('/detail/artist/1/')
         self.assertEqual(res.status_code, 200)
@@ -86,14 +114,14 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'], Author.objects.get(pk=1))
         self.assertEqual(res.context['thingy'], Author.objects.get(pk=1))
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
 
     def test_duplicated_context_object_name(self):
         res = self.client.get('/detail/author/1/dupe_context_object_name/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'], Author.objects.get(pk=1))
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
 
     def test_invalid_url(self):

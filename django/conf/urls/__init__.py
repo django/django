@@ -1,9 +1,11 @@
 from importlib import import_module
+import warnings
 
 from django.core.urlresolvers import (RegexURLPattern,
     RegexURLResolver, LocaleRegexURLResolver)
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 __all__ = ['handler400', 'handler403', 'handler404', 'handler500', 'include', 'patterns', 'url']
@@ -42,6 +44,12 @@ def include(arg, namespace=None, app_name=None):
 
 
 def patterns(prefix, *args):
+    warnings.warn(
+        'django.conf.urls.patterns() is deprecated and will be removed in '
+        'Django 2.0. Update your urlpatterns to be a list of '
+        'django.conf.urls.url() instances instead.',
+        RemovedInDjango20Warning, stacklevel=2
+    )
     pattern_list = []
     for t in args:
         if isinstance(t, (list, tuple)):
@@ -59,6 +67,12 @@ def url(regex, view, kwargs=None, name=None, prefix=''):
         return RegexURLResolver(regex, urlconf_module, kwargs, app_name=app_name, namespace=namespace)
     else:
         if isinstance(view, six.string_types):
+            warnings.warn(
+                'Support for string view arguments to url() is deprecated and '
+                'will be removed in Django 2.0 (got %s). Pass the callable '
+                'instead.' % view,
+                RemovedInDjango20Warning, stacklevel=2
+            )
             if not view:
                 raise ImproperlyConfigured('Empty URL pattern view name not permitted (for pattern %r)' % regex)
             if prefix:

@@ -8,7 +8,7 @@ from zipimport import zipimporter
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, modify_settings
-from django.test.utils import IgnorePendingDeprecationWarningsMixin, extend_sys_path
+from django.test.utils import IgnoreDeprecationWarningsMixin, extend_sys_path
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.module_loading import (autodiscover_modules, import_by_path, import_string,
@@ -110,7 +110,7 @@ class EggLoader(unittest.TestCase):
             self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
 
 
-class ModuleImportTestCase(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
+class ModuleImportTestCase(IgnoreDeprecationWarningsMixin, unittest.TestCase):
     def test_import_by_path(self):
         cls = import_by_path('django.utils.module_loading.import_by_path')
         self.assertEqual(cls, import_by_path)
@@ -155,6 +155,15 @@ class ModuleImportTestCase(IgnorePendingDeprecationWarningsMixin, unittest.TestC
 @modify_settings(INSTALLED_APPS={'append': 'utils_tests.test_module'})
 class AutodiscoverModulesTestCase(SimpleTestCase):
 
+    def tearDown(self):
+        sys.path_importer_cache.clear()
+
+        sys.modules.pop('utils_tests.test_module.another_bad_module', None)
+        sys.modules.pop('utils_tests.test_module.another_good_module', None)
+        sys.modules.pop('utils_tests.test_module.bad_module', None)
+        sys.modules.pop('utils_tests.test_module.good_module', None)
+        sys.modules.pop('utils_tests.test_module', None)
+
     def test_autodiscover_modules_found(self):
         autodiscover_modules('good_module')
 
@@ -172,11 +181,27 @@ class AutodiscoverModulesTestCase(SimpleTestCase):
     def test_autodiscover_modules_several_found(self):
         autodiscover_modules('good_module', 'another_good_module')
 
+    def test_autodiscover_modules_several_found_with_registry(self):
+        from .test_module import site
+        autodiscover_modules('good_module', 'another_good_module', register_to=site)
+        self.assertEqual(site._registry, {'lorem': 'ipsum'})
+
     def test_validate_registry_keeps_intact(self):
         from .test_module import site
         with six.assertRaisesRegex(self, Exception, "Some random exception."):
             autodiscover_modules('another_bad_module', register_to=site)
         self.assertEqual(site._registry, {})
+
+    def test_validate_registry_resets_after_erroneous_module(self):
+        from .test_module import site
+        with six.assertRaisesRegex(self, Exception, "Some random exception."):
+            autodiscover_modules('another_good_module', 'another_bad_module', register_to=site)
+        self.assertEqual(site._registry, {'lorem': 'ipsum'})
+
+    def test_validate_registry_resets_after_missing_module(self):
+        from .test_module import site
+        autodiscover_modules('does_not_exist', 'another_good_module', 'does_not_exist2', register_to=site)
+        self.assertEqual(site._registry, {'lorem': 'ipsum'})
 
 
 class ProxyFinder(object):

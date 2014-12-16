@@ -22,6 +22,9 @@ class OpenLayersWidget(Textarea):
         # Update the template parameters with any attributes passed in.
         if attrs:
             self.params.update(attrs)
+            self.params['editable'] = self.params['modifiable']
+        else:
+            self.params['editable'] = True
 
         # Defaulting the WKT value to a blank string -- this
         # will be tested in the JavaScript and the appropriate

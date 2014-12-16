@@ -440,9 +440,9 @@ Settings
 Better exceptions
 ~~~~~~~~~~~~~~~~~
 
-The old :exc:`~exceptions.EnvironmentError` has split into an
-:exc:`~exceptions.ImportError` when Django fails to find the settings module
-and a :exc:`~exceptions.RuntimeError` when you try to reconfigure settings
+The old :exc:`EnvironmentError` has split into an
+:exc:`ImportError` when Django fails to find the settings module
+and a :exc:`RuntimeError` when you try to reconfigure settings
 after having already used them.
 
 :setting:`LOGIN_URL` has moved
@@ -479,7 +479,7 @@ Different exception from ``get()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Managers now return a :exc:`~django.core.exceptions.MultipleObjectsReturned`
-exception instead of :exc:`~exceptions.AssertionError`:
+exception instead of :exc:`AssertionError`:
 
 Old (0.96)::
 

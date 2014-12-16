@@ -46,7 +46,7 @@ __ http://sphinx-doc.org/
 __ http://docutils.sourceforge.net/
 
 To actually build the documentation locally, you'll currently need to install
-Sphinx -- ``sudo pip install Sphinx`` should do the trick.
+Sphinx -- ``pip install Sphinx`` should do the trick.
 
 .. note::
 
@@ -154,7 +154,7 @@ Django-specific markup
 Besides the `Sphinx built-in markup`__, Django's docs defines some extra
 description units:
 
-__ http://sphinx-doc.org/markup/desc.html
+__ http://sphinx-doc.org/markup/
 
 * Settings::
 
@@ -192,6 +192,10 @@ __ http://sphinx-doc.org/markup/desc.html
 
   To link, use ``:djadminopt:`--traceback```.
 
+* Links to Trac tickets (typically reserved for minor release notes)::
+
+        :ticket:`12345`
+
 .. _documenting-new-features:
 
 Documenting new features
@@ -205,7 +209,7 @@ Our policy for new features is:
     release, not the development version.
 
 Our preferred way for marking new features is by prefacing the features'
-documentation with: "``.. versionadded:: X.Y``", followed by a a mandatory
+documentation with: "``.. versionadded:: X.Y``", followed by a mandatory
 blank line and an optional content (indented).
 
 General improvements, or other changes to the APIs that should be emphasized
@@ -319,10 +323,6 @@ look better:
 
   This will probably be a continuing, never-ending project.
 
-* Add `info field lists`__ where appropriate.
-
-  __ http://sphinx-doc.org/markup/desc.html#info-field-lists
-
 * Whenever possible, use links. So, use ``:setting:`ADMINS``` instead
   of ````ADMINS````.
 
@@ -349,6 +349,8 @@ look better:
   ``:class:`~django.contrib.contenttypes.models.ContentType``` will just
   display a link with the title "ContentType".
 
+.. _documentation-spelling-check:
+
 Spelling check
 --------------
 
@@ -372,3 +374,9 @@ one of the following:
 * Find synonyms that the spell checker recognizes.
 * If, and only if, you are sure the word you are using is correct - add it
   to ``docs/spelling_wordlist`` (please keep the list in alphabetical order).
+
+Translating documentation
+-------------------------
+
+See :ref:`Localizing the Django documentation <translating-documentation>` if
+you'd like to help translate the documentation into another language.

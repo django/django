@@ -2,7 +2,7 @@ import sys
 import threading
 import weakref
 
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 if sys.version_info < (3, 4):
     from .weakref_backports import WeakMethod
@@ -60,7 +60,7 @@ class Signal(object):
                 A function or an instance method which is to receive signals.
                 Receivers must be hashable objects.
 
-                If weak is True, then receiver must be weak-referencable.
+                If weak is True, then receiver must be weak referenceable.
 
                 Receivers must be able to accept keyword arguments.
 
@@ -162,7 +162,7 @@ class Signal(object):
 
         with self.lock:
             self._clear_dead_receivers()
-            for index in xrange(len(self.receivers)):
+            for index in range(len(self.receivers)):
                 (r_key, _) = self.receivers[index]
                 if r_key == lookup_key:
                     del self.receivers[index]
@@ -220,7 +220,8 @@ class Signal(object):
 
         If any receiver raises an error (specifically any subclass of
         Exception), the error instance is returned as the result for that
-        receiver.
+        receiver. The traceback is always attached to the error at
+        ``__traceback__``.
         """
         responses = []
         if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
@@ -232,6 +233,8 @@ class Signal(object):
             try:
                 response = receiver(signal=self, sender=sender, **named)
             except Exception as err:
+                if not hasattr(err, '__traceback__'):
+                    err.__traceback__ = sys.exc_info()[2]
                 responses.append((receiver, err))
             else:
                 responses.append((receiver, response))

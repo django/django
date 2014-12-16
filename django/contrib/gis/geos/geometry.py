@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 # Python, ctypes and types dependencies.
 from ctypes import addressof, byref, c_double
 
-from django.contrib.gis import memoryview
 # super-class for mutable list behavior
 from django.contrib.gis.geos.mutable_list import ListMixin
 
@@ -80,7 +79,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         elif isinstance(geo_input, GEOM_PTR):
             # When the input is a pointer to a geometry (GEOM_PTR).
             g = geo_input
-        elif isinstance(geo_input, memoryview):
+        elif isinstance(geo_input, six.memoryview):
             # When the input is a buffer (WKB).
             g = wkb_r().read(geo_input)
         elif isinstance(geo_input, GEOSGeometry):
@@ -116,7 +115,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Destroys this Geometry; in other words, frees the memory used by the
         GEOS C++ object.
         """
-        if self._ptr:
+        if self._ptr and capi:
             capi.destroy_geom(self._ptr)
 
     def __copy__(self):
@@ -135,8 +134,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
         return self.clone()
 
     def __str__(self):
-        "WKT is used for the string representation."
-        return self.wkt
+        "EWKT is used for the string representation."
+        return self.ewkt
 
     def __repr__(self):
         "Short-hand representation because WKT may be very large."
@@ -151,7 +150,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def __setstate__(self, state):
         # Instantiating from the tuple state that was pickled.
         wkb, srid = state
-        ptr = wkb_r().read(memoryview(wkb))
+        ptr = wkb_r().read(six.memoryview(wkb))
         if not ptr:
             raise GEOSException('Invalid Geometry loaded from pickled state.')
         self.ptr = ptr
@@ -377,9 +376,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def ewkt(self):
         """
-        Returns the EWKT (WKT + SRID) of the Geometry.  Note that Z values
-        are *not* included in this representation because GEOS does not yet
-        support serializing them.
+        Returns the EWKT (SRID + WKT) of the Geometry. Note that Z values
+        are only included in this representation if GEOS >= 3.3.0.
         """
         if self.get_srid():
             return 'SRID=%s;%s' % (self.srid, self.wkt)
@@ -577,15 +575,11 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def interpolate(self, distance):
         if not isinstance(self, (LineString, MultiLineString)):
             raise TypeError('interpolate only works on LineString and MultiLineString geometries')
-        if not hasattr(capi, 'geos_interpolate'):
-            raise NotImplementedError('interpolate requires GEOS 3.2+')
         return self._topology(capi.geos_interpolate(self.ptr, distance))
 
     def interpolate_normalized(self, distance):
         if not isinstance(self, (LineString, MultiLineString)):
             raise TypeError('interpolate only works on LineString and MultiLineString geometries')
-        if not hasattr(capi, 'geos_interpolate_normalized'):
-            raise NotImplementedError('interpolate_normalized requires GEOS 3.2+')
         return self._topology(capi.geos_interpolate_normalized(self.ptr, distance))
 
     def intersection(self, other):
@@ -602,8 +596,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
             raise TypeError('locate_point argument must be a Point')
         if not isinstance(self, (LineString, MultiLineString)):
             raise TypeError('locate_point only works on LineString and MultiLineString geometries')
-        if not hasattr(capi, 'geos_project'):
-            raise NotImplementedError('geos_project requires GEOS 3.2+')
         return capi.geos_project(self.ptr, point.ptr)
 
     def project_normalized(self, point):
@@ -611,8 +603,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
             raise TypeError('locate_point argument must be a Point')
         if not isinstance(self, (LineString, MultiLineString)):
             raise TypeError('locate_point only works on LineString and MultiLineString geometries')
-        if not hasattr(capi, 'geos_project_normalized'):
-            raise NotImplementedError('project_normalized requires GEOS 3.2+')
         return capi.geos_project_normalized(self.ptr, point.ptr)
 
     def relate(self, other):

@@ -16,7 +16,7 @@ except ImportError:
 
 from django.core import management, serializers
 from django.db import transaction, connection
-from django.test import TestCase, TransactionTestCase, override_settings
+from django.test import TestCase, TransactionTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
 from django.utils.six import StringIO
@@ -267,21 +267,19 @@ class SerializersTransactionTestBase(object):
 
     available_apps = ['serializers']
 
+    @skipUnlessDBFeature('supports_forward_references')
     def test_forward_refs(self):
         """
         Tests that objects ids can be referenced before they are
         defined in the serialization data.
         """
-        # The deserialization process needs to be contained
-        # within a transaction in order to test forward reference
-        # handling.
-        transaction.enter_transaction_management()
-        objs = serializers.deserialize(self.serializer_name, self.fwd_ref_str)
-        with connection.constraint_checks_disabled():
-            for obj in objs:
-                obj.save()
-        transaction.commit()
-        transaction.leave_transaction_management()
+        # The deserialization process needs to run in a transaction in order
+        # to test forward reference handling.
+        with transaction.atomic():
+            objs = serializers.deserialize(self.serializer_name, self.fwd_ref_str)
+            with connection.constraint_checks_disabled():
+                for obj in objs:
+                    obj.save()
 
         for model_cls in (Category, Author, Article):
             self.assertEqual(model_cls.objects.all().count(), 1)

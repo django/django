@@ -2,17 +2,17 @@ from unittest import skipUnless
 
 from django.forms import ValidationError
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.tests.utils import HAS_SPATIALREFSYS
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils.html import escape
 
-if HAS_SPATIALREFSYS:
+if HAS_GDAL:
     from django.contrib.gis import forms
     from django.contrib.gis.geos import GEOSGeometry
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIALREFSYS, "GeometryFieldTest needs gdal support and a spatial database")
+@skipUnless(HAS_GDAL, "GeometryFieldTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class GeometryFieldTest(SimpleTestCase):
 
     def test_init(self):
@@ -90,8 +90,8 @@ class GeometryFieldTest(SimpleTestCase):
         self.assertFalse(form.has_changed())
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
-    "SpecializedFieldTest needs gdal support and a spatial database")
+@skipUnless(HAS_GDAL, "SpecializedFieldTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class SpecializedFieldTest(SimpleTestCase):
     def setUp(self):
         self.geometries = {
@@ -174,7 +174,7 @@ class SpecializedFieldTest(SimpleTestCase):
         self.assertFalse(PointForm().is_valid())
         invalid = PointForm(data={'p': 'some invalid geom'})
         self.assertFalse(invalid.is_valid())
-        self.assertTrue('Invalid geometry value' in str(invalid.errors))
+        self.assertIn('Invalid geometry value', str(invalid.errors))
 
         for invalid in [geo for key, geo in self.geometries.items() if key != 'point']:
             self.assertFalse(PointForm(data={'p': invalid.wkt}).is_valid())
@@ -258,8 +258,8 @@ class SpecializedFieldTest(SimpleTestCase):
             self.assertFalse(GeometryForm(data={'g': invalid.wkt}).is_valid())
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
-    "OSMWidgetTest needs gdal support and a spatial database")
+@skipUnless(HAS_GDAL, "OSMWidgetTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class OSMWidgetTest(SimpleTestCase):
     def setUp(self):
         self.geometries = {
@@ -300,8 +300,8 @@ class OSMWidgetTest(SimpleTestCase):
                 rendered)
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
-    "CustomGeometryWidgetTest needs gdal support and a spatial database")
+@skipUnless(HAS_GDAL, "CustomGeometryWidgetTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class CustomGeometryWidgetTest(SimpleTestCase):
 
     def test_custom_serialization_widget(self):

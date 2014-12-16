@@ -27,7 +27,7 @@ Specifying widgets
 Whenever you specify a field on a form, Django will use a default widget
 that is appropriate to the type of data that is to be displayed. To find
 which widget is used on which field, see the documentation about
-:ref:`built-in fields`.
+:ref:`built-in-fields`.
 
 However, if you want to use a different widget for a field, you can
 just use the :attr:`~Field.widget` argument on the field definition. For
@@ -198,12 +198,25 @@ foundation for custom widgets.
         A dictionary containing HTML attributes to be set on the rendered
         widget.
 
-        .. code-block:: python
+        .. code-block:: pycon
 
             >>> from django import forms
             >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name',})
             >>> name.render('name', 'A name')
-            u'<input title="Your name" type="text" name="name" value="A name" size="10" />'
+            '<input title="Your name" type="text" name="name" value="A name" size="10" />'
+
+        .. versionchanged:: 1.8
+
+            If you assign a value of ``True`` or ``False`` to an attribute,
+            it will be rendered as an HTML5 boolean attribute::
+
+                >>> name = forms.TextInput(attrs={'required': True})
+                >>> name.render('name', 'A name')
+                '<input name="name" type="text" value="A name" required />'
+                >>>
+                >>> name = forms.TextInput(attrs={'required': False})
+                >>> name.render('name', 'A name')
+                '<input name="name" type="text" value="A name" />'
 
     .. method:: render(name, value, attrs=None)
 
@@ -217,7 +230,12 @@ foundation for custom widgets.
     .. method:: value_from_datadict(data, files, name)
 
         Given a dictionary of data and this widget's name, returns the value
-        of this widget. Returns ``None`` if a value wasn't provided.
+        of this widget. ``files`` may contain data coming from
+        :attr:`request.FILES <django.http.HttpRequest.FILES>`. Returns ``None``
+        if a value wasn't provided. Note also that ``value_from_datadict`` may
+        be called more than once during handling of form data, so if you
+        customize it and add expensive processing, you should implement some
+        caching mechanism yourself.
 
 .. class:: MultiWidget(widgets, attrs=None)
 
@@ -329,7 +347,7 @@ foundation for custom widgets.
                 return [None, None, None]
 
             def format_output(self, rendered_widgets):
-                return u''.join(rendered_widgets)
+                return ''.join(rendered_widgets)
 
             def value_from_datadict(self, data, files, name):
                 datelist = [
@@ -396,8 +414,6 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: NumberInput
 
-    .. versionadded:: 1.6
-
     Text input: ``<input type="number" ...>``
 
     Beware that not all browsers support entering localized numbers in
@@ -409,16 +425,12 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: EmailInput
 
-    .. versionadded:: 1.6
-
     Text input: ``<input type="email" ...>``
 
 ``URLInput``
 ~~~~~~~~~~~~
 
 .. class:: URLInput
-
-    .. versionadded:: 1.6
 
     Text input: ``<input type="url" ...>``
 
@@ -520,7 +532,7 @@ Selector and checkbox widgets
 
     .. attribute:: CheckboxInput.check_test
 
-        A callable that takes the value of the CheckBoxInput and returns
+        A callable that takes the value of the ``CheckboxInput`` and returns
         ``True`` if the checkbox should be checked for that value.
 
 ``Select``
@@ -562,7 +574,7 @@ Selector and checkbox widgets
     .. code-block:: html
 
         <ul>
-          <li><input type='radio' ...></li>
+          <li><input type='radio' name='...'></li>
           ...
         </ul>
 
@@ -636,10 +648,8 @@ Selector and checkbox widgets
     simply includes ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>``
     with ``<li>`` tags, as above.
 
-.. versionchanged:: 1.6
-
-The outer ``<ul>`` container will now receive the ``id`` attribute defined on
-the widget.
+    The outer ``<ul>`` container will receive the ``id`` attribute defined on
+    the widget.
 
 .. versionchanged:: 1.7
 
@@ -658,14 +668,12 @@ the widget.
     .. code-block:: html
 
         <ul>
-          <li><input type='checkbox' ...></li>
+          <li><input type='checkbox' name='...' ></li>
           ...
         </ul>
 
-.. versionchanged:: 1.6
-
-The outer ``<ul>`` container will now receive the ``id`` attribute defined on
-the widget.
+    The outer ``<ul>`` container will receive the ``id`` attribute defined on
+    the widget.
 
 Like :class:`RadioSelect`, you can now loop over the individual checkboxes making
 up the lists. See the documentation of :class:`RadioSelect` for more details.
@@ -769,12 +777,33 @@ Composite widgets
         An optional dict of months to use in the "months" select box.
 
         The keys of the dict correspond to the month number (1-indexed) and
-        the values are the displayed months.
-
-        .. code-block:: python
+        the values are the displayed months::
 
             MONTHS = {
                 1:_('jan'), 2:_('feb'), 3:_('mar'), 4:_('apr'),
                 5:_('may'), 6:_('jun'), 7:_('jul'), 8:_('aug'),
                 9:_('sep'), 10:_('oct'), 11:_('nov'), 12:_('dec')
             }
+
+    .. attribute:: SelectDateWidget.empty_label
+
+        .. versionadded:: 1.8
+
+        If the :class:`~django.forms.DateField` is not required,
+        :class:`SelectDateWidget` will have an empty choice at the top of the
+        list (which is ``---`` by default). You can change the text of this
+        label with the ``empty_label`` attribute. ``empty_label`` can be a
+        ``string``, ``list``, or ``tuple``. When a string is used, all select
+        boxes will each have an empty choice with this label. If ``empty_label``
+        is a ``list`` or ``tuple`` of 3 string elements, the select boxes will
+        have their own custom label. The labels should be in this order
+        ``('year_label', 'month_label', 'day_label')``.
+
+        .. code-block:: python
+
+            # A custom empty label with string
+            field1 = forms.DateField(widget=SelectDateWidget(empty_label="Nothing"))
+
+            # A custom empty label with tuple
+            field1 = forms.DateField(widget=SelectDateWidget(
+                empty_label=("Choose Year", "Choose Month", "Choose Day"))

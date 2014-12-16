@@ -1,6 +1,6 @@
 from django.contrib.admin import ModelAdmin
 from django.contrib.gis.admin.widgets import OpenLayersWidget
-from django.contrib.gis.gdal import OGRGeomType
+from django.contrib.gis.gdal import HAS_GDAL, OGRGeomType
 from django.contrib.gis.db import models
 
 
@@ -123,14 +123,8 @@ class GeoModelAdmin(ModelAdmin):
                       }
         return OLMap
 
-from django.contrib.gis import gdal
-if gdal.HAS_GDAL:
-    # Use the official spherical mercator projection SRID on versions
-    # of GDAL that support it; otherwise, fallback to 900913.
-    if gdal.GDAL_VERSION >= (1, 7):
-        spherical_mercator_srid = 3857
-    else:
-        spherical_mercator_srid = 900913
+if HAS_GDAL:
+    spherical_mercator_srid = 3857
 
     class OSMGeoAdmin(GeoModelAdmin):
         map_template = 'gis/admin/osm.html'

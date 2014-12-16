@@ -75,6 +75,7 @@ details on how ``staticfiles`` finds your files.
     by putting those static files inside *another* directory named for the
     application itself.
 
+.. _serving-static-files-in-development:
 
 Serving static files during development.
 ========================================
@@ -94,9 +95,9 @@ this by adding the following snippet to your urls.py::
     from django.conf import settings
     from django.conf.urls.static import static
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         # ... the rest of your URLconf goes here ...
-    ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 .. note::
 
@@ -107,6 +108,8 @@ this by adding the following snippet to your urls.py::
     Also this helper function only serves the actual :setting:`STATIC_ROOT`
     folder; it doesn't perform static files discovery like
     :mod:`django.contrib.staticfiles`.
+
+.. _serving-uploaded-files-in-development:
 
 Serving files uploaded by a user during development.
 ====================================================
@@ -124,9 +127,9 @@ this by adding the following snippet to your urls.py::
     from django.conf import settings
     from django.conf.urls.static import static
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         # ... the rest of your URLconf goes here ...
-    ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 .. note::
 
@@ -149,7 +152,7 @@ file-serving functionality: It doesn't know about the finders feature of the
 collected under :setting:`STATIC_ROOT`.
 
 Because of this, ``staticfiles`` ships its own
-:class:`django.contrib.staticfiles.testing.StaticLiveServerCase`, a subclass
+:class:`django.contrib.staticfiles.testing.StaticLiveServerTestCase`, a subclass
 of the built-in one that has the ability to transparently serve all the assets
 during execution of these tests in a way very similar to what we get at
 development time with ``DEBUG = True``, i.e. without having to collect them
@@ -157,8 +160,8 @@ using :djadmin:`collectstatic` first.
 
 .. versionadded:: 1.7
 
-    :class:`django.contrib.staticfiles.testing.StaticLiveServerCase` is new in
-    Django 1.7. Previously its functionality was provided by
+    :class:`django.contrib.staticfiles.testing.StaticLiveServerTestCase` is new
+    in Django 1.7. Previously its functionality was provided by
     :class:`django.test.LiveServerTestCase`.
 
 Deployment

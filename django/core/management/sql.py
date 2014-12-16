@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-import codecs
+import io
 import os
 import re
 import warnings
@@ -9,12 +9,24 @@ from django.apps import apps
 from django.conf import settings
 from django.core.management.base import CommandError
 from django.db import models, router
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
+
+
+def check_for_migrations(app_config, connection):
+    # Inner import, else tests imports it too early as it needs settings
+    from django.db.migrations.loader import MigrationLoader
+    loader = MigrationLoader(connection)
+    if app_config.label in loader.migrated_apps:
+        raise CommandError(
+            "App '%s' has migrations. Only the sqlmigrate and sqlflush commands "
+            "can be used when an app has migrations." % app_config.label
+        )
 
 
 def sql_create(app_config, style, connection):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
+
+    check_for_migrations(app_config, connection)
 
     if connection.settings_dict['ENGINE'] == 'django.db.backends.dummy':
         # This must be the "dummy" database backend, which means the user
@@ -27,7 +39,7 @@ def sql_create(app_config, style, connection):
     # We trim models from the current app so that the sqlreset command does not
     # generate invalid SQL (leaving models out of known_models is harmless, so
     # we can be conservative).
-    app_models = app_config.get_models(include_auto_created=True)
+    app_models = list(app_config.get_models(include_auto_created=True))
     final_output = []
     tables = connection.introspection.table_names()
     known_models = set(model for model in connection.introspection.installed_models(tables) if model not in app_models)
@@ -50,8 +62,8 @@ def sql_create(app_config, style, connection):
     if not_installed_models:
         alter_sql = []
         for model in not_installed_models:
-            alter_sql.extend(['-- ' + sql for sql in
-                connection.creation.sql_for_pending_references(model, style, pending_references)])
+            alter_sql.extend('-- ' + sql for sql in
+                connection.creation.sql_for_pending_references(model, style, pending_references))
         if alter_sql:
             final_output.append('-- The following references should be added but depend on non-existent tables:')
             final_output.extend(alter_sql)
@@ -59,8 +71,10 @@ def sql_create(app_config, style, connection):
     return final_output
 
 
-def sql_delete(app_config, style, connection):
+def sql_delete(app_config, style, connection, close_connection=True):
     "Returns a list of the DROP TABLE SQL statements for the given app."
+
+    check_for_migrations(app_config, connection)
 
     # This should work even if a connection isn't available
     try:
@@ -98,10 +112,12 @@ def sql_delete(app_config, style, connection):
     finally:
         # Close database connection explicitly, in case this output is being piped
         # directly into a database client, to avoid locking issues.
-        if cursor:
+        if cursor and close_connection:
             cursor.close()
             connection.close()
 
+    if not output:
+        output.append('-- App creates no tables in the database. Nothing to do.')
     return output[::-1]  # Reverse it, to deal with table dependencies.
 
 
@@ -113,9 +129,9 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
     models and are in INSTALLED_APPS will be included.
     """
     if only_django:
-        tables = connection.introspection.django_table_names(only_existing=True)
+        tables = connection.introspection.django_table_names(only_existing=True, include_views=False)
     else:
-        tables = connection.introspection.table_names()
+        tables = connection.introspection.table_names(include_views=False)
     seqs = connection.introspection.sequence_list() if reset_sequences else ()
     statements = connection.ops.sql_flush(style, tables, seqs, allow_cascade)
     return statements
@@ -123,6 +139,9 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
 
 def sql_custom(app_config, style, connection):
     "Returns a list of the custom table modifying SQL statements for the given app."
+
+    check_for_migrations(app_config, connection)
+
     output = []
 
     app_models = router.get_migratable_models(app_config, connection.alias)
@@ -135,6 +154,9 @@ def sql_custom(app_config, style, connection):
 
 def sql_indexes(app_config, style, connection):
     "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
+
+    check_for_migrations(app_config, connection)
+
     output = []
     for model in router.get_migratable_models(app_config, connection.alias, include_auto_created=True):
         output.extend(connection.creation.sql_indexes_for_model(model, style))
@@ -143,6 +165,9 @@ def sql_indexes(app_config, style, connection):
 
 def sql_destroy_indexes(app_config, style, connection):
     "Returns a list of the DROP INDEX SQL statements for all models in the given app."
+
+    check_for_migrations(app_config, connection)
+
     output = []
     for model in router.get_migratable_models(app_config, connection.alias, include_auto_created=True):
         output.extend(connection.creation.sql_destroy_indexes_for_model(model, style))
@@ -150,11 +175,19 @@ def sql_destroy_indexes(app_config, style, connection):
 
 
 def sql_all(app_config, style, connection):
+
+    check_for_migrations(app_config, connection)
+
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
-    return sql_create(app_config, style, connection) + sql_custom(app_config, style, connection) + sql_indexes(app_config, style, connection)
+    return (
+        sql_create(app_config, style, connection) +
+        sql_custom(app_config, style, connection) +
+        sql_indexes(app_config, style, connection)
+    )
 
 
 def _split_statements(content):
+    # Private API only called from code that emits a RemovedInDjango19Warning.
     comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
     statements = []
     statement = []
@@ -201,10 +234,8 @@ def custom_sql_for_model(model, style, connection):
         sql_files.append(os.path.join(app_dir, "%s.sql" % opts.model_name))
     for sql_file in sql_files:
         if os.path.exists(sql_file):
-            with codecs.open(sql_file, 'r' if six.PY3 else 'U', encoding=settings.FILE_CHARSET) as fp:
-                # Some backends can't execute more than one SQL statement at a time,
-                # so split into separate statements.
-                output.extend(_split_statements(fp.read()))
+            with io.open(sql_file, encoding=settings.FILE_CHARSET) as fp:
+                output.extend(connection.ops.prepare_sql_script(fp.read(), _allow_fallback=True))
     return output
 
 

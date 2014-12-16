@@ -4,7 +4,7 @@ from django.contrib.gis.geos.libgeos import get_pointer_arr, GEOM_PTR
 from django.contrib.gis.geos.linestring import LinearRing
 from django.contrib.gis.geos import prototypes as capi
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 class Polygon(GEOSGeometry):
@@ -49,7 +49,7 @@ class Polygon(GEOSGeometry):
 
     def __iter__(self):
         "Iterates over each ring in the polygon."
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             yield self[i]
 
     def __len__(self):
@@ -98,7 +98,8 @@ class Polygon(GEOSGeometry):
         else:
             return capi.geom_clone(g.ptr)
 
-    def _construct_ring(self, param, msg='Parameter must be a sequence of LinearRings or objects that can initialize to LinearRings'):
+    def _construct_ring(self, param, msg=(
+            'Parameter must be a sequence of LinearRings or objects that can initialize to LinearRings')):
         "Helper routine for trying to construct a ring from the given parameter."
         if isinstance(param, LinearRing):
             return param
@@ -164,12 +165,12 @@ class Polygon(GEOSGeometry):
     @property
     def tuple(self):
         "Gets the tuple for each ring in this Polygon."
-        return tuple(self[i].tuple for i in xrange(len(self)))
+        return tuple(self[i].tuple for i in range(len(self)))
     coords = tuple
 
     @property
     def kml(self):
         "Returns the KML representation of this Polygon."
         inner_kml = ''.join("<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
-            for i in xrange(self.num_interior_rings))
+            for i in range(self.num_interior_rings))
         return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (self[0].kml, inner_kml)

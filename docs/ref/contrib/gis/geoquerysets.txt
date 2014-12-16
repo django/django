@@ -1,5 +1,3 @@
-.. _ref-geoquerysets:
-
 =========================
 GeoQuerySet API Reference
 =========================
@@ -7,7 +5,6 @@ GeoQuerySet API Reference
 .. currentmodule:: django.contrib.gis.db.models
 
 .. class:: GeoQuerySet([model=None])
-
 
 .. _spatial-lookups:
 
@@ -121,10 +118,6 @@ contains_properly
 
 Returns true if the lookup geometry intersects the interior of the
 geometry field, but not the boundary (or exterior). [#fncontainsproperly]_
-
-.. note::
-
-    Requires PostGIS 1.4 and above.
 
 Example::
 
@@ -492,16 +485,16 @@ strictly_below
 
 *Availability*: PostGIS
 
-Tests if the geometry field's bounding box is strictly above the lookup
+Tests if the geometry field's bounding box is strictly below the lookup
 geometry's bounding box.
 
 Example::
 
-    Zipcode.objects.filter(poly__strictly_above=geom)
+    Zipcode.objects.filter(poly__strictly_below=geom)
 
 PostGIS equivalent::
 
-    SELECT ... WHERE poly |>> geom
+    SELECT ... WHERE poly <<| geom
 
 
 .. _distance-lookups:
@@ -613,8 +606,11 @@ SpatiaLite  ``Distance(poly, geom) <= 5``
 dwithin
 -------
 
-Returns models where the distance to the geometry field from the
-lookup geometry are within the given distance from one another.
+Returns models where the distance to the geometry field from the lookup
+geometry are within the given distance from one another. Note that you can only
+provide :class:`~django.contrib.gis.measure.Distance` objects if the targeted
+geometries are in a projected system. For geographic geometries, you should use
+units of the geometry field (e.g. degrees for ``WGS84``) .
 
 Example::
 
@@ -731,7 +727,7 @@ the distance from the `Tasmanian`__ city of Hobart to every other
     :class:`~django.contrib.gis.measure.Distance` object, you can easily express
     the value in the units of your choice.  For example, ``city.distance.mi`` is
     the distance value in miles and ``city.distance.km`` is the distance value
-    in kilometers.  See the :ref:`ref-measure` for usage details and the list of
+    in kilometers.  See :doc:`measure` for usage details and the list of
     :ref:`supported_units`.
 
 __ https://github.com/django/django/blob/master/django/contrib/gis/tests/distapp/models.py
@@ -1099,7 +1095,7 @@ Aggregate Methods
 
 .. method:: GeoQuerySet.collect(**kwargs)
 
-*Availability*: PostGIS
+*Availability*: PostGIS, Spatialite (>=3.0)
 
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
 column. This is analogous to a simplified version of the :meth:`GeoQuerySet.unionagg` method,
@@ -1112,7 +1108,7 @@ dissolving boundaries.
 
 .. method:: GeoQuerySet.extent(**kwargs)
 
-*Availability*: PostGIS, Oracle
+*Availability*: PostGIS, Oracle, Spatialite (>=3.0)
 
 Returns the extent of the ``GeoQuerySet`` as a four-tuple, comprising the
 lower left coordinate and the upper right coordinate.

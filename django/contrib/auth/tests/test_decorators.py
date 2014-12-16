@@ -5,16 +5,16 @@ from django.contrib.auth.tests.test_views import AuthViewsTestCase
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.auth.tests.urls')
 class LoginRequiredTestCase(AuthViewsTestCase):
     """
     Tests the login_required decorators
     """
-    urls = 'django.contrib.auth.tests.urls'
 
     def testCallable(self):
         """
@@ -42,7 +42,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
             login_url = settings.LOGIN_URL
         response = self.client.get(view_url)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(login_url in response.url)
+        self.assertIn(login_url, response.url)
         self.login()
         response = self.client.get(view_url)
         self.assertEqual(response.status_code, 200)
@@ -89,7 +89,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_permissioned_denied_redirect(self):
 
-        @permission_required(['auth.add_customuser', 'auth.change_customuser', 'non-existant-permission'])
+        @permission_required(['auth.add_customuser', 'auth.change_customuser', 'non-existent-permission'])
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -99,7 +99,9 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_permissioned_denied_exception_raised(self):
 
-        @permission_required(['auth.add_customuser', 'auth.change_customuser', 'non-existant-permission'], raise_exception=True)
+        @permission_required([
+            'auth.add_customuser', 'auth.change_customuser', 'non-existent-permission'
+        ], raise_exception=True)
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')

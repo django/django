@@ -56,6 +56,7 @@ SuspiciousOperation
 
     * DisallowedHost
     * DisallowedModelAdminLookup
+    * DisallowedModelAdminToField
     * DisallowedRedirect
     * InvalidSessionKey
     * SuspiciousFileOperation
@@ -187,11 +188,6 @@ information provided. (Note that this attribute is available under
 both Python 2 and Python 3, although :pep:`3134` normally only applies
 to Python 3.)
 
-.. versionchanged:: 1.6
-
-    Previous versions of Django only wrapped ``DatabaseError`` and
-    ``IntegrityError``, and did not provide ``__cause__``.
-
 .. exception:: models.ProtectedError
 
 Raised to prevent deletion of referenced objects when using
@@ -221,9 +217,22 @@ Transaction exceptions are defined in :mod:`django.db.transaction`.
     The :exc:`TransactionManagementError` is raised for any and all problems
     related to database transactions.
 
+.. currentmodule:: django.test
+
+Testing Framework Exceptions
+============================
+
+Exceptions provided by the :mod:`django.test` package.
+
+.. exception:: client.RedirectCycleError
+
+    .. versionadded:: 1.8
+
+    :exc:`~client.RedirectCycleError` is raised when the test client detects a
+    loop or an overly long chain of redirects.
+
 Python Exceptions
 =================
 
 Django raises built-in Python exceptions when appropriate as well. See the
-Python documentation for further information on the
-built-in :mod:`exceptions`.
+Python documentation for further information on the :ref:`bltin-exceptions`.

@@ -1,13 +1,12 @@
+from __future__ import unicode_literals
+
 from importlib import import_module
 import os
 import sys
 
 from django.apps import apps
 from django.db.migrations.recorder import MigrationRecorder
-from django.db.migrations.graph import MigrationGraph
-from django.db.migrations.migration import Migration
-from django.db.migrations.state import ModelState
-from django.db.migrations import operations
+from django.db.migrations.graph import MigrationGraph, NodeNotFoundError
 from django.utils import six
 from django.conf import settings
 
@@ -40,10 +39,11 @@ class MigrationLoader(object):
     in memory.
     """
 
-    def __init__(self, connection, load=True):
+    def __init__(self, connection, load=True, ignore_no_migrations=False):
         self.connection = connection
         self.disk_migrations = None
         self.applied_migrations = None
+        self.ignore_no_migrations = ignore_no_migrations
         if load:
             self.build_graph()
 
@@ -63,8 +63,6 @@ class MigrationLoader(object):
         self.unmigrated_apps = set()
         self.migrated_apps = set()
         for app_config in apps.get_app_configs():
-            if app_config.models_module is None:
-                continue
             # Get the migrations module directory
             module_name = self.migrations_module(app_config.label)
             was_loaded = module_name in sys.modules
@@ -89,10 +87,10 @@ class MigrationLoader(object):
                     six.moves.reload_module(module)
             self.migrated_apps.add(app_config.label)
             directory = os.path.dirname(module.__file__)
-            # Scan for .py[c|o] files
+            # Scan for .py files
             migration_names = set()
             for name in os.listdir(directory):
-                if name.endswith(".py") or name.endswith(".pyc") or name.endswith(".pyo"):
+                if name.endswith(".py"):
                     import_name = name.rsplit(".", 1)[0]
                     if import_name[0] not in "_.~":
                         migration_names.add(import_name)
@@ -108,7 +106,9 @@ class MigrationLoader(object):
                         break
                     raise
                 if not hasattr(migration_module, "Migration"):
-                    raise BadMigrationError("Migration %s in app %s has no Migration class" % (migration_name, app_config.label))
+                    raise BadMigrationError(
+                        "Migration %s in app %s has no Migration class" % (migration_name, app_config.label)
+                    )
                 # Ignore South-style migrations
                 if hasattr(migration_module.Migration, "forwards"):
                     south_style_migrations = True
@@ -118,7 +118,7 @@ class MigrationLoader(object):
                 self.unmigrated_apps.add(app_config.label)
 
     def get_migration(self, app_label, name_prefix):
-        "Gets the migration exactly named, or raises KeyError"
+        "Gets the migration exactly named, or raises `graph.NodeNotFoundError`"
         return self.graph.nodes[app_label, name_prefix]
 
     def get_migration_by_prefix(self, app_label, name_prefix):
@@ -129,13 +129,43 @@ class MigrationLoader(object):
             if l == app_label and n.startswith(name_prefix):
                 results.append((l, n))
         if len(results) > 1:
-            raise AmbiguityError("There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix))
+            raise AmbiguityError(
+                "There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix)
+            )
         elif len(results) == 0:
             raise KeyError("There no migrations for '%s' with the prefix '%s'" % (app_label, name_prefix))
         else:
             return self.disk_migrations[results[0]]
 
-    def build_graph(self, ignore_unmigrated=False):
+    def check_key(self, key, current_app):
+        if (key[1] != "__first__" and key[1] != "__latest__") or key in self.graph:
+            return key
+        # Special-case __first__, which means "the first migration" for
+        # migrated apps, and is ignored for unmigrated apps. It allows
+        # makemigrations to declare dependencies on apps before they even have
+        # migrations.
+        if key[0] == current_app:
+            # Ignore __first__ references to the same app (#22325)
+            return
+        if key[0] in self.unmigrated_apps:
+            # This app isn't migrated, but something depends on it.
+            # The models will get auto-added into the state, though
+            # so we're fine.
+            return
+        if key[0] in self.migrated_apps:
+            try:
+                if key[1] == "__first__":
+                    return list(self.graph.root_nodes(key[0]))[0]
+                else:  # "__latest__"
+                    return list(self.graph.leaf_nodes(key[0]))[0]
+            except IndexError:
+                if self.ignore_no_migrations:
+                    return None
+                else:
+                    raise ValueError("Dependency on app with no migrations: %s" % key[0])
+        raise ValueError("Dependency on unknown app: %s" % key[0])
+
+    def build_graph(self):
         """
         Builds a migration dependency graph using both the disk and database.
         You'll need to rebuild the graph if you apply migrations. This isn't
@@ -144,8 +174,11 @@ class MigrationLoader(object):
         # Load disk data
         self.load_disk()
         # Load database data
-        recorder = MigrationRecorder(self.connection)
-        self.applied_migrations = recorder.applied_migrations()
+        if self.connection is None:
+            self.applied_migrations = set()
+        else:
+            recorder = MigrationRecorder(self.connection)
+            self.applied_migrations = recorder.applied_migrations()
         # Do a first pass to separate out replacing and non-replacing migrations
         normal = {}
         replacing = {}
@@ -161,6 +194,12 @@ class MigrationLoader(object):
         for key, migration in normal.items():
             for parent in migration.dependencies:
                 reverse_dependencies.setdefault(parent, set()).add(key)
+        # Remeber the possible replacements to generate more meaningful error
+        # messages
+        reverse_replacements = {}
+        for key, migration in replacing.items():
+            for replaced in migration.replaces:
+                reverse_replacements.setdefault(replaced, set()).add(key)
         # Carry out replacements if we can - that is, if all replaced migrations
         # are either unapplied or missing.
         for key, migration in replacing.items():
@@ -182,8 +221,15 @@ class MigrationLoader(object):
                 for child_key in reverse_dependencies.get(replaced, set()):
                     if child_key in migration.replaces:
                         continue
-                    normal[child_key].dependencies.remove(replaced)
-                    normal[child_key].dependencies.append(key)
+                    # child_key may appear in a replacement
+                    if child_key in reverse_replacements:
+                        for replaced_child_key in reverse_replacements[child_key]:
+                            if replaced in replacing[replaced_child_key].dependencies:
+                                replacing[replaced_child_key].dependencies.remove(replaced)
+                                replacing[replaced_child_key].dependencies.append(key)
+                    else:
+                        normal[child_key].dependencies.remove(replaced)
+                        normal[child_key].dependencies.append(key)
             normal[key] = migration
             # Mark the replacement as applied if all its replaced ones are
             if all(applied_statuses):
@@ -192,45 +238,70 @@ class MigrationLoader(object):
         self.graph = MigrationGraph()
         for key, migration in normal.items():
             self.graph.add_node(key, migration)
+
+        def _reraise_missing_dependency(migration, missing, exc):
+            """
+            Checks if ``missing`` could have been replaced by any squash
+            migration but wasn't because the the squash migration was partially
+            applied before. In that case raise a more understandable exception.
+
+            #23556
+            """
+            if missing in reverse_replacements:
+                candidates = reverse_replacements.get(missing, set())
+                is_replaced = any(candidate in self.graph.nodes for candidate in candidates)
+                if not is_replaced:
+                    tries = ', '.join('%s.%s' % c for c in candidates)
+                    exc_value = NodeNotFoundError(
+                        "Migration {0} depends on nonexistent node ('{1}', '{2}'). "
+                        "Django tried to replace migration {1}.{2} with any of [{3}] "
+                        "but wasn't able to because some of the replaced migrations "
+                        "are already applied.".format(
+                            migration, missing[0], missing[1], tries
+                        ),
+                        missing)
+                    exc_value.__cause__ = exc
+                    six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+            raise exc
+
+        # Add all internal dependencies first to ensure __first__ dependencies
+        # find the correct root node.
         for key, migration in normal.items():
             for parent in migration.dependencies:
-                # Special-case __first__, which means "the first migration" for
-                # migrated apps, and is ignored for unmigrated apps. It allows
-                # makemigrations to declare dependencies on apps before they
-                # even have migrations.
-                if parent[1] == "__first__" and parent not in self.graph:
-                    if parent[0] in self.unmigrated_apps:
-                        if ignore_unmigrated:
-                            parent = None
-                        else:
-                            # This app isn't migrated, but something depends on it.
-                            # We'll add a fake initial migration for it into the
-                            # graph.
-                            app_config = apps.get_app_config(parent[0])
-                            ops = []
-                            for model in app_config.get_models():
-                                model_state = ModelState.from_model(model)
-                                ops.append(
-                                    operations.CreateModel(
-                                        name=model_state.name,
-                                        fields=model_state.fields,
-                                        options=model_state.options,
-                                        bases=model_state.bases,
-                                    )
-                                )
-                            new_migration = type(
-                                "FakeInitialMigration",
-                                (Migration, ),
-                                {"operations": ops},
-                            )(parent[1], parent[0])
-                            self.graph.add_node(parent, new_migration)
-                            self.applied_migrations.add(parent)
-                    elif parent[0] in self.migrated_apps:
-                        parent = list(self.graph.root_nodes(parent[0]))[0]
-                    else:
-                        raise ValueError("Dependency on unknown app %s" % parent[0])
+                if parent[0] != key[0] or parent[1] == '__first__':
+                    # Ignore __first__ references to the same app (#22325)
+                    continue
+                try:
+                    self.graph.add_dependency(migration, key, parent)
+                except NodeNotFoundError as e:
+                    # Since we added "key" to the nodes before this implies
+                    # "parent" is not in there. To make the raised exception
+                    # more understandable we check if parent could have been
+                    # replaced but hasn't (eg partially applied squashed
+                    # migration)
+                    _reraise_missing_dependency(migration, parent, e)
+        for key, migration in normal.items():
+            for parent in migration.dependencies:
+                if parent[0] == key[0]:
+                    # Internal dependencies already added.
+                    continue
+                parent = self.check_key(parent, key[0])
                 if parent is not None:
-                    self.graph.add_dependency(key, parent)
+                    try:
+                        self.graph.add_dependency(migration, key, parent)
+                    except NodeNotFoundError as e:
+                        # Since we added "key" to the nodes before this implies
+                        # "parent" is not in there.
+                        _reraise_missing_dependency(migration, parent, e)
+            for child in migration.run_before:
+                child = self.check_key(child, key[0])
+                if child is not None:
+                    try:
+                        self.graph.add_dependency(migration, child, key)
+                    except NodeNotFoundError as e:
+                        # Since we added "key" to the nodes before this implies
+                        # "child" is not in there.
+                        _reraise_missing_dependency(migration, child, e)
 
     def detect_conflicts(self):
         """
@@ -244,7 +315,16 @@ class MigrationLoader(object):
             if app_label in seen_apps:
                 conflicting_apps.add(app_label)
             seen_apps.setdefault(app_label, set()).add(migration_name)
-        return dict((app_label, seen_apps[app_label]) for app_label in conflicting_apps)
+        return {app_label: seen_apps[app_label] for app_label in conflicting_apps}
+
+    def project_state(self, nodes=None, at_end=True):
+        """
+        Returns a ProjectState object representing the most recent state
+        that the migrations we loaded represent.
+
+        See graph.make_state for the meaning of "nodes" and "at_end"
+        """
+        return self.graph.make_state(nodes=nodes, at_end=at_end, real_apps=list(self.unmigrated_apps))
 
 
 class BadMigrationError(Exception):

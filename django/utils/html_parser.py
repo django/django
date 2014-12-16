@@ -9,7 +9,12 @@ use_workaround = (
     (current_version >= (3, 0) and current_version < (3, 2, 3))
 )
 
-HTMLParseError = _html_parser.HTMLParseError
+try:
+    HTMLParseError = _html_parser.HTMLParseError
+except AttributeError:
+    # create a dummy class for Python 3.5+ where it's been removed
+    class HTMLParseError(Exception):
+        pass
 
 if not use_workaround:
     if current_version >= (3, 4):
@@ -20,8 +25,8 @@ if not use_workaround:
             it at call time because Python 2.7 does not have the keyword
             argument.
             """
-            def __init__(self, convert_charrefs=False):
-                _html_parser.HTMLParser.__init__(self, convert_charrefs=convert_charrefs)
+            def __init__(self, convert_charrefs=False, **kwargs):
+                _html_parser.HTMLParser.__init__(self, convert_charrefs=convert_charrefs, **kwargs)
     else:
         HTMLParser = _html_parser.HTMLParser
 else:

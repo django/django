@@ -34,10 +34,10 @@ All attributes should be considered read-only, unless stated otherwise below.
 
 .. attribute:: HttpRequest.scheme
 
-   .. versionadded:: 1.7
+    .. versionadded:: 1.7
 
-   A string representing the scheme of the request (``http`` or ``https``
-   usually).
+    A string representing the scheme of the request (``http`` or ``https``
+    usually).
 
 .. attribute:: HttpRequest.body
 
@@ -132,7 +132,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 
     A dictionary-like object containing all uploaded files. Each key in
     ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
-    value in ``FILES`` is an :class:`UploadedFile` as described below.
+    value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.
 
@@ -251,68 +251,75 @@ Methods
 
 .. method:: HttpRequest.get_full_path()
 
-   Returns the ``path``, plus an appended query string, if applicable.
+    Returns the ``path``, plus an appended query string, if applicable.
 
-   Example: ``"/music/bands/the_beatles/?print=true"``
+    Example: ``"/music/bands/the_beatles/?print=true"``
 
 .. method:: HttpRequest.build_absolute_uri(location)
 
-   Returns the absolute URI form of ``location``. If no location is provided,
-   the location will be set to ``request.get_full_path()``.
+    Returns the absolute URI form of ``location``. If no location is provided,
+    the location will be set to ``request.get_full_path()``.
 
-   If the location is already an absolute URI, it will not be altered.
-   Otherwise the absolute URI is built using the server variables available in
-   this request.
+    If the location is already an absolute URI, it will not be altered.
+    Otherwise the absolute URI is built using the server variables available in
+    this request.
 
-   Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
+    Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
 
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
 
-   Returns a cookie value for a signed cookie, or raises a
-   ``django.core.signing.BadSignature`` exception if the signature is
-   no longer valid. If you provide the ``default`` argument the exception
-   will be suppressed and that default value will be returned instead.
+    Returns a cookie value for a signed cookie, or raises a
+    ``django.core.signing.BadSignature`` exception if the signature is
+    no longer valid. If you provide the ``default`` argument the exception
+    will be suppressed and that default value will be returned instead.
 
-   The optional ``salt`` argument can be used to provide extra protection
-   against brute force attacks on your secret key. If supplied, the
-   ``max_age`` argument will be checked against the signed timestamp
-   attached to the cookie value to ensure the cookie is not older than
-   ``max_age`` seconds.
+    The optional ``salt`` argument can be used to provide extra protection
+    against brute force attacks on your secret key. If supplied, the
+    ``max_age`` argument will be checked against the signed timestamp
+    attached to the cookie value to ensure the cookie is not older than
+    ``max_age`` seconds.
 
-   For example::
+    For example::
 
-          >>> request.get_signed_cookie('name')
-          'Tony'
-          >>> request.get_signed_cookie('name', salt='name-salt')
-          'Tony' # assuming cookie was set using the same salt
-          >>> request.get_signed_cookie('non-existing-cookie')
-          ...
-          KeyError: 'non-existing-cookie'
-          >>> request.get_signed_cookie('non-existing-cookie', False)
-          False
-          >>> request.get_signed_cookie('cookie-that-was-tampered-with')
-          ...
-          BadSignature: ...
-          >>> request.get_signed_cookie('name', max_age=60)
-          ...
-          SignatureExpired: Signature age 1677.3839159 > 60 seconds
-          >>> request.get_signed_cookie('name', False, max_age=60)
-          False
+        >>> request.get_signed_cookie('name')
+        'Tony'
+        >>> request.get_signed_cookie('name', salt='name-salt')
+        'Tony' # assuming cookie was set using the same salt
+        >>> request.get_signed_cookie('non-existing-cookie')
+        ...
+        KeyError: 'non-existing-cookie'
+        >>> request.get_signed_cookie('non-existing-cookie', False)
+        False
+        >>> request.get_signed_cookie('cookie-that-was-tampered-with')
+        ...
+        BadSignature: ...
+        >>> request.get_signed_cookie('name', max_age=60)
+        ...
+        SignatureExpired: Signature age 1677.3839159 > 60 seconds
+        >>> request.get_signed_cookie('name', False, max_age=60)
+        False
 
-   See :doc:`cryptographic signing </topics/signing>` for more information.
+    See :doc:`cryptographic signing </topics/signing>` for more information.
 
 .. method:: HttpRequest.is_secure()
 
-   Returns ``True`` if the request is secure; that is, if it was made with
-   HTTPS.
+    Returns ``True`` if the request is secure; that is, if it was made with
+    HTTPS.
 
 .. method:: HttpRequest.is_ajax()
 
-   Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
-   checking the ``HTTP_X_REQUESTED_WITH`` header for the string
-   ``'XMLHttpRequest'``. Most modern JavaScript libraries send this header.
-   If you write your own XMLHttpRequest call (on the browser side), you'll
-   have to set this header manually if you want ``is_ajax()`` to work.
+    Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
+    checking the ``HTTP_X_REQUESTED_WITH`` header for the string
+    ``'XMLHttpRequest'``. Most modern JavaScript libraries send this header.
+    If you write your own XMLHttpRequest call (on the browser side), you'll
+    have to set this header manually if you want ``is_ajax()`` to work.
+
+    If a response varies on whether or not it's requested via AJAX and you are
+    using some form of caching like Django's :mod:`cache middleware
+    <django.middleware.cache>`, you should decorate the view with
+    :func:`vary_on_headers('HTTP_X_REQUESTED_WITH')
+    <django.views.decorators.vary.vary_on_headers>` so that the responses are
+    properly cached.
 
 .. method:: HttpRequest.read(size=None)
 .. method:: HttpRequest.readline()
@@ -334,56 +341,48 @@ Methods
             process(element)
 
 
-UploadedFile objects
-====================
-
-.. class:: UploadedFile
-
-
-Attributes
-----------
-
-.. attribute::  UploadedFile.name
-
-    The name of the uploaded file.
-
-.. attribute:: UploadedFile.size
-
-    The size, in bytes, of the uploaded file.
-
-Methods
-----------
-
-.. method:: UploadedFile.chunks(chunk_size=None)
-
-    Returns a generator that yields sequential chunks of data.
-
-.. method:: UploadedFile.read(num_bytes=None)
-
-    Read a number of bytes from the file.
-
-
-
 QueryDict objects
 =================
 
 .. class:: QueryDict
 
-In an :class:`HttpRequest` object, the ``GET`` and ``POST`` attributes are instances
-of ``django.http.QueryDict``. :class:`QueryDict` is a dictionary-like
-class customized to deal with multiple values for the same key. This is
-necessary because some HTML form elements, notably
-``<select multiple="multiple">``, pass multiple values for the same key.
+In an :class:`HttpRequest` object, the ``GET`` and ``POST`` attributes are
+instances of ``django.http.QueryDict``, a dictionary-like class customized to
+deal with multiple values for the same key. This is necessary because some HTML
+form elements, notably ``<select multiple>``, pass multiple values for the same
+key.
 
-``QueryDict`` instances are immutable, unless you create a ``copy()`` of them.
-That means you can't change attributes of ``request.POST`` and ``request.GET``
-directly.
+The ``QueryDict``\ s at ``request.POST`` and ``request.GET`` will be immutable
+when accessed in a normal request/response cycle. To get a mutable version you
+need to use ``.copy()``.
 
 Methods
 -------
 
-:class:`QueryDict` implements all the standard dictionary methods, because it's
+:class:`QueryDict` implements all the standard dictionary methods because it's
 a subclass of dictionary. Exceptions are outlined here:
+
+.. method:: QueryDict.__init__(query_string=None, mutable=False, encoding=None)
+
+    Instantiates a ``QueryDict`` object based on ``query_string``.
+
+    >>> QueryDict('a=1&a=2&c=3')
+    <QueryDict: {'a': ['1', '2'], 'c': ['3']}>
+
+    If ``query_string`` is not passed in, the resulting ``QueryDict`` will be
+    empty (it will have no keys or values).
+
+    Most ``QueryDict``\ s you encounter, and in particular those at
+    ``request.POST`` and ``request.GET``, will be immutable. If you are
+    instantiating one yourself, you can make it mutable by passing
+    ``mutable=True`` to its ``__init__()``.
+
+    Strings for setting both keys and values will be converted from ``encoding``
+    to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
+
+    .. versionchanged:: 1.8
+
+        In previous versions, ``query_string`` was a required positional argument.
 
 .. method:: QueryDict.__getitem__(key)
 
@@ -397,8 +396,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Sets the given key to ``[value]`` (a Python list whose single element is
     ``value``). Note that this, as other dictionary functions that have side
-    effects, can only be called on a mutable ``QueryDict`` (one that was created
-    via ``copy()``).
+    effects, can only be called on a mutable ``QueryDict`` (such as one that
+    was created via ``copy()``).
 
 .. method:: QueryDict.__contains__(key)
 
@@ -421,22 +420,21 @@ a subclass of dictionary. Exceptions are outlined here:
     dictionary ``update()`` method, except it *appends* to the current
     dictionary items rather than replacing them. For example::
 
-          >>> q = QueryDict('a=1')
-          >>> q = q.copy() # to make it mutable
-          >>> q.update({'a': '2'})
-          >>> q.getlist('a')
-          [u'1', u'2']
-          >>> q['a'] # returns the last
-          [u'2']
+        >>> q = QueryDict('a=1', mutable=True)
+        >>> q.update({'a': '2'})
+        >>> q.getlist('a')
+        ['1', '2']
+        >>> q['a'] # returns the last
+        ['2']
 
 .. method:: QueryDict.items()
 
     Just like the standard dictionary ``items()`` method, except this uses the
     same last-value logic as ``__getitem__()``. For example::
 
-           >>> q = QueryDict('a=1&a=2&a=3')
-           >>> q.items()
-           [(u'a', u'3')]
+        >>> q = QueryDict('a=1&a=2&a=3')
+        >>> q.items()
+        [('a', '3')]
 
 .. method:: QueryDict.iteritems()
 
@@ -454,9 +452,9 @@ a subclass of dictionary. Exceptions are outlined here:
     Just like the standard dictionary ``values()`` method, except this uses the
     same last-value logic as ``__getitem__()``. For example::
 
-           >>> q = QueryDict('a=1&a=2&a=3')
-           >>> q.values()
-           [u'3']
+        >>> q = QueryDict('a=1&a=2&a=3')
+        >>> q.values()
+        ['3']
 
 .. method:: QueryDict.itervalues()
 
@@ -467,8 +465,7 @@ In addition, ``QueryDict`` has the following methods:
 .. method:: QueryDict.copy()
 
     Returns a copy of the object, using ``copy.deepcopy()`` from the Python
-    standard library. The copy will be mutable -- that is, you can change its
-    values.
+    standard library. This copy will be mutable even if the original was not.
 
 .. method:: QueryDict.getlist(key, default)
 
@@ -497,7 +494,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> q.lists()
-        [(u'a', [u'1', u'2', u'3'])]
+        [('a', ['1', '2', '3'])]
 
 .. method:: QueryDict.pop(key)
 
@@ -506,7 +503,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
         >>> q.pop('a')
-        [u'1', u'2', u'3']
+        ['1', '2', '3']
 
 .. method:: QueryDict.popitem()
 
@@ -517,7 +514,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
         >>> q.popitem()
-        (u'a', [u'1', u'2', u'3'])
+        ('a', ['1', '2', '3'])
 
 .. method:: QueryDict.dict()
 
@@ -527,7 +524,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=3&a=5')
         >>> q.dict()
-        {u'a': u'5'}
+        {'a': '5'}
 
 .. method:: QueryDict.urlencode([safe])
 
@@ -540,7 +537,7 @@ In addition, ``QueryDict`` has the following methods:
     Optionally, urlencode can be passed characters which
     do not require encoding. For example::
 
-        >>> q = QueryDict('', mutable=True)
+        >>> q = QueryDict(mutable=True)
         >>> q['next'] = '/a&b/'
         >>> q.urlencode(safe='/')
         'next=/a%26b/'
@@ -630,13 +627,20 @@ Attributes
     A bytestring representing the content, encoded from a Unicode
     object if necessary.
 
+.. attribute:: HttpResponse.charset
+
+    .. versionadded:: 1.8
+
+    A string denoting the charset in which the response will be encoded. If not
+    given at ``HttpResponse`` instantiation time, it will be extracted from
+    ``content_type`` and if that is unsuccessful, the
+    :setting:`DEFAULT_CHARSET` setting will be used.
+
 .. attribute:: HttpResponse.status_code
 
     The `HTTP status code`_ for the response.
 
 .. attribute:: HttpResponse.reason_phrase
-
-    .. versionadded:: 1.6
 
     The HTTP reason phrase for the response.
 
@@ -647,10 +651,16 @@ Attributes
     This attribute exists so middleware can treat streaming responses
     differently from regular responses.
 
+.. attribute:: HttpResponse.closed
+
+    .. versionadded:: 1.8
+
+    ``True`` if the response has been closed.
+
 Methods
 -------
 
-.. method:: HttpResponse.__init__(content='', content_type=None, status=200, reason=None)
+.. method:: HttpResponse.__init__(content='', content_type=None, status=200, reason=None, charset=None)
 
     Instantiates an ``HttpResponse`` object with the given page content and
     content type.
@@ -666,14 +676,18 @@ Methods
     specified, it is formed by the :setting:`DEFAULT_CONTENT_TYPE` and
     :setting:`DEFAULT_CHARSET` settings, by default: "`text/html; charset=utf-8`".
 
-    Historically, this parameter was called ``mimetype`` (now deprecated).
-
     ``status`` is the `HTTP status code`_ for the response.
-
-    .. versionadded:: 1.6
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
+
+    ``charset`` is the charset in which the response will be encoded. If not
+    given it will be extracted from ``content_type``, and if that
+    is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
+
+    .. versionadded:: 1.8
+
+        The ``charset`` parameter was added.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
@@ -694,10 +708,16 @@ Methods
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
 
+.. method:: HttpResponse.setdefault(header, value)
+
+    .. versionadded:: 1.8
+
+    Sets a header unless it has already been set.
+
 .. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
 
-    Sets a cookie. The parameters are the same as in the :class:`Cookie.Morsel`
-    object in the Python standard library.
+    Sets a cookie. The parameters are the same as in the
+    :class:`~http.cookies.Morsel` cookie object in the Python standard library.
 
     * ``max_age`` should be a number of seconds, or ``None`` (default) if
       the cookie should last only as long as the client's browser session.
@@ -722,6 +742,14 @@ Methods
       data.
 
     .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
+
+    .. warning::
+
+        Both :rfc:`2109` and :rfc:`6265` state that user agents should support
+        cookies of at least 4096 bytes. For many browsers this is also the
+        maximum size. Django will not raise an exception if there's an attempt
+        to store a cookie of more than 4096 bytes, but many browsers will not
+        set the cookie correctly.
 
 .. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
 
@@ -753,6 +781,27 @@ Methods
 
     This method makes an :class:`HttpResponse` instance a file-like object.
 
+.. method:: HttpResponse.getvalue()
+
+    .. versionadded:: 1.8
+
+    Returns the value of :attr:`HttpResponse.content`. This method makes
+    an :class:`HttpResponse` instance a stream-like object.
+
+.. method:: HttpResponse.writable()
+
+    .. versionadded:: 1.8
+
+    Always ``True``. This method makes an :class:`HttpResponse` instance a
+    stream-like object.
+
+.. method:: HttpResponse.writelines(lines)
+
+    .. versionadded:: 1.8
+
+    Writes a list of lines to the response. Line separators are not added. This
+    method makes an :class:`HttpResponse` instance a stream-like object.
+
 .. _HTTP status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
 
 .. _ref-httpresponse-subclasses:
@@ -773,8 +822,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     constructor arguments. Note that this returns an HTTP status code 302.
 
     .. attribute:: HttpResponseRedirect.url
-
-        .. versionadded:: 1.6
 
         This read-only attribute represents the URL the response will redirect
         to (equivalent to the ``Location`` response header).
@@ -850,7 +897,7 @@ JsonResponse objects
    The ``safe`` boolean parameter defaults to ``True``. If it's set to ``False``,
    any object can be passed for serialization (otherwise only ``dict`` instances
    are allowed). If ``safe`` is ``True`` and a non-``dict`` object is passed as
-   the first argument, a :exc:`~exceptions.TypeError` will be raised.
+   the first argument, a :exc:`TypeError` will be raised.
 
 Usage
 -----
@@ -871,7 +918,7 @@ parameter to ``False``::
 
     >>> response = JsonResponse([1, 2, 3], safe=False)
 
-Without passing ``safe=False``, a :exc:`~exceptions.TypeError` will be raised.
+Without passing ``safe=False``, a :exc:`TypeError` will be raised.
 
 .. warning::
 
@@ -886,7 +933,7 @@ Without passing ``safe=False``, a :exc:`~exceptions.TypeError` will be raised.
 Changing the default JSON encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you need to use a differ JSON encoder class you can pass the ``encoder``
+If you need to use a different JSON encoder class you can pass the ``encoder``
 parameter to the constructor method::
 
     >>> response = JsonResponse(data, encoder=MyJSONEncoder)
@@ -901,7 +948,7 @@ StreamingHttpResponse objects
 The :class:`StreamingHttpResponse` class is used to stream a response from
 Django to the browser. You might want to do this if generating the response
 takes too long or uses too much memory. For instance, it's useful for
-generating large CSV files.
+:ref:`generating large CSV files <streaming-csv-files>`.
 
 .. admonition:: Performance considerations
 
@@ -940,16 +987,14 @@ Attributes
 
     An iterator of strings representing the content.
 
-.. attribute:: HttpResponse.status_code
+.. attribute:: StreamingHttpResponse.status_code
 
     The `HTTP status code`_ for the response.
 
-.. attribute:: HttpResponse.reason_phrase
-
-    .. versionadded:: 1.6
+.. attribute:: StreamingHttpResponse.reason_phrase
 
     The HTTP reason phrase for the response.
 
-.. attribute:: HttpResponse.streaming
+.. attribute:: StreamingHttpResponse.streaming
 
     This is always ``True``.

@@ -26,6 +26,10 @@ directory whose name doesn't begin with an underscore. For example::
         tests.py
         views.py
 
+On Python 2, be sure to include ``__init__.py`` files in both the
+``management`` and ``management/commands`` directories as done above or your
+command will not be detected.
+
 In this example, the ``closepoll`` command will be made available to any project
 that includes the ``polls`` application in :setting:`INSTALLED_APPS`.
 
@@ -42,21 +46,21 @@ The ``closepoll.py`` module has only one requirement -- it must define a class
   or from Windows scheduled tasks control panel.
 
 To implement the command, edit ``polls/management/commands/closepoll.py`` to
-look like this:
-
-.. code-block:: python
+look like this::
 
     from django.core.management.base import BaseCommand, CommandError
     from polls.models import Poll
 
     class Command(BaseCommand):
-        args = '<poll_id poll_id ...>'
         help = 'Closes the specified poll for voting'
 
+        def add_arguments(self, parser):
+            parser.add_argument('poll_id', nargs='+', type=int)
+
         def handle(self, *args, **options):
-            for poll_id in args:
+            for poll_id in options['poll_id']:
                 try:
-                    poll = Poll.objects.get(pk=int(poll_id))
+                    poll = Poll.objects.get(pk=poll_id)
                 except Poll.DoesNotExist:
                     raise CommandError('Poll "%s" does not exist' % poll_id)
 
@@ -64,6 +68,14 @@ look like this:
                 poll.save()
 
                 self.stdout.write('Successfully closed poll "%s"' % poll_id)
+
+Before Django 1.8, management commands were based on the :py:mod:`optparse`
+module, and positional arguments were passed in ``*args`` while optional
+arguments were passed in ``**options``. Now that management commands use
+:py:mod:`argparse` for argument parsing, all arguments are passed in
+``**options`` by default, unless you name your positional arguments to ``args``
+(compatibility mode). You are encouraged to exclusively use ``**options`` for
+new commands.
 
 .. _management-commands-output:
 
@@ -81,28 +93,32 @@ look like this:
 The new custom command can be called using ``python manage.py closepoll
 <poll_id>``.
 
-The ``handle()`` method takes zero or more ``poll_ids`` and sets ``poll.opened``
+The ``handle()`` method takes one or more ``poll_ids`` and sets ``poll.opened``
 to ``False`` for each one. If the user referenced any nonexistent polls, a
 :class:`CommandError` is raised. The ``poll.opened`` attribute does not exist
 in the :doc:`tutorial</intro/tutorial01>` and was added to
 ``polls.models.Poll`` for this example.
 
+.. _custom-commands-options:
+
+Accepting optional arguments
+============================
+
 The same ``closepoll`` could be easily modified to delete a given poll instead
-of closing it by accepting additional command line options. These custom options
-must be added to :attr:`~BaseCommand.option_list` like this:
-
-.. code-block:: python
-
-    from optparse import make_option
+of closing it by accepting additional command line options. These custom
+options can be added in the :meth:`~BaseCommand.add_arguments` method like this::
 
     class Command(BaseCommand):
-        option_list = BaseCommand.option_list + (
-            make_option('--delete',
+        def add_arguments(self, parser):
+            # Positional arguments
+            parser.add_argument('poll_id', nargs='+', type=int)
+
+            # Named (optional) arguments
+            parser.add_argument('--delete',
                 action='store_true',
                 dest='delete',
                 default=False,
-                help='Delete poll instead of closing it'),
-            )
+                help='Delete poll instead of closing it')
 
         def handle(self, *args, **options):
             # ...
@@ -110,9 +126,15 @@ must be added to :attr:`~BaseCommand.option_list` like this:
                 poll.delete()
             # ...
 
+.. versionchanged:: 1.8
+
+    Previously, only the standard :py:mod:`optparse` library was supported and
+    you would have to extend the command ``option_list`` variable with
+    ``optparse.make_option()``.
+
 The option (``delete`` in our example) is available in the options dict
-parameter of the handle method. See the :py:mod:`optparse` Python documentation
-for more about ``make_option`` usage.
+parameter of the handle method. See the :py:mod:`argparse` Python documentation
+for more about ``add_argument`` usage.
 
 In addition to being able to add custom command line options, all
 :doc:`management commands</ref/django-admin>` can accept some
@@ -130,10 +152,8 @@ require a system-neutral string language (for which we use 'en-us').
 
 If, for some reason, your custom management command needs to use a fixed locale
 different from 'en-us', you should manually activate and deactivate it in your
-:meth:`~BaseCommand.handle` or :meth:`~NoArgsCommand.handle_noargs` method using
-the functions provided by the I18N support code:
-
-.. code-block:: python
+:meth:`~BaseCommand.handle` method using the functions provided by the I18N
+support code::
 
     from django.core.management.base import BaseCommand, CommandError
     from django.utils import translation
@@ -148,12 +168,11 @@ the functions provided by the I18N support code:
             translation.activate('ru')
 
             # Or you can activate the LANGUAGE_CODE # chosen in the settings:
-            #
-            #from django.conf import settings
-            #translation.activate(settings.LANGUAGE_CODE)
+            from django.conf import settings
+            translation.activate(settings.LANGUAGE_CODE)
 
             # Your command logic here
-            # ...
+            ...
 
             translation.deactivate()
 
@@ -173,6 +192,12 @@ non-uniform locales, so you might need to:
 * Review the code of your command and the code it calls for behavioral
   differences when locales are changed and evaluate its impact on
   predictable behavior of your command.
+
+Testing
+=======
+
+Information on how to test custom management commands can be found in the
+:ref:`testing docs <topics-testing-management-commands>`.
 
 Command objects
 ===============
@@ -202,6 +227,12 @@ All attributes can be set in your derived class and can be used in
   a list of application names might set this to '<app_label
   app_label ...>'.
 
+  .. deprecated:: 1.8
+
+      This should be done now in the :meth:`~BaseCommand.add_arguments()`
+      method, by calling the ``parser.add_argument()`` method. See the
+      ``closepoll`` example above.
+
 .. attribute:: BaseCommand.can_import_settings
 
   A boolean indicating whether the command needs to be able to
@@ -215,10 +246,24 @@ All attributes can be set in your derived class and can be used in
   help message when the user runs the command
   ``python manage.py help <command>``.
 
+.. attribute:: BaseCommand.missing_args_message
+
+.. versionadded:: 1.8
+
+  If your command defines mandatory positional arguments, you can customize
+  the message error returned in the case of missing arguments. The default is
+  output by :py:mod:`argparse` ("too few arguments").
+
 .. attribute:: BaseCommand.option_list
 
   This is the list of ``optparse`` options which will be fed
   into the command's ``OptionParser`` for parsing arguments.
+
+  .. deprecated:: 1.8
+
+      You should now override the :meth:`~BaseCommand.add_arguments` method to
+      add custom arguments accepted by your command.
+      See :ref:`the example above <custom-commands-options>`.
 
 .. attribute:: BaseCommand.output_transaction
 
@@ -269,10 +314,6 @@ All attributes can be set in your derived class and can be used in
   because attempting to set the locale needs access to settings. This condition
   will generate a :class:`CommandError`.
 
-.. versionadded:: 1.6
-
-    The ``leave_locale_alone`` option was added in Django 1.6.
-
 Methods
 -------
 
@@ -281,15 +322,22 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. admonition:: Implementing a constructor in a subclass
 
-  If you implement ``__init__`` in your subclass of :class:`BaseCommand`,
-  you must call :class:`BaseCommand`’s ``__init__``.
+    If you implement ``__init__`` in your subclass of :class:`BaseCommand`,
+    you must call :class:`BaseCommand`’s ``__init__``::
 
-  .. code-block:: python
+        class Command(BaseCommand):
+            def __init__(self, *args, **kwargs):
+                super(Command, self).__init__(*args, **kwargs)
+                # ...
 
-    class Command(BaseCommand):
-        def __init__(self, *args, **kwargs):
-            super(Command, self).__init__(*args, **kwargs)
-            # ...
+.. method:: BaseCommand.add_arguments(parser)
+
+.. versionadded:: 1.8
+
+    Entry point to add parser arguments to handle command line arguments passed
+    to the command. Custom commands should override this method to add both
+    positional and optional arguments accepted by the command. Calling
+    ``super()`` is not needed when directly subclassing ``BaseCommand``.
 
 .. method:: BaseCommand.get_version()
 
@@ -322,8 +370,9 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     potential problems. Serious problems are raised as a :class:`CommandError`;
     warnings are output to stderr; minor notifications are output to stdout.
 
-    If ``apps`` and ``tags`` are both None, all system checks are performed.
-    ``tags`` can be a list of check tags, like ``compatibility`` or ``models``.
+    If ``app_configs`` and ``tags`` are both ``None``, all system checks are
+    performed. ``tags`` can be a list of check tags, like ``compatibility`` or
+    ``models``.
 
 .. method:: BaseCommand.validate(app=None, display_num_errors=False)
 
@@ -383,6 +432,10 @@ Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
     string as given on the command line.
 
 .. class:: NoArgsCommand
+
+.. deprecated:: 1.8
+
+    Use :class:`BaseCommand` instead, which takes no arguments by default.
 
 A command which takes no arguments on the command line.
 

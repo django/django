@@ -18,7 +18,8 @@ Core settings
 
 Here's a list of settings available in Django core and their default values.
 Settings provided by contrib apps are listed below, followed by a topical index
-of the core settings.
+of the core settings. For introductory material, see the :doc:`settings topic
+guide </topics/settings>`.
 
 .. setting:: ABSOLUTE_URL_OVERRIDES
 
@@ -28,7 +29,7 @@ ABSOLUTE_URL_OVERRIDES
 Default: ``{}`` (Empty dictionary)
 
 A dictionary mapping ``"app_label.model_name"`` strings to functions that take
-a model object and return its URL. This is a way of overriding
+a model object and return its URL. This is a way of inserting or overriding
 ``get_absolute_url()`` methods on a per-installation basis. Example::
 
     ABSOLUTE_URL_OVERRIDES = {
@@ -38,6 +39,11 @@ a model object and return its URL. This is a way of overriding
 
 Note that the model name used in this setting should be all lower-case, regardless
 of the case of the actual model class name.
+
+.. versionchanged:: 1.7.1
+
+    ``ABSOLUTE_URL_OVERRIDES`` now works on models that don't declare
+    ``get_absolute_url()``.
 
 .. setting:: ADMINS
 
@@ -88,8 +94,8 @@ middleware; if so this middleware must be listed first in
     wildcard::
 
         ALLOWED_HOSTS = [
-            '.example.com', # Allow domain and subdomains
-            '.example.com.', # Also allow FQDN and subdomains
+            '.example.com',  # Allow domain and subdomains
+            '.example.com.',  # Also allow FQDN and subdomains
         ]
 
     In Django 1.7, the trailing dot is stripped when performing host validation,
@@ -189,7 +195,7 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 KEY_FUNCTION
 ~~~~~~~~~~~~
 
-A string containing a dotted path to a function that defines how to
+A string containing a dotted path to a function (or any callable) that defines how to
 compose a prefix, version and key into a final cache key. The default
 implementation is equivalent to the function::
 
@@ -279,26 +285,6 @@ Default: ``default``
 
 The cache connection to use for the cache middleware.
 
-.. setting:: CACHE_MIDDLEWARE_ANONYMOUS_ONLY
-
-CACHE_MIDDLEWARE_ANONYMOUS_ONLY
--------------------------------
-
-Default: ``False``
-
-.. deprecated:: 1.6
-
-    This setting was largely ineffective because of using cookies for sessions
-    and CSRF. See the :doc:`Django 1.6 release notes</releases/1.6>` for more
-    information.
-
-If the value of this setting is ``True``, only anonymous requests (i.e., not
-those made by a logged-in user) will be cached.  Otherwise, the middleware
-caches every page that doesn't have GET or POST parameters.
-
-If you set the value of this setting to ``True``, you should make sure you've
-activated ``AuthenticationMiddleware``.
-
 .. setting:: CACHE_MIDDLEWARE_KEY_PREFIX
 
 CACHE_MIDDLEWARE_KEY_PREFIX
@@ -368,12 +354,16 @@ protection is safe from cross-subdomain attacks by default - please see the
 CSRF_COOKIE_HTTPONLY
 --------------------
 
-.. versionadded:: 1.6
-
 Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the CSRF cookie.
+
+This can help prevent malicious JavaScript from bypassing CSRF protection. If
+you enable this and need to send the value of the CSRF token with Ajax requests,
+your JavaScript will need to pull the value from a hidden CSRF token form input
+on the page instead of from the cookie.
+
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 
 .. setting:: CSRF_COOKIE_NAME
@@ -384,7 +374,7 @@ CSRF_COOKIE_NAME
 Default: ``'csrftoken'``
 
 The name of the cookie to use for the CSRF authentication token. This can be whatever you
-want.  See :doc:`/ref/contrib/csrf`.
+want.  See :doc:`/ref/csrf`.
 
 .. setting:: CSRF_COOKIE_PATH
 
@@ -425,7 +415,7 @@ is rejected by the CSRF protection.  The function should have this signature::
 
 where ``reason`` is a short message (intended for developers or logging, not for
 end users) indicating the reason the request was rejected.  See
-:doc:`/ref/contrib/csrf`.
+:doc:`/ref/csrf`.
 
 .. setting:: DATABASES
 
@@ -458,7 +448,7 @@ other database types. This example is for PostgreSQL::
 
     DATABASES = {
         'default': {
-            'ENGINE':'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'mydatabase',
             'USER': 'mydatabaseuser',
             'PASSWORD': 'mypassword',
@@ -475,8 +465,6 @@ configurations are available:
 ATOMIC_REQUESTS
 ~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.6
-
 Default: ``False``
 
 Set this to ``True`` to wrap each HTTP request in a transaction on this
@@ -486,8 +474,6 @@ database. See :ref:`tying-transactions-to-http-requests`.
 
 AUTOCOMMIT
 ~~~~~~~~~~
-
-.. versionadded:: 1.6
 
 Default: ``True``
 
@@ -555,8 +541,6 @@ file. When specifying the path, always use forward slashes, even on Windows
 CONN_MAX_AGE
 ~~~~~~~~~~~~
 
-.. versionadded:: 1.6
-
 Default: ``0``
 
 The lifetime of a database connection, in seconds. Use ``0`` to close database
@@ -614,6 +598,8 @@ TEST
 
     All :setting:`TEST <DATABASE-TEST>` sub-entries used to be independent
     entries in the database settings dictionary, with a ``TEST_`` prefix.
+    For backwards compatibility with older versions of Django, you can define
+    both versions of the settings as long as they match.
     Further, ``TEST_CREATE``, ``TEST_USER_CREATE`` and ``TEST_PASSWD``
     were changed to ``CREATE_DB``, ``CREATE_USER`` and ``PASSWORD``
     respectively.
@@ -639,7 +625,7 @@ Supported for the PostgreSQL_ (``postgresql_psycopg2``) and MySQL_ (``mysql``)
 backends.
 
 .. _PostgreSQL: http://www.postgresql.org/docs/current/static/multibyte.html
-.. _MySQL: http://dev.mysql.com/doc/refman/5.0/en/charset-database.html
+.. _MySQL: http://dev.mysql.com/doc/refman/5.6/en/charset-database.html
 
 .. setting:: TEST_COLLATION
 
@@ -677,10 +663,11 @@ Default: ``None``
 The alias of the database that this database should mirror during
 testing.
 
-This setting exists to allow for testing of master/slave
+This setting exists to allow for testing of primary/replica
+(referred to as master/slave by some databases)
 configurations of multiple databases. See the documentation on
-:ref:`testing master/slave configurations
-<topics-testing-masterslave>` for details.
+:ref:`testing primary/replica configurations
+<topics-testing-primaryreplica>` for details.
 
 .. setting:: TEST_NAME
 
@@ -696,6 +683,19 @@ tests will use a memory resident database. For all other database engines the
 test database will use the name ``'test_' + DATABASE_NAME``.
 
 See :ref:`the-test-database`.
+
+.. setting:: TEST_SERIALIZE
+
+SERIALIZE
+^^^^^^^^^
+
+.. versionadded:: 1.7.1
+
+Boolean value to control whether or not the default test runner serializes the
+database into an in-memory JSON string before running tests (used to restore
+the database state between tests if you don't have transactions). You can set
+this to ``False`` to speed up creation time if you don't have any test classes
+with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
 
 .. setting:: TEST_CREATE
 
@@ -755,7 +755,11 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The name of the tablespace that will be used when running tests. If not
-provided, Django will use ``'test_' + NAME``.
+provided, Django will use ``'test_' + USER``.
+
+.. versionchanged:: 1.8
+
+    Previously Django used ``'test_' + NAME`` if not provided.
 
 .. setting:: TEST_TBLSPACE_TMP
 
@@ -767,7 +771,73 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The name of the temporary tablespace that will be used when running tests. If
-not provided, Django will use ``'test_' + NAME + '_temp'``.
+not provided, Django will use ``'test_' + USER + '_temp'``.
+
+.. versionchanged:: 1.8
+
+    Previously Django used ``'test_' + NAME + '_temp'`` if not provided.
+
+.. setting:: DATAFILE
+
+DATAFILE
+^^^^^^^^
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+This is an Oracle-specific setting.
+
+The name of the datafile to use for the TBLSPACE. If not provided, Django will
+use ``TBLSPACE + '.dbf'``.
+
+.. setting:: DATAFILE_TMP
+
+DATAFILE_TMP
+^^^^^^^^^^^^
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+This is an Oracle-specific setting.
+
+The name of the datafile to use for the TBLSPACE_TMP. If not provided, Django
+will use ``TBLSPACE_TMP + '.dbf'``.
+
+.. setting:: DATAFILE_MAXSIZE
+
+DATAFILE_MAXSIZE
+^^^^^^^^^^^^^^^^
+
+.. versionadded:: 1.8
+
+Default: ``'500M'``
+
+.. versionchanged:: 1.8
+
+    The previous value was 200M and was not user customizable.
+
+This is an Oracle-specific setting.
+
+The maximum size that the DATAFILE is allowed to grow to.
+
+.. setting:: DATAFILE_TMP_MAXSIZE
+
+DATAFILE_TMP_MAXSIZE
+^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 1.8
+
+Default: ``'500M'``
+
+.. versionchanged:: 1.8
+
+    The previous value was 200M and was not user customizable.
+
+This is an Oracle-specific setting.
+
+The maximum size that the DATAFILE_TMP is allowed to grow to.
 
 .. setting:: OLD_TEST_CHARSET
 
@@ -1002,14 +1072,12 @@ environment, such as all the currently defined Django settings (from
 ``settings.py``).
 
 As a security measure, Django will *not* include settings that might be
-sensitive (or offensive), such as :setting:`SECRET_KEY` or
-:setting:`PROFANITIES_LIST`. Specifically, it will exclude any setting whose
-name includes any of the following:
+sensitive (or offensive), such as :setting:`SECRET_KEY`. Specifically, it will
+exclude any setting whose name includes any of the following:
 
 * ``'API'``
 * ``'KEY'``
 * ``'PASS'``
-* ``'PROFANITIES_LIST'``
 * ``'SECRET'``
 * ``'SIGNATURE'``
 * ``'TOKEN'``
@@ -1250,6 +1318,50 @@ see the explicit TLS setting :setting:`EMAIL_USE_TLS`.
 Note that :setting:`EMAIL_USE_TLS`/:setting:`EMAIL_USE_SSL` are mutually
 exclusive, so only set one of those settings to ``True``.
 
+.. setting:: EMAIL_SSL_CERTFILE
+
+EMAIL_SSL_CERTFILE
+------------------
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
+optionally specify the path to a PEM-formatted certificate chain file to use
+for the SSL connection.
+
+.. setting:: EMAIL_SSL_KEYFILE
+
+EMAIL_SSL_KEYFILE
+-----------------
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
+optionally specify the path to a PEM-formatted private key file to use for the
+SSL connection.
+
+Note that setting :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE`
+doesn't result in any certificate checking. They're passed to the underlying SSL
+connection. Please refer to the documentation of Python's
+:func:`python:ssl.wrap_socket` function for details on how the certificate chain
+file and private key file are handled.
+
+.. setting:: EMAIL_TIMEOUT
+
+EMAIL_TIMEOUT
+-------------
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+Specifies a timeout in seconds for blocking operations like the connection
+attempt.
+
 .. setting:: FILE_CHARSET
 
 FILE_CHARSET
@@ -1268,9 +1380,12 @@ FILE_UPLOAD_HANDLERS
 Default::
 
     ("django.core.files.uploadhandler.MemoryFileUploadHandler",
-     "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+     "django.core.files.uploadhandler.TemporaryFileUploadHandler")
 
-A tuple of handlers to use for uploading. See :doc:`/topics/files` for details.
+A tuple of handlers to use for uploading. Changing this setting allows complete
+customization -- even replacement -- of Django's upload process.
+
+See :doc:`/topics/files` for details.
 
 .. setting:: FILE_UPLOAD_MAX_MEMORY_SIZE
 
@@ -1308,14 +1423,17 @@ FILE_UPLOAD_PERMISSIONS
 
 Default: ``None``
 
-The numeric mode (i.e. ``0644``) to set newly uploaded files to. For
+The numeric mode (i.e. ``0o644``) to set newly uploaded files to. For
 more information about what these modes mean, see the documentation for
 :func:`os.chmod`.
 
 If this isn't given or is ``None``, you'll get operating-system
 dependent behavior. On most platforms, temporary files will have a mode
-of ``0600``, and files saved from memory will be saved using the
+of ``0o600``, and files saved from memory will be saved using the
 system's standard umask.
+
+For security reasons, these permissions aren't applied to the temporary files
+that are stored in :setting:`FILE_UPLOAD_TEMP_DIR`.
 
 This setting also determines the default permissions for collected static files
 when using the :djadmin:`collectstatic` management command. See
@@ -1330,7 +1448,6 @@ when using the :djadmin:`collectstatic` management command. See
     way that modes must be specified. If you try to use ``644``, you'll
     get totally incorrect behavior.
 
-
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
 FILE_UPLOAD_TEMP_DIR
@@ -1338,9 +1455,11 @@ FILE_UPLOAD_TEMP_DIR
 
 Default: ``None``
 
-The directory to store data temporarily while uploading files. If ``None``,
-Django will use the standard temporary directory for the operating system. For
-example, this will default to '/tmp' on \*nix-style operating systems.
+The directory to store data (typically files larger than
+:setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`) temporarily while uploading files.
+If ``None``, Django will use the standard temporary directory for the operating
+system. For example, this will default to ``/tmp`` on \*nix-style operating
+systems.
 
 See :doc:`/topics/files` for details.
 
@@ -1407,6 +1526,20 @@ like::
             en/
                 __init__.py
                 formats.py
+
+.. versionchanged:: 1.8
+
+    You can also set this setting to a list of Python paths, for example::
+
+        FORMAT_MODULE_PATH = [
+            'mysite.formats',
+            'some_app.formats',
+        ]
+
+    When Django searches for a certain format, it will go through all given
+    Python paths until it finds a module that actually defines the given
+    format. This means that formats defined in packages farther up in the list
+    will take precedence over the same formats in packages farther down.
 
 Available formats are :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`,
 :setting:`DATETIME_FORMAT`, :setting:`YEAR_MONTH_FORMAT`,
@@ -1490,7 +1623,7 @@ A tuple of IP addresses, as strings, that:
 
 * See debug comments, when :setting:`DEBUG` is ``True``
 * Receive X headers in admindocs if the ``XViewMiddleware`` is installed (see
-  :doc:`/topics/http/middleware`)
+  :doc:`/ref/contrib/admin/admindocs`)
 
 .. setting:: LANGUAGE_CODE
 
@@ -1547,7 +1680,7 @@ standard domain cookies, existing user cookies that have the old domain
 will not be updated. This will result in site users being unable to switch
 the language as long as these cookies persist. The only safe and reliable
 option to perform the switch is to change the language cookie name
-permanently (via the :setting:`SESSION_COOKIE_NAME` setting) and to add
+permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting) and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the old one.
 
@@ -1583,7 +1716,7 @@ setting to use a deeper path than it previously used, existing user cookies that
 have the old path will not be updated. This will result in site users being
 unable to switch the language as long as these cookies persist. The only safe
 and reliable option to perform the switch is to change the language cookie name
-permanently (via the :setting:`SESSION_COOKIE_NAME` setting), and to add
+permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting), and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the one.
 
@@ -1635,7 +1768,7 @@ Example::
 
     LOCALE_PATHS = (
         '/home/www/project/common_files/locale',
-        '/var/local/translations/locale'
+        '/var/local/translations/locale',
     )
 
 Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
@@ -1723,7 +1856,13 @@ Default: ``''`` (Empty string)
 
 URL that handles the media served from :setting:`MEDIA_ROOT`, used
 for :doc:`managing stored files </topics/files>`. It must end in a slash if set
-to a non-empty value.
+to a non-empty value. You will need to :ref:`configure these files to be served
+<serving-uploaded-files-in-development>` in both development and production.
+
+In order to use ``{{ MEDIA_URL }}`` in your templates, you must have
+``'django.core.context_processors.media'`` in your
+:setting:`TEMPLATE_CONTEXT_PROCESSORS`. It's there by default, but be sure
+to include it if you override that setting and want this behavior.
 
 Example: ``"http://media.example.com/"``
 
@@ -1746,12 +1885,16 @@ MIDDLEWARE_CLASSES
 Default::
 
     ('django.middleware.common.CommonMiddleware',
-     'django.contrib.sessions.middleware.SessionMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware',
-     'django.contrib.auth.middleware.AuthenticationMiddleware',
-     'django.contrib.messages.middleware.MessageMiddleware',)
+     'django.middleware.csrf.CsrfViewMiddleware')
 
 A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
+
+.. versionchanged:: 1.7
+
+    :class:`~django.contrib.sessions.middleware.SessionMiddleware`,
+    :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`, and
+    :class:`~django.contrib.messages.middleware.MessageMiddleware` were removed
+    from this setting.
 
 .. setting:: MIGRATION_MODULES
 
@@ -1760,7 +1903,7 @@ MIGRATION_MODULES
 
 Default::
 
-    {} # empty dictionary
+    {}  # empty dictionary
 
 A dictionary specifying the package where migration modules can be found on a per-app basis. The default value
 of this setting is an empty dictionary, but the default package name for migration modules is ``migrations``.
@@ -1770,6 +1913,9 @@ Example::
     {'blog': 'blog.db_migrations'}
 
 In this case, migrations pertaining to the ``blog`` app will be contained in the ``blog.db_migrations`` package.
+
+If you provide the ``app_label`` argument, :djadmin:`makemigrations` will
+automatically create the package if it doesn't already exist.
 
 .. setting:: MONTH_DAY_FORMAT
 
@@ -1786,6 +1932,9 @@ For example, when a Django admin change-list page is being filtered by a date
 drilldown, the header for a given day displays the day and month. Different
 locales have different formats. For example, U.S. English would say
 "January 1," whereas Spanish might say "1 Enero."
+
+Note that if :setting:`USE_L10N` is set to ``True``, then the corresponding
+locale-dictated format has higher precedence and will be applied.
 
 See :tfilter:`allowed date format strings <date>`. See also
 :setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`,
@@ -1845,7 +1994,7 @@ A secret key for a particular Django installation. This is used to provide
 :doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
 unpredictable value.
 
-:djadmin:`django-admin.py startproject <startproject>` automatically adds a
+:djadmin:`django-admin startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.
 
 Django will refuse to start if :setting:`SECRET_KEY` is not set.
@@ -1857,6 +2006,90 @@ Django will refuse to start if :setting:`SECRET_KEY` is not set.
     Running Django with a known :setting:`SECRET_KEY` defeats many of Django's
     security protections, and can lead to privilege escalation and remote code
     execution vulnerabilities.
+
+The secret key is used for:
+
+* All :doc:`sessions </topics/http/sessions>` if you are using
+  any other session backend than ``django.contrib.sessions.backends.cache``,
+  or if you use
+  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware`
+  and are using the default
+  :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`.
+* All :doc:`messages </ref/contrib/messages>` if you are using
+  :class:`~django.contrib.messages.storage.cookie.CookieStorage` or
+  :class:`~django.contrib.messages.storage.fallback.FallbackStorage`.
+* :mod:`Form wizard <formtools.wizard.views>` progress when using
+  cookie storage with
+  :class:`formtools.wizard.views.CookieWizardView`.
+* All :func:`~django.contrib.auth.views.password_reset` tokens.
+* All in progress :mod:`form previews <formtools.preview>`.
+* Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
+  different key is provided.
+
+If you rotate your secret key, all of the above will be invalidated.
+Secret keys are not used for passwords of users and key rotation will not
+affect them.
+
+.. setting:: SECURE_BROWSER_XSS_FILTER
+
+SECURE_BROWSER_XSS_FILTER
+-------------------------
+
+.. versionadded:: 1.8
+
+Default: ``False``
+
+If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` sets
+the :ref:`x-xss-protection` header on all responses that do not already have it.
+
+.. setting:: SECURE_CONTENT_TYPE_NOSNIFF
+
+SECURE_CONTENT_TYPE_NOSNIFF
+---------------------------
+
+.. versionadded:: 1.8
+
+Default: ``False``
+
+If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
+sets the :ref:`x-content-type-options` header on all responses that do not
+already have it.
+
+.. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS
+------------------------------
+
+.. versionadded:: 1.8
+
+Default: ``False``
+
+If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` adds
+the ``includeSubDomains`` tag to the :ref:`http-strict-transport-security`
+header. It has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a
+non-zero value.
+
+.. warning::
+    Setting this incorrectly can irreversibly (for some time) break your site.
+    Read the :ref:`http-strict-transport-security` documentation first.
+
+.. setting:: SECURE_HSTS_SECONDS
+
+SECURE_HSTS_SECONDS
+-------------------
+
+.. versionadded:: 1.8
+
+Default: ``0``
+
+If set to a non-zero integer value, the
+:class:`~django.middleware.security.SecurityMiddleware` sets the
+:ref:`http-strict-transport-security` header on all responses that do not
+already have it.
+
+.. warning::
+    Setting this incorrectly can irreversibly (for some time) break your site.
+    Read the :ref:`http-strict-transport-security` documentation first.
 
 .. setting:: SECURE_PROXY_SSL_HEADER
 
@@ -1919,23 +2152,54 @@ available in ``request.META``.)
     If any of those are not true, you should keep this setting set to ``None``
     and find another way of determining HTTPS, perhaps via custom middleware.
 
-.. setting:: SEND_BROKEN_LINK_EMAILS
+.. setting:: SECURE_REDIRECT_EXEMPT
 
-SEND_BROKEN_LINK_EMAILS
------------------------
+SECURE_REDIRECT_EXEMPT
+----------------------
 
-.. deprecated:: 1.6
-    Since :class:`~django.middleware.common.BrokenLinkEmailsMiddleware`
-    was split from :class:`~django.middleware.common.CommonMiddleware`,
-    this setting no longer serves a purpose.
+.. versionadded:: 1.8
 
-Default: ``False``
+Default: ``[]``
 
-Whether to send an email to the :setting:`MANAGERS` each time somebody visits
-a Django-powered page that is 404ed with a non-empty referer (i.e., a broken
-link). This is only used if ``CommonMiddleware`` is installed (see
-:doc:`/topics/http/middleware`). See also :setting:`IGNORABLE_404_URLS` and
-:doc:`/howto/error-reporting`.
+If a URL path matches a regular expression in this list, the request will not be
+redirected to HTTPS. If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
+setting has no effect.
+
+.. setting:: SECURE_SSL_HOST
+
+SECURE_SSL_HOST
+---------------
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+If a string (e.g. ``secure.example.com``), all SSL redirects will be directed
+to this host rather than the originally-requested host
+(e.g. ``www.example.com``). If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
+setting has no effect.
+
+.. setting:: SECURE_SSL_REDIRECT
+
+SECURE_SSL_REDIRECT
+-------------------
+
+.. versionadded:: 1.8
+
+Default: ``False``.
+
+If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
+:ref:`redirects <ssl-redirect>` all non-HTTPS requests to HTTPS (except for
+those URLs matching a regular expression listed in
+:setting:`SECURE_REDIRECT_EXEMPT`).
+
+.. note::
+
+   If turning this to ``True`` causes infinite redirects, it probably means
+   your site is running behind a proxy and can't tell which requests are secure
+   and which are not. Your proxy likely sets a header to indicate secure
+   requests; you can correct the problem by finding out what that header is and
+   configuring the :setting:`SECURE_PROXY_SSL_HEADER` setting accordingly.
 
 .. setting:: SERIALIZATION_MODULES
 
@@ -1948,7 +2212,7 @@ A dictionary of modules containing serializer definitions (provided as
 strings), keyed by a string identifier for that serialization type. For
 example, to define a YAML serializer, use::
 
-    SERIALIZATION_MODULES = { 'yaml' : 'path.to.yaml_serializer' }
+    SERIALIZATION_MODULES = {'yaml': 'path.to.yaml_serializer'}
 
 .. setting:: SERVER_EMAIL
 
@@ -2095,7 +2359,7 @@ TEMPLATE_STRING_IF_INVALID
 Default: ``''`` (Empty string)
 
 Output, as a string, that the template system should use for invalid (e.g.
-misspelled) variables. See :ref:`invalid-template-variables`..
+misspelled) variables. See :ref:`invalid-template-variables`.
 
 .. setting:: TEST_RUNNER
 
@@ -2107,10 +2371,25 @@ Default: ``'django.test.runner.DiscoverRunner'``
 The name of the class to use for starting the test suite. See
 :ref:`other-testing-frameworks`.
 
-.. versionchanged:: 1.6
+.. setting:: TEST_NON_SERIALIZED_APPS
 
-    Previously the default ``TEST_RUNNER`` was
-    ``django.test.simple.DjangoTestSuiteRunner``.
+TEST_NON_SERIALIZED_APPS
+------------------------
+
+.. versionadded:: 1.7
+
+Default: ``[]``
+
+In order to restore the database state between tests for
+``TransactionTestCase``\s and database backends without transactions, Django
+will :ref:`serialize the contents of all apps with migrations
+<test-case-serialized-rollback>` when it starts the test run so it can then
+reload from that copy before tests that need it.
+
+This slows down the startup time of the test runner; if you have apps that
+you know don't need this feature, you can add their full names in here (e.g.
+``'django.contrib.contenttypes'``) to exclude them from this serialization
+process.
 
 .. setting:: THOUSAND_SEPARATOR
 
@@ -2166,10 +2445,6 @@ precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
-.. versionchanged:: 1.6
-
-    Input format with microseconds has been added.
-
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: TIME_ZONE
@@ -2223,22 +2498,6 @@ to ensure your processes are running in the correct environment.
 
 .. _pytz: http://pytz.sourceforge.net/
 
-.. setting:: TRANSACTIONS_MANAGED
-
-TRANSACTIONS_MANAGED
---------------------
-
-.. deprecated:: 1.6
-
-    This setting was deprecated because its name is very misleading. Use the
-    :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` key in :setting:`DATABASES`
-    entries instead.
-
-Default: ``False``
-
-Set this to ``True`` if you want to :ref:`disable Django's transaction
-management <deactivate-transaction-management>` and implement your own.
-
 .. setting:: USE_ETAGS
 
 USE_ETAGS
@@ -2280,7 +2539,7 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin.py
+    The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` includes ``USE_L10N = True`` for convenience.
 
 .. setting:: USE_THOUSAND_SEPARATOR
@@ -2314,7 +2573,7 @@ See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 .. note::
 
     The default :file:`settings.py` file created by
-    :djadmin:`django-admin.py startproject <startproject>` includes
+    :djadmin:`django-admin startproject <startproject>` includes
     ``USE_TZ = True`` for convenience.
 
 .. setting:: USE_X_FORWARDED_HOST
@@ -2336,7 +2595,7 @@ WSGI_APPLICATION
 Default: ``None``
 
 The full Python path of the WSGI application object that Django's built-in
-servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin.py
+servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin
 startproject <startproject>` management command will create a simple
 ``wsgi.py`` file with an ``application`` callable in it, and point this setting
 to that ``application``.
@@ -2360,6 +2619,9 @@ For example, when a Django admin change-list page is being filtered by a date
 drilldown, the header for a given month displays the month and the year.
 Different locales have different formats. For example, U.S. English would say
 "January 2006," whereas another locale might say "2006/January."
+
+Note that if :setting:`USE_L10N` is set to ``True``, then the corresponding
+locale-dictated format has higher precedence and will be applied.
 
 See :tfilter:`allowed date format strings <date>`. See also
 :setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT`
@@ -2401,6 +2663,14 @@ AUTH_USER_MODEL
 Default: 'auth.User'
 
 The model to use to represent a User. See :ref:`auth-custom-user`.
+
+.. warning::
+    You cannot change the AUTH_USER_MODEL setting during the lifetime of
+    a project (i.e. once you have made and migrated models that depend on it)
+    without serious effort. It is intended to be set at the project start,
+    and the model it refers to must be available in the first migration of
+    the app that it lives in.
+    See :ref:`auth-custom-user` for more details.
 
 .. setting:: LOGIN_REDIRECT_URL
 
@@ -2467,54 +2737,7 @@ Default::
      'django.contrib.auth.hashers.SHA1PasswordHasher',
      'django.contrib.auth.hashers.MD5PasswordHasher',
      'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
-     'django.contrib.auth.hashers.CryptPasswordHasher',)
-
-
-.. _settings-comments:
-
-Comments
-========
-
-Settings for :mod:`django.contrib.comments`.
-
-.. setting:: COMMENTS_HIDE_REMOVED
-
-COMMENTS_HIDE_REMOVED
----------------------
-
-If ``True`` (default), removed comments will be excluded from comment
-lists/counts (as taken from template tags). Otherwise, the template author is
-responsible for some sort of a "this comment has been removed by the site staff"
-message.
-
-.. setting:: COMMENT_MAX_LENGTH
-
-COMMENT_MAX_LENGTH
-------------------
-
-The maximum length of the comment field, in characters. Comments longer than
-this will be rejected. Defaults to 3000.
-
-.. setting:: COMMENTS_APP
-
-COMMENTS_APP
-------------
-
-An app which provides :doc:`customization of the comments framework
-</ref/contrib/comments/custom>`.  Use the same dotted-string notation
-as in :setting:`INSTALLED_APPS`.  Your custom :setting:`COMMENTS_APP`
-must also be listed in :setting:`INSTALLED_APPS`.
-
-.. setting:: PROFANITIES_LIST
-
-PROFANITIES_LIST
-----------------
-
-Default: ``()`` (Empty tuple)
-
-A tuple of profanities, as strings, that will be forbidden in comments when
-``COMMENTS_ALLOW_PROFANITIES`` is ``False``.
-
+     'django.contrib.auth.hashers.CryptPasswordHasher')
 
 .. _settings-messages:
 
@@ -2578,7 +2801,7 @@ Default::
     messages.INFO: 'info',
     messages.SUCCESS: 'success',
     messages.WARNING: 'warning',
-    messages.ERROR: 'error',}
+    messages.ERROR: 'error'}
 
 This sets the mapping of message level to message tag, which is typically
 rendered as a CSS class in HTML. If you specify a value, it will extend
@@ -2660,6 +2883,11 @@ consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.
 
+Turning it on makes it less trivial for an attacker to escalate a cross-site
+scripting vulnerability into full hijacking of a user's session. There's not
+much excuse for leaving this off, either: if your code depends on reading
+session cookies from Javascript, you're probably doing it wrong.
+
 .. versionadded:: 1.7
 
 This setting also affects cookies set by :mod:`django.contrib.messages`.
@@ -2700,6 +2928,13 @@ Default: ``False``
 Whether to use a secure cookie for the session cookie. If this is set to
 ``True``, the cookie will be marked as "secure," which means browsers may
 ensure that the cookie is only sent under an HTTPS connection.
+
+Since it's trivial for a packet sniffer (e.g. `Firesheep`_) to hijack a user's
+session if the session cookie is sent unencrypted, there's really no good
+excuse to leave this off. It will prevent you from using sessions on insecure
+requests and that's a good thing.
+
+.. _Firesheep: http://codebutler.com/firesheep
 
 .. versionadded:: 1.7
 
@@ -2761,12 +2996,6 @@ SESSION_SERIALIZER
 ------------------
 
 Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
-
-.. versionchanged:: 1.6
-
-    The default switched from
-    :class:`~django.contrib.sessions.serializers.PickleSerializer` to
-    :class:`~django.contrib.sessions.serializers.JSONSerializer` in Django 1.6.
 
 Full import path of a serializer class to use for serializing session data.
 Included serializers are:
@@ -2846,6 +3075,10 @@ If not ``None``, this will be used as the base path for
 :doc:`staticfiles app</ref/contrib/staticfiles>`.
 
 It must end in a slash if set to a non-empty value.
+
+You may need to :ref:`configure these files to be served in development
+<serving-static-files-in-development>` and will definitely need to do so
+:doc:`in production </howto/static-files/deployment>`.
 
 .. setting:: STATICFILES_DIRS
 
@@ -2952,7 +3185,6 @@ Cache
 -----
 * :setting:`CACHES`
 * :setting:`CACHE_MIDDLEWARE_ALIAS`
-* :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY`
 * :setting:`CACHE_MIDDLEWARE_KEY_PREFIX`
 * :setting:`CACHE_MIDDLEWARE_SECONDS`
 
@@ -2962,7 +3194,6 @@ Database
 * :setting:`DATABASE_ROUTERS`
 * :setting:`DEFAULT_INDEX_TABLESPACE`
 * :setting:`DEFAULT_TABLESPACE`
-* :setting:`TRANSACTIONS_MANAGED`
 
 Debugging
 ---------
@@ -2980,10 +3211,12 @@ Email
 * :setting:`EMAIL_HOST_PASSWORD`
 * :setting:`EMAIL_HOST_USER`
 * :setting:`EMAIL_PORT`
+* :setting:`EMAIL_SSL_CERTFILE`
+* :setting:`EMAIL_SSL_KEYFILE`
 * :setting:`EMAIL_SUBJECT_PREFIX`
+* :setting*`EMAIL_TIMEOUT`
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
-* :setting:`SEND_BROKEN_LINK_EMAILS`
 * :setting:`SERVER_EMAIL`
 
 Error reporting
@@ -2991,8 +3224,9 @@ Error reporting
 * :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER`
 * :setting:`IGNORABLE_404_URLS`
 * :setting:`MANAGERS`
-* :setting:`SEND_BROKEN_LINK_EMAILS`
 * :setting:`SILENCED_SYSTEM_CHECKS`
+
+.. _file-upload-settings:
 
 File uploads
 ------------
@@ -3043,7 +3277,16 @@ HTTP
 * :setting:`FORCE_SCRIPT_NAME`
 * :setting:`INTERNAL_IPS`
 * :setting:`MIDDLEWARE_CLASSES`
-* :setting:`SECURE_PROXY_SSL_HEADER`
+* Security
+
+  * :setting:`SECURE_BROWSER_XSS_FILTER`
+  * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
+  * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
+  * :setting:`SECURE_HSTS_SECONDS`
+  * :setting:`SECURE_PROXY_SSL_HEADER`
+  * :setting:`SECURE_REDIRECT_EXEMPT`
+  * :setting:`SECURE_SSL_HOST`
+  * :setting:`SECURE_SSL_REDIRECT`
 * :setting:`SIGNING_BACKEND`
 * :setting:`USE_ETAGS`
 * :setting:`USE_X_FORWARDED_HOST`
@@ -3090,6 +3333,7 @@ Templates
 Testing
 -------
 * Database: :setting:`TEST <DATABASE-TEST>`
+* :setting:`TEST_NON_SERIALIZED_APPS`
 * :setting:`TEST_RUNNER`
 
 URLs

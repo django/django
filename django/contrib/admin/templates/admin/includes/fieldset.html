@@ -14,7 +14,7 @@
                     {% else %}
                         {{ field.label_tag }}
                         {% if field.is_readonly %}
-                            <p>{{ field.contents|linebreaksbr }}</p>
+                            <p>{{ field.contents }}</p>
                         {% else %}
                             {{ field.field }}
                         {% endif %}

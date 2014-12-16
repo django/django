@@ -1,28 +1,26 @@
 from __future__ import unicode_literals
 
 from io import BytesIO
-from unittest import skipUnless
 from xml.dom import minidom
-import os
+import warnings
 import zipfile
 
 from django.conf import settings
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.contrib.sites.models import Site
-from django.test import TestCase, modify_settings
-from django.test.utils import IgnoreDeprecationWarningsMixin
-from django.utils._os import upath
+from django.test import (
+    TestCase, modify_settings, override_settings, skipUnlessDBFeature
+)
+from django.utils.deprecation import RemovedInDjango20Warning
 
 if HAS_GEOS:
     from .models import City, Country
 
 
-@modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
-class GeoSitemapTest(IgnoreDeprecationWarningsMixin, TestCase):
-
-    urls = 'django.contrib.gis.tests.geoapp.urls'
+@modify_settings(INSTALLED_APPS={'append': ['django.contrib.sites', 'django.contrib.sitemaps']})
+@override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoapp.urls')
+@skipUnlessDBFeature("gis_enabled")
+class GeoSitemapTest(TestCase):
 
     def setUp(self):
         super(GeoSitemapTest, self).setUp()
@@ -34,36 +32,28 @@ class GeoSitemapTest(IgnoreDeprecationWarningsMixin, TestCase):
         expected = set(expected)
         self.assertEqual(actual, expected)
 
-    def test_geositemap_index(self):
-        "Tests geographic sitemap index."
-        # Getting the geo index.
-        from django.contrib import sitemaps
-        template_dirs = settings.TEMPLATE_DIRS + (
-            os.path.join(os.path.dirname(upath(sitemaps.__file__)), 'templates'),)
-        with self.settings(TEMPLATE_DIRS=template_dirs):
-            doc = minidom.parseString(self.client.get('/sitemap.xml').content)
-        index = doc.firstChild
-        self.assertEqual(index.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9')
-        self.assertEqual(3, len(index.getElementsByTagName('sitemap')))
-
     def test_geositemap_kml(self):
         "Tests KML/KMZ geographic sitemaps."
         for kml_type in ('kml', 'kmz'):
-            doc = minidom.parseString(self.client.get('/sitemaps/%s.xml' % kml_type).content)
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+                # The URL for the sitemaps in urls.py have been updated
+                # with a name but since reversing by Python path is tried first
+                # before reversing by name and works since we're giving
+                # name='django.contrib.gis.sitemaps.views.(kml|kmz)', we need
+                # to silence the erroneous warning until reversing by dotted
+                # path is removed. The test will work without modification when
+                # it's removed.
+                doc = minidom.parseString(self.client.get('/sitemaps/%s.xml' % kml_type).content)
 
-            # Ensuring the right sitemaps namespaces are present.
+            # Ensuring the right sitemaps namespace is present.
             urlset = doc.firstChild
             self.assertEqual(urlset.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9')
-            self.assertEqual(urlset.getAttribute('xmlns:geo'), 'http://www.google.com/geo/schemas/sitemap/1.0')
 
             urls = urlset.getElementsByTagName('url')
             self.assertEqual(2, len(urls))  # Should only be 2 sitemaps.
             for url in urls:
-                self.assertChildNodes(url, ['loc', 'geo:geo'])
-                # Making sure the 'geo:format' element was properly set.
-                geo_elem = url.getElementsByTagName('geo:geo')[0]
-                geo_format = geo_elem.getElementsByTagName('geo:format')[0]
-                self.assertEqual(kml_type, geo_format.childNodes[0].data)
+                self.assertChildNodes(url, ['loc'])
 
                 # Getting the relative URL since we don't have a real site.
                 kml_url = url.getElementsByTagName('loc')[0].childNodes[0].data.split('http://example.com')[1]
@@ -84,25 +74,3 @@ class GeoSitemapTest(IgnoreDeprecationWarningsMixin, TestCase):
                 elif 'country' in kml_url:
                     model = Country
                 self.assertEqual(model.objects.count(), len(kml_doc.getElementsByTagName('Placemark')))
-
-    def test_geositemap_georss(self):
-        "Tests GeoRSS geographic sitemaps."
-        from .feeds import feed_dict
-
-        doc = minidom.parseString(self.client.get('/sitemaps/georss.xml').content)
-
-        # Ensuring the right sitemaps namespaces are present.
-        urlset = doc.firstChild
-        self.assertEqual(urlset.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9')
-        self.assertEqual(urlset.getAttribute('xmlns:geo'), 'http://www.google.com/geo/schemas/sitemap/1.0')
-
-        # Making sure the correct number of feed URLs were included.
-        urls = urlset.getElementsByTagName('url')
-        self.assertEqual(len(feed_dict), len(urls))
-
-        for url in urls:
-            self.assertChildNodes(url, ['loc', 'geo:geo'])
-            # Making sure the 'geo:format' element was properly set to 'georss'.
-            geo_elem = url.getElementsByTagName('geo:geo')[0]
-            geo_format = geo_elem.getElementsByTagName('geo:format')[0]
-            self.assertEqual('georss', geo_format.childNodes[0].data)

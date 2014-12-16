@@ -26,7 +26,8 @@ Basic configuration
 
 Once you've got mod_wsgi installed and activated, edit your Apache server's
 ``httpd.conf`` file and add the following. If you are using a version of Apache
-older than 2.4, replace ``Require all granted`` with ``Allow from all``.
+older than 2.4, replace ``Require all granted`` with ``Allow from all`` and
+also add the line ``Order deny,allow`` above it.
 
 .. code-block:: apache
 
@@ -35,7 +36,6 @@ older than 2.4, replace ``Require all granted`` with ``Allow from all``.
 
     <Directory /path/to/mysite.com/mysite>
     <Files wsgi.py>
-    Order deny,allow
     Require all granted
     </Files>
     </Directory>
@@ -61,12 +61,18 @@ should put in this file, and what else you can add to it.
 
 .. warning::
 
-   If multiple Django sites are run in a single mod_wsgi process, all of them
-   will use the settings of whichever one happens to run first. This can be
-   solved with a minor edit to ``wsgi.py`` (see comment in the file for
-   details), or by :ref:`using mod_wsgi daemon mode<daemon-mode>` and ensuring
-   that each site runs in its own daemon process.
+    If multiple Django sites are run in a single mod_wsgi process, all of them
+    will use the settings of whichever one happens to run first. This can be
+    solved by changing::
 
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{{ project_name }}.settings")
+
+    in ``wsgi.py``, to::
+
+        os.environ["DJANGO_SETTINGS_MODULE"] = "{{ project_name }}.settings"
+
+    or by :ref:`using mod_wsgi daemon mode<daemon-mode>` and ensuring that each
+    site runs in its own daemon process.
 
 Using a virtualenv
 ==================
@@ -79,10 +85,10 @@ if using a UNIX-like system, or a semicolon (``;``) if using Windows. If any
 part of a directory path contains a space character, the complete argument
 string to ``WSGIPythonPath`` must be quoted::
 
-    WSGIPythonPath /path/to/mysite.com:/path/to/your/venv/lib/python2.X/site-packages
+    WSGIPythonPath /path/to/mysite.com:/path/to/your/venv/lib/python3.X/site-packages
 
 Make sure you give the correct path to your virtualenv, and replace
-``python2.X`` with the correct Python version (e.g. ``python2.7``).
+``python3.X`` with the correct Python version (e.g. ``python3.4``).
 
 .. _virtualenv: http://www.virtualenv.org
 
@@ -118,11 +124,8 @@ server you choose.
 We recommend using a separate Web server -- i.e., one that's not also running
 Django -- for serving media. Here are some good choices:
 
-* lighttpd_
 * Nginx_
-* TUX_
 * A stripped-down version of Apache_
-* Cherokee_
 
 If, however, you have no option but to serve media files on the same Apache
 ``VirtualHost`` as Django, you can set up Apache to serve some URLs as
@@ -136,18 +139,14 @@ will be served using mod_wsgi::
     Alias /robots.txt /path/to/mysite.com/static/robots.txt
     Alias /favicon.ico /path/to/mysite.com/static/favicon.ico
 
-    AliasMatch ^/([^/]*\.css) /path/to/mysite.com/static/styles/$1
-
     Alias /media/ /path/to/mysite.com/media/
     Alias /static/ /path/to/mysite.com/static/
 
     <Directory /path/to/mysite.com/static>
-    Order deny,allow
     Require all granted
     </Directory>
 
     <Directory /path/to/mysite.com/media>
-    Order deny,allow
     Require all granted
     </Directory>
 
@@ -155,19 +154,16 @@ will be served using mod_wsgi::
 
     <Directory /path/to/mysite.com/mysite>
     <Files wsgi.py>
-    Order allow,deny
     Require all granted
     </Files>
     </Directory>
 
 If you are using a version of Apache older than 2.4, replace
-``Require all granted`` with ``Allow from all``.
+``Require all granted`` with ``Allow from all`` and also add the line
+``Order deny,allow`` above it.
 
-.. _lighttpd: http://www.lighttpd.net/
 .. _Nginx: http://wiki.nginx.org/Main
-.. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
 .. _Apache: http://httpd.apache.org/
-.. _Cherokee: http://www.cherokee-project.com/
 
 .. More details on configuring a mod_wsgi site to serve static files can be found
 .. in the mod_wsgi documentation on `hosting static files`_.
@@ -221,7 +217,7 @@ If you're taking advantage of the internationalization features of Django (see
 ensure that the environment used to start Apache is configured to accept
 non-ASCII file names. If your environment is not correctly configured, you
 will trigger ``UnicodeEncodeError`` exceptions when calling functions like
-``os.path()`` on filenames that contain non-ASCII characters.
+the ones in :mod:`os.path` on filenames that contain non-ASCII characters.
 
 To avoid these problems, the environment used to start Apache should contain
 settings analogous to the following::

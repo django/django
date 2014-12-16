@@ -41,8 +41,3 @@ class DummyCache(BaseCache):
 
     def clear(self):
         pass
-
-
-# For backwards compatibility
-class CacheClass(DummyCache):
-    pass

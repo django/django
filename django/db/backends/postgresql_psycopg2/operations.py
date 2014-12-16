@@ -93,6 +93,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def no_limit_value(self):
         return None
 
+    def prepare_sql_script(self, sql, _allow_fallback=False):
+        return [sql]
+
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
             return name  # Quoting once is enough.
@@ -161,27 +164,35 @@ class DatabaseOperations(BaseDatabaseOperations):
 
             for f in model._meta.local_fields:
                 if isinstance(f, models.AutoField):
-                    output.append("%s setval(pg_get_serial_sequence('%s','%s'), coalesce(max(%s), 1), max(%s) %s null) %s %s;" %
-                        (style.SQL_KEYWORD('SELECT'),
-                        style.SQL_TABLE(qn(model._meta.db_table)),
-                        style.SQL_FIELD(f.column),
-                        style.SQL_FIELD(qn(f.column)),
-                        style.SQL_FIELD(qn(f.column)),
-                        style.SQL_KEYWORD('IS NOT'),
-                        style.SQL_KEYWORD('FROM'),
-                        style.SQL_TABLE(qn(model._meta.db_table))))
+                    output.append(
+                        "%s setval(pg_get_serial_sequence('%s','%s'), "
+                        "coalesce(max(%s), 1), max(%s) %s null) %s %s;" % (
+                            style.SQL_KEYWORD('SELECT'),
+                            style.SQL_TABLE(qn(model._meta.db_table)),
+                            style.SQL_FIELD(f.column),
+                            style.SQL_FIELD(qn(f.column)),
+                            style.SQL_FIELD(qn(f.column)),
+                            style.SQL_KEYWORD('IS NOT'),
+                            style.SQL_KEYWORD('FROM'),
+                            style.SQL_TABLE(qn(model._meta.db_table)),
+                        )
+                    )
                     break  # Only one AutoField is allowed per model, so don't bother continuing.
             for f in model._meta.many_to_many:
                 if not f.rel.through:
-                    output.append("%s setval(pg_get_serial_sequence('%s','%s'), coalesce(max(%s), 1), max(%s) %s null) %s %s;" %
-                        (style.SQL_KEYWORD('SELECT'),
-                        style.SQL_TABLE(qn(f.m2m_db_table())),
-                        style.SQL_FIELD('id'),
-                        style.SQL_FIELD(qn('id')),
-                        style.SQL_FIELD(qn('id')),
-                        style.SQL_KEYWORD('IS NOT'),
-                        style.SQL_KEYWORD('FROM'),
-                        style.SQL_TABLE(qn(f.m2m_db_table()))))
+                    output.append(
+                        "%s setval(pg_get_serial_sequence('%s','%s'), "
+                        "coalesce(max(%s), 1), max(%s) %s null) %s %s;" % (
+                            style.SQL_KEYWORD('SELECT'),
+                            style.SQL_TABLE(qn(f.m2m_db_table())),
+                            style.SQL_FIELD('id'),
+                            style.SQL_FIELD(qn('id')),
+                            style.SQL_FIELD(qn('id')),
+                            style.SQL_KEYWORD('IS NOT'),
+                            style.SQL_KEYWORD('FROM'),
+                            style.SQL_TABLE(qn(f.m2m_db_table()))
+                        )
+                    )
         return output
 
     def prep_for_iexact_query(self, x):

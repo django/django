@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core.checks import Error
+from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
 from django.test.utils import override_settings
 from django.test.testcases import skipIfDBFeature
@@ -58,6 +58,35 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 id='fields.E300',
             ),
         ]
+        self.assertEqual(errors, expected)
+
+    def test_many_to_many_with_useless_options(self):
+        class Model(models.Model):
+            name = models.CharField(max_length=20)
+
+        class ModelM2M(models.Model):
+            m2m = models.ManyToManyField(Model, null=True, validators=[''])
+
+        errors = ModelM2M.check()
+        field = ModelM2M._meta.get_field('m2m')
+
+        expected = [
+            DjangoWarning(
+                'null has no effect on ManyToManyField.',
+                hint=None,
+                obj=field,
+                id='fields.W340',
+            )
+        ]
+        expected.append(
+            DjangoWarning(
+                'ManyToManyField does not support validators.',
+                hint=None,
+                obj=field,
+                id='fields.W341',
+            )
+        )
+
         self.assertEqual(errors, expected)
 
     def test_ambiguous_relationship_model(self):
@@ -516,6 +545,73 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             expected_error.obj = field
             errors = field.check(from_model=Model)
             self.assertEqual(errors, [expected_error])
+
+    def test_related_field_has_invalid_related_name(self):
+        digit = 0
+        illegal_non_alphanumeric = '!'
+        whitespace = '\t'
+
+        invalid_related_names = [
+            '%s_begins_with_digit' % digit,
+            '%s_begins_with_illegal_non_alphanumeric' % illegal_non_alphanumeric,
+            '%s_begins_with_whitespace' % whitespace,
+            'contains_%s_illegal_non_alphanumeric' % illegal_non_alphanumeric,
+            'contains_%s_whitespace' % whitespace,
+            'ends_with_with_illegal_non_alphanumeric_%s' % illegal_non_alphanumeric,
+            'ends_with_whitespace_%s' % whitespace,
+            # Python's keyword
+            'with',
+        ]
+
+        class Parent(models.Model):
+            pass
+
+        for invalid_related_name in invalid_related_names:
+            Child = type(str('Child_%s') % str(invalid_related_name), (models.Model,), {
+                'parent': models.ForeignKey('Parent', related_name=invalid_related_name),
+                '__module__': Parent.__module__,
+            })
+
+            field = Child._meta.get_field('parent')
+            errors = Child.check()
+            expected = [
+                Error(
+                    "The name '%s' is invalid related_name for field Child_%s.parent"
+                    % (invalid_related_name, invalid_related_name),
+                    hint="Related name must be a valid Python identifier or end with a '+'",
+                    obj=field,
+                    id='fields.E306',
+                ),
+            ]
+            self.assertEqual(errors, expected)
+
+    def test_related_field_has_valid_related_name(self):
+        lowercase = 'a'
+        uppercase = 'A'
+        digit = 0
+
+        related_names = [
+            '%s_starts_with_lowercase' % lowercase,
+            '%s_tarts_with_uppercase' % uppercase,
+            '_starts_with_underscore',
+            'contains_%s_digit' % digit,
+            'ends_with_plus+',
+            '_',
+            '_+',
+            '+',
+        ]
+
+        class Parent(models.Model):
+            pass
+
+        for related_name in related_names:
+            Child = type(str('Child_%s') % str(related_name), (models.Model,), {
+                'parent': models.ForeignKey('Parent', related_name=related_name),
+                '__module__': Parent.__module__,
+            })
+
+            errors = Child.check()
+            self.assertFalse(errors)
 
 
 class AccessorClashTests(IsolatedModelsTestCase):

@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
 import codecs
@@ -7,7 +8,9 @@ import locale
 
 from django.utils.functional import Promise
 from django.utils import six
-from django.utils.six.moves.urllib.parse import quote
+from django.utils.six.moves.urllib.parse import quote, unquote
+if six.PY3:
+    from urllib.parse import unquote_to_bytes
 
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
@@ -52,14 +55,17 @@ def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     return force_text(s, encoding, strings_only, errors)
 
 
+_PROTECTED_TYPES = six.integer_types + (type(None), float, Decimal,
+    datetime.datetime, datetime.date, datetime.time)
+
+
 def is_protected_type(obj):
     """Determine if the object instance is of a protected type.
 
     Objects of protected types are preserved as-is when passed to
     force_text(strings_only=True).
     """
-    return isinstance(obj, six.integer_types + (type(None), float, Decimal,
-        datetime.datetime, datetime.date, datetime.time))
+    return isinstance(obj, _PROTECTED_TYPES)
 
 
 def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
@@ -99,8 +105,8 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
             # working unicode method. Try to handle this without raising a
             # further exception by individually forcing the exception args
             # to unicode.
-            s = ' '.join([force_text(arg, encoding, strings_only,
-                    errors) for arg in s])
+            s = ' '.join(force_text(arg, encoding, strings_only, errors)
+                         for arg in s)
     return s
 
 
@@ -146,8 +152,8 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
                 # An Exception subclass containing non-ASCII data that doesn't
                 # know how to print itself properly. We shouldn't raise a
                 # further exception.
-                return b' '.join([force_bytes(arg, encoding, strings_only,
-                        errors) for arg in s])
+                return b' '.join(force_bytes(arg, encoding, strings_only, errors)
+                                 for arg in s)
             return six.text_type(s).encode(encoding, errors)
     else:
         return s.encode(encoding, errors)
@@ -182,7 +188,9 @@ def iri_to_uri(iri):
     assuming input is either UTF-8 or unicode already, we can simplify things a
     little from the full method.
 
-    Returns an ASCII string containing the encoded result.
+    Takes an IRI in UTF-8 bytes (e.g. '/I \xe2\x99\xa5 Django/') or unicode
+    (e.g. '/I ♥ Django/') and returns ASCII bytes containing the encoded result
+    (e.g. '/I%20%E2%99%A5%20Django/').
     """
     # The list of safe characters here is constructed from the "reserved" and
     # "unreserved" characters specified in sections 2.2 and 2.3 of RFC 3986:
@@ -199,6 +207,55 @@ def iri_to_uri(iri):
     if iri is None:
         return iri
     return quote(force_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
+
+
+def uri_to_iri(uri):
+    """
+    Converts a Uniform Resource Identifier(URI) into an Internationalized
+    Resource Identifier(IRI).
+
+    This is the algorithm from section 3.2 of RFC 3987.
+
+    Takes an URI in ASCII bytes (e.g. '/I%20%E2%99%A5%20Django/') and returns
+    unicode containing the encoded result (e.g. '/I \xe2\x99\xa5 Django/').
+    """
+    if uri is None:
+        return uri
+    uri = force_bytes(uri)
+    iri = unquote_to_bytes(uri) if six.PY3 else unquote(uri)
+    return repercent_broken_unicode(iri).decode('utf-8')
+
+
+def escape_uri_path(path):
+    """
+    Escape the unsafe characters from the path portion of a Uniform Resource
+    Identifier (URI).
+    """
+    # These are the "reserved" and "unreserved" characters specified in
+    # sections 2.2 and 2.3 of RFC 2396:
+    #   reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ","
+    #   unreserved  = alphanum | mark
+    #   mark        = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
+    # The list of safe characters here is constructed substracting ";", "=",
+    # and "?" according to section 3.3 of RFC 2396.
+    # The reason for not subtracting and escaping "/" is that we are escaping
+    # the entire path, not a path segment.
+    return quote(force_bytes(path), safe=b"/:@&+$,-_.!~*'()")
+
+
+def repercent_broken_unicode(path):
+    """
+    As per section 3.2 of RFC 3987, step three of converting a URI into an IRI,
+    we need to re-percent-encode any octet produced that is not part of a
+    strictly legal UTF-8 octet sequence.
+    """
+    try:
+        path.decode('utf-8')
+    except UnicodeDecodeError as e:
+        repercent = quote(path[e.start:e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
+        path = repercent_broken_unicode(
+            path[:e.start] + force_bytes(repercent) + path[e.end:])
+    return path
 
 
 def filepath_to_uri(path):

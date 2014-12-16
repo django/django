@@ -30,15 +30,17 @@ interacting with end users.
 
 Time zone support is disabled by default. To enable it, set :setting:`USE_TZ =
 True <USE_TZ>` in your settings file. Installing pytz_ is highly recommended,
-but not mandatory. It's as simple as:
+but may not be mandatory depending on your particular database backend,
+operating system and time zone. If you encounter an exception querying dates
+or times, please try installing it before filing a bug. It's as simple as:
 
 .. code-block:: bash
 
-    $ sudo pip install pytz
+    $ pip install pytz
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin.py
+    The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` includes :setting:`USE_TZ = True <USE_TZ>`
     for convenience.
 
@@ -76,20 +78,13 @@ the current time, you would write::
 
     now = datetime.datetime.now()
 
-When time zone support is enabled, Django uses time-zone-aware datetime
-objects. If your code creates datetime objects, they should be aware too. In
-this mode, the example above becomes::
+When time zone support is enabled (:setting:`USE_TZ=True <USE_TZ>`), Django uses
+time-zone-aware datetime objects. If your code creates datetime objects, they
+should be aware too. In this mode, the example above becomes::
 
-    import datetime
-    from django.utils.timezone import utc
+    from django.utils import timezone
 
-    now = datetime.datetime.utcnow().replace(tzinfo=utc)
-
-.. note::
-
-    :mod:`django.utils.timezone` provides a
-    :func:`~django.utils.timezone.now()` function that returns a naive or
-    aware datetime object according to the value of :setting:`USE_TZ`.
+    now = timezone.now()
 
 .. warning::
 
@@ -107,7 +102,8 @@ this mode, the example above becomes::
     lead to questionable usefulness".
 
     Django only supports naive time objects and will raise an exception if you
-    attempt to save an aware time object.
+    attempt to save an aware time object, as a timezone for a time with no
+    associated date does not make sense.
 
 .. _naive-datetime-objects:
 
@@ -460,9 +456,8 @@ zone support.
 
 Fixtures generated with ``USE_TZ = False``, or before Django 1.4, use the
 "naive" format. If your project contains such fixtures, after you enable time
-zone support, you'll see :exc:`~exceptions.RuntimeWarning`\ s when you load
-them. To get rid of the warnings, you must convert your fixtures to the "aware"
-format.
+zone support, you'll see :exc:`RuntimeWarning`\ s when you load them. To get
+rid of the warnings, you must convert your fixtures to the "aware" format.
 
 You can regenerate fixtures with :djadmin:`loaddata` then :djadmin:`dumpdata`.
 Or, if they're small enough, you can simply edit them to add the UTC offset
@@ -553,7 +548,7 @@ Troubleshooting
        >>> import datetime
        >>> from django.utils import timezone
        >>> naive = datetime.datetime.utcnow()
-       >>> aware = naive.replace(tzinfo=timezone.utc)
+       >>> aware = timezone.now()
        >>> naive == aware
        Traceback (most recent call last):
        ...

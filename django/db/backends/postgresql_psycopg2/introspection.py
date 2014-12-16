@@ -1,7 +1,11 @@
 from __future__ import unicode_literals
+from collections import namedtuple
 
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
 from django.utils.encoding import force_text
+
+
+FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -28,28 +32,39 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     ignored_tables = []
 
+    def get_field_type(self, data_type, description):
+        field_type = super(DatabaseIntrospection, self).get_field_type(data_type, description)
+        if field_type == 'IntegerField' and description.default and 'nextval' in description.default:
+            return 'AutoField'
+        return field_type
+
     def get_table_list(self, cursor):
-        "Returns a list of table names in the current database."
+        """
+        Returns a list of table and view names in the current database.
+        """
         cursor.execute("""
-            SELECT c.relname
+            SELECT c.relname, c.relkind
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-            WHERE c.relkind IN ('r', 'v', '')
+            WHERE c.relkind IN ('r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)""")
-        return [row[0] for row in cursor.fetchall() if row[0] not in self.ignored_tables]
+        return [TableInfo(row[0], {'r': 't', 'v': 'v'}.get(row[1]))
+                for row in cursor.fetchall()
+                if row[0] not in self.ignored_tables]
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
         # As cursor.description does not return reliably the nullable property,
         # we have to query the information_schema (#7783)
         cursor.execute("""
-            SELECT column_name, is_nullable
+            SELECT column_name, is_nullable, column_default
             FROM information_schema.columns
             WHERE table_name = %s""", [table_name])
-        null_map = dict(cursor.fetchall())
+        field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [FieldInfo(*((force_text(line[0]),) + line[1:6] + (null_map[force_text(line[0])] == 'YES',)))
+        return [FieldInfo(*((force_text(line[0]),) + line[1:6]
+                            + (field_map[force_text(line[0])][0] == 'YES', field_map[force_text(line[0])][1])))
                 for line in cursor.description]
 
     def get_relations(self, cursor, table_name):
@@ -128,7 +143,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 kc.constraint_name,
                 kc.column_name,
                 c.constraint_type,
-                array(SELECT table_name::text || '.' || column_name::text FROM information_schema.constraint_column_usage WHERE constraint_name = kc.constraint_name)
+                array(SELECT table_name::text || '.' || column_name::text
+                      FROM information_schema.constraint_column_usage
+                      WHERE constraint_name = kc.constraint_name)
             FROM information_schema.key_column_usage AS kc
             JOIN information_schema.table_constraints AS c ON
                 kc.table_schema = c.table_schema AND

@@ -10,7 +10,7 @@ from binascii import Error as BinasciiError
 from email.utils import formatdate
 
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_bytes, force_str, force_text
 from django.utils.functional import allow_lazy
 from django.utils import six
 from django.utils.six.moves.urllib.parse import (
@@ -29,6 +29,9 @@ __T = r'(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})'
 RFC1123_DATE = re.compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
 RFC850_DATE = re.compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
 ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
+
+RFC3986_GENDELIMS = str(":/?#[]@")
+RFC3986_SUBDELIMS = str("!$&'()*+,;=")
 
 
 def urlquote(url, safe='/'):
@@ -186,8 +189,7 @@ def int_to_base36(i):
     """
     Converts an integer to a base36 string
     """
-    digits = "0123456789abcdefghijklmnopqrstuvwxyz"
-    factor = 0
+    char_set = '0123456789abcdefghijklmnopqrstuvwxyz'
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
     if six.PY2:
@@ -195,20 +197,13 @@ def int_to_base36(i):
             raise TypeError("Non-integer base36 conversion input.")
         if i > sys.maxint:
             raise ValueError("Base36 conversion input too large.")
-    # Find starting factor
-    while True:
-        factor += 1
-        if i < 36 ** factor:
-            factor -= 1
-            break
-    base36 = []
-    # Construct base36 representation
-    while factor >= 0:
-        j = 36 ** factor
-        base36.append(digits[i // j])
-        i = i % j
-        factor -= 1
-    return ''.join(base36)
+    if i < 36:
+        return char_set[i]
+    b36 = ''
+    while i != 0:
+        i, n = divmod(i, 36)
+        b36 = char_set[n] + b36
+    return b36
 
 
 def urlsafe_base64_encode(s):
@@ -224,7 +219,7 @@ def urlsafe_base64_decode(s):
     Decodes a base64 encoded string, adding back any trailing equal signs that
     might have been stripped.
     """
-    s = s.encode('utf-8')  # base64encode should only return ASCII.
+    s = force_bytes(s)
     try:
         return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b'='))
     except (LookupError, BinasciiError) as e:
@@ -272,6 +267,18 @@ def is_safe_url(url, host=None):
     """
     if not url:
         return False
+    # Chrome treats \ completely as /
+    url = url.replace('\\', '/')
+    # Chrome considers any URL with more than two slashes to be absolute, but
+    # urlparse is not so flexible. Treat any url with three slashes as unsafe.
+    if url.startswith('///'):
+        return False
     url_info = urlparse(url)
+    # Forbid URLs like http:///example.com - with a scheme, but without a hostname.
+    # In that URL, example.com is not the hostname but, a path component. However,
+    # Chrome will still consider example.com to be the hostname, so we must not
+    # allow this syntax.
+    if not url_info.netloc and url_info.scheme:
+        return False
     return ((not url_info.netloc or url_info.netloc == host) and
             (not url_info.scheme or url_info.scheme in ['http', 'https']))

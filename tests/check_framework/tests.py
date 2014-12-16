@@ -9,15 +9,15 @@ from django.conf import settings
 from django.core import checks
 from django.core.checks import Error, Warning
 from django.core.checks.registry import CheckRegistry
-from django.core.checks.compatibility.django_1_6_0 import check_1_6_compatibility
+from django.core.checks.compatibility.django_1_7_0 import check_1_7_compatibility
 from django.core.management.base import CommandError
 from django.core.management import call_command
-from django.db.models.fields import NOT_PROVIDED
+from django.db import models
 from django.test import TestCase
 from django.test.utils import override_settings, override_system_checks
 from django.utils.encoding import force_text
 
-from .models import SimpleModel, Book
+from .models import SimpleModel
 
 
 class DummyObj(object):
@@ -28,17 +28,47 @@ class DummyObj(object):
 class SystemCheckFrameworkTests(TestCase):
 
     def test_register_and_run_checks(self):
-        calls = [0]
 
-        registry = CheckRegistry()
-
-        @registry.register()
         def f(**kwargs):
             calls[0] += 1
             return [1, 2, 3]
+
+        def f2(**kwargs):
+            return [4, ]
+
+        def f3(**kwargs):
+            return [5, ]
+
+        calls = [0]
+
+        # test register as decorator
+        registry = CheckRegistry()
+        registry.register()(f)
+        registry.register("tag1", "tag2")(f2)
+        registry.register("tag2", deploy=True)(f3)
+
+        # test register as function
+        registry2 = CheckRegistry()
+        registry2.register(f)
+        registry2.register(f2, "tag1", "tag2")
+        registry2.register(f3, "tag2", deploy=True)
+
+        # check results
         errors = registry.run_checks()
-        self.assertEqual(errors, [1, 2, 3])
-        self.assertEqual(calls[0], 1)
+        errors2 = registry2.run_checks()
+        self.assertEqual(errors, errors2)
+        self.assertEqual(sorted(errors), [1, 2, 3, 4])
+        self.assertEqual(calls[0], 2)
+
+        errors = registry.run_checks(tags=["tag1"])
+        errors2 = registry2.run_checks(tags=["tag1"])
+        self.assertEqual(errors, errors2)
+        self.assertEqual(sorted(errors), [4])
+
+        errors = registry.run_checks(tags=["tag1", "tag2"], include_deployment_checks=True)
+        errors2 = registry2.run_checks(tags=["tag1", "tag2"], include_deployment_checks=True)
+        self.assertEqual(errors, errors2)
+        self.assertEqual(sorted(errors), [4, 5])
 
 
 class MessageTests(TestCase):
@@ -81,71 +111,38 @@ class MessageTests(TestCase):
         self.assertEqual(force_text(e), expected)
 
 
-class Django_1_6_0_CompatibilityChecks(TestCase):
+class Django_1_7_0_CompatibilityChecks(TestCase):
 
-    @override_settings(TEST_RUNNER='django.test.runner.DiscoverRunner')
-    def test_test_runner_new_default(self):
-        errors = check_1_6_compatibility()
+    @override_settings(MIDDLEWARE_CLASSES=('django.contrib.sessions.middleware.SessionMiddleware',))
+    def test_middleware_classes_overridden(self):
+        errors = check_1_7_compatibility()
         self.assertEqual(errors, [])
 
-    @override_settings(TEST_RUNNER='myapp.test.CustomRunner')
-    def test_test_runner_overriden(self):
-        errors = check_1_6_compatibility()
-        self.assertEqual(errors, [])
-
-    def test_test_runner_not_set_explicitly(self):
-        # If TEST_RUNNER was set explicitly, temporarily pretend it wasn't
-        test_runner_overridden = False
-        if 'TEST_RUNNER' in settings._wrapped._explicit_settings:
-            test_runner_overridden = True
-            settings._wrapped._explicit_settings.remove('TEST_RUNNER')
-        # We remove some settings to make this look like a project generated under Django 1.5.
-        settings._wrapped._explicit_settings.add('MANAGERS')
-        settings._wrapped._explicit_settings.add('ADMINS')
+    def test_middleware_classes_not_set_explicitly(self):
+        # If MIDDLEWARE_CLASSES was set explicitly, temporarily pretend it wasn't
+        middleware_classes_overridden = False
+        if 'MIDDLEWARE_CLASSES' in settings._wrapped._explicit_settings:
+            middleware_classes_overridden = True
+            settings._wrapped._explicit_settings.remove('MIDDLEWARE_CLASSES')
         try:
-            errors = check_1_6_compatibility()
+            errors = check_1_7_compatibility()
             expected = [
                 checks.Warning(
-                    "Some project unittests may not execute as expected.",
-                    hint=("Django 1.6 introduced a new default test runner. It looks like "
-                          "this project was generated using Django 1.5 or earlier. You should "
-                          "ensure your tests are all running & behaving as expected. See "
-                          "https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module "
-                          "for more information."),
+                    "MIDDLEWARE_CLASSES is not set.",
+                    hint=("Django 1.7 changed the global defaults for the MIDDLEWARE_CLASSES. "
+                          "django.contrib.sessions.middleware.SessionMiddleware, "
+                          "django.contrib.auth.middleware.AuthenticationMiddleware, and "
+                          "django.contrib.messages.middleware.MessageMiddleware were removed from the defaults. "
+                          "If your project needs these middleware then you should configure this setting."),
                     obj=None,
-                    id='1_6.W001',
+                    id='1_7.W001',
                 )
             ]
             self.assertEqual(errors, expected)
         finally:
             # Restore settings value
-            if test_runner_overridden:
-                settings._wrapped._explicit_settings.add('TEST_RUNNER')
-            settings._wrapped._explicit_settings.remove('MANAGERS')
-            settings._wrapped._explicit_settings.remove('ADMINS')
-
-    def test_boolean_field_default_value(self):
-        with self.settings(TEST_RUNNER='myapp.test.CustomRunnner'):
-            # We patch the field's default value to trigger the warning
-            boolean_field = Book._meta.get_field('is_published')
-            old_default = boolean_field.default
-            try:
-                boolean_field.default = NOT_PROVIDED
-                errors = check_1_6_compatibility()
-                expected = [
-                    checks.Warning(
-                        'BooleanField does not have a default value.',
-                        hint=('Django 1.6 changed the default value of BooleanField from False to None. '
-                              'See https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield '
-                              'for more information.'),
-                        obj=boolean_field,
-                        id='1_6.W002',
-                    )
-                ]
-                self.assertEqual(errors, expected)
-            finally:
-                # Restore the ``default``
-                boolean_field.default = old_default
+            if middleware_classes_overridden:
+                settings._wrapped._explicit_settings.add('MIDDLEWARE_CLASSES')
 
 
 def simple_system_check(**kwargs):
@@ -157,6 +154,12 @@ def tagged_system_check(**kwargs):
     tagged_system_check.kwargs = kwargs
     return []
 tagged_system_check.tags = ['simpletag']
+
+
+def deployment_system_check(**kwargs):
+    deployment_system_check.kwargs = kwargs
+    return [checks.Warning('Deployment Check')]
+deployment_system_check.tags = ['deploymenttag']
 
 
 class CheckCommandTests(TestCase):
@@ -193,6 +196,37 @@ class CheckCommandTests(TestCase):
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_invalid_tag(self):
         self.assertRaises(CommandError, call_command, 'check', tags=['missingtag'])
+
+    @override_system_checks([simple_system_check])
+    def test_list_tags_empty(self):
+        call_command('check', list_tags=True)
+        self.assertEqual('\n', sys.stdout.getvalue())
+
+    @override_system_checks([tagged_system_check])
+    def test_list_tags(self):
+        call_command('check', list_tags=True)
+        self.assertEqual('simpletag\n', sys.stdout.getvalue())
+
+    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    def test_list_deployment_check_omitted(self):
+        call_command('check', list_tags=True)
+        self.assertEqual('simpletag\n', sys.stdout.getvalue())
+
+    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    def test_list_deployment_check_included(self):
+        call_command('check', deploy=True, list_tags=True)
+        self.assertEqual('deploymenttag\nsimpletag\n', sys.stdout.getvalue())
+
+    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    def test_tags_deployment_check_omitted(self):
+        msg = 'There is no system check with the "deploymenttag" tag.'
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command('check', tags=['deploymenttag'])
+
+    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    def test_tags_deployment_check_included(self):
+        call_command('check', deploy=True, tags=['deploymenttag'])
+        self.assertIn('Deployment Check', sys.stderr.getvalue())
 
 
 def custom_error_system_check(app_configs, **kwargs):
@@ -255,3 +289,59 @@ class SilencingCheckTests(TestCase):
 
         self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
         self.assertEqual(err.getvalue(), '')
+
+
+class CheckFrameworkReservedNamesTests(TestCase):
+
+    def setUp(self):
+        self.current_models = apps.all_models[__package__]
+        self.saved_models = set(self.current_models)
+
+    def tearDown(self):
+        for model in (set(self.current_models) - self.saved_models):
+            del self.current_models[model]
+        apps.clear_cache()
+
+    @override_settings(
+        SILENCED_SYSTEM_CHECKS=['models.E20', 'fields.W342'],  # ForeignKey(unique=True)
+        INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'check_framework']
+    )
+    def test_model_check_method_not_shadowed(self):
+        class ModelWithAttributeCalledCheck(models.Model):
+            check = 42
+
+        class ModelWithFieldCalledCheck(models.Model):
+            check = models.IntegerField()
+
+        class ModelWithRelatedManagerCalledCheck(models.Model):
+            pass
+
+        class ModelWithDescriptorCalledCheck(models.Model):
+            check = models.ForeignKey(ModelWithRelatedManagerCalledCheck)
+            article = models.ForeignKey(ModelWithRelatedManagerCalledCheck, related_name='check')
+
+        errors = checks.run_checks()
+        expected = [
+            Error(
+                "The 'ModelWithAttributeCalledCheck.check()' class method is "
+                "currently overridden by 42.",
+                hint=None,
+                obj=ModelWithAttributeCalledCheck,
+                id='models.E020'
+            ),
+            Error(
+                "The 'ModelWithRelatedManagerCalledCheck.check()' class method is "
+                "currently overridden by %r." % ModelWithRelatedManagerCalledCheck.check,
+                hint=None,
+                obj=ModelWithRelatedManagerCalledCheck,
+                id='models.E020'
+            ),
+            Error(
+                "The 'ModelWithDescriptorCalledCheck.check()' class method is "
+                "currently overridden by %r." % ModelWithDescriptorCalledCheck.check,
+                hint=None,
+                obj=ModelWithDescriptorCalledCheck,
+                id='models.E020'
+            ),
+        ]
+        self.assertEqual(errors, expected)

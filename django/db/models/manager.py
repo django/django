@@ -1,23 +1,21 @@
 import copy
+from importlib import import_module
 import inspect
 
 from django.db import router
 from django.db.models.query import QuerySet
-from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase, RemovedInDjango18Warning
 from django.utils.encoding import python_2_unicode_compatible
 
 
-def ensure_default_manager(sender, **kwargs):
+def ensure_default_manager(cls):
     """
     Ensures that a Model subclass contains a default manager  and sets the
     _default_manager attribute on the class. Also sets up the _base_manager
     points to a plain Manager instance (which could be the same as
     _default_manager if it's not a subclass of Manager).
     """
-    cls = sender
     if cls._meta.abstract:
         setattr(cls, 'objects', AbstractManagerDescriptor(cls))
         return
@@ -28,7 +26,10 @@ def ensure_default_manager(sender, **kwargs):
         # Create the default manager, if needed.
         try:
             cls._meta.get_field('objects')
-            raise ValueError("Model %s must specify a custom Manager, because it has a field named 'objects'" % cls.__name__)
+            raise ValueError(
+                "Model %s must specify a custom Manager, because it has a "
+                "field named 'objects'" % cls.__name__
+            )
         except FieldDoesNotExist:
             pass
         cls.add_to_class('objects', Manager())
@@ -47,27 +48,32 @@ def ensure_default_manager(sender, **kwargs):
                         getattr(base_class, "use_for_related_fields", False)):
                     cls.add_to_class('_base_manager', base_class())
                     return
-            raise AssertionError("Should never get here. Please report a bug, including your model and model manager setup.")
-
-signals.class_prepared.connect(ensure_default_manager)
-
-
-class RenameManagerMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('get_query_set', 'get_queryset', RemovedInDjango18Warning),
-        ('get_prefetch_query_set', 'get_prefetch_queryset', RemovedInDjango18Warning),
-    )
+            raise AssertionError(
+                "Should never get here. Please report a bug, including your "
+                "model and model manager setup."
+            )
 
 
 @python_2_unicode_compatible
-class BaseManager(six.with_metaclass(RenameManagerMethods)):
+class BaseManager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
+
+    #: If set to True the manager will be serialized into migrations and will
+    #: thus be available in e.g. RunPython operations
+    use_in_migrations = False
+
+    def __new__(cls, *args, **kwargs):
+        # We capture the arguments to make returning them trivial
+        obj = super(BaseManager, cls).__new__(cls)
+        obj._constructor_args = (args, kwargs)
+        return obj
 
     def __init__(self):
         super(BaseManager, self).__init__()
         self._set_creation_counter()
         self.model = None
+        self.name = None
         self._inherited = False
         self._db = None
         self._hints = {}
@@ -75,12 +81,45 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
     def __str__(self):
         """ Return "app_label.model_label.manager_name". """
         model = self.model
-        opts = model._meta
         app = model._meta.app_label
-        manager_name = next(name for (_, name, manager)
-            in opts.concrete_managers + opts.abstract_managers
-            if manager == self)
-        return '%s.%s.%s' % (app, model._meta.object_name, manager_name)
+        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+
+    def deconstruct(self):
+        """
+        Returns a 5-tuple of the form (as_manager (True), manager_class,
+        queryset_class, args, kwargs).
+
+        Raises a ValueError if the manager is dynamically generated.
+        """
+        qs_class = self._queryset_class
+        if getattr(self, '_built_as_manager', False):
+            # using MyQuerySet.as_manager()
+            return (
+                True,  # as_manager
+                None,  # manager_class
+                '%s.%s' % (qs_class.__module__, qs_class.__name__),  # qs_class
+                None,  # args
+                None,  # kwargs
+            )
+        else:
+            module_name = self.__module__
+            name = self.__class__.__name__
+            # Make sure it's actually there and not an inner class
+            module = import_module(module_name)
+            if not hasattr(module, name):
+                raise ValueError(
+                    "Could not find manager %s in %s.\n"
+                    "Please note that you need to inherit from managers you "
+                    "dynamically generated with 'from_queryset()'."
+                    % (name, module_name)
+                )
+            return (
+                False,  # as_manager
+                '%s.%s' % (module_name, name),  # manager_class
+                None,  # qs_class
+                self._constructor_args[0],  # args
+                self._constructor_args[1],  # kwargs
+            )
 
     def check(self, **kwargs):
         return []
@@ -122,22 +161,24 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
     def contribute_to_class(self, model, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
         self.model = model
+        if not self.name:
+            self.name = name
         # Only contribute the manager if the model is concrete
         if model._meta.abstract:
             setattr(model, name, AbstractManagerDescriptor(model))
         elif model._meta.swapped:
             setattr(model, name, SwappedManagerDescriptor(model))
         else:
-        # if not model._meta.abstract and not model._meta.swapped:
+            # if not model._meta.abstract and not model._meta.swapped:
             setattr(model, name, ManagerDescriptor(self))
-        if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
+        if (not getattr(model, '_default_manager', None) or
+                self.creation_counter < model._default_manager.creation_counter):
             model._default_manager = self
+
+        abstract = False
         if model._meta.abstract or (self._inherited and not self.model._meta.proxy):
-            model._meta.abstract_managers.append((self.creation_counter, name,
-                    self))
-        else:
-            model._meta.concrete_managers.append((self.creation_counter, name,
-                self))
+            abstract = True
+        model._meta.managers.append((self.creation_counter, self, abstract))
 
     def _set_creation_counter(self):
         """
@@ -189,6 +230,15 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
         # implementation of `RelatedManager.get_queryset()` for a better
         # understanding of how this comes into play.
         return self.get_queryset()
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__) and
+            self._constructor_args == other._constructor_args
+        )
+
+    def __ne__(self, other):
+        return not (self == other)
 
 
 class Manager(BaseManager.from_queryset(QuerySet)):

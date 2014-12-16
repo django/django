@@ -20,8 +20,10 @@ def popen_wrapper(args, os_err_exc_type=CommandError):
         p = Popen(args, shell=False, stdout=PIPE, stderr=PIPE,
                 close_fds=os.name != 'nt', universal_newlines=True)
     except OSError as e:
+        strerror = force_text(e.strerror, DEFAULT_LOCALE_ENCODING,
+                              strings_only=True)
         six.reraise(os_err_exc_type, os_err_exc_type('Error executing %s: %s' %
-                    (args[0], e.strerror)), sys.exc_info()[2])
+                    (args[0], strerror)), sys.exc_info()[2])
     output, errors = p.communicate()
     return (
         output,
@@ -30,21 +32,18 @@ def popen_wrapper(args, os_err_exc_type=CommandError):
     )
 
 
-def handle_extensions(extensions=('html',), ignored=('py',)):
+def handle_extensions(extensions):
     """
     Organizes multiple extensions that are separated with commas or passed by
-    using --extension/-e multiple times. Note that the .py extension is ignored
-    here because of the way non-*.py files are handled in make_messages() (they
-    are copied to file.ext.py files to trick xgettext to parse them as Python
-    files).
+    using --extension/-e multiple times.
 
     For example: running 'django-admin makemessages -e js,txt -e xhtml -a'
     would result in an extension list: ['.js', '.txt', '.xhtml']
 
     >>> handle_extensions(['.html', 'html,js,py,py,py,.py', 'py,.py'])
-    set(['.html', '.js'])
+    {'.html', '.js', '.py'}
     >>> handle_extensions(['.html, txt,.tpl'])
-    set(['.html', '.tpl', '.txt'])
+    {'.html', '.tpl', '.txt'}
     """
     ext_list = []
     for ext in extensions:
@@ -52,12 +51,12 @@ def handle_extensions(extensions=('html',), ignored=('py',)):
     for i, ext in enumerate(ext_list):
         if not ext.startswith('.'):
             ext_list[i] = '.%s' % ext_list[i]
-    return set(x for x in ext_list if x.strip('.') not in ignored)
+    return set(ext_list)
 
 
 def find_command(cmd, path=None, pathext=None):
     if path is None:
-        path = os.environ.get('PATH', []).split(os.pathsep)
+        path = os.environ.get('PATH', '').split(os.pathsep)
     if isinstance(path, six.string_types):
         path = [path]
     # check if there are funny path extensions for executables, e.g. Windows

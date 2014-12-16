@@ -169,6 +169,11 @@ For example::
 This example allows you to request ``Person.authors.all()``, ``Person.editors.all()``,
 and ``Person.people.all()``, yielding predictable results.
 
+.. _default-managers:
+
+Default managers
+~~~~~~~~~~~~~~~~
+
 If you use custom ``Manager`` objects, take note that the first ``Manager``
 Django encounters (in the order in which they're defined in the model) has a
 special status. Django interprets the first ``Manager`` defined in a class as
@@ -178,10 +183,6 @@ exclusively for that model. As a result, it's a good idea to be careful in
 your choice of default manager in order to avoid a situation where overriding
 ``get_queryset()`` results in an inability to retrieve objects you'd like to
 work with.
-
-.. versionchanged:: 1.6
-
-    The ``get_queryset`` method was previously named ``get_query_set``.
 
 .. _managers-for-related-objects:
 
@@ -294,15 +295,12 @@ from_queryset
 
 .. classmethod:: from_queryset(queryset_class)
 
-For advance usage you might want both a custom ``Manager`` and a custom
+For advanced usage you might want both a custom ``Manager`` and a custom
 ``QuerySet``. You can do that by calling ``Manager.from_queryset()`` which
 returns a *subclass* of your base ``Manager`` with a copy of the custom
 ``QuerySet`` methods::
 
     class BaseManager(models.Manager):
-        def __init__(self, *args, **kwargs):
-            ...
-
         def manager_only_method(self):
             return
 
@@ -311,14 +309,14 @@ returns a *subclass* of your base ``Manager`` with a copy of the custom
             return
 
     class MyModel(models.Model):
-        objects = BaseManager.from_queryset(CustomQueryset)(*args, **kwargs)
+        objects = BaseManager.from_queryset(CustomQueryset)()
 
 You may also store the generated class into a variable::
 
     CustomManager = BaseManager.from_queryset(CustomQueryset)
 
     class MyModel(models.Model):
-        objects = CustomManager(*args, **kwargs)
+        objects = CustomManager()
 
 .. _custom-managers-and-inheritance:
 

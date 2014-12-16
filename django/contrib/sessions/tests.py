@@ -24,6 +24,7 @@ from django.test import TestCase, RequestFactory, override_settings
 from django.test.utils import patch_logger
 from django.utils import six
 from django.utils import timezone
+from django.utils.encoding import force_text
 
 from django.contrib.sessions.exceptions import InvalidSessionKey
 
@@ -178,7 +179,10 @@ class SessionTestsMixin(object):
             try:
                 session.save()
             except AttributeError:
-                self.fail("The session object did not save properly.  Middleware may be saving cache items without namespaces.")
+                self.fail(
+                    "The session object did not save properly. "
+                    "Middleware may be saving cache items without namespaces."
+                )
             self.assertNotEqual(session.session_key, '1')
             self.assertEqual(session.get('cat'), None)
             session.delete()
@@ -282,7 +286,7 @@ class SessionTestsMixin(object):
             self.assertEqual({}, self.session.decode(bad_encode))
             # check that the failed decode is logged
             self.assertEqual(len(calls), 1)
-            self.assertTrue('corrupted' in calls[0])
+            self.assertIn('corrupted', calls[0])
 
     def test_actual_expiry(self):
         # this doesn't work with JSONSerializer (serializing timedelta)
@@ -309,6 +313,16 @@ class SessionTestsMixin(object):
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
 
     backend = DatabaseSession
+
+    def test_session_str(self):
+        "Session repr should be the session key."
+        self.session['x'] = 1
+        self.session.save()
+
+        session_key = self.session.session_key
+        s = Session.objects.get(session_key=session_key)
+
+        self.assertEqual(force_text(s), session_key)
 
     def test_session_get_decoded(self):
         """
@@ -493,7 +507,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         },
     }, SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
-        # Re-initalize the session backend to make use of overridden settings.
+        # Re-initialize the session backend to make use of overridden settings.
         self.session = self.backend()
 
         self.session.save()
@@ -567,6 +581,30 @@ class SessionMiddlewareTests(unittest.TestCase):
 
         # Check that the value wasn't saved above.
         self.assertNotIn('hello', request.session.load())
+
+    def test_session_delete_on_end(self):
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        middleware = SessionMiddleware()
+
+        # Before deleting, there has to be an existing cookie
+        request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
+
+        # Simulate a request that ends the session
+        middleware.process_request(request)
+        request.session.flush()
+
+        # Handle the response through the middleware
+        response = middleware.process_response(request, response)
+
+        # Check that the cookie was deleted, not recreated.
+        # A deleted cookie header looks like:
+        #  Set-Cookie: sessionid=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
+        self.assertEqual(
+            'Set-Cookie: {}=; expires=Thu, 01-Jan-1970 00:00:00 GMT; '
+            'Max-Age=0; Path=/'.format(settings.SESSION_COOKIE_NAME),
+            str(response.cookies[settings.SESSION_COOKIE_NAME])
+        )
 
 
 class CookieSessionTests(SessionTestsMixin, TestCase):

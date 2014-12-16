@@ -9,9 +9,11 @@ a list of all possible variables.
 import importlib
 import os
 import time     # Needed for Windows
+import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import LazyObject, empty
 from django.utils import six
 
@@ -74,9 +76,6 @@ class BaseSettings(object):
     def __setattr__(self, name, value):
         if name in ("MEDIA_URL", "STATIC_URL") and value and not value.endswith('/'):
             raise ImproperlyConfigured("If set, %s must end with a slash" % name)
-        elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
-            raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
-                "to a tuple, not a string.")
         object.__setattr__(self, name, value)
 
 
@@ -90,15 +89,14 @@ class Settings(BaseSettings):
         # store the settings module in case someone later cares
         self.SETTINGS_MODULE = settings_module
 
-        try:
-            mod = importlib.import_module(self.SETTINGS_MODULE)
-        except ImportError as e:
-            raise ImportError(
-                "Could not import settings '%s' (Is it on sys.path? Is there an import error in the settings file?): %s"
-                % (self.SETTINGS_MODULE, e)
-            )
+        mod = importlib.import_module(self.SETTINGS_MODULE)
 
-        tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
+        tuple_settings = (
+            "ALLOWED_INCLUDE_ROOTS",
+            "INSTALLED_APPS",
+            "TEMPLATE_DIRS",
+            "LOCALE_PATHS",
+        )
         self._explicit_settings = set()
         for setting in dir(mod):
             if setting.isupper():
@@ -113,6 +111,16 @@ class Settings(BaseSettings):
 
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+
+        if ('django.contrib.auth.middleware.AuthenticationMiddleware' in self.MIDDLEWARE_CLASSES and
+                'django.contrib.auth.middleware.SessionAuthenticationMiddleware' not in self.MIDDLEWARE_CLASSES):
+            warnings.warn(
+                "Session verification will become mandatory in Django 2.0. "
+                "Please add 'django.contrib.auth.middleware.SessionAuthenticationMiddleware' "
+                "to your MIDDLEWARE_CLASSES setting when you are ready to opt-in after "
+                "reading the upgrade considerations in the 1.8 release notes.",
+                RemovedInDjango20Warning
+            )
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -153,11 +161,12 @@ class UserSettingsHolder(BaseSettings):
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        return super(UserSettingsHolder, self).__setattr__(name, value)
+        super(UserSettingsHolder, self).__setattr__(name, value)
 
     def __delattr__(self, name):
         self._deleted.add(name)
-        return super(UserSettingsHolder, self).__delattr__(name)
+        if hasattr(self, name):
+            super(UserSettingsHolder, self).__delattr__(name)
 
     def __dir__(self):
         return list(self.__dict__) + dir(self.default_settings)

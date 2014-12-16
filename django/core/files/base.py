@@ -3,10 +3,11 @@ from __future__ import unicode_literals
 import os
 from io import BytesIO, StringIO, UnsupportedOperation
 
-from django.utils.encoding import smart_text
 from django.core.files.utils import FileProxyMixin
 from django.utils import six
-from django.utils.encoding import force_bytes, python_2_unicode_compatible
+from django.utils.encoding import (
+    force_bytes, force_str, python_2_unicode_compatible, smart_text,
+)
 
 
 @python_2_unicode_compatible
@@ -25,7 +26,7 @@ class File(FileProxyMixin):
         return smart_text(self.name or '')
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self or "None")
+        return force_str("<%s: %s>" % (self.__class__.__name__, self or "None"))
 
     def __bool__(self):
         return bool(self.name)
@@ -36,19 +37,26 @@ class File(FileProxyMixin):
     def __len__(self):
         return self.size
 
+    def _get_size_from_underlying_file(self):
+        if hasattr(self.file, 'size'):
+            return self.file.size
+        if hasattr(self.file, 'name'):
+            try:
+                return os.path.getsize(self.file.name)
+            except (OSError, TypeError):
+                pass
+        if hasattr(self.file, 'tell') and hasattr(self.file, 'seek'):
+            pos = self.file.tell()
+            self.file.seek(0, os.SEEK_END)
+            size = self.file.tell()
+            self.file.seek(pos)
+            return size
+        raise AttributeError("Unable to determine the file's size.")
+
     def _get_size(self):
-        if not hasattr(self, '_size'):
-            if hasattr(self.file, 'size'):
-                self._size = self.file.size
-            elif hasattr(self.file, 'name') and os.path.exists(self.file.name):
-                self._size = os.path.getsize(self.file.name)
-            elif hasattr(self.file, 'tell') and hasattr(self.file, 'seek'):
-                pos = self.file.tell()
-                self.file.seek(0, os.SEEK_END)
-                self._size = self.file.tell()
-                self.file.seek(pos)
-            else:
-                raise AttributeError("Unable to determine the file's size.")
+        if hasattr(self, '_size'):
+            return self._size
+        self._size = self._get_size_from_underlying_file()
         return self._size
 
     def _set_size(self, size):
@@ -95,16 +103,22 @@ class File(FileProxyMixin):
         # Iterate over this file-like object by newlines
         buffer_ = None
         for chunk in self.chunks():
-            chunk_buffer = BytesIO(chunk)
-
-            for line in chunk_buffer:
+            for line in chunk.splitlines(True):
                 if buffer_:
-                    line = buffer_ + line
+                    if endswith_cr(buffer_) and not equals_lf(line):
+                        # Line split after a \r newline; yield buffer_.
+                        yield buffer_
+                        # Continue with line.
+                    else:
+                        # Line either split without a newline (line
+                        # continues after buffer_) or with \r\n
+                        # newline (line == b'\n').
+                        line = buffer_ + line
+                    # buffer_ handled, clear it.
                     buffer_ = None
 
-                # If this is the end of a line, yield
-                # otherwise, wait for the next round
-                if line[-1:] in (b'\n', b'\r'):
+                # If this is the end of a \n or \r\n line, yield.
+                if endswith_lf(line):
                     yield line
                 else:
                     buffer_ = line
@@ -158,3 +172,24 @@ class ContentFile(File):
 
     def close(self):
         pass
+
+
+def endswith_cr(line):
+    """
+    Return True if line (a text or byte string) ends with '\r'.
+    """
+    return line.endswith('\r' if isinstance(line, six.text_type) else b'\r')
+
+
+def endswith_lf(line):
+    """
+    Return True if line (a text or byte string) ends with '\n'.
+    """
+    return line.endswith('\n' if isinstance(line, six.text_type) else b'\n')
+
+
+def equals_lf(line):
+    """
+    Return True if line (a text or byte string) equals '\n'.
+    """
+    return line == ('\n' if isinstance(line, six.text_type) else b'\n')

@@ -1,13 +1,13 @@
 from importlib import import_module
 import os
-from optparse import make_option
 import unittest
 from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
+from django.utils.datastructures import OrderedSet
 
 
 class DiscoverRunner(object):
@@ -18,18 +18,10 @@ class DiscoverRunner(object):
     test_suite = TestSuite
     test_runner = unittest.TextTestRunner
     test_loader = defaultTestLoader
-    reorder_by = (TestCase, )
-    option_list = (
-        make_option('-t', '--top-level-directory',
-            action='store', dest='top_level', default=None,
-            help='Top level of project for unittest discovery.'),
-        make_option('-p', '--pattern', action='store', dest='pattern',
-            default="test*.py",
-            help='The test matching pattern. Defaults to test*.py.'),
-    )
+    reorder_by = (TestCase, SimpleTestCase)
 
     def __init__(self, pattern=None, top_level=None,
-                 verbosity=1, interactive=True, failfast=False,
+                 verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False,
                  **kwargs):
 
         self.pattern = pattern
@@ -38,6 +30,23 @@ class DiscoverRunner(object):
         self.verbosity = verbosity
         self.interactive = interactive
         self.failfast = failfast
+        self.keepdb = keepdb
+        self.reverse = reverse
+
+    @classmethod
+    def add_arguments(cls, parser):
+        parser.add_argument('-t', '--top-level-directory',
+            action='store', dest='top_level', default=None,
+            help='Top level of project for unittest discovery.')
+        parser.add_argument('-p', '--pattern', action='store', dest='pattern',
+            default="test*.py",
+            help='The test matching pattern. Defaults to test*.py.')
+        parser.add_argument('-k', '--keepdb', action='store_true', dest='keepdb',
+            default=False,
+            help='Preserves the test DB between runs.')
+        parser.add_argument('-r', '--reverse', action='store_true', dest='reverse',
+            default=False,
+            help='Reverses test cases order.')
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment()
@@ -103,10 +112,10 @@ class DiscoverRunner(object):
         for test in extra_tests:
             suite.addTest(test)
 
-        return reorder_suite(suite, self.reorder_by)
+        return reorder_suite(suite, self.reorder_by, self.reverse)
 
     def setup_databases(self, **kwargs):
-        return setup_databases(self.verbosity, self.interactive, **kwargs)
+        return setup_databases(self.verbosity, self.interactive, self.keepdb, **kwargs)
 
     def run_suite(self, suite, **kwargs):
         return self.test_runner(
@@ -121,7 +130,7 @@ class DiscoverRunner(object):
         old_names, mirrors = old_config
         for connection, old_name, destroy in old_names:
             if destroy:
-                connection.creation.destroy_test_db(old_name, self.verbosity)
+                connection.creation.destroy_test_db(old_name, self.verbosity, self.keepdb)
 
     def teardown_test_environment(self, **kwargs):
         unittest.removeHandler()
@@ -178,7 +187,7 @@ def dependency_ordered(test_databases, dependencies):
     # Maps db signature to dependencies of all it's aliases
     dependencies_map = {}
 
-    # sanity check - no DB can depend on it's own alias
+    # sanity check - no DB can depend on its own alias
     for sig, (_, aliases) in test_databases:
         all_deps = set()
         for alias in aliases:
@@ -209,7 +218,7 @@ def dependency_ordered(test_databases, dependencies):
     return ordered_test_databases
 
 
-def reorder_suite(suite, classes):
+def reorder_suite(suite, classes, reverse=False):
     """
     Reorders a test suite by test type.
 
@@ -217,40 +226,47 @@ def reorder_suite(suite, classes):
 
     All tests of type classes[0] are placed first, then tests of type
     classes[1], etc. Tests with no match in classes are placed last.
+
+    If `reverse` is True, tests within classes are sorted in opposite order,
+    but test classes are not reversed.
     """
     class_count = len(classes)
     suite_class = type(suite)
-    bins = [suite_class() for i in range(class_count + 1)]
-    partition_suite(suite, classes, bins)
-    for i in range(class_count):
-        bins[0].addTests(bins[i + 1])
-    return bins[0]
+    bins = [OrderedSet() for i in range(class_count + 1)]
+    partition_suite(suite, classes, bins, reverse=reverse)
+    reordered_suite = suite_class()
+    for i in range(class_count + 1):
+        reordered_suite.addTests(bins[i])
+    return reordered_suite
 
 
-def partition_suite(suite, classes, bins):
+def partition_suite(suite, classes, bins, reverse=False):
     """
-    Partitions a test suite by test type.
+    Partitions a test suite by test type. Also prevents duplicated tests.
 
     classes is a sequence of types
     bins is a sequence of TestSuites, one more than classes
+    reverse changes the ordering of tests within bins
 
     Tests of type classes[i] are added to bins[i],
     tests with no match found in classes are place in bins[-1]
     """
     suite_class = type(suite)
+    if reverse:
+        suite = reversed(tuple(suite))
     for test in suite:
         if isinstance(test, suite_class):
-            partition_suite(test, classes, bins)
+            partition_suite(test, classes, bins, reverse=reverse)
         else:
             for i in range(len(classes)):
                 if isinstance(test, classes[i]):
-                    bins[i].addTest(test)
+                    bins[i].add(test)
                     break
             else:
-                bins[-1].addTest(test)
+                bins[-1].add(test)
 
 
-def setup_databases(verbosity, interactive, **kwargs):
+def setup_databases(verbosity, interactive, keepdb=False, **kwargs):
     from django.db import connections, DEFAULT_DB_ALIAS
 
     # First pass -- work out which databases actually need to be created,
@@ -294,7 +310,11 @@ def setup_databases(verbosity, interactive, **kwargs):
             connection = connections[alias]
             if test_db_name is None:
                 test_db_name = connection.creation.create_test_db(
-                    verbosity, autoclobber=not interactive)
+                    verbosity,
+                    autoclobber=not interactive,
+                    keepdb=keepdb,
+                    serialize=connection.settings_dict.get("TEST", {}).get("SERIALIZE", True),
+                )
                 destroy = True
             else:
                 connection.settings_dict['NAME'] = test_db_name

@@ -31,6 +31,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'SmallIntegerField': 'smallint',
         'TextField': 'text',
         'TimeField': 'time',
+        'UUIDField': 'uuid',
     }
 
     data_type_check_constraints = {
@@ -40,14 +41,17 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def sql_table_creation_suffix(self):
         test_settings = self.connection.settings_dict['TEST']
-        assert test_settings['COLLATION'] is None, "PostgreSQL does not support collation setting at database creation time."
+        assert test_settings['COLLATION'] is None, (
+            "PostgreSQL does not support collation setting at database creation time."
+        )
         if test_settings['CHARSET']:
             return "WITH ENCODING '%s'" % test_settings['CHARSET']
         return ''
 
     def sql_indexes_for_field(self, model, f, style):
         output = []
-        if f.db_index or f.unique:
+        db_type = f.db_type(connection=self.connection)
+        if db_type is not None and (f.db_index or f.unique):
             qn = self.connection.ops.quote_name
             db_table = model._meta.db_table
             tablespace = f.db_tablespace or model._meta.db_tablespace
@@ -73,7 +77,6 @@ class DatabaseCreation(BaseDatabaseCreation):
             # a second index that specifies their operator class, which is
             # needed when performing correct LIKE queries outside the
             # C locale. See #12234.
-            db_type = f.db_type(connection=self.connection)
             if db_type.startswith('varchar'):
                 output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
                                             ' varchar_pattern_ops'))

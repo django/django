@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
+import io
+import os
 import re
 import types
 from unittest import TestCase
@@ -14,13 +16,15 @@ from django.core.validators import (
     validate_ipv46_address, validate_ipv4_address, validate_ipv6_address,
     validate_slug,
 )
+from django.test import SimpleTestCase
 from django.test.utils import str_prefix
+from django.utils._os import upath
 
 
 NOW = datetime.now()
 EXTENDED_SCHEMES = ['http', 'https', 'ftp', 'ftps', 'git', 'file']
 
-TEST_DATA = (
+TEST_DATA = [
     # (validator, value, expected),
     (validate_integer, '42', None),
     (validate_integer, '-42', None),
@@ -58,6 +62,7 @@ TEST_DATA = (
     (validate_email, 'email@[::ffff:127.0.0.256]', ValidationError),
     (validate_email, 'example@invalid-.com', ValidationError),
     (validate_email, 'example@-invalid.com', ValidationError),
+    (validate_email, 'example@invalid.com-', ValidationError),
     (validate_email, 'example@inv-.alid-.com', ValidationError),
     (validate_email, 'example@inv-.-alid.com', ValidationError),
     (validate_email, 'test@example.com\n\n<script src="x.js">', ValidationError),
@@ -65,6 +70,9 @@ TEST_DATA = (
     (validate_email, '"\\\011"@here.com', None),
     (validate_email, '"\\\012"@here.com', ValidationError),
     (validate_email, 'trailingdot@shouldfail.com.', ValidationError),
+    # Max length of domain name in email is 249 (see validator for calculation)
+    (validate_email, 'a@%s.us' % ('a' * 249), None),
+    (validate_email, 'a@%s.us' % ('a' * 250), ValidationError),
 
     (validate_slug, 'slug-ok', None),
     (validate_slug, 'longer-slug-still-ok', None),
@@ -88,7 +96,7 @@ TEST_DATA = (
     (validate_ipv4_address, '25.1 .1.1', ValidationError),
 
     # validate_ipv6_address uses django.utils.ipv6, which
-    # is tested in much greater detail in it's own testcase
+    # is tested in much greater detail in its own testcase
     (validate_ipv6_address, 'fe80::1', None),
     (validate_ipv6_address, '::1', None),
     (validate_ipv6_address, '1:2:3:4:5:6:7:8', None),
@@ -148,36 +156,9 @@ TEST_DATA = (
 
     (MinLengthValidator(10), '', ValidationError),
 
-    (URLValidator(), 'http://www.djangoproject.com/', None),
-    (URLValidator(), 'HTTP://WWW.DJANGOPROJECT.COM/', None),
-    (URLValidator(), 'http://localhost/', None),
-    (URLValidator(), 'http://example.com/', None),
-    (URLValidator(), 'http://www.example.com/', None),
-    (URLValidator(), 'http://www.example.com:8000/test', None),
-    (URLValidator(), 'http://valid-with-hyphens.com/', None),
-    (URLValidator(), 'http://subdomain.example.com/', None),
-    (URLValidator(), 'http://200.8.9.10/', None),
-    (URLValidator(), 'http://200.8.9.10:8000/test', None),
-    (URLValidator(), 'http://valid-----hyphens.com/', None),
-    (URLValidator(), 'http://example.com?something=value', None),
-    (URLValidator(), 'http://example.com/index.php?something=value&another=value2', None),
-    (URLValidator(), 'https://example.com/', None),
-    (URLValidator(), 'ftp://example.com/', None),
-    (URLValidator(), 'ftps://example.com/', None),
     (URLValidator(EXTENDED_SCHEMES), 'file://localhost/path', None),
     (URLValidator(EXTENDED_SCHEMES), 'git://example.com/', None),
 
-    (URLValidator(), 'foo', ValidationError),
-    (URLValidator(), 'http://', ValidationError),
-    (URLValidator(), 'http://example', ValidationError),
-    (URLValidator(), 'http://example.', ValidationError),
-    (URLValidator(), 'http://.com', ValidationError),
-    (URLValidator(), 'http://invalid-.com', ValidationError),
-    (URLValidator(), 'http://-invalid.com', ValidationError),
-    (URLValidator(), 'http://inv-.alid-.com', ValidationError),
-    (URLValidator(), 'http://inv-.-alid.com', ValidationError),
-    (URLValidator(), 'file://localhost/path', ValidationError),
-    (URLValidator(), 'git://example.com/', ValidationError),
     (URLValidator(EXTENDED_SCHEMES), 'git://-invalid.com', ValidationError),
 
     (BaseValidator(True), True, None),
@@ -198,7 +179,24 @@ TEST_DATA = (
     (RegexValidator(re.compile('x'), inverse_match=True), 'y', None),
     (RegexValidator('x', inverse_match=True), 'x', ValidationError),
     (RegexValidator(re.compile('x'), inverse_match=True), 'x', ValidationError),
-)
+
+    (RegexValidator('x', flags=re.IGNORECASE), 'y', ValidationError),
+    (RegexValidator('a'), 'A', ValidationError),
+    (RegexValidator('a', flags=re.IGNORECASE), 'A', None),
+]
+
+
+def create_path(filename):
+    return os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), filename))
+
+# Add valid and invalid URL tests.
+# This only tests the validator without extended schemes.
+with io.open(create_path('valid_urls.txt'), encoding='utf8') as f:
+    for url in f:
+        TEST_DATA.append((URLValidator(), url.strip(), None))
+with io.open(create_path('invalid_urls.txt'), encoding='utf8') as f:
+    for url in f:
+        TEST_DATA.append((URLValidator(), url.strip(), ValidationError))
 
 
 def create_simple_test_method(validator, expected, value, num):
@@ -234,7 +232,7 @@ def create_simple_test_method(validator, expected, value, num):
 # Dynamically assemble a test class with the contents of TEST_DATA
 
 
-class TestSimpleValidators(TestCase):
+class TestSimpleValidators(SimpleTestCase):
     def test_single_message(self):
         v = ValidationError('Not Valid')
         self.assertEqual(str(v), str_prefix("[%(_)s'Not Valid']"))
@@ -249,6 +247,19 @@ class TestSimpleValidators(TestCase):
         v = ValidationError({'first': ['First Problem']})
         self.assertEqual(str(v), str_prefix("{%(_)s'first': [%(_)s'First Problem']}"))
         self.assertEqual(repr(v), str_prefix("ValidationError({%(_)s'first': [%(_)s'First Problem']})"))
+
+    def test_regex_validator_flags(self):
+        try:
+            RegexValidator(re.compile('a'), flags=re.IGNORECASE)
+        except TypeError:
+            pass
+        else:
+            self.fail("TypeError not raised when flags and pre-compiled regex in RegexValidator")
+
+    def test_max_length_validator_message(self):
+        v = MaxLengthValidator(16, message='"%(value)s" has more than %(limit_value)d characters.')
+        with self.assertRaisesMessage(ValidationError, '"djangoproject.com" has more than 16 characters.'):
+            v('djangoproject.com')
 
 test_counter = 0
 for validator, value, expected in TEST_DATA:
@@ -282,6 +293,33 @@ class TestValidatorEquality(TestCase):
         self.assertNotEqual(
             RegexValidator(r'^(?:[a-z0-9\.\-]*)://', "oh noes", "invalid"),
             RegexValidator(r'^(?:[a-z0-9\.\-]*)://'),
+        )
+
+        self.assertNotEqual(
+            RegexValidator('', flags=re.IGNORECASE),
+            RegexValidator(''),
+        )
+
+        self.assertNotEqual(
+            RegexValidator(''),
+            RegexValidator('', inverse_match=True),
+        )
+
+    def test_regex_equality_nocache(self):
+        pattern = r'^(?:[a-z0-9\.\-]*)://'
+        left = RegexValidator(pattern)
+        re.purge()
+        right = RegexValidator(pattern)
+
+        self.assertEqual(
+            left,
+            right,
+        )
+
+    def test_regex_equality_blank(self):
+        self.assertEqual(
+            RegexValidator(),
+            RegexValidator(),
         )
 
     def test_email_equality(self):

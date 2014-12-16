@@ -1,7 +1,10 @@
+import warnings
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.utils.translation import ugettext as _
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
@@ -11,7 +14,8 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 
 # Avoid shadowing the login() and logout() views below.
-from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, get_user_model
+from django.contrib.auth import (REDIRECT_FIELD_NAME, login as auth_login,
+    logout as auth_logout, get_user_model, update_session_auth_hash)
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
@@ -158,6 +162,12 @@ def password_reset(request, is_admin_site=False,
                 'html_email_template_name': html_email_template_name,
             }
             if is_admin_site:
+                warnings.warn(
+                    "The is_admin_site argument to "
+                    "django.contrib.auth.views.password_reset() is deprecated "
+                    "and will be removed in Django 2.0.",
+                    RemovedInDjango20Warning, 3
+                )
                 opts = dict(opts, domain_override=request.get_host())
             form.save(**opts)
             return HttpResponseRedirect(post_reset_redirect)
@@ -177,7 +187,7 @@ def password_reset_done(request,
                         template_name='registration/password_reset_done.html',
                         current_app=None, extra_context=None):
     context = {
-        'title': _('Password reset successful'),
+        'title': _('Password reset sent'),
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -264,6 +274,11 @@ def password_change(request,
         form = password_change_form(user=request.user, data=request.POST)
         if form.is_valid():
             form.save()
+            # Updating the password logs out all other sessions for the user
+            # except the current one if
+            # django.contrib.auth.middleware.SessionAuthenticationMiddleware
+            # is enabled.
+            update_session_auth_hash(request, form.user)
             return HttpResponseRedirect(post_change_redirect)
     else:
         form = password_change_form(user=request.user)

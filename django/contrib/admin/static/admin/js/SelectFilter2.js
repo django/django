@@ -15,7 +15,7 @@ function findForm(node) {
 window.SelectFilter = {
     init: function(field_id, field_name, is_stacked, admin_static_prefix) {
         if (field_id.match(/__prefix__/)){
-            // Don't intialize on empty forms.
+            // Don't initialize on empty forms.
             return;
         }
         var from_box = document.getElementById(field_id);
@@ -83,6 +83,7 @@ window.SelectFilter = {
         from_box.setAttribute('name', from_box.getAttribute('name') + '_old');
 
         // Set up the JavaScript event handlers for the select box filter interface
+        addEvent(filter_input, 'keypress', function(e) { SelectFilter.filter_key_press(e, field_id); });
         addEvent(filter_input, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id); });
         addEvent(filter_input, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id); });
         addEvent(from_box, 'change', function(e) { SelectFilter.refresh_icons(field_id) });
@@ -123,15 +124,19 @@ window.SelectFilter = {
         $('#' + field_id + '_add_all_link').toggleClass('active', from.find('option').length > 0);
         $('#' + field_id + '_remove_all_link').toggleClass('active', to.find('option').length > 0);
     },
-    filter_key_up: function(event, field_id) {
+    filter_key_press: function(event, field_id) {
         var from = document.getElementById(field_id + '_from');
         // don't submit form if user pressed Enter
         if ((event.which && event.which == 13) || (event.keyCode && event.keyCode == 13)) {
             from.selectedIndex = 0;
             SelectBox.move(field_id + '_from', field_id + '_to');
             from.selectedIndex = 0;
+            event.preventDefault()
             return false;
         }
+    },
+    filter_key_up: function(event, field_id) {
+        var from = document.getElementById(field_id + '_from');
         var temp = from.selectedIndex;
         SelectBox.filter(field_id + '_from', document.getElementById(field_id + '_input').value);
         from.selectedIndex = temp;

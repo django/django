@@ -5,7 +5,6 @@ import warnings
 from django.core import management
 from django.db import transaction
 from django.test import TestCase, TransactionTestCase
-from django.test.utils import override_system_checks
 from django.utils.six import StringIO
 
 from .models import Article, Book
@@ -31,7 +30,6 @@ class TestNoInitialDataLoading(TransactionTestCase):
 
     available_apps = ['fixtures_model_package']
 
-    @override_system_checks([])
     def test_migrate(self):
         with transaction.atomic():
             Book.objects.all().delete()
@@ -43,7 +41,6 @@ class TestNoInitialDataLoading(TransactionTestCase):
             )
             self.assertQuerysetEqual(Book.objects.all(), [])
 
-    @override_system_checks([])
     def test_flush(self):
         # Test presence of fixture (flush called by TransactionTestCase)
         self.assertQuerysetEqual(
@@ -67,6 +64,7 @@ class FixtureTestCase(TestCase):
     def test_initial_data(self):
         "Fixtures can load initial data into models defined in packages"
         # migrate introduces 1 initial data object from initial_data.json
+        # this behavior is deprecated and will be removed in Django 1.9
         self.assertQuerysetEqual(
             Book.objects.all(), [
                 'Achieving self-awareness of Python programs'
@@ -125,7 +123,6 @@ class InitialSQLTests(TestCase):
         out = StringIO()
         management.call_command("sqlcustom", "fixtures_model_package", stdout=out)
         output = out.getvalue()
-        self.assertTrue("INSERT INTO fixtures_model_package_book (name) "
-                        "VALUES ('My Book')" in output)
+        self.assertIn("INSERT INTO fixtures_model_package_book (name) VALUES ('My Book')", output)
         # value from deprecated search path models/sql (remove in Django 1.9)
-        self.assertTrue("Deprecated Book" in output)
+        self.assertIn("Deprecated Book", output)

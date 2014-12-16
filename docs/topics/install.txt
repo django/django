@@ -22,12 +22,8 @@ your operating system's package manager.
 
 .. admonition:: Python on Windows
 
-    On Windows, you might need to adjust your ``PATH`` environment variable
-    to include paths to Python executable and additional scripts. For example,
-    if your Python is installed in ``C:\Python27\``, the following paths need
-    to be added to ``PATH``::
-
-        C:\Python27\;C:\Python27\Scripts;
+    If you are just starting with Django and using Windows, you may find
+    :doc:`/howto/windows` useful.
 
 Install Apache and mod_wsgi
 =============================
@@ -60,14 +56,11 @@ installed.
 If you can't use mod_wsgi for some reason, fear not: Django supports many other
 deployment options. One is :doc:`uWSGI </howto/deployment/wsgi/uwsgi>`; it works
 very well with `nginx`_. Additionally, Django follows the WSGI spec
-(:pep:`3333`), which allows it to run on a variety of server platforms. See the
-`server-arrangements wiki page`_ for specific installation instructions for
-each platform.
+(:pep:`3333`), which allows it to run on a variety of server platforms.
 
 .. _Apache: http://httpd.apache.org/
 .. _nginx: http://nginx.org/
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
-.. _server-arrangements wiki page: https://code.djangoproject.com/wiki/ServerArrangements
 
 .. _database-installation:
 
@@ -212,7 +205,7 @@ This is the recommended way to install Django.
 .. _pip: http://www.pip-installer.org/
 .. _virtualenv: http://www.virtualenv.org/
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
-.. _standalone pip installer: http://www.pip-installer.org/en/latest/installing.html#using-the-installer
+.. _standalone pip installer: http://www.pip-installer.org/en/latest/installing.html#install-pip
 
 Installing an official release manually
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -288,7 +281,7 @@ latest bug fixes and improvements, follow these instructions:
    (If using a virtualenv_ you can omit ``sudo``.)
 
    This will make Django's code importable, and will also make the
-   ``django-admin.py`` utility command available. In other words, you're all
+   ``django-admin`` utility command available. In other words, you're all
    set!
 
    If you don't have pip_ available, see the alternative instructions for
@@ -347,7 +340,7 @@ Next you need to make the ``django-admin.py`` utility available in your
 shell PATH.
 
 On Unix-like systems, create a symbolic link to the file
-``django-trunk/django/bin/django-admin.py`` in a directory on your system
+``django-trunk/django/bin/django-admin`` in a directory on your system
 path, such as ``/usr/local/bin``. For example:
 
 .. code-block:: bash
@@ -363,3 +356,7 @@ rather than having to qualify the command with the full path to the file.
 On Windows systems, the same result can be achieved by copying the file
 ``django-trunk/django/bin/django-admin.py`` to somewhere on your system
 path, for example ``C:\Python27\Scripts``.
+
+Note that the rest of the documentation assumes this utility is installed
+as ``django-admin``. You'll have to substitute ``django-admin.py`` if you use
+this method.

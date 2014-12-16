@@ -4,7 +4,7 @@ from django.db import DEFAULT_DB_ALIAS
 
 
 class TestRouter(object):
-    # A test router. The behavior is vaguely master/slave, but the
+    # A test router. The behavior is vaguely primary/replica, but the
     # databases aren't assumed to propagate changes.
     def db_for_read(self, model, instance=None, **hints):
         if instance:

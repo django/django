@@ -1,5 +1,5 @@
 """
-  The Spatial Reference class, represensents OGR Spatial Reference objects.
+  The Spatial Reference class, represents OGR Spatial Reference objects.
 
   Example:
   >>> from django.contrib.gis.gdal import SpatialReference
@@ -97,7 +97,7 @@ class SpatialReference(GDALBase):
 
     def __del__(self):
         "Destroys this spatial reference."
-        if self._ptr:
+        if self._ptr and capi:
             capi.release_srs(self._ptr)
 
     def __getitem__(self, target):
@@ -342,7 +342,7 @@ class CoordTransform(GDALBase):
 
     def __del__(self):
         "Deletes this Coordinate Transformation object."
-        if self._ptr:
+        if self._ptr and capi:
             capi.destroy_ct(self._ptr)
 
     def __str__(self):

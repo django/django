@@ -35,36 +35,37 @@ class BadHeaderError(ValueError):
     pass
 
 
-# Copied from Python standard library, with the following modifications:
+# Copied from Python 3.2+ standard library, with the following modifications:
 # * Used cached hostname for performance.
-# * Added try/except to support lack of getpid() in Jython (#5496).
-def make_msgid(idstring=None):
+# TODO: replace with email.utils.make_msgid(.., domain=DNS_NAME) when dropping
+# Python 2 (Python 2's version doesn't have domain parameter) (#23905).
+def make_msgid(idstring=None, domain=None):
     """Returns a string suitable for RFC 2822 compliant Message-ID, e.g:
 
     <20020201195627.33539.96671@nightshade.la.mastaler.com>
 
     Optional idstring if given is a string used to strengthen the
-    uniqueness of the message id.
+    uniqueness of the message id.  Optional domain if given provides the
+    portion of the message id after the '@'.  It defaults to the locally
+    defined hostname.
     """
     timeval = time.time()
     utcdate = time.strftime('%Y%m%d%H%M%S', time.gmtime(timeval))
-    try:
-        pid = os.getpid()
-    except AttributeError:
-        # No getpid() in Jython, for example.
-        pid = 1
+    pid = os.getpid()
     randint = random.randrange(100000)
     if idstring is None:
         idstring = ''
     else:
         idstring = '.' + idstring
-    idhost = DNS_NAME
-    msgid = '<%s.%s.%s%s@%s>' % (utcdate, pid, randint, idstring, idhost)
+    if domain is None:
+        # stdlib uses socket.getfqdn() here instead
+        domain = DNS_NAME
+    msgid = '<%s.%s.%s%s@%s>' % (utcdate, pid, randint, idstring, domain)
     return msgid
 
 
 # Header names that contain structured address data (RFC #5322)
-ADDRESS_HEADERS = set([
+ADDRESS_HEADERS = {
     'from',
     'sender',
     'reply-to',
@@ -76,7 +77,7 @@ ADDRESS_HEADERS = set([
     'resent-to',
     'resent-cc',
     'resent-bcc',
-])
+}
 
 
 def forbid_multi_line_headers(name, val, encoding):
@@ -123,7 +124,7 @@ def sanitize_address(addr, encoding):
 
 
 class MIMEMixin():
-    def as_string(self, unixfrom=False):
+    def as_string(self, unixfrom=False, linesep='\n'):
         """Return the entire formatted message as a string.
         Optional `unixfrom' when True, means include the Unix From_ envelope
         header.
@@ -133,13 +134,16 @@ class MIMEMixin():
         """
         fp = six.StringIO()
         g = generator.Generator(fp, mangle_from_=False)
-        g.flatten(self, unixfrom=unixfrom)
+        if six.PY2:
+            g.flatten(self, unixfrom=unixfrom)
+        else:
+            g.flatten(self, unixfrom=unixfrom, linesep=linesep)
         return fp.getvalue()
 
     if six.PY2:
         as_bytes = as_string
     else:
-        def as_bytes(self, unixfrom=False):
+        def as_bytes(self, unixfrom=False, linesep='\n'):
             """Return the entire formatted message as bytes.
             Optional `unixfrom' when True, means include the Unix From_ envelope
             header.
@@ -149,7 +153,7 @@ class MIMEMixin():
             """
             fp = six.BytesIO()
             g = generator.BytesGenerator(fp, mangle_from_=False)
-            g.flatten(self, unixfrom=unixfrom)
+            g.flatten(self, unixfrom=unixfrom, linesep=linesep)
             return fp.getvalue()
 
 
@@ -163,24 +167,27 @@ class SafeMIMEMessage(MIMEMixin, MIMEMessage):
 
 class SafeMIMEText(MIMEMixin, MIMEText):
 
-    def __init__(self, text, subtype, charset):
-        self.encoding = charset
-        if charset == 'utf-8':
-            # Unfortunately, Python doesn't support setting a Charset instance
+    def __init__(self, _text, _subtype='plain', _charset=None):
+        self.encoding = _charset
+        if _charset == 'utf-8':
+            # Unfortunately, Python < 3.5 doesn't support setting a Charset instance
             # as MIMEText init parameter (http://bugs.python.org/issue16324).
             # We do it manually and trigger re-encoding of the payload.
-            MIMEText.__init__(self, text, subtype, None)
+            MIMEText.__init__(self, _text, _subtype, None)
             del self['Content-Transfer-Encoding']
             # Workaround for versions without http://bugs.python.org/issue19063
             if (3, 2) < sys.version_info < (3, 3, 4):
-                payload = text.encode(utf8_charset.output_charset)
+                payload = _text.encode(utf8_charset.output_charset)
                 self._payload = payload.decode('ascii', 'surrogateescape')
                 self.set_charset(utf8_charset)
             else:
-                self.set_payload(text, utf8_charset)
-            self.replace_header('Content-Type', 'text/%s; charset="%s"' % (subtype, charset))
+                self.set_payload(_text, utf8_charset)
+            self.replace_header('Content-Type', 'text/%s; charset="%s"' % (_subtype, _charset))
+        elif _charset is None:
+            # the default value of '_charset' is 'us-ascii' on Python 2
+            MIMEText.__init__(self, _text, _subtype)
         else:
-            MIMEText.__init__(self, text, subtype, charset)
+            MIMEText.__init__(self, _text, _subtype, _charset)
 
     def __setitem__(self, name, val):
         name, val = forbid_multi_line_headers(name, val, self.encoding)
@@ -207,7 +214,8 @@ class EmailMessage(object):
     encoding = None     # None => use settings default
 
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
-                 connection=None, attachments=None, headers=None, cc=None):
+                 connection=None, attachments=None, headers=None, cc=None,
+                 reply_to=None):
         """
         Initialize a single email message (which can be sent to multiple
         recipients).
@@ -217,20 +225,29 @@ class EmailMessage(object):
         necessary encoding conversions.
         """
         if to:
-            assert not isinstance(to, six.string_types), '"to" argument must be a list or tuple'
+            if isinstance(to, six.string_types):
+                raise TypeError('"to" argument must be a list or tuple')
             self.to = list(to)
         else:
             self.to = []
         if cc:
-            assert not isinstance(cc, six.string_types), '"cc" argument must be a list or tuple'
+            if isinstance(cc, six.string_types):
+                raise TypeError('"cc" argument must be a list or tuple')
             self.cc = list(cc)
         else:
             self.cc = []
         if bcc:
-            assert not isinstance(bcc, six.string_types), '"bcc" argument must be a list or tuple'
+            if isinstance(bcc, six.string_types):
+                raise TypeError('"bcc" argument must be a list or tuple')
             self.bcc = list(bcc)
         else:
             self.bcc = []
+        if reply_to:
+            if isinstance(reply_to, six.string_types):
+                raise TypeError('"reply_to" argument must be a list or tuple')
+            self.reply_to = list(reply_to)
+        else:
+            self.reply_to = []
         self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
         self.subject = subject
         self.body = body
@@ -253,6 +270,8 @@ class EmailMessage(object):
         msg['To'] = self.extra_headers.get('To', ', '.join(self.to))
         if self.cc:
             msg['Cc'] = ', '.join(self.cc)
+        if self.reply_to:
+            msg['Reply-To'] = self.extra_headers.get('Reply-To', ', '.join(self.reply_to))
 
         # Email header names are case-insensitive (RFC 2045), so we have to
         # accommodate that when doing comparisons.
@@ -260,7 +279,8 @@ class EmailMessage(object):
         if 'date' not in header_names:
             msg['Date'] = formatdate()
         if 'message-id' not in header_names:
-            msg['Message-ID'] = make_msgid()
+            # Use cached DNS_NAME for performance
+            msg['Message-ID'] = make_msgid(domain=DNS_NAME)
         for name, value in self.extra_headers.items():
             if name.lower() in ('from', 'to'):  # From and To are already handled
                 continue
@@ -341,7 +361,7 @@ class EmailMessage(object):
                 content = content.message()
             elif not isinstance(content, Message):
                 # For compatibility with existing code, parse the message
-                # into a email.Message object if it is not one already.
+                # into an email.Message object if it is not one already.
                 content = message_from_string(content)
 
             attachment = SafeMIMEMessage(content, subtype)
@@ -384,7 +404,7 @@ class EmailMultiAlternatives(EmailMessage):
 
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
             connection=None, attachments=None, headers=None, alternatives=None,
-            cc=None):
+            cc=None, reply_to=None):
         """
         Initialize a single email message (which can be sent to multiple
         recipients).
@@ -393,7 +413,10 @@ class EmailMultiAlternatives(EmailMessage):
         bytestrings). The SafeMIMEText class will handle any necessary encoding
         conversions.
         """
-        super(EmailMultiAlternatives, self).__init__(subject, body, from_email, to, bcc, connection, attachments, headers, cc)
+        super(EmailMultiAlternatives, self).__init__(
+            subject, body, from_email, to, bcc, connection, attachments,
+            headers, cc, reply_to,
+        )
         self.alternatives = alternatives or []
 
     def attach_alternative(self, content, mimetype):

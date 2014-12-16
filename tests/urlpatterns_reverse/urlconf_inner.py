@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.template import Template, Context
 from django.http import HttpResponse
 
@@ -8,6 +8,6 @@ def inner_view(request):
                        '{% url "inner" as inner_url %}inner:{{ inner_url }}').render(Context())
     return HttpResponse(content)
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^second_test/$', inner_view, name='inner'),
-)
+]

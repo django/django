@@ -1,7 +1,9 @@
 from django.db import transaction
 from django.conf import settings
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.options import IS_POPUP_VAR
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import (UserCreationForm, UserChangeForm,
     AdminPasswordChangeForm)
 from django.contrib.auth.models import User, Group
@@ -76,11 +78,9 @@ class UserAdmin(admin.ModelAdmin):
         return super(UserAdmin, self).get_form(request, obj, **defaults)
 
     def get_urls(self):
-        from django.conf.urls import patterns
-        return patterns('',
-            (r'^(\d+)/password/$',
-             self.admin_site.admin_view(self.user_change_password))
-        ) + super(UserAdmin, self).get_urls()
+        return [
+            url(r'^(\d+)/password/$', self.admin_site.admin_view(self.user_change_password)),
+        ] + super(UserAdmin, self).get_urls()
 
     def lookup_allowed(self, lookup, value):
         # See #20078: we don't want to allow any lookups involving passwords.
@@ -129,9 +129,10 @@ class UserAdmin(admin.ModelAdmin):
             if form.is_valid():
                 form.save()
                 change_message = self.construct_change_message(request, form, None)
-                self.log_change(request, request.user, change_message)
+                self.log_change(request, user, change_message)
                 msg = ugettext('Password changed successfully.')
                 messages.success(request, msg)
+                update_session_auth_hash(request, form.user)
                 return HttpResponseRedirect('..')
         else:
             form = self.change_password_form(user)

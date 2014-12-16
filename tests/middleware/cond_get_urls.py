@@ -1,6 +1,6 @@
-from django.conf.urls import patterns
+from django.conf.urls import url
 from django.http import HttpResponse
 
-urlpatterns = patterns('',
-    (r'^$', lambda request: HttpResponse('root is here')),
-)
+urlpatterns = [
+    url(r'^$', lambda request: HttpResponse('root is here')),
+]

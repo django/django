@@ -72,7 +72,7 @@ class HashedFilesMixin(object):
 
     def file_hash(self, name, content=None):
         """
-        Retuns a hash of the file with the given name and optional content.
+        Returns a hash of the file with the given name and optional content.
         """
         if content is None:
             return None
@@ -292,7 +292,7 @@ class ManifestFilesMixin(HashedFilesMixin):
     def read_manifest(self):
         try:
             with self.open(self.manifest_name) as manifest:
-                return manifest.read()
+                return manifest.read().decode('utf-8')
         except IOError:
             return None
 
@@ -312,14 +312,19 @@ class ManifestFilesMixin(HashedFilesMixin):
                          (self.manifest_name, self.manifest_version))
 
     def post_process(self, *args, **kwargs):
+        self.hashed_files = OrderedDict()
         all_post_processed = super(ManifestFilesMixin,
                                    self).post_process(*args, **kwargs)
         for post_processed in all_post_processed:
             yield post_processed
+        self.save_manifest()
+
+    def save_manifest(self):
         payload = {'paths': self.hashed_files, 'version': self.manifest_version}
         if self.exists(self.manifest_name):
             self.delete(self.manifest_name)
-        self._save(self.manifest_name, ContentFile(json.dumps(payload)))
+        contents = json.dumps(payload).encode('utf-8')
+        self._save(self.manifest_name, ContentFile(contents))
 
 
 class _MappingCache(object):

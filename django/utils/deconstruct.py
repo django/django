@@ -1,3 +1,7 @@
+from __future__ import absolute_import  # Avoid importing `importlib` from this package.
+from importlib import import_module
+
+
 def deconstructible(*args, **kwargs):
     """
     Class decorator that allow the decorated class to be serialized
@@ -19,8 +23,25 @@ def deconstructible(*args, **kwargs):
             Returns a 3-tuple of class import path, positional arguments,
             and keyword arguments.
             """
+            # Python 2/fallback version
+            if path:
+                module_name, _, name = path.rpartition('.')
+            else:
+                module_name = obj.__module__
+                name = obj.__class__.__name__
+            # Make sure it's actually there and not an inner class
+            module = import_module(module_name)
+            if not hasattr(module, name):
+                raise ValueError(
+                    "Could not find object %s in %s.\n"
+                    "Please note that you cannot serialize things like inner "
+                    "classes. Please move the object into the main module "
+                    "body to use migrations.\n"
+                    "For more information, see "
+                    "https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values"
+                    % (name, module_name))
             return (
-                path or '%s.%s' % (obj.__class__.__module__, obj.__class__.__name__),
+                path or '%s.%s' % (obj.__class__.__module__, name),
                 obj._constructor_args[0],
                 obj._constructor_args[1],
             )

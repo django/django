@@ -7,13 +7,10 @@ from __future__ import unicode_literals
 import os
 import itertools
 
-from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template import (TemplateSyntaxError,
-    Context, Template, loader)
-import django.template.context
+from django.template import TemplateSyntaxError, Context, Template
 from django.test import Client, TestCase, override_settings
-from django.test.client import encode_file, RequestFactory
+from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.template.response import SimpleTemplateResponse
 from django.utils._os import upath
@@ -27,10 +24,10 @@ from .views import CustomTestException
 
 
 @override_settings(
-    TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
+    TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),),
+    ROOT_URLCONF='test_client_regress.urls',
 )
 class AssertContainsTests(TestCase):
-    urls = 'test_client_regress.urls'
 
     def test_contains(self):
         "Responses can be inspected for content, including counting repeated substrings"
@@ -191,9 +188,9 @@ class AssertContainsTests(TestCase):
         self.assertNotContains(response, 'Bye')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='test_client_regress.urls',)
 class AssertTemplateUsedTests(TestCase):
-    urls = 'test_client_regress.urls'
     fixtures = ['testdata.json']
 
     def test_no_context(self):
@@ -212,6 +209,12 @@ class AssertTemplateUsedTests(TestCase):
             self.assertTemplateUsed(response, 'GET Template', msg_prefix='abc')
         except AssertionError as e:
             self.assertIn("abc: No templates used to render the response", str(e))
+
+        with self.assertRaises(AssertionError) as context:
+            self.assertTemplateUsed(response, 'GET Template', count=2)
+        self.assertIn(
+            "No templates used to render the response",
+            str(context.exception))
 
     def test_single_context(self):
         "Template assertions work when there is a single context"
@@ -236,6 +239,21 @@ class AssertTemplateUsedTests(TestCase):
             self.assertTemplateUsed(response, 'Empty POST Template', msg_prefix='abc')
         except AssertionError as e:
             self.assertIn("abc: Template 'Empty POST Template' was not a template used to render the response. Actual template(s) used: Empty GET Template", str(e))
+
+        with self.assertRaises(AssertionError) as context:
+            self.assertTemplateUsed(response, 'Empty GET Template', count=2)
+        self.assertIn(
+            "Template 'Empty GET Template' was expected to be rendered 2 "
+            "time(s) but was actually rendered 1 time(s).",
+            str(context.exception))
+
+        with self.assertRaises(AssertionError) as context:
+            self.assertTemplateUsed(
+                response, 'Empty GET Template', msg_prefix='abc', count=2)
+        self.assertIn(
+            "abc: Template 'Empty GET Template' was expected to be rendered 2 "
+            "time(s) but was actually rendered 1 time(s).",
+            str(context.exception))
 
     def test_multiple_context(self):
         "Template assertions work when there are multiple contexts"
@@ -263,9 +281,22 @@ class AssertTemplateUsedTests(TestCase):
         except AssertionError as e:
             self.assertIn("Template 'Valid POST Template' was not a template used to render the response. Actual template(s) used: form_view.html, base.html", str(e))
 
+        with self.assertRaises(AssertionError) as context:
+            self.assertTemplateUsed(response, 'base.html', count=2)
+        self.assertIn(
+            "Template 'base.html' was expected to be rendered 2 "
+            "time(s) but was actually rendered 1 time(s).",
+            str(context.exception))
 
+    def test_template_rendered_multiple_times(self):
+        """Template assertions work when a template is rendered multiple times."""
+        response = self.client.get('/render_template_multiple_times/')
+
+        self.assertTemplateUsed(response, 'base.html', count=2)
+
+
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class AssertRedirectsTests(TestCase):
-    urls = 'test_client_regress.urls'
 
     def test_redirect_page(self):
         "An assertion is raised if the original page couldn't be retrieved as expected"
@@ -346,15 +377,24 @@ class AssertRedirectsTests(TestCase):
 
     def test_redirect_chain_to_self(self):
         "Redirections to self are caught and escaped"
-        response = self.client.get('/redirect_to_self/', {}, follow=True)
+        with self.assertRaises(RedirectCycleError) as context:
+            self.client.get('/redirect_to_self/', {}, follow=True)
+        response = context.exception.last_response
         # The chain of redirects stops once the cycle is detected.
         self.assertRedirects(response, '/redirect_to_self/',
             status_code=301, target_status_code=301)
         self.assertEqual(len(response.redirect_chain), 2)
 
+    def test_redirect_to_self_with_changing_query(self):
+        "Redirections don't loop forever even if query is changing"
+        with self.assertRaises(RedirectCycleError):
+            self.client.get('/redirect_to_self_with_changing_query_view/', {'counter': '0'}, follow=True)
+
     def test_circular_redirect(self):
         "Circular redirect chains are caught and escaped"
-        response = self.client.get('/circular_redirect_1/', {}, follow=True)
+        with self.assertRaises(RedirectCycleError) as context:
+            self.client.get('/circular_redirect_1/', {}, follow=True)
+        response = context.exception.last_response
         # The chain of redirects will get back to the starting point, but stop there.
         self.assertRedirects(response, '/circular_redirect_2/',
             status_code=301, target_status_code=301)
@@ -459,8 +499,8 @@ class AssertRedirectsTests(TestCase):
                 self.assertRedirects(response, 'http://testserver/secure_view/', status_code=301)
 
 
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class AssertFormErrorTests(TestCase):
-    urls = 'test_client_regress.urls'
 
     def test_unknown_form(self):
         "An assertion is raised if the form name is unknown"
@@ -576,8 +616,8 @@ class AssertFormErrorTests(TestCase):
             self.assertIn("abc: The form 'form' in context 0 does not contain the non-field error 'Some error.' (actual errors: )", str(e))
 
 
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class AssertFormsetErrorTests(TestCase):
-    urls = 'test_client_regress.urls'
     msg_prefixes = [("", {}), ("abc: ", {"msg_prefix": "abc"})]
 
     def setUp(self):
@@ -770,14 +810,9 @@ class AssertFormsetErrorTests(TestCase):
                                     **kwargs)
 
 
-class ProcessedMiddleware(object):
-    def process_request(self, request):
-        request.has_been_processed = True
-
-
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='test_client_regress.urls',)
 class LoginTests(TestCase):
-    urls = 'test_client_regress.urls'
     fixtures = ['testdata']
 
     def test_login_different_client(self):
@@ -796,31 +831,13 @@ class LoginTests(TestCase):
         # default client.
         self.assertRedirects(response, "http://testserver/get_view/")
 
-    @override_settings(
-        MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) +
-        ['test_client_regress.tests.ProcessedMiddleware'])
-    def test_request_middleware(self):
-        "Check that the request middleware is executed on login request"
-
-        def listener(sender, signal, **kwargs):
-            request = kwargs['request']
-            self.assertTrue(hasattr(request, 'has_been_processed'))
-
-        # Unlike other Client request performing methods, login and logout don't
-        # return the response, therefore we must use signals to get it
-        user_logged_in.connect(listener)
-        try:
-            self.client.login(username='testclient', password='password')
-        finally:
-            user_logged_in.disconnect(listener)
-
 
 @override_settings(
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
-    SESSION_ENGINE='test_client_regress.session'
+    SESSION_ENGINE='test_client_regress.session',
+    ROOT_URLCONF='test_client_regress.urls',
 )
 class SessionEngineTests(TestCase):
-    urls = 'test_client_regress.urls'
     fixtures = ['testdata']
 
     def test_login(self):
@@ -834,8 +851,8 @@ class SessionEngineTests(TestCase):
         self.assertEqual(response.context['user'].username, 'testclient')
 
 
+@override_settings(ROOT_URLCONF='test_client_regress.urls',)
 class URLEscapingTests(TestCase):
-    urls = 'test_client_regress.urls'
 
     def test_simple_argument_get(self):
         "Get a view that has a simple string argument"
@@ -862,9 +879,9 @@ class URLEscapingTests(TestCase):
         self.assertEqual(response.content, b'Hi, Arthur')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='test_client_regress.urls',)
 class ExceptionTests(TestCase):
-    urls = 'test_client_regress.urls'
     fixtures = ['testdata.json']
 
     def test_exception_cleared(self):
@@ -889,15 +906,8 @@ class ExceptionTests(TestCase):
             self.fail("Staff should be able to visit this page")
 
 
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class TemplateExceptionTests(TestCase):
-    urls = 'test_client_regress.urls'
-
-    def setUp(self):
-        # Reset the loaders so they don't try to render cached templates.
-        if loader.template_source_loaders is not None:
-            for template_loader in loader.template_source_loaders:
-                if hasattr(template_loader, 'reset'):
-                    template_loader.reset()
 
     @override_settings(
         TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'bad_templates'),)
@@ -906,16 +916,17 @@ class TemplateExceptionTests(TestCase):
         "Errors found when rendering 404 error templates are re-raised"
         try:
             self.client.get("/no_such_view/")
-            self.fail("Should get error about syntax error in template")
         except TemplateSyntaxError:
             pass
+        else:
+            self.fail("Should get error about syntax error in template")
 
 
 # We need two different tests to check URLconf substitution -  one to check
 # it was changed, and another one (without self.urls) to check it was reverted on
 # teardown. This pair of tests relies upon the alphabetical ordering of test execution.
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class UrlconfSubstitutionTests(TestCase):
-    urls = 'test_client_regress.urls'
 
     def test_urlconf_was_changed(self):
         "TestCase can enforce a custom URLconf on a per-test basis"
@@ -936,16 +947,16 @@ class zzUrlconfSubstitutionTests(TestCase):
             reverse('arg_view', args=['somename'])
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='test_client_regress.urls',)
 class ContextTests(TestCase):
-    urls = 'test_client_regress.urls'
     fixtures = ['testdata']
 
     def test_single_context(self):
         "Context variables can be retrieved from a single context"
         response = self.client.get("/request_data/", data={'foo': 'whiz'})
         self.assertEqual(response.context.__class__, Context)
-        self.assertTrue('get-foo' in response.context)
+        self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'sausage')
@@ -961,7 +972,7 @@ class ContextTests(TestCase):
         response = self.client.get("/request_data_extended/", data={'foo': 'whiz'})
         self.assertEqual(response.context.__class__, ContextList)
         self.assertEqual(len(response.context), 2)
-        self.assertTrue('get-foo' in response.context)
+        self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'bacon')
@@ -983,20 +994,19 @@ class ContextTests(TestCase):
         l = ContextList([c1, c2])
         # None, True and False are builtins of BaseContext, and present
         # in every Context without needing to be added.
-        self.assertEqual(set(['None', 'True', 'False', 'hello', 'goodbye',
-                              'python', 'dolly']),
+        self.assertEqual({'None', 'True', 'False', 'hello', 'goodbye',
+                          'python', 'dolly'},
                          l.keys())
 
     def test_15368(self):
         # Need to insert a context processor that assumes certain things about
         # the request instance. This triggers a bug caused by some ways of
         # copying RequestContext.
-        try:
-            django.template.context._standard_context_processors = (lambda request: {'path': request.special_path},)
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=(
+            'test_client_regress.context_processors.special',
+        )):
             response = self.client.get("/request_context_view/")
             self.assertContains(response, 'Path: /request_context_view/')
-        finally:
-            django.template.context._standard_context_processors = None
 
     def test_nested_requests(self):
         """
@@ -1007,9 +1017,9 @@ class ContextTests(TestCase):
         self.assertEqual(response.context['nested'], 'yes')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='test_client_regress.urls',)
 class SessionTests(TestCase):
-    urls = 'test_client_regress.urls'
     fixtures = ['testdata.json']
 
     def test_session(self):
@@ -1038,6 +1048,14 @@ class SessionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'YES')
 
+    def test_session_initiated(self):
+        session = self.client.session
+        session['session_var'] = 'foo'
+        session.save()
+
+        response = self.client.get('/check_session/')
+        self.assertEqual(response.content, b'foo')
+
     def test_logout(self):
         """Logout should work whether the user is logged in or not (#9978)."""
         self.client.logout()
@@ -1062,6 +1080,25 @@ class SessionTests(TestCase):
     @override_settings(AUTH_USER_MODEL='test_client_regress.CustomUser')
     def test_logout_with_custom_user(self):
         """Logout should send user_logged_out signal if custom user was logged in."""
+        def listener(*args, **kwargs):
+            self.assertEqual(kwargs['sender'], CustomUser)
+            listener.executed = True
+        listener.executed = False
+        u = CustomUser.custom_objects.create(email='test@test.com')
+        u.set_password('password')
+        u.save()
+
+        user_logged_out.connect(listener)
+        self.client.login(username='test@test.com', password='password')
+        self.client.logout()
+        user_logged_out.disconnect(listener)
+        self.assertTrue(listener.executed)
+
+    @override_settings(AUTHENTICATION_BACKENDS=(
+        'django.contrib.auth.backends.ModelBackend',
+        'test_client_regress.auth_backends.CustomUserBackend'))
+    def test_logout_with_custom_auth_backend(self):
+        "Request a logout after logging in with custom authentication backend"
         def listener(*args, **kwargs):
             self.assertEqual(kwargs['sender'], CustomUser)
             listener.executed = True
@@ -1116,8 +1153,8 @@ class SessionTests(TestCase):
         self.assertFalse(listener.executed)
 
 
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class RequestMethodTests(TestCase):
-    urls = 'test_client_regress.urls'
 
     def test_get(self):
         "Request a view via request method GET"
@@ -1164,8 +1201,8 @@ class RequestMethodTests(TestCase):
         self.assertEqual(response.content, b'request method: PATCH')
 
 
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class RequestMethodStringDataTests(TestCase):
-    urls = 'test_client_regress.urls'
 
     def test_post(self):
         "Request a view with string data via request method POST"
@@ -1191,9 +1228,19 @@ class RequestMethodStringDataTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'request method: PATCH')
 
+    def test_empty_string_data(self):
+        "Request a view with empty string data via request method GET/POST/HEAD"
+        # Regression test for #21740
+        response = self.client.get('/body/', data='', content_type='application/json')
+        self.assertEqual(response.content, b'')
+        response = self.client.post('/body/', data='', content_type='application/json')
+        self.assertEqual(response.content, b'')
+        response = self.client.head('/body/', data='', content_type='application/json')
+        self.assertEqual(response.content, b'')
 
+
+@override_settings(ROOT_URLCONF='test_client_regress.urls',)
 class QueryStringTests(TestCase):
-    urls = 'test_client_regress.urls'
 
     def test_get_like_requests(self):
         # See: https://code.djangoproject.com/ticket/10571.
@@ -1247,8 +1294,8 @@ class QueryStringTests(TestCase):
         self.assertEqual(response.context['request-bar'], 'bang')
 
 
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class UnicodePayloadTests(TestCase):
-    urls = 'test_client_regress.urls'
 
     def test_simple_unicode_payload(self):
         "A simple ASCII-only unicode JSON document can be POSTed"
@@ -1312,33 +1359,13 @@ class UploadedFileEncodingTest(TestCase):
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.unknown"))[2])
 
 
+@override_settings(ROOT_URLCONF='test_client_regress.urls',)
 class RequestHeadersTest(TestCase):
-    urls = 'test_client_regress.urls'
-    fixtures = ['testdata']
-
     def test_client_headers(self):
         "A test client can receive custom headers"
         response = self.client.get("/check_headers/", HTTP_X_ARG_CHECK='Testing 123')
         self.assertEqual(response.content, b"HTTP_X_ARG_CHECK: Testing 123")
         self.assertEqual(response.status_code, 200)
-
-    @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
-    def test_client_login_headers(self):
-        "Test client headers are used in login"
-
-        client = Client(HTTP_HOST='different')
-
-        def listener(sender, signal, **kwargs):
-            request = kwargs['request']
-            self.assertEqual(request.get_host(), 'different')
-
-        # Unlike other Client request performing methods, login and logout don't
-        # return the response, therefore we must use signals to get it
-        user_logged_in.connect(listener)
-        try:
-            client.login(username='testclient', password='password')
-        finally:
-            user_logged_in.disconnect(listener)
 
     def test_client_headers_redirect(self):
         "Test client headers are preserved through redirects"
@@ -1348,6 +1375,7 @@ class RequestHeadersTest(TestCase):
             status_code=301, target_status_code=200)
 
 
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class ReadLimitedStreamTest(TestCase):
     """
     Tests that ensure that HttpRequest.body, HttpRequest.read() and
@@ -1355,7 +1383,6 @@ class ReadLimitedStreamTest(TestCase):
 
     Refs #14753, #15785
     """
-    urls = 'test_client_regress.urls'
 
     def test_body_from_empty_request(self):
         """HttpRequest.body on a test client GET request should return
@@ -1391,6 +1418,7 @@ class ReadLimitedStreamTest(TestCase):
             content_type='text/plain').content, payload)
 
 
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class RequestFactoryStateTest(TestCase):
     """Regression tests for #15929."""
     # These tests are checking that certain middleware don't change certain
@@ -1398,7 +1426,6 @@ class RequestFactoryStateTest(TestCase):
     # ensuring test isolation behavior. So, unusually, it doesn't make sense to
     # run the tests individually, and if any are failing it is confusing to run
     # them with any other set of tests.
-    urls = 'test_client_regress.urls'
 
     def common_test_that_should_always_pass(self):
         request = RequestFactory().get('/')
@@ -1418,12 +1445,12 @@ class RequestFactoryStateTest(TestCase):
         self.common_test_that_should_always_pass()
 
 
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class RequestFactoryEnvironmentTests(TestCase):
     """
     Regression tests for #8551 and #17067: ensure that environment variables
     are set correctly in RequestFactory.
     """
-    urls = 'test_client_regress.urls'
 
     def test_should_set_correct_env_variables(self):
         request = RequestFactory().get('/path/')

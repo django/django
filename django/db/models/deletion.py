@@ -54,9 +54,9 @@ def DO_NOTHING(collector, field, sub_objs, using):
 class Collector(object):
     def __init__(self, using):
         self.using = using
-        # Initially, {model: set([instances])}, later values become lists.
+        # Initially, {model: {instances}}, later values become lists.
         self.data = {}
-        self.field_updates = {}  # {model: {(field, value): set([instances])}}
+        self.field_updates = {}  # {model: {(field, value): {instances}}}
         # fast_deletes is a list of queryset-likes that can be deleted without
         # fetching the objects into memory.
         self.fast_deletes = []
@@ -66,7 +66,7 @@ class Collector(object):
         # should be included, as the dependencies exist only between actual
         # database tables; proxy models are represented here by their concrete
         # parent.
-        self.dependencies = {}  # {model: set([models])}
+        self.dependencies = {}  # {model: {models}}
 
     def add(self, objs, source=None, nullable=False, reverse_dependency=False):
         """
@@ -138,11 +138,23 @@ class Collector(object):
                 include_hidden=True, include_proxy_eq=True):
             if related.field.rel.on_delete is not DO_NOTHING:
                 return False
-        # GFK deletes
-        for relation in opts.many_to_many:
-            if not relation.rel.through:
+        for field in model._meta.virtual_fields:
+            if hasattr(field, 'bulk_related_objects'):
+                # It's something like generic foreign key.
                 return False
         return True
+
+    def get_del_batches(self, objs, field):
+        """
+        Returns the objs in suitably sized batches for the used connection.
+        """
+        conn_batch_size = max(
+            connections[self.using].ops.bulk_batch_size([field.name], objs), 1)
+        if len(objs) > conn_batch_size:
+            return [objs[i:i + conn_batch_size]
+                    for i in range(0, len(objs), conn_batch_size)]
+        else:
+            return [objs]
 
     def collect(self, objs, source=None, nullable=False, collect_related=True,
             source_attr=None, reverse_dependency=False):
@@ -192,11 +204,13 @@ class Collector(object):
                 field = related.field
                 if field.rel.on_delete == DO_NOTHING:
                     continue
-                sub_objs = self.related_objects(related, new_objs)
-                if self.can_fast_delete(sub_objs, from_field=field):
-                    self.fast_deletes.append(sub_objs)
-                elif sub_objs:
-                    field.rel.on_delete(self, field, sub_objs, self.using)
+                batches = self.get_del_batches(new_objs, field)
+                for batch in batches:
+                    sub_objs = self.related_objects(related, batch)
+                    if self.can_fast_delete(sub_objs, from_field=field):
+                        self.fast_deletes.append(sub_objs)
+                    elif sub_objs:
+                        field.rel.on_delete(self, field, sub_objs, self.using)
             for field in model._meta.virtual_fields:
                 if hasattr(field, 'bulk_related_objects'):
                     # Its something like generic foreign key.
@@ -249,7 +263,7 @@ class Collector(object):
         # end of a transaction.
         self.sort()
 
-        with transaction.commit_on_success_unless_managed(using=self.using):
+        with transaction.atomic(using=self.using, savepoint=False):
             # send pre_delete signals
             for model, obj in self.instances_with_model():
                 if not model._meta.auto_created:

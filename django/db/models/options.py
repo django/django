@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from bisect import bisect
 from collections import OrderedDict
-import warnings
 
 from django.apps import apps
 from django.conf import settings
@@ -10,7 +9,6 @@ from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces
@@ -22,7 +20,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
-                 'select_on_save')
+                 'select_on_save', 'default_related_name')
 
 
 def normalize_together(option_together):
@@ -90,9 +88,10 @@ class Options(object):
         self.auto_created = False
 
         # To handle various inheritance situations, we need to track where
-        # managers came from (concrete or abstract base classes).
-        self.abstract_managers = []
-        self.concrete_managers = []
+        # managers came from (concrete or abstract base classes). `managers`
+        # keeps a list of 3-tuples of the form:
+        # (creation_counter, instance, abstract(=True))
+        self.managers = []
 
         # List of all lookups defined in ForeignKey 'limit_choices_to' options
         # from *other* models. Needed for some admin checks. Internal use only.
@@ -100,6 +99,8 @@ class Options(object):
 
         # A custom app registry to use, if you're making a separate model set.
         self.apps = apps
+
+        self.default_related_name = None
 
     @property
     def app_config(self):
@@ -109,6 +110,20 @@ class Options(object):
     @property
     def installed(self):
         return self.app_config is not None
+
+    @property
+    def abstract_managers(self):
+        return [
+            (counter, instance.name, instance) for counter, instance, abstract
+            in self.managers if abstract
+        ]
+
+    @property
+    def concrete_managers(self):
+        return [
+            (counter, instance.name, instance) for counter, instance, abstract
+            in self.managers if not abstract
+        ]
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
@@ -165,21 +180,12 @@ class Options(object):
             self.db_table = "%s_%s" % (self.app_label, self.model_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
 
-    @property
-    def module_name(self):
-        """
-        This property has been deprecated in favor of `model_name`. refs #19689
-        """
-        warnings.warn(
-            "Options.module_name has been deprecated in favor of model_name",
-            RemovedInDjango18Warning, stacklevel=2)
-        return self.model_name
-
     def _prepare(self, model):
         if self.order_with_respect_to:
             self.order_with_respect_to = self.get_field(self.order_with_respect_to)
             self.ordering = ('_order',)
-            model.add_to_class('_order', OrderWrt())
+            if not any(isinstance(field, OrderWrt) for field in model._meta.local_fields):
+                model.add_to_class('_order', OrderWrt())
         else:
             self.order_with_respect_to = None
 
@@ -450,43 +456,12 @@ class Options(object):
         for f, model in self.get_fields_with_model():
             cache[f.name] = cache[f.attname] = (f, model, True, False)
         for f in self.virtual_fields:
-            cache[f.name] = (f, None if f.model == self.model else f.model, True, False)
+            if hasattr(f, 'related'):
+                cache[f.name] = cache[f.attname] = (
+                    f, None if f.model == self.model else f.model, True, False)
         if apps.ready:
             self._name_map = cache
         return cache
-
-    def get_add_permission(self):
-        """
-        This method has been deprecated in favor of
-        `django.contrib.auth.get_permission_codename`. refs #20642
-        """
-        warnings.warn(
-            "`Options.get_add_permission` has been deprecated in favor "
-            "of `django.contrib.auth.get_permission_codename`.",
-            RemovedInDjango18Warning, stacklevel=2)
-        return 'add_%s' % self.model_name
-
-    def get_change_permission(self):
-        """
-        This method has been deprecated in favor of
-        `django.contrib.auth.get_permission_codename`. refs #20642
-        """
-        warnings.warn(
-            "`Options.get_change_permission` has been deprecated in favor "
-            "of `django.contrib.auth.get_permission_codename`.",
-            RemovedInDjango18Warning, stacklevel=2)
-        return 'change_%s' % self.model_name
-
-    def get_delete_permission(self):
-        """
-        This method has been deprecated in favor of
-        `django.contrib.auth.get_permission_codename`. refs #20642
-        """
-        warnings.warn(
-            "`Options.get_delete_permission` has been deprecated in favor "
-            "of `django.contrib.auth.get_permission_codename`.",
-            RemovedInDjango18Warning, stacklevel=2)
-        return 'delete_%s' % self.model_name
 
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):
@@ -586,7 +561,7 @@ class Options(object):
         """
         Returns a list of parent classes leading to 'model' (order from closet
         to most distant ancestor). This has to handle the case were 'model' is
-        a granparent or even more distant relation.
+        a grandparent or even more distant relation.
         """
         if not self.parents:
             return None

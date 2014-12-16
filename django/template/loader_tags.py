@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-from django.conf import settings
 from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
     token_kwargs, Variable
 from django.template.loader import get_template
@@ -68,6 +67,11 @@ class BlockNode(Node):
         return result
 
     def super(self):
+        if not hasattr(self, 'context'):
+            raise TemplateSyntaxError(
+                "'%s' object has no attribute 'context'. Did you use "
+                "{{ block.super }} in a base template?" % self.__class__.__name__
+            )
         render_context = self.context.render_context
         if (BLOCK_CONTEXT_KEY in render_context and
                 render_context[BLOCK_CONTEXT_KEY].get_block(self.name) is not None):
@@ -82,7 +86,7 @@ class ExtendsNode(Node):
         self.nodelist = nodelist
         self.parent_name = parent_name
         self.template_dirs = template_dirs
-        self.blocks = dict((n.name, n) for n in nodelist.get_nodes_by_type(BlockNode))
+        self.blocks = {n.name: n for n in nodelist.get_nodes_by_type(BlockNode)}
 
     def __repr__(self):
         return '<ExtendsNode: extends %s>' % self.parent_name.token
@@ -116,8 +120,8 @@ class ExtendsNode(Node):
             # The ExtendsNode has to be the first non-text node.
             if not isinstance(node, TextNode):
                 if not isinstance(node, ExtendsNode):
-                    blocks = dict((n.name, n) for n in
-                                  compiled_parent.nodelist.get_nodes_by_type(BlockNode))
+                    blocks = {n.name: n for n in
+                              compiled_parent.nodelist.get_nodes_by_type(BlockNode)}
                     block_context.add_blocks(blocks)
                 break
 
@@ -149,7 +153,7 @@ class IncludeNode(Node):
             with context.push(**values):
                 return template.render(context)
         except Exception:
-            if settings.TEMPLATE_DEBUG:
+            if context.engine.debug:
                 raise
             return ''
 
@@ -223,7 +227,10 @@ def do_include(parser, token):
     """
     bits = token.split_contents()
     if len(bits) < 2:
-        raise TemplateSyntaxError("%r tag takes at least one argument: the name of the template to be included." % bits[0])
+        raise TemplateSyntaxError(
+            "%r tag takes at least one argument: the name of the template to "
+            "be included." % bits[0]
+        )
     options = {}
     remaining_bits = bits[2:]
     while remaining_bits:

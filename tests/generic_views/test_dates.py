@@ -19,9 +19,9 @@ def _make_books(n, base_date):
             pubdate=base_date - datetime.timedelta(days=i))
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class ArchiveIndexViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_archive_view(self):
         res = self.client.get('/dates/books/')
@@ -35,7 +35,7 @@ class ArchiveIndexViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'year', 'DESC')))
         self.assertEqual(list(res.context['thingies']), list(Book.objects.all()))
-        self.assertFalse('latest' in res.context)
+        self.assertNotIn('latest', res.context)
         self.assertTemplateUsed(res, 'generic_views/book_archive.html')
 
     def test_empty_archive_view(self):
@@ -120,10 +120,26 @@ class ArchiveIndexViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['date_list']), list(reversed(sorted(res.context['date_list']))))
 
+    def test_archive_view_custom_sorting(self):
+        Book.objects.create(name="Zebras for Dummies", pages=600, pubdate=datetime.date(2007, 5, 1))
+        res = self.client.get('/dates/books/sortedbyname/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'year', 'DESC')))
+        self.assertEqual(list(res.context['latest']), list(Book.objects.order_by('name').all()))
+        self.assertTemplateUsed(res, 'generic_views/book_archive.html')
 
+    def test_archive_view_custom_sorting_dec(self):
+        Book.objects.create(name="Zebras for Dummies", pages=600, pubdate=datetime.date(2007, 5, 1))
+        res = self.client.get('/dates/books/sortedbynamedec/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'year', 'DESC')))
+        self.assertEqual(list(res.context['latest']), list(Book.objects.order_by('-name').all()))
+        self.assertTemplateUsed(res, 'generic_views/book_archive.html')
+
+
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class YearArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_year_view(self):
         res = self.client.get('/dates/books/2008/')
@@ -178,6 +194,26 @@ class YearArchiveViewTests(TestCase):
         self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__year=2006)))
         self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
 
+    def test_year_view_custom_sort_order(self):
+        # Zebras comes after Dreaming by name, but before on '-pubdate' which is the default sorting
+        Book.objects.create(name="Zebras for Dummies", pages=600, pubdate=datetime.date(2006, 9, 1))
+        res = self.client.get('/dates/books/2006/sortedbyname/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(list(res.context['date_list']), [datetime.date(2006, 5, 1), datetime.date(2006, 9, 1)])
+        self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate__year=2006).order_by('name')))
+        self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__year=2006).order_by('name')))
+        self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
+
+    def test_year_view_two_custom_sort_orders(self):
+        Book.objects.create(name="Zebras for Dummies", pages=300, pubdate=datetime.date(2006, 9, 1))
+        Book.objects.create(name="Hunting Hippos", pages=400, pubdate=datetime.date(2006, 3, 1))
+        res = self.client.get('/dates/books/2006/sortedbypageandnamedec/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(list(res.context['date_list']), [datetime.date(2006, 3, 1), datetime.date(2006, 5, 1), datetime.date(2006, 9, 1)])
+        self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate__year=2006).order_by('pages', '-name')))
+        self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__year=2006).order_by('pages', '-name')))
+        self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
+
     def test_year_view_invalid_pattern(self):
         res = self.client.get('/dates/books/no_year/')
         self.assertEqual(res.status_code, 404)
@@ -206,9 +242,9 @@ class YearArchiveViewTests(TestCase):
         self.assertEqual(list(res.context['date_list']), list(sorted(res.context['date_list'])))
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class MonthArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_month_view(self):
         res = self.client.get('/dates/books/2008/oct/')
@@ -333,9 +369,9 @@ class MonthArchiveViewTests(TestCase):
         self.assertEqual(list(res.context['date_list']), list(sorted(res.context['date_list'])))
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class WeekArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_week_view(self):
         res = self.client.get('/dates/books/2008/week/39/')
@@ -430,9 +466,9 @@ class WeekArchiveViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class DayArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_day_view(self):
         res = self.client.get('/dates/books/2008/oct/01/')
@@ -508,7 +544,7 @@ class DayArchiveViewTests(TestCase):
 
     def test_next_prev_context(self):
         res = self.client.get('/dates/books/2008/oct/01/')
-        self.assertEqual(res.content, b"Archive for Oct. 1, 2008. Previous day is May 1, 2006")
+        self.assertEqual(res.content, b"Archive for Oct. 1, 2008. Previous day is May 1, 2006\n")
 
     def test_custom_month_format(self):
         res = self.client.get('/dates/books/2008/10/01/')
@@ -548,9 +584,9 @@ class DayArchiveViewTests(TestCase):
         self.assertEqual(res.status_code, 404)
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class DateDetailViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_date_detail_by_pk(self):
         res = self.client.get('/dates/books/2008/oct/01/1/')

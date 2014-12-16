@@ -5,18 +5,16 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from itertools import chain
 import time
-from unittest import skipIf
 
-from django.db import connection, connections
-from django.core import signals
 from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
 from django.http import (HttpRequest, HttpResponse, parse_cookie,
     build_request_repr, UnreadablePostError, RawPostDataException)
-from django.test import SimpleTestCase, TransactionTestCase, override_settings
+from django.test import SimpleTestCase, RequestFactory, override_settings
 from django.test.client import FakePayload
 from django.test.utils import str_prefix
 from django.utils import six
+from django.utils.encoding import force_str
 from django.utils.http import cookie_date, urlencode
 from django.utils.six.moves.urllib.parse import urlencode as original_urlencode
 from django.utils.timezone import utc
@@ -30,17 +28,48 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(list(request.COOKIES.keys()), [])
         self.assertEqual(list(request.META.keys()), [])
 
+        # .GET and .POST should be QueryDicts
+        self.assertEqual(request.GET.urlencode(), '')
+        self.assertEqual(request.POST.urlencode(), '')
+
+        # and FILES should be MultiValueDict
+        self.assertEqual(request.FILES.getlist('foo'), [])
+
+    def test_httprequest_full_path(self):
+        request = HttpRequest()
+        request.path = request.path_info = '/;some/?awful/=path/foo:bar/'
+        request.META['QUERY_STRING'] = ';some=query&+query=string'
+        expected = '/%3Bsome/%3Fawful/%3Dpath/foo:bar/?;some=query&+query=string'
+        self.assertEqual(request.get_full_path(), expected)
+
+    def test_httprequest_full_path_with_query_string_and_fragment(self):
+        request = HttpRequest()
+        request.path = request.path_info = '/foo#bar'
+        request.META['QUERY_STRING'] = 'baz#quux'
+        self.assertEqual(request.get_full_path(), '/foo%23bar?baz#quux')
+
     def test_httprequest_repr(self):
         request = HttpRequest()
         request.path = '/somepath/'
+        request.method = 'GET'
         request.GET = {'get-key': 'get-value'}
         request.POST = {'post-key': 'post-value'}
         request.COOKIES = {'post-key': 'post-value'}
         request.META = {'post-key': 'post-value'}
-        self.assertEqual(repr(request), str_prefix("<HttpRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
-        self.assertEqual(build_request_repr(request), repr(request))
+        self.assertEqual(repr(request), str_prefix("<HttpRequest: GET '/somepath/'>"))
+        self.assertEqual(build_request_repr(request), str_prefix("<HttpRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
         self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={'a': 'b'}, POST_override={'c': 'd'}, COOKIES_override={'e': 'f'}, META_override={'g': 'h'}),
                          str_prefix("<HttpRequest\npath:/otherpath/,\nGET:{%(_)s'a': %(_)s'b'},\nPOST:{%(_)s'c': %(_)s'd'},\nCOOKIES:{%(_)s'e': %(_)s'f'},\nMETA:{%(_)s'g': %(_)s'h'}>"))
+
+    def test_httprequest_repr_invalid_method_and_path(self):
+        request = HttpRequest()
+        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
+        request = HttpRequest()
+        request.method = "GET"
+        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
+        request = HttpRequest()
+        request.path = ""
+        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
 
     def test_bad_httprequest_repr(self):
         """
@@ -56,14 +85,14 @@ class RequestsTests(SimpleTestCase):
         for attr in ['GET', 'POST', 'COOKIES', 'META']:
             request = HttpRequest()
             setattr(request, attr, {'bomb': bomb})
-            self.assertIn('%s:<could not parse>' % attr, repr(request))
+            self.assertIn('%s:<could not parse>' % attr, build_request_repr(request))
 
     def test_wsgirequest(self):
         request = WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus', 'wsgi.input': BytesIO(b'')})
         self.assertEqual(list(request.GET.keys()), [])
         self.assertEqual(list(request.POST.keys()), [])
         self.assertEqual(list(request.COOKIES.keys()), [])
-        self.assertEqual(set(request.META.keys()), set(['PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME', 'wsgi.input']))
+        self.assertEqual(set(request.META.keys()), {'PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME', 'wsgi.input'})
         self.assertEqual(request.META['PATH_INFO'], 'bogus')
         self.assertEqual(request.META['REQUEST_METHOD'], 'bogus')
         self.assertEqual(request.META['SCRIPT_NAME'], '')
@@ -107,13 +136,15 @@ class RequestsTests(SimpleTestCase):
             self.assertEqual(request.path, '/FORCED_PREFIX/somepath/')
 
     def test_wsgirequest_repr(self):
+        request = WSGIRequest({'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+        self.assertEqual(repr(request), str_prefix("<WSGIRequest: GET '/'>"))
         request = WSGIRequest({'PATH_INFO': '/somepath/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
         request.GET = {'get-key': 'get-value'}
         request.POST = {'post-key': 'post-value'}
         request.COOKIES = {'post-key': 'post-value'}
         request.META = {'post-key': 'post-value'}
-        self.assertEqual(repr(request), str_prefix("<WSGIRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
-        self.assertEqual(build_request_repr(request), repr(request))
+        self.assertEqual(repr(request), str_prefix("<WSGIRequest: GET '/somepath/'>"))
+        self.assertEqual(build_request_repr(request), str_prefix("<WSGIRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
         self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={'a': 'b'}, POST_override={'c': 'd'}, COOKIES_override={'e': 'f'}, META_override={'g': 'h'}),
                          str_prefix("<WSGIRequest\npath:/otherpath/,\nGET:{%(_)s'a': %(_)s'b'},\nPOST:{%(_)s'c': %(_)s'd'},\nCOOKIES:{%(_)s'e': %(_)s'f'},\nMETA:{%(_)s'g': %(_)s'h'}>"))
 
@@ -186,8 +217,15 @@ class RequestsTests(SimpleTestCase):
         example_cookie = response.cookies['example']
         # A compat cookie may be in use -- check that it has worked
         # both as an output string, and using the cookie attributes
-        self.assertTrue('; httponly' in str(example_cookie))
+        self.assertIn('; httponly', str(example_cookie))
         self.assertTrue(example_cookie['httponly'])
+
+    def test_unicode_cookie(self):
+        "Verify HttpResponse.set_cookie() works with unicode data."
+        response = HttpResponse()
+        cookie_value = '清風'
+        response.set_cookie('test', cookie_value)
+        self.assertEqual(force_str(cookie_value), response.cookies['test'].value)
 
     def test_limited_stream(self):
         # Read all of a limited stream
@@ -649,8 +687,8 @@ class HostValidationTests(SimpleTestCase):
     def test_get_host_suggestion_of_allowed_host(self):
         """get_host() makes helpful suggestions if a valid-looking host is not in ALLOWED_HOSTS."""
         msg_invalid_host = "Invalid HTTP_HOST header: %r."
-        msg_suggestion = msg_invalid_host + "You may need to add %r to ALLOWED_HOSTS."
-        msg_suggestion2 = msg_invalid_host + "The domain name provided is not valid according to RFC 1034/1035"
+        msg_suggestion = msg_invalid_host + " You may need to add %r to ALLOWED_HOSTS."
+        msg_suggestion2 = msg_invalid_host + " The domain name provided is not valid according to RFC 1034/1035"
 
         for host in [  # Valid-looking hosts
             'example.com',
@@ -698,58 +736,62 @@ class HostValidationTests(SimpleTestCase):
         )
 
 
-@skipIf(connection.vendor == 'sqlite'
-        and connection.settings_dict['TEST']['NAME'] in (None, '', ':memory:'),
-        "Cannot establish two connections to an in-memory SQLite database.")
-class DatabaseConnectionHandlingTests(TransactionTestCase):
-
-    available_apps = []
+class BuildAbsoluteURITestCase(SimpleTestCase):
+    """
+    Regression tests for ticket #18314.
+    """
 
     def setUp(self):
-        # Use a temporary connection to avoid messing with the main one.
-        self._old_default_connection = connections['default']
-        del connections['default']
+        self.factory = RequestFactory()
 
-    def tearDown(self):
-        try:
-            connections['default'].close()
-        finally:
-            connections['default'] = self._old_default_connection
+    def test_build_absolute_uri_no_location(self):
+        """
+        Ensures that ``request.build_absolute_uri()`` returns the proper value
+        when the ``location`` argument is not provided, and ``request.path``
+        begins with //.
+        """
+        # //// is needed to create a request with a path beginning with //
+        request = self.factory.get('////absolute-uri')
+        self.assertEqual(
+            request.build_absolute_uri(),
+            'http://testserver//absolute-uri'
+        )
 
-    def test_request_finished_db_state(self):
-        # Force closing connection on request end
-        connection.settings_dict['CONN_MAX_AGE'] = 0
+    def test_build_absolute_uri_absolute_location(self):
+        """
+        Ensures that ``request.build_absolute_uri()`` returns the proper value
+        when an absolute URL ``location`` argument is provided, and
+        ``request.path`` begins with //.
+        """
+        # //// is needed to create a request with a path beginning with //
+        request = self.factory.get('////absolute-uri')
+        self.assertEqual(
+            request.build_absolute_uri(location='http://example.com/?foo=bar'),
+            'http://example.com/?foo=bar'
+        )
 
-        # The GET below will not succeed, but it will give a response with
-        # defined ._handler_class. That is needed for sending the
-        # request_finished signal.
-        response = self.client.get('/')
-        # Make sure there is an open connection
-        connection.ensure_connection()
-        connection.enter_transaction_management()
-        signals.request_finished.send(sender=response._handler_class)
-        self.assertEqual(len(connection.transaction_state), 0)
+    def test_build_absolute_uri_schema_relative_location(self):
+        """
+        Ensures that ``request.build_absolute_uri()`` returns the proper value
+        when a schema-relative URL ``location`` argument is provided, and
+        ``request.path`` begins with //.
+        """
+        # //// is needed to create a request with a path beginning with //
+        request = self.factory.get('////absolute-uri')
+        self.assertEqual(
+            request.build_absolute_uri(location='//example.com/?foo=bar'),
+            'http://example.com/?foo=bar'
+        )
 
-    def test_request_finished_failed_connection(self):
-        # Force closing connection on request end
-        connection.settings_dict['CONN_MAX_AGE'] = 0
-
-        connection.enter_transaction_management()
-        connection.set_dirty()
-
-        # Test that the rollback doesn't succeed (for example network failure
-        # could cause this).
-        def fail_horribly():
-            raise Exception("Horrible failure!")
-        connection._rollback = fail_horribly
-        try:
-            with self.assertRaises(Exception):
-                signals.request_finished.send(sender=self.__class__)
-            # The connection's state wasn't cleaned up
-            self.assertEqual(len(connection.transaction_state), 1)
-        finally:
-            del connection._rollback
-        # The connection will be cleaned on next request where the conn
-        # works again.
-        signals.request_finished.send(sender=self.__class__)
-        self.assertEqual(len(connection.transaction_state), 0)
+    def test_build_absolute_uri_relative_location(self):
+        """
+        Ensures that ``request.build_absolute_uri()`` returns the proper value
+        when a relative URL ``location`` argument is provided, and
+        ``request.path`` begins with //.
+        """
+        # //// is needed to create a request with a path beginning with //
+        request = self.factory.get('////absolute-uri')
+        self.assertEqual(
+            request.build_absolute_uri(location='/foo/bar/'),
+            'http://testserver/foo/bar/'
+        )

@@ -1,9 +1,9 @@
-=================
-Class-based views
-=================
+==============================
+Built-in Class-based views API
+==============================
 
-Class-based views API reference. For introductory material, see
-:doc:`/topics/class-based-views/index`.
+Class-based views API reference. For introductory material, see the
+:doc:`/topics/class-based-views/index` topic guide.
 
 .. toctree::
    :maxdepth: 3
@@ -25,9 +25,9 @@ a thread-safe operation).
 A class-based view is deployed into a URL pattern using the
 :meth:`~django.views.generic.base.View.as_view()` classmethod::
 
-    urlpatterns = patterns('',
-        (r'^view/$', MyView.as_view(size=42)),
-    )
+    urlpatterns = [
+        url(r'^view/$', MyView.as_view(size=42)),
+    ]
 
 .. admonition:: Thread safety with view arguments
 

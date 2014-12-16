@@ -10,10 +10,6 @@ class MultiDBChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
         self.user = models.User.objects.db_manager('other').create_user(username='joe', password='qwerty')
-        self.stdout = StringIO()
-
-    def tearDown(self):
-        self.stdout.close()
 
     def test_that_changepassword_command_with_database_option_uses_given_db(self):
         """
@@ -24,8 +20,9 @@ class MultiDBChangepasswordManagementCommandTestCase(TestCase):
         command = changepassword.Command()
         command._get_pass = lambda *args: 'not qwerty'
 
-        command.execute("joe", database='other', stdout=self.stdout)
-        command_output = self.stdout.getvalue().strip()
+        out = StringIO()
+        command.execute(username="joe", database='other', stdout=out)
+        command_output = out.getvalue().strip()
 
         self.assertEqual(command_output, "Changing password for user 'joe'\nPassword changed successfully for user 'joe'")
         self.assertTrue(models.User.objects.using('other').get(username="joe").check_password("not qwerty"))

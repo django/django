@@ -4,43 +4,24 @@ backends.
 """
 
 
-class SpatialOperation(object):
+class SpatialOperator(object):
     """
-    Base class for generating spatial SQL.
+    Class encapsulating the behavior specific to a GIS operation (used by lookups).
     """
-    sql_template = '%(geo_col)s %(operator)s %(geometry)s'
+    sql_template = None
 
-    def __init__(self, function='', operator='', result='', **kwargs):
-        self.function = function
-        self.operator = operator
-        self.result = result
-        self.extra = kwargs
+    def __init__(self, op=None, func=None):
+        self.op = op
+        self.func = func
 
-    def as_sql(self, geo_col, geometry='%s'):
-        return self.sql_template % self.params(geo_col, geometry), []
+    @property
+    def default_template(self):
+        if self.func:
+            return '%(func)s(%(lhs)s, %(rhs)s)'
+        else:
+            return '%(lhs)s %(op)s %(rhs)s'
 
-    def params(self, geo_col, geometry):
-        params = {'function': self.function,
-                  'geo_col': geo_col,
-                  'geometry': geometry,
-                  'operator': self.operator,
-                  'result': self.result,
-                  }
-        params.update(self.extra)
-        return params
-
-
-class SpatialFunction(SpatialOperation):
-    """
-    Base class for generating spatial SQL related to a function.
-    """
-    sql_template = '%(function)s(%(geo_col)s, %(geometry)s)'
-
-    def __init__(self, func, result='', operator='', **kwargs):
-        # Getting the function prefix.
-        default = {'function': func,
-                   'operator': operator,
-                   'result': result
-                   }
-        kwargs.update(default)
-        super(SpatialFunction, self).__init__(**kwargs)
+    def as_sql(self, connection, lookup, template_params, sql_params):
+        sql_template = self.sql_template or lookup.sql_template or self.default_template
+        template_params.update({'op': self.op, 'func': self.func})
+        return sql_template % template_params, sql_params

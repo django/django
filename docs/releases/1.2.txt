@@ -141,7 +141,7 @@ Improved CSRF protection
 ------------------------
 
 Django now has much improved protection against :doc:`Cross-Site Request Forgery
-(CSRF) attacks</ref/contrib/csrf>`. This type of attack occurs when a malicious
+(CSRF) attacks</ref/csrf>`. This type of attack occurs when a malicious
 Web site contains a link, a form button or some JavaScript that is intended to
 perform some action on your Web site, using the credentials of a logged-in user
 who visits the malicious site in their browser. A related type of attack, "login
@@ -370,13 +370,12 @@ methods are new in 1.2:
 * :meth:`~django.contrib.gis.db.models.GeoQuerySet.reverse_geom`
 * :meth:`~django.contrib.gis.db.models.GeoQuerySet.geohash`
 
-The :ref:`GEOS interface <ref-geos>` was updated to use
-thread-safe C library functions when available on the platform.
+The GEOS interface was updated to use thread-safe C library functions when
+available on the platform.
 
-The :ref:`GDAL interface <ref-gdal>` now allows the user to
-set a :attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on
-the features returned when iterating over a
-:class:`~django.contrib.gis.gdal.Layer`.
+The GDAL interface now allows the user to set a
+:attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on the features returned
+when iterating over a :class:`~django.contrib.gis.gdal.Layer`.
 
 Finally, :doc:`GeoDjango's documentation </ref/contrib/gis/index>` is now
 included with Django's and is no longer
@@ -426,7 +425,7 @@ CSRF Protection
 ---------------
 
 We've made large changes to the way CSRF protection works, detailed in
-:doc:`the CSRF documentation </ref/contrib/csrf>`. Here are the major changes you
+:doc:`the CSRF documentation </ref/csrf>`. Here are the major changes you
 should be aware of:
 
 * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated and
@@ -721,8 +720,9 @@ value and interpretation of the ``max_num`` parameter to the
 :ref:`django.forms.formsets.formset_factory() <formsets-max-num>` and
 :ref:`django.forms.models.modelformset_factory()
 <model-formsets-max-num>` functions has changed slightly. This
-change also affects the way the ``max_num`` argument is :ref:`used for
-inline admin objects <ref-contrib-admin-inline-max-num>`
+change also affects the way the
+:attr:`~django.contrib.admin.InlineModelAdmin.max_num` argument is used for
+inline admin objects.
 
 Previously, the default value for ``max_num`` was ``0`` (zero).
 FormSets then used the boolean value of ``max_num`` to determine if a

@@ -92,7 +92,11 @@ class WSGIRequest(http.HttpRequest):
             path_info = '/'
         self.environ = environ
         self.path_info = path_info
-        self.path = '%s/%s' % (script_name.rstrip('/'), path_info.lstrip('/'))
+        # be careful to only replace the first slash in the path because of
+        # http://test/something and http://test//something being different as
+        # stated in http://www.ietf.org/rfc/rfc2396.txt
+        self.path = '%s/%s' % (script_name.rstrip('/'),
+                               path_info.replace('/', '', 1))
         self.META = environ
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
@@ -172,7 +176,7 @@ class WSGIHandler(base.BaseHandler):
                     raise
 
         set_script_prefix(get_script_name(environ))
-        signals.request_started.send(sender=self.__class__)
+        signals.request_started.send(sender=self.__class__, environ=environ)
         try:
             request = self.request_class(environ)
         except UnicodeDecodeError:
@@ -202,7 +206,6 @@ def get_path_info(environ):
     """
     path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '/')
 
-    # It'd be better to implement URI-to-IRI decoding, see #19508.
     return path_info.decode(UTF_8)
 
 
@@ -232,7 +235,6 @@ def get_script_name(environ):
     else:
         script_name = get_bytes_from_wsgi(environ, 'SCRIPT_NAME', '')
 
-    # It'd be better to implement URI-to-IRI decoding, see #19508.
     return script_name.decode(UTF_8)
 
 
@@ -247,16 +249,15 @@ def get_bytes_from_wsgi(environ, key, default):
     # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
     # decoded with ISO-8859-1. This is wrong for Django websites where UTF-8
     # is the default. Re-encode to recover the original bytestring.
-    return value if six.PY2 else value.encode(ISO_8859_1)
+    return value.encode(ISO_8859_1) if six.PY3 else value
 
 
 def get_str_from_wsgi(environ, key, default):
     """
-    Get a value from the WSGI environ dictionary as bytes.
+    Get a value from the WSGI environ dictionary as str.
 
     key and default should be str objects. Under Python 2 they may also be
     unicode objects provided they only contain ASCII characters.
     """
-    value = environ.get(str(key), str(default))
-    # Same comment as above
-    return value if six.PY2 else value.encode(ISO_8859_1).decode(UTF_8)
+    value = get_bytes_from_wsgi(environ, key, default)
+    return value.decode(UTF_8, errors='replace') if six.PY3 else value

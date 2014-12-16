@@ -1,6 +1,5 @@
 from collections import OrderedDict
 import sys
-import warnings
 
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.core.paginator import InvalidPage
@@ -8,13 +7,14 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase, RemovedInDjango18Warning
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
 
 from django.contrib.admin import FieldListFilter
-from django.contrib.admin.exceptions import DisallowedModelAdminLookup
+from django.contrib.admin.exceptions import (
+    DisallowedModelAdminLookup, DisallowedModelAdminToField,
+)
 from django.contrib.admin.options import IncorrectLookupParameters, IS_POPUP_VAR, TO_FIELD_VAR
 from django.contrib.admin.utils import (quote, get_fields_from_path,
     lookup_needs_distinct, prepare_lookup_value)
@@ -34,36 +34,7 @@ IGNORED_PARAMS = (
 EMPTY_CHANGELIST_VALUE = ugettext_lazy('(None)')
 
 
-def _is_changelist_popup(request):
-    """
-    Returns True if the popup GET parameter is set.
-
-    This function is introduced to facilitate deprecating the legacy
-    value for IS_POPUP_VAR and should be removed at the end of the
-    deprecation cycle.
-    """
-
-    if IS_POPUP_VAR in request.GET:
-        return True
-
-    IS_LEGACY_POPUP_VAR = 'pop'
-    if IS_LEGACY_POPUP_VAR in request.GET:
-        warnings.warn(
-            "The `%s` GET parameter has been renamed to `%s`." %
-            (IS_LEGACY_POPUP_VAR, IS_POPUP_VAR),
-            RemovedInDjango18Warning, 2)
-        return True
-
-    return False
-
-
-class RenameChangeListMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('get_query_set', 'get_queryset', RemovedInDjango18Warning),
-    )
-
-
-class ChangeList(six.with_metaclass(RenameChangeListMethods)):
+class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links,
             list_filter, date_hierarchy, search_fields, list_select_related,
             list_per_page, list_max_show_all, list_editable, model_admin):
@@ -88,8 +59,11 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         except ValueError:
             self.page_num = 0
         self.show_all = ALL_VAR in request.GET
-        self.is_popup = _is_changelist_popup(request)
-        self.to_field = request.GET.get(TO_FIELD_VAR)
+        self.is_popup = IS_POPUP_VAR in request.GET
+        to_field = request.GET.get(TO_FIELD_VAR)
+        if to_field and not model_admin.to_field_allowed(request, to_field):
+            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
+        self.to_field = to_field
         self.params = dict(request.GET.items())
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
@@ -109,20 +83,6 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
             title = ugettext('Select %s to change')
         self.title = title % force_text(self.opts.verbose_name)
         self.pk_attname = self.lookup_opts.pk.attname
-
-    @property
-    def root_query_set(self):
-        warnings.warn("`ChangeList.root_query_set` is deprecated, "
-                      "use `root_queryset` instead.",
-                      RemovedInDjango18Warning, 2)
-        return self.root_queryset
-
-    @property
-    def query_set(self):
-        warnings.warn("`ChangeList.query_set` is deprecated, "
-                      "use `queryset` instead.",
-                      RemovedInDjango18Warning, 2)
-        return self.queryset
 
     def get_filters_params(self, params=None):
         """
@@ -217,10 +177,13 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         # Perform a slight optimization:
         # full_result_count is equal to paginator.count if no filters
         # were applied
-        if self.get_filters_params() or self.params.get(SEARCH_VAR):
-            full_result_count = self.root_queryset.count()
+        if self.model_admin.show_full_result_count:
+            if self.get_filters_params() or self.params.get(SEARCH_VAR):
+                full_result_count = self.root_queryset.count()
+            else:
+                full_result_count = result_count
         else:
-            full_result_count = result_count
+            full_result_count = None
         can_show_all = result_count <= self.list_max_show_all
         multi_page = result_count > self.list_per_page
 
@@ -234,6 +197,10 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                 raise IncorrectLookupParameters
 
         self.result_count = result_count
+        self.show_full_result_count = self.model_admin.show_full_result_count
+        # Admin actions are shown if there is at least one entry
+        # or if entries are not counted because show_full_result_count is disabled
+        self.show_admin_actions = self.show_full_result_count or bool(full_result_count)
         self.full_result_count = full_result_count
         self.result_list = result_list
         self.can_show_all = can_show_all
@@ -308,7 +275,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         # ordering fields so we can guarantee a deterministic order across all
         # database backends.
         pk_name = self.lookup_opts.pk.name
-        if not (set(ordering) & set(['pk', '-pk', pk_name, '-' + pk_name])):
+        if not (set(ordering) & {'pk', '-pk', pk_name, '-' + pk_name}):
             # The two sets do not intersect, meaning the pk isn't present. So
             # we add it.
             ordering.append('-pk')

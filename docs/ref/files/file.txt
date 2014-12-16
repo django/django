@@ -11,8 +11,8 @@ The ``File`` Class
 
 .. class:: File(file_object)
 
-    The :class:`File` class is a thin wrapper around Python's :py:ref:`built-in
-    file object<bltin-file-objects>` with some Django-specific additions.
+    The :class:`File` class is a thin wrapper around a Python
+    :py:term:`file object` with some Django-specific additions.
     Internally, Django uses this class when it needs to represent a file.
 
     :class:`File` objects have the following attributes and methods:
@@ -28,8 +28,7 @@ The ``File`` Class
 
     .. attribute:: file
 
-        The underlying :py:ref:`built-in file object<bltin-file-objects>` that
-        this class wraps.
+        The underlying :py:term:`file object` that this class wraps.
 
     .. attribute:: mode
 
@@ -53,6 +52,15 @@ The ``File`` Class
     .. method:: __iter__()
 
         Iterate over the file yielding one line at a time.
+
+        .. versionchanged:: 1.8
+
+            ``File`` now uses `universal newlines`_. The following are
+            recognized as ending a line: the Unix end-of-line convention
+            ``'\n'``, the Windows convention ``'\r\n'``, and the old Macintosh
+            convention ``'\r'``.
+
+            .. _universal newlines: http://www.python.org/dev/peps/pep-0278
 
     .. method:: chunks([chunk_size=None])
 

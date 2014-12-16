@@ -21,8 +21,9 @@ class RegexValidator(object):
     message = _('Enter a valid value.')
     code = 'invalid'
     inverse_match = False
+    flags = 0
 
-    def __init__(self, regex=None, message=None, code=None, inverse_match=None):
+    def __init__(self, regex=None, message=None, code=None, inverse_match=None, flags=None):
         if regex is not None:
             self.regex = regex
         if message is not None:
@@ -31,10 +32,14 @@ class RegexValidator(object):
             self.code = code
         if inverse_match is not None:
             self.inverse_match = inverse_match
+        if flags is not None:
+            self.flags = flags
+        if self.flags and not isinstance(self.regex, six.string_types):
+            raise TypeError("If the flags are set, regex must be a regular expression string.")
 
         # Compile the regex if it was not passed pre-compiled.
         if isinstance(self.regex, six.string_types):
-            self.regex = re.compile(self.regex)
+            self.regex = re.compile(self.regex, self.flags)
 
     def __call__(self, value):
         """
@@ -46,14 +51,24 @@ class RegexValidator(object):
             raise ValidationError(self.message, code=self.code)
 
     def __eq__(self, other):
-        return isinstance(other, RegexValidator) and (self.regex == other.regex) and (self.message == other.message) and (self.code == other.code)
+        return (
+            isinstance(other, RegexValidator) and
+            self.regex.pattern == other.regex.pattern and
+            self.regex.flags == other.regex.flags and
+            (self.message == other.message) and
+            (self.code == other.code) and
+            (self.inverse_match == other.inverse_match)
+        )
+
+    def __ne__(self, other):
+        return not (self == other)
 
 
 @deconstructible
 class URLValidator(RegexValidator):
     regex = re.compile(
         r'^(?:[a-z0-9\.\-]*)://'  # scheme is validated separately
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}(?<!-)\.?)|'  # domain...
         r'localhost|'  # localhost...
         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
         r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
@@ -109,7 +124,9 @@ class EmailValidator(object):
         r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"$)',  # quoted-string
         re.IGNORECASE)
     domain_regex = re.compile(
-        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,})$',
+        # max length of the domain is 249: 254 (max email length) minus one
+        # period, two characters for the TLD, @ sign, & one character before @.
+        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,247}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,}(?<!-))$',
         re.IGNORECASE)
     literal_regex = re.compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
@@ -136,7 +153,7 @@ class EmailValidator(object):
         if not self.user_regex.match(user_part):
             raise ValidationError(self.message, code=self.code)
 
-        if (not domain_part in self.domain_whitelist and
+        if (domain_part not in self.domain_whitelist and
                 not self.validate_domain_part(domain_part)):
             # Try for possible IDN domain-part
             try:
@@ -162,12 +179,21 @@ class EmailValidator(object):
         return False
 
     def __eq__(self, other):
-        return isinstance(other, EmailValidator) and (self.domain_whitelist == other.domain_whitelist) and (self.message == other.message) and (self.code == other.code)
+        return (
+            isinstance(other, EmailValidator) and
+            (self.domain_whitelist == other.domain_whitelist) and
+            (self.message == other.message) and
+            (self.code == other.code)
+        )
 
 validate_email = EmailValidator()
 
 slug_re = re.compile(r'^[-a-zA-Z0-9_]+$')
-validate_slug = RegexValidator(slug_re, _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."), 'invalid')
+validate_slug = RegexValidator(
+    slug_re,
+    _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."),
+    'invalid'
+)
 
 ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
 validate_ipv4_address = RegexValidator(ipv4_re, _('Enter a valid IPv4 address.'), 'invalid')
@@ -211,7 +237,11 @@ def ip_address_validators(protocol, unpack_ipv4):
                          % (protocol, list(ip_address_validator_map)))
 
 comma_separated_int_list_re = re.compile('^[\d,]+$')
-validate_comma_separated_integer_list = RegexValidator(comma_separated_int_list_re, _('Enter only digits separated by commas.'), 'invalid')
+validate_comma_separated_integer_list = RegexValidator(
+    comma_separated_int_list_re,
+    _('Enter only digits separated by commas.'),
+    'invalid'
+)
 
 
 @deconstructible
@@ -221,17 +251,24 @@ class BaseValidator(object):
     message = _('Ensure this value is %(limit_value)s (it is %(show_value)s).')
     code = 'limit_value'
 
-    def __init__(self, limit_value):
+    def __init__(self, limit_value, message=None):
         self.limit_value = limit_value
+        if message:
+            self.message = message
 
     def __call__(self, value):
         cleaned = self.clean(value)
-        params = {'limit_value': self.limit_value, 'show_value': cleaned}
+        params = {'limit_value': self.limit_value, 'show_value': cleaned, 'value': value}
         if self.compare(cleaned, self.limit_value):
             raise ValidationError(self.message, code=self.code, params=params)
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and (self.limit_value == other.limit_value) and (self.message == other.message) and (self.code == other.code)
+        return (
+            isinstance(other, self.__class__) and
+            (self.limit_value == other.limit_value)
+            and (self.message == other.message)
+            and (self.code == other.code)
+        )
 
 
 @deconstructible

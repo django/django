@@ -21,8 +21,8 @@ restricted subset of the test client API:
 
 * It only has access to the HTTP methods :meth:`~Client.get()`,
   :meth:`~Client.post()`, :meth:`~Client.put()`,
-  :meth:`~Client.delete()`, :meth:`~Client.head()` and
-  :meth:`~Client.options()`.
+  :meth:`~Client.delete()`, :meth:`~Client.head()`,
+  :meth:`~Client.options()`, and :meth:`~Client.trace()`.
 
 * These methods accept all the same arguments *except* for
   ``follows``. Since this is just a factory for producing
@@ -37,7 +37,7 @@ Example
 
 The following is a simple unit test using the request factory::
 
-    from django.contrib.auth.models import User
+    from django.contrib.auth.models import AnonymousUser, User
     from django.test import TestCase, RequestFactory
 
     class SimpleTest(TestCase):
@@ -51,9 +51,13 @@ The following is a simple unit test using the request factory::
             # Create an instance of a GET request.
             request = self.factory.get('/customer/details')
 
-            # Recall that middleware are not suported. You can simulate a
+            # Recall that middleware are not supported. You can simulate a
             # logged-in user by setting request.user manually.
             request.user = self.user
+
+            # Or you can simulate an anonymous user by setting request.user to
+            # an AnonymousUser instance.
+            request.user = AnonymousUser()
 
             # Test my_view() as if it were deployed at /customer/details
             response = my_view(request)
@@ -64,16 +68,17 @@ The following is a simple unit test using the request factory::
 Tests and multiple databases
 ============================
 
-.. _topics-testing-masterslave:
+.. _topics-testing-primaryreplica:
 
-Testing master/slave configurations
------------------------------------
+Testing primary/replica configurations
+--------------------------------------
 
-If you're testing a multiple database configuration with master/slave
-replication, this strategy of creating test databases poses a problem.
+If you're testing a multiple database configuration with primary/replica
+(referred to as master/slave by some databases) replication, this strategy of
+creating test databases poses a problem.
 When the test databases are created, there won't be any replication,
-and as a result, data created on the master won't be seen on the
-slave.
+and as a result, data created on the primary won't be seen on the
+replica.
 
 To compensate for this, Django allows you to define that a database is
 a *test mirror*. Consider the following (simplified) example database
@@ -83,34 +88,34 @@ configuration::
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'myproject',
-            'HOST': 'dbmaster',
+            'HOST': 'dbprimary',
              # ... plus some other settings
         },
-        'slave': {
+        'replica': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'myproject',
-            'HOST': 'dbslave',
+            'HOST': 'dbreplica',
             'TEST_MIRROR': 'default'
             # ... plus some other settings
         }
     }
 
-In this setup, we have two database servers: ``dbmaster``, described
-by the database alias ``default``, and ``dbslave`` described by the
-alias ``slave``. As you might expect, ``dbslave`` has been configured
-by the database administrator as a read slave of ``dbmaster``, so in
-normal activity, any write to ``default`` will appear on ``slave``.
+In this setup, we have two database servers: ``dbprimary``, described
+by the database alias ``default``, and ``dbreplica`` described by the
+alias ``replica``. As you might expect, ``dbreplica`` has been configured
+by the database administrator as a read replica of ``dbprimary``, so in
+normal activity, any write to ``default`` will appear on ``replica``.
 
 If Django created two independent test databases, this would break any
-tests that expected replication to occur. However, the ``slave``
+tests that expected replication to occur. However, the ``replica``
 database has been configured as a test mirror (using the
 :setting:`TEST_MIRROR` setting), indicating that under testing,
-``slave`` should be treated as a mirror of ``default``.
+``replica`` should be treated as a mirror of ``default``.
 
-When the test environment is configured, a test version of ``slave``
-will *not* be created. Instead the connection to ``slave``
+When the test environment is configured, a test version of ``replica``
+will *not* be created. Instead the connection to ``replica``
 will be redirected to point at ``default``. As a result, writes to
-``default`` will appear on ``slave`` -- but because they are actually
+``default`` will appear on ``replica`` -- but because they are actually
 the same database, not because there is data replication between the
 two databases.
 
@@ -165,8 +170,6 @@ Advanced features of ``TransactionTestCase``
 ============================================
 
 .. attribute:: TransactionTestCase.available_apps
-
-    .. versionadded:: 1.6
 
     .. warning::
 
@@ -231,25 +234,76 @@ Advanced features of ``TransactionTestCase``
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is an relatively expensive database operation.
 
-Running tests outside the test runner
-=====================================
 
-If you want to run tests outside of ``./manage.py test`` -- for example,
-from a shell prompt -- you will need to set up the test
-environment first. Django provides a convenience method to do this::
+Using the Django test runner to test reusable applications
+==========================================================
 
-    >>> from django.test.utils import setup_test_environment
-    >>> setup_test_environment()
+If you are writing a :doc:`reusable application </intro/reusable-apps>`
+you may want to use the Django test runner to run your own test suite
+and thus benefit from the Django testing infrastructure.
 
-:func:`~django.test.utils.setup_test_environment` puts several Django features
-into modes that allow for repeatable testing, but does not create the test
-databases; :func:`django.test.runner.DiscoverRunner.setup_databases`
-takes care of that.
+A common practice is a *tests* directory next to the application code, with the
+following structure::
 
-The call to :func:`~django.test.utils.setup_test_environment` is made
-automatically as part of the setup of ``./manage.py test``. You only
-need to manually invoke this method if you're not using running your
-tests via Django's test runner.
+    runtests.py
+    polls/
+        __init__.py
+        models.py
+        ...
+    tests/
+        __init__.py
+        models.py
+        test_settings.py
+        tests.py
+
+Let's take a look inside a couple of those files:
+
+.. snippet::
+    :filename: runtests.py
+
+    #!/usr/bin/env python
+    import os
+    import sys
+
+    import django
+    from django.conf import settings
+    from django.test.utils import get_runner
+
+    if __name__ == "__main__":
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.test_settings'
+        django.setup()
+        TestRunner = get_runner(settings)
+        test_runner = TestRunner()
+        failures = test_runner.run_tests(["tests"])
+        sys.exit(bool(failures))
+
+
+This is the script that you invoke to run the test suite. It sets up the
+Django environment, creates the test database and runs the tests.
+
+For the sake of clarity, this example contains only the bare minimum
+necessary to use the Django test runner. You may want to add
+command-line options for controlling verbosity, passing in specific test
+labels to run, etc.
+
+.. snippet::
+    :filename: tests/test_settings.py
+
+    SECRET_KEY = 'fake-key'
+    INSTALLED_APPS = [
+        "tests",
+    ]
+
+This file contains the :doc:`Django settings </topics/settings>`
+required to run your app's tests.
+
+Again, this is a minimal example; your tests may require additional
+settings to run.
+
+Since the *tests* package is included in :setting:`INSTALLED_APPS` when
+running your tests, you can define test-only models in its ``models.py``
+file.
+
 
 .. _other-testing-frameworks:
 
@@ -295,15 +349,13 @@ Defining a test runner
 
 .. currentmodule:: django.test.runner
 
-.. versionadded:: 1.6
-
 A test runner is a class defining a ``run_tests()`` method. Django ships
 with a ``DiscoverRunner`` class that defines the default Django testing
 behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used to by ``run_tests()`` to set up,
 execute and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=True, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=True, keepdb=False, reverse=False, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -325,15 +377,32 @@ execute and tear down the test suite.
     If ``failfast`` is ``True``, the test suite will stop running after the
     first test failure is detected.
 
+    If ``keepdb`` is ``True``, the test suite will use the existing database,
+    or create one if necessary. If ``False``, a new database will be created,
+    prompting the user to remove the existing one, if present.
+
+    If ``reverse`` is ``True``, test cases will be executed in the opposite
+    order. This could be useful to debug tests that aren't properly isolated
+    and have side effects. :ref:`Grouping by test class <order-of-tests>` is
+    preserved when using this option.
+
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
     expansion. If you subclass ``DiscoverRunner`` or write your own test
     runner, ensure it accepts ``**kwargs``.
 
     Your test runner may also define additional command-line options.
-    If you add an ``option_list`` attribute to a subclassed test runner,
-    those options will be added to the list of command-line options that
-    the :djadmin:`test` command can use.
+    Create or override an ``add_arguments(cls, parser)`` class method and add
+    custom arguments by calling ``parser.add_argument()`` inside the method, so
+    that the :djadmin:`test` command will be able to use those arguments.
+
+    .. versionchanged:: 1.8
+
+        Previously, you had to provide an ``option_list`` attribute to a
+        subclassed test runner to add options to the list of command-line
+        options that the :djadmin:`test` command could use.
+
+        The ``keepdb`` and the ``reverse`` arguments were added.
 
 Attributes
 ~~~~~~~~~~
@@ -370,6 +439,12 @@ Attributes
     management command's ``OptionParser`` for parsing arguments. See the
     documentation for Python's ``optparse`` module for more details.
 
+    .. deprecated:: 1.8
+
+        You should now override the :meth:`~DiscoverRunner.add_arguments` class
+        method to add custom arguments accepted by the :djadmin:`test`
+        management command.
+
 Methods
 ~~~~~~~
 
@@ -386,6 +461,15 @@ Methods
     in addition to those discovered in the modules listed in ``test_labels``.
 
     This method should return the number of tests that failed.
+
+.. classmethod:: DiscoverRunner.add_arguments(parser)
+
+    .. versionadded:: 1.8
+
+    Override this class method to add custom arguments accepted by the
+    :djadmin:`test` management command. See
+    :py:meth:`argparse.ArgumentParser.add_argument()` for details about adding
+    arguments to a parser.
 
 .. method:: DiscoverRunner.setup_test_environment(**kwargs)
 
@@ -483,7 +567,7 @@ django.db.connection.creation
 The creation module of the database backend also provides some utilities that
 can be useful during testing.
 
-.. function:: create_test_db([verbosity=1, autoclobber=False])
+.. function:: create_test_db([verbosity=1, autoclobber=False, serialize=True, keepdb=False])
 
     Creates a new test database and runs ``migrate`` against it.
 
@@ -499,13 +583,39 @@ can be useful during testing.
     * If autoclobber is ``True``, the database will be destroyed
       without consulting the user.
 
+    ``serialize`` determines if Django serializes the database into an
+    in-memory JSON string before running tests (used to restore the database
+    state between tests if you don't have transactions). You can set this to
+    ``False`` to speed up creation time if you don't have any test classes
+    with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
+
+    .. versionadded:: 1.7.1
+
+        If you are using the default test runner, you can control this with the
+        the :setting:`SERIALIZE <TEST_SERIALIZE>` entry in the
+        :setting:`TEST <DATABASE-TEST>` dictionary
+
+    ``keepdb`` determines if the test run should use an existing
+    database, or create a new one. If ``True``, the existing
+    database will be used, or created if not present. If ``False``,
+    a new database will be created, prompting the user to remove
+    the existing one, if present.
+
     Returns the name of the test database that it created.
 
     ``create_test_db()`` has the side effect of modifying the value of
     :setting:`NAME` in :setting:`DATABASES` to match the name of the test
     database.
 
-.. function:: destroy_test_db(old_database_name, [verbosity=1])
+    .. versionchanged:: 1.7
+
+        The ``serialize`` argument was added.
+
+    .. versionchanged:: 1.8
+
+        The ``keepdb`` argument was added.
+
+.. function:: destroy_test_db(old_database_name, [verbosity=1, keepdb=False])
 
     Destroys the database whose name is the value of :setting:`NAME` in
     :setting:`DATABASES`, and sets :setting:`NAME` to the value of
@@ -513,6 +623,13 @@ can be useful during testing.
 
     The ``verbosity`` argument has the same behavior as for
     :class:`~django.test.runner.DiscoverRunner`.
+
+    If the ``keepdb`` argument is ``True``, then the connection to the
+    database will be closed, but the database will not be destroyed.
+
+    .. versionchanged:: 1.8
+
+        The ``keepdb`` argument was added.
 
 .. _topics-testing-code-coverage:
 

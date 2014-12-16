@@ -4,7 +4,7 @@ import sys
 import threading
 import warnings
 
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.utils import lru_cache
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils._os import upath
@@ -43,7 +43,7 @@ class Apps(object):
         self.stored_app_configs = []
 
         # Whether the registry is populated.
-        self.ready = False
+        self.apps_ready = self.models_ready = self.ready = False
 
         # Lock for thread-safe population.
         self._lock = threading.Lock()
@@ -100,29 +100,41 @@ class Apps(object):
                     "Application names aren't unique, "
                     "duplicates: %s" % ", ".join(duplicates))
 
+            self.apps_ready = True
+
             # Load models.
             for app_config in self.app_configs.values():
                 all_models = self.all_models[app_config.label]
                 app_config.import_models(all_models)
 
             self.clear_cache()
-            self.ready = True
+
+            self.models_ready = True
 
             for app_config in self.get_app_configs():
                 app_config.ready()
 
-    def check_ready(self):
+            self.ready = True
+
+    def check_apps_ready(self):
         """
-        Raises an exception if the registry isn't ready.
+        Raises an exception if all apps haven't been imported yet.
         """
-        if not self.ready:
-            raise RuntimeError("App registry isn't ready yet.")
+        if not self.apps_ready:
+            raise AppRegistryNotReady("Apps aren't loaded yet.")
+
+    def check_models_ready(self):
+        """
+        Raises an exception if all models haven't been imported yet.
+        """
+        if not self.models_ready:
+            raise AppRegistryNotReady("Models aren't loaded yet.")
 
     def get_app_configs(self):
         """
         Imports applications and returns an iterable of app configs.
         """
-        self.check_ready()
+        self.check_apps_ready()
         return self.app_configs.values()
 
     def get_app_config(self, app_label):
@@ -131,7 +143,7 @@ class Apps(object):
 
         Raises LookupError if no application exists with this label.
         """
-        self.check_ready()
+        self.check_apps_ready()
         try:
             return self.app_configs[app_label]
         except KeyError:
@@ -153,7 +165,7 @@ class Apps(object):
 
         Set the corresponding keyword argument to True to include such models.
         """
-        self.check_ready()
+        self.check_models_ready()
         if app_mod:
             warnings.warn(
                 "The app_mod argument of get_models is deprecated.",
@@ -184,7 +196,7 @@ class Apps(object):
         model exists with this name in the application. Raises ValueError if
         called with a single argument that doesn't contain exactly one dot.
         """
-        self.check_ready()
+        self.check_models_ready()
         if model_name is None:
             app_label, model_name = app_label.split('.')
         return self.get_app_config(app_label).get_model(model_name.lower())
@@ -196,9 +208,17 @@ class Apps(object):
         model_name = model._meta.model_name
         app_models = self.all_models[app_label]
         if model_name in app_models:
-            raise RuntimeError(
-                "Conflicting '%s' models in application '%s': %s and %s." %
-                (model_name, app_label, app_models[model_name], model))
+            if (model.__name__ == app_models[model_name].__name__ and
+                    model.__module__ == app_models[model_name].__module__):
+                warnings.warn(
+                    "Model '%s.%s' was already registered. "
+                    "Reloading models is not advised as it can lead to inconsistencies, "
+                    "most notably with related models." % (model_name, app_label),
+                    RuntimeWarning, stacklevel=2)
+            else:
+                raise RuntimeError(
+                    "Conflicting '%s' models in application '%s': %s and %s." %
+                    (model_name, app_label, app_models[model_name], model))
         app_models[model_name] = model
         self.clear_cache()
 
@@ -207,10 +227,8 @@ class Apps(object):
         Checks whether an application with this name exists in the registry.
 
         app_name is the full name of the app eg. 'django.contrib.admin'.
-
-        It's safe to call this method at import time, even while the registry
-        is being populated. It returns False for apps that aren't loaded yet.
         """
+        self.check_apps_ready()
         return any(ac.name == app_name for ac in self.app_configs.values())
 
     def get_containing_app_config(self, object_name):
@@ -221,10 +239,10 @@ class Apps(object):
 
         Returns the app config for the inner application in case of nesting.
         Returns None if the object isn't in any registered app config.
-
-        It's safe to call this method at import time, even while the registry
-        is being populated.
         """
+        # In Django 1.7 and 1.8, it's allowed to call this method at import
+        # time, even while the registry is being populated. In Django 1.9 and
+        # later, that should be forbidden with `self.check_apps_ready()`.
         candidates = []
         for app_config in self.app_configs.values():
             if object_name.startswith(app_config.name):
@@ -297,10 +315,11 @@ class Apps(object):
         imports safely (eg. that could lead to registering listeners twice),
         models are registered when they're imported and never removed.
         """
-        self.check_ready()
+        if not self.ready:
+            raise AppRegistryNotReady("App registry isn't ready yet.")
         self.stored_app_configs.append(self.app_configs)
         self.app_configs = OrderedDict()
-        self.ready = False
+        self.apps_ready = self.models_ready = self.ready = False
         self.clear_cache()
         self.populate(installed)
 
@@ -309,7 +328,7 @@ class Apps(object):
         Cancels a previous call to set_installed_apps().
         """
         self.app_configs = self.stored_app_configs.pop()
-        self.ready = True
+        self.apps_ready = self.models_ready = self.ready = True
         self.clear_cache()
 
     def clear_cache(self):
@@ -402,7 +421,7 @@ class Apps(object):
         warnings.warn(
             "[a.path for a in get_app_configs()] supersedes get_app_paths().",
             RemovedInDjango19Warning, stacklevel=2)
-        self.check_ready()
+        self.check_apps_ready()
         app_paths = []
         for app in self.get_apps():
             app_paths.append(self._get_app_path(app))

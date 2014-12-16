@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from copy import copy
@@ -8,15 +8,14 @@ import unittest
 from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql
-from django.db import router
+from django.db import connection
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.utils._os import upath
 
 if HAS_GDAL:
     from django.contrib.gis.utils.layermapping import (LayerMapping,
-        LayerMapError, InvalidDecimal, MissingForeignKey)
+        LayerMapError, InvalidDecimal, InvalidString, MissingForeignKey)
     from django.contrib.gis.gdal import DataSource
 
     from .models import (
@@ -36,7 +35,8 @@ NUMS = [1, 2, 1, 19, 1]  # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
+@skipUnless(HAS_GDAL, "LayerMapTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class LayerMapTest(TestCase):
 
     def test_init(self):
@@ -150,7 +150,7 @@ class LayerMapTest(TestCase):
             # Unique may take tuple or string parameters.
             for arg in ('name', ('name', 'mpoly')):
                 lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique=arg)
-        except:
+        except Exception:
             self.fail('No exception should be raised for proper use of keywords.')
 
         # Testing invalid params for the `unique` keyword.
@@ -158,7 +158,7 @@ class LayerMapTest(TestCase):
             self.assertRaises(e, LayerMapping, County, co_shp, co_mapping, transform=False, unique=arg)
 
         # No source reference system defined in the shapefile, should raise an error.
-        if not mysql:
+        if connection.features.supports_transform:
             self.assertRaises(LayerMapError, LayerMapping, County, co_shp, co_mapping)
 
         # Passing in invalid ForeignKey mapping parameters -- must be a dictionary
@@ -287,6 +287,13 @@ class LayerMapTest(TestCase):
                           source_srs=4326)
         lm.save(silent=True)
 
+    def test_charfield_too_short(self):
+        mapping = copy(city_mapping)
+        mapping['name_short'] = 'Name'
+        lm = LayerMapping(City, city_shp, mapping)
+        with self.assertRaises(InvalidString):
+            lm.save(silent=True, strict=True)
+
     def test_textfield(self):
         "Tests that String content fits also in a TextField"
         mapping = copy(city_mapping)
@@ -294,7 +301,7 @@ class LayerMapTest(TestCase):
         lm = LayerMapping(City, city_shp, mapping)
         lm.save(silent=True, strict=True)
         self.assertEqual(City.objects.count(), 3)
-        self.assertEqual(City.objects.all().order_by('name_txt')[0].name_txt, "Houston")
+        self.assertEqual(City.objects.get(name='Houston').name_txt, "Houston")
 
     def test_encoded_name(self):
         """ Test a layer containing utf-8-encoded name """
@@ -319,15 +326,10 @@ class OtherRouter(object):
         return True
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
+@skipUnless(HAS_GDAL, "LayerMapRouterTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
+@override_settings(DATABASE_ROUTERS=[OtherRouter()])
 class LayerMapRouterTest(TestCase):
-
-    def setUp(self):
-        self.old_routers = router.routers
-        router.routers = [OtherRouter()]
-
-    def tearDown(self):
-        router.routers = self.old_routers
 
     @unittest.skipUnless(len(settings.DATABASES) > 1, 'multiple databases required')
     def test_layermapping_default_db(self):

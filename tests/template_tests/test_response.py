@@ -5,7 +5,7 @@ import pickle
 import time
 from datetime import datetime
 
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, SimpleTestCase
 from django.conf import settings
 from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
@@ -25,7 +25,7 @@ class CustomURLConfMiddleware(object):
         request.urlconf = 'template_tests.alternate_urls'
 
 
-class SimpleTemplateResponseTest(TestCase):
+class SimpleTemplateResponseTest(SimpleTestCase):
 
     def _response(self, template='foo', *args, **kwargs):
         return SimpleTemplateResponse(Template(template), *args, **kwargs)
@@ -167,7 +167,7 @@ class SimpleTemplateResponseTest(TestCase):
         self.assertEqual(unpickled_response['content-type'], response['content-type'])
         self.assertEqual(unpickled_response.status_code, response.status_code)
 
-        # ...and the unpickled reponse doesn't have the
+        # ...and the unpickled response doesn't have the
         # template-related attributes, so it can't be re-rendered
         template_attrs = ('template_name', 'context_data', '_post_render_callbacks')
         for attr in template_attrs:
@@ -210,7 +210,7 @@ class SimpleTemplateResponseTest(TestCase):
     TEMPLATE_CONTEXT_PROCESSORS=[test_processor_name],
     TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates')),
 )
-class TemplateResponseTest(TestCase):
+class TemplateResponseTest(SimpleTestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -232,6 +232,12 @@ class TemplateResponseTest(TestCase):
         response = self._response('{{ foo }}{{ processors }}',
                                   Context({'foo': 'bar'})).render()
         self.assertEqual(response.content, b'bar')
+
+    def test_context_processor_priority(self):
+        # context processors should be overridden by passed-in context
+        response = self._response('{{ foo }}{{ processors }}',
+                                  {'processors': 'no'}).render()
+        self.assertEqual(response.content, b'no')
 
     def test_kwargs(self):
         response = self._response(content_type='application/json',
@@ -259,7 +265,8 @@ class TemplateResponseTest(TestCase):
             'first/test.html', {
                 'value': 123,
                 'fn': datetime.now,
-            })
+            }
+        )
         self.assertRaises(ContentNotRenderedError,
                           pickle.dumps, response)
 
@@ -272,7 +279,7 @@ class TemplateResponseTest(TestCase):
         self.assertEqual(unpickled_response['content-type'], response['content-type'])
         self.assertEqual(unpickled_response.status_code, response.status_code)
 
-        # ...and the unpickled reponse doesn't have the
+        # ...and the unpickled response doesn't have the
         # template-related attributes, so it can't be re-rendered
         template_attrs = ('template_name', 'context_data',
             '_post_render_callbacks', '_request', '_current_app')
@@ -301,10 +308,10 @@ class TemplateResponseTest(TestCase):
 @override_settings(
     MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
         'template_tests.test_response.CustomURLConfMiddleware'
-    ]
+    ],
+    ROOT_URLCONF='template_tests.urls',
 )
-class CustomURLConfTest(TestCase):
-    urls = 'template_tests.urls'
+class CustomURLConfTest(SimpleTestCase):
 
     def test_custom_urlconf(self):
         response = self.client.get('/template_response_view/')
@@ -317,10 +324,10 @@ class CustomURLConfTest(TestCase):
     MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
         'django.middleware.cache.FetchFromCacheMiddleware',
         'django.middleware.cache.UpdateCacheMiddleware',
-    ]
+    ],
+    ROOT_URLCONF='template_tests.alternate_urls',
 )
-class CacheMiddlewareTest(TestCase):
-    urls = 'template_tests.alternate_urls'
+class CacheMiddlewareTest(SimpleTestCase):
 
     def test_middleware_caching(self):
         response = self.client.get('/template_response_view/')

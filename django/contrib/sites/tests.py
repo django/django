@@ -1,12 +1,17 @@
 from __future__ import unicode_literals
 
+from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db.models.signals import post_migrate
 from django.http import HttpRequest
 from django.test import TestCase, modify_settings, override_settings
+from django.test.utils import captured_stdout
 
+from . import models
+from .management import create_default_site
 from .middleware import CurrentSiteMiddleware
-from .models import Site
+from .models import clear_site_cache, Site
 from .requests import RequestSite
 from .shortcuts import get_current_site
 
@@ -15,18 +20,17 @@ from .shortcuts import get_current_site
 class SitesFrameworkTests(TestCase):
 
     def setUp(self):
-        Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
-
-    def test_save_another(self):
-        # Regression for #17415
-        # On some backends the sequence needs reset after save with explicit ID.
-        # Test that there is no sequence collisions by saving another site.
-        Site(domain="example2.com", name="example2.com").save()
+        self.site = Site(
+            id=settings.SITE_ID,
+            domain="example.com",
+            name="example.com",
+        )
+        self.site.save()
 
     def test_site_manager(self):
         # Make sure that get_current() does not return a deleted Site object.
         s = Site.objects.get_current()
-        self.assertTrue(isinstance(s, Site))
+        self.assertIsInstance(s, Site)
         s.delete()
         self.assertRaises(ObjectDoesNotExist, Site.objects.get_current)
 
@@ -57,7 +61,7 @@ class SitesFrameworkTests(TestCase):
             "SERVER_PORT": "80",
         }
         site = get_current_site(request)
-        self.assertTrue(isinstance(site, Site))
+        self.assertIsInstance(site, Site)
         self.assertEqual(site.id, settings.SITE_ID)
 
         # Test that an exception is raised if the sites framework is installed
@@ -68,8 +72,19 @@ class SitesFrameworkTests(TestCase):
         # A RequestSite is returned if the sites framework is not installed
         with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
             site = get_current_site(request)
-            self.assertTrue(isinstance(site, RequestSite))
+            self.assertIsInstance(site, RequestSite)
             self.assertEqual(site.name, "example.com")
+
+    @override_settings(SITE_ID='', ALLOWED_HOSTS=['example.com'])
+    def test_get_current_site_no_site_id(self):
+        request = HttpRequest()
+        request.META = {
+            "SERVER_NAME": "example.com",
+            "SERVER_PORT": "80",
+        }
+        del settings.SITE_ID
+        site = get_current_site(request)
+        self.assertEqual(site.name, "example.com")
 
     def test_domain_name_with_whitespaces(self):
         # Regression for #17320
@@ -80,6 +95,94 @@ class SitesFrameworkTests(TestCase):
         self.assertRaises(ValidationError, site.full_clean)
         site.domain = "test\ntest"
         self.assertRaises(ValidationError, site.full_clean)
+
+    def test_clear_site_cache(self):
+        request = HttpRequest()
+        request.META = {
+            "SERVER_NAME": "example.com",
+            "SERVER_PORT": "80",
+        }
+        self.assertEqual(models.SITE_CACHE, {})
+        get_current_site(request)
+        expected_cache = {self.site.id: self.site}
+        self.assertEqual(models.SITE_CACHE, expected_cache)
+
+        with self.settings(SITE_ID=''):
+            get_current_site(request)
+
+        expected_cache.update({self.site.domain: self.site})
+        self.assertEqual(models.SITE_CACHE, expected_cache)
+
+        clear_site_cache(Site, instance=self.site)
+        self.assertEqual(models.SITE_CACHE, {})
+
+
+class JustOtherRouter(object):
+    def allow_migrate(self, db, model):
+        return db == 'other'
+
+
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
+class CreateDefaultSiteTests(TestCase):
+    multi_db = True
+
+    def setUp(self):
+        self.app_config = apps.get_app_config('sites')
+        # Delete the site created as part of the default migration process.
+        Site.objects.all().delete()
+
+    def test_basic(self):
+        """
+        #15346, #15573 - create_default_site() creates an example site only if
+        none exist.
+        """
+        with captured_stdout() as stdout:
+            create_default_site(self.app_config)
+        self.assertEqual(Site.objects.count(), 1)
+        self.assertIn("Creating example.com", stdout.getvalue())
+
+        with captured_stdout() as stdout:
+            create_default_site(self.app_config)
+        self.assertEqual(Site.objects.count(), 1)
+        self.assertEqual("", stdout.getvalue())
+
+    @override_settings(DATABASE_ROUTERS=[JustOtherRouter()])
+    def test_multi_db(self):
+        """
+        #16353, #16828 - The default site creation should respect db routing.
+        """
+        create_default_site(self.app_config, db='default', verbosity=0)
+        create_default_site(self.app_config, db='other', verbosity=0)
+        self.assertFalse(Site.objects.using('default').exists())
+        self.assertTrue(Site.objects.using('other').exists())
+
+    def test_save_another(self):
+        """
+        #17415 - Another site can be created right after the default one.
+
+        On some backends the sequence needs to be reset after saving with an
+        explicit ID. Test that there isn't a sequence collisions by saving
+        another site. This test is only meaningful with databases that use
+        sequences for automatic primary keys such as PostgreSQL and Oracle.
+        """
+        create_default_site(self.app_config, verbosity=0)
+        Site(domain='example2.com', name='example2.com').save()
+
+    def test_signal(self):
+        """
+        #23641 - Sending the ``post_migrate`` signal triggers creation of the
+        default site.
+        """
+        post_migrate.send(sender=self.app_config, app_config=self.app_config, verbosity=0)
+        self.assertTrue(Site.objects.exists())
+
+    @override_settings(SITE_ID=35696)
+    def test_custom_site_id(self):
+        """
+        #23945 - The configured ``SITE_ID`` should be respected.
+        """
+        create_default_site(self.app_config, verbosity=0)
+        self.assertEqual(Site.objects.get().pk, 35696)
 
 
 class MiddlewareTest(TestCase):

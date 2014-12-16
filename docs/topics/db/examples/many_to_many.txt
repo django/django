@@ -78,7 +78,7 @@ Adding a second time is OK::
 
     >>> a2.publications.add(p3)
 
-Adding an object of the wrong type raises :exc:`~exceptions.TypeError`::
+Adding an object of the wrong type raises :exc:`TypeError`::
 
     >>> a2.publications.add(a1)
     Traceback (most recent call last):

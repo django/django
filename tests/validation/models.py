@@ -18,6 +18,7 @@ class ModelToValidate(models.Model):
     number = models.IntegerField(db_column='number_val')
     parent = models.ForeignKey('self', blank=True, null=True, limit_choices_to={'number': 10})
     email = models.EmailField(blank=True)
+    ufm = models.ForeignKey('UniqueFieldsModel', to_field='unique_charfield', blank=True, null=True)
     url = models.URLField(blank=True)
     f_with_custom_validator = models.IntegerField(blank=True, null=True, validators=[validate_answer_to_universe])
     slug = models.SlugField(blank=True)

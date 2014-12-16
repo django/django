@@ -2,7 +2,7 @@
 Test URLs for auth admins.
 """
 
-from django.conf.urls import patterns, include
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
 from django.contrib.auth.models import User, Group
@@ -13,6 +13,6 @@ site = admin.AdminSite(name='auth_test_admin')
 site.register(User, UserAdmin)
 site.register(Group, GroupAdmin)
 
-urlpatterns = urlpatterns + patterns('',
-    (r'^admin/', include(site.urls)),
-)
+urlpatterns += [
+    url(r'^admin/', include(site.urls)),
+]

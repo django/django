@@ -1,8 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from .views import ArticleFormView
 
 
-urlpatterns = patterns('',
-    url(r'^model_form/(?P<pk>\d+)/$', ArticleFormView.as_view(), name="article_form"),
-)
+urlpatterns = [
+    url(r'^model_form/(?P<pk>[0-9]+)/$', ArticleFormView.as_view(), name="article_form"),
+]

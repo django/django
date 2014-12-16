@@ -1,11 +1,13 @@
 from __future__ import unicode_literals
 
+import os
 import warnings
 
 from django.contrib.sites.models import Site
 from django.core import management
 from django.db import connection, IntegrityError
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.utils.encoding import force_text
 from django.utils import six
 
 from .models import Article, Book, Spy, Tag, Visa
@@ -37,19 +39,25 @@ class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
 
 class DumpDataAssertMixin(object):
 
-    def _dumpdata_assert(self, args, output, format='json',
+    def _dumpdata_assert(self, args, output, format='json', filename=None,
                          natural_foreign_keys=False, natural_primary_keys=False,
                          use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = six.StringIO()
         management.call_command('dumpdata', *args, **{'format': format,
                                                       'stdout': new_io,
                                                       'stderr': new_io,
+                                                      'output': filename,
                                                       'use_natural_foreign_keys': natural_foreign_keys,
                                                       'use_natural_primary_keys': natural_primary_keys,
                                                       'use_base_manager': use_base_manager,
                                                       'exclude': exclude_list,
                                                       'primary_keys': primary_keys})
-        command_output = new_io.getvalue().strip()
+        if filename:
+            with open(filename, "r") as f:
+                command_output = f.read()
+            os.remove(filename)
+        else:
+            command_output = new_io.getvalue().strip()
         if format == "json":
             self.assertJSONEqual(command_output, output)
         elif format == "xml":
@@ -62,6 +70,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_initial_data(self):
         # migrate introduces 1 initial data object from initial_data.json.
+        # this behavior is deprecated and will be removed in Django 1.9
         self.assertQuerysetEqual(Book.objects.all(), [
             '<Book: Achieving self-awareness of Python programs>'
         ])
@@ -156,18 +165,6 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<Book: Achieving self-awareness of Python programs>',
             '<Book: Music for all ages by Artist formerly known as "Prince" and Django Reinhardt>'
         ])
-
-        # Loading a fixture that doesn't exist emits a warning
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            management.call_command('loaddata', 'unknown.json', verbosity=0)
-        self.assertEqual(len(w), 1)
-        self.assertTrue(w[0].message, "No fixture named 'unknown' found.")
-
-        # An attempt to load a nonexistent 'initial_data' fixture isn't an error
-        with warnings.catch_warnings(record=True) as w:
-            management.call_command('loaddata', 'initial_data.json', verbosity=0)
-        self.assertEqual(len(w), 0)
 
         # object list is unaffected
         self.assertQuerysetEqual(Article.objects.all(), [
@@ -282,6 +279,11 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 primary_keys='2,3'
             )
 
+    def test_dumpdata_with_file_output(self):
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
+        self._dumpdata_assert(['fixtures'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}, {"pk": 10, "model": "fixtures.book", "fields": {"name": "Achieving self-awareness of Python programs", "authors": []}}]',
+                filename='dumpdata.json')
+
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
         management.call_command('loaddata', 'fixture4.json', verbosity=0)
@@ -381,6 +383,35 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # Dump the current contents of the database as an XML fixture
         self._dumpdata_assert(['fixtures'], """<?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0"><object pk="1" model="fixtures.category"><field type="CharField" name="title">News Stories</field><field type="TextField" name="description">Latest news stories</field></object><object pk="2" model="fixtures.article"><field type="CharField" name="headline">Poker has no place on ESPN</field><field type="DateTimeField" name="pub_date">2006-06-16T12:00:00</field></object><object pk="3" model="fixtures.article"><field type="CharField" name="headline">Time to reform copyright</field><field type="DateTimeField" name="pub_date">2006-06-16T13:00:00</field></object><object pk="1" model="fixtures.tag"><field type="CharField" name="name">copyright</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="2" model="fixtures.tag"><field type="CharField" name="name">law</field><field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field></object><object pk="1" model="fixtures.person"><field type="CharField" name="name">Django Reinhardt</field></object><object pk="2" model="fixtures.person"><field type="CharField" name="name">Stephane Grappelli</field></object><object pk="3" model="fixtures.person"><field type="CharField" name="name">Prince</field></object><object pk="10" model="fixtures.book"><field type="CharField" name="name">Achieving self-awareness of Python programs</field><field to="fixtures.person" name="authors" rel="ManyToManyRel"></field></object></django-objects>""", format='xml', natural_foreign_keys=True)
+
+
+class NonExistentFixtureTests(TestCase):
+    """
+    Custom class to limit fixture dirs.
+    """
+    available_apps = ['django.contrib.auth', 'django.contrib.contenttypes']
+
+    def test_loaddata_not_existent_fixture_file(self):
+        stdout_output = six.StringIO()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            # With verbosity=2, we get both stdout output and a warning
+            management.call_command(
+                'loaddata',
+                'this_fixture_doesnt_exist',
+                verbosity=2,
+                stdout=stdout_output,
+            )
+        self.assertIn("No fixture 'this_fixture_doesnt_exist' in",
+            force_text(stdout_output.getvalue()))
+        self.assertEqual(len(w), 1)
+        self.assertEqual(force_text(w[0].message),
+            "No fixture named 'this_fixture_doesnt_exist' found.")
+
+        # An attempt to load a non-existent 'initial_data' fixture doesn't produce any warning
+        with warnings.catch_warnings(record=True) as w:
+            management.call_command('loaddata', 'initial_data.json', verbosity=0)
+        self.assertEqual(len(w), 0)
 
 
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):

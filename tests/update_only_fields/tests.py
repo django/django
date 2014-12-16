@@ -73,7 +73,7 @@ class UpdateOnlyFieldsTests(TestCase):
         with self.assertNumQueries(1):
             s1.save()
         # Test that the deferred class does not remember that gender was
-        # set, instead the instace should remember this.
+        # set, instead the instance should remember this.
         s1 = Person.objects.only('name').get(pk=s.pk)
         with self.assertNumQueries(1):
             s1.save()
@@ -204,10 +204,10 @@ class UpdateOnlyFieldsTests(TestCase):
         p.save(update_fields=['name'])
         self.assertEqual(len(pre_save_data), 1)
         self.assertEqual(len(pre_save_data[0]), 1)
-        self.assertTrue('name' in pre_save_data[0])
+        self.assertIn('name', pre_save_data[0])
         self.assertEqual(len(post_save_data), 1)
         self.assertEqual(len(post_save_data[0]), 1)
-        self.assertTrue('name' in post_save_data[0])
+        self.assertIn('name', post_save_data[0])
 
         pre_save.disconnect(pre_save_receiver)
         post_save.disconnect(post_save_receiver)

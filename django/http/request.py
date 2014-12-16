@@ -5,12 +5,8 @@ import os
 import re
 import sys
 from io import BytesIO
+from itertools import chain
 from pprint import pformat
-try:
-    from urllib.parse import parse_qsl, urlencode, quote, urljoin
-except ImportError:
-    from urllib import urlencode, quote
-    from urlparse import parse_qsl, urljoin
 
 from django.conf import settings
 from django.core import signing
@@ -19,11 +15,13 @@ from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils import six
 from django.utils.datastructures import MultiValueDict, ImmutableList
-from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
+from django.utils.encoding import (
+    force_bytes, force_text, force_str, escape_uri_path, iri_to_uri,
+)
+from django.utils.six.moves.urllib.parse import parse_qsl, urlencode, quote, urljoin, urlsplit
 
 
 RAISE_ERROR = object()
-absolute_http_url_re = re.compile(r"^https?://", re.I)
 host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9:]+\])(:\d+)?$")
 
 
@@ -52,7 +50,12 @@ class HttpRequest(object):
         # Any variable assignment made here should also happen in
         # `WSGIRequest.__init__()`.
 
-        self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
+        self.GET = QueryDict(mutable=True)
+        self.POST = QueryDict(mutable=True)
+        self.COOKIES = {}
+        self.META = {}
+        self.FILES = MultiValueDict()
+
         self.path = ''
         self.path_info = ''
         self.method = None
@@ -60,7 +63,11 @@ class HttpRequest(object):
         self._post_parse_error = False
 
     def __repr__(self):
-        return build_request_repr(self)
+        if self.method is None or not self.get_full_path():
+            return force_str('<%s>' % self.__class__.__name__)
+        return force_str(
+            '<%s: %s %r>' % (self.__class__.__name__, self.method, force_str(self.get_full_path()))
+        )
 
     def get_host(self):
         """Returns the HTTP host using the environment or request headers."""
@@ -87,15 +94,18 @@ class HttpRequest(object):
         else:
             msg = "Invalid HTTP_HOST header: %r." % host
             if domain:
-                msg += "You may need to add %r to ALLOWED_HOSTS." % domain
+                msg += " You may need to add %r to ALLOWED_HOSTS." % domain
             else:
-                msg += "The domain name provided is not valid according to RFC 1034/1035"
+                msg += " The domain name provided is not valid according to RFC 1034/1035."
             raise DisallowedHost(msg)
 
     def get_full_path(self):
         # RFC 3986 requires query string arguments to be in the ASCII range.
         # Rather than crash if this doesn't happen, we encode defensively.
-        return '%s%s' % (self.path, ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) if self.META.get('QUERY_STRING', '') else '')
+        return '%s%s' % (
+            escape_uri_path(self.path),
+            ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) if self.META.get('QUERY_STRING', '') else ''
+        )
 
     def get_signed_cookie(self, key, default=RAISE_ERROR, salt='', max_age=None):
         """
@@ -123,14 +133,25 @@ class HttpRequest(object):
     def build_absolute_uri(self, location=None):
         """
         Builds an absolute URI from the location and the variables available in
-        this request. If no location is specified, the absolute URI is built on
-        ``request.get_full_path()``.
+        this request. If no ``location`` is specified, the absolute URI is
+        built on ``request.get_full_path()``. Anyway, if the location is
+        absolute, it is simply converted to an RFC 3987 compliant URI and
+        returned and if location is relative or is scheme-relative (i.e.,
+        ``//example.com/``), it is urljoined to a base URL constructed from the
+        request variables.
         """
-        if not location:
-            location = self.get_full_path()
-        if not absolute_http_url_re.match(location):
-            current_uri = '%s://%s%s' % (self.scheme,
-                                         self.get_host(), self.path)
+        if location is None:
+            # Make it an absolute url (but schemeless and domainless) for the
+            # edge case that the path starts with '//'.
+            location = '//%s' % self.get_full_path()
+        bits = urlsplit(location)
+        if not (bits.scheme and bits.netloc):
+            current_uri = '{scheme}://{host}{path}'.format(scheme=self.scheme,
+                                                           host=self.get_host(),
+                                                           path=self.path)
+            # Join the constructed URL with the provided location, which will
+            # allow the provided ``location`` to apply query strings to the
+            # base path as well as override the host, if it begins with //
             location = urljoin(current_uri, location)
         return iri_to_uri(location)
 
@@ -144,7 +165,9 @@ class HttpRequest(object):
             try:
                 header, value = settings.SECURE_PROXY_SSL_HEADER
             except ValueError:
-                raise ImproperlyConfigured('The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values.')
+                raise ImproperlyConfigured(
+                    'The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values.'
+                )
             if self.META.get(header, None) == value:
                 return 'https'
         # Failing that, fall back to _get_scheme(), which is a hook for
@@ -235,11 +258,11 @@ class HttpRequest(object):
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
             except MultiPartParserError:
-                # An error occured while parsing POST data. Since when
+                # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
                 # attempts to parse POST data again.
-                # Mark that an error occured. This allows self.__repr__ to
+                # Mark that an error occurred. This allows self.__repr__ to
                 # be explicit about it instead of simply representing an
                 # empty POST
                 self._mark_post_parse_error()
@@ -248,6 +271,11 @@ class HttpRequest(object):
             self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
         else:
             self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
+
+    def close(self):
+        if hasattr(self, '_files'):
+            for f in chain.from_iterable(l[1] for l in self._files.lists()):
+                f.close()
 
     # File-like and iterator interface.
     #
@@ -286,26 +314,37 @@ class HttpRequest(object):
 
 class QueryDict(MultiValueDict):
     """
-    A specialized MultiValueDict that takes a query string when initialized.
-    This is immutable unless you create a copy of it.
+    A specialized MultiValueDict which represents a query string.
 
-    Values retrieved from this class are converted from the given encoding
+    A QueryDict can be used to represent GET or POST data. It subclasses
+    MultiValueDict since keys in such data can be repeated, for instance
+    in the data from a form with a <select multiple> field.
+
+    By default QueryDicts are immutable, though the copy() method
+    will always return a mutable copy.
+
+    Both keys and values set on this class are converted from the given encoding
     (DEFAULT_CHARSET by default) to unicode.
     """
+
     # These are both reset in __init__, but is specified here at the class
     # level so that unpickling will have valid values
     _mutable = True
     _encoding = None
 
-    def __init__(self, query_string, mutable=False, encoding=None):
+    def __init__(self, query_string=None, mutable=False, encoding=None):
         super(QueryDict, self).__init__()
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
         if six.PY3:
             if isinstance(query_string, bytes):
-                # query_string contains URL-encoded data, a subset of ASCII.
-                query_string = query_string.decode()
+                # query_string normally contains URL-encoded data, a subset of ASCII.
+                try:
+                    query_string = query_string.decode(encoding)
+                except UnicodeDecodeError:
+                    # ... but some user agents are misbehaving :-(
+                    query_string = query_string.decode('iso-8859-1')
             for key, value in parse_qsl(query_string or '',
                                         keep_blank_values=True,
                                         encoding=encoding):
@@ -313,8 +352,12 @@ class QueryDict(MultiValueDict):
         else:
             for key, value in parse_qsl(query_string or '',
                                         keep_blank_values=True):
+                try:
+                    value = value.decode(encoding)
+                except UnicodeDecodeError:
+                    value = value.decode('iso-8859-1')
                 self.appendlist(force_text(key, encoding, errors='replace'),
-                                force_text(value, encoding, errors='replace'))
+                                value)
         self._mutable = mutable
 
     @property
@@ -415,8 +458,8 @@ class QueryDict(MultiValueDict):
             encode = lambda k, v: urlencode({k: v})
         for k, list_ in self.lists():
             k = force_bytes(k, self.encoding)
-            output.extend([encode(k, force_bytes(v, self.encoding))
-                           for v in list_])
+            output.extend(encode(k, force_bytes(v, self.encoding))
+                          for v in list_)
         return '&'.join(output)
 
 

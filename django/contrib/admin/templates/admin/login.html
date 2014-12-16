@@ -30,11 +30,11 @@
 <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
   <div class="form-row">
     {{ form.username.errors }}
-    <label for="id_username" class="required">{{ form.username.label }}:</label> {{ form.username }}
+    {{ form.username.label_tag }} {{ form.username }}
   </div>
   <div class="form-row">
     {{ form.password.errors }}
-    <label for="id_password" class="required">{% trans 'Password:' %}</label> {{ form.password }}
+    {{ form.password.label_tag }} {{ form.password }}
     <input type="hidden" name="next" value="{{ next }}" />
   </div>
   {% url 'admin_password_reset' as password_reset_url %}

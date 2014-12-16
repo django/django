@@ -1,4 +1,5 @@
 from django.db.backends.creation import BaseDatabaseCreation
+from django.utils.functional import cached_property
 
 
 class DatabaseCreation(BaseDatabaseCreation):
@@ -6,7 +7,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.
     # If a column type is set to None, it won't be included in the output.
-    data_types = {
+    _data_types = {
         'AutoField': 'integer AUTO_INCREMENT',
         'BinaryField': 'longblob',
         'BooleanField': 'bool',
@@ -30,7 +31,15 @@ class DatabaseCreation(BaseDatabaseCreation):
         'SmallIntegerField': 'smallint',
         'TextField': 'longtext',
         'TimeField': 'time',
+        'UUIDField': 'char(32)',
     }
+
+    @cached_property
+    def data_types(self):
+        if self.connection.features.supports_microsecond_precision:
+            return dict(self._data_types, DateTimeField='datetime(6)', TimeField='time(6)')
+        else:
+            return self._data_types
 
     def sql_table_creation_suffix(self):
         suffix = []

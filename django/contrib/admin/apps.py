@@ -11,7 +11,7 @@ class SimpleAdminConfig(AppConfig):
     verbose_name = _("Administration")
 
     def ready(self):
-        checks.register('admin')(check_admin_app)
+        checks.register(check_admin_app, checks.Tags.admin)
 
 
 class AdminConfig(SimpleAdminConfig):

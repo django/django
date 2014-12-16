@@ -1,6 +1,5 @@
 import threading
 from ctypes import byref, c_char_p, c_int, c_char, c_size_t, Structure, POINTER
-from django.contrib.gis import memoryview
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_string, check_sized_string
@@ -164,7 +163,7 @@ class _WKBReader(IOBase):
 
     def read(self, wkb):
         "Returns a _pointer_ to C GEOS Geometry object from the given WKB."
-        if isinstance(wkb, memoryview):
+        if isinstance(wkb, six.memoryview):
             wkb_s = bytes(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
         elif isinstance(wkb, (bytes, six.string_types)):
@@ -189,7 +188,7 @@ class WKTWriter(IOBase):
 
     @outdim.setter
     def outdim(self, new_dim):
-        if not new_dim in (2, 3):
+        if new_dim not in (2, 3):
             raise ValueError('WKT output dimension must be 2 or 3')
         wkt_writer_set_outdim(self.ptr, new_dim)
 
@@ -201,7 +200,7 @@ class WKBWriter(IOBase):
 
     def write(self, geom):
         "Returns the WKB representation of the given geometry."
-        return memoryview(wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t())))
+        return six.memoryview(wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t())))
 
     def write_hex(self, geom):
         "Returns the HEXEWKB representation of the given geometry."
@@ -214,7 +213,7 @@ class WKBWriter(IOBase):
         return wkb_writer_get_byteorder(self.ptr)
 
     def _set_byteorder(self, order):
-        if not order in (0, 1):
+        if order not in (0, 1):
             raise ValueError('Byte order parameter must be 0 (Big Endian) or 1 (Little Endian).')
         wkb_writer_set_byteorder(self.ptr, order)
 
@@ -225,7 +224,7 @@ class WKBWriter(IOBase):
         return wkb_writer_get_outdim(self.ptr)
 
     def _set_outdim(self, new_dim):
-        if not new_dim in (2, 3):
+        if new_dim not in (2, 3):
             raise ValueError('WKB output dimension must be 2 or 3')
         wkb_writer_set_outdim(self.ptr, new_dim)
 

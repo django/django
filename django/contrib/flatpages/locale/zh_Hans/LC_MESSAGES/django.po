@@ -1,0 +1,101 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Lele Long <schemacs@gmail.com>, 2011
+# ouyanghongyu <ouyanghongyu@gmail.com>, 2014
+# Kevin Sze <leiarix@gmail.com>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-09-04 10:34+0000\n"
+"Last-Translator: ouyanghongyu <ouyanghongyu@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"language/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contrib/flatpages/admin.py:11
+msgid "Advanced options"
+msgstr "高级选项"
+
+#: contrib/flatpages/apps.py:8
+msgid "Flat Pages"
+msgstr "简单页面"
+
+#: contrib/flatpages/forms.py:8 contrib/flatpages/models.py:12
+msgid "URL"
+msgstr "URL"
+
+#: contrib/flatpages/forms.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "例如：'/about/contact/'。请确保开始和结尾的斜杠。"
+
+#: contrib/flatpages/forms.py:11
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr "该值必须只能包含字母，数字，点号，下划线，破折号，和"
+
+#: contrib/flatpages/forms.py:22
+msgid "URL is missing a leading slash."
+msgstr "URL头部缺失斜线."
+
+#: contrib/flatpages/forms.py:29
+msgid "URL is missing a trailing slash."
+msgstr "URL尾部缺失斜线."
+
+#: contrib/flatpages/forms.py:46
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "带有url %(url)s的Flatpage已经存在于站点 %(site)s"
+
+#: contrib/flatpages/models.py:13
+msgid "title"
+msgstr "标题"
+
+#: contrib/flatpages/models.py:14
+msgid "content"
+msgstr "内容"
+
+#: contrib/flatpages/models.py:15
+msgid "enable comments"
+msgstr "允许评论"
+
+#: contrib/flatpages/models.py:16
+msgid "template name"
+msgstr "模板名称"
+
+#: contrib/flatpages/models.py:17
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"例如：'flatpages/contact_page.html'。若未提供，系统将使用'flatpages/default."
+"html'。"
+
+#: contrib/flatpages/models.py:18
+msgid "registration required"
+msgstr "请先注册"
+
+#: contrib/flatpages/models.py:19
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "如果被选中，仅登录用户才可以查看此页。"
+
+#: contrib/flatpages/models.py:25
+msgid "flat page"
+msgstr "简单页面"
+
+#: contrib/flatpages/models.py:26
+msgid "flat pages"
+msgstr "简单页面"
+
+#: contrib/flatpages/tests/test_forms.py:98
+msgid "This field is required."
+msgstr "这个字段是必填项。"

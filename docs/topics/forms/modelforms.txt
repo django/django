@@ -281,6 +281,9 @@ You can override the error messages from ``NON_FIELD_ERRORS`` raised by model
 validation by adding the :data:`~django.core.exceptions.NON_FIELD_ERRORS` key
 to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` class::
 
+    from django.forms import ModelForm
+    from django.core.exceptions import NON_FIELD_ERRORS
+
     class ArticleForm(ModelForm):
         class Meta:
             error_messages = {
@@ -430,13 +433,11 @@ In addition, Django applies the following rule: if you set ``editable=False`` on
 the model field, *any* form created from the model via ``ModelForm`` will not
 include that field.
 
-.. versionchanged:: 1.6
+.. versionchanged:: 1.8
 
-    Before version 1.6, the ``'__all__'`` shortcut did not exist, but omitting
-    the ``fields`` attribute had the same effect. Omitting both ``fields`` and
-    ``exclude`` is now deprecated, but will continue to work as before until
-    version 1.8
-
+    In older versions, omitting both ``fields`` and ``exclude`` resulted in
+    a form with all the model's fields. Doing this now raises an
+    :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
 .. note::
 
@@ -484,10 +485,9 @@ To specify a custom widget for a field, use the ``widgets`` attribute of the
 inner ``Meta`` class. This should be a dictionary mapping field names to widget
 classes or instances.
 
-For example, if you want the a ``CharField`` for the ``name``
-attribute of ``Author`` to be represented by a ``<textarea>`` instead
-of its default ``<input type="text">``, you can override the field's
-widget::
+For example, if you want the ``CharField`` for the ``name`` attribute of
+``Author`` to be represented by a ``<textarea>`` instead of its default
+``<input type="text">``, you can override the field's widget::
 
     from django.forms import ModelForm, Textarea
     from myapp.models import Author
@@ -503,15 +503,13 @@ widget::
 The ``widgets`` dictionary accepts either widget instances (e.g.,
 ``Textarea(...)``) or classes (e.g., ``Textarea``).
 
-.. versionadded:: 1.6
-
-    The ``labels``, ``help_texts`` and ``error_messages`` options were added.
-
 Similarly, you can specify the ``labels``, ``help_texts`` and ``error_messages``
 attributes of the inner ``Meta`` class if you want to further customize a field.
 
 For example if you wanted to customize the wording of all user facing strings for
 the ``name`` field::
+
+    from django.utils.translation import ugettext_lazy as _
 
     class AuthorForm(ModelForm):
         class Meta:
@@ -550,7 +548,7 @@ field, you could do the following::
 If you want to specify a field's validators, you can do so by defining
 the field declaratively and setting its ``validators`` parameter::
 
-    from django.forms import ModelForm, DateField
+    from django.forms import ModelForm, CharField
     from myapp.models import Article
 
     class ArticleForm(ModelForm):
@@ -612,8 +610,6 @@ the field declaratively and setting its ``validators`` parameter::
 Enabling localization of fields
 -------------------------------
 
-.. versionadded:: 1.6
-
 By default, the fields in a ``ModelForm`` will not localize their data. To
 enable localization for fields, you can use the ``localized_fields``
 attribute on the ``Meta`` class.
@@ -669,10 +665,8 @@ There are a couple of things to note, however.
 
 .. versionadded:: 1.7
 
-* It's possible to opt-out from a ``Field`` inherited from a parent class by
-  shadowing it. While any non-``Field`` value works for this purpose, it's
-  recommended to use ``None`` to make it explicit that a field is being
-  nullified.
+* It's possible to declaratively remove a ``Field`` inherited from a parent class by
+  setting the name to be ``None`` on the subclass.
 
   You can only use this technique to opt out from a field defined declaratively
   by a parent class; it won't prevent the ``ModelForm`` metaclass from generating
@@ -820,8 +814,6 @@ exclude::
 Specifying widgets to use in the form with ``widgets``
 ------------------------------------------------------
 
-.. versionadded:: 1.6
-
 Using the ``widgets`` parameter, you can specify a dictionary of values to
 customize the ``ModelForm``’s widget class for a particular field. This
 works the same way as the ``widgets`` dictionary on the inner ``Meta``
@@ -832,8 +824,6 @@ class of a ``ModelForm`` works::
 
 Enabling localization for fields with ``localized_fields``
 ----------------------------------------------------------
-
-.. versionadded:: 1.6
 
 Using the ``localized_fields`` parameter, you can enable localization for
 fields in the form.
@@ -860,7 +850,9 @@ Saving objects in the formset
 -----------------------------
 
 As with a ``ModelForm``, you can save the data as a model object. This is done
-with the formset's ``save()`` method::
+with the formset's ``save()`` method:
+
+.. code-block:: python
 
     # Create a formset instance with POST data.
     >>> formset = AuthorFormSet(request.POST)
@@ -878,7 +870,9 @@ excluded), these fields will not be set by the ``save()`` method. You can find
 more information about this restriction, which also holds for regular
 ``ModelForms``, in `Selecting the fields to use`_.
 
-Pass ``commit=False`` to return the unsaved model instances::
+Pass ``commit=False`` to return the unsaved model instances:
+
+.. code-block:: python
 
     # don't save to the database
     >>> instances = formset.save(commit=False)
@@ -915,7 +909,7 @@ extra forms displayed.
     >>> AuthorFormSet = modelformset_factory(Author, max_num=1)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
     >>> [x.name for x in formset.get_queryset()]
-    [u'Charles Baudelaire', u'Paul Verlaine', u'Walt Whitman']
+    ['Charles Baudelaire', 'Paul Verlaine', 'Walt Whitman']
 
 If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,
@@ -1113,7 +1107,7 @@ a particular author, you could do this::
 
     >>> from django.forms.models import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book)
-    >>> author = Author.objects.get(name=u'Mike Royko')
+    >>> author = Author.objects.get(name='Mike Royko')
     >>> formset = BookFormSet(instance=author)
 
 .. note::
@@ -1152,7 +1146,7 @@ Then when you create your inline formset, pass in the optional argument
 
     >>> from django.forms.models import inlineformset_factory
     >>> BookFormSet = inlineformset_factory(Author, Book, formset=CustomInlineFormSet)
-    >>> author = Author.objects.get(name=u'Mike Royko')
+    >>> author = Author.objects.get(name='Mike Royko')
     >>> formset = BookFormSet(instance=author)
 
 More than one foreign key to the same model
@@ -1198,9 +1192,9 @@ Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.
 Specifying widgets to use in the inline form
 --------------------------------------------
 
-.. versionadded:: 1.6
 
 ``inlineformset_factory`` uses ``modelformset_factory`` and passes most
 of its arguments to ``modelformset_factory``. This means you can use
 the ``widgets`` parameter in much the same way as passing it to
-``modelformset_factory``. See `Specifying widgets to use in the form with widgets`_ above.
+``modelformset_factory``. See `Specifying widgets to use in the form with
+widgets`_ above.

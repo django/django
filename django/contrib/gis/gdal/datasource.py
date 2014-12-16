@@ -47,7 +47,7 @@ from django.contrib.gis.gdal.prototypes import ds as capi
 
 from django.utils.encoding import force_bytes, force_text
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
@@ -67,10 +67,7 @@ class DataSource(GDALBase):
         # See also http://trac.osgeo.org/gdal/wiki/rfc23_ogr_unicode
         self.encoding = encoding
 
-        # Registering all the drivers, this needs to be done
-        #  _before_ we try to open up a data source.
-        if not capi.get_driver_count():
-            capi.register_all()
+        Driver.ensure_registered()
 
         if isinstance(ds_input, six.string_types):
             # The data source driver is a void pointer.
@@ -96,12 +93,12 @@ class DataSource(GDALBase):
 
     def __del__(self):
         "Destroys this DataStructure object."
-        if self._ptr:
+        if self._ptr and capi:
             capi.destroy_ds(self._ptr)
 
     def __iter__(self):
         "Allows for iteration over the layers in a data source."
-        for i in xrange(self.layer_count):
+        for i in range(self.layer_count):
             yield self[i]
 
     def __getitem__(self, index):

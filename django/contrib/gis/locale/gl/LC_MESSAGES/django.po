@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# fasouto <fsoutomoure@gmail.com>, 2011.
-#   <fonzzo@gmail.com>, 2013.
+# fasouto <fsoutomoure@gmail.com>, 2011
+# fonso <fonzzo@gmail.com>, 2013
+# Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2013-01-07 11:44+0000\n"
-"Last-Translator: fonso <fonzzo@gmail.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Galician (http://www.transifex.com/projects/p/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -18,61 +19,56 @@ msgstr ""
 "Language: gl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:9
-msgid "No feeds are registered."
-msgstr "Non hai feeds rexistradas."
+#: contrib/gis/apps.py:8
+msgid "GIS"
+msgstr ""
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr "A url curta %r non está rexistrada."
-
-#: db/models/fields.py:51
+#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "O campo GIS base -- correspóndese co tipo Geometry da especificación OpenGIS."
 
-#: db/models/fields.py:271
+#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Punto"
 
-#: db/models/fields.py:275
+#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Secuencia de liñas"
 
-#: db/models/fields.py:279
+#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Polígono"
 
-#: db/models/fields.py:283
+#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Punto múltiple"
 
-#: db/models/fields.py:287
+#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Cadea multi-liña"
 
-#: db/models/fields.py:291
+#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Multi polígono"
 
-#: db/models/fields.py:295
+#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Colección de xeometrías"
 
-#: forms/fields.py:19
+#: contrib/gis/forms/fields.py:22
 msgid "No geometry value provided."
 msgstr "Non se proporcionou un valor de xeometría."
 
-#: forms/fields.py:20
+#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Valor xeométrico non válido."
 
-#: forms/fields.py:21
+#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
-msgstr "Tipo xeometríco non válido."
+msgstr "Tipo xeométrico non válido."
 
-#: forms/fields.py:22
+#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -80,17 +76,26 @@ msgstr ""
 "Atopouse un erro mentras se trasnformaba a xeometría ó SRID do campo "
 "xeométrico do formulario."
 
-#: sitemaps/views.py:46
+#: contrib/gis/sitemaps/views.py:56
 #, python-format
 msgid "No sitemap available for section: %r"
 msgstr "Non hai un mapa do sitio dispoñíbel para a sección: %r"
 
-#: sitemaps/views.py:60
+#: contrib/gis/sitemaps/views.py:70
 #, python-format
 msgid "Page %s empty"
 msgstr "A páxina %s baleira"
 
-#: sitemaps/views.py:62
+#: contrib/gis/sitemaps/views.py:72
 #, python-format
 msgid "No page '%s'"
 msgstr "Non existe a páxina '%s'"
+
+#: contrib/gis/views.py:10
+msgid "No feeds are registered."
+msgstr "Non hai feeds rexistradas."
+
+#: contrib/gis/views.py:16
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "A url curta %r non está rexistrada."

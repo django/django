@@ -8,7 +8,8 @@ from django.test import TestCase, override_settings
 from .models import Action, Person, Car
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='admin_custom_urls.urls',)
 class AdminCustomUrlsTest(TestCase):
     """
     Remember that:
@@ -16,16 +17,12 @@ class AdminCustomUrlsTest(TestCase):
     * The ModelAdmin for Action customizes the add_view URL, it's
       '<app name>/<model name>/!add/'
     """
-    urls = 'admin_custom_urls.urls'
     fixtures = ['users.json', 'actions.json']
 
     def setUp(self):
         self.client.login(username='super', password='secret')
 
-    def tearDown(self):
-        self.client.logout()
-
-    def testBasicAddGet(self):
+    def test_basic_add_GET(self):
         """
         Ensure GET on the add_view works.
         """
@@ -33,7 +30,7 @@ class AdminCustomUrlsTest(TestCase):
         self.assertIsInstance(response, TemplateResponse)
         self.assertEqual(response.status_code, 200)
 
-    def testAddWithGETArgs(self):
+    def test_add_with_GET_args(self):
         """
         Ensure GET on the add_view plus specifying a field value in the query
         string works.
@@ -42,7 +39,7 @@ class AdminCustomUrlsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'value="My Action"')
 
-    def testBasicAddPost(self):
+    def test_basic_add_POST(self):
         """
         Ensure POST on add_view works.
         """
@@ -56,7 +53,7 @@ class AdminCustomUrlsTest(TestCase):
         self.assertContains(response, 'dismissAddAnotherPopup')
         self.assertContains(response, 'Action added through a popup')
 
-    def testAdminUrlsNoClash(self):
+    def test_admin_URLs_no_clash(self):
         """
         Test that some admin URLs work correctly.
         """
@@ -83,16 +80,13 @@ class AdminCustomUrlsTest(TestCase):
         self.assertContains(response, 'value="path/to/html/document.html"')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='admin_custom_urls.urls',)
 class CustomRedirects(TestCase):
-    urls = 'admin_custom_urls.urls'
     fixtures = ['users.json', 'actions.json']
 
     def setUp(self):
         self.client.login(username='super', password='secret')
-
-    def tearDown(self):
-        self.client.logout()
 
     def test_post_save_add_redirect(self):
         """

@@ -44,6 +44,8 @@ supported Python series (2.6.X, 2.7.X, 3.2.X, and 3.3.X).
 Django 1.6 will be the final release series to support Python 2.6; beginning
 with Django 1.7, the minimum supported Python version will be 2.7.
 
+Python 3.4 is not supported, but support will be added in Django 1.7.
+
 What's new in Django 1.6
 ========================
 
@@ -129,9 +131,9 @@ binary data in the database.
 GeoDjango form widgets
 ~~~~~~~~~~~~~~~~~~~~~~
 
-GeoDjango now provides :ref:`form fields and widgets <ref-gis-forms-api>` for
-its geo-specialized fields. They are OpenLayers-based by default, but they can
-be customized to use any other JS framework.
+GeoDjango now provides :doc:`form fields and widgets </ref/contrib/gis/forms-api>`
+for its geo-specialized fields. They are OpenLayers-based by default, but they
+can be customized to use any other JS framework.
 
 ``check`` management command added for verifying compatibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,7 +168,7 @@ Minor features
   :setting:`CSRF_COOKIE_HTTPONLY`.
 
 * The :meth:`~django.test.TransactionTestCase.assertQuerysetEqual` now checks
-  for undefined order and raises :exc:`~exceptions.ValueError` if undefined
+  for undefined order and raises :exc:`ValueError` if undefined
   order is spotted. The order is seen as undefined if the given ``QuerySet``
   isn't ordered and there are more than one ordered values to compare against.
 
@@ -378,7 +380,7 @@ Backwards incompatible changes in 1.6
 .. warning::
 
     In addition to the changes outlined in this section, be sure to review the
-    :doc:`deprecation plan </internals/deprecation>` for any features that
+    :ref:`deprecation plan <deprecation-removed-in-1.6>` for any features that
     have been removed. If you haven't updated your code within the
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
@@ -411,8 +413,8 @@ Autocommit option for PostgreSQL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In previous versions, database-level autocommit was only an option for
-PostgreSQL, and it was disabled by default. This option is now :ref:`ignored
-<postgresql-autocommit-mode>` and can be removed.
+PostgreSQL, and it was disabled by default. This option is now ignored and can
+be removed.
 
 .. _new-test-runner:
 
@@ -441,6 +443,17 @@ to fully restore the old test behavior. ``DjangoTestSuiteRunner`` is deprecated
 but will not be removed from Django until version 1.8.
 
 .. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
+
+Removal of ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner`` GeoDjango custom test runner
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is for developers working on the GeoDjango application itself and related
+to the item above about changes in the test runners:
+
+The ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner`` test runner has been
+removed and the standalone GeoDjango tests execution setup it implemented isn't
+supported anymore. To run the GeoDjango tests simply use the new
+``DiscoverRunner`` and specify the ``django.contrib.gis`` app.
 
 Custom User models in tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -478,7 +491,7 @@ pytz_. If you're using MySQL, you must install pytz_ and load the time zone
 tables with `mysql_tzinfo_to_sql`_.
 
 .. _pytz: http://pytz.sourceforge.net/
-.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
+.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 Addition of ``QuerySet.datetimes()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -584,12 +597,13 @@ to arguments before interpolating them in URL patterns. This bug is fixed in
 Django 1.6. If you worked around this bug by applying URL quoting before
 passing arguments to :func:`~django.core.urlresolvers.reverse`, this may
 result in double-quoting. If this happens, simply remove the URL quoting from
-your code.
+your code. You will also have to replace special characters in URLs used in
+:func:`~django.test.SimpleTestCase.assertRedirects` with their encoded versions.
 
 Storage of IP addresses in the comments app
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :doc:`comments </ref/contrib/comments/index>` app now uses a
+The comments app now uses a
 ``GenericIPAddressField`` for storing commenters' IP addresses, to support
 comments submitted from IPv6 addresses. Until now, it stored them in an
 ``IPAddressField``, which is only meant to support IPv4. When saving a comment
@@ -637,21 +651,24 @@ Help text of model form fields for ManyToManyField fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 HTML rendering of model form fields corresponding to
-:class:`~django.db.models.ManyToManyField` ORM model fields used to get the
-hard-coded sentence
+:class:`~django.db.models.ManyToManyField` model fields used to get the
+hard-coded sentence:
 
   *Hold down "Control", or "Command" on a Mac, to select more than one.*
 
 (or its translation to the active locale) imposed as the help legend shown along
 them if neither :attr:`model <django.db.models.Field.help_text>` nor :attr:`form
-<django.forms.Field.help_text>` ``help_text`` attribute was specified by the
-user (or appended to, if ``help_text`` was provided.)
+<django.forms.Field.help_text>` ``help_text`` attributes were specified by the
+user (or this string was appended to any ``help_text`` that was provided).
 
-This happened always, possibly even with form fields implementing user
-interactions that don't involve a keyboard and/or a mouse and was handled at the
-model field layer.
+Since this happened at the model layer, there was no way to prevent the text
+from appearing in cases where it wasn't applicable such as form fields that
+implement user interactions that don't involve a keyboard and/or a mouse.
 
-Starting with Django 1.6 this doesn't happen anymore.
+Starting with Django 1.6, as an ad-hoc temporary backward-compatibility
+provision, the logic to add the "Hold down..." sentence has been moved to the
+model form field layer and modified to add the text only when the associated
+widget is :class:`~django.forms.SelectMultiple` or selected subclasses.
 
 The change can affect you in a backward incompatible way if you employ custom
 model form fields and/or widgets for ``ManyToManyField`` model fields whose UIs
@@ -663,11 +680,6 @@ Applications that use Django :doc:`model form </topics/forms/modelforms>`
 facilities together with Django built-in form :doc:`fields </ref/forms/fields>`
 and :doc:`widgets </ref/forms/widgets>` aren't affected but need to be aware of
 what's described in :ref:`m2m-help_text-deprecation` below.
-
-This is because, as an ad-hoc temporary backward-compatibility provision, the
-described non-standard behavior has been preserved but moved to the model form
-field layer and occurs only when the associated widget is
-:class:`~django.forms.SelectMultiple` or selected subclasses.
 
 QuerySet iteration
 ~~~~~~~~~~~~~~~~~~
@@ -1009,7 +1021,7 @@ tags render their arguments as-is.
 Django 1.6 starts a process to correct this inconsistency. The ``future``
 template library provides alternate implementations of :ttag:`cycle` and
 :ttag:`firstof` that autoescape their inputs. If you're using these tags,
-you're encourage to include the following line at the top of your templates to
+you're encouraged to include the following line at the top of your templates to
 enable the new behavior::
 
     {% load cycle from future %}
@@ -1087,6 +1099,53 @@ a regular deprecation path.
 Methods that return a ``QuerySet`` such as ``Manager.get_query_set`` or
 ``ModelAdmin.queryset`` have been renamed to ``get_queryset``.
 
+If you are writing a library that implements, for example, a
+``Manager.get_query_set`` method, and you need to support old Django versions,
+you should rename the method and conditionally add an alias with the old name::
+
+    class CustomManager(models.Manager):
+        def get_queryset(self):
+            pass # ...
+
+        if django.VERSION < (1, 6):
+            get_query_set = get_queryset
+
+        # For Django >= 1.6, models.Manager provides a get_query_set fallback
+        # that emits a warning when used.
+
+If you are writing a library that needs to call the ``get_queryset`` method and
+must support old Django versions, you should write::
+
+    get_queryset = (some_manager.get_query_set
+                    if hasattr(some_manager, 'get_query_set')
+                    else some_manager.get_queryset)
+    return get_queryset() # etc
+
+In the general case of a custom manager that both implements its own
+``get_queryset`` method and calls that method, and needs to work with older Django
+versions, and libraries that have not been updated yet, it is useful to define
+a ``get_queryset_compat`` method as below and use it internally to your manager::
+
+    class YourCustomManager(models.Manager):
+        def get_queryset(self):
+            return YourCustomQuerySet() # for example
+
+        get_query_set = get_queryset
+
+        def active(self): # for example
+            return self.get_queryset_compat().filter(active=True)
+
+        def get_queryset_compat(self):
+            get_queryset = (self.get_query_set
+                            if hasattr(self, 'get_query_set')
+                            else self.get_queryset)
+            return get_queryset()
+
+This helps to minimize the changes that are needed, but also works correctly in
+the case of subclasses (such as ``RelatedManagers`` from Django 1.5) which might
+override either ``get_query_set`` or ``get_queryset``.
+
+
 ``shortcut`` view and URLconf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1151,7 +1210,7 @@ create a ``ModelForm`` that uses all fields for a model.
 For this reason, if you use these views for editing models, you must also supply
 the ``fields`` attribute (new in Django 1.6), which is a list of model fields
 and works in the same way as the :class:`~django.forms.ModelForm`
-``Meta.fields`` attribute. Alternatively, you can set set the ``form_class``
+``Meta.fields`` attribute. Alternatively, you can set the ``form_class``
 attribute to a ``ModelForm`` that explicitly defines the fields to be used.
 Defining an ``UpdateView`` or ``CreateView`` subclass to be used with a model
 but without an explicit list of fields is deprecated.

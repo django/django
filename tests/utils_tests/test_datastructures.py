@@ -6,13 +6,13 @@ import copy
 import pickle
 
 from django.test import SimpleTestCase
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils.datastructures import (DictWrapper, ImmutableList,
-    MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
+    MultiValueDict, MultiValueDictKeyError, MergeDict, OrderedSet, SortedDict)
 from django.utils import six
 
 
-class SortedDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
+class SortedDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):
     def setUp(self):
         super(SortedDictTests, self).setUp()
         self.d1 = SortedDict()
@@ -136,7 +136,7 @@ class SortedDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
         self.assertEqual(list(reversed(self.d2)), [7, 0, 9, 1])
 
 
-class MergeDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
+class MergeDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):
 
     def test_simple_mergedict(self):
         d1 = {'chris': 'cool', 'camri': 'cute', 'cotton': 'adorable',
@@ -177,7 +177,7 @@ class MergeDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
         self.assertEqual(sorted(six.iterkeys(mm)), ['key1', 'key2', 'key4'])
         self.assertEqual(len(list(six.itervalues(mm))), 3)
 
-        self.assertTrue('value1' in six.itervalues(mm))
+        self.assertIn('value1', six.itervalues(mm))
 
         self.assertEqual(
             sorted(six.iteritems(mm), key=lambda k: k[0]),
@@ -204,6 +204,16 @@ class MergeDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
         d1 = MergeDict({'key1': 42})
         with six.assertRaisesRegex(self, KeyError, 'key2'):
             d1['key2']
+
+
+class OrderedSetTests(SimpleTestCase):
+
+    def test_bool(self):
+        # Refs #23664
+        s = OrderedSet()
+        self.assertFalse(s)
+        s.add(1)
+        self.assertTrue(s)
 
 
 class MultiValueDictTests(SimpleTestCase):
@@ -271,7 +281,7 @@ class MultiValueDictTests(SimpleTestCase):
             'pm': ['Rory'],
         })
         d = mvd.dict()
-        self.assertEqual(list(six.iterkeys(d)), list(six.iterkeys(mvd)))
+        self.assertEqual(sorted(six.iterkeys(d)), sorted(six.iterkeys(mvd)))
         for key in six.iterkeys(mvd):
             self.assertEqual(d[key], mvd[key])
 

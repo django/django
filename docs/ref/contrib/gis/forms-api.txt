@@ -1,13 +1,9 @@
-.. _ref-gis-forms-api:
-
 ===================
 GeoDjango Forms API
 ===================
 
 .. module:: django.contrib.gis.forms
    :synopsis: GeoDjango forms API.
-
-.. versionadded:: 1.6
 
 GeoDjango provides some specialized form fields and widgets in order to visually
 display and edit geolocalized data on a map. By default, they use

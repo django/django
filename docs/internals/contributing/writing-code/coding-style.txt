@@ -16,11 +16,13 @@ Python style
   :pep:`8` is only a guide, so respect the style of the surrounding code as a
   primary goal.
 
-  One big exception to :pep:`8` is our preference of longer line lengths.
-  We're well into the 21st Century, and we have high-resolution computer
-  screens that can fit way more than 79 characters on a screen. Don't limit
-  lines of code to 79 characters if it means the code looks significantly
-  uglier or is harder to read.
+  An exception to :pep:`8` is our rules on line lengths. Don't limit lines of
+  code to 79 characters if it means the code looks significantly uglier or is
+  harder to read. We allow up to 119 characters as this is the width of GitHub
+  code review; anything longer requires horizontal scrolling which makes review
+  more difficult. This check is included when you run ``flake8``. Documentation,
+  comments, and docstrings should be wrapped at 79 characters, even though
+  :pep:`8` suggests 72.
 
 * Use four spaces for indentation.
 
@@ -206,7 +208,7 @@ Miscellaneous
 
 * Remove ``import`` statements that are no longer used when you change code.
   `flake8`_ will identify these imports for you. If an unused import needs to
-  remain for backwards-compatibility, mark the end of of with ``# NOQA`` to
+  remain for backwards-compatibility, mark the end of with ``# NOQA`` to
   silence the flake8 warning.
 
 * Systematically remove all trailing whitespaces from your code as those

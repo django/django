@@ -6,30 +6,26 @@ from io import BytesIO
 import random
 import re
 from unittest import skipIf
-import warnings
 
 from django.conf import settings
 from django.core import mail
-from django.db import (transaction, connections, DEFAULT_DB_ALIAS,
-                       IntegrityError)
-from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
+from django.http import (
+    HttpRequest, HttpResponse, StreamingHttpResponse, HttpResponsePermanentRedirect,
+    HttpResponseRedirect,
+)
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
 from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
-from django.middleware.transaction import TransactionMiddleware
-from django.test import TransactionTestCase, TestCase, RequestFactory, override_settings
-from django.test.utils import IgnoreDeprecationWarningsMixin
+from django.test import TestCase, RequestFactory, override_settings
+from django.test.utils import patch_logger
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_str
-from django.utils.six.moves import xrange
-
-from .models import Band
+from django.utils.six.moves import range
 
 
+@override_settings(ROOT_URLCONF='middleware.urls')
 class CommonMiddlewareTest(TestCase):
-    urls = 'middleware.urls'
 
     def _get_request(self, path):
         request = HttpRequest()
@@ -170,7 +166,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('customurlconf/slash')
         request.urlconf = 'middleware.extra_urls'
         r = CommonMiddleware().process_request(request)
-        self.assertFalse(r is None,
+        self.assertIsNotNone(r,
             "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, 'http://testserver/customurlconf/slash/')
@@ -206,7 +202,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('customurlconf/needsquoting#')
         request.urlconf = 'middleware.extra_urls'
         r = CommonMiddleware().process_request(request)
-        self.assertFalse(r is None,
+        self.assertIsNotNone(r,
             "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
@@ -241,45 +237,16 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(r.url,
             'http://www.testserver/customurlconf/slash/')
 
-    # Legacy tests for the 404 error reporting via email (to be removed in 1.8)
-
-    @override_settings(IGNORABLE_404_URLS=(re.compile(r'foo'),),
-                       SEND_BROKEN_LINK_EMAILS=True,
-                       MANAGERS=('PHB@dilbert.com',))
-    def test_404_error_reporting(self):
-        request = self._get_request('regular_url/that/does/not/exist')
-        request.META['HTTP_REFERER'] = '/another/url/'
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango18Warning)
-            response = self.client.get(request.path)
-            CommonMiddleware().process_response(request, response)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('Broken', mail.outbox[0].subject)
-
-    @override_settings(IGNORABLE_404_URLS=(re.compile(r'foo'),),
-                       SEND_BROKEN_LINK_EMAILS=True,
-                       MANAGERS=('PHB@dilbert.com',))
-    def test_404_error_reporting_no_referer(self):
-        request = self._get_request('regular_url/that/does/not/exist')
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango18Warning)
-            response = self.client.get(request.path)
-            CommonMiddleware().process_response(request, response)
-        self.assertEqual(len(mail.outbox), 0)
-
-    @override_settings(IGNORABLE_404_URLS=(re.compile(r'foo'),),
-                       SEND_BROKEN_LINK_EMAILS=True,
-                       MANAGERS=('PHB@dilbert.com',))
-    def test_404_error_reporting_ignored_url(self):
-        request = self._get_request('foo_url/that/does/not/exist/either')
-        request.META['HTTP_REFERER'] = '/another/url/'
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango18Warning)
-            response = self.client.get(request.path)
-            CommonMiddleware().process_response(request, response)
-        self.assertEqual(len(mail.outbox), 0)
-
     # Other tests
+
+    @override_settings(DISALLOWED_USER_AGENTS=[re.compile(r'foo')])
+    def test_disallowed_user_agents(self):
+        with patch_logger('django.request', 'warning') as log_messages:
+            request = self._get_request('slash')
+            request.META['HTTP_USER_AGENT'] = 'foo'
+            r = CommonMiddleware().process_request(request)
+            self.assertEqual(r.status_code, 403)
+            self.assertEqual(log_messages, ['Forbidden (User agent): /slash'])
 
     def test_non_ascii_query_string_does_not_crash(self):
         """Regression test for #15152"""
@@ -287,6 +254,23 @@ class CommonMiddlewareTest(TestCase):
         request.META['QUERY_STRING'] = force_str('drink=café')
         response = CommonMiddleware().process_request(request)
         self.assertEqual(response.status_code, 301)
+
+    def test_response_redirect_class(self):
+        request = self._get_request('slash')
+        r = CommonMiddleware().process_request(request)
+        self.assertEqual(r.status_code, 301)
+        self.assertEqual(r.url, 'http://testserver/slash/')
+        self.assertIsInstance(r, HttpResponsePermanentRedirect)
+
+    def test_response_redirect_class_subclass(self):
+        class MyCommonMiddleware(CommonMiddleware):
+            response_redirect_class = HttpResponseRedirect
+
+        request = self._get_request('slash')
+        r = MyCommonMiddleware().process_request(request)
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r.url, 'http://testserver/slash/')
+        self.assertIsInstance(r, HttpResponseRedirect)
 
 
 @override_settings(
@@ -349,8 +333,8 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
 
+@override_settings(ROOT_URLCONF='middleware.cond_get_urls')
 class ConditionalGetMiddlewareTest(TestCase):
-    urls = 'middleware.cond_get_urls'
 
     def setUp(self):
         self.req = HttpRequest()
@@ -364,24 +348,24 @@ class ConditionalGetMiddlewareTest(TestCase):
     # Tests for the Date header
 
     def test_date_header_added(self):
-        self.assertFalse('Date' in self.resp)
+        self.assertNotIn('Date', self.resp)
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertTrue('Date' in self.resp)
+        self.assertIn('Date', self.resp)
 
     # Tests for the Content-Length header
 
     def test_content_length_header_added(self):
         content_length = len(self.resp.content)
-        self.assertFalse('Content-Length' in self.resp)
+        self.assertNotIn('Content-Length', self.resp)
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertTrue('Content-Length' in self.resp)
+        self.assertIn('Content-Length', self.resp)
         self.assertEqual(int(self.resp['Content-Length']), content_length)
 
     def test_content_length_header_not_added(self):
         resp = StreamingHttpResponse('content')
-        self.assertFalse('Content-Length' in resp)
+        self.assertNotIn('Content-Length', resp)
         resp = ConditionalGetMiddleware().process_response(self.req, resp)
-        self.assertFalse('Content-Length' in resp)
+        self.assertNotIn('Content-Length', resp)
 
     def test_content_length_header_not_changed(self):
         bad_content_length = len(self.resp.content) + 10
@@ -411,6 +395,19 @@ class ConditionalGetMiddlewareTest(TestCase):
         self.resp['ETag'] = 'eggs'
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 200)
+
+    def test_if_none_match_and_redirect(self):
+        self.req.META['HTTP_IF_NONE_MATCH'] = self.resp['ETag'] = 'spam'
+        self.resp['Location'] = '/'
+        self.resp.status_code = 301
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 301)
+
+    def test_if_none_match_and_client_error(self):
+        self.req.META['HTTP_IF_NONE_MATCH'] = self.resp['ETag'] = 'spam'
+        self.resp.status_code = 400
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 400)
 
     @override_settings(USE_ETAGS=True)
     def test_etag(self):
@@ -464,6 +461,21 @@ class ConditionalGetMiddlewareTest(TestCase):
         self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:41:44 GMT'
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 200)
+
+    def test_if_modified_since_and_redirect(self):
+        self.req.META['HTTP_IF_MODIFIED_SINCE'] = 'Sat, 12 Feb 2011 17:38:44 GMT'
+        self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:35:44 GMT'
+        self.resp['Location'] = '/'
+        self.resp.status_code = 301
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 301)
+
+    def test_if_modified_since_and_client_error(self):
+        self.req.META['HTTP_IF_MODIFIED_SINCE'] = 'Sat, 12 Feb 2011 17:38:44 GMT'
+        self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:35:44 GMT'
+        self.resp.status_code = 400
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 400)
 
 
 class XFrameOptionsMiddlewareTest(TestCase):
@@ -590,7 +602,7 @@ class GZipMiddlewareTest(TestCase):
     """
     short_string = b"This string is too short to be worth compressing."
     compressible_string = b'a' * 500
-    uncompressible_string = b''.join(six.int2byte(random.randint(0, 255)) for _ in xrange(500))
+    uncompressible_string = b''.join(six.int2byte(random.randint(0, 255)) for _ in range(500))
     sequence = [b'a' * 500, b'b' * 200, b'a' * 300]
 
     def setUp(self):
@@ -659,16 +671,6 @@ class GZipMiddlewareTest(TestCase):
         self.assertEqual(r.content, self.compressible_string)
         self.assertEqual(r.get('Content-Encoding'), 'deflate')
 
-    def test_no_compress_ie_js_requests(self):
-        """
-        Tests that compression isn't performed on JavaScript requests from Internet Explorer.
-        """
-        self.req.META['HTTP_USER_AGENT'] = 'Mozilla/4.0 (compatible; MSIE 5.00; Windows 98)'
-        self.resp['Content-Type'] = 'application/javascript; charset=UTF-8'
-        r = GZipMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(r.content, self.compressible_string)
-        self.assertEqual(r.get('Content-Encoding'), None)
-
     def test_no_compress_uncompressible_response(self):
         """
         Tests that compression isn't performed on responses with uncompressible content.
@@ -706,64 +708,3 @@ class ETagGZipMiddlewareTest(TestCase):
         nogzip_etag = response.get('ETag')
 
         self.assertNotEqual(gzip_etag, nogzip_etag)
-
-
-class TransactionMiddlewareTest(IgnoreDeprecationWarningsMixin, TransactionTestCase):
-    """
-    Test the transaction middleware.
-    """
-
-    available_apps = ['middleware']
-
-    def setUp(self):
-        super(TransactionMiddlewareTest, self).setUp()
-        self.request = HttpRequest()
-        self.request.META = {
-            'SERVER_NAME': 'testserver',
-            'SERVER_PORT': 80,
-        }
-        self.request.path = self.request.path_info = "/"
-        self.response = HttpResponse()
-        self.response.status_code = 200
-
-    def tearDown(self):
-        transaction.abort()
-        super(TransactionMiddlewareTest, self).tearDown()
-
-    def test_request(self):
-        TransactionMiddleware().process_request(self.request)
-        self.assertFalse(transaction.get_autocommit())
-
-    def test_managed_response(self):
-        transaction.enter_transaction_management()
-        Band.objects.create(name='The Beatles')
-        self.assertTrue(transaction.is_dirty())
-        TransactionMiddleware().process_response(self.request, self.response)
-        self.assertFalse(transaction.is_dirty())
-        self.assertEqual(Band.objects.count(), 1)
-
-    def test_exception(self):
-        transaction.enter_transaction_management()
-        Band.objects.create(name='The Beatles')
-        self.assertTrue(transaction.is_dirty())
-        TransactionMiddleware().process_exception(self.request, None)
-        self.assertFalse(transaction.is_dirty())
-        self.assertEqual(Band.objects.count(), 0)
-
-    def test_failing_commit(self):
-        # It is possible that connection.commit() fails. Check that
-        # TransactionMiddleware handles such cases correctly.
-        try:
-            def raise_exception():
-                raise IntegrityError()
-            connections[DEFAULT_DB_ALIAS].commit = raise_exception
-            transaction.enter_transaction_management()
-            Band.objects.create(name='The Beatles')
-            self.assertTrue(transaction.is_dirty())
-            with self.assertRaises(IntegrityError):
-                TransactionMiddleware().process_response(self.request, None)
-            self.assertFalse(transaction.is_dirty())
-            self.assertEqual(Band.objects.count(), 0)
-            self.assertFalse(transaction.is_managed())
-        finally:
-            del connections[DEFAULT_DB_ALIAS].commit

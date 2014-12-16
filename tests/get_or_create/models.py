@@ -1,11 +1,3 @@
-"""
-33. get_or_create()
-
-``get_or_create()`` does what it says: it tries to look up an object with the
-given parameters. If an object isn't found, it creates one with the given
-parameters.
-"""
-
 from __future__ import unicode_literals
 
 from django.db import models
@@ -42,3 +34,17 @@ class Tag(models.Model):
 class Thing(models.Model):
     name = models.CharField(max_length=256)
     tags = models.ManyToManyField(Tag)
+
+
+class Publisher(models.Model):
+    name = models.CharField(max_length=100)
+
+
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+
+
+class Book(models.Model):
+    name = models.CharField(max_length=100)
+    authors = models.ManyToManyField(Author, related_name='books')
+    publisher = models.ForeignKey(Publisher, related_name='books', db_column="publisher_id_column")

@@ -1,5 +1,3 @@
-from optparse import make_option
-
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections, DEFAULT_DB_ALIAS
 
@@ -8,13 +6,12 @@ class Command(BaseCommand):
     help = ("Runs the command-line client for specified database, or the "
         "default database if none is provided.")
 
-    option_list = BaseCommand.option_list + (
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database onto which to '
-                'open a shell.  Defaults to the "default" database.'),
-    )
-
     requires_system_checks = False
+
+    def add_arguments(self, parser):
+        parser.add_argument('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a database onto which to '
+            'open a shell. Defaults to the "default" database.')
 
     def handle(self, **options):
         connection = connections[options.get('database')]

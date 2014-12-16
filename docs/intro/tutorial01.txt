@@ -35,10 +35,9 @@ older versions of Django and install a newer one.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to |django-users| or drop by `#django on irc.freenode.net`__ to chat
-    with other Django users who might be able to help.
-
-__ irc://irc.freenode.net/django
+    to |django-users| or drop by `#django on irc.freenode.net
+    <irc://irc.freenode.net/django>`_ to chat with other Django users who might
+    be able to help.
 
 Creating a project
 ==================
@@ -54,10 +53,10 @@ code, then run the following command:
 
 .. code-block:: bash
 
-   $ django-admin.py startproject mysite
+   $ django-admin startproject mysite
 
 This will create a ``mysite`` directory in your current directory. If it didn't
-work, see :ref:`troubleshooting-django-admin-py`.
+work, see :ref:`troubleshooting-django-admin`.
 
 .. note::
 
@@ -87,13 +86,6 @@ Let's look at what :djadmin:`startproject` created::
             settings.py
             urls.py
             wsgi.py
-
-.. admonition:: Doesn't match what you see?
-
-    The default project layout recently changed. If you're seeing a "flat"
-    layout (with no inner :file:`mysite/` directory), you're probably using
-    a version of Django that doesn't match this tutorial version.  You'll
-    want to either switch to the older tutorial or the newer Django version.
 
 These files are:
 
@@ -125,72 +117,6 @@ These files are:
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
 
 .. _more about packages: http://docs.python.org/tutorial/modules.html#packages
-
-The development server
-----------------------
-
-Let's verify this worked. Change into the outer :file:`mysite` directory, if
-you haven't already, and run the command:
-
-.. code-block:: bash
-
-   $ python manage.py runserver
-
-You'll see the following output on the command line:
-
-.. parsed-literal::
-
-    Performing system checks...
-
-    0 errors found
-    |today| - 15:50:53
-    Django version |version|, using settings 'mysite.settings'
-    Starting development server at http://127.0.0.1:8000/
-    Quit the server with CONTROL-C.
-
-You've started the Django development server, a lightweight Web server written
-purely in Python. We've included this with Django so you can develop things
-rapidly, without having to deal with configuring a production server -- such as
-Apache -- until you're ready for production.
-
-Now's a good time to note: **don't** use this server in anything resembling a
-production environment. It's intended only for use while developing. (We're in
-the business of making Web frameworks, not Web servers.)
-
-Now that the server's running, visit http://127.0.0.1:8000/ with your Web
-browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
-It worked!
-
-.. admonition:: Changing the port
-
-    By default, the :djadmin:`runserver` command starts the development server
-    on the internal IP at port 8000.
-
-    If you want to change the server's port, pass
-    it as a command-line argument. For instance, this command starts the server
-    on port 8080:
-
-    .. code-block:: bash
-
-        $ python manage.py runserver 8080
-
-    If you want to change the server's IP, pass it along with the port. So to
-    listen on all public IPs (useful if you want to show off your work on other
-    computers), use:
-
-    .. code-block:: bash
-
-        $ python manage.py runserver 0.0.0.0:8000
-
-    Full docs for the development server can be found in the
-    :djadmin:`runserver` reference.
-
-.. admonition:: Automatic reloading of :djadmin:`runserver`
-
-    The development server automatically reloads Python code for each request
-    as needed. You don't need to restart the server for code changes to take
-    effect. However, some actions like adding files don't trigger a restart,
-    so you'll have to restart the server in these cases.
 
 Database setup
 --------------
@@ -272,40 +198,7 @@ The :djadmin:`migrate` command looks at the :setting:`INSTALLED_APPS` setting
 and creates any necessary database tables according to the database settings
 in your :file:`mysite/settings.py` file and the database migrations shipped
 with the app (we'll cover those later). You'll see a message for each
-migration it applies, and you'll get a prompt asking you if you'd like to
-create a superuser account for the authentication system.
-
-First, you'll be asked if you would like to create a superuser. Type the word
-``yes`` and hit enter.
-
-.. code-block:: text
-
-    You have installed Django's auth system, and don't have any superusers defined.
-    Would you like to create one now? (yes/no): yes
-
-Next, enter a username. By default, this will be your system username. Enter
-your desired username and press enter.
-
-.. code-block:: text
-
-    Username (leave blank to use 'your_username'): admin
-
-You will then be prompted for your desired email address:
-
-.. code-block:: text
-
-    Email address: admin@example.com
-
-The final step is to enter your password. You will be asked to enter your
-password twice, the second time as a confirmation of the first.
-
-.. code-block:: text
-
-    Password: **********
-    Password (again): *********
-    Superuser created successfully.
-
-With that done, if you're interested, run the command-line client for your
+migration it applies. If you're interested, run the command-line client for your
 database and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or
 ``.schema`` (SQLite) to display the tables Django created.
 
@@ -317,6 +210,72 @@ database and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or
     :setting:`INSTALLED_APPS` before running :djadmin:`migrate`. The
     :djadmin:`migrate` command will only run migrations for apps in
     :setting:`INSTALLED_APPS`.
+
+The development server
+----------------------
+
+Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
+you haven't already, and run the following commands:
+
+.. code-block:: bash
+
+   $ python manage.py runserver
+
+You'll see the following output on the command line:
+
+.. parsed-literal::
+
+    Performing system checks...
+
+    0 errors found
+    |today| - 15:50:53
+    Django version |version|, using settings 'mysite.settings'
+    Starting development server at http://127.0.0.1:8000/
+    Quit the server with CONTROL-C.
+
+You've started the Django development server, a lightweight Web server written
+purely in Python. We've included this with Django so you can develop things
+rapidly, without having to deal with configuring a production server -- such as
+Apache -- until you're ready for production.
+
+Now's a good time to note: **don't** use this server in anything resembling a
+production environment. It's intended only for use while developing. (We're in
+the business of making Web frameworks, not Web servers.)
+
+Now that the server's running, visit http://127.0.0.1:8000/ with your Web
+browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
+It worked!
+
+.. admonition:: Changing the port
+
+    By default, the :djadmin:`runserver` command starts the development server
+    on the internal IP at port 8000.
+
+    If you want to change the server's port, pass
+    it as a command-line argument. For instance, this command starts the server
+    on port 8080:
+
+    .. code-block:: bash
+
+        $ python manage.py runserver 8080
+
+    If you want to change the server's IP, pass it along with the port. So to
+    listen on all public IPs (useful if you want to show off your work on other
+    computers), use:
+
+    .. code-block:: bash
+
+        $ python manage.py runserver 0.0.0.0:8000
+
+    Full docs for the development server can be found in the
+    :djadmin:`runserver` reference.
+
+.. admonition:: Automatic reloading of :djadmin:`runserver`
+
+    The development server automatically reloads Python code for each request
+    as needed. You don't need to restart the server for code changes to take
+    effect. However, some actions like adding files don't trigger a restart,
+    so you'll have to restart the server in these cases.
 
 .. _creating-models:
 
@@ -487,6 +446,7 @@ You should see something similar to the following:
       0001_initial.py:
         - Create model Question
         - Create model Choice
+        - Add field question to choice
 
 By running ``makemigrations``, you're telling Django that you've made
 some changes to your models (in this case, you've made new ones) and that
@@ -514,6 +474,7 @@ readability):
 
 .. code-block:: sql
 
+    BEGIN;
     CREATE TABLE polls_question (
         "id" serial NOT NULL PRIMARY KEY,
         "question_text" varchar(200) NOT NULL,
@@ -534,6 +495,7 @@ readability):
         FOREIGN KEY ("question_id")
         REFERENCES "polls_question" ("id")
         DEFERRABLE INITIALLY DEFERRED;
+    COMMIT;
 
 
 Note the following:
@@ -611,7 +573,7 @@ you'll commit migrations to your version control system and ship them with
 your app; they not only make your development easier, they're also useable by
 other developers and in production.
 
-Read the :doc:`django-admin.py documentation </ref/django-admin>` for full
+Read the :doc:`django-admin documentation </ref/django-admin>` for full
 information on what the ``manage.py`` utility can do.
 
 Playing with the API
@@ -632,12 +594,14 @@ the Python import path to your :file:`mysite/settings.py` file.
 
     If you'd rather not use :file:`manage.py`, no problem. Just set the
     :envvar:`DJANGO_SETTINGS_MODULE` environment variable to
-    ``mysite.settings``, start a plain Python shell, and set up Django::
+    ``mysite.settings``, start a plain Python shell, and set up Django:
 
-    >>> import django
-    >>> django.setup()
+    .. code-block:: pycon
 
-    If this raises an :exc:`~exceptions.AttributeError`, you're probably using
+        >>> import django
+        >>> django.setup()
+
+    If this raises an :exc:`AttributeError`, you're probably using
     a version of Django that doesn't match this tutorial version. You'll want
     to either switch to the older tutorial or the newer Django version.
 
@@ -645,7 +609,7 @@ the Python import path to your :file:`mysite/settings.py` file.
     or ensure that directory is on the Python path, so that ``import mysite``
     works.
 
-    For more information on all of this, see the :doc:`django-admin.py
+    For more information on all of this, see the :doc:`django-admin
     documentation </ref/django-admin>`.
 
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
@@ -673,7 +637,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
     >>> q.id
     1
 
-    # Access database columns via Python attributes.
+    # Access model field values via Python attributes.
     >>> q.question_text
     "What's new?"
     >>> q.pub_date
@@ -738,8 +702,11 @@ demonstration:
     :filename: polls/models.py
 
     import datetime
+
+    from django.db import models
     from django.utils import timezone
-    # ...
+
+
     class Question(models.Model):
         # ...
         def was_published_recently(self):
@@ -777,7 +744,7 @@ Save these changes and start a new Python interactive shell by running
     >>> Question.objects.get(id=2)
     Traceback (most recent call last):
         ...
-    DoesNotExist: Question matching query does not exist. Lookup parameters were {'id': 2}
+    DoesNotExist: Question matching query does not exist.
 
     # Lookup by a primary key is the most common case, so Django provides a
     # shortcut for primary-key exact lookups.

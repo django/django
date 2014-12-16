@@ -21,6 +21,37 @@ automatically-generated admin site.
     The admin isn't intended to be used by site visitors. It's for site
     managers.
 
+Creating an admin user
+======================
+
+First we'll need to create a user who can login to the admin site. Run the
+following command:
+
+.. code-block:: bash
+
+    $ python manage.py createsuperuser
+
+Enter your desired username and press enter.
+
+.. code-block:: text
+
+    Username: admin
+
+You will then be prompted for your desired email address:
+
+.. code-block:: text
+
+    Email address: admin@example.com
+
+The final step is to enter your password. You will be asked to enter your
+password twice, the second time as a confirmation of the first.
+
+.. code-block:: text
+
+    Password: **********
+    Password (again): *********
+    Superuser created successfully.
+
 Start the development server
 ============================
 
@@ -59,10 +90,7 @@ browser's settings and on whether Django has a translation for this language.
 Enter the admin site
 ====================
 
-Now, try logging in. You created a superuser account in the first part of this
-tutorial, remember?  If you didn't create one or forgot the password you can
-:ref:`create another one <topics-auth-creating-superusers>`.
-
+Now, try logging in with the superuser account you created in the previous step.
 You should see the Django admin index page:
 
 .. image:: _images/admin02.png
@@ -204,7 +232,8 @@ up into fieldsets:
 
     admin.site.register(Question, QuestionAdmin)
 
-The first element of each tuple in ``fieldsets`` is the title of the fieldset.
+The first element of each tuple in
+:attr:`~django.contrib.admin.ModelAdmin.fieldsets` is the title of the fieldset.
 Here's what our form looks like now:
 
 .. image:: _images/admin08t.png
@@ -228,6 +257,8 @@ aren't commonly used:
             ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
         ]
 
+    admin.site.register(Question, QuestionAdmin)
+
 .. image:: _images/admin09.png
    :alt: Fieldset is initially collapsed
 
@@ -246,8 +277,8 @@ with the admin just as we did with ``Question``. That's easy:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Choice
-
+    from polls.models import Choice, Question
+    # ...
     admin.site.register(Choice)
 
 Now "Choices" is an available option in the Django admin. The "Add choice" form
@@ -290,8 +321,7 @@ registration code to read:
     class QuestionAdmin(admin.ModelAdmin):
         fieldsets = [
             (None,               {'fields': ['question_text']}),
-            ('Date information', {'fields': ['pub_date'],
-                                  'classes': ['collapse']}),
+            ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
         ]
         inlines = [ChoiceInline]
 
@@ -350,8 +380,9 @@ Here's what it looks like at this point:
 
 By default, Django displays the ``str()`` of each object. But sometimes it'd be
 more helpful if we could display individual fields. To do that, use the
-``list_display`` admin option, which is a tuple of field names to display, as
-columns, on the change list page for the object:
+:attr:`~django.contrib.admin.ModelAdmin.list_display` admin option, which is a
+tuple of field names to display, as columns, on the change list page for the
+object:
 
 .. snippet::
     :filename: polls/admin.py
@@ -396,8 +427,13 @@ attributes, as follows:
         was_published_recently.boolean = True
         was_published_recently.short_description = 'Published recently?'
 
-Edit your :file:`polls/admin.py` file again and add an improvement to the Question
-change list page: Filters. Add the following line to ``QuestionAdmin``::
+For more information on these method properties, see
+:attr:`~django.contrib.admin.ModelAdmin.list_display`.
+
+Edit your :file:`polls/admin.py` file again and add an improvement to the
+``Question`` change list page: filters using the
+:attr:`~django.contrib.admin.ModelAdmin.list_filter`. Add the following line to
+``QuestionAdmin``::
 
     list_filter = ['pub_date']
 
@@ -419,12 +455,17 @@ This is shaping up well. Let's add some search capability::
 That adds a search box at the top of the change list. When somebody enters
 search terms, Django will search the ``question_text`` field. You can use as many
 fields as you'd like -- although because it uses a ``LIKE`` query behind the
-scenes, keep it reasonable, to keep your database happy.
+scenes, limiting the number of search fields to a reasonable number will make
+it easier for your database to do the search.
 
 Now's also a good time to note that change lists give you free pagination. The
-default is to display 100 items per page. Change-list pagination, search boxes,
-filters, date-hierarchies and column-header-ordering all work together like you
-think they should.
+default is to display 100 items per page. :attr:`Change list pagination
+<django.contrib.admin.ModelAdmin.list_per_page>`, :attr:`search boxes
+<django.contrib.admin.ModelAdmin.search_fields>`, :attr:`filters
+<django.contrib.admin.ModelAdmin.list_filter>`, :attr:`date-hierarchies
+<django.contrib.admin.ModelAdmin.date_hierarchy>`, and
+:attr:`column-header-ordering <django.contrib.admin.ModelAdmin.list_display>`
+all work together like you think they should.
 
 Customize the admin look and feel
 =================================
@@ -475,10 +516,18 @@ template directory in the source code of Django itself
         import django
         print(django.__path__)"
 
-Then, just edit the file and replace ``{{ site_header }}`` with your own
-site's name as you see fit. We use this approach to teach you how to override
-templates. In an actual project, you would probably use the
-:attr:`django.contrib.admin.AdminSite.site_header` attribute to more easily
+Then, just edit the file and replace
+``{{ site_header|default:_('Django administration') }}`` (including the curly
+braces) with your own site's name as you see fit. You should end up with
+a line like:
+
+.. code-block:: html+django
+
+    <h1 id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></h1>
+
+We use this approach to teach you how to override templates. In an actual
+project, you would probably use
+the :attr:`django.contrib.admin.AdminSite.site_header` attribute to more easily
 make this particular customization.
 
 This template file contains lots of text like ``{% block branding %}``

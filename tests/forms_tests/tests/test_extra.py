@@ -318,7 +318,73 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
         # label tag is correctly associated with month dropdown
         d = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
-        self.assertTrue('<label for="id_mydate_month">' in d.as_p())
+        self.assertIn('<label for="id_mydate_month">', d.as_p())
+
+    def test_selectdate_empty_label(self):
+        w = SelectDateWidget(years=('2014',), empty_label='empty_label')
+
+        # Rendering the default state with empty_label setted as string.
+        self.assertInHTML('<option value="0">empty_label</option>', w.render('mydate', ''), count=3)
+
+        w = SelectDateWidget(years=('2014',), empty_label=('empty_year', 'empty_month', 'empty_day'))
+
+        # Rendering the default state with empty_label tuple.
+        self.assertHTMLEqual(w.render('mydate', ''), """<select name="mydate_month" id="id_mydate_month">
+<option value="0">empty_month</option>
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
+<option value="4">April</option>
+<option value="5">May</option>
+<option value="6">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
+</select>
+<select name="mydate_day" id="id_mydate_day">
+<option value="0">empty_day</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+<option value="10">10</option>
+<option value="11">11</option>
+<option value="12">12</option>
+<option value="13">13</option>
+<option value="14">14</option>
+<option value="15">15</option>
+<option value="16">16</option>
+<option value="17">17</option>
+<option value="18">18</option>
+<option value="19">19</option>
+<option value="20">20</option>
+<option value="21">21</option>
+<option value="22">22</option>
+<option value="23">23</option>
+<option value="24">24</option>
+<option value="25">25</option>
+<option value="26">26</option>
+<option value="27">27</option>
+<option value="28">28</option>
+<option value="29">29</option>
+<option value="30">30</option>
+<option value="31">31</option>
+</select>
+<select name="mydate_year" id="id_mydate_year">
+<option value="0">empty_year</option>
+<option value="2014">2014</option>
+</select>""")
+
+        self.assertRaisesMessage(ValueError, 'empty_label list/tuple must have 3 elements.',
+            SelectDateWidget, years=('2014',), empty_label=('not enough', 'values'))
 
     def test_multiwidget(self):
         # MultiWidget and MultiValueField #############################################
@@ -377,19 +443,19 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFormErrors(['This field is required.'], f.clean, ['some text', ['JP']])
 
         # test with no initial data
-        self.assertTrue(f._has_changed(None, ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
+        self.assertTrue(f.has_changed(None, ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
 
         # test when the data is the same as initial
-        self.assertFalse(f._has_changed('some text,JP,2007-04-25 06:24:00',
+        self.assertFalse(f.has_changed('some text,JP,2007-04-25 06:24:00',
             ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
 
         # test when the first widget's data has changed
-        self.assertTrue(f._has_changed('some text,JP,2007-04-25 06:24:00',
+        self.assertTrue(f.has_changed('some text,JP,2007-04-25 06:24:00',
             ['other text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
 
         # test when the last widget's data has changed. this ensures that it is not
         # short circuiting while testing the widgets.
-        self.assertTrue(f._has_changed('some text,JP,2007-04-25 06:24:00',
+        self.assertTrue(f.has_changed('some text,JP,2007-04-25 06:24:00',
             ['some text', ['J', 'P'], ['2009-04-25', '11:44:00']]))
 
         class ComplexFieldForm(Form):
@@ -737,7 +803,7 @@ class FormsExtraL10NTestCase(TestCase):
 
     def test_l10n_date_changed(self):
         """
-        Ensure that DateField._has_changed() with SelectDateWidget works
+        Ensure that DateField.has_changed() with SelectDateWidget works
         correctly with a localized date format.
         Refs #17165.
         """
@@ -799,4 +865,4 @@ class FormsExtraL10NTestCase(TestCase):
     def test_form_label_association(self):
         # label tag is correctly associated with first rendered dropdown
         a = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
-        self.assertTrue('<label for="id_mydate_day">' in a.as_p())
+        self.assertIn('<label for="id_mydate_day">', a.as_p())

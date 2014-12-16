@@ -222,9 +222,9 @@ we'll want the functionality provided by
 We'll demonstrate this with the ``Author`` model we used in the
 :doc:`generic class-based views introduction<generic-display>`.
 
-.. code-block:: python
+.. snippet::
+    :filename: views.py
 
-    # views.py
     from django.http import HttpResponseForbidden, HttpResponseRedirect
     from django.core.urlresolvers import reverse
     from django.views.generic import View
@@ -253,16 +253,18 @@ look up the author we're interested in, which it just does with a simple call
 to ``self.get_object()``. Everything else is taken care of for us by the
 mixin.
 
-We can hook this into our URLs easily enough::
+We can hook this into our URLs easily enough:
 
-    # urls.py
-    from django.conf.urls import patterns, url
+.. snippet::
+    :filename: urls.py
+
+    from django.conf.urls import url
     from books.views import RecordInterest
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         #...
-        url(r'^author/(?P<pk>\d+)/interest/$', RecordInterest.as_view(), name='author-interest'),
-    )
+        url(r'^author/(?P<pk>[0-9]+)/interest/$', RecordInterest.as_view(), name='author-interest'),
+    ]
 
 Note the ``pk`` named group, which
 :meth:`~django.views.generic.detail.SingleObjectMixin.get_object` uses
@@ -461,16 +463,14 @@ Our new ``AuthorDetail`` looks like this::
 
         def get_context_data(self, **kwargs):
             context = super(AuthorDetail, self).get_context_data(**kwargs)
-            form_class = self.get_form_class()
-            context['form'] = self.get_form(form_class)
+            context['form'] = self.get_form()
             return context
 
         def post(self, request, *args, **kwargs):
             if not request.user.is_authenticated():
                 return HttpResponseForbidden()
             self.object = self.get_object()
-            form_class = self.get_form_class()
-            form = self.get_form(form_class)
+            form = self.get_form()
             if form.is_valid():
                 return self.form_valid(form)
             else:
@@ -519,9 +519,7 @@ The ``AuthorDisplay`` view is almost the same as :ref:`when we
 first introduced AuthorDetail<generic-views-extra-work>`; we have to
 write our own ``get_context_data()`` to make the
 ``AuthorInterestForm`` available to the template. We'll skip the
-``get_object()`` override from before for clarity.
-
-.. code-block:: python
+``get_object()`` override from before for clarity::
 
     from django.views.generic import DetailView
     from django import forms
@@ -542,9 +540,7 @@ Then the ``AuthorInterest`` is a simple :class:`FormView`, but we
 have to bring in :class:`~django.views.generic.detail.SingleObjectMixin` so we
 can find the author we're talking about, and we have to remember to set
 ``template_name`` to ensure that form errors will render the same
-template as ``AuthorDisplay`` is using on ``GET``.
-
-.. code-block:: python
+template as ``AuthorDisplay`` is using on ``GET``::
 
     from django.core.urlresolvers import reverse
     from django.http import HttpResponseForbidden
@@ -573,9 +569,7 @@ based view, so we can do that at the point we choose between the two subviews.
 You can of course pass through keyword arguments to
 :meth:`~django.views.generic.base.View.as_view()` in the same way you
 would in your URLconf, such as if you wanted the ``AuthorInterest`` behavior
-to also appear at another URL but using a different template.
-
-.. code-block:: python
+to also appear at another URL but using a different template::
 
     from django.views.generic import View
 
@@ -608,8 +602,7 @@ conversion to JSON once.
 
 For example, a simple JSON mixin might look something like this::
 
-    import json
-    from django.http import HttpResponse
+    from django.http import JsonResponse
 
     class JSONResponseMixin(object):
         """
@@ -619,19 +612,20 @@ For example, a simple JSON mixin might look something like this::
             """
             Returns a JSON response, transforming 'context' to make the payload.
             """
-            return HttpResponse(
-                self.convert_context_to_json(context),
-                content_type='application/json',
+            return JsonResponse(
+                self.get_data(context),
                 **response_kwargs
             )
 
-        def convert_context_to_json(self, context):
-            "Convert the context dictionary into a JSON object"
+        def get_data(self, context):
+            """
+            Returns an object that will be serialized as JSON by json.dumps().
+            """
             # Note: This is *EXTREMELY* naive; in reality, you'll need
             # to do much more complex handling to ensure that arbitrary
             # objects -- such as Django model instances or querysets
             # -- can be serialized as JSON.
-            return json.dumps(context)
+            return context
 
 .. note::
 

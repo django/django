@@ -66,6 +66,11 @@ class BookWithYear(Book):
         AuthorWithAge, related_name='books_with_year')
 
 
+class Bio(models.Model):
+    author = models.OneToOneField(Author)
+    books = models.ManyToManyField(Book, blank=True)
+
+
 @python_2_unicode_compatible
 class Reader(models.Model):
     name = models.CharField(max_length=50)
@@ -195,6 +200,10 @@ class Person(models.Model):
     def primary_house(self):
         # Assume business logic forces every person to have at least one house.
         return sorted(self.houses.all(), key=lambda house: -house.rooms.count())[0]
+
+    @property
+    def all_houses(self):
+        return list(self.houses.all())
 
     class Meta:
         ordering = ['id']

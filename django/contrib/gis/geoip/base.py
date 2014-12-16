@@ -48,7 +48,7 @@ class GeoIP(object):
     GEOIP_CHECK_CACHE = 2
     GEOIP_INDEX_CACHE = 4
     GEOIP_MMAP_CACHE = 8
-    cache_options = dict((opt, None) for opt in (0, 1, 2, 4, 8))
+    cache_options = {opt: None for opt in (0, 1, 2, 4, 8)}
 
     # Paths to the city & country binary databases.
     _city_file = ''
@@ -192,7 +192,7 @@ class GeoIP(object):
 
     def country(self, query):
         """
-        Returns a dictionary with with the country code and name when given an
+        Returns a dictionary with the country code and name when given an
         IP address or a Fully Qualified Domain Name (FQDN).  For example, both
         '24.124.1.80' and 'djangoproject.com' are valid parameters.
         """
@@ -238,7 +238,7 @@ class GeoIP(object):
 
     @property
     def city_info(self):
-        "Retuns information about the GeoIP city database."
+        "Returns information about the GeoIP city database."
         if self._city is None:
             ci = 'No GeoIP City data in "%s"' % self._city_file
         else:

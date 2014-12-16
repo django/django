@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from io import BytesIO
+from io import BytesIO, StringIO
 import os
 import gzip
 import tempfile
 import unittest
 import zlib
 
-from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
 from django.core.files.move import file_move_safe
 from django.core.files.base import ContentFile
@@ -18,21 +17,21 @@ from django.utils._os import upath
 from django.utils import six
 
 try:
-    from django.utils.image import Image
-    from django.core.files import images
-except ImproperlyConfigured:
+    from PIL import Image
+except ImportError:
     Image = None
+else:
+    from django.core.files import images
 
 
 class FileTests(unittest.TestCase):
     def test_unicode_uploadedfile_name(self):
-        """
-        Regression test for #8156: files with unicode names I can't quite figure
-        out the encoding situation between doctest and this file, but the actual
-        repr doesn't matter; it just shouldn't return a unicode object.
-        """
         uf = UploadedFile(name='¿Cómo?', content_type='text')
-        self.assertEqual(type(uf.__repr__()), str)
+        self.assertIs(type(repr(uf)), str)
+
+    def test_unicode_file_name(self):
+        f = File(None, 'djángö')
+        self.assertIs(type(repr(f)), str)
 
     def test_context_manager(self):
         orig_file = tempfile.TemporaryFile()
@@ -71,6 +70,54 @@ class FileTests(unittest.TestCase):
         """
         file = File(BytesIO(b'one\ntwo\nthree'))
         self.assertEqual(list(file), [b'one\n', b'two\n', b'three'])
+
+    def test_file_iteration_windows_newlines(self):
+        """
+        #8149 - File objects with \r\n line endings should yield lines
+        when iterated over.
+        """
+        f = File(BytesIO(b'one\r\ntwo\r\nthree'))
+        self.assertEqual(list(f), [b'one\r\n', b'two\r\n', b'three'])
+
+    def test_file_iteration_mac_newlines(self):
+        """
+        #8149 - File objects with \r line endings should yield lines
+        when iterated over.
+        """
+        f = File(BytesIO(b'one\rtwo\rthree'))
+        self.assertEqual(list(f), [b'one\r', b'two\r', b'three'])
+
+    def test_file_iteration_mixed_newlines(self):
+        f = File(BytesIO(b'one\rtwo\nthree\r\nfour'))
+        self.assertEqual(list(f), [b'one\r', b'two\n', b'three\r\n', b'four'])
+
+    def test_file_iteration_with_unix_newline_at_chunk_boundary(self):
+        f = File(BytesIO(b'one\ntwo\nthree'))
+        # Set chunk size to create a boundary after \n:
+        # b'one\n...
+        #        ^
+        f.DEFAULT_CHUNK_SIZE = 4
+        self.assertEqual(list(f), [b'one\n', b'two\n', b'three'])
+
+    def test_file_iteration_with_windows_newline_at_chunk_boundary(self):
+        f = File(BytesIO(b'one\r\ntwo\r\nthree'))
+        # Set chunk size to create a boundary between \r and \n:
+        # b'one\r\n...
+        #        ^
+        f.DEFAULT_CHUNK_SIZE = 4
+        self.assertEqual(list(f), [b'one\r\n', b'two\r\n', b'three'])
+
+    def test_file_iteration_with_mac_newline_at_chunk_boundary(self):
+        f = File(BytesIO(b'one\rtwo\rthree'))
+        # Set chunk size to create a boundary after \r:
+        # b'one\r...
+        #        ^
+        f.DEFAULT_CHUNK_SIZE = 4
+        self.assertEqual(list(f), [b'one\r', b'two\r', b'three'])
+
+    def test_file_iteration_with_text(self):
+        f = File(StringIO('one\ntwo\nthree'))
+        self.assertEqual(list(f), ['one\n', 'two\n', 'three'])
 
 
 class NoNameFileTestCase(unittest.TestCase):
@@ -112,7 +159,7 @@ class DimensionClosingBug(unittest.TestCase):
     """
     Test that get_image_dimensions() properly closes files (#8817)
     """
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_not_closing_of_files(self):
         """
         Open files passed into get_image_dimensions() should stay opened.
@@ -123,7 +170,7 @@ class DimensionClosingBug(unittest.TestCase):
         finally:
             self.assertTrue(not empty_io.closed)
 
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_closing_of_filenames(self):
         """
         get_image_dimensions() called with a filename should closed the file.
@@ -163,7 +210,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
     Test that get_image_dimensions() works properly after various calls
     using a file handler (#11158)
     """
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_multiple_calls(self):
         """
         Multiple calls of get_image_dimensions() should return the same size.
@@ -177,7 +224,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         self.assertEqual(image_pil.size, size_1)
         self.assertEqual(size_1, size_2)
 
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_bug_19457(self):
         """
         Regression test for #19457
@@ -205,3 +252,17 @@ class FileMoveSafeTests(unittest.TestCase):
 
         os.close(handle_a)
         os.close(handle_b)
+
+
+class SpooledTempTests(unittest.TestCase):
+    def test_in_memory_spooled_temp(self):
+        with tempfile.SpooledTemporaryFile() as temp:
+            temp.write(b"foo bar baz quux\n")
+            django_file = File(temp, name="something.txt")
+            self.assertEqual(django_file.size, 17)
+
+    def test_written_spooled_temp(self):
+        with tempfile.SpooledTemporaryFile(max_size=4) as temp:
+            temp.write(b"foo bar baz quux\n")
+            django_file = File(temp, name="something.txt")
+            self.assertEqual(django_file.size, 17)

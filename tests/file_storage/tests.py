@@ -19,7 +19,8 @@ from django.core.cache import cache
 from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import File, ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.uploadedfile import (InMemoryUploadedFile, SimpleUploadedFile,
+    TemporaryUploadedFile)
 from django.test import LiveServerTestCase, SimpleTestCase
 from django.test import override_settings
 from django.utils import six
@@ -27,6 +28,9 @@ from django.utils.six.moves.urllib.request import urlopen
 from django.utils._os import upath
 
 from .models import Storage, temp_storage, temp_storage_location
+
+
+FILE_SUFFIX_REGEX = '[A-Za-z0-9]{7}'
 
 
 class GetStorageClassTests(SimpleTestCase):
@@ -64,6 +68,23 @@ class GetStorageClassTests(SimpleTestCase):
                 'django.core.files.non_existing_storage.NonExistingStorage')
 
 
+class FileStorageDeconstructionTests(unittest.TestCase):
+
+    def test_deconstruction(self):
+        path, args, kwargs = temp_storage.deconstruct()
+        self.assertEqual(path, "django.core.files.storage.FileSystemStorage")
+        self.assertEqual(args, tuple())
+        self.assertEqual(kwargs, {'location': temp_storage_location})
+
+        kwargs_orig = {
+            'location': temp_storage_location,
+            'base_url': 'http://myfiles.example.com/'
+        }
+        storage = FileSystemStorage(**kwargs_orig)
+        path, args, kwargs = storage.deconstruct()
+        self.assertEqual(kwargs, kwargs_orig)
+
+
 class FileStorageTests(unittest.TestCase):
     storage_class = FileSystemStorage
 
@@ -79,7 +100,7 @@ class FileStorageTests(unittest.TestCase):
         shutil.rmtree(self.temp_dir)
         shutil.rmtree(self.temp_dir2)
 
-    def test_emtpy_location(self):
+    def test_empty_location(self):
         """
         Makes sure an exception is raised if the location is empty
         """
@@ -117,7 +138,7 @@ class FileStorageTests(unittest.TestCase):
 
         self.assertEqual(atime, datetime.fromtimestamp(
             os.path.getatime(self.storage.path(f_name))))
-        self.assertTrue(datetime.now() - self.storage.accessed_time(f_name) < timedelta(seconds=2))
+        self.assertLess(datetime.now() - self.storage.accessed_time(f_name), timedelta(seconds=2))
         self.storage.delete(f_name)
 
     def test_file_created_time(self):
@@ -133,7 +154,7 @@ class FileStorageTests(unittest.TestCase):
 
         self.assertEqual(ctime, datetime.fromtimestamp(
             os.path.getctime(self.storage.path(f_name))))
-        self.assertTrue(datetime.now() - self.storage.created_time(f_name) < timedelta(seconds=2))
+        self.assertLess(datetime.now() - self.storage.created_time(f_name), timedelta(seconds=2))
 
         self.storage.delete(f_name)
 
@@ -150,7 +171,7 @@ class FileStorageTests(unittest.TestCase):
 
         self.assertEqual(mtime, datetime.fromtimestamp(
             os.path.getmtime(self.storage.path(f_name))))
-        self.assertTrue(datetime.now() - self.storage.modified_time(f_name) < timedelta(seconds=2))
+        self.assertLess(datetime.now() - self.storage.modified_time(f_name), timedelta(seconds=2))
 
         self.storage.delete(f_name)
 
@@ -189,6 +210,23 @@ class FileStorageTests(unittest.TestCase):
 
         self.storage.delete('path/to/test.file')
 
+    def test_save_doesnt_close(self):
+        with TemporaryUploadedFile('test', 'text/plain', 1, 'utf8') as file:
+            file.write(b'1')
+            file.seek(0)
+            self.assertFalse(file.closed)
+            self.storage.save('path/to/test.file', file)
+            self.assertFalse(file.closed)
+            self.assertFalse(file.file.closed)
+
+        file = InMemoryUploadedFile(six.StringIO('1'), '', 'test',
+                                    'text/plain', 1, 'utf8')
+        with file:
+            self.assertFalse(file.closed)
+            self.storage.save('path/to/test.file', file)
+            self.assertFalse(file.closed)
+            self.assertFalse(file.file.closed)
+
     def test_file_path(self):
         """
         File storage returns the full path of a file
@@ -222,6 +260,14 @@ class FileStorageTests(unittest.TestCase):
         self.storage.base_url = None
         self.assertRaises(ValueError, self.storage.url, 'test.file')
 
+        # #22717: missing ending slash in base_url should be auto-corrected
+        storage = self.storage_class(location=self.temp_dir,
+            base_url='/no_ending_slash')
+        self.assertEqual(
+            storage.url('test.file'),
+            '%s%s' % (storage.base_url, 'test.file')
+        )
+
     def test_listdir(self):
         """
         File storage returns a tuple containing directories and files.
@@ -235,9 +281,9 @@ class FileStorageTests(unittest.TestCase):
         os.mkdir(os.path.join(self.temp_dir, 'storage_dir_1'))
 
         dirs, files = self.storage.listdir('')
-        self.assertEqual(set(dirs), set(['storage_dir_1']))
+        self.assertEqual(set(dirs), {'storage_dir_1'})
         self.assertEqual(set(files),
-                         set(['storage_test_1', 'storage_test_2']))
+                         {'storage_test_1', 'storage_test_2'})
 
         self.storage.delete('storage_test_1')
         self.storage.delete('storage_test_2')
@@ -413,7 +459,7 @@ class FileFieldStorageTests(unittest.TestCase):
         obj1.normal = SimpleUploadedFile("assignment.txt", b"content")
         dirs, files = temp_storage.listdir("tests")
         self.assertEqual(dirs, [])
-        self.assertFalse("assignment.txt" in files)
+        self.assertNotIn("assignment.txt", files)
 
         obj1.save()
         dirs, files = temp_storage.listdir("tests")
@@ -422,14 +468,16 @@ class FileFieldStorageTests(unittest.TestCase):
         # Save another file with the same name.
         obj2 = Storage()
         obj2.normal.save("django_test.txt", ContentFile("more content"))
-        self.assertEqual(obj2.normal.name, "tests/django_test_1.txt")
+        obj2_name = obj2.normal.name
+        six.assertRegex(self, obj2_name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
         self.assertEqual(obj2.normal.size, 12)
         obj2.normal.close()
 
         # Deleting an object does not delete the file it uses.
         obj2.delete()
         obj2.normal.save("django_test.txt", ContentFile("more content"))
-        self.assertEqual(obj2.normal.name, "tests/django_test_2.txt")
+        self.assertNotEqual(obj2_name, obj2.normal.name)
+        six.assertRegex(self, obj2.normal.name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
         obj2.normal.close()
 
     def test_filefield_read(self):
@@ -442,17 +490,18 @@ class FileFieldStorageTests(unittest.TestCase):
         self.assertEqual(list(obj.normal.chunks(chunk_size=2)), [b"co", b"nt", b"en", b"t"])
         obj.normal.close()
 
-    def test_file_numbering(self):
-        # Multiple files with the same name get _N appended to them.
-        objs = [Storage() for i in range(3)]
+    def test_duplicate_filename(self):
+        # Multiple files with the same name get _(7 random chars) appended to them.
+        objs = [Storage() for i in range(2)]
         for o in objs:
             o.normal.save("multiple_files.txt", ContentFile("Same Content"))
-        self.assertEqual(
-            [o.normal.name for o in objs],
-            ["tests/multiple_files.txt", "tests/multiple_files_1.txt", "tests/multiple_files_2.txt"]
-        )
-        for o in objs:
-            o.delete()
+        try:
+            names = [o.normal.name for o in objs]
+            self.assertEqual(names[0], "tests/multiple_files.txt")
+            six.assertRegex(self, names[1], "tests/multiple_files_%s.txt" % FILE_SUFFIX_REGEX)
+        finally:
+            for o in objs:
+                o.delete()
 
     def test_filefield_default(self):
         # Default values allow an object to access a single file.
@@ -544,10 +593,9 @@ class FileSaveRaceConditionTest(unittest.TestCase):
         self.thread.start()
         self.save_file('conflict')
         self.thread.join()
-        self.assertTrue(self.storage.exists('conflict'))
-        self.assertTrue(self.storage.exists('conflict_1'))
-        self.storage.delete('conflict')
-        self.storage.delete('conflict_1')
+        files = sorted(os.listdir(self.storage_dir))
+        self.assertEqual(files[0], 'conflict')
+        six.assertRegex(self, files[1], 'conflict_%s' % FILE_SUFFIX_REGEX)
 
 
 @unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports umasks and chmod.")
@@ -608,9 +656,10 @@ class FileStoragePathParsing(unittest.TestCase):
         self.storage.save('dotted.path/test', ContentFile("1"))
         self.storage.save('dotted.path/test', ContentFile("2"))
 
+        files = sorted(os.listdir(os.path.join(self.storage_dir, 'dotted.path')))
         self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test')))
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test_1')))
+        self.assertEqual(files[0], 'test')
+        six.assertRegex(self, files[1], 'test_%s' % FILE_SUFFIX_REGEX)
 
     def test_first_character_dot(self):
         """
@@ -620,8 +669,10 @@ class FileStoragePathParsing(unittest.TestCase):
         self.storage.save('dotted.path/.test', ContentFile("1"))
         self.storage.save('dotted.path/.test', ContentFile("2"))
 
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test')))
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
+        files = sorted(os.listdir(os.path.join(self.storage_dir, 'dotted.path')))
+        self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
+        self.assertEqual(files[0], '.test')
+        six.assertRegex(self, files[1], '.test_%s' % FILE_SUFFIX_REGEX)
 
 
 class ContentFileStorageTestCase(unittest.TestCase):
@@ -641,13 +692,13 @@ class ContentFileStorageTestCase(unittest.TestCase):
         self.storage.save('unicode.txt', ContentFile("español"))
 
 
+@override_settings(ROOT_URLCONF='file_storage.urls')
 class FileLikeObjectTestCase(LiveServerTestCase):
     """
     Test file-like objects (#15644).
     """
 
     available_apps = []
-    urls = 'file_storage.urls'
 
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()

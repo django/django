@@ -11,19 +11,15 @@ from django.test import (
     LiveServerTestCase, TestCase, modify_settings, override_settings)
 from django.utils import six
 from django.utils._os import upath
+from django.utils.module_loading import import_string
 from django.utils.translation import override, LANGUAGE_SESSION_KEY
-
-try:
-    from selenium.webdriver.firefox import webdriver as firefox
-except ImportError:
-    firefox = None
 
 from ..urls import locale_dir
 
 
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class I18NTests(TestCase):
     """ Tests django views in django/views/i18n.py """
-    urls = 'view_tests.urls'
 
     def test_setlang(self):
         """
@@ -89,12 +85,12 @@ class I18NTests(TestCase):
                     self.assertContains(response, r'"month name\u0004May": "mai"', 1)
 
 
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class JsI18NTests(TestCase):
     """
     Tests django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE.
     """
-    urls = 'view_tests.urls'
 
     def test_jsi18n_with_missing_en_files(self):
         """
@@ -119,7 +115,7 @@ class JsI18NTests(TestCase):
             response = self.client.get('/jsi18n/')
             self.assertContains(response, 'il faut le traduire')
 
-    def testI18NLanguageNonEnglishDefault(self):
+    def test_i18n_language_non_english_default(self):
         """
         Check if the Javascript i18n view returns an empty language catalog
         if the default language is non-English, the selected language
@@ -131,7 +127,7 @@ class JsI18NTests(TestCase):
             self.assertNotContains(response, 'Choisir une heure')
 
     @modify_settings(INSTALLED_APPS={'append': 'view_tests.app0'})
-    def test_nonenglish_default_english_userpref(self):
+    def test_non_english_default_english_userpref(self):
         """
         Same as above with the difference that there IS an 'en' translation
         available. The Javascript i18n view must return a NON empty language catalog
@@ -141,7 +137,7 @@ class JsI18NTests(TestCase):
             response = self.client.get('/jsi18n_english_translation/')
             self.assertContains(response, 'this app0 string is to be translated')
 
-    def testI18NLanguageNonEnglishFallback(self):
+    def test_i18n_language_non_english_fallback(self):
         """
         Makes sure that the fallback language is still working properly
         in cases where the selected language cannot be found.
@@ -167,14 +163,14 @@ class JsI18NTests(TestCase):
             self.assertContains(response, '\\ud83d\\udca9')
 
 
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class JsI18NTestsMultiPackage(TestCase):
-    urls = 'view_tests.urls'
     """
     Tests for django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE and merge JS translation from several packages.
     """
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app1', 'view_tests.app2']})
-    def testI18NLanguageEnglishDefault(self):
+    def test_i18n_language_english_default(self):
         """
         Check if the JavaScript i18n view returns a complete language catalog
         if the default language is en-us, the selected language has a
@@ -187,7 +183,7 @@ class JsI18NTestsMultiPackage(TestCase):
             self.assertContains(response, 'il faut traduire cette cha\\u00eene de caract\\u00e8res de app1')
 
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app3', 'view_tests.app4']})
-    def testI18NDifferentNonEnLangs(self):
+    def test_i18n_different_non_english_languages(self):
         """
         Similar to above but with neither default or requested language being
         English.
@@ -196,7 +192,7 @@ class JsI18NTestsMultiPackage(TestCase):
             response = self.client.get('/jsi18n_multi_packages2/')
             self.assertContains(response, 'este texto de app3 debe ser traducido')
 
-    def testI18NWithLocalePaths(self):
+    def test_i18n_with_locale_paths(self):
         extended_locale_paths = settings.LOCALE_PATHS + (
             path.join(path.dirname(
                 path.dirname(path.abspath(upath(__file__)))), 'app3', 'locale'),)
@@ -211,16 +207,23 @@ skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 
 
 @unittest.skipIf(skip_selenium, 'Selenium tests not requested')
-@unittest.skipUnless(firefox, 'Selenium not installed')
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class JavascriptI18nTests(LiveServerTestCase):
 
-    # The test cases use translations from these apps.
-    available_apps = ['django.contrib.admin', 'view_tests']
-    urls = 'view_tests.urls'
+    # The test cases use fixtures & translations from these apps.
+    available_apps = [
+        'django.contrib.admin', 'django.contrib.auth',
+        'django.contrib.contenttypes', 'view_tests',
+    ]
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     @classmethod
     def setUpClass(cls):
-        cls.selenium = firefox.WebDriver()
+        try:
+            cls.selenium = import_string(cls.webdriver_class)()
+        except Exception as e:
+            raise unittest.SkipTest('Selenium webdriver "%s" not installed or '
+                                    'not operational: %s' % (cls.webdriver_class, str(e)))
         super(JavascriptI18nTests, cls).setUpClass()
 
     @classmethod
@@ -244,3 +247,11 @@ class JavascriptI18nTests(LiveServerTestCase):
         self.assertEqual(elem.text, "1 Resultat")
         elem = self.selenium.find_element_by_id("npgettext_plur")
         self.assertEqual(elem.text, "455 Resultate")
+
+
+class JavascriptI18nChromeTests(JavascriptI18nTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+
+class JavascriptI18nIETests(JavascriptI18nTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'

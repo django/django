@@ -15,6 +15,7 @@ from django.test import override_settings
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     ),
+    ROOT_URLCONF='django.contrib.flatpages.tests.urls',
     CSRF_FAILURE_VIEW='django.views.csrf.csrf_failure',
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
@@ -23,7 +24,6 @@ from django.test import override_settings
 )
 class FlatpageCSRFTests(TestCase):
     fixtures = ['sample_flatpages', 'example_site']
-    urls = 'django.contrib.flatpages.tests.urls'
 
     def setUp(self):
         self.client = Client(enforce_csrf_checks=True)

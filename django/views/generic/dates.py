@@ -343,7 +343,14 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         """
         raise NotImplementedError('A DateView must provide an implementation of get_dated_items()')
 
-    def get_dated_queryset(self, ordering=None, **lookup):
+    def get_ordering(self):
+        """
+        Returns the field or fields to use for ordering the queryset; uses the
+        date field by default.
+        """
+        return '-%s' % self.get_date_field() if self.ordering is None else self.ordering
+
+    def get_dated_queryset(self, **lookup):
         """
         Get a queryset properly filtered according to `allow_future` and any
         extra lookup kwargs.
@@ -353,9 +360,6 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         allow_future = self.get_allow_future()
         allow_empty = self.get_allow_empty()
         paginate_by = self.get_paginate_by(qs)
-
-        if ordering is not None:
-            qs = qs.order_by(ordering)
 
         if not allow_future:
             now = timezone.now() if self.uses_datetime_field else timezone_today()
@@ -412,7 +416,7 @@ class BaseArchiveIndexView(BaseDateListView):
         """
         Return (date_list, items, extra_context) for this request.
         """
-        qs = self.get_dated_queryset(ordering='-%s' % self.get_date_field())
+        qs = self.get_dated_queryset()
         date_list = self.get_date_list(qs, ordering='DESC')
 
         if not date_list:
@@ -451,7 +455,7 @@ class BaseYearArchiveView(YearMixin, BaseDateListView):
             '%s__lt' % date_field: until,
         }
 
-        qs = self.get_dated_queryset(ordering='-%s' % date_field, **lookup_kwargs)
+        qs = self.get_dated_queryset(**lookup_kwargs)
         date_list = self.get_date_list(qs)
 
         if not self.get_make_object_list():
@@ -647,10 +651,13 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
         qs = queryset or self.get_queryset()
 
         if not self.get_allow_future() and date > datetime.date.today():
-            raise Http404(_("Future %(verbose_name_plural)s not available because %(class_name)s.allow_future is False.") % {
+            raise Http404(_(
+                "Future %(verbose_name_plural)s not available because "
+                "%(class_name)s.allow_future is False.") % {
                 'verbose_name_plural': qs.model._meta.verbose_name_plural,
                 'class_name': self.__class__.__name__,
-            })
+                },
+            )
 
         # Filter down a queryset from self.queryset using the date from the
         # URL. This'll get passed as the queryset to DetailView.get_object,
@@ -698,7 +705,7 @@ def _get_next_prev(generic_view, date, is_previous, period):
 
         * If allow_empty and allow_future are both true, this is easy: just
           return the naive result (just the next/previous day/week/month,
-          reguardless of object existence.)
+          regardless of object existence.)
 
         * If allow_empty is true, allow_future is false, and the naive result
           isn't in the future, then return it; otherwise return None.

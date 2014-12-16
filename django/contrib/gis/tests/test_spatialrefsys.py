@@ -1,44 +1,49 @@
 import unittest
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.tests.utils import (no_mysql, oracle, postgis,
-    spatialite, HAS_SPATIALREFSYS, SpatialRefSys)
+from django.contrib.gis.tests.utils import (oracle, postgis, spatialite,
+    SpatialRefSys)
 from django.db import connection
+from django.test import skipUnlessDBFeature
 from django.utils import six
 
 
-test_srs = ({'srid': 4326,
-             'auth_name': ('EPSG', True),
-             'auth_srid': 4326,
-             # Only the beginning, because there are differences depending on installed libs
-             'srtext': 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84"',
-             # +ellps=WGS84 has been removed in the 4326 proj string in proj-4.8
-             'proj4_re': r'\+proj=longlat (\+ellps=WGS84 )?(\+datum=WGS84 |\+towgs84=0,0,0,0,0,0,0 )\+no_defs ',
-             'spheroid': 'WGS 84', 'name': 'WGS 84',
-             'geographic': True, 'projected': False, 'spatialite': True,
-             'ellipsoid': (6378137.0, 6356752.3, 298.257223563),  # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
-             'eprec': (1, 1, 9),
-             },
-            {'srid': 32140,
-             'auth_name': ('EPSG', False),
-             'auth_srid': 32140,
-             'srtext': 'PROJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980"',
-             'proj4_re': r'\+proj=lcc \+lat_1=30.28333333333333 \+lat_2=28.38333333333333 \+lat_0=27.83333333333333 '
-                         r'\+lon_0=-99 \+x_0=600000 \+y_0=4000000 (\+ellps=GRS80 )?'
-                         r'(\+datum=NAD83 |\+towgs84=0,0,0,0,0,0,0 )?\+units=m \+no_defs ',
-             'spheroid': 'GRS 1980', 'name': 'NAD83 / Texas South Central',
-             'geographic': False, 'projected': True, 'spatialite': False,
-             'ellipsoid': (6378137.0, 6356752.31414, 298.257222101),  # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
-             'eprec': (1, 5, 10),
-             },
-            )
+test_srs = ({
+    'srid': 4326,
+    'auth_name': ('EPSG', True),
+    'auth_srid': 4326,
+    # Only the beginning, because there are differences depending on installed libs
+    'srtext': 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84"',
+    # +ellps=WGS84 has been removed in the 4326 proj string in proj-4.8
+    'proj4_re': r'\+proj=longlat (\+ellps=WGS84 )?(\+datum=WGS84 |\+towgs84=0,0,0,0,0,0,0 )\+no_defs ',
+    'spheroid': 'WGS 84', 'name': 'WGS 84',
+    'geographic': True, 'projected': False, 'spatialite': True,
+    # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
+    'ellipsoid': (6378137.0, 6356752.3, 298.257223563),
+    'eprec': (1, 1, 9),
+}, {
+    'srid': 32140,
+    'auth_name': ('EPSG', False),
+    'auth_srid': 32140,
+    'srtext': (
+        'PROJCS["NAD83 / Texas South Central",GEOGCS["NAD83",'
+        'DATUM["North_American_Datum_1983",SPHEROID["GRS 1980"'
+    ),
+    'proj4_re': r'\+proj=lcc \+lat_1=30.28333333333333 \+lat_2=28.38333333333333 \+lat_0=27.83333333333333 '
+                r'\+lon_0=-99 \+x_0=600000 \+y_0=4000000 (\+ellps=GRS80 )?'
+                r'(\+datum=NAD83 |\+towgs84=0,0,0,0,0,0,0 )?\+units=m \+no_defs ',
+    'spheroid': 'GRS 1980', 'name': 'NAD83 / Texas South Central',
+    'geographic': False, 'projected': True, 'spatialite': False,
+    # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
+    'ellipsoid': (6378137.0, 6356752.31414, 298.257222101),
+    'eprec': (1, 5, 10),
+})
 
 
-@unittest.skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
-    "SpatialRefSysTest needs gdal support and a spatial database")
+@unittest.skipUnless(HAS_GDAL, "SpatialRefSysTest needs gdal support")
+@skipUnlessDBFeature("has_spatialrefsys_table")
 class SpatialRefSysTest(unittest.TestCase):
 
-    @no_mysql
     def test_retrieve(self):
         """
         Test retrieval of SpatialRefSys model objects.
@@ -61,7 +66,6 @@ class SpatialRefSysTest(unittest.TestCase):
                 self.assertTrue(srs.wkt.startswith(sd['srtext']))
                 six.assertRegex(self, srs.proj4text, sd['proj4_re'])
 
-    @no_mysql
     def test_osr(self):
         """
         Test getting OSR objects from SpatialRefSys model objects.
@@ -85,7 +89,6 @@ class SpatialRefSysTest(unittest.TestCase):
                 if not spatialite or connection.ops.spatial_version[0] >= 4:
                     self.assertTrue(srs.wkt.startswith(sd['srtext']))
 
-    @no_mysql
     def test_ellipsoid(self):
         """
         Test the ellipsoid property.
@@ -102,7 +105,7 @@ class SpatialRefSysTest(unittest.TestCase):
             for i in range(3):
                 self.assertAlmostEqual(ellps1[i], ellps2[i], prec[i])
 
-    @no_mysql
+    @skipUnlessDBFeature('supports_add_srs_entry')
     def test_add_entry(self):
         """
         Test adding a new entry in the SpatialRefSys model using the
@@ -110,11 +113,11 @@ class SpatialRefSysTest(unittest.TestCase):
         """
         from django.contrib.gis.utils import add_srs_entry
 
-        add_srs_entry(900913)
+        add_srs_entry(3857)
         self.assertTrue(
-            SpatialRefSys.objects.filter(srid=900913).exists()
+            SpatialRefSys.objects.filter(srid=3857).exists()
         )
-        srs = SpatialRefSys.objects.get(srid=900913)
+        srs = SpatialRefSys.objects.get(srid=3857)
         self.assertTrue(
             SpatialRefSys.get_spheroid(srs.wkt).startswith('SPHEROID[')
         )

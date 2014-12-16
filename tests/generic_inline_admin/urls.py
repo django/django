@@ -1,7 +1,7 @@
-from django.conf.urls import patterns, include
+from django.conf.urls import include, url
 
 from . import admin
 
-urlpatterns = patterns('',
-    (r'^generic_inline_admin/admin/', include(admin.site.urls)),
-)
+urlpatterns = [
+    url(r'^generic_inline_admin/admin/', include(admin.site.urls)),
+]

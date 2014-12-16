@@ -9,7 +9,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 from django.utils.translation import ungettext, ugettext as _
 
 
@@ -114,7 +114,7 @@ class BaseFormSet(object):
             return min(self.management_form.cleaned_data[TOTAL_FORM_COUNT], self.absolute_max)
         else:
             initial_forms = self.initial_form_count()
-            total_forms = initial_forms + self.extra
+            total_forms = max(initial_forms, self.min_num) + self.extra
             # Allow all existing related objects/inlines to be displayed,
             # but don't allow extra beyond max_num.
             if initial_forms > self.max_num >= 0:
@@ -138,7 +138,7 @@ class BaseFormSet(object):
         Instantiate forms at first property access.
         """
         # DoS protection is included in total_form_count()
-        forms = [self._construct_form(i) for i in xrange(self.total_form_count())]
+        forms = [self._construct_form(i) for i in range(self.total_form_count())]
         return forms
 
     def _construct_form(self, i, **kwargs):
@@ -153,13 +153,14 @@ class BaseFormSet(object):
         if self.is_bound:
             defaults['data'] = self.data
             defaults['files'] = self.files
-        if self.initial and not 'initial' in kwargs:
+        if self.initial and 'initial' not in kwargs:
             try:
                 defaults['initial'] = self.initial[i]
             except IndexError:
                 pass
-        # Allow extra forms to be empty.
-        if i >= self.initial_form_count():
+        # Allow extra forms to be empty, unless they're part of
+        # the minimum forms.
+        if i >= self.initial_form_count() and i >= self.min_num:
             defaults['empty_permitted'] = True
         defaults.update(kwargs)
         form = self.form(**defaults)
@@ -308,7 +309,7 @@ class BaseFormSet(object):
                     # should not cause the entire formset to be invalid.
                     continue
             forms_valid &= form.is_valid()
-        return forms_valid and not bool(self.non_form_errors())
+        return forms_valid and not self.non_form_errors()
 
     def full_clean(self):
         """
@@ -422,7 +423,6 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     # limit is simply max_num + DEFAULT_MAX_NUM (which is 2*DEFAULT_MAX_NUM
     # if max_num is None in the first place)
     absolute_max = max_num + DEFAULT_MAX_NUM
-    extra += min_num
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
              'min_num': min_num, 'max_num': max_num,

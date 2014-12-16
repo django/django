@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 """Tests for jslex."""
-# encoding: utf-8
 # originally from https://bitbucket.org/ned/jslex
+from __future__ import unicode_literals
 
 from django.test import TestCase
 from django.utils.jslex import JsLexer, prepare_js_for_gettext
@@ -10,7 +11,7 @@ class JsTokensTest(TestCase):
     LEX_CASES = [
         # ids
         ("a ABC $ _ a123", ["id a", "id ABC", "id $", "id _", "id a123"]),
-        (r"\u1234 abc\u0020 \u0065_\u0067", [r"id \u1234", r"id abc\u0020", r"id \u0065_\u0067"]),
+        ("\\u1234 abc\\u0020 \\u0065_\\u0067", ["id \\u1234", "id abc\\u0020", "id \\u0065_\\u0067"]),
         # numbers
         ("123 1.234 0.123e-3 0 1E+40 1e1 .123", ["dnum 123", "dnum 1.234", "dnum 0.123e-3", "dnum 0", "dnum 1E+40", "dnum 1e1", "dnum .123"]),
         ("0x1 0xabCD 0XABcd", ["hnum 0x1", "hnum 0xabCD", "hnum 0XABcd"]),
@@ -63,16 +64,16 @@ class JsTokensTest(TestCase):
         (r"""/\[[^\]]+\]/gi""", [r"""regex /\[[^\]]+\]/gi"""]),
         ("""
             rexl.re = {
-            NAME: /^(?!\d)(?:\w)+|^"(?:[^"]|"")+"/,
-            UNQUOTED_LITERAL: /^@(?:(?!\d)(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,
+            NAME: /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/,
+            UNQUOTED_LITERAL: /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,
             QUOTED_LITERAL: /^'(?:[^']|'')*'/,
             NUMERIC_LITERAL: /^[0-9]+(?:\.[0-9]*(?:[eE][-+][0-9]+)?)?/,
             SYMBOL: /^(?:==|=|<>|<=|<|>=|>|!~~|!~|~~|~|!==|!=|!~=|!~|!|&|\||\.|\:|,|\(|\)|\[|\]|\{|\}|\?|\:|;|@|\^|\/\+|\/|\*|\+|-)/
             };
         """,
         ["id rexl", "punct .", "id re", "punct =", "punct {",
-         "id NAME", "punct :", r"""regex /^(?!\d)(?:\w)+|^"(?:[^"]|"")+"/""", "punct ,",
-         "id UNQUOTED_LITERAL", "punct :", r"""regex /^@(?:(?!\d)(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/""", "punct ,",
+         "id NAME", "punct :", r"""regex /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/""", "punct ,",
+         "id UNQUOTED_LITERAL", "punct :", r"""regex /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/""", "punct ,",
          "id QUOTED_LITERAL", "punct :", r"""regex /^'(?:[^']|'')*'/""", "punct ,",
          "id NUMERIC_LITERAL", "punct :", r"""regex /^[0-9]+(?:\.[0-9]*(?:[eE][-+][0-9]+)?)?/""", "punct ,",
          "id SYMBOL", "punct :", r"""regex /^(?:==|=|<>|<=|<|>=|>|!~~|!~|~~|~|!==|!=|!~=|!~|!|&|\||\.|\:|,|\(|\)|\[|\]|\{|\}|\?|\:|;|@|\^|\/\+|\/|\*|\+|-)/""",
@@ -81,8 +82,8 @@ class JsTokensTest(TestCase):
 
         ("""
             rexl.re = {
-            NAME: /^(?!\d)(?:\w)+|^"(?:[^"]|"")+"/,
-            UNQUOTED_LITERAL: /^@(?:(?!\d)(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,
+            NAME: /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/,
+            UNQUOTED_LITERAL: /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,
             QUOTED_LITERAL: /^'(?:[^']|'')*'/,
             NUMERIC_LITERAL: /^[0-9]+(?:\.[0-9]*(?:[eE][-+][0-9]+)?)?/,
             SYMBOL: /^(?:==|=|<>|<=|<|>=|>|!~~|!~|~~|~|!==|!=|!~=|!~|!|&|\||\.|\:|,|\(|\)|\[|\]|\{|\}|\?|\:|;|@|\^|\/\+|\/|\*|\+|-)/
@@ -90,8 +91,8 @@ class JsTokensTest(TestCase):
             str = '"';
         """,
         ["id rexl", "punct .", "id re", "punct =", "punct {",
-         "id NAME", "punct :", r"""regex /^(?!\d)(?:\w)+|^"(?:[^"]|"")+"/""", "punct ,",
-         "id UNQUOTED_LITERAL", "punct :", r"""regex /^@(?:(?!\d)(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/""", "punct ,",
+         "id NAME", "punct :", r"""regex /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/""", "punct ,",
+         "id UNQUOTED_LITERAL", "punct :", r"""regex /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/""", "punct ,",
          "id QUOTED_LITERAL", "punct :", r"""regex /^'(?:[^']|'')*'/""", "punct ,",
          "id NUMERIC_LITERAL", "punct :", r"""regex /^[0-9]+(?:\.[0-9]*(?:[eE][-+][0-9]+)?)?/""", "punct ,",
          "id SYMBOL", "punct :", r"""regex /^(?:==|=|<>|<=|<|>=|>|!~~|!~|~~|~|!==|!=|!~=|!~|!|&|\||\.|\:|,|\(|\)|\[|\]|\{|\}|\?|\:|;|@|\^|\/\+|\/|\*|\+|-)/""",
@@ -197,8 +198,8 @@ GETTEXT_CASES = (
             for (var x = a in foo && "</x>" || mot ? z/x:3;x<5;y<"REGEX") {xyz(x++);}
         """
     ), (
-        r"""
-            \u1234xyz = gettext('Hello there');
+        """
+            \\u1234xyz = gettext('Hello there');
         """, r"""
             Uu1234xyz = gettext("Hello there");
         """

@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import six
 
 from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
-    SelfReferChildSibling, Worksheet, RegressionModelSplit, Line)
+    SelfReferChildSibling, Worksheet, RegressionModelSplit)
 
 
 class M2MRegressionTests(TestCase):
@@ -85,27 +85,15 @@ class M2MRegressionTests(TestCase):
         t2 = Tag.objects.create()
 
         # Get same manager twice in a row:
-        self.assertTrue(t1.entry_set.__class__ is t1.entry_set.__class__)
-        self.assertTrue(e1.topics.__class__ is e1.topics.__class__)
+        self.assertIs(t1.entry_set.__class__, t1.entry_set.__class__)
+        self.assertIs(e1.topics.__class__, e1.topics.__class__)
 
         # Get same manager for different instances
-        self.assertTrue(e1.topics.__class__ is e2.topics.__class__)
-        self.assertTrue(t1.entry_set.__class__ is t2.entry_set.__class__)
+        self.assertIs(e1.topics.__class__, e2.topics.__class__)
+        self.assertIs(t1.entry_set.__class__, t2.entry_set.__class__)
 
     def test_m2m_abstract_split(self):
         # Regression for #19236 - an abstract class with a 'split' method
         # causes a TypeError in add_lazy_relation
         m1 = RegressionModelSplit(name='1')
         m1.save()
-
-    def test_m2m_filter(self):
-        worksheet = Worksheet.objects.create(id=1)
-        line_hi = Line.objects.create(name="hi")
-        line_bye = Line.objects.create(name="bye")
-
-        worksheet.lines = [line_hi, line_bye]
-        hi = worksheet.lines.filter(name="hi")
-
-        worksheet.lines = hi
-        self.assertEqual(1, worksheet.lines.count())
-        self.assertEqual(1, hi.count())

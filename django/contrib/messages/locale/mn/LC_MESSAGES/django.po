@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011.
+# Zorig <zorig_ezd@yahoo.com>, 2014
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011,2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:16+0000\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-09-12 08:01+0000\n"
 "Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
@@ -17,6 +18,10 @@ msgstr ""
 "Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: tests/base.py:101
+#: contrib/messages/apps.py:8
+msgid "Messages"
+msgstr "Мессежүүд"
+
+#: contrib/messages/tests/base.py:105
 msgid "lazy message"
 msgstr "Удаан мессеж"

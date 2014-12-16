@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django import forms
 from django.contrib.admin.utils import (flatten_fieldsets, lookup_field,
     display_for_field, label_for_field, help_text_for_field)
@@ -7,8 +9,10 @@ from django.contrib.admin.templatetags.admin_static import static
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
 from django.forms.utils import flatatt
-from django.template.defaultfilters import capfirst
+from django.template.defaultfilters import capfirst, linebreaksbr
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
+from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -105,7 +109,10 @@ class Fieldline(object):
                 yield AdminField(self.form, field, is_first=(i == 0))
 
     def errors(self):
-        return mark_safe('\n'.join(self.form[f].errors.as_ul() for f in self.fields if f not in self.readonly_fields).strip('\n'))
+        return mark_safe(
+            '\n'.join(self.form[f].errors.as_ul()
+            for f in self.fields if f not in self.readonly_fields).strip('\n')
+        )
 
 
 class AdminField(object):
@@ -136,7 +143,6 @@ class AdminField(object):
 
 class AdminReadonlyField(object):
     def __init__(self, form, field, is_first, model_admin=None):
-        label = label_for_field(field, form._meta.model, model_admin)
         # Make self.field look a little bit like a field. This means that
         # {{ field.name }} must be a useful class name to identify the field.
         # For convenience, store other field-related data here too.
@@ -144,11 +150,22 @@ class AdminReadonlyField(object):
             class_name = field.__name__ if field.__name__ != '<lambda>' else ''
         else:
             class_name = field
+
+        if form._meta.labels and class_name in form._meta.labels:
+            label = form._meta.labels[class_name]
+        else:
+            label = label_for_field(field, form._meta.model, model_admin)
+
+        if form._meta.help_texts and class_name in form._meta.help_texts:
+            help_text = form._meta.help_texts[class_name]
+        else:
+            help_text = help_text_for_field(class_name, form._meta.model)
+
         self.field = {
             'name': class_name,
             'label': label,
+            'help_text': help_text,
             'field': field,
-            'help_text': help_text_for_field(class_name, form._meta.model)
         }
         self.form = form
         self.model_admin = model_admin
@@ -161,7 +178,7 @@ class AdminReadonlyField(object):
         if not self.is_first:
             attrs["class"] = "inline"
         label = self.field['label']
-        return format_html('<label{0}>{1}:</label>',
+        return format_html('<label{}>{}:</label>',
                            flatatt(attrs),
                            capfirst(force_text(label)))
 
@@ -182,6 +199,8 @@ class AdminReadonlyField(object):
                     result_repr = smart_text(value)
                     if getattr(attr, "allow_tags", False):
                         result_repr = mark_safe(result_repr)
+                    else:
+                        result_repr = linebreaksbr(result_repr)
             else:
                 if isinstance(f.rel, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(six.text_type, value.all()))
@@ -255,15 +274,25 @@ class InlineAdminForm(AdminForm):
         self.formset = formset
         self.model_admin = model_admin
         self.original = original
-        if original is not None:
-            # Since this module gets imported in the application's root package,
-            # it cannot import models from other applications at the module level.
-            from django.contrib.contenttypes.models import ContentType
-            self.original_content_type_id = ContentType.objects.get_for_model(original).pk
         self.show_url = original and view_on_site_url is not None
         self.absolute_url = view_on_site_url
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields,
             readonly_fields, model_admin)
+
+    @cached_property
+    def original_content_type_id(self):
+        warnings.warn(
+            'InlineAdminForm.original_content_type_id is deprecated and will be '
+            'removed in Django 2.0. If you were using this attribute to construct '
+            'the "view on site" URL, use the `absolute_url` attribute instead.',
+            RemovedInDjango20Warning, stacklevel=2
+        )
+        if self.original is not None:
+            # Since this module gets imported in the application's root package,
+            # it cannot import models from other applications at the module level.
+            from django.contrib.contenttypes.models import ContentType
+            return ContentType.objects.get_for_model(self.original).pk
+        raise AttributeError
 
     def __iter__(self):
         for name, options in self.fieldsets:

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.contrib.admin import (site, ModelAdmin, SimpleListFilter,
-    BooleanFieldListFilter, AllValuesFieldListFilter)
+    BooleanFieldListFilter, AllValuesFieldListFilter, RelatedOnlyFieldListFilter)
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -12,7 +12,7 @@ from django.test import TestCase, RequestFactory, override_settings
 from django.utils.encoding import force_text
 from django.utils import six
 
-from .models import Book, Department, Employee
+from .models import Book, Department, Employee, Bookmark, TaggedItem
 
 
 def select_by(dictlist, key, value):
@@ -91,11 +91,11 @@ class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):
     parameter_name = 'department'
 
     def lookups(self, request, model_admin):
-        return sorted(set([
+        return sorted({
             (employee.department.id,  # Intentionally not a string (Refs #19318)
              employee.department.code)
             for employee in model_admin.get_queryset(request).all()
-        ]))
+        })
 
     def queryset(self, request, queryset):
         if self.value():
@@ -132,6 +132,27 @@ class BookAdminWithTupleBooleanFilter(BookAdmin):
 
 class BookAdminWithUnderscoreLookupAndTuple(BookAdmin):
     list_filter = ('year', ('author__email', AllValuesFieldListFilter), 'contributors', 'is_best_seller', 'date_registered', 'no')
+
+
+class BookAdminWithCustomQueryset(ModelAdmin):
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(BookAdminWithCustomQueryset, self).__init__(*args, **kwargs)
+
+    list_filter = ('year',)
+
+    def get_queryset(self, request):
+        return super(BookAdminWithCustomQueryset, self).get_queryset(request).filter(author=self.user)
+
+
+class BookAdminRelatedOnlyFilter(ModelAdmin):
+    list_filter = (
+        'year', 'is_best_seller', 'date_registered', 'no',
+        ('author', RelatedOnlyFieldListFilter),
+        ('contributors', RelatedOnlyFieldListFilter),
+    )
+    ordering = ('-id',)
 
 
 class DecadeFilterBookAdmin(ModelAdmin):
@@ -182,6 +203,10 @@ class DepartmentFilterUnderscoredEmployeeAdmin(EmployeeAdmin):
 
 class DepartmentFilterDynamicValueBookAdmin(EmployeeAdmin):
     list_filter = [DepartmentListFilterLookupWithDynamicValue, ]
+
+
+class BookmarkAdminGenericRelation(ModelAdmin):
+    list_filter = ['tags__tag']
 
 
 class ListFiltersTests(TestCase):
@@ -356,8 +381,32 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[2]['selected'], True)
         self.assertEqual(choices[2]['query_string'], '?year=2002')
 
+    def test_allvaluesfieldlistfilter_custom_qs(self):
+        # Make sure that correct filters are returned with custom querysets
+        modeladmin = BookAdminWithCustomQueryset(self.alfred, Book, site)
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        filterspec = changelist.get_filters(request)[0][0]
+        choices = list(filterspec.choices(changelist))
+        # Should have 'All', 1999 and 2009 options i.e. the subset of years of
+        # books written by alfred (which is the filtering criteria set by
+        # BookAdminWithCustomQueryset.get_queryset())
+        self.assertEqual(3, len(choices))
+        self.assertEqual(choices[0]['query_string'], '?')
+        self.assertEqual(choices[1]['query_string'], '?year=1999')
+        self.assertEqual(choices[2]['query_string'], '?year=2009')
+
     def test_relatedfieldlistfilter_foreignkey(self):
         modeladmin = BookAdmin(Book, site)
+
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure that all users are present in the author's list filter
+        filterspec = changelist.get_filters(request)[0][1]
+        expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
+        self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
 
         request = self.request_factory.get('/', {'author__isnull': 'True'})
         changelist = self.get_changelist(request, Book, modeladmin)
@@ -386,6 +435,14 @@ class ListFiltersTests(TestCase):
 
     def test_relatedfieldlistfilter_manytomany(self):
         modeladmin = BookAdmin(Book, site)
+
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure that all users are present in the contrib's list filter
+        filterspec = changelist.get_filters(request)[0][2]
+        expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
+        self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
 
         request = self.request_factory.get('/', {'contributors__isnull': 'True'})
         changelist = self.get_changelist(request, Book, modeladmin)
@@ -463,6 +520,46 @@ class ListFiltersTests(TestCase):
         choice = select_by(filterspec.choices(changelist), "display", self.django_book.title)
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?books_contributed__id__exact=%d' % self.django_book.pk)
+
+    def test_relatedonlyfieldlistfilter_foreignkey(self):
+        modeladmin = BookAdminRelatedOnlyFilter(Book, site)
+
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure that only actual authors are present in author's list filter
+        filterspec = changelist.get_filters(request)[0][4]
+        expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob')]
+        self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
+
+    def test_relatedonlyfieldlistfilter_manytomany(self):
+        modeladmin = BookAdminRelatedOnlyFilter(Book, site)
+
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure that only actual contributors are present in contrib's list filter
+        filterspec = changelist.get_filters(request)[0][5]
+        expected = [(self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
+        self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
+
+    def test_listfilter_genericrelation(self):
+        django_bookmark = Bookmark.objects.create(url='https://www.djangoproject.com/')
+        python_bookmark = Bookmark.objects.create(url='https://www.python.org/')
+        kernel_bookmark = Bookmark.objects.create(url='https://www.kernel.org/')
+
+        TaggedItem.objects.create(content_object=django_bookmark, tag='python')
+        TaggedItem.objects.create(content_object=python_bookmark, tag='python')
+        TaggedItem.objects.create(content_object=kernel_bookmark, tag='linux')
+
+        modeladmin = BookmarkAdminGenericRelation(Bookmark, site)
+
+        request = self.request_factory.get('/', {'tags__tag': 'python'})
+        changelist = self.get_changelist(request, Bookmark, modeladmin)
+        queryset = changelist.get_queryset(request)
+
+        expected = [python_bookmark, django_bookmark]
+        self.assertEqual(list(queryset), expected)
 
     def test_booleanfieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)

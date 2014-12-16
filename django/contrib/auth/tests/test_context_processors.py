@@ -1,6 +1,5 @@
 import os
 
-from django.conf import global_settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.models import User, Permission
@@ -46,10 +45,10 @@ class PermWrapperTests(TestCase):
         """
         perms = PermWrapper(MockUser())
         # Works for modules and full permissions.
-        self.assertTrue('mockapp' in perms)
-        self.assertFalse('nonexisting' in perms)
-        self.assertTrue('mockapp.someperm' in perms)
-        self.assertFalse('mockapp.nonexisting' in perms)
+        self.assertIn('mockapp', perms)
+        self.assertNotIn('nonexisting', perms)
+        self.assertIn('mockapp.someperm', perms)
+        self.assertNotIn('mockapp.nonexisting', perms)
 
     def test_permlookupdict_in(self):
         """
@@ -66,6 +65,7 @@ class PermWrapperTests(TestCase):
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
+    ROOT_URLCONF='django.contrib.auth.tests.urls',
     USE_TZ=False,                           # required for loading the fixture
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
 )
@@ -73,12 +73,16 @@ class AuthContextProcessorTests(TestCase):
     """
     Tests for the ``django.contrib.auth.context_processors.auth`` processor
     """
-    urls = 'django.contrib.auth.tests.urls'
     fixtures = ['context-processors-users.xml']
 
     @override_settings(
-        MIDDLEWARE_CLASSES=global_settings.MIDDLEWARE_CLASSES,
-        TEMPLATE_CONTEXT_PROCESSORS=global_settings.TEMPLATE_CONTEXT_PROCESSORS,
+        MIDDLEWARE_CLASSES=(
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+        ),
+        TEMPLATE_CONTEXT_PROCESSORS=(
+            'django.contrib.auth.context_processors.auth',
+        ),
     )
     def test_session_not_accessed(self):
         """
@@ -89,8 +93,13 @@ class AuthContextProcessorTests(TestCase):
         self.assertContains(response, "Session not accessed")
 
     @override_settings(
-        MIDDLEWARE_CLASSES=global_settings.MIDDLEWARE_CLASSES,
-        TEMPLATE_CONTEXT_PROCESSORS=global_settings.TEMPLATE_CONTEXT_PROCESSORS,
+        MIDDLEWARE_CLASSES=(
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+        ),
+        TEMPLATE_CONTEXT_PROCESSORS=(
+            'django.contrib.auth.context_processors.auth',
+        ),
     )
     def test_session_is_accessed(self):
         """

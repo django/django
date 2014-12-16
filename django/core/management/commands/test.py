@@ -1,7 +1,6 @@
 import logging
 import sys
 import os
-from optparse import make_option, OptionParser
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -9,26 +8,7 @@ from django.test.utils import get_runner
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--noinput',
-            action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.'),
-        make_option('--failfast',
-            action='store_true', dest='failfast', default=False,
-            help='Tells Django to stop running the test suite after first '
-                 'failed test.'),
-        make_option('--testrunner',
-            action='store', dest='testrunner',
-            help='Tells Django to use specified test runner class instead of '
-                 'the one specified by the TEST_RUNNER setting.'),
-        make_option('--liveserver',
-            action='store', dest='liveserver', default=None,
-            help='Overrides the default address where the live server (used '
-                 'with LiveServerTestCase) is expected to run from. The '
-                 'default value is localhost:8081.'),
-    )
-    help = ('Discover and run tests in the specified modules or the current directory.')
-    args = '[path.to.modulename|path.to.modulename.TestCase|path.to.modulename.TestCase.test_method]...'
+    help = 'Discover and run tests in the specified modules or the current directory.'
 
     requires_system_checks = False
 
@@ -49,17 +29,40 @@ class Command(BaseCommand):
                 break
         super(Command, self).run_from_argv(argv)
 
-    def create_parser(self, prog_name, subcommand):
+    def add_arguments(self, parser):
+        parser.add_argument('args', metavar='test_label', nargs='*',
+            help='Module paths to test; can be modulename, modulename.TestCase or modulename.TestCase.test_method')
+        parser.add_argument('--noinput',
+            action='store_false', dest='interactive', default=True,
+            help='Tells Django to NOT prompt the user for input of any kind.'),
+        parser.add_argument('--failfast',
+            action='store_true', dest='failfast', default=False,
+            help='Tells Django to stop running the test suite after first '
+                 'failed test.'),
+        parser.add_argument('--testrunner',
+            action='store', dest='testrunner',
+            help='Tells Django to use specified test runner class instead of '
+                 'the one specified by the TEST_RUNNER setting.'),
+        parser.add_argument('--liveserver',
+            action='store', dest='liveserver', default=None,
+            help='Overrides the default address where the live server (used '
+                 'with LiveServerTestCase) is expected to run from. The '
+                 'default value is localhost:8081.'),
+
         test_runner_class = get_runner(settings, self.test_runner)
-        options = self.option_list + getattr(
-            test_runner_class, 'option_list', ())
-        return OptionParser(prog=prog_name,
-                            usage=self.usage(subcommand),
-                            version=self.get_version(),
-                            option_list=options)
+        if hasattr(test_runner_class, 'option_list'):
+            # Keeping compatibility with both optparse and argparse at this level
+            # would be too heavy for a non-critical item
+            raise RuntimeError(
+                "The method to extend accepted command-line arguments by the "
+                "test management command has changed in Django 1.8. Please "
+                "create an add_arguments class method to achieve this.")
+
+        if hasattr(test_runner_class, 'add_arguments'):
+            test_runner_class.add_arguments(parser)
 
     def execute(self, *args, **options):
-        if int(options['verbosity']) > 0:
+        if options['verbosity'] > 0:
             # ensure that deprecation warnings are displayed during testing
             # the following state is assumed:
             # logging.capturewarnings is true
@@ -69,7 +72,7 @@ class Command(BaseCommand):
             handler = logging.StreamHandler()
             logger.addHandler(handler)
         super(Command, self).execute(*args, **options)
-        if int(options['verbosity']) > 0:
+        if options['verbosity'] > 0:
             # remove the testing-specific handler
             logger.removeHandler(handler)
 
@@ -78,7 +81,6 @@ class Command(BaseCommand):
         from django.test.utils import get_runner
 
         TestRunner = get_runner(settings, options.get('testrunner'))
-        options['verbosity'] = int(options.get('verbosity'))
 
         if options.get('liveserver') is not None:
             os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = options['liveserver']

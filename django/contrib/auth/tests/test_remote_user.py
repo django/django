@@ -6,14 +6,14 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.auth.tests.urls')
 class RemoteUserTest(TestCase):
 
-    urls = 'django.contrib.auth.tests.urls'
     middleware = 'django.contrib.auth.middleware.RemoteUserMiddleware'
     backend = 'django.contrib.auth.backends.RemoteUserBackend'
     header = 'REMOTE_USER'
@@ -124,6 +124,24 @@ class RemoteUserTest(TestCase):
         authenticate(username='modeluser', password='foo')
         response = self.client.get('/remote_user/')
         self.assertEqual(response.context['user'].username, 'modeluser')
+
+    def test_user_switch_forces_new_login(self):
+        """
+        Tests that if the username in the header changes between requests
+        that the original user is logged out
+        """
+        User.objects.create(username='knownuser')
+        # Known user authenticates
+        response = self.client.get('/remote_user/',
+                                   **{self.header: self.known_user})
+        self.assertEqual(response.context['user'].username, 'knownuser')
+        # During the session, the REMOTE_USER changes to a different user.
+        response = self.client.get('/remote_user/',
+                                   **{self.header: "newnewuser"})
+        # Ensure that the current user is not the prior remote_user
+        # In backends that create a new user, username is "newnewuser"
+        # In backends that do not create new users, it is '' (anonymous user)
+        self.assertNotEqual(response.context['user'].username, 'knownuser')
 
     def tearDown(self):
         """Restores settings to avoid breaking other tests."""

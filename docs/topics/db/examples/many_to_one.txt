@@ -2,11 +2,7 @@
 Many-to-one relationships
 #########################
 
-.. highlight:: pycon
-
-To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
-
-.. code-block:: python
+To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`::
 
     from django.db import models
 
@@ -32,6 +28,8 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
 What follows are examples of operations that can be performed using the Python
 API facilities.
 
+.. highlight:: pycon
+
 Create a few Reporters::
 
     >>> r = Reporter(first_name='John', last_name='Smith', email='john@example.com')
@@ -51,6 +49,21 @@ Create an Article::
 
     >>> a.reporter
     <Reporter: John Smith>
+
+Note that you must save an object before it can be assigned to a foreign key
+relationship. For example, creating an ``Article`` with unsaved ``Reporter``
+raises ``ValueError``::
+
+    >>> r3 = Reporter(first_name='John', last_name='Smith', email='john@example.com')
+    >>> Article(headline="This is a test", pub_date=date(2005, 7, 27), reporter=r3)
+    Traceback (most recent call last):
+    ...
+    ValueError: 'Cannot assign "<Reporter: John Smith>": "Reporter" instance isn't saved in the database.'
+
+.. versionchanged:: 1.8
+
+    Previously, assigning unsaved objects did not raise an error and could
+    result in silent data loss.
 
 Article objects have access to their related Reporter objects::
 

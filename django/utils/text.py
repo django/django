@@ -12,7 +12,7 @@ from django.utils.functional import allow_lazy, SimpleLazyObject
 from django.utils import six
 from django.utils.six.moves import html_entities
 from django.utils.translation import ugettext_lazy, ugettext as _, pgettext
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeText, mark_safe
 
 if six.PY2:
     # Import force_unicode even though this module doesn't use it, because some
@@ -34,30 +34,33 @@ re_camel_case = re.compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
 
 def wrap(text, width):
     """
-    A word-wrap function that preserves existing line breaks and most spaces in
-    the text. Expects that existing line breaks are posix newlines.
+    A word-wrap function that preserves existing line breaks. Expects that
+    existing line breaks are posix newlines.
+
+    All white space is preserved except added line breaks consume the space on
+    which they break the line.
+
+    Long words are not wrapped, so the output text may have lines longer than
+    ``width``.
     """
     text = force_text(text)
 
     def _generator():
-        it = iter(text.split(' '))
-        word = next(it)
-        yield word
-        pos = len(word) - word.rfind('\n') - 1
-        for word in it:
-            if "\n" in word:
-                lines = word.split('\n')
-            else:
-                lines = (word,)
-            pos += len(lines[0]) + 1
-            if pos > width:
-                yield '\n'
-                pos = len(lines[-1])
-            else:
-                yield ' '
-                if len(lines) > 1:
-                    pos = len(lines[-1])
-            yield word
+        for line in text.splitlines(True):  # True keeps trailing linebreaks
+            max_width = min((line.endswith('\n') and width + 1 or width), width)
+            while len(line) > max_width:
+                space = line[:max_width + 1].rfind(' ') + 1
+                if space == 0:
+                    space = line.find(' ') + 1
+                    if space == 0:
+                        yield line
+                        line = ''
+                        break
+                yield '%s\n' % line[:space - 1]
+                line = line[space:]
+                max_width = min((line.endswith('\n') and width + 1 or width), width)
+            if line:
+                yield line
     return ''.join(_generator())
 wrap = allow_lazy(wrap, six.text_type)
 
@@ -435,14 +438,15 @@ unescape_string_literal = allow_lazy(unescape_string_literal)
 
 def slugify(value):
     """
-    Converts to lowercase, removes non-word characters (alphanumerics and
-    underscores) and converts spaces to hyphens. Also strips leading and
-    trailing whitespace.
+    Converts to ASCII. Converts spaces to hyphens. Removes characters that
+    aren't alphanumerics, underscores, or hyphens. Converts to lowercase.
+    Also strips leading and trailing whitespace.
     """
+    value = force_text(value)
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub('[^\w\s-]', '', value).strip().lower()
     return mark_safe(re.sub('[-\s]+', '-', value))
-slugify = allow_lazy(slugify, six.text_type)
+slugify = allow_lazy(slugify, six.text_type, SafeText)
 
 
 def camel_case_to_spaces(value):

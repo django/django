@@ -58,12 +58,6 @@ test utility is to find all the test cases (that is, subclasses of
 :class:`unittest.TestCase`) in any file whose name begins with ``test``,
 automatically build a test suite out of those test cases, and run that suite.
 
-.. versionchanged:: 1.6
-
-   Previously, Django's default test runner only discovered tests in
-   ``tests.py`` and ``models.py`` files within a Python package listed in
-   :setting:`INSTALLED_APPS`.
-
 For more details about :mod:`unittest`, see the Python documentation.
 
 .. warning::
@@ -120,15 +114,6 @@ You can specify a custom filename pattern match using the ``-p`` (or
 
     $ ./manage.py test --pattern="tests_*.py"
 
-.. versionchanged:: 1.6
-
-   Previously, test labels were in the form ``applabel``,
-   ``applabel.TestCase``, or ``applabel.TestCase.test_method``, rather than
-   being true Python dotted paths, and tests could only be found within
-   ``tests.py`` or ``models.py`` files within a Python package listed in
-   :setting:`INSTALLED_APPS`. The ``--pattern`` option and file paths as test
-   labels are new in 1.6.
-
 If you press ``Ctrl-C`` while the tests are running, the test runner will
 wait for the currently running test to complete and then exit gracefully.
 During a graceful exit the test runner will output details of any test
@@ -164,6 +149,14 @@ Tests that require a database (namely, model tests) will not use your "real"
 Regardless of whether the tests pass or fail, the test databases are destroyed
 when all the tests have been executed.
 
+.. versionadded:: 1.8
+
+   You can prevent the test databases from being destroyed by adding the
+   :djadminopt:`--keepdb` flag to the test command. This will preserve the test
+   database between runs. If the database does not exist, it will first
+   be created. Any migrations will also be applied in order to keep it
+   up to date.
+
 By default the test databases get their names by prepending ``test_``
 to the value of the :setting:`NAME` settings for the databases
 defined in :setting:`DATABASES`. When using the SQLite database engine
@@ -172,6 +165,11 @@ database will be created in memory, bypassing the filesystem
 entirely!). If you want to use a different database name, specify
 :setting:`NAME <TEST_NAME>` in the :setting:`TEST <DATABASE-TEST>`
 dictionary for any given database in :setting:`DATABASES`.
+
+.. versionchanged:: 1.7
+
+    On PostgreSQL, :setting:`USER` will also need read access to the built-in
+    ``postgres`` database.
 
 Aside from using a separate database, the test runner will otherwise
 use all of the same database settings you have in your settings file:
@@ -221,13 +219,13 @@ the Django test runner reorders tests in the following way:
 
 * All :class:`~django.test.TestCase` subclasses are run first.
 
-* Then, all other unittests (including :class:`unittest.TestCase`,
-  :class:`~django.test.SimpleTestCase` and
+* Then, all other Django-based tests (test cases based on
+  :class:`~django.test.SimpleTestCase`, including
   :class:`~django.test.TransactionTestCase`) are run with no particular
   ordering guaranteed nor enforced among them.
 
-* Then any other tests (e.g. doctests) that may alter the database without
-  restoring it to its original state are run.
+* Then any other :class:`unittest.TestCase` tests (including doctests) that may
+  alter the database without restoring it to its original state are run.
 
 .. note::
 
@@ -235,6 +233,41 @@ the Django test runner reorders tests in the following way:
     ordering. This is the case with doctests that relied on state left in the
     database by a given :class:`~django.test.TransactionTestCase` test, they
     must be updated to be able to run independently.
+
+.. versionadded:: 1.8
+
+    You may reverse the execution order inside groups by passing
+    :djadminopt:`--reverse` to the test command. This can help with ensuring
+    your tests are independent from each other.
+
+.. _test-case-serialized-rollback:
+
+Rollback emulation
+------------------
+
+Any initial data loaded in migrations will only be available in ``TestCase``
+tests and not in ``TransactionTestCase`` tests, and additionally only on
+backends where transactions are supported (the most important exception being
+MyISAM). This is also true for tests which rely on ``TransactionTestCase``
+such as :class:`LiveServerTestCase` and
+:class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`.
+
+Django can reload that data for you on a per-testcase basis by
+setting the ``serialized_rollback`` option to ``True`` in the body of the
+``TestCase`` or ``TransactionTestCase``, but note that this will slow down
+that test suite by approximately 3x.
+
+Third-party apps or those developing against MyISAM will need to set this;
+in general, however, you should be developing your own projects against a
+transactional database and be using ``TestCase`` for most tests, and thus
+not need this setting.
+
+The initial serialization is usually very quick, but if you wish to exclude
+some apps from this process (and speed up test runs slightly), you may add
+those apps to :setting:`TEST_NON_SERIALIZED_APPS`.
+
+Apps without migrations are not affected; ``initial_data`` fixtures are
+reloaded as usual.
 
 Other test conditions
 ---------------------

@@ -28,7 +28,7 @@ class OGRGeomType(object):
               7 + wkb25bit: 'GeometryCollection25D',
               }
     # Reverse type dictionary, keyed by lower-case of the name.
-    _str_types = dict((v.lower(), k) for k, v in _types.items())
+    _str_types = {v.lower(): k for k, v in _types.items()}
 
     def __init__(self, type_input):
         "Figures out the correct OGR Type based upon the input."
@@ -42,7 +42,7 @@ class OGRGeomType(object):
             if num is None:
                 raise OGRException('Invalid OGR String Type "%s"' % type_input)
         elif isinstance(type_input, int):
-            if not type_input in self._types:
+            if type_input not in self._types:
                 raise OGRException('Invalid OGR Integer Type: %d' % type_input)
             num = type_input
         else:

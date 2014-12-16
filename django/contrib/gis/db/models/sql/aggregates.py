@@ -6,12 +6,15 @@ from django.contrib.gis.db.models.fields import GeometryField
 __all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union'] + aggregates.__all__
 
 
+warnings.warn(
+    "django.contrib.gis.db.models.sql.aggregates is deprecated. Use "
+    "django.contrib.gis.db.models.aggregates instead.",
+    RemovedInDjango20Warning, stacklevel=2)
+
+
 class GeoAggregate(Aggregate):
     # Default SQL template for spatial aggregates.
-    sql_template = '%(function)s(%(field)s)'
-
-    # Conversion class, if necessary.
-    conversion_class = None
+    sql_template = '%(function)s(%(expressions)s)'
 
     # Flags for indicating the type of the aggregate.
     is_extent = False
@@ -26,7 +29,7 @@ class GeoAggregate(Aggregate):
         if not isinstance(self.source, GeometryField):
             raise ValueError('Geospatial aggregates only allowed on geometry fields.')
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
         "Return the aggregate, rendered as SQL with parameters."
 
         if connection.ops.oracle:
@@ -35,9 +38,9 @@ class GeoAggregate(Aggregate):
         params = []
 
         if hasattr(self.col, 'as_sql'):
-            field_name, params = self.col.as_sql(qn, connection)
+            field_name, params = self.col.as_sql(compiler, connection)
         elif isinstance(self.col, (list, tuple)):
-            field_name = '.'.join(qn(c) for c in self.col)
+            field_name = '.'.join(compiler.quote_name_unless_alias(c) for c in self.col)
         else:
             field_name = self.col
 
@@ -45,7 +48,7 @@ class GeoAggregate(Aggregate):
 
         substitutions = {
             'function': sql_function,
-            'field': field_name
+            'expressions': field_name
         }
         substitutions.update(self.extra)
 

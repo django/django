@@ -52,11 +52,13 @@ comment
 ^^^^^^^
 
 Ignores everything between ``{% comment %}`` and ``{% endcomment %}``.
+An optional note may be inserted in the first tag. For example, this is
+useful when commenting out code for documenting why the code was disabled.
 
 Sample usage::
 
     <p>Rendered text with {{ pub_date|date:"c" }}</p>
-    {% comment %}
+    {% comment "Optional note" %}
         <p>Commented out text with {{ create_date|date:"c" }}</p>
     {% endcomment %}
 
@@ -68,7 +70,7 @@ csrf_token
 ^^^^^^^^^^
 
 This tag is used for CSRF protection, as described in the documentation for
-:doc:`Cross Site Request Forgeries </ref/contrib/csrf>`.
+:doc:`Cross Site Request Forgeries </ref/csrf>`.
 
 .. templatetag:: cycle
 
@@ -102,13 +104,11 @@ this::
         </tr>
     {% endfor %}
 
-Note that the variables included in the cycle will not be escaped. Any HTML or
-Javascript code contained in the printed variable will be rendered as-is, which
-could potentially lead to security issues. So either make sure that you trust
-their values or use explicit escaping like this::
+Variables included in the cycle will be escaped.  You can disable auto-escaping
+with::
 
     {% for o in some_list %}
-        <tr class="{% filter force_escape %}{% cycle rowvalue1 rowvalue2 %}{% endfilter %}">
+        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
             ...
         </tr>
     {% endfor %}
@@ -196,21 +196,6 @@ In this syntax, each value gets interpreted as a literal string, and there's no
 way to specify variable values. Or literal commas. Or spaces. Did we mention
 you shouldn't use this syntax in any new projects?
 
-.. versionchanged:: 1.6
-
-To improve safety, future versions of ``cycle`` will automatically escape
-their output. You're encouraged to activate this behavior by loading
-``cycle`` from the ``future`` template library::
-
-    {% load cycle from future %}
-
-When using the ``future`` version, you can disable auto-escaping with::
-
-    {% for o in some_list %}
-        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
-            ...
-        </tr>
-    {% endfor %}
 
 .. templatetag:: debug
 
@@ -268,10 +253,8 @@ Sample usage::
 firstof
 ^^^^^^^
 
-Outputs the first argument variable that is not False. This tag does *not*
-auto-escape variable values.
-
-Outputs nothing if all the passed variables are False.
+Outputs the first argument variable that is not ``False``. Outputs nothing if
+all the passed variables are ``False``.
 
 Sample usage::
 
@@ -280,11 +263,11 @@ Sample usage::
 This is equivalent to::
 
     {% if var1 %}
-        {{ var1|safe }}
+        {{ var1 }}
     {% elif var2 %}
-        {{ var2|safe }}
+        {{ var2 }}
     {% elif var3 %}
-        {{ var3|safe }}
+        {{ var3 }}
     {% endif %}
 
 You can also use a literal string as a fallback value in case all
@@ -292,32 +275,15 @@ passed variables are False::
 
     {% firstof var1 var2 var3 "fallback value" %}
 
-Note that currently the variables included in the firstof tag will not be
-escaped. Any HTML or Javascript code contained in the printed variable will be
-rendered as-is, which could potentially lead to security issues. If you need
-to escape the variables in the firstof tag, you must do so explicitly::
+This tag auto-escapes variable values. You can disable auto-escaping with::
 
-    {% filter force_escape %}
-        {% firstof var1 var2 var3 "fallback value" %}
-    {% endfilter %}
+    {% autoescape off %}
+        {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
+    {% endautoescape %}
 
-.. versionchanged:: 1.6
+Or if only some variables should be escaped, you can use::
 
-    To improve safety, future versions of ``firstof`` will automatically escape
-    their output. You're encouraged to activate this behavior by loading
-    ``firstof`` from the ``future`` template library::
-
-        {% load firstof from future %}
-
-    When using the ``future`` version, you can disable auto-escaping with::
-
-        {% autoescape off %}
-            {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
-        {% endautoescape %}
-
-    Or if only some variables should be escaped, you can use::
-
-        {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
+    {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
 
 .. templatetag:: for
 
@@ -441,9 +407,7 @@ variables or to negate a given variable::
     {% endif %}
 
     {% if not athlete_list or coach_list %}
-        There are no athletes or there are some coaches (OK, so
-        writing English translations of boolean logic sounds
-        stupid; it's not our fault).
+        There are no athletes or there are some coaches.
     {% endif %}
 
     {% if athlete_list and not coach_list %}
@@ -736,6 +700,11 @@ available to the included template::
     This means that there is no shared state between included templates --
     each include is a completely independent rendering process.
 
+    Blocks are evaluated *before* they are included. This means that a template
+    that includes blocks from another will contain blocks that have *already
+    been evaluated and rendered* - not blocks that can be overridden by, for
+    example, an extending template.
+
 See also: :ttag:`{% ssi %}<ssi>`.
 
 .. templatetag:: load
@@ -760,6 +729,44 @@ and ``bar`` will be loaded from ``somelibrary``::
 See :doc:`Custom tag and filter libraries </howto/custom-template-tags>` for
 more information.
 
+.. templatetag:: lorem
+
+lorem
+^^^^^
+
+.. versionadded:: 1.8
+
+    The tag was previously located in :mod:`django.contrib.webdesign`.
+
+Displays random "lorem ipsum" Latin text. This is useful for providing sample
+data in templates.
+
+Usage::
+
+    {% lorem [count] [method] [random] %}
+
+The ``{% lorem %}`` tag can be used with zero, one, two or three arguments.
+The arguments are:
+
+===========  =============================================================
+Argument     Description
+===========  =============================================================
+``count``    A number (or variable) containing the number of paragraphs or
+             words to generate (default is 1).
+``method``   Either ``w`` for words, ``p`` for HTML paragraphs or ``b``
+             for plain-text paragraph blocks (default is ``b``).
+``random``   The word ``random``, which if given, does not use the common
+             paragraph ("Lorem ipsum dolor sit amet...") when generating
+             text.
+===========  =============================================================
+
+Examples:
+
+* ``{% lorem %}`` will output the common "lorem ipsum" paragraph.
+* ``{% lorem 3 p %}`` will output the common "lorem ipsum" paragraph
+  and two random paragraphs each wrapped in HTML ``<p>`` tags.
+* ``{% lorem 2 w random %}`` will output two random Latin words.
+
 .. templatetag:: now
 
 now
@@ -774,11 +781,11 @@ Example::
     It is {% now "jS F Y H:i" %}
 
 Note that you can backslash-escape a format string if you want to use the
-"raw" value. In this example, "f" is backslash-escaped, because otherwise
-"f" is a format string that displays the time. The "o" doesn't need to be
-escaped, because it's not a format character::
+"raw" value. In this example, both "o" and "f" are backslash-escaped, because
+otherwise each is a format string that displays the year and the time,
+respectively::
 
-    It is the {% now "jS o\f F" %}
+    It is the {% now "jS \o\f F" %}
 
 This would display as "It is the 4th of September".
 
@@ -791,6 +798,18 @@ This would display as "It is the 4th of September".
     if :ref:`format-localization` is enabled, e.g.::
 
         It is {% now "SHORT_DATETIME_FORMAT" %}
+
+
+You can also use the syntax ``{% now "Y" as current_year %}`` to store the
+output inside a variable. This is useful if you want to use ``{% now %}``
+inside a template tag like :ttag:`blocktrans` for example::
+
+    {% now "Y" as current_year %}
+    {% blocktrans %}Copyright {{ current_year }}{% endblocktrans %}
+
+.. versionadded:: 1.8
+
+The ability to use the "as" syntax was added.
 
 .. templatetag:: regroup
 
@@ -1010,17 +1029,13 @@ url
 ^^^
 
 Returns an absolute path reference (a URL without the domain name) matching a
-given view function and optional parameters.
-
-.. versionchanged:: 1.6
-
-    Any special characters in the resulting path will be encoded using
-    :func:`~django.utils.encoding.iri_to_uri`.
+given view function and optional parameters. Any special characters in the
+resulting path will be encoded using :func:`~django.utils.encoding.iri_to_uri`.
 
 This is a way to output links without violating the DRY principle by having to
 hard-code URLs in your templates::
 
-    {% url 'path.to.some_view' v1 v2 %}
+    {% url 'some-url-name' v1 v2 %}
 
 The first argument is a path to a view function in the format
 ``package.package.module.function``. It can be a quoted literal or any other
@@ -1029,7 +1044,7 @@ should be space-separated values that will be used as arguments in the URL.
 The example above shows passing positional arguments. Alternatively you may
 use keyword syntax::
 
-    {% url 'path.to.some_view' arg1=v1 arg2=v2 %}
+    {% url 'some-url-name' arg1=v1 arg2=v2 %}
 
 Do not mix both positional and keyword syntax in a single call. All arguments
 required by the URLconf should be present.
@@ -1040,7 +1055,7 @@ takes a client ID (here, ``client()`` is a method inside the views file
 
 .. code-block:: python
 
-    ('^client/(\d+)/$', 'app_views.client')
+    ('^client/([0-9]+)/$', 'app_views.client', name='app-views-client')
 
 If this app's URLconf is included into the project's URLconf under a path
 such as this:
@@ -1051,7 +1066,7 @@ such as this:
 
 ...then, in a template, you can create a link to this view like this::
 
-    {% url 'app_views.client' client.id %}
+    {% url 'app-views-client' client.id %}
 
 The template tag will output the string ``/clients/client/123/``.
 
@@ -1066,7 +1081,7 @@ cause your site to display an error page.
 If you'd like to retrieve a URL without displaying it, you can use a slightly
 different call::
 
-    {% url 'path.to.view' arg arg2 as the_url %}
+    {% url 'some-url-name' arg arg2 as the_url %}
 
     <a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
 
@@ -1076,7 +1091,7 @@ The scope of the variable created by the  ``as var`` syntax is the
 This ``{% url ... as var %}`` syntax will *not* cause an error if the view is
 missing. In practice you'll use this to link to views that are optional::
 
-    {% url 'path.to.view' as the_url %}
+    {% url 'some-url-name' as the_url %}
     {% if the_url %}
       <a href="{{ the_url }}">Link to optional stuff</a>
     {% endif %}
@@ -1088,6 +1103,13 @@ If you'd like to retrieve a namespaced URL, specify the fully qualified name::
 This will follow the normal :ref:`namespaced URL resolution strategy
 <topics-http-reversing-url-namespaces>`, including using any hints provided
 by the context as to the current application.
+
+.. deprecated:: 1.8
+
+    The dotted Python path syntax is deprecated and will be removed in
+    Django 2.0::
+
+        {% url 'path.to.some_view' v1 v2 %}
 
 .. warning::
 
@@ -1132,13 +1154,15 @@ If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100, the
 image in the above example will be 88 pixels wide
 (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
 
-.. versionchanged:: 1.7
-
 In some cases you might want to capture the result of ``widthratio`` in a
 variable. It can be useful, for instance, in a :ttag:`blocktrans` like this::
 
     {% widthratio this_value max_value max_width as width %}
     {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
+
+.. versionchanged:: 1.7
+
+    The ability to use "as" with this tag like in the example above was added.
 
 .. templatetag:: with
 
@@ -1572,35 +1596,6 @@ For example::
 
 If ``value`` is the list ``['a', 'b', 'c']``, the output will be ``'a'``.
 
-.. templatefilter:: fix_ampersands
-
-fix_ampersands
-^^^^^^^^^^^^^^
-
-.. note::
-
-    This is rarely useful as ampersands are automatically escaped. See
-    :tfilter:`escape` for more information.
-
-.. deprecated:: 1.7
-    This filter has been deprecated and will be removed in Django 1.8.
-
-Replaces ampersands with ``&amp;`` entities.
-
-For example::
-
-    {{ value|fix_ampersands }}
-
-If ``value`` is ``Tom & Jerry``, the output will be ``Tom &amp; Jerry``.
-
-However, ampersands used in named entities and numeric character references
-will not be replaced. For example, if ``value`` is ``Caf&eacute;``, the output
-will *not* be ``Caf&amp;eacute;`` but remain ``Caf&eacute;``. This means that
-in some edge cases, such as acronyms followed by semicolons, this filter will
-not replace ampersands that need replacing. For example, if ``value`` is
-``Contact the R&D;``, the output will remain unchanged because ``&D;``
-resembles a named entity.
-
 .. templatefilter:: floatformat
 
 floatformat
@@ -1745,7 +1740,13 @@ For example::
 
     {{ value|length }}
 
-If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
+If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
+``4``.
+
+.. versionchanged:: 1.8
+
+    The filter returns ``0`` for an undefined variable. Previously, it returned
+    an empty string.
 
 .. templatefilter:: length_is
 
@@ -1758,7 +1759,8 @@ For example::
 
     {{ value|length_is:"4" }}
 
-If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``True``.
+If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
+``True``.
 
 .. templatefilter:: linebreaks
 
@@ -1857,8 +1859,8 @@ For example::
     {{ value|make_list }}
 
 If ``value`` is the string ``"Joel"``, the output would be the list
-``[u'J', u'o', u'e', u'l']``. If ``value`` is ``123``, the output will be the
-list ``[u'1', u'2', u'3']``.
+``['J', 'o', 'e', 'l']``. If ``value`` is ``123``, the output will be the
+list ``['1', '2', '3']``.
 
 .. templatefilter:: phone2numeric
 
@@ -1933,19 +1935,38 @@ If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output could be ``"b"``.
 removetags
 ^^^^^^^^^^
 
+.. deprecated:: 1.8
+
+    ``removetags`` cannot guarantee HTML safe output and has been deprecated due
+    to security concerns. Consider using `bleach`_ instead.
+
+.. _bleach: http://bleach.readthedocs.org/en/latest/
+
 Removes a space-separated list of [X]HTML tags from the output.
 
 For example::
 
-    {{ value|removetags:"b span"|safe }}
+    {{ value|removetags:"b span" }}
 
 If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-output will be ``"Joel <button>is</button> a slug"``.
+unescaped output will be ``"Joel <button>is</button> a slug"``.
 
 Note that this filter is case-sensitive.
 
 If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"`` the
-output will be ``"<B>Joel</B> <button>is</button> a slug"``.
+unescaped output will be ``"<B>Joel</B> <button>is</button> a slug"``.
+
+.. admonition:: No safety guarantee
+
+    Note that ``removetags`` doesn't give any guarantee about its output being
+    HTML safe. In particular, it doesn't work recursively, so an input like
+    ``"<sc<script>ript>alert('XSS')</sc</script>ript>"`` won't be safe even if
+    you apply ``|removetags:"script"``. So if the input is user provided,
+    **NEVER** apply the ``safe`` filter to a ``removetags`` output. If you are
+    looking for something more robust, you can use the ``bleach`` Python
+    library, notably its `clean`_ method.
+
+.. _clean: http://bleach.readthedocs.org/en/latest/clean.html
 
 .. templatefilter:: rjust
 
@@ -2017,9 +2038,9 @@ If ``some_list`` is ``['a', 'b', 'c']``, the output will be ``['a', 'b']``.
 slugify
 ^^^^^^^
 
-Converts to lowercase, removes non-word characters (alphanumerics and
-underscores) and converts spaces to hyphens. Also strips leading and trailing
-whitespace.
+Converts to ASCII. Converts spaces to hyphens. Removes characters that aren't
+alphanumerics, underscores, or hyphens. Converts to lowercase. Also strips
+leading and trailing whitespace.
 
 For example::
 
@@ -2050,7 +2071,7 @@ If ``value`` is ``10``, the output will be ``1.000000E+01``.
 striptags
 ^^^^^^^^^
 
-Strips all [X]HTML tags.
+Makes all possible efforts to strip all [X]HTML tags.
 
 For example::
 
@@ -2058,6 +2079,16 @@ For example::
 
 If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``, the
 output will be ``"Joel is a slug"``.
+
+.. admonition:: No safety guarantee
+
+    Note that ``striptags`` doesn't give any guarantee about its output being
+    HTML safe, particularly with non valid HTML input. So **NEVER** apply the
+    ``safe`` filter to a ``striptags`` output. If you are looking for something
+    more robust, you can use the ``bleach`` Python library, notably its
+    `clean`_ method.
+
+.. _clean: http://bleach.readthedocs.org/en/latest/clean.html
 
 .. templatefilter:: time
 
@@ -2264,8 +2295,11 @@ contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
     </ul>
     </li>
 
-Note: An older, more restrictive and verbose input format is also supported:
-``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``,
+.. deprecated:: 1.8
+
+    An older, more restrictive and verbose input format is also supported:
+    ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``.
+    Support for this syntax will be removed in Django 2.0.
 
 .. templatefilter:: upper
 
@@ -2319,6 +2353,12 @@ This template tag works on links prefixed with ``http://``, ``https://``, or
 It also supports domain-only links ending in one of the original top level
 domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
 ``.org``). For example, ``djangoproject.com`` gets converted.
+
+.. versionchanged:: 1.8
+
+    Support for domain-only links that include characters after the top-level
+    domain (e.g. ``djangoproject.com/`` and ``djangoproject.com/download/``)
+    was added.
 
 Links can have trailing punctuation (periods, commas, close-parens) and leading
 punctuation (opening parens), and ``urlize`` will still do the right thing.
@@ -2522,7 +2562,7 @@ slightly different call:
     The :mod:`staticfiles<django.contrib.staticfiles>` contrib app also ships
     with a :ttag:`static template tag<staticfiles-static>` which uses
     ``staticfiles'`` :setting:`STATICFILES_STORAGE` to build the URL of the
-    given path (rather than simply using :func:`urlparse.urljoin` with the
+    given path (rather than simply using :func:`urllib.parse.urljoin` with the
     :setting:`STATIC_URL` setting and the given path). Use that instead if you
     have an advanced use case such as :ref:`using a cloud service to serve
     static files<staticfiles-from-cdn>`::

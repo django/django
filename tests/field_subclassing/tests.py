@@ -2,14 +2,21 @@ from __future__ import unicode_literals
 
 import inspect
 
-from django.core import serializers
+from django.core import exceptions, serializers
+from django.db import connection
 from django.test import TestCase
 
-from .fields import Small
-from .models import DataModel, MyModel, OtherModel
+from .fields import Small, CustomTypedField
+from .models import ChoicesModel, DataModel, MyModel, OtherModel
 
 
 class CustomField(TestCase):
+    def test_refresh(self):
+        d = DataModel.objects.create(data=[1, 2, 3])
+        d.refresh_from_db(fields=['data'])
+        self.assertIsInstance(d.data, list)
+        self.assertEqual(d.data, [1, 2, 3])
+
     def test_defer(self):
         d = DataModel.objects.create(data=[1, 2, 3])
 
@@ -104,3 +111,20 @@ class CustomField(TestCase):
         data = dict(inspect.getmembers(MyModel))
         self.assertIn('__module__', data)
         self.assertEqual(data['__module__'], 'field_subclassing.models')
+
+    def test_validation_of_choices_for_custom_field(self):
+        # a valid choice
+        o = ChoicesModel.objects.create(data=Small('a', 'b'))
+        o.full_clean()
+
+        # an invalid choice
+        o = ChoicesModel.objects.create(data=Small('d', 'e'))
+        with self.assertRaises(exceptions.ValidationError):
+            o.full_clean()
+
+
+class TestDbType(TestCase):
+
+    def test_db_parameters_respects_db_type(self):
+        f = CustomTypedField()
+        self.assertEqual(f.db_parameters(connection)['type'], 'custom_field')

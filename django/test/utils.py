@@ -14,11 +14,11 @@ from django.core import mail
 from django.core.signals import request_started
 from django.db import reset_queries
 from django.http import request
-from django.template import Template, loader, TemplateDoesNotExist
-from django.template.loaders import cached
+from django.template import Template
+from django.template.loaders import locmem
 from django.test.signals import template_rendered, setting_changed
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
 
@@ -30,7 +30,6 @@ __all__ = (
     'setup_test_environment', 'teardown_test_environment',
 )
 
-RESTORE_LOADERS_ATTR = '_original_template_source_loaders'
 TZ_SUPPORT = hasattr(time, 'tzset')
 
 
@@ -146,42 +145,14 @@ def get_runner(settings, test_runner_class=None):
     return test_runner
 
 
-def setup_test_template_loader(templates_dict, use_cached_loader=False):
-    """
-    Changes Django to only find templates from within a dictionary (where each
-    key is the template name and each value is the corresponding template
-    content to return).
+class TestTemplateLoader(locmem.Loader):
 
-    Use meth:`restore_template_loaders` to restore the original loaders.
-    """
-    if hasattr(loader, RESTORE_LOADERS_ATTR):
-        raise Exception("loader.%s already exists" % RESTORE_LOADERS_ATTR)
-
-    def test_template_loader(template_name, template_dirs=None):
-        "A custom template loader that loads templates from a dictionary."
-        try:
-            return (templates_dict[template_name], "test:%s" % template_name)
-        except KeyError:
-            raise TemplateDoesNotExist(template_name)
-
-    if use_cached_loader:
-        template_loader = cached.Loader(('test_template_loader',))
-        template_loader._cached_loaders = (test_template_loader,)
-    else:
-        template_loader = test_template_loader
-
-    setattr(loader, RESTORE_LOADERS_ATTR, loader.template_source_loaders)
-    loader.template_source_loaders = (template_loader,)
-    return template_loader
-
-
-def restore_template_loaders():
-    """
-    Restores the original template loaders after
-    :meth:`setup_test_template_loader` has been run.
-    """
-    loader.template_source_loaders = getattr(loader, RESTORE_LOADERS_ATTR)
-    delattr(loader, RESTORE_LOADERS_ATTR)
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.test.utils.TestTemplateLoader was renamed to "
+            "django.template.loaders.locmem.Loader.",
+            RemovedInDjango19Warning, stacklevel=2)
+        super(TestTemplateLoader, self).__init__(*args, **kwargs)
 
 
 class override_settings(object):
@@ -260,7 +231,7 @@ class modify_settings(override_settings):
     """
     def __init__(self, *args, **kwargs):
         if args:
-            # Hack used when instantiating from SimpleTestCase._pre_setup.
+            # Hack used when instantiating from SimpleTestCase.setUpClass.
             assert not kwargs
             self.operations = args[0]
         else:
@@ -279,7 +250,7 @@ class modify_settings(override_settings):
         self.options = {}
         for name, operations in self.operations:
             try:
-                # When called from SimpleTestCase._pre_setup, values may be
+                # When called from SimpleTestCase.setUpClass, values may be
                 # overridden several times; cumulate changes.
                 value = self.options[name]
             except KeyError:
@@ -300,7 +271,7 @@ class modify_settings(override_settings):
         super(modify_settings, self).enable()
 
 
-def override_system_checks(new_checks):
+def override_system_checks(new_checks, deployment_checks=None):
     """ Acts as a decorator. Overrides list of registered system checks.
     Useful when you override `INSTALLED_APPS`, e.g. if you exclude `auth` app,
     you also need to exclude its system checks. """
@@ -312,10 +283,14 @@ def override_system_checks(new_checks):
         def inner(*args, **kwargs):
             old_checks = registry.registered_checks
             registry.registered_checks = new_checks
+            old_deployment_checks = registry.deployment_checks
+            if deployment_checks is not None:
+                registry.deployment_checks = deployment_checks
             try:
                 return test_func(*args, **kwargs)
             finally:
                 registry.registered_checks = old_checks
+                registry.deployment_checks = old_deployment_checks
         return inner
     return outer
 
@@ -334,8 +309,8 @@ def compare_xml(want, got):
         return _norm_whitespace_re.sub(' ', v)
 
     def child_text(element):
-        return ''.join([c.data for c in element.childNodes
-                        if c.nodeType == Node.TEXT_NODE])
+        return ''.join(c.data for c in element.childNodes
+                       if c.nodeType == Node.TEXT_NODE)
 
     def children(element):
         return [c for c in element.childNodes
@@ -442,23 +417,23 @@ class CaptureQueriesContext(object):
         return self.connection.queries[self.initial_queries:self.final_queries]
 
     def __enter__(self):
-        self.use_debug_cursor = self.connection.use_debug_cursor
-        self.connection.use_debug_cursor = True
-        self.initial_queries = len(self.connection.queries)
+        self.force_debug_cursor = self.connection.force_debug_cursor
+        self.connection.force_debug_cursor = True
+        self.initial_queries = len(self.connection.queries_log)
         self.final_queries = None
         request_started.disconnect(reset_queries)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.connection.use_debug_cursor = self.use_debug_cursor
+        self.connection.force_debug_cursor = self.force_debug_cursor
         request_started.connect(reset_queries)
         if exc_type is not None:
             return
-        self.final_queries = len(self.connection.queries)
+        self.final_queries = len(self.connection.queries_log)
 
 
 class IgnoreDeprecationWarningsMixin(object):
-    warning_classes = [RemovedInDjango18Warning]
+    warning_classes = [RemovedInDjango19Warning]
 
     def setUp(self):
         super(IgnoreDeprecationWarningsMixin, self).setUp()
@@ -473,11 +448,11 @@ class IgnoreDeprecationWarningsMixin(object):
 
 
 class IgnorePendingDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
-        warning_classes = [RemovedInDjango19Warning]
+        warning_classes = [RemovedInDjango20Warning]
 
 
 class IgnoreAllDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
-        warning_classes = [RemovedInDjango19Warning, RemovedInDjango18Warning]
+        warning_classes = [RemovedInDjango20Warning, RemovedInDjango19Warning]
 
 
 @contextmanager
@@ -518,3 +493,65 @@ def extend_sys_path(*paths):
         yield
     finally:
         sys.path = _orig_sys_path
+
+
+@contextmanager
+def captured_output(stream_name):
+    """Return a context manager used by captured_stdout/stdin/stderr
+    that temporarily replaces the sys stream *stream_name* with a StringIO.
+
+    Note: This function and the following ``captured_std*`` are copied
+          from CPython's ``test.support`` module."""
+    orig_stdout = getattr(sys, stream_name)
+    setattr(sys, stream_name, six.StringIO())
+    try:
+        yield getattr(sys, stream_name)
+    finally:
+        setattr(sys, stream_name, orig_stdout)
+
+
+def captured_stdout():
+    """Capture the output of sys.stdout:
+
+       with captured_stdout() as stdout:
+           print("hello")
+       self.assertEqual(stdout.getvalue(), "hello\n")
+    """
+    return captured_output("stdout")
+
+
+def captured_stderr():
+    """Capture the output of sys.stderr:
+
+       with captured_stderr() as stderr:
+           print("hello", file=sys.stderr)
+       self.assertEqual(stderr.getvalue(), "hello\n")
+    """
+    return captured_output("stderr")
+
+
+def captured_stdin():
+    """Capture the input to sys.stdin:
+
+       with captured_stdin() as stdin:
+           stdin.write('hello\n')
+           stdin.seek(0)
+           # call test code that consumes from sys.stdin
+           captured = input()
+       self.assertEqual(captured, "hello")
+    """
+    return captured_output("stdin")
+
+
+def reset_warning_registry():
+    """
+    Clear warning registry for all modules. This is required in some tests
+    because of a bug in Python that prevents warnings.simplefilter("always")
+    from always making warnings appear: http://bugs.python.org/issue4180
+
+    The bug was fixed in Python 3.4.2.
+    """
+    key = "__warningregistry__"
+    for mod in sys.modules.values():
+        if hasattr(mod, key):
+            getattr(mod, key).clear()
