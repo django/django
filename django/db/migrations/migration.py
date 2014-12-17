@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 from django.db.transaction import atomic
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Migration(object):
     """
     The base class for all migrations.
