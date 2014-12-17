@@ -39,7 +39,7 @@ from ctypes import byref
 # The GDAL C library, OGR exceptions, and the Layer object.
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.driver import Driver
-from django.contrib.gis.gdal.error import OGRException, OGRIndexError
+from django.contrib.gis.gdal.error import GDALException, OGRIndexError
 from django.contrib.gis.gdal.layer import Layer
 
 # Getting the ctypes prototypes for the DataSource.
@@ -75,21 +75,21 @@ class DataSource(GDALBase):
             try:
                 # OGROpen will auto-detect the data source type.
                 ds = capi.open_ds(force_bytes(ds_input), self._write, byref(ds_driver))
-            except OGRException:
+            except GDALException:
                 # Making the error message more clear rather than something
                 # like "Invalid pointer returned from OGROpen".
-                raise OGRException('Could not open the datasource at "%s"' % ds_input)
+                raise GDALException('Could not open the datasource at "%s"' % ds_input)
         elif isinstance(ds_input, self.ptr_type) and isinstance(ds_driver, Driver.ptr_type):
             ds = ds_input
         else:
-            raise OGRException('Invalid data source input type: %s' % type(ds_input))
+            raise GDALException('Invalid data source input type: %s' % type(ds_input))
 
         if ds:
             self.ptr = ds
             self.driver = Driver(ds_driver)
         else:
             # Raise an exception if the returned pointer is NULL
-            raise OGRException('Invalid data source file "%s"' % ds_input)
+            raise GDALException('Invalid data source file "%s"' % ds_input)
 
     def __del__(self):
         "Destroys this DataStructure object."

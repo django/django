@@ -1,6 +1,6 @@
 from ctypes import c_void_p
 from django.contrib.gis.gdal.base import GDALBase
-from django.contrib.gis.gdal.error import OGRException
+from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import ds as vcapi, raster as rcapi
 
 from django.utils import six
@@ -61,11 +61,11 @@ class Driver(GDALBase):
         elif isinstance(dr_input, c_void_p):
             driver = dr_input
         else:
-            raise OGRException('Unrecognized input type for GDAL/OGR Driver: %s' % str(type(dr_input)))
+            raise GDALException('Unrecognized input type for GDAL/OGR Driver: %s' % str(type(dr_input)))
 
         # Making sure we get a valid pointer to the OGR Driver
         if not driver:
-            raise OGRException('Could not initialize GDAL/OGR Driver on input: %s' % str(dr_input))
+            raise GDALException('Could not initialize GDAL/OGR Driver on input: %s' % str(dr_input))
         self.ptr = driver
 
     def __str__(self):

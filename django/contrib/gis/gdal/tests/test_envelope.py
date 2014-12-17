@@ -4,7 +4,7 @@ from unittest import skipUnless
 from django.contrib.gis.gdal import HAS_GDAL
 
 if HAS_GDAL:
-    from django.contrib.gis.gdal import Envelope, OGRException
+    from django.contrib.gis.gdal import Envelope, GDALException
 
 
 class TestPoint(object):
@@ -25,16 +25,16 @@ class EnvelopeTest(unittest.TestCase):
         Envelope(0, 0, 5, 5)
         Envelope(0, '0', '5', 5)  # Thanks to ww for this
         Envelope(e1._envelope)
-        self.assertRaises(OGRException, Envelope, (5, 5, 0, 0))
-        self.assertRaises(OGRException, Envelope, 5, 5, 0, 0)
-        self.assertRaises(OGRException, Envelope, (0, 0, 5, 5, 3))
-        self.assertRaises(OGRException, Envelope, ())
+        self.assertRaises(GDALException, Envelope, (5, 5, 0, 0))
+        self.assertRaises(GDALException, Envelope, 5, 5, 0, 0)
+        self.assertRaises(GDALException, Envelope, (0, 0, 5, 5, 3))
+        self.assertRaises(GDALException, Envelope, ())
         self.assertRaises(ValueError, Envelope, 0, 'a', 5, 5)
         self.assertRaises(TypeError, Envelope, 'foo')
-        self.assertRaises(OGRException, Envelope, (1, 1, 0, 0))
+        self.assertRaises(GDALException, Envelope, (1, 1, 0, 0))
         try:
             Envelope(0, 0, 0, 0)
-        except OGRException:
+        except GDALException:
             self.fail("shouldn't raise an exception for min_x == max_x or min_y == max_y")
 
     def test02_properties(self):

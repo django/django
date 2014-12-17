@@ -13,7 +13,7 @@ from django.utils.six.moves import range
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import (OGRGeometry, OGRGeomType,
-        OGRException, OGRIndexError, SpatialReference, CoordTransform,
+        GDALException, OGRIndexError, SpatialReference, CoordTransform,
         GDAL_VERSION)
 
 
@@ -33,9 +33,9 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         OGRGeomType('Unknown')
 
         # Should throw TypeError on this input
-        self.assertRaises(OGRException, OGRGeomType, 23)
-        self.assertRaises(OGRException, OGRGeomType, 'fooD')
-        self.assertRaises(OGRException, OGRGeomType, 9)
+        self.assertRaises(GDALException, OGRGeomType, 23)
+        self.assertRaises(GDALException, OGRGeomType, 'fooD')
+        self.assertRaises(GDALException, OGRGeomType, 9)
 
         # Equivalence can take strings, ints, and other OGRGeomTypes
         self.assertEqual(OGRGeomType(1), OGRGeomType(1))
@@ -243,7 +243,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         # Both rings in this geometry are not closed.
         poly = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5), (1 1, 2 1, 2 2, 2 1))')
         self.assertEqual(8, poly.point_count)
-        with self.assertRaises(OGRException):
+        with self.assertRaises(GDALException):
             poly.centroid
 
         poly.close_rings()
@@ -407,7 +407,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         # Can't insert a Point into a MultiPolygon.
         mp = OGRGeometry('MultiPolygon')
         pnt = OGRGeometry('POINT(5 23)')
-        self.assertRaises(OGRException, mp.add, pnt)
+        self.assertRaises(GDALException, mp.add, pnt)
 
         # GeometryCollection.add may take an OGRGeometry (if another collection
         # of the same type all child geoms will be added individually) or WKT.

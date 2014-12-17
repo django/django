@@ -161,6 +161,10 @@ Minor features
 * Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
   Django 1.2 have been removed.
 
+* All GDAL-related exceptions are now raised with ``GDALException``. The former
+  ``OGRException`` has been kept for backwards compatibility but should not be
+  used any longer.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
