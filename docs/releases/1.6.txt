@@ -836,11 +836,11 @@ Object Relational Mapper changes
 Django 1.6 contains many changes to the ORM. These changes fall mostly in
 three categories:
 
-  1. Bug fixes (e.g. proper join clauses for generic relations, query
-     combining, join promotion, and join trimming fixes)
-  2. Preparation for new features. For example the ORM is now internally ready
-     for multicolumn foreign keys.
-  3. General cleanup.
+1. Bug fixes (e.g. proper join clauses for generic relations, query combining,
+   join promotion, and join trimming fixes)
+2. Preparation for new features. For example the ORM is now internally ready
+   for multicolumn foreign keys.
+3. General cleanup.
 
 These changes can result in some compatibility problems. For example, some
 queries will now generate different table aliases. This can affect
