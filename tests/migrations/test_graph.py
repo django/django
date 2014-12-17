@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.db.migrations.graph import CircularDependencyError, MigrationGraph, NodeNotFoundError
+from django.utils.encoding import force_text
 
 
 class GraphTests(TestCase):
@@ -213,7 +214,7 @@ class GraphTests(TestCase):
                        /               \
         app_c:   0001<-  <------------- x 0002
 
-        And apply sqashing on app_c.
+        And apply squashing on app_c.
         """
         graph = MigrationGraph()
 
@@ -229,3 +230,18 @@ class GraphTests(TestCase):
 
         with self.assertRaises(CircularDependencyError):
             graph.forwards_plan(("app_c", "0001_squashed_0002"))
+
+    def test_stringify(self):
+        graph = MigrationGraph()
+        self.assertEqual(force_text(graph), "Graph: 0 nodes, 0 edges")
+
+        graph.add_node(("app_a", "0001"), None)
+        graph.add_node(("app_a", "0002"), None)
+        graph.add_node(("app_a", "0003"), None)
+        graph.add_node(("app_b", "0001"), None)
+        graph.add_node(("app_b", "0002"), None)
+        graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
+        graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_a", "0002"))
+        graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_b", "0002"))
+
+        self.assertEqual(force_text(graph), "Graph: 5 nodes, 3 edges")
