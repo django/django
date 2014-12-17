@@ -151,3 +151,7 @@ Bugfixes
   (:ticket:`23975`).
 
 * Made admin system checks run for custom ``AdminSite``\s (:ticket:`23497`).
+
+* Ensured the app registry is fully populated when unpickling models. When an
+  external script (like a queueing infrastructure) reloads pickled models, it
+  could crash with an ``AppRegistryNotReady`` exception (:ticket:`24007`).
