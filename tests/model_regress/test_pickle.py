@@ -1,6 +1,7 @@
 import datetime
 import pickle
 import subprocess
+import sys
 import tempfile
 import warnings
 
@@ -82,7 +83,7 @@ print(article.headline)"""
             script.write(script_template % pickle.dumps(a))
             script.flush()
             try:
-                result = subprocess.check_output(['python', script.name])
+                result = subprocess.check_output([sys.executable, script.name])
             except subprocess.CalledProcessError:
                 self.fail("Unable to reload model pickled data")
         self.assertEqual(result.strip().decode(), "Some object")
