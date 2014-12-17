@@ -6,7 +6,7 @@ import re
 import datetime
 import unittest
 
-from django.conf import settings, global_settings
+from django.conf import global_settings
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
@@ -62,7 +62,6 @@ from .admin import site, site2, CityAdmin
 
 ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields may be case-sensitive."
-ADMIN_VIEW_TEMPLATES_DIR = settings.TEMPLATE_DIRS + (os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
@@ -788,7 +787,24 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContains(response, '<a href="/my-site-url/">View site</a>')
 
 
-@override_settings(TEMPLATE_DIRS=ADMIN_VIEW_TEMPLATES_DIR)
+@override_settings(TEMPLATES=[{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    # Put this app's templates dir in DIRS to take precedence over the admin's
+    # templates dir.
+    'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+    'APP_DIRS': True,
+    'OPTIONS': {
+        'context_processors': [
+            'django.template.context_processors.debug',
+            'django.template.context_processors.i18n',
+            'django.template.context_processors.tz',
+            'django.template.context_processors.media',
+            'django.template.context_processors.static',
+            'django.contrib.auth.context_processors.auth',
+            'django.contrib.messages.context_processors.messages',
+        ],
+    },
+}])
 class AdminCustomTemplateTests(AdminViewBasicTestCase):
     def test_extended_bodyclass_template_change_form(self):
         """

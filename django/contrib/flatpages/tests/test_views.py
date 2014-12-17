@@ -1,9 +1,10 @@
-import os
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.flatpages.models import FlatPage
 from django.test import TestCase, override_settings
+
+from .settings import FLATPAGES_TEMPLATES
 
 
 @override_settings(
@@ -17,9 +18,7 @@ from django.test import TestCase, override_settings
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ),
     ROOT_URLCONF='django.contrib.flatpages.tests.urls',
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(__file__), 'templates'),
-    ),
+    TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )
 class FlatpageViewTests(TestCase):
@@ -85,9 +84,7 @@ class FlatpageViewTests(TestCase):
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ),
     ROOT_URLCONF='django.contrib.flatpages.tests.urls',
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(__file__), 'templates'),
-    ),
+    TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )
 class FlatpageViewAppendSlashTests(TestCase):

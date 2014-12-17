@@ -209,8 +209,8 @@ subscribing to LJWorld.com alerts." Same goes for the email's message body.
 
 Note that an even more flexible (but more heavyweight) way of doing this would
 be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
-different template directories (:setting:`TEMPLATE_DIRS`), you could simply
-farm out to the template system like so::
+different template directories (:setting:`DIRS <TEMPLATES-DIRS>`), you could
+simply farm out to the template system like so::
 
     from django.core.mail import send_mail
     from django.template import loader, Context

@@ -1,8 +1,9 @@
-import os
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase, Client
 from django.test import override_settings
+
+from .settings import FLATPAGES_TEMPLATES
 
 
 @override_settings(
@@ -17,9 +18,7 @@ from django.test import override_settings
     ),
     ROOT_URLCONF='django.contrib.flatpages.tests.urls',
     CSRF_FAILURE_VIEW='django.views.csrf.csrf_failure',
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(__file__), 'templates'),
-    ),
+    TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )
 class FlatpageCSRFTests(TestCase):
