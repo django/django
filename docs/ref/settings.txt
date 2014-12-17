@@ -2439,6 +2439,11 @@ Default::
      ('django.template.loaders.filesystem.Loader',
       'django.template.loaders.app_directories.Loader')
 
+.. deprecated:: 1.8
+
+    Set the ``'loaders'`` option in the :setting:`OPTIONS <TEMPLATES-OPTIONS>`
+    of a ``DjangoTemplates`` backend instead.
+
 A tuple of template loader classes, specified as strings. Each ``Loader`` class
 knows how to import templates from a particular source. Optionally, a tuple can be
 used instead of a string. The first item in the tuple should be the ``Loader``’s

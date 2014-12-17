@@ -1,14 +1,17 @@
 from importlib import import_module
 import itertools
-import os
 import re
 import warnings
 
 from django.apps import apps
-from django.conf import global_settings, settings
+from django.conf import settings
 from django.contrib.sites.requests import RequestSite
 from django.contrib.admin.models import LogEntry
+from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
+from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
+    SetPasswordForm)
 from django.contrib.auth.models import User
+from django.contrib.auth.views import login as login_view
 from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import QueryDict, HttpRequest
@@ -16,19 +19,15 @@ from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import urlparse, ParseResult
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.utils._os import upath
 from django.test import TestCase, override_settings
 from django.test.utils import patch_logger
 from django.middleware.csrf import CsrfViewMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 
-from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
-from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
-                SetPasswordForm)
 # Needed so model is installed when tests are run independently:
-from django.contrib.auth.tests.custom_user import CustomUser  # NOQA
-from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.contrib.auth.views import login as login_view
+from .custom_user import CustomUser  # NOQA
+from .settings import AUTH_TEMPLATES
+from .utils import skipIfCustomUser
 
 
 @override_settings(
@@ -36,10 +35,7 @@ from django.contrib.auth.views import login as login_view
         ('en', 'English'),
     ),
     LANGUAGE_CODE='en',
-    TEMPLATE_LOADERS=global_settings.TEMPLATE_LOADERS,
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-    ),
+    TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='django.contrib.auth.tests.urls',

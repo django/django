@@ -63,21 +63,28 @@ class DebugViewTests(TestCase):
         response = self.client.get('/raises400/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
 
+    # Ensure no 403.html template exists to test the default case.
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    }])
     def test_403(self):
-        # Ensure no 403.html template exists to test the default case.
-        with override_settings(TEMPLATE_LOADERS=[]):
-            response = self.client.get('/raises403/')
-            self.assertContains(response, '<h1>403 Forbidden</h1>', status_code=403)
+        response = self.client.get('/raises403/')
+        self.assertContains(response, '<h1>403 Forbidden</h1>', status_code=403)
 
+    # Set up a test 403.html template.
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.locmem.Loader', {
+                    '403.html': 'This is a test template for a 403 error.',
+                }),
+            ],
+        },
+    }])
     def test_403_template(self):
-        # Set up a test 403.html template.
-        with override_settings(TEMPLATE_LOADERS=[
-            ('django.template.loaders.locmem.Loader', {
-                '403.html': 'This is a test template for a 403 Forbidden error.',
-            })
-        ]):
-            response = self.client.get('/raises403/')
-            self.assertContains(response, 'test template', status_code=403)
+        response = self.client.get('/raises403/')
+        self.assertContains(response, 'test template', status_code=403)
 
     def test_404(self):
         response = self.client.get('/raises404/')
