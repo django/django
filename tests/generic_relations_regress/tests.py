@@ -220,15 +220,18 @@ class GenericRelationTests(TestCase):
 
     def test_annotate(self):
         hs1 = HasLinkThing.objects.create()
+        hs2 = HasLinkThing.objects.create()
+        HasLinkThing.objects.create()
         b = Board.objects.create(name=str(hs1.pk))
+        Link.objects.create(content_object=hs2)
         l = Link.objects.create(content_object=hs1)
         Link.objects.create(content_object=b)
-        qs = HasLinkThing.objects.annotate(Sum('links'))
+        qs = HasLinkThing.objects.annotate(Sum('links')).filter(pk=hs1.pk)
         # If content_type restriction isn't in the query's join condition,
         # then wrong results are produced here as the link to b will also match
         # (b and hs1 have equal pks).
         self.assertEqual(qs.count(), 1)
-        self.assertEqual(qs[0].links__sum, hs1.id)
+        self.assertEqual(qs[0].links__sum, l.id)
         l.delete()
         # Now if we don't have proper left join, we will not produce any
         # results at all here.
@@ -240,6 +243,15 @@ class GenericRelationTests(TestCase):
         # Finally test that filtering works.
         self.assertEqual(qs.filter(links__sum__isnull=True).count(), 1)
         self.assertEqual(qs.filter(links__sum__isnull=False).count(), 0)
+
+    def test_filter_targets_related_pk(self):
+        HasLinkThing.objects.create()
+        hs2 = HasLinkThing.objects.create()
+        l = Link.objects.create(content_object=hs2)
+        self.assertNotEqual(l.object_id, l.pk)
+        self.assertQuerysetEqual(
+            HasLinkThing.objects.filter(links=l.pk),
+            [hs2], lambda x: x)
 
     def test_editable_generic_rel(self):
         GenericRelationForm = modelform_factory(HasLinkThing, fields='__all__')
