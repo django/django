@@ -1,6 +1,6 @@
 # The GDAL C library, OGR exception, and the Field object
 from django.contrib.gis.gdal.base import GDALBase
-from django.contrib.gis.gdal.error import OGRException, OGRIndexError
+from django.contrib.gis.gdal.error import GDALException, OGRIndexError
 from django.contrib.gis.gdal.field import Field
 from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 
@@ -28,7 +28,7 @@ class Feature(GDALBase):
         Initializes Feature from a pointer and its Layer object.
         """
         if not feat:
-            raise OGRException('Cannot create OGR Feature, invalid pointer given.')
+            raise GDALException('Cannot create OGR Feature, invalid pointer given.')
         self.ptr = feat
         self._layer = layer
 

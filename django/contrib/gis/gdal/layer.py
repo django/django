@@ -4,7 +4,7 @@ from ctypes import c_double, byref
 # Other GDAL imports.
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
+from django.contrib.gis.gdal.error import GDALException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.feature import Feature
 from django.contrib.gis.gdal.field import OGRFieldTypes
 from django.contrib.gis.gdal.geomtype import OGRGeomType
@@ -35,7 +35,7 @@ class Layer(GDALBase):
         collection of the `DataSource` while this Layer is still active.
         """
         if not layer_ptr:
-            raise OGRException('Cannot create Layer, invalid pointer given')
+            raise GDALException('Cannot create Layer, invalid pointer given')
         self.ptr = layer_ptr
         self._ds = ds
         self._ldefn = capi.get_layer_defn(self._ptr)
@@ -84,7 +84,7 @@ class Layer(GDALBase):
             # If the Layer supports random reading, return.
             try:
                 return Feature(capi.get_feature(self.ptr, feat_id), self)
-            except OGRException:
+            except GDALException:
                 pass
         else:
             # Random access isn't supported, have to increment through
@@ -169,7 +169,7 @@ class Layer(GDALBase):
     def _get_spatial_filter(self):
         try:
             return OGRGeometry(geom_api.clone_geom(capi.get_spatial_filter(self.ptr)))
-        except OGRException:
+        except GDALException:
             return None
 
     def _set_spatial_filter(self, filter):
@@ -196,7 +196,7 @@ class Layer(GDALBase):
         in the Layer.
         """
         if field_name not in self.fields:
-            raise OGRException('invalid field name: %s' % field_name)
+            raise GDALException('invalid field name: %s' % field_name)
         return [feat.get(field_name) for feat in self]
 
     def get_geoms(self, geos=False):
