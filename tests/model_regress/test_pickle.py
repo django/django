@@ -1,10 +1,15 @@
+import datetime
 import pickle
+import subprocess
+import tempfile
 import warnings
 
 from django.db import models, DJANGO_VERSION_PICKLE_KEY
 from django.test import TestCase
 from django.utils.encoding import force_text
 from django.utils.version import get_major_version, get_version
+
+from .models import Article
 
 
 class ModelPickleTestCase(TestCase):
@@ -51,3 +56,33 @@ class ModelPickleTestCase(TestCase):
                 "Pickled model instance's Django version %s does not "
                 "match the current version %s."
                 % (str(float(get_major_version()) - 0.1), get_version()))
+
+    def test_unpickling_when_appregistrynotready(self):
+        """
+        #24007 -- Verifies that a pickled model can be unpickled without having
+        to manually setup the apps registry beforehand.
+        """
+        script_template = """#!/usr/bin/env python
+import pickle
+
+from django.conf import settings
+
+data = %r
+
+settings.configure(DEBUG=False, INSTALLED_APPS=('model_regress',), SECRET_KEY = "blah")
+article = pickle.loads(data)
+print(article.headline)"""
+        a = Article.objects.create(
+            headline="Some object",
+            pub_date=datetime.datetime.now(),
+            article_text="This is an article",
+        )
+
+        with tempfile.NamedTemporaryFile(mode='w+', suffix=".py", dir='.', delete=True) as script:
+            script.write(script_template % pickle.dumps(a))
+            script.flush()
+            try:
+                result = subprocess.check_output(['python', script.name])
+            except subprocess.CalledProcessError:
+                self.fail("Unable to reload model pickled data")
+        self.assertEqual(result.strip().decode(), "Some object")
