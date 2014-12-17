@@ -2,7 +2,10 @@ from __future__ import unicode_literals
 
 import datetime
 from operator import attrgetter
+import pickle
+import subprocess
 import sys
+import tempfile
 import unittest
 
 from django.core.exceptions import ValidationError
@@ -245,3 +248,35 @@ class EvaluateMethodTest(TestCase):
         dept = Department.objects.create(pk=1, name='abc')
         dept.evaluate = 'abc'
         Worker.objects.filter(department=dept)
+
+
+class ModelPickleTestCase(TestCase):
+    def test_unpickling_when_appregistrynotready(self):
+        """
+        #24007 -- Verifies that a pickled model can be unpickled without having
+        to manually setup the apps registry beforehand.
+        """
+        script_template = """#!/usr/bin/env python
+import pickle
+
+from django.conf import settings
+
+data = %r
+
+settings.configure(DEBUG=False, INSTALLED_APPS=('model_regress',), SECRET_KEY = "blah")
+article = pickle.loads(data)
+print(article.headline)"""
+        a = Article.objects.create(
+            headline="Some object",
+            pub_date=datetime.datetime.now(),
+            article_text="This is an article",
+        )
+
+        with tempfile.NamedTemporaryFile(mode='w+', suffix=".py", dir='.', delete=True) as script:
+            script.write(script_template % pickle.dumps(a))
+            script.flush()
+            try:
+                result = subprocess.check_output(['python', script.name])
+            except subprocess.CalledProcessError:
+                self.fail("Unable to reload model pickled data")
+        self.assertEqual(result.strip().decode(), "Some object")
