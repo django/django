@@ -431,14 +431,14 @@ class IsOverriddenTest(TestCase):
             s = Settings('fake_settings_module')
 
             self.assertTrue(s.is_overridden('SECRET_KEY'))
-            self.assertFalse(s.is_overridden('TEMPLATE_LOADERS'))
+            self.assertFalse(s.is_overridden('ALLOWED_HOSTS'))
         finally:
             del sys.modules['fake_settings_module']
 
     def test_override(self):
-        self.assertFalse(settings.is_overridden('TEMPLATE_LOADERS'))
-        with override_settings(TEMPLATE_LOADERS=[]):
-            self.assertTrue(settings.is_overridden('TEMPLATE_LOADERS'))
+        self.assertFalse(settings.is_overridden('ALLOWED_HOSTS'))
+        with override_settings(ALLOWED_HOSTS=[]):
+            self.assertTrue(settings.is_overridden('ALLOWED_HOSTS'))
 
 
 class TestTupleSettings(unittest.TestCase):

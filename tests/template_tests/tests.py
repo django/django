@@ -17,6 +17,11 @@ from django.test.utils import override_settings, extend_sys_path
 from django.utils._os import upath
 
 
+TESTS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(upath(__file__))))
+
+TEMPLATES_DIR = os.path.join(TESTS_DIR, 'templates')
+
+
 class TemplateLoaderTests(SimpleTestCase):
 
     def test_loaders_security(self):
@@ -73,7 +78,10 @@ class TemplateLoaderTests(SimpleTestCase):
             test_template_sources('/DIR1/index.HTML', template_dirs,
                                   ['/DIR1/index.HTML'])
 
-    @override_settings(TEMPLATE_LOADERS=['django.template.loaders.filesystem.Loader'])
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [TEMPLATES_DIR],
+    }])
     # Turn TEMPLATE_DEBUG on, so that the origin file name will be kept with
     # the compiled templates.
     @override_settings(TEMPLATE_DEBUG=True)
@@ -90,10 +98,17 @@ class TemplateLoaderTests(SimpleTestCase):
         self.assertTrue(template_name.endswith(load_name),
             'Template loaded by filesystem loader has incorrect name for debug page: %s' % template_name)
 
-    @override_settings(TEMPLATE_LOADERS=[
-        ('django.template.loaders.cached.Loader',
-            ['django.template.loaders.filesystem.Loader']),
-    ])
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [TEMPLATES_DIR],
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.cached.Loader', [
+                    'django.template.loaders.filesystem.Loader',
+                ]),
+            ],
+        },
+    }])
     @override_settings(TEMPLATE_DEBUG=True)
     def test_cached_loader_debug_origin(self):
         # Same comment as in test_loader_debug_origin.
@@ -130,7 +145,10 @@ class TemplateLoaderTests(SimpleTestCase):
     # Test the base loader class via the app loader. load_template
     # from base is used by all shipped loaders excepting cached,
     # which has its own test.
-    @override_settings(TEMPLATE_LOADERS=['django.template.loaders.app_directories.Loader'])
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+    }])
     def test_include_missing_template(self):
         """
         Tests that the correct template is identified as not existing
@@ -151,7 +169,10 @@ class TemplateLoaderTests(SimpleTestCase):
     # Test the base loader class via the app loader. load_template
     # from base is used by all shipped loaders excepting cached,
     # which has its own test.
-    @override_settings(TEMPLATE_LOADERS=['django.template.loaders.app_directories.Loader'])
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+    }])
     def test_extends_include_missing_baseloader(self):
         """
         Tests that the correct template is identified as not existing
@@ -168,34 +189,39 @@ class TemplateLoaderTests(SimpleTestCase):
             self.assertEqual(e.args[0], 'missing.html')
         self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
 
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.cached.Loader', [
+                    'django.template.loaders.app_directories.Loader',
+                ]),
+            ],
+        },
+    }])
     @override_settings(TEMPLATE_DEBUG=True)
     def test_extends_include_missing_cachedloader(self):
         """
         Same as test_extends_include_missing_baseloader, only tests
         behavior of the cached loader instead of base loader.
         """
-        with override_settings(TEMPLATE_LOADERS=[
-            ('django.template.loaders.cached.Loader', [
-                'django.template.loaders.app_directories.Loader',
-            ]),
-        ]):
-            load_name = 'test_extends_error.html'
-            tmpl = loader.get_template(load_name)
-            r = None
-            try:
-                r = tmpl.render(template.Context({}))
-            except template.TemplateDoesNotExist as e:
-                self.assertEqual(e.args[0], 'missing.html')
-            self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
+        load_name = 'test_extends_error.html'
+        tmpl = loader.get_template(load_name)
+        r = None
+        try:
+            r = tmpl.render(template.Context({}))
+        except template.TemplateDoesNotExist as e:
+            self.assertEqual(e.args[0], 'missing.html')
+        self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
 
-            # For the cached loader, repeat the test, to ensure the first attempt did not cache a
-            # result that behaves incorrectly on subsequent attempts.
-            tmpl = loader.get_template(load_name)
-            try:
-                tmpl.render(template.Context({}))
-            except template.TemplateDoesNotExist as e:
-                self.assertEqual(e.args[0], 'missing.html')
-            self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
+        # For the cached loader, repeat the test, to ensure the first attempt did not cache a
+        # result that behaves incorrectly on subsequent attempts.
+        tmpl = loader.get_template(load_name)
+        try:
+            tmpl.render(template.Context({}))
+        except template.TemplateDoesNotExist as e:
+            self.assertEqual(e.args[0], 'missing.html')
+        self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
 
     def test_include_template_argument(self):
         """
@@ -429,11 +455,16 @@ class RequestContextTests(unittest.TestCase):
     def setUp(self):
         self.fake_request = RequestFactory().get('/')
 
-    @override_settings(TEMPLATE_LOADERS=[
-        ('django.template.loaders.locmem.Loader', {
-            'child': '{{ var|default:"none" }}',
-        }),
-    ])
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.locmem.Loader', {
+                    'child': '{{ var|default:"none" }}',
+                }),
+            ],
+        },
+    }])
     def test_include_only(self):
         """
         Regression test for #15721, ``{% include %}`` and ``RequestContext``

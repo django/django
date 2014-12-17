@@ -35,21 +35,26 @@ class DefaultsTests(TestCase):
         response = self.client.get('/server_error/')
         self.assertEqual(response.status_code, 500)
 
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.locmem.Loader', {
+                    '404.html': 'This is a test template for a 404 error.',
+                    '500.html': 'This is a test template for a 500 error.',
+                }),
+            ],
+        },
+    }])
     def test_custom_templates(self):
         """
         Test that 404.html and 500.html templates are picked by their respective
         handler.
         """
-        with override_settings(TEMPLATE_LOADERS=[
-            ('django.template.loaders.locmem.Loader', {
-                '404.html': 'This is a test template for a 404 error.',
-                '500.html': 'This is a test template for a 500 error.',
-            }),
-        ]):
-            for code, url in ((404, '/non_existing_url/'), (500, '/server_error/')):
-                response = self.client.get(url)
-                self.assertContains(response, "test template for a %d error" % code,
-                    status_code=code)
+        for code, url in ((404, '/non_existing_url/'), (500, '/server_error/')):
+            response = self.client.get(url)
+            self.assertContains(response, "test template for a %d error" % code,
+                status_code=code)
 
     def test_get_absolute_url_attributes(self):
         "A model can set attributes on the get_absolute_url method"

@@ -1303,8 +1303,7 @@ Django itself uses this signal to reset various data:
 Overridden settings              Data reset
 ================================ ========================
 USE_TZ, TIME_ZONE                Databases timezone
-TEMPLATE_CONTEXT_PROCESSORS      Context processors cache
-TEMPLATE_LOADERS                 Template loaders cache
+TEMPLATES                        Template engines
 SERIALIZATION_MODULES            Serializers cache
 LOCALE_PATHS, LANGUAGE_CODE      Default translation and loaded translations
 MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage

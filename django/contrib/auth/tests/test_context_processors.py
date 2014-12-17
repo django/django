@@ -1,13 +1,12 @@
-import os
-
 from django.contrib.auth import authenticate
-from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.context_processors import PermWrapper, PermLookupDict
 from django.db.models import Q
 from django.test import TestCase, override_settings
-from django.utils._os import upath
+
+from .settings import AUTH_MIDDLEWARE_CLASSES, AUTH_TEMPLATES
+from .utils import skipIfCustomUser
 
 
 class MockUser(object):
@@ -61,17 +60,10 @@ class PermWrapperTests(TestCase):
 
 @skipIfCustomUser
 @override_settings(
-    TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-    ),
-    TEMPLATE_CONTEXT_PROCESSORS=(
-        'django.contrib.auth.context_processors.auth',
-        'django.contrib.messages.context_processors.messages'
-    ),
-    ROOT_URLCONF='django.contrib.auth.tests.urls',
-    USE_TZ=False,                           # required for loading the fixture
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='django.contrib.auth.tests.urls',
+    TEMPLATES=AUTH_TEMPLATES,
+    USE_TZ=False,                           # required for loading the fixture
 )
 class AuthContextProcessorTests(TestCase):
     """
@@ -79,12 +71,7 @@ class AuthContextProcessorTests(TestCase):
     """
     fixtures = ['context-processors-users.xml']
 
-    @override_settings(
-        MIDDLEWARE_CLASSES=(
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.contrib.auth.middleware.AuthenticationMiddleware',
-        ),
-    )
+    @override_settings(MIDDLEWARE_CLASSES=AUTH_MIDDLEWARE_CLASSES)
     def test_session_not_accessed(self):
         """
         Tests that the session is not accessed simply by including
@@ -93,12 +80,7 @@ class AuthContextProcessorTests(TestCase):
         response = self.client.get('/auth_processor_no_attr_access/')
         self.assertContains(response, "Session not accessed")
 
-    @override_settings(
-        MIDDLEWARE_CLASSES=(
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.contrib.auth.middleware.AuthenticationMiddleware',
-        ),
-    )
+    @override_settings(MIDDLEWARE_CLASSES=AUTH_MIDDLEWARE_CLASSES)
     def test_session_is_accessed(self):
         """
         Tests that the session is accessed if the auth context processor
