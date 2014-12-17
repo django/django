@@ -90,6 +90,7 @@ details on these changes.
 * The following settings will be removed:
 
   * ``ALLOWED_INCLUDE_ROOTS``
+  * ``TEMPLATE_LOADERS``
   * ``TEMPLATE_STRING_IF_INVALID``
 
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` will

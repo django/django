@@ -917,7 +917,7 @@ Miscellaneous
   session store always fetches the most current session data.
 
 * Private APIs ``override_template_loaders`` and ``override_with_test_loader``
-  in ``django.test.utils`` were removed. Override ``TEMPLATE_LOADERS`` with
+  in ``django.test.utils`` were removed. Override ``TEMPLATES`` with
   ``override_settings`` instead.
 
 * Warnings from the MySQL database backend are no longer converted to
@@ -1021,6 +1021,7 @@ As a consequence of the multiple template engines refactor, several settings
 are deprecated in favor of :setting:`TEMPLATES`:
 
 * ``ALLOWED_INCLUDE_ROOTS``
+* ``TEMPLATE_LOADERS``
 * ``TEMPLATE_STRING_IF_INVALID``
 
 ``django.core.context_processors``

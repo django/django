@@ -2337,8 +2337,9 @@ directory.
 
 In order to override one or more of them, first create an ``admin`` directory
 in your project's ``templates`` directory. This can be any of the directories
-you specified in :setting:`TEMPLATE_DIRS`. If you have customized the
-:setting:`TEMPLATE_LOADERS` setting, be sure
+you specified in the :setting:`DIRS <TEMPLATES-DIRS>` option of the
+``DjangoTemplates`` backend in the :setting:`TEMPLATES` setting. If you have
+customized the ``'loaders'`` option, be sure
 ``'django.template.loaders.filesystem.Loader'`` appears before
 ``'django.template.loaders.app_directories.Loader'`` so that your custom
 templates will be found by the template loading system before those that are

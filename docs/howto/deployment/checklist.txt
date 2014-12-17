@@ -178,8 +178,8 @@ processing time.
 
 This helps a lot on virtualized hosts with limited network performance.
 
-:setting:`TEMPLATE_LOADERS`
----------------------------
+:setting:`TEMPLATES`
+--------------------
 
 Enabling the cached template loader often improves performance drastically, as
 it avoids compiling each template every time it needs to be rendered. See the

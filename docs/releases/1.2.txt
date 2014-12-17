@@ -267,9 +267,9 @@ opposed to functions, the only method available until Django 1.1.
 All the template loaders :ref:`shipped with Django <template-loaders>` have
 been ported to the new API but they still implement the function-based API and
 the template core machinery still accepts function-based loaders (builtin or
-third party) so there is no immediate need to modify your
-:setting:`TEMPLATE_LOADERS` setting in existing projects, things will keep
-working if you leave it untouched up to and including the Django 1.3 release.
+third party) so there is no immediate need to modify your ``TEMPLATE_LOADERS``
+setting in existing projects, things will keep working if you leave it
+untouched up to and including the Django 1.3 release.
 
 If you have developed your own custom template loaders we suggest to consider
 porting them to a class-based implementation because the code for backwards

@@ -314,12 +314,13 @@ creating a template that the view can use.
 First, create a directory called ``templates`` in your ``polls`` directory.
 Django will look for templates in there.
 
-Django's :setting:`TEMPLATE_LOADERS` setting contains a list of callables that
-know how to import templates from various sources. One of the defaults is
-:class:`django.template.loaders.app_directories.Loader` which looks for a
-"templates" subdirectory in each of the :setting:`INSTALLED_APPS` - this is how
-Django knows to find the polls templates even though we didn't modify
-:setting:`TEMPLATE_DIRS`, as we did in :ref:`Tutorial 2
+Your project's :setting:`TEMPLATES` setting describes how Django will load and
+render templates. The default settings file configures a ``DjangoTemplates``
+backend whose :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` option is set to
+``True``. By convention ``DjangoTemplates`` looks for a "templates"
+subdirectory in each of the :setting:`INSTALLED_APPS`. This is how Django
+knows to find the polls templates even though we didn't modify the
+:setting:`DIRS <TEMPLATES-DIRS>` option, as we did in :ref:`Tutorial 2
 <ref-customizing-your-projects-templates>`.
 
 .. admonition:: Organizing templates

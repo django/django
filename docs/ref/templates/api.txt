@@ -734,9 +734,10 @@ with a few other template loaders, which know how to load templates from other
 sources.
 
 Some of these other loaders are disabled by default, but you can activate them
-by editing your :setting:`TEMPLATE_LOADERS` setting. :setting:`TEMPLATE_LOADERS`
-should be a tuple of strings or tuples, where each represents a template loader
-class. Here are the template loaders that come with Django:
+by adding a ``'loaders'`` option to your ``DjangoTemplates`` backend in the
+:setting:`TEMPLATES` setting. ``'loaders'`` should be a list of strings or
+tuples, where each represents a template loader class. Here are the template
+loaders that come with Django:
 
 .. currentmodule:: django.template.loaders
 
@@ -744,8 +745,16 @@ class. Here are the template loaders that come with Django:
 
 .. class:: filesystem.Loader
 
-    Loads templates from the filesystem, according to :setting:`TEMPLATE_DIRS`.
-    This loader is enabled by default.
+    Loads templates from the filesystem, according to
+    :setting:`DIRS <TEMPLATES-DIRS>`.
+
+    This loader is enabled by default. However it won't find any templates
+    until you set :setting:`DIRS <TEMPLATES-DIRS>` to a non-empty list::
+
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        }]
 
 ``django.template.loaders.app_directories.Loader``
 
@@ -782,7 +791,14 @@ class. Here are the template loaders that come with Django:
     it caches a list of which :setting:`INSTALLED_APPS` packages have a
     ``templates`` subdirectory.
 
-    This loader is enabled by default.
+    This loader is enabled if and only if :setting:`APP_DIRS
+    <TEMPLATES-APP_DIRS>` is set::
+
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+        }]
+
 
 ``django.template.loaders.eggs.Loader``
 
@@ -810,12 +826,18 @@ class. Here are the template loaders that come with Django:
     For example, to enable template caching with the ``filesystem`` and
     ``app_directories`` template loaders you might use the following settings::
 
-        TEMPLATE_LOADERS = (
-            ('django.template.loaders.cached.Loader', (
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-            )),
-        )
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+            'OPTIONS': {
+                'loaders': [
+                    ('django.template.loaders.cached.Loader', (
+                        'django.template.loaders.filesystem.Loader',
+                        'django.template.loaders.app_directories.Loader',
+                    )),
+                ],
+            },
+        }]
 
     .. note::
 
@@ -838,17 +860,21 @@ class. Here are the template loaders that come with Django:
 
     This loader takes a dictionary of templates as its first argument::
 
-        TEMPLATE_LOADERS = (
-            ('django.template.loaders.locmem.Loader', {
-                'index.html': 'content here',
-            }),
-        )
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {
+                'loaders': [
+                    ('django.template.loaders.locmem.Loader', {
+                        'index.html': 'content here',
+                    }),
+                ],
+            },
+        }]
 
     This loader is disabled by default.
 
-Django uses the template loaders in order according to the
-:setting:`TEMPLATE_LOADERS` setting. It uses each loader until a loader finds a
-match.
+Django uses the template loaders in order according to the ``'loaders'``
+option. It uses each loader until a loader finds a match.
 
 .. currentmodule:: django.template
 
