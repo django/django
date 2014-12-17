@@ -488,15 +488,32 @@ whatever user your server runs.) However, keeping your templates within the
 project is a good convention to follow.
 
 Open your settings file (:file:`mysite/settings.py`, remember) and add a
-:setting:`TEMPLATE_DIRS` setting:
+:setting:`DIRS <TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting:
 
 .. snippet::
     :filename: mysite/settings.py
 
-    TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.i18n',
+                    'django.template.context_processors.tz',
+                    'django.template.context_processors.media',
+                    'django.template.context_processors.static',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                ],
+            },
+        },
+    ]
 
-:setting:`TEMPLATE_DIRS` is an iterable of filesystem directories to check when
-loading Django templates; it's a search path.
+:setting:`DIRS <TEMPLATES-DIRS>` is a list of filesystem directories to check
+when loading Django templates; it's a search path.
 
 Now create a directory called ``admin`` inside ``templates``, and copy the
 template ``admin/base_site.html`` from within the default Django admin
@@ -547,10 +564,11 @@ changes.
 Customizing your *application's* templates
 ------------------------------------------
 
-Astute readers will ask: But if :setting:`TEMPLATE_DIRS` was empty by default,
-how was Django finding the default admin templates? The answer is that, by
-default, Django automatically looks for a ``templates/`` subdirectory within
-each application package, for use as a fallback (don't forget that
+Astute readers will ask: But if :setting:`DIRS <TEMPLATES-DIRS>` was empty by
+default, how was Django finding the default admin templates? The answer is
+that, since :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` is set to ``True``,
+Django automatically looks for a ``templates/`` subdirectory within each
+application package, for use as a fallback (don't forget that
 ``django.contrib.admin`` is an application).
 
 Our poll application is not very complex and doesn't need custom admin

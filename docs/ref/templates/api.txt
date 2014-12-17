@@ -620,21 +620,30 @@ specified as a **template directory**.
 
 Django searches for template directories in a number of places, depending on
 your template-loader settings (see "Loader types" below), but the most basic
-way of specifying template directories is by using the :setting:`TEMPLATE_DIRS`
-setting.
+way of specifying template directories is by using the :setting:`DIRS
+<TEMPLATES-DIRS>` option.
 
-The TEMPLATE_DIRS setting
-~~~~~~~~~~~~~~~~~~~~~~~~~
+The DIRS option
+~~~~~~~~~~~~~~~
 
-Tell Django what your template directories are by using the
-:setting:`TEMPLATE_DIRS` setting in your settings file. This should be set to a
-list or tuple of strings that contain full paths to your template
-directory(ies). Example::
+.. versionchanged:: 1.8
 
-    TEMPLATE_DIRS = (
-        "/home/html/templates/lawrence.com",
-        "/home/html/templates/default",
-    )
+    This value used to be defined by the ``TEMPLATE_DIRS`` setting.
+
+Tell Django what your template directories are by using the :setting:`DIRS
+<TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting in your settings
+file. This should be set to a list of strings that contain full paths to your
+template directory(ies). Example::
+
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [
+                '/home/html/templates/lawrence.com',
+                '/home/html/templates/default',
+            ],
+        },
+    ]
 
 Your templates can go anywhere you want, as long as the directories and
 templates are readable by the Web server. They can have any extension you want,
@@ -679,8 +688,8 @@ The Python API
        The ``dirs`` parameter was deprecated.
 
 For example, if you call ``get_template('story_detail.html')`` and have the
-above :setting:`TEMPLATE_DIRS` setting, here are the files Django will look for,
-in order:
+above :setting:`DIRS <TEMPLATES-DIRS>` option, here are the files Django will
+look for, in order:
 
 * ``/home/html/templates/lawrence.com/story_detail.html``
 * ``/home/html/templates/default/story_detail.html``
@@ -718,8 +727,8 @@ To load a template that's within a subdirectory, just use a slash, like so::
 
     get_template('news/story_detail.html')
 
-Using the same :setting:`TEMPLATE_DIRS` setting from above, this example
-``get_template()`` call will attempt to load the following templates:
+Using the same :setting:`DIRS <TEMPLATES-DIRS>` option from above, this
+example ``get_template()`` call will attempt to load the following templates:
 
 * ``/home/html/templates/lawrence.com/news/story_detail.html``
 * ``/home/html/templates/default/news/story_detail.html``
@@ -976,7 +985,7 @@ in :ref:`settings-without-django-settings-module`. Simply import the appropriate
 pieces of the templating system and then, *before* you call any of the
 templating functions, call :func:`django.conf.settings.configure()` with any
 settings you wish to specify. You might want to consider setting at least
-:setting:`TEMPLATE_DIRS` (if you're going to use template loaders),
+:setting:`DIRS <TEMPLATES-DIRS>` (if you're going to use template loaders),
 :setting:`DEFAULT_CHARSET` (although the default of ``utf-8`` is probably fine)
 and :setting:`TEMPLATE_DEBUG`. If you plan to use the :ttag:`url` template tag,
 you will also need to set the :setting:`ROOT_URLCONF` setting. All available

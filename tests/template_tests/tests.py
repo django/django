@@ -86,13 +86,11 @@ class TemplateLoaderTests(SimpleTestCase):
     # the compiled templates.
     @override_settings(TEMPLATE_DEBUG=True)
     def test_loader_debug_origin(self):
-        # We rely on the fact that runtests.py sets up TEMPLATE_DIRS to
-        # point to a directory containing a login.html file.
         load_name = 'login.html'
 
-        # We also rely on the fact the file system and app directories loaders
-        # both inherit the load_template method from the base Loader class, so
-        # we only need to test one of them.
+        # We rely on the fact the file system and app directories loaders both
+        # inherit the load_template method from the base Loader class, so we
+        # only need to test one of them.
         template = loader.get_template(load_name).template
         template_name = template.nodelist[0].source[0].name
         self.assertTrue(template_name.endswith(load_name),
@@ -111,7 +109,6 @@ class TemplateLoaderTests(SimpleTestCase):
     }])
     @override_settings(TEMPLATE_DEBUG=True)
     def test_cached_loader_debug_origin(self):
-        # Same comment as in test_loader_debug_origin.
         load_name = 'login.html'
 
         # Test the cached loader separately since it overrides load_template.

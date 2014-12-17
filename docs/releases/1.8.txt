@@ -1021,6 +1021,7 @@ As a consequence of the multiple template engines refactor, several settings
 are deprecated in favor of :setting:`TEMPLATES`:
 
 * ``ALLOWED_INCLUDE_ROOTS``
+* ``TEMPLATE_DIRS``
 * ``TEMPLATE_LOADERS``
 * ``TEMPLATE_STRING_IF_INVALID``
 
@@ -1249,7 +1250,7 @@ templates through the ``context`` dict.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following functions will no longer accept a ``dirs`` parameter to override
-:setting:`TEMPLATE_DIRS` in Django 2.0:
+``TEMPLATE_DIRS`` in Django 2.0:
 
 * :func:`django.template.loader.get_template()`
 * :func:`django.template.loader.select_template()`

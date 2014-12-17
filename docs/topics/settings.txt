@@ -13,9 +13,9 @@ A settings file is just a Python module with module-level variables.
 
 Here are a couple of example settings::
 
+    ALLOWED_HOSTS = ['www.example.com']
     DEBUG = False
     DEFAULT_FROM_EMAIL = 'webmaster@example.com'
-    TEMPLATE_DIRS = ('/home/templates/mike', '/home/templates/john')
 
 .. note::
 
@@ -188,8 +188,7 @@ Example::
 
     from django.conf import settings
 
-    settings.configure(DEBUG=True, TEMPLATE_DEBUG=True,
-        TEMPLATE_DIRS=('/home/web-apps/myapp', '/home/web-apps/base'))
+    settings.configure(DEBUG=True, TEMPLATE_DEBUG=True)
 
 Pass ``configure()`` as many keyword arguments as you'd like, with each keyword
 argument representing a setting and its value. Each argument name should be all

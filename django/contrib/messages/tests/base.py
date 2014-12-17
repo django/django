@@ -2,7 +2,6 @@ from unittest import skipUnless
 
 from django import http
 from django.apps import apps
-from django.conf import global_settings
 from django.contrib.messages import constants, utils, get_level, set_level
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
@@ -58,8 +57,17 @@ class BaseTests(object):
 
     def setUp(self):
         self.settings_override = override_settings_tags(
-            TEMPLATE_DIRS=(),
-            TEMPLATE_CONTEXT_PROCESSORS=global_settings.TEMPLATE_CONTEXT_PROCESSORS,
+            TEMPLATES=[{
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'DIRS': [],
+                'APP_DIRS': True,
+                'OPTIONS': {
+                    'context_processors': (
+                        'django.contrib.auth.context_processors.auth',
+                        'django.contrib.messages.context_processors.messages',
+                    ),
+                },
+            }],
             ROOT_URLCONF='django.contrib.messages.tests.urls',
             MESSAGE_TAGS='',
             MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__,
@@ -219,9 +227,15 @@ class BaseTests(object):
     @modify_settings(
         INSTALLED_APPS={'remove': 'django.contrib.messages'},
         MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
-        TEMPLATE_CONTEXT_PROCESSORS={'remove': 'django.contrib.messages.context_processors.messages'},
     )
-    @override_settings(MESSAGE_LEVEL=constants.DEBUG)
+    @override_settings(
+        MESSAGE_LEVEL=constants.DEBUG,
+        TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'APP_DIRS': True,
+        }],
+    )
     def test_middleware_disabled(self):
         """
         Tests that, when the middleware is disabled, an exception is raised
@@ -239,7 +253,13 @@ class BaseTests(object):
     @modify_settings(
         INSTALLED_APPS={'remove': 'django.contrib.messages'},
         MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
-        TEMPLATE_CONTEXT_PROCESSORS={'remove': 'django.contrib.messages.context_processors.messages'},
+    )
+    @override_settings(
+        TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'APP_DIRS': True,
+        }],
     )
     def test_middleware_disabled_fail_silently(self):
         """
