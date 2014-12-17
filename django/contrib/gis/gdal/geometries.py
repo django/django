@@ -46,7 +46,7 @@ from ctypes import byref, string_at, c_char_p, c_double, c_ubyte, c_void_p
 # Getting GDAL prerequisites
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
+from django.contrib.gis.gdal.error import GDALException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
 from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
 
@@ -110,12 +110,12 @@ class OGRGeometry(GDALBase):
             # OGR pointer (c_void_p) was the input.
             g = geom_input
         else:
-            raise OGRException('Invalid input type for OGR Geometry construction: %s' % type(geom_input))
+            raise GDALException('Invalid input type for OGR Geometry construction: %s' % type(geom_input))
 
         # Now checking the Geometry pointer before finishing initialization
         # by setting the pointer for the object.
         if not g:
-            raise OGRException('Cannot create OGR Geometry from input: %s' % str(geom_input))
+            raise GDALException('Cannot create OGR Geometry from input: %s' % str(geom_input))
         self.ptr = g
 
         # Assigning the SpatialReference object to the geometry, if valid.
@@ -143,7 +143,7 @@ class OGRGeometry(GDALBase):
         wkb, srs = state
         ptr = capi.from_wkb(wkb, None, byref(c_void_p()), len(wkb))
         if not ptr:
-            raise OGRException('Invalid OGRGeometry loaded from pickled state.')
+            raise GDALException('Invalid OGRGeometry loaded from pickled state.')
         self.ptr = ptr
         self.srs = srs
 
@@ -666,7 +666,7 @@ class GeometryCollection(OGRGeometry):
             tmp = OGRGeometry(geom)
             capi.add_geom(self.ptr, tmp.ptr)
         else:
-            raise OGRException('Must add an OGRGeometry.')
+            raise GDALException('Must add an OGRGeometry.')
 
     @property
     def point_count(self):

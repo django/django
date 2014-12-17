@@ -12,7 +12,7 @@ from django.contrib.gis.geometry.test_data import TEST_DATA
 from django.utils.six import StringIO
 
 if HAS_GDAL:
-    from django.contrib.gis.gdal import Driver, OGRException
+    from django.contrib.gis.gdal import Driver, GDALException
     from django.contrib.gis.utils.ogrinspect import ogrinspect
 
     from .models import AllOGRFields
@@ -94,7 +94,7 @@ class OGRInspectTest(TestCase):
             model_def = ogrinspect(ogr_db, 'Measurement',
                                    layer_key=AllOGRFields._meta.db_table,
                                    decimal=['f_decimal'])
-        except OGRException:
+        except GDALException:
             self.skipTest("Unable to setup an OGR connection to your database")
 
         self.assertTrue(model_def.startswith(
