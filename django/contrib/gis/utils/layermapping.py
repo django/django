@@ -12,7 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, router
 from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.gdal import (CoordTransform, DataSource,
-    OGRException, OGRGeometry, OGRGeomType, SpatialReference)
+    GDALException, OGRGeometry, OGRGeomType, SpatialReference)
 from django.contrib.gis.gdal.field import (
     OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime)
 from django.db import models, transaction
@@ -207,7 +207,7 @@ class LayerMapping(object):
                         gtype = OGRGeomType(ogr_name + '25D')
                     else:
                         gtype = OGRGeomType(ogr_name)
-                except OGRException:
+                except GDALException:
                     raise LayerMapError('Invalid mapping for GeometryField "%s".' % field_name)
 
                 # Making sure that the OGR Layer's Geometry is compatible.
@@ -304,7 +304,7 @@ class LayerMapping(object):
                 # Verify OGR geometry.
                 try:
                     val = self.verify_geom(feat.geom, model_field)
-                except OGRException:
+                except GDALException:
                     raise LayerMapError('Could not retrieve geometry from feature.')
             elif isinstance(model_field, models.base.ModelBase):
                 # The related _model_, not a field was passed in -- indicating
