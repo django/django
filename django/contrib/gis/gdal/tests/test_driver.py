@@ -11,7 +11,7 @@ valid_drivers = (
     'ESRI Shapefile', 'MapInfo File', 'TIGER', 'S57', 'DGN', 'Memory', 'CSV',
     'GML', 'KML',
     # raster
-    'GTiff', 'JPEG', 'netCDF', 'MEM', 'PNG',
+    'GTiff', 'JPEG', 'MEM', 'PNG',
 )
 
 invalid_drivers = ('Foo baz', 'clucka', 'ESRI Shp', 'ESRI rast')
