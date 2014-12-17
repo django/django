@@ -146,3 +146,7 @@ Bugfixes
 
 * Fixed migration crash when adding ``order_with_respect_to`` to a table
   with existing rows (:ticket:`23983`).
+
+* Ensured the apps registry is fully populated when unpickling models. When an
+  external script (like a queueing infrastructure) reloads pickled models, it
+  could crash with an ``AppRegistryNotReady`` exception (:ticket:`24007`).

@@ -75,7 +75,7 @@ print(article.headline)"""
         a = Article.objects.create(
             headline="Some object",
             pub_date=datetime.datetime.now(),
-            article_text="This is an article"
+            article_text="This is an article",
         )
 
         with tempfile.NamedTemporaryFile(mode='w+', suffix=".py", dir='.', delete=True) as script:
