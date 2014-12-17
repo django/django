@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 import os
+from multiprocessing import Process
 
 from django.utils import html
 from django.utils._os import upath
@@ -97,12 +98,29 @@ class TestUtilsHtml(TestCase):
             path = os.path.join(os.path.dirname(upath(__file__)), 'files', filename)
             with open(path, 'r') as fp:
                 content = force_text(fp.read())
-                start = datetime.now()
-                stripped = html.strip_tags(content)
-                elapsed = datetime.now() - start
+            start = datetime.now()
+            stripped = html.strip_tags(content)
+            elapsed = datetime.now() - start
             self.assertEqual(elapsed.seconds, 0)
             self.assertIn("Please try again.", stripped)
             self.assertNotIn('<', stripped)
+
+        # Test for runaway execution reported in ticket #24001
+        filename = 'strip_tags2.html'
+        path = os.path.join(os.path.dirname(upath(__file__)), 'files', filename)
+        with open(path, 'r') as fp:
+            content = force_text(fp.read())
+
+        # Create a child process to run the html.strip_tags function
+        p = Process(target=html.strip_tags, args=(content,))
+        p.start()
+        p.join(1)
+
+        # If child process is still alive after join returns, it must have hit the timeout
+        # This is needed to avoid the halting problem
+        if p.is_alive():
+            p.terminate()
+            self.assertEqual(0, 1)
 
     def test_strip_spaces_between_tags(self):
         f = html.strip_spaces_between_tags
