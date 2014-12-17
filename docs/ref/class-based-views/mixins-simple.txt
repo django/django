@@ -61,11 +61,10 @@ TemplateResponseMixin
         .. versionchanged:: 1.8
 
             In older versions of Django, ``TemplateResponse`` used
-            :class:`~django.template.RequestContext` in such a way that
-            callables defined in :setting:`TEMPLATE_CONTEXT_PROCESSORS` would
-            override template variables defined in your views. For example, if
-            you subclassed :class:`DetailView
-            <django.views.generic.detail.DetailView>` and
+            :class:`~django.template.RequestContext` in such a way that values
+            from template context processors would override template variables
+            defined in your views. For example, if you subclassed
+            :class:`DetailView <django.views.generic.detail.DetailView>` and
             set ``context_object_name`` to ``user``, the
             ``django.contrib.auth.context_processors.auth`` context processor
             would overwrite your variable with the current user. Now, for

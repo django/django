@@ -90,6 +90,7 @@ details on these changes.
 * The following settings will be removed:
 
   * ``ALLOWED_INCLUDE_ROOTS``
+  * ``TEMPLATE_CONTEXT_PROCESSORS``
   * ``TEMPLATE_DIRS``
   * ``TEMPLATE_LOADERS``
   * ``TEMPLATE_STRING_IF_INVALID``

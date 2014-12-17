@@ -6,7 +6,15 @@ from django.test import TestCase, override_settings
 
 @override_settings(
     ROOT_URLCONF='context_processors.urls',
-    TEMPLATE_CONTEXT_PROCESSORS=('django.template.context_processors.request',),
+    TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+            ],
+        },
+    }],
 )
 class RequestContextProcessorTests(TestCase):
     """
@@ -42,7 +50,15 @@ class RequestContextProcessorTests(TestCase):
     DEBUG=True,
     INTERNAL_IPS=('127.0.0.1',),
     ROOT_URLCONF='context_processors.urls',
-    TEMPLATE_CONTEXT_PROCESSORS=('django.template.context_processors.debug',),
+    TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+            ],
+        },
+    }],
 )
 class DebugContextProcessorTests(TestCase):
     """

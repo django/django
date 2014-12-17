@@ -446,27 +446,37 @@ normal ``django.template.Context``. The first difference is that it takes an
         'foo': 'bar',
     })
 
-The second difference is that it automatically populates the context with a few
-variables, according to your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+The second difference is that it automatically populates the context with a
+few variables, according to the ``'context_processors'`` option in the
+:setting:`TEMPLATES` setting.
 
-The :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting is a tuple of callables --
-called **context processors** -- that take a request object as their argument
-and return a dictionary of items to be merged into the context. By default,
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` is set to::
+The ``'context_processors'`` option is a list of callables -- called **context
+processors** -- that take a request object as their argument and return a
+dictionary of items to be merged into the context. In the default generated
+settings file, the default template engine contains the following context
+processors::
 
-    ("django.contrib.auth.context_processors.auth",
-    "django.template.context_processors.debug",
-    "django.template.context_processors.i18n",
-    "django.template.context_processors.media",
-    "django.template.context_processors.static",
-    "django.template.context_processors.tz",
-    "django.contrib.messages.context_processors.messages")
+    [
+        'django.contrib.auth.context_processors.auth',
+        'django.template.context_processors.debug',
+        'django.template.context_processors.i18n',
+        'django.template.context_processors.media',
+        'django.template.context_processors.static',
+        'django.template.context_processors.tz',
+        'django.contrib.messages.context_processors.messages',
+    ]
+
+.. versionchanged:: 1.8
+
+    Built-in template context processors were moved from
+    ``django.core.context_processors`` to
+    ``django.template.context_processors`` in Django 1.8.
 
 In addition to these, ``RequestContext`` always uses
 ``django.template.context_processors.csrf``.  This is a security
 related context processor required by the admin and other contrib apps, and,
 in case of accidental misconfiguration, it is deliberately hardcoded in and
-cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+cannot be turned off in the ``'context_processors'`` option.
 
 Each processor is applied in order. That means, if one processor adds a
 variable to the context and a second processor adds a variable with the same
@@ -513,8 +523,8 @@ Here's what each of the default processors does:
 django.contrib.auth.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these variables:
+If this processor is enabled, every ``RequestContext`` will contain these
+variables:
 
 * ``user`` -- An ``auth.User`` instance representing the currently
   logged-in user (or an ``AnonymousUser`` instance, if the client isn't
@@ -529,10 +539,10 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 django.template.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these two variables -- but only if your
-:setting:`DEBUG` setting is set to ``True`` and the request's IP address
-(``request.META['REMOTE_ADDR']``) is in the :setting:`INTERNAL_IPS` setting:
+If this processor is enabled, every ``RequestContext`` will contain these two
+variables -- but only if your :setting:`DEBUG` setting is set to ``True`` and
+the request's IP address (``request.META['REMOTE_ADDR']``) is in the
+:setting:`INTERNAL_IPS` setting:
 
 * ``debug`` -- ``True``. You can use this in templates to test whether
   you're in :setting:`DEBUG` mode.
@@ -544,8 +554,8 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 django.template.context_processors.i18n
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these two variables:
+If this processor is enabled, every ``RequestContext`` will contain these two
+variables:
 
 * ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
 * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
@@ -556,18 +566,16 @@ See :doc:`/topics/i18n/index` for more.
 django.template.context_processors.media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
-value of the :setting:`MEDIA_URL` setting.
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``MEDIA_URL``, providing the value of the :setting:`MEDIA_URL` setting.
 
 django.template.context_processors.static
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: static
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a variable ``STATIC_URL``, providing the
-value of the :setting:`STATIC_URL` setting.
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``STATIC_URL``, providing the value of the :setting:`STATIC_URL` setting.
 
 django.template.context_processors.csrf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -579,16 +587,15 @@ tag for protection against :doc:`Cross Site Request Forgeries
 django.template.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a variable ``request``, which is the current
-:class:`~django.http.HttpRequest`. Note that this processor is not enabled by default;
-you'll have to activate it.
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``request``, which is the current :class:`~django.http.HttpRequest`. Note that
+this processor is not enabled by default; you'll have to activate it.
 
 django.contrib.messages.context_processors.messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these two variables:
+If this processor is enabled, every ``RequestContext`` will contain these two
+variables:
 
 * ``messages`` -- A list of messages (as strings) that have been set
   via the :doc:`messages framework </ref/contrib/messages>`.
@@ -607,9 +614,9 @@ that takes one argument, an :class:`~django.http.HttpRequest` object, and
 returns a dictionary that gets added to the template context. Each context
 processor *must* return a dictionary.
 
-Custom context processors can live anywhere in your code base. All Django cares
-about is that your custom context processors are pointed-to by your
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+Custom context processors can live anywhere in your code base. All Django
+cares about is that your custom context processors are pointed to by the
+``'context_processors'`` option in your :setting:`TEMPLATES` setting.
 
 Loading templates
 -----------------

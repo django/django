@@ -187,7 +187,7 @@ class RenderContext(BaseContext):
 class RequestContext(Context):
     """
     This subclass of template.Context automatically populates itself using
-    the processors defined in TEMPLATE_CONTEXT_PROCESSORS.
+    the processors defined in the engine's configuration.
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
