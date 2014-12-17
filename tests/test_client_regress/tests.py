@@ -25,10 +25,7 @@ from .models import CustomUser
 from .views import CustomTestException
 
 
-@override_settings(
-    TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),),
-    ROOT_URLCONF='test_client_regress.urls',
-)
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class AssertContainsTests(TestCase):
 
     def test_contains(self):
@@ -911,9 +908,10 @@ class ExceptionTests(TestCase):
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class TemplateExceptionTests(TestCase):
 
-    @override_settings(
-        TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'bad_templates'),)
-    )
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'bad_templates')],
+    }])
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"
         try:

@@ -853,7 +853,7 @@ Templates
   rendering of a template.
 
 * The following functions now accept a ``dirs`` parameter which is a list or
-  tuple to override :setting:`TEMPLATE_DIRS`:
+  tuple to override ``TEMPLATE_DIRS``:
 
   * :func:`django.template.loader.get_template()`
   * :func:`django.template.loader.select_template()`

@@ -208,10 +208,13 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         self.assertEqual(unpickled_response.cookies['key'].value, 'value')
 
 
-@override_settings(
-    TEMPLATE_CONTEXT_PROCESSORS=[test_processor_name],
-    TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates')),
-)
+@override_settings(TEMPLATES=[{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+    'OPTIONS': {
+        'context_processors': [test_processor_name],
+    },
+}])
 class TemplateResponseTest(SimpleTestCase):
 
     def setUp(self):

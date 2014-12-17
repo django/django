@@ -145,7 +145,10 @@ class DebugViewTests(TestCase):
         with NamedTemporaryFile(prefix=template_name) as tempfile:
             tempdir = os.path.dirname(tempfile.name)
             template_path = os.path.join(tempdir, template_name)
-            with override_settings(TEMPLATE_DIRS=(tempdir,)):
+            with override_settings(TEMPLATES=[{
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'DIRS': [tempdir],
+            }]):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
             self.assertContains(response, "%s (File does not exist)" % template_path, status_code=500, count=1)
 
@@ -157,7 +160,10 @@ class DebugViewTests(TestCase):
             tempdir = os.path.dirname(tempfile.name)
             template_path = os.path.join(tempdir, template_name)
             os.chmod(template_path, 0o0222)
-            with override_settings(TEMPLATE_DIRS=(tempdir,)):
+            with override_settings(TEMPLATES=[{
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'DIRS': [tempdir],
+            }]):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
             self.assertContains(response, "%s (File is not readable)" % template_path, status_code=500, count=1)
 
@@ -167,7 +173,10 @@ class DebugViewTests(TestCase):
             template_path = mkdtemp()
             template_name = os.path.basename(template_path)
             tempdir = os.path.dirname(template_path)
-            with override_settings(TEMPLATE_DIRS=(tempdir,)):
+            with override_settings(TEMPLATES=[{
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'DIRS': [tempdir],
+            }]):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
             self.assertContains(response, "%s (Not a file)" % template_path, status_code=500, count=1)
         finally:

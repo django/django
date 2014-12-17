@@ -2422,6 +2422,11 @@ TEMPLATE_DIRS
 
 Default: ``()`` (Empty tuple)
 
+.. deprecated:: 1.8
+
+    Set the :setting:`DIRS <TEMPLATES-DIRS>` option of a ``DjangoTemplates``
+    backend instead.
+
 List of locations of the template source files searched by
 :class:`django.template.loaders.filesystem.Loader`, in search order.
 

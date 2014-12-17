@@ -39,9 +39,10 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % self.base_url
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
-    @override_settings(
-        TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
-    )
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+    }])
     def test_simple_sitemap_custom_index(self):
         "A simple sitemap index can be rendered with a custom template"
         with warnings.catch_warnings():
@@ -81,9 +82,10 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
-    @override_settings(
-        TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
-    )
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+    }])
     def test_simple_custom_sitemap(self):
         "A simple sitemap can be rendered with a custom template"
         response = self.client.get('/simple/custom-sitemap.xml')
