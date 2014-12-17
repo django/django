@@ -50,10 +50,10 @@ To take advantage of CSRF protection in your views, follow these steps:
    being used. Usually, this can be done in one of two ways:
 
    1. Use RequestContext, which always uses
-      ``'django.template.context_processors.csrf'`` (no matter what your
-      TEMPLATE_CONTEXT_PROCESSORS setting).  If you are using
-      generic views or contrib apps, you are covered already, since these
-      apps use RequestContext throughout.
+      ``'django.template.context_processors.csrf'`` (no matter what template
+      context processors are configured in the :setting:`TEMPLATES` setting).
+      If you are using generic views or contrib apps, you are covered already,
+      since these apps use RequestContext throughout.
 
    2. Manually import and use the processor to generate the CSRF token and
       add it to the template context. e.g.::

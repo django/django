@@ -1021,6 +1021,7 @@ As a consequence of the multiple template engines refactor, several settings
 are deprecated in favor of :setting:`TEMPLATES`:
 
 * ``ALLOWED_INCLUDE_ROOTS``
+* ``TEMPLATE_CONTEXT_PROCESSORS``
 * ``TEMPLATE_DIRS``
 * ``TEMPLATE_LOADERS``
 * ``TEMPLATE_STRING_IF_INVALID``

@@ -10,8 +10,8 @@ Settings
 
     Be careful when you override settings, especially when the default value
     is a non-empty tuple or dictionary, such as :setting:`MIDDLEWARE_CLASSES`
-    and :setting:`TEMPLATE_CONTEXT_PROCESSORS`. Make sure you keep the
-    components required by the features of Django you wish to use.
+    and :setting:`STATICFILES_FINDERS`. Make sure you keep the components
+    required by the features of Django you wish to use.
 
 Core settings
 =============
@@ -1868,9 +1868,9 @@ to a non-empty value. You will need to :ref:`configure these files to be served
 <serving-uploaded-files-in-development>` in both development and production.
 
 In order to use ``{{ MEDIA_URL }}`` in your templates, you must have
-``'django.template.context_processors.media'`` in your
-:setting:`TEMPLATE_CONTEXT_PROCESSORS`. It's there by default, but be sure
-to include it if you override that setting and want this behavior.
+``'django.template.context_processors.media'`` in the ``'context_processors'``
+option of :setting:`TEMPLATES`. It's there by default, but be sure to include
+it if you override that setting and want this behavior.
 
 Example: ``"http://media.example.com/"``
 
@@ -2394,9 +2394,20 @@ Default::
     "django.template.context_processors.tz",
     "django.contrib.messages.context_processors.messages")
 
+.. deprecated:: 1.8
+
+    Set the ``'context_processors'`` option in the :setting:`OPTIONS
+    <TEMPLATES-OPTIONS>` of a ``DjangoTemplates`` backend instead.
+
 A tuple of callables that are used to populate the context in ``RequestContext``.
 These callables take a request object as their argument and return a dictionary
 of items to be merged into the context.
+
+.. versionchanged:: 1.8
+
+    Built-in template context processors were moved from
+    ``django.core.context_processors`` to
+    ``django.template.context_processors`` in Django 1.8.
 
 .. setting:: TEMPLATE_DEBUG
 

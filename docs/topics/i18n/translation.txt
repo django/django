@@ -29,7 +29,7 @@ use internationalization, you should take the two seconds to set
 :setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
 make some optimizations so as not to load the internationalization machinery.
 You'll probably also want to remove ``'django.template.context_processors.i18n'``
-from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+from the ``'context_processors'`` option of your :setting:`TEMPLATES` setting.
 
 .. note::
 
@@ -1506,8 +1506,8 @@ As a convenience, Django comes with a view, :func:`django.views.i18n.set_languag
 that sets a user's language preference and redirects to a given URL or, by default,
 back to the previous page.
 
-Make sure that the following item is in your
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` list in your settings file::
+Make sure that the following context processor is enabled in the
+:setting:`TEMPLATES` setting in your settings file::
 
     'django.template.context_processors.i18n'
 
