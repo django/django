@@ -503,7 +503,7 @@ class Col(ExpressionNode):
         return self.__class__(relabels.get(self.alias, self.alias), self.target, self.output_field)
 
     def get_group_by_cols(self):
-        return [(self.alias, self.target.column)]
+        return [self]
 
 
 class Ref(ExpressionNode):
@@ -529,7 +529,7 @@ class Ref(ExpressionNode):
         return "%s" % compiler.quote_name_unless_alias(self.refs), []
 
     def get_group_by_cols(self):
-        return [(None, self.refs)]
+        return [self]
 
 
 class Date(ExpressionNode):
