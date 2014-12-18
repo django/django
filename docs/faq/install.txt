@@ -49,9 +49,9 @@ Django version Python versions
 **1.7, 1.8**   **2.7** and **3.2, 3.3, 3.4**
 ============== ===============
 
-For a given series of Python versions, only the latest release is officially
-supported. For instance, at the time of writing (August 1st, 2014), the latest
-release in the 2.7 series is 2.7.8.
+For each version of Python, only the latest micro release (A.B.C) is officially
+supported. You can find the latest micro version for each series on the `Python
+download page <https://www.python.org/downloads/>`_.
 
 What Python version should I use with Django?
 ---------------------------------------------
