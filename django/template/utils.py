@@ -1,14 +1,14 @@
 from collections import Counter, OrderedDict
 import os
 import sys
-# import warnings
+import warnings
 
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache
 from django.utils import six
-# from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -32,12 +32,10 @@ class EngineHandler(object):
             self._templates = settings.TEMPLATES
 
         if not self._templates:
-            # TODO: re-enable this warning once the entire test suite has been
-            #       updated to rely on TEMPLATES instead of legacy settings.
-            # warnings.warn(
-            #     "You haven't defined a TEMPLATES setting. You must do so "
-            #     "before upgrading to Django 2.0. Otherwise Django will be "
-            #     "unable to load templates.", RemovedInDjango20Warning)
+            warnings.warn(
+                "You haven't defined a TEMPLATES setting. You must do so "
+                "before upgrading to Django 2.0. Otherwise Django will be "
+                "unable to load templates.", RemovedInDjango20Warning)
             self._templates = [
                 {
                     'BACKEND': 'django.template.backends.django.DjangoTemplates',
