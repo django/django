@@ -598,6 +598,13 @@ class SQLCompiler(object):
         (for example, cur_depth=1 means we are looking at models with direct
         connections to the root model).
         """
+        def _get_choices():
+            direct_choices = [f.name for (f, _) in opts.get_fields_with_model() if f.rel]
+            reverse_choices = [f.field.related_query_name()
+                               for f in opts.get_all_related_objects()
+                               if f.field.unique]
+            return direct_choices + reverse_choices
+
         if not restricted and self.query.max_depth and cur_depth > self.query.max_depth:
             # We've recursed far enough; bail out.
             return
@@ -627,7 +634,8 @@ class SQLCompiler(object):
                     # If a non-related field is used like a relation,
                     # or if a single non-relational field is given.
                     if next or (cur_depth == 1 and f.name in requested):
-                        raise FieldError("Non-relational field given in select_related: '%s'" % f.name)
+                        raise FieldError("Non-relational field given in select_related: '%s'. "
+                                         "Choices are: %s" % (f.name, ", ".join(_get_choices())))
             else:
                 next = False
 
@@ -678,9 +686,11 @@ class SQLCompiler(object):
 
             fields_not_found = set(requested.keys()).difference(fields_found)
             if fields_not_found:
-                field_descriptions = ["'%s'" % s for s in fields_not_found]
-                raise FieldError('Invalid field name(s) given in select_related: %s' %
-                                 (', '.join(field_descriptions)))
+                invalid_fields = ["'%s'" % s for s in fields_not_found]
+
+                raise FieldError('Invalid field name(s) given in select_related: %s. '
+                                 'Choices are: %s' %
+                                 (', '.join(invalid_fields), ', '.join(_get_choices())))
 
     def deferred_to_columns(self):
         """
