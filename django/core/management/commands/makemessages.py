@@ -310,9 +310,9 @@ class Command(BaseCommand):
     @cached_property
     def gettext_version(self):
         out, err, status = popen_wrapper(['xgettext', '--version'])
-        m = re.search(r'(\d)\.(\d+)\.(\d+)', out)
+        m = re.search(r'(\d)\.(\d+)\.?(\d+)?', out)
         if m:
-            return tuple(int(d) for d in m.groups())
+            return tuple(int(d) for d in m.groups() if d is not None)
         else:
             raise CommandError("Unable to get gettext version. Is it installed?")
 
