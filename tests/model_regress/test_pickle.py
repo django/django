@@ -83,7 +83,10 @@ print(article.headline)"""
             script.write(script_template % pickle.dumps(a))
             script.flush()
             try:
-                result = subprocess.check_output([sys.executable, script.name])
+                result = subprocess.check_output(
+                    [sys.executable, script.name],
+                    env={'PYTHONPATH': ':'.join(sys.path)}
+                )
             except subprocess.CalledProcessError:
                 self.fail("Unable to reload model pickled data")
         self.assertEqual(result.strip().decode(), "Some object")
