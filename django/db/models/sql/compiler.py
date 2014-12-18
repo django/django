@@ -583,10 +583,11 @@ class SQLCompiler(object):
             for annotation in self.query.annotation_select.values():
                 cols = annotation.get_group_by_cols()
                 for col in cols:
-                    sql = '%s.%s' % (qn(col[0]), qn(col[1]))
-                    if sql not in seen:
+                    sql, col_params = self.compile(col)
+                    if sql not in seen or col_params:
                         result.append(sql)
                         seen.add(sql)
+                        params.extend(col_params)
 
         return result, params
 
