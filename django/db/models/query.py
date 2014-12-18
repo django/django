@@ -224,6 +224,26 @@ class QuerySet(object):
         combined.query.combine(other.query, sql.OR)
         return combined
 
+    def _populate_load_fields(self, master_model, only_load):
+        """
+        If only/defer clauses have been specified,
+        build the list of fields that are to be loaded.
+        """
+        load_fields = []
+        for field, model in master_model._meta.get_concrete_fields_with_model():
+            if model is None:
+                model = master_model
+            try:
+                if field.name in only_load[model]:
+                    # Add a field that has been explicitly included
+                    load_fields.append(field.name)
+            except KeyError:
+                # Model wasn't explicitly listed in the only_load table
+                # Therefore, we need to load all fields from this model
+                load_fields.append(field.name)
+
+        return load_fields
+
     ####################################
     # METHODS THAT DO DATABASE QUERIES #
     ####################################
@@ -249,20 +269,19 @@ class QuerySet(object):
         fields = self.model._meta.concrete_fields
 
         load_fields = []
-        # If only/defer clauses have been specified,
-        # build the list of fields that are to be loaded.
         if only_load:
-            for field, model in self.model._meta.get_concrete_fields_with_model():
-                if model is None:
-                    model = self.model
-                try:
-                    if field.name in only_load[model]:
-                        # Add a field that has been explicitly included
-                        load_fields.append(field.name)
-                except KeyError:
-                    # Model wasn't explicitly listed in the only_load table
-                    # Therefore, we need to load all fields from this model
-                    load_fields.append(field.name)
+            load_fields = self._populate_load_fields(self.model, only_load)
+            if requested:
+                for field in requested:
+                    model = self.model._meta.get_field_by_name(field)[0].model
+                    if model is self.model:
+                        continue
+                    for load_field in self._populate_load_fields(model, only_load):
+                        if load_field not in load_fields:
+                            load_fields.append(load_field)
+                            if model not in only_load:
+                                only_load[model] = set()
+                            only_load[model].add(load_field)
 
         skip = None
         if load_fields:
@@ -1340,7 +1359,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
                 init_list.append(field.attname)
         # Retrieve all the requested fields
         field_count = len(init_list)
-        if skip:
+        if skip or (from_parent and from_parent._deferred):
             klass = deferred_class_factory(klass, skip)
             field_names = init_list
         else:
@@ -1380,17 +1399,26 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
             related_fields.append((f, klass_info))
 
     reverse_related_fields = []
+    model = klass._meta.proxy_for_model if klass._meta.proxy else klass
     if restricted:
-        for o in klass._meta.get_all_related_objects():
+        for o in model._meta.get_all_related_objects():
             if o.field.unique and select_related_descend(o.field, restricted, requested,
                                                          only_load.get(o.model), reverse=True):
                 next = requested[o.field.related_query_name()]
-                parent = klass if issubclass(o.model, klass) else None
+                parent = klass if issubclass(o.model, model) else None
                 klass_info = get_klass_info(o.model, max_depth=max_depth, cur_depth=cur_depth + 1,
                                             requested=next, only_load=only_load, from_parent=parent)
                 reverse_related_fields.append((o.field, klass_info))
     if field_names:
-        pk_idx = field_names.index(klass._meta.pk.attname)
+        try:
+            pk_idx = field_names.index(klass._meta.pk.attname)
+        except ValueError:
+            field_names = [klass._meta.pk.attname]
+            for field in klass._meta.fields:
+                if issubclass(field.model, model) and field.attname != klass._meta.pk.attname:
+                    field_names.append(field.attname)
+            pk_idx = field_names.index(klass._meta.pk.attname)
+            field_count = len(field_names)
     else:
         pk_idx = klass._meta.pk_index()
 
@@ -1486,7 +1514,8 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
         # Transfer data from this object to childs.
         parent_data = []
         for rel_field, rel_model in klass_info[0]._meta.get_fields_with_model():
-            if rel_model is not None and isinstance(obj, rel_model):
+            if (rel_model is not None and isinstance(obj, rel_model)
+                    and rel_field.attname in obj.__dict__):
                 parent_data.append((rel_field, getattr(obj, rel_field.attname)))
         # Recursively retrieve the data for the related object
         cached_row = get_cached_row(row, index_end, using, klass_info,
