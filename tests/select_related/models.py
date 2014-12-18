@@ -120,7 +120,7 @@ class Pizza(models.Model):
 class TaggedItem(models.Model):
     tag = models.CharField(max_length=30)
 
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, related_name='select_related_tagged_items')
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
