@@ -50,8 +50,8 @@ Django version Python versions
 ============== ===============
 
 For a given series of Python versions, only the latest release is officially
-supported. For instance, at the time of writing (August 1st, 2014), the latest
-release in the 2.7 series is 2.7.8.
+supported. For instance, at the time of writing (December 17th, 2014), the
+latest release in the 2.7 series is 2.7.9.
 
 What Python version should I use with Django?
 ---------------------------------------------
