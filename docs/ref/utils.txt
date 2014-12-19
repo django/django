@@ -861,7 +861,7 @@ appropriate entities.
     ``"joel-is-a-slug"``.
 
     You can set the ``unicode`` parameter to ``True``, if you want to support
-    Unicode characters::
+    unicode characters::
 
         slugify(value, unicode=True)
 

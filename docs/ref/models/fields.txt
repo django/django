@@ -962,12 +962,11 @@ of some other value.  You can do this automatically in the admin using
 
 .. attribute:: SlugField.unicode
 
-    Allows the field to accept unicode letters. Accepted values are ``False``
-    (default) or ``True``.
+    If ``True``, the field accepts unicode letters. Defaults to ``False``.
 
 .. versionchanged:: 1.8
 
-    ``unicode`` parameter was added.
+    The ``unicode`` parameter was added.
 
 ``SmallIntegerField``
 ---------------------
