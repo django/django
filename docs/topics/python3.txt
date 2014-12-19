@@ -42,7 +42,7 @@ developers are used to dealing with such constraints.
 Porting tools provided by Django are inspired by this philosophy, and it's
 reflected throughout this guide.
 
-.. _Python's official porting guide: http://docs.python.org/3/howto/pyporting.html
+.. _Python's official porting guide: https://docs.python.org/3/howto/pyporting.html
 .. _Pragmatic Unicode: http://nedbatchelder.com/text/unipain.html
 
 Porting tips
@@ -401,6 +401,6 @@ extras.
     ``testcase.assertRegex`` on Python 3. ``assertRegexpMatches`` still
     exists in current Python 3 versions, but issues a warning.
 
-.. _unicode: http://docs.python.org/2/library/functions.html#unicode
+.. _unicode: https://docs.python.org/2/library/functions.html#unicode
 .. _ __unicode__(): https://docs.python.org/2/reference/datamodel.html#object.__unicode__
-.. _basestring: http://docs.python.org/2/library/functions.html#basestring
+.. _basestring: https://docs.python.org/2/library/functions.html#basestring

@@ -80,7 +80,7 @@ You could also replace the Django WSGI application with a custom WSGI
 application that later delegates to the Django WSGI application, if you want
 to combine a Django application with a WSGI application of another framework.
 
-.. _`WSGI middleware`: http://www.python.org/dev/peps/pep-3333/#middleware-components-that-play-both-sides
+.. _`WSGI middleware`: https://www.python.org/dev/peps/pep-3333/#middleware-components-that-play-both-sides
 
 .. note::
 

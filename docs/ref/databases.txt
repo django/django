@@ -223,10 +223,8 @@ running ``migrate``::
 MySQL DB API Drivers
 --------------------
 
-The Python Database API is described in `PEP 249`_. MySQL has three prominent
+The Python Database API is described in :pep:`249`. MySQL has three prominent
 drivers that implement this API:
-
-.. _PEP 249: http://www.python.org/dev/peps/pep-0249/
 
 - `MySQLdb`_ is a native driver that has been developed and supported for over
   a decade by Andy Dustman.

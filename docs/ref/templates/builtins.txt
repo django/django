@@ -2071,7 +2071,7 @@ Formats the variable according to the argument, a string formatting specifier.
 This specifier uses Python string formatting syntax, with the exception that
 the leading "%" is dropped.
 
-See http://docs.python.org/library/stdtypes.html#string-formatting-operations
+See https://docs.python.org/library/stdtypes.html#string-formatting-operations
 for documentation of Python string formatting
 
 For example::

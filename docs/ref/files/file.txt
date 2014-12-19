@@ -60,7 +60,7 @@ The ``File`` Class
             ``'\n'``, the Windows convention ``'\r\n'``, and the old Macintosh
             convention ``'\r'``.
 
-            .. _universal newlines: http://www.python.org/dev/peps/pep-0278
+            .. _universal newlines: https://www.python.org/dev/peps/pep-0278
 
     .. method:: chunks([chunk_size=None])
 

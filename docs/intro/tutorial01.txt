@@ -116,7 +116,7 @@ These files are:
 * :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
 
-.. _more about packages: http://docs.python.org/tutorial/modules.html#packages
+.. _more about packages: https://docs.python.org/tutorial/modules.html#packages
 
 Database setup
 --------------
@@ -396,7 +396,7 @@ Finally, note a relationship is defined, using
 to a single ``Question``. Django supports all the common database relationships:
 many-to-one, many-to-many and one-to-one.
 
-.. _`Python path`: http://docs.python.org/tutorial/modules.html#the-module-search-path
+.. _`Python path`: https://docs.python.org/tutorial/modules.html#the-module-search-path
 
 Activating models
 =================

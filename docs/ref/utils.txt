@@ -677,7 +677,7 @@ escaping HTML.
     If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"``
     the return value will be ``"<B>Joel</B> <button>is</button> a slug"``.
 
-.. _str.format: http://docs.python.org/library/stdtypes.html#str.format
+.. _str.format: https://docs.python.org/library/stdtypes.html#str.format
 .. _bleach: https://pypi.python.org/pypi/bleach
 
 ``django.utils.http``
@@ -739,7 +739,7 @@ escaping HTML.
     Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
     smaller than `sys.maxint`_.
 
-    .. _sys.maxint: http://docs.python.org/2/library/sys.html#sys.maxint
+    .. _sys.maxint: https://docs.python.org/2/library/sys.html#sys.maxint
 
 .. function:: urlsafe_base64_encode(s)
 

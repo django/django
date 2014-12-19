@@ -17,7 +17,7 @@ those packages have.
     ``'django.contrib.redirects'``) to your :setting:`INSTALLED_APPS` setting
     and re-run ``manage.py migrate``.
 
-.. _"batteries included" philosophy: http://docs.python.org/tutorial/stdlib.html#batteries-included
+.. _"batteries included" philosophy: https://docs.python.org/tutorial/stdlib.html#batteries-included
 
 .. toctree::
    :maxdepth: 1

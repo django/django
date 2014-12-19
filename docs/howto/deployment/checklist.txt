@@ -253,4 +253,4 @@ drastically increase CPU usage by causing worst-case performance when
 creating ``dict`` instances. See `oCERT advisory #2011-003
 <http://www.ocert.org/advisories/ocert-2011-003.html>`_ for more information.
 
-.. _-r: http://docs.python.org/2.7/using/cmdline.html#cmdoption-R
+.. _-r: https://docs.python.org/using/cmdline.html#cmdoption-R

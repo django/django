@@ -206,7 +206,7 @@ the box.
     course, you can always dip into Django's implementation of the generic
     class based views for inspiration on how to tackle problems.)
 
-.. _method resolution order: http://www.python.org/download/releases/2.3/mro/
+.. _method resolution order: https://www.python.org/download/releases/2.3/mro/
 
 
 Using SingleObjectMixin with View

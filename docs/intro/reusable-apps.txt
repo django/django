@@ -34,7 +34,7 @@ projects and ready to publish for others to install and use.
 
 .. admonition:: Package? App?
 
-    A Python `package <http://docs.python.org/tutorial/modules.html#packages>`_
+    A Python `package <https://docs.python.org/tutorial/modules.html#packages>`_
     provides a way of grouping related Python code for easy reuse. A package
     contains one or more files of Python code (also known as "modules").
 
