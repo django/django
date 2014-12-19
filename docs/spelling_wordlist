@@ -497,6 +497,7 @@ queryset
 querysets
 Querysets
 querystring
+queueing
 Quickstart
 quoteless
 Radziej
@@ -689,6 +690,7 @@ unmigrated
 unparseable
 unpickle
 unpickled
+unpickling
 unpythonic
 unregistration
 unrendered
