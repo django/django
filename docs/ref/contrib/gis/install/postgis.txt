@@ -46,7 +46,7 @@ Finally, make and install::
     the section on :ref:`spatialdb_template91` or
     :ref:`spatialdb_template_earlier` for more information.
 
-__ http://postgis.refractions.net/
+__ http://postgis.net/
 
 Post-installation
 =================

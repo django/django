@@ -48,13 +48,13 @@ Journal-World`_ of Lawrence, Kansas, USA.
 .. _lawrence journal-world: http://ljworld.com/
 .. _adrian holovaty: http://holovaty.com/
 .. _everyblock: http://everyblock.com/
-.. _soundslice: http://www.soundslice.com/
+.. _soundslice: https://www.soundslice.com/
 .. _simon willison: http://simonwillison.net/
 .. _web-development blog: `simon willison`_
 .. _jacob kaplan-moss: http://jacobian.org/
 .. _revolution systems: http://revsys.com/
 .. _wilson miner: http://wilsonminer.com/
-.. _heroku: http://heroku.com/
+.. _heroku: https://heroku.com/
 .. _Rdio: http://rdio.com
 
 .. _core-team-list:
@@ -151,7 +151,7 @@ Karen Tracey
     .. _Bauhaus-University Weimar: http://www.uni-weimar.de/
     .. _virtualenv: http://www.virtualenv.org/
     .. _pip: http://www.pip-installer.org/
-    .. _Mozilla: http://www.mozilla.org/
+    .. _Mozilla: https://www.mozilla.org/
 
 `Andrew Godwin`_
     Andrew is a freelance Python developer and tinkerer, and has been
@@ -196,7 +196,7 @@ Ramiro Morales
     developers). He works remotely as a developer for `Lincoln Loop`_.
 
     .. _Chris Beaven: http://smileychris.com/
-    .. _Lincoln Loop: http://lincolnloop.com/
+    .. _Lincoln Loop: https://lincolnloop.com/
 
 Honza Král
     Honza first discovered Django in 2006 and started using it right away,
@@ -329,7 +329,7 @@ Jeremy Dunck
     and `shoutcaster`_ in the after-hours. Bryan lives in Los Angeles, CA, USA.
 
     .. _bryan veloso: http://avalonstar.com/
-    .. _vlogger: http://youtube.com/bryanveloso/
+    .. _vlogger: https://youtube.com/bryanveloso/
     .. _shoutcaster: http://twitch.tv/vlogalonstar/
 
 `Preston Holmes`_
@@ -405,7 +405,7 @@ Baptiste Mispelon
     Baptiste currently lives in Budapest, Hungary and works for `M2BPO`_,
     a small French company providing services to architects.
 
-    .. _M2BPO: http://www.m2bpo.fr
+    .. _M2BPO: https://www.m2bpo.fr
 
 Daniele Procida
     Daniele unexpectedly became a Django developer on 29th April 2009. Since
@@ -416,7 +416,7 @@ Daniele Procida
     He is the author of `Arkestra`_ and `Don't be afraid to commit`_. He lives
     in Cardiff, Wales, and works for `Divio`_.
 
-    .. _Divio: http://divio.ch/
+    .. _Divio: https://divio.ch/
     .. _Arkestra: http://arkestra-project.org/
     .. _Don\'t be afraid to commit: https://dont-be-afraid-to-commit.readthedocs.org
 
@@ -518,7 +518,7 @@ Robert Wittams
 
     Alex lives in San Francisco, CA, USA.
 
-    .. _Alex Gaynor: http://alexgaynor.net
+    .. _Alex Gaynor: https://alexgaynor.net
 
 `Simon Meers`_
     Simon discovered Django 0.96 during his Computer Science PhD research and
