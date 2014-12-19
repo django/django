@@ -35,6 +35,20 @@ def set_language(request):
     if request.method == 'POST':
         lang_code = request.POST.get('language', None)
         if lang_code and check_for_language(lang_code):
+            parsed = urlsplit(next)
+            try:
+                match = resolve(parsed.path)
+            except Resolver404:
+                pass
+            else:
+                activate(lang_code)
+                try:
+                    url = reverse("%s:%s" % (match.namespace, match.url_name) if match.namespace else match.url_name, args=match.args, kwargs=match.kwargs)
+                except NoReverseMatch:
+                    pass
+                else:
+                    next = urlunsplit((parsed.scheme, parsed.netloc, url, parsed.query, parsed.fragment))
+                    response = http.HttpResponseRedirect(next)
             if hasattr(request, 'session'):
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
             else:
