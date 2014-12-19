@@ -11,12 +11,12 @@ Bugfixes
 
 * Added backwards compatibility support for the :mod:`django.contrib.messages`
   cookie format of Django 1.4 and earlier to facilitate upgrading to 1.6 from
-  1.4 (`#22426 <http://code.djangoproject.com/ticket/22426>`_).
+  1.4 (:ticket:`22426`).
 
 * Restored the ability to :meth:`~django.core.urlresolvers.reverse` views
   created using :func:`functools.partial()`
-  (`#22486 <http://code.djangoproject.com/ticket/22486>`_).
+  (:ticket:`22486`).
 
 * Fixed the ``object_id`` of the ``LogEntry`` that's created after a user
   password change in the admin
-  (`#22515 <http://code.djangoproject.com/ticket/22515>`_).
+  (:ticket:`22515`).

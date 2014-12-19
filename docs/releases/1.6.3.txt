@@ -136,51 +136,50 @@ Other bugfixes and changes
 
 * Content retrieved from the GeoIP library is now properly decoded from its
   default ``iso-8859-1`` encoding
-  (`#21996 <http://code.djangoproject.com/ticket/21996>`_).
+  (:ticket:`21996`).
 
 * Fixed ``AttributeError`` when using
   :meth:`~django.db.models.query.QuerySet.bulk_create` with ``ForeignObject``
-  (`#21566 <http://code.djangoproject.com/ticket/21566>`_).
+  (:ticket:`21566`).
 
 * Fixed crash of ``QuerySet``\s that use ``F() + timedelta()`` when their query
   was compiled more once
-  (`#21643 <http://code.djangoproject.com/ticket/21643>`_).
+  (:ticket:`21643`).
 
 * Prevented custom ``widget`` class attribute of
   :class:`~django.forms.IntegerField` subclasses from being overwritten by the
   code in their ``__init__`` method
-  (`#22245 <http://code.djangoproject.com/ticket/22245>`_).
+  (:ticket:`22245`).
 
 * Improved :func:`~django.utils.html.strip_tags` accuracy (but it still cannot
   guarantee an HTML-safe result, as stated in the documentation).
 
 * Fixed a regression in the :mod:`django.contrib.gis` SQL compiler for
-  non-concrete fields (`#22250 <http://code.djangoproject.com/ticket/22250>`_).
+  non-concrete fields (:ticket:`22250`).
 
 * Fixed :attr:`ModelAdmin.preserve_filters
   <django.contrib.admin.ModelAdmin.preserve_filters>` when running a site with
-  a URL prefix (`#21795 <http://code.djangoproject.com/ticket/21795>`_).
+  a URL prefix (:ticket:`21795`).
 
 * Fixed a crash in the ``find_command`` management utility when the ``PATH``
   environment variable wasn't set
-  (`#22256 <http://code.djangoproject.com/ticket/22256>`_).
+  (:ticket:`22256`).
 
 * Fixed :djadmin:`changepassword` on Windows
-  (`#22364 <https://code.djangoproject.com/ticket/22364>`_).
+  (:ticket:`22364`).
 
 * Avoided shadowing deadlock exceptions on MySQL
-  (`#22291 <https://code.djangoproject.com/ticket/22291>`_).
+  (:ticket:`22291`).
 
 * Wrapped database exceptions in ``_set_autocommit``
-  (`#22321 <https://code.djangoproject.com/ticket/22321>`_).
+  (:ticket:`22321`).
 
 * Fixed atomicity when closing a database connection or when the database server
-  disconnects (`#21239 <https://code.djangoproject.com/ticket/21239>`_ and
-  `#21202 <https://code.djangoproject.com/ticket/21202>`_)
+  disconnects (:ticket:`21239` and :ticket:`21202`)
 
 * Fixed regression in ``prefetch_related`` that caused the related objects
   query to include an unnecessary join
-  (`#21760 <https://code.djangoproject.com/ticket/21760>`_).
+  (:ticket:`21760`).
 
 Additionally, Django's vendored version of six, :mod:`django.utils.six` has been
 upgraded to the latest release (1.6.1).

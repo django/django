@@ -10,7 +10,7 @@ Bugfixes
 ========
 
 * Allowed related many-to-many fields to be referenced in the admin
-  (`#23604 <http://code.djangoproject.com/ticket/23604>`_).
+  (:ticket:`23604`).
 
 * Allowed inline and hidden references to admin fields
-  (`#23431 <http://code.djangoproject.com/ticket/23431>`_).
+  (:ticket:`23431`).
