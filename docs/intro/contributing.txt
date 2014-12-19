@@ -287,7 +287,7 @@ correctly in a couple different situations.
       your teeth into, there's always the `Python unittest documentation`__.
 
 __ http://www.diveintopython.net/unit_testing/index.html
-__ http://docs.python.org/library/unittest.html
+__ https://docs.python.org/library/unittest.html
 
 Running your new test
 ---------------------

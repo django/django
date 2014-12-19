@@ -209,7 +209,7 @@ requested URL. (If none of them matches, Django calls a special-case 404 view.)
 This is blazingly fast, because the regular expressions are compiled at load
 time.
 
-.. _regular expressions: http://docs.python.org/2/howto/regex.html
+.. _regular expressions: https://docs.python.org/howto/regex.html
 
 Once one of the regexes matches, Django imports and calls the given view, which
 is a simple Python function. Each view gets passed a request object --

@@ -105,7 +105,7 @@ Django provides a single API to control database transactions.
     completes successfully, its effects can still be rolled back if an
     exception is raised in the outer block at a later point.
 
-    ``atomic`` is usable both as a `decorator`_::
+    ``atomic`` is usable both as a :py:term:`decorator`::
 
         from django.db import transaction
 
@@ -114,7 +114,7 @@ Django provides a single API to control database transactions.
             # This code executes inside a transaction.
             do_stuff()
 
-    and as a `context manager`_::
+    and as a :py:term:`context manager`::
 
         from django.db import transaction
 
@@ -125,9 +125,6 @@ Django provides a single API to control database transactions.
             with transaction.atomic():
                 # This code executes inside a transaction.
                 do_more_stuff()
-
-    .. _decorator: http://docs.python.org/glossary.html#term-decorator
-    .. _context manager: http://docs.python.org/glossary.html#term-context-manager
 
     Wrapping ``atomic`` in a try/except block allows for natural handling of
     integrity errors::

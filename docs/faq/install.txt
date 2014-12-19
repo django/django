@@ -31,7 +31,7 @@ If you want to use Django with a database, which is probably the case, you'll
 also need a database engine. PostgreSQL_ is recommended, because we're
 PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 
-.. _Python: http://www.python.org/
+.. _Python: https://www.python.org/
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/

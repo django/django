@@ -1001,7 +1001,7 @@ precedence and will be applied instead.
 
 See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
-.. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
+.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: DATETIME_FORMAT
 
@@ -1049,7 +1049,7 @@ precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
-.. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
+.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: DEBUG
 
@@ -1812,7 +1812,7 @@ configuration process will be skipped.
 
     Previously, the default value was ``'django.utils.log.dictConfig'``.
 
-.. _dictConfig: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
+.. _dictConfig: https://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
 .. setting:: MANAGERS
 
@@ -2445,7 +2445,7 @@ precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
-.. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
+.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: TIME_ZONE
 

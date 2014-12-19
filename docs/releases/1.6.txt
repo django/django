@@ -442,7 +442,7 @@ If you wish to delay updates to your test suite, you can set your
 to fully restore the old test behavior. ``DjangoTestSuiteRunner`` is deprecated
 but will not be removed from Django until version 1.8.
 
-.. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
+.. _recommendations in the Python documentation: https://docs.python.org/library/doctest.html#unittest-api
 
 Removal of ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner`` GeoDjango custom test runner
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

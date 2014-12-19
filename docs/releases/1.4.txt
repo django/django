@@ -1313,7 +1313,7 @@ This behavior was never documented. Since it is unpythonic and not obviously
 useful, it was removed in Django 1.4. If you relied on it, you must edit your
 settings file to list all your applications explicitly.
 
-.. _this can't be done reliably: http://docs.python.org/tutorial/modules.html#importing-from-a-package
+.. _this can't be done reliably: https://docs.python.org/tutorial/modules.html#importing-from-a-package
 
 ``HttpRequest.raw_post_data`` renamed to ``HttpRequest.body``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
