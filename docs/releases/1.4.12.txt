@@ -11,4 +11,4 @@ Bugfixes
 
 * Restored the ability to :meth:`~django.core.urlresolvers.reverse` views
   created using :func:`functools.partial()`
-  (`#22486 <http://code.djangoproject.com/ticket/22486>`_)
+  (:ticket:`22486`)
