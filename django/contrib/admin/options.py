@@ -629,13 +629,12 @@ class ModelAdmin(BaseModelAdmin):
             'core.js',
             'admin/RelatedObjectLookups.js',
             'jquery%s.js' % extra,
-            'jquery.init.js',
-            'xregexp.min.js',
+            'jquery.init.js'
         ]
         if self.actions is not None:
             js.append('actions%s.js' % extra)
         if self.prepopulated_fields:
-            js.extend(['urlify.js', 'prepopulate%s.js' % extra])
+            js.extend(['xregexp.min.js', 'urlify.js', 'prepopulate%s.js' % extra])
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])
 
     def get_model_perms(self, request):

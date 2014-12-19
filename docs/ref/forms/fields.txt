@@ -861,7 +861,7 @@ For each field, we describe the default widget used if you don't specify
 
    .. versionchanged:: 1.8
 
-       ``unicode`` parameter was added.
+       The ``unicode`` parameter was added.
 
 ``TimeField``
 ~~~~~~~~~~~~~

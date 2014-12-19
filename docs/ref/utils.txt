@@ -869,7 +869,7 @@ appropriate entities.
 
     .. versionchanged:: 1.8
 
-        ``unicode`` parameter was added.
+        The ``unicode`` parameter was added.
 
 .. _time-zone-selection-functions:
 

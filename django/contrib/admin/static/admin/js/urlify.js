@@ -141,9 +141,12 @@ function URLify(s, num_chars, unicode) {
     s = s.replace(r, '');
     // if downcode doesn't hit, the char will be stripped here
     if (unicode) {
-        s = XRegExp.replace(s, XRegExp('[^-\\p{L}\\s]','g'), '');  // remove unneeded chars
-    } else
+        // keep unicode letters including both lowercase and uppercase,
+        // whitespace and dash chars, remove other unneeded chars
+        s = XRegExp.replace(s, XRegExp('[^-\\p{L}\\s]','g'), '');
+    } else {
         s = s.replace(/[^-\w\s]/g, '');  // remove unneeded chars
+    }
     s = s.replace(/^\s+|\s+$/g, ''); // trim leading/trailing spaces
     s = s.replace(/[-\s]+/g, '-');   // convert spaces to hyphens
     s = s.toLowerCase();             // convert to lowercase
