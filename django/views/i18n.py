@@ -3,12 +3,13 @@ import json
 import os
 import gettext as gettext_module
 
+from urlparse import urlsplit, urlunsplit
 from django import http
 from django.apps import apps
 from django.conf import settings
 from django.core.urlresolvers import resolve, reverse, NoReverseMatch, Resolver404
 from django.template import Context, Template
-from django.utils.translation import check_for_language, to_locale, get_language, LANGUAGE_SESSION_KEY
+from django.utils.translation import activate, check_for_language, to_locale, get_language, LANGUAGE_SESSION_KEY
 from django.utils.encoding import smart_text
 from django.utils.formats import get_format_modules, get_format
 from django.utils._os import upath
