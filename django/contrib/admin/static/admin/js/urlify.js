@@ -143,7 +143,7 @@ function URLify(s, num_chars, unicode) {
     if (unicode) {
         // keep unicode letters including both lowercase and uppercase,
         // whitespace and dash chars, remove other unneeded chars
-        s = XRegExp.replace(s, XRegExp('[^-\\p{L}\\s]','g'), '');
+        s = XRegExp.replace(s, XRegExp('[^-_\\p{L}\\p{N}\\s]','g'), '');
     } else {
         s = s.replace(/[^-\w\s]/g, '');  // remove unneeded chars
     }
