@@ -420,6 +420,11 @@ onto which the data will be loaded.
 The :djadminopt:`--ignorenonexistent` option can be used to ignore fields and
 models that may have been removed since the fixture was originally generated.
 
+.. django-admin-option:: --app
+
+The :djadminopt:`--app` option can be used to specify a single app to look
+for fixtures in rather than looking through all apps.
+
 .. versionchanged:: 1.7
 
     ``--app`` was added.
@@ -427,11 +432,6 @@ models that may have been removed since the fixture was originally generated.
 .. versionchanged:: 1.8
 
     ``--ignorenonexistent`` also ignores non-existent models.
-
-.. django-admin-option:: --app
-
-The :djadminopt:`--app` option can be used to specify a single app to look
-for fixtures in rather than looking through all apps.
 
 What's a "fixture"?
 ~~~~~~~~~~~~~~~~~~~
