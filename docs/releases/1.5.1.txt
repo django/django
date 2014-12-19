@@ -21,8 +21,5 @@ fix those issues.
 Django 1.5.1 also includes a couple smaller fixes:
 
 * Module-level warnings emitted during tests are no longer silently hidden
-  (`#18985`__).
-* Prevented filtering on password hashes in the user admin (`#20078`__).
-
-__ https://code.djangoproject.com/ticket/18985
-__ https://code.djangoproject.com/ticket/20078
+  (:ticket:`18985`).
+* Prevented filtering on password hashes in the user admin (:ticket:`20078`).

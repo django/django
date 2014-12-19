@@ -105,7 +105,7 @@ __ http://www.virtualenv.org
 Rolling back to a previous revision of Django
 =============================================
 
-For this tutorial, we'll be using `ticket #17549`__ as a case study, so we'll
+For this tutorial, we'll be using ticket :ticket:`17549` as a case study, so we'll
 rewind Django's version history in git to before that ticket's patch was
 applied. This will allow us to go through all of the steps involved in writing
 that patch from scratch, including running Django's test suite.
@@ -121,7 +121,6 @@ development revision of Django when working on your own patch for a ticket!**
     Consequently, we'll be using the revision of Django just prior to that,
     `commit 39f5bc7fc3a4bb43ed8a1358b17fe0521a1a63ac`__.
 
-__ https://code.djangoproject.com/ticket/17549
 __ https://github.com/django/django/commit/ac2052ebc84c45709ab5f0f25e685bf656ce79bc
 __ https://github.com/django/django/commit/39f5bc7fc3a4bb43ed8a1358b17fe0521a1a63ac
 
@@ -226,7 +225,7 @@ __ http://en.wikipedia.org/wiki/Test-driven_development
 Writing some tests for ticket #17549
 ------------------------------------
 
-`Ticket #17549`__ describes the following, small feature addition:
+Ticket :ticket:`17549` describes the following, small feature addition:
 
     It's useful for URLField to give you a way to open the URL; otherwise you
     might as well use a CharField.
@@ -287,7 +286,6 @@ correctly in a couple different situations.
     * After reading those, if you want something a little meatier to sink
       your teeth into, there's always the `Python unittest documentation`__.
 
-__ https://code.djangoproject.com/ticket/17549
 __ http://www.diveintopython.net/unit_testing/index.html
 __ http://docs.python.org/library/unittest.html
 
@@ -310,7 +308,8 @@ class.
 Writing the code for your ticket
 ================================
 
-Next we'll be adding the functionality described in `ticket #17549`__ to Django.
+Next we'll be adding the functionality described in ticket :ticket:`17549` to
+Django.
 
 Writing the code for ticket #17549
 ----------------------------------
@@ -355,8 +354,6 @@ We forgot to add the import for that method.  Go ahead and add the
 Re-run the tests and everything should pass. If it doesn't, make sure you
 correctly modified the ``AdminURLFieldWidget`` class as shown above and
 copied the new tests correctly.
-
-__ https://code.djangoproject.com/ticket/17549
 
 Running Django's test suite for the second time
 ===============================================

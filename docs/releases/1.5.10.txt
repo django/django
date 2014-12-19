@@ -10,4 +10,4 @@ Bugfixes
 ========
 
 * Allowed inherited and m2m fields to be referenced in the admin
-  (`#22486 <http://code.djangoproject.com/ticket/23329>`_)
+  (:ticket:`22486`)
