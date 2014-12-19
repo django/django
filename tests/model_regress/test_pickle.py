@@ -1,11 +1,12 @@
 import datetime
+import os
 import pickle
 import subprocess
 import sys
-import tempfile
 import warnings
 
 from django.db import models, DJANGO_VERSION_PICKLE_KEY
+from django.core.files.temp import NamedTemporaryFile
 from django.test import TestCase
 from django.utils.encoding import force_text
 from django.utils.version import get_major_version, get_version
@@ -79,13 +80,18 @@ print(article.headline)"""
             article_text="This is an article",
         )
 
-        with tempfile.NamedTemporaryFile(mode='w+', suffix=".py", dir='.', delete=True) as script:
+        with NamedTemporaryFile(mode='w+', suffix=".py", dir='.') as script:
             script.write(script_template % pickle.dumps(a))
             script.flush()
             try:
                 result = subprocess.check_output(
                     [sys.executable, script.name],
-                    env={'PYTHONPATH': ':'.join(sys.path)}
+                    env={
+                        # Needed to run test outside of tests directory
+                        str('PYTHONPATH'): os.pathsep.join(sys.path),
+                        # Needed on Windows because http://bugs.python.org/issue8557
+                        str('PATH'): os.environ['PATH'],
+                    }
                 )
             except subprocess.CalledProcessError:
                 self.fail("Unable to reload model pickled data")
