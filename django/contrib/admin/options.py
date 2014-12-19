@@ -629,7 +629,8 @@ class ModelAdmin(BaseModelAdmin):
             'core.js',
             'admin/RelatedObjectLookups.js',
             'jquery%s.js' % extra,
-            'jquery.init.js'
+            'jquery.init.js',
+            'xregexp.min.js',
         ]
         if self.actions is not None:
             js.append('actions%s.js' % extra)

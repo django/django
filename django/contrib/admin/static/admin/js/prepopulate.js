@@ -1,5 +1,5 @@
 (function($) {
-    $.fn.prepopulate = function(dependencies, maxLength) {
+    $.fn.prepopulate = function(dependencies, maxLength, unicode) {
         /*
             Depends on urlify.js
             Populates a selected field with the values of the dependent fields,
@@ -23,7 +23,7 @@
                         values.push(field.val());
                     }
                 });
-                prepopulatedField.val(URLify(values.join(' '), maxLength));
+                prepopulatedField.val(URLify(values.join(' '), maxLength, unicode));
             };
 
             prepopulatedField.data('_changed', false);

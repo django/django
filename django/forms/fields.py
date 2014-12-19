@@ -1230,7 +1230,8 @@ class SlugField(CharField):
     default_validators = [validators.validate_slug]
 
     def __init__(self, *args, **kwargs):
-        if kwargs.pop('unicode', False):
+        self.unicode = kwargs.pop('unicode', False)
+        if self.unicode:
             self.default_validators = [validators.validate_unicode_slug]
         super(SlugField, self).__init__(*args, **kwargs)
 
