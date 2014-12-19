@@ -705,7 +705,7 @@ in Python`_).
     In previous versions instance's without primary key value were
     hashable.
 
-.. _is forbidden in Python: http://docs.python.org/reference/datamodel.html#object.__hash__
+.. _is forbidden in Python: https://docs.python.org/reference/datamodel.html#object.__hash__
 
 ``get_absolute_url``
 --------------------
