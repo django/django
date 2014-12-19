@@ -246,7 +246,7 @@ In addition to a DB API driver, Django needs an adapter to access the database
 drivers from its ORM. Django provides an adapter for MySQLdb/mysqlclient while
 MySQL Connector/Python includes `its own`_.
 
-.. _its own: http://dev.mysql.com/doc/refman/5.6/en/connector-python-django-backend.html
+.. _its own: http://dev.mysql.com/doc/refman/5.6/en/connector-python-info.html
 
 MySQLdb
 ~~~~~~~
