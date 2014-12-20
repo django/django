@@ -1091,7 +1091,9 @@ private API, it will go through a regular deprecation path.
 
 ``Model._meta.get_(add|change|delete)_permission`` methods were deprecated.
 Even if they were not part of the public API they'll also go through
-a regular deprecation path.
+a regular deprecation path. You can replace them with
+``django.contrib.auth.get_permission_codename('action', Model._meta)`` where
+``'action'`` is ``'add'``, ``'change'``, or ``'delete'``.
 
 ``get_query_set`` and similar methods renamed to ``get_queryset``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
