@@ -213,7 +213,7 @@ WHEN (new.%(col_name)s IS NULL)
                 day_precision), []
 
     def format_for_duration_arithmetic(self, sql):
-        return "NUMTODSINTERVAL(%s / 100000, 'SECOND')" % sql
+        return "NUMTODSINTERVAL(%s / 1000000, 'SECOND')" % sql
 
     def date_trunc_sql(self, lookup_type, field_name):
         # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
