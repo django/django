@@ -41,9 +41,6 @@ class GenericAdminViewTest(TestCase):
         m.save()
         self.png_media_pk = m.pk
 
-    def tearDown(self):
-        self.client.logout()
-
     def test_basic_add_GET(self):
         """
         A smoke test to ensure GET on the add_view works.
@@ -136,9 +133,6 @@ class GenericInlineAdminParametersTest(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
         self.factory = RequestFactory()
-
-    def tearDown(self):
-        self.client.logout()
 
     def _create_object(self, model):
         """
@@ -285,9 +279,6 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
-
-    def tearDown(self):
-        self.client.logout()
 
     def test_add(self):
         category_id = Category.objects.create(name='male').pk

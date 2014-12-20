@@ -3,7 +3,7 @@ import unittest
 from django.contrib.gis.gdal import HAS_GDAL
 
 if HAS_GDAL:
-    from django.contrib.gis.gdal import Driver, OGRException
+    from django.contrib.gis.gdal import Driver, GDALException
 
 
 valid_drivers = (
@@ -11,7 +11,7 @@ valid_drivers = (
     'ESRI Shapefile', 'MapInfo File', 'TIGER', 'S57', 'DGN', 'Memory', 'CSV',
     'GML', 'KML',
     # raster
-    'GTiff', 'JPEG', 'netCDF', 'MEM', 'PNG',
+    'GTiff', 'JPEG', 'MEM', 'PNG',
 )
 
 invalid_drivers = ('Foo baz', 'clucka', 'ESRI Shp', 'ESRI rast')
@@ -40,7 +40,7 @@ class DriverTest(unittest.TestCase):
     def test02_invalid_driver(self):
         "Testing invalid GDAL/OGR Data Source Drivers."
         for i in invalid_drivers:
-            self.assertRaises(OGRException, Driver, i)
+            self.assertRaises(GDALException, Driver, i)
 
     def test03_aliases(self):
         "Testing driver aliases."

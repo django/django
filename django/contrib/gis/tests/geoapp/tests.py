@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import re
 from tempfile import NamedTemporaryFile
-import unittest
 
 from django.db import connection
 from django.contrib.gis import gdal
@@ -292,6 +291,11 @@ class GeoLookupTest(TestCase):
         # Right: A >> B => true if xmin(A) > xmax(B)
         # See: BOX2D_left() and BOX2D_right() in lwgeom_box2dfloat4.c in PostGIS source.
 
+        # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
+        # http://trac.osgeo.org/postgis/ticket/2035
+        if postgis_bug_version():
+            self.skipTest("PostGIS 2.0/2.0.1 left and right lookups are known to be buggy.")
+
         # Getting the borders for Colorado & Kansas
         co_border = State.objects.get(name='Colorado').poly
         ks_border = State.objects.get(name='Kansas').poly
@@ -324,11 +328,6 @@ class GeoLookupTest(TestCase):
         self.assertEqual(2, len(qs))
         for c in qs:
             self.assertIn(c.name, cities)
-
-    # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
-    # http://trac.osgeo.org/postgis/ticket/2035
-    if postgis_bug_version():
-        test_left_right_lookups = unittest.expectedFailure(test_left_right_lookups)
 
     def test_equals_lookups(self):
         "Testing the 'same_as' and 'equals' lookup types."

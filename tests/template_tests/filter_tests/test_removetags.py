@@ -1,5 +1,6 @@
 import warnings
 
+from django.template.defaultfilters import removetags
 from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.safestring import mark_safe
@@ -35,3 +36,22 @@ class RemovetagsTests(SimpleTestCase):
                 },
             )
         self.assertEqual(output, 'x <p>y</p> x <p>y</p>')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_removetags(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RemovedInDjango20Warning)
+            self.assertEqual(
+                removetags(
+                    'some <b>html</b> with <script>alert("You smell")</script> disallowed <img /> tags',
+                    'script img',
+                ),
+                'some <b>html</b> with alert("You smell") disallowed  tags',
+            )
+
+    def test_non_string_input(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RemovedInDjango20Warning)
+            self.assertEqual(removetags(123, 'a'), '123')

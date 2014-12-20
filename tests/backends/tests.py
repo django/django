@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import copy
 import datetime
-from decimal import Decimal
+from decimal import Decimal, Rounded
 import re
 import threading
 import unittest
@@ -26,7 +26,7 @@ from django.test import (TestCase, TransactionTestCase, mock, override_settings,
     skipUnlessDBFeature, skipIfDBFeature)
 from django.test.utils import str_prefix, IgnoreAllDeprecationWarningsMixin
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 from . import models
 
@@ -76,7 +76,7 @@ class OracleTests(unittest.TestCase):
         # than 4000 chars and read it properly
         with connection.cursor() as cursor:
             cursor.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-            long_str = ''.join(six.text_type(x) for x in xrange(4000))
+            long_str = ''.join(six.text_type(x) for x in range(4000))
             cursor.execute('INSERT INTO ltext VALUES (%s)', [long_str])
             cursor.execute('SELECT text FROM ltext')
             row = cursor.fetchone()
@@ -1059,6 +1059,22 @@ class BackendUtilTests(TestCase):
               '0.1')
         equal('0.1234567890', 12, 0,
               '0')
+        equal('0.1234567890', None, 0,
+              '0')
+        equal('1234567890.1234567890', None, 0,
+              '1234567890')
+        equal('1234567890.1234567890', None, 2,
+              '1234567890.12')
+        equal('0.1234', 5, None,
+              '0.1234')
+        equal('123.12', 5, None,
+              '123.12')
+        with self.assertRaises(Rounded):
+            equal('0.1234567890', 5, None,
+                  '0.12346')
+        with self.assertRaises(Rounded):
+            equal('1234567890.1234', 5, None,
+                  '1234600000')
 
 
 class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):

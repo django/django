@@ -1,3 +1,4 @@
+from django.template.defaultfilters import make_list
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
 from django.utils.safestring import mark_safe
@@ -31,3 +32,12 @@ class MakeListTests(SimpleTestCase):
     def test_make_list04(self):
         output = render('make_list04', {"a": mark_safe("&")})
         self.assertEqual(output, str_prefix("[%(_)s'&']"))
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_string(self):
+        self.assertEqual(make_list('abc'), ['a', 'b', 'c'])
+
+    def test_integer(self):
+        self.assertEqual(make_list(1234), ['1', '2', '3', '4'])

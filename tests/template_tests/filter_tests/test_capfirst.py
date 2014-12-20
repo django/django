@@ -1,3 +1,4 @@
+from django.template.defaultfilters import capfirst
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -15,3 +16,9 @@ class CapfirstTests(SimpleTestCase):
     def test_capfirst02(self):
         output = render('capfirst02', {'a': 'fred>', 'b': mark_safe('fred&gt;')})
         self.assertEqual(output, 'Fred&gt; Fred&gt;')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_capfirst(self):
+        self.assertEqual(capfirst('hello world'), 'Hello world')

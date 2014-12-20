@@ -31,4 +31,4 @@ the easiest, fastest, and most stable deployment choice.
       ``mod_python`` was first deprecated, then completely removed in
       Django 1.5.
 
-.. _chapter 12 of the django book (second edition): http://djangobook.com/en/2.0/chapter12.html
+.. _chapter 12 of the django book (second edition): http://www.djangobook.com/en/2.0/chapter12.html

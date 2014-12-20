@@ -8,15 +8,16 @@ except ImportError:
     sqlparse = None
 
 from django import test
-from django.db import connection, migrations, models
+from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
-from django.db.utils import IntegrityError, DatabaseError
+from django.db.utils import IntegrityError
 from django.test import override_settings
 from django.utils import six
 
+from .models import FoodManager, FoodQuerySet
 from .test_base import MigrationTestBase
 
 
@@ -48,36 +49,31 @@ class OperationTestBase(MigrationTestBase):
         return project_state, new_state
 
     def set_up_test_model(self, app_label, second_model=False, third_model=False,
-            related_model=False, mti_model=False, proxy_model=False,
+            related_model=False, mti_model=False, proxy_model=False, manager_model=False,
             unique_together=False, options=False, db_table=None, index_together=False):
         """
         Creates a test model state and database table.
         """
         # Delete the tables if they already exist
-        with connection.cursor() as cursor:
+        table_names = [
             # Start with ManyToMany tables
-            try:
-                cursor.execute("DROP TABLE %s_pony_stables" % app_label)
-            except DatabaseError:
-                pass
-            try:
-                cursor.execute("DROP TABLE %s_pony_vans" % app_label)
-            except DatabaseError:
-                pass
-
+            '_pony_stables', '_pony_vans',
             # Then standard model tables
-            try:
-                cursor.execute("DROP TABLE %s_pony" % app_label)
-            except DatabaseError:
-                pass
-            try:
-                cursor.execute("DROP TABLE %s_stable" % app_label)
-            except DatabaseError:
-                pass
-            try:
-                cursor.execute("DROP TABLE %s_van" % app_label)
-            except DatabaseError:
-                pass
+            '_pony', '_stable', '_van',
+        ]
+        tables = [(app_label + table_name) for table_name in table_names]
+        with connection.cursor() as cursor:
+            table_names = connection.introspection.table_names(cursor)
+            connection.disable_constraint_checking()
+            sql_delete_table = connection.schema_editor().sql_delete_table
+            with transaction.atomic():
+                for table in tables:
+                    if table in table_names:
+                        cursor.execute(sql_delete_table % {
+                            "table": connection.ops.quote_name(table),
+                        })
+            connection.enable_constraint_checking()
+
         # Make the "current" state
         model_options = {
             "swappable": "TEST_SWAP_MODEL",
@@ -142,6 +138,18 @@ class OperationTestBase(MigrationTestBase):
                 options={"proxy": True},
                 bases=['%s.Pony' % app_label],
             ))
+        if manager_model:
+            operations.append(migrations.CreateModel(
+                "Food",
+                fields=[
+                    ("id", models.AutoField(primary_key=True)),
+                ],
+                managers=[
+                    ("food_qs", FoodQuerySet.as_manager()),
+                    ("food_mgr", FoodManager("a", "b")),
+                    ("food_mgr_kwargs", FoodManager("x", "y", 3, 4)),
+                ]
+            ))
 
         return self.apply_operations(app_label, ProjectState(), operations)
 
@@ -186,6 +194,10 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "CreateModel")
         self.assertEqual(definition[1], [])
         self.assertEqual(sorted(definition[2].keys()), ["fields", "name"])
+        # And default manager not in set
+        operation = migrations.CreateModel("Foo", fields=[], managers=[("objects", models.Manager())])
+        definition = operation.deconstruct()
+        self.assertNotIn('managers', definition[2])
 
     def test_create_model_with_unique_after(self):
         """
@@ -364,6 +376,37 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_crummo", editor, new_state, project_state)
         self.assertTableNotExists("test_crummo_unmanagedpony")
         self.assertTableExists("test_crummo_pony")
+
+    def test_create_model_managers(self):
+        """
+        Tests that the managers on a model are set.
+        """
+        project_state = self.set_up_test_model("test_cmoma")
+        # Test the state alteration
+        operation = migrations.CreateModel(
+            "Food",
+            fields=[
+                ("id", models.AutoField(primary_key=True)),
+            ],
+            managers=[
+                ("food_qs", FoodQuerySet.as_manager()),
+                ("food_mgr", FoodManager("a", "b")),
+                ("food_mgr_kwargs", FoodManager("x", "y", 3, 4)),
+            ]
+        )
+        self.assertEqual(operation.describe(), "Create model Food")
+        new_state = project_state.clone()
+        operation.state_forwards("test_cmoma", new_state)
+        self.assertIn(("test_cmoma", "food"), new_state.models)
+        managers = new_state.models["test_cmoma", "food"].managers
+        self.assertEqual(managers[0][0], "food_qs")
+        self.assertIsInstance(managers[0][1], models.Manager)
+        self.assertEqual(managers[1][0], "food_mgr")
+        self.assertIsInstance(managers[1][1], FoodManager)
+        self.assertEqual(managers[1][1].args, ("a", "b", 1, 2))
+        self.assertEqual(managers[2][0], "food_mgr_kwargs")
+        self.assertIsInstance(managers[2][1], FoodManager)
+        self.assertEqual(managers[2][1].args, ("x", "y", 3, 4))
 
     def test_delete_model(self):
         """
@@ -1194,10 +1237,19 @@ class OperationTests(OperationTestBase):
         self.assertEqual(new_state.models["test_alorwrtto", "rider"].options.get("order_with_respect_to", None), "pony")
         # Make sure there's no matching index
         self.assertColumnNotExists("test_alorwrtto_rider", "_order")
+        # Create some rows before alteration
+        rendered_state = project_state.render()
+        pony = rendered_state.get_model("test_alorwrtto", "Pony").objects.create(weight=50)
+        rendered_state.get_model("test_alorwrtto", "Rider").objects.create(pony=pony, friend_id=1)
+        rendered_state.get_model("test_alorwrtto", "Rider").objects.create(pony=pony, friend_id=2)
         # Test the database alteration
         with connection.schema_editor() as editor:
             operation.database_forwards("test_alorwrtto", editor, project_state, new_state)
         self.assertColumnExists("test_alorwrtto_rider", "_order")
+        # Check for correct value in rows
+        updated_riders = new_state.render().get_model("test_alorwrtto", "Rider").objects.all()
+        self.assertEqual(updated_riders[0]._order, 0)
+        self.assertEqual(updated_riders[1]._order, 0)
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alorwrtto", editor, new_state, project_state)
@@ -1207,6 +1259,61 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "AlterOrderWithRespectTo")
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'name': "Rider", 'order_with_respect_to': "pony"})
+
+    def test_alter_model_managers(self):
+        """
+        Tests that the managers on a model are set.
+        """
+        project_state = self.set_up_test_model("test_almoma")
+        # Test the state alteration
+        operation = migrations.AlterModelManagers(
+            "Pony",
+            managers=[
+                ("food_qs", FoodQuerySet.as_manager()),
+                ("food_mgr", FoodManager("a", "b")),
+                ("food_mgr_kwargs", FoodManager("x", "y", 3, 4)),
+            ]
+        )
+        self.assertEqual(operation.describe(), "Change managers on Pony")
+        managers = project_state.models["test_almoma", "pony"].managers
+        self.assertEqual(managers, [])
+
+        new_state = project_state.clone()
+        operation.state_forwards("test_almoma", new_state)
+        self.assertIn(("test_almoma", "pony"), new_state.models)
+        managers = new_state.models["test_almoma", "pony"].managers
+        self.assertEqual(managers[0][0], "food_qs")
+        self.assertIsInstance(managers[0][1], models.Manager)
+        self.assertEqual(managers[1][0], "food_mgr")
+        self.assertIsInstance(managers[1][1], FoodManager)
+        self.assertEqual(managers[1][1].args, ("a", "b", 1, 2))
+        self.assertEqual(managers[2][0], "food_mgr_kwargs")
+        self.assertIsInstance(managers[2][1], FoodManager)
+        self.assertEqual(managers[2][1].args, ("x", "y", 3, 4))
+
+    def test_alter_model_managers_emptying(self):
+        """
+        Tests that the managers on a model are set.
+        """
+        project_state = self.set_up_test_model("test_almomae", manager_model=True)
+        # Test the state alteration
+        operation = migrations.AlterModelManagers("Food", managers=[])
+        self.assertEqual(operation.describe(), "Change managers on Food")
+        self.assertIn(("test_almomae", "food"), project_state.models)
+        managers = project_state.models["test_almomae", "food"].managers
+        self.assertEqual(managers[0][0], "food_qs")
+        self.assertIsInstance(managers[0][1], models.Manager)
+        self.assertEqual(managers[1][0], "food_mgr")
+        self.assertIsInstance(managers[1][1], FoodManager)
+        self.assertEqual(managers[1][1].args, ("a", "b", 1, 2))
+        self.assertEqual(managers[2][0], "food_mgr_kwargs")
+        self.assertIsInstance(managers[2][1], FoodManager)
+        self.assertEqual(managers[2][1].args, ("x", "y", 3, 4))
+
+        new_state = project_state.clone()
+        operation.state_forwards("test_almomae", new_state)
+        managers = new_state.models["test_almomae", "food"].managers
+        self.assertEqual(managers, [])
 
     def test_alter_fk(self):
         """

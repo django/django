@@ -143,7 +143,7 @@ wherever you would have historically used::
 If you want to continue to use the base unittest library, you can --
 you just won't get any of the nice new unittest2 features.
 
-.. _unittest2: http://pypi.python.org/pypi/unittest2
+.. _unittest2: https://pypi.python.org/pypi/unittest2
 
 Transaction context managers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,7 +154,7 @@ Users of Python 2.5 and above may now use transaction management functions as
     with transaction.autocommit():
         # ...
 
-.. _context managers: http://docs.python.org/glossary.html#term-context-manager
+.. _context managers: https://docs.python.org/glossary.html#term-context-manager
 
 Configurable delete-cascade
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

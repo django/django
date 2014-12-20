@@ -178,6 +178,7 @@ class MigrationAutodetector(object):
         self.generate_deleted_proxies()
         self.generate_created_proxies()
         self.generate_altered_options()
+        self.generate_altered_managers()
 
         # Generate field operations
         self.generate_renamed_fields()
@@ -463,7 +464,7 @@ class MigrationAutodetector(object):
                     if field.rel.to:
                         if field.primary_key:
                             primary_key_rel = field.rel.to
-                        else:
+                        elif not field.rel.parent_link:
                             related_fields[field.name] = field
                     # through will be none on M2Ms on swapped-out models;
                     # we can treat lack of through as auto_created=True, though.
@@ -503,6 +504,7 @@ class MigrationAutodetector(object):
                     fields=[d for d in model_state.fields if d[0] not in related_fields],
                     options=model_state.options,
                     bases=model_state.bases,
+                    managers=model_state.managers,
                 ),
                 dependencies=dependencies,
                 beginning=True,
@@ -607,6 +609,7 @@ class MigrationAutodetector(object):
                     fields=[],
                     options=model_state.options,
                     bases=model_state.bases,
+                    managers=model_state.managers,
                 ),
                 # Depend on the deletion of any possible non-proxy version of us
                 dependencies=dependencies,
@@ -794,8 +797,11 @@ class MigrationAutodetector(object):
                         None,
                         True
                     ))
-            # You can't just add NOT NULL fields with no default
-            if not field.null and not field.has_default() and not isinstance(field, models.ManyToManyField):
+            # You can't just add NOT NULL fields with no default or fields
+            # which don't allow empty strings as default.
+            if (not field.null and not field.has_default() and
+                    not isinstance(field, models.ManyToManyField) and
+                    not (field.blank and field.empty_strings_allowed)):
                 field = field.clone()
                 field.default = self.questioner.ask_not_null_addition(field_name, model_name)
                 self.add_operation(
@@ -988,6 +994,20 @@ class MigrationAutodetector(object):
                         order_with_respect_to=new_model_state.options.get('order_with_respect_to', None),
                     ),
                     dependencies=dependencies,
+                )
+
+    def generate_altered_managers(self):
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            if old_model_state.managers != new_model_state.managers:
+                self.add_operation(
+                    app_label,
+                    operations.AlterModelManagers(
+                        name=model_name,
+                        managers=new_model_state.managers,
+                    )
                 )
 
     def arrange_for_graph(self, changes, graph, migration_name=None):

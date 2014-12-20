@@ -442,7 +442,7 @@ If you wish to delay updates to your test suite, you can set your
 to fully restore the old test behavior. ``DjangoTestSuiteRunner`` is deprecated
 but will not be removed from Django until version 1.8.
 
-.. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
+.. _recommendations in the Python documentation: https://docs.python.org/library/doctest.html#unittest-api
 
 Removal of ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner`` GeoDjango custom test runner
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -836,11 +836,11 @@ Object Relational Mapper changes
 Django 1.6 contains many changes to the ORM. These changes fall mostly in
 three categories:
 
-  1. Bug fixes (e.g. proper join clauses for generic relations, query
-     combining, join promotion, and join trimming fixes)
-  2. Preparation for new features. For example the ORM is now internally ready
-     for multicolumn foreign keys.
-  3. General cleanup.
+1. Bug fixes (e.g. proper join clauses for generic relations, query combining,
+   join promotion, and join trimming fixes)
+2. Preparation for new features. For example the ORM is now internally ready
+   for multicolumn foreign keys.
+3. General cleanup.
 
 These changes can result in some compatibility problems. For example, some
 queries will now generate different table aliases. This can affect
@@ -1091,7 +1091,9 @@ private API, it will go through a regular deprecation path.
 
 ``Model._meta.get_(add|change|delete)_permission`` methods were deprecated.
 Even if they were not part of the public API they'll also go through
-a regular deprecation path.
+a regular deprecation path. You can replace them with
+``django.contrib.auth.get_permission_codename('action', Model._meta)`` where
+``'action'`` is ``'add'``, ``'change'``, or ``'delete'``.
 
 ``get_query_set`` and similar methods renamed to ``get_queryset``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -169,11 +169,12 @@ got a fast, well-indexed database server.
 
 To use a database table as your cache backend:
 
-    * Set :setting:`BACKEND <CACHES-BACKEND>` to
-      ``django.core.cache.backends.db.DatabaseCache``
-    * Set :setting:`LOCATION <CACHES-LOCATION>` to ``tablename``, the name of
-      the database table. This name can be whatever you want, as long as it's
-      a valid table name that's not already being used in your database.
+* Set :setting:`BACKEND <CACHES-BACKEND>` to
+  ``django.core.cache.backends.db.DatabaseCache``
+
+* Set :setting:`LOCATION <CACHES-LOCATION>` to ``tablename``, the name of the
+  database table. This name can be whatever you want, as long as it's a valid
+  table name that's not already being used in your database.
 
 In this example, the cache table's name is ``my_cache_table``::
 

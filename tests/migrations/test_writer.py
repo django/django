@@ -22,6 +22,8 @@ from django.utils.timezone import get_default_timezone, utc, FixedOffset
 import custom_migration_operations.operations
 import custom_migration_operations.more_operations
 
+from .models import FoodQuerySet, FoodManager
+
 
 class TestModel1(object):
     def upload_to(self):
@@ -351,3 +353,12 @@ class WriterTests(TestCase):
 
         string = MigrationWriter.serialize(models.CharField(default=DeconstructableInstances))[0]
         self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructableInstances)")
+
+    def test_serialize_managers(self):
+        self.assertSerializedEqual(models.Manager())
+        self.assertSerializedResultEqual(
+            FoodQuerySet.as_manager(),
+            ('migrations.models.FoodQuerySet.as_manager()', {'import migrations.models'})
+        )
+        self.assertSerializedEqual(FoodManager('a', 'b'))
+        self.assertSerializedEqual(FoodManager('x', 'y', c=3, d=4))

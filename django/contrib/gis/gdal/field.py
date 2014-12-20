@@ -1,7 +1,7 @@
 from ctypes import byref, c_int
 from datetime import date, datetime, time
 from django.contrib.gis.gdal.base import GDALBase
-from django.contrib.gis.gdal.error import OGRException
+from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import ds as capi
 from django.utils.encoding import force_text
 
@@ -29,7 +29,7 @@ class Field(GDALBase):
         # Getting the pointer for this field.
         fld_ptr = capi.get_feat_field_defn(feat.ptr, index)
         if not fld_ptr:
-            raise OGRException('Cannot create OGR Field, invalid pointer given.')
+            raise GDALException('Cannot create OGR Field, invalid pointer given.')
         self.ptr = fld_ptr
 
         # Setting the class depending upon the OGR Field Type (OFT)
@@ -67,7 +67,7 @@ class Field(GDALBase):
         if status:
             return (yy, mm, dd, hh, mn, ss, tz)
         else:
-            raise OGRException('Unable to retrieve date & time information from the field.')
+            raise GDALException('Unable to retrieve date & time information from the field.')
 
     #### Field Properties ####
     @property
@@ -155,7 +155,7 @@ class OFTDate(Field):
         try:
             yy, mm, dd, hh, mn, ss, tz = self.as_datetime()
             return date(yy.value, mm.value, dd.value)
-        except (ValueError, OGRException):
+        except (ValueError, GDALException):
             return None
 
 
@@ -170,7 +170,7 @@ class OFTDateTime(Field):
         try:
             yy, mm, dd, hh, mn, ss, tz = self.as_datetime()
             return datetime(yy.value, mm.value, dd.value, hh.value, mn.value, ss.value)
-        except (ValueError, OGRException):
+        except (ValueError, GDALException):
             return None
 
 
@@ -181,7 +181,7 @@ class OFTTime(Field):
         try:
             yy, mm, dd, hh, mn, ss, tz = self.as_datetime()
             return time(hh.value, mn.value, ss.value)
-        except (ValueError, OGRException):
+        except (ValueError, GDALException):
             return None
 
 

@@ -46,7 +46,7 @@ from ctypes import byref, string_at, c_char_p, c_double, c_ubyte, c_void_p
 # Getting GDAL prerequisites
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
+from django.contrib.gis.gdal.error import GDALException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
 from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
 
@@ -57,7 +57,7 @@ from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
 
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -110,12 +110,12 @@ class OGRGeometry(GDALBase):
             # OGR pointer (c_void_p) was the input.
             g = geom_input
         else:
-            raise OGRException('Invalid input type for OGR Geometry construction: %s' % type(geom_input))
+            raise GDALException('Invalid input type for OGR Geometry construction: %s' % type(geom_input))
 
         # Now checking the Geometry pointer before finishing initialization
         # by setting the pointer for the object.
         if not g:
-            raise OGRException('Cannot create OGR Geometry from input: %s' % str(geom_input))
+            raise GDALException('Cannot create OGR Geometry from input: %s' % str(geom_input))
         self.ptr = g
 
         # Assigning the SpatialReference object to the geometry, if valid.
@@ -143,7 +143,7 @@ class OGRGeometry(GDALBase):
         wkb, srs = state
         ptr = capi.from_wkb(wkb, None, byref(c_void_p()), len(wkb))
         if not ptr:
-            raise OGRException('Invalid OGRGeometry loaded from pickled state.')
+            raise GDALException('Invalid OGRGeometry loaded from pickled state.')
         self.ptr = ptr
         self.srs = srs
 
@@ -546,7 +546,7 @@ class LineString(OGRGeometry):
 
     def __iter__(self):
         "Iterates over each point in the LineString."
-        for i in xrange(self.point_count):
+        for i in range(self.point_count):
             yield self[i]
 
     def __len__(self):
@@ -556,7 +556,7 @@ class LineString(OGRGeometry):
     @property
     def tuple(self):
         "Returns the tuple representation of this LineString."
-        return tuple(self[i] for i in xrange(len(self)))
+        return tuple(self[i] for i in range(len(self)))
     coords = tuple
 
     def _listarr(self, func):
@@ -564,7 +564,7 @@ class LineString(OGRGeometry):
         Internal routine that returns a sequence (list) corresponding with
         the given function.
         """
-        return [func(self.ptr, i) for i in xrange(len(self))]
+        return [func(self.ptr, i) for i in range(len(self))]
 
     @property
     def x(self):
@@ -596,7 +596,7 @@ class Polygon(OGRGeometry):
 
     def __iter__(self):
         "Iterates through each ring in the Polygon."
-        for i in xrange(self.geom_count):
+        for i in range(self.geom_count):
             yield self[i]
 
     def __getitem__(self, index):
@@ -616,14 +616,14 @@ class Polygon(OGRGeometry):
     @property
     def tuple(self):
         "Returns a tuple of LinearRing coordinate tuples."
-        return tuple(self[i].tuple for i in xrange(self.geom_count))
+        return tuple(self[i].tuple for i in range(self.geom_count))
     coords = tuple
 
     @property
     def point_count(self):
         "The number of Points in this Polygon."
         # Summing up the number of points in each ring of the Polygon.
-        return sum(self[i].point_count for i in xrange(self.geom_count))
+        return sum(self[i].point_count for i in range(self.geom_count))
 
     @property
     def centroid(self):
@@ -647,7 +647,7 @@ class GeometryCollection(OGRGeometry):
 
     def __iter__(self):
         "Iterates over each Geometry."
-        for i in xrange(self.geom_count):
+        for i in range(self.geom_count):
             yield self[i]
 
     def __len__(self):
@@ -666,18 +666,18 @@ class GeometryCollection(OGRGeometry):
             tmp = OGRGeometry(geom)
             capi.add_geom(self.ptr, tmp.ptr)
         else:
-            raise OGRException('Must add an OGRGeometry.')
+            raise GDALException('Must add an OGRGeometry.')
 
     @property
     def point_count(self):
         "The number of Points in this Geometry Collection."
         # Summing up the number of points in each geometry in this collection
-        return sum(self[i].point_count for i in xrange(self.geom_count))
+        return sum(self[i].point_count for i in range(self.geom_count))
 
     @property
     def tuple(self):
         "Returns a tuple representation of this Geometry Collection."
-        return tuple(self[i].tuple for i in xrange(self.geom_count))
+        return tuple(self[i].tuple for i in range(self.geom_count))
     coords = tuple
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import TestCase, mock, override_settings
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ProjectState, ModelState
@@ -8,6 +8,8 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.loader import MigrationLoader
 from django.db import models, connection
 from django.contrib.auth.models import AbstractBaseUser
+
+from .models import FoodManager, FoodQuerySet
 
 
 class DeconstructableObject(object):
@@ -62,6 +64,16 @@ class AutodetectorTests(TestCase):
         ("name", models.CharField(max_length=200, default=models.IntegerField())),
     ])
     author_custom_pk = ModelState("testapp", "Author", [("pk_field", models.IntegerField(primary_key=True))])
+    author_with_biography_non_blank = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField()),
+        ("biography", models.TextField()),
+    ])
+    author_with_biography_blank = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(blank=True)),
+        ("biography", models.TextField(blank=True)),
+    ])
     author_with_book = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
@@ -158,6 +170,13 @@ class AutodetectorTests(TestCase):
     ])
     other_pony = ModelState("otherapp", "Pony", [
         ("id", models.AutoField(primary_key=True)),
+    ])
+    other_pony_food = ModelState("otherapp", "Pony", [
+        ("id", models.AutoField(primary_key=True)),
+    ], managers=[
+        ('food_qs', FoodQuerySet.as_manager()),
+        ('food_mgr', FoodManager('a', 'b')),
+        ('food_mgr_kwargs', FoodManager('x', 'y', 3, 4)),
     ])
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
     third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
@@ -456,13 +475,15 @@ class AutodetectorTests(TestCase):
         """Tests autodetection of new models."""
         # Make state
         before = self.make_project_state([])
-        after = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.other_pony_food])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number/type of migrations?
-        self.assertNumberMigrations(changes, 'testapp', 1)
-        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ["CreateModel"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="Pony")
+        self.assertEqual([name for name, mgr in changes['otherapp'][0].operations[0].managers],
+                         ['food_qs', 'food_mgr', 'food_mgr_kwargs'])
 
     def test_old_model(self):
         """Tests deletion of old models."""
@@ -1406,6 +1427,24 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author", order_with_respect_to="book")
         self.assertNotIn("_order", [name for name, field in changes['testapp'][0].operations[0].fields])
 
+    def test_alter_model_managers(self):
+        """
+        Tests that changing the model managers adds a new operation.
+        """
+        # Make state
+        before = self.make_project_state([self.other_pony])
+        after = self.make_project_state([self.other_pony_food])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ["AlterModelManagers"])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="pony")
+        self.assertEqual([name for name, mgr in changes['otherapp'][0].operations[0].managers],
+                         ['food_qs', 'food_mgr', 'food_mgr_kwargs'])
+        self.assertEqual(changes['otherapp'][0].operations[0].managers[1][1].args, ('a', 'b', 1, 2))
+        self.assertEqual(changes['otherapp'][0].operations[0].managers[2][1].args, ('x', 'y', 3, 4))
+
     def test_swappable_first_inheritance(self):
         """Tests that swappable models get their CreateModel first."""
         # Make state
@@ -1445,6 +1484,29 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Author")
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Aardvark")
+
+    def test_multiple_bases(self):
+        """#23956 - Tests that inheriting models doesn't move *_ptr fields into AddField operations."""
+        A = ModelState("app", "A", [("a_id", models.AutoField(primary_key=True))])
+        B = ModelState("app", "B", [("b_id", models.AutoField(primary_key=True))])
+        C = ModelState("app", "C", [], bases=("app.A", "app.B"))
+        D = ModelState("app", "D", [], bases=("app.A", "app.B"))
+        E = ModelState("app", "E", [], bases=("app.A", "app.B"))
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([A, B, C, D, E])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "app", 1)
+        self.assertOperationTypes(changes, "app", 0, [
+            "CreateModel", "CreateModel", "CreateModel", "CreateModel", "CreateModel"
+        ])
+        self.assertOperationAttributes(changes, "app", 0, 0, name="A")
+        self.assertOperationAttributes(changes, "app", 0, 1, name="B")
+        self.assertOperationAttributes(changes, "app", 0, 2, name="C")
+        self.assertOperationAttributes(changes, "app", 0, 3, name="D")
+        self.assertOperationAttributes(changes, "app", 0, 4, name="E")
 
     def test_proxy_bases_first(self):
         """Tests that bases of proxies come first."""
@@ -1659,3 +1721,37 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'a', 1)
         self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
         self.assertMigrationDependencies(changes, 'a', 0, [])
+
+    def test_add_blank_textfield_and_charfield(self):
+        """
+        #23405 - Adding a NOT NULL and blank `CharField` or `TextField`
+        without default should not prompt for a default.
+        """
+        class CustomQuestioner(MigrationQuestioner):
+            def ask_not_null_addition(self, field_name, model_name):
+                raise Exception("Should not have prompted for not null addition")
+
+        before = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.author_with_biography_blank])
+        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0)
+
+    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition')
+    def test_add_non_blank_textfield_and_charfield(self, mocked_ask_method):
+        """
+        #23405 - Adding a NOT NULL and non-blank `CharField` or `TextField`
+        without default should prompt for a default.
+        """
+        before = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.author_with_biography_non_blank])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner())
+        changes = autodetector._detect_changes()
+        # need to check for questioner call
+        self.assertTrue(mocked_ask_method.called)
+        self.assertEqual(mocked_ask_method.call_count, 2)
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0)

@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.template.defaultfilters import upper
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
@@ -19,3 +23,16 @@ class UpperTests(SimpleTestCase):
     def test_upper02(self):
         output = render('upper02', {'a': 'a & b', 'b': mark_safe('a &amp; b')})
         self.assertEqual(output, 'A &amp; B A &amp;AMP; B')
+
+
+class FunctionTests(SimpleTestCase):
+
+    def test_upper(self):
+        self.assertEqual(upper('Mixed case input'), 'MIXED CASE INPUT')
+
+    def test_unicode(self):
+        # lowercase e umlaut
+        self.assertEqual(upper('\xeb'), '\xcb')
+
+    def test_non_string_input(self):
+        self.assertEqual(upper(123), '123')

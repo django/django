@@ -67,6 +67,25 @@ to accept expressions other than aggregates. Aggregates are now able to
 reference multiple fields, as well as perform arithmetic, similar to ``F()``
 objects.
 
+``TestCase`` data setup
+~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`~django.test.TestCase` has been refactored to allow for data
+initialization at the class level using transactions and savepoints. Database
+backends which do not support transactions, like MySQL with the MyISAM storage
+engine, will still be able to run these tests but won't benefit from the
+improvements. Tests are now run within two nested
+:func:`~django.db.transaction.atomic()` blocks: one for the whole class and one
+for each test.
+
+* The class method
+  :meth:`TestCase.setUpTestData() <django.test.TestCase.setUpTestData>` adds
+  the ability to setup test data at the class level. Using this technique can
+  speed up the tests as compared to using ``setUp()``.
+
+* Fixture loading within ``TestCase`` is now performed once for the whole
+  ``TestCase``.
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -141,6 +160,10 @@ Minor features
 
 * Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
   Django 1.2 have been removed.
+
+* All GDAL-related exceptions are now raised with ``GDALException``. The former
+  ``OGRException`` has been kept for backwards compatibility but should not be
+  used any longer.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -368,6 +391,9 @@ Migrations
 * It is now possible to have migrations (most probably :ref:`data migrations
   <data-migrations>`) for applications without models.
 
+* Migrations can now :ref:`serialize model managers
+  <using-managers-in-migrations>` as part of the model state.
+
 Models
 ^^^^^^
 
@@ -483,6 +509,10 @@ Requests and Responses
   like :meth:`~django.http.HttpResponse.getvalue` so that instances can be used
   as stream objects.
 
+* The new :meth:`HttpResponse.setdefault()
+  <django.http.HttpResponse.setdefault>` method allows setting a header unless
+  it has already been set.
+
 Tests
 ^^^^^
 
@@ -510,10 +540,6 @@ Tests
 
 * The :func:`~django.test.override_settings` decorator can now affect the
   master router in :setting:`DATABASE_ROUTERS`.
-
-* Added the ability to setup test data at the class level using
-  :meth:`TestCase.setUpTestData() <django.test.TestCase.setUpTestData>`. Using
-  this technique can speed up the tests as compared to using ``setUp()``.
 
 * Added test client support for file uploads with file-like objects.
 
@@ -808,8 +834,8 @@ Miscellaneous
 * Seconds have been removed from any locales that had them in ``TIME_FORMAT``,
   ``DATETIME_FORMAT``, or ``SHORT_DATETIME_FORMAT``.
 
-* The default max size of the Oracle test tablespace has increased from 200M
-  to 500M.
+* The default max size of the Oracle test tablespace has increased from 300M
+  (or 200M, before 1.7.2) to 500M.
 
 * :func:`~django.core.urlresolvers.reverse` and
   :func:`~django.core.urlresolvers.reverse_lazy` now return Unicode strings
@@ -829,7 +855,7 @@ Miscellaneous
   Unix end-of-line convention ``'\n'``, the Windows convention ``'\r\n'``, and
   the old Macintosh convention ``'\r'``.
 
-  .. _universal newlines: http://www.python.org/dev/peps/pep-0278
+  .. _universal newlines: https://www.python.org/dev/peps/pep-0278
 
 * The Memcached cache backends ``MemcachedCache`` and ``PyLibMCCache`` will
   delete a key if ``set()`` fails. This is necessary to ensure the ``cache_db``
@@ -1181,6 +1207,13 @@ In Django 2.0, session verification will be enabled regardless of whether or not
 ``SessionAuthenticationMiddleware`` will have no significance). You can add it
 to your ``MIDDLEWARE_CLASSES`` sometime before then to opt-in. Please read the
 :ref:`upgrade considerations <session-invalidation-on-password-change>` first.
+
+``django.contrib.sitemaps.FlatPageSitemap``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.contrib.sitemaps.FlatPageSitemap`` has moved to
+``django.contrib.flatpages.sitemaps.FlatPageSitemap``. The old import location
+is deprecated and will be removed in Django 1.9.
 
 .. removed-features-1.8:
 
