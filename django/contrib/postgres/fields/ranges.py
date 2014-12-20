@@ -70,7 +70,7 @@ class FloatRangeField(RangeField):
 
 
 class DateTimeRangeField(RangeField):
-    base_field = models.FloatField()
+    base_field = models.DateTimeField()
     range_type = DateTimeTZRange
 
     def db_type(self, connection):
@@ -78,7 +78,7 @@ class DateTimeRangeField(RangeField):
 
 
 class DateRangeField(RangeField):
-    base_field = models.FloatField()
+    base_field = models.DateField()
     range_type = DateRange
 
     def db_type(self, connection):
