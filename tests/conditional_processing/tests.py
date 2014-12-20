@@ -49,6 +49,20 @@ class ConditionalGet(TestCase):
         response = self.client.get('/condition/')
         self.assertFullResponse(response)
 
+    def test_if_unmodified_since(self):
+        self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = LAST_MODIFIED_STR
+        response = self.client.get('/condition/')
+        self.assertFullResponse(response)
+        self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = LAST_MODIFIED_NEWER_STR
+        response = self.client.get('/condition/')
+        self.assertFullResponse(response)
+        self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = LAST_MODIFIED_INVALID_STR
+        response = self.client.get('/condition/')
+        self.assertFullResponse(response)
+        self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = EXPIRED_LAST_MODIFIED_STR
+        response = self.client.get('/condition/')
+        self.assertEqual(response.status_code, 412)
+
     def test_if_none_match(self):
         self.client.defaults['HTTP_IF_NONE_MATCH'] = '"%s"' % ETAG
         response = self.client.get('/condition/')
@@ -71,6 +85,7 @@ class ConditionalGet(TestCase):
         self.assertEqual(response.status_code, 412)
 
     def test_both_headers(self):
+        # see http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec13.3.4
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_STR
         self.client.defaults['HTTP_IF_NONE_MATCH'] = '"%s"' % ETAG
         response = self.client.get('/condition/')
@@ -85,6 +100,32 @@ class ConditionalGet(TestCase):
         self.client.defaults['HTTP_IF_NONE_MATCH'] = '"%s"' % EXPIRED_ETAG
         response = self.client.get('/condition/')
         self.assertFullResponse(response)
+
+        self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = EXPIRED_LAST_MODIFIED_STR
+        self.client.defaults['HTTP_IF_NONE_MATCH'] = '"%s"' % EXPIRED_ETAG
+        response = self.client.get('/condition/')
+        self.assertFullResponse(response)
+
+    def test_both_headers_2(self):
+        self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = LAST_MODIFIED_STR
+        self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % ETAG
+        response = self.client.get('/condition/')
+        self.assertFullResponse(response)
+
+        self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = EXPIRED_LAST_MODIFIED_STR
+        self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % EXPIRED_ETAG
+        response = self.client.get('/condition/')
+        self.assertEqual(response.status_code, 412)
+
+        self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = LAST_MODIFIED_STR
+        self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % EXPIRED_ETAG
+        response = self.client.get('/condition/')
+        self.assertEqual(response.status_code, 412)
+
+        self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = EXPIRED_LAST_MODIFIED_STR
+        self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % ETAG
+        response = self.client.get('/condition/')
+        self.assertEqual(response.status_code, 412)
 
     def test_single_condition_1(self):
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_STR
@@ -123,6 +164,25 @@ class ConditionalGet(TestCase):
         self.assertNotModified(response)
         response = self.client.get('/condition/last_modified2/')
         self.assertFullResponse(response, check_etag=False)
+
+    def test_single_condition_7(self):
+        self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = EXPIRED_LAST_MODIFIED_STR
+        response = self.client.get('/condition/last_modified/')
+        self.assertEqual(response.status_code, 412)
+        response = self.client.get('/condition/etag/')
+        self.assertFullResponse(response, check_last_modified=False)
+
+    def test_single_condition_8(self):
+        self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = LAST_MODIFIED_STR
+        response = self.client.get('/condition/last_modified/')
+        self.assertFullResponse(response, check_etag=False)
+
+    def test_single_condition_9(self):
+        self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = EXPIRED_LAST_MODIFIED_STR
+        response = self.client.get('/condition/last_modified2/')
+        self.assertEqual(response.status_code, 412)
+        response = self.client.get('/condition/etag2/')
+        self.assertFullResponse(response, check_last_modified=False)
 
     def test_single_condition_head(self):
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_STR
