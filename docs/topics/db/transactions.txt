@@ -522,8 +522,8 @@ you can roll back the single offending operation, rather than the entire
 transaction. For example::
 
     a.save() # Succeeds, and never undone by savepoint rollback
+    sid = transaction.savepoint()
     try:
-        sid = transaction.savepoint()
         b.save() # Could throw exception
         transaction.savepoint_commit(sid)
     except IntegrityError:
