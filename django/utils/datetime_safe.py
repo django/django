@@ -32,8 +32,7 @@ class datetime(real_datetime):
 
 
 class time(real_time):
-    def strftime(self, fmt):
-        return strftime(self, fmt)
+    pass
 
 
 def new_date(d):
