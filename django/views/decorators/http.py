@@ -52,6 +52,16 @@ require_safe = require_http_methods(["GET", "HEAD"])
 require_safe.__doc__ = "Decorator to require that a view only accept safe methods: GET and HEAD."
 
 
+def _precondition_failed(request):
+    logger.warning('Precondition Failed: %s', request.path,
+        extra={
+            'status_code': 412,
+            'request': request
+        },
+    )
+    return HttpResponse(status=412)
+
+
 def condition(etag_func=None, last_modified_func=None):
     """
     Decorator to support conditional retrieval (or change) for a view
@@ -81,8 +91,12 @@ def condition(etag_func=None, last_modified_func=None):
             if_modified_since = request.META.get("HTTP_IF_MODIFIED_SINCE")
             if if_modified_since:
                 if_modified_since = parse_http_date_safe(if_modified_since)
+            if_unmodified_since = request.META.get("HTTP_IF_UNMODIFIED_SINCE")
+            if if_unmodified_since:
+                if_unmodified_since = parse_http_date_safe(if_unmodified_since)
             if_none_match = request.META.get("HTTP_IF_NONE_MATCH")
             if_match = request.META.get("HTTP_IF_MATCH")
+            etags = []
             if if_none_match or if_match:
                 # There can be more than one ETag in the request, so we
                 # consider the list of values.
@@ -97,21 +111,19 @@ def condition(etag_func=None, last_modified_func=None):
                     if_match = None
 
             # Compute values (if any) for the requested resource.
-            if etag_func:
-                res_etag = etag_func(request, *args, **kwargs)
-            else:
-                res_etag = None
-            if last_modified_func:
-                dt = last_modified_func(request, *args, **kwargs)
-                if dt:
-                    res_last_modified = timegm(dt.utctimetuple())
-                else:
-                    res_last_modified = None
-            else:
-                res_last_modified = None
+            def get_last_modified():
+                if last_modified_func:
+                    dt = last_modified_func(request, *args, **kwargs)
+                    if dt:
+                        return timegm(dt.utctimetuple())
+
+            res_etag = etag_func(request, *args, **kwargs) if etag_func else None
+            res_last_modified = get_last_modified()
 
             response = None
-            if not ((if_match and (if_modified_since or if_none_match)) or
+            if not ((if_match and if_modified_since) or
+                    (if_none_match and if_unmodified_since) or
+                    (if_modified_since and if_unmodified_since) or
                     (if_match and if_none_match)):
                 # We only get here if no undefined combinations of headers are
                 # specified.
@@ -123,26 +135,20 @@ def condition(etag_func=None, last_modified_func=None):
                     if request.method in ("GET", "HEAD"):
                         response = HttpResponseNotModified()
                     else:
-                        logger.warning('Precondition Failed: %s', request.path,
-                            extra={
-                                'status_code': 412,
-                                'request': request
-                            }
-                        )
-                        response = HttpResponse(status=412)
-                elif if_match and ((not res_etag and "*" in etags) or
-                        (res_etag and res_etag not in etags)):
-                    logger.warning('Precondition Failed: %s', request.path,
-                        extra={
-                            'status_code': 412,
-                            'request': request
-                        }
-                    )
-                    response = HttpResponse(status=412)
+                        response = _precondition_failed(request)
+                elif (if_match and ((not res_etag and "*" in etags) or
+                        (res_etag and res_etag not in etags) or
+                        (res_last_modified and if_unmodified_since and
+                        res_last_modified > if_unmodified_since))):
+                    response = _precondition_failed(request)
                 elif (not if_none_match and request.method in ("GET", "HEAD") and
                         res_last_modified and if_modified_since and
                         res_last_modified <= if_modified_since):
                     response = HttpResponseNotModified()
+                elif (not if_match and
+                        res_last_modified and if_unmodified_since and
+                        res_last_modified > if_unmodified_since):
+                    response = _precondition_failed(request)
 
             if response is None:
                 response = func(request, *args, **kwargs)

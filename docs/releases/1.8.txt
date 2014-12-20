@@ -528,6 +528,9 @@ Requests and Responses
   <django.http.HttpResponse.setdefault>` method allows setting a header unless
   it has already been set.
 
+* The :func:`~django.views.decorators.http.condition` decorator for
+  conditional view processing now supports the ``If-unmodified-since`` header.
+
 Tests
 ^^^^^
 
