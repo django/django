@@ -239,6 +239,12 @@ Database backends
   and up will support microseconds. See the :ref:`MySQL database notes
   <mysql-fractional-seconds>` for more details.
 
+Decorators
+^^^^^^^^^^
+
+* The :func:`~django.views.decorators.condition` decorator does now also support
+  the If-unmodified-since header.
+
 Email
 ^^^^^
 
