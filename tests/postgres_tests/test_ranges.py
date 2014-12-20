@@ -331,3 +331,11 @@ class TestFormField(TestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['1', 'b'])
         self.assertEqual(cm.exception.messages[0], 'Enter a whole number.')
+
+    def test_required(self):
+        field = pg_forms.IntegerRangeField(required=True)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['', ''])
+        self.assertEqual(cm.exception.messages[0], 'This field is required.')
+        value = field.clean([1, ''])
+        self.assertEqual(value, NumericRange(1, None))
