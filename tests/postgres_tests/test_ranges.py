@@ -251,8 +251,11 @@ class TestFormField(TestCase):
         self.assertEqual(value, DateRange(lower, upper))
 
     def test_using_split_datetime_widget(self):
+        class SplitDateTimeRangeField(pg_forms.DateTimeRangeField):
+            base_field = forms.SplitDateTimeField
+
         class SplitForm(forms.Form):
-            field = pg_forms.DateTimeRangeField(widget=forms.MultiWidget([forms.SplitDateTimeWidget, forms.SplitDateTimeWidget]))
+            field = SplitDateTimeRangeField()
 
         form = SplitForm()
         self.assertHTMLEqual(str(form), '''
@@ -310,20 +313,6 @@ class TestFormField(TestCase):
         value = field.clean(['', '0'])
         self.assertEqual(value, NumericRange(None, 0))
 
-    def test_too_many_args(self):
-        field = pg_forms.IntegerRangeField()
-        with self.assertRaises(exceptions.ValidationError) as cm:
-            field.clean(['1', '2', '3'])
-        self.assertEqual(cm.exception.messages[0], 'Enter two valid values.')
-        self.assertEqual(cm.exception.code, 'invalid')
-
-    def test_not_enough_args(self):
-        field = pg_forms.IntegerRangeField()
-        with self.assertRaises(exceptions.ValidationError) as cm:
-            field.clean(['1'])
-        self.assertEqual(cm.exception.messages[0], 'Enter two valid values.')
-        self.assertEqual(cm.exception.code, 'invalid')
-
     def test_incorrect_data_type(self):
         field = pg_forms.IntegerRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
@@ -335,12 +324,10 @@ class TestFormField(TestCase):
         field = pg_forms.IntegerRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['a', '2'])
-        self.assertEqual(cm.exception.messages[0], 'Enter a valid start value: Enter a whole number.')
-        self.assertEqual(cm.exception.code, 'lower_invalid')
+        self.assertEqual(cm.exception.messages[0], 'Enter a whole number.')
 
     def test_invalid_upper(self):
         field = pg_forms.IntegerRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['1', 'b'])
-        self.assertEqual(cm.exception.messages[0], 'Enter a valid end value: Enter a whole number.')
-        self.assertEqual(cm.exception.code, 'upper_invalid')
+        self.assertEqual(cm.exception.messages[0], 'Enter a whole number.')
