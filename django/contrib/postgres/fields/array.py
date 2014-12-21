@@ -82,7 +82,8 @@ class ArrayField(Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super(ArrayField, self).deconstruct()
-        path = 'django.contrib.postgres.fields.ArrayField'
+        if path == 'django.contrib.postgres.fields.array.ArrayField':
+            path = 'django.contrib.postgres.fields.ArrayField'
         kwargs.update({
             'base_field': self.base_field,
             'size': self.size,

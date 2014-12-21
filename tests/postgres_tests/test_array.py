@@ -10,7 +10,7 @@ from django import forms
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from .models import IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel, DateTimeArrayModel, NestedIntegerArrayModel
+from .models import IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel, DateTimeArrayModel, NestedIntegerArrayModel, ArrayFieldSubclass
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
@@ -227,6 +227,15 @@ class TestMigrations(TestCase):
         name, path, args, kwargs = field.deconstruct()
         new = ArrayField(*args, **kwargs)
         self.assertEqual(new.base_field.max_length, field.base_field.max_length)
+
+    def test_subclass_deconstruct(self):
+        field = ArrayField(models.IntegerField())
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, 'django.contrib.postgres.fields.ArrayField')
+
+        field = ArrayFieldSubclass()
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, 'postgres_tests.models.ArrayFieldSubclass')
 
     @override_settings(MIGRATION_MODULES={
         "postgres_tests": "postgres_tests.array_default_migrations",

@@ -32,3 +32,8 @@ class CharFieldModel(models.Model):
 
 class TextFieldModel(models.Model):
     field = models.TextField()
+
+
+class ArrayFieldSubclass(ArrayField):
+    def __init__(self, *args, **kwargs):
+        super(ArrayFieldSubclass, self).__init__(models.IntegerField())
