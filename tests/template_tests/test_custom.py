@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
 from unittest import TestCase
-import warnings
 
 from django import template
+from django.test import ignore_warnings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -246,6 +246,7 @@ class CustomTagTests(TestCase):
         self.verify_tag(custom.inclusion_tag_current_app, 'inclusion_tag_current_app')
         self.verify_tag(custom.inclusion_unlimited_args_kwargs, 'inclusion_unlimited_args_kwargs')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_15070_current_app(self):
         """
         Test that inclusion tag passes down `current_app` of context to the
@@ -255,10 +256,9 @@ class CustomTagTests(TestCase):
         t = template.Template('{% load custom %}{% inclusion_tag_current_app %}')
         self.assertEqual(t.render(c).strip(), 'None')
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
-            c = template.Context({}, current_app='advanced')
-            self.assertEqual(t.render(c).strip(), 'advanced')
+        # That part produces the deprecation warning
+        c = template.Context({}, current_app='advanced')
+        self.assertEqual(t.render(c).strip(), 'advanced')
 
     def test_15070_use_l10n(self):
         """

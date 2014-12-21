@@ -6,7 +6,6 @@ import copy
 import datetime
 from decimal import Decimal, Rounded
 import re
-import sys
 import threading
 import unittest
 import warnings
@@ -25,8 +24,9 @@ from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (TestCase, TransactionTestCase, mock, override_settings,
     skipUnlessDBFeature, skipIfDBFeature)
-from django.test.utils import str_prefix, IgnoreAllDeprecationWarningsMixin
+from django.test.utils import ignore_warnings, str_prefix
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.six.moves import range
 
 from . import models
@@ -1081,17 +1081,12 @@ class BackendUtilTests(TestCase):
                   '1234600000')
 
 
-class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):
+@ignore_warnings(category=UserWarning,
+                 message="Overriding setting DATABASES can lead to unexpected behavior")
+class DBTestSettingsRenamedTests(TestCase):
 
     mismatch_msg = ("Connection 'test-deprecation' has mismatched TEST "
                     "and TEST_* database settings.")
-
-    @classmethod
-    def setUpClass(cls):
-        super(DBTestSettingsRenamedTests, cls).setUpClass()
-        # Silence "UserWarning: Overriding setting DATABASES can lead to
-        # unexpected behavior."
-        cls.warning_classes.append(UserWarning)
 
     def setUp(self):
         super(DBTestSettingsRenamedTests, self).setUp()
@@ -1189,6 +1184,7 @@ class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):
         with override_settings(DATABASES=self.db_settings):
             self.handler.prepare_test_settings('test-deprecation')
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_old_settings_only(self):
         # should be able to define old settings without the new
         self.db_settings.update({

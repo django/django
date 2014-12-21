@@ -1,13 +1,7 @@
 import unittest
-import warnings
 
+from django.test import ignore_warnings
 from django.utils.deprecation import RemovedInDjango20Warning
-
-with warnings.catch_warnings():
-    warnings.filterwarnings(
-        'ignore', 'django.utils.checksums will be removed in Django 2.0.',
-        RemovedInDjango20Warning)
-    from django.utils import checksums
 
 
 class TestUtilsChecksums(unittest.TestCase):
@@ -21,7 +15,9 @@ class TestUtilsChecksums(unittest.TestCase):
             output = value
         self.assertEqual(function(value), output)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_luhn(self):
+        from django.utils import checksums
         f = checksums.luhn
         items = (
             (4111111111111111, True), ('4111111111111111', True),
