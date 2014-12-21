@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
+
 import warnings
 
 from django.db import models
+from django.utils.deprecation import RemovedInDjango19Warning
 
 
 class People(models.Model):
@@ -60,8 +62,8 @@ class ColumnTypes(models.Model):
     file_path_field = models.FilePathField()
     float_field = models.FloatField()
     int_field = models.IntegerField()
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RemovedInDjango19Warning)
         ip_address_field = models.IPAddressField()
     gen_ip_adress_field = models.GenericIPAddressField(protocol="ipv4")
     pos_int_field = models.PositiveIntegerField()

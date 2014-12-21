@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import warnings
-
 from django.db import models
 from django.test import TestCase, override_settings
 from django.utils import six
@@ -238,9 +236,7 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(kwargs, {})
 
     def test_ip_address_field(self):
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            field = models.IPAddressField()
+        field = models.IPAddressField()
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.IPAddressField")
         self.assertEqual(args, [])

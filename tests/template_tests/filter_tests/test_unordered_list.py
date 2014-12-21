@@ -1,7 +1,5 @@
-import warnings
-
 from django.template.defaultfilters import unordered_list
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
@@ -16,11 +14,10 @@ class UnorderedListTests(SimpleTestCase):
         output = self.engine.render_to_string('unordered_list01', {'a': ['x>', ['<y']]})
         self.assertEqual(output, '\t<li>x&gt;\n\t<ul>\n\t\t<li>&lt;y</li>\n\t</ul>\n\t</li>')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'unordered_list02': '{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}'})
     def test_unordered_list02(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', RemovedInDjango20Warning)
-            output = self.engine.render_to_string('unordered_list02', {'a': ['x>', ['<y']]})
+        output = self.engine.render_to_string('unordered_list02', {'a': ['x>', ['<y']]})
         self.assertEqual(output, '\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>')
 
     @setup({'unordered_list03': '{{ a|unordered_list }}'})
@@ -39,41 +36,32 @@ class UnorderedListTests(SimpleTestCase):
         self.assertEqual(output, '\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>')
 
 
+@ignore_warnings(category=RemovedInDjango20Warning)
 class DeprecatedUnorderedListSyntaxTests(SimpleTestCase):
 
     @setup({'unordered_list01': '{{ a|unordered_list }}'})
     def test_unordered_list01(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', RemovedInDjango20Warning)
-            output = self.engine.render_to_string('unordered_list01', {'a': ['x>', [['<y', []]]]})
+        output = self.engine.render_to_string('unordered_list01', {'a': ['x>', [['<y', []]]]})
         self.assertEqual(output, '\t<li>x&gt;\n\t<ul>\n\t\t<li>&lt;y</li>\n\t</ul>\n\t</li>')
 
     @setup({'unordered_list02': '{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}'})
     def test_unordered_list02(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', RemovedInDjango20Warning)
-            output = self.engine.render_to_string('unordered_list02', {'a': ['x>', [['<y', []]]]})
+        output = self.engine.render_to_string('unordered_list02', {'a': ['x>', [['<y', []]]]})
         self.assertEqual(output, '\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>')
 
     @setup({'unordered_list03': '{{ a|unordered_list }}'})
     def test_unordered_list03(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', RemovedInDjango20Warning)
-            output = self.engine.render_to_string('unordered_list03', {'a': ['x>', [[mark_safe('<y'), []]]]})
+        output = self.engine.render_to_string('unordered_list03', {'a': ['x>', [[mark_safe('<y'), []]]]})
         self.assertEqual(output, '\t<li>x&gt;\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>')
 
     @setup({'unordered_list04': '{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}'})
     def test_unordered_list04(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', RemovedInDjango20Warning)
-            output = self.engine.render_to_string('unordered_list04', {'a': ['x>', [[mark_safe('<y'), []]]]})
+        output = self.engine.render_to_string('unordered_list04', {'a': ['x>', [[mark_safe('<y'), []]]]})
         self.assertEqual(output, '\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>')
 
     @setup({'unordered_list05': '{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}'})
     def test_unordered_list05(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', RemovedInDjango20Warning)
-            output = self.engine.render_to_string('unordered_list05', {'a': ['x>', [['<y', []]]]})
+        output = self.engine.render_to_string('unordered_list05', {'a': ['x>', [['<y', []]]]})
         self.assertEqual(output, '\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>')
 
 
@@ -130,28 +118,26 @@ class FunctionTests(SimpleTestCase):
 
         self.assertEqual(unordered_list(item_generator()), '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_legacy(self):
         """
         Old format for unordered lists should still work
         """
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', RemovedInDjango20Warning)
+        self.assertEqual(unordered_list(['item 1', []]), '\t<li>item 1</li>')
 
-            self.assertEqual(unordered_list(['item 1', []]), '\t<li>item 1</li>')
+        self.assertEqual(
+            unordered_list(['item 1', [['item 1.1', []]]]),
+            '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>',
+        )
 
-            self.assertEqual(
-                unordered_list(['item 1', [['item 1.1', []]]]),
-                '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>',
-            )
+        self.assertEqual(
+            unordered_list(['item 1', [['item 1.1', []],
+            ['item 1.2', []]]]), '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1'
+            '</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>',
+        )
 
-            self.assertEqual(
-                unordered_list(['item 1', [['item 1.1', []],
-                ['item 1.2', []]]]), '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1'
-                '</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>',
-            )
-
-            self.assertEqual(
-                unordered_list(['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]),
-                '\t<li>States\n\t<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>'
-                '\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>',
-            )
+        self.assertEqual(
+            unordered_list(['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]),
+            '\t<li>States\n\t<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>'
+            '\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>',
+        )

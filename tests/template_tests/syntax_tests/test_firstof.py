@@ -1,7 +1,5 @@
-import warnings
-
 from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from ..utils import setup
@@ -59,31 +57,27 @@ class FirstOfTagTests(SimpleTestCase):
         output = self.engine.render_to_string('firstof10', {'a': '<'})
         self.assertEqual(output, '&lt;')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'firstof11': '{% load firstof from future %}{% firstof a b %}'})
     def test_firstof11(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('firstof11', {'a': '<', 'b': '>'})
+        output = self.engine.render_to_string('firstof11', {'a': '<', 'b': '>'})
         self.assertEqual(output, '&lt;')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'firstof12': '{% load firstof from future %}{% firstof a b %}'})
     def test_firstof12(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('firstof12', {'a': '', 'b': '>'})
+        output = self.engine.render_to_string('firstof12', {'a': '', 'b': '>'})
         self.assertEqual(output, '&gt;')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'firstof13': '{% load firstof from future %}'
                          '{% autoescape off %}{% firstof a %}{% endautoescape %}'})
     def test_firstof13(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('firstof13', {'a': '<'})
+        output = self.engine.render_to_string('firstof13', {'a': '<'})
         self.assertEqual(output, '<')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'firstof14': '{% load firstof from future %}{% firstof a|safe b %}'})
     def test_firstof14(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('firstof14', {'a': '<'})
+        output = self.engine.render_to_string('firstof14', {'a': '<'})
         self.assertEqual(output, '<')

@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import warnings
-
 from django.forms import (
     CharField, ChoiceField, Form, HiddenInput, IntegerField, ModelForm,
     ModelMultipleChoiceField, MultipleChoiceField, RadioSelect, Select,
     TextInput,
 )
-from django.test import TestCase
+from django.test import TestCase, ignore_warnings
 from django.utils import translation
 from django.utils.translation import gettext_lazy, ugettext_lazy
 
@@ -61,17 +59,6 @@ class FormsRegressionsTestCase(TestCase):
         f = SomeForm()
         self.assertHTMLEqual(f.as_p(), '<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label> <ul id="id_somechoice">\n<li><label for="id_somechoice_0"><input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" /> En tied\xe4</label></li>\n<li><label for="id_somechoice_1"><input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" /> Mies</label></li>\n<li><label for="id_somechoice_2"><input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" /> Nainen</label></li>\n</ul></p>')
 
-        # Testing choice validation with UTF-8 bytestrings as input (these are the
-        # Russian abbreviations "мес." and "шт.".
-        UNITS = ((b'\xd0\xbc\xd0\xb5\xd1\x81.', b'\xd0\xbc\xd0\xb5\xd1\x81.'),
-                 (b'\xd1\x88\xd1\x82.', b'\xd1\x88\xd1\x82.'))
-        f = ChoiceField(choices=UNITS)
-        with warnings.catch_warnings():
-            # Ignore UnicodeWarning
-            warnings.simplefilter("ignore")
-            self.assertEqual(f.clean('\u0448\u0442.'), '\u0448\u0442.')
-            self.assertEqual(f.clean(b'\xd1\x88\xd1\x82.'), '\u0448\u0442.')
-
         # Translated error messages used to be buggy.
         with translation.override('ru'):
             f = SomeForm({})
@@ -82,6 +69,16 @@ class FormsRegressionsTestCase(TestCase):
             degree = IntegerField(widget=Select(choices=((1, gettext_lazy('test')),)))
 
         f = CopyForm()
+
+    @ignore_warnings(category=UnicodeWarning)
+    def test_regression_5216_b(self):
+        # Testing choice validation with UTF-8 bytestrings as input (these are the
+        # Russian abbreviations "мес." and "шт.".
+        UNITS = ((b'\xd0\xbc\xd0\xb5\xd1\x81.', b'\xd0\xbc\xd0\xb5\xd1\x81.'),
+                 (b'\xd1\x88\xd1\x82.', b'\xd1\x88\xd1\x82.'))
+        f = ChoiceField(choices=UNITS)
+        self.assertEqual(f.clean('\u0448\u0442.'), '\u0448\u0442.')
+        self.assertEqual(f.clean(b'\xd1\x88\xd1\x82.'), '\u0448\u0442.')
 
     def test_misc(self):
         # There once was a problem with Form fields called "data". Let's make sure that

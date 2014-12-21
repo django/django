@@ -1,9 +1,7 @@
 # coding: utf-8
-import warnings
-
 from django.core.urlresolvers import NoReverseMatch
 from django.template import TemplateSyntaxError
-from django.test import override_settings, SimpleTestCase
+from django.test import ignore_warnings, override_settings, SimpleTestCase
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from ..utils import setup
@@ -13,46 +11,40 @@ from ..utils import setup
 class UrlTagTests(SimpleTestCase):
 
     # Successes
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url01': '{% url "template_tests.views.client" client.id %}'})
     def test_url01(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url01', {'client': {'id': 1}})
+        output = self.engine.render_to_string('url01', {'client': {'id': 1}})
         self.assertEqual(output, '/client/1/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url02': '{% url "template_tests.views.client_action" id=client.id action="update" %}'})
     def test_url02(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url02', {'client': {'id': 1}})
+        output = self.engine.render_to_string('url02', {'client': {'id': 1}})
         self.assertEqual(output, '/client/1/update/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url02a': '{% url "template_tests.views.client_action" client.id "update" %}'})
     def test_url02a(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url02a', {'client': {'id': 1}})
+        output = self.engine.render_to_string('url02a', {'client': {'id': 1}})
         self.assertEqual(output, '/client/1/update/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url02b': "{% url 'template_tests.views.client_action' id=client.id action='update' %}"})
     def test_url02b(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url02b', {'client': {'id': 1}})
+        output = self.engine.render_to_string('url02b', {'client': {'id': 1}})
         self.assertEqual(output, '/client/1/update/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url02c': "{% url 'template_tests.views.client_action' client.id 'update' %}"})
     def test_url02c(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url02c', {'client': {'id': 1}})
+        output = self.engine.render_to_string('url02c', {'client': {'id': 1}})
         self.assertEqual(output, '/client/1/update/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url03': '{% url "template_tests.views.index" %}'})
     def test_url03(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url03')
+        output = self.engine.render_to_string('url03')
         self.assertEqual(output, '/')
 
     @setup({'url04': '{% url "named.client" client.id %}'})
@@ -70,11 +62,10 @@ class UrlTagTests(SimpleTestCase):
         output = self.engine.render_to_string('url06', {'v': 'Ω'})
         self.assertEqual(output, '/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url07': '{% url "template_tests.views.client2" tag=v %}'})
     def test_url07(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url07', {'v': 'Ω'})
+        output = self.engine.render_to_string('url07', {'v': 'Ω'})
         self.assertEqual(output, '/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/')
 
     @setup({'url08': '{% url "метка_оператора" v %}'})
@@ -87,62 +78,54 @@ class UrlTagTests(SimpleTestCase):
         output = self.engine.render_to_string('url09', {'v': 'Ω'})
         self.assertEqual(output, '/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url10': '{% url "template_tests.views.client_action" id=client.id action="two words" %}'})
     def test_url10(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url10', {'client': {'id': 1}})
+        output = self.engine.render_to_string('url10', {'client': {'id': 1}})
         self.assertEqual(output, '/client/1/two%20words/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url11': '{% url "template_tests.views.client_action" id=client.id action="==" %}'})
     def test_url11(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url11', {'client': {'id': 1}})
+        output = self.engine.render_to_string('url11', {'client': {'id': 1}})
         self.assertEqual(output, '/client/1/==/')
 
     @setup({'url12': '{% url "template_tests.views.client_action" '
                      'id=client.id action="!$&\'()*+,;=~:@," %}'})
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_url12(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url12', {'client': {'id': 1}})
+        output = self.engine.render_to_string('url12', {'client': {'id': 1}})
         self.assertEqual(output, '/client/1/!$&\'()*+,;=~:@,/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url13': '{% url "template_tests.views.client_action" '
                      'id=client.id action=arg|join:"-" %}'})
     def test_url13(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url13', {'client': {'id': 1}, 'arg': ['a', 'b']})
+        output = self.engine.render_to_string('url13', {'client': {'id': 1}, 'arg': ['a', 'b']})
         self.assertEqual(output, '/client/1/a-b/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url14': '{% url "template_tests.views.client_action" client.id arg|join:"-" %}'})
     def test_url14(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url14', {'client': {'id': 1}, 'arg': ['a', 'b']})
+        output = self.engine.render_to_string('url14', {'client': {'id': 1}, 'arg': ['a', 'b']})
         self.assertEqual(output, '/client/1/a-b/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url15': '{% url "template_tests.views.client_action" 12 "test" %}'})
     def test_url15(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url15')
+        output = self.engine.render_to_string('url15')
         self.assertEqual(output, '/client/12/test/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url18': '{% url "template_tests.views.client" "1,2" %}'})
     def test_url18(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url18')
+        output = self.engine.render_to_string('url18')
         self.assertEqual(output, '/client/1,2/')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url19': '{% url named_url client.id %}'})
     def test_url19(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url19', {'client': {'id': 1}, 'named_url': 'template_tests.views.client'})
+        output = self.engine.render_to_string('url19', {'client': {'id': 1}, 'named_url': 'template_tests.views.client'})
         self.assertEqual(output, '/client/1/')
 
     @setup({'url20': '{% url url_name_in_var client.id %}'})
@@ -161,12 +144,11 @@ class UrlTagTests(SimpleTestCase):
         with self.assertRaises(NoReverseMatch):
             self.engine.render_to_string('url-fail02')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url-fail03': '{% url "template_tests.views.client" %}'})
     def test_url_fail03(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            with self.assertRaises(NoReverseMatch):
-                self.engine.render_to_string('url-fail03')
+        with self.assertRaises(NoReverseMatch):
+            self.engine.render_to_string('url-fail03')
 
     @setup({'url-fail04': '{% url "view" id, %}'})
     def test_url_fail04(self):
@@ -208,12 +190,11 @@ class UrlTagTests(SimpleTestCase):
         with self.assertRaises(NoReverseMatch):
             self.engine.render_to_string('url-fail12', {'named_url': 'no_such_view'})
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url-fail13': '{% url named_url %}'})
     def test_url_fail13(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            with self.assertRaises(NoReverseMatch):
-                self.engine.render_to_string('url-fail13', {'named_url': 'template_tests.views.client'})
+        with self.assertRaises(NoReverseMatch):
+            self.engine.render_to_string('url-fail13', {'named_url': 'template_tests.views.client'})
 
     @setup({'url-fail14': '{% url named_url id, %}'})
     def test_url_fail14(self):
@@ -246,18 +227,16 @@ class UrlTagTests(SimpleTestCase):
             self.engine.render_to_string('url-fail19', {'named_url': 'view'})
 
     # {% url ... as var %}
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url-asvar01': '{% url "template_tests.views.index" as url %}'})
     def test_url_asvar01(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url-asvar01')
+        output = self.engine.render_to_string('url-asvar01')
         self.assertEqual(output, '')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'url-asvar02': '{% url "template_tests.views.index" as url %}{{ url }}'})
     def test_url_asvar02(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango20Warning)
-            output = self.engine.render_to_string('url-asvar02')
+        output = self.engine.render_to_string('url-asvar02')
         self.assertEqual(output, '/')
 
     @setup({'url-asvar03': '{% url "no_such_view" as url %}{{ url }}'})

@@ -8,8 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.test import TestCase, RequestFactory, override_settings
-from django.test.utils import IgnoreDeprecationWarningsMixin
+from django.test import TestCase, RequestFactory, ignore_warnings, override_settings
 from django.views.generic import View, TemplateView, RedirectView
 
 from . import views
@@ -331,8 +330,9 @@ class TemplateViewTest(TestCase):
         self.assertEqual(response['Content-Type'], 'text/plain')
 
 
+@ignore_warnings(category=RemovedInDjango19Warning)
 @override_settings(ROOT_URLCONF='generic_views.urls')
-class RedirectViewTest(IgnoreDeprecationWarningsMixin, TestCase):
+class RedirectViewTest(TestCase):
 
     rf = RequestFactory()
 

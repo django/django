@@ -11,6 +11,7 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
 from django.contrib.contenttypes.models import ContentType
+from django.utils.deprecation import RemovedInDjango19Warning
 
 # The following classes are for testing basic data
 # marshalling, including NULL values, where allowed.
@@ -68,8 +69,8 @@ class BigIntegerData(models.Model):
 
 
 class IPAddressData(models.Model):
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RemovedInDjango19Warning)
         data = models.IPAddressField(null=True)
 
 

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from unittest import skipUnless
 import warnings
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import reset_warning_registry
 from django.utils import six, text
 from django.utils.deprecation import RemovedInDjango19Warning
@@ -198,26 +198,24 @@ class TestUtilsText(SimpleTestCase):
         filename = "^&'@{}[],$=!-#()%+~_123.txt"
         self.assertEqual(text.get_valid_filename(filename), "-_123.txt")
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_javascript_quote(self):
         input = "<script>alert('Hello \\xff.\n Welcome\there\r');</script>"
         output = r"<script>alert(\'Hello \\xff.\n Welcome\there\r\');<\/script>"
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango19Warning)
-            self.assertEqual(text.javascript_quote(input), output)
+        self.assertEqual(text.javascript_quote(input), output)
 
-            # Exercising quote_double_quotes keyword argument
-            input = '"Text"'
-            self.assertEqual(text.javascript_quote(input), '"Text"')
-            self.assertEqual(text.javascript_quote(input, quote_double_quotes=True),
-                             '&quot;Text&quot;')
+        # Exercising quote_double_quotes keyword argument
+        input = '"Text"'
+        self.assertEqual(text.javascript_quote(input), '"Text"')
+        self.assertEqual(text.javascript_quote(input, quote_double_quotes=True),
+                         '&quot;Text&quot;')
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     @skipUnless(IS_WIDE_BUILD, 'Not running in a wide build of Python')
     def test_javascript_quote_unicode(self):
         input = "<script>alert('Hello \\xff.\n Wel𝕃come\there\r');</script>"
         output = r"<script>alert(\'Hello \\xff.\n Wel𝕃come\there\r\');<\/script>"
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RemovedInDjango19Warning)
-            self.assertEqual(text.javascript_quote(input), output)
+        self.assertEqual(text.javascript_quote(input), output)
 
     def test_deprecation(self):
         reset_warning_registry()

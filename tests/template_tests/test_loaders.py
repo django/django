@@ -19,9 +19,9 @@ from django.template import TemplateDoesNotExist, Context
 from django.template.loaders import cached, eggs
 from django.template.engine import Engine
 from django.template import loader
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
+from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils._os import upath
 from django.utils.six import StringIO
 
@@ -166,11 +166,12 @@ class RenderToStringTest(SimpleTestCase):
             loader.select_template, [])
 
 
+@ignore_warnings(category=RemovedInDjango20Warning)
 @override_settings(TEMPLATES=[{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [TEMPLATES_DIR],
 }])
-class DeprecatedRenderToStringTest(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
+class DeprecatedRenderToStringTest(SimpleTestCase):
 
     def test_existing_context_kept_clean(self):
         context = Context({'obj': 'before'})
@@ -192,10 +193,11 @@ class DeprecatedRenderToStringTest(IgnorePendingDeprecationWarningsMixin, Simple
             loader.render_to_string('test_context_stack.html', context_instance=Context()).strip())
 
 
+@ignore_warnings(category=RemovedInDjango20Warning)
 @override_settings(TEMPLATES=[{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
 }])
-class TemplateDirsOverrideTest(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
+class TemplateDirsOverrideTest(SimpleTestCase):
 
     dirs_tuple = (os.path.join(os.path.dirname(upath(__file__)), 'other_templates'),)
     dirs_list = list(dirs_tuple)
