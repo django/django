@@ -580,6 +580,12 @@ class BaseDatabaseFeatures(object):
     # Is there a true datatype for timedeltas?
     has_native_duration_field = False
 
+    # Does the database driver support timedeltas as arguments?
+    # This is only relevant when there is a native duration field.
+    # Specifically, there is a bug with cx_Oracle:
+    # https://bitbucket.org/anthony_tuininga/cx_oracle/issue/7/
+    driver_supports_timedelta_args = False
+
     # Do time/datetime fields have microsecond precision?
     supports_microsecond_precision = True
 

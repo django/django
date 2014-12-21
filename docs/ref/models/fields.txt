@@ -551,7 +551,8 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
 
 A field for storing periods of time - modeled in Python by
 :class:`~python:datetime.timedelta`. When used on PostgreSQL, the data type
-used is an ``interval``, otherwise a ``bigint`` of microseconds is used.
+used is an ``interval`` and on Oracle the data type is ``INTERVAL DAY(9) TO
+SECOND(6)``. Otherwise a ``bigint`` of microseconds is used.
 
 .. note::
 
