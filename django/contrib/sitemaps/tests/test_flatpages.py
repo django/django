@@ -6,13 +6,15 @@ import warnings
 from django.apps import apps
 from django.conf import settings
 from django.contrib.sitemaps import FlatPageSitemap
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango19Warning
 
 from .base import SitemapTestsBase
 
 
 class FlatpagesSitemapTests(SitemapTestsBase):
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     @skipUnless(apps.is_installed('django.contrib.flatpages'),
                 "django.contrib.flatpages app not installed.")
     def test_flatpage_sitemap(self):
@@ -38,9 +40,7 @@ class FlatpagesSitemapTests(SitemapTestsBase):
             registration_required=True
         )
         private.sites.add(settings.SITE_ID)
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            response = self.client.get('/flatpages/sitemap.xml')
+        response = self.client.get('/flatpages/sitemap.xml')
         # Public flatpage should be in the sitemap
         self.assertContains(response, '<loc>%s%s</loc>' % (self.base_url, public.url))
         # Private flatpage should not be in the sitemap

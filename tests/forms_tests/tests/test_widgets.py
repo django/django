@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 import copy
 import datetime
-import warnings
 
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -20,7 +19,7 @@ from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
 from django.utils.translation import activate, deactivate, override
-from django.test import TestCase, override_settings
+from django.test import TestCase, ignore_warnings, override_settings
 from django.utils.encoding import python_2_unicode_compatible, force_text
 
 from ..models import Article
@@ -1112,27 +1111,24 @@ class WidgetTests(TestCase):
         # to make a copy of its sub-widgets when it is copied.
         self.assertEqual(w1.choices, [1, 2, 3])
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_13390(self):
         # See ticket #13390
         class SplitDateForm(Form):
             field = DateTimeField(widget=SplitDateTimeWidget, required=False)
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango19Warning)
-            form = SplitDateForm({'field': ''})
-            self.assertTrue(form.is_valid())
-            form = SplitDateForm({'field': ['', '']})
-            self.assertTrue(form.is_valid())
+        form = SplitDateForm({'field': ''})
+        self.assertTrue(form.is_valid())
+        form = SplitDateForm({'field': ['', '']})
+        self.assertTrue(form.is_valid())
 
         class SplitDateRequiredForm(Form):
             field = DateTimeField(widget=SplitDateTimeWidget, required=True)
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango19Warning)
-            form = SplitDateRequiredForm({'field': ''})
-            self.assertFalse(form.is_valid())
-            form = SplitDateRequiredForm({'field': ['', '']})
-            self.assertFalse(form.is_valid())
+        form = SplitDateRequiredForm({'field': ''})
+        self.assertFalse(form.is_valid())
+        form = SplitDateRequiredForm({'field': ['', '']})
+        self.assertFalse(form.is_valid())
 
 
 @override_settings(ROOT_URLCONF='forms_tests.urls')

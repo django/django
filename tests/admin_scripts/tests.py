@@ -15,17 +15,17 @@ import socket
 import subprocess
 import sys
 import unittest
-import warnings
 
 import django
 from django import conf, get_version
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, call_command, color
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.utils._os import npath, upath
 from django.utils.six import StringIO
-from django.test import LiveServerTestCase, TestCase, mock, override_settings
+from django.test import LiveServerTestCase, TestCase, ignore_warnings, mock, override_settings
 from django.test.runner import DiscoverRunner
 
 
@@ -1663,11 +1663,10 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
         self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_requires_model_validation_and_requires_system_checks_both_defined(self):
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.core.management.base')
-            from .management.commands.validation_command import InvalidCommand
-            self.assertRaises(ImproperlyConfigured, InvalidCommand)
+        from .management.commands.validation_command import InvalidCommand
+        self.assertRaises(ImproperlyConfigured, InvalidCommand)
 
 
 class Discovery(TestCase):

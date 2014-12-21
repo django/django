@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import warnings
-
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import (
     BooleanField, CharField, ChoiceField, DateField, DateTimeField,
@@ -203,9 +201,7 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'required': 'REQUIRED',
             'invalid': 'INVALID IP ADDRESS',
         }
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            f = IPAddressField(error_messages=e)
+        f = IPAddressField(error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
         self.assertFormErrors(['INVALID IP ADDRESS'], f.clean, '127.0.0')
 

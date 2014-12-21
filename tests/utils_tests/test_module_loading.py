@@ -7,8 +7,8 @@ import warnings
 from zipimport import zipimporter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase, modify_settings
-from django.test.utils import IgnoreDeprecationWarningsMixin, extend_sys_path
+from django.test import SimpleTestCase, ignore_warnings, modify_settings
+from django.test.utils import extend_sys_path
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.module_loading import (autodiscover_modules, import_by_path, import_string,
@@ -110,7 +110,8 @@ class EggLoader(unittest.TestCase):
             self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
 
 
-class ModuleImportTestCase(IgnoreDeprecationWarningsMixin, unittest.TestCase):
+@ignore_warnings(category=RemovedInDjango19Warning)
+class ModuleImportTestCase(unittest.TestCase):
     def test_import_by_path(self):
         cls = import_by_path('django.utils.module_loading.import_by_path')
         self.assertEqual(cls, import_by_path)

@@ -33,7 +33,6 @@ import os
 import uuid
 from decimal import Decimal
 from unittest import skipIf
-import warnings
 
 try:
     from PIL import Image
@@ -50,10 +49,11 @@ from django.forms import (
     TimeField, TypedChoiceField, TypedMultipleChoiceField, URLField, UUIDField,
     ValidationError, Widget,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils import formats
 from django.utils import six
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils._os import upath
 
 
@@ -491,15 +491,14 @@ class FieldsTests(SimpleTestCase):
         f = DateField()
         self.assertRaisesMessage(ValidationError, "'Enter a valid date.'", f.clean, 'a\x00b')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)  # for _has_changed
     def test_datefield_changed(self):
         format = '%d/%m/%Y'
         f = DateField(input_formats=[format])
         d = datetime.date(2007, 9, 17)
         self.assertFalse(f.has_changed(d, '17/09/2007'))
         # Test for deprecated behavior _has_changed
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(f._has_changed(d, '17/09/2007'))
+        self.assertFalse(f._has_changed(d, '17/09/2007'))
 
     def test_datefield_strptime(self):
         """Test that field.strptime doesn't raise an UnicodeEncodeError (#16123)"""
@@ -662,11 +661,9 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, ' 2A2')
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '2A2 ')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)  # error_message deprecation
     def test_regexfield_4(self):
-        # deprecated error_message argument; remove in Django 2.0
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
+        f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
         self.assertEqual('1234', f.clean('1234'))
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, '123')
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, 'abcd')

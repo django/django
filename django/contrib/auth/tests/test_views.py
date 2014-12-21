@@ -1,7 +1,6 @@
 from importlib import import_module
 import itertools
 import re
-import warnings
 
 from django.apps import apps
 from django.conf import settings
@@ -15,11 +14,12 @@ from django.contrib.auth.views import login as login_view
 from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import QueryDict, HttpRequest
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import urlparse, ParseResult
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.test import TestCase, override_settings
+from django.test import TestCase, ignore_warnings, override_settings
 from django.test.utils import patch_logger
 from django.middleware.csrf import CsrfViewMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -154,15 +154,14 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual("staffmember@example.com", mail.outbox[0].from_email)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(ALLOWED_HOSTS=['adminsite.com'])
     def test_admin_reset(self):
         "If the reset view is marked as being for admin, the HTTP_HOST header is used for a domain override."
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            response = self.client.post('/admin_password_reset/',
-                {'email': 'staffmember@example.com'},
-                HTTP_HOST='adminsite.com'
-            )
+        response = self.client.post('/admin_password_reset/',
+            {'email': 'staffmember@example.com'},
+            HTTP_HOST='adminsite.com'
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("http://adminsite.com", mail.outbox[0].body)
