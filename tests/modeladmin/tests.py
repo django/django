@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from datetime import date
-import warnings
 
 from django import forms
 from django.contrib.admin.options import (ModelAdmin, TabularInline,
@@ -15,7 +14,7 @@ from django.core.checks import Error
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
-from django.test import TestCase
+from django.test import TestCase, ignore_warnings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 
@@ -1505,19 +1504,18 @@ class FormsetCheckTests(CheckTestCase):
 
 
 class CustomModelAdminTests(CheckTestCase):
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_deprecation(self):
         "Deprecated Custom Validator definitions still work with the check framework."
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RemovedInDjango19Warning)
 
-            class CustomValidator(ModelAdminValidator):
-                def validate_me(self, model_admin, model):
-                    raise ImproperlyConfigured('error!')
+        class CustomValidator(ModelAdminValidator):
+            def validate_me(self, model_admin, model):
+                raise ImproperlyConfigured('error!')
 
-            class CustomModelAdmin(ModelAdmin):
-                validator_class = CustomValidator
+        class CustomModelAdmin(ModelAdmin):
+            validator_class = CustomValidator
 
-            self.assertIsInvalid(CustomModelAdmin, ValidationTestModel, 'error!')
+        self.assertIsInvalid(CustomModelAdmin, ValidationTestModel, 'error!')
 
 
 class ListDisplayEditableTests(CheckTestCase):

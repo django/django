@@ -182,6 +182,7 @@ class DeprecatingRequestMergeDictTest(SimpleTestCase):
         Ensure the correct warning is raised when WSGIRequest.REQUEST is
         accessed.
         """
+        reset_warning_registry()
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('always')
             request = RequestFactory().get('/')

@@ -1,12 +1,11 @@
 from __future__ import unicode_literals
 
-import warnings
-
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from django.test import TestCase, ignore_warnings
 from django.test.utils import str_prefix
+from django.utils.deprecation import RemovedInDjango19Warning
 
 from .models import Song, Book, Album, TwoAlbumFKAndAnE, City
 
@@ -33,6 +32,7 @@ class ValidFormFieldsets(admin.ModelAdmin):
     )
 
 
+@ignore_warnings(category=RemovedInDjango19Warning)
 class ValidationTestCase(TestCase):
 
     def test_readonly_and_editable(self):
@@ -44,17 +44,13 @@ class ValidationTestCase(TestCase):
                 }),
             ]
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            SongAdmin.validate(Song)
+        SongAdmin.validate(Song)
 
     def test_custom_modelforms_with_fields_fieldsets(self):
         """
         # Regression test for #8027: custom ModelForms with fields/fieldsets
         """
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            ValidFields.validate(Song)
+        ValidFields.validate(Song)
 
     def test_custom_get_form_with_fieldsets(self):
         """
@@ -62,9 +58,7 @@ class ValidationTestCase(TestCase):
         is overridden.
         Refs #19445.
         """
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            ValidFormFieldsets.validate(Song)
+        ValidFormFieldsets.validate(Song)
 
     def test_exclude_values(self):
         """
@@ -73,23 +67,19 @@ class ValidationTestCase(TestCase):
         class ExcludedFields1(admin.ModelAdmin):
             exclude = ('foo')
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            self.assertRaisesMessage(ImproperlyConfigured,
-                "'ExcludedFields1.exclude' must be a list or tuple.",
-                ExcludedFields1.validate,
-                Book)
+        self.assertRaisesMessage(ImproperlyConfigured,
+            "'ExcludedFields1.exclude' must be a list or tuple.",
+            ExcludedFields1.validate,
+            Book)
 
     def test_exclude_duplicate_values(self):
         class ExcludedFields2(admin.ModelAdmin):
             exclude = ('name', 'name')
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            self.assertRaisesMessage(ImproperlyConfigured,
-                "There are duplicate field(s) in ExcludedFields2.exclude",
-                ExcludedFields2.validate,
-                Book)
+        self.assertRaisesMessage(ImproperlyConfigured,
+            "There are duplicate field(s) in ExcludedFields2.exclude",
+            ExcludedFields2.validate,
+            Book)
 
     def test_exclude_in_inline(self):
         class ExcludedFieldsInline(admin.TabularInline):
@@ -100,12 +90,10 @@ class ValidationTestCase(TestCase):
             model = Album
             inlines = [ExcludedFieldsInline]
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            self.assertRaisesMessage(ImproperlyConfigured,
-                "'ExcludedFieldsInline.exclude' must be a list or tuple.",
-                ExcludedFieldsAlbumAdmin.validate,
-                Album)
+        self.assertRaisesMessage(ImproperlyConfigured,
+            "'ExcludedFieldsInline.exclude' must be a list or tuple.",
+            ExcludedFieldsAlbumAdmin.validate,
+            Album)
 
     def test_exclude_inline_model_admin(self):
         """
@@ -120,12 +108,10 @@ class ValidationTestCase(TestCase):
             model = Album
             inlines = [SongInline]
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            self.assertRaisesMessage(ImproperlyConfigured,
-                "SongInline cannot exclude the field 'album' - this is the foreign key to the parent model admin_validation.Album.",
-                AlbumAdmin.validate,
-                Album)
+        self.assertRaisesMessage(ImproperlyConfigured,
+            "SongInline cannot exclude the field 'album' - this is the foreign key to the parent model admin_validation.Album.",
+            AlbumAdmin.validate,
+            Album)
 
     def test_app_label_in_admin_validation(self):
         """
@@ -134,12 +120,10 @@ class ValidationTestCase(TestCase):
         class RawIdNonexistingAdmin(admin.ModelAdmin):
             raw_id_fields = ('nonexisting',)
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            self.assertRaisesMessage(ImproperlyConfigured,
-                "'RawIdNonexistingAdmin.raw_id_fields' refers to field 'nonexisting' that is missing from model 'admin_validation.Album'.",
-                RawIdNonexistingAdmin.validate,
-                Album)
+        self.assertRaisesMessage(ImproperlyConfigured,
+            "'RawIdNonexistingAdmin.raw_id_fields' refers to field 'nonexisting' that is missing from model 'admin_validation.Album'.",
+            RawIdNonexistingAdmin.validate,
+            Album)
 
     def test_fk_exclusion(self):
         """
@@ -155,9 +139,7 @@ class ValidationTestCase(TestCase):
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            MyAdmin.validate(Album)
+        MyAdmin.validate(Album)
 
     def test_inline_self_validation(self):
         class TwoAlbumFKAndAnEInline(admin.TabularInline):
@@ -166,11 +148,9 @@ class ValidationTestCase(TestCase):
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            self.assertRaisesMessage(ValueError,
-                "'admin_validation.TwoAlbumFKAndAnE' has more than one ForeignKey to 'admin_validation.Album'.",
-                MyAdmin.validate, Album)
+        self.assertRaisesMessage(ValueError,
+            "'admin_validation.TwoAlbumFKAndAnE' has more than one ForeignKey to 'admin_validation.Album'.",
+            MyAdmin.validate, Album)
 
     def test_inline_with_specified(self):
         class TwoAlbumFKAndAnEInline(admin.TabularInline):
@@ -180,17 +160,13 @@ class ValidationTestCase(TestCase):
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            MyAdmin.validate(Album)
+        MyAdmin.validate(Album)
 
     def test_readonly(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("title",)
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            SongAdmin.validate(Song)
+        SongAdmin.validate(Song)
 
     def test_readonly_on_method(self):
         def my_function(obj):
@@ -199,9 +175,7 @@ class ValidationTestCase(TestCase):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = (my_function,)
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            SongAdmin.validate(Song)
+        SongAdmin.validate(Song)
 
     def test_readonly_on_modeladmin(self):
         class SongAdmin(admin.ModelAdmin):
@@ -210,42 +184,34 @@ class ValidationTestCase(TestCase):
             def readonly_method_on_modeladmin(self, obj):
                 pass
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            SongAdmin.validate(Song)
+        SongAdmin.validate(Song)
 
     def test_readonly_method_on_model(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("readonly_method_on_model",)
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            SongAdmin.validate(Song)
+        SongAdmin.validate(Song)
 
     def test_nonexistent_field(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("title", "nonexistent")
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            self.assertRaisesMessage(ImproperlyConfigured,
-                str_prefix("SongAdmin.readonly_fields[1], %(_)s'nonexistent' is not a callable "
-                           "or an attribute of 'SongAdmin' or found in the model 'Song'."),
-                SongAdmin.validate,
-                Song)
+        self.assertRaisesMessage(ImproperlyConfigured,
+            str_prefix("SongAdmin.readonly_fields[1], %(_)s'nonexistent' is not a callable "
+                       "or an attribute of 'SongAdmin' or found in the model 'Song'."),
+            SongAdmin.validate,
+            Song)
 
     def test_nonexistent_field_on_inline(self):
         class CityInline(admin.TabularInline):
             model = City
             readonly_fields = ['i_dont_exist']  # Missing attribute
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            self.assertRaisesMessage(ImproperlyConfigured,
-                str_prefix("CityInline.readonly_fields[0], %(_)s'i_dont_exist' is not a callable "
-                           "or an attribute of 'CityInline' or found in the model 'City'."),
-                CityInline.validate,
-                City)
+        self.assertRaisesMessage(ImproperlyConfigured,
+            str_prefix("CityInline.readonly_fields[0], %(_)s'i_dont_exist' is not a callable "
+                       "or an attribute of 'CityInline' or found in the model 'City'."),
+            CityInline.validate,
+            City)
 
     def test_extra(self):
         class SongAdmin(admin.ModelAdmin):
@@ -254,17 +220,13 @@ class ValidationTestCase(TestCase):
                     return "Best Ever!"
                 return "Status unknown."
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            SongAdmin.validate(Song)
+        SongAdmin.validate(Song)
 
     def test_readonly_lambda(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = (lambda obj: "test",)
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            SongAdmin.validate(Song)
+        SongAdmin.validate(Song)
 
     def test_graceful_m2m_fail(self):
         """
@@ -276,12 +238,10 @@ class ValidationTestCase(TestCase):
         class BookAdmin(admin.ModelAdmin):
             fields = ['authors']
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            self.assertRaisesMessage(ImproperlyConfigured,
-                "'BookAdmin.fields' can't include the ManyToManyField field 'authors' because 'authors' manually specifies a 'through' model.",
-                BookAdmin.validate,
-                Book)
+        self.assertRaisesMessage(ImproperlyConfigured,
+            "'BookAdmin.fields' can't include the ManyToManyField field 'authors' because 'authors' manually specifies a 'through' model.",
+            BookAdmin.validate,
+            Book)
 
     def test_cannot_include_through(self):
         class FieldsetBookAdmin(admin.ModelAdmin):
@@ -290,20 +250,16 @@ class ValidationTestCase(TestCase):
                 ('Header 2', {'fields': ('authors',)}),
             )
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            self.assertRaisesMessage(ImproperlyConfigured,
-                "'FieldsetBookAdmin.fieldsets[1][1]['fields']' can't include the ManyToManyField field 'authors' because 'authors' manually specifies a 'through' model.",
-                FieldsetBookAdmin.validate,
-                Book)
+        self.assertRaisesMessage(ImproperlyConfigured,
+            "'FieldsetBookAdmin.fieldsets[1][1]['fields']' can't include the ManyToManyField field 'authors' because 'authors' manually specifies a 'through' model.",
+            FieldsetBookAdmin.validate,
+            Book)
 
     def test_nested_fields(self):
         class NestedFieldsAdmin(admin.ModelAdmin):
             fields = ('price', ('name', 'subtitle'))
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            NestedFieldsAdmin.validate(Book)
+        NestedFieldsAdmin.validate(Book)
 
     def test_nested_fieldsets(self):
         class NestedFieldsetAdmin(admin.ModelAdmin):
@@ -311,9 +267,7 @@ class ValidationTestCase(TestCase):
                 ('Main', {'fields': ('price', ('name', 'subtitle'))}),
             )
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            NestedFieldsetAdmin.validate(Book)
+        NestedFieldsetAdmin.validate(Book)
 
     def test_explicit_through_override(self):
         """
@@ -330,9 +284,7 @@ class ValidationTestCase(TestCase):
 
         # If the through model is still a string (and hasn't been resolved to a model)
         # the validation will fail.
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            BookAdmin.validate(Book)
+        BookAdmin.validate(Book)
 
     def test_non_model_fields(self):
         """
@@ -346,9 +298,7 @@ class ValidationTestCase(TestCase):
             form = SongForm
             fields = ['title', 'extra_data']
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            FieldsOnFormOnlyAdmin.validate(Song)
+        FieldsOnFormOnlyAdmin.validate(Song)
 
     def test_non_model_first_field(self):
         """
@@ -366,6 +316,4 @@ class ValidationTestCase(TestCase):
             form = SongForm
             fields = ['extra_data', 'title']
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            FieldsOnFormOnlyAdmin.validate(Song)
+        FieldsOnFormOnlyAdmin.validate(Song)

@@ -29,14 +29,15 @@ from django.middleware.csrf import CsrfViewMiddleware
 from django.template import Template
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
-from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
+from django.test import (TestCase, TransactionTestCase, RequestFactory,
+    ignore_warnings, override_settings)
 from django.test.signals import setting_changed
-from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
 from django.utils import timezone
 from django.utils import translation
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
 
@@ -1220,8 +1221,9 @@ class CustomCacheKeyValidationTests(TestCase):
         }
     }
 )
-class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
+class GetCacheTests(TestCase):
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_simple(self):
         self.assertIsInstance(
             caches[DEFAULT_CACHE_ALIAS],
@@ -1241,6 +1243,7 @@ class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_close_deprecated(self):
         cache = get_cache('cache.closeable_cache.CacheClass')
         self.assertFalse(cache.closed)

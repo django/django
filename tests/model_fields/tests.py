@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import datetime
 from decimal import Decimal
 import unittest
-import warnings
 
 from django import test
 from django import forms
@@ -800,16 +799,15 @@ class PromiseTest(test.TestCase):
             int)
 
     def test_IPAddressField(self):
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
-            self.assertIsInstance(
-                IPAddressField().get_prep_value(lazy_func()),
-                six.text_type)
-            lazy_func = lazy(lambda: 0, int)
-            self.assertIsInstance(
-                IPAddressField().get_prep_value(lazy_func()),
-                six.text_type)
+        # Deprecation silenced in runtests.py
+        lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
+        self.assertIsInstance(
+            IPAddressField().get_prep_value(lazy_func()),
+            six.text_type)
+        lazy_func = lazy(lambda: 0, int)
+        self.assertIsInstance(
+            IPAddressField().get_prep_value(lazy_func()),
+            six.text_type)
 
     def test_GenericIPAddressField(self):
         lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
