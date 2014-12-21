@@ -488,7 +488,8 @@ class Value(ExpressionNode):
 
 class DurationValue(Value):
     def as_sql(self, compiler, connection):
-        if connection.features.has_native_duration_field:
+        if (connection.features.has_native_duration_field and
+                connection.features.driver_supports_timedelta_args):
             return super(DurationValue, self).as_sql(compiler, connection)
         return connection.ops.date_interval_sql(self.value)
 

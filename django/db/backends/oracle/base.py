@@ -62,6 +62,7 @@ from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.db.backends.oracle.schema import DatabaseSchemaEditor
 from django.db.utils import InterfaceError
 from django.utils import six, timezone
+from django.utils.duration import duration_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
@@ -106,6 +107,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     has_zoneinfo_database = pytz is not None
     supports_bitwise_or = False
+    has_native_duration_field = True
     can_defer_constraint_checks = True
     supports_partially_nullable_unique_constraints = False
     truncates_names = True
@@ -211,9 +213,6 @@ WHEN (new.%(col_name)s IS NULL)
         fmt = "INTERVAL '%s %02d:%02d:%02d.%06d' DAY(%d) TO SECOND(6)"
         return fmt % (days, hours, minutes, seconds, timedelta.microseconds,
                 day_precision), []
-
-    def format_for_duration_arithmetic(self, sql):
-        return "NUMTODSINTERVAL(%s / 1000000, 'SECOND')" % sql
 
     def date_trunc_sql(self, lookup_type, field_name):
         # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
@@ -795,6 +794,11 @@ class OracleParam(object):
                 default_timezone = timezone.get_default_timezone()
                 param = timezone.make_aware(param, default_timezone)
             param = Oracle_datetime.from_datetime(param.astimezone(timezone.utc))
+
+        if isinstance(param, datetime.timedelta):
+            param = duration_string(param)
+            if ' ' not in param:
+                param = '0 ' + param
 
         string_size = 0
         # Oracle doesn't recognize True and False correctly in Python 3.
