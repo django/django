@@ -487,6 +487,16 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
 
+    def test_loaddata_with_m2m_to_self(self):
+        """
+        Regression test for ticket #17946.
+        """
+        management.call_command(
+            'loaddata',
+            'm2mtoself.json',
+            verbosity=0,
+        )
+
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
                                      os.path.join(_cur_dir, 'fixtures_1')])
     def test_fixture_dirs_with_duplicates(self):

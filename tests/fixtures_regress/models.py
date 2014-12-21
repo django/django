@@ -248,6 +248,10 @@ class Thingy(models.Model):
     name = models.CharField(max_length=255)
 
 
+class M2MToSelf(models.Model):
+    parent = models.ManyToManyField("self", blank=True, null=True)
+
+
 @python_2_unicode_compatible
 class BaseNKModel(models.Model):
     """

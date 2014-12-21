@@ -9,7 +9,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core.serializers import base
 from django.db import models, DEFAULT_DB_ALIAS
-from django.utils.encoding import smart_text, is_protected_type
+from django.utils.encoding import force_text, is_protected_type
 from django.utils import six
 
 
@@ -36,11 +36,11 @@ class Serializer(base.Serializer):
 
     def get_dump_object(self, obj):
         data = {
-            "model": smart_text(obj._meta),
+            "model": force_text(obj._meta),
             "fields": self._current,
         }
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
-            data["pk"] = smart_text(obj._get_pk_val(), strings_only=True)
+            data["pk"] = force_text(obj._get_pk_val(), strings_only=True)
 
         return data
 
@@ -70,7 +70,7 @@ class Serializer(base.Serializer):
             if self.use_natural_foreign_keys and hasattr(field.rel.to, 'natural_key'):
                 m2m_value = lambda value: value.natural_key()
             else:
-                m2m_value = lambda value: smart_text(value._get_pk_val(), strings_only=True)
+                m2m_value = lambda value: force_text(value._get_pk_val(), strings_only=True)
             self._current[field.name] = [m2m_value(related)
                                for related in getattr(obj, field.name).iterator()]
 
@@ -111,7 +111,7 @@ def Deserializer(object_list, **options):
                 continue
 
             if isinstance(field_value, str):
-                field_value = smart_text(
+                field_value = force_text(
                     field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True
                 )
 
@@ -124,9 +124,9 @@ def Deserializer(object_list, **options):
                         if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
                             return field.rel.to._default_manager.db_manager(db).get_by_natural_key(*value).pk
                         else:
-                            return smart_text(field.rel.to._meta.pk.to_python(value))
+                            return force_text(field.rel.to._meta.pk.to_python(value), strings_only=True)
                 else:
-                    m2m_convert = lambda v: smart_text(field.rel.to._meta.pk.to_python(v))
+                    m2m_convert = lambda v: force_text(field.rel.to._meta.pk.to_python(v), strings_only=True)
                 m2m_data[field.name] = [m2m_convert(pk) for pk in field_value]
 
             # Handle FK fields
