@@ -80,14 +80,6 @@ else:
     convert_unicode = force_bytes
 
 
-class Oracle_timedelta(datetime.timedelta):
-    """
-    A timedelta object, with an additional class attribute
-    to tell cx_Oracle what input size to use
-    """
-    input_size = Database.INTERVAL
-
-
 class Oracle_datetime(datetime.datetime):
     """
     A datetime object, with an additional class attribute
