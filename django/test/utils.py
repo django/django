@@ -18,7 +18,7 @@ from django.template import Template
 from django.template.loaders import locmem
 from django.test.signals import template_rendered, setting_changed
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
 
@@ -432,27 +432,40 @@ class CaptureQueriesContext(object):
         self.final_queries = len(self.connection.queries_log)
 
 
-class IgnoreDeprecationWarningsMixin(object):
-    warning_classes = [RemovedInDjango19Warning]
+class ignore_warnings(object):
+    def __init__(self, **kwargs):
+        self.ignore_kwargs = kwargs
+        if 'message' in self.ignore_kwargs or 'module' in self.ignore_kwargs:
+            self.filter_func = warnings.filterwarnings
+        else:
+            self.filter_func = warnings.simplefilter
 
-    def setUp(self):
-        super(IgnoreDeprecationWarningsMixin, self).setUp()
-        self.catch_warnings = warnings.catch_warnings()
-        self.catch_warnings.__enter__()
-        for warning_class in self.warning_classes:
-            warnings.filterwarnings("ignore", category=warning_class)
+    def __call__(self, decorated):
+        if isinstance(decorated, type):
+            # A class is decorated
+            saved_setUp = decorated.setUp
+            saved_tearDown = decorated.tearDown
 
-    def tearDown(self):
-        self.catch_warnings.__exit__(*sys.exc_info())
-        super(IgnoreDeprecationWarningsMixin, self).tearDown()
+            def setUp(inner_self):
+                self.catch_warnings = warnings.catch_warnings()
+                self.catch_warnings.__enter__()
+                self.filter_func('ignore', **self.ignore_kwargs)
+                saved_setUp(inner_self)
 
+            def tearDown(inner_self):
+                saved_tearDown(inner_self)
+                self.catch_warnings.__exit__(*sys.exc_info())
 
-class IgnorePendingDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
-        warning_classes = [RemovedInDjango20Warning]
-
-
-class IgnoreAllDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
-        warning_classes = [RemovedInDjango20Warning, RemovedInDjango19Warning]
+            decorated.setUp = setUp
+            decorated.tearDown = tearDown
+            return decorated
+        else:
+            @wraps(decorated)
+            def inner(*args, **kwargs):
+                with warnings.catch_warnings():
+                    self.filter_func('ignore', **self.ignore_kwargs)
+                    return decorated(*args, **kwargs)
+            return inner
 
 
 @contextmanager
