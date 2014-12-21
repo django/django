@@ -296,7 +296,7 @@ def _get_non_gfk_field(opts, name):
     should be treated as not found by the 'label_for_field' function.
     """
     field = opts.get_field(name)
-    if getattr(field, 'is_gfk', False):
+    if field.has_relation and field.one_to_many and not field.related_model:
         raise models.FieldDoesNotExist()
     return field
 

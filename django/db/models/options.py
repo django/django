@@ -360,7 +360,7 @@ class Options(object):
         # these three filters as filters to the generator.
         is_not_an_m2m_field = lambda f: not (f.has_relation and f.many_to_many)
         is_not_a_generic_relation = lambda f: not (f.has_relation and f.many_to_one)
-        is_not_a_generic_foreign_key = lambda f: not hasattr(f, 'is_gfk')
+        is_not_a_generic_foreign_key = lambda f: not (f.has_relation and f.one_to_many and not f.related_model)
 
         return make_immutable_fields_list("fields", (f for f in self.get_fields(reverse=False) if
                                           is_not_an_m2m_field(f) and is_not_a_generic_relation(f)

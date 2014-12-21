@@ -21,10 +21,6 @@ class GenericForeignKey(FieldFlagsMixin):
     Provides a generic relation to any object through content-type/object-id
     fields.
     """
-    # Adding a specific flag to identify GenericForeignKey without having to
-    # import base class and do instance check
-    is_gfk = True
-
     related_model = None
     editable = False
     is_reverse_object = False
