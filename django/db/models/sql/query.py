@@ -1353,11 +1353,10 @@ class Query(object):
                 # GenericForeignKey) cannot generate reverse relations Therefore they
                 # cannote be used for reverse querying.
                 if field.has_relation and not field.related_model:
-                    raise FieldError("Field %r is a GenericForeignKey. This field "
-                                     "type does not generate a reverse relation "
-                                     "by default and therefore cannot be used for "
-                                     "reverse querying. Consider using a "
-                                     "GenericRelation." % name)
+                    raise FieldError("Field %r does not generate an automatic reverse "
+                                     "relation and therefore cannot be used for reverse "
+                                     "querying. If it is a GenericForeignKey, consider "
+                                     "adding a GenericRelation." % name)
                 model = field.parent_model._meta.concrete_model
             except FieldDoesNotExist:
                 # is it an annotation?
