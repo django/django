@@ -54,7 +54,8 @@ class RelatedObject(FieldFlagsMixin):
         return [f for f in self.opts.fields + self.opts.many_to_many if f.editable and f != self.field]
 
     def __repr__(self):
-        return "<RelatedObject: %s related to %s>" % (self.name, self.field.name)
+        return "<RelatedObject: %s:%s related to %s>" % (self.opts.app_label, self.opts.model_name,
+                        self.field.name)
 
     def get_accessor_name(self):
         # This method encapsulates the logic that decides what name to give an
