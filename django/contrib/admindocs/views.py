@@ -309,6 +309,10 @@ def load_all_installed_template_libraries():
     # Load/register all template tag libraries from installed apps.
     for module_name in template.get_templatetags_modules():
         mod = import_module(module_name)
+        if not hasattr(mod, '__file__'):
+            # e.g. packages installed as eggs
+            continue
+
         try:
             libraries = [
                 os.path.splitext(p)[0]
@@ -316,12 +320,13 @@ def load_all_installed_template_libraries():
                 if p.endswith('.py') and p[0].isalpha()
             ]
         except OSError:
-            libraries = []
-        for library_name in libraries:
-            try:
-                template.get_library(library_name)
-            except template.InvalidTemplateLibrary:
-                pass
+            continue
+        else:
+            for library_name in libraries:
+                try:
+                    template.get_library(library_name)
+                except template.InvalidTemplateLibrary:
+                    pass
 
 
 def get_return_data_type(func_name):
