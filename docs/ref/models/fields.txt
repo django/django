@@ -1794,7 +1794,9 @@ Attributes for fields
 
 .. attribute:: has_relation
 
-    A field has a relation when it depends on one or more models.
+    A field has a relation when the it contains references to one or
+    more other models for its functionality (e.g. ``ForeignKey``).
+    This also includes recursive relations.
 
 .. attribute:: model
 
@@ -1803,7 +1805,8 @@ Attributes for fields
 .. attribute:: hidden
 
     Hidden fields are fields that concretely exist, but that
-    are used to back other field's functionality (e.g. ``GenericForeignKey``).
+    are used to back other field's functionality (e.g. the ``content_type``
+    and ``object_id`` fields that make up a ``GenericForeignKey``).
 
     .. note::
         get_fields() excludes hidden fields by default. Pass in

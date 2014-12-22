@@ -419,7 +419,7 @@ class Options(object):
     @cached_property
     def _forward_fields_map(self):
         res = {}
-        # call get_fields with export_ordered_set=True in order to have a field_instance -> names map
+        # call get_fields() with export_ordered_set=True in order to have a field_instance -> names map
         fields = self.get_fields(reverse=False)
         for field in fields:
             res[field.name] = field
@@ -437,7 +437,7 @@ class Options(object):
     def fields_map(self):
         res = {}
 
-        # call get_fields with export_ordered_set=True in order to have a field_instance -> names map
+        # call get_fields() with export_ordered_set=True in order to have a field_instance -> names map
         fields = self.get_fields(forward=False, include_hidden=True)
         for field in fields:
             res[field.name] = field

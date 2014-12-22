@@ -7,11 +7,11 @@ Model ``_meta`` API
 
 .. class:: Options
 
-The Model ``_meta`` API is at the core of Django. It enables other parts of the
-system such as lookups, queries, forms, and the admin to understand the
-capabilities of each model. The API is accessible through the ``_meta``
-attribute of each model class. It's a ``django.db.models.options.Options``
-object.
+The Model ``_meta`` API is at the core of the Django ORM. It enables other
+parts of the system such as lookups, queries, forms, and the admin to
+understand the capabilities of each model. The API is accessible through
+the ``_meta`` attribute of each model class. It's a
+``django.db.models.options.Options`` object.
 
 Methods that it provides can be used for:
 
