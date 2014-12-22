@@ -141,7 +141,7 @@ class MigrationWriter(object):
                 imports.add("from django.conf import settings")
             else:
                 # No need to output bytestrings for dependencies
-                dependency = tuple([force_text(s) for s in dependency])
+                dependency = tuple(force_text(s) for s in dependency)
                 dependencies.append("        %s," % self.serialize(dependency)[0])
         items["dependencies"] = "\n".join(dependencies) + "\n" if dependencies else ""
 
@@ -223,13 +223,7 @@ class MigrationWriter(object):
 
     @classmethod
     def serialize_deconstructed(cls, path, args, kwargs):
-        module, name = path.rsplit(".", 1)
-        if module == "django.db.models":
-            imports = {"from django.db import models"}
-            name = "models.%s" % name
-        else:
-            imports = {"import %s" % module}
-            name = path
+        name, imports = cls._serialize_path(path)
         strings = []
         for arg in args:
             arg_string, arg_imports = cls.serialize(arg)
@@ -240,6 +234,17 @@ class MigrationWriter(object):
             imports.update(arg_imports)
             strings.append("%s=%s" % (kw, arg_string))
         return "%s(%s)" % (name, ", ".join(strings)), imports
+
+    @classmethod
+    def _serialize_path(cls, path):
+        module, name = path.rsplit(".", 1)
+        if module == "django.db.models":
+            imports = {"from django.db import models"}
+            name = "models.%s" % name
+        else:
+            imports = {"import %s" % module}
+            name = path
+        return name, imports
 
     @classmethod
     def serialize(cls, value):
@@ -330,6 +335,27 @@ class MigrationWriter(object):
         elif isinstance(value, models.Field):
             attr_name, path, args, kwargs = value.deconstruct()
             return cls.serialize_deconstructed(path, args, kwargs)
+        # Classes
+        elif isinstance(value, type):
+            special_cases = [
+                (models.Model, "models.Model", []),
+            ]
+            for case, string, imports in special_cases:
+                if case is value:
+                    return string, set(imports)
+            if hasattr(value, "__module__"):
+                module = value.__module__
+                if module == six.moves.builtins.__name__:
+                    return value.__name__, set()
+                else:
+                    return "%s.%s" % (module, value.__name__), {"import %s" % module}
+        elif isinstance(value, models.manager.BaseManager):
+            as_manager, manager_path, qs_path, args, kwargs = value.deconstruct()
+            if as_manager:
+                name, imports = cls._serialize_path(qs_path)
+                return "%s.as_manager()" % name, imports
+            else:
+                return cls.serialize_deconstructed(manager_path, args, kwargs)
         # Anything that knows how to deconstruct itself.
         elif hasattr(value, 'deconstruct'):
             return cls.serialize_deconstructed(*value.deconstruct())
@@ -364,20 +390,6 @@ class MigrationWriter(object):
                     "https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values"
                     % (value.__name__, module_name))
             return "%s.%s" % (module_name, value.__name__), {"import %s" % module_name}
-        # Classes
-        elif isinstance(value, type):
-            special_cases = [
-                (models.Model, "models.Model", []),
-            ]
-            for case, string, imports in special_cases:
-                if case is value:
-                    return string, set(imports)
-            if hasattr(value, "__module__"):
-                module = value.__module__
-                if module == six.moves.builtins.__name__:
-                    return value.__name__, set()
-                else:
-                    return "%s.%s" % (module, value.__name__), {"import %s" % module}
         # Other iterables
         elif isinstance(value, collections.Iterable):
             imports = set()

@@ -135,7 +135,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         if cls.validator_class:
             warnings.warn(
                 'ModelAdmin.validator_class is deprecated. '
-                'ModeAdmin validators must be converted to use '
+                'ModelAdmin validators must be converted to use '
                 'the system check framework.',
                 RemovedInDjango19Warning)
             validator = cls.validator_class()
@@ -1861,6 +1861,8 @@ class InlineModelAdmin(BaseModelAdmin):
                 if self.cleaned_data.get(DELETION_FIELD_NAME, False):
                     using = router.db_for_write(self._meta.model)
                     collector = NestedObjects(using=using)
+                    if self.instance.pk is None:
+                        return
                     collector.collect([self.instance])
                     if collector.protected:
                         objs = []

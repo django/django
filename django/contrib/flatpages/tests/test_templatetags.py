@@ -125,10 +125,10 @@ class FlatpageTemplateTagTests(TestCase):
         self.assertRaises(TemplateSyntaxError, render,
                           "{% load flatpages %}{% get_flatpages cheesecake flatpages %}")
         self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages as flatpages asdf%}")
+                          "{% load flatpages %}{% get_flatpages as flatpages asdf %}")
         self.assertRaises(TemplateSyntaxError, render,
                           "{% load flatpages %}{% get_flatpages cheesecake user as flatpages %}")
         self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages for user as flatpages asdf%}")
+                          "{% load flatpages %}{% get_flatpages for user as flatpages asdf %}")
         self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages prefix for user as flatpages asdf%}")
+                          "{% load flatpages %}{% get_flatpages prefix for user as flatpages asdf %}")

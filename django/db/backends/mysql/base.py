@@ -289,9 +289,12 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql, params
 
-    def date_interval_sql(self, sql, connector, timedelta):
-        return "(%s %s INTERVAL '%d 0:0:%d:%d' DAY_MICROSECOND)" % (sql, connector,
-                timedelta.days, timedelta.seconds, timedelta.microseconds)
+    def date_interval_sql(self, timedelta):
+        return "INTERVAL '%d 0:0:%d:%d' DAY_MICROSECOND" % (
+            timedelta.days, timedelta.seconds, timedelta.microseconds), []
+
+    def format_for_duration_arithmetic(self, sql):
+        return 'INTERVAL %s MICROSECOND' % sql
 
     def drop_foreignkey_sql(self):
         return "DROP FOREIGN KEY"

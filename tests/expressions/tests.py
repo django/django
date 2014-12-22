@@ -4,7 +4,7 @@ from copy import deepcopy
 import datetime
 
 from django.core.exceptions import FieldError
-from django.db import connection, transaction
+from django.db import connection, transaction, DatabaseError
 from django.db.models import F
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
@@ -13,9 +13,9 @@ from django.utils import six
 from .models import Company, Employee, Number, Experiment
 
 
-class ExpressionsTests(TestCase):
-
-    def test_filter(self):
+class BasicExpressionsTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
         Company.objects.create(
             name="Example Inc.", num_employees=2300, num_chairs=5,
             ceo=Employee.objects.create(firstname="Joe", lastname="Smith")
@@ -29,16 +29,19 @@ class ExpressionsTests(TestCase):
             ceo=Employee.objects.create(firstname="Max", lastname="Mustermann")
         )
 
-        company_query = Company.objects.values(
+    def setUp(self):
+        self.company_query = Company.objects.values(
             "name", "num_employees", "num_chairs"
         ).order_by(
             "name", "num_employees", "num_chairs"
         )
 
-        # We can filter for companies where the number of employees is greater
+    def test_filter_inter_attribute(self):
+        # We can filter on attribute relationships on same model obj, e.g.
+        # find companies where the number of employees is greater
         # than the number of chairs.
         self.assertQuerysetEqual(
-            company_query.filter(num_employees__gt=F("num_chairs")), [
+            self.company_query.filter(num_employees__gt=F("num_chairs")), [
                 {
                     "num_chairs": 5,
                     "name": "Example Inc.",
@@ -53,11 +56,12 @@ class ExpressionsTests(TestCase):
             lambda o: o
         )
 
+    def test_update(self):
         # We can set one field to have the value of another field
         # Make sure we have enough chairs
-        company_query.update(num_chairs=F("num_employees"))
+        self.company_query.update(num_chairs=F("num_employees"))
         self.assertQuerysetEqual(
-            company_query, [
+            self.company_query, [
                 {
                     "num_chairs": 2300,
                     "name": "Example Inc.",
@@ -77,11 +81,12 @@ class ExpressionsTests(TestCase):
             lambda o: o
         )
 
+    def test_arithmetic(self):
         # We can perform arithmetic operations in expressions
         # Make sure we have 2 spare chairs
-        company_query.update(num_chairs=F("num_employees") + 2)
+        self.company_query.update(num_chairs=F("num_employees") + 2)
         self.assertQuerysetEqual(
-            company_query, [
+            self.company_query, [
                 {
                     'num_chairs': 2302,
                     'name': 'Example Inc.',
@@ -101,12 +106,13 @@ class ExpressionsTests(TestCase):
             lambda o: o,
         )
 
+    def test_order_of_operations(self):
         # Law of order of operations is followed
-        company_query.update(
+        self. company_query.update(
             num_chairs=F('num_employees') + 2 * F('num_employees')
         )
         self.assertQuerysetEqual(
-            company_query, [
+            self.company_query, [
                 {
                     'num_chairs': 6900,
                     'name': 'Example Inc.',
@@ -126,12 +132,13 @@ class ExpressionsTests(TestCase):
             lambda o: o,
         )
 
+    def test_parenthesis_priority(self):
         # Law of order of operations can be overridden by parentheses
-        company_query.update(
+        self.company_query.update(
             num_chairs=((F('num_employees') + 2) * F('num_employees'))
         )
         self.assertQuerysetEqual(
-            company_query, [
+            self.company_query, [
                 {
                     'num_chairs': 5294600,
                     'name': 'Example Inc.',
@@ -151,8 +158,8 @@ class ExpressionsTests(TestCase):
             lambda o: o,
         )
 
-        # The relation of a foreign key can become copied over to an other
-        # foreign key.
+    def test_update_with_fk(self):
+        # ForeignKey can become updated with the value of another ForeignKey.
         self.assertEqual(
             Company.objects.update(point_of_contact=F('ceo')),
             3
@@ -167,11 +174,13 @@ class ExpressionsTests(TestCase):
             ordered=False
         )
 
+    def test_filter_with_join(self):
+        # F Expressions can also span joins
+        Company.objects.update(point_of_contact=F('ceo'))
         c = Company.objects.all()[0]
         c.point_of_contact = Employee.objects.create(firstname="Guido", lastname="van Rossum")
         c.save()
 
-        # F Expressions can also span joins
         self.assertQuerysetEqual(
             Company.objects.filter(ceo__firstname=F("point_of_contact__firstname")), [
                 "Foobar Ltd.",
@@ -197,6 +206,7 @@ class ExpressionsTests(TestCase):
                     ceo__firstname=F('point_of_contact__firstname')
                 ).update(name=F('point_of_contact__lastname'))
 
+    def test_object_update(self):
         # F expressions can be used to update attributes on single objects
         test_gmbh = Company.objects.get(name="Test GmbH")
         self.assertEqual(test_gmbh.num_employees, 32)
@@ -205,11 +215,10 @@ class ExpressionsTests(TestCase):
         test_gmbh = Company.objects.get(pk=test_gmbh.pk)
         self.assertEqual(test_gmbh.num_employees, 36)
 
+    def test_object_update_fk(self):
         # F expressions cannot be used to update attributes which are foreign
         # keys, or attributes which involve joins.
-        test_gmbh.point_of_contact = None
-        test_gmbh.save()
-        self.assertIsNone(test_gmbh.point_of_contact)
+        test_gmbh = Company.objects.get(name="Test GmbH")
 
         def test():
             test_gmbh.point_of_contact = F("ceo")
@@ -220,8 +229,10 @@ class ExpressionsTests(TestCase):
         test_gmbh.name = F("ceo__last_name")
         self.assertRaises(FieldError, test_gmbh.save)
 
+    def test_object_update_unsaved_objects(self):
         # F expressions cannot be used to update attributes on objects which do
         # not yet exist in the database
+        test_gmbh = Company.objects.get(name="Test GmbH")
         acme = Company(
             name="The Acme Widget Co.", num_employees=12, num_chairs=5,
             ceo=test_gmbh.ceo
@@ -286,6 +297,9 @@ class ExpressionsTests(TestCase):
             company_ceo_set__num_employees=F('company_ceo_set__num_employees')
         )
         self.assertEqual(str(qs.query).count('JOIN'), 2)
+
+
+class ExpressionsTests(TestCase):
 
     def test_F_object_deepcopy(self):
         """
@@ -588,7 +602,7 @@ class FTimeDeltaTests(TestCase):
         # e0: started same day as assigned, zero duration
         end = stime + delta0
         e0 = Experiment.objects.create(name='e0', assigned=sday, start=stime,
-            end=end, completed=end.date())
+            end=end, completed=end.date(), estimated_time=delta0)
         self.deltas.append(delta0)
         self.delays.append(e0.start -
             datetime.datetime.combine(e0.assigned, midnight))
@@ -603,7 +617,7 @@ class FTimeDeltaTests(TestCase):
             delay = datetime.timedelta(1)
             end = stime + delay + delta1
             e1 = Experiment.objects.create(name='e1', assigned=sday,
-                start=stime + delay, end=end, completed=end.date())
+                start=stime + delay, end=end, completed=end.date(), estimated_time=delta1)
             self.deltas.append(delta1)
             self.delays.append(e1.start -
                 datetime.datetime.combine(e1.assigned, midnight))
@@ -613,7 +627,7 @@ class FTimeDeltaTests(TestCase):
         end = stime + delta2
         e2 = Experiment.objects.create(name='e2',
             assigned=sday - datetime.timedelta(3), start=stime, end=end,
-            completed=end.date())
+            completed=end.date(), estimated_time=datetime.timedelta(hours=1))
         self.deltas.append(delta2)
         self.delays.append(e2.start -
             datetime.datetime.combine(e2.assigned, midnight))
@@ -623,7 +637,7 @@ class FTimeDeltaTests(TestCase):
         delay = datetime.timedelta(4)
         end = stime + delay + delta3
         e3 = Experiment.objects.create(name='e3',
-            assigned=sday, start=stime + delay, end=end, completed=end.date())
+            assigned=sday, start=stime + delay, end=end, completed=end.date(), estimated_time=delta3)
         self.deltas.append(delta3)
         self.delays.append(e3.start -
             datetime.datetime.combine(e3.assigned, midnight))
@@ -633,7 +647,7 @@ class FTimeDeltaTests(TestCase):
         end = stime + delta4
         e4 = Experiment.objects.create(name='e4',
             assigned=sday - datetime.timedelta(10), start=stime, end=end,
-            completed=end.date())
+            completed=end.date(), estimated_time=delta4 - datetime.timedelta(1))
         self.deltas.append(delta4)
         self.delays.append(e4.start -
             datetime.datetime.combine(e4.assigned, midnight))
@@ -659,6 +673,10 @@ class FTimeDeltaTests(TestCase):
             delta = self.deltas[i]
             test_set = [e.name for e in
                 Experiment.objects.filter(end__lt=F('start') + delta)]
+            self.assertEqual(test_set, self.expnames[:i])
+
+            test_set = [e.name for e in
+                Experiment.objects.filter(end__lt=delta + F('start'))]
             self.assertEqual(test_set, self.expnames[:i])
 
             test_set = [e.name for e in
@@ -742,42 +760,29 @@ class FTimeDeltaTests(TestCase):
             self.assertEqual(expected_ends, new_ends)
             self.assertEqual(expected_durations, new_durations)
 
-    def test_delta_invalid_op_mult(self):
-        raised = False
-        try:
-            repr(Experiment.objects.filter(end__lt=F('start') * self.deltas[0]))
-        except TypeError:
-            raised = True
-        self.assertTrue(raised, "TypeError not raised on attempt to multiply datetime by timedelta.")
+    def test_invalid_operator(self):
+        with self.assertRaises(DatabaseError):
+            list(Experiment.objects.filter(start=F('start') * datetime.timedelta(0)))
 
-    def test_delta_invalid_op_div(self):
-        raised = False
-        try:
-            repr(Experiment.objects.filter(end__lt=F('start') / self.deltas[0]))
-        except TypeError:
-            raised = True
-        self.assertTrue(raised, "TypeError not raised on attempt to divide datetime by timedelta.")
+    def test_durationfield_add(self):
+        zeros = [e.name for e in
+            Experiment.objects.filter(start=F('start') + F('estimated_time'))]
+        self.assertEqual(zeros, ['e0'])
 
-    def test_delta_invalid_op_mod(self):
-        raised = False
-        try:
-            repr(Experiment.objects.filter(end__lt=F('start') % self.deltas[0]))
-        except TypeError:
-            raised = True
-        self.assertTrue(raised, "TypeError not raised on attempt to modulo divide datetime by timedelta.")
+        end_less = [e.name for e in
+            Experiment.objects.filter(end__lt=F('start') + F('estimated_time'))]
+        self.assertEqual(end_less, ['e2'])
 
-    def test_delta_invalid_op_and(self):
-        raised = False
-        try:
-            repr(Experiment.objects.filter(end__lt=F('start').bitand(self.deltas[0])))
-        except TypeError:
-            raised = True
-        self.assertTrue(raised, "TypeError not raised on attempt to binary and a datetime with a timedelta.")
+        delta_math = [e.name for e in
+            Experiment.objects.filter(end__gte=F('start') + F('estimated_time') + datetime.timedelta(hours=1))]
+        self.assertEqual(delta_math, ['e4'])
 
-    def test_delta_invalid_op_or(self):
-        raised = False
-        try:
-            repr(Experiment.objects.filter(end__lt=F('start').bitor(self.deltas[0])))
-        except TypeError:
-            raised = True
-        self.assertTrue(raised, "TypeError not raised on attempt to binary or a datetime with a timedelta.")
+    @skipUnlessDBFeature("has_native_duration_field")
+    def test_date_subtraction(self):
+        under_estimate = [e.name for e in
+            Experiment.objects.filter(estimated_time__gt=F('end') - F('start'))]
+        self.assertEqual(under_estimate, ['e2'])
+
+        over_estimate = [e.name for e in
+            Experiment.objects.filter(estimated_time__lt=F('end') - F('start'))]
+        self.assertEqual(over_estimate, ['e4'])

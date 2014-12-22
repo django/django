@@ -546,6 +546,23 @@ For each field, we describe the default widget used if you don't specify
 
         The maximum number of decimal places permitted.
 
+``DurationField``
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.8
+
+.. class:: DurationField(**kwargs)
+
+    * Default widget: :class:`TextInput`
+    * Empty value: ``None``
+    * Normalizes to: A Python :class:`~python:datetime.timedelta`.
+    * Validates that the given value is a string which can be converted into a
+      ``timedelta``.
+    * Error message keys: ``required``, ``invalid``.
+
+    Accepts any format understood by
+    :func:`~django.utils.dateparse.parse_duration`.
+
 ``EmailField``
 ~~~~~~~~~~~~~~
 

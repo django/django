@@ -1384,7 +1384,7 @@ class FormsTestCase(TestCase):
         """
         class CustomWidget(TextInput):
             def render(self, name, value, attrs=None):
-                return format_html(str('<input{0} />'), ' id=custom')
+                return format_html(str('<input{} />'), ' id=custom')
 
         class SampleForm(Form):
             name = CharField(widget=CustomWidget)
@@ -2005,6 +2005,22 @@ class FormsTestCase(TestCase):
         self.assertIsInstance(field2, ChoicesField)
         self.assertIsNot(field2.fields, field.fields)
         self.assertIsNot(field2.fields[0].choices, field.fields[0].choices)
+
+    def test_multivalue_initial_data(self):
+        """
+        #23674 -- invalid initial data should not break form.changed_data()
+        """
+        class DateAgeField(MultiValueField):
+            def __init__(self, fields=(), *args, **kwargs):
+                fields = (DateField(label="Date"), IntegerField(label="Age"))
+                super(DateAgeField, self).__init__(fields=fields, *args, **kwargs)
+
+        class DateAgeForm(Form):
+            date_age = DateAgeField()
+
+        data = {"date_age": ["1998-12-06", 16]}
+        form = DateAgeForm(data, initial={"date_age": ["200-10-10", 14]})
+        self.assertTrue(form.has_changed())
 
     def test_multivalue_optional_subfields(self):
         class PhoneField(MultiValueField):

@@ -43,11 +43,12 @@ except ImportError:
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import (
     BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
-    DecimalField, EmailField, Field, FileField, FilePathField, FloatField,
-    Form, forms, HiddenInput, ImageField, IntegerField, MultipleChoiceField,
-    NullBooleanField, NumberInput, PasswordInput, RadioSelect, RegexField,
-    SplitDateTimeField, TextInput, Textarea, TimeField, TypedChoiceField,
-    TypedMultipleChoiceField, URLField, UUIDField, ValidationError, Widget,
+    DecimalField, DurationField, EmailField, Field, FileField, FilePathField,
+    FloatField, Form, forms, HiddenInput, ImageField, IntegerField,
+    MultipleChoiceField, NullBooleanField, NumberInput, PasswordInput,
+    RadioSelect, RegexField, SplitDateTimeField, TextInput, Textarea,
+    TimeField, TypedChoiceField, TypedMultipleChoiceField, URLField, UUIDField,
+    ValidationError, Widget,
 )
 from django.test import SimpleTestCase
 from django.utils import formats
@@ -610,6 +611,32 @@ class FieldsTests(SimpleTestCase):
         self.assertFalse(f.has_changed(d, '2006 09 17 2:30 PM'))
 
     # RegexField ##################################################################
+
+    def test_durationfield_1(self):
+        f = DurationField()
+        self.assertEqual(datetime.timedelta(seconds=30), f.clean('30'))
+        self.assertEqual(
+            datetime.timedelta(minutes=15, seconds=30),
+            f.clean('15:30')
+        )
+        self.assertEqual(
+            datetime.timedelta(hours=1, minutes=15, seconds=30),
+            f.clean('1:15:30')
+        )
+        self.assertEqual(
+            datetime.timedelta(
+                days=1, hours=1, minutes=15, seconds=30, milliseconds=300),
+            f.clean('1 1:15:30.3')
+        )
+
+    def test_durationfield_2(self):
+        class DurationForm(Form):
+            duration = DurationField(initial=datetime.timedelta(hours=1))
+        f = DurationForm()
+        self.assertHTMLEqual(
+            '<input id="id_duration" type="text" name="duration" value="01:00:00">',
+            str(f['duration'])
+        )
 
     def test_regexfield_1(self):
         f = RegexField('^[0-9][A-F][0-9]$')

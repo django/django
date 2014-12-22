@@ -109,6 +109,10 @@ details on these changes.
   * ``django.shortcuts.render()``
   * ``django.shortcuts.render_to_response()``
 
+* Session verification will be enabled regardless of whether or not
+  ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` is in
+  ``MIDDLEWARE_CLASSES``.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
@@ -231,6 +235,9 @@ details on these changes.
 * The default value of the
   :attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
   attribute will change from ``True`` to ``False``.
+
+* ``django.contrib.sitemaps.FlatPageSitemap`` will be removed in favor of
+  ``django.contrib.flatpages.sitemaps.FlatPageSitemap``.
 
 .. _deprecation-removed-in-1.8:
 

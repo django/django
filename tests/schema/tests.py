@@ -10,7 +10,7 @@ from django.db.transaction import atomic
 from .models import (Author, AuthorWithDefaultHeight, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough,
-    AuthorWithEvenLongerName, BookWeak)
+    AuthorWithEvenLongerName, BookWeak, Note)
 
 
 class SchemaTests(TransactionTestCase):
@@ -64,13 +64,13 @@ class SchemaTests(TransactionTestCase):
 
     def column_classes(self, model):
         with connection.cursor() as cursor:
-            columns = dict(
-                (d[0], (connection.introspection.get_field_type(d[1], d), d))
+            columns = {
+                d[0]: (connection.introspection.get_field_type(d[1], d), d)
                 for d in connection.introspection.get_table_description(
                     cursor,
                     model._meta.db_table,
                 )
-            )
+            }
         # SQLite has a different format for field_type
         for name, (type, desc) in columns.items():
             if isinstance(type, tuple):
@@ -415,6 +415,19 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
         self.assertEqual(bool(columns['name'][1][6]), False)
+
+    def test_alter_text_field(self):
+        # Regression for "BLOB/TEXT column 'info' can't have a default value")
+        # on MySQL.
+        new_field = TextField(blank=True)
+        new_field.set_attributes_from_name("info")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                Note,
+                Note._meta.get_field_by_name("info")[0],
+                new_field,
+                strict=True,
+            )
 
     def test_alter_null_to_not_null(self):
         """
@@ -1160,3 +1173,27 @@ class SchemaTests(TransactionTestCase):
                 }
             )
             editor.alter_field(model, get_field(Author, field_class=ForeignKey), field)
+
+    def test_add_field_use_effective_default(self):
+        """
+        #23987 - effective_default() should be used as the field default when
+        adding a new field.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Ensure there's no surname field
+        columns = self.column_classes(Author)
+        self.assertNotIn("surname", columns)
+        # Create a row
+        Author.objects.create(name='Anonymous1')
+        # Add new CharField to ensure default will be used from effective_default
+        new_field = CharField(max_length=15, blank=True)
+        new_field.set_attributes_from_name("surname")
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, new_field)
+        # Ensure field was added with the right default
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT surname FROM schema_author;")
+            item = cursor.fetchall()[0]
+            self.assertEqual(item[0], None if connection.features.interprets_empty_strings_as_nulls else '')

@@ -5,7 +5,7 @@ import pickle
 import time
 from datetime import datetime
 
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, SimpleTestCase
 from django.conf import settings
 from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
@@ -25,7 +25,7 @@ class CustomURLConfMiddleware(object):
         request.urlconf = 'template_tests.alternate_urls'
 
 
-class SimpleTemplateResponseTest(TestCase):
+class SimpleTemplateResponseTest(SimpleTestCase):
 
     def _response(self, template='foo', *args, **kwargs):
         return SimpleTemplateResponse(Template(template), *args, **kwargs)
@@ -210,7 +210,7 @@ class SimpleTemplateResponseTest(TestCase):
     TEMPLATE_CONTEXT_PROCESSORS=[test_processor_name],
     TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates')),
 )
-class TemplateResponseTest(TestCase):
+class TemplateResponseTest(SimpleTestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -311,7 +311,7 @@ class TemplateResponseTest(TestCase):
     ],
     ROOT_URLCONF='template_tests.urls',
 )
-class CustomURLConfTest(TestCase):
+class CustomURLConfTest(SimpleTestCase):
 
     def test_custom_urlconf(self):
         response = self.client.get('/template_response_view/')
@@ -327,7 +327,7 @@ class CustomURLConfTest(TestCase):
     ],
     ROOT_URLCONF='template_tests.alternate_urls',
 )
-class CacheMiddlewareTest(TestCase):
+class CacheMiddlewareTest(SimpleTestCase):
 
     def test_middleware_caching(self):
         response = self.client.get('/template_response_view/')

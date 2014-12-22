@@ -198,19 +198,22 @@ WHEN (new.%(col_name)s IS NULL)
             # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions050.htm
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
-    def date_interval_sql(self, sql, connector, timedelta):
+    def date_interval_sql(self, timedelta):
         """
         Implements the interval functionality for expressions
         format for Oracle:
-        (datefield + INTERVAL '3 00:03:20.000000' DAY(1) TO SECOND(6))
+        INTERVAL '3 00:03:20.000000' DAY(1) TO SECOND(6)
         """
         minutes, seconds = divmod(timedelta.seconds, 60)
         hours, minutes = divmod(minutes, 60)
         days = str(timedelta.days)
         day_precision = len(days)
-        fmt = "(%s %s INTERVAL '%s %02d:%02d:%02d.%06d' DAY(%d) TO SECOND(6))"
-        return fmt % (sql, connector, days, hours, minutes, seconds,
-                timedelta.microseconds, day_precision)
+        fmt = "INTERVAL '%s %02d:%02d:%02d.%06d' DAY(%d) TO SECOND(6)"
+        return fmt % (days, hours, minutes, seconds, timedelta.microseconds,
+                day_precision), []
+
+    def format_for_duration_arithmetic(self, sql):
+        return "NUMTODSINTERVAL(%s / 1000000, 'SECOND')" % sql
 
     def date_trunc_sql(self, lookup_type, field_name):
         # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
@@ -274,8 +277,6 @@ WHEN (new.%(col_name)s IS NULL)
             converters.append(self.convert_binaryfield_value)
         elif internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
-        elif internal_type == 'DecimalField':
-            converters.append(self.convert_decimalfield_value)
         elif internal_type == 'DateField':
             converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
@@ -309,11 +310,6 @@ WHEN (new.%(col_name)s IS NULL)
     def convert_booleanfield_value(self, value, field):
         if value in (1, 0):
             value = bool(value)
-        return value
-
-    def convert_decimalfield_value(self, value, field):
-        if value is not None:
-            value = backend_utils.typecast_decimal(field.format_number(value))
         return value
 
     # cx_Oracle always returns datetime.datetime objects for
@@ -886,7 +882,7 @@ class FormatStylePlaceholderCursor(object):
 
     def _format_params(self, params):
         try:
-            return dict((k, OracleParam(v, self, True)) for k, v in params.items())
+            return {k: OracleParam(v, self, True) for k, v in params.items()}
         except AttributeError:
             return tuple(OracleParam(p, self, True) for p in params)
 
@@ -911,7 +907,7 @@ class FormatStylePlaceholderCursor(object):
     def _param_generator(self, params):
         # Try dict handling; if that fails, treat as sequence
         if hasattr(params, 'items'):
-            return dict((k, v.force_bytes) for k, v in params.items())
+            return {k: v.force_bytes for k, v in params.items()}
         else:
             return [p.force_bytes for p in params]
 
@@ -927,7 +923,7 @@ class FormatStylePlaceholderCursor(object):
             query = convert_unicode(query, self.charset)
         elif hasattr(params, 'keys'):
             # Handle params as dict
-            args = dict((k, ":%s" % k) for k in params.keys())
+            args = {k: ":%s" % k for k in params.keys()}
             query = convert_unicode(query % args, self.charset)
         else:
             # Handle params as sequence

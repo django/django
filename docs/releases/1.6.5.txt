@@ -50,14 +50,14 @@ Bugfixes
 ========
 
 * Made the ``year_lookup_bounds_for_datetime_field`` Oracle backend method
-  Python 3 compatible (`#22551 <http://code.djangoproject.com/ticket/22551>`_).
+  Python 3 compatible (:ticket:`22551`).
 
 * Fixed ``pgettext_lazy`` crash when receiving bytestring content on Python 2
-  (`#22565 <http://code.djangoproject.com/ticket/22565>`_).
+  (:ticket:`22565`).
 
 * Fixed the SQL generated when filtering by a negated ``Q`` object that contains
-  a ``F`` object. (`#22429 <http://code.djangoproject.com/ticket/22429>`_).
+  a ``F`` object. (:ticket:`22429`).
 
 * Avoided overwriting data fetched by ``select_related()`` in certain cases
   which could cause minor performance regressions
-  (`#22508 <http://code.djangoproject.com/ticket/22508>`_).
+  (:ticket:`22508`).

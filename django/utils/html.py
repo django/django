@@ -90,7 +90,7 @@ def format_html(format_string, *args, **kwargs):
     of str.format or % interpolation to build up small HTML fragments.
     """
     args_safe = map(conditional_escape, args)
-    kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in six.iteritems(kwargs))
+    kwargs_safe = {k: conditional_escape(v) for (k, v) in six.iteritems(kwargs)}
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 
@@ -105,7 +105,7 @@ def format_html_join(sep, format_string, args_generator):
 
     Example:
 
-      format_html_join('\n', "<li>{0} {1}</li>", ((u.first_name, u.last_name)
+      format_html_join('\n', "<li>{} {}</li>", ((u.first_name, u.last_name)
                                                   for u in users))
 
     """

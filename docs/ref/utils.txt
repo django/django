@@ -158,6 +158,15 @@ The functions defined in this module share the following properties:
     ``tzinfo`` attribute is a :class:`~django.utils.tzinfo.FixedOffset`
     instance.
 
+.. function:: parse_duration(value)
+
+    .. versionadded:: 1.8
+
+    Parses a string and returns a :class:`datetime.timedelta`.
+
+    Expects data in the format ``"DD HH:MM:SS.uuuuuu"`` or as specified by ISO
+    8601 (e.g. ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``).
+
 ``django.utils.decorators``
 ===========================
 
@@ -605,7 +614,7 @@ escaping HTML.
 
     You should instead use::
 
-        format_html("{0} <b>{1}</b> {2}",
+        format_html("{} <b>{}</b> {}",
                     mark_safe(some_html), some_text, some_other_text)
 
     This has the advantage that you don't need to apply :func:`escape` to each
@@ -627,7 +636,7 @@ escaping HTML.
     ``args_generator`` should be an iterator that returns the sequence of
     ``args`` that will be passed to :func:`format_html`. For example::
 
-        format_html_join('\n', "<li>{0} {1}</li>", ((u.first_name, u.last_name)
+        format_html_join('\n', "<li>{} {}</li>", ((u.first_name, u.last_name)
                                                     for u in users))
 
 .. function:: strip_tags(value)
@@ -677,7 +686,7 @@ escaping HTML.
     If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"``
     the return value will be ``"<B>Joel</B> <button>is</button> a slug"``.
 
-.. _str.format: http://docs.python.org/library/stdtypes.html#str.format
+.. _str.format: https://docs.python.org/library/stdtypes.html#str.format
 .. _bleach: https://pypi.python.org/pypi/bleach
 
 ``django.utils.http``
@@ -739,7 +748,7 @@ escaping HTML.
     Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
     smaller than `sys.maxint`_.
 
-    .. _sys.maxint: http://docs.python.org/2/library/sys.html#sys.maxint
+    .. _sys.maxint: https://docs.python.org/2/library/sys.html#sys.maxint
 
 .. function:: urlsafe_base64_encode(s)
 

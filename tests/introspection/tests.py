@@ -2,12 +2,15 @@ from __future__ import unicode_literals
 
 from django.db import connection
 from django.db.utils import DatabaseError
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import Reporter, Article
 
 
-class IntrospectionTests(TestCase):
+class IntrospectionTests(TransactionTestCase):
+
+    available_apps = ['introspection']
+
     def test_table_names(self):
         tl = connection.introspection.table_names()
         self.assertEqual(tl, sorted(tl))
@@ -25,13 +28,9 @@ class IntrospectionTests(TestCase):
                              "django_table_names() returned a non-Django table")
 
     def test_django_table_names_retval_type(self):
-        # Ticket #15216
-        with connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
-
+        #15216 - Table name is a list
         tl = connection.introspection.django_table_names(only_existing=True)
         self.assertIs(type(tl), list)
-
         tl = connection.introspection.django_table_names(only_existing=False)
         self.assertIs(type(tl), list)
 

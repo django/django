@@ -26,7 +26,9 @@ from django.forms.widgets import (
 from django.utils import formats
 from django.utils.encoding import smart_text, force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
+from django.utils.dateparse import parse_duration
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning, RenameMethodsBase
+from django.utils.duration import duration_string
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
@@ -37,7 +39,7 @@ from django.core.validators import EMPTY_VALUES  # NOQA
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
-    'DateField', 'TimeField', 'DateTimeField',
+    'DateField', 'TimeField', 'DateTimeField', 'DurationField',
     'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
@@ -516,6 +518,25 @@ class DateTimeField(BaseTemporalField):
 
     def strptime(self, value, format):
         return datetime.datetime.strptime(force_str(value), format)
+
+
+class DurationField(Field):
+    default_error_messages = {
+        'invalid': _('Enter a valid duration.'),
+    }
+
+    def prepare_value(self, value):
+        return duration_string(value)
+
+    def to_python(self, value):
+        if value in self.empty_values:
+            return None
+        if isinstance(value, datetime.timedelta):
+            return value
+        value = parse_duration(value)
+        if value is None:
+            raise ValidationError(self.error_messages['invalid'], code='invalid')
+        return value
 
 
 class RegexField(CharField):
@@ -1028,7 +1049,7 @@ class MultiValueField(Field):
 
     def __deepcopy__(self, memo):
         result = super(MultiValueField, self).__deepcopy__(memo)
-        result.fields = tuple([x.__deepcopy__(memo) for x in self.fields])
+        result.fields = tuple(x.__deepcopy__(memo) for x in self.fields)
         return result
 
     def validate(self, value):
@@ -1104,7 +1125,11 @@ class MultiValueField(Field):
             if not isinstance(initial, list):
                 initial = self.widget.decompress(initial)
         for field, initial, data in zip(self.fields, initial, data):
-            if field.has_changed(field.to_python(initial), data):
+            try:
+                initial = field.to_python(initial)
+            except ValidationError:
+                return True
+            if field.has_changed(initial, data):
                 return True
         return False
 

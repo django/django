@@ -4,7 +4,7 @@ from unittest import skipUnless
 from django.contrib.gis.gdal import HAS_GDAL
 
 if HAS_GDAL:
-    from django.contrib.gis.gdal import SpatialReference, CoordTransform, OGRException, SRSException
+    from django.contrib.gis.gdal import SpatialReference, CoordTransform, GDALException, SRSException
 
 
 class TestSRS:
@@ -160,7 +160,7 @@ class SpatialRefTest(unittest.TestCase):
             try:
                 srs = SpatialReference(bad)
                 srs.validate()
-            except (SRSException, OGRException):
+            except (SRSException, GDALException):
                 pass
             else:
                 self.fail('Should not have initialized on bad WKT "%s"!')

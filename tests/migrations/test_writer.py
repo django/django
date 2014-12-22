@@ -22,6 +22,8 @@ from django.utils.timezone import get_default_timezone, utc, FixedOffset
 import custom_migration_operations.operations
 import custom_migration_operations.more_operations
 
+from .models import FoodQuerySet, FoodManager
+
 
 class TestModel1(object):
     def upload_to(self):
@@ -340,3 +342,23 @@ class WriterTests(TestCase):
         fixed_offset_datetime = datetime.datetime(2014, 1, 1, 1, 1, tzinfo=FixedOffset(180))
         self.assertEqual(MigrationWriter.serialize_datetime(fixed_offset_datetime),
                          "datetime.datetime(2013, 12, 31, 22, 1, tzinfo=utc)")
+
+    def test_deconstruct_class_arguments(self):
+        # Yes, it doesn't make sense to use a class as a default for a
+        # CharField. It does make sense for custom fields though, for example
+        # an enumfield that takes the enum class as an argument.
+        class DeconstructableInstances(object):
+            def deconstruct(self):
+                return ('DeconstructableInstances', [], {})
+
+        string = MigrationWriter.serialize(models.CharField(default=DeconstructableInstances))[0]
+        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructableInstances)")
+
+    def test_serialize_managers(self):
+        self.assertSerializedEqual(models.Manager())
+        self.assertSerializedResultEqual(
+            FoodQuerySet.as_manager(),
+            ('migrations.models.FoodQuerySet.as_manager()', {'import migrations.models'})
+        )
+        self.assertSerializedEqual(FoodManager('a', 'b'))
+        self.assertSerializedEqual(FoodManager('x', 'y', c=3, d=4))

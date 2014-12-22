@@ -223,10 +223,8 @@ running ``migrate``::
 MySQL DB API Drivers
 --------------------
 
-The Python Database API is described in `PEP 249`_. MySQL has three prominent
+The Python Database API is described in :pep:`249`. MySQL has three prominent
 drivers that implement this API:
-
-.. _PEP 249: http://www.python.org/dev/peps/pep-0249/
 
 - `MySQLdb`_ is a native driver that has been developed and supported for over
   a decade by Andy Dustman.
@@ -248,7 +246,7 @@ In addition to a DB API driver, Django needs an adapter to access the database
 drivers from its ORM. Django provides an adapter for MySQLdb/mysqlclient while
 MySQL Connector/Python includes `its own`_.
 
-.. _its own: http://dev.mysql.com/doc/refman/5.6/en/connector-python-django-backend.html
+.. _its own: http://dev.mysql.com/doc/refman/5.6/en/connector-python-info.html
 
 MySQLdb
 ~~~~~~~
@@ -383,6 +381,13 @@ you should use ``utf8_general_ci`` because it is faster. If this is not acceptab
 because it is more accurate.
 
 .. _MySQL Unicode Character Sets: http://dev.mysql.com/doc/refman/5.7/en/charset-unicode-sets.html
+
+.. warning::
+
+    Model formsets validate unique fields in a case-sensitive manner. Thus when
+    using a case-insensitive collation, a formset with unique field values that
+    differ only by case will pass validation, but upon calling ``save()``, an
+    ``IntegrityError`` will be raised.
 
 Connecting to the database
 --------------------------

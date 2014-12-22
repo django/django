@@ -367,7 +367,7 @@ a subclass of dictionary. Exceptions are outlined here:
     Instantiates a ``QueryDict`` object based on ``query_string``.
 
     >>> QueryDict('a=1&a=2&c=3')
-    <QueryDict: {u'a': [u'1', u'2'], u'b': [u'1']}>
+    <QueryDict: {'a': ['1', '2'], 'c': ['3']}>
 
     If ``query_string`` is not passed in, the resulting ``QueryDict`` will be
     empty (it will have no keys or values).
@@ -707,6 +707,12 @@ Methods
 
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
+
+.. method:: HttpResponse.setdefault(header, value)
+
+    .. versionadded:: 1.8
+
+    Sets a header unless it has already been set.
 
 .. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
 

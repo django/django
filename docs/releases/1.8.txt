@@ -93,9 +93,16 @@ New data types
 ~~~~~~~~~~~~~~
 
 * Django now has a :class:`~django.db.models.UUIDField` for storing
-  universally unique identifiers. There is a corresponding :class:`form field
-  <django.forms.UUIDField>`. It is stored as the native ``uuid`` data type on
-  PostgreSQL and as a fixed length character field on other backends.
+  universally unique identifiers. It is stored as the native ``uuid`` data type
+  on PostgreSQL and as a fixed length character field on other backends. There
+  is a corresponding :class:`form field <django.forms.UUIDField>`.
+
+* Django now has a :class:`~django.db.models.DurationField` for storing periods
+  of time - modeled in Python by :class:`~python:datetime.timedelta`. It is
+  stored in the native ``interval`` data type on PostgreSQL and as a ``bigint``
+  of microseconds on other backends. Date and time related arithmetic has also
+  been improved on all backends. There is a corresponding :class:`form field
+  <django.forms.DurationField>`.
 
 Query Expressions
 ~~~~~~~~~~~~~~~~~
@@ -105,6 +112,25 @@ customize, and compose complex SQL expressions. This has enabled annotate
 to accept expressions other than aggregates. Aggregates are now able to
 reference multiple fields, as well as perform arithmetic, similar to ``F()``
 objects.
+
+``TestCase`` data setup
+~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`~django.test.TestCase` has been refactored to allow for data
+initialization at the class level using transactions and savepoints. Database
+backends which do not support transactions, like MySQL with the MyISAM storage
+engine, will still be able to run these tests but won't benefit from the
+improvements. Tests are now run within two nested
+:func:`~django.db.transaction.atomic()` blocks: one for the whole class and one
+for each test.
+
+* The class method
+  :meth:`TestCase.setUpTestData() <django.test.TestCase.setUpTestData>` adds
+  the ability to setup test data at the class level. Using this technique can
+  speed up the tests as compared to using ``setUp()``.
+
+* Fixture loading within ``TestCase`` is now performed once for the whole
+  ``TestCase``.
 
 Minor features
 ~~~~~~~~~~~~~~
@@ -174,8 +200,16 @@ Minor features
 * The Spatialite backend now supports ``Collect`` and ``Extent`` aggregates
   when the database version is 3.0 or later.
 
+* The PostGIS 2 ``CREATE EXTENSION postgis`` and the Spatialite
+  ``SELECT InitSpatialMetaData`` initialization commands are now automatically
+  run by :djadmin:`migrate`.
+
 * Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
   Django 1.2 have been removed.
+
+* All GDAL-related exceptions are now raised with ``GDALException``. The former
+  ``OGRException`` has been kept for backwards compatibility but should not be
+  used any longer.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -403,6 +437,9 @@ Migrations
 * It is now possible to have migrations (most probably :ref:`data migrations
   <data-migrations>`) for applications without models.
 
+* Migrations can now :ref:`serialize model managers
+  <using-managers-in-migrations>` as part of the model state.
+
 Models
 ^^^^^^
 
@@ -518,6 +555,10 @@ Requests and Responses
   like :meth:`~django.http.HttpResponse.getvalue` so that instances can be used
   as stream objects.
 
+* The new :meth:`HttpResponse.setdefault()
+  <django.http.HttpResponse.setdefault>` method allows setting a header unless
+  it has already been set.
+
 Tests
 ^^^^^
 
@@ -545,6 +586,8 @@ Tests
 
 * The :func:`~django.test.override_settings` decorator can now affect the
   master router in :setting:`DATABASE_ROUTERS`.
+
+* Added test client support for file uploads with file-like objects.
 
 Validators
 ^^^^^^^^^^
@@ -782,6 +825,14 @@ The new package is available `on Github`_ and on PyPI.
 
 .. _on GitHub: https://github.com/django/django-formtools/
 
+Database connection reloading between tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django previously closed database connections between each test within a
+``TestCase``. This is no longer the case as Django now wraps the whole
+``TestCase`` within a transaction. If some of your tests relied on the old
+behavior, you should have them inherit from ``TransactionTestCase`` instead.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -829,8 +880,8 @@ Miscellaneous
 * Seconds have been removed from any locales that had them in ``TIME_FORMAT``,
   ``DATETIME_FORMAT``, or ``SHORT_DATETIME_FORMAT``.
 
-* The default max size of the Oracle test tablespace has increased from 200M
-  to 500M.
+* The default max size of the Oracle test tablespace has increased from 300M
+  (or 200M, before 1.7.2) to 500M.
 
 * :func:`~django.core.urlresolvers.reverse` and
   :func:`~django.core.urlresolvers.reverse_lazy` now return Unicode strings
@@ -850,7 +901,7 @@ Miscellaneous
   Unix end-of-line convention ``'\n'``, the Windows convention ``'\r\n'``, and
   the old Macintosh convention ``'\r'``.
 
-  .. _universal newlines: http://www.python.org/dev/peps/pep-0278
+  .. _universal newlines: https://www.python.org/dev/peps/pep-0278
 
 * The Memcached cache backends ``MemcachedCache`` and ``PyLibMCCache`` will
   delete a key if ``set()`` fails. This is necessary to ensure the ``cache_db``
@@ -877,6 +928,11 @@ Miscellaneous
 * When following redirects, the test client now raises
   :exc:`~django.test.client.RedirectCycleError` if it detects a loop or hits a
   maximum redirect limit (rather than passing silently).
+
+* Translatable strings set as the ``default`` parameter of the field are cast
+  to concrete strings later, so the return type of ``Field.get_default()`` is
+  different in some cases. There is no change to default values which are the
+  result of a callable.
 
 .. _deprecated-features-1.8:
 
@@ -1200,6 +1256,28 @@ Default value of ``RedirectView.permanent``
 The default value of the
 :attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
 attribute will change from ``True`` to ``False`` in Django 1.9.
+
+Using ``AuthenticationMiddleware`` without ``SessionAuthenticationMiddleware``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`django.contrib.auth.middleware.SessionAuthenticationMiddleware` was
+added in Django 1.7. In Django 1.7.2, its functionality was moved to
+``auth.get_user()`` and, for backwards compatibility, enabled only if
+``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` appears in
+:setting:`MIDDLEWARE_CLASSES`.
+
+In Django 2.0, session verification will be enabled regardless of whether or not
+``SessionAuthenticationMiddleware`` is enabled (at which point
+``SessionAuthenticationMiddleware`` will have no significance). You can add it
+to your ``MIDDLEWARE_CLASSES`` sometime before then to opt-in. Please read the
+:ref:`upgrade considerations <session-invalidation-on-password-change>` first.
+
+``django.contrib.sitemaps.FlatPageSitemap``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.contrib.sitemaps.FlatPageSitemap`` has moved to
+``django.contrib.flatpages.sitemaps.FlatPageSitemap``. The old import location
+is deprecated and will be removed in Django 1.9.
 
 .. removed-features-1.8:
 

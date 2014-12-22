@@ -86,7 +86,7 @@ class ExtendsNode(Node):
         self.nodelist = nodelist
         self.parent_name = parent_name
         self.template_dirs = template_dirs
-        self.blocks = dict((n.name, n) for n in nodelist.get_nodes_by_type(BlockNode))
+        self.blocks = {n.name: n for n in nodelist.get_nodes_by_type(BlockNode)}
 
     def __repr__(self):
         return '<ExtendsNode: extends %s>' % self.parent_name.token
@@ -120,8 +120,8 @@ class ExtendsNode(Node):
             # The ExtendsNode has to be the first non-text node.
             if not isinstance(node, TextNode):
                 if not isinstance(node, ExtendsNode):
-                    blocks = dict((n.name, n) for n in
-                                  compiled_parent.nodelist.get_nodes_by_type(BlockNode))
+                    blocks = {n.name: n for n in
+                              compiled_parent.nodelist.get_nodes_by_type(BlockNode)}
                     block_context.add_blocks(blocks)
                 break
 

@@ -240,9 +240,9 @@ the Python Software Foundation.  An advantage to using the installer is
 that OS X's Python will remain "pristine" for internal operating system
 use.
 
-__ http://python.org/ftp/python/2.7.5/
-__ http://python.org/ftp/python/3.2.5/
-__ http://python.org/ftp/python/3.3.2/
+__ https://python.org/ftp/python/2.7.5/
+__ https://python.org/ftp/python/3.2.5/
+__ https://python.org/ftp/python/3.3.2/
 
 .. note::
 
@@ -404,7 +404,7 @@ Next, run the installer and keep the defaults -- for example, keep
     products sometimes install a copy there.  *You should still install a
     fresh version of Python 2.7.*
 
-__ http://python.org/download/
+__ https://python.org/download/
 
 PostgreSQL
 ^^^^^^^^^^

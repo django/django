@@ -1,5 +1,6 @@
 from collections import deque
 import datetime
+import decimal
 import time
 import warnings
 
@@ -18,6 +19,7 @@ from django.db.backends.signals import connection_created
 from django.db.backends import utils
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper, ProgrammingError
+from django.utils.dateparse import parse_duration
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.functional import cached_property
 from django.utils import six
@@ -29,6 +31,8 @@ TableInfo = namedtuple('TableInfo', ['name', 'type'])
 # Structure returned by the DB-API cursor.description interface (PEP 249)
 FieldInfo = namedtuple('FieldInfo',
     'name type_code display_size internal_size precision scale null_ok')
+
+NO_DB_ALIAS = '__no_db__'
 
 
 class BaseDatabaseWrapper(object):
@@ -432,6 +436,13 @@ class BaseDatabaseWrapper(object):
 
     ##### Miscellaneous #####
 
+    def prepare_database(self):
+        """
+        Hook to do any database check or preparation, generally called before
+        migrating a project or an app.
+        """
+        pass
+
     @cached_property
     def wrap_database_errors(self):
         """
@@ -469,6 +480,24 @@ class BaseDatabaseWrapper(object):
             cursor.close()
             if must_close:
                 self.close()
+
+    @cached_property
+    def _nodb_connection(self):
+        """
+        Alternative connection to be used when there is no need to access
+        the main database, specifically for test db creation/deletion.
+        This also prevents the production database from being exposed to
+        potential child threads while (or after) the test database is destroyed.
+        Refs #10868, #17786, #16969.
+        """
+        settings_dict = self.settings_dict.copy()
+        settings_dict['NAME'] = None
+        #backend = load_backend(settings_dict['ENGINE'])
+        nodb_connection = self.__class__(
+            settings_dict,
+            alias=NO_DB_ALIAS,
+            allow_thread_sharing=False)
+        return nodb_connection
 
     def _start_transaction_under_autocommit(self):
         """
@@ -547,6 +576,9 @@ class BaseDatabaseFeatures(object):
     supports_bitwise_or = True
 
     supports_binary_field = True
+
+    # Is there a true datatype for timedeltas?
+    has_native_duration_field = False
 
     # Do time/datetime fields have microsecond precision?
     supports_microsecond_precision = True
@@ -918,7 +950,7 @@ class BaseDatabaseOperations(object):
         elif params is None:
             u_params = ()
         else:
-            u_params = dict((to_unicode(k), to_unicode(v)) for k, v in params.items())
+            u_params = {to_unicode(k): to_unicode(v) for k, v in params.items()}
 
         return six.text_type("QUERY = %r - PARAMS = %r") % (sql, u_params)
 
@@ -1188,8 +1220,6 @@ class BaseDatabaseOperations(object):
         Transform a decimal.Decimal value to an object compatible with what is
         expected by the backend driver for decimal (numeric) columns.
         """
-        if value is None:
-            return None
         return utils.format_number(value, max_digits, decimal_places)
 
     def year_lookup_bounds_for_date_field(self, value):
@@ -1226,7 +1256,15 @@ class BaseDatabaseOperations(object):
         Some field types on some backends do not provide data in the correct
         format, this is the hook for coverter functions.
         """
+        if not self.connection.features.has_native_duration_field and internal_type == 'DurationField':
+            return [self.convert_durationfield_value]
         return []
+
+    def convert_durationfield_value(self, value, field):
+        if value is not None:
+            value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
+            value = parse_duration(value)
+        return value
 
     def check_aggregate_support(self, aggregate_func):
         """Check that the backend supports the provided aggregate
@@ -1246,6 +1284,9 @@ class BaseDatabaseOperations(object):
         """
         conn = ' %s ' % connector
         return conn.join(sub_expressions)
+
+    def combine_duration_expression(self, connector, sub_expressions):
+        return self.combine_expression(connector, sub_expressions)
 
     def modify_insert_params(self, placeholders, params):
         """Allow modification of insert parameters. Needed for Oracle Spatial
@@ -1302,8 +1343,8 @@ class BaseDatabaseIntrospection(object):
         in sorting order between databases.
         """
         def get_names(cursor):
-            return sorted([ti.name for ti in self.get_table_list(cursor)
-                           if include_views or ti.type == 't'])
+            return sorted(ti.name for ti in self.get_table_list(cursor)
+                          if include_views or ti.type == 't')
         if cursor is None:
             with self.connection.cursor() as cursor:
                 return get_names(cursor)

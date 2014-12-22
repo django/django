@@ -231,7 +231,7 @@ class modify_settings(override_settings):
     """
     def __init__(self, *args, **kwargs):
         if args:
-            # Hack used when instantiating from SimpleTestCase._pre_setup.
+            # Hack used when instantiating from SimpleTestCase.setUpClass.
             assert not kwargs
             self.operations = args[0]
         else:
@@ -250,7 +250,7 @@ class modify_settings(override_settings):
         self.options = {}
         for name, operations in self.operations:
             try:
-                # When called from SimpleTestCase._pre_setup, values may be
+                # When called from SimpleTestCase.setUpClass, values may be
                 # overridden several times; cumulate changes.
                 value = self.options[name]
             except KeyError:
@@ -309,8 +309,8 @@ def compare_xml(want, got):
         return _norm_whitespace_re.sub(' ', v)
 
     def child_text(element):
-        return ''.join([c.data for c in element.childNodes
-                        if c.nodeType == Node.TEXT_NODE])
+        return ''.join(c.data for c in element.childNodes
+                       if c.nodeType == Node.TEXT_NODE)
 
     def children(element):
         return [c for c in element.childNodes
@@ -541,3 +541,17 @@ def captured_stdin():
        self.assertEqual(captured, "hello")
     """
     return captured_output("stdin")
+
+
+def reset_warning_registry():
+    """
+    Clear warning registry for all modules. This is required in some tests
+    because of a bug in Python that prevents warnings.simplefilter("always")
+    from always making warnings appear: http://bugs.python.org/issue4180
+
+    The bug was fixed in Python 3.4.2.
+    """
+    key = "__warningregistry__"
+    for mod in sys.modules.values():
+        if hasattr(mod, key):
+            getattr(mod, key).clear()

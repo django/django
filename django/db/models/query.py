@@ -67,7 +67,9 @@ class QuerySet(object):
     def as_manager(cls):
         # Address the circular dependency between `Queryset` and `Manager`.
         from django.db.models.manager import Manager
-        return Manager.from_queryset(cls)()
+        manager = Manager.from_queryset(cls)()
+        manager._built_as_manager = True
+        return manager
     as_manager.queryset_only = True
     as_manager = classmethod(as_manager)
 
@@ -490,7 +492,7 @@ class QuerySet(object):
         for f in self.model._meta.fields:
             if f.attname in lookup:
                 lookup[f.name] = lookup.pop(f.attname)
-        params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
+        params = {k: v for k, v in kwargs.items() if LOOKUP_SEP not in k}
         params.update(defaults)
         return lookup, params
 
@@ -544,7 +546,7 @@ class QuerySet(object):
         if not id_list:
             return {}
         qs = self.filter(pk__in=id_list).order_by()
-        return dict((obj._get_pk_val(), obj) for obj in qs)
+        return {obj._get_pk_val(): obj for obj in qs}
 
     def delete(self):
         """

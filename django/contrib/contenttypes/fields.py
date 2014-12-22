@@ -324,7 +324,7 @@ class GenericRelation(ForeignObject):
 
     def get_path_info(self):
         opts = self.rel.to._meta
-        target = opts.get_field(self.object_id_field_name)
+        target = opts.pk
         return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
 
     def get_reverse_path_info(self):

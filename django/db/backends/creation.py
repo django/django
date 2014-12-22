@@ -3,9 +3,7 @@ import sys
 import time
 
 from django.conf import settings
-from django.db.utils import load_backend
 from django.utils.encoding import force_bytes
-from django.utils.functional import cached_property
 from django.utils.six.moves import input
 from django.utils.six import StringIO
 from django.db import router
@@ -17,7 +15,6 @@ from .utils import truncate_name
 # The prefix to put on the default database name when creating
 # the test database.
 TEST_DATABASE_PREFIX = 'test_'
-NO_DB_ALIAS = '__no_db__'
 
 
 class BaseDatabaseCreation(object):
@@ -34,23 +31,12 @@ class BaseDatabaseCreation(object):
     def __init__(self, connection):
         self.connection = connection
 
-    @cached_property
+    @property
     def _nodb_connection(self):
         """
-        Alternative connection to be used when there is no need to access
-        the main database, specifically for test db creation/deletion.
-        This also prevents the production database from being exposed to
-        potential child threads while (or after) the test database is destroyed.
-        Refs #10868, #17786, #16969.
+        Used to be defined here, now moved to DatabaseWrapper.
         """
-        settings_dict = self.connection.settings_dict.copy()
-        settings_dict['NAME'] = None
-        backend = load_backend(settings_dict['ENGINE'])
-        nodb_connection = backend.DatabaseWrapper(
-            settings_dict,
-            alias=NO_DB_ALIAS,
-            allow_thread_sharing=False)
-        return nodb_connection
+        return self.connection._nodb_connection
 
     @classmethod
     def _digest(cls, *args):
@@ -371,8 +357,6 @@ class BaseDatabaseCreation(object):
         settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
         self.connection.settings_dict["NAME"] = test_database_name
 
-        self._create_test_db_pre_migrate_sql()
-
         # We report migrate messages at one level lower than that requested.
         # This ensures we don't get flooded with messages during testing
         # (unless you really ask to be flooded).
@@ -397,12 +381,6 @@ class BaseDatabaseCreation(object):
         self.connection.ensure_connection()
 
         return test_database_name
-
-    def _create_test_db_pre_migrate_sql(self):
-        """
-        Hook for databases to load SQL before creating the test DB.
-        """
-        pass
 
     def serialize_db_to_string(self):
         """
