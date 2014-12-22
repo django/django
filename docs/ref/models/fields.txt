@@ -1837,7 +1837,7 @@ Attributes for fields
 Attributes for fields with relations
 ====================================
 
-If a field responds truthfully to the ``has_relation`` attribute, it must
+If a field returns ``True`` to the ``has_relation`` attribute, it must
 also necessarily respond to the attributes for relational fields.
 These attributes are used inside and outside Django to query for the
 cardinality and other details of a relation.
@@ -1854,20 +1854,20 @@ cardinality and other details of a relation.
 
 .. attribute:: one_to_one
 
-    Responds truthfully if the field has a one-to-one relation with
+    Responds ``True`` if the field has a one-to-one relation with
     the related model, such as a ``OneToOneField``.
 
 .. attribute:: many_to_one
 
-    Responds truthfully if the field has a many-to-one relation with
+    Responds ``True`` if the field has a many-to-one relation with
     the related model, such as a ``GenericRelation``.
 
 .. attribute:: one_to_many
 
-    Responds truthfully if the field has a one-to-many relation with
+    Responds ``True`` if the field has a one-to-many relation with
     the related model, such as a ``ForeignKey``.
 
 .. attribute:: many_to_many
 
-    Responds truthfully if the field has a many-to-many relation with
+    Responds ``True`` if the field has a many-to-many relation with
     the related model, such as a ``ManyToManyField``.
