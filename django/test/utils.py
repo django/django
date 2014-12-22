@@ -555,3 +555,19 @@ def reset_warning_registry():
     for mod in sys.modules.values():
         if hasattr(mod, key):
             getattr(mod, key).clear()
+
+
+@contextmanager
+def freeze_time(t):
+    """Context manager to temporarily freeze time.time()
+
+    This helper will temporarily modify the time function of the time module.
+    Module which imported this function directly (e.g. from time import time)
+    won't be affected.
+    """
+    _real_time = time.time
+    time.time = lambda: t
+    try:
+        yield
+    finally:
+        time.time = _real_time
