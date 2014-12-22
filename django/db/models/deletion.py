@@ -53,17 +53,23 @@ def DO_NOTHING(collector, field, sub_objs, using):
 
 
 def get_candidates_to_delete(opts):
-    related_objects_on_proxies = (
-        f for f in chain.from_iterable(
-            c.related_objects for c in opts.concrete_model._meta.proxied_children
-            if c is not opts
-        )
+    # Collect models that contain candidate relations to delete. This may include
+    # relations coming from proxy models.
+    candidate_models = {opts}
+    candidate_models = candidate_models.union(opts.concrete_model._meta.proxied_children)
+
+    # For each model, get all candidate fields.
+    candidate_model_fields = chain.from_iterable(
+        opts.get_fields(include_hidden=True) for opts in candidate_models
     )
+
+    # Keep related objects not coming from ManyToManyFields from all candidate
+    # model fields.
     related_objects_without_m2ms = (
-        f for f in opts.get_fields(include_hidden=True)
+        f for f in candidate_model_fields
         if f.is_reverse_object and not f.many_to_many
     )
-    return chain(related_objects_on_proxies, related_objects_without_m2ms)
+    return related_objects_without_m2ms
 
 
 class Collector(object):
