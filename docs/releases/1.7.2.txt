@@ -160,3 +160,5 @@ Bugfixes
   a crash when the index name requires it (:ticket:`#24015`).
 
 * Added ``datetime.time`` support to migrations questioner (:ticket:`23998`).
+
+* Fixed admindocs crash on apps installed as eggs (:ticket:`23525`).
