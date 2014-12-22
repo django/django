@@ -12,8 +12,14 @@ The framework is extensible so you can easily add your own checks.
 
 Checks can be triggered explicitly via the :djadmin:`check` command. Checks are
 triggered implicitly before most commands, including :djadmin:`runserver` and
-:djadmin:`migrate`. For performance reasons, the checks are not performed if
-:setting:`DEBUG` is set to ``False``.
+:djadmin:`migrate`. 
+
+.. note::
+
+    For performance reasons, the checks are only performed if you start django via
+    the :djadmin:`runserver` command. They will not run as part of the WSGI stack 
+    that is used to deploy the site. If you need to run system checks on your 
+    deployment server, you need to trigger them explicitly via :djadmin:`check`.
 
 Serious errors will prevent Django commands (such as :djadmin:`runserver`) from
 running at all. Minor problems are reported to the console. If you have inspected
