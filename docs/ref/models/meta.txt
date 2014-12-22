@@ -18,6 +18,12 @@ Methods that it provides can be used for:
 * Retrieving all field instances of a model
 * Retrieving a single field instance of a model by name
 
+.. note::
+    The Model ``_meta`` API has always existed as a Django internal, but
+    wasn't formally documented and supported. As part of the effort to
+    make this API public, some of the already existing API entrypoints
+    may have slightly changed.
+
 .. _model-meta-field-apis:
 
 ``Field-access APIs``
