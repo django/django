@@ -1,5 +1,8 @@
-from django.contrib.sites.models import Site
 from django.db import models
+
+
+class Site(models.Model):
+    name = models.CharField(max_length=100)
 
 
 class Article(models.Model):
