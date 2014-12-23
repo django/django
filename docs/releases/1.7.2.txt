@@ -186,3 +186,6 @@ Bugfixes
 
 * Restored the ability to use more than five levels of subqueries
   (:ticket:`23758`).
+
+* Fixed crash when ``ValidationError`` is initialized with a ``ValidationError``
+  that is initialized with a dictionary (:ticket:`24008`).
