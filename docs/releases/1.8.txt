@@ -116,7 +116,7 @@ Minor features
   <django.contrib.admin.ModelAdmin.delete_view>` displays a summary of objects
   to be deleted on the deletion confirmation page.
 
-* The jQuery library embedded in the admin has been upgraded to version 1.11.1.
+* The jQuery library embedded in the admin has been upgraded to version 1.11.2.
 
 * You can now specify :attr:`AdminSite.site_url
   <django.contrib.admin.AdminSite.site_url>` in order to display a link to the
