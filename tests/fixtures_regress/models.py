@@ -249,7 +249,7 @@ class Thingy(models.Model):
 
 
 class M2MToSelf(models.Model):
-    parent = models.ManyToManyField("self", blank=True, null=True)
+    parent = models.ManyToManyField("self", blank=True)
 
 
 @python_2_unicode_compatible
