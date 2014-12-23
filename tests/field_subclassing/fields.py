@@ -94,3 +94,57 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.TextField)):
 class CustomTypedField(models.TextField):
     def db_type(self, connection):
         return 'custom_field'
+
+from django.utils.translation import ugettext_lazy as _
+from django.db.models import fields
+import six
+
+
+class CustomAutoField(fields.Field):
+    description = _("Integer")
+
+    empty_strings_allowed = False
+    default_error_messages = {
+        'invalid': _("'%(value)s' value must be an integer."),
+    }
+
+    def __init__(self, *args, **kwargs):
+        kwargs['blank'] = True
+        super(CustomAutoField, self).__init__(*args, **kwargs)
+
+    def get_internal_type(self):
+        return "AutoField"
+
+    def to_python(self, value):
+        if value is None:
+            return value
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            raise exceptions.ValidationError(
+                self.error_messages['invalid'],
+                code='invalid',
+                params={'value': value},
+            )
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if not prepared:
+            value = self.get_prep_value(value)
+            value = connection.ops.validate_autopk_value(value)
+        return value
+
+    def get_prep_value(self, value):
+        value = super(CustomAutoField, self).get_prep_value(value)
+        if value is None:
+            return None
+        return int(value)
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        assert not cls._meta.has_auto_field, \
+            "A model can't have more than one AutoField."
+        super(CustomAutoField, self).contribute_to_class(cls, name, **kwargs)
+        cls._meta.has_auto_field = True
+        cls._meta.auto_field = self
+
+    def formfield(self, **kwargs):
+        return None

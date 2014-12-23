@@ -7,7 +7,7 @@ from django.db import connection
 from django.test import TestCase
 
 from .fields import Small, CustomTypedField
-from .models import ChoicesModel, DataModel, MyModel, OtherModel
+from .models import ChoicesModel, DataModel, MyModel, OtherModel, CustomAutoFieldModel
 
 
 class CustomField(TestCase):
@@ -121,6 +121,13 @@ class CustomField(TestCase):
         o = ChoicesModel.objects.create(data=Small('d', 'e'))
         with self.assertRaises(exceptions.ValidationError):
             o.full_clean()
+
+    def test_auto_field(self):
+        o = CustomAutoFieldModel()
+        self.assertEqual(o.pk, None)
+        o.save()
+        self.assertNotEqual(o.pk, None)
+        self.assertTrue(isinstance(o.pk, int))
 
 
 class TestDbType(TestCase):

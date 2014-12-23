@@ -4,7 +4,7 @@ Tests for field subclassing.
 from django.db import models
 from django.utils.encoding import force_text
 
-from .fields import Small, SmallField, SmallerField, JSONField
+from .fields import Small, SmallField, SmallerField, JSONField, CustomAutoField
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -33,3 +33,7 @@ class ChoicesModel(models.Model):
 
 class DataModel(models.Model):
     data = JSONField()
+
+
+class CustomAutoFieldModel(models.Model):
+    id = CustomAutoField(primary_key=True)
