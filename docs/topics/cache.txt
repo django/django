@@ -436,6 +436,8 @@ of 60 seconds, and a maximum capacity of 1000 items::
 Invalid arguments are silently ignored, as are invalid values of known
 arguments.
 
+.. _the-per-site-cache:
+
 The per-site cache
 ==================
 
@@ -562,9 +564,9 @@ setting for the middleware.  It can be used like this::
     def my_view(request):
         ...
 
-The two settings can also be combined. If you specify a ``cache`` *and*
-a ``key_prefix``, you will get all the settings of the requested cache
-alias, but with the key_prefix overridden.
+The ``key_prefix and ``cache`` arguments may be specified together. The
+``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
+specified under :setting:`CACHES` will be concatenated.
 
 Specifying per-view cache in the URLconf
 ----------------------------------------
