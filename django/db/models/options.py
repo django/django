@@ -538,8 +538,8 @@ class Options(object):
             children = chain.from_iterable(c._relation_tree
                                            for c in self.concrete_model._meta.proxied_children
                                            if c is not self)
-            relations = (f.related for f in children
-                         if include_hidden or not f.related.field.rel.is_hidden())
+            relations = (f.rel for f in children
+                         if include_hidden or not f.rel.field.rel.is_hidden())
             fields = chain(fields, relations)
 
         return list(fields)
@@ -748,7 +748,7 @@ class Options(object):
                                                                    self.concrete_model._meta._relation_tree)
 
             # Pull out all related objects from forward fields
-            for field in (f.related for f in all_fields):
+            for field in (f.rel for f in all_fields):
                 # If hidden fields should be included or the relation
                 # is not intentionally hidden, add to the fields dict
                 if include_hidden or not field.hidden:

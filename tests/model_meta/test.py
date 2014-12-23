@@ -1,8 +1,7 @@
 from django import test
 from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.db.models import FieldDoesNotExist
-from django.db.models.fields import related, CharField, Field
+from django.db.models.fields import related, CharField, Field, FieldDoesNotExist
 from django.db.models.options import IMMUTABLE_WARNING, EMPTY_RELATION_TREE
 
 from .models import Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating
@@ -163,12 +162,12 @@ class GetFieldByNameTests(OptionsBaseTests):
     def test_get_related_object(self):
         field_info = self._details(Person, Person._meta.get_field('relating_baseperson'))
         self.assertEqual(field_info[1:], (BasePerson, False, False))
-        self.assertIsInstance(field_info[0], related.RelatedObject)
+        self.assertIsInstance(field_info[0], related.ForeignObjectRel)
 
     def test_get_related_m2m(self):
         field_info = self._details(Person, Person._meta.get_field('relating_people'))
         self.assertEqual(field_info[1:], (None, False, True))
-        self.assertIsInstance(field_info[0], related.RelatedObject)
+        self.assertIsInstance(field_info[0], related.ForeignObjectRel)
 
     def test_get_generic_relation(self):
         field_info = self._details(Person, Person._meta.get_field('generic_relation_base'))
@@ -231,7 +230,7 @@ class RelationTreeTests(test.TestCase):
 
         self.assertEqual(
             sorted([field.related_query_name() for field in Relation._meta._relation_tree
-                   if not field.related.field.rel.is_hidden()]),
+                   if not field.rel.field.rel.is_hidden()]),
             sorted(['fk_abstract_rel', 'fk_abstract_rel', 'fk_abstract_rel', 'fk_base_rel', 'fk_base_rel',
                     'fk_base_rel', 'fk_concrete_rel', 'fk_concrete_rel', 'fo_abstract_rel', 'fo_abstract_rel',
                     'fo_abstract_rel', 'fo_base_rel', 'fo_base_rel', 'fo_base_rel', 'fo_concrete_rel',

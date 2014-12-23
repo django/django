@@ -161,12 +161,12 @@ class GetFieldByNameTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTest
     def test_get_related_object(self):
         field_info = Person._meta.get_field_by_name('relating_baseperson')
         self.assertEqual(field_info[1:], (BasePerson, False, False))
-        self.assertIsInstance(field_info[0], related.RelatedObject)
+        self.assertTrue(field_info[0].is_reverse_object)
 
     def test_get_related_m2m(self):
         field_info = Person._meta.get_field_by_name('relating_people')
         self.assertEqual(field_info[1:], (None, False, True))
-        self.assertIsInstance(field_info[0], related.RelatedObject)
+        self.assertTrue(field_info[0].is_reverse_object)
 
     def test_get_generic_relation(self):
         field_info = Person._meta.get_field_by_name('generic_relation_base')

@@ -1598,7 +1598,8 @@ class DecimalField(Field):
 class DurationField(Field):
     """Stores timedelta objects.
 
-    Uses interval on postgres, bigint of microseconds on other databases.
+    Uses interval on postgres, INVERAL DAY TO SECOND on Oracle, and bigint of
+    microseconds on other databases.
     """
     empty_strings_allowed = False
     default_error_messages = {
@@ -1633,6 +1634,12 @@ class DurationField(Field):
         if connection.features.has_native_duration_field:
             return value
         return value.total_seconds() * 1000000
+
+    def get_db_converters(self, connection):
+        converters = []
+        if not connection.features.has_native_duration_field:
+            converters.append(connection.ops.convert_durationfield_value)
+        return converters + super(DurationField, self).get_db_converters(connection)
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)

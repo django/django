@@ -99,9 +99,10 @@ New data types
 
 * Django now has a :class:`~django.db.models.DurationField` for storing periods
   of time - modeled in Python by :class:`~python:datetime.timedelta`. It is
-  stored in the native ``interval`` data type on PostgreSQL and as a ``bigint``
-  of microseconds on other backends. Date and time related arithmetic has also
-  been improved on all backends. There is a corresponding :class:`form field
+  stored in the native ``interval`` data type on PostgreSQL, as a ``INTERVAL
+  DAY(9) TO SECOND(6)`` on Oracle, and as a ``bigint`` of microseconds on other
+  backends. Date and time related arithmetic has also been improved on all
+  backends. There is a corresponding :class:`form field
   <django.forms.DurationField>`.
 
 Query Expressions
@@ -155,7 +156,7 @@ Minor features
   <django.contrib.admin.ModelAdmin.delete_view>` displays a summary of objects
   to be deleted on the deletion confirmation page.
 
-* The jQuery library embedded in the admin has been upgraded to version 1.11.1.
+* The jQuery library embedded in the admin has been upgraded to version 1.11.2.
 
 * You can now specify :attr:`AdminSite.site_url
   <django.contrib.admin.AdminSite.site_url>` in order to display a link to the
@@ -203,6 +204,9 @@ Minor features
 * The PostGIS 2 ``CREATE EXTENSION postgis`` and the Spatialite
   ``SELECT InitSpatialMetaData`` initialization commands are now automatically
   run by :djadmin:`migrate`.
+
+* The GDAL interface now supports retrieving properties of
+  :ref:`raster (image) data file <raster-data-source-objects>`.
 
 * Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
   Django 1.2 have been removed.
@@ -1278,6 +1282,16 @@ to your ``MIDDLEWARE_CLASSES`` sometime before then to opt-in. Please read the
 ``django.contrib.sitemaps.FlatPageSitemap`` has moved to
 ``django.contrib.flatpages.sitemaps.FlatPageSitemap``. The old import location
 is deprecated and will be removed in Django 1.9.
+
+Model ``Field.related``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Private attribute ``django.db.models.Field.related`` is deprecated in favor
+of ``Field.rel``.  The latter is an instance of
+``django.db.models.fields.related.ForeignObjectRel`` which replaces
+``django.db.models.related.RelatedObject``. The ``django.db.models.related``
+module has been removed and the ``Field.related`` attribute will be removed in
+Django 2.0.
 
 .. removed-features-1.8:
 

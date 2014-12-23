@@ -23,7 +23,8 @@ from django.db.models.fields import (
     TimeField, URLField)
 
 from django.db.models.fields.related import (
-    ForeignObject, ForeignKey, OneToOneField, ManyToManyField, RelatedObject,
+    ForeignObject, ForeignKey, OneToOneField, ManyToManyField,
+    ManyToOneRel, ForeignObjectRel,
 )
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
@@ -58,10 +59,6 @@ RELATION_FIELDS = (
     GenericRelation,
 )
 
-IS_REVERSE_OBJECT = (
-    RelatedObject,
-)
-
 ONE_TO_MANY_CLASSES = set([
     ForeignObject,
     ForeignKey,
@@ -69,7 +66,8 @@ ONE_TO_MANY_CLASSES = set([
 ])
 
 MANY_TO_ONE_CLASSES = set([
-    RelatedObject,
+    ForeignObjectRel,
+    ManyToOneRel,
     GenericRelation,
 ])
 
@@ -794,13 +792,6 @@ class FieldFlagsTests(test.TestCase):
             else:
                 self.assertFalse(field.has_relation)
 
-    def test_reverse_object_fields(self):
-        for field in self.fields_and_reverse_objects:
-            if type(field) in IS_REVERSE_OBJECT:
-                self.assertTrue(field.is_reverse_object)
-            else:
-                self.assertFalse(field.is_reverse_object)
-
     def test_field_names_should_always_be_available(self):
         for field in self.fields_and_reverse_objects:
             self.assertTrue(field.name)
@@ -826,7 +817,7 @@ class FieldFlagsTests(test.TestCase):
 
         # Ensure all m2m reverses are m2m
         for field in m2m_type_fields:
-            reverse_field = field.related
+            reverse_field = field.rel
             self.assertTrue(reverse_field.has_relation)
             self.assertTrue(reverse_field.many_to_many)
             self.assertTrue(reverse_field.related_model)
@@ -844,8 +835,8 @@ class FieldFlagsTests(test.TestCase):
 
         # Ensure all o2m reverses are m2o
         for field in o2m_type_fields:
-            if hasattr(field, 'related'):
-                reverse_field = field.related
+            if field.is_reverse_object:
+                reverse_field = field.rel
                 self.assertTrue(reverse_field.has_relation
                                 and reverse_field.many_to_one)
 
@@ -862,7 +853,7 @@ class FieldFlagsTests(test.TestCase):
 
         # Ensure all m2o reverses are o2m
         for obj in m2o_type_fields:
-            if hasattr(obj, 'field'):
+            if obj.is_reverse_object:
                 reverse_field = obj.field
                 self.assertTrue(reverse_field.has_relation
                                 and reverse_field.one_to_many)

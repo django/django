@@ -3,11 +3,19 @@ from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
+class Site(models.Model):
+    domain = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.domain
+
+
 class Article(models.Model):
     """
     A simple Article model for testing
     """
-    site = models.ForeignKey('sites.Site', related_name="admin_articles")
+    site = models.ForeignKey(Site, related_name="admin_articles")
     title = models.CharField(max_length=100)
     title2 = models.CharField(max_length=100, verbose_name="another name")
     created = models.DateTimeField()
