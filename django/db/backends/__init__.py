@@ -580,6 +580,9 @@ class BaseDatabaseFeatures(object):
     # Is there a true datatype for timedeltas?
     has_native_duration_field = False
 
+    # Does the databae driver natively support timedeltas for expressions?
+    driver_supports_timedeltas = False
+
     # Do time/datetime fields have microsecond precision?
     supports_microsecond_precision = True
 
