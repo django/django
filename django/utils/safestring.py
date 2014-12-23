@@ -144,4 +144,4 @@ def mark_for_escaping(s):
         return EscapeBytes(s)
     if isinstance(s, (six.text_type, Promise)):
         return EscapeText(s)
-    return EscapeBytes(bytes(s))
+    return EscapeString(str(s))
