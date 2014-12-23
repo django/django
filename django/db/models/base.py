@@ -798,7 +798,7 @@ class Model(six.with_metaclass(ModelBase)):
 
             fields = meta.local_concrete_fields
             if not pk_set:
-                fields = [f for f in fields if not isinstance(f, AutoField)]
+                fields = [f for f in fields if not f.get_internal_type() == "AutoField"]
 
             update_pk = bool(meta.has_auto_field and not pk_set)
             result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
