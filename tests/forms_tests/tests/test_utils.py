@@ -65,9 +65,31 @@ class FormsUtilsTestCase(TestCase):
         self.assertHTMLEqual(str(ErrorList(ValidationError(["Error one.", "Error two."]).messages)),
                          '<ul class="errorlist"><li>Error one.</li><li>Error two.</li></ul>')
 
+        # Can take a dict.
+        self.assertHTMLEqual(
+            str(ErrorList(sorted(ValidationError({'error_1': "1. Error one.", 'error_2': "2. Error two."}).messages))),
+            '<ul class="errorlist"><li>1. Error one.</li><li>2. Error two.</li></ul>'
+        )
+
         # Can take a mixture in a list.
-        self.assertHTMLEqual(str(ErrorList(ValidationError(["First error.", "Not \u03C0.", ugettext_lazy("Error.")]).messages)),
-                         '<ul class="errorlist"><li>First error.</li><li>Not π.</li><li>Error.</li></ul>')
+        self.assertHTMLEqual(
+            str(ErrorList(sorted(ValidationError([
+                "1. First error.",
+                "2. Not \u03C0.",
+                ugettext_lazy("3. Error."),
+                {
+                    'error_1': "4. First dict error.",
+                    'error_2': "5. Second dict error.",
+                },
+            ]).messages))),
+            '<ul class="errorlist">'
+            '<li>1. First error.</li>'
+            '<li>2. Not π.</li>'
+            '<li>3. Error.</li>'
+            '<li>4. First dict error.</li>'
+            '<li>5. Second dict error.</li>'
+            '</ul>'
+        )
 
         @python_2_unicode_compatible
         class VeryBadError:
