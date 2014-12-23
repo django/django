@@ -162,3 +162,6 @@ Bugfixes
 * Added ``datetime.time`` support to migrations questioner (:ticket:`23998`).
 
 * Fixed admindocs crash on apps installed as eggs (:ticket:`23525`).
+
+* Fixed crash when ``ValidationError`` is initialized with a ``ValidationError``
+  that is initialized with a dictionary (:ticket:`24008`).
