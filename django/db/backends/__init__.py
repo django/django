@@ -1262,8 +1262,6 @@ class BaseDatabaseOperations(object):
         Some field types on some backends do not provide data in the correct
         format, this is the hook for coverter functions.
         """
-        if not self.connection.features.has_native_duration_field and internal_type == 'DurationField':
-            return [self.convert_durationfield_value]
         return []
 
     def convert_durationfield_value(self, value, field):
