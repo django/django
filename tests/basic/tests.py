@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db import DatabaseError
 from django.db.models.fields import Field
+from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet, MAX_GET_RESULTS
 from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -774,23 +775,13 @@ class ModelRefreshTests(TestCase):
 
 
 class TestRelatedObjectDeprecation(TestCase):
-    def test_deprecation(self):
+    def test_field_related_deprecation(self):
         field = SelfRef._meta.get_field_by_name('selfref')[0]
         with warnings.catch_warnings(record=True) as warns:
             warnings.simplefilter('always')
-            from django.db.models.related import RelatedObject
-            self.assertTrue(isinstance(field.rel, RelatedObject))
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(
-                str(warns.pop().message),
-                'The django.db.models.related module has been removed. '
-                'PathInfo has been moved to django.db.models.query_utils, and '
-                'RelatedObject has been deprecated.'
-            )
-            self.assertTrue(isinstance(field.related, RelatedObject))
+            self.assertIsInstance(field.related, ForeignObjectRel)
             self.assertEqual(len(warns), 1)
             self.assertEqual(
                 str(warns.pop().message),
                 'Usage of field.related has been deprecated. Use field.rel instead.'
             )
-            # TODO: RelatedObject is no longer tested, I think

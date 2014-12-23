@@ -334,10 +334,6 @@ class RelatedField(Field):
             RemovedInDjango20Warning, 2)
         return self.rel
 
-    @related.setter
-    def set_related(self, val):
-        self._related = val
-
     def do_related_class(self, other, cls):
         self.set_attributes_from_rel()
         if not cls._meta.abstract:
