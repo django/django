@@ -1440,12 +1440,17 @@ class Model(six.with_metaclass(ModelBase)):
     def _check_local_fields(cls, fields, option):
         from django.db import models
 
+        # In order to avoid hitting the relation tree prematurily, we use our own
+        # fields_map instead of using get_field()
+        forward_fields_map = dict(
+            (field.name, field) for field in cls._meta.get_fields(reverse=False)
+        )
+
         errors = []
         for field_name in fields:
             try:
-                field = next(f for f in cls._meta.get_fields(reverse=False)
-                             if f.name == field_name)
-            except StopIteration:
+                field = forward_fields_map[field_name]
+            except KeyError:
                 errors.append(
                     checks.Error(
                         "'%s' refers to the non-existent field '%s'." % (option, field_name),
