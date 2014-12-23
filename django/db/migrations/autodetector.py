@@ -447,8 +447,9 @@ class MigrationAutodetector(object):
         We also defer any model options that refer to collections of fields
         that might be deferred (e.g. unique_together, index_together).
         """
-        added_models = set(self.new_model_keys) - set(self.old_model_keys)
-        added_unmanaged_models = set(self.new_unmanaged_keys) - set(self.old_unmanaged_keys)
+        old_keys = set(self.old_model_keys).union(self.old_unmanaged_keys)
+        added_models = set(self.new_model_keys) - old_keys
+        added_unmanaged_models = set(self.new_unmanaged_keys) - old_keys
         models = chain(
             sorted(added_models, key=self.swappable_first_key, reverse=True),
             sorted(added_unmanaged_models, key=self.swappable_first_key, reverse=True)
@@ -625,19 +626,14 @@ class MigrationAutodetector(object):
         We also bring forward removal of any model options that refer to
         collections of fields - the inverse of generate_created_models().
         """
-        deleted_models = set(self.old_model_keys) - set(self.new_model_keys)
-        deleted_unmanaged_models = set(self.old_unmanaged_keys) - set(self.new_unmanaged_keys)
+        new_keys = set(self.new_model_keys).union(self.new_unmanaged_keys)
+        deleted_models = set(self.old_model_keys) - new_keys
+        deleted_unmanaged_models = set(self.old_unmanaged_keys) - new_keys
         models = chain(sorted(deleted_models), sorted(deleted_unmanaged_models))
         for app_label, model_name in models:
             model_state = self.from_state.models[app_label, model_name]
             model = self.old_apps.get_model(app_label, model_name)
             if not model._meta.managed:
-                self.add_operation(
-                    app_label,
-                    operations.DeleteModel(
-                        name=model_state.name,
-                    ),
-                )
                 # Skip here, no need to handle fields for unmanaged models
                 continue
 
@@ -947,7 +943,18 @@ class MigrationAutodetector(object):
         makes an operation to represent them in state changes (in case Python
         code in migrations needs them)
         """
-        models_to_check = self.kept_model_keys.union(self.kept_proxy_keys).union(self.kept_unmanaged_keys)
+        models_to_check = self.kept_model_keys.union(
+            self.kept_proxy_keys
+        ).union(
+            self.kept_unmanaged_keys
+        ).union(
+            # unmanaged converted to managed
+            set(self.old_unmanaged_keys).intersection(self.new_model_keys)
+        ).union(
+            # managed converted to unmanaged
+            set(self.old_model_keys).intersection(self.new_unmanaged_keys)
+        )
+
         for app_label, model_name in sorted(models_to_check):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
