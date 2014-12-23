@@ -1,6 +1,6 @@
 from django.template.base import Lexer, Parser, tag_re, NodeList, VariableNode, TemplateSyntaxError
 from django.utils.encoding import force_text
-from django.utils.html import escape
+from django.utils.html import conditional_escape
 from django.utils.safestring import SafeData, EscapeData
 from django.utils.formats import localize
 from django.utils.timezone import template_localtime
@@ -98,6 +98,6 @@ class DebugVariableNode(VariableNode):
                 e.django_template_source = self.source
             raise
         if (context.autoescape and not isinstance(output, SafeData)) or isinstance(output, EscapeData):
-            return escape(output)
+            return conditional_escape(output)
         else:
             return output
