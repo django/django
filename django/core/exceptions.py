@@ -118,7 +118,10 @@ class ValidationError(Exception):
                 # Normalize plain strings to instances of ValidationError.
                 if not isinstance(message, ValidationError):
                     message = ValidationError(message)
-                self.error_list.extend(message.error_list)
+                if hasattr(message, 'error_dict'):
+                    self.error_list.extend(sum(message.error_dict.values(), []))
+                else:
+                    self.error_list.extend(message.error_list)
 
         else:
             self.message = message
