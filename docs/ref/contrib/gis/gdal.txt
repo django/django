@@ -1096,7 +1096,7 @@ supports reading data from a variety of GDAL-supported geospatial file
 formats and data sources using a simple, consistent interface.  Each
 data source is represented by a :class:`GDALRaster` object which contains
 one or more layers of data named bands.  Each band, represented by a
-:class:`GDALBand` object, contains georeferenced image data. For exemple, an RGB
+:class:`GDALBand` object, contains georeferenced image data. For example, an RGB
 image is represented as three bands: one for red, one for green, and one for
 blue.
 
@@ -1176,7 +1176,7 @@ blue.
 
 .. class:: GDALBand
 
-    ``GDALBand`` instances are not created explicitely, but rather obtained
+    ``GDALBand`` instances are not created explicitly, but rather obtained
     from a :class:`GDALRaster` object, through its :attr:`~GDALRaster.bands`
     attribute.
 
