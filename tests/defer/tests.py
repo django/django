@@ -7,154 +7,165 @@ from .models import Secondary, Primary, Child, BigChild, ChildProxy, RefreshPrim
 
 
 class DeferTests(TestCase):
+
     def assert_delayed(self, obj, num):
+        """
+        To all outward appearances, instances with deferred fields look the
+        same as normal instances when we examine attribute values. Therefore,
+        this method returns the number of deferred fields on returned 
+        instances.
+        """
         count = 0
         for field in obj._meta.fields:
             if isinstance(obj.__class__.__dict__.get(field.attname),
                     DeferredAttribute):
                 count += 1
         self.assertEqual(count, num)
-
+    
+    def setUp(self):
+        self.s1 = Secondary.objects.create(first="x1", second="y1")
+        self.p1 = Primary.objects.create(name="p1", value="xx", related=self.s1)
+    
     def test_defer(self):
-        # To all outward appearances, instances with deferred fields look the
-        # same as normal instances when we examine attribute values. Therefore
-        # we test for the number of deferred fields on returned instances (by
-        # poking at the internals), as a way to observe what is going on.
+        queryset = Primary.objects.all()
+        self.assert_delayed(queryset.defer("name")[0], 1)
+        self.assert_delayed(queryset.defer("name").get(pk=self.s1.pk), 1)
+        self.assert_delayed(queryset.defer("related__first")[0], 0)
+        self.assert_delayed(queryset.defer("name").defer("value")[0], 2)
+    
+    def test_only(self):
+        queryset = Primary.objects.all()
+        self.assert_delayed(queryset.only("name")[0], 2)
+        self.assert_delayed(queryset.only("name").get(pk=self.p1.pk), 2)
+        self.assert_delayed(queryset.only("name").only("value")[0], 2)
+        self.assert_delayed(queryset.only("related__first")[0], 2)
+        # Using 'pk' with only() should result in 3 deferred fields.        
+        self.assert_delayed(queryset.only("pk")[0], 3)
+        self.assert_delayed(self.s1.primary_set.all().only('pk')[0], 3)
 
-        s1 = Secondary.objects.create(first="x1", second="y1")
-        p1 = Primary.objects.create(name="p1", value="xx", related=s1)
+    def test_defer_only_chaining(self):
+        queryset = Primary.objects.all()
+        self.assert_delayed(queryset.only("name", "value").defer("name")[0], 2)
+        self.assert_delayed(queryset.defer("name").only("value", "name")[0], 2)
+        self.assert_delayed(queryset.defer("name").only("value")[0], 2)
+        self.assert_delayed(queryset.defer("name").only("value")[0], 2)
+        self.assert_delayed(queryset.only("name").defer("value")[0], 2)
+    
+    def test_defer_on_an_already_deferred_field(self):
+        queryset = Primary.objects.all()
+        obj = queryset.defer("name")[0]
+        self.assert_delayed(obj, 1)
+        self.assert_delayed(queryset.defer("name")[0], 1)
 
-        qs = Primary.objects.all()
+    def test_defer_None_to_clear_deferred_set(self):
+        queryset = Primary.objects.all()
+        self.assert_delayed(queryset.defer("name", "value")[0], 2)
+        self.assert_delayed(queryset.defer(None)[0], 0)
+        self.assert_delayed(queryset.only("name").defer(None)[0], 0)
 
-        self.assert_delayed(qs.defer("name")[0], 1)
-        self.assert_delayed(qs.only("name")[0], 2)
-        self.assert_delayed(qs.defer("related__first")[0], 0)
+    def test_only_None_raises_TypeError(self):
+        queryset = Primary.objects.all()
+        with self.assertRaises(TypeError):
+            queryset.only(None)
+ 
+    def test_defer_values_does_not_defer(self):
+        queryset = Primary.objects.all()
+        self.assertEqual(queryset.defer("name").values()[0], {
+            "id": self.p1.id,
+            "name": "p1",
+            "value": "xx",
+            "related_id": self.s1.id,
+        })
+    
+    def test_only_values_does_not_defer(self):
+        queryset = Primary.objects.all()
+        self.assertEqual(queryset.only("name").values()[0], {
+            "id": self.p1.id,
+            "name": "p1",
+            "value": "xx",
+            "related_id": self.s1.id,
+        })
+    
+    def test_defer_with_select_related(self):
+        queryset = Primary.objects.all()
+        obj = queryset.select_related().defer("related__first", "related__second")[0]
+        self.assert_delayed(obj.related, 2)
+        self.assert_delayed(obj, 0) 
 
-        # Using 'pk' with only() should result in 3 deferred fields, namely all
-        # of them except the model's primary key see #15494
-        self.assert_delayed(qs.only("pk")[0], 3)
-
-        obj = qs.select_related().only("related__first")[0]
+    def test_only_with_select_related(self):
+        queryset = Primary.objects.all()
+        obj = queryset.select_related().only("related__first")[0]
         self.assert_delayed(obj, 2)
-
-        self.assertEqual(obj.related_id, s1.pk)
-
-        # You can use 'pk' with reverse foreign key lookups.
-        self.assert_delayed(s1.primary_set.all().only('pk')[0], 3)
-
-        self.assert_delayed(qs.defer("name").extra(select={"a": 1})[0], 1)
-        self.assert_delayed(qs.extra(select={"a": 1}).defer("name")[0], 1)
-        self.assert_delayed(qs.defer("name").defer("value")[0], 2)
-        self.assert_delayed(qs.only("name").only("value")[0], 2)
-        self.assert_delayed(qs.only("name").defer("value")[0], 2)
-        self.assert_delayed(qs.only("name", "value").defer("value")[0], 2)
-        self.assert_delayed(qs.defer("name").only("value")[0], 2)
-
-        obj = qs.only()[0]
-        self.assert_delayed(qs.defer(None)[0], 0)
-        self.assert_delayed(qs.only("name").defer(None)[0], 0)
-
-        # User values() won't defer anything (you get the full list of
-        # dictionaries back), but it still works.
-        self.assertEqual(qs.defer("name").values()[0], {
-            "id": p1.id,
-            "name": "p1",
-            "value": "xx",
-            "related_id": s1.id,
-        })
-        self.assertEqual(qs.only("name").values()[0], {
-            "id": p1.id,
-            "name": "p1",
-            "value": "xx",
-            "related_id": s1.id,
-        })
-
-        # Using defer() and only() with get() is also valid.
-        self.assert_delayed(qs.defer("name").get(pk=p1.pk), 1)
-        self.assert_delayed(qs.only("name").get(pk=p1.pk), 2)
-
-        # When we defer a field and also select_related it, the query is
-        # invalid and raises an exception.
+        self.assert_delayed(obj.related, 1)
+        self.assertEqual(obj.related_id, self.s1.pk)
+        self.assertEqual(obj.name, "p1")
+    
+    def test_defer_selected_related_raises_InvalidQuery(self):
+        queryset = Primary.objects.all()
         with self.assertRaises(InvalidQuery):
-            qs.only("name").select_related("related")[0]
+            queryset.defer("related").select_related("related")[0]
+        
+    def test_only_selected_related_raises_InvalidQuery(self):
+        queryset = Primary.objects.all()
         with self.assertRaises(InvalidQuery):
-            qs.defer("related").select_related("related")[0]
-
-        # With a depth-based select_related, all deferred ForeignKeys are
-        # deferred instead of traversed.
+            queryset.only("name").select_related("related")[0]
+    
+    def test_defer_ForeignKeys_are_deferred_and_not_traversed(self):
+        queryset = Primary.objects.all()
         with self.assertNumQueries(3):
-            obj = qs.defer("related").select_related()[0]
+            obj = queryset.defer("related").select_related()[0]
             self.assert_delayed(obj, 1)
-            self.assertEqual(obj.related.id, s1.pk)
-
-        # Saving models with deferred fields is possible (but inefficient,
-        # since every field has to be retrieved first).
-        obj = Primary.objects.defer("value").get(name="p1")
+            self.assertEqual(obj.related.id, self.s1.pk)
+ 
+    def test_saving_object_with_deferred_field(self):
+        Primary.objects.create(name="p2", value="xy", related=self.s1)
+        obj = Primary.objects.defer("value").get(name="p2")
         obj.name = "a new name"
         obj.save()
         self.assertQuerysetEqual(
             Primary.objects.all(), [
-                "a new name",
+               "p1", "a new name",
             ],
-            lambda p: p.name
+            lambda p: p.name,
+            ordered=False,
         )
 
-        # Regression for #10572 - A subclass with no extra fields can defer
-        # fields from the base class
-        Child.objects.create(name="c1", value="foo", related=s1)
-        # You can defer a field on a baseclass when the subclass has no fields
-        obj = Child.objects.defer("value").get(name="c1")
+    def test_defer_baseclass_when_subclass_has_no_added_fields(self):
+        Child.objects.create(name="c1", value="foo", related=self.s1)
+        queryset = Child.objects.all()
+        obj = queryset.defer("value").get(name="c1")
         self.assert_delayed(obj, 1)
         self.assertEqual(obj.name, "c1")
         self.assertEqual(obj.value, "foo")
-        obj.name = "c2"
-        obj.save()
-
-        # You can retrieve a single column on a base class with no fields
-        obj = Child.objects.only("name").get(name="c2")
+                
+    def test_only_baseclass_when_subclass_has_no_added_fields(self):
+        Child.objects.create(name="c1", value="foo", related=self.s1)
+        queryset = Child.objects.all() 
+        obj = queryset.only("name").get(name="c1")
+        # when inherited model, its PK is also fetched, hence '3' deferred fields.
         self.assert_delayed(obj, 3)
-        self.assertEqual(obj.name, "c2")
+        self.assertEqual(obj.name, "c1")
         self.assertEqual(obj.value, "foo")
-        obj.name = "cc"
-        obj.save()
-
-        BigChild.objects.create(name="b1", value="foo", related=s1, other="bar")
-        # You can defer a field on a baseclass
-        obj = BigChild.objects.defer("value").get(name="b1")
+   
+    def test_defer_baseclass_when_subclass_has_added_field(self):
+        BigChild.objects.create(name="b1", value="foo", related=self.s1, other="bar")
+        queryset = BigChild.objects.all()
+        obj = queryset.defer("value").get(name="b1")
         self.assert_delayed(obj, 1)
         self.assertEqual(obj.name, "b1")
         self.assertEqual(obj.value, "foo")
         self.assertEqual(obj.other, "bar")
-        obj.name = "b2"
-        obj.save()
-
-        # You can defer a field on a subclass
-        obj = BigChild.objects.defer("other").get(name="b2")
-        self.assert_delayed(obj, 1)
-        self.assertEqual(obj.name, "b2")
-        self.assertEqual(obj.value, "foo")
-        self.assertEqual(obj.other, "bar")
-        obj.name = "b3"
-        obj.save()
-
-        # You can retrieve a single field on a baseclass
-        obj = BigChild.objects.only("name").get(name="b3")
+       
+    def test_only_baseclass_when_subclass_has_added_field(self):
+        BigChild.objects.create(name="b1", value="foo", related=self.s1, other="bar")
+        queryset = BigChild.objects.all()
+        obj = queryset.only("name").get(name="b1")
+        # when inherited model, its PK is also fetched, hence '4' deferred fields.
         self.assert_delayed(obj, 4)
-        self.assertEqual(obj.name, "b3")
+        self.assertEqual(obj.name, "b1")
         self.assertEqual(obj.value, "foo")
         self.assertEqual(obj.other, "bar")
-        obj.name = "b4"
-        obj.save()
-
-        # You can retrieve a single field on a baseclass
-        obj = BigChild.objects.only("other").get(name="b4")
-        self.assert_delayed(obj, 4)
-        self.assertEqual(obj.name, "b4")
-        self.assertEqual(obj.value, "foo")
-        self.assertEqual(obj.other, "bar")
-        obj.name = "bb"
-        obj.save()
-
+     
     def test_defer_proxy(self):
         """
         Ensure select_related together with only on a proxy model behaves
@@ -193,7 +204,7 @@ class DeferTests(TestCase):
     def test_refresh_not_loading_deferred_fields(self):
         s = Secondary.objects.create()
         rf = Primary.objects.create(name='foo', value='bar', related=s)
-        rf2 = Primary.objects.only('related', 'value').get()
+        rf2 = Primary.objects.only('related', 'value').get(pk=s.pk)
         rf.name = 'new foo'
         rf.value = 'new bar'
         rf.save()
@@ -206,7 +217,7 @@ class DeferTests(TestCase):
     def test_custom_refresh_on_deferred_loading(self):
         s = Secondary.objects.create()
         rf = RefreshPrimaryProxy.objects.create(name='foo', value='bar', related=s)
-        rf2 = RefreshPrimaryProxy.objects.only('related').get()
+        rf2 = RefreshPrimaryProxy.objects.only('related').get(pk=s.pk)
         rf.name = 'new foo'
         rf.value = 'new bar'
         rf.save()
