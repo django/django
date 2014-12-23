@@ -15,6 +15,8 @@ PathInfo = namedtuple('PathInfo',
 class RelatedObject(FieldFlagsMixin):
     is_reverse_object = True
     editable = False
+    has_relation = True
+    concrete = False
 
     def __init__(self, parent_model, model, field):
         self.parent_model = parent_model
@@ -25,8 +27,28 @@ class RelatedObject(FieldFlagsMixin):
         self.var_name = self.opts.model_name
 
     @cached_property
+    def related_model(self):
+        return self.field.model
+
+    @cached_property
     def hidden(self):
         return self.field.rel.is_hidden()
+
+    @cached_property
+    def many_to_many(self):
+        return self.field.many_to_many
+
+    @cached_property
+    def many_to_one(self):
+        return self.field.one_to_many
+
+    @cached_property
+    def one_to_many(self):
+        return self.field.many_to_one
+
+    @cached_property
+    def one_to_one(self):
+        return self.field.one_to_one
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
                     limit_to_currently_related=False):

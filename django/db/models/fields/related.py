@@ -95,7 +95,12 @@ signals.class_prepared.connect(do_pending_lookups)
 
 
 class RelatedField(Field):
+    has_relation = True
     generate_reverse_relation = True
+
+    @cached_property
+    def related_model(self):
+        return self.rel.to
 
     def check(self, **kwargs):
         errors = super(RelatedField, self).check(**kwargs)
