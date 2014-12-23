@@ -25,7 +25,7 @@ from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
 from django.db.models.sql.datastructures import (
     EmptyResultSet, Empty, MultiJoin, Join, BaseTable)
 from django.db.models.sql.where import (WhereNode, EverythingNode,
-    ExtraWhere, AND, OR, EmptyWhere)
+    ExtraWhere, AND, OR, NothingNode)
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -141,7 +141,6 @@ class Query(object):
         #  - True: group by all select fields of the model
         # See compiler.get_group_by() for details.
         self.group_by = None
-        self.having = where()
         self.order_by = []
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.distinct = False
@@ -268,7 +267,6 @@ class Query(object):
             obj.group_by = True
         else:
             obj.group_by = self.group_by[:]
-        obj.having = self.having.clone()
         obj.order_by = self.order_by[:]
         obj.low_mark, obj.high_mark = self.low_mark, self.high_mark
         obj.distinct = self.distinct
@@ -449,7 +447,7 @@ class Query(object):
         return number
 
     def has_filters(self):
-        return self.where or self.having
+        return self.where
 
     def has_results(self, using):
         q = self.clone()
@@ -770,9 +768,8 @@ class Query(object):
             else:
                 return col.relabeled_clone(change_map)
         # 1. Update references in "select" (normal columns plus aliases),
-        # "group by", "where" and "having".
+        # "group by" and "where".
         self.where.relabel_aliases(change_map)
-        self.having.relabel_aliases(change_map)
         if isinstance(self.group_by, list):
             self.group_by = [relabel_column(col) for col in self.group_by]
         self.select = [col.relabeled_clone(change_map) for col in self.select]
@@ -1093,7 +1090,7 @@ class Query(object):
         """
         Builds a WhereNode for a single filter clause, but doesn't add it
         to this Query. Query.add_q() will then add this filter to the where
-        or having Node.
+        Node.
 
         The 'branch_negated' tells us if the current branch contains any
         negations. This will be used to determine if subqueries are needed.
@@ -1197,59 +1194,11 @@ class Query(object):
     def add_filter(self, filter_clause):
         self.add_q(Q(**{filter_clause[0]: filter_clause[1]}))
 
-    def need_having(self, obj):
-        """
-        Returns whether or not all elements of this q_object need to be put
-        together in the HAVING clause.
-        """
-        if not self._annotations:
-            return False
-        if hasattr(obj, 'refs_aggregate'):
-            return obj.refs_aggregate(self.annotations)[0]
-        return (refs_aggregate(obj[0].split(LOOKUP_SEP), self.annotations)[0]
-                or (hasattr(obj[1], 'refs_aggregate')
-                    and obj[1].refs_aggregate(self.annotations)[0]))
-
-    def split_having_parts(self, q_object, negated=False):
-        """
-        Returns a list of q_objects which need to go into the having clause
-        instead of the where clause. Removes the splitted out nodes from the
-        given q_object. Note that the q_object is altered, so cloning it is
-        needed.
-        """
-        having_parts = []
-        for c in q_object.children[:]:
-            # When constructing the having nodes we need to take care to
-            # preserve the negation status from the upper parts of the tree
-            if isinstance(c, Node):
-                # For each negated child, flip the in_negated flag.
-                in_negated = c.negated ^ negated
-                if c.connector == OR and self.need_having(c):
-                    # A subtree starting from OR clause must go into having in
-                    # whole if any part of that tree references an aggregate.
-                    q_object.children.remove(c)
-                    having_parts.append(c)
-                    c.negated = in_negated
-                else:
-                    having_parts.extend(
-                        self.split_having_parts(c, in_negated)[1])
-            elif self.need_having(c):
-                q_object.children.remove(c)
-                new_q = self.where_class(children=[c], negated=negated)
-                having_parts.append(new_q)
-        return q_object, having_parts
-
     def add_q(self, q_object):
         """
-        A preprocessor for the internal _add_q(). Responsible for
-        splitting the given q_object into where and having parts and
-        setting up some internal variables.
+        A preprocessor for the internal _add_q(). Responsible for doing final
+        join promotion.
         """
-        if not self.need_having(q_object):
-            where_part, having_parts = q_object, []
-        else:
-            where_part, having_parts = self.split_having_parts(
-                q_object.clone(), q_object.negated)
         # For join promotion this case is doing an AND for the added q_object
         # and existing conditions. So, any existing inner join forces the join
         # type to remain inner. Existing outer joins can however be demoted.
@@ -1258,11 +1207,8 @@ class Query(object):
         # So, demotion is OK.
         existing_inner = set(
             (a for a in self.alias_map if self.alias_map[a].join_type == INNER))
-        clause, require_inner = self._add_q(where_part, self.used_aliases)
+        clause, require_inner = self._add_q(q_object, self.used_aliases)
         self.where.add(clause, AND)
-        for hp in having_parts:
-            clause, _ = self._add_q(hp, self.used_aliases)
-            self.having.add(clause, AND)
         self.demote_joins(existing_inner)
 
     def _add_q(self, q_object, used_aliases, branch_negated=False,
@@ -1557,11 +1503,10 @@ class Query(object):
         return condition, needed_inner
 
     def set_empty(self):
-        self.where = EmptyWhere()
-        self.having = EmptyWhere()
+        self.where.add(NothingNode(), AND)
 
     def is_empty(self):
-        return isinstance(self.where, EmptyWhere) or isinstance(self.having, EmptyWhere)
+        return any(isinstance(c, NothingNode) for c in self.where.children)
 
     def set_limits(self, low=None, high=None):
         """

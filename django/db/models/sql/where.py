@@ -1,9 +1,10 @@
 """
 Code to manage the creation and SQL rendering of 'where' constraints.
 """
+
 from django.db.models.sql.datastructures import EmptyResultSet
-from django.utils.functional import cached_property
 from django.utils import tree
+from django.utils.functional import cached_property
 
 
 # Connection types
@@ -36,6 +37,37 @@ class WhereNode(tree.Node):
     variable.
     """
     default = AND
+
+    def split_having(self, negated=False):
+        """
+        Returns two possibly None nodes: one for those parts of self that
+        should be pushed to having and one for those parts of self
+        that should be in where.
+        """
+        in_negated = negated ^ self.negated
+        # If the effective connector is OR and this node contains an aggregate,
+        # then we need to push the whole branch to HAVING clause.
+        may_need_split = (
+            (in_negated and self.connector == AND) or
+            (not in_negated and self.connector == OR))
+        if may_need_split and self.contains_aggregate:
+            return None, self
+        where_parts = []
+        having_parts = []
+        for c in self.children:
+            if hasattr(c, 'split_having'):
+                where_part, having_part = c.split_having(in_negated)
+                if where_part:
+                    where_parts.append(where_part)
+                if having_part:
+                    having_parts.append(having_part)
+            elif c.contains_aggregate:
+                having_parts.append(c)
+            else:
+                where_parts.append(c)
+        having_node = self.__class__(having_parts, self.connector, self.negated) if having_parts else None
+        where_node = self.__class__(where_parts, self.connector, self.negated) if where_parts else None
+        return where_node, having_node
 
     def as_sql(self, compiler, connection):
         """
@@ -145,27 +177,20 @@ class WhereNode(tree.Node):
 
     @classmethod
     def _contains_aggregate(cls, obj):
-        if not isinstance(obj, tree.Node):
-            return getattr(obj.lhs, 'contains_aggregate', False) or getattr(obj.rhs, 'contains_aggregate', False)
-        return any(cls._contains_aggregate(c) for c in obj.children)
+        if isinstance(obj, tree.Node):
+            return any(cls._contains_aggregate(c) for c in obj.children)
+        return obj.contains_aggregate
 
     @cached_property
     def contains_aggregate(self):
         return self._contains_aggregate(self)
 
 
-class EmptyWhere(WhereNode):
-    def add(self, data, connector):
-        return
-
-    def as_sql(self, compiler=None, connection=None):
-        raise EmptyResultSet
-
-
 class EverythingNode(object):
     """
     A node that matches everything.
     """
+    contains_aggregate = False
 
     def as_sql(self, compiler=None, connection=None):
         return '', []
@@ -175,11 +200,16 @@ class NothingNode(object):
     """
     A node that matches nothing.
     """
+    contains_aggregate = False
+
     def as_sql(self, compiler=None, connection=None):
         raise EmptyResultSet
 
 
 class ExtraWhere(object):
+    # The contents are a black box - assume no aggregates are used.
+    contains_aggregate = False
+
     def __init__(self, sqls, params):
         self.sqls = sqls
         self.params = params
@@ -190,6 +220,10 @@ class ExtraWhere(object):
 
 
 class SubqueryConstraint(object):
+    # Even if aggregates would be used in a subquery, the outer query isn't
+    # interested about those.
+    contains_aggregate = False
+
     def __init__(self, alias, columns, targets, query_object):
         self.alias = alias
         self.columns = columns
