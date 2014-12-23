@@ -33,6 +33,15 @@ class SafeStringTest(TestCase):
         self.assertIsInstance(mark_safe(b), SafeData)
         self.assertRenderEqual('{{ s }}', 'a&b', s=mark_safe(s))
 
+    def test_mark_safe_object_implementing_dunder_str(self):
+        class Obj(object):
+            def __str__(self):
+                return '<obj>'
+
+        s = mark_safe(Obj())
+
+        self.assertRenderEqual('{{ s }}', '<obj>', s=s)
+
     def test_mark_for_escaping(self):
         s = mark_for_escaping('a&b')
         self.assertRenderEqual('{{ s }}', 'a&amp;b', s=s)
@@ -49,6 +58,15 @@ class SafeStringTest(TestCase):
     def test_html(self):
         s = '<h1>interop</h1>'
         self.assertEqual(s, mark_safe(s).__html__())
+
+    def test_mark_for_escaping_object_implementing_dunder_str(self):
+        class Obj(object):
+            def __str__(self):
+                return '<obj>'
+
+        s = mark_for_escaping(Obj())
+
+        self.assertRenderEqual('{{ s }}', '&lt;obj&gt;', s=s)
 
     def test_add_lazy_safe_text_and_safe_text(self):
         s = html.escape(lazystr('a'))
