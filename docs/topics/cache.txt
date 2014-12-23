@@ -436,6 +436,8 @@ of 60 seconds, and a maximum capacity of 1000 items::
 Invalid arguments are silently ignored, as are invalid values of known
 arguments.
 
+.. _the-per-site-cache:
+
 The per-site cache
 ==================
 
@@ -543,11 +545,11 @@ then requests to ``/foo/1/`` and ``/foo/23/`` will be cached separately, as
 you may expect. But once a particular URL (e.g., ``/foo/23/``) has been
 requested, subsequent requests to that URL will use the cache.
 
-``cache_page`` can also take an optional keyword argument, ``cache``,
-which directs the decorator to use a specific cache (from your
-:setting:`CACHES` setting) when caching view results. By default, the
-``default`` cache will be used, but you can specify any cache you
-want::
+``cache_page`` can also take an optional keyword argument, ``cache``, which
+directs the decorator to use a specific cache (from your :setting:`CACHES`
+setting) when caching view results. By default, the cache specified in
+:setting:`CACHE_MIDDLEWARE_ALIAS` will be used, but you can specify any cache
+you want::
 
     @cache_page(60 * 15, cache="special_cache")
     def my_view(request):
@@ -562,9 +564,9 @@ setting for the middleware.  It can be used like this::
     def my_view(request):
         ...
 
-The two settings can also be combined. If you specify a ``cache`` *and*
-a ``key_prefix``, you will get all the settings of the requested cache
-alias, but with the key_prefix overridden.
+The two settings can also be combined. Note that the ``key_prefix`` argument
+and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>` specified under
+:setting:`CACHES` will be used in combination.
 
 Specifying per-view cache in the URLconf
 ----------------------------------------
