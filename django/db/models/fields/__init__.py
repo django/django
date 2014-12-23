@@ -782,9 +782,6 @@ class Field(RegisterLookupMixin):
         """
         return smart_text(self._get_val_from_obj(obj))
 
-    def bind(self, fieldmapping, original, bound_field_class):
-        return bound_field_class(self, fieldmapping, original)
-
     def _get_choices(self):
         if isinstance(self._choices, collections.Iterator):
             choices, self._choices = tee(self._choices)
