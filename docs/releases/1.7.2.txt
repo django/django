@@ -162,3 +162,8 @@ Bugfixes
 * Added ``datetime.time`` support to migrations questioner (:ticket:`23998`).
 
 * Fixed admindocs crash on apps installed as eggs (:ticket:`23525`).
+
+* Changed migrations autodetector to generate an ``AlterModelOptions`` operation
+  instead of ``DeleteModel`` and ``CreateModel`` operations when changing
+  ``Meta.managed``. This prevents data loss when changing ``managed`` from
+  ``False`` to ``True`` and vice versa (:ticket:`24037`).
