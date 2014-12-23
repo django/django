@@ -1069,6 +1069,12 @@ class FieldsTests(SimpleTestCase):
             "'Select a valid choice. 3 is not one of the available choices.'",
             f.clean, '3')
 
+    def test_typedchoicefield_using_zero(self):
+        f = TypedChoiceField(choices=[], coerce=int, required=True, empty_value=None)
+        self.assertRaisesMessage(ValidationError,
+            "'Select a valid choice. 0 is not one of the available choices.'",
+            f.clean, '0')
+
     # NullBooleanField ############################################################
 
     def test_nullbooleanfield_1(self):

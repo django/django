@@ -861,7 +861,11 @@ class ChoiceField(Field):
         Validates that the input is in self.choices.
         """
         super(ChoiceField, self).validate(value)
-        if value and not self.valid_value(value):
+        if value is None:
+            return
+        if value in self.empty_values:
+            return
+        if not self.valid_value(value):
             raise ValidationError(
                 self.error_messages['invalid_choice'],
                 code='invalid_choice',
