@@ -17,7 +17,7 @@ from django.utils.translation import ugettext_lazy, pgettext_lazy
 from django.utils.safestring import (SafeData, EscapeData, mark_safe,
     mark_for_escaping)
 from django.utils.formats import localize
-from django.utils.html import escape
+from django.utils.html import conditional_escape
 from django.utils.module_loading import module_has_submodule
 from django.utils import six
 from django.utils.timezone import template_localtime
@@ -881,7 +881,7 @@ def render_value_in_context(value, context):
     value = force_text(value)
     if ((context.autoescape and not isinstance(value, SafeData)) or
             isinstance(value, EscapeData)):
-        return escape(value)
+        return conditional_escape(value)
     else:
         return value
 
