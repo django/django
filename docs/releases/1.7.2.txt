@@ -175,3 +175,6 @@ Bugfixes
 
 * Corrected ``contrib.sites`` default site creation in a multiple database
   setup (:ticket:`24000`).
+
+* Restored support for objects that aren't :class:`str` or :class:`bytes` in
+  :func:`~django.utils.safestring.mark_for_escaping` on Python 3.
