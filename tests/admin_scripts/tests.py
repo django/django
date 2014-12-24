@@ -8,6 +8,7 @@ and default settings.py files.
 """
 
 import codecs
+import locale
 import os
 import re
 import shutil
@@ -1743,6 +1744,13 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         'django.contrib.sessions',
     ]
 
+    def ensure_strings_in_file(self, filepath, strings):
+        "Asserts each string in the array strings exists in file"
+        with open(filepath, 'r') as fp:
+            content = force_text(fp.read())
+            for string in strings:
+                self.assertIn(string, content)
+
     def test_wrong_args(self):
         "Make sure passing the wrong kinds of arguments outputs an error and prints usage"
         out, err = self.run_django_admin(['startproject'])
@@ -1792,6 +1800,100 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "already exists")
+
+    def test_locale_detection_normal_locale(self):
+        "Make sure a pretty common-looking locale like pt_BR works"
+        try:
+            prev_locale = os.environ['LC_CTYPE']
+
+            # fake settings another locale, and LANGUAGE_CODE should be set accordingly.
+            # we need to do it using the environment, since the management cmd is run as 
+            # a child process.
+            os.environ['LC_CTYPE'] = 'pt_BR.utf-8'
+    
+            proj_name = 'testswedishlanguagedetectionproject'
+            args = ['startproject', proj_name]
+            testproject_dir = os.path.join(test_dir, proj_name)
+            self.addCleanup(shutil.rmtree, testproject_dir, True)
+    
+            out, err = self.run_django_admin(args)
+            self.assertNoOutput(err)
+            test_settings = os.path.join(testproject_dir, proj_name, "settings.py")
+            self.ensure_strings_in_file(test_settings, ["LANGUAGE_CODE = 'pt-br'"])
+
+        finally:
+            # restore locale
+            os.environ['LC_CTYPE'] = prev_locale
+
+    def test_locale_detection_special_locale(self):
+        "Make sure a special-looking locale like zh-hans works"
+        try:
+            prev_locale = os.environ['LC_CTYPE']
+
+            # fake settings another locale, and LANGUAGE_CODE should be set accordingly.
+            # we need to do it using the environment, since the management cmd is run as 
+            # a child process.
+            os.environ['LC_CTYPE'] = 'zh_HANS.utf-8'
+    
+            proj_name = 'testswedishlanguagedetectionproject'
+            args = ['startproject', proj_name]
+            testproject_dir = os.path.join(test_dir, proj_name)
+            self.addCleanup(shutil.rmtree, testproject_dir, True)
+    
+            out, err = self.run_django_admin(args)
+            self.assertNoOutput(err)
+            test_settings = os.path.join(testproject_dir, proj_name, "settings.py")
+            self.ensure_strings_in_file(test_settings, ["LANGUAGE_CODE = 'zh-hans'"])
+
+        finally:
+            # restore locale
+            os.environ['LC_CTYPE'] = prev_locale
+
+    def test_locale_detection_special_locale_2(self):
+        "Make sure another special-looking locale like udm works"
+        try:
+            prev_locale = os.environ['LC_CTYPE']
+
+            # fake settings another locale, and LANGUAGE_CODE should be set accordingly.
+            # we need to do it using the environment, since the management cmd is run as 
+            # a child process.
+            os.environ['LC_CTYPE'] = 'udm.UTF-8'
+    
+            proj_name = 'testswedishlanguagedetectionproject'
+            args = ['startproject', proj_name]
+            testproject_dir = os.path.join(test_dir, proj_name)
+            self.addCleanup(shutil.rmtree, testproject_dir, True)
+    
+            out, err = self.run_django_admin(args)
+            self.assertNoOutput(err)
+            test_settings = os.path.join(testproject_dir, proj_name, "settings.py")
+            self.ensure_strings_in_file(test_settings, ["LANGUAGE_CODE = 'udm'"])
+
+        finally:
+            # restore locale
+            os.environ['LC_CTYPE'] = prev_locale
+
+    def test_locale_fake_locale(self):
+        "Make sure a nonsensical locale just falls back to en-us"
+        try:
+            prev_locale = os.environ['LC_CTYPE']
+
+            # fake settings another locale, and LANGUAGE_CODE should be set accordingly.
+            os.environ['LC_CTYPE'] = "foo_BA.UTF-8"
+    
+            proj_name = 'testfakelocaledetectionproject'
+            args = ['startproject', proj_name]
+            testproject_dir = os.path.join(test_dir, proj_name)
+            self.addCleanup(shutil.rmtree, testproject_dir, True)
+    
+            out, err = self.run_django_admin(args)
+            self.assertNoOutput(err)
+            test_settings = os.path.join(testproject_dir, proj_name, "settings.py")
+            self.ensure_strings_in_file(test_settings, ["LANGUAGE_CODE = 'en-us'"])
+
+        finally:
+            # restore locale
+            os.environ['LC_CTYPE'] = prev_locale
 
     def test_custom_project_template(self):
         "Make sure the startproject management command is able to use a different project template"
@@ -1896,10 +1998,10 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         test_manage_py = os.path.join(testproject_dir, 'manage.py')
-        with open(test_manage_py, 'r') as fp:
-            content = force_text(fp.read())
-            self.assertIn("project_name = 'another_project'", content)
-            self.assertIn("project_directory = '%s'" % testproject_dir, content)
+        self.ensure_strings_in_file(test_manage_py, [
+            "project_name = 'another_project'", 
+            "project_directory = '%s'" % testproject_dir
+        ])
 
     def test_no_escaping_of_project_variables(self):
         "Make sure template context variables are not html escaped"
@@ -1914,9 +2016,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         test_manage_py = os.path.join(testproject_dir, 'additional_dir', 'extra.py')
-        with open(test_manage_py, 'r') as fp:
-            content = fp.read()
-            self.assertIn("<&>", content)
+        self.ensure_strings_in_file(test_manage_py, ["<&>"])
 
     def test_custom_project_destination_missing(self):
         """
