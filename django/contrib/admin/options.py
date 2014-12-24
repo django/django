@@ -1009,25 +1009,25 @@ class ModelAdmin(BaseModelAdmin):
         """
         change_message = []
         if form.changed_data:
-            change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
+            change_message.append('Changed %s.' % get_text_list(form.changed_data, 'and'))
 
         if formsets:
             for formset in formsets:
                 for added_object in formset.new_objects:
-                    change_message.append(_('Added %(name)s "%(object)s".')
+                    change_message.append('Added %(name)s "%(object)s".'
                                           % {'name': force_text(added_object._meta.verbose_name),
                                              'object': force_text(added_object)})
                 for changed_object, changed_fields in formset.changed_objects:
-                    change_message.append(_('Changed %(list)s for %(name)s "%(object)s".')
-                                          % {'list': get_text_list(changed_fields, _('and')),
+                    change_message.append('Changed %(list)s for %(name)s "%(object)s".'
+                                          % {'list': get_text_list(changed_fields, 'and'),
                                              'name': force_text(changed_object._meta.verbose_name),
                                              'object': force_text(changed_object)})
                 for deleted_object in formset.deleted_objects:
-                    change_message.append(_('Deleted %(name)s "%(object)s".')
+                    change_message.append('Deleted %(name)s "%(object)s".'
                                           % {'name': force_text(deleted_object._meta.verbose_name),
                                              'object': force_text(deleted_object)})
         change_message = ' '.join(change_message)
-        return change_message or _('No fields changed.')
+        return change_message or 'No fields changed.'
 
     def message_user(self, request, message, level=messages.INFO, extra_tags='',
                      fail_silently=False):
