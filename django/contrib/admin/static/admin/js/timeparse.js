@@ -29,9 +29,6 @@ var timeParsePatterns = [
                 hour = 0;
             }
             if (bits[2].toLowerCase() == 'p') {
-                if (hour == 12) {
-                    hour = 0;
-                }
                 return (hour + 12) + ':00';
             } else {
                 if (hour < 10) {
@@ -54,9 +51,6 @@ var timeParsePatterns = [
                 hour = 0;
             }
             if (bits[3].toLowerCase() == 'p') {
-                if (hour == 12) {
-                    hour = 0;
-                }
                 return (hour + 12) + ':' + mins;
             } else {
                 if (hour < 10) {

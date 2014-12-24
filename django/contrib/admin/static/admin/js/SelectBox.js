@@ -1,9 +1,9 @@
 var SelectBox = {
-    cache: new Object(),
+    cache: {},
     init: function(id) {
         var box = document.getElementById(id);
         var node;
-        SelectBox.cache[id] = new Array();
+        SelectBox.cache[id] = [];
         var cache = SelectBox.cache[id];
         for (var i = 0; (node = box.options[i]); i++) {
             cache.push({value: node.value, text: node.text, displayed: 1});
@@ -39,15 +39,15 @@ var SelectBox = {
         SelectBox.redisplay(id);
     },
     delete_from_cache: function(id, value) {
-        var node, delete_index = null;
-        for (var i = 0; (node = SelectBox.cache[id][i]); i++) {
+        var node, delete_index = null, i;
+        for (i = 0; (node = SelectBox.cache[id][i]); i++) {
             if (node.value == value) {
                 delete_index = i;
                 break;
             }
         }
         var j = SelectBox.cache[id].length - 1;
-        for (var i = delete_index; i < j; i++) {
+        for (i = delete_index; i < j; i++) {
             SelectBox.cache[id][i] = SelectBox.cache[id][i+1];
         }
         SelectBox.cache[id].length--;
@@ -111,4 +111,4 @@ var SelectBox = {
             box.options[i].selected = 'selected';
         }
     }
-}
+};
