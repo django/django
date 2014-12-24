@@ -422,7 +422,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                 else:
                     rel_name = None
             elif isinstance(field, ForeignObjectRel):
-                model = field.model
+                model = field.related_model
                 rel_name = model._meta.pk.name
             else:
                 rel_name = None
@@ -478,7 +478,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             if f.is_reverse_object
         )
         for related_object in related_objects:
-            related_model = related_object.model
+            related_model = related_object.related_model
             if (any(issubclass(model, related_model) for model in registered_models) and
                     related_object.field.rel.get_related_field() == field):
                 return True

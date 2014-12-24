@@ -646,7 +646,7 @@ class SQLCompiler(object):
 
         if restricted:
             related_fields = [
-                (o.field, o.model)
+                (o.field, o.related_model)
                 for o in opts.related_objects
                 if o.field.unique and not o.many_to_many
             ]

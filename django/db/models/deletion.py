@@ -244,7 +244,7 @@ class Collector(object):
         Gets a QuerySet of objects related to ``objs`` via the relation ``related``.
 
         """
-        return related.model._base_manager.using(self.using).filter(
+        return related.related_model._base_manager.using(self.using).filter(
             **{"%s__in" % related.field.name: objs}
         )
 
