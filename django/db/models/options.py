@@ -520,7 +520,20 @@ class Options(object):
 
     @raise_deprecation(suggested_alternative="field_names")
     def get_all_field_names(self):
-        return self.field_names
+        res = set()
+        fields = self.get_fields()
+        for field in fields:
+
+            # For legacy reasons GenericForeignKey should not be included in the results
+            if field.has_relation and field.one_to_many and field.related_model is None:
+                continue
+
+            res.add(field.name)
+            if hasattr(field, 'attname'):
+                res.add(field.attname)
+
+        # Filter out hidden results
+        return [name for name in res if not name.endswith('+')]
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_objects(self, local_only=False, include_hidden=False,

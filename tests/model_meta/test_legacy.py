@@ -182,3 +182,13 @@ class GetFieldByNameTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTest
                 **{'field_name': 'm2m_base', 'many_to_many': False}
             )
             self.assertEqual([RemovedInDjango20Warning], [w.message.__class__ for w in warning])
+
+
+class GetAllFieldNamesTestCase(OptionsBaseTests):
+
+    def test_get_all_field_names(self):
+        for model, expected_names in TEST_RESULTS['get_all_field_names'].items():
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                objects = model._meta.get_all_field_names()
+                self.assertEqual(sorted(map(str, objects)), sorted(expected_names))
