@@ -5,9 +5,8 @@ from django.test import TestCase
 
 from .models import Secondary, Primary, Child, BigChild, ChildProxy, RefreshPrimaryProxy
 
-
-class DeferTests(TestCase):
-
+class TestAssertDelayed(TestCase):
+    
     def assert_delayed(self, obj, num):
         """
         To all outward appearances, instances with deferred fields look the
@@ -22,9 +21,12 @@ class DeferTests(TestCase):
                 count += 1
         self.assertEqual(count, num)
     
-    def setUp(self):
-        self.s1 = Secondary.objects.create(first="x1", second="y1")
-        self.p1 = Primary.objects.create(name="p1", value="xx", related=self.s1)
+class DeferTests(TestAssertDelayed):
+
+    @classmethod   
+    def setUpTestData(cls):
+        cls.s1 = Secondary.objects.create(first="x1", second="y1")
+        cls.p1 = Primary.objects.create(name="p1", value="xx", related=cls.s1)
     
     def test_defer(self):
         queryset = Primary.objects.all()
