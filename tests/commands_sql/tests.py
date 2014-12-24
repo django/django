@@ -72,14 +72,14 @@ class SQLCommandsTestCase(TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RemovedInDjango20Warning)
             output = sql_indexes(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
-        # PostgreSQL creates one additional index for CharField
-        self.assertIn(self.count_ddl(output, 'CREATE INDEX'), [3, 4])
+        # Number of indexes is backend-dependent
+        self.assertTrue(1 <= self.count_ddl(output, 'CREATE INDEX') <= 4)
 
     def test_sql_destroy_indexes(self):
         app_config = apps.get_app_config('commands_sql')
         output = sql_destroy_indexes(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
-        # PostgreSQL creates one additional index for CharField
-        self.assertIn(self.count_ddl(output, 'DROP INDEX'), [3, 4])
+        # Number of indexes is backend-dependent
+        self.assertTrue(1 <= self.count_ddl(output, 'DROP INDEX') <= 4)
 
     def test_sql_all(self):
         app_config = apps.get_app_config('commands_sql')
@@ -88,8 +88,8 @@ class SQLCommandsTestCase(TestCase):
             output = sql_all(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
 
         self.assertEqual(self.count_ddl(output, 'CREATE TABLE'), 3)
-        # PostgreSQL creates one additional index for CharField
-        self.assertIn(self.count_ddl(output, 'CREATE INDEX'), [3, 4])
+        # Number of indexes is backend-dependent
+        self.assertTrue(1 <= self.count_ddl(output, 'CREATE INDEX') <= 4)
 
 
 class TestRouter(object):
