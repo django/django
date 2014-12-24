@@ -266,14 +266,7 @@ Behind the scenes, ``compress.py`` is a front-end for Google's
 `Closure Compiler`_ which is written in Java. However, the Closure Compiler
 library is not bundled with Django directly, so those wishing to contribute
 complete javascript patches will need to download and install the library
-independently.
-
-The Closure Compiler library requires Java version 6 or higher (Java 1.6 or
-higher on Mac OS X. Note that Mac OS X 10.5 and earlier did not ship with
-Java 1.6 by default, so it may be necessary to upgrade your Java installation
-before the tool will be functional. Also note that even after upgrading Java,
-the default ``/usr/bin/java`` command may remain linked to the previous Java
-binary, so relinking that command may be necessary as well.)
+independently. The Closure Compiler library requires `Java`_ 7 or higher.
 
 Please don't forget to run ``compress.py`` and include the ``diff`` of the
 minified scripts when submitting patches for Django's javascript.
@@ -281,6 +274,7 @@ minified scripts when submitting patches for Django's javascript.
 .. _Closure Compiler: https://developers.google.com/closure/compiler/
 .. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _ticket tracker: https://code.djangoproject.com/newticket
+.. _Java: https://www.java.com
 
 .. _patch-review-checklist:
 
