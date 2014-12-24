@@ -142,13 +142,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_storage_engine(self, cursor, table_name):
         """
-        Retrieves the storage engine for a given table.
+        Retrieves the storage engine for a given table. Returns the default
+        storage engine if the table doesn't exist.
         """
         cursor.execute(
             "SELECT engine "
             "FROM information_schema.tables "
             "WHERE table_name = %s", [table_name])
-        return cursor.fetchone()[0]
+        result = cursor.fetchone()
+        if not result:
+            return self.connection.features._mysql_storage_engine
+        return result[0]
 
     def get_constraints(self, cursor, table_name):
         """
