@@ -251,3 +251,11 @@ class RelationTreeTests(test.TestCase):
                     'person', 'relating_basepeople', 'relating_baseperson'])
         )
         self.assertEqual([field.related_query_name() for field in AbstractPerson._meta._relation_tree], [])
+
+
+class GetAllFieldNamesTestCase(OptionsBaseTests):
+
+    def test_get_all_field_names(self):
+        for model, expected_names in TEST_RESULTS['get_all_field_names'].items():
+            objects = model._meta.get_all_field_names()
+            self.assertEqual(sorted(map(str, objects)), sorted(expected_names))
