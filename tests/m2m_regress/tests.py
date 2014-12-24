@@ -97,3 +97,15 @@ class M2MRegressionTests(TestCase):
         # causes a TypeError in add_lazy_relation
         m1 = RegressionModelSplit(name='1')
         m1.save()
+
+    def test_assigning_invalid_data_to_m2m_doesnt_clear_existing_relations(self):
+        t1 = Tag.objects.create(name='t1')
+        t2 = Tag.objects.create(name='t2')
+        c1 = TagCollection.objects.create(name='c1')
+        c1.tags = [t1, t2]
+
+        with self.assertRaises(TypeError):
+            c1.tags = 7
+
+        c1.refresh_from_db()
+        self.assertQuerysetEqual(c1.tags.order_by('name'), ["<Tag: t1>", "<Tag: t2>"])
