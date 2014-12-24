@@ -448,7 +448,7 @@ def reverse_field_path(model, path):
             parent = field.rel.to
         else:
             related_name = field.field.name
-            parent = field.model
+            parent = field.related_model
         reversed_path.insert(0, related_name)
     return (parent, LOOKUP_SEP.join(reversed_path))
 

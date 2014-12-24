@@ -1383,10 +1383,10 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     if restricted:
         for o in klass._meta.related_objects:
             if o.field.unique and select_related_descend(o.field, restricted, requested,
-                                                         only_load.get(o.model), reverse=True):
+                                                         only_load.get(o.related_model), reverse=True):
                 next = requested[o.field.related_query_name()]
-                parent = klass if issubclass(o.model, klass) else None
-                klass_info = get_klass_info(o.model, max_depth=max_depth, cur_depth=cur_depth + 1,
+                parent = klass if issubclass(o.related_model, klass) else None
+                klass_info = get_klass_info(o.related_model, max_depth=max_depth, cur_depth=cur_depth + 1,
                                             requested=next, only_load=only_load, from_parent=parent)
                 reverse_related_fields.append((o.field, klass_info))
     if field_names:

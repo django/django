@@ -746,11 +746,11 @@ class Options(object):
                         if obj.many_to_many:
                             # In order for a reverse ManyToManyRel object to be valid, its creation
                             # counter must be > 0 and must be in the parent list
-                            if not (obj.field.creation_counter < 0 and obj.model not in parent_list):
+                            if not (obj.field.creation_counter < 0 and obj.related_model not in parent_list):
                                 fields[obj] = True
 
                         elif not ((obj.field.creation_counter < 0 or obj.field.rel.parent_link)
-                                  and obj.model not in parent_list):
+                                  and obj.related_model not in parent_list):
                             fields[obj] = True
 
             # Tree is computer once and cached until apps cache is expired. It is composed of

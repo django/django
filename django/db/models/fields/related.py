@@ -245,7 +245,7 @@ class RelatedField(Field):
         potential_clashes = (r for r in rel_opts.related_objects if r.field is not self)
         for clash_field in potential_clashes:
             clash_name = "%s.%s" % (  # i. e. "Model.m2m"
-                clash_field.model._meta.object_name,
+                clash_field.related_model._meta.object_name,
                 clash_field.field.name)
             if clash_field.get_accessor_name() == rel_name:
                 errors.append(
@@ -396,7 +396,7 @@ class SingleRelatedObjectDescriptor(object):
         # consistency with `ReverseSingleRelatedObjectDescriptor`.
         return type(
             str('RelatedObjectDoesNotExist'),
-            (self.related.model.DoesNotExist, AttributeError),
+            (self.related.related_model.DoesNotExist, AttributeError),
             {}
         )
 
@@ -404,11 +404,11 @@ class SingleRelatedObjectDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        manager = self.related.model._default_manager
+        manager = self.related.related_model._default_manager
         # If the related manager indicates that it should be used for
         # related fields, respect that.
         if not getattr(manager, 'use_for_related_fields', False):
-            manager = self.related.model._base_manager
+            manager = self.related.related_model._base_manager
         return manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
@@ -445,7 +445,7 @@ class SingleRelatedObjectDescriptor(object):
                     params['%s__%s' % (self.related.field.name, rh_field.name)] = getattr(instance, rh_field.attname)
                 try:
                     rel_obj = self.get_queryset(instance=instance).get(**params)
-                except self.related.model.DoesNotExist:
+                except self.related.related_model.DoesNotExist:
                     rel_obj = None
                 else:
                     setattr(rel_obj, self.related.field.get_cache_name(), instance)
@@ -474,7 +474,7 @@ class SingleRelatedObjectDescriptor(object):
                     self.related.get_accessor_name(),
                 )
             )
-        elif value is not None and not isinstance(value, self.related.model):
+        elif value is not None and not isinstance(value, self.related.related_model):
             raise ValueError(
                 'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
                     value,
@@ -829,9 +829,9 @@ class ForeignRelatedObjectsDescriptor(object):
         # Dynamically create a class that subclasses the related model's default
         # manager.
         return create_foreign_related_manager(
-            self.related.model._default_manager.__class__,
+            self.related.related_model._default_manager.__class__,
             self.related.field,
-            self.related.model,
+            self.related.related_model,
         )
 
 
@@ -1152,7 +1152,7 @@ class ManyRelatedObjectsDescriptor(object):
         # Dynamically create a class that subclasses the related
         # model's default manager.
         return create_many_related_manager(
-            self.related.model._default_manager.__class__,
+            self.related.related_model._default_manager.__class__,
             self.related.field.rel
         )
 
@@ -1160,7 +1160,7 @@ class ManyRelatedObjectsDescriptor(object):
         if instance is None:
             return self
 
-        rel_model = self.related.model
+        rel_model = self.related.related_model
 
         manager = self.related_manager_cls(
             model=rel_model,
@@ -1282,14 +1282,11 @@ class ForeignObjectRel(object):
     # AttributeError
     @cached_property
     def model(self):
-        if not self.field.model:
-            raise AttributeError(
-                "This property can't be accessed before self.field.contribute_to_class has been called.")
-        return self.field.model
+        return self.to
 
     @cached_property
     def opts(self):
-        return self.model._meta
+        return self.related_model._meta
 
     @cached_property
     def to_opts(self):
@@ -1340,7 +1337,7 @@ class ForeignObjectRel(object):
         initially for utilization by RelatedFieldListFilter.
         """
         first_choice = blank_choice if include_blank else []
-        queryset = self.model._default_manager.all()
+        queryset = self.related_model._default_manager.all()
         if limit_to_currently_related:
             queryset = queryset.complex_filter(
                 {'%s__isnull' % self.parent_model._meta.model_name: False}
@@ -1385,7 +1382,7 @@ class ForeignObjectRel(object):
         # Due to backwards compatibility ModelForms need to be able to provide
         # an alternate model. See BaseInlineFormSet.get_default_prefix().
         opts = model._meta if model else self.opts
-        model = model or self.model
+        model = model or self.related_model
         if self.multiple:
             # If this is a symmetrical m2m relation on self, there is no reverse accessor.
             if self.symmetrical and model == self.to:
@@ -1776,7 +1773,7 @@ class ForeignObject(RelatedField):
     def contribute_to_related_class(self, cls, related):
         # Internal FK's - i.e., those with a related name ending with '+' -
         # and swapped models don't get a related descriptor.
-        if not self.rel.is_hidden() and not related.model._meta.swapped:
+        if not self.rel.is_hidden() and not related.related_model._meta.swapped:
             setattr(cls, related.get_accessor_name(), self.related_accessor_class(related))
             # While 'limit_choices_to' might be a callable, simply pass
             # it along for later - this is too early because it's still
@@ -2453,7 +2450,7 @@ class ManyToManyField(RelatedField):
         else:
             link_field_name = None
         for f in self.rel.through._meta.fields:
-            if hasattr(f, 'rel') and f.rel and f.rel.to == related.model and \
+            if f.has_relation and f.rel.to == related.related_model and \
                     (link_field_name is None or link_field_name == f.name):
                 setattr(self, cache_attr, getattr(f, attr))
                 return getattr(self, cache_attr)
@@ -2469,8 +2466,9 @@ class ManyToManyField(RelatedField):
         else:
             link_field_name = None
         for f in self.rel.through._meta.fields:
-            if hasattr(f, 'rel') and f.rel and f.rel.to == related.parent_model:
-                if link_field_name is None and related.model == related.parent_model:
+            # NOTE f.rel.to != f.related_model
+            if f.has_relation and f.rel.to == related.parent_model:
+                if link_field_name is None and related.related_model == related.parent_model:
                     # If this is an m2m-intermediate to self,
                     # the first foreign key you find will be
                     # the source column. Keep searching for
@@ -2534,7 +2532,7 @@ class ManyToManyField(RelatedField):
     def contribute_to_related_class(self, cls, related):
         # Internal M2Ms (i.e., those with a related name ending with '+')
         # and swapped models don't get a related descriptor.
-        if not self.rel.is_hidden() and not related.model._meta.swapped:
+        if not self.rel.is_hidden() and not related.related_model._meta.swapped:
             setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related))
 
         # Set up the accessors for the column names on the m2m table
