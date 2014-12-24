@@ -886,6 +886,17 @@ class FieldFlagsTests(test.TestCase):
                 f.hidden
             )
 
+    def test_model_and_reverse_model_should_equal_on_relations(self):
+        for field in AllFieldsModel._meta.get_fields():
+            if field.has_relation and not field.is_reverse_object:
+
+                if field.related_model is None or isinstance(field.related_model, six.string_types):
+                    continue
+
+                reverse_field = field.rel
+                self.assertEquals(field.model, reverse_field.related_model)
+                self.assertEquals(field.related_model, reverse_field.model)
+
 
 class GenericIPAddressFieldTests(test.TestCase):
     def test_genericipaddressfield_formfield_protocol(self):
