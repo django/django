@@ -532,8 +532,7 @@ class Options(object):
             if hasattr(field, 'attname'):
                 res.add(field.attname)
 
-        # Filter out hidden results
-        return [name for name in res if not name.endswith('+')]
+        return list(res)
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_objects(self, local_only=False, include_hidden=False,
