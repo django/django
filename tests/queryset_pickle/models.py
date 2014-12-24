@@ -46,6 +46,7 @@ class Group(models.Model):
 
 
 class Event(models.Model):
+    title = models.CharField(max_length=100)
     group = models.ForeignKey(Group)
 
 
