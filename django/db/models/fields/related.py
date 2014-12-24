@@ -474,7 +474,7 @@ class SingleRelatedObjectDescriptor(object):
                     self.related.get_accessor_name(),
                 )
             )
-        elif value is not None and not isinstance(value, self.related.model):
+        elif value is not None and not isinstance(value, self.related.related_model):
             raise ValueError(
                 'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
                     value,
@@ -1280,9 +1280,8 @@ class ForeignObjectRel(object):
     # __init__ as the field doesn't have its model yet. Calling these methods
     # before field.contribute_to_class() has been called will result in
     # AttributeError
-    @property
+    @cached_property
     def model(self):
-        import ipdb; ipdb.set_trace()
         return self.to
 
     @cached_property
