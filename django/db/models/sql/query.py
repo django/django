@@ -594,7 +594,7 @@ class Query(object):
                 old_model = cur_model
                 source = opts.get_field(name)
                 if is_reverse_o2o(source):
-                    cur_model = source.model
+                    cur_model = source.related_model
                 else:
                     cur_model = source.rel.to
                 opts = cur_model._meta

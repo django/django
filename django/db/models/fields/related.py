@@ -396,7 +396,7 @@ class SingleRelatedObjectDescriptor(object):
         # consistency with `ReverseSingleRelatedObjectDescriptor`.
         return type(
             str('RelatedObjectDoesNotExist'),
-            (self.related.model.DoesNotExist, AttributeError),
+            (self.related.related_model.DoesNotExist, AttributeError),
             {}
         )
 
@@ -404,11 +404,11 @@ class SingleRelatedObjectDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        manager = self.related.model._default_manager
+        manager = self.related.related_model._default_manager
         # If the related manager indicates that it should be used for
         # related fields, respect that.
         if not getattr(manager, 'use_for_related_fields', False):
-            manager = self.related.model._base_manager
+            manager = self.related.related_model._base_manager
         return manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
@@ -445,7 +445,7 @@ class SingleRelatedObjectDescriptor(object):
                     params['%s__%s' % (self.related.field.name, rh_field.name)] = getattr(instance, rh_field.attname)
                 try:
                     rel_obj = self.get_queryset(instance=instance).get(**params)
-                except self.related.model.DoesNotExist:
+                except self.related.related_model.DoesNotExist:
                     rel_obj = None
                 else:
                     setattr(rel_obj, self.related.field.get_cache_name(), instance)
@@ -2467,6 +2467,7 @@ class ManyToManyField(RelatedField):
         else:
             link_field_name = None
         for f in self.rel.through._meta.fields:
+            # NOTE f.rel.to != f.related_model
             if f.has_relation and f.rel.to == related.parent_model:
                 if link_field_name is None and related.related_model == related.parent_model:
                     # If this is an m2m-intermediate to self,
