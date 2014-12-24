@@ -1325,7 +1325,7 @@ class ForeignObjectRel(object):
         return self.field.one_to_one
 
     def __repr__(self):
-        return '%s.%s' % (self.opts.app_label, self.opts.model_name)
+        return '<%s: %s.%s>' % (type(self).__name__, self.opts.app_label, self.opts.model_name)
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
                     limit_to_currently_related=False):

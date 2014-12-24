@@ -58,7 +58,7 @@ Retrieving a single field instance of a model by name
 
         # A field from another model, that has a relation with the current model
         >>> User._meta.get_field('logentry')
-        <RelatedObject: admin:logentry related to user>
+        <ManyToOneRel: admin.logentry>
 
         # A non existent field
         >>> User._meta.get_field('does_not_exist')
@@ -117,7 +117,7 @@ Retrieving all field instances of a model
          <django.db.models.fields.BooleanField: is_staff>,
          <django.db.models.fields.BooleanField: is_active>,
          <django.db.models.fields.DateTimeField: date_joined>,
-         <RelatedObject: admin:logentry related to user>,)
+         <ManyToOneRel: admin.logentry>,)
 
         # Include also hidden fields, there are rare occasion in which you
         # might want to do this.
@@ -133,6 +133,8 @@ Retrieving all field instances of a model
          <django.db.models.fields.BooleanField: is_staff>,
          <django.db.models.fields.BooleanField: is_active>,
          <django.db.models.fields.DateTimeField: date_joined>,
-         <RelatedObject: auth:user_groups related to user>,
-         <RelatedObject: auth:user_user_permissions related to user>,
-         <RelatedObject: admin:logentry related to user>,)
+         <ManyToOneRel: auth.user_groups>,
+         <ManyToOneRel: auth.user_user_permissions>,
+         <ManyToOneRel: auth.user_groups>,
+         <ManyToOneRel: auth.user_user_permissions>,
+         <ManyToOneRel: admin.logentry>,)
