@@ -50,7 +50,6 @@ class DeferTests(TestAssertDelayed):
         self.assert_delayed(queryset.only("name", "value").defer("name")[0], 2)
         self.assert_delayed(queryset.defer("name").only("value", "name")[0], 2)
         self.assert_delayed(queryset.defer("name").only("value")[0], 2)
-        self.assert_delayed(queryset.defer("name").only("value")[0], 2)
         self.assert_delayed(queryset.only("name").defer("value")[0], 2)
     
     def test_defer_on_an_already_deferred_field(self):
