@@ -775,7 +775,7 @@ class SecondUrls:
 
 class OverrideSettingsTests(TestCase):
 
-    # #21518 -- If neither override_settings nor a settings_changed receiver
+    # #21518 -- If neither override_settings nor a setting_changed receiver
     # clears the URL cache between tests, then one of test_first or
     # test_second will fail.
 
