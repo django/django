@@ -59,7 +59,7 @@ CSRF_FAILURE_TEMPLATE = """
 
   <p>In general, this can occur when there is a genuine Cross Site Request Forgery, or when
   <a
-  href='https://docs.djangoproject.com/en/{{ docs_version }}/ref/contrib/csrf/#ref-contrib-csrf'>Django's
+  href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/csrf/">Django's
   CSRF mechanism</a> has not been used correctly.  For POST forms, you need to
   ensure:</p>
 
@@ -67,7 +67,7 @@ CSRF_FAILURE_TEMPLATE = """
     <li>Your browser is accepting cookies.</li>
 
     <li>The view function uses <a
-    href='https://docs.djangoproject.com/en/{{ docs_version }}/ref/templates/api/#subclassing-context-requestcontext'><code>RequestContext</code></a>
+    href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/templates/api/#subclassing-context-requestcontext"><code>RequestContext</code></a>
     for the template, instead of <code>Context</code>.</li>
 
     <li>In the template, there is a <code>{% templatetag openblock %} csrf_token
