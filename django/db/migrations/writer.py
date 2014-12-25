@@ -18,6 +18,7 @@ from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 from django.utils.timezone import utc
+from django.utils.version import get_docs_version
 
 
 COMPILED_REGEX_TYPE = type(re.compile(''))
@@ -389,8 +390,8 @@ class MigrationWriter(object):
                     "declared and used in the same class body). Please move "
                     "the function into the main module body to use migrations.\n"
                     "For more information, see "
-                    "https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values"
-                    % (value.__name__, module_name))
+                    "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
+                    % (value.__name__, module_name, get_docs_version()))
             return "%s.%s" % (module_name, value.__name__), {"import %s" % module_name}
         # Other iterables
         elif isinstance(value, collections.Iterable):
@@ -419,8 +420,8 @@ class MigrationWriter(object):
         else:
             raise ValueError(
                 "Cannot serialize: %r\nThere are some values Django cannot serialize into "
-                "migration files.\nFor more, see https://docs.djangoproject.com/en/dev/"
-                "topics/migrations/#migration-serializing" % value
+                "migration files.\nFor more, see https://docs.djangoproject.com/en/%s/"
+                "topics/migrations/#migration-serializing" % (value, get_docs_version())
             )
 
 

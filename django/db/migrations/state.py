@@ -10,6 +10,7 @@ from django.conf import settings
 from django.utils import six
 from django.utils.encoding import force_text, smart_text
 from django.utils.module_loading import import_string
+from django.utils.version import get_docs_version
 
 
 class InvalidBasesError(ValueError):
@@ -71,8 +72,8 @@ class ProjectState(object):
                     raise InvalidBasesError(
                         "Cannot resolve bases for %r\nThis can happen if you are inheriting models from an "
                         "app with migrations (e.g. contrib.auth)\n in an app with no migrations; see "
-                        "https://docs.djangoproject.com/en/1.7/topics/migrations/#dependencies "
-                        "for more" % new_unrendered_models
+                        "https://docs.djangoproject.com/en/%s/topics/migrations/#dependencies "
+                        "for more" % (new_unrendered_models, get_docs_version())
                     )
                 unrendered_models = new_unrendered_models
             # make sure apps has no dangling references
