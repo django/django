@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.management.base import CommandError
 from django.db import models, router
 from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.version import get_docs_version
 
 
 def check_for_migrations(app_config, connection):
@@ -31,9 +32,11 @@ def sql_create(app_config, style, connection):
     if connection.settings_dict['ENGINE'] == 'django.db.backends.dummy':
         # This must be the "dummy" database backend, which means the user
         # hasn't set ENGINE for the database.
-        raise CommandError("Django doesn't know which syntax to use for your SQL statements,\n" +
-            "because you haven't properly specified the ENGINE setting for the database.\n" +
-            "see: https://docs.djangoproject.com/en/dev/ref/settings/#databases")
+        raise CommandError(
+            "Django doesn't know which syntax to use for your SQL statements,\n"
+            "because you haven't properly specified the ENGINE setting for the database.\n"
+            "see: https://docs.djangoproject.com/en/%s/ref/settings/#databases" % get_docs_version()
+        )
 
     # Get installed models, so we generate REFERENCES right.
     # We trim models from the current app so that the sqlreset command does not

@@ -2,6 +2,7 @@ from django.conf import settings
 from django.http import HttpResponseForbidden
 from django.template import Context, Template
 from django.utils.translation import ugettext as _
+from django.utils.version import get_docs_version
 
 # We include the template inline since we need to be able to reliably display
 # this error message, especially for the sake of developers, and there isn't any
@@ -58,7 +59,7 @@ CSRF_FAILURE_TEMPLATE = """
 
   <p>In general, this can occur when there is a genuine Cross Site Request Forgery, or when
   <a
-  href='http://docs.djangoproject.com/en/dev/ref/contrib/csrf/#ref-contrib-csrf'>Django's
+  href='https://docs.djangoproject.com/en/{{ docs_version }}/ref/contrib/csrf/#ref-contrib-csrf'>Django's
   CSRF mechanism</a> has not been used correctly.  For POST forms, you need to
   ensure:</p>
 
@@ -66,7 +67,7 @@ CSRF_FAILURE_TEMPLATE = """
     <li>Your browser is accepting cookies.</li>
 
     <li>The view function uses <a
-    href='http://docs.djangoproject.com/en/dev/ref/templates/api/#subclassing-context-requestcontext'><code>RequestContext</code></a>
+    href='https://docs.djangoproject.com/en/{{ docs_version }}/ref/templates/api/#subclassing-context-requestcontext'><code>RequestContext</code></a>
     for the template, instead of <code>Context</code>.</li>
 
     <li>In the template, there is a <code>{% templatetag openblock %} csrf_token
@@ -126,6 +127,7 @@ def csrf_failure(request, reason=""):
             "re-enable them, at least for this site, or for 'same-origin' "
             "requests."),
         'DEBUG': settings.DEBUG,
+        'docs_version': get_docs_version(),
         'more': _("More information is available with DEBUG=True."),
     })
     return HttpResponseForbidden(t.render(c), content_type='text/html')
