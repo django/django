@@ -73,21 +73,21 @@ class FormsUtilTestCase(TestCase):
 
         # Can take a mixture in a list.
         self.assertHTMLEqual(
-            str(ErrorList(ValidationError([
-                "First error.",
-                "Not \u03C0.",
-                ugettext_lazy("Error."),
+            str(ErrorList(sorted(ValidationError([
+                "1. First error.",
+                "2. Not \u03C0.",
+                ugettext_lazy("3. Error."),
                 {
-                    'error_1': "First dict error.",
-                    'error_2': "Second dict error.",
+                    'error_1': "4. First dict error.",
+                    'error_2': "5. Second dict error.",
                 }
-            ]).messages)),
+            ]).messages))),
             '<ul class="errorlist">'
-                '<li>First error.</li>'
-                '<li>Not π.</li>'
-                '<li>Error.</li>'
-                '<li>First dict error.</li>'
-                '<li>Second dict error.</li>'
+            '<li>1. First error.</li>'
+            '<li>2. Not π.</li>'
+            '<li>3. Error.</li>'
+            '<li>4. First dict error.</li>'
+            '<li>5. Second dict error.</li>'
             '</ul>'
         )
 
