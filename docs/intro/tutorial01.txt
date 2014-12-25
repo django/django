@@ -327,7 +327,7 @@ The first step in writing a database Web app in Django is to define your models
 
 .. admonition:: Philosophy
 
-   A model is the single, definitive source of data about your data. It contains
+   A model is the single, definitive source of truth about your data. It contains
    the essential fields and behaviors of the data you're storing. Django follows
    the :ref:`DRY Principle <dry>`. The goal is to define your data model in one
    place and automatically derive things from it.
