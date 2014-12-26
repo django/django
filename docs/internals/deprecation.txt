@@ -42,10 +42,6 @@ details on these changes.
   is loaded. In particular, it won't be possible to import models inside
   the root package of their application.
 
-* If models are organized in a package, Django will no longer look for
-  :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
-  custom SQL files to ``myapp/sql/``.
-
 * The model and form ``IPAddressField`` will be removed.
 
 * ``AppCommand.handle_app()`` will no longer be supported.
