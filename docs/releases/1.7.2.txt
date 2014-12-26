@@ -167,3 +167,6 @@ Bugfixes
   instead of ``DeleteModel`` and ``CreateModel`` operations when changing
   ``Meta.managed``. This prevents data loss when changing ``managed`` from
   ``False`` to ``True`` and vice versa (:ticket:`24037`).
+
+* Enabled the ``sqlsequencereset`` command on apps with migrations
+  (:ticket:`24054`).
