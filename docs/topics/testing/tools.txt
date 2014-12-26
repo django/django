@@ -670,12 +670,12 @@ to test the effects of commit and rollback:
 
 .. warning::
 
-  ``TestCase`` running on a database that does not support rollback (e.g. MySQL with the
-  MyISAM storage engine), and all instances of ``TransactionTestCase``, will
-  roll back at the end of the test by deleting all data from the test database
-  and reloading initial data for apps without migrations.
+  ``TestCase`` running on a database that does not support rollback (e.g. MySQL
+  with the MyISAM storage engine), and all instances of ``TransactionTestCase``,
+  will roll back at the end of the test by deleting all data from the test
+  database.
 
-  Apps with migrations :ref:`will not see their data reloaded <test-case-serialized-rollback>`;
+  Apps :ref:`will not see their data reloaded <test-case-serialized-rollback>`;
   if you need this functionality (for example, third-party apps should enable
   this) you can set ``serialized_rollback = True`` inside the
   ``TestCase`` body.

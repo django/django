@@ -183,8 +183,7 @@ scenes.
 
 .. attribute:: Field.db_index
 
-If ``True``, :djadmin:`django-admin sqlindexes <sqlindexes>` will output a
-``CREATE INDEX`` statement for this field.
+If ``True``, a database index will be created for this field.
 
 ``db_tablespace``
 -----------------
@@ -1120,12 +1119,6 @@ avoid the overhead of an index if you are creating a foreign key for
 consistency rather than joins, or if you will be creating an alternative index
 like a partial or multiple column index.
 
-.. warning::
-
-    It is not recommended to have a ``ForeignKey`` from an app without migrations
-    to an app with migrations. See the :ref:`dependencies documentation
-    <unmigrated-dependencies>` for more details.
-
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1334,12 +1327,6 @@ which the model is related, which works exactly the same as it does for
 
 Related objects can be added, removed, or created with the field's
 :class:`~django.db.models.fields.related.RelatedManager`.
-
-.. warning::
-
-    It is not recommended to have a ``ManyToManyField`` from an app without migrations
-    to an app with migrations. See the :ref:`dependencies documentation
-    <unmigrated-dependencies>` for more details.
 
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~

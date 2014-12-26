@@ -366,6 +366,7 @@ class BaseDatabaseCreation(object):
             verbosity=max(verbosity - 1, 0),
             interactive=False,
             database=self.connection.alias,
+            run_syncdb=True,
         )
 
         # We then serialize the current state of the database into a string

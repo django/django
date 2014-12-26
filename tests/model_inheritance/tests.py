@@ -404,7 +404,7 @@ class InheritanceSameModelNameTests(TransactionTestCase):
     def test_inheritance_with_same_model_name(self):
         with self.modify_settings(
                 INSTALLED_APPS={'append': ['model_inheritance.same_model_name']}):
-            call_command('migrate', verbosity=0)
+            call_command('migrate', verbosity=0, run_syncdb=True)
             from .same_model_name.models import Copy
             copy = self.title.attached_same_model_name_copy_set.create(
                 content='The Web framework for perfectionists with deadlines.',

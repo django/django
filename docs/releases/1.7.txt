@@ -74,9 +74,8 @@ but a few of the key features are:
   <test-case-serialized-rollback>`.
 
 * It is not advised to have apps without migrations depend on (have a
-  :ref:`ForeignKey <ref-foreignkey>` or :ref:`ManyToManyField <ref-manytomany>` to) apps with migrations. Read the
-  :ref:`dependencies documentation <unmigrated-dependencies>` for more.
-
+  :ref:`ForeignKey <ref-foreignkey>` or :ref:`ManyToManyField <ref-manytomany>`
+  to) apps with migrations.
 
 * If you are upgrading from South, see our :ref:`upgrading-from-south`
   documentation, and third-party app authors should read the
