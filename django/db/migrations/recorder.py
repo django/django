@@ -11,7 +11,7 @@ class MigrationRecorder(object):
     Deals with storing migration records in the database.
 
     Because this table is actually itself used for dealing with model
-    creation, it's the one thing we can't do normally via syncdb or migrations.
+    creation, it's the one thing we can't do normally via migrations.
     We manually handle table creation/schema updating (using schema backend)
     and then have a floating model to do queries with.
 
