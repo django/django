@@ -27,7 +27,7 @@ class ManyToManySignalsTest(TestCase):
         self.expected_messages = []
 
         self.c4 = SportsCar.objects.create(name='Bugatti', price='1000000')
-        
+
         self.c4b = Car.objects.get(name='Bugatti')
         self.vw = Car.objects.create(name='VW')
         self.bmw = Car.objects.create(name='BMW')
@@ -42,7 +42,7 @@ class ManyToManySignalsTest(TestCase):
         self.bob = Person.objects.create(name='Bob')
         self.chuck = Person.objects.create(name='Chuck')
         self.daisy = Person.objects.create(name='Daisy')
-        
+
         models.signals.m2m_changed.connect(
             self.m2m_changed_signal_receiver, Car.optional_parts.through
         )
@@ -57,7 +57,7 @@ class ManyToManySignalsTest(TestCase):
         models.signals.m2m_changed.connect(
             self.m2m_changed_signal_receiver, Car.default_parts.through
         )
-        
+
         # Install liseners for self tests
         models.signals.m2m_changed.connect(
             self.m2m_changed_signal_receiver, Person.fans.through
@@ -82,10 +82,7 @@ class ManyToManySignalsTest(TestCase):
         )
 
     def test_m2m_relations_add_parts_signal(self):
-
         # Install a listener on one of the two m2m relations.
-        
-
         self.vw.default_parts.add(self.wheelset, self.doors, self.engine)
         self.expected_messages.append({
             'instance': self.vw,
