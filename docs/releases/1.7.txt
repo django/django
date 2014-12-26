@@ -51,8 +51,8 @@ but a few of the key features are:
 * A new ``makemigrations`` command provides an easy way to autodetect changes
   to your models and make migrations for them.
 
-  :data:`~django.db.models.signals.pre_syncdb` and
-  :data:`~django.db.models.signals.post_syncdb` have been deprecated,
+  ``django.db.models.signals.pre_syncdb`` and
+  ``django.db.models.signals.post_syncdb`` have been deprecated,
   to be replaced by :data:`~django.db.models.signals.pre_migrate` and
   :data:`~django.db.models.signals.post_migrate` respectively. These
   new signals have slightly different arguments. Check the
