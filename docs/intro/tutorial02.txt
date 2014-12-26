@@ -519,11 +519,13 @@ template directory in the source code of Django itself
 Then, just edit the file and replace
 ``{{ site_header|default:_('Django administration') }}`` (including the curly
 braces) with your own site's name as you see fit. You should end up with
-a line like:
+a section of code like:
 
 .. code-block:: html+django
 
+    {% block branding %}
     <h1 id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></h1>
+    {% endblock %}
 
 We use this approach to teach you how to override templates. In an actual
 project, you would probably use
