@@ -924,6 +924,8 @@ Miscellaneous
   different in some cases. There is no change to default values which are the
   result of a callable.
 
+* Lookups usage in ``get_or_create()`` was prohibited.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8

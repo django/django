@@ -125,6 +125,14 @@ class GetOrCreateTests(TestCase):
         # The publisher should have three books.
         self.assertEqual(p.books.count(), 3)
 
+    def test_get_or_create_with_lookups_raises_exception(self):
+        Person.objects.create(first_name="Morihei", last_name="Ueshiba", birthday=date(1883, 12, 14))
+        self.assertRaises(
+            TypeError,
+            Person.objects.get_or_create,
+            name__iexact='morihei', last_name="Ueshiba", birthday__gte=date(1800, 12, 12)
+        )
+
 
 class GetOrCreateTestsWithManualPKs(TestCase):
 
