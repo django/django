@@ -105,7 +105,7 @@ the policy that data inserted by custom SQL will *not* be visible
 during testing.
 
 This change only affects the testing process. You can still use custom
-SQL to load data into your production database as part of the syncdb
+SQL to load data into your production database as part of the ``syncdb``
 process. If you require data to exist during test conditions, you
 should either insert it using :ref:`test fixtures
 <topics-testing-fixtures>`, or using the ``setUp()`` method of your

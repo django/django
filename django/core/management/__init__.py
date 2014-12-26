@@ -81,7 +81,7 @@ def call_command(name, *args, **options):
     This is the primary API you should use for calling specific commands.
 
     Some examples:
-        call_command('syncdb')
+        call_command('migrate')
         call_command('shell', plain=True)
         call_command('sqlmigrate', 'myapp')
     """

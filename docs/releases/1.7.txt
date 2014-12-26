@@ -953,8 +953,8 @@ Backwards incompatible changes in 1.7
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
-allow_syncdb/allow_migrate
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+``allow_syncdb`` / ``allow_migrate``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 While Django will still look at ``allow_syncdb`` methods even though they
 should be renamed to ``allow_migrate``, there is a subtle difference in which
@@ -1567,7 +1567,7 @@ submodules and the ``django.contrib.contenttypes.generic`` module is deprecated:
 ``syncdb``
 ~~~~~~~~~~
 
-The :djadmin:`syncdb` command has been deprecated in favor of the new :djadmin:`migrate`
+The ``syncdb`` command has been deprecated in favor of the new :djadmin:`migrate`
 command. ``migrate`` takes the same arguments as ``syncdb`` used to plus a few
 more, so it's safe to just change the name you're calling and nothing else.
 
