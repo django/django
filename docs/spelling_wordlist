@@ -582,12 +582,7 @@ spam
 spammers
 spatialite
 Springmeyer
-sql
-sqlall
-sqlclear
-sqldropindexes
 sqlflush
-sqlindexes
 sqlmigrate
 sqlsequencereset
 squashmigrations

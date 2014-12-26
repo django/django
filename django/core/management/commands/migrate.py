@@ -93,14 +93,12 @@ class Command(BaseCommand):
             )
 
         # If they supplied command line arguments, work out what they mean.
-        run_syncdb = False
         target_app_labels_only = True
         if options['app_label'] and options['migration_name']:
             app_label, migration_name = options['app_label'], options['migration_name']
             if app_label not in executor.loader.migrated_apps:
                 raise CommandError(
-                    "App '%s' does not have migrations (you cannot selectively "
-                    "sync unmigrated apps)" % app_label
+                    "App '%s' does not have migrations." % app_label
                 )
             if migration_name == "zero":
                 targets = [(app_label, None)]
@@ -122,20 +120,19 @@ class Command(BaseCommand):
             app_label = options['app_label']
             if app_label not in executor.loader.migrated_apps:
                 raise CommandError(
-                    "App '%s' does not have migrations (you cannot selectively "
-                    "sync unmigrated apps)" % app_label
+                    "App '%s' does not have migrations." % app_label
                 )
             targets = [key for key in executor.loader.graph.leaf_nodes() if key[0] == app_label]
         else:
             targets = executor.loader.graph.leaf_nodes()
-            run_syncdb = True
 
         plan = executor.migration_plan(targets)
+        run_syncdb = options.get('run_syncdb') and executor.loader.unmigrated_apps
 
         # Print some useful info
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
-            if run_syncdb and executor.loader.unmigrated_apps:
+            if run_syncdb:
                 self.stdout.write(
                     self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
                     (", ".join(executor.loader.unmigrated_apps))
@@ -159,7 +156,7 @@ class Command(BaseCommand):
         emit_pre_migrate_signal(self.verbosity, self.interactive, connection.alias)
 
         # Run the syncdb phase.
-        if run_syncdb and executor.loader.unmigrated_apps:
+        if run_syncdb:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
             self.sync_apps(connection, executor.loader.unmigrated_apps)

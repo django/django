@@ -963,53 +963,6 @@ beyond those apps. Same as ``--list``, applied migrations are marked by an
 ``[X]``. For a verbosity of 2 and above, all dependencies of a migration will
 also be shown.
 
-sql <app_label app_label ...>
------------------------------
-
-.. django-admin:: sql
-
-Prints the CREATE TABLE SQL statements for the given app name(s).
-
-The :djadminopt:`--database` option can be used to specify the database for
-which to print the SQL.
-
-sqlall <app_label app_label ...>
---------------------------------
-
-.. django-admin:: sqlall
-
-Prints the CREATE TABLE and initial-data SQL statements for the given app name(s).
-
-The :djadminopt:`--database` option can be used to specify the database for
-which to print the SQL.
-
-.. versionchanged:: 1.7
-
-    The ``sql*`` management commands now respect the ``allow_migrate()`` method
-    of :setting:`DATABASE_ROUTERS`. If you have models synced to non-default
-    databases, use the :djadminopt:`--database` flag to get SQL for those
-    models (previously they would always be included in the output).
-
-sqlclear <app_label app_label ...>
-----------------------------------
-
-.. django-admin:: sqlclear
-
-Prints the DROP TABLE SQL statements for the given app name(s).
-
-The :djadminopt:`--database` option can be used to specify the database for
-which to print the SQL.
-
-sqldropindexes <app_label app_label ...>
-----------------------------------------
-
-.. django-admin:: sqldropindexes
-
-Prints the DROP INDEX SQL statements for the given app name(s).
-
-The :djadminopt:`--database` option can be used to specify the database for
-which to print the SQL.
-
 sqlflush
 --------
 
@@ -1017,16 +970,6 @@ sqlflush
 
 Prints the SQL statements that would be executed for the :djadmin:`flush`
 command.
-
-The :djadminopt:`--database` option can be used to specify the database for
-which to print the SQL.
-
-sqlindexes <app_label app_label ...>
-------------------------------------
-
-.. django-admin:: sqlindexes
-
-Prints the CREATE INDEX SQL statements for the given app name(s).
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.

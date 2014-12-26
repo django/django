@@ -136,12 +136,9 @@ database to make sure they work as expected::
 
     $ python manage.py migrate
     Operations to perform:
-      Synchronize unmigrated apps: sessions, admin, messages, auth, staticfiles, contenttypes
       Apply all migrations: books
-    Synchronizing apps without migrations:
-      Creating tables...
-      Installing indexes...
     Running migrations:
+      Rendering model states... DONE
       Applying books.0003_auto... OK
 
 The command runs in two stages; first, it synchronizes unmigrated apps, and
@@ -194,26 +191,6 @@ restrict to a single app. Restricting to a single app (either in
 ``makemigrations`` or ``migrate``) is a best-efforts promise, and not
 a guarantee; any other apps that need to be used to get dependencies correct
 will be.
-
-.. _unmigrated-dependencies:
-
-Be aware, however, that unmigrated apps cannot depend on migrated apps, by the
-very nature of not having migrations. This means that it is not generally
-possible to have an unmigrated app have a ``ForeignKey`` or ``ManyToManyField``
-to a migrated app; some cases may work, but it will eventually fail.
-
-.. warning::
-
-    Even if things appear to work with unmigrated apps depending on migrated
-    apps, Django may not generate all the necessary foreign key constraints!
-
-This is particularly apparent if you use swappable models (e.g.
-``AUTH_USER_MODEL``), as every app that uses swappable models will need
-to have migrations if you're unlucky. As time goes on, more and more
-third-party apps will get migrations, but in the meantime you can either
-give them migrations yourself (using :setting:`MIGRATION_MODULES` to
-store those modules outside of the app's own module if you wish), or
-keep the app with your user model unmigrated.
 
 .. _migration-files:
 

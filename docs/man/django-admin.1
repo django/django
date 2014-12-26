@@ -74,21 +74,8 @@ The
 option forces the use of the standard Python interpreter even when IPython is
 installed.
 .TP
-.BI "sql [" "app_label ..." "]"
-Prints the CREATE TABLE SQL statements for the given app name(s).
-.TP
-.BI "sqlall [" "app_label ..." "]"
-Prints the CREATE TABLE, initial\-data and CREATE INDEX SQL statements for the
-given model module name(s).
-.TP
-.BI "sqlclear [" "app_label ..." "]"
-Prints the DROP TABLE SQL statements for the given app name(s).
-.TP
 .BI "sqlflush [" "app_label ..." "]"
 Prints the SQL statements that would be executed for the "flush" command.
-.TP
-.BI "sqlindexes [" "app_label ..." "]"
-Prints the CREATE INDEX SQL statements for the given model module name(s).
 .TP
 .BI "sqlsequencereset [" "app_label ..." "]"
 Prints the SQL statements for resetting PostgreSQL sequences for the
@@ -103,8 +90,7 @@ Creates a Django project directory structure for the given project name
 in the current directory or the optional destination.
 .TP
 .BI migrate
-Runs migrations for apps containing migrations, and just creates missing tables
-for apps without migrations.
+Runs migrations for all apps.
 .TP
 .BI "test [" "\-\-verbosity" "] [" "\-\-failfast" "] [" "app_label ..." "]"
 Runs the test suite for the specified applications, or the entire project if

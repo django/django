@@ -432,8 +432,7 @@ If you have an existing project that is using the database session
 backend, you don't have to do anything to accommodate this change.
 However, you may get a significant performance boost if you manually
 add the new index to the session table. The SQL that will add the
-index can be found by running the :djadmin:`sqlindexes` admin
-command::
+index can be found by running the ``sqlindexes`` admin command::
 
     python manage.py sqlindexes sessions
 

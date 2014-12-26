@@ -319,13 +319,6 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
-    def test_sqlclear_builtin_with_settings(self):
-        "fulldefault: django-admin builtin commands succeed if a setting file is provided"
-        args = ['sqlclear', '--settings=test_project.settings', 'complex_app']
-        out, err = self.run_django_admin(args)
-        self.assertNoOutput(err)
-        self.assertOutput(out, '-- App creates no tables in the database. Nothing to do.')
-
     def test_builtin_with_environment(self):
         "fulldefault: django-admin builtin commands succeed if the environment contains settings"
         args = ['check', 'admin_scripts']
