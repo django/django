@@ -13,19 +13,17 @@ object.
 See docs/topics/cache.txt for information on the public API.
 """
 from threading import local
-import warnings
 
 from django.conf import settings
 from django.core import signals
 from django.core.cache.backends.base import (
     InvalidCacheBackendError, CacheKeyWarning, BaseCache)
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.module_loading import import_string
 
 
 __all__ = [
-    'get_cache', 'cache', 'DEFAULT_CACHE_ALIAS', 'InvalidCacheBackendError',
+    'cache', 'DEFAULT_CACHE_ALIAS', 'InvalidCacheBackendError',
     'CacheKeyWarning', 'BaseCache',
 ]
 
@@ -33,33 +31,6 @@ DEFAULT_CACHE_ALIAS = 'default'
 
 if DEFAULT_CACHE_ALIAS not in settings.CACHES:
     raise ImproperlyConfigured("You must define a '%s' cache" % DEFAULT_CACHE_ALIAS)
-
-
-def get_cache(backend, **kwargs):
-    """
-    Function to create a cache backend dynamically. This is flexible by design
-    to allow different use cases:
-
-    To load a backend that is pre-defined in the settings::
-
-        cache = get_cache('default')
-
-    To create a backend with its dotted import path,
-    including arbitrary options::
-
-        cache = get_cache('django.core.cache.backends.memcached.MemcachedCache', **{
-            'LOCATION': '127.0.0.1:11211', 'TIMEOUT': 30,
-        })
-
-    """
-    warnings.warn("'get_cache' is deprecated in favor of 'caches'.",
-                  RemovedInDjango19Warning, stacklevel=2)
-    cache = _create_cache(backend, **kwargs)
-    # Some caches -- python-memcached in particular -- need to do a cleanup at the
-    # end of a request cycle. If not implemented in a particular backend
-    # cache.close is a no-op
-    signals.request_finished.connect(cache.close)
-    return cache
 
 
 def _create_cache(backend, **kwargs):
