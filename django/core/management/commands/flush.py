@@ -102,4 +102,4 @@ Are you sure you want to do this?
         all_models = []
         for app_config in apps.get_app_configs():
             all_models.extend(router.get_migratable_models(app_config, database, include_auto_created=True))
-        emit_post_migrate_signal(set(all_models), verbosity, interactive, database)
+        emit_post_migrate_signal(verbosity, interactive, database)
