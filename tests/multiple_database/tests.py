@@ -1778,8 +1778,7 @@ class MigrateTestCase(TestCase):
         self.assertGreater(count, 0)
 
         cts.delete()
-        management.call_command('migrate', verbosity=0, interactive=False,
-            load_initial_data=False, database='other')
+        management.call_command('migrate', verbosity=0, interactive=False, database='other')
         self.assertEqual(cts.count(), count)
 
     def test_migrate_to_other_database_with_router(self):
@@ -1788,8 +1787,7 @@ class MigrateTestCase(TestCase):
 
         cts.delete()
         with override_settings(DATABASE_ROUTERS=[SyncOnlyDefaultDatabaseRouter()]):
-            management.call_command('migrate', verbosity=0, interactive=False,
-                load_initial_data=False, database='other')
+            management.call_command('migrate', verbosity=0, interactive=False, database='other')
 
         self.assertEqual(cts.count(), 0)
 

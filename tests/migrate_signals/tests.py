@@ -66,7 +66,7 @@ class MigrateSignalTests(TestCase):
         signals.pre_migrate.connect(r, sender=APP_CONFIG)
         management.call_command('migrate', database=MIGRATE_DATABASE,
             verbosity=MIGRATE_VERBOSITY, interactive=MIGRATE_INTERACTIVE,
-            load_initial_data=False, stdout=six.StringIO())
+            stdout=six.StringIO())
 
         args = r.call_args
         self.assertEqual(r.call_counter, 1)
@@ -86,7 +86,7 @@ class MigrateSignalTests(TestCase):
         stdout = six.StringIO()
         management.call_command('migrate', database=MIGRATE_DATABASE,
             verbosity=MIGRATE_VERBOSITY, interactive=MIGRATE_INTERACTIVE,
-            load_initial_data=False, stdout=stdout)
+            stdout=stdout)
         args = r.call_args
         self.assertEqual(r.call_counter, 1)
         self.assertEqual(set(args), set(PRE_MIGRATE_ARGS))
