@@ -4,14 +4,12 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from importlib import import_module
 import time
-import traceback
 import warnings
 
 from django.apps import apps
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.color import no_style
-from django.core.management.sql import custom_sql_for_model, emit_post_migrate_signal, emit_pre_migrate_signal
+from django.core.management.sql import emit_post_migrate_signal, emit_pre_migrate_signal
 from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
@@ -47,7 +45,6 @@ class Command(BaseCommand):
 
         self.verbosity = options.get('verbosity')
         self.interactive = options.get('interactive')
-        self.show_traceback = options.get('traceback')
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
@@ -73,7 +70,7 @@ class Command(BaseCommand):
                 no_color=options.get('no_color'),
                 settings=options.get('settings'),
                 stdout=self.stdout,
-                traceback=self.show_traceback,
+                traceback=options.get('traceback'),
                 verbosity=self.verbosity,
             )
 
@@ -166,18 +163,6 @@ class Command(BaseCommand):
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
             self.sync_apps(connection, executor.loader.unmigrated_apps)
-
-        # The test runner requires us to flush after a syncdb but before migrations,
-        # so do that here.
-        if options.get("test_flush", False):
-            call_command(
-                'flush',
-                verbosity=max(self.verbosity - 1, 0),
-                interactive=False,
-                database=db,
-                reset_sequences=False,
-                inhibit_post_migrate=True,
-            )
 
         # Migrate!
         if self.verbosity >= 1:
@@ -296,43 +281,6 @@ class Command(BaseCommand):
                     self.stdout.write("    Running deferred SQL...\n")
                 for statement in deferred_sql:
                     cursor.execute(statement)
-        finally:
-            cursor.close()
-
-        # The connection may have been closed by a syncdb handler.
-        cursor = connection.cursor()
-        try:
-            # Install custom SQL for the app (but only if this
-            # is a model we've just created)
-            if self.verbosity >= 1:
-                self.stdout.write("  Installing custom SQL...\n")
-            for app_name, model_list in manifest.items():
-                for model in model_list:
-                    if model in created_models:
-                        custom_sql = custom_sql_for_model(model, no_style(), connection)
-                        if custom_sql:
-                            if self.verbosity >= 2:
-                                self.stdout.write(
-                                    "    Installing custom SQL for %s.%s model\n" %
-                                    (app_name, model._meta.object_name)
-                                )
-                            try:
-                                with transaction.atomic(using=connection.alias):
-                                    for sql in custom_sql:
-                                        cursor.execute(sql)
-                            except Exception as e:
-                                self.stderr.write(
-                                    "    Failed to install custom SQL for %s.%s model: %s\n"
-                                    % (app_name, model._meta.object_name, e)
-                                )
-                                if self.show_traceback:
-                                    traceback.print_exc()
-                        else:
-                            if self.verbosity >= 3:
-                                self.stdout.write(
-                                    "    No custom SQL for %s.%s model\n" %
-                                    (app_name, model._meta.object_name)
-                                )
         finally:
             cursor.close()
 

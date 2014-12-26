@@ -738,7 +738,7 @@ Management Commands
 * :djadmin:`collectstatic` command with symlink option is now supported on
   Windows NT 6 (Windows Vista and newer).
 
-* :ref:`initial-sql` now works better if the sqlparse_ Python library is
+* Initial SQL data now works better if the sqlparse_ Python library is
   installed.
 
   Note that it's deprecated in favor of the
@@ -1517,8 +1517,8 @@ Custom SQL location for models package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Previously, if models were organized in a package (``myapp/models/``) rather
-than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
-<initial-sql>` in ``myapp/models/sql/``. This bug has been fixed so that Django
+than simply ``myapp/models.py``, Django would look for initial SQL data in
+``myapp/models/sql/``. This bug has been fixed so that Django
 will search ``myapp/sql/`` as documented. After this issue was fixed, migrations
 were added which deprecates initial SQL data. Thus, while this change still
 exists, the deprecation is irrelevant as the entire feature will be removed in

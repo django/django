@@ -45,9 +45,6 @@ class Command(BaseCommand):
                 "Django to create, modify, and delete the table"
             )
             yield "# Feel free to rename the models, but don't rename db_table values or field names."
-            yield "#"
-            yield "# Also note: You'll have to insert the output of 'django-admin sqlcustom [app_label]'"
-            yield "# into your database."
             yield "from __future__ import unicode_literals"
             yield ''
             yield 'from %s import models' % self.db_module

@@ -1295,8 +1295,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     Take no action. If your database backend enforces referential
     integrity, this will cause an :exc:`~django.db.IntegrityError` unless
-    you manually add an SQL ``ON DELETE`` constraint to the database field
-    (perhaps using :ref:`initial sql<initial-sql>`).
+    you manually add an SQL ``ON DELETE`` constraint to the database field.
 
 .. attribute:: ForeignKey.swappable
 

@@ -233,7 +233,7 @@ class ManagementUtility(object):
             subcommand_cls = self.fetch_command(cwords[0])
             # special case: add the names of installed apps to options
             if cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
-                    'sqlcustom', 'sqlindexes', 'sqlmigrate', 'sqlsequencereset', 'test'):
+                    'sqlindexes', 'sqlmigrate', 'sqlsequencereset', 'test'):
                 try:
                     app_configs = apps.get_app_configs()
                     # Get the last part of the dotted path as the app name.
