@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 from importlib import import_module
-import itertools
 import time
 import traceback
 import warnings
@@ -163,17 +162,13 @@ class Command(BaseCommand):
                         % (targets[0][1], targets[0][0])
                     )
 
+        emit_pre_migrate_signal(self.verbosity, self.interactive, connection.alias)
+
         # Run the syncdb phase.
-        # If you ever manage to get rid of this, I owe you many, many drinks.
-        # Note that pre_migrate is called from inside here, as it needs
-        # the list of models about to be installed.
         if run_syncdb and executor.loader.unmigrated_apps:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
-            created_models = self.sync_apps(connection, executor.loader.unmigrated_apps)
-        else:
-            created_models = []
-            emit_pre_migrate_signal([], self.verbosity, self.interactive, connection.alias)
+            self.sync_apps(connection, executor.loader.unmigrated_apps)
 
         # The test runner requires us to flush after a syncdb but before migrations,
         # so do that here.
@@ -214,7 +209,7 @@ class Command(BaseCommand):
 
         # Send the post_migrate signal, so individual apps can do whatever they need
         # to do at this point.
-        emit_post_migrate_signal(created_models, self.verbosity, self.interactive, connection.alias)
+        emit_post_migrate_signal(self.verbosity, self.interactive, connection.alias)
 
     def migration_progress_callback(self, action, migration=None, fake=False):
         if self.verbosity >= 1:
@@ -278,9 +273,6 @@ class Command(BaseCommand):
                 (app_name, list(filter(model_installed, model_list)))
                 for app_name, model_list in all_models
             )
-
-            create_models = set(itertools.chain(*manifest.values()))
-            emit_pre_migrate_signal(create_models, self.verbosity, self.interactive, connection.alias)
 
             # Create the tables for each model
             if self.verbosity >= 1:

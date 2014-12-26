@@ -67,6 +67,3 @@ m2m_changed = ModelSignal(
 
 pre_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "using"])
 post_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "using"])
-
-pre_syncdb = Signal(providing_args=["app", "create_models", "verbosity", "interactive", "db"])
-post_syncdb = Signal(providing_args=["class", "app", "created_models", "verbosity", "interactive", "db"])
