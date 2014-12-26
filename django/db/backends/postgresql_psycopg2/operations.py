@@ -86,7 +86,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def no_limit_value(self):
         return None
 
-    def prepare_sql_script(self, sql, _allow_fallback=False):
+    def prepare_sql_script(self, sql):
         return [sql]
 
     def quote_name(self, name):

@@ -1,13 +1,12 @@
 import datetime
 import decimal
 from importlib import import_module
-import warnings
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db.backends import utils
 from django.utils import six, timezone
 from django.utils.dateparse import parse_duration
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 
 
@@ -255,7 +254,7 @@ class BaseDatabaseOperations(object):
         """
         return 'DEFAULT'
 
-    def prepare_sql_script(self, sql, _allow_fallback=False):
+    def prepare_sql_script(self, sql):
         """
         Takes a SQL script that may contain multiple lines and returns a list
         of statements to feed to successive cursor.execute() calls.
@@ -264,21 +263,13 @@ class BaseDatabaseOperations(object):
         cursor.execute() call and PEP 249 doesn't talk about this use case,
         the default implementation is conservative.
         """
-        # Remove _allow_fallback and keep only 'return ...' in Django 1.9.
         try:
-            # This import must stay inside the method because it's optional.
             import sqlparse
         except ImportError:
-            if _allow_fallback:
-                # Without sqlparse, fall back to the legacy (and buggy) logic.
-                warnings.warn(
-                    "Providing initial SQL data on a %s database will require "
-                    "sqlparse in Django 1.9." % self.connection.vendor,
-                    RemovedInDjango19Warning)
-                from django.core.management.sql import _split_statements
-                return _split_statements(sql)
-            else:
-                raise
+            raise ImproperlyConfigured(
+                "sqlparse is required if you don't split your SQL "
+                "statements manually."
+            )
         else:
             return [sqlparse.format(statement, strip_comments=True)
                     for statement in sqlparse.split(sql) if statement]

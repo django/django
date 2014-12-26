@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import re
-
 from django.apps import apps
 from django.core.management.base import CommandError
 from django.db import models, router
@@ -166,22 +164,6 @@ def sql_all(app_config, style, connection):
         sql_create(app_config, style, connection) +
         sql_indexes(app_config, style, connection)
     )
-
-
-def _split_statements(content):
-    # Private API only called from code that emits a RemovedInDjango19Warning.
-    comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
-    statements = []
-    statement = []
-    for line in content.split("\n"):
-        cleaned_line = comment_re.sub(r"\1", line).strip()
-        if not cleaned_line:
-            continue
-        statement.append(cleaned_line)
-        if cleaned_line.endswith(";"):
-            statements.append(" ".join(statement))
-            statement = []
-    return statements
 
 
 def emit_pre_migrate_signal(verbosity, interactive, db):
