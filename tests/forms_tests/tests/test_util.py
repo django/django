@@ -67,8 +67,8 @@ class FormsUtilTestCase(TestCase):
 
         # Can take a dict.
         self.assertHTMLEqual(
-            str(ErrorList(ValidationError({'error_1': "Error one.", 'error_2': "Error two."}).messages)),
-            '<ul class="errorlist"><li>Error one.</li><li>Error two.</li></ul>'
+            str(ErrorList(sorted(ValidationError({'error_1': "1. Error one.", 'error_2': "2. Error two."}).messages))),
+            '<ul class="errorlist"><li>1. Error one.</li><li>2. Error two.</li></ul>'
         )
 
         # Can take a mixture in a list.
