@@ -395,6 +395,11 @@ class TemplateTagLoading(SimpleTestCase):
             self.assertIn('ImportError', e.args[0])
             self.assertIn('Xtemplate', e.args[0])
 
+    def test_fully_qualified_path(self):
+        ttext = "{% load template_tests.templatetags.subpackage.echo %}"
+        settings.INSTALLED_APPS = []
+        template.Template(ttext)
+
     def test_load_error_egg(self):
         ttext = "{% load broken_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
