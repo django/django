@@ -1,9 +1,0 @@
-[
-    {
-        "pk": "10",
-        "model": "fixtures_model_package.book",
-        "fields": {
-            "name": "Achieving self-awareness of Python programs"
-        }
-    }
-]

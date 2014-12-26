@@ -984,18 +984,6 @@ The most straightforward way of creating a fixture is to use the
 already have some data in your database. See the :djadmin:`dumpdata
 documentation<dumpdata>` for more details.
 
-.. note::
-
-    If you've ever run :djadmin:`manage.py migrate<migrate>`, you've
-    already used a fixture without even knowing it! When you call
-    :djadmin:`migrate` in the database for the first time, Django
-    installs a fixture called ``initial_data``. This gives you a way
-    of populating a new database with any initial data, such as a
-    default set of categories.
-
-    Fixtures with other names can always be installed manually using
-    the :djadmin:`manage.py loaddata<loaddata>` command.
-
 .. admonition:: Initial SQL data and testing
 
     Django provides a second way to insert initial data into models --

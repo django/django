@@ -341,12 +341,6 @@ prompts.
 The :djadminopt:`--database` option may be used to specify the database
 to flush.
 
-``--no-initial-data``
-~~~~~~~~~~~~~~~~~~~~~
-
-Use ``--no-initial-data`` to avoid loading the initial_data fixture.
-
-
 inspectdb
 ---------
 

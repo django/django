@@ -3,11 +3,10 @@ from __future__ import unicode_literals
 import warnings
 
 from django.core import management
-from django.db import transaction
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase
 from django.utils.six import StringIO
 
-from .models import Article, Book
+from .models import Article
 
 
 class SampleTestCase(TestCase):
@@ -26,51 +25,7 @@ class SampleTestCase(TestCase):
         )
 
 
-class TestNoInitialDataLoading(TransactionTestCase):
-
-    available_apps = ['fixtures_model_package']
-
-    def test_migrate(self):
-        with transaction.atomic():
-            Book.objects.all().delete()
-
-            management.call_command(
-                'migrate',
-                verbosity=0,
-                load_initial_data=False
-            )
-            self.assertQuerysetEqual(Book.objects.all(), [])
-
-    def test_flush(self):
-        # Test presence of fixture (flush called by TransactionTestCase)
-        self.assertQuerysetEqual(
-            Book.objects.all(), [
-                'Achieving self-awareness of Python programs'
-            ],
-            lambda a: a.name
-        )
-
-        with transaction.atomic():
-            management.call_command(
-                'flush',
-                verbosity=0,
-                interactive=False,
-                load_initial_data=False
-            )
-            self.assertQuerysetEqual(Book.objects.all(), [])
-
-
 class FixtureTestCase(TestCase):
-    def test_initial_data(self):
-        "Fixtures can load initial data into models defined in packages"
-        # migrate introduces 1 initial data object from initial_data.json
-        # this behavior is deprecated and will be removed in Django 1.9
-        self.assertQuerysetEqual(
-            Book.objects.all(), [
-                'Achieving self-awareness of Python programs'
-            ],
-            lambda a: a.name
-        )
 
     def test_loaddata(self):
         "Fixtures can load data into models defined in packages"
