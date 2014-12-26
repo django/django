@@ -35,8 +35,6 @@ class Command(BaseCommand):
         )
         parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.')
-        parser.add_argument('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
-            help='Tells Django not to load any initial data after database synchronization.')
         parser.add_argument('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
                 'Defaults to the "default" database.')
@@ -50,7 +48,6 @@ class Command(BaseCommand):
         self.verbosity = options.get('verbosity')
         self.interactive = options.get('interactive')
         self.show_traceback = options.get('traceback')
-        self.load_initial_data = options.get('load_initial_data')
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
@@ -338,14 +335,5 @@ class Command(BaseCommand):
                                 )
         finally:
             cursor.close()
-
-        # Load initial_data fixtures (unless that has been disabled)
-        if self.load_initial_data:
-            for app_label in app_labels:
-                call_command(
-                    'loaddata', 'initial_data', verbosity=self.verbosity,
-                    database=connection.alias, app_label=app_label,
-                    hide_empty=True,
-                )
 
         return created_models

@@ -76,21 +76,6 @@ from the fixture and re-loaded into the database. Note this means that if you
 change one of the rows created by a fixture and then run :djadmin:`loaddata`
 again, you'll wipe out any changes you've made.
 
-Automatically loading initial data fixtures
--------------------------------------------
-
-.. deprecated:: 1.7
-
-    If an application uses migrations, there is no automatic loading of
-    fixtures. Since migrations will be required for applications in Django 1.9,
-    this behavior is considered deprecated. If you want to load initial data
-    for an app, consider doing it in a :ref:`data migration <data-migrations>`.
-
-If you create a fixture named ``initial_data.[xml/yaml/json]``, that fixture will
-be loaded every time you run :djadmin:`migrate`. This is extremely convenient,
-but be careful: remember that the data will be refreshed *every time* you run
-:djadmin:`migrate`. So don't use ``initial_data`` for data you'll want to edit.
-
 Where Django finds fixture files
 --------------------------------
 

@@ -260,9 +260,6 @@ The initial serialization is usually very quick, but if you wish to exclude
 some apps from this process (and speed up test runs slightly), you may add
 those apps to :setting:`TEST_NON_SERIALIZED_APPS`.
 
-Apps without migrations are not affected; ``initial_data`` fixtures are
-reloaded as usual.
-
 Other test conditions
 ---------------------
 
@@ -288,8 +285,6 @@ prepares itself. You can control the level of detail of these messages with the
     Creating test database...
     Creating table myapp_animal
     Creating table myapp_mineral
-    Loading 'initial_data' fixtures...
-    No fixtures found.
 
 This tells you that the test runner is creating a test database, as described
 in the previous section.
