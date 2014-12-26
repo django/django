@@ -17,9 +17,7 @@ import warnings
 from django.conf import settings
 from django.core import management
 from django.core import signals
-from django.core.cache import (cache, caches, CacheKeyWarning,
-    InvalidCacheBackendError, DEFAULT_CACHE_ALIAS, get_cache,
-    close_caches)
+from django.core.cache import cache, caches, CacheKeyWarning, DEFAULT_CACHE_ALIAS
 from django.db import connection, connections, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
@@ -30,14 +28,13 @@ from django.template import engines
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (TestCase, TransactionTestCase, RequestFactory,
-    ignore_warnings, override_settings)
+    override_settings)
 from django.test.signals import setting_changed
 from django.utils import six
 from django.utils import timezone
 from django.utils import translation
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
 
@@ -1221,39 +1218,12 @@ class CustomCacheKeyValidationTests(TestCase):
         }
     }
 )
-class GetCacheTests(TestCase):
-
-    @ignore_warnings(category=RemovedInDjango19Warning)
-    def test_simple(self):
-        self.assertIsInstance(
-            caches[DEFAULT_CACHE_ALIAS],
-            get_cache('default').__class__
-        )
-
-        cache = get_cache(
-            'django.core.cache.backends.dummy.DummyCache',
-            **{'TIMEOUT': 120}
-        )
-        self.assertEqual(cache.default_timeout, 120)
-
-        self.assertRaises(InvalidCacheBackendError, get_cache, 'does_not_exist')
+class CacheClosingTests(TestCase):
 
     def test_close(self):
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
-
-    @ignore_warnings(category=RemovedInDjango19Warning)
-    def test_close_deprecated(self):
-        cache = get_cache('cache.closeable_cache.CacheClass')
-        self.assertFalse(cache.closed)
-        # Ensure that we don't close the global cache instances.
-        signals.request_finished.disconnect(close_caches)
-        try:
-            signals.request_finished.send(self.__class__)
-            self.assertTrue(cache.closed)
-        finally:
-            signals.request_finished.connect(close_caches)
 
 
 DEFAULT_MEMORY_CACHES_SETTINGS = {

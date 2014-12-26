@@ -747,21 +747,6 @@ Accessing the cache
 
     This object is equivalent to ``caches['default']``.
 
-.. function:: django.core.cache.get_cache(backend, **kwargs)
-
-    .. deprecated:: 1.7
-        This function has been deprecated in favor of
-        :data:`~django.core.cache.caches`.
-
-    Before Django 1.7 this function was the canonical way to obtain a cache
-    instance. It could also be used to create a new cache instance with a
-    different configuration.
-
-        >>> from django.core.cache import get_cache
-        >>> get_cache('default')
-        >>> get_cache('django.core.cache.backends.memcached.MemcachedCache', LOCATION='127.0.0.2')
-        >>> get_cache('default', TIMEOUT=300)
-
 Basic usage
 -----------
 

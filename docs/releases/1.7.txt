@@ -544,7 +544,7 @@ Cache
 
 * Access to caches configured in :setting:`CACHES` is now available via
   :data:`django.core.cache.caches`. This dict-like object provides a different
-  instance per thread. It supersedes :func:`django.core.cache.get_cache` which
+  instance per thread. It supersedes ``django.core.cache.get_cache()`` which
   is now deprecated.
 
 * If you instantiate cache backends directly, be aware that they aren't
@@ -1468,7 +1468,7 @@ Features deprecated in 1.7
 ``django.core.cache.get_cache``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:func:`django.core.cache.get_cache` has been supplanted by
+``django.core.cache.get_cache`` has been supplanted by
 :data:`django.core.cache.caches`.
 
 ``django.utils.dictconfig``/``django.utils.importlib``
