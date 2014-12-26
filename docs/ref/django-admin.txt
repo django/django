@@ -751,10 +751,6 @@ The behavior of this command changes depending on the arguments provided:
   migrated past the named migration. Use the name ``zero`` to unapply all
   migrations for an app.
 
-Unlike ``syncdb``, this command does not prompt you to create a superuser if
-one doesn't exist (assuming you are using :mod:`django.contrib.auth`). Use
-:djadmin:`createsuperuser` to do that if you wish.
-
 The :djadminopt:`--database` option can be used to specify the database to
 migrate.
 
@@ -1263,19 +1259,6 @@ Please also see the :ref:`rendering warning <render_warning>` as mentioned
 for :djadmin:`startapp`.
 
 .. _`template source`: https://github.com/django/django/tree/master/django/conf/project_template/
-
-syncdb
-------
-
-.. django-admin:: syncdb
-
-.. deprecated:: 1.7
-
-    This command has been deprecated in favor of the :djadmin:`migrate`
-    command, which performs both the old behavior as well as executing
-    migrations. It is now just an alias to that command.
-
-Alias for :djadmin:`migrate`.
 
 test <app or test identifier>
 -----------------------------

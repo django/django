@@ -24,7 +24,7 @@ class BaseDatabaseSchemaEditor(object):
     It is intended to eventually completely replace DatabaseCreation.
 
     This class should be used by creating an instance for each set of schema
-    changes (e.g. a syncdb run, a migration file), and by first calling start(),
+    changes (e.g. a migration file), and by first calling start(),
     then the relevant actions, and then commit(). This is necessary to allow
     things like circular foreign key references - FKs will only be created once
     commit() is called.
