@@ -1386,7 +1386,6 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "Checks the entire Django project for potential problems.")
-        self.assertEqual(out.count('optional arguments'), 1)
 
     def test_color_style(self):
         style = color.no_style()

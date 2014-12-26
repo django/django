@@ -1,15 +1,10 @@
 from __future__ import unicode_literals
 
-import io
-import os
 import re
-import warnings
 
 from django.apps import apps
-from django.conf import settings
 from django.core.management.base import CommandError
 from django.db import models, router
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.version import get_docs_version
 
 
@@ -140,21 +135,6 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
     return statements
 
 
-def sql_custom(app_config, style, connection):
-    "Returns a list of the custom table modifying SQL statements for the given app."
-
-    check_for_migrations(app_config, connection)
-
-    output = []
-
-    app_models = router.get_migratable_models(app_config, connection.alias)
-
-    for model in app_models:
-        output.extend(custom_sql_for_model(model, style, connection))
-
-    return output
-
-
 def sql_indexes(app_config, style, connection):
     "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
 
@@ -184,7 +164,6 @@ def sql_all(app_config, style, connection):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
     return (
         sql_create(app_config, style, connection) +
-        sql_custom(app_config, style, connection) +
         sql_indexes(app_config, style, connection)
     )
 
@@ -203,43 +182,6 @@ def _split_statements(content):
             statements.append(" ".join(statement))
             statement = []
     return statements
-
-
-def custom_sql_for_model(model, style, connection):
-    opts = model._meta
-    app_dirs = []
-    app_dir = apps.get_app_config(model._meta.app_label).path
-    app_dirs.append(os.path.normpath(os.path.join(app_dir, 'sql')))
-
-    # Deprecated location -- remove in Django 1.9
-    old_app_dir = os.path.normpath(os.path.join(app_dir, 'models/sql'))
-    if os.path.exists(old_app_dir):
-        warnings.warn("Custom SQL location '<app_label>/models/sql' is "
-                      "deprecated, use '<app_label>/sql' instead.",
-                      RemovedInDjango19Warning)
-        app_dirs.append(old_app_dir)
-
-    output = []
-
-    # Post-creation SQL should come before any initial SQL data is loaded.
-    # However, this should not be done for models that are unmanaged or
-    # for fields that are part of a parent model (via model inheritance).
-    if opts.managed:
-        post_sql_fields = [f for f in opts.local_fields if hasattr(f, 'post_create_sql')]
-        for f in post_sql_fields:
-            output.extend(f.post_create_sql(style, model._meta.db_table))
-
-    # Find custom SQL, if it's available.
-    backend_name = connection.settings_dict['ENGINE'].split('.')[-1]
-    sql_files = []
-    for app_dir in app_dirs:
-        sql_files.append(os.path.join(app_dir, "%s.%s.sql" % (opts.model_name, backend_name)))
-        sql_files.append(os.path.join(app_dir, "%s.sql" % opts.model_name))
-    for sql_file in sql_files:
-        if os.path.exists(sql_file):
-            with io.open(sql_file, encoding=settings.FILE_CHARSET) as fp:
-                output.extend(connection.ops.prepare_sql_script(fp.read(), _allow_fallback=True))
-    return output
 
 
 def emit_pre_migrate_signal(verbosity, interactive, db):

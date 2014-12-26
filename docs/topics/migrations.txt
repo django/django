@@ -140,9 +140,7 @@ database to make sure they work as expected::
       Apply all migrations: books
     Synchronizing apps without migrations:
       Creating tables...
-      Installing custom SQL...
       Installing indexes...
-    Installed 0 object(s) from 0 fixture(s)
     Running migrations:
       Applying books.0003_auto... OK
 

@@ -989,9 +989,6 @@ sqlall <app_label app_label ...>
 
 Prints the CREATE TABLE and initial-data SQL statements for the given app name(s).
 
-Refer to the description of :djadmin:`sqlcustom` for an explanation of how to
-specify initial data.
-
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
@@ -1008,30 +1005,6 @@ sqlclear <app_label app_label ...>
 .. django-admin:: sqlclear
 
 Prints the DROP TABLE SQL statements for the given app name(s).
-
-The :djadminopt:`--database` option can be used to specify the database for
-which to print the SQL.
-
-sqlcustom <app_label app_label ...>
------------------------------------
-
-.. django-admin:: sqlcustom
-
-Prints the custom SQL statements for the given app name(s).
-
-For each model in each specified app, this command looks for the file
-``<app_label>/sql/<modelname>.sql``, where ``<app_label>`` is the given app
-name and ``<modelname>`` is the model's name in lowercase. For example, if you
-have an app ``news`` that includes a ``Story`` model, ``sqlcustom`` will
-attempt to read a file ``news/sql/story.sql`` and append it to the output of
-this command.
-
-Each of the SQL files, if given, is expected to contain valid SQL. The SQL
-files are piped directly into the database after all of the models'
-table-creation statements have been executed. Use this SQL hook to make any
-table modifications, or insert any SQL functions into the database.
-
-Note that the order in which the SQL files are processed is undefined.
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
