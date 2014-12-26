@@ -585,7 +585,6 @@ Springmeyer
 sql
 sqlall
 sqlclear
-sqlcustom
 sqldropindexes
 sqlflush
 sqlindexes

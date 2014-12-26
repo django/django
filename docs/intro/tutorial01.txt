@@ -543,9 +543,7 @@ Now, run :djadmin:`migrate` again to create those model tables in your database:
       Apply all migrations: polls
     Synchronizing apps without migrations:
       Creating tables...
-      Installing custom SQL...
       Installing indexes...
-    Installed 0 object(s) from 0 fixture(s)
     Running migrations:
       Applying polls.0001_initial... OK
 
