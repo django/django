@@ -85,7 +85,7 @@ def call_command(name, *args, **options):
     Some examples:
         call_command('syncdb')
         call_command('shell', plain=True)
-        call_command('sqlall', 'myapp')
+        call_command('sqlmigrate', 'myapp')
     """
     # Load the command object.
     try:
@@ -240,7 +240,7 @@ class ManagementUtility(object):
                 options.extend((k, 1) for k in FASTCGI_OPTIONS)
             # special case: add the names of installed apps to options
             elif cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
-                    'sqlcustom', 'sqlindexes', 'sqlsequencereset', 'test'):
+                    'sqlcustom', 'sqlindexes', 'sqlmigrate', 'sqlsequencereset', 'test'):
                 try:
                     app_configs = apps.get_app_configs()
                     # Get the last part of the dotted path as the app name.
