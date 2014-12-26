@@ -2515,6 +2515,17 @@ Templates can override or extend base admin templates as described in
     Path to a custom template that will be used by the admin site password
     change done view.
 
+``AdminSite`` methods
+---------------------
+
+.. method:: AdminSite.has_permission(request)
+
+    Returns ``True`` if the user for the given ``HttpRequest`` has permission
+    to view at least one page in the admin site. Defaults to requiring both
+    :attr:`User.is_active <django.contrib.auth.models.User.is_active>` and
+    :attr:`User.is_staff <django.contrib.auth.models.User.is_staff>` to be
+    ``True``.
+
 Hooking ``AdminSite`` instances into your URLconf
 -------------------------------------------------
 
