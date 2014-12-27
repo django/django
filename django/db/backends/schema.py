@@ -254,6 +254,13 @@ class BaseDatabaseSchemaEditor(object):
             "table": self.quote_name(model._meta.db_table),
             "definition": ", ".join(column_sqls)
         }
+
+        # Add tablespace statement to ddl if needed
+        if model._meta.db_tablespace:
+            tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
+            if tablespace_sql:
+                sql += ' ' + tablespace_sql
+
         self.execute(sql, params)
 
         # Add any field index and index_together's (deferred as SQLite3 _remake_table needs it)
