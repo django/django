@@ -111,8 +111,8 @@ class CreateDefaultSiteTests(TestCase):
         old_routers = router.routers
         router.routers = [JustOtherRouter()]
         try:
-            create_default_site(self.app_config, db='default', verbosity=0)
-            create_default_site(self.app_config, db='other', verbosity=0)
+            create_default_site(self.app_config, using='default', verbosity=0)
+            create_default_site(self.app_config, using='other', verbosity=0)
             self.assertFalse(Site.objects.using('default').exists())
             self.assertTrue(Site.objects.using('other').exists())
         finally:
