@@ -10,7 +10,7 @@ from django.db.transaction import atomic
 from .models import (Author, AuthorWithDefaultHeight, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough,
-    AuthorWithEvenLongerName, BookWeak, Note)
+    AuthorWithEvenLongerName, BookWeak, Note, Tablespace)
 
 
 class SchemaTests(TransactionTestCase):
@@ -28,7 +28,7 @@ class SchemaTests(TransactionTestCase):
         Author, AuthorWithM2M, Book, BookWithLongName, BookWithSlug,
         BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest,
         Thing, TagThrough, BookWithM2MThrough, AuthorWithEvenLongerName,
-        BookWeak,
+        BookWeak, Tablespace,
     ]
 
     # Utility functions
@@ -1204,3 +1204,47 @@ class SchemaTests(TransactionTestCase):
             cursor.execute("SELECT surname FROM schema_author;")
             item = cursor.fetchall()[0]
             self.assertEqual(item[0], None if connection.features.interprets_empty_strings_as_nulls else '')
+
+    @unittest.skipUnless(connection.features.supports_tablespaces, "No tablespace support")
+    def test_table_is_defined_with_tablespace(self):
+        """
+        Regression test for #24051.
+        Only affects databases that support table spaces
+        """
+
+        tablespace_name = Tablespace._meta.db_tablespace
+        table_name = Tablespace._meta.db_table
+
+        self.assertEqual(tablespace_name,
+                         "django_test_d_01",
+                         "Tablespace model broken")
+
+        # Create the initial tables
+        with connection.schema_editor() as editor:
+            editor.create_model(Tablespace)
+
+        with connection.cursor() as cursor:
+            if connection.vendor == 'postgresql':
+                cursor.execute("""
+                               SELECT tablename
+                               FROM pg_tables
+                               WHERE
+                               UPPER(tablename) = UPPER('%s')
+                               AND UPPER(tablespace) = UPPER('%s')
+                               """ % (table_name,
+                                      tablespace_name))
+            # Oracle
+            else:
+                cursor.execute("""
+                               SELECT table_name
+                               FROM all_tables
+                               WHERE
+                               UPPER(table_name) = UPPER('%s')
+                               AND UPPER(tablespace_name) = UPPER('%s')
+                               """ % (table_name,
+                                      tablespace_name))
+
+            item = cursor.fetchall()[0]
+            self.assertEqual(item[0].upper(),
+                             table_name.upper(),
+                             "Table was not created in the correct tablespace")

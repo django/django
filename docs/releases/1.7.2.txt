@@ -170,3 +170,7 @@ Bugfixes
 
 * Enabled the ``sqlsequencereset`` command on apps with migrations
   (:ticket:`24054`).
+
+* Fixed issue where new models were not being created in correct tablespace
+  if the tablespace was defined in the model or settings. (:ticket:`24051`).
+

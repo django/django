@@ -175,3 +175,9 @@ class Thing(models.Model):
 
 class Note(models.Model):
     info = models.TextField()
+
+class Tablespace(models.Model):
+    name = models.TextField()
+
+    class Meta:
+        db_tablespace = 'django_test_d_01'
