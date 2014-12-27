@@ -60,6 +60,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # do something raises complain; anything that tries
     # to rollback or undo something raises ignore.
     _cursor = complain
+    ensure_connection = complain
     _commit = complain
     _rollback = ignore
     _close = ignore
