@@ -611,3 +611,11 @@ class RequestFactoryTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, echoed_request_line)
+
+    def test_quoting_path(self):
+        request = self.request_factory.get('/needsquoting#')
+        response = get_view(request)
+
+        self.assertEqual(request.path_info, '/needsquoting#')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'This is a test')
