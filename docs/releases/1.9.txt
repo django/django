@@ -33,7 +33,7 @@ Minor features
 :mod:`django.contrib.admin`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Admin views now have ``model_admin`` or ``admin_site`` attributes.
 
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -107,6 +107,12 @@ Forms
 ^^^^^
 
 * ...
+
+Generic Views
+^^^^^^^^^^^^^
+
+* Class based views generated using ``as_view()`` now have ``view_class``
+  and ``view_initkwargs`` attributes.
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^

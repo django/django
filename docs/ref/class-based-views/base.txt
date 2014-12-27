@@ -65,6 +65,11 @@ View
 
             response = MyView.as_view()(request)
 
+        .. versionadded:: 1.9
+
+        The returned view has ``view_class`` and ``view_initkwargs``
+        attributes.
+
     .. method:: dispatch(request, *args, **kwargs)
 
         The ``view`` part of the view -- the method that accepts a ``request``
