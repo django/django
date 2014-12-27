@@ -170,3 +170,5 @@ Bugfixes
 
 * Enabled the ``sqlsequencereset`` command on apps with migrations
   (:ticket:`24054`).
+
+* Added tablespace SQL to apps with migrations (:ticket:`24051`).
