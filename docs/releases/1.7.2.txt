@@ -172,3 +172,6 @@ Bugfixes
   (:ticket:`24054`).
 
 * Added tablespace SQL to apps with migrations (:ticket:`24051`).
+
+* Corrected ``contrib.sites`` default site creation in a multiple database
+  setup (:ticket:`24000`).
