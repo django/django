@@ -25,7 +25,7 @@ from django.core.management import BaseCommand, CommandError, call_command, colo
 from django.utils.encoding import force_text
 from django.utils._os import npath, upath
 from django.utils.six import StringIO
-from django.test import LiveServerTestCase, TestCase, override_settings
+from django.test import LiveServerTestCase, TestCase, mock, override_settings
 from django.test.runner import DiscoverRunner
 
 
@@ -1580,6 +1580,18 @@ class CommandTypes(AdminScriptTestCase):
 
         with self.assertRaises(SystemExit):
             command.run_from_argv(['', ''])
+
+    def test_run_from_argv_closes_connections(self):
+        """
+        A command called from the command line should close connections after
+        being executed (#21255).
+        """
+        command = BaseCommand(stderr=StringIO())
+        command.handle = lambda *args, **kwargs: args
+        with mock.patch('django.core.management.base.connections') as mock_connections:
+            command.run_from_argv(['', ''])
+        # Test connections have been closed
+        self.assertTrue(mock_connections.close_all.called)
 
     def test_noargs(self):
         "NoArg Commands can be executed"

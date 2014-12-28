@@ -252,6 +252,14 @@ class ConnectionHandler(object):
     def all(self):
         return [self[alias] for alias in self]
 
+    def close_all(self):
+        for alias in self:
+            try:
+                connection = getattr(self._connections, alias)
+            except AttributeError:
+                continue
+            connection.close()
+
 
 class ConnectionRouter(object):
     def __init__(self, routers=None):
