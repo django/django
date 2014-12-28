@@ -16,6 +16,18 @@ class Coalesce(Func):
             raise ValueError('Coalesce must take at least two expressions')
         super(Coalesce, self).__init__(*expressions, **extra)
 
+    def as_oracle(self, compiler, connection):
+        # we can't mix TextField (NCLOB) and CharField (NVARCHAR), so convert
+        # all fields to NCLOB when we expect NCLOB
+        if self.output_field.get_internal_type() == 'TextField':
+            class ToNCLOB(Func):
+                function = 'TO_NCLOB'
+
+            expressions = [
+                ToNCLOB(expression) for expression in self.get_source_expressions()]
+            self.set_source_expressions(expressions)
+        return super(Coalesce, self).as_sql(compiler, connection)
+
 
 class ConcatPair(Func):
     """
