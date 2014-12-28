@@ -50,7 +50,7 @@ Lookup registration can also be done using a decorator pattern::
 
     from django.db.models.fields import Field
 
-    @Field.registerLookup
+    @Field.register_lookup
     class NotEqualLookup(Lookup):
         # ...
 
