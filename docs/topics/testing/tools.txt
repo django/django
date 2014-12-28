@@ -880,7 +880,8 @@ attribute::
     from django.test.client import Client
 
     class MyTestClient(Client):
-        # Specialized methods for your environment...
+        # Specialized methods for your environment
+        ...
 
     class MyTest(TestCase):
         client_class = MyTestClient
