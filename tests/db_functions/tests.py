@@ -56,6 +56,18 @@ class FunctionTests(TestCase):
             lambda a: a.headline
         )
 
+        # mixed Text and Char wrapped
+        article = Article.objects.annotate(
+            headline=Coalesce(Lower('summary'), Lower('text'), output_field=TextField()),
+        )
+
+        self.assertQuerysetEqual(
+            article.order_by('title'), [
+                lorem_ipsum.lower(),
+            ],
+            lambda a: a.headline
+        )
+
     def test_concat(self):
         Author.objects.create(name='Jayden')
         Author.objects.create(name='John Smith', alias='smithj', goes_by='John')
