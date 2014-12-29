@@ -33,15 +33,16 @@ def check_programs(*programs):
 
 def gettext_popen_wrapper(args, os_err_exc_type=CommandError):
     """
-    Makes sure text obtained from stdout of gettext utilities contains valid
-    Unicode on Windows.
+    Makes sure text obtained from stdout of gettext utilities is Unicode.
     """
     stdout, stderr, status_code = popen_wrapper(args, os_err_exc_type=os_err_exc_type)
-    if os.name == 'nt':
+    if os.name == 'nt' and six.PY3:
         # This looks weird because it's undoing what subprocess.Popen(universal_newlines=True).communicate()
         # does when capturing PO files contents from stdout of gettext command line programs. See ticket #23271
-        # for details.
+        # for details. No need to do anything on Python 2 because it's already a UTF-8-encoded byte-string there
         stdout = stdout.encode(locale.getpreferredencoding(False)).decode('utf-8')
+    if six.PY2:
+        stdout = stdout.decode('utf-8')
     return stdout, stderr, status_code
 
 
@@ -142,8 +143,6 @@ class TranslatableFile(object):
                 # Print warnings
                 command.stdout.write(errors)
         if msgs:
-            if six.PY2:
-                msgs = msgs.decode('utf-8')
             # Write/append messages to pot file
             potfile = os.path.join(self.locale_dir, '%s.pot' % str(domain))
             if is_templatized:
@@ -350,8 +349,6 @@ class Command(BaseCommand):
                 continue
             args = ['msguniq'] + self.msguniq_options + [potfile]
             msgs, errors, status = gettext_popen_wrapper(args)
-            if six.PY2:
-                msgs = msgs.decode('utf-8')
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
@@ -442,8 +439,6 @@ class Command(BaseCommand):
         if os.path.exists(pofile):
             args = ['msgmerge'] + self.msgmerge_options + [pofile, potfile]
             msgs, errors, status = gettext_popen_wrapper(args)
-            if six.PY2:
-                msgs = msgs.decode('utf-8')
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
