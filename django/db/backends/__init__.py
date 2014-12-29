@@ -39,6 +39,12 @@ class BaseDatabaseWrapper(object):
     """
     Represents a database connection.
     """
+    # Mapping of Field objects to their column types.
+    data_types = {}
+    # Mapping of Field objects to their SQL suffix such as AUTOINCREMENT.
+    data_types_suffix = {}
+    # Mapping of Field objects to their SQL for CHECK constraints.
+    data_type_check_constraints = {}
     ops = None
     vendor = 'unknown'
     SchemaEditorClass = None

@@ -26,10 +26,6 @@ class BaseDatabaseCreation(object):
     Fields, the SQL used to create and destroy tables, and the creation and
     destruction of test databases.
     """
-    data_types = {}
-    data_types_suffix = {}
-    data_type_check_constraints = {}
-
     def __init__(self, connection):
         self.connection = connection
 
