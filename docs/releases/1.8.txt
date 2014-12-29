@@ -272,8 +272,9 @@ File Storage
 ^^^^^^^^^^^^
 
 * :class:`~django.core.files.storage.Storage` and
-  :class:`~django.core.files.storage.FileSystemStorage` now have ``move``
-  and ``copy`` methods
+  :class:`~django.core.files.storage.FileSystemStorage` now have
+  :meth:`~django.core.files.storage.Storage.move()` and
+  :meth:`~django.core.files.storage.Storage.copy()` methods
 
 File Uploads
 ^^^^^^^^^^^^
