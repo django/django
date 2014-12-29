@@ -100,9 +100,9 @@ def render_to_string(template_name, context=None,
         # Some deprecated arguments were passed - use the legacy code path
         for engine in _engine_list(using):
             try:
-                # This is required for deprecating arguments specific to Django
-                # templates. Simply return engine.render_to_string(template_name,
-                # context) in Django 2.0.
+                # This is required for deprecating properly arguments specific
+                # to Django templates. Remove Engine.render_to_string() at the
+                # same time as this code path in Django 2.0.
                 if isinstance(engine, DjangoTemplates):
                     # Hack -- use the internal Engine instance of DjangoTemplates.
                     return engine.engine.render_to_string(
