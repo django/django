@@ -547,6 +547,10 @@ class SchemaTests(TransactionTestCase):
                 strict=True,
             )
 
+        # This will fail if DROP DEFAULT is inadvertently executed on this
+        # field which drops the id sequence, at least on PostgreSQL.
+        Author.objects.create(name='Foo')
+
     def test_rename(self):
         """
         Tests simple altering of fields

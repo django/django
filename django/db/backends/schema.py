@@ -550,34 +550,31 @@ class BaseDatabaseSchemaEditor(object):
         # Default change?
         old_default = self.effective_default(old_field)
         new_default = self.effective_default(new_field)
-        if old_default != new_default and not self.skip_default(new_field):
-            if new_default is None:
+        needs_database_default = (
+            old_default != new_default and
+            new_default is not None and
+            not self.skip_default(new_field)
+        )
+        if needs_database_default:
+            if self.connection.features.requires_literal_defaults:
+                # Some databases can't take defaults as a parameter (oracle)
+                # If this is the case, the individual schema backend should
+                # implement prepare_default
                 actions.append((
-                    self.sql_alter_column_no_default % {
+                    self.sql_alter_column_default % {
                         "column": self.quote_name(new_field.column),
+                        "default": self.prepare_default(new_default),
                     },
                     [],
                 ))
             else:
-                if self.connection.features.requires_literal_defaults:
-                    # Some databases can't take defaults as a parameter (oracle)
-                    # If this is the case, the individual schema backend should
-                    # implement prepare_default
-                    actions.append((
-                        self.sql_alter_column_default % {
-                            "column": self.quote_name(new_field.column),
-                            "default": self.prepare_default(new_default),
-                        },
-                        [],
-                    ))
-                else:
-                    actions.append((
-                        self.sql_alter_column_default % {
-                            "column": self.quote_name(new_field.column),
-                            "default": "%s",
-                        },
-                        [new_default],
-                    ))
+                actions.append((
+                    self.sql_alter_column_default % {
+                        "column": self.quote_name(new_field.column),
+                        "default": "%s",
+                    },
+                    [new_default],
+                ))
         # Nullability change?
         if old_field.null != new_field.null:
             if new_field.null:
@@ -712,7 +709,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Drop the default if we need to
         # (Django usually does not use in-database defaults)
-        if not self.skip_default(new_field) and new_field.default is not None:
+        if needs_database_default:
             sql = self.sql_alter_column % {
                 "table": self.quote_name(model._meta.db_table),
                 "changes": self.sql_alter_column_no_default % {
