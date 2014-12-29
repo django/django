@@ -125,6 +125,9 @@ class BaseDatabaseFeatures(object):
     # This is True for all core backends.
     can_introspect_null = True
 
+    # Can the backend introspect the default value of a column?
+    can_introspect_default = True
+
     # Confirm support for introspected foreign keys
     # Every database can do this reliably, except MySQL,
     # which can't do it for MyISAM tables

@@ -165,6 +165,15 @@ Backwards incompatible changes in 1.9
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+Database backend API
+~~~~~~~~~~~~~~~~~~~~
+
+* A couple of new tests rely on the ability of the backend to introspect column
+  defaults (returning the result as ``Field.default``). You can set the
+  ``can_introspect_default`` database feature to ``False`` if your backend
+  doesn't implement this. You may want to review the implementation on the
+  backends that Django includes for reference (:ticket:`24245`).
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
