@@ -1,4 +1,5 @@
 import re
+from collections import namedtuple
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
@@ -6,6 +7,7 @@ from django.db.backends.base.introspection import (
 
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
+FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 
 
 def get_field_size(name):
@@ -69,8 +71,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
-        return [FieldInfo(info['name'], info['type'], None, info['size'], None, None,
-                 info['null_ok']) for info in self._table_info(cursor, table_name)]
+        return [
+            FieldInfo(
+                info['name'],
+                info['type'],
+                None,
+                info['size'],
+                None,
+                None,
+                info['null_ok'],
+                info['default'],
+            ) for info in self._table_info(cursor, table_name)
+        ]
 
     def column_name_converter(self, name):
         """
@@ -211,13 +223,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def _table_info(self, cursor, name):
         cursor.execute('PRAGMA table_info(%s)' % self.connection.ops.quote_name(name))
-        # cid, name, type, notnull, dflt_value, pk
-        return [{'name': field[1],
-                 'type': field[2],
-                 'size': get_field_size(field[2]),
-                 'null_ok': not field[3],
-                 'pk': field[5]     # undocumented
-                 } for field in cursor.fetchall()]
+        # cid, name, type, notnull, default_value, pk
+        return [{
+            'name': field[1],
+            'type': field[2],
+            'size': get_field_size(field[2]),
+            'null_ok': not field[3],
+            'default': field[4],
+            'pk': field[5],  # undocumented
+        } for field in cursor.fetchall()]
 
     def get_constraints(self, cursor, table_name):
         """
