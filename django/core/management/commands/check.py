@@ -24,7 +24,7 @@ class Command(BaseCommand):
     def handle(self, *app_labels, **options):
         include_deployment_checks = options['deploy']
         if options.get('list_tags'):
-            self.stdout.write('\n'.join(sorted(registry.tags_available(include_deployment_checks))))
+            self.info('\n'.join(sorted(registry.tags_available(include_deployment_checks))))
             return
 
         if app_labels:

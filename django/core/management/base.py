@@ -425,7 +425,7 @@ class BaseCommand(object):
 
             # SystemCheckError takes care of its own formatting.
             if isinstance(e, SystemCheckError):
-                self.stderr.write(str(e), lambda x: x)
+                self.error(str(e), no_color=True)
             else:
                 self.stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
@@ -559,9 +559,9 @@ class BaseCommand(object):
 
         if msg:
             if visible_issue_count:
-                self.stderr.write(msg, lambda x: x)
+                self.error(msg, no_color=True)
             else:
-                self.stdout.write(msg)
+                self.info(msg)
 
     def handle(self, *args, **options):
         """
