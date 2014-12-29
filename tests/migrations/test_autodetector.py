@@ -99,6 +99,11 @@ class AutodetectorTests(TestCase):
         ("name", models.CharField(max_length=200)),
         ("publisher", models.ForeignKey("testapp.Publisher")),
     ])
+    author_with_user = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+        ("user", models.ForeignKey("auth.User")),
+    ])
     author_with_custom_user = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
@@ -1138,6 +1143,20 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Author")
         self.assertMigrationDependencies(changes, 'testapp', 0, [("__setting__", "AUTH_USER_MODEL")])
+
+    def test_swappable_changed(self):
+        before = self.make_project_state([self.custom_user, self.author_with_user])
+        with override_settings(AUTH_USER_MODEL="thirdapp.CustomUser"):
+            after = self.make_project_state([self.custom_user, self.author_with_custom_user])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name="author", name='user')
+        fk_field = changes['testapp'][0].operations[0].field
+        to_model = '%s.%s' % (fk_field.rel.to._meta.app_label, fk_field.rel.to._meta.object_name)
+        self.assertEqual(to_model, 'thirdapp.CustomUser')
 
     def test_add_field_with_default(self):
         """#22030 - Adding a field with a default should work."""
