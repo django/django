@@ -61,6 +61,8 @@ def patterns(prefix, *args):
 
 
 def url(regex, view, kwargs=None, name=None, prefix=''):
+    if name is not None and ':' in name:
+        raise ImproperlyConfigured('URL pattern pattern names cannot contain colons, because this would lead to ambiguous namespace references (for %r)' % name)
     if isinstance(view, (list, tuple)):
         # For include(...) processing.
         urlconf_module, app_name, namespace = view
