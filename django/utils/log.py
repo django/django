@@ -7,7 +7,7 @@ import warnings
 from django.conf import settings
 from django.core import mail
 from django.core.mail import get_connection
-from django.core.management.color import color_style
+from django.core.management.color import color_style, no_style
 from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
@@ -177,7 +177,10 @@ class AdminEmailHandler(logging.Handler):
 
 class ColoredFormatter(logging.Formatter):
     def format(self, record):
-        style = color_style()
+        if getattr(record, 'no_color', False):
+            style = no_style()
+        else:
+            style = color_style()
         if record.levelname in ('WARNING', 'ERROR'):
             return getattr(style, record.levelname)(record.getMessage())
         return super(ColoredFormatter, self).format(record)

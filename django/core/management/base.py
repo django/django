@@ -312,12 +312,16 @@ class BaseCommand(object):
         """
         Log a warning to stderr by default.
         """
+        no_color = kwargs.pop('no_color', False)
+        kwargs.update({'extra': {'no_color': no_color}})
         self.logger.warning(msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
         """
         Log an error to stderr by default.
         """
+        no_color = kwargs.pop('no_color', False)
+        kwargs.update({'extra': {'no_color': no_color}})
         self.logger.error(msg, *args, **kwargs)
 
     def create_parser(self, prog_name, subcommand):
