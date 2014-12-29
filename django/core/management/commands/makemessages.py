@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import fnmatch
 import glob
 import io
+import locale
 import os
 import re
 import sys
@@ -28,6 +29,20 @@ def check_programs(*programs):
         if find_command(program) is None:
             raise CommandError("Can't find %s. Make sure you have GNU "
                     "gettext tools 0.15 or newer installed." % program)
+
+
+def gettext_popen_wrapper(args, os_err_exc_type=CommandError):
+    """
+    Makes sure text obtained from stdout of gettext utilities contains valid
+    Unicode on Windows.
+    """
+    stdout, stderr, status_code = popen_wrapper(args, os_err_exc_type=os_err_exc_type)
+    if os.name == 'nt':
+        # This looks weird because it's undoing what subprocess.Popen(universal_newlines=True).communicate()
+        # does when capturing PO files contents from stdout of gettext command line programs. See ticket #23271
+        # for details.
+        stdout = stdout.encode(locale.getpreferredencoding(False)).decode('utf-8')
+    return stdout, stderr, status_code
 
 
 @total_ordering
@@ -115,7 +130,7 @@ class TranslatableFile(object):
             args.append(work_file)
         else:
             return
-        msgs, errors, status = popen_wrapper(args)
+        msgs, errors, status = gettext_popen_wrapper(args)
         if errors:
             if status != STATUS_OK:
                 if is_templatized:
@@ -309,7 +324,7 @@ class Command(BaseCommand):
 
     @cached_property
     def gettext_version(self):
-        out, err, status = popen_wrapper(['xgettext', '--version'])
+        out, err, status = gettext_popen_wrapper(['xgettext', '--version'])
         m = re.search(r'(\d)\.(\d+)\.?(\d+)?', out)
         if m:
             return tuple(int(d) for d in m.groups() if d is not None)
@@ -334,7 +349,7 @@ class Command(BaseCommand):
             if not os.path.exists(potfile):
                 continue
             args = ['msguniq'] + self.msguniq_options + [potfile]
-            msgs, errors, status = popen_wrapper(args)
+            msgs, errors, status = gettext_popen_wrapper(args)
             if six.PY2:
                 msgs = msgs.decode('utf-8')
             if errors:
@@ -426,7 +441,7 @@ class Command(BaseCommand):
 
         if os.path.exists(pofile):
             args = ['msgmerge'] + self.msgmerge_options + [pofile, potfile]
-            msgs, errors, status = popen_wrapper(args)
+            msgs, errors, status = gettext_popen_wrapper(args)
             if six.PY2:
                 msgs = msgs.decode('utf-8')
             if errors:
@@ -447,7 +462,7 @@ class Command(BaseCommand):
 
         if self.no_obsolete:
             args = ['msgattrib'] + self.msgattrib_options + ['-o', pofile, pofile]
-            msgs, errors, status = popen_wrapper(args)
+            msgs, errors, status = gettext_popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
