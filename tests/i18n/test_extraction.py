@@ -67,14 +67,21 @@ class ExtractorTests(SimpleTestCase):
             po_contents = fp.read()
         return output, po_contents
 
-    def assertMsgId(self, msgid, s, use_quotes=True):
+    def _assertPoKeyword(self, keyword, expected_value, haystack, use_quotes=True):
         q = '"'
         if use_quotes:
-            msgid = '"%s"' % msgid
+            expected_value = '"%s"' % expected_value
             q = "'"
-        needle = 'msgid %s' % msgid
-        msgid = re.escape(msgid)
-        return self.assertTrue(re.search('^msgid %s' % msgid, s, re.MULTILINE), 'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q})
+        needle = '%s %s' % (keyword, expected_value)
+        expected_value = re.escape(expected_value)
+        return self.assertTrue(re.search('^%s %s' % (keyword, expected_value), haystack, re.MULTILINE),
+                               'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q})
+
+    def assertMsgId(self, msgid, haystack, use_quotes=True):
+        return self._assertPoKeyword('msgid', msgid, haystack, use_quotes=use_quotes)
+
+    def assertMsgStr(self, msgstr, haystack, use_quotes=True):
+        return self._assertPoKeyword('msgstr', msgstr, haystack, use_quotes=use_quotes)
 
     def assertNotMsgId(self, msgid, s, use_quotes=True):
         if use_quotes:
@@ -390,6 +397,18 @@ class BasicExtractorTests(ExtractorTests):
         cmd = MakeMessagesCommand()
         with six.assertRaisesRegex(self, CommandError, "Unable to get gettext version. Is it installed?"):
             cmd.gettext_version
+
+    def test_po_file_encoding_when_updating(self):
+        """Update of PO file doesn't corrupt it with non-UTF-8 encoding on Python3+Windows (#23271)"""
+        BR_PO_BASE = 'locale/pt_BR/LC_MESSAGES/django'
+        os.chdir(self.test_dir)
+        shutil.copyfile(BR_PO_BASE + '.pristine', BR_PO_BASE + '.po')
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'locale', 'pt_BR', 'LC_MESSAGES', 'django.po'))
+        management.call_command('makemessages', locale=['pt_BR'], verbosity=0)
+        self.assertTrue(os.path.exists(BR_PO_BASE + '.po'))
+        with io.open(BR_PO_BASE + '.po', 'r', encoding='utf-8') as fp:
+            po_contents = force_text(fp.read())
+            self.assertMsgStr("Größe", po_contents)
 
 
 class JavascriptExtractorTests(ExtractorTests):
