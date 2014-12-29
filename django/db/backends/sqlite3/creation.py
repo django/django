@@ -7,39 +7,6 @@ from django.utils.six.moves import input
 
 
 class DatabaseCreation(BaseDatabaseCreation):
-    # SQLite doesn't actually support most of these types, but it "does the right
-    # thing" given more verbose field definitions, so leave them as is so that
-    # schema inspection is more useful.
-    data_types = {
-        'AutoField': 'integer',
-        'BinaryField': 'BLOB',
-        'BooleanField': 'bool',
-        'CharField': 'varchar(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
-        'DateField': 'date',
-        'DateTimeField': 'datetime',
-        'DecimalField': 'decimal',
-        'DurationField': 'bigint',
-        'FileField': 'varchar(%(max_length)s)',
-        'FilePathField': 'varchar(%(max_length)s)',
-        'FloatField': 'real',
-        'IntegerField': 'integer',
-        'BigIntegerField': 'bigint',
-        'IPAddressField': 'char(15)',
-        'GenericIPAddressField': 'char(39)',
-        'NullBooleanField': 'bool',
-        'OneToOneField': 'integer',
-        'PositiveIntegerField': 'integer unsigned',
-        'PositiveSmallIntegerField': 'smallint unsigned',
-        'SlugField': 'varchar(%(max_length)s)',
-        'SmallIntegerField': 'smallint',
-        'TextField': 'text',
-        'TimeField': 'time',
-        'UUIDField': 'char(32)',
-    }
-    data_types_suffix = {
-        'AutoField': 'AUTOINCREMENT',
-    }
 
     def sql_for_pending_references(self, model, style, pending_references):
         "SQLite3 doesn't support constraints"

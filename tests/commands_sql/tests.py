@@ -45,7 +45,7 @@ class SQLCommandsTestCase(TestCase):
             'commands_sql_comment', 'commands_sql_book', 'commands_sql_book_comments'
         })
 
-    @unittest.skipUnless('PositiveIntegerField' in connections[DEFAULT_DB_ALIAS].creation.data_type_check_constraints, 'Backend does not have checks.')
+    @unittest.skipUnless('PositiveIntegerField' in connections[DEFAULT_DB_ALIAS].data_type_check_constraints, 'Backend does not have checks.')
     def test_sql_create_check(self):
         """Regression test for #23416 -- Check that db_params['check'] is respected."""
         app_config = apps.get_app_config('commands_sql')

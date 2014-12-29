@@ -849,6 +849,16 @@ Also private APIs ``django.template.base.compile_string()``,
 ``django.template.loader.find_template()``, and
 ``django.template.loader.get_template_from_string()`` were removed.
 
+Database backend API
+~~~~~~~~~~~~~~~~~~~~
+
+The following changes to the database backend API are documented to assist
+those writing third-party backends in updating their code:
+
+* The ``data_types``, ``data_types_suffix``, and
+  ``data_type_check_constraints`` attributes have moved from the
+  ``DatabaseCreation`` class to ``DatabaseWrapper``.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
