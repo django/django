@@ -12,49 +12,6 @@ PASSWORD = 'Im_a_lumberjack'
 
 
 class DatabaseCreation(BaseDatabaseCreation):
-    # This dictionary maps Field objects to their associated Oracle column
-    # types, as strings. Column-type strings can contain format strings; they'll
-    # be interpolated against the values of Field.__dict__ before being output.
-    # If a column type is set to None, it won't be included in the output.
-    #
-    # Any format strings starting with "qn_" are quoted before being used in the
-    # output (the "qn_" prefix is stripped before the lookup is performed.
-
-    data_types = {
-        'AutoField': 'NUMBER(11)',
-        'BinaryField': 'BLOB',
-        'BooleanField': 'NUMBER(1)',
-        'CharField': 'NVARCHAR2(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'VARCHAR2(%(max_length)s)',
-        'DateField': 'DATE',
-        'DateTimeField': 'TIMESTAMP',
-        'DecimalField': 'NUMBER(%(max_digits)s, %(decimal_places)s)',
-        'DurationField': 'INTERVAL DAY(9) TO SECOND(6)',
-        'FileField': 'NVARCHAR2(%(max_length)s)',
-        'FilePathField': 'NVARCHAR2(%(max_length)s)',
-        'FloatField': 'DOUBLE PRECISION',
-        'IntegerField': 'NUMBER(11)',
-        'BigIntegerField': 'NUMBER(19)',
-        'IPAddressField': 'VARCHAR2(15)',
-        'GenericIPAddressField': 'VARCHAR2(39)',
-        'NullBooleanField': 'NUMBER(1)',
-        'OneToOneField': 'NUMBER(11)',
-        'PositiveIntegerField': 'NUMBER(11)',
-        'PositiveSmallIntegerField': 'NUMBER(11)',
-        'SlugField': 'NVARCHAR2(%(max_length)s)',
-        'SmallIntegerField': 'NUMBER(11)',
-        'TextField': 'NCLOB',
-        'TimeField': 'TIMESTAMP',
-        'URLField': 'VARCHAR2(%(max_length)s)',
-        'UUIDField': 'VARCHAR2(32)',
-    }
-
-    data_type_check_constraints = {
-        'BooleanField': '%(qn_column)s IN (0,1)',
-        'NullBooleanField': '(%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL)',
-        'PositiveIntegerField': '%(qn_column)s >= 0',
-        'PositiveSmallIntegerField': '%(qn_column)s >= 0',
-    }
 
     def _create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
         parameters = self._get_test_db_params()
