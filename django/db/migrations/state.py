@@ -82,6 +82,11 @@ class ProjectState(object):
     def apps(self):
         return StateApps(self.real_apps, self.models)
 
+    @property
+    def concrete_apps(self):
+        self.apps = StateApps(self.real_apps, self.models, ignore_swappable=True)
+        return self.apps
+
     @classmethod
     def from_apps(cls, apps):
         "Takes in an Apps and returns a ProjectState matching it"
@@ -122,7 +127,7 @@ class StateApps(Apps):
     Subclass of the global Apps registry class to better handle dynamic model
     additions and removals.
     """
-    def __init__(self, real_apps, models):
+    def __init__(self, real_apps, models, ignore_swappable=False):
         # Any apps in self.real_apps should have all their models included
         # in the render. We don't use the original model instances as there
         # are some variables that refer to the Apps object.
