@@ -3,6 +3,7 @@ Internationalization support.
 """
 from __future__ import unicode_literals
 import os
+import pkgutil
 import re
 
 from django.core.exceptions import ImproperlyConfigured
@@ -10,6 +11,7 @@ from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils.importlib import import_module
+from django.utils._os import upath
 from django.utils import six
 
 
@@ -244,15 +246,15 @@ def load_backend(backend_name):
     except ImportError as e_user:
         # The backend wasn't found. Display a helpful error message listing all
         # possible (built-in) backends.
-        backend_dir = os.path.join(os.path.dirname(__file__), 'backends')
+        backend_dir = os.path.join(os.path.dirname(upath(__file__)), 'backends')
         try:
-            available_backends = [f for f in os.listdir(backend_dir)
-                    if os.path.isdir(os.path.join(backend_dir, f))
-                    and not f.startswith('.')]
+            available_backends = [
+                name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
+                if ispkg and name != 'null']
         except EnvironmentError:
             available_backends = []
-        name = backend_name[34:] if backend_name.startswith('django.utils.translation.backends.') else backend_name
-        if name not in available_backends:
+        if backend_name not in ['django.utils.translation.backends.%s' % b for b in
+                                available_backends]:
             backend_reprs = map(repr, sorted(available_backends))
             error_msg = ("%r isn't an available i18n backend.\n"
                          "Try using django.utils.translation.backends.XXX, where XXX "
