@@ -334,6 +334,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         command.execute(
             stdin=sentinel,
             stdout=six.StringIO(),
+            stderr=six.StringIO(),
             interactive=False,
             verbosity=0,
             username='janet',
@@ -344,6 +345,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         command = createsuperuser.Command()
         command.execute(
             stdout=six.StringIO(),
+            stderr=six.StringIO(),
             interactive=False,
             verbosity=0,
             username='joe',

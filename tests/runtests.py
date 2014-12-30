@@ -246,11 +246,6 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels)
             'initial_data fixtures are deprecated. Use data migrations instead.',
             RemovedInDjango19Warning
         )
-        warnings.filterwarnings(
-            'ignore',
-            'IPAddressField has been deprecated. Use GenericIPAddressField instead.',
-            RemovedInDjango19Warning
-        )
         failures = test_runner.run_tests(
             test_labels or get_installed(), extra_tests=extra_tests)
 

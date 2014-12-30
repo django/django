@@ -159,7 +159,8 @@ details on these changes.
   is loaded. In particular, it won't be possible to import models inside
   the root package of their application.
 
-* The model and form ``IPAddressField`` will be removed.
+* The model and form ``IPAddressField`` will be removed. A stub field will
+  remain for compatibility with historical migrations.
 
 * ``AppCommand.handle_app()`` will no longer be supported.
 
