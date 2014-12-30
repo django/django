@@ -58,9 +58,9 @@ class Trans(object):
     def __getattr__(self, real_name):
         from django.conf import settings
         if settings.USE_I18N:
-            from django.utils.translation import trans_real as trans
+            trans = load_backend(settings.I18N_BACKEND)
         else:
-            from django.utils.translation import trans_null as trans
+            from django.utils.translation.backends import null as trans
         setattr(self, real_name, getattr(trans, real_name))
         return getattr(trans, real_name)
 
