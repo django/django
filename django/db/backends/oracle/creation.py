@@ -56,9 +56,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         'PositiveSmallIntegerField': '%(qn_column)s >= 0',
     }
 
-    def __init__(self, connection):
-        super(DatabaseCreation, self).__init__(connection)
-
     def _create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
         parameters = self._get_test_db_params()
         cursor = self.connection.cursor()
