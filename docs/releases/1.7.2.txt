@@ -192,3 +192,8 @@ Bugfixes
 
 * Prevented a crash on apps without migrations when running ``migrate --list``
   (:ticket:`23366`).
+
+* The deprecation of ``IPAddressField`` is now handled through the system
+  check framework (with error code ``fields.W900``) so that deprecation
+  warnings aren't displayed if the field only appears in historical migrations
+  (:ticket:`23891`).
