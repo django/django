@@ -8,14 +8,6 @@ from django.utils.six.moves import input
 
 class DatabaseCreation(BaseDatabaseCreation):
 
-    def sql_for_pending_references(self, model, style, pending_references):
-        "SQLite3 doesn't support constraints"
-        return []
-
-    def sql_remove_table_constraints(self, model, references_to_delete, style):
-        "SQLite3 doesn't support constraints"
-        return []
-
     def _get_test_db_name(self):
         test_database_name = self.connection.settings_dict['TEST']['NAME']
         if test_database_name and test_database_name != ':memory:':
