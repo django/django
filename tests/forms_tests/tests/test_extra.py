@@ -11,10 +11,11 @@ from django.forms import (
 )
 from django.forms.extras import SelectDateWidget
 from django.forms.utils import ErrorList
-from django.test import TestCase, override_settings
+from django.test import TestCase, ignore_warnings, override_settings
 from django.utils import six
 from django.utils import translation
 from django.utils.dates import MONTHS_AP
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 
 from .test_error_messages import AssertFormErrorsMixin
@@ -482,6 +483,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
         self.assertEqual(f.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_ipaddress(self):
         f = IPAddressField()
         self.assertFormErrors(['This field is required.'], f.clean, '')

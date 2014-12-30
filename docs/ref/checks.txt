@@ -95,6 +95,8 @@ Fields
 * **fields.E160**: The options ``auto_now``, ``auto_now_add``, and ``default``
   are mutually exclusive. Only one of these options may be present.
 * **fields.W161**: Fixed default value provided.
+* **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
+  (except in historical migrations) will be removed in Django 1.9.
 
 File Fields
 ~~~~~~~~~~~

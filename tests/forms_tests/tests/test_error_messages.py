@@ -9,7 +9,8 @@ from django.forms import (
     ModelMultipleChoiceField, MultipleChoiceField, RegexField,
     SplitDateTimeField, TimeField, URLField, utils, ValidationError,
 )
-from django.test import TestCase
+from django.test import ignore_warnings, TestCase
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -196,6 +197,7 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFormErrors(['REQUIRED'], f.clean, '')
         self.assertFormErrors(['INVALID DATE', 'INVALID TIME'], f.clean, ['a', 'b'])
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_ipaddressfield(self):
         e = {
             'required': 'REQUIRED',
