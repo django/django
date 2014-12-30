@@ -26,7 +26,7 @@ from django.utils import six
 from django.utils.six import PY3
 from django.utils.translation import (activate, deactivate,
     get_language, get_language_from_request, get_language_info,
-    to_locale, trans_real,
+    to_locale,
     gettext, gettext_lazy,
     ugettext, ugettext_lazy,
     ngettext_lazy,
@@ -35,6 +35,7 @@ from django.utils.translation import (activate, deactivate,
     npgettext, npgettext_lazy,
     check_for_language,
     string_concat, LANGUAGE_SESSION_KEY)
+from django.utils.translation.backends import gettext as gettext_backend
 
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel
@@ -206,8 +207,8 @@ class TranslationTests(TestCase):
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
-        trans_real._active = local()
-        trans_real._translations = {}
+        gettext_backend._active = local()
+        gettext_backend._translations = {}
         with translation.override('de'):
             self.assertEqual(pgettext("unexisting", "May"), "May")
             self.assertEqual(pgettext("month name", "May"), "Mai")
@@ -221,8 +222,8 @@ class TranslationTests(TestCase):
         {% blocktrans %} template tags.
         Refs #14806.
         """
-        trans_real._active = local()
-        trans_real._translations = {}
+        gettext_backend._active = local()
+        gettext_backend._translations = {}
         with translation.override('de'):
 
             # {% trans %} -----------------------------------
@@ -374,7 +375,7 @@ class TranslationTests(TestCase):
         Translations on files with mac or dos end of lines will be converted
         to unix eof in .po catalogs, and they have to match when retrieved
         """
-        ca_translation = trans_real.translation('ca')
+        ca_translation = gettext_backend.translation('ca')
         ca_translation._catalog['Mac\nEOF\n'] = 'Catalan Mac\nEOF\n'
         ca_translation._catalog['Win\nEOF\n'] = 'Catalan Win\nEOF\n'
         with translation.override('ca', deactivate=True):
@@ -393,8 +394,8 @@ class TranslationTests(TestCase):
         """
         Test the to_language function
         """
-        self.assertEqual(trans_real.to_language('en_US'), 'en-us')
-        self.assertEqual(trans_real.to_language('sr_Lat'), 'sr-lat')
+        self.assertEqual(gettext_backend.to_language('en_US'), 'en-us')
+        self.assertEqual(gettext_backend.to_language('sr_Lat'), 'sr-lat')
 
     @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),))
     def test_bad_placeholder_1(self):
@@ -425,31 +426,31 @@ class TranslationThreadSafetyTests(TestCase):
 
     def setUp(self):
         self._old_language = get_language()
-        self._translations = trans_real._translations
+        self._translations = gettext_backend._translations
 
         # here we rely on .split() being called inside the _fetch()
-        # in trans_real.translation()
+        # in django.utils.translation.backends.gettext.translation()
         class sideeffect_str(str):
             def split(self, *args, **kwargs):
                 res = str.split(self, *args, **kwargs)
-                trans_real._translations['en-YY'] = None
+                gettext_backend._translations['en-YY'] = None
                 return res
 
-        trans_real._translations = {sideeffect_str('en-XX'): None}
+        gettext_backend._translations = {sideeffect_str('en-XX'): None}
 
     def tearDown(self):
-        trans_real._translations = self._translations
+        gettext_backend._translations = self._translations
         activate(self._old_language)
 
     def test_bug14894_translation_activate_thread_safety(self):
-        translation_count = len(trans_real._translations)
+        translation_count = len(gettext_backend._translations)
         try:
             translation.activate('pl')
         except RuntimeError:
             self.fail('translation.activate() is not thread-safe')
 
         # make sure sideeffect_str actually added a new translation
-        self.assertLess(translation_count, len(trans_real._translations))
+        self.assertLess(translation_count, len(gettext_backend._translations))
 
 
 @override_settings(USE_L10N=True)
@@ -912,7 +913,7 @@ class MiscTests(TestCase):
         values according to the spec (and that we extract all the pieces in
         the right order).
         """
-        p = trans_real.parse_accept_lang_header
+        p = gettext_backend.parse_accept_lang_header
         # Good headers.
         self.assertEqual([('de', 1.0)], p('de'))
         self.assertEqual([('en-au', 1.0)], p('en-AU'))
@@ -1093,13 +1094,13 @@ class MiscTests(TestCase):
         self.assertEqual(g(r), 'zh-cn')
 
     def test_get_language_from_path_real(self):
-        g = trans_real.get_language_from_path
+        g = gettext_backend.get_language_from_path
         self.assertEqual(g('/pl/'), 'pl')
         self.assertEqual(g('/pl'), 'pl')
         self.assertEqual(g('/xyz/'), None)
 
     def test_get_language_from_path_null(self):
-        from django.utils.translation.trans_null import get_language_from_path as g
+        from django.utils.translation.backends.null import get_language_from_path as g
         self.assertEqual(g('/pl/'), None)
         self.assertEqual(g('/pl'), None)
         self.assertEqual(g('/xyz/'), None)
@@ -1473,5 +1474,5 @@ class TranslationFilesMissing(TestCase):
         Refs: #18192
         '''
         self.patchGettextFind()
-        trans_real._translations = {}
+        gettext_backend._translations = {}
         self.assertRaises(IOError, activate, 'en')
