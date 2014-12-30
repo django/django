@@ -184,9 +184,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     atomic_transactions = False
     supports_column_check_constraints = False
 
-    def __init__(self, connection):
-        super(DatabaseFeatures, self).__init__(connection)
-
     @cached_property
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
