@@ -1,6 +1,5 @@
 import hashlib
 
-from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.utils import truncate_name
 from django.db.models.fields.related import ManyToManyField
 from django.db.transaction import atomic
@@ -105,6 +104,17 @@ class BaseDatabaseSchemaEditor(object):
 
     def quote_name(self, name):
         return self.connection.ops.quote_name(name)
+
+    @classmethod
+    def _digest(cls, *args):
+        """
+        Generates a 32-bit digest of a set of arguments that can be used to
+        shorten identifying names.
+        """
+        h = hashlib.md5()
+        for arg in args:
+            h.update(force_bytes(arg))
+        return h.hexdigest()[:8]
 
     # Field <-> database mapping functions
 
@@ -772,7 +782,7 @@ class BaseDatabaseSchemaEditor(object):
         # If there is just one column in the index, use a default algorithm from Django
         if len(column_names) == 1 and not suffix:
             return truncate_name(
-                '%s_%s' % (model._meta.db_table, BaseDatabaseCreation._digest(column_names[0])),
+                '%s_%s' % (model._meta.db_table, self._digest(column_names[0])),
                 self.connection.ops.max_name_length()
             )
         # Else generate the name for the index using a different algorithm
