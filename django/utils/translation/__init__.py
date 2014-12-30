@@ -2,10 +2,14 @@
 Internationalization support.
 """
 from __future__ import unicode_literals
+import os
 import re
+
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
+from django.utils.importlib import import_module
 from django.utils import six
 
 
@@ -231,3 +235,30 @@ trim_whitespace_re = re.compile('\s*\n\s*')
 
 def trim_whitespace(s):
     return trim_whitespace_re.sub(' ', s.strip())
+
+
+def load_backend(backend_name):
+    # Look for a fully qualified i18n backend name
+    try:
+        return import_module(backend_name)
+    except ImportError as e_user:
+        # The backend wasn't found. Display a helpful error message listing all
+        # possible (built-in) backends.
+        backend_dir = os.path.join(os.path.dirname(__file__), 'backends')
+        try:
+            available_backends = [f for f in os.listdir(backend_dir)
+                    if os.path.isdir(os.path.join(backend_dir, f))
+                    and not f.startswith('.')]
+        except EnvironmentError:
+            available_backends = []
+        name = backend_name[34:] if backend_name.startswith('django.utils.translation.backends.') else backend_name
+        if name not in available_backends:
+            backend_reprs = map(repr, sorted(available_backends))
+            error_msg = ("%r isn't an available i18n backend.\n"
+                         "Try using django.utils.translation.backends.XXX, where XXX "
+                         "is one of:\n    %s\nError was: %s" %
+                         (backend_name, ", ".join(backend_reprs), e_user))
+            raise ImproperlyConfigured(error_msg)
+        else:
+            # If there's some other error, this must be an error in Django
+            raise
