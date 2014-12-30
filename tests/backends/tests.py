@@ -6,7 +6,6 @@ import copy
 import datetime
 from decimal import Decimal, Rounded
 import re
-import sys
 import threading
 import unittest
 import warnings
