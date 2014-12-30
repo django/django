@@ -773,7 +773,7 @@ class ModelAdmin(BaseModelAdmin):
             warnings.warn(
                 "ModelAdmin.get_formsets() is deprecated and will be removed in "
                 "Django 1.9. Use ModelAdmin.get_formsets_with_inlines() instead.",
-                RemovedInDjango19Warning
+                RemovedInDjango19Warning, stacklevel=2
             )
             if formsets:
                 zipped = zip(formsets, self.get_inline_instances(request, None))
