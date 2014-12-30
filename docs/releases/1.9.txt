@@ -146,6 +146,10 @@ Internationalization
 * The :func:`django.views.i18n.javascript_catalog` view now works correctly
   if used multiple times with different configurations on the same page.
 
+* You can now use locale variants supported by gettext. These are usually used
+  for languages which can be written in different scripts, for example Latin
+  and Cyrillic (e.g. ``be@latin``).
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
