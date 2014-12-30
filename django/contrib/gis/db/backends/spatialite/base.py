@@ -9,7 +9,6 @@ from django.db.backends.sqlite3.base import (
 from django.utils import six
 
 from .client import SpatiaLiteClient
-from .creation import SpatiaLiteCreation
 from .features import DatabaseFeatures
 from .introspection import SpatiaLiteIntrospection
 from .operations import SpatiaLiteOperations
@@ -41,7 +40,6 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         self.features = DatabaseFeatures(self)
         self.ops = SpatiaLiteOperations(self)
         self.client = SpatiaLiteClient(self)
-        self.creation = SpatiaLiteCreation(self)
         self.introspection = SpatiaLiteIntrospection(self)
 
     def get_new_connection(self, conn_params):
