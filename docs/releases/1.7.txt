@@ -1520,11 +1520,10 @@ Custom SQL location for models package
 Previously, if models were organized in a package (``myapp/models/``) rather
 than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
 <initial-sql>` in ``myapp/models/sql/``. This bug has been fixed so that Django
-will search ``myapp/sql/`` as documented. The old location will continue to
-work until Django 1.9. After this issue was fixed, migrations were added which
-deprecates initial SQL data. Thus, while this change still exists, the
-deprecation is somewhat irrelevant as the entire feature will be removed in
-Django 2.0 when migrations become compulsory for all applications.
+will search ``myapp/sql/`` as documented. After this issue was fixed, migrations
+were added which deprecates initial SQL data. Thus, while this change still
+exists, the deprecation is irrelevant as the entire feature will be removed in
+Django 1.9.
 
 Reorganization of ``django.contrib.sites``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
