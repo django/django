@@ -1,5 +1,4 @@
 from django.db.backends.base.creation import BaseDatabaseCreation
-from django.db.backends.utils import truncate_name
 
 
 class DatabaseCreation(BaseDatabaseCreation):
@@ -12,40 +11,3 @@ class DatabaseCreation(BaseDatabaseCreation):
         if test_settings['CHARSET']:
             return "WITH ENCODING '%s'" % test_settings['CHARSET']
         return ''
-
-    def sql_indexes_for_field(self, model, f, style):
-        output = []
-        db_type = f.db_type(connection=self.connection)
-        if db_type is not None and (f.db_index or f.unique):
-            qn = self.connection.ops.quote_name
-            db_table = model._meta.db_table
-            tablespace = f.db_tablespace or model._meta.db_tablespace
-            if tablespace:
-                tablespace_sql = self.connection.ops.tablespace_sql(tablespace)
-                if tablespace_sql:
-                    tablespace_sql = ' ' + tablespace_sql
-            else:
-                tablespace_sql = ''
-
-            def get_index_sql(index_name, opclass=''):
-                return (style.SQL_KEYWORD('CREATE INDEX') + ' ' +
-                        style.SQL_TABLE(qn(truncate_name(index_name, self.connection.ops.max_name_length()))) + ' ' +
-                        style.SQL_KEYWORD('ON') + ' ' +
-                        style.SQL_TABLE(qn(db_table)) + ' ' +
-                        "(%s%s)" % (style.SQL_FIELD(qn(f.column)), opclass) +
-                        "%s;" % tablespace_sql)
-
-            if not f.unique:
-                output = [get_index_sql('%s_%s' % (db_table, f.column))]
-
-            # Fields with database column types of `varchar` and `text` need
-            # a second index that specifies their operator class, which is
-            # needed when performing correct LIKE queries outside the
-            # C locale. See #12234.
-            if db_type.startswith('varchar'):
-                output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
-                                            ' varchar_pattern_ops'))
-            elif db_type.startswith('text'):
-                output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
-                                            ' text_pattern_ops'))
-        return output
