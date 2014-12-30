@@ -9,7 +9,7 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
-from django.test import TestCase, override_settings, RequestFactory
+from django.test import RequestFactory, TestCase, ignore_warnings, override_settings
 from django.utils.deprecation import RemovedInDjango19Warning
 
 # local test models
@@ -474,6 +474,7 @@ class GenericInlineModelAdminTest(TestCase):
             list(ma.get_formsets_with_inlines(request))
             self.assertEqual(len(w), 0)
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_get_formsets_with_inlines_returns_tuples(self):
         """
         Ensure that get_formsets_with_inlines() returns the correct tuples.
@@ -506,14 +507,12 @@ class GenericInlineModelAdminTest(TestCase):
             ]
 
             def get_formsets(self, request, obj=None):
-                # Catch the deprecation warning to force the usage of get_formsets
-                with warnings.catch_warnings(record=True):
-                    warnings.simplefilter("always")
-                    return super(EpisodeAdmin, self).get_formsets(request, obj)
+                # Override get_formsets to force the usage of get_formsets in
+                # ModelAdmin.get_formsets_with_inlines() then ignore the
+                # warning raised by ModelAdmin.get_formsets_with_inlines()
+                return self._get_formsets(request, obj)
 
         ma = EpisodeAdmin(Episode, self.site)
         inlines = ma.get_inline_instances(request)
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            for (formset, inline), other_inline in zip(ma.get_formsets_with_inlines(request), inlines):
-                self.assertIsInstance(formset, other_inline.get_formset(request).__class__)
+        for (formset, inline), other_inline in zip(ma.get_formsets_with_inlines(request), inlines):
+            self.assertIsInstance(formset, other_inline.get_formset(request).__class__)
