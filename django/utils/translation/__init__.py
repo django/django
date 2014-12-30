@@ -51,8 +51,8 @@ class Trans(object):
     from _trans.__dict__.
 
     Note that storing the function with setattr will have a noticeable
-    performance effect, as access to the function goes the normal path,
-    instead of using __getattr__.
+    beneficial performance effect, as access to the function goes the normal
+    path, instead of using __getattr__.
     """
 
     def __getattr__(self, real_name):
