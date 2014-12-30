@@ -43,9 +43,12 @@ accept_language_re = re.compile(r'''
         (?:\s*,\s*|$)                                 # Multiple accepts per header.
         ''', re.VERBOSE)
 
-language_code_re = re.compile(r'^[a-z]{1,8}(?:-[a-z0-9]{1,8})*$', re.IGNORECASE)
+language_code_re = re.compile(
+    r'^[a-z]{1,8}(?:-[a-z0-9]{1,8})*(?:@[a-z0-9]{1,20})?$',
+    re.IGNORECASE
+)
 
-language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
+language_code_prefix_re = re.compile(r'^/([\w@-]+)(/|$)')
 
 
 @receiver(setting_changed)

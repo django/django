@@ -1420,9 +1420,18 @@ class CountrySpecificLanguageTests(TestCase):
         self.assertTrue(check_for_language('en'))
         self.assertTrue(check_for_language('en-us'))
         self.assertTrue(check_for_language('en-US'))
+        self.assertTrue(check_for_language('be'))
+        self.assertTrue(check_for_language('be@latin'))
+        self.assertTrue(check_for_language('sr-RS@latin'))
+        self.assertTrue(check_for_language('sr-RS@12345'))
         self.assertFalse(check_for_language('en-ü'))
         self.assertFalse(check_for_language('en\x00'))
         self.assertFalse(check_for_language(None))
+        self.assertFalse(check_for_language('be@ '))
+        # Specifying encoding is not supported (Django enforces UTF-8)
+        self.assertFalse(check_for_language('tr-TR.UTF-8'))
+        self.assertFalse(check_for_language('tr-TR.UTF8'))
+        self.assertFalse(check_for_language('de-DE.utf-8'))
 
     def test_get_language_from_request(self):
         # issue 19919

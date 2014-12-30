@@ -162,6 +162,10 @@ Internationalization
 * The :func:`django.utils.timezone.make_aware` function gained an ``is_dst``
   argument to help resolve ambiguous times during DST transitions.
 
+* You can now use locale variants supported by gettext. These are usually used
+  for languages which can be written in different scripts, for example Latin
+  and Cyrillic (e.g. ``be@latin``).
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
