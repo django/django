@@ -201,7 +201,11 @@ class RequestsTests(SimpleTestCase):
         response = HttpResponse()
         response.set_cookie('datetime', expires=datetime(2028, 1, 1, 4, 5, 6))
         datetime_cookie = response.cookies['datetime']
-        self.assertEqual(datetime_cookie['expires'], 'Sat, 01-Jan-2028 04:05:06 GMT')
+        self.assertIn(
+            datetime_cookie['expires'],
+            # Slight time dependency; refs #23450
+            ('Sat, 01-Jan-2028 04:05:06 GMT', 'Sat, 01-Jan-2028 04:05:07 GMT')
+        )
 
     def test_max_age_expiration(self):
         "Cookie will expire if max_age is provided"
