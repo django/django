@@ -145,11 +145,11 @@ def clean_files(filelist):
 
 def reset_translations():
     import gettext
-    from django.utils.translation import trans_real
+    from django.utils.translation.backends import gettext as backend
     gettext._translations = {}
-    trans_real._translations = {}
-    trans_real._default = None
-    trans_real._active = threading.local()
+    backend._translations = {}
+    backend._default = None
+    backend._active = threading.local()
 
 
 def inotify_code_changed():
