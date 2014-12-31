@@ -92,6 +92,13 @@ FLAG_PROPERTIES = (
     'related_model'
 )
 
+FLAG_PROPERTIES_FOR_RELATIONS = (
+    'one_to_many',
+    'many_to_one',
+    'many_to_many',
+    'one_to_one',
+)
+
 
 class BasicFieldTests(test.TestCase):
     def test_show_hidden_initial(self):
@@ -797,6 +804,15 @@ class FieldFlagsTests(test.TestCase):
         for field in self.fields_and_reverse_objects:
             for flag in FLAG_PROPERTIES:
                 self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
+            if field.has_relation:
+                true_cardinailty_flags = [
+                    True for flag in FLAG_PROPERTIES_FOR_RELATIONS
+                    if getattr(field, flag) is True
+                ]
+
+                # If the field has a relation, there should be only one of the
+                # 4 cardinality flags available.
+                self.assertEqual(1, len(true_cardinailty_flags))
 
     def test_cardinality_m2m(self):
         m2m_type_fields = (
