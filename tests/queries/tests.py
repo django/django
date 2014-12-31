@@ -17,6 +17,7 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
+from django.utils.six.moves import range
 
 from .models import (
     Annotation, Article, Author, Celebrity, Child, Cover, Detail, DumbCategory,
@@ -393,7 +394,7 @@ class Queries1Tests(BaseQuerysetTest):
 
     def test_reasonable_number_of_subq_aliases(self):
         x = Tag.objects.filter(pk=1)
-        for _ in xrange(20):
+        for _ in range(20):
             x = Tag.objects.filter(pk__in=x)
         self.assertEqual(
             x.query.subq_aliases, {
