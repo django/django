@@ -369,6 +369,9 @@ class Options(object):
         """
         Returns a list of all forward fields on the model and its parents excluding
         ManyToManyFields.
+        This is a private API and is only intenede to be used by Django itself.
+        It is more safe to use get_fields(), outside of Django, that is officially
+        maintained.
         """
         # Due to legacy reasons, the fields property should only contain forward
         # fields that are not virtual or with a m2m cardinality. Therefore we pass
@@ -385,6 +388,9 @@ class Options(object):
     def concrete_fields(self):
         """
         Returns a list of all concrete fields on the model and its parents.
+        This is a private API and is only intenede to be used by Django itself.
+        It is more safe to use get_fields(), outside of Django, that is officially
+        maintained.
         """
         return make_immutable_fields_list("concrete_fields", (f for f in self.fields if f.concrete))
 
@@ -392,6 +398,9 @@ class Options(object):
     def local_concrete_fields(self):
         """
         Returns a list of all concrete fields on the model.
+        This is a private API and is only intenede to be used by Django itself.
+        It is more safe to use get_fields(), outside of Django, that is officially
+        maintained.
         """
         return make_immutable_fields_list("local_concrete_fields", (f for f in self.local_fields if f.concrete))
 
@@ -408,6 +417,9 @@ class Options(object):
         """
         Returns a list of all many to many fields on the model and
         its parents.
+        This is a private API and is only intenede to be used by Django itself.
+        It is more safe to use get_fields(), outside of Django, that is officially
+        maintained.
         """
         return make_immutable_fields_list("many_to_many", (f for f in self.get_fields(reverse=False)
                                           if f.has_relation and f.many_to_many))
@@ -418,6 +430,9 @@ class Options(object):
         Returns all related objects pointing to the current model.
         The related objects can come from a one-to-one, one-to-many, many-to-many
         field relation type.
+        This is a private API and is only intenede to be used by Django itself.
+        It is more safe to use get_fields(), outside of Django, that is officially
+        maintained.
         """
         all_related_fields = self.get_fields(forward=False, reverse=True,
                                              include_hidden=True, cache_results=True)
@@ -451,8 +466,6 @@ class Options(object):
     @cached_property
     def fields_map(self):
         res = {}
-
-        # call get_fields() with export_ordered_set=True in order to have a field_instance -> names map
         fields = self.get_fields(forward=False, include_hidden=True)
         for field in fields:
             res[field.name] = field

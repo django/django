@@ -1805,19 +1805,12 @@ Attributes for fields
 .. attribute:: concrete
 
     A concrete field has a database column associated with it. Concrete
-    fields require a database migration and always contain state.
-
-.. attribute:: editable
-
-    An editable field contains data can be manipulated in a model
-    or form. An ``Autofield``, for example, should generally not be
-    manipulated and therefore this attribute is ``False``.
+    fields always require a database migration.
 
 .. attribute:: has_relation
 
     A field has a relation when the it contains references to one or
     more other models for its functionality (e.g. ``ForeignKey``).
-    This also includes recursive relations.
 
 .. attribute:: model
 
@@ -1825,9 +1818,12 @@ Attributes for fields
 
 .. attribute:: hidden
 
-    Hidden fields are fields that concretely exist, but that
-    are used to back other field's functionality (e.g. the ``content_type``
-    and ``object_id`` fields that make up a ``GenericForeignKey``).
+    Hidden fields are fields that exist, but are used to back other non-hidden
+    field's functionality (e.g. the ``content_type`` and ``object_id`` fields
+    that make up a ``GenericForeignKey``). The hidden flag is used to distinguish
+    what constitutes the public subset of fields on the model from all the fields
+    on the model.
+
 
     .. note::
         get_fields() excludes hidden fields by default. Pass in
@@ -1855,20 +1851,20 @@ cardinality and other details of a relation.
 
 .. attribute:: one_to_one
 
-    Responds ``True`` if the field has a one-to-one relation with
-    the related model, such as a ``OneToOneField``.
+    Responds ``True`` if the field has a one-to-one relation,
+    such as a ``OneToOneField``.
 
 .. attribute:: many_to_one
 
-    Responds ``True`` if the field has a many-to-one relation with
-    the related model, such as a ``GenericRelation``.
+    Responds ``True`` if the field has a many-to-one relation,
+    such as a ``GenericRelation``.
 
 .. attribute:: one_to_many
 
-    Responds ``True`` if the field has a one-to-many relation with
-    the related model, such as a ``ForeignKey``.
+    Responds ``True`` if the field has a one-to-many relation,
+    such as a ``ForeignKey``.
 
 .. attribute:: many_to_many
 
-    Responds ``True`` if the field has a many-to-many relation with
-    the related model, such as a ``ManyToManyField``.
+    Responds ``True`` if the field has a many-to-many relation,
+    such as a ``ManyToManyField``.
