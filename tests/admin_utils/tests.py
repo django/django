@@ -90,7 +90,7 @@ class NestedObjectsTests(TestCase):
         n.collect([Vehicle.objects.first()])
 
 
-class UtilTests(TestCase):
+class UtilsTests(TestCase):
     def test_values_from_lookup_field(self):
         """
         Regression test for #12654: lookup_field

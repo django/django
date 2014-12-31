@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy
 from django.utils.encoding import python_2_unicode_compatible
 
 
-class FormsUtilTestCase(TestCase):
+class FormsUtilsTestCase(TestCase):
     # Tests for forms/utils.py module.
 
     def test_flatatt(self):
