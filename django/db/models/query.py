@@ -253,7 +253,7 @@ class QuerySet(object):
         # build the list of fields that are to be loaded.
         if only_load:
             for field in self.model._meta.concrete_fields:
-                model = field.parent_model._meta.model
+                model = field.model._meta.model
                 try:
                     if field.name in only_load[model]:
                         # Add a field that has been explicitly included
@@ -1329,7 +1329,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         init_list = []
         # Build the list of fields that *haven't* been requested
         for field in klass._meta.concrete_fields:
-            model = field.parent_model._meta.concrete_model
+            model = field.model._meta.concrete_model
             if from_parent and model and issubclass(from_parent, model):
                 # Avoid loading fields already loaded for parent model for
                 # child models.
@@ -1487,7 +1487,7 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
         # Transfer data from this object to childs.
         parent_data = []
         for rel_field in klass_info[0]._meta.fields:
-            rel_model = rel_field.parent_model._meta.concrete_model
+            rel_model = rel_field.model._meta.concrete_model
             if rel_model == klass_info[0]._meta.model:
                 rel_model = None
             if rel_model is not None and isinstance(obj, rel_model):

@@ -17,13 +17,12 @@ class OptionsBaseTests(test.TestCase):
         return tuple((f.name, m) for f, m in res)
 
     def _model(self, current_model, field):
-        direct = isinstance(field, Field) or isinstance(field, GenericForeignKey)
-        model = field.model if direct else field.parent_model._meta.concrete_model
+        model = field.model._meta.concrete_model
         return None if model == current_model else model
 
     def _details(self, current_model, relation):
         direct = isinstance(relation, Field) or isinstance(relation, GenericForeignKey)
-        model = relation.model if direct else relation.parent_model._meta.concrete_model
+        model = relation.model._meta.concrete_model
         if model == current_model:
             model = None
 

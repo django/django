@@ -1293,10 +1293,6 @@ class ForeignObjectRel(object):
         return self.to._meta
 
     @cached_property
-    def parent_model(self):
-        return self.to
-
-    @cached_property
     def hidden(self):
         return self.is_hidden()
 
@@ -1340,7 +1336,7 @@ class ForeignObjectRel(object):
         queryset = self.related_model._default_manager.all()
         if limit_to_currently_related:
             queryset = queryset.complex_filter(
-                {'%s__isnull' % self.parent_model._meta.model_name: False}
+                {'%s__isnull' % self.related_model._meta.model_name: False}
             )
         lst = [(x._get_pk_val(), smart_text(x)) for x in queryset]
         return first_choice + lst
@@ -2473,8 +2469,8 @@ class ManyToManyField(RelatedField):
             link_field_name = None
         for f in self.rel.through._meta.fields:
             # NOTE f.rel.to != f.related_model
-            if f.has_relation and f.rel.to == related.parent_model:
-                if link_field_name is None and related.related_model == related.parent_model:
+            if f.has_relation and f.rel.to == related.model:
+                if link_field_name is None and related.related_model == related.model:
                     # If this is an m2m-intermediate to self,
                     # the first foreign key you find will be
                     # the source column. Keep searching for

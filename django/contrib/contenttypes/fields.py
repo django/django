@@ -347,7 +347,6 @@ class GenericRelation(ForeignObject):
         super(GenericRelation, self).contribute_to_class(cls, name, **kwargs)
         # Save a reference to which model this class is on for future use
         self.model = cls
-        self.parent_model = cls
         # Add the descriptor for the relation
         setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self, self.for_concrete_model))
 

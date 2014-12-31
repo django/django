@@ -298,7 +298,7 @@ class SQLCompiler(object):
         seen_models = {None: start_alias}
 
         for field in opts.concrete_fields:
-            model = field.parent_model._meta.concrete_model
+            model = field.model._meta.concrete_model
 
             # A proxy model will have a different model and concrete_model. We
             # will assign None if the field belongs to this model.
@@ -626,7 +626,7 @@ class SQLCompiler(object):
                 restricted = False
 
         for f in opts.fields:
-            field_model = f.parent_model._meta.concrete_model
+            field_model = f.model._meta.concrete_model
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):
                 continue

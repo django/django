@@ -591,7 +591,6 @@ class Field(RegisterLookupMixin):
     def contribute_to_class(self, cls, name, virtual_only=False):
         self.set_attributes_from_name(name)
         self.model = cls
-        self.parent_model = cls
         if virtual_only:
             cls._meta.add_field(self, virtual=True)
         else:

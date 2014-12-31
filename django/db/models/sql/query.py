@@ -605,7 +605,8 @@ class Query(object):
                     must_include[old_model].add(source)
                 add_to_dict(must_include, cur_model, opts.pk)
             field = opts.get_field(parts[-1])
-            model = field.parent_model._meta.concrete_model
+            model = field.related_model if field.is_reverse_object else field.model
+            model = model._meta.concrete_model
             if model == opts.model:
                 model = cur_model
             if not is_reverse_o2o(field):
@@ -621,7 +622,7 @@ class Query(object):
                 for field in model._meta.fields:
                     if field in values:
                         continue
-                    m = field.parent_model._meta.concrete_model
+                    m = field.model._meta.concrete_model
                     add_to_dict(workset, m, field)
             for model, values in six.iteritems(must_include):
                 # If we haven't included a model in workset, we don't add the
@@ -912,7 +913,7 @@ class Query(object):
         seen = {None: root_alias}
 
         for field in opts.fields:
-            model = field.parent_model._meta.concrete_model
+            model = field.model._meta.concrete_model
             if model is not opts.model and model not in seen:
                 self.join_parent_model(opts, model, root_alias, seen)
         self.included_inherited_models = seen
@@ -1356,7 +1357,7 @@ class Query(object):
                                      "relation and therefore cannot be used for reverse "
                                      "querying. If it is a GenericForeignKey, consider "
                                      "adding a GenericRelation." % name)
-                model = field.parent_model._meta.concrete_model
+                model = field.model._meta.concrete_model
             except FieldDoesNotExist:
                 # is it an annotation?
                 if self._annotations and name in self._annotations:

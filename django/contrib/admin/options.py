@@ -1921,7 +1921,7 @@ class InlineModelAdmin(BaseModelAdmin):
             # The model was auto-created as intermediary for a
             # ManyToMany-relationship, find the target model
             for field in opts.fields:
-                if field.rel and field.rel.to != self.parent_model:
+                if field.rel and field.rel.to != self.model:
                     opts = field.rel.to._meta
                     break
         codename = get_permission_codename('change', opts)

@@ -149,7 +149,7 @@ class Options(object):
         # No future methods should link to this function.
         # This function maps a field to (field, model or related_model,) depending on the field
         # type.
-        model = link.model if not link.is_reverse_object else link.parent_model._meta.concrete_model
+        model = link.model._meta.concrete_model
         if model is self.model:
             model = None
         return link, model
@@ -161,7 +161,7 @@ class Options(object):
         # This function maps a field to (field, model or related_model, direct, is_m2m) depending
         # on the field type.
         direct = not link.is_reverse_object
-        model = link.model if direct else link.parent_model._meta.concrete_model
+        model = link.model._meta.concrete_model
         if model is self.model:
             model = None
         m2m = link.has_relation and link.many_to_many
