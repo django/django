@@ -450,11 +450,11 @@ class MigrationAutodetector(object):
         old_keys = set(self.old_model_keys).union(self.old_unmanaged_keys)
         added_models = set(self.new_model_keys) - old_keys
         added_unmanaged_models = set(self.new_unmanaged_keys) - old_keys
-        models = chain(
+        all_added_models = chain(
             sorted(added_models, key=self.swappable_first_key, reverse=True),
             sorted(added_unmanaged_models, key=self.swappable_first_key, reverse=True)
         )
-        for app_label, model_name in models:
+        for app_label, model_name in all_added_models:
             model_state = self.to_state.models[app_label, model_name]
             model_opts = self.new_apps.get_model(app_label, model_name)._meta
             # Gather related fields
@@ -629,8 +629,8 @@ class MigrationAutodetector(object):
         new_keys = set(self.new_model_keys).union(self.new_unmanaged_keys)
         deleted_models = set(self.old_model_keys) - new_keys
         deleted_unmanaged_models = set(self.old_unmanaged_keys) - new_keys
-        models = chain(sorted(deleted_models), sorted(deleted_unmanaged_models))
-        for app_label, model_name in models:
+        all_deleted_models = chain(sorted(deleted_models), sorted(deleted_unmanaged_models))
+        for app_label, model_name in all_deleted_models:
             model_state = self.from_state.models[app_label, model_name]
             model = self.old_apps.get_model(app_label, model_name)
             if not model._meta.managed:
