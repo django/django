@@ -157,7 +157,7 @@ class UserAdmin(admin.ModelAdmin):
             'save_as': False,
             'show_save': True,
         }
-        context.update(admin.site.each_context())
+        context.update(admin.site.each_context(request))
 
         request.current_app = self.admin_site.name
 

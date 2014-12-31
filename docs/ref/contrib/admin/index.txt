@@ -2520,6 +2520,24 @@ Templates can override or extend base admin templates as described in
 ``AdminSite`` methods
 ---------------------
 
+.. method:: AdminSite.each_context(request):
+
+    .. versionadded:: 1.7
+
+    Returns a dictionary of variables to put in the template context for
+    every page in the admin site.
+
+    Includes the following variables and values by default:
+
+    * ``site_header``: :attr:`AdminSite.site_header`
+    * ``site_title``: :attr:`AdminSite.site_title`
+    * ``site_url``: :attr:`AdminSite.site_url`
+    * ``has_permission``: :meth:`AdminSite.has_permission`
+
+    .. versionchanged:: 1.8
+
+        The ``request`` argument and the ``has_permission`` variable were added.
+
 .. method:: AdminSite.has_permission(request)
 
     Returns ``True`` if the user for the given ``HttpRequest`` has permission
