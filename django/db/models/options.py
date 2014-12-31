@@ -496,8 +496,8 @@ class Options(object):
                 # We always want to throw a warning if many_to_many is used regardless
                 # of if it alters the return type or not.
                 warnings.warn(
-                    "The 'many_to_many' argument on get_field() is deprecated and will "
-                    "be removed. Please change your implementation accordingly.",
+                    "The 'many_to_many' argument on get_field() is deprecated; get_field()"
+                    "can now always return any field type.",
                     RemovedInDjango20Warning
                 )
                 if kwargs['many_to_many'] is False and field.many_to_many:
