@@ -41,7 +41,7 @@ class Command(BaseCommand):
         some named apps.
         """
         # Load migrations from disk/DB
-        loader = MigrationLoader(connection)
+        loader = MigrationLoader(connection, ignore_no_migrations=True)
         graph = loader.graph
         # If we were passed a list of apps, validate it
         if app_names:

@@ -189,3 +189,6 @@ Bugfixes
 
 * Fixed crash when ``ValidationError`` is initialized with a ``ValidationError``
   that is initialized with a dictionary (:ticket:`24008`).
+
+* Prevented a crash on apps without migrations when running ``migrate --list``
+  (:ticket:`23366`).
