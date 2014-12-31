@@ -679,26 +679,22 @@ class Options(object):
     def _relation_tree(self):
         # If cache is not present, populate the cache
         self._populate_directed_relation_graph()
-        try:
-            return self.__dict__['_relation_tree']
-        except KeyError:
-            # It may happen, often when the registry is not ready, that
-            # a not yet registered model is queried. In this very rare
-            # case we simply return an EMPTY_RELATION_TREE.
-            # When the registry will be ready, cache will be flushed and
-            # this model will be computed properly.
-            return EMPTY_RELATION_TREE
+        # It may happen, often when the registry is not ready, that
+        # a not yet registered model is queried. In this very rare
+        # case we simply return an EMPTY_RELATION_TREE.
+        # When the registry will be ready, cache will be flushed and
+        # this model will be computed properly.
+        return self.__dict__.get('_relation_tree', EMPTY_RELATION_TREE)
 
     def _expire_cache(self, forward=True, reverse=True):
-
+        # This method is usually called by apps.cache_clear(), when the
+        # registry is finalized, or when a new field is added.
         properties_to_expire = []
         if forward:
             properties_to_expire.extend(self.FORWARD_PROPERTIES)
         if reverse:
             properties_to_expire.extend(self.REVERSE_PROPERTIES)
 
-        # When a new model is registered, we expire the
-        # relation tree and any attribute that depends on it.
         for cache_key in properties_to_expire:
             try:
                 delattr(self, cache_key)
