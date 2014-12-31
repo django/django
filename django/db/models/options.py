@@ -488,21 +488,19 @@ class Options(object):
         # NOTE: previous get_field API had a many_to_many key. In order to avoid breaking
         # other's implementation we will catch the use of 'many_to_many'.
         try:
-            if kwargs['many_to_many'] is False:
-                # We always want to throw a warning if many_to_many is used regardless
-                # of if it alters the return type or not.
-                warnings.warn(
-                    "The 'many_to_many' argument on get_field() is deprecated and will "
-                    "be removed. Please change your implementation accordingly.",
-                    RemovedInDjango20Warning
-                )
-                try:
-                    field = self._forward_fields_map[field_name]
-                    if not isinstance(field, ManyToManyField):
-                        return field
-                except StopIteration:
-                    pass
-                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+            many_to_many = kwargs['many_to_many']
+            # We always want to throw a warning if many_to_many is used regardless
+            # of if it alters the return type or not.
+            warnings.warn(
+                "The 'many_to_many' argument on get_field() is deprecated and will "
+                "be removed. Please change your implementation accordingly.",
+                RemovedInDjango20Warning
+            )
+            if field_name in self._forward_fields_map:
+                field = self._forward_fields_map[field_name]
+                if many_to_many is True or not field.many_to_many:
+                    return field
+            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
         except KeyError:
             pass

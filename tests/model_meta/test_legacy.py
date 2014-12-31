@@ -181,7 +181,14 @@ class GetFieldByNameTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTest
                 Person._meta.get_field,
                 **{'field_name': 'm2m_base', 'many_to_many': False}
             )
-            self.assertEqual([RemovedInDjango20Warning], [w.message.__class__ for w in warning])
+            self.assertEqual(Person._meta.get_field('m2m_base', many_to_many=True).name, 'm2m_base')
+
+            # 2 RemovedInDjango20Warning messages should be raised, one for each call of get_field()
+            # with the 'many_to_many' argument.
+            self.assertEqual(
+                [RemovedInDjango20Warning, RemovedInDjango20Warning],
+                [w.message.__class__ for w in warning]
+            )
 
 
 class GetAllFieldNamesTestCase(OptionsBaseTests):
