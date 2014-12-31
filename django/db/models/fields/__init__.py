@@ -117,12 +117,13 @@ class Field(RegisterLookupMixin):
     class_lookups = default_lookups.copy()
     is_reverse_object = False
 
+    # Field flags
     hidden = False
-    related_model = None
     one_to_one = None
     one_to_many = None
     many_to_many = None
     many_to_one = None
+    related_model = None
 
     # Generic field type description, usually overridden by subclasses
     def _description(self):
@@ -145,6 +146,7 @@ class Field(RegisterLookupMixin):
         self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
         self.rel = rel
+        self.has_relation = self.rel is not None
         self.default = default
         self.editable = editable
         self.serialize = serialize
@@ -177,14 +179,6 @@ class Field(RegisterLookupMixin):
         messages.update(error_messages or {})
         self._error_messages = error_messages  # Store for deconstruction later
         self.error_messages = messages
-
-    @cached_property
-    def concrete(self):
-        return self.column is not None
-
-    @cached_property
-    def has_relation(self):
-        return self.rel is not None
 
     def __str__(self):
         """ Return "app_label.model_label.field_name". """
@@ -590,6 +584,7 @@ class Field(RegisterLookupMixin):
         if not self.name:
             self.name = name
         self.attname, self.column = self.get_attname_column()
+        self.concrete = self.column is not None
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 

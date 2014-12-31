@@ -1783,6 +1783,12 @@ class ForeignObject(RelatedField):
 
 
 class ForeignKey(ForeignObject):
+    # Field flags
+    one_to_many = True
+    one_to_one = False
+    many_to_many = False
+    many_to_one = False
+
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _('%(model)s instance with %(field)s %(value)r does not exist.')
