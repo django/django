@@ -38,31 +38,12 @@ __all__ = [str(x) for x in (
     'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
     'BooleanField', 'CharField', 'CommaSeparatedIntegerField', 'DateField',
     'DateTimeField', 'DecimalField', 'DurationField', 'EmailField',
-    'Empty', 'Field', 'FieldDoesNotExist', 'FieldFlagsMixin', 'FilePathField',
-    'FloatField', 'GenericIPAddressField', 'IPAddressField', 'IntegerField',
-    'NOT_PROVIDED', 'NullBooleanField', 'PositiveIntegerField',
-    'PositiveSmallIntegerField', 'SlugField', 'SmallIntegerField', 'TextField',
-    'TimeField', 'URLField', 'UUIDField',
+    'Empty', 'Field', 'FieldDoesNotExist', 'FilePathField', 'FloatField',
+    'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
+    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
+    'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
+    'UUIDField',
 )]
-
-
-class FieldFlagsMixin(object):
-    """
-    Base mixin class for model fields types. This allows required field flags to
-    be computed based on the internal attributes defined on the field instance.
-    """
-
-    _FLAGS_ERROR_MESSAGE = "The mandatory field flag '%s' has not been implemented. Please implement it."
-    editable = True
-    hidden = False
-
-    @cached_property
-    def concrete(self):
-        return self.column is not None
-
-    @cached_property
-    def has_relation(self):
-        return self.rel is not None
 
 
 class Empty(object):
@@ -108,7 +89,7 @@ def _empty(of_cls):
 
 @total_ordering
 @python_2_unicode_compatible
-class Field(RegisterLookupMixin, FieldFlagsMixin):
+class Field(RegisterLookupMixin):
     """Base class for all field types"""
 
     # Designates whether empty strings fundamentally are allowed at the
@@ -135,6 +116,13 @@ class Field(RegisterLookupMixin, FieldFlagsMixin):
     }
     class_lookups = default_lookups.copy()
     is_reverse_object = False
+
+    hidden = False
+    related_model = None
+    one_to_one = None
+    one_to_many = None
+    many_to_many = None
+    many_to_one = None
 
     # Generic field type description, usually overridden by subclasses
     def _description(self):
@@ -189,6 +177,14 @@ class Field(RegisterLookupMixin, FieldFlagsMixin):
         messages.update(error_messages or {})
         self._error_messages = error_messages  # Store for deconstruction later
         self.error_messages = messages
+
+    @cached_property
+    def concrete(self):
+        return self.column is not None
+
+    @cached_property
+    def has_relation(self):
+        return self.rel is not None
 
     def __str__(self):
         """ Return "app_label.model_label.field_name". """

@@ -85,9 +85,6 @@ FLAG_PROPERTIES = (
     'has_relation',
     'model',
     'hidden',
-)
-
-FLAG_PROPERTIES_FOR_RELATIONS = (
     'one_to_many',
     'many_to_one',
     'many_to_many',
@@ -800,9 +797,6 @@ class FieldFlagsTests(test.TestCase):
         for field in self.fields_and_reverse_objects:
             for flag in FLAG_PROPERTIES:
                 self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
-            if field.has_relation:
-                for flag in FLAG_PROPERTIES_FOR_RELATIONS:
-                    self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
 
     def test_cardinality_m2m(self):
         m2m_type_fields = (

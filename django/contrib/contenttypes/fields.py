@@ -6,7 +6,7 @@ from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db import models, router, transaction, DEFAULT_DB_ALIAS
-from django.db.models import signals, FieldDoesNotExist, DO_NOTHING, FieldFlagsMixin
+from django.db.models import signals, FieldDoesNotExist, DO_NOTHING
 from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.query_utils import PathInfo
@@ -16,19 +16,22 @@ from django.utils.encoding import smart_text, python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
-class GenericForeignKey(FieldFlagsMixin):
+class GenericForeignKey(object):
     """
     Provides a generic relation to any object through content-type/object-id
     fields.
     """
-    related_model = None
+    concrete = False
     editable = False
+    hidden = False
     is_reverse_object = False
 
+    has_relation = True
     one_to_many = True
     many_to_many = False
     many_to_one = False
     one_to_one = False
+    related_model = None
 
     def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
         self.ct_field = ct_field
