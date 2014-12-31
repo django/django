@@ -485,32 +485,26 @@ class Options(object):
         or reverse field
         """
 
-        # NOTE: previous get_field API had a many_to_many key. In order to avoid breaking
-        # other's implementation we will catch the use of 'many_to_many'.
-        try:
-            many_to_many = kwargs['many_to_many']
-            # We always want to throw a warning if many_to_many is used regardless
-            # of if it alters the return type or not.
-            warnings.warn(
-                "The 'many_to_many' argument on get_field() is deprecated and will "
-                "be removed. Please change your implementation accordingly.",
-                RemovedInDjango20Warning
-            )
-            if field_name in self._forward_fields_map:
-                field = self._forward_fields_map[field_name]
-                if many_to_many is True or not field.many_to_many:
-                    return field
-            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
-
-        except KeyError:
-            pass
-
-        # Legacy get_field() handling has finished. If the function gets to this point
-        # this means many_to_many was not supplied.
+        m2m_in_kwargs = 'many_to_many' in kwargs
         try:
             # In order to avoid premature loading of the relation tree (expensive) we
             # prefer checking if the field is a forward field.
-            return self._forward_fields_map[field_name]
+            field = self._forward_fields_map[field_name]
+
+            # NOTE: previous get_field API had a many_to_many key. In order to avoid breaking
+            # other's implementation we will catch the use of 'many_to_many'.
+            if m2m_in_kwargs:
+                # We always want to throw a warning if many_to_many is used regardless
+                # of if it alters the return type or not.
+                warnings.warn(
+                    "The 'many_to_many' argument on get_field() is deprecated and will "
+                    "be removed. Please change your implementation accordingly.",
+                    RemovedInDjango20Warning
+                )
+                if kwargs['many_to_many'] is False and field.many_to_many:
+                    raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+
+            return field
         except KeyError:
             # If the apps registry is not ready, reverse fields are unavailable, therefore
             # we throw an FieldDoesNotExist exception.
@@ -520,6 +514,10 @@ class Options(object):
                                         'be available yet.' % (self.object_name, field_name))
 
         try:
+            if m2m_in_kwargs:
+                # Previous API does not allow searching reverse fields.
+                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+
             # Retreive field instance by name from cached or just-computer field map
             return self.fields_map[field_name]
         except KeyError:
