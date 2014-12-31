@@ -252,7 +252,7 @@ class Options(object):
             query = self.order_with_respect_to
             try:
                 self.order_with_respect_to = next(
-                    f for f in self.get_fields(reverse=False)
+                    f for f in self._get_fields(reverse=False)
                     if f.name == query or f.attname == query
                 )
             except StopIteration:
@@ -380,7 +380,7 @@ class Options(object):
         is_not_a_generic_relation = lambda f: not (f.has_relation and f.many_to_one)
         is_not_a_generic_foreign_key = lambda f: not (f.has_relation and f.one_to_many and not f.related_model)
 
-        return make_immutable_fields_list("fields", (f for f in self.get_fields(reverse=False) if
+        return make_immutable_fields_list("fields", (f for f in self._get_fields(reverse=False) if
                                           is_not_an_m2m_field(f) and is_not_a_generic_relation(f)
                                           and is_not_a_generic_foreign_key(f)))
 
@@ -421,7 +421,7 @@ class Options(object):
         It is more safe to use get_fields(), outside of Django, that is officially
         maintained.
         """
-        return make_immutable_fields_list("many_to_many", (f for f in self.get_fields(reverse=False)
+        return make_immutable_fields_list("many_to_many", (f for f in self._get_fields(reverse=False)
                                           if f.has_relation and f.many_to_many))
 
     @cached_property
@@ -434,8 +434,7 @@ class Options(object):
         It is more safe to use get_fields(), outside of Django, that is officially
         maintained.
         """
-        all_related_fields = self.get_fields(forward=False, reverse=True,
-                                             include_hidden=True, cache_results=True)
+        all_related_fields = self._get_fields(forward=False, reverse=True, include_hidden=True)
         return make_immutable_fields_list(
             "related_objects",
             (obj for obj in all_related_fields
@@ -450,7 +449,7 @@ class Options(object):
     def _forward_fields_map(self):
         res = {}
         # call get_fields() with export_ordered_set=True in order to have a field_instance -> names map
-        fields = self.get_fields(reverse=False)
+        fields = self._get_fields(reverse=False)
         for field in fields:
             res[field.name] = field
 
@@ -466,7 +465,7 @@ class Options(object):
     @cached_property
     def fields_map(self):
         res = {}
-        fields = self.get_fields(forward=False, include_hidden=True)
+        fields = self._get_fields(forward=False, include_hidden=True)
         for field in fields:
             res[field.name] = field
 
@@ -548,7 +547,7 @@ class Options(object):
                                 include_proxy_eq=False):
 
         include_parents = local_only is False
-        fields = self.get_fields(
+        fields = self._get_fields(
             forward=False, reverse=True,
             include_parents=include_parents,
             include_hidden=include_hidden,
@@ -576,13 +575,13 @@ class Options(object):
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_many_to_many_objects(self, local_only=False):
-        fields = self.get_fields(forward=False, reverse=True,
+        fields = self._get_fields(forward=False, reverse=True,
                         include_parents=local_only is not True, include_hidden=True)
         return [obj for obj in fields if isinstance(obj.field, ManyToManyField)]
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_m2m_objects_with_model(self):
-        fields = self.get_fields(forward=False, reverse=True, include_hidden=True)
+        fields = self._get_fields(forward=False, reverse=True, include_hidden=True)
         return [self._map_model(obj) for obj in fields if isinstance(obj.field, ManyToManyField)]
 
     def get_base_chain(self, model):
@@ -646,7 +645,7 @@ class Options(object):
         for model in all_models:
 
             fields_with_relations = (
-                f for f in model._meta.get_fields(reverse=False)
+                f for f in model._meta._get_fields(reverse=False)
                 if f.has_relation and f.related_model is not None
             )
             if model._meta.auto_created:
@@ -703,7 +702,7 @@ class Options(object):
 
         self._get_fields_cache = {}
 
-    def get_fields(self, include_parents=True, include_hidden=False, **kwargs):
+    def get_fields(self, include_parents=True, include_hidden=False):
         """
         Returns a list of fields associated to the model. By default will only return forward fields.
         This can be changed by enabling or disabling field types using the flags available.
@@ -712,15 +711,14 @@ class Options(object):
         - include_parents:        include fields derived from inheritance
         - include_hidden:         include fields that have a related_name that starts with a "+"
         """
+        return self._get_fields(include_parents=include_parents, include_hidden=include_hidden)
+
+    def _get_fields(self, forward=True, reverse=True, include_parents=True, include_hidden=False,
+                    export_ordered_set=False):
+        # This helper function is used to allow recursion in the get_fields() API and
+        # provide a fast way for Django's internals to access specific subset of fields.
 
         # Creates a cache key composed of all arguments
-        forward = kwargs.pop('forward', True)
-        reverse = kwargs.pop('reverse', True)
-        export_ordered_set = kwargs.pop('export_ordered_set', False)
-        cache_results = kwargs.pop('cache_results', True)
-        if kwargs:
-            raise TypeError("'%s' are invalid keyword arguments" % ', '.join(kwargs.keys()))
-
         cache_key = (forward, reverse, include_parents, include_hidden, export_ordered_set)
         try:
             # In order to avoid list manipulation. Always return a shallow copy
@@ -737,16 +735,15 @@ class Options(object):
             'include_parents': include_parents,
             'include_hidden': include_hidden,
             'export_ordered_set': True,
-            'cache_results': cache_results,
         }
 
         if reverse:
             if include_parents:
                 parent_list = self.get_parent_list()
-                # Recursively call get_fields on each parent, with the same options provided
+                # Recursively call _get_fields on each parent, with the same options provided
                 # in this call
                 for parent in self.parents:
-                    for obj, _ in six.iteritems(parent._meta.get_fields(forward=False, **options)):
+                    for obj, _ in six.iteritems(parent._meta._get_fields(forward=False, **options)):
 
                         if obj.many_to_many:
                             # In order for a reverse ManyToManyRel object to be valid, its creation
@@ -775,7 +772,7 @@ class Options(object):
             if include_parents:
                 for parent in self.parents:
                     # Extend the fields dict with all the forward fields of each parent.
-                    fields.update(parent._meta.get_fields(reverse=False, **options))
+                    fields.update(parent._meta._get_fields(reverse=False, **options))
             fields.update(
                 (field, True,)
                 for field in chain(self.local_fields, self.local_many_to_many)
@@ -783,20 +780,18 @@ class Options(object):
 
         if not export_ordered_set:
             # By default, fields contains field instances as keys and all possible names
-            # if the field instance as values. when get_fields is called, we only want to
+            # if the field instance as values. when _get_fields is called, we only want to
             # return field instances, so we just preserve the keys.
             fields = list(fields.keys())
 
             # Virtual fields are not inheritable, therefore they are inserted only when the
-            # recursive get_fields() call comes to an end.
+            # recursive _get_fields() call comes to an end.
             if forward:
                 fields.extend(self.virtual_fields)
 
             fields = make_immutable_fields_list("get_fields()", fields)
 
         # Store result into cache for later access
-        if cache_results:
-            self._get_fields_cache[cache_key] = fields
         # In order to avoid list manipulation. Always
         # return a shallow copy of the results
         return fields

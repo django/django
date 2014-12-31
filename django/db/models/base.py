@@ -1443,7 +1443,7 @@ class Model(six.with_metaclass(ModelBase)):
         # In order to avoid hitting the relation tree prematurely, we use our own
         # fields_map instead of using get_field()
         forward_fields_map = dict(
-            (field.name, field) for field in cls._meta.get_fields(reverse=False)
+            (field.name, field) for field in cls._meta._get_fields(reverse=False)
         )
 
         errors = []

@@ -43,11 +43,6 @@ class GetFieldsTests(OptionsBaseTests):
                 fields += ["errors"]
             self.assertEqual(str(err.exception), IMMUTABLE_WARNING % "get_fields()")
 
-    def test_get_fields_accepts_only_valid_kwargs(self):
-        with self.assertRaises(TypeError) as err:
-            Person._meta.get_fields(revese=True)
-        self.assertEqual(str(err.exception), "'revese' are invalid keyword arguments")
-
 
 class DataTests(OptionsBaseTests):
 
