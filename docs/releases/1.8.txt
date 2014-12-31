@@ -136,6 +136,15 @@ Minor features
 * The ``AdminSite.password_change()`` method now has an ``extra_context``
   parameter.
 
+* You can now control who may login to the admin site by overriding only
+  :meth:`AdminSite.has_permission()
+  <django.contrib.admin.AdminSite.has_permission>` and
+  :attr:`AdminSite.login_form <django.contrib.admin.AdminSite.login_form>`.
+  The ``base.html`` template has a new block ``usertools`` which contains the
+  user-specific header. A new context variable ``has_permission``, which gets
+  its value from :meth:`~django.contrib.admin.AdminSite.has_permission`,
+  indicates whether the user may access the site.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -898,6 +907,14 @@ Miscellaneous
   attribute has been removed. The application name is always ``admin`` (as
   opposed to the instance name which you can still customize using
   ``AdminSite(name="...")``.
+
+* The block ``usertools`` in the ``base.html`` template of
+  :mod:`django.contrib.admin` now requires the ``has_permission`` context
+  variable to be set. If you have any custom admin views that use this
+  template, update them to pass :meth:`AdminSite.has_permission()
+  <django.contrib.admin.AdminSite.has_permission>` as this new variable's
+  value or simply include :meth:`AdminSite.each_context(request)
+  <django.contrib.admin.AdminSite.each_context>` in the context.
 
 * Internal changes were made to the :class:`~django.forms.ClearableFileInput`
   widget to allow more customization. The undocumented ``url_markup_template``

@@ -64,7 +64,7 @@ def delete_selected(modeladmin, request, queryset):
         title = _("Are you sure?")
 
     context = dict(
-        modeladmin.admin_site.each_context(),
+        modeladmin.admin_site.each_context(request),
         title=title,
         objects_name=objects_name,
         deletable_objects=[deletable_objects],

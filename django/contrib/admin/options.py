@@ -1461,7 +1461,7 @@ class ModelAdmin(BaseModelAdmin):
         for inline_formset in inline_formsets:
             media = media + inline_formset.media
 
-        context = dict(self.admin_site.each_context(),
+        context = dict(self.admin_site.each_context(request),
             title=(_('Add %s') if add else _('Change %s')) % force_text(opts.verbose_name),
             adminform=adminForm,
             object_id=object_id,
@@ -1617,7 +1617,7 @@ class ModelAdmin(BaseModelAdmin):
             'All %(total_count)s selected', cl.result_count)
 
         context = dict(
-            self.admin_site.each_context(),
+            self.admin_site.each_context(request),
             module_name=force_text(opts.verbose_name_plural),
             selection_note=_('0 of %(cnt)s selected') % {'cnt': len(cl.result_list)},
             selection_note_all=selection_note_all % {'total_count': cl.result_count},
@@ -1686,7 +1686,7 @@ class ModelAdmin(BaseModelAdmin):
             title = _("Are you sure?")
 
         context = dict(
-            self.admin_site.each_context(),
+            self.admin_site.each_context(request),
             title=title,
             object_name=object_name,
             object=obj,
@@ -1720,7 +1720,7 @@ class ModelAdmin(BaseModelAdmin):
             content_type=get_content_type_for_model(model)
         ).select_related().order_by('action_time')
 
-        context = dict(self.admin_site.each_context(),
+        context = dict(self.admin_site.each_context(request),
             title=_('Change history: %s') % force_text(obj),
             action_list=action_list,
             module_name=capfirst(force_text(opts.verbose_name_plural)),

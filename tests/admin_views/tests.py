@@ -1091,6 +1091,9 @@ class AdminViewPermissionsTest(TestCase):
         change_user = User.objects.get(username='changeuser')
         change_user.user_permissions.add(get_perm(Article,
             get_permission_codename('change', opts)))
+        change_user2 = User.objects.get(username='nostaff')
+        change_user2.user_permissions.add(get_perm(Article,
+            get_permission_codename('change', opts)))
 
         # User who can delete Articles
         delete_user = User.objects.get(username='deleteuser')
@@ -1129,6 +1132,11 @@ class AdminViewPermissionsTest(TestCase):
         self.deleteuser_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
             'username': 'deleteuser',
+            'password': 'secret',
+        }
+        self.nostaff_login = {
+            REDIRECT_FIELD_NAME: '/test_admin/has_permission_admin/',
+            'username': 'nostaff',
             'password': 'secret',
         }
         self.joepublic_login = {
@@ -1210,6 +1218,34 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(login.status_code, 200)
         form = login.context[0].get('form')
         self.assertEqual(form.errors['username'][0], 'This field is required.')
+
+    def test_login_has_permission(self):
+        # Regular User should not be able to login.
+        response = self.client.get('/test_admin/has_permission_admin/')
+        self.assertEqual(response.status_code, 302)
+        login = self.client.post('/test_admin/has_permission_admin/login/', self.joepublic_login)
+        self.assertEqual(login.status_code, 200)
+        self.assertContains(login, 'permission denied')
+
+        # User with permissions should be able to login.
+        response = self.client.get('/test_admin/has_permission_admin/')
+        self.assertEqual(response.status_code, 302)
+        login = self.client.post('/test_admin/has_permission_admin/login/', self.nostaff_login)
+        self.assertRedirects(login, '/test_admin/has_permission_admin/')
+        self.assertFalse(login.context)
+        self.client.get('/test_admin/has_permission_admin/logout/')
+
+        # Staff should be able to login.
+        response = self.client.get('/test_admin/has_permission_admin/')
+        self.assertEqual(response.status_code, 302)
+        login = self.client.post('/test_admin/has_permission_admin/login/', {
+            REDIRECT_FIELD_NAME: '/test_admin/has_permission_admin/',
+            'username': 'deleteuser',
+            'password': 'secret',
+        })
+        self.assertRedirects(login, '/test_admin/has_permission_admin/')
+        self.assertFalse(login.context)
+        self.client.get('/test_admin/has_permission_admin/logout/')
 
     def test_login_successfully_redirects_to_original_URL(self):
         response = self.client.get('/test_admin/admin/')
