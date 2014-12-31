@@ -31,9 +31,6 @@ details on these changes.
 * Using an incorrect count of unpacked values in the ``for`` template tag
   will raise an exception rather than fail silently.
 
-* The ``DatabaseCreation`` class on each database backend will be removed,
-  and all table/schema editing will be moved to be via ``SchemaEditor`` instead.
-
 * The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
   Python path will be removed.
 
