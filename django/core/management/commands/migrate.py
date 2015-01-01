@@ -68,14 +68,15 @@ class Command(BaseCommand):
             warnings.warn(
                 "The 'migrate --list' command is deprecated. Use 'showmigrations' instead.",
                 RemovedInDjango20Warning, stacklevel=2)
+            self.stdout.ending = None  # Remove when #21429 is fixed
             return call_command(
                 'showmigrations',
                 '--list',
                 app_labels=[options['app_label']] if options['app_label'] else None,
                 database=db,
-                no_color=options.get('no-color'),
+                no_color=options.get('no_color'),
                 settings=options.get('settings'),
-                stdout=options.get('stdout', self.stdout),
+                stdout=self.stdout,
                 traceback=self.show_traceback,
                 verbosity=self.verbosity,
             )
