@@ -734,9 +734,9 @@ auth views.
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm`
 
-  Assumes that the user model has an integer primary key, has a field named
-  ``email`` that can be used to identify the user, and a boolean field
-  named ``is_active`` to prevent password resets for inactive users.
+  Assumes that the user model has a field named ``email`` that can be used to
+  identify the user and a boolean field named ``is_active`` to prevent
+  password resets for inactive users.
 
 * :class:`~django.contrib.auth.forms.SetPasswordForm`
 
