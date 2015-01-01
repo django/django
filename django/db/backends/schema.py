@@ -1,6 +1,5 @@
 import hashlib
 
-from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.utils import truncate_name
 from django.db.models.fields.related import ManyToManyField
 from django.db.transaction import atomic
@@ -111,6 +110,17 @@ class BaseDatabaseSchemaEditor(object):
     def quote_name(self, name):
         return self.connection.ops.quote_name(name)
 
+    @classmethod
+    def _digest(cls, *args):
+        """
+        Generates a 32-bit digest of a set of arguments that can be used to
+        shorten identifying names.
+        """
+        h = hashlib.md5()
+        for arg in args:
+            h.update(force_bytes(arg))
+        return h.hexdigest()[:8]
+
     # Field <-> database mapping functions
 
     def column_sql(self, model, field, include_default=False):
@@ -128,17 +138,18 @@ class BaseDatabaseSchemaEditor(object):
         # Work out nullability
         null = field.null
         # If we were told to include a default value, do so
-        default_value = self.effective_default(field)
         include_default = include_default and not self.skip_default(field)
-        if include_default and default_value is not None:
-            if self.connection.features.requires_literal_defaults:
-                # Some databases can't take defaults as a parameter (oracle)
-                # If this is the case, the individual schema backend should
-                # implement prepare_default
-                sql += " DEFAULT %s" % self.prepare_default(default_value)
-            else:
-                sql += " DEFAULT %s"
-                params += [default_value]
+        if include_default:
+            default_value = self.effective_default(field)
+            if default_value is not None:
+                if self.connection.features.requires_literal_defaults:
+                    # Some databases can't take defaults as a parameter (oracle)
+                    # If this is the case, the individual schema backend should
+                    # implement prepare_default
+                    sql += " DEFAULT %s" % self.prepare_default(default_value)
+                else:
+                    sql += " DEFAULT %s"
+                    params += [default_value]
         # Oracle treats the empty string ('') as null, so coerce the null
         # option whenever '' is a possible value.
         if (field.empty_strings_allowed and not field.primary_key and
@@ -252,6 +263,7 @@ class BaseDatabaseSchemaEditor(object):
                 autoinc_sql = self.connection.ops.autoinc_sql(model._meta.db_table, field.column)
                 if autoinc_sql:
                     self.deferred_sql.extend(autoinc_sql)
+
         # Add any unique_togethers
         for fields in model._meta.unique_together:
             columns = [model._meta.get_field(field).column for field in fields]
@@ -263,7 +275,12 @@ class BaseDatabaseSchemaEditor(object):
             "table": self.quote_name(model._meta.db_table),
             "definition": ", ".join(column_sqls)
         }
-        self.execute(sql, params)
+        if model._meta.db_tablespace:
+            tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
+            if tablespace_sql:
+                sql += ' ' + tablespace_sql
+        # Prevent using [] as params, in the case a literal '%' is used in the definition
+        self.execute(sql, params or None)
 
         # Add any field index and index_together's (deferred as SQLite3 _remake_table needs it)
         self.deferred_sql.extend(self._model_indexes_sql(model))
@@ -549,34 +566,31 @@ class BaseDatabaseSchemaEditor(object):
         # Default change?
         old_default = self.effective_default(old_field)
         new_default = self.effective_default(new_field)
-        if old_default != new_default and not self.skip_default(new_field):
-            if new_default is None:
+        needs_database_default = (
+            old_default != new_default and
+            new_default is not None and
+            not self.skip_default(new_field)
+        )
+        if needs_database_default:
+            if self.connection.features.requires_literal_defaults:
+                # Some databases can't take defaults as a parameter (oracle)
+                # If this is the case, the individual schema backend should
+                # implement prepare_default
                 actions.append((
-                    self.sql_alter_column_no_default % {
+                    self.sql_alter_column_default % {
                         "column": self.quote_name(new_field.column),
+                        "default": self.prepare_default(new_default),
                     },
                     [],
                 ))
             else:
-                if self.connection.features.requires_literal_defaults:
-                    # Some databases can't take defaults as a parameter (oracle)
-                    # If this is the case, the individual schema backend should
-                    # implement prepare_default
-                    actions.append((
-                        self.sql_alter_column_default % {
-                            "column": self.quote_name(new_field.column),
-                            "default": self.prepare_default(new_default),
-                        },
-                        [],
-                    ))
-                else:
-                    actions.append((
-                        self.sql_alter_column_default % {
-                            "column": self.quote_name(new_field.column),
-                            "default": "%s",
-                        },
-                        [new_default],
-                    ))
+                actions.append((
+                    self.sql_alter_column_default % {
+                        "column": self.quote_name(new_field.column),
+                        "default": "%s",
+                    },
+                    [new_default],
+                ))
         # Nullability change?
         if old_field.null != new_field.null:
             if new_field.null:
@@ -712,7 +726,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Drop the default if we need to
         # (Django usually does not use in-database defaults)
-        if not self.skip_default(new_field) and new_field.default is not None:
+        if needs_database_default:
             sql = self.sql_alter_column % {
                 "table": self.quote_name(model._meta.db_table),
                 "changes": self.sql_alter_column_no_default % {
@@ -775,7 +789,7 @@ class BaseDatabaseSchemaEditor(object):
         # If there is just one column in the index, use a default algorithm from Django
         if len(column_names) == 1 and not suffix:
             return truncate_name(
-                '%s_%s' % (model._meta.db_table, BaseDatabaseCreation._digest(column_names[0])),
+                '%s_%s' % (model._meta.db_table, self._digest(column_names[0])),
                 self.connection.ops.max_name_length()
             )
         # Else generate the name for the index using a different algorithm

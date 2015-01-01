@@ -233,6 +233,9 @@ geolocalized
 geolocated
 geolocation
 geoquerysets
+georeference
+georeferenced
+georeferencing
 geospatial
 Geospatial
 Gettext
@@ -613,6 +616,7 @@ subpackages
 subqueries
 subquery
 subselect
+substr
 subtemplate
 subtemplates
 subviews

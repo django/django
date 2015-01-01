@@ -189,6 +189,8 @@ extra attribute ``field_lower`` produced, roughly, from the following SQL::
         ...
         LOWER("app_label"."field") as "field_lower"
 
+See :doc:`database-functions` for a list of built-in database functions.
+
 The ``Func`` API is as follows:
 
 .. class:: Func(*expressions, **extra)

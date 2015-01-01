@@ -2,40 +2,34 @@
 
 from __future__ import unicode_literals
 
+import os
 import functools
 
 from django import template
 from django.template import Library
-from django.template.base import Context
+from django.template.base import libraries
 from django.template.engine import Engine
-from django.template.loader import get_template
 from django.test.utils import override_settings
-from django.utils import translation
+from django.utils._os import upath
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
 
-def render(template_name, context=None):
-    if context is None:
-        context = {}
-
-    t = get_template(template_name)
-    with translation.override(context.get('LANGUAGE_CODE', 'en-us')):
-        return t.render(Context(context))
+ROOT = os.path.dirname(os.path.abspath(upath(__file__)))
 
 
 def setup(templates, *args):
     """
     Runs test method multiple times in the following order:
 
-    TEMPLATE_DEBUG      CACHED      TEMPLATE_STRING_IF_INVALID
-    --------------      ------      --------------------------
-    False               False
-    False               True
-    False               False       INVALID
-    False               True        INVALID
-    True                False
-    True                True
+    debug       cached      string_if_invalid
+    -----       ------      -----------------
+    False       False
+    False       True
+    False       False       INVALID
+    False       True        INVALID
+    True        False
+    True        True
     """
 
     for arg in args:
@@ -45,31 +39,44 @@ def setup(templates, *args):
     # add this in here for simplicity
     templates["inclusion.html"] = "{{ result }}"
 
+    loaders = [
+        ('django.template.loaders.cached.Loader', [
+            ('django.template.loaders.locmem.Loader', templates),
+        ]),
+    ]
+
     def decorator(func):
         @register_test_tags
-        @override_settings(TEMPLATE_LOADERS=[
-            ('django.template.loaders.cached.Loader', [
-                ('django.template.loaders.locmem.Loader', templates),
-            ]),
-        ])
+        # Make Engine.get_default() raise an exception to ensure that tests
+        # are properly isolated from Django's global settings.
+        @override_settings(TEMPLATES=None)
         @functools.wraps(func)
         def inner(self):
-            loader = Engine.get_default().template_loaders[0]
-
+            self.engine = Engine(
+                allowed_include_roots=[ROOT],
+                loaders=loaders,
+            )
             func(self)
             func(self)
-            loader.reset()
 
-            with override_settings(TEMPLATE_STRING_IF_INVALID='INVALID'):
-                func(self)
-                func(self)
-                loader.reset()
+            self.engine = Engine(
+                allowed_include_roots=[ROOT],
+                loaders=loaders,
+                string_if_invalid='INVALID',
+            )
+            func(self)
+            func(self)
 
-            with override_settings(TEMPLATE_DEBUG=True):
-                func(self)
-                func(self)
-                loader.reset()
+            self.engine = Engine(
+                allowed_include_roots=[ROOT],
+                debug=True,
+                loaders=loaders,
+            )
+            func(self)
+            func(self)
+
         return inner
+
     return decorator
 
 
@@ -100,9 +107,11 @@ def upper(value):
 def register_test_tags(func):
     @functools.wraps(func)
     def inner(self):
-        template.libraries['testtags'] = register
-        func(self)
-        del template.libraries['testtags']
+        libraries['testtags'] = register
+        try:
+            func(self)
+        finally:
+            del libraries['testtags']
     return inner
 
 

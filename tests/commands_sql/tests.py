@@ -8,8 +8,9 @@ from django.core.management.color import no_style
 from django.core.management.sql import (sql_create, sql_delete, sql_indexes,
     sql_destroy_indexes, sql_all)
 from django.db import connections, DEFAULT_DB_ALIAS
-from django.test import TestCase, override_settings
+from django.test import TestCase, ignore_warnings, override_settings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 # See also initial_sql_regress for 'custom_sql_for_model' tests
 
@@ -44,7 +45,7 @@ class SQLCommandsTestCase(TestCase):
             'commands_sql_comment', 'commands_sql_book', 'commands_sql_book_comments'
         })
 
-    @unittest.skipUnless('PositiveIntegerField' in connections[DEFAULT_DB_ALIAS].creation.data_type_check_constraints, 'Backend does not have checks.')
+    @unittest.skipUnless('PositiveIntegerField' in connections[DEFAULT_DB_ALIAS].data_type_check_constraints, 'Backend does not have checks.')
     def test_sql_create_check(self):
         """Regression test for #23416 -- Check that db_params['check'] is respected."""
         app_config = apps.get_app_config('commands_sql')
@@ -65,25 +66,27 @@ class SQLCommandsTestCase(TestCase):
         sql = drop_tables[-1].lower()
         six.assertRegex(self, sql, r'^drop table .commands_sql_comment.*')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_sql_indexes(self):
         app_config = apps.get_app_config('commands_sql')
         output = sql_indexes(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
-        # PostgreSQL creates one additional index for CharField
-        self.assertIn(self.count_ddl(output, 'CREATE INDEX'), [3, 4])
+        # Number of indexes is backend-dependent
+        self.assertTrue(1 <= self.count_ddl(output, 'CREATE INDEX') <= 4)
 
     def test_sql_destroy_indexes(self):
         app_config = apps.get_app_config('commands_sql')
         output = sql_destroy_indexes(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
-        # PostgreSQL creates one additional index for CharField
-        self.assertIn(self.count_ddl(output, 'DROP INDEX'), [3, 4])
+        # Number of indexes is backend-dependent
+        self.assertTrue(1 <= self.count_ddl(output, 'DROP INDEX') <= 4)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_sql_all(self):
         app_config = apps.get_app_config('commands_sql')
         output = sql_all(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
 
         self.assertEqual(self.count_ddl(output, 'CREATE TABLE'), 3)
-        # PostgreSQL creates one additional index for CharField
-        self.assertIn(self.count_ddl(output, 'CREATE INDEX'), [3, 4])
+        # Number of indexes is backend-dependent
+        self.assertTrue(1 <= self.count_ddl(output, 'CREATE INDEX') <= 4)
 
 
 class TestRouter(object):

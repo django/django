@@ -1,7 +1,7 @@
 import logging
 
 from django.forms.widgets import Textarea
-from django.template import loader, Context
+from django.template import loader
 from django.utils import six
 from django.utils import translation
 
@@ -10,7 +10,7 @@ from django.contrib.gis.geos import GEOSGeometry, GEOSException
 
 # Creating a template context that contains Django settings
 # values needed by admin map templates.
-geo_context = Context({'LANGUAGE_BIDI': translation.get_language_bidi()})
+geo_context = {'LANGUAGE_BIDI': translation.get_language_bidi()}
 logger = logging.getLogger('django.contrib.gis')
 
 
@@ -81,8 +81,8 @@ class OpenLayersWidget(Textarea):
             # geometry.
             self.params['wkt'] = wkt
 
-        return loader.render_to_string(self.template, self.params,
-                                       context_instance=geo_context)
+        self.params.update(geo_context)
+        return loader.render_to_string(self.template, self.params)
 
     def map_options(self):
         "Builds the map options hash for the OpenLayers template."

@@ -13,8 +13,8 @@ from django.apps import apps
 from django.conf import settings
 from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
+from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.test.signals import setting_changed
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.utils._os import upath
@@ -544,8 +544,8 @@ def templatize(src, origin=None):
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
-    from django.template import (Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK,
-            TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
+    from django.template.base import (Lexer, TOKEN_TEXT, TOKEN_VAR,
+        TOKEN_BLOCK, TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
     src = force_text(src, settings.FILE_CHARSET)
     out = StringIO('')
     message_context = None

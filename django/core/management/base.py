@@ -18,6 +18,7 @@ import django
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
+from django.db import connections
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils.encoding import force_str
 
@@ -398,6 +399,8 @@ class BaseCommand(object):
             else:
                 self.stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
+        finally:
+            connections.close_all()
 
     def execute(self, *args, **options):
         """

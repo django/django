@@ -31,9 +31,6 @@ details on these changes.
 * Using an incorrect count of unpacked values in the ``for`` template tag
   will raise an exception rather than fail silently.
 
-* The ``DatabaseCreation`` class on each database backend will be removed,
-  and all table/schema editing will be moved to be via ``SchemaEditor`` instead.
-
 * The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
   Python path will be removed.
 
@@ -43,6 +40,8 @@ details on these changes.
 * The class :class:`~django.core.management.NoArgsCommand` will be removed. Use
   :class:`~django.core.management.BaseCommand` instead, which takes no arguments
   by default.
+
+* ``django.core.context_processors`` module will be removed.
 
 * ``django.db.models.sql.aggregates`` module will be removed.
 
@@ -99,8 +98,31 @@ details on these changes.
 * The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
   defined with no default value for its ``form_class`` argument will be removed.
 
+* The following settings will be removed:
+
+  * ``ALLOWED_INCLUDE_ROOTS``
+  * ``TEMPLATE_CONTEXT_PROCESSORS``
+  * ``TEMPLATE_DIRS``
+  * ``TEMPLATE_LOADERS``
+  * ``TEMPLATE_STRING_IF_INVALID``
+
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` will
   be removed.
+
+* The ``current_app`` parameter for the following function and classes will be
+  removed:
+
+  * ``django.shortcuts.render()``
+  * ``django.template.Context()``
+  * ``django.template.RequestContext()``
+  * ``django.template.response.TemplateResponse()``
+
+* The ``dictionary`` and ``context_instance`` parameters for the following
+  functions will be removed:
+
+  * ``django.shortcuts.render()``
+  * ``django.shortcuts.render_to_response()``
+  * ``django.template.loader.render_to_string()``
 
 * The ``dirs`` parameter for the following functions will be removed:
 
@@ -114,6 +136,8 @@ details on these changes.
   ``MIDDLEWARE_CLASSES``.
 
 * Private attribute ``django.db.models.Field.related`` will be removed.
+
+* The ``--list`` option of the ``migrate`` management command will be removed.
 
 .. _deprecation-removed-in-1.9:
 
@@ -148,10 +172,6 @@ details on these changes.
   Furthermore, it won't be possible to import them before their application
   is loaded. In particular, it won't be possible to import models inside
   the root package of their application.
-
-* If models are organized in a package, Django will no longer look for
-  :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
-  custom SQL files to ``myapp/sql/``.
 
 * The model and form ``IPAddressField`` will be removed.
 

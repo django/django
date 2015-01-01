@@ -4,6 +4,7 @@ import threading
 import warnings
 
 from django.conf import settings
+from django.core.signals import setting_changed
 from django.db import connections, router
 from django.db.utils import ConnectionRouter
 from django.dispatch import receiver, Signal
@@ -11,8 +12,6 @@ from django.utils import timezone
 from django.utils.functional import empty
 
 template_rendered = Signal(providing_args=["template", "context"])
-
-setting_changed = Signal(providing_args=["setting", "value", "enter"])
 
 # Most setting_changed receivers are supposed to be added below,
 # except for cases where the receiver is related to a contrib app.
@@ -85,8 +84,9 @@ def clear_routers_cache(**kwargs):
 
 
 @receiver(setting_changed)
-def reset_default_template_engine(**kwargs):
+def reset_template_engines(**kwargs):
     if kwargs['setting'] in {
+        'TEMPLATES',
         'TEMPLATE_DIRS',
         'ALLOWED_INCLUDE_ROOTS',
         'TEMPLATE_CONTEXT_PROCESSORS',
@@ -94,7 +94,15 @@ def reset_default_template_engine(**kwargs):
         'TEMPLATE_LOADERS',
         'TEMPLATE_STRING_IF_INVALID',
         'FILE_CHARSET',
+        'INSTALLED_APPS',
     }:
+        from django.template import engines
+        try:
+            del engines.templates
+        except AttributeError:
+            pass
+        engines._templates = None
+        engines._engines = {}
         from django.template.engine import Engine
         Engine.get_default.cache_clear()
 

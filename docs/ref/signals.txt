@@ -666,6 +666,13 @@ It's actually sent twice: when the new value is applied ("setup") and when the
 original value is restored ("teardown"). Use the ``enter`` argument to
 distinguish between the two.
 
+You can also import this signal from ``django.core.signals`` to avoid importing
+from ``django.test`` in non-test situations.
+
+.. versionchanged:: 1.8
+
+    The signal was moved to ``django.core.signals`` as described above.
+
 Arguments sent with this signal:
 
 ``sender``

@@ -171,7 +171,7 @@ straight lookups. Here are some things to keep in mind:
   ``silent_variable_failure`` whose value is ``True``. If the exception
   *does* have a ``silent_variable_failure`` attribute whose value is
   ``True``, the variable will render as the value of the
-  :setting:`TEMPLATE_STRING_IF_INVALID` setting (an empty string, by default).
+  ``string_if_invalid`` configuration option (an empty string, by default).
   Example::
 
     >>> t = Template("My name is {{ person.first_name }}.")
@@ -200,7 +200,7 @@ straight lookups. Here are some things to keep in mind:
   silently.
 
 * A variable can only be called if it has no required arguments. Otherwise,
-  the system will return the value of :setting:`TEMPLATE_STRING_IF_INVALID`.
+  the system will return the value of the ``string_if_invalid`` option.
 
 .. _alters-data-description:
 
@@ -217,7 +217,7 @@ straight lookups. Here are some things to keep in mind:
   To prevent this, set an ``alters_data`` attribute on the callable
   variable. The template system won't call a variable if it has
   ``alters_data=True`` set, and will instead replace the variable with
-  :setting:`TEMPLATE_STRING_IF_INVALID`, unconditionally.  The
+  ``string_if_invalid``, unconditionally.  The
   dynamically-generated :meth:`~django.db.models.Model.delete` and
   :meth:`~django.db.models.Model.save` methods on Django model objects get
   ``alters_data=True`` automatically. Example::
@@ -239,36 +239,34 @@ How invalid variables are handled
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Generally, if a variable doesn't exist, the template system inserts the
-value of the :setting:`TEMPLATE_STRING_IF_INVALID` setting, which is set to
+value of the ``string_if_invalid`` configuration option, which is set to
 ``''`` (the empty string) by default.
 
 Filters that are applied to an invalid variable will only be applied if
-:setting:`TEMPLATE_STRING_IF_INVALID` is set to ``''`` (the empty string). If
-:setting:`TEMPLATE_STRING_IF_INVALID` is set to any other value, variable
-filters will be ignored.
+``string_if_invalid`` is set to ``''`` (the empty string). If
+``string_if_invalid`` is set to any other value, variable filters will be
+ignored.
 
 This behavior is slightly different for the ``if``, ``for`` and ``regroup``
 template tags. If an invalid variable is provided to one of these template
 tags, the variable will be interpreted as ``None``. Filters are always
 applied to invalid variables within these template tags.
 
-If :setting:`TEMPLATE_STRING_IF_INVALID` contains a ``'%s'``, the format marker will
-be replaced with the name of the invalid variable.
+If ``string_if_invalid`` contains a ``'%s'``, the format marker will be
+replaced with the name of the invalid variable.
 
 .. admonition:: For debug purposes only!
 
-    While :setting:`TEMPLATE_STRING_IF_INVALID` can be a useful debugging tool,
-    it is a bad idea to turn it on as a 'development default'.
+    While ``string_if_invalid`` can be a useful debugging tool, it is a bad
+    idea to turn it on as a 'development default'.
 
-    Many templates, including those in the Admin site, rely upon the
-    silence of the template system when a non-existent variable is
-    encountered. If you assign a value other than ``''`` to
-    :setting:`TEMPLATE_STRING_IF_INVALID`, you will experience rendering
-    problems with these templates and sites.
+    Many templates, including those in the Admin site, rely upon the silence
+    of the template system when a non-existent variable is encountered. If you
+    assign a value other than ``''`` to ``string_if_invalid``, you will
+    experience rendering problems with these templates and sites.
 
-    Generally, :setting:`TEMPLATE_STRING_IF_INVALID` should only be enabled
-    in order to debug a specific template problem, then cleared
-    once debugging is complete.
+    Generally, ``string_if_invalid`` should only be enabled in order to debug
+    a specific template problem, then cleared once debugging is complete.
 
 Builtin variables
 ~~~~~~~~~~~~~~~~~
@@ -448,27 +446,37 @@ normal ``django.template.Context``. The first difference is that it takes an
         'foo': 'bar',
     })
 
-The second difference is that it automatically populates the context with a few
-variables, according to your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+The second difference is that it automatically populates the context with a
+few variables, according to the ``'context_processors'`` option in the
+:setting:`TEMPLATES` setting.
 
-The :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting is a tuple of callables --
-called **context processors** -- that take a request object as their argument
-and return a dictionary of items to be merged into the context. By default,
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` is set to::
+The ``'context_processors'`` option is a list of callables -- called **context
+processors** -- that take a request object as their argument and return a
+dictionary of items to be merged into the context. In the default generated
+settings file, the default template engine contains the following context
+processors::
 
-    ("django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages")
+    [
+        'django.contrib.auth.context_processors.auth',
+        'django.template.context_processors.debug',
+        'django.template.context_processors.i18n',
+        'django.template.context_processors.media',
+        'django.template.context_processors.static',
+        'django.template.context_processors.tz',
+        'django.contrib.messages.context_processors.messages',
+    ]
+
+.. versionchanged:: 1.8
+
+    Built-in template context processors were moved from
+    ``django.core.context_processors`` to
+    ``django.template.context_processors`` in Django 1.8.
 
 In addition to these, ``RequestContext`` always uses
-``django.core.context_processors.csrf``.  This is a security
+``django.template.context_processors.csrf``.  This is a security
 related context processor required by the admin and other contrib apps, and,
 in case of accidental misconfiguration, it is deliberately hardcoded in and
-cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+cannot be turned off in the ``'context_processors'`` option.
 
 Each processor is applied in order. That means, if one processor adds a
 variable to the context and a second processor adds a variable with the same
@@ -515,8 +523,8 @@ Here's what each of the default processors does:
 django.contrib.auth.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these variables:
+If this processor is enabled, every ``RequestContext`` will contain these
+variables:
 
 * ``user`` -- An ``auth.User`` instance representing the currently
   logged-in user (or an ``AnonymousUser`` instance, if the client isn't
@@ -526,15 +534,15 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
   ``django.contrib.auth.context_processors.PermWrapper``, representing the
   permissions that the currently logged-in user has.
 
-.. currentmodule:: django.core.context_processors
+.. currentmodule:: django.template.context_processors
 
-django.core.context_processors.debug
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.debug
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these two variables -- but only if your
-:setting:`DEBUG` setting is set to ``True`` and the request's IP address
-(``request.META['REMOTE_ADDR']``) is in the :setting:`INTERNAL_IPS` setting:
+If this processor is enabled, every ``RequestContext`` will contain these two
+variables -- but only if your :setting:`DEBUG` setting is set to ``True`` and
+the request's IP address (``request.META['REMOTE_ADDR']``) is in the
+:setting:`INTERNAL_IPS` setting:
 
 * ``debug`` -- ``True``. You can use this in templates to test whether
   you're in :setting:`DEBUG` mode.
@@ -543,11 +551,11 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
   and how long it took. The list is in order by query and lazily generated
   on access.
 
-django.core.context_processors.i18n
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.i18n
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these two variables:
+If this processor is enabled, every ``RequestContext`` will contain these two
+variables:
 
 * ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
 * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
@@ -555,42 +563,39 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 
 See :doc:`/topics/i18n/index` for more.
 
-django.core.context_processors.media
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.media
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
-value of the :setting:`MEDIA_URL` setting.
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``MEDIA_URL``, providing the value of the :setting:`MEDIA_URL` setting.
 
-django.core.context_processors.static
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.static
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: static
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a variable ``STATIC_URL``, providing the
-value of the :setting:`STATIC_URL` setting.
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``STATIC_URL``, providing the value of the :setting:`STATIC_URL` setting.
 
-django.core.context_processors.csrf
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.csrf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
 </ref/csrf>`.
 
-django.core.context_processors.request
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+django.template.context_processors.request
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a variable ``request``, which is the current
-:class:`~django.http.HttpRequest`. Note that this processor is not enabled by default;
-you'll have to activate it.
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``request``, which is the current :class:`~django.http.HttpRequest`. Note that
+this processor is not enabled by default; you'll have to activate it.
 
 django.contrib.messages.context_processors.messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these two variables:
+If this processor is enabled, every ``RequestContext`` will contain these two
+variables:
 
 * ``messages`` -- A list of messages (as strings) that have been set
   via the :doc:`messages framework </ref/contrib/messages>`.
@@ -609,9 +614,9 @@ that takes one argument, an :class:`~django.http.HttpRequest` object, and
 returns a dictionary that gets added to the template context. Each context
 processor *must* return a dictionary.
 
-Custom context processors can live anywhere in your code base. All Django cares
-about is that your custom context processors are pointed-to by your
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+Custom context processors can live anywhere in your code base. All Django
+cares about is that your custom context processors are pointed to by the
+``'context_processors'`` option in your :setting:`TEMPLATES` setting.
 
 Loading templates
 -----------------
@@ -622,21 +627,30 @@ specified as a **template directory**.
 
 Django searches for template directories in a number of places, depending on
 your template-loader settings (see "Loader types" below), but the most basic
-way of specifying template directories is by using the :setting:`TEMPLATE_DIRS`
-setting.
+way of specifying template directories is by using the :setting:`DIRS
+<TEMPLATES-DIRS>` option.
 
-The TEMPLATE_DIRS setting
-~~~~~~~~~~~~~~~~~~~~~~~~~
+The DIRS option
+~~~~~~~~~~~~~~~
 
-Tell Django what your template directories are by using the
-:setting:`TEMPLATE_DIRS` setting in your settings file. This should be set to a
-list or tuple of strings that contain full paths to your template
-directory(ies). Example::
+.. versionchanged:: 1.8
 
-    TEMPLATE_DIRS = (
-        "/home/html/templates/lawrence.com",
-        "/home/html/templates/default",
-    )
+    This value used to be defined by the ``TEMPLATE_DIRS`` setting.
+
+Tell Django what your template directories are by using the :setting:`DIRS
+<TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting in your settings
+file. This should be set to a list of strings that contain full paths to your
+template directory(ies). Example::
+
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [
+                '/home/html/templates/lawrence.com',
+                '/home/html/templates/default',
+            ],
+        },
+    ]
 
 Your templates can go anywhere you want, as long as the directories and
 templates are readable by the Web server. They can have any extension you want,
@@ -681,8 +695,8 @@ The Python API
        The ``dirs`` parameter was deprecated.
 
 For example, if you call ``get_template('story_detail.html')`` and have the
-above :setting:`TEMPLATE_DIRS` setting, here are the files Django will look for,
-in order:
+above :setting:`DIRS <TEMPLATES-DIRS>` option, here are the files Django will
+look for, in order:
 
 * ``/home/html/templates/lawrence.com/story_detail.html``
 * ``/home/html/templates/default/story_detail.html``
@@ -720,8 +734,8 @@ To load a template that's within a subdirectory, just use a slash, like so::
 
     get_template('news/story_detail.html')
 
-Using the same :setting:`TEMPLATE_DIRS` setting from above, this example
-``get_template()`` call will attempt to load the following templates:
+Using the same :setting:`DIRS <TEMPLATES-DIRS>` option from above, this
+example ``get_template()`` call will attempt to load the following templates:
 
 * ``/home/html/templates/lawrence.com/news/story_detail.html``
 * ``/home/html/templates/default/news/story_detail.html``
@@ -736,9 +750,10 @@ with a few other template loaders, which know how to load templates from other
 sources.
 
 Some of these other loaders are disabled by default, but you can activate them
-by editing your :setting:`TEMPLATE_LOADERS` setting. :setting:`TEMPLATE_LOADERS`
-should be a tuple of strings or tuples, where each represents a template loader
-class. Here are the template loaders that come with Django:
+by adding a ``'loaders'`` option to your ``DjangoTemplates`` backend in the
+:setting:`TEMPLATES` setting. ``'loaders'`` should be a list of strings or
+tuples, where each represents a template loader class. Here are the template
+loaders that come with Django:
 
 .. currentmodule:: django.template.loaders
 
@@ -746,8 +761,16 @@ class. Here are the template loaders that come with Django:
 
 .. class:: filesystem.Loader
 
-    Loads templates from the filesystem, according to :setting:`TEMPLATE_DIRS`.
-    This loader is enabled by default.
+    Loads templates from the filesystem, according to
+    :setting:`DIRS <TEMPLATES-DIRS>`.
+
+    This loader is enabled by default. However it won't find any templates
+    until you set :setting:`DIRS <TEMPLATES-DIRS>` to a non-empty list::
+
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        }]
 
 ``django.template.loaders.app_directories.Loader``
 
@@ -784,7 +807,14 @@ class. Here are the template loaders that come with Django:
     it caches a list of which :setting:`INSTALLED_APPS` packages have a
     ``templates`` subdirectory.
 
-    This loader is enabled by default.
+    This loader is enabled if and only if :setting:`APP_DIRS
+    <TEMPLATES-APP_DIRS>` is set::
+
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+        }]
+
 
 ``django.template.loaders.eggs.Loader``
 
@@ -812,12 +842,18 @@ class. Here are the template loaders that come with Django:
     For example, to enable template caching with the ``filesystem`` and
     ``app_directories`` template loaders you might use the following settings::
 
-        TEMPLATE_LOADERS = (
-            ('django.template.loaders.cached.Loader', (
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-            )),
-        )
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+            'OPTIONS': {
+                'loaders': [
+                    ('django.template.loaders.cached.Loader', (
+                        'django.template.loaders.filesystem.Loader',
+                        'django.template.loaders.app_directories.Loader',
+                    )),
+                ],
+            },
+        }]
 
     .. note::
 
@@ -840,17 +876,21 @@ class. Here are the template loaders that come with Django:
 
     This loader takes a dictionary of templates as its first argument::
 
-        TEMPLATE_LOADERS = (
-            ('django.template.loaders.locmem.Loader', {
-                'index.html': 'content here',
-            }),
-        )
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {
+                'loaders': [
+                    ('django.template.loaders.locmem.Loader', {
+                        'index.html': 'content here',
+                    }),
+                ],
+            },
+        }]
 
     This loader is disabled by default.
 
-Django uses the template loaders in order according to the
-:setting:`TEMPLATE_LOADERS` setting. It uses each loader until a loader finds a
-match.
+Django uses the template loaders in order according to the ``'loaders'``
+option. It uses each loader until a loader finds a match.
 
 .. currentmodule:: django.template
 
@@ -890,7 +930,7 @@ When :setting:`TEMPLATE_DEBUG` is ``True`` template objects will have an
 The ``render_to_string`` shortcut
 ===================================
 
-.. function:: loader.render_to_string(template_name, dictionary=None, context_instance=None)
+.. function:: loader.render_to_string(template_name, context=None, context_instance=None)
 
 To cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which largely
@@ -906,15 +946,24 @@ The ``render_to_string`` shortcut takes one required argument --
 and render (or a list of template names, in which case Django will use
 the first template in the list that exists) -- and two optional arguments:
 
-dictionary
+``context``
     A dictionary to be used as variables and values for the
-    template's context. This can also be passed as the second
+    template's context. This should be passed as the second
     positional argument.
 
-context_instance
+    .. versionchanged:: 1.8
+
+       The ``context`` argument used to be called ``dictionary``. That name
+       is deprecated in Django 1.8 and will be removed in Django 2.0.
+
+``context_instance``
     An instance of :class:`~django.template.Context` or a subclass (e.g., an
     instance of :class:`~django.template.RequestContext`) to use as the
     template's context. This can also be passed as the third positional argument.
+
+    .. deprecated:: 1.8
+
+       The ``context_instance`` argument is deprecated. Simply use ``context``.
 
 See also the :func:`~django.shortcuts.render_to_response()` shortcut, which
 calls ``render_to_string`` and feeds the result into an :class:`~django.http.HttpResponse`
@@ -943,7 +992,7 @@ in :ref:`settings-without-django-settings-module`. Simply import the appropriate
 pieces of the templating system and then, *before* you call any of the
 templating functions, call :func:`django.conf.settings.configure()` with any
 settings you wish to specify. You might want to consider setting at least
-:setting:`TEMPLATE_DIRS` (if you're going to use template loaders),
+:setting:`DIRS <TEMPLATES-DIRS>` (if you're going to use template loaders),
 :setting:`DEFAULT_CHARSET` (although the default of ``utf-8`` is probably fine)
 and :setting:`TEMPLATE_DEBUG`. If you plan to use the :ttag:`url` template tag,
 you will also need to set the :setting:`ROOT_URLCONF` setting. All available

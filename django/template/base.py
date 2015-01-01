@@ -1,3 +1,54 @@
+"""
+This is the Django template system.
+
+How it works:
+
+The Lexer.tokenize() function converts a template string (i.e., a string containing
+markup with custom template tags) to tokens, which can be either plain text
+(TOKEN_TEXT), variables (TOKEN_VAR) or block statements (TOKEN_BLOCK).
+
+The Parser() class takes a list of tokens in its constructor, and its parse()
+method returns a compiled template -- which is, under the hood, a list of
+Node objects.
+
+Each Node is responsible for creating some sort of output -- e.g. simple text
+(TextNode), variable values in a given context (VariableNode), results of basic
+logic (IfNode), results of looping (ForNode), or anything else. The core Node
+types are TextNode, VariableNode, IfNode and ForNode, but plugin modules can
+define their own custom node types.
+
+Each Node has a render() method, which takes a Context and returns a string of
+the rendered node. For example, the render() method of a Variable Node returns
+the variable's value as a string. The render() method of a ForNode returns the
+rendered output of whatever was inside the loop, recursively.
+
+The Template class is a convenient wrapper that takes care of template
+compilation and rendering.
+
+Usage:
+
+The only thing you should ever use directly in this file is the Template class.
+Create a compiled template object with a template_string, then call render()
+with a context. In the compilation stage, the TemplateSyntaxError exception
+will be raised if the template doesn't have proper syntax.
+
+Sample code:
+
+>>> from django import template
+>>> s = u'<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>'
+>>> t = template.Template(s)
+
+(t is now a compiled template, and its render() method can be called multiple
+times with multiple contexts)
+
+>>> c = template.Context({'test':True, 'varvalue': 'Hello'})
+>>> t.render(c)
+u'<html><h1>Hello</h1></html>'
+>>> c = template.Context({'test':False, 'varvalue': 'Hello'})
+>>> t.render(c)
+u'<html></html>'
+"""
+
 from __future__ import unicode_literals
 
 import re
@@ -19,7 +70,7 @@ from django.utils.translation import ugettext_lazy, pgettext_lazy
 from django.utils.safestring import (SafeData, EscapeData, mark_safe,
     mark_for_escaping)
 from django.utils.formats import localize
-from django.utils.html import escape
+from django.utils.html import conditional_escape
 from django.utils.module_loading import module_has_submodule
 from django.utils import six
 from django.utils.timezone import template_localtime
@@ -125,6 +176,10 @@ class Template(object):
         except UnicodeDecodeError:
             raise TemplateEncodingError("Templates can only be constructed "
                                         "from unicode or UTF-8 strings.")
+        # If Template is instantiated directly rather than from an Engine and
+        # exactly one Django template engine is configured, use that engine.
+        # This is required to preserve backwards-compatibility for direct use
+        # e.g. Template('...').render(Context({...}))
         if engine is None:
             from .engine import Engine
             engine = Engine.get_default()
@@ -887,7 +942,7 @@ def render_value_in_context(value, context):
     value = force_text(value)
     if ((context.autoescape and not isinstance(value, SafeData)) or
             isinstance(value, EscapeData)):
-        return escape(value)
+        return conditional_escape(value)
     else:
         return value
 
@@ -1202,7 +1257,7 @@ class Library(object):
         else:
             raise TemplateSyntaxError("Invalid arguments provided to assignment_tag")
 
-    def inclusion_tag(self, file_name, context_class=Context, takes_context=False, name=None):
+    def inclusion_tag(self, file_name, takes_context=False, name=None):
         def dec(func):
             params, varargs, varkw, defaults = getargspec(func)
 
@@ -1213,21 +1268,16 @@ class Library(object):
                     _dict = func(*resolved_args, **resolved_kwargs)
 
                     if not getattr(self, 'nodelist', False):
-                        from django.template.loader import get_template, select_template
                         if isinstance(file_name, Template):
                             t = file_name
+                        elif isinstance(getattr(file_name, 'template', None), Template):
+                            t = file_name.template
                         elif not isinstance(file_name, six.string_types) and is_iterable(file_name):
-                            t = select_template(file_name)
+                            t = context.engine.select_template(file_name)
                         else:
-                            t = get_template(file_name)
+                            t = context.engine.get_template(file_name)
                         self.nodelist = t.nodelist
-                    new_context = context_class(_dict, **{
-                        'autoescape': context.autoescape,
-                        'current_app': context.current_app,
-                        'use_l10n': context.use_l10n,
-                        'use_tz': context.use_tz,
-                        'engine': context.engine,
-                    })
+                    new_context = context.new(_dict)
                     # Copy across the CSRF token, if present, because
                     # inclusion tags are often used for forms, and we need
                     # instructions for using CSRF protection to be as simple

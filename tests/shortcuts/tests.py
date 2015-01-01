@@ -1,10 +1,8 @@
-import warnings
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.test import TestCase, override_settings
+from django.test import TestCase, ignore_warnings, override_settings
 
 
 @override_settings(
-    TEMPLATE_CONTEXT_PROCESSORS=('django.core.context_processors.static',),
     STATIC_URL='/path/to/static/media/',
     ROOT_URLCONF='shortcuts.urls',
 )
@@ -16,6 +14,7 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.content, b'FOO.BAR..\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_render_to_response_with_request_context(self):
         response = self.client.get('/render_to_response/request_context/')
         self.assertEqual(response.status_code, 200)
@@ -28,14 +27,14 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.content, b'FOO.BAR..\n')
         self.assertEqual(response['Content-Type'], 'application/x-rendertest')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_render_to_response_with_dirs(self):
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
-            response = self.client.get('/render_to_response/dirs/')
+        response = self.client.get('/render_to_response/dirs/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'spam eggs\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_render_to_response_with_context_instance_misuse(self):
         """
         For backwards-compatibility, ensure that it's possible to pass a
@@ -50,8 +49,9 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'FOO.BAR../path/to/static/media/\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-        self.assertEqual(response.context.current_app, None)
+        self.assertFalse(hasattr(response.context.request, 'current_app'))
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_render_with_base_context(self):
         response = self.client.get('/render/base_context/')
         self.assertEqual(response.status_code, 200)
@@ -69,18 +69,19 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.content, b'FOO.BAR../path/to/static/media/\n')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_render_with_current_app(self):
         response = self.client.get('/render/current_app/')
-        self.assertEqual(response.context.current_app, "foobar_app")
+        self.assertEqual(response.context.request.current_app, "foobar_app")
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_render_with_dirs(self):
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
-            response = self.client.get('/render/dirs/')
+        response = self.client.get('/render/dirs/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'spam eggs\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_render_with_current_app_conflict(self):
         with self.assertRaises(ValueError):
             self.client.get('/render/current_app_conflict/')

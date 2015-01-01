@@ -427,6 +427,7 @@ class AlterModelOptions(Operation):
     # Model options we want to compare and preserve in an AlterModelOptions op
     ALTER_OPTION_KEYS = [
         "get_latest_by",
+        "managed",
         "ordering",
         "permissions",
         "default_permissions",

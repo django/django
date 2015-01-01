@@ -184,9 +184,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     atomic_transactions = False
     supports_column_check_constraints = False
 
-    def __init__(self, connection):
-        super(DatabaseFeatures, self).__init__(connection)
-
     @cached_property
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
@@ -396,6 +393,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_booleanfield_value)
         if internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
+        if internal_type == 'TextField':
+            converters.append(self.convert_textfield_value)
         return converters
 
     def convert_booleanfield_value(self, value, field):
@@ -408,9 +407,53 @@ class DatabaseOperations(BaseDatabaseOperations):
             value = uuid.UUID(value)
         return value
 
+    def convert_textfield_value(self, value, field):
+        if value is not None:
+            value = force_text(value)
+        return value
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
+    # This dictionary maps Field objects to their associated MySQL column
+    # types, as strings. Column-type strings can contain format strings; they'll
+    # be interpolated against the values of Field.__dict__ before being output.
+    # If a column type is set to None, it won't be included in the output.
+    _data_types = {
+        'AutoField': 'integer AUTO_INCREMENT',
+        'BinaryField': 'longblob',
+        'BooleanField': 'bool',
+        'CharField': 'varchar(%(max_length)s)',
+        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
+        'DateField': 'date',
+        'DateTimeField': 'datetime',
+        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'DurationField': 'bigint',
+        'FileField': 'varchar(%(max_length)s)',
+        'FilePathField': 'varchar(%(max_length)s)',
+        'FloatField': 'double precision',
+        'IntegerField': 'integer',
+        'BigIntegerField': 'bigint',
+        'IPAddressField': 'char(15)',
+        'GenericIPAddressField': 'char(39)',
+        'NullBooleanField': 'bool',
+        'OneToOneField': 'integer',
+        'PositiveIntegerField': 'integer UNSIGNED',
+        'PositiveSmallIntegerField': 'smallint UNSIGNED',
+        'SlugField': 'varchar(%(max_length)s)',
+        'SmallIntegerField': 'smallint',
+        'TextField': 'longtext',
+        'TimeField': 'time',
+        'UUIDField': 'char(32)',
+    }
+
+    @cached_property
+    def data_types(self):
+        if self.features.supports_microsecond_precision:
+            return dict(self._data_types, DateTimeField='datetime(6)', TimeField='time(6)')
+        else:
+            return self._data_types
+
     operators = {
         'exact': '= %s',
         'iexact': 'LIKE %s',

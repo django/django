@@ -6,7 +6,6 @@ import re
 import datetime
 import unittest
 
-from django.conf import settings, global_settings
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
@@ -62,7 +61,6 @@ from .admin import site, site2, CityAdmin
 
 ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields may be case-sensitive."
-ADMIN_VIEW_TEMPLATES_DIR = settings.TEMPLATE_DIRS + (os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
@@ -788,7 +786,24 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContains(response, '<a href="/my-site-url/">View site</a>')
 
 
-@override_settings(TEMPLATE_DIRS=ADMIN_VIEW_TEMPLATES_DIR)
+@override_settings(TEMPLATES=[{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    # Put this app's templates dir in DIRS to take precedence over the admin's
+    # templates dir.
+    'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+    'APP_DIRS': True,
+    'OPTIONS': {
+        'context_processors': [
+            'django.template.context_processors.debug',
+            'django.template.context_processors.i18n',
+            'django.template.context_processors.tz',
+            'django.template.context_processors.media',
+            'django.template.context_processors.static',
+            'django.contrib.auth.context_processors.auth',
+            'django.contrib.messages.context_processors.messages',
+        ],
+    },
+}])
 class AdminCustomTemplateTests(AdminViewBasicTestCase):
     def test_extended_bodyclass_template_change_form(self):
         """
@@ -1076,6 +1091,9 @@ class AdminViewPermissionsTest(TestCase):
         change_user = User.objects.get(username='changeuser')
         change_user.user_permissions.add(get_perm(Article,
             get_permission_codename('change', opts)))
+        change_user2 = User.objects.get(username='nostaff')
+        change_user2.user_permissions.add(get_perm(Article,
+            get_permission_codename('change', opts)))
 
         # User who can delete Articles
         delete_user = User.objects.get(username='deleteuser')
@@ -1114,6 +1132,11 @@ class AdminViewPermissionsTest(TestCase):
         self.deleteuser_login = {
             REDIRECT_FIELD_NAME: '/test_admin/admin/',
             'username': 'deleteuser',
+            'password': 'secret',
+        }
+        self.nostaff_login = {
+            REDIRECT_FIELD_NAME: '/test_admin/has_permission_admin/',
+            'username': 'nostaff',
             'password': 'secret',
         }
         self.joepublic_login = {
@@ -1195,6 +1218,34 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(login.status_code, 200)
         form = login.context[0].get('form')
         self.assertEqual(form.errors['username'][0], 'This field is required.')
+
+    def test_login_has_permission(self):
+        # Regular User should not be able to login.
+        response = self.client.get('/test_admin/has_permission_admin/')
+        self.assertEqual(response.status_code, 302)
+        login = self.client.post('/test_admin/has_permission_admin/login/', self.joepublic_login)
+        self.assertEqual(login.status_code, 200)
+        self.assertContains(login, 'permission denied')
+
+        # User with permissions should be able to login.
+        response = self.client.get('/test_admin/has_permission_admin/')
+        self.assertEqual(response.status_code, 302)
+        login = self.client.post('/test_admin/has_permission_admin/login/', self.nostaff_login)
+        self.assertRedirects(login, '/test_admin/has_permission_admin/')
+        self.assertFalse(login.context)
+        self.client.get('/test_admin/has_permission_admin/logout/')
+
+        # Staff should be able to login.
+        response = self.client.get('/test_admin/has_permission_admin/')
+        self.assertEqual(response.status_code, 302)
+        login = self.client.post('/test_admin/has_permission_admin/login/', {
+            REDIRECT_FIELD_NAME: '/test_admin/has_permission_admin/',
+            'username': 'deleteuser',
+            'password': 'secret',
+        })
+        self.assertRedirects(login, '/test_admin/has_permission_admin/')
+        self.assertFalse(login.context)
+        self.client.get('/test_admin/has_permission_admin/logout/')
 
     def test_login_successfully_redirects_to_original_URL(self):
         response = self.client.get('/test_admin/admin/')
@@ -4333,8 +4384,25 @@ class AdminDocsTest(TestCase):
         self.assertContains(response, '<li><a href="#built_in-add">add</a></li>', html=True)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
-    ROOT_URLCONF="admin_views.urls")
+@override_settings(
+    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF="admin_views.urls",
+    TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.tz',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    }],
+    USE_I18N=False,
+)
 class ValidXHTMLTests(TestCase):
     fixtures = ['admin-views-users.xml']
     urlbit = 'admin'
@@ -4342,12 +4410,6 @@ class ValidXHTMLTests(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
 
-    @override_settings(
-        TEMPLATE_CONTEXT_PROCESSORS=filter(
-            lambda t: t != 'django.core.context_processors.i18n',
-            global_settings.TEMPLATE_CONTEXT_PROCESSORS),
-        USE_I18N=False,
-    )
     def test_lang_name_present(self):
         response = self.client.get('/test_admin/%s/admin_views/' % self.urlbit)
         self.assertNotContains(response, ' lang=""')

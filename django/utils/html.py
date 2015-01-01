@@ -44,6 +44,10 @@ def escape(text):
     """
     Returns the given text with ampersands, quotes and angle brackets encoded
     for use in HTML.
+
+    This function always escapes its input, even if it's already escaped and
+    marked as such. This may result in double-escaping. If this is a concern,
+    use conditional_escape() instead.
     """
     return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;')
         .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
@@ -76,6 +80,9 @@ escapejs = allow_lazy(escapejs, six.text_type, SafeText)
 def conditional_escape(text):
     """
     Similar to escape(), except that it doesn't operate on pre-escaped strings.
+
+    This function relies on the __html__ convention used both by Django's
+    SafeData class and by third-party libraries like markupsafe.
     """
     if hasattr(text, '__html__'):
         return text.__html__()

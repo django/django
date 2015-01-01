@@ -204,6 +204,7 @@ class StateTests(TestCase):
         new_apps = project_state.render()
         self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field("name").max_length, 100)
         self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field("hidden").null, False)
+
         self.assertEqual(len(new_apps.get_model("migrations", "SubTag")._meta.local_fields), 2)
 
         Food = new_apps.get_model("migrations", "Food")

@@ -184,29 +184,32 @@ you need to eliminate or silence any warnings generated when running the tests.
 
 The first step is to remove any use of the deprecated behavior by Django itself.
 Next you can silence warnings in tests that actually test the deprecated
-behavior in one of two ways:
+behavior by using the ``ignore_warnings`` decorator, either at the test or class
+level:
 
 #) In a particular test::
 
-    import warnings
-
+    from django.test import ignore_warnings
     from django.utils.deprecation import RemovedInDjangoXXWarning
 
+    @ignore_warnings(category=RemovedInDjangoXXWarning)
     def test_foo(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RemovedInDjangoXXWarning)
-            # invoke deprecated behavior
-        # go ahead with the rest of the test
-
-#) For an entire test case, ``django.test.utils`` contains three helpful
-   mixins to silence warnings: ``IgnorePendingDeprecationWarningsMixin``,
-   ``IgnoreDeprecationWarningsMixin``, and
-   ``IgnoreAllDeprecationWarningsMixin``. For example::
-
-    from django.test.utils import IgnorePendingDeprecationWarningsMixin
-
-    class MyDeprecatedTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
         ...
+
+#) For an entire test case::
+
+    from django.test import ignore_warnings
+    from django.utils.deprecation import RemovedInDjangoXXWarning
+
+    @ignore_warnings(category=RemovedInDjangoXXWarning)
+    class MyDeprecatedTests(unittest.TestCase):
+        ...
+
+.. versionchanged:: 1.8
+
+    Previous versions of Django had some ``Ignore*DeprecationWarningsMixin``
+    classes to prevent warnings from appearing. These have been replaced by the
+    ``ignore_warnings`` decorator.
 
 You can also add a test for the deprecation warning. You'll have to disable the
 "warning as error" behavior in your test by doing::
@@ -266,14 +269,7 @@ Behind the scenes, ``compress.py`` is a front-end for Google's
 `Closure Compiler`_ which is written in Java. However, the Closure Compiler
 library is not bundled with Django directly, so those wishing to contribute
 complete javascript patches will need to download and install the library
-independently.
-
-The Closure Compiler library requires Java version 6 or higher (Java 1.6 or
-higher on Mac OS X. Note that Mac OS X 10.5 and earlier did not ship with
-Java 1.6 by default, so it may be necessary to upgrade your Java installation
-before the tool will be functional. Also note that even after upgrading Java,
-the default ``/usr/bin/java`` command may remain linked to the previous Java
-binary, so relinking that command may be necessary as well.)
+independently. The Closure Compiler library requires `Java`_ 7 or higher.
 
 Please don't forget to run ``compress.py`` and include the ``diff`` of the
 minified scripts when submitting patches for Django's javascript.
@@ -281,6 +277,7 @@ minified scripts when submitting patches for Django's javascript.
 .. _Closure Compiler: https://developers.google.com/closure/compiler/
 .. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _ticket tracker: https://code.djangoproject.com/newticket
+.. _Java: https://www.java.com
 
 .. _patch-review-checklist:
 

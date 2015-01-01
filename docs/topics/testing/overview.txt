@@ -185,11 +185,19 @@ control the particular collation used by the test database. See the
 :doc:`settings documentation </ref/settings>` for details of these
 and other advanced settings.
 
+If using a SQLite in-memory database with Python 3.4+ and SQLite 3.7.13+,
+`shared cache <https://www.sqlite.org/sharedcache.html>`_ will be enabled, so
+you can write tests with ability to share the database between threads.
+
 .. versionchanged:: 1.7
 
    The different options in the :setting:`TEST <DATABASE-TEST>` database
    setting used to be separate options in the database settings dictionary,
    prefixed with ``TEST_``.
+
+.. versionadded:: 1.8
+
+    The ability to use SQLite with a shared cache as described above was added.
 
 .. admonition:: Finding data from your production database when running tests?
 

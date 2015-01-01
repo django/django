@@ -1,6 +1,5 @@
 import warnings
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache
 from django.utils import six
@@ -8,10 +7,13 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
+from . import engines
 from .base import Context, Lexer, Parser, Template, TemplateDoesNotExist
 from .context import _builtin_context_processors
 
 
+_context_instance_undefined = object()
+_dictionary_undefined = object()
 _dirs_undefined = object()
 
 
@@ -20,7 +22,7 @@ class Engine(object):
     def __init__(self, dirs=None, app_dirs=False,
                  allowed_include_roots=None, context_processors=None,
                  debug=False, loaders=None, string_if_invalid='',
-                 file_charset=None):
+                 file_charset='utf-8'):
         if dirs is None:
             dirs = []
         if allowed_include_roots is None:
@@ -34,9 +36,11 @@ class Engine(object):
         else:
             if app_dirs:
                 raise ImproperlyConfigured(
-                    "APP_DIRS must not be set when LOADERS is defined.")
-        if file_charset is None:
-            file_charset = 'utf-8'
+                    "app_dirs must not be set when loaders is defined.")
+
+        if isinstance(allowed_include_roots, six.string_types):
+            raise ImproperlyConfigured(
+                "allowed_include_roots must be a tuple, not a string.")
 
         self.dirs = dirs
         self.app_dirs = app_dirs
@@ -47,19 +51,38 @@ class Engine(object):
         self.string_if_invalid = string_if_invalid
         self.file_charset = file_charset
 
-    @classmethod
+    @staticmethod
     @lru_cache.lru_cache()
-    def get_default(cls):
-        """Transitional method for refactoring."""
-        return cls(
-            dirs=settings.TEMPLATE_DIRS,
-            allowed_include_roots=settings.ALLOWED_INCLUDE_ROOTS,
-            context_processors=settings.TEMPLATE_CONTEXT_PROCESSORS,
-            debug=settings.TEMPLATE_DEBUG,
-            loaders=settings.TEMPLATE_LOADERS,
-            string_if_invalid=settings.TEMPLATE_STRING_IF_INVALID,
-            file_charset=settings.FILE_CHARSET,
-        )
+    def get_default():
+        """
+        When only one DjangoTemplates backend is configured, returns it.
+
+        Raises ImproperlyConfigured otherwise.
+
+        This is required for preserving historical APIs that rely on a
+        globally available, implicitly configured engine such as:
+
+        >>> from django.template import Context, Template
+        >>> template = Template("Hello {{ name }}!")
+        >>> context = Context({'name': "world"})
+        >>> template.render(context)
+        'Hello world!'
+        """
+        # Since DjangoTemplates is a wrapper around this Engine class, a local
+        # import is mandatory to avoid an import loop.
+        from django.template.backends.django import DjangoTemplates
+        django_engines = [engine for engine in engines.all()
+                          if isinstance(engine, DjangoTemplates)]
+        if len(django_engines) == 1:
+            # Unwrap the Engine instance inside DjangoTemplates
+            return django_engines[0].engine
+        elif len(django_engines) == 0:
+            raise ImproperlyConfigured(
+                "No DjangoTemplates backend is configured.")
+        else:
+            raise ImproperlyConfigured(
+                "Several DjangoTemplates backends are configured. "
+                "You must select one explicitly.")
 
     @cached_property
     def template_context_processors(self):
@@ -123,6 +146,13 @@ class Engine(object):
                 pass
         raise TemplateDoesNotExist(name)
 
+    def from_string(self, template_code):
+        """
+        Returns a compiled Template object for the given template code,
+        handling template inheritance recursively.
+        """
+        return Template(template_code, engine=self)
+
     def get_template(self, template_name, dirs=_dirs_undefined):
         """
         Returns a compiled Template object for the given template name,
@@ -138,24 +168,25 @@ class Engine(object):
         template, origin = self.find_template(template_name, dirs)
         if not hasattr(template, 'render'):
             # template needs to be compiled
-            template = self.get_template_from_string(template, origin, template_name)
+            template = Template(template, origin, template_name, engine=self)
         return template
 
-    def get_template_from_string(self, source, origin=None, name=None):
-        """
-        Returns a compiled Template object for the given template code,
-        handling template inheritance recursively.
-        """
-        return Template(source, origin, name)
-
-    def render_to_string(self, template_name, dictionary=None, context_instance=None,
-                         dirs=_dirs_undefined):
+    def render_to_string(self, template_name, context=None,
+                         context_instance=_context_instance_undefined,
+                         dirs=_dirs_undefined,
+                         dictionary=_dictionary_undefined):
         """
         Loads the given template_name and renders it with the given dictionary as
         context. The template_name may be a string to load a single template using
         get_template, or it may be a tuple to use select_template to find one of
         the templates in the list. Returns a string.
         """
+        if context_instance is _context_instance_undefined:
+            context_instance = None
+        else:
+            warnings.warn(
+                "The context_instance argument of render_to_string is "
+                "deprecated.", RemovedInDjango20Warning, stacklevel=2)
         if dirs is _dirs_undefined:
             # Do not set dirs to None here to avoid triggering the deprecation
             # warning in select_template or get_template.
@@ -164,23 +195,30 @@ class Engine(object):
             warnings.warn(
                 "The dirs argument of render_to_string is deprecated.",
                 RemovedInDjango20Warning, stacklevel=2)
+        if dictionary is _dictionary_undefined:
+            dictionary = None
+        else:
+            warnings.warn(
+                "The dictionary argument of render_to_string was renamed to "
+                "context.", RemovedInDjango20Warning, stacklevel=2)
+            context = dictionary
 
         if isinstance(template_name, (list, tuple)):
             t = self.select_template(template_name, dirs)
         else:
             t = self.get_template(template_name, dirs)
         if not context_instance:
-            # Django < 1.8 accepted a Context in `dictionary` even though that's
-            # unintended. Preserve this ability but don't rewrap `dictionary`.
-            if isinstance(dictionary, Context):
-                return t.render(dictionary)
+            # Django < 1.8 accepted a Context in `context` even though that's
+            # unintended. Preserve this ability but don't rewrap `context`.
+            if isinstance(context, Context):
+                return t.render(context)
             else:
-                return t.render(Context(dictionary))
-        if not dictionary:
+                return t.render(Context(context))
+        if not context:
             return t.render(context_instance)
-        # Add the dictionary to the context stack, ensuring it gets removed again
+        # Add the context to the context stack, ensuring it gets removed again
         # to keep the context_instance in the same state it started in.
-        with context_instance.push(dictionary):
+        with context_instance.push(context):
             return t.render(context_instance)
 
     def select_template(self, template_name_list, dirs=_dirs_undefined):

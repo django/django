@@ -1,34 +1,33 @@
 from importlib import import_module
 import itertools
-import os
 import re
-import warnings
 
 from django.apps import apps
-from django.conf import global_settings, settings
+from django.conf import settings
 from django.contrib.sites.requests import RequestSite
 from django.contrib.admin.models import LogEntry
+from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
+from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
+    SetPasswordForm)
 from django.contrib.auth.models import User
+from django.contrib.auth.views import login as login_view
 from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import QueryDict, HttpRequest
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import urlparse, ParseResult
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.utils._os import upath
-from django.test import TestCase, override_settings
+from django.test import TestCase, ignore_warnings, override_settings
 from django.test.utils import patch_logger
 from django.middleware.csrf import CsrfViewMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 
-from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
-from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
-                SetPasswordForm)
 # Needed so model is installed when tests are run independently:
-from django.contrib.auth.tests.custom_user import CustomUser  # NOQA
-from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.contrib.auth.views import login as login_view
+from .custom_user import CustomUser  # NOQA
+from .settings import AUTH_TEMPLATES
+from .utils import skipIfCustomUser
 
 
 @override_settings(
@@ -36,10 +35,7 @@ from django.contrib.auth.views import login as login_view
         ('en', 'English'),
     ),
     LANGUAGE_CODE='en',
-    TEMPLATE_LOADERS=global_settings.TEMPLATE_LOADERS,
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-    ),
+    TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='django.contrib.auth.tests.urls',
@@ -158,15 +154,14 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual("staffmember@example.com", mail.outbox[0].from_email)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(ALLOWED_HOSTS=['adminsite.com'])
     def test_admin_reset(self):
         "If the reset view is marked as being for admin, the HTTP_HOST header is used for a domain override."
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            response = self.client.post('/admin_password_reset/',
-                {'email': 'staffmember@example.com'},
-                HTTP_HOST='adminsite.com'
-            )
+        response = self.client.post('/admin_password_reset/',
+            {'email': 'staffmember@example.com'},
+            HTTP_HOST='adminsite.com'
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("http://adminsite.com", mail.outbox[0].body)

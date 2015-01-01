@@ -3,7 +3,6 @@ import warnings
 from django import test
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db.models.fields import related, CharField, Field, FieldDoesNotExist
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import BasePerson, Person
@@ -59,7 +58,8 @@ class M2MTests(OptionsBaseTests):
             self.assertEqual(models, expected_result)
 
 
-class RelatedObjectsTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTests):
+@test.ignore_warnings(category=RemovedInDjango20Warning)
+class RelatedObjectsTests(OptionsBaseTests):
     key_name = lambda self, r: r[0]
 
     def test_related_objects(self):
@@ -111,7 +111,8 @@ class RelatedObjectsTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTest
             )
 
 
-class RelatedM2MTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTests):
+@test.ignore_warnings(category=RemovedInDjango20Warning)
+class RelatedM2MTests(OptionsBaseTests):
 
     def test_related_m2m_with_model(self):
         result_key = 'get_all_related_many_to_many_with_model_legacy'
@@ -146,7 +147,8 @@ class VirtualFieldsTests(OptionsBaseTests):
             self.assertEqual(sorted([f.name for f in objects]), sorted(expected_names))
 
 
-class GetFieldByNameTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTests):
+@test.ignore_warnings(category=RemovedInDjango20Warning)
+class GetFieldByNameTests(OptionsBaseTests):
 
     def test_get_data_field(self):
         field_info = Person._meta.get_field_by_name('data_abstract')

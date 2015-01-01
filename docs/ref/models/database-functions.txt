@@ -1,0 +1,153 @@
+==================
+Database Functions
+==================
+
+.. module:: django.db.models.functions
+    :synopsis: Database Functions
+
+.. versionadded:: 1.8
+
+The classes documented below provide a way for users to use functions provided
+by the underlying database as annotations, aggregations, or filters in Django.
+Functions are also :doc:`expressions <expressions>`, so they can be used and
+combined with other expressions like :ref:`aggregate functions
+<aggregation-functions>`.
+
+We'll be using the following model in examples of each function::
+
+    class Author(models.Model):
+        name = models.CharField(max_length=50)
+        age = models.PositiveIntegerField(null=True, blank=True)
+        alias = models.CharField(max_length=50, null=True, blank=True)
+        goes_by = models.CharField(max_length=50, null=True, blank=True)
+
+We don't usually recommend allowing ``null=True`` for ``CharField`` since this
+allows the field to have two "empty values", but it's important for the
+``Coalesce`` example below.
+
+Coalesce
+--------
+
+.. class:: Coalesce(*expressions, **extra)
+
+Accepts a list of at least two field names or expressions and returns the
+first non-null value (note that an empty string is not considered a null
+value). Each argument must be of a similar type, so mixing text and numbers
+will result in a database error.
+
+Usage examples::
+
+    >>> # Get a screen name from least to most public
+    >>> from django.db.models import Sum, Value as V
+    >>> from django.db.models.functions import Coalesce
+    >>> Author.objects.create(name='Margaret Smith', goes_by='Maggie')
+    >>> author = Author.objects.annotate(
+    ...    screen_name=Coalesce('alias', 'goes_by', 'name')).get()
+    >>> print(author.screen_name)
+    Maggie
+
+    >>> # Prevent an aggregate Sum() from returning None
+    >>> aggregated = Author.objects.aggregate(
+    ...    combined_age=Coalesce(Sum('age'), V(0)),
+    ...    combined_age_default=Sum('age'))
+    >>> print(aggregated['combined_age'])
+    0
+    >>> print(aggregated['combined_age_default'])
+    None
+
+Concat
+------
+
+.. class:: Concat(*expressions, **extra)
+
+Accepts a list of at least two text fields or expressions and returns the
+concatenated text. Each argument must be of a text or char type. If you want
+to concatenate a ``TextField()`` with a ``CharField()``, then be sure to tell
+Django that the ``output_field`` should be a ``TextField()``. This is also
+required when concatenating a ``Value`` as in the example below.
+
+This function will never have a null result. On backends where a null argument
+results in the entire expression being null, Django will ensure that each null
+part is converted to an empty string first.
+
+Usage example::
+
+    >>> # Get the display name as "name (goes_by)"
+    >>> from django.db.models import CharField, Value as V
+    >>> from django.db.models.functions import Concat
+    >>> Author.objects.create(name='Margaret Smith', goes_by='Maggie')
+    >>> author = Author.objects.annotate(
+    ...    screen_name=Concat('name', V(' ('), 'goes_by', V(')'),
+    ...    output_field=CharField())).get()
+    >>> print(author.screen_name)
+    Margaret Smith (Maggie)
+
+Length
+------
+
+.. class:: Length(expression, **extra)
+
+Accepts a single text field or expression and returns the number of characters
+the value has. If the expression is null, then the length will also be null.
+
+Usage example::
+
+    >>> # Get the length of the name and goes_by fields
+    >>> from django.db.models.functions import Length
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(
+    ...    name_length=Length('name'),
+    ...    goes_by_length=Length('goes_by')).get()
+    >>> print(author.name_length, author.goes_by_length)
+    (14, None)
+
+Lower
+------
+
+.. class:: Lower(expression, **extra)
+
+Accepts a single text field or expression and returns the lowercase
+representation.
+
+Usage example::
+
+    >>> from django.db.models.functions import Lower
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_lower=Lower('name')).get()
+    >>> print(author.name_lower)
+    margaret smith
+
+Substr
+------
+
+.. class:: Substr(expression, pos, length=None, **extra)
+
+Returns a substring of length ``length`` from the field or expression starting
+at position ``pos``. The position is 1-indexed, so the position must be greater
+than 0. If ``length`` is ``None``, then the rest of the string will be returned.
+
+Usage example::
+
+    >>> # Set the alias to the first 5 characters of the name as lowercase
+    >>> from django.db.models.functions import Substr, Lower
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> Author.objects.update(alias=Lower(Substr('name', 1, 5)))
+    1
+    >>> print(Author.objects.get(name='Margaret Smith').alias)
+    marga
+
+Upper
+------
+
+.. class:: Upper(expression, **extra)
+
+Accepts a single text field or expression and returns the uppercase
+representation.
+
+Usage example::
+
+    >>> from django.db.models.functions import Upper
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_upper=Upper('name')).get()
+    >>> print(author.name_upper)
+    MARGARET SMITH
