@@ -34,11 +34,11 @@ What's new in Django 1.8
 
 Django now has an official API for ``Model._meta``, providing a formal
 API for :ref:`retrieving fields <model-meta-field-apis>` and filtering
-fields based on their :ref:`attributes <field-attributes>`.
+fields based on their :ref:`attributes <model-field-attributes>`.
 
 The ``Model._meta`` object has been part of Django since the days of pre-0.96
 "Magic Removal" -- it just wasn't an official, stable API. In recognition of
-this, we've endeavoured to maintain backwards-compatibility with the old
+this, we've endeavored to maintain backwards-compatibility with the old
 API endpoint where possible. However, API endpoints that aren't part of the
 new official API have been deprecated, and will eventually be removed.
 
@@ -1041,7 +1041,7 @@ be removed in in Django 2.0. Use the methods and properties documented in
   These old APIs can be replicated by invoking :meth:`Options.get_fields()
   <django.db.models.options.Options.get_fields()>` to retrieve a list of
   all fields, and then filtering this list using the
-  :ref:`field attributes <field-attributes>` that describe (or retrieve,
+  :ref:`field attributes <model-field-attributes>` that describe (or retrieve,
   in the case of ``_with_model`` variants) the properties
   of the desired fields.
 

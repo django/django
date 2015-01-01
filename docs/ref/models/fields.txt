@@ -1791,7 +1791,7 @@ Field API reference
         This method must be added to fields prior to 1.7 to migrate its data
         using :doc:`/topics/migrations`.
 
-.. _field-attributes:
+.. _model-field-attributes:
 
 =========================
 Field attribute reference
@@ -1807,69 +1807,71 @@ Custom model fields should implement these flags.
 Attributes for fields
 =====================
 
-.. attribute:: concrete
+.. attribute:: Field.concrete
 
-    A concrete field has a database column associated with it. Concrete
-    fields always require a database migration.
+    Boolean flag that indicates if the if the field has a database column associated
+    with it.
 
-.. attribute:: has_relation
+.. attribute:: Field.has_relation
 
-    A field has a relation when the it contains references to one or
+    Boolean flag that indicates if a field contains references to one or
     more other models for its functionality (e.g. ``ForeignKey``).
 
-.. attribute:: model
+.. attribute:: Field.model
 
     Returns the model that owns the current field. If a field is defined on
     a superclass, ``model`` will refer to the superclass, not the class of
     the instance.
 
-.. attribute:: hidden
+.. attribute:: Field.hidden
 
-    Hidden fields are fields that exist, but are used to back other non-hidden
+    Boolean flag that indicates if a field is used to back other non-hidden
     field's functionality (e.g. the ``content_type`` and ``object_id`` fields
-    that make up a ``GenericForeignKey``). The hidden flag is used to distinguish
-    what constitutes the public subset of fields on the model from all the fields
-    on the model.
+    that make up a ``GenericForeignKey``). The hidden flag is used to
+    distinguish what constitutes the public subset of fields on the model from
+    all the fields on the model.
 
     .. note::
+
         :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
-        excludes hidden fields by default. Pass in ``include_hidden=True`` to return
-        hidden fields in the results.
+        excludes hidden fields by default. Pass in ``include_hidden=True`` to
+        return hidden fields in the results.
 
 
 Attributes for fields with relations
 ====================================
 
-If a field returns ``True`` to the ``has_relation`` attribute, it must
-also necessarily respond to the attributes for relational fields.
-These attributes are used inside and outside Django to query for the
-cardinality and other details of a relation.
+Fields with ``has_relation = True`` must also have the following attributes.
+These attributes are used to query for the cardinality and other details of a
+relation. These attribute are present on all fields; however, they will only
+have meaningful values if the field is a relation type.
 
-These attributes are presnt on *all* fields; however, they will only have
-meaningful values if the field is a relation type.
-
-.. attribute:: related_model
+.. attribute:: Field.related_model
 
     Points to the model it relates to. If a field has a generic
     relation (such as a ``GenericForeignKey`` or a ``GenericRelation``) then
     ``related_model`` will be ``None``.
 
-.. attribute:: one_to_one
+.. attribute:: Field.one_to_one
 
-    Responds ``True`` if the field has a one-to-one relation,
-    such as a ``OneToOneField``.
+    Boolean flag that is ``True`` if the field has a one-to-one relation, such
+    as a ``OneToOneField``; ``False`` otherwise.
 
-.. attribute:: many_to_one
+.. attribute:: Field.many_to_one
 
-    Responds ``True`` if the field has a many-to-one relation,
-    such as a ``GenericRelation``.
+    Boolean flag that is ``True`` if the field has a many-to-one relation, such
+    as a ``GenericRelation``, or the reverse of a ``ForeignKey``; ``False``
+    otherwise.
 
-.. attribute:: one_to_many
+.. attribute:: Field.one_to_many
 
-    Responds ``True`` if the field has a one-to-many relation,
-    such as a ``ForeignKey``.
+    Boolean flag that is ``True`` if the field has a one-to-many relation, such
+    as a ``ForeignKey``; ``False`` otherwise.
 
-.. attribute:: many_to_many
+.. attribute:: Field.many_to_many
 
-    Responds ``True`` if the field has a many-to-many relation,
-    such as a ``ManyToManyField``.
+    Boolean flag that is ``True`` if the field has a many-to-many relation;
+    ``False`` otherwise.
+
+    The only field included with Django where this is ``True`` is
+    :class:`~django.db.models.ManyToManyField`.
