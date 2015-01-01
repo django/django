@@ -1819,7 +1819,9 @@ Attributes for fields
 
 .. attribute:: model
 
-    Returns the model that owns the current field (in order of inheritance).
+    Returns the model that owns the current field. If a field is defined on
+    a superclass, ``model`` will refer to the superclass, not the class of
+    the instance.
 
 .. attribute:: hidden
 
@@ -1829,11 +1831,10 @@ Attributes for fields
     what constitutes the public subset of fields on the model from all the fields
     on the model.
 
-
     .. note::
-        get_fields() excludes hidden fields by default. Pass in
-        include_hidden=True to return hidden fields. In case you allow hidden
-        fields then you can use this flag for further filtering.
+        :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
+        excludes hidden fields by default. Pass in ``include_hidden=True`` to return
+        hidden fields in the results.
 
 
 Attributes for fields with relations
@@ -1844,9 +1845,8 @@ also necessarily respond to the attributes for relational fields.
 These attributes are used inside and outside Django to query for the
 cardinality and other details of a relation.
 
-.. note::
-    These attribute will not be present on fields that do not have a
-    relation.
+These attributes are presnt on *all* fields; however, they will only have
+meaningful values if the field is a relation type.
 
 .. attribute:: related_model
 
