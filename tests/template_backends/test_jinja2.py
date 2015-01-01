@@ -1,3 +1,7 @@
+# Since this package contains a "jinja2" directory, this is required to
+# silence an ImportWarning warning on Python 2.
+from __future__ import absolute_import
+
 import sys
 
 from unittest import skipIf
