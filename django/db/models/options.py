@@ -482,13 +482,16 @@ class Options(object):
 
         return res
 
-    def get_field(self, field_name, **kwargs):
+    def get_field(self, field_name, many_to_many=None):
         """
         Returns a field instance given a field name. The field can be either a forward
-        or reverse field
-        """
+        or reverse field, unless many_to_many is specified; if it is, only
+        forward fields will be returned.
 
-        m2m_in_kwargs = 'many_to_many' in kwargs
+        The many_to_many argument exists for backwards compatibility reasons; it has
+        been deprecated and will be removed in Django 2.0.
+        """
+        m2m_in_kwargs = many_to_many is not None
         try:
             # In order to avoid premature loading of the relation tree (expensive) we
             # prefer checking if the field is a forward field.
@@ -500,11 +503,10 @@ class Options(object):
                 # We always want to throw a warning if many_to_many is used regardless
                 # of if it alters the return type or not.
                 warnings.warn(
-                    "The 'many_to_many' argument on get_field() is deprecated; get_field()"
-                    "can now always return any field type.",
+                    "The 'many_to_many' argument on get_field() is deprecated; use a filter on field.many_to_many instead.",
                     RemovedInDjango20Warning
                 )
-                if kwargs['many_to_many'] is False and field.many_to_many:
+                if many_to_many is False and field.many_to_many:
                     raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
             return field
