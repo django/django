@@ -2520,7 +2520,7 @@ Templates can override or extend base admin templates as described in
 ``AdminSite`` methods
 ---------------------
 
-.. method:: AdminSite.each_context(request):
+.. method:: AdminSite.each_context(request)
 
     .. versionadded:: 1.7
 
