@@ -467,6 +467,73 @@ You can pass a second callable to
 want executed when migrating backwards. If this callable is omitted, migrating
 backwards will raise an exception.
 
+.. _data-migrations-and-multiple-databases:
+
+Data migrations and multiple databases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using multiple databases, you may need to figure out whether or not to
+run a migration against a particular database. For example, you may want to
+**only** run a migration on a particular database.
+
+In order to do that you can check the database connection's alias inside a
+``RunPython`` operation by looking at the ``schema_editor.connection.alias``
+attribute::
+
+    from django.db import migrations
+
+    def forwards(apps, schema_editor):
+        if not schema_editor.connection.alias == 'default':
+            return
+        # Your migration code goes here
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            # Dependencies to other migrations
+        ]
+
+        operations = [
+            migrations.RunPython(forwards),
+        ]
+
+You can also use your database router's ``allow_migrate()`` method, but keep in
+mind that the imported router needs to stay around as long as it is referenced
+inside a migration:
+
+.. snippet::
+    :filename: myapp/dbrouters.py
+
+    class MyRouter(object):
+
+        def allow_migrate(self, db, model):
+            return db == 'default'
+
+Then, to leverage this in your migrations, do the following::
+
+    from django.db import migrations
+
+    from myappname.dbrouters import MyRouter
+
+    def forwards(apps, schema_editor):
+        MyModel = apps.get_model("myappname", "MyModel")
+        if not MyRouter().allow_migrate(schema_editor.connection.alias, MyModel):
+            return
+        # Your migration code goes here
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            # Dependencies to other migrations
+        ]
+
+        operations = [
+            migrations.RunPython(forwards),
+        ]
+
+More advanced migrations
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 If you're interested in the more advanced migration operations, or want
 to be able to write your own, see the :doc:`migration operations reference
 </ref/migration-operations>`.
