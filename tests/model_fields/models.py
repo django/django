@@ -329,6 +329,7 @@ class AllFieldsModel(models.Model):
     text = models.TextField()
     time = models.TimeField()
     url = models.URLField()
+    uuid = models.UUIDField()
 
     fo = ForeignObject(
         'self',
