@@ -387,6 +387,54 @@ contains a reference to them. On the plus side, methods and managers from these
 base classes inherit normally, so if you absolutely need access to these you
 can opt to move them into a superclass.
 
+.. _migrations-removing-model-fields:
+
+Considerations when removing model fields
+-----------------------------------------
+
+.. versionadded:: 1.8
+
+Similar to the "references to historical functions" considerations described in
+the previous section, removing custom model fields from your project or
+third-party app will cause a problem if they are referenced in old migrations.
+
+To help with this situation, Django provides some model field attributes to
+assist with model field deprecation using the :doc:`system checks framework
+</topics/checks>`.
+
+Add the ``system_check_deprecated_details`` attribute to your model field
+similar to the following::
+
+    class IPAddressField(Field):
+        system_check_deprecated_details = {
+            'msg': (
+                'IPAddressField has been deprecated. Support for it (except '
+                'in historical migrations) will be removed in Django 1.9.'
+            ),
+            'hint': 'Use GenericIPAddressField instead.',  # optional
+            'id': 'fields.W900',  # pick a unique ID for your field.
+        }
+
+After a deprecation period of your choosing (two major releases for fields in
+Django itself), change the ``system_check_deprecated_details`` attribute to
+``system_check_removed_details`` and update the dictionary similar to::
+
+    class IPAddressField(Field):
+        system_check_removed_details = {
+            'msg': (
+                'IPAddressField has been removed except for support in '
+                'historical migrations.'
+            ),
+            'hint': 'Use GenericIPAddressField instead.',
+            'id': 'fields.E900',  # pick a unique ID for your field.
+        }
+
+You should keep the field's methods that are required for it to operate in
+database migrations such as ``__init__()``, ``deconstruct()``, and
+``get_internal_type()``. Keep this stub field for as long as any migrations
+which reference the field exist. For example, after squashing migrations and
+removing the old ones, you should be able to remove the field completely.
+
 .. _data-migrations:
 
 Data Migrations

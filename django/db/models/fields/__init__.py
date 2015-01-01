@@ -113,6 +113,8 @@ class Field(RegisterLookupMixin):
                              "%(date_field_label)s %(lookup_type)s."),
     }
     class_lookups = default_lookups.copy()
+    system_check_deprecated_details = None
+    system_check_removed_details = None
 
     # Generic field type description, usually overridden by subclasses
     def _description(self):
@@ -191,6 +193,7 @@ class Field(RegisterLookupMixin):
         errors.extend(self._check_db_index())
         errors.extend(self._check_null_allowed_for_primary_keys())
         errors.extend(self._check_backend_specific_checks(**kwargs))
+        errors.extend(self._check_deprecation_details())
         return errors
 
     def _check_field_name(self):
@@ -289,6 +292,34 @@ class Field(RegisterLookupMixin):
 
     def _check_backend_specific_checks(self, **kwargs):
         return connection.validation.check_field(self, **kwargs)
+
+    def _check_deprecation_details(self):
+        if self.system_check_removed_details is not None:
+            return [
+                checks.Error(
+                    self.system_check_removed_details.get(
+                        'msg',
+                        '%s has been removed except for support in historical '
+                        'migrations.' % self.__class__.__name__
+                    ),
+                    hint=self.system_check_removed_details.get('hint'),
+                    obj=self,
+                    id=self.system_check_removed_details.get('id', 'fields.EXXX'),
+                )
+            ]
+        elif self.system_check_deprecated_details is not None:
+            return [
+                checks.Warning(
+                    self.system_check_deprecated_details.get(
+                        'msg',
+                        '%s has been deprecated.' % self.__class__.__name__
+                    ),
+                    hint=self.system_check_deprecated_details.get('hint'),
+                    obj=self,
+                    id=self.system_check_deprecated_details.get('id', 'fields.WXXX'),
+                )
+            ]
+        return []
 
     def deconstruct(self):
         """
@@ -1832,6 +1863,14 @@ class BigIntegerField(IntegerField):
 class IPAddressField(Field):
     empty_strings_allowed = False
     description = _("IPv4 address")
+    system_check_deprecated_details = {
+        'msg': (
+            'IPAddressField has been deprecated. Support for it (except in '
+            'historical migrations) will be removed in Django 1.9.'
+        ),
+        'hint': 'Use GenericIPAddressField instead.',
+        'id': 'fields.W900',
+    }
 
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 15
@@ -1855,19 +1894,6 @@ class IPAddressField(Field):
         defaults = {'form_class': forms.IPAddressField}
         defaults.update(kwargs)
         return super(IPAddressField, self).formfield(**defaults)
-
-    def check(self, **kwargs):
-        errors = super(IPAddressField, self).check(**kwargs)
-        errors.append(
-            checks.Warning(
-                'IPAddressField has been deprecated. Support for it '
-                '(except in historical migrations) will be removed in Django 1.9.',
-                hint='Use GenericIPAddressField instead.',
-                obj=self,
-                id='fields.W900',
-            )
-        )
-        return errors
 
 
 class GenericIPAddressField(Field):
