@@ -6,6 +6,7 @@ import os
 import posixpath
 import shutil
 import sys
+import tempfile
 import unittest
 
 from django.template import Context, Template
@@ -129,12 +130,16 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
     """
     def setUp(self):
         super(BaseCollectionTestCase, self).setUp()
-        if not os.path.exists(settings.STATIC_ROOT):
-            os.mkdir(settings.STATIC_ROOT)
+        self.old_root = settings.STATIC_ROOT
+        settings.STATIC_ROOT = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
         self.run_collectstatic()
         # Use our own error handler that can handle .svn dirs on Windows
         self.addCleanup(shutil.rmtree, settings.STATIC_ROOT,
                         ignore_errors=True, onerror=rmtree_errorhandler)
+
+    def tearDown(self):
+        settings.STATIC_ROOT = self.old_root
+        super(BaseCollectionTestCase, self).tearDown()
 
     def run_collectstatic(self, **kwargs):
         call_command('collectstatic', interactive=False, verbosity=0,
