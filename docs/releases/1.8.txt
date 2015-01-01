@@ -438,6 +438,9 @@ Migrations
 * Migrations can now :ref:`serialize model managers
   <using-managers-in-migrations>` as part of the model state.
 
+* A :ref:`generic mechanism to handle the deprecation of model fields
+  <migrations-removing-model-fields>` was added.
+
 Models
 ^^^^^^
 
