@@ -3,9 +3,7 @@ from __future__ import unicode_literals
 
 from itertools import chain
 
-from django.contrib.admin.utils import (
-    get_fields_from_path, flatten, NotRelationField,
-)
+from django.contrib.admin.utils import get_fields_from_path, NotRelationField, flatten
 from django.core import checks
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
