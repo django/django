@@ -518,9 +518,9 @@ class BaseDatabaseSchemaEditor(object):
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
             # '_meta.related_field' contains also M2M reverse fields, these will be filtered out
             for rel in _related_non_m2m_objects(new_field.model._meta):
-                rel_fk_names = self._constraint_names(rel.model, [rel.field.column], foreign_key=True)
+                rel_fk_names = self._constraint_names(rel.related_model, [rel.field.column], foreign_key=True)
                 for fk_name in rel_fk_names:
-                    self.execute(self._delete_constraint_sql(self.sql_delete_fk, rel.model, fk_name))
+                    self.execute(self._delete_constraint_sql(self.sql_delete_fk, rel.related_model, fk_name))
         # Removed an index? (no strict check, as multiple indexes are possible)
         if (old_field.db_index and not new_field.db_index and
                 not old_field.unique and not
@@ -697,7 +697,7 @@ class BaseDatabaseSchemaEditor(object):
             rel_type = rel_db_params['type']
             self.execute(
                 self.sql_alter_column % {
-                    "table": self.quote_name(rel.model._meta.db_table),
+                    "table": self.quote_name(rel.related_model._meta.db_table),
                     "changes": self.sql_alter_column_type % {
                         "column": self.quote_name(rel.field.column),
                         "type": rel_type,
@@ -713,7 +713,7 @@ class BaseDatabaseSchemaEditor(object):
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
             for rel in new_field.model._meta.related_objects:
                 if not rel.many_to_many:
-                    self.execute(self._create_fk_sql(rel.model, rel.field, "_fk"))
+                    self.execute(self._create_fk_sql(rel.related_model, rel.field, "_fk"))
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:
             self.execute(
