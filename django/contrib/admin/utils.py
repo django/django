@@ -292,8 +292,8 @@ def lookup_field(name, obj, model_admin=None):
 
 def _get_non_gfk_field(opts, name):
     """
-    Due to current implementation of the Admin app, GenericForeignKeys
-    should be treated as not found by the 'label_for_field' function.
+    For historical reasons, the admin app relies on GenericForeignKeys as being
+    "not found" by get_field(). This could likely be cleaned up.
     """
     field = opts.get_field(name)
     if field.has_relation and field.one_to_many and not field.related_model:

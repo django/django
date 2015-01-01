@@ -367,8 +367,8 @@ class Options(object):
     @cached_property
     def fields(self):
         """
-        Returns a list of all forward fields on the model and it's parents, excluding
-        ManyToManyFields.
+        Returns a list of all forward fields on the model and its parents,
+        excluding ManyToManyFields.
 
         This is a private API and is only intended to be used by Django itself.
         ``get_fields()`` combined with filtering of field properties is the
@@ -388,7 +388,7 @@ class Options(object):
     @cached_property
     def concrete_fields(self):
         """
-        Returns a list of all concrete fields on the model and it's parents.
+        Returns a list of all concrete fields on the model and its parents.
 
         This is a private API and is only intended to be used by Django itself.
         ``get_fields()`` combined with filtering of field properties is the
@@ -418,7 +418,7 @@ class Options(object):
     @cached_property
     def many_to_many(self):
         """
-        Returns a list of all many to many fields on the model and it's parents.
+        Returns a list of all many to many fields on the model and its parents.
 
         This is a private API and is only intended to be used by Django itself.
         ``get_fields()`` combined with filtering of field properties is the
@@ -431,8 +431,8 @@ class Options(object):
     def related_objects(self):
         """
         Returns all related objects pointing to the current model.
-        The related objects can come from a one-to-one, one-to-many, many-to-many
-        field relation type.
+        The related objects can come from a one-to-one, one-to-many,
+        many-to-many field relation type.
 
         This is a private API and is only intended to be used by Django itself.
         ``get_fields()`` combined with filtering of field properties is the
@@ -484,12 +484,12 @@ class Options(object):
 
     def get_field(self, field_name, many_to_many=None):
         """
-        Returns a field instance given a field name. The field can be either a forward
-        or reverse field, unless many_to_many is specified; if it is, only
-        forward fields will be returned.
+        Returns a field instance given a field name. The field can be either a
+        forward or reverse field, unless many_to_many is specified; if it is,
+        only forward fields will be returned.
 
-        The many_to_many argument exists for backwards compatibility reasons; it has
-        been deprecated and will be removed in Django 2.0.
+        The many_to_many argument exists for backwards compatibility reasons;
+        it has been deprecated and will be removed in Django 2.0.
         """
         m2m_in_kwargs = many_to_many is not None
         try:
@@ -640,7 +640,7 @@ class Options(object):
 
     def _populate_directed_relation_graph(self):
         """
-        This method is used by each model to find it's reverse objects. As this
+        This method is used by each model to find its reverse objects. As this
         method is very expensive and is accessed frequently (it looks up every
         field in a model, in every app), it is computed on first access and then
         is set as a property on every model.
@@ -710,32 +710,36 @@ class Options(object):
 
     def get_fields(self, include_parents=True, include_hidden=False):
         """
-        Returns a list of fields associated to the model. By default will only return forward fields.
-        This can be changed by enabling or disabling field types using the flags available.
+        Returns a list of fields associated to the model. By default will only
+        return forward fields. This can be changed by enabling or disabling
+        field types using the flags available.
 
         Options can be any of the following:
-        - include_parents:        include fields derived from inheritance
-        - include_hidden:         include fields that have a related_name that starts with a "+"
+        - include_parents: include fields derived from inheritance
+        - include_hidden:  include fields that have a related_name that
+                           starts with a "+"
         """
         return self._get_fields(include_parents=include_parents, include_hidden=include_hidden)
 
     def _get_fields(self, forward=True, reverse=True, include_parents=True, include_hidden=False,
                     export_ordered_set=False):
-        # This helper function is used to allow recursion in ``get_fields()`` implementation, and
-        # provide a fast way for Django's internals to access specific subset of fields.
+        # This helper function is used to allow recursion in ``get_fields()``
+        # implementation, and provide a fast way for Django's internals to
+        # access specific subset of fields.
 
         # Creates a cache key composed of all arguments
         cache_key = (forward, reverse, include_parents, include_hidden, export_ordered_set)
         try:
             # In order to avoid list manipulation. Always return a shallow copy
-            # of the results
+            # of the results.
             return self._get_fields_cache[cache_key]
         except KeyError:
             pass
 
-        # Using an OrderedDict to preserve the order of insertion. This is fundamental
-        # when displaying a ModelForm or django.contrib.admin panel and no specific ordering
-        # is provided. For this reason, order of field insertion must be preserved
+        # Using an OrderedDict to preserve the order of insertion. This is
+        # fundamental when displaying a ModelForm or django.contrib.admin panel
+        # and no specific ordering is provided. For this reason, order of field
+        # insertion must be preserved
         fields = OrderedDict()
         options = {
             'include_parents': include_parents,
@@ -746,14 +750,15 @@ class Options(object):
         if reverse:
             if include_parents:
                 parent_list = self.get_parent_list()
-                # Recursively call _get_fields on each parent, with the same options provided
-                # in this call
+                # Recursively call _get_fields on each parent, with the same
+                # options provided in this call
                 for parent in self.parents:
                     for obj, _ in six.iteritems(parent._meta._get_fields(forward=False, **options)):
 
                         if obj.many_to_many:
-                            # In order for a reverse ManyToManyRel object to be valid, its creation
-                            # counter must be > 0 and must be in the parent list
+                            # In order for a reverse ManyToManyRel object to be
+                            # valid, its creation counter must be > 0 and must
+                            # be in the parent list
                             if not (obj.field.creation_counter < 0 and obj.related_model not in parent_list):
                                 fields[obj] = True
 
@@ -761,9 +766,10 @@ class Options(object):
                                   and obj.related_model not in parent_list):
                             fields[obj] = True
 
-            # Tree is computer once and cached until apps cache is expired. It is composed of
-            # a list of fields pointing to the current model from other models.
-            # If the model is a proxy model, then we also add the concrete model.
+            # Tree is computed once and cached until apps cache is expired. It
+            # is composed of a list of fields pointing to the current model
+            # from other models.  If the model is a proxy model, then we also
+            # add the concrete model.
             all_fields = self._relation_tree if not self.proxy else chain(self._relation_tree,
                                                                    self.concrete_model._meta._relation_tree)
 
