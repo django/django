@@ -367,11 +367,12 @@ class Options(object):
     @cached_property
     def fields(self):
         """
-        Returns a list of all forward fields on the model and its parents excluding
+        Returns a list of all forward fields on the model and it's parents, excluding
         ManyToManyFields.
-        This is a private API and is only intenede to be used by Django itself.
-        It is more safe to use get_fields(), outside of Django, that is officially
-        maintained.
+
+        This is a private API and is only intended to be used by Django itself.
+        ``get_fields()`` combined with filtering of field properties is the
+        officially maintained method for obtaining this field list.
         """
         # Due to legacy reasons, the fields property should only contain forward
         # fields that are not virtual or with a m2m cardinality. Therefore we pass
@@ -387,10 +388,11 @@ class Options(object):
     @cached_property
     def concrete_fields(self):
         """
-        Returns a list of all concrete fields on the model and its parents.
-        This is a private API and is only intenede to be used by Django itself.
-        It is more safe to use get_fields(), outside of Django, that is officially
-        maintained.
+        Returns a list of all concrete fields on the model and it's parents.
+
+        This is a private API and is only intended to be used by Django itself.
+        ``get_fields()`` combined with filtering of field properties is the
+        officially maintained method for obtaining this field list.
         """
         return make_immutable_fields_list("concrete_fields", (f for f in self.fields if f.concrete))
 
@@ -398,9 +400,10 @@ class Options(object):
     def local_concrete_fields(self):
         """
         Returns a list of all concrete fields on the model.
-        This is a private API and is only intenede to be used by Django itself.
-        It is more safe to use get_fields(), outside of Django, that is officially
-        maintained.
+
+        This is a private API and is only intended to be used by Django itself.
+        ``get_fields()`` combined with filtering of field properties is the
+        officially maintained method for obtaining this field list.
         """
         return make_immutable_fields_list("local_concrete_fields", (f for f in self.local_fields if f.concrete))
 
@@ -415,11 +418,11 @@ class Options(object):
     @cached_property
     def many_to_many(self):
         """
-        Returns a list of all many to many fields on the model and
-        its parents.
-        This is a private API and is only intenede to be used by Django itself.
-        It is more safe to use get_fields(), outside of Django, that is officially
-        maintained.
+        Returns a list of all many to many fields on the model and it's parents.
+
+        This is a private API and is only intended to be used by Django itself.
+        ``get_fields()`` combined with filtering of field properties is the
+        officially maintained method for obtaining this field list.
         """
         return make_immutable_fields_list("many_to_many", (f for f in self._get_fields(reverse=False)
                                           if f.has_relation and f.many_to_many))
@@ -430,9 +433,10 @@ class Options(object):
         Returns all related objects pointing to the current model.
         The related objects can come from a one-to-one, one-to-many, many-to-many
         field relation type.
-        This is a private API and is only intenede to be used by Django itself.
-        It is more safe to use get_fields(), outside of Django, that is officially
-        maintained.
+
+        This is a private API and is only intended to be used by Django itself.
+        ``get_fields()`` combined with filtering of field properties is the
+        officially maintained method for obtaining this field list.
         """
         all_related_fields = self._get_fields(forward=False, reverse=True, include_hidden=True)
         return make_immutable_fields_list(
@@ -715,7 +719,7 @@ class Options(object):
 
     def _get_fields(self, forward=True, reverse=True, include_parents=True, include_hidden=False,
                     export_ordered_set=False):
-        # This helper function is used to allow recursion in the get_fields() API and
+        # This helper function is used to allow recursion in ``get_fields()`` implementation, and
         # provide a fast way for Django's internals to access specific subset of fields.
 
         # Creates a cache key composed of all arguments
