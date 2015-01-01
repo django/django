@@ -32,41 +32,28 @@ What's new in Django 1.8
 ``Model._meta`` API
 ~~~~~~~~~~~~~~~~~~~
 
-Django now has an official API for ``Model._meta`` in the
-:class:`~django.db.models.options.Options` class, as well as formalized
-documentation for :ref:`field types <model-meta-field-types>` and
-:ref:`field attributes <field-attributes>`.
+Django now has an official API for ``Model._meta``, providing a formal
+API for :ref:`retrieving fields <model-meta-field-apis>` and filtering
+fields based on their :ref:`attributes <field-attributes>`.
 
-The new API is composed of 3 main endpoints:
+The ``Model._meta`` object has been part of Django since the days of pre-0.96
+"Magic Removal" -- it just wasn't an official, stable API. In recognition of
+this, we've endeavoured to maintain backwards-compatibility with the old
+API endpoint where possible. However, API endpoints that aren't part of the
+new official API have been deprecated, and will eventually be removed.
+
+The new API is composed of 2 main endpoints:
 
 * :meth:`Options.get_field() <django.db.models.options.Options.get_field()>`
-  retrieves a field by name. This endpoint replaces:
-
-  * ``get_field_by_name()``
+  to retrieves a field by name.
 
 * :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
-  retrieves a list of fields given a specific filter criteria. This endpoint
-  replaces:
+  to retrieve a list of all fields on an object, including reverse and
+  many-to-many relationships.
 
-  * ``get_fields_with_model()``
-  * ``get_concrete_fields_with_model()``
-  * ``get_m2m_with_model()``
-  * ``get_all_related_objects()``
-  * ``get_all_related_objects_with_model()``
-  * ``get_all_related_many_to_many_objects()``
-  * ``get_all_related_m2m_objects_with_model()``
-
-* :attr:`Options.related_objects <django.db.models.options.Options.related_objects>`
-  returns a list of related objects that point to the current model. This endpoint
-  is a cached property of :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
-  with only the ``reverse`` flag enabled.
-
-* :attr:`Options.field_names <django.db.models.options.Options.field_names>`
-  retrieves all the field names of a model. This endpoint replaces:
-
-  * ``get_all_field_names()``
-
-More details can be found in the :doc:`/ref/models/meta` docs.
+More details can be found in the :doc:`/ref/models/meta` docs. Details of
+the migration path for old ``Model._meta`` usage can be found in the
+:ref:`deprecated features <model_meta_upgrade>` section of this document.
 
 Security enhancements
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1022,6 +1009,8 @@ Miscellaneous
 Features deprecated in 1.8
 ==========================
 
+.. _model_meta_upgrade:
+
 Selected methods in ``django.db.models.options.Options``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1030,15 +1019,31 @@ The following undocumented methods in the ``Model._meta`` API (from the
 be removed in in Django 2.0. Use the methods and properties documented in
 :doc:`/ref/models/meta` instead.
 
-* ``get_field_by_name()``
-* ``get_all_field_names()``
-* ``get_fields_with_model()``
-* ``get_concrete_fields_with_model()``
-* ``get_m2m_with_model()``
-* ``get_all_related_objects()``
-* ``get_all_related_objects_with_model()``
-* ``get_all_related_many_to_many_objects()``
-* ``get_all_related_m2m_objects_with_model()``
+* :meth:`Options.get_field() <django.db.models.options.Options.get_field()>`
+  retrieves a field by name. This endpoint replaces:
+
+  * ``get_field_by_name()``
+
+* :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
+  retrieves a list of fields. This endpoint replaces:
+
+  * ``get_fields_with_model()``
+  * ``get_concrete_fields_with_model()``
+  * ``get_m2m_with_model()``
+  * ``get_all_related_objects()``
+  * ``get_all_related_objects_with_model()``
+  * ``get_all_related_many_to_many_objects()``
+  * ``get_all_related_m2m_objects_with_model()``
+  * ``fields``
+  * ``concrete_fields``
+  * ``local_concrete_fields``
+
+  These old APIs can be replicated by invoking :meth:`Options.get_fields()
+  <django.db.models.options.Options.get_fields()>` to retrieve a list of
+  all fields, and then filtering this list using the
+  :ref:`field attributes <field-attributes>` that describe (or retrieve,
+  in the case of ``_with_model`` variants) the properties
+  of the desired fields.
 
 Loading ``cycle`` and ``firstof`` template tags from ``future`` library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

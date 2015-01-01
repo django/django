@@ -532,7 +532,7 @@ class Options(object):
     def get_field_by_name(self, name):
         return self._map_model_details(self.get_field(name))
 
-    @raise_deprecation(suggested_alternative="field_names")
+    @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_field_names(self):
         res = set()
         fields = self.get_fields()
