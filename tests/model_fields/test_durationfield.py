@@ -5,7 +5,7 @@ from django.core import exceptions, serializers
 from django.db import models
 from django.test import TestCase
 
-from .models import DurationModel
+from .models import DurationModel, NullDurationModel
 
 
 class TestSaveLoad(TestCase):
@@ -15,6 +15,11 @@ class TestSaveLoad(TestCase):
         DurationModel.objects.create(field=duration)
         loaded = DurationModel.objects.get()
         self.assertEqual(loaded.field, duration)
+
+    def test_create_empty(self):
+        NullDurationModel.objects.create()
+        loaded = NullDurationModel.objects.get()
+        self.assertEqual(loaded.field, None)
 
 
 class TestQuerying(TestCase):
