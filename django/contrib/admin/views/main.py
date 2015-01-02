@@ -1,11 +1,10 @@
 from collections import OrderedDict
 import sys
 
-from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
+from django.core.exceptions import FieldDoesNotExist, SuspiciousOperation, ImproperlyConfigured
 from django.core.paginator import InvalidPage
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext, ugettext_lazy
@@ -226,7 +225,7 @@ class ChangeList(object):
         try:
             field = self.lookup_opts.get_field(field_name)
             return field.name
-        except models.FieldDoesNotExist:
+        except FieldDoesNotExist:
             # See whether field_name is a name of a non-field
             # that allows sorting.
             if callable(field_name):
@@ -377,7 +376,7 @@ class ChangeList(object):
         for field_name in self.list_display:
             try:
                 field = self.lookup_opts.get_field(field_name)
-            except models.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 pass
             else:
                 if isinstance(field.rel, models.ManyToOneRel):

@@ -9,14 +9,14 @@ from django.apps import apps
 from django.apps.config import MODELS_MODULE_NAME
 from django.conf import settings
 from django.core import checks
-from django.core.exceptions import (ObjectDoesNotExist,
+from django.core.exceptions import (FieldDoesNotExist, ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
 from django.db import (router, connections, transaction, DatabaseError,
     DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY)
 from django.db.models import signals
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.fields import AutoField, FieldDoesNotExist
+from django.db.models.fields import AutoField
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
 from django.db.models.manager import ensure_default_manager
@@ -1443,7 +1443,7 @@ class Model(six.with_metaclass(ModelBase)):
             try:
                 field = cls._meta.get_field(field_name,
                     many_to_many=True)
-            except models.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 errors.append(
                     checks.Error(
                         "'%s' refers to the non-existent field '%s'." % (option, field_name),
@@ -1484,8 +1484,6 @@ class Model(six.with_metaclass(ModelBase)):
     def _check_ordering(cls):
         """ Check "ordering" option -- is it a list of strings and do all fields
         exist? """
-
-        from django.db.models import FieldDoesNotExist
 
         if not cls._meta.ordering:
             return []

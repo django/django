@@ -5,13 +5,13 @@ import warnings
 
 from django.apps import apps
 from django.core import checks
+from django.core.exceptions import FieldDoesNotExist
 from django.db import connection, connections, router, transaction
 from django.db.backends import utils
 from django.db.models import signals, Q
 from django.db.models.deletion import SET_NULL, SET_DEFAULT, CASCADE
 from django.db.models.fields import (AutoField, Field, IntegerField,
-    PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist,
-    BLANK_CHOICE_DASH)
+    PositiveIntegerField, PositiveSmallIntegerField, BLANK_CHOICE_DASH)
 from django.db.models.lookups import IsNull
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo

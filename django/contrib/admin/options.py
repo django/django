@@ -20,12 +20,12 @@ from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.auth import get_permission_codename
 from django.core import checks
 from django.core.exceptions import (PermissionDenied, ValidationError,
-    FieldError, ImproperlyConfigured)
+    FieldDoesNotExist, FieldError, ImproperlyConfigured)
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, router
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.formsets import all_valid, DELETION_FIELD_NAME
@@ -1381,7 +1381,7 @@ class ModelAdmin(BaseModelAdmin):
         for k in initial:
             try:
                 f = self.model._meta.get_field(k)
-            except models.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 continue
             # We have to special-case M2Ms as a list of comma-separated PKs.
             if isinstance(f, models.ManyToManyField):
