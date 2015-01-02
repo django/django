@@ -5,6 +5,7 @@ import datetime
 import decimal
 
 from django.contrib.auth import get_permission_codename
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
@@ -265,7 +266,7 @@ def lookup_field(name, obj, model_admin=None):
     opts = obj._meta
     try:
         f = opts.get_field(name)
-    except models.FieldDoesNotExist:
+    except FieldDoesNotExist:
         # For non-field values, the value is either a method, property or
         # returned via a callable.
         if callable(name):
@@ -306,7 +307,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
         except AttributeError:
             # field is likely a ForeignObjectRel
             label = field.opts.verbose_name
-    except models.FieldDoesNotExist:
+    except FieldDoesNotExist:
         if name == "__unicode__":
             label = force_text(model._meta.verbose_name)
             attr = six.text_type
@@ -349,7 +350,7 @@ def help_text_for_field(name, model):
     help_text = ""
     try:
         field_data = model._meta.get_field_by_name(name)
-    except models.FieldDoesNotExist:
+    except FieldDoesNotExist:
         pass
     else:
         field = field_data[0]

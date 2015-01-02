@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.core import checks
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
-from django.db.models.fields import FieldDoesNotExist
 
 
 class CurrentSiteManager(models.Manager):

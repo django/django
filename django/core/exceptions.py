@@ -5,6 +5,11 @@ from django.utils import six
 from django.utils.encoding import force_text
 
 
+class FieldDoesNotExist(Exception):
+    """The requested model field does not exist"""
+    pass
+
+
 class DjangoRuntimeWarning(RuntimeWarning):
     pass
 
