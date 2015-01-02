@@ -107,7 +107,8 @@ Retrieving all field instances of a model
 
         >>> from django.contrib.auth.models import User
         >>> User._meta.get_fields()
-        (<django.db.models.fields.AutoField: id>,
+        (<ManyToOneRel: admin.logentry>,
+         <django.db.models.fields.AutoField: id>,
          <django.db.models.fields.CharField: password>,
          <django.db.models.fields.DateTimeField: last_login>,
          <django.db.models.fields.BooleanField: is_superuser>,
@@ -122,10 +123,12 @@ Retrieving all field instances of a model
          <django.db.models.fields.related.ManyToManyField: user_permissions>)
 
         # Also include hidden fields.
-        # TODO: this list is identical -- is it correct? is the description
         # of include_hidden above still correct?
         >>> User._meta.get_fields(include_hidden=True)
-        (<django.db.models.fields.AutoField: id>,
+        (<ManyToOneRel: auth.user_groups>,
+         <ManyToOneRel: auth.user_user_permissions>,
+         <ManyToOneRel: admin.logentry>,
+         <django.db.models.fields.AutoField: id>,
          <django.db.models.fields.CharField: password>,
          <django.db.models.fields.DateTimeField: last_login>,
          <django.db.models.fields.BooleanField: is_superuser>,

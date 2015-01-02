@@ -3,14 +3,19 @@ from django.test import TestCase
 
 from .models import Issue, User, UnicodeReferenceModel
 
+USER_RELATED_OBJECTS = (
+    'test_issue_client',
+    'test_issue_cc',
+)
+
 
 class RelatedObjectTests(TestCase):
 
     def test_related_objects_have_name_attribute(self):
-        for Model in (Issue, User, UnicodeReferenceModel):
-            for obj in Model._meta.get_fields():
-                if obj.is_reverse_object:
-                    self.assertEqual(obj.name, obj.field.related_query_name())
+        opts = User._meta
+        for field_name in USER_RELATED_OBJECTS:
+            obj = opts.get_field(field_name)
+            self.assertEqual(field_name, obj.field.related_query_name())
 
     def test_m2m_and_m2o(self):
         r = User.objects.create(username="russell")
