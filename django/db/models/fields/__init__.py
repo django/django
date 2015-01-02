@@ -61,7 +61,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 # When the _meta object was formalized, this exception was moved to
 # django.core.exceptions. It is retained here for backwards compatibility
 # purposes.
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist  # NOQA
 
 
 def _load_field(app_label, model_name, field_name):
