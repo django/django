@@ -697,7 +697,7 @@ class Options(object):
         properties_to_expire = []
         if forward:
             properties_to_expire.extend(self.FORWARD_PROPERTIES)
-        if reverse:
+        if reverse and not self.abstract:
             properties_to_expire.extend(self.REVERSE_PROPERTIES)
 
         for cache_key in properties_to_expire:
@@ -747,7 +747,8 @@ class Options(object):
             'export_ordered_set': True,
         }
 
-        if reverse:
+        # Abstract models cannot hold reverse fields.
+        if reverse and not self.abstract:
             if include_parents:
                 parent_list = self.get_parent_list()
                 # Recursively call _get_fields on each parent, with the same
