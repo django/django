@@ -364,14 +364,21 @@ class Field(RegisterLookupMixin):
                     keywords[name] = value
         # Work out path - we shorten it for known Django core fields
         path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
-        if path.startswith("django.db.models.fields.related"):
-            path = path.replace("django.db.models.fields.related", "django.db.models")
-        if path.startswith("django.db.models.fields.files"):
-            path = path.replace("django.db.models.fields.files", "django.db.models")
-        if path.startswith("django.db.models.fields.proxy"):
-            path = path.replace("django.db.models.fields.proxy", "django.db.models")
-        if path.startswith("django.db.models.fields"):
-            path = path.replace("django.db.models.fields", "django.db.models")
+        flatten_paths = [
+            "django.db.models.fields.related.base",
+            "django.db.models.fields.related.many_to_one",
+            "django.db.models.fields.related.many_to_many",
+            "django.db.models.fields.related.one_to_one",
+            "django.db.models.fields.related",
+            "django.db.models.fields.files",
+            "django.db.models.fields.proxy",
+            "django.db.models.fields",
+        ]
+        for flatten_path in flatten_paths:
+            if path.startswith(flatten_path):
+                path = path.replace(flatten_path, "django.db.models")
+                break
+
         # Return basic info - other fields should override this.
         return (
             force_text(self.name, strings_only=True),
