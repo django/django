@@ -280,5 +280,7 @@ Disconnecting signals
 To disconnect a receiver from a signal, call :meth:`Signal.disconnect`. The
 arguments are as described in :meth:`.Signal.connect`.
 
+Method returns ``True``, if receiver was disconnected, and ``False`` if not.
+
 The *receiver* argument indicates the registered receiver to disconnect. It may
 be ``None`` if ``dispatch_uid`` is used to identify the receiver.
