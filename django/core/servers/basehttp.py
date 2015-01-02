@@ -87,7 +87,7 @@ class WSGIServer(simple_server.WSGIServer, object):
             super(WSGIServer, self).handle_error(request, client_address)
 
 
-class ServerHandler(simple_server.ServerHandler):
+class ServerHandler(simple_server.ServerHandler, object):
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
         if not is_broken_pipe_error():
