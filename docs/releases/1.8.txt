@@ -371,6 +371,8 @@ Management Commands
 * Database connections are now always closed after a management command called
   from the command line has finished doing its job.
 
+* Commands from alternate package formats like eggs are now also discovered.
+
 * :djadmin:`dumpdata` now has the option :djadminopt:`--output` which allows
   specifying the file to which the serialized data is written.
 
