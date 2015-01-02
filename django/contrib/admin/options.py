@@ -475,7 +475,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
 
         related_objects = (
             f for f in opts.get_fields(include_hidden=True)
-            if f.is_reverse_object
+            if (f.auto_created and not f.concrete)
         )
         for related_object in related_objects:
             related_model = related_object.related_model

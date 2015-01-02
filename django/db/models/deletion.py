@@ -65,7 +65,7 @@ def get_candidate_relations_to_delete(opts):
     # model fields.
     return (
         f for f in candidate_model_fields
-        if f.is_reverse_object and not f.many_to_many
+        if f.auto_created and not f.concrete and not f.many_to_many
     )
 
 

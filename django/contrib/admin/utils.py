@@ -444,7 +444,7 @@ def reverse_field_path(model, path):
                 break
 
         # Field should point to another model
-        if not field.is_reverse_object and field.has_relation:
+        if field.has_relation and not (field.auto_created and not field.concrete):
             related_name = field.related_query_name()
             parent = field.rel.to
         else:
