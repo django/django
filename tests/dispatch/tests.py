@@ -45,7 +45,7 @@ d_signal = Signal(providing_args=["val"], use_caching=True)
 class DispatcherTests(unittest.TestCase):
     """Test suite for dispatcher (barely started)"""
 
-    def _testIsClean(self, signal):
+    def assertTestIsClean(self, signal):
         """Assert that everything has been cleaned up automatically"""
         # Note that dead weakref cleanup happens as side effect of using
         # the signal's receivers through the signals API. So, first do a
@@ -59,7 +59,7 @@ class DispatcherTests(unittest.TestCase):
         result = a_signal.send(sender=self, val="test")
         self.assertEqual(result, expected)
         a_signal.disconnect(receiver_1_arg, sender=self)
-        self._testIsClean(a_signal)
+        self.assertTestIsClean(a_signal)
 
     def test_ignored_sender(self):
         a_signal.connect(receiver_1_arg)
@@ -67,7 +67,7 @@ class DispatcherTests(unittest.TestCase):
         result = a_signal.send(sender=self, val="test")
         self.assertEqual(result, expected)
         a_signal.disconnect(receiver_1_arg)
-        self._testIsClean(a_signal)
+        self.assertTestIsClean(a_signal)
 
     def test_garbage_collected(self):
         a = Callable()
@@ -77,7 +77,7 @@ class DispatcherTests(unittest.TestCase):
         garbage_collect()
         result = a_signal.send(sender=self, val="test")
         self.assertEqual(result, expected)
-        self._testIsClean(a_signal)
+        self.assertTestIsClean(a_signal)
 
     def test_cached_garbaged_collected(self):
         """
@@ -111,7 +111,7 @@ class DispatcherTests(unittest.TestCase):
         del a
         del result
         garbage_collect()
-        self._testIsClean(a_signal)
+        self.assertTestIsClean(a_signal)
 
     def test_uid_registration(self):
         def uid_based_receiver_1(**kwargs):
@@ -124,10 +124,10 @@ class DispatcherTests(unittest.TestCase):
         a_signal.connect(uid_based_receiver_2, dispatch_uid="uid")
         self.assertEqual(len(a_signal.receivers), 1)
         a_signal.disconnect(dispatch_uid="uid")
-        self._testIsClean(a_signal)
+        self.assertTestIsClean(a_signal)
 
     def test_robust(self):
-        """Test the sendRobust function"""
+        """Test the send_robust() function"""
         def fails(val, **kwargs):
             raise ValueError('this')
         a_signal.connect(fails)
@@ -138,7 +138,7 @@ class DispatcherTests(unittest.TestCase):
         self.assertTrue(hasattr(err, '__traceback__'))
         self.assertTrue(isinstance(err.__traceback__, TracebackType))
         a_signal.disconnect(fails)
-        self._testIsClean(a_signal)
+        self.assertTestIsClean(a_signal)
 
     def test_disconnection(self):
         receiver_1 = Callable()
@@ -151,7 +151,7 @@ class DispatcherTests(unittest.TestCase):
         del receiver_2
         garbage_collect()
         a_signal.disconnect(receiver_3)
-        self._testIsClean(a_signal)
+        self.assertTestIsClean(a_signal)
 
     def test_has_listeners(self):
         self.assertFalse(a_signal.has_listeners())
@@ -168,7 +168,6 @@ class DispatcherTests(unittest.TestCase):
 class ReceiverTestCase(unittest.TestCase):
     """
     Test suite for receiver.
-
     """
     def test_receiver_single_signal(self):
         @receiver(a_signal)
