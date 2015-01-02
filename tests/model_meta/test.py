@@ -196,8 +196,10 @@ class RelationTreeTests(test.TestCase):
         apps.clear_cache(expire_models_cache=True)
 
     def test_clear_cache_clears_relation_tree(self):
-        # the apps.clear_cache is setUp() should have deleted all trees.
-        for m in self.all_models:
+        # The apps.clear_cache is setUp() should have deleted all trees. Exclude abstract
+        # models, that are not included in the Apps registry and have no cache.
+        all_models_with_cache = (m for m in self.all_models if not m._meta.abstract)
+        for m in all_models_with_cache:
             self.assertNotIn('_relation_tree', m._meta.__dict__)
 
     def test_first_relation_tree_access_populates_all(self):
