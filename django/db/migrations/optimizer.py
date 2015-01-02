@@ -177,7 +177,7 @@ class MigrationOptimizer(object):
         """
         Folds a CreateModel and a DeleteModel into nothing.
         """
-        if (operation.name.lower() == other.name.lower() and
+        if (operation.name_lower == other.name_lower and
                 not operation.options.get("proxy", False)):
             return []
 
@@ -185,14 +185,14 @@ class MigrationOptimizer(object):
         """
         Folds an AlterModelSomething and a DeleteModel into just delete.
         """
-        if operation.name.lower() == other.name.lower():
+        if operation.name_lower == other.name_lower:
             return [other]
 
     def reduce_model_create_rename(self, operation, other, in_between):
         """
         Folds a model rename into its create
         """
-        if operation.name.lower() == other.old_name.lower():
+        if operation.name_lower == other.old_name_lower:
             return [
                 migrations.CreateModel(
                     other.new_name,
@@ -206,7 +206,7 @@ class MigrationOptimizer(object):
         """
         Folds a model rename into another one
         """
-        if operation.new_name.lower() == other.old_name.lower():
+        if operation.new_name_lower == other.old_name_lower:
             return [
                 migrations.RenameModel(
                     operation.old_name,
@@ -215,7 +215,7 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_create_model_add_field(self, operation, other, in_between):
-        if operation.name.lower() == other.model_name.lower():
+        if operation.name_lower == other.model_name_lower:
             # Don't allow optimisations of FKs through models they reference
             if hasattr(other.field, "rel") and other.field.rel:
                 for between in in_between:
@@ -239,7 +239,7 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_create_model_alter_field(self, operation, other, in_between):
-        if operation.name.lower() == other.model_name.lower():
+        if operation.name_lower == other.model_name_lower:
             return [
                 migrations.CreateModel(
                     operation.name,
@@ -253,7 +253,7 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_create_model_rename_field(self, operation, other, in_between):
-        if operation.name.lower() == other.model_name.lower():
+        if operation.name_lower == other.model_name_lower:
             return [
                 migrations.CreateModel(
                     operation.name,
@@ -267,14 +267,14 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_create_model_remove_field(self, operation, other, in_between):
-        if operation.name.lower() == other.model_name.lower():
+        if operation.name_lower == other.model_name_lower:
             return [
                 migrations.CreateModel(
                     operation.name,
                     fields=[
                         (n, v)
                         for n, v in operation.fields
-                        if n.lower() != other.name.lower()
+                        if n.lower() != other.name_lower
                     ],
                     options=operation.options,
                     bases=operation.bases,
@@ -282,7 +282,8 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_add_field_alter_field(self, operation, other, in_between):
-        if operation.model_name.lower() == other.model_name.lower() and operation.name.lower() == other.name.lower():
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.name_lower == other.name_lower):
             return [
                 migrations.AddField(
                     model_name=operation.model_name,
@@ -292,16 +293,18 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_add_field_delete_field(self, operation, other, in_between):
-        if operation.model_name.lower() == other.model_name.lower() and operation.name.lower() == other.name.lower():
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.name_lower == other.name_lower):
             return []
 
     def reduce_alter_field_delete_field(self, operation, other, in_between):
-        if operation.model_name.lower() == other.model_name.lower() and operation.name.lower() == other.name.lower():
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.name_lower == other.name_lower):
             return [other]
 
     def reduce_add_field_rename_field(self, operation, other, in_between):
-        if (operation.model_name.lower() == other.model_name.lower() and
-                operation.name.lower() == other.old_name.lower()):
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.name_lower == other.old_name_lower):
             return [
                 migrations.AddField(
                     model_name=operation.model_name,
@@ -311,8 +314,8 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_alter_field_rename_field(self, operation, other, in_between):
-        if (operation.model_name.lower() == other.model_name.lower() and
-                operation.name.lower() == other.old_name.lower()):
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.name_lower == other.old_name_lower):
             return [
                 other,
                 migrations.AlterField(
@@ -323,8 +326,8 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_rename_field_self(self, operation, other, in_between):
-        if (operation.model_name.lower() == other.model_name.lower() and
-                operation.new_name.lower() == other.old_name.lower()):
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.new_name_lower == other.old_name_lower):
             return [
                 migrations.RenameField(
                     operation.model_name,
