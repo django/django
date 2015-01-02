@@ -13,12 +13,11 @@ from collections import Mapping, OrderedDict
 import copy
 import warnings
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
-from django.db.models.fields import FieldDoesNotExist
 from django.db.models.query_utils import PathInfo, Q, refs_aggregate
 from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
         ORDER_PATTERN, SelectInfo, INNER, LOUTER)

@@ -38,11 +38,10 @@ __all__ = [str(x) for x in (
     'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
     'BooleanField', 'CharField', 'CommaSeparatedIntegerField', 'DateField',
     'DateTimeField', 'DecimalField', 'DurationField', 'EmailField',
-    'Empty', 'Field', 'FieldDoesNotExist', 'FilePathField', 'FloatField',
-    'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
-    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
-    'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
-    'UUIDField',
+    'Empty', 'Field', 'FilePathField', 'FloatField', 'GenericIPAddressField',
+    'IPAddressField', 'IntegerField', 'NOT_PROVIDED', 'NullBooleanField',
+    'PositiveIntegerField', 'PositiveSmallIntegerField', 'SlugField',
+    'SmallIntegerField', 'TextField', 'TimeField', 'URLField', 'UUIDField',
 )]
 
 
@@ -60,10 +59,6 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 def _load_field(app_label, model_name, field_name):
     return apps.get_model(app_label, model_name)._meta.get_field(field_name)
-
-
-class FieldDoesNotExist(Exception):
-    pass
 
 
 # A guide to Field parameters:

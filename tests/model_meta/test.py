@@ -1,7 +1,8 @@
 from django import test
 from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.db.models.fields import related, CharField, Field, FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist
+from django.db.models.fields import related, CharField, Field
 from django.db.models.options import IMMUTABLE_WARNING, EMPTY_RELATION_TREE
 
 from .models import Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating
