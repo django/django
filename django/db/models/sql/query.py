@@ -961,7 +961,7 @@ class Query(object):
         self.append_annotation_mask([alias])
         self.annotations[alias] = annotation
 
-    def prepare_lookup_value(self, value, lookups, can_reuse):
+    def prepare_lookup_value(self, value, lookups, can_reuse, allow_joins=True):
         # Default lookup if none given is exact.
         used_joins = []
         if len(lookups) == 0:
@@ -980,7 +980,7 @@ class Query(object):
             value = value()
         elif hasattr(value, 'resolve_expression'):
             pre_joins = self.alias_refcount.copy()
-            value = value.resolve_expression(self, reuse=can_reuse)
+            value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
             used_joins = [k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)]
         # Subqueries need to use a different set of aliases than the
         # outer query. Call bump_prefix to change aliases of the inner
@@ -1095,7 +1095,7 @@ class Query(object):
                 (name, lhs.output_field.__class__.__name__))
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
-                     can_reuse=None, connector=AND):
+                     can_reuse=None, connector=AND, allow_joins=True):
         """
         Builds a WhereNode for a single filter clause, but doesn't add it
         to this Query. Query.add_q() will then add this filter to the where
@@ -1125,10 +1125,12 @@ class Query(object):
         if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)
         lookups, parts, reffed_aggregate = self.solve_lookup_type(arg)
+        if not allow_joins and len(parts) > 1:
+            raise FieldError("Joined field references are not permitted in this query")
 
         # Work out the lookup type and remove it from the end of 'parts',
         # if necessary.
-        value, lookups, used_joins = self.prepare_lookup_value(value, lookups, can_reuse)
+        value, lookups, used_joins = self.prepare_lookup_value(value, lookups, can_reuse, allow_joins)
 
         clause = self.where_class()
         if reffed_aggregate:
@@ -1225,11 +1227,11 @@ class Query(object):
         """
         if not self._annotations:
             return False
-        if not isinstance(obj, Node):
-            return (refs_aggregate(obj[0].split(LOOKUP_SEP), self.annotations)[0]
-                    or (hasattr(obj[1], 'refs_aggregate')
-                        and obj[1].refs_aggregate(self.annotations)[0]))
-        return any(self.need_having(c) for c in obj.children)
+        if hasattr(obj, 'refs_aggregate'):
+            return obj.refs_aggregate(self.annotations)[0]
+        return (refs_aggregate(obj[0].split(LOOKUP_SEP), self.annotations)[0]
+                or (hasattr(obj[1], 'refs_aggregate')
+                    and obj[1].refs_aggregate(self.annotations)[0]))
 
     def split_having_parts(self, q_object, negated=False):
         """
@@ -1287,7 +1289,7 @@ class Query(object):
         self.demote_joins(existing_inner)
 
     def _add_q(self, q_object, used_aliases, branch_negated=False,
-               current_negated=False):
+               current_negated=False, allow_joins=True):
         """
         Adds a Q-object to the current filter.
         """
@@ -1301,12 +1303,12 @@ class Query(object):
             if isinstance(child, Node):
                 child_clause, needed_inner = self._add_q(
                     child, used_aliases, branch_negated,
-                    current_negated)
+                    current_negated, allow_joins)
                 joinpromoter.add_votes(needed_inner)
             else:
                 child_clause, needed_inner = self.build_filter(
                     child, can_reuse=used_aliases, branch_negated=branch_negated,
-                    current_negated=current_negated, connector=connector)
+                    current_negated=current_negated, connector=connector, allow_joins=allow_joins)
                 joinpromoter.add_votes(needed_inner)
             target_clause.add(child_clause, connector)
         needed_inner = joinpromoter.update_join_types(self)

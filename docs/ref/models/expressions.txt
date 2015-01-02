@@ -332,6 +332,15 @@ instantiating the model field as any arguments relating to data validation
 (``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
 output value.
 
+Conditional expressions
+-----------------------
+
+.. versionadded:: 1.8
+
+Conditional expressions allow you to use :keyword:`if` ... :keyword:`elif` ...
+:keyword:`else` logic in queries. Django natively supports SQL ``CASE``
+expressions. For more details see :doc:`conditional-expressions`.
+
 Technical Information
 =====================
 
