@@ -36,7 +36,6 @@ class ProxyRelation(Relation):
 class AbstractPerson(models.Model):
     # DATA fields
     data_abstract = models.CharField(max_length=10)
-
     # M2M fields
     m2m_abstract = models.ManyToManyField(Relation, related_name='m2m_abstract_rel')
     friends_abstract = models.ManyToManyField('self', related_name='friends_abstract', symmetrical=True)
@@ -51,12 +50,10 @@ class BasePerson(AbstractPerson):
     # DATA fields
     data_base = models.CharField(max_length=10)
     fk_base = models.ForeignKey(Relation, related_name='fk_base_rel')
-
     # M2M fields
     m2m_base = models.ManyToManyField(Relation, related_name='m2m_base_rel')
     friends_base = models.ManyToManyField('self', related_name='friends_base', symmetrical=True)
     following_base = models.ManyToManyField('self', related_name='followers_base', symmetrical=False)
-
     # VIRTUAL fields
     data_not_concrete_base = models.ForeignObject(
         Relation,

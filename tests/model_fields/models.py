@@ -315,9 +315,7 @@ class AllFieldsModel(models.Model):
     file_path = models.FilePathField()
     floatf = models.FloatField()
     integer = models.IntegerField()
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        ip_address = models.IPAddressField()
+    ip_address = models.IPAddressField()
     generic_ip = models.GenericIPAddressField()
     null_boolean = models.NullBooleanField()
     positive_integer = models.PositiveIntegerField()

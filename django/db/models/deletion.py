@@ -57,12 +57,10 @@ def get_candidate_relations_to_delete(opts):
     # relations coming from proxy models.
     candidate_models = {opts}
     candidate_models = candidate_models.union(opts.concrete_model._meta.proxied_children)
-
     # For each model, get all candidate fields.
     candidate_model_fields = chain.from_iterable(
         opts.get_fields(include_hidden=True) for opts in candidate_models
     )
-
     # Keep related objects not coming from ManyToManyFields from all candidate
     # model fields.
     return (
@@ -203,7 +201,7 @@ class Collector(object):
         model = new_objs[0].__class__
 
         # Recursively collect concrete model's parent models, but not their
-        # related objects. These will be found by meta.get_fields
+        # related objects. These will be found by meta.get_fields()
         concrete_model = model._meta.concrete_model
         for ptr in six.itervalues(concrete_model._meta.parents):
             if ptr:

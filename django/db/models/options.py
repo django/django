@@ -145,7 +145,7 @@ class Options(object):
     @lru_cache(maxsize=None)
     def _map_model(self, link):
         # This helper function is used to allow backwards compatibility with
-        # the previous API. No future methods should link to this function.
+        # the previous API. No future methods should use this function.
         # It maps a field to (field, model or related_model,) depending on the
         # field type.
         model = link.model._meta.concrete_model
@@ -156,9 +156,9 @@ class Options(object):
     @lru_cache(maxsize=None)
     def _map_model_details(self, link):
         # This helper function is used to allow backwards compatibility with
-        # the previous API. No future methods should link to this function.
-        # It maps a field to a tuple of:
-        # (field, model or related_model, direct, is_m2m) depending on the
+        # the previous API. No future methods should use this function.
+        # This function maps a field to a tuple of:
+        #  (field, model or related_model, direct, is_m2m) depending on the
         # field type.
         direct = not link.is_reverse_object
         model = link.model._meta.concrete_model
@@ -429,7 +429,7 @@ class Options(object):
 
         Private API intended only to be used by Django itself; get_fields()
         combined with filtering of field properties is the public API for
-        obtaining this field list.
+        obtaining this list.
         """
         return make_immutable_fields_list(
             "many_to_many",
@@ -536,7 +536,7 @@ class Options(object):
                 # Previous API does not allow searching reverse fields.
                 raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
-            # Retreive field instance by name from cached or just-computed
+            # Retrieve field instance by name from cached or just-computed
             # field map
             return self.fields_map[field_name]
         except KeyError:
@@ -551,8 +551,8 @@ class Options(object):
         names = set()
         fields = self.get_fields()
         for field in fields:
-
-            # For legacy reasons GenericForeignKey should not be included in the results
+            # For backwards compatibility GenericForeignKey should not be
+            # included in the results.
             if field.has_relation and field.one_to_many and field.related_model is None:
                 continue
 
@@ -589,7 +589,7 @@ class Options(object):
             self._map_model(f) for f in self.get_all_related_objects(
                 local_only=local_only,
                 include_hidden=include_hidden,
-                include_proxy_eq=include_proxy_eq
+                include_proxy_eq=include_proxy_eq,
             )
         ]
 
@@ -738,8 +738,8 @@ class Options(object):
     def _get_fields(self, forward=True, reverse=True, include_parents=True, include_hidden=False,
                     export_ordered_set=False):
         # This helper function is used to allow recursion in ``get_fields()``
-        # implementation and provide a fast way for Django's internals to
-        # access specific subset of fields.
+        # implementation and to provide a fast way for Django's internals to
+        # access specific subsets of fields.
 
         # Creates a cache key composed of all arguments
         cache_key = (forward, reverse, include_parents, include_hidden, export_ordered_set)
@@ -750,8 +750,8 @@ class Options(object):
         except KeyError:
             pass
 
-        # Using an OrderedDict to preserve the order of insertion. This is
-        # important when displaying a ModelForm or django.contrib.admin panel
+        # Using an OrderedDict preserves the order of insertion. This is
+        # important when displaying a ModelForm or the contrib.admin panel
         # and no specific ordering is provided.
         fields = OrderedDict()
         options = {
@@ -765,10 +765,9 @@ class Options(object):
             if include_parents:
                 parent_list = self.get_parent_list()
                 # Recursively call _get_fields() on each parent, with the same
-                # options provided in this call
+                # options provided in this call.
                 for parent in self.parents:
                     for obj, _ in six.iteritems(parent._meta._get_fields(forward=False, **options)):
-
                         if obj.many_to_many:
                             # In order for a reverse ManyToManyRel object to be
                             # valid, its creation counter must be > 0 and must
@@ -780,9 +779,9 @@ class Options(object):
                                   and obj.related_model not in parent_list):
                             fields[obj] = True
 
-            # Tree is computed once and cached until apps cache is expired.
+            # Tree is computed once and cached until the app cache is expired.
             # It is composed of a list of fields pointing to the current model
-            # from other models.  If the model is a proxy model, then we also
+            # from other models. If the model is a proxy model, then we also
             # add the concrete model.
             all_fields = (
                 self._relation_tree if not self.proxy else
@@ -795,7 +794,6 @@ class Options(object):
                 # intentionally hidden, add to the fields dict.
                 if include_hidden or not field.hidden:
                     fields[field] = True
-
         if forward:
             if include_parents:
                 for parent in self.parents:

@@ -231,7 +231,6 @@ class RelationTreeTests(test.TestCase):
                 'm2m_base_rel', 'm2m_base_rel', 'm2m_base_rel', 'm2m_concrete_rel', 'm2m_concrete_rel',
             ])
         )
-
         # Testing hidden related objects
         self.assertEqual(
             sorted([field.related_query_name() for field in BasePerson._meta._relation_tree]),
