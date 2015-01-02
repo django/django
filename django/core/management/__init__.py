@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import collections
 from importlib import import_module
 import os
+import pkgutil
 import sys
 
 import django
@@ -24,11 +25,10 @@ def find_commands(management_dir):
     Returns an empty list if no commands are defined.
     """
     command_dir = os.path.join(management_dir, 'commands')
-    try:
-        return [f[:-3] for f in os.listdir(command_dir)
-                if not f.startswith('_') and f.endswith('.py')]
-    except OSError:
-        return []
+    # Workaround for a Python 3.2 bug with pkgutil.iter_modules
+    sys.path_importer_cache.pop(command_dir, None)
+    return [name for _, name, is_pkg in pkgutil.iter_modules([command_dir])
+            if not is_pkg and not name.startswith('_')]
 
 
 def load_command_class(app_name, name):

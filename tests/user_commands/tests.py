@@ -1,13 +1,15 @@
 import os
 
+from django.apps import apps
 from django.db import connection
 from django.core import management
-from django.core.management import BaseCommand, CommandError
+from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import find_command, popen_wrapper
 from django.test import SimpleTestCase, ignore_warnings
-from django.test.utils import captured_stderr, captured_stdout
+from django.test.utils import captured_stderr, captured_stdout, extend_sys_path
 from django.utils import translation
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils._os import upath
 from django.utils.six import StringIO
 
 
@@ -71,6 +73,17 @@ class CommandTests(SimpleTestCase):
         finally:
             if current_path is not None:
                 os.environ['PATH'] = current_path
+
+    def test_discover_commands_in_eggs(self):
+        """
+        Test that management commands can also be loaded from Python eggs.
+        """
+        egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
+        egg_name = '%s/basic.egg' % egg_dir
+        with extend_sys_path(egg_name):
+            with self.settings(INSTALLED_APPS=['commandegg']):
+                cmds = find_commands(os.path.join(apps.get_app_config('commandegg').path, 'management'))
+        self.assertEqual(cmds, ['eggcommand'])
 
     def test_call_command_option_parsing(self):
         """
