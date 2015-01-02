@@ -821,6 +821,14 @@ class BaseDatabaseOperations(object):
         """
         return "SELECT cache_key FROM %s ORDER BY cache_key LIMIT 1 OFFSET %%s"
 
+    def unification_cast_sql(self, output_field):
+        """
+        Given a field instance, returns the SQL necessary to cast the result of
+        a union to that type. Note that the resulting string should contain a
+        '%s' placeholder for the expression being cast.
+        """
+        return '%s'
+
     def date_extract_sql(self, lookup_type, field_name):
         """
         Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
