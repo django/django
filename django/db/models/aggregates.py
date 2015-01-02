@@ -14,8 +14,9 @@ class Aggregate(Func):
     contains_aggregate = True
     name = None
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         assert len(self.source_expressions) == 1
+        # Aggregates are not allowed in UPDATE queries, so ignore for_save
         c = super(Aggregate, self).resolve_expression(query, allow_joins, reuse, summarize)
         if c.source_expressions[0].contains_aggregate and not summarize:
             name = self.source_expressions[0].name
@@ -101,7 +102,6 @@ class Count(Aggregate):
     def __init__(self, expression, distinct=False, **extra):
         if expression == '*':
             expression = Value(expression)
-            expression._output_field = IntegerField()
         super(Count, self).__init__(
             expression, distinct='DISTINCT ' if distinct else '', output_field=IntegerField(), **extra)
 
