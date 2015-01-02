@@ -11,6 +11,7 @@ from itertools import count, product
 
 from collections import Mapping, OrderedDict
 import copy
+from itertools import chain
 import warnings
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
@@ -31,6 +32,13 @@ from django.utils.encoding import force_text
 from django.utils.tree import Node
 
 __all__ = ['Query', 'RawQuery']
+
+
+def get_field_names_from_opts(opts):
+    return set(chain.from_iterable(
+        (f.name, f.attname) if f.concrete else (f.name,)
+        for f in opts.get_fields()
+    ))
 
 
 class RawQuery(object):
@@ -1397,7 +1405,7 @@ class Query(object):
                 # one step.
                 pos -= 1
                 if pos == -1 or fail_on_missing:
-                    field_names = [f.name for f in opts.get_fields()]
+                    field_names = list(get_field_names_from_opts(opts))
                     available = sorted(field_names + list(self.annotation_select))
                     raise FieldError("Cannot resolve keyword %r into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))
@@ -1448,7 +1456,7 @@ class Query(object):
         return path, final_field, targets, names[pos + 1:]
 
     def raise_field_error(self, opts, name):
-        available = opts.get_all_field_names() + list(self.annotation_select)
+        available = list(get_field_names_from_opts(opts)) + list(self.annotation_select)
         raise FieldError("Cannot resolve keyword %r into field. "
                          "Choices are: %s" % (name, ", ".join(available)))
 
@@ -1709,7 +1717,7 @@ class Query(object):
                 # from the model on which the lookup failed.
                 raise
             else:
-                names = sorted([f.name for f in opts.get_fields()] + list(self.extra)
+                names = sorted(list(get_field_names_from_opts(opts)) + list(self.extra)
                                + list(self.annotation_select))
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (name, ", ".join(names)))
