@@ -8,7 +8,7 @@
 """
 import sys
 from decimal import Decimal, InvalidOperation as DecimalInvalidOperation
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import connections, router
 from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.gdal import (CoordTransform, DataSource,
@@ -189,7 +189,7 @@ class LayerMapping(object):
             # for the given field name in the mapping.
             try:
                 model_field = self.model._meta.get_field(field_name)
-            except models.fields.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 raise LayerMapError('Given mapping field "%s" not in given Model fields.' % field_name)
 
             # Getting the string name for the Django field class (e.g., 'PointField').
@@ -231,7 +231,7 @@ class LayerMapping(object):
                         idx = check_ogr_fld(ogr_field)
                         try:
                             rel_model._meta.get_field(rel_name)
-                        except models.fields.FieldDoesNotExist:
+                        except FieldDoesNotExist:
                             raise LayerMapError('ForeignKey mapping field "%s" not in %s fields.' %
                                                 (rel_name, rel_model.__class__.__name__))
                     fields_val = rel_model

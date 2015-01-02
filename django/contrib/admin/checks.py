@@ -5,8 +5,8 @@ from itertools import chain
 
 from django.contrib.admin.utils import get_fields_from_path, NotRelationField, flatten
 from django.core import checks
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
-from django.db.models.fields import FieldDoesNotExist
 from django.forms.models import BaseModelForm, _get_foreign_key, BaseModelFormSet
 
 
@@ -53,7 +53,7 @@ class BaseModelAdminChecks(object):
 
         try:
             field = model._meta.get_field(field_name)
-        except models.FieldDoesNotExist:
+        except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E002')
         else:
@@ -168,7 +168,7 @@ class BaseModelAdminChecks(object):
         else:
             try:
                 field = model._meta.get_field(field_name)
-            except models.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 # If we can't find a field on the model that matches, it could
                 # be an extra field on the form.
                 return []
@@ -248,7 +248,7 @@ class BaseModelAdminChecks(object):
 
         try:
             field = model._meta.get_field(field_name)
-        except models.FieldDoesNotExist:
+        except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E019')
         else:
@@ -277,7 +277,7 @@ class BaseModelAdminChecks(object):
 
         try:
             field = model._meta.get_field(field_name)
-        except models.FieldDoesNotExist:
+        except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E022')
         else:
@@ -357,7 +357,7 @@ class BaseModelAdminChecks(object):
 
         try:
             field = model._meta.get_field(field_name)
-        except models.FieldDoesNotExist:
+        except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E027')
         else:
@@ -394,7 +394,7 @@ class BaseModelAdminChecks(object):
 
         try:
             model._meta.get_field(field_name)
-        except models.FieldDoesNotExist:
+        except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E030')
         else:
@@ -439,7 +439,7 @@ class BaseModelAdminChecks(object):
 
             try:
                 model._meta.get_field(field_name)
-            except models.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 return refer_to_missing_field(field=field_name, option=label,
                                               model=model, obj=cls, id='admin.E033')
             else:
@@ -468,7 +468,7 @@ class BaseModelAdminChecks(object):
         else:
             try:
                 model._meta.get_field(field_name)
-            except models.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 return [
                     checks.Error(
                         "The value of '%s' is not a callable, an attribute of '%s', or an attribute of '%s.%s'." % (
@@ -581,7 +581,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             # getattr(model, item) could be an X_RelatedObjectsDescriptor
             try:
                 field = model._meta.get_field(item)
-            except models.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 try:
                     field = getattr(model, item)
                 except AttributeError:
@@ -613,7 +613,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         else:
             try:
                 model._meta.get_field(item)
-            except models.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 return [
                     # This is a deliberate repeat of E108; there's more than one path
                     # required to test this condition.
@@ -763,7 +763,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
     def _check_list_editable_item(self, cls, model, field_name, label):
         try:
             field = model._meta.get_field_by_name(field_name)[0]
-        except models.FieldDoesNotExist:
+        except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E121')
         else:
@@ -833,7 +833,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         else:
             try:
                 field = model._meta.get_field(cls.date_hierarchy)
-            except models.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 return refer_to_missing_field(option='date_hierarchy',
                                               field=cls.date_hierarchy,
                                               model=model, obj=cls, id='admin.E127')

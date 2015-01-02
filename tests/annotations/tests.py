@@ -2,12 +2,11 @@ from __future__ import unicode_literals
 import datetime
 from decimal import Decimal
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
     Sum, Count,
     F, Value, Func,
     IntegerField, BooleanField, CharField)
-from django.db.models.fields import FieldDoesNotExist
 from django.test import TestCase
 from django.utils import six
 

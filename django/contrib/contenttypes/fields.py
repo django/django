@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from django.core import checks
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import connection
 from django.db import models, router, transaction, DEFAULT_DB_ALIAS
-from django.db.models import signals, FieldDoesNotExist, DO_NOTHING
+from django.db.models import signals, DO_NOTHING
 from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.query_utils import PathInfo

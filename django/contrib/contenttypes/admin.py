@@ -9,7 +9,7 @@ from django.contrib.contenttypes.forms import (
     BaseGenericInlineFormSet, generic_inlineformset_factory
 )
 from django.core import checks
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist
 from django.forms import ALL_FIELDS
 from django.forms.models import modelform_defines_fields
 

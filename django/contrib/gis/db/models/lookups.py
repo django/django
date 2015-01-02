@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 import re
 
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import FieldDoesNotExist
 from django.db.models.lookups import Lookup
 from django.db.models.expressions import ExpressionNode, Col
 from django.utils import six
