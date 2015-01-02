@@ -2,15 +2,16 @@ from __future__ import unicode_literals
 
 from copy import deepcopy
 import datetime
+import uuid
 
 from django.core.exceptions import FieldError
 from django.db import connection, transaction, DatabaseError
-from django.db.models import F, Value
+from django.db.models import F, Value, TimeField, UUIDField
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
 
-from .models import Company, Employee, Number, Experiment
+from .models import Company, Employee, Number, Experiment, Time, UUID
 
 
 class BasicExpressionsTests(TestCase):
@@ -799,3 +800,15 @@ class FTimeDeltaTests(TestCase):
         over_estimate = [e.name for e in
             Experiment.objects.filter(estimated_time__lt=F('end') - F('start'))]
         self.assertEqual(over_estimate, ['e4'])
+
+
+class ValueTests(TestCase):
+    def test_update_TimeField_using_Value(self):
+        Time.objects.create()
+        Time.objects.update(time=Value(datetime.time(1), output_field=TimeField()))
+        self.assertEqual(Time.objects.get().time, datetime.time(1))
+
+    def test_update_UUIDField_using_Value(self):
+        UUID.objects.create()
+        UUID.objects.update(uuid=Value(uuid.UUID('12345678901234567890123456789012'), output_field=UUIDField()))
+        self.assertEqual(UUID.objects.get().uuid, uuid.UUID('12345678901234567890123456789012'))
