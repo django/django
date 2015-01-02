@@ -747,7 +747,7 @@ class BinaryFieldTests(test.TestCase):
 class FieldFlagsTests(test.TestCase):
     @classmethod
     def setUpClass(cls):
-        super(FieldFlagsTets, cls).setUpClass()
+        super(FieldFlagsTests, cls).setUpClass()
         cls.fields = (
             list(AllFieldsModel._meta.fields) +
             list(AllFieldsModel._meta.virtual_fields)
