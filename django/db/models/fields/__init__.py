@@ -224,6 +224,15 @@ class Field(RegisterLookupMixin):
                     id='fields.E003',
                 )
             ]
+        elif self.name == 'exact':
+            return [
+                checks.Error(
+                    "'exact' is a reserved word that cannot be used as a field name.",
+                    hint=None,
+                    obj=self,
+                    id='fields.E008',
+                )
+            ]
         else:
             return []
 
