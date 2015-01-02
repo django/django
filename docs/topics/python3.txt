@@ -387,19 +387,7 @@ Django customized version of six
 --------------------------------
 
 The version of six bundled with Django (``django.utils.six``) includes a few
-extras.
-
-.. function:: assertRaisesRegex(testcase, *args, **kwargs)
-
-    This replaces ``testcase.assertRaisesRegexp`` on Python 2, and
-    ``testcase.assertRaisesRegex`` on Python 3. ``assertRaisesRegexp`` still
-    exists in current Python 3 versions, but issues a warning.
-
-.. function:: assertRegex(testcase, *args, **kwargs)
-
-    This replaces ``testcase.assertRegexpMatches`` on Python 2, and
-    ``testcase.assertRegex`` on Python 3. ``assertRegexpMatches`` still
-    exists in current Python 3 versions, but issues a warning.
+customizations for internal use only.
 
 .. _unicode: https://docs.python.org/2/library/functions.html#unicode
 .. _ __unicode__(): https://docs.python.org/2/reference/datamodel.html#object.__unicode__
