@@ -31,6 +31,9 @@ from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 from django.utils.itercompat import is_iterable
 
+# imported for backwards compatibility
+from django.core.exceptions import FieldDoesNotExist  # NOQA
+
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode
 __all__ = [str(x) for x in (
@@ -59,10 +62,6 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 def _load_field(app_label, model_name, field_name):
     return apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
-
-
-class FieldDoesNotExist(Exception):
-    pass
 
 
 # A guide to Field parameters:
