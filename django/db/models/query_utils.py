@@ -99,7 +99,7 @@ class DeferredAttribute(object):
         Retrieves and caches the value from the datastore on the first lookup.
         Returns the cached value.
         """
-        from django.db.models.fields import FieldDoesNotExist
+        from django.core.exceptions import FieldDoesNotExist
         non_deferred_model = instance._meta.proxy_for_model
         opts = non_deferred_model._meta
 

@@ -10,14 +10,14 @@ from django.apps import apps
 from django.apps.config import MODELS_MODULE_NAME
 from django.conf import settings
 from django.core import checks
-from django.core.exceptions import (ObjectDoesNotExist,
+from django.core.exceptions import (FieldDoesNotExist, ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
 from django.db import (router, connections, transaction, DatabaseError,
     DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY)
 from django.db.models import signals
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.fields import AutoField, FieldDoesNotExist
+from django.db.models.fields import AutoField
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
 from django.db.models.manager import ensure_default_manager

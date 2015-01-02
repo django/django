@@ -7,8 +7,9 @@ import warnings
 
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields.related import ManyToManyField
-from django.db.models.fields import AutoField, FieldDoesNotExist
+from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
 from django.utils.datastructures import ImmutableList
@@ -711,7 +712,7 @@ class Options(object):
         properties_to_expire = []
         if forward:
             properties_to_expire.extend(self.FORWARD_PROPERTIES)
-        if reverse:
+        if reverse and not self.abstract:
             properties_to_expire.extend(self.REVERSE_PROPERTIES)
 
         for cache_key in properties_to_expire:
@@ -759,7 +760,8 @@ class Options(object):
             'export_ordered_set': True,
         }
 
-        if reverse:
+        # Abstract models cannot hold reverse fields.
+        if reverse and not self.abstract:
             if include_parents:
                 parent_list = self.get_parent_list()
                 # Recursively call _get_fields() on each parent, with the same
@@ -817,4 +819,9 @@ class Options(object):
                 fields.extend(self.virtual_fields)
             fields = make_immutable_fields_list("get_fields()", fields)
 
+        # Store result into cache for later access
+        self._get_fields_cache[cache_key] = fields
+
+        # In order to avoid list manipulation. Always
+        # return a shallow copy of the results
         return fields
