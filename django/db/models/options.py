@@ -296,9 +296,17 @@ class Options(object):
             self.local_fields.insert(bisect(self.local_fields, field), field)
             self.setup_pk(field)
 
-        if field_has_relation and field.related_model:
+        # If the field being added is a relation to another known field,
+        # expire the cache on this field, and the forward cache on the field
+        # being referenced, because there will be new relationships in the
+        # cache. Otherwise, expire the cache of references *to* this field.
+        # The mechanism for getting at the related model is slightly odd -
+        # ideally, we'd just ask for field.related_model. However, related_model
+        # is a cached property, and all the models haven't been laoded yet, so
+        # we need to make sure we don't cache a string reference.
+        if field_has_relation and hasattr(field.rel, 'to') and field.rel.to:
             try:
-                field.related_model._meta._expire_cache(forward=False)
+                field.rel.to._meta._expire_cache(forward=False)
             except AttributeError:
                 pass
             self._expire_cache()
@@ -377,9 +385,15 @@ class Options(object):
         # For legacy reasons, the fields property should only contain forward
         # fields that are not virtual or with a m2m cardinality. Therefore we
         # pass these three filters as filters to the generator.
+        # The third lambda is a longwinded way of checking f.related_model - we don't
+        # use that property directly because related_model is a cached property,
+        # and all the models may not have been loaded yet; we don't want to cache
+        # the string reference to the related_model.
         is_not_an_m2m_field = lambda f: not (f.has_relation and f.many_to_many)
         is_not_a_generic_relation = lambda f: not (f.has_relation and f.many_to_one)
-        is_not_a_generic_foreign_key = lambda f: not (f.has_relation and f.one_to_many and not f.related_model)
+        is_not_a_generic_foreign_key = lambda f: not (
+            f.has_relation and f.one_to_many and not (hasattr(f.rel, 'to') and f.rel.to)
+        )
 
         return make_immutable_fields_list(
             "fields",

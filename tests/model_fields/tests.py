@@ -884,7 +884,7 @@ class FieldFlagsTests(test.TestCase):
     def test_model_and_reverse_model_should_equal_on_relations(self):
         for field in AllFieldsModel._meta.get_fields():
             if field.has_relation and not field.is_reverse_object:
-                if field.related_model is None or isinstance(field.related_model, six.string_types):
+                if field.related_model is None:
                     continue
                 reverse_field = field.rel
                 self.assertEqual(field.model, reverse_field.related_model)

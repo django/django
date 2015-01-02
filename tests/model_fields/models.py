@@ -1,7 +1,6 @@
 import os
 import tempfile
 import uuid
-import warnings
 
 try:
     from PIL import Image

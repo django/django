@@ -102,6 +102,8 @@ class RelatedField(Field):
 
     @cached_property
     def related_model(self):
+        # Can't cache this property until all the models are loaded.
+        apps.check_models_ready()
         return self.rel.to
 
     def check(self, **kwargs):
@@ -1276,9 +1278,7 @@ class ForeignObjectRel(object):
         self.symmetrical = False
 
     # This and the following cached_properties can't be initialized in
-    # __init__ as the field doesn't have its model yet. Calling these methods
-    # before field.contribute_to_class() has been called will result in
-    # AttributeError
+    # __init__ as the field doesn't have its model yet.
     @cached_property
     def model(self):
         return self.to
