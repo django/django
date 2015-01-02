@@ -20,7 +20,6 @@ from django.db.models.fields import (
     GenericIPAddressField, NOT_PROVIDED, NullBooleanField, PositiveIntegerField,
     PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
     TimeField, URLField)
-
 from django.db.models.fields.related import (
     ForeignObject, ForeignKey, OneToOneField, ManyToManyField,
     ManyToOneRel, ForeignObjectRel,
@@ -746,33 +745,39 @@ class BinaryFieldTests(test.TestCase):
 
 
 class FieldFlagsTests(test.TestCase):
-
-    def setUp(self):
-        self.fields = list(AllFieldsModel._meta.fields) + \
+    @classmethod
+    def setUpClass(cls):
+        super(FieldFlagsTets, cls).setUpClass()
+        cls.fields = (
+            list(AllFieldsModel._meta.fields) +
             list(AllFieldsModel._meta.virtual_fields)
+        )
 
-        self.all_fields = self.fields + \
-            list(AllFieldsModel._meta.many_to_many) + \
+        cls.all_fields = (
+            cls.fields +
+            list(AllFieldsModel._meta.many_to_many) +
             list(AllFieldsModel._meta.virtual_fields)
+        )
 
-        self.fields_and_reverse_objects = self.all_fields + \
+        cls.fields_and_reverse_objects = (
+            cls.all_fields +
             list(AllFieldsModel._meta.related_objects)
+        )
 
     def test_each_field_should_have_a_concrete_attribute(self):
-        self.assertTrue(all(f.concrete.__class__ == bool
-                        for f in self.fields))
+        self.assertTrue(all(f.concrete.__class__ == bool for f in self.fields))
 
     def test_each_field_should_have_an_editable_attribute(self):
-        self.assertTrue(all(f.editable.__class__ == bool
-                        for f in self.all_fields))
+        self.assertTrue(all(f.editable.__class__ == bool for f in self.all_fields))
 
     def test_each_field_should_have_a_has_rel_attribute(self):
-        self.assertTrue(all(f.has_relation.__class__ == bool
-                        for f in self.all_fields))
+        self.assertTrue(all(f.has_relation.__class__ == bool for f in self.all_fields))
 
     def test_each_object_should_have_is_reverse_object(self):
-        self.assertTrue(all(f.is_reverse_object.__class__ == bool
-                        for f in self.fields_and_reverse_objects))
+        self.assertTrue(
+            all(f.is_reverse_object.__class__ == bool
+            for f in self.fields_and_reverse_objects)
+        )
 
     def test_non_concrete_fields(self):
         for field in self.fields:

@@ -171,23 +171,25 @@ class GetFieldByNameTests(OptionsBaseTests):
     def test_get_fields_only_searaches_forward_on_apps_not_ready(self):
         opts = Person._meta
 
-        # If apps registry is not ready, get_field() searches
-        # over only forward fields.
+        # If apps registry is not ready, get_field() searches over only
+        # forward fields.
         opts.apps.ready = False
 
-        # 'data_abstract' is a forward field, and therefore will be found
-        self.assertTrue(opts.get_field('data_abstract'))
+        try:
+            # 'data_abstract' is a forward field, and therefore will be found
+            self.assertTrue(opts.get_field('data_abstract'))
 
-        message = "Person has no field named 'relating_baseperson'. The app cache " \
-                  "isn't ready yet, so if this is a forward field, it won't be " \
-                  "available yet."
+            msg = (
+                "Person has no field named 'relating_baseperson'. The app "
+                "cache isn't ready yet, so if this is a forward field, it "
+                "won't be available yet."
+            )
 
-        # 'data_abstract' is a reverse field, and will raise an exception
-        with self.assertRaises(FieldDoesNotExist) as err:
-            opts.get_field('relating_baseperson')
-        self.assertEqual(str(err.exception), message)
-
-        opts.apps.ready = True
+            # 'data_abstract' is a reverse field, and will raise an exception
+            with self.assertRaisesMessage(FieldDoesNotExist, msg):
+                opts.get_field('relating_baseperson')
+        finally:
+            opts.apps.ready = True
 
 
 class RelationTreeTests(test.TestCase):
@@ -207,10 +209,7 @@ class RelationTreeTests(test.TestCase):
 
         # AbstractPerson does not have any relations, so relation_tree
         # should just return an EMPTY_RELATION_TREE.
-        self.assertEqual(
-            AbstractPerson._meta._relation_tree,
-            EMPTY_RELATION_TREE
-        )
+        self.assertEqual(AbstractPerson._meta._relation_tree, EMPTY_RELATION_TREE)
 
         # All the other models should already have their relation tree
         # in the internal __dict__ .
@@ -219,29 +218,31 @@ class RelationTreeTests(test.TestCase):
             self.assertIn('_relation_tree', m._meta.__dict__)
 
     def test_relations_related_objects(self):
-
         # Testing non hidden related objects
-
         self.assertEqual(
             sorted([field.related_query_name() for field in Relation._meta._relation_tree
                    if not field.rel.field.rel.is_hidden()]),
-            sorted(['fk_abstract_rel', 'fk_abstract_rel', 'fk_abstract_rel', 'fk_base_rel', 'fk_base_rel',
-                    'fk_base_rel', 'fk_concrete_rel', 'fk_concrete_rel', 'fo_abstract_rel', 'fo_abstract_rel',
-                    'fo_abstract_rel', 'fo_base_rel', 'fo_base_rel', 'fo_base_rel', 'fo_concrete_rel',
-                    'fo_concrete_rel', 'm2m_abstract_rel', 'm2m_abstract_rel', 'm2m_abstract_rel',
-                    'm2m_base_rel', 'm2m_base_rel', 'm2m_base_rel', 'm2m_concrete_rel', 'm2m_concrete_rel'])
+            sorted([
+                'fk_abstract_rel', 'fk_abstract_rel', 'fk_abstract_rel', 'fk_base_rel', 'fk_base_rel',
+                'fk_base_rel', 'fk_concrete_rel', 'fk_concrete_rel', 'fo_abstract_rel', 'fo_abstract_rel',
+                'fo_abstract_rel', 'fo_base_rel', 'fo_base_rel', 'fo_base_rel', 'fo_concrete_rel',
+                'fo_concrete_rel', 'm2m_abstract_rel', 'm2m_abstract_rel', 'm2m_abstract_rel',
+                'm2m_base_rel', 'm2m_base_rel', 'm2m_base_rel', 'm2m_concrete_rel', 'm2m_concrete_rel',
+            ])
         )
 
         # Testing hidden related objects
         self.assertEqual(
             sorted([field.related_query_name() for field in BasePerson._meta._relation_tree]),
-            sorted(['+', '+', 'BasePerson_following_abstract+', 'BasePerson_following_abstract+',
-                    'BasePerson_following_base+', 'BasePerson_following_base+', 'BasePerson_friends_abstract+',
-                    'BasePerson_friends_abstract+', 'BasePerson_friends_base+', 'BasePerson_friends_base+',
-                    'BasePerson_m2m_abstract+', 'BasePerson_m2m_base+', 'Relating_basepeople+',
-                    'Relating_basepeople_hidden+', 'followers_abstract', 'followers_abstract', 'followers_abstract',
-                    'followers_base', 'followers_base', 'followers_base', 'friends_abstract_rel_+', 'friends_abstract_rel_+',
-                    'friends_abstract_rel_+', 'friends_base_rel_+', 'friends_base_rel_+', 'friends_base_rel_+', 'person',
-                    'person', 'relating_basepeople', 'relating_baseperson'])
+            sorted([
+                '+', '+', 'BasePerson_following_abstract+', 'BasePerson_following_abstract+',
+                'BasePerson_following_base+', 'BasePerson_following_base+', 'BasePerson_friends_abstract+',
+                'BasePerson_friends_abstract+', 'BasePerson_friends_base+', 'BasePerson_friends_base+',
+                'BasePerson_m2m_abstract+', 'BasePerson_m2m_base+', 'Relating_basepeople+',
+                'Relating_basepeople_hidden+', 'followers_abstract', 'followers_abstract', 'followers_abstract',
+                'followers_base', 'followers_base', 'followers_base', 'friends_abstract_rel_+', 'friends_abstract_rel_+',
+                'friends_abstract_rel_+', 'friends_base_rel_+', 'friends_base_rel_+', 'friends_base_rel_+', 'person',
+                'person', 'relating_basepeople', 'relating_baseperson',
+            ])
         )
         self.assertEqual([field.related_query_name() for field in AbstractPerson._meta._relation_tree], [])

@@ -1375,14 +1375,16 @@ class Query(object):
             try:
                 field = opts.get_field(name)
 
-                # Fields that contain one-to-many relations with a generic model (like a
-                # GenericForeignKey) cannot generate reverse relations Therefore they
-                # cannote be used for reverse querying.
+                # Fields that contain one-to-many relations with a generic
+                # model (like a GenericForeignKey) cannot generate reverse
+                # relations Therefore they cannote be used for reverse querying.
                 if field.has_relation and not field.related_model:
-                    raise FieldError("Field %r does not generate an automatic reverse "
-                                     "relation and therefore cannot be used for reverse "
-                                     "querying. If it is a GenericForeignKey, consider "
-                                     "adding a GenericRelation." % name)
+                    raise FieldError(
+                        "Field %r does not generate an automatic reverse "
+                        "relation and therefore cannot be used for reverse "
+                        "querying. If it is a GenericForeignKey, consider "
+                        "adding a GenericRelation." % name
+                    )
                 model = field.model._meta.concrete_model
             except FieldDoesNotExist:
                 # is it an annotation?

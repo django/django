@@ -7,7 +7,7 @@ from .models import Issue, User, UnicodeReferenceModel
 class RelatedObjectTests(TestCase):
 
     def test_related_objects_have_name_attribute(self):
-        for Model in (Issue, User, UnicodeReferenceModel,):
+        for Model in (Issue, User, UnicodeReferenceModel):
             for obj in Model._meta.get_fields():
                 if obj.is_reverse_object:
                     self.assertEqual(obj.name, obj.field.related_query_name())

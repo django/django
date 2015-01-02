@@ -12,11 +12,11 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields.related import (
-    ForeignObject, ForeignKey, ManyToManyField, OneToOneField)
+    ForeignObject, ForeignKey, ManyToManyField, OneToOneField,
+)
 from django.db import models
 from django.db.models.fields.files import ImageFieldFile, ImageField
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 
 
 class Foo(models.Model):
@@ -165,9 +165,7 @@ class VerboseNameField(models.Model):
     # Don't want to depend on Pillow in this test
     #field_image = models.ImageField("verbose field")
     field12 = models.IntegerField("verbose field12")
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=RemovedInDjango19Warning)
-        field13 = models.IPAddressField("verbose field13")
+    field13 = models.IPAddressField("verbose field13")
     field14 = models.GenericIPAddressField("verbose field14", protocol="ipv4")
     field15 = models.NullBooleanField("verbose field15")
     field16 = models.PositiveIntegerField("verbose field16")
