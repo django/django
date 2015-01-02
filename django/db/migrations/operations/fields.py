@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db.models.fields import NOT_PROVIDED
 from django.utils import six
+from django.utils.functional import cached_property
 from .base import Operation
 
 
@@ -15,6 +16,14 @@ class AddField(Operation):
         self.name = name
         self.field = field
         self.preserve_default = preserve_default
+
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
+
+    @cached_property
+    def model_name_lower(self):
+        return self.model_name.lower()
 
     def deconstruct(self):
         kwargs = {
@@ -37,8 +46,8 @@ class AddField(Operation):
             field.default = NOT_PROVIDED
         else:
             field = self.field
-        state.models[app_label, self.model_name.lower()].fields.append((self.name, field))
-        state.reload_model(app_label, self.model_name)
+        state.models[app_label, self.model_name_lower].fields.append((self.name, field))
+        state.reload_model(app_label, self.model_name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
@@ -63,10 +72,10 @@ class AddField(Operation):
         return "Add field %s to %s" % (self.name, self.model_name)
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name.lower()
+        return name.lower() == self.model_name_lower
 
     def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and name.lower() == self.name.lower()
+        return self.references_model(model_name) and name.lower() == self.name_lower
 
 
 class RemoveField(Operation):
@@ -77,6 +86,14 @@ class RemoveField(Operation):
     def __init__(self, model_name, name):
         self.model_name = model_name
         self.name = name
+
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
+
+    @cached_property
+    def model_name_lower(self):
+        return self.model_name.lower()
 
     def deconstruct(self):
         kwargs = {
@@ -91,11 +108,11 @@ class RemoveField(Operation):
 
     def state_forwards(self, app_label, state):
         new_fields = []
-        for name, instance in state.models[app_label, self.model_name.lower()].fields:
+        for name, instance in state.models[app_label, self.model_name_lower].fields:
             if name != self.name:
                 new_fields.append((name, instance))
-        state.models[app_label, self.model_name.lower()].fields = new_fields
-        state.reload_model(app_label, self.model_name)
+        state.models[app_label, self.model_name_lower].fields = new_fields
+        state.reload_model(app_label, self.model_name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.apps.get_model(app_label, self.model_name)
@@ -112,10 +129,10 @@ class RemoveField(Operation):
         return "Remove field %s from %s" % (self.name, self.model_name)
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name.lower()
+        return name.lower() == self.model_name_lower
 
     def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and name.lower() == self.name.lower()
+        return self.references_model(model_name) and name.lower() == self.name_lower
 
 
 class AlterField(Operation):
@@ -128,6 +145,14 @@ class AlterField(Operation):
         self.name = name
         self.field = field
         self.preserve_default = preserve_default
+
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
+
+    @cached_property
+    def model_name_lower(self):
+        return self.model_name.lower()
 
     def deconstruct(self):
         kwargs = {
@@ -149,10 +174,12 @@ class AlterField(Operation):
             field.default = NOT_PROVIDED
         else:
             field = self.field
-        state.models[app_label, self.model_name.lower()].fields = [
-            (n, field if n == self.name else f) for n, f in state.models[app_label, self.model_name.lower()].fields
+        state.models[app_label, self.model_name_lower].fields = [
+            (n, field if n == self.name else f)
+            for n, f in
+            state.models[app_label, self.model_name_lower].fields
         ]
-        state.reload_model(app_label, self.model_name)
+        state.reload_model(app_label, self.model_name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
@@ -181,10 +208,10 @@ class AlterField(Operation):
         return "Alter field %s on %s" % (self.name, self.model_name)
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name.lower()
+        return name.lower() == self.model_name_lower
 
     def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and name.lower() == self.name.lower()
+        return self.references_model(model_name) and name.lower() == self.name_lower
 
 
 class RenameField(Operation):
@@ -196,6 +223,18 @@ class RenameField(Operation):
         self.model_name = model_name
         self.old_name = old_name
         self.new_name = new_name
+
+    @cached_property
+    def old_name_lower(self):
+        return self.old_name.lower()
+
+    @cached_property
+    def new_name_lower(self):
+        return self.new_name.lower()
+
+    @cached_property
+    def model_name_lower(self):
+        return self.model_name.lower()
 
     def deconstruct(self):
         kwargs = {
@@ -211,19 +250,19 @@ class RenameField(Operation):
 
     def state_forwards(self, app_label, state):
         # Rename the field
-        state.models[app_label, self.model_name.lower()].fields = [
+        state.models[app_label, self.model_name_lower].fields = [
             (self.new_name if n == self.old_name else n, f)
-            for n, f in state.models[app_label, self.model_name.lower()].fields
+            for n, f in state.models[app_label, self.model_name_lower].fields
         ]
         # Fix index/unique_together to refer to the new field
-        options = state.models[app_label, self.model_name.lower()].options
+        options = state.models[app_label, self.model_name_lower].options
         for option in ('index_together', 'unique_together'):
             if option in options:
                 options[option] = [
                     [self.new_name if n == self.old_name else n for n in together]
                     for together in options[option]
                 ]
-        state.reload_model(app_label, self.model_name)
+        state.reload_model(app_label, self.model_name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
@@ -249,10 +288,10 @@ class RenameField(Operation):
         return "Rename field %s on %s to %s" % (self.old_name, self.model_name, self.new_name)
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name.lower()
+        return name.lower() == self.model_name_lower
 
     def references_field(self, model_name, name, app_label=None):
         return self.references_model(model_name) and (
-            name.lower() == self.old_name.lower() or
-            name.lower() == self.new_name.lower()
+            name.lower() == self.old_name_lower or
+            name.lower() == self.new_name_lower
         )
