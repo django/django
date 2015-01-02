@@ -160,7 +160,7 @@ class Options(object):
         # This function maps a field to a tuple of:
         #  (field, model or related_model, direct, is_m2m) depending on the
         # field type.
-        direct = not link.is_reverse_object
+        direct = not link.auto_created or link.concrete
         model = link.model._meta.concrete_model
         if model is self.model:
             model = None

@@ -24,7 +24,7 @@ class GenericForeignKey(object):
     concrete = False
     editable = False
     hidden = False
-    is_reverse_object = False
+    auto_created = False
 
     has_relation = True
     one_to_many = True
@@ -257,7 +257,7 @@ class GenericForeignKey(object):
 
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
-    is_reverse_object = False
+    auto_created = False
 
     many_to_one = True
     one_to_many = False

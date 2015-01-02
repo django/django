@@ -93,7 +93,7 @@ class RelatedObjectsTests(OptionsBaseTests):
             objects = [
                 (field, self._model(model, field))
                 for field in model._meta.get_fields()
-                if field.is_reverse_object
+                if field.auto_created and not field.concrete
             ]
             self.assertEqual(self._map_related_query_names(objects), expected)
 
@@ -103,7 +103,7 @@ class RelatedObjectsTests(OptionsBaseTests):
             objects = [
                 (field, self._model(model, field))
                 for field in model._meta.get_fields(include_parents=False)
-                if field.is_reverse_object
+                if field.auto_created and not field.concrete
             ]
             self.assertEqual(self._map_related_query_names(objects), expected)
 
@@ -113,7 +113,7 @@ class RelatedObjectsTests(OptionsBaseTests):
             objects = [
                 (field, self._model(model, field))
                 for field in model._meta.get_fields(include_hidden=True)
-                if field.is_reverse_object
+                if field.auto_created and not field.concrete
             ]
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),
@@ -126,7 +126,7 @@ class RelatedObjectsTests(OptionsBaseTests):
             objects = [
                 (field, self._model(model, field))
                 for field in model._meta.get_fields(include_hidden=True, include_parents=False)
-                if field.is_reverse_object
+                if field.auto_created and not field.concrete
             ]
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),

@@ -1258,7 +1258,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
 
 class ForeignObjectRel(object):
-    is_reverse_object = True
+    auto_created = True
     has_relation = True
     editable = False
     concrete = False
