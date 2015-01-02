@@ -121,7 +121,7 @@ class UpdateQuery(Query):
         values_seq = []
         for name, val in six.iteritems(values):
             field = self.get_meta().get_field(name)
-            direct = not field.is_reverse_object or not field.concrete
+            direct = not (field.auto_created and not field.concrete) or not field.concrete
             model = field.model._meta.concrete_model
             if not direct or (field.has_relation and field.many_to_many):
                 raise FieldError(

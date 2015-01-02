@@ -773,9 +773,9 @@ class FieldFlagsTests(test.TestCase):
     def test_each_field_should_have_a_has_rel_attribute(self):
         self.assertTrue(all(f.has_relation.__class__ == bool for f in self.all_fields))
 
-    def test_each_object_should_have_is_reverse_object(self):
+    def test_each_object_should_have_auto_created(self):
         self.assertTrue(
-            all(f.is_reverse_object.__class__ == bool
+            all(f.auto_created.__class__ == bool
             for f in self.fields_and_reverse_objects)
         )
 
@@ -842,7 +842,7 @@ class FieldFlagsTests(test.TestCase):
 
         # Ensure all o2m reverses are m2o
         for field in o2m_type_fields:
-            if field.is_reverse_object:
+            if field.concrete:
                 reverse_field = field.rel
                 self.assertTrue(reverse_field.has_relation and reverse_field.many_to_one)
 
@@ -856,7 +856,7 @@ class FieldFlagsTests(test.TestCase):
 
         # Ensure all m2o reverses are o2m
         for obj in m2o_type_fields:
-            if obj.is_reverse_object:
+            if hasattr(obj, 'field'):
                 reverse_field = obj.field
                 self.assertTrue(reverse_field.has_relation and reverse_field.one_to_many)
 

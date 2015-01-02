@@ -117,7 +117,6 @@ class Field(RegisterLookupMixin):
                              "%(date_field_label)s %(lookup_type)s."),
     }
     class_lookups = default_lookups.copy()
-    is_reverse_object = False
 
     # Field flags
     hidden = False

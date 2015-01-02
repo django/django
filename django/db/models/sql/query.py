@@ -614,7 +614,8 @@ class Query(object):
                     must_include[old_model].add(source)
                 add_to_dict(must_include, cur_model, opts.pk)
             field = opts.get_field(parts[-1])
-            model = field.related_model if field.is_reverse_object else field.model
+            is_reverse_object = field.auto_created and not field.concrete
+            model = field.related_model if is_reverse_object else field.model
             model = model._meta.concrete_model
             if model == opts.model:
                 model = cur_model
