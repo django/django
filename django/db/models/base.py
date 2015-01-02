@@ -1523,7 +1523,7 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Skip ordering on pk. This is always a valid order_by field
         # but is an alias and therefore won't be found by opts.get_field.
-        fields = set(f for f in fields if f != 'pk')
+        fields = {f for f in fields if f != 'pk'}
 
         # Check for invalid or non-existent fields in ordering.
         invalid_fields = []
