@@ -386,7 +386,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
             w.render('test', band.pk, attrs={}), (
                 '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" />'
                 '<a href="/admin_widgets/band/?_to_field=id" class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
-                '&nbsp;<strong>Linkin Park</strong>'
+                '&#160;<strong>Linkin Park</strong>'
             ) % {'bandpk': band.pk}
         )
 
@@ -404,7 +404,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
             w.render('test', core.parent_id, attrs={}), (
                 '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" />'
                 '<a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" title="Lookup">'
-                '</a>&nbsp;<strong>Apple</strong>'
+                '</a>&#160;<strong>Apple</strong>'
             )
         )
 
@@ -418,7 +418,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('honeycomb_widget', big_honeycomb.pk, attrs={}),
-            '<input type="text" name="honeycomb_widget" value="%(hcombpk)s" />&nbsp;<strong>Honeycomb object</strong>' % {'hcombpk': big_honeycomb.pk}
+            '<input type="text" name="honeycomb_widget" value="%(hcombpk)s" />&#160;<strong>Honeycomb object</strong>' % {'hcombpk': big_honeycomb.pk}
         )
 
     def test_fk_to_self_model_not_in_admin(self):
@@ -431,7 +431,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('individual_widget', subject1.pk, attrs={}),
-            '<input type="text" name="individual_widget" value="%(subj1pk)s" />&nbsp;<strong>Individual object</strong>' % {'subj1pk': subject1.pk}
+            '<input type="text" name="individual_widget" value="%(subj1pk)s" />&#160;<strong>Individual object</strong>' % {'subj1pk': subject1.pk}
         )
 
     def test_proper_manager_for_label_lookup(self):
@@ -449,7 +449,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
             w.render('test', child_of_hidden.parent_id, attrs={}), (
                 '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" />'
                 '<a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" title="Lookup">'
-                '</a>&nbsp;<strong>Hidden</strong>'
+                '</a>&#160;<strong>Hidden</strong>'
             )
         )
 
