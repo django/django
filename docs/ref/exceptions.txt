@@ -33,6 +33,18 @@ ObjectDoesNotExist and DoesNotExist
     See :meth:`~django.db.models.query.QuerySet.get()` for further information
     on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
 
+FieldDoesNotExist
+-----------------------
+.. exception:: FieldDoesNotExist
+
+    The :exc:`FieldDoesNotExist` exception is raised by a model when a field
+    instance requested by name does not exist on the model or on the model's
+    parents.
+
+    See :meth:`~django.db.models.options.Option.get_field()` and
+    :meth:`~django.db.models.options.Option.get_field_by_name()` for further
+    information.
+
 MultipleObjectsReturned
 -----------------------
 .. exception:: MultipleObjectsReturned

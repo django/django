@@ -1,7 +1,7 @@
 from django import test
-
-from django.db.models.fields import related, CharField, Field, FieldDoesNotExist
 from django.contrib.contenttypes.fields import GenericRelation
+from django.core.exceptions import FieldDoesNotExist
+from django.db.models.fields import related, CharField, Field
 
 from .models import (
     AbstractPerson, BasePerson, Person, Relating, Relation
