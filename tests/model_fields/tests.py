@@ -745,7 +745,6 @@ class BinaryFieldTests(test.TestCase):
 
 
 class FieldFlagsTests(test.TestCase):
-
     @classmethod
     def setUpClass(cls):
         super(FieldFlagsTests, cls).setUpClass()
@@ -753,6 +752,7 @@ class FieldFlagsTests(test.TestCase):
             list(AllFieldsModel._meta.fields) +
             list(AllFieldsModel._meta.virtual_fields)
         )
+
         cls.all_fields = (
             cls.fields +
             list(AllFieldsModel._meta.many_to_many) +
@@ -824,6 +824,7 @@ class FieldFlagsTests(test.TestCase):
         )
         # Test classes are what we expect
         self.assertEqual(MANY_TO_MANY_CLASSES, {f.__class__ for f in m2m_type_fields})
+
         # Ensure all m2m reverses are m2m
         for field in m2m_type_fields:
             reverse_field = field.rel
@@ -838,6 +839,7 @@ class FieldFlagsTests(test.TestCase):
         ]
         # Test classes are what we expect
         self.assertEqual(ONE_TO_MANY_CLASSES, {f.__class__ for f in o2m_type_fields})
+
         # Ensure all o2m reverses are m2o
         for field in o2m_type_fields:
             if field.is_reverse_object:
@@ -851,6 +853,7 @@ class FieldFlagsTests(test.TestCase):
         ]
         # Test classes are what we expect
         self.assertEqual(MANY_TO_ONE_CLASSES, {f.__class__ for f in m2o_type_fields})
+
         # Ensure all m2o reverses are o2m
         for obj in m2o_type_fields:
             if obj.is_reverse_object:
@@ -864,6 +867,7 @@ class FieldFlagsTests(test.TestCase):
         ]
         # Test classes are what we expect
         self.assertEqual(ONE_TO_ONE_CLASSES, {f.__class__ for f in o2o_type_fields})
+
         # Ensure all o2o reverses are o2o
         for obj in o2o_type_fields:
             if hasattr(obj, 'field'):

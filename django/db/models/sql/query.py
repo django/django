@@ -1381,6 +1381,7 @@ class Query(object):
                 name = opts.pk.name
             try:
                 field = opts.get_field(name)
+
                 # Fields that contain one-to-many relations with a generic
                 # model (like a GenericForeignKey) cannot generate reverse
                 # relations Therefore they cannote be used for reverse querying.

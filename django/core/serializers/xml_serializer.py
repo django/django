@@ -176,6 +176,7 @@ class Deserializer(base.Deserializer):
         # bail.
         Model = self._get_model_from_node(node, "model")
 
+        field_names = {f.name for f in Model._meta.get_fields()}
         # Start building a data dictionary from the object.
         data = {}
         if node.hasAttribute('pk'):
