@@ -168,7 +168,7 @@ class MigrationAutodetector(object):
                         and not old_field.rel.through._meta.auto_created):
                     through_key = (
                         old_field.rel.through._meta.app_label,
-                        old_field.rel.through._meta.object_name.lower(),
+                        old_field.rel.through._meta.model_name,
                     )
                     self.through_users[through_key] = (app_label, old_model_name, field_name)
 
@@ -322,47 +322,47 @@ class MigrationAutodetector(object):
         if dependency[2] is None and dependency[3] is True:
             return (
                 isinstance(operation, operations.CreateModel) and
-                operation.name.lower() == dependency[1].lower()
+                operation.name_lower == dependency[1].lower()
             )
         # Created field
         elif dependency[2] is not None and dependency[3] is True:
             return (
                 (
                     isinstance(operation, operations.CreateModel) and
-                    operation.name.lower() == dependency[1].lower() and
+                    operation.name_lower == dependency[1].lower() and
                     any(dependency[2] == x for x, y in operation.fields)
                 ) or
                 (
                     isinstance(operation, operations.AddField) and
-                    operation.model_name.lower() == dependency[1].lower() and
-                    operation.name.lower() == dependency[2].lower()
+                    operation.model_name_lower == dependency[1].lower() and
+                    operation.name_lower == dependency[2].lower()
                 )
             )
         # Removed field
         elif dependency[2] is not None and dependency[3] is False:
             return (
                 isinstance(operation, operations.RemoveField) and
-                operation.model_name.lower() == dependency[1].lower() and
-                operation.name.lower() == dependency[2].lower()
+                operation.model_name_lower == dependency[1].lower() and
+                operation.name_lower == dependency[2].lower()
             )
         # Removed model
         elif dependency[2] is None and dependency[3] is False:
             return (
                 isinstance(operation, operations.DeleteModel) and
-                operation.name.lower() == dependency[1].lower()
+                operation.name_lower == dependency[1].lower()
             )
         # Field being altered
         elif dependency[2] is not None and dependency[3] == "alter":
             return (
                 isinstance(operation, operations.AlterField) and
-                operation.model_name.lower() == dependency[1].lower() and
-                operation.name.lower() == dependency[2].lower()
+                operation.model_name_lower == dependency[1].lower() and
+                operation.name_lower == dependency[2].lower()
             )
         # order_with_respect_to being unset for a field
         elif dependency[2] is not None and dependency[3] == "order_wrt_unset":
             return (
                 isinstance(operation, operations.AlterOrderWithRespectTo) and
-                operation.name.lower() == dependency[1].lower() and
+                operation.name_lower == dependency[1].lower() and
                 (operation.order_with_respect_to or "").lower() != dependency[2].lower()
             )
         # Field is removed and part of an index/unique_together
@@ -370,7 +370,7 @@ class MigrationAutodetector(object):
             return (
                 isinstance(operation, (operations.AlterUniqueTogether,
                                        operations.AlterIndexTogether)) and
-                operation.name.lower() == dependency[1].lower()
+                operation.name_lower == dependency[1].lower()
             )
         # Unknown dependency. Raise an error.
         else:
@@ -696,7 +696,7 @@ class MigrationAutodetector(object):
             for name, field in sorted(related_fields.items()):
                 dependencies.append((app_label, model_name, name, False))
             # We're referenced in another field's through=
-            through_user = self.through_users.get((app_label, model_state.name.lower()), None)
+            through_user = self.through_users.get((app_label, model_state.name_lower), None)
             if through_user:
                 dependencies.append((through_user[0], through_user[1], through_user[2], False))
             # Finally, make the operation, deduping any dependencies
@@ -842,7 +842,7 @@ class MigrationAutodetector(object):
             if hasattr(new_field, "rel") and getattr(new_field.rel, "to", None):
                 rename_key = (
                     new_field.rel.to._meta.app_label,
-                    new_field.rel.to._meta.object_name.lower(),
+                    new_field.rel.to._meta.model_name,
                 )
                 if rename_key in self.renamed_models:
                     new_field.rel.to = old_field.rel.to
@@ -1094,16 +1094,16 @@ class MigrationAutodetector(object):
         """
         if len(ops) == 1:
             if isinstance(ops[0], operations.CreateModel):
-                return ops[0].name.lower()
+                return ops[0].name_lower
             elif isinstance(ops[0], operations.DeleteModel):
-                return "delete_%s" % ops[0].name.lower()
+                return "delete_%s" % ops[0].name_lower
             elif isinstance(ops[0], operations.AddField):
-                return "%s_%s" % (ops[0].model_name.lower(), ops[0].name.lower())
+                return "%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
             elif isinstance(ops[0], operations.RemoveField):
-                return "remove_%s_%s" % (ops[0].model_name.lower(), ops[0].name.lower())
+                return "remove_%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
         elif len(ops) > 1:
             if all(isinstance(o, operations.CreateModel) for o in ops):
-                return "_".join(sorted(o.name.lower() for o in ops))
+                return "_".join(sorted(o.name_lower for o in ops))
         return "auto_%s" % datetime.datetime.now().strftime("%Y%m%d_%H%M")
 
     @classmethod

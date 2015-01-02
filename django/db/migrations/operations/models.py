@@ -5,6 +5,7 @@ from django.db.models.options import normalize_together
 from django.db.migrations.state import ModelState
 from django.db.migrations.operations.base import Operation
 from django.utils import six
+from django.utils.functional import cached_property
 
 
 class CreateModel(Operation):
@@ -20,6 +21,10 @@ class CreateModel(Operation):
         self.options = options or {}
         self.bases = bases or (models.Model,)
         self.managers = managers or []
+
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
 
     def deconstruct(self):
         kwargs = {
@@ -87,6 +92,10 @@ class DeleteModel(Operation):
     def __init__(self, name):
         self.name = name
 
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
+
     def deconstruct(self):
         kwargs = {
             'name': self.name,
@@ -98,7 +107,7 @@ class DeleteModel(Operation):
         )
 
     def state_forwards(self, app_label, state):
-        state.remove_model(app_label, self.name)
+        state.remove_model(app_label, self.name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.name)
@@ -111,7 +120,7 @@ class DeleteModel(Operation):
             schema_editor.create_model(model)
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.name.lower()
+        return name.lower() == self.name_lower
 
     def describe(self):
         return "Delete model %s" % (self.name, )
@@ -125,6 +134,14 @@ class RenameModel(Operation):
     def __init__(self, old_name, new_name):
         self.old_name = old_name
         self.new_name = new_name
+
+    @cached_property
+    def old_name_lower(self):
+        return self.old_name.lower()
+
+    @cached_property
+    def new_name_lower(self):
+        return self.new_name.lower()
 
     def deconstruct(self):
         kwargs = {
@@ -147,18 +164,18 @@ class RenameModel(Operation):
             if f.auto_created and not f.concrete and not (f.hidden or f.many_to_many)
         )
         # Rename the model
-        state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
-        state.models[app_label, self.new_name.lower()].name = self.new_name
-        state.remove_model(app_label, self.old_name)
+        state.models[app_label, self.new_name_lower] = state.models[app_label, self.old_name_lower]
+        state.models[app_label, self.new_name_lower].name = self.new_name
+        state.remove_model(app_label, self.old_name_lower)
         # Repoint the FKs and M2Ms pointing to us
         for related_object in all_related_objects:
             # Use the new related key for self referential related objects.
             if related_object.related_model == model:
-                related_key = (app_label, self.new_name.lower())
+                related_key = (app_label, self.new_name_lower)
             else:
                 related_key = (
                     related_object.related_model._meta.app_label,
-                    related_object.related_model._meta.object_name.lower(),
+                    related_object.related_model._meta.model_name,
                 )
             new_fields = []
             for name, field in state.models[related_key].fields:
@@ -168,7 +185,7 @@ class RenameModel(Operation):
                 new_fields.append((name, field))
             state.models[related_key].fields = new_fields
             state.reload_model(*related_key)
-        state.reload_model(app_label, self.new_name)
+        state.reload_model(app_label, self.new_name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.new_name)
@@ -184,12 +201,12 @@ class RenameModel(Operation):
             for related_object in old_model._meta.related_objects:
                 if related_object.related_model == old_model:
                     model = new_model
-                    related_key = (app_label, self.new_name.lower())
+                    related_key = (app_label, self.new_name_lower)
                 else:
                     model = related_object.related_model
                     related_key = (
                         related_object.related_model._meta.app_label,
-                        related_object.related_model._meta.object_name.lower(),
+                        related_object.related_model._meta.model_name,
                     )
                 to_field = to_state.apps.get_model(
                     *related_key
@@ -201,14 +218,18 @@ class RenameModel(Operation):
                 )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        self.new_name_lower, self.old_name_lower = self.old_name_lower, self.new_name_lower
         self.new_name, self.old_name = self.old_name, self.new_name
+
         self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+        self.new_name_lower, self.old_name_lower = self.old_name_lower, self.new_name_lower
         self.new_name, self.old_name = self.old_name, self.new_name
 
     def references_model(self, name, app_label=None):
         return (
-            name.lower() == self.old_name.lower() or
-            name.lower() == self.new_name.lower()
+            name.lower() == self.old_name_lower or
+            name.lower() == self.new_name_lower
         )
 
     def describe(self):
@@ -224,6 +245,10 @@ class AlterModelTable(Operation):
         self.name = name
         self.table = table
 
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
+
     def deconstruct(self):
         kwargs = {
             'name': self.name,
@@ -236,8 +261,8 @@ class AlterModelTable(Operation):
         )
 
     def state_forwards(self, app_label, state):
-        state.models[app_label, self.name.lower()].options["db_table"] = self.table
-        state.reload_model(app_label, self.name)
+        state.models[app_label, self.name_lower].options["db_table"] = self.table
+        state.reload_model(app_label, self.name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
@@ -261,7 +286,7 @@ class AlterModelTable(Operation):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.name.lower()
+        return name.lower() == self.name_lower
 
     def describe(self):
         return "Rename table for %s to %s" % (self.name, self.table)
@@ -279,6 +304,10 @@ class AlterUniqueTogether(Operation):
         unique_together = normalize_together(unique_together)
         self.unique_together = set(tuple(cons) for cons in unique_together)
 
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
+
     def deconstruct(self):
         kwargs = {
             'name': self.name,
@@ -291,9 +320,9 @@ class AlterUniqueTogether(Operation):
         )
 
     def state_forwards(self, app_label, state):
-        model_state = state.models[app_label, self.name.lower()]
+        model_state = state.models[app_label, self.name_lower]
         model_state.options[self.option_name] = self.unique_together
-        state.reload_model(app_label, self.name)
+        state.reload_model(app_label, self.name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
@@ -309,7 +338,7 @@ class AlterUniqueTogether(Operation):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.name.lower()
+        return name.lower() == self.name_lower
 
     def describe(self):
         return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.unique_together or ''))
@@ -327,6 +356,10 @@ class AlterIndexTogether(Operation):
         index_together = normalize_together(index_together)
         self.index_together = set(tuple(cons) for cons in index_together)
 
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
+
     def deconstruct(self):
         kwargs = {
             'name': self.name,
@@ -339,9 +372,9 @@ class AlterIndexTogether(Operation):
         )
 
     def state_forwards(self, app_label, state):
-        model_state = state.models[app_label, self.name.lower()]
+        model_state = state.models[app_label, self.name_lower]
         model_state.options[self.option_name] = self.index_together
-        state.reload_model(app_label, self.name)
+        state.reload_model(app_label, self.name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
@@ -357,7 +390,7 @@ class AlterIndexTogether(Operation):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.name.lower()
+        return name.lower() == self.name_lower
 
     def describe(self):
         return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.index_together or ''))
@@ -372,6 +405,10 @@ class AlterOrderWithRespectTo(Operation):
         self.name = name
         self.order_with_respect_to = order_with_respect_to
 
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
+
     def deconstruct(self):
         kwargs = {
             'name': self.name,
@@ -384,9 +421,9 @@ class AlterOrderWithRespectTo(Operation):
         )
 
     def state_forwards(self, app_label, state):
-        model_state = state.models[app_label, self.name.lower()]
+        model_state = state.models[app_label, self.name_lower]
         model_state.options['order_with_respect_to'] = self.order_with_respect_to
-        state.reload_model(app_label, self.name)
+        state.reload_model(app_label, self.name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.name)
@@ -410,7 +447,7 @@ class AlterOrderWithRespectTo(Operation):
         self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.name.lower()
+        return name.lower() == self.name_lower
 
     def describe(self):
         return "Set order_with_respect_to on %s to %s" % (self.name, self.order_with_respect_to)
@@ -439,6 +476,10 @@ class AlterModelOptions(Operation):
         self.name = name
         self.options = options
 
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
+
     def deconstruct(self):
         kwargs = {
             'name': self.name,
@@ -451,13 +492,13 @@ class AlterModelOptions(Operation):
         )
 
     def state_forwards(self, app_label, state):
-        model_state = state.models[app_label, self.name.lower()]
+        model_state = state.models[app_label, self.name_lower]
         model_state.options = dict(model_state.options)
         model_state.options.update(self.options)
         for key in self.ALTER_OPTION_KEYS:
             if key not in self.options and key in model_state.options:
                 del model_state.options[key]
-        state.reload_model(app_label, self.name)
+        state.reload_model(app_label, self.name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         pass
@@ -466,7 +507,7 @@ class AlterModelOptions(Operation):
         pass
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.name.lower()
+        return name.lower() == self.name_lower
 
     def describe(self):
         return "Change Meta options on %s" % (self.name, )
@@ -483,6 +524,10 @@ class AlterModelManagers(Operation):
         self.name = name
         self.managers = managers
 
+    @cached_property
+    def name_lower(self):
+        return self.name.lower()
+
     def deconstruct(self):
         return (
             self.__class__.__name__,
@@ -491,7 +536,7 @@ class AlterModelManagers(Operation):
         )
 
     def state_forwards(self, app_label, state):
-        model_state = state.models[app_label, self.name.lower()]
+        model_state = state.models[app_label, self.name_lower]
         model_state.managers = list(self.managers)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -501,7 +546,7 @@ class AlterModelManagers(Operation):
         pass
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.name.lower()
+        return name.lower() == self.name_lower
 
     def describe(self):
         return "Change managers on %s" % (self.name, )
