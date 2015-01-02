@@ -52,24 +52,21 @@ def DO_NOTHING(collector, field, sub_objs, using):
     pass
 
 
-def get_candidates_to_delete(opts):
+def get_candidate_relations_to_delete(opts):
     # Collect models that contain candidate relations to delete. This may include
     # relations coming from proxy models.
     candidate_models = {opts}
     candidate_models = candidate_models.union(opts.concrete_model._meta.proxied_children)
-
     # For each model, get all candidate fields.
     candidate_model_fields = chain.from_iterable(
         opts.get_fields(include_hidden=True) for opts in candidate_models
     )
-
     # Keep related objects not coming from ManyToManyFields from all candidate
     # model fields.
-    related_objects_without_m2ms = (
+    return (
         f for f in candidate_model_fields
         if f.is_reverse_object and not f.many_to_many
     )
-    return related_objects_without_m2ms
 
 
 class Collector(object):
@@ -155,7 +152,7 @@ class Collector(object):
             return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
-        for related in get_candidates_to_delete(opts):
+        for related in get_candidate_relations_to_delete(opts):
             if related.field.rel.on_delete is not DO_NOTHING:
                 return False
         for field in model._meta.virtual_fields:
@@ -204,7 +201,7 @@ class Collector(object):
         model = new_objs[0].__class__
 
         # Recursively collect concrete model's parent models, but not their
-        # related objects. These will be found by meta.get_fields
+        # related objects. These will be found by meta.get_fields()
         concrete_model = model._meta.concrete_model
         for ptr in six.itervalues(concrete_model._meta.parents):
             if ptr:
@@ -219,7 +216,7 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-            for related in get_candidates_to_delete(model._meta):
+            for related in get_candidate_relations_to_delete(model._meta):
                 field = related.field
                 if field.rel.on_delete == DO_NOTHING:
                     continue

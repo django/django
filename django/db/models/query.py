@@ -817,7 +817,7 @@ class QuerySet(object):
         obj = self._clone()
         names = getattr(self, '_fields', None)
         if names is None:
-            names = set(f.name for f in self.model._meta.get_fields())
+            names = {f.name for f in self.model._meta.get_fields()}
 
         # Add the annotations to the query
         for alias, annotation in annotations.items():

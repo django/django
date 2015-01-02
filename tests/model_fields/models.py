@@ -12,7 +12,8 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields.related import (
-    ForeignObject, ForeignKey, ManyToManyField, OneToOneField)
+    ForeignObject, ForeignKey, ManyToManyField, OneToOneField,
+)
 from django.db import models
 from django.db.models.fields.files import ImageFieldFile, ImageField
 from django.utils import six
@@ -317,9 +318,7 @@ class AllFieldsModel(models.Model):
     file_path = models.FilePathField()
     floatf = models.FloatField()
     integer = models.IntegerField()
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        ip_address = models.IPAddressField()
+    ip_address = models.IPAddressField()
     generic_ip = models.GenericIPAddressField()
     null_boolean = models.NullBooleanField()
     positive_integer = models.PositiveIntegerField()

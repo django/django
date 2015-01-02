@@ -36,12 +36,10 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
 
 
 class raise_deprecation(object):
-
     def __init__(self, suggested_alternative):
         self.suggested_alternative = suggested_alternative
 
     def __call__(self, fn):
-
         def wrapper(*args, **kwargs):
             warnings.warn(
                 "'%s is an unofficial API that has been deprecated. "
@@ -84,8 +82,8 @@ def make_immutable_fields_list(name, data):
 @python_2_unicode_compatible
 class Options(object):
     FORWARD_PROPERTIES = ('fields', 'many_to_many', 'concrete_fields',
-                          'local_concrete_fields', '_forward_fields_map',)
-    REVERSE_PROPERTIES = ('related_objects', 'fields_map', '_relation_tree',)
+                          'local_concrete_fields', '_forward_fields_map')
+    REVERSE_PROPERTIES = ('related_objects', 'fields_map', '_relation_tree')
 
     def __init__(self, meta, app_label=None):
         self._get_fields_cache = {}
@@ -146,10 +144,10 @@ class Options(object):
 
     @lru_cache(maxsize=None)
     def _map_model(self, link):
-        # This helper function is used to allow backwards compatibility with the previous API.
-        # No future methods should link to this function.
-        # This function maps a field to (field, model or related_model,) depending on the field
-        # type.
+        # This helper function is used to allow backwards compatibility with
+        # the previous API. No future methods should use this function.
+        # It maps a field to (field, model or related_model,) depending on the
+        # field type.
         model = link.model._meta.concrete_model
         if model is self.model:
             model = None
@@ -157,10 +155,11 @@ class Options(object):
 
     @lru_cache(maxsize=None)
     def _map_model_details(self, link):
-        # This helper function is used to allow backwards compatibility with the previous API.
-        # No future methods should link to this function.
-        # This function maps a field to (field, model or related_model, direct, is_m2m) depending
-        # on the field type.
+        # This helper function is used to allow backwards compatibility with
+        # the previous API. No future methods should use this function.
+        # This function maps a field to a tuple of:
+        #  (field, model or related_model, direct, is_m2m) depending on the
+        # field type.
         direct = not link.is_reverse_object
         model = link.model._meta.concrete_model
         if model is self.model:
@@ -248,8 +247,8 @@ class Options(object):
 
     def _prepare(self, model):
         if self.order_with_respect_to:
-            # The apps registry will not be ready at this point. So
-            # we cannot use get_field().
+            # The apps registry will not be ready at this point so we cannot
+            # use get_field().
             query = self.order_with_respect_to
             try:
                 self.order_with_respect_to = next(
@@ -371,42 +370,51 @@ class Options(object):
         Returns a list of all forward fields on the model and its parents,
         excluding ManyToManyFields.
 
-        This is a private API and is only intended to be used by Django itself.
-        ``get_fields()`` combined with filtering of field properties is the
-        officially maintained method for obtaining this field list.
+        Private API intended only to be used by Django itself; get_fields()
+        combined with filtering of field properties is the public API for
+        obtaining this list.
         """
-        # Due to legacy reasons, the fields property should only contain forward
-        # fields that are not virtual or with a m2m cardinality. Therefore we pass
-        # these three filters as filters to the generator.
+        # Due to legacy reasons, the fields property should only contain
+        # forward  fields that are not virtual or with a m2m cardinality.
+        # Therefore we pass these three filters as filters to the generator.
         is_not_an_m2m_field = lambda f: not (f.has_relation and f.many_to_many)
         is_not_a_generic_relation = lambda f: not (f.has_relation and f.many_to_one)
         is_not_a_generic_foreign_key = lambda f: not (f.has_relation and f.one_to_many and not f.related_model)
 
-        return make_immutable_fields_list("fields", (f for f in self._get_fields(reverse=False) if
-                                          is_not_an_m2m_field(f) and is_not_a_generic_relation(f)
-                                          and is_not_a_generic_foreign_key(f)))
+        return make_immutable_fields_list(
+            "fields",
+            (f for f in self._get_fields(reverse=False) if
+            is_not_an_m2m_field(f) and is_not_a_generic_relation(f)
+            and is_not_a_generic_foreign_key(f))
+        )
 
     @cached_property
     def concrete_fields(self):
         """
         Returns a list of all concrete fields on the model and its parents.
 
-        This is a private API and is only intended to be used by Django itself.
-        ``get_fields()`` combined with filtering of field properties is the
-        officially maintained method for obtaining this field list.
+        Private API intended only to be used by Django itself; get_fields()
+        combined with filtering of field properties is the public API for
+        obtaining this list.
         """
-        return make_immutable_fields_list("concrete_fields", (f for f in self.fields if f.concrete))
+        return make_immutable_fields_list(
+            "concrete_fields",
+            (f for f in self.fields if f.concrete)
+        )
 
     @cached_property
     def local_concrete_fields(self):
         """
         Returns a list of all concrete fields on the model.
 
-        This is a private API and is only intended to be used by Django itself.
-        ``get_fields()`` combined with filtering of field properties is the
-        officially maintained method for obtaining this field list.
+        Private API intended only to be used by Django itself; get_fields()
+        combined with filtering of field properties is the public API for
+        obtaining this list.
         """
-        return make_immutable_fields_list("local_concrete_fields", (f for f in self.local_fields if f.concrete))
+        return make_immutable_fields_list(
+            "local_concrete_fields",
+            (f for f in self.local_fields if f.concrete)
+        )
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_fields_with_model(self):
@@ -421,23 +429,26 @@ class Options(object):
         """
         Returns a list of all many to many fields on the model and its parents.
 
-        This is a private API and is only intended to be used by Django itself.
-        ``get_fields()`` combined with filtering of field properties is the
-        officially maintained method for obtaining this field list.
+        Private API intended only to be used by Django itself; get_fields()
+        combined with filtering of field properties is the public API for
+        obtaining this list.
         """
-        return make_immutable_fields_list("many_to_many", (f for f in self._get_fields(reverse=False)
-                                          if f.has_relation and f.many_to_many))
+        return make_immutable_fields_list(
+            "many_to_many",
+            (f for f in self._get_fields(reverse=False)
+            if f.has_relation and f.many_to_many)
+        )
 
     @cached_property
     def related_objects(self):
         """
-        Returns all related objects pointing to the current model.
-        The related objects can come from a one-to-one, one-to-many,
-        many-to-many field relation type.
+        Returns all related objects pointing to the current model. The related
+        objects can come from a one-to-one, one-to-many, or many-to-many field
+        relation type.
 
-        This is a private API and is only intended to be used by Django itself.
-        ``get_fields()`` combined with filtering of field properties is the
-        officially maintained method for obtaining this field list.
+        Private API intended only to be used by Django itself; get_fields()
+        combined with filtering of field properties is the public API for
+        obtaining this list.
         """
         all_related_fields = self._get_fields(forward=False, reverse=True, include_hidden=True)
         return make_immutable_fields_list(
@@ -453,18 +464,18 @@ class Options(object):
     @cached_property
     def _forward_fields_map(self):
         res = {}
-        # call get_fields() with export_ordered_set=True in order to have a field_instance -> names map
+        # call get_fields() with export_ordered_set=True in order to have a
+        # field_instance -> names map
         fields = self._get_fields(reverse=False)
         for field in fields:
             res[field.name] = field
-
-            # Due to the way Django's internals work, get_field() should also be able to fetch a field by attname.
-            # Which in the case of a concrete field with relation, includes the *_id name too
+            # Due to the way Django's internals work, get_field() should also
+            # be able to fetch a field by attname, which in the case of a
+            # concrete field with relation, includes the *_id name too.
             try:
                 res[field.attname] = field
             except AttributeError:
                 pass
-
         return res
 
     @cached_property
@@ -473,9 +484,9 @@ class Options(object):
         fields = self._get_fields(forward=False, include_hidden=True)
         for field in fields:
             res[field.name] = field
-
-            # Due to the way Django's internals work, get_field() should also be able to fetch a field by attname.
-            # Which in the case of a concrete field with relation, includes the *_id name too
+            # Due to the way Django's internals work, get_field() should also
+            # be able to fetch a field by attname, which in the case of a
+            # concrete field with relation, includes the *_id name too.
             try:
                 res[field.attname] = field
             except AttributeError:
@@ -493,38 +504,41 @@ class Options(object):
         it has been deprecated and will be removed in Django 2.0.
         """
         m2m_in_kwargs = many_to_many is not None
+        if m2m_in_kwargs:
+            # Always throw a warning if many_to_many is used regardless of
+            # if it alters the return type or not.
+            warnings.warn(
+                "The 'many_to_many' argument of get_field() is deprecated; "
+                "use a filter on field.many_to_many instead.",
+                RemovedInDjango20Warning
+            )
+
         try:
-            # In order to avoid premature loading of the relation tree (expensive) we
-            # prefer checking if the field is a forward field.
+            # In order to avoid premature loading of the relation tree
+            # (expensive) we prefer checking if the field is a forward field.
             field = self._forward_fields_map[field_name]
-
-            # NOTE: previous get_field API had a many_to_many key. In order to avoid breaking
-            # other's implementation we will catch the use of 'many_to_many'.
-            if m2m_in_kwargs:
-                # We always want to throw a warning if many_to_many is used regardless
-                # of if it alters the return type or not.
-                warnings.warn(
-                    "The 'many_to_many' argument on get_field() is deprecated; use a filter on field.many_to_many instead.",
-                    RemovedInDjango20Warning
+            if many_to_many is False and field.many_to_many:
+                raise FieldDoesNotExist(
+                    '%s has no field named %r' % (self.object_name, field_name)
                 )
-                if many_to_many is False and field.many_to_many:
-                    raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
-
             return field
         except KeyError:
-            # If the apps registry is not ready, reverse fields are unavailable, therefore
-            # we throw an FieldDoesNotExist exception.
+            # If the apps registry is not ready, reverse fields are
+            # unavailable, therefore we throw a FieldDoesNotExist exception.
             if not self.apps.ready:
-                raise FieldDoesNotExist('%s has no field named %r. The app cache isn\'t '
-                                        'ready yet, so if this is a forward field, it won\'t '
-                                        'be available yet.' % (self.object_name, field_name))
+                raise FieldDoesNotExist(
+                    "%s has no field named %r. The app cache isn't "
+                    "ready yet, so if this is a forward field, it won't "
+                    "be available yet." % (self.object_name, field_name)
+                )
 
         try:
             if m2m_in_kwargs:
                 # Previous API does not allow searching reverse fields.
                 raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
-            # Retreive field instance by name from cached or just-computer field map
+            # Retrieve field instance by name from cached or just-computed
+            # field map
             return self.fields_map[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
@@ -535,19 +549,17 @@ class Options(object):
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_field_names(self):
-        res = set()
+        names = set()
         fields = self.get_fields()
         for field in fields:
-
-            # For legacy reasons GenericForeignKey should not be included in the results
+            # For backwards compatibility GenericForeignKey should not be
+            # included in the results.
             if field.has_relation and field.one_to_many and field.related_model is None:
                 continue
-
-            res.add(field.name)
+            names.add(field.name)
             if hasattr(field, 'attname'):
-                res.add(field.attname)
-
-        return list(res)
+                names.add(field.attname)
+        return list(names)
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_objects(self, local_only=False, include_hidden=False,
@@ -568,22 +580,25 @@ class Options(object):
             relations = (f.rel for f in children
                          if include_hidden or not f.rel.field.rel.is_hidden())
             fields = chain(fields, relations)
-
         return list(fields)
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
                                            include_proxy_eq=False):
-        return [self._map_model(f) for f in
-                self.get_all_related_objects(
-                    local_only=local_only,
-                    include_hidden=include_hidden,
-                    include_proxy_eq=include_proxy_eq)]
+        return [
+            self._map_model(f) for f in self.get_all_related_objects(
+                local_only=local_only,
+                include_hidden=include_hidden,
+                include_proxy_eq=include_proxy_eq,
+            )
+        ]
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_many_to_many_objects(self, local_only=False):
-        fields = self._get_fields(forward=False, reverse=True,
-                        include_parents=local_only is not True, include_hidden=True)
+        fields = self._get_fields(
+            forward=False, reverse=True,
+            include_parents=local_only is not True, include_hidden=True
+        )
         return [obj for obj in fields if isinstance(obj.field, ManyToManyField)]
 
     @raise_deprecation(suggested_alternative="get_fields()")
@@ -650,32 +665,31 @@ class Options(object):
 
         all_models = self.apps.get_models(include_auto_created=True)
         for model in all_models:
-
             fields_with_relations = (
                 f for f in model._meta._get_fields(reverse=False)
                 if f.has_relation and f.related_model is not None
             )
             if model._meta.auto_created:
-                fields_with_relations = (f for f in fields_with_relations
-                                         if not f.many_to_many)
-
+                fields_with_relations = (
+                    f for f in fields_with_relations
+                    if not f.many_to_many
+                )
             for f in fields_with_relations:
                 if not isinstance(f.rel.to, six.string_types):
                     # Set options_instance -> field
                     related_objects_graph[f.rel.to._meta].append(f)
 
         for model in all_models:
-            # Set the relation_tree using the internal __dict__.
-            # In this way we avoid calling the cached property.
-            # In attribute lookup, __dict__ takes precedence over
-            # a data descriptor (such as @cached_property). This
-            # means that the _meta._relation_tree is only called
-            # if related_objects is not in __dict__.
+            # Set the relation_tree using the internal __dict__. In this way
+            # we avoid calling the cached property. In attribute lookup,
+            # __dict__ takes precedence over a data descriptor (such as
+            # @cached_property). This means that the _meta._relation_tree is
+            # only called if related_objects is not in __dict__.
             related_objects = related_objects_graph[model._meta]
 
             # If related_objects are empty, it makes sense # to set
-            # EMPTY_RELATION_TREE. This will avoid allocating multiple
-            # empty relation trees.
+            # EMPTY_RELATION_TREE. This will avoid allocating multiple empty
+            # relation trees.
             relation_tree = EMPTY_RELATION_TREE
             if related_objects:
                 relation_tree = related_objects
@@ -685,11 +699,10 @@ class Options(object):
     def _relation_tree(self):
         # If cache is not present, populate the cache
         self._populate_directed_relation_graph()
-        # It may happen, often when the registry is not ready, that
-        # a not yet registered model is queried. In this very rare
-        # case we simply return an EMPTY_RELATION_TREE.
-        # When the registry will be ready, cache will be flushed and
-        # this model will be computed properly.
+        # It may happen, often when the registry is not ready, that a not yet
+        # registered model is queried. In this very rare case we simply return
+        # an EMPTY_RELATION_TREE. When the registry is ready, the cache will
+        # be flushed and this model will be computed properly.
         return self.__dict__.get('_relation_tree', EMPTY_RELATION_TREE)
 
     def _expire_cache(self, forward=True, reverse=True):
@@ -713,9 +726,7 @@ class Options(object):
         """
         Returns a list of fields associated to the model. By default will only
         return forward fields. This can be changed by enabling or disabling
-        field types using the flags available.
-
-        Options can be any of the following:
+        field types using the parameters:
         - include_parents: include fields derived from inheritance
         - include_hidden:  include fields that have a related_name that
                            starts with a "+"
@@ -725,8 +736,8 @@ class Options(object):
     def _get_fields(self, forward=True, reverse=True, include_parents=True, include_hidden=False,
                     export_ordered_set=False):
         # This helper function is used to allow recursion in ``get_fields()``
-        # implementation, and provide a fast way for Django's internals to
-        # access specific subset of fields.
+        # implementation and to provide a fast way for Django's internals to
+        # access specific subsets of fields.
 
         # Creates a cache key composed of all arguments
         cache_key = (forward, reverse, include_parents, include_hidden, export_ordered_set)
@@ -737,10 +748,9 @@ class Options(object):
         except KeyError:
             pass
 
-        # Using an OrderedDict to preserve the order of insertion. This is
-        # fundamental when displaying a ModelForm or django.contrib.admin panel
-        # and no specific ordering is provided. For this reason, order of field
-        # insertion must be preserved
+        # Using an OrderedDict preserves the order of insertion. This is
+        # important when displaying a ModelForm or the contrib.admin panel
+        # and no specific ordering is provided.
         fields = OrderedDict()
         options = {
             'include_parents': include_parents,
@@ -752,15 +762,14 @@ class Options(object):
         if reverse and not self.abstract:
             if include_parents:
                 parent_list = self.get_parent_list()
-                # Recursively call _get_fields on each parent, with the same
-                # options provided in this call
+                # Recursively call _get_fields() on each parent, with the same
+                # options provided in this call.
                 for parent in self.parents:
                     for obj, _ in six.iteritems(parent._meta._get_fields(forward=False, **options)):
-
                         if obj.many_to_many:
                             # In order for a reverse ManyToManyRel object to be
                             # valid, its creation counter must be > 0 and must
-                            # be in the parent list
+                            # be in the parent list.
                             if not (obj.field.creation_counter < 0 and obj.related_model not in parent_list):
                                 fields[obj] = True
 
@@ -768,24 +777,24 @@ class Options(object):
                                   and obj.related_model not in parent_list):
                             fields[obj] = True
 
-            # Tree is computed once and cached until apps cache is expired. It
-            # is composed of a list of fields pointing to the current model
-            # from other models.  If the model is a proxy model, then we also
+            # Tree is computed once and cached until the app cache is expired.
+            # It is composed of a list of fields pointing to the current model
+            # from other models. If the model is a proxy model, then we also
             # add the concrete model.
-            all_fields = self._relation_tree if not self.proxy else chain(self._relation_tree,
-                                                                   self.concrete_model._meta._relation_tree)
-
+            all_fields = (
+                self._relation_tree if not self.proxy else
+                chain(self._relation_tree, self.concrete_model._meta._relation_tree)
+            )
             # Pull out all related objects from forward fields
             for field in (f.rel for f in all_fields):
-                # If hidden fields should be included or the relation
-                # is not intentionally hidden, add to the fields dict
+                # If hidden fields should be included or the relation is not
+                # intentionally hidden, add to the fields dict.
                 if include_hidden or not field.hidden:
                     fields[field] = True
-
         if forward:
             if include_parents:
                 for parent in self.parents:
-                    # Extend the fields dict with all the forward fields of each parent.
+                    # Add the forward fields of each parent.
                     fields.update(parent._meta._get_fields(reverse=False, **options))
             fields.update(
                 (field, True,)

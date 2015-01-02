@@ -20,7 +20,6 @@ from django.db.models.fields import (
     GenericIPAddressField, NOT_PROVIDED, NullBooleanField, PositiveIntegerField,
     PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
     TimeField, URLField)
-
 from django.db.models.fields.related import (
     ForeignObject, ForeignKey, OneToOneField, ManyToManyField,
     ManyToOneRel, ForeignObjectRel,
@@ -58,25 +57,25 @@ RELATION_FIELDS = (
     GenericRelation,
 )
 
-ONE_TO_MANY_CLASSES = set([
+ONE_TO_MANY_CLASSES = {
     ForeignObject,
     ForeignKey,
     GenericForeignKey,
-])
+}
 
-MANY_TO_ONE_CLASSES = set([
+MANY_TO_ONE_CLASSES = {
     ForeignObjectRel,
     ManyToOneRel,
     GenericRelation,
-])
+}
 
-MANY_TO_MANY_CLASSES = set([
+MANY_TO_MANY_CLASSES = {
     ManyToManyField,
-])
+}
 
-ONE_TO_ONE_CLASSES = set([
+ONE_TO_ONE_CLASSES = {
     OneToOneField,
-])
+}
 
 FLAG_PROPERTIES = (
     'concrete',
@@ -88,7 +87,7 @@ FLAG_PROPERTIES = (
     'many_to_one',
     'many_to_many',
     'one_to_one',
-    'related_model'
+    'related_model',
 )
 
 FLAG_PROPERTIES_FOR_RELATIONS = (
@@ -747,32 +746,38 @@ class BinaryFieldTests(test.TestCase):
 
 class FieldFlagsTests(test.TestCase):
 
-    def setUp(self):
-        self.fields = list(AllFieldsModel._meta.fields) + \
+    @classmethod
+    def setUpClass(cls):
+        super(FieldFlagsTests, cls).setUpClass()
+        cls.fields = (
+            list(AllFieldsModel._meta.fields) +
             list(AllFieldsModel._meta.virtual_fields)
-
-        self.all_fields = self.fields + \
-            list(AllFieldsModel._meta.many_to_many) + \
+        )
+        cls.all_fields = (
+            cls.fields +
+            list(AllFieldsModel._meta.many_to_many) +
             list(AllFieldsModel._meta.virtual_fields)
+        )
 
-        self.fields_and_reverse_objects = self.all_fields + \
+        cls.fields_and_reverse_objects = (
+            cls.all_fields +
             list(AllFieldsModel._meta.related_objects)
+        )
 
     def test_each_field_should_have_a_concrete_attribute(self):
-        self.assertTrue(all(f.concrete.__class__ == bool
-                        for f in self.fields))
+        self.assertTrue(all(f.concrete.__class__ == bool for f in self.fields))
 
     def test_each_field_should_have_an_editable_attribute(self):
-        self.assertTrue(all(f.editable.__class__ == bool
-                        for f in self.all_fields))
+        self.assertTrue(all(f.editable.__class__ == bool for f in self.all_fields))
 
     def test_each_field_should_have_a_has_rel_attribute(self):
-        self.assertTrue(all(f.has_relation.__class__ == bool
-                        for f in self.all_fields))
+        self.assertTrue(all(f.has_relation.__class__ == bool for f in self.all_fields))
 
     def test_each_object_should_have_is_reverse_object(self):
-        self.assertTrue(all(f.is_reverse_object.__class__ == bool
-                        for f in self.fields_and_reverse_objects))
+        self.assertTrue(
+            all(f.is_reverse_object.__class__ == bool
+            for f in self.fields_and_reverse_objects)
+        )
 
     def test_non_concrete_fields(self):
         for field in self.fields:
@@ -804,26 +809,21 @@ class FieldFlagsTests(test.TestCase):
             for flag in FLAG_PROPERTIES:
                 self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
             if field.has_relation:
-                true_cardinailty_flags = [
-                    True for flag in FLAG_PROPERTIES_FOR_RELATIONS
-                    if getattr(field, flag) is True
-                ]
-
+                true_cardinality_flags = sum(
+                    getattr(field, flag) is True
+                    for flag in FLAG_PROPERTIES_FOR_RELATIONS
+                )
                 # If the field has a relation, there should be only one of the
                 # 4 cardinality flags available.
-                self.assertEqual(1, len(true_cardinailty_flags))
+                self.assertEqual(1, true_cardinality_flags)
 
     def test_cardinality_m2m(self):
         m2m_type_fields = (
             f for f in self.all_fields
             if f.has_relation and f.many_to_many
         )
-
         # Test classes are what we expect
-        self.assertEqual(MANY_TO_MANY_CLASSES, set(
-            f.__class__ for f in m2m_type_fields
-        ))
-
+        self.assertEqual(MANY_TO_MANY_CLASSES, {f.__class__ for f in m2m_type_fields})
         # Ensure all m2m reverses are m2m
         for field in m2m_type_fields:
             reverse_field = field.rel
@@ -836,75 +836,55 @@ class FieldFlagsTests(test.TestCase):
             f for f in self.fields_and_reverse_objects
             if f.has_relation and f.one_to_many
         ]
-
         # Test classes are what we expect
-        self.assertEqual(ONE_TO_MANY_CLASSES, set(
-            f.__class__ for f in o2m_type_fields
-        ))
-
+        self.assertEqual(ONE_TO_MANY_CLASSES, {f.__class__ for f in o2m_type_fields})
         # Ensure all o2m reverses are m2o
         for field in o2m_type_fields:
             if field.is_reverse_object:
                 reverse_field = field.rel
-                self.assertTrue(reverse_field.has_relation
-                                and reverse_field.many_to_one)
+                self.assertTrue(reverse_field.has_relation and reverse_field.many_to_one)
 
     def test_cardinality_m2o(self):
         m2o_type_fields = [
             f for f in self.fields_and_reverse_objects
             if f.has_relation and f.many_to_one
         ]
-
         # Test classes are what we expect
-        self.assertEqual(MANY_TO_ONE_CLASSES, set(
-            f.__class__ for f in m2o_type_fields
-        ))
-
+        self.assertEqual(MANY_TO_ONE_CLASSES, {f.__class__ for f in m2o_type_fields})
         # Ensure all m2o reverses are o2m
         for obj in m2o_type_fields:
             if obj.is_reverse_object:
                 reverse_field = obj.field
-                self.assertTrue(reverse_field.has_relation
-                                and reverse_field.one_to_many)
+                self.assertTrue(reverse_field.has_relation and reverse_field.one_to_many)
 
     def test_cardinality_o2o(self):
         o2o_type_fields = [
             f for f in self.all_fields
             if f.has_relation and f.one_to_one
         ]
-
         # Test classes are what we expect
-        self.assertEqual(ONE_TO_ONE_CLASSES, set(
-            f.__class__ for f in o2o_type_fields
-        ))
-
+        self.assertEqual(ONE_TO_ONE_CLASSES, {f.__class__ for f in o2o_type_fields})
         # Ensure all o2o reverses are o2o
         for obj in o2o_type_fields:
             if hasattr(obj, 'field'):
                 reverse_field = obj.field
-                self.assertTrue(reverse_field.has_relation
-                                and reverse_field.one_to_one)
+                self.assertTrue(reverse_field.has_relation and reverse_field.one_to_one)
 
     def test_hidden_flag(self):
         incl_hidden = set(AllFieldsModel._meta.get_fields(include_hidden=True))
         no_hidden = set(AllFieldsModel._meta.get_fields())
         fields_that_should_be_hidden = (incl_hidden - no_hidden)
         for f in incl_hidden:
-            self.assertEqual(
-                f in fields_that_should_be_hidden,
-                f.hidden
-            )
+            self.assertEqual(f in fields_that_should_be_hidden, f.hidden)
 
     def test_model_and_reverse_model_should_equal_on_relations(self):
         for field in AllFieldsModel._meta.get_fields():
             if field.has_relation and not field.is_reverse_object:
-
                 if field.related_model is None or isinstance(field.related_model, six.string_types):
                     continue
-
                 reverse_field = field.rel
-                self.assertEquals(field.model, reverse_field.related_model)
-                self.assertEquals(field.related_model, reverse_field.model)
+                self.assertEqual(field.model, reverse_field.related_model)
+                self.assertEqual(field.related_model, reverse_field.model)
 
 
 class GenericIPAddressFieldTests(test.TestCase):

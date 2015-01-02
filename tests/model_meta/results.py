@@ -1,5 +1,5 @@
 from .models import (
-    AbstractPerson, BasePerson, Person, Relating, Relation
+    AbstractPerson, BasePerson, Person, Relating, Relation,
 )
 
 TEST_RESULTS = {
