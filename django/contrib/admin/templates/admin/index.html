@@ -30,13 +30,13 @@
             {% if model.add_url %}
                 <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
             {% else %}
-                <td>&nbsp;</td>
+                <td>&#160;</td>
             {% endif %}
 
             {% if model.admin_url %}
                 <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
             {% else %}
-                <td>&nbsp;</td>
+                <td>&#160;</td>
             {% endif %}
             </tr>
         {% endfor %}

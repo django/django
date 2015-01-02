@@ -225,7 +225,7 @@ def items_for_result(cl, result, form):
                 if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
                     row_classes.append('nowrap')
         if force_text(result_repr) == '':
-            result_repr = mark_safe('&nbsp;')
+            result_repr = mark_safe('&#160;')  # &nbsp;
         row_class = mark_safe(' class="%s"' % ' '.join(row_classes))
         # If list_display_links not defined, add the link tag to the first field
         if link_in_col(first, field_name, cl):

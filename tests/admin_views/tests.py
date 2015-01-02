@@ -1314,7 +1314,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.get('/test_admin/admin/')
         self.client.post(login_url, self.adduser_login)
         addpage = self.client.get('/test_admin/admin/admin_views/article/add/')
-        change_list_link = '&rsaquo; <a href="/test_admin/admin/admin_views/article/">Articles</a>'
+        change_list_link = '&#8250; <a href="/test_admin/admin/admin_views/article/">Articles</a>'
         self.assertNotContains(addpage, change_list_link,
             msg_prefix='User restricted to add permission is given link to change list view in breadcrumbs.')
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
