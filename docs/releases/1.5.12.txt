@@ -2,7 +2,7 @@
 Django 1.5.12 release notes
 ===========================
 
-*Under development*
+*January 2, 2015*
 
 Django 1.5.12 fixes a regression in the 1.5.9 security release.
 
