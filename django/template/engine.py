@@ -7,7 +7,6 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
-from . import engines
 from .base import Context, Lexer, Parser, Template, TemplateDoesNotExist
 from .context import _builtin_context_processors
 
@@ -68,8 +67,10 @@ class Engine(object):
         >>> template.render(context)
         'Hello world!'
         """
-        # Since DjangoTemplates is a wrapper around this Engine class, a local
-        # import is mandatory to avoid an import loop.
+        # Since Engine is imported in django.template and since
+        # DjangoTemplates is a wrapper around this Engine class,
+        # local imports are required to avoid import loops.
+        from django.template import engines
         from django.template.backends.django import DjangoTemplates
         django_engines = [engine for engine in engines.all()
                           if isinstance(engine, DjangoTemplates)]
