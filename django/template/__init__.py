@@ -41,12 +41,14 @@ Shared:
 
 ### Multiple Template Engines
 
+from .engine import Engine
+
 from .utils import EngineHandler
 
 
 engines = EngineHandler()
 
-__all__ = ('engines',)
+__all__ = ('Engine', 'engines')
 
 
 ### Django Template Language
