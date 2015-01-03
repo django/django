@@ -1014,6 +1014,13 @@ Miscellaneous
   that Django includes) will no longer convert null values back to an empty
   string. This is consistent with other backends.
 
+* When the :attr:`~django.core.management.BaseCommand.leave_locale_alone`
+  attribute is ``False``, translations are now deactivated instead of forcing
+  the "en-us" locale. In the case your models contained non-English strings and
+  you counted on English translations to be activated in management commands,
+  this will not happen any longer. It might be that new database migrations are
+  generated (once) after migrating to 1.8.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
