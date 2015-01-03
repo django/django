@@ -14,7 +14,7 @@ from django.core.management.base import CommandError
 from django.core.management import call_command
 from django.db import models
 from django.test import TestCase
-from django.test.utils import override_settings, override_system_checks, patch_logger
+from django.test.utils import override_settings, override_system_checks
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
 
@@ -171,13 +171,15 @@ class CheckCommandTests(TestCase):
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_simple_call(self):
-        call_command('check')
+        with self.assertLogs('django.commands', level='INFO'):
+            call_command('check')
         self.assertEqual(simple_system_check.kwargs, {'app_configs': None})
         self.assertEqual(tagged_system_check.kwargs, {'app_configs': None})
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_given_app(self):
-        call_command('check', 'auth', 'admin')
+        with self.assertLogs('django.commands', level='INFO'):
+            call_command('check', 'auth', 'admin')
         auth_config = apps.get_app_config('auth')
         admin_config = apps.get_app_config('admin')
         self.assertEqual(simple_system_check.kwargs, {'app_configs': [auth_config, admin_config]})
@@ -185,7 +187,8 @@ class CheckCommandTests(TestCase):
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_given_tag(self):
-        call_command('check', tags=['simpletag'])
+        with self.assertLogs('django.commands', level='INFO'):
+            call_command('check', tags=['simpletag'])
         self.assertEqual(simple_system_check.kwargs, None)
         self.assertEqual(tagged_system_check.kwargs, {'app_configs': None})
 
@@ -195,27 +198,27 @@ class CheckCommandTests(TestCase):
 
     @override_system_checks([simple_system_check])
     def test_list_tags_empty(self):
-        with patch_logger('django.commands', 'info') as calls:
+        with self.assertLogs('django.commands', level='INFO') as logger:
             call_command('check', list_tags=True)
-        self.assertEqual('', calls[0])
+        self.assertEqual(logger.output[0], '')
 
     @override_system_checks([tagged_system_check])
     def test_list_tags(self):
-        with patch_logger('django.commands', 'info') as calls:
+        with self.assertLogs('django.commands', level='INFO') as logger:
             call_command('check', list_tags=True)
-        self.assertEqual('simpletag', calls[0])
+        self.assertEqual(logger.output[0], 'simpletag')
 
     @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
     def test_list_deployment_check_omitted(self):
-        with patch_logger('django.commands', 'info') as calls:
+        with self.assertLogs('django.commands', level='INFO') as logger:
             call_command('check', list_tags=True)
-        self.assertEqual('simpletag', calls[0])
+        self.assertEqual(logger.output[0], 'simpletag')
 
     @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
     def test_list_deployment_check_included(self):
-        with patch_logger('django.commands', 'info') as calls:
+        with self.assertLogs('django.commands', level='INFO') as logger:
             call_command('check', deploy=True, list_tags=True)
-        self.assertEqual('deploymenttag\nsimpletag', calls[0])
+        self.assertEqual(logger.output[0], 'deploymenttag\nsimpletag')
 
     @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
     def test_tags_deployment_check_omitted(self):
@@ -225,9 +228,9 @@ class CheckCommandTests(TestCase):
 
     @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
     def test_tags_deployment_check_included(self):
-        with patch_logger('django.commands', 'error') as calls:
+        with self.assertLogs('django.commands', level='INFO') as logger:
             call_command('check', deploy=True, tags=['deploymenttag'])
-        self.assertIn('Deployment Check', calls[0])
+        self.assertIn('Deployment Check', logger.output[0])
 
 
 def custom_error_system_check(app_configs, **kwargs):
@@ -256,13 +259,13 @@ class SilencingCheckTests(TestCase):
     @override_system_checks([custom_error_system_check])
     def test_silenced_error(self):
         try:
-            with patch_logger('django.commands', 'info') as calls_stdout, patch_logger('django.commands', 'error') as calls_stderr:
+            with self.assertLogs('django.commands', level='INFO') as logger:
                 call_command('check', no_color=True)
         except CommandError:
             self.fail("The mycheck.E001 check should be silenced.")
-        self.assertEqual(calls_stdout, [])
+        self.assertEqual(logger.records[0].levelname, 'ERROR')
         self.assertEqual(
-            calls_stderr[0],
+            logger.output[0],
             'System check identified some issues:\n\n'
             'ERRORS:\n'
             '?: (myerrorcheck.E001) Error\n\n'
@@ -273,13 +276,13 @@ class SilencingCheckTests(TestCase):
     @override_system_checks([custom_warning_system_check])
     def test_silenced_warning(self):
         try:
-            with patch_logger('django.commands', 'info') as calls_stdout, patch_logger('django.commands', 'error') as calls_stderr:
+            with self.assertLogs('django.commands', level='INFO') as logger:
                 call_command('check')
         except CommandError:
             self.fail("The mycheck.E001 check should be silenced.")
 
-        self.assertEqual(calls_stdout[0], 'System check identified no issues (1 silenced).')
-        self.assertEqual(calls_stderr, [])
+        self.assertEqual(logger.records[0].levelname, 'INFO')
+        self.assertEqual(logger.output[0], 'System check identified no issues (1 silenced).')
 
 
 class CheckFrameworkReservedNamesTests(TestCase):
