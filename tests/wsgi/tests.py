@@ -51,6 +51,28 @@ class WSGITest(TestCase):
             bytes(response),
             b"Content-Type: text/html; charset=utf-8\r\n\r\nHello World!")
 
+    def test_file_wrapper(self):
+        """
+        Verify that FileResponse uses wsgi.file_wrapper.
+        """
+        class FileWrapper(object):
+            def __init__(self, filelike, blksize=8192):
+                filelike.close()
+        application = get_wsgi_application()
+        environ = RequestFactory()._base_environ(
+            PATH_INFO='/file/',
+            REQUEST_METHOD='GET',
+            **{'wsgi.file_wrapper': FileWrapper}
+        )
+        response_data = {}
+
+        def start_response(status, headers):
+            response_data['status'] = status
+            response_data['headers'] = headers
+        response = application(environ, start_response)
+        self.assertEqual(response_data['status'], '200 OK')
+        self.assertIsInstance(response, FileWrapper)
+
 
 class GetInternalWSGIApplicationTest(unittest.TestCase):
     @override_settings(WSGI_APPLICATION="wsgi.wsgi.application")

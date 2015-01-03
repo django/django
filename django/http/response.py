@@ -417,6 +417,9 @@ class StreamingHttpResponse(HttpResponseBase):
 
     @streaming_content.setter
     def streaming_content(self, value):
+        self._set_streaming_content(value)
+
+    def _set_streaming_content(self, value):
         # Ensure we can never iterate on "value" more than once.
         self._iterator = iter(value)
         if hasattr(value, 'close'):
@@ -427,6 +430,22 @@ class StreamingHttpResponse(HttpResponseBase):
 
     def getvalue(self):
         return b''.join(self.streaming_content)
+
+
+class FileResponse(StreamingHttpResponse):
+    """
+    A streaming HTTP response class optimized for files.
+    """
+    block_size = 4096
+
+    def _set_streaming_content(self, value):
+        if hasattr(value, 'read'):
+            self.file_to_stream = value
+            filelike = value
+            value = iter(lambda: filelike.read(self.block_size), b'')
+        else:
+            self.file_to_stream = None
+        super(FileResponse, self)._set_streaming_content(value)
 
 
 class HttpResponseRedirectBase(HttpResponse):
