@@ -2,7 +2,7 @@
 Custom template tags and filters
 ================================
 
-Django's template system comes with a wide variety of :doc:`built-in
+Django's template language comes with a wide variety of :doc:`built-in
 tags and filters </ref/templates/builtins>` designed to address the
 presentation logic needs of your application. Nevertheless, you may
 find yourself needing functionality that is not covered by the core
@@ -85,11 +85,12 @@ Custom filters are just Python functions that take one or two arguments:
 For example, in the filter ``{{ var|foo:"bar" }}``, the filter ``foo`` would be
 passed the variable ``var`` and the argument ``"bar"``.
 
-Usually any exception raised from a template filter will be exposed as a server
-error. Thus, filter functions should avoid raising exceptions if there is a
-reasonable fallback value to return. In case of input that represents a clear
-bug in a template, raising an exception may still be better than silent failure
-which hides the bug.
+Since the template language doesn't provide exception handling, any exception
+raised from a template filter will be exposed as a server error. Thus, filter
+functions should avoid raising exceptions if there is a reasonable fallback
+value to return. In case of input that represents a clear bug in a template,
+raising an exception may still be better than silent failure which hides the
+bug.
 
 Here's an example filter definition::
 
@@ -663,9 +664,9 @@ a template tag from the ground up.
 A quick overview
 ~~~~~~~~~~~~~~~~
 
-Above, this document explained that the template system works in a two-step
-process: compiling and rendering. To define a custom template tag, you specify
-how the compilation works and how the rendering works.
+The template system works in a two-step process: compiling and rendering. To
+define a custom template tag, you specify how the compilation works and how
+the rendering works.
 
 When Django compiles a template, it splits the raw template text into
 ''nodes''. Each node is an instance of ``django.template.Node`` and has
@@ -811,8 +812,16 @@ This is not a very common situation, but it's useful if you're rendering a
 template yourself. For example::
 
     def render(self, context):
-        t = template.loader.get_template('small_fragment.html')
+        t = context.engine.get_template('small_fragment.html')
         return t.render(Context({'var': obj}, autoescape=context.autoescape))
+
+.. versionchanged:: 1.8
+
+    The ``engine`` attribute of ``Context`` objects was added in Django 1.8.
+    :meth:`context.engine.get_template <django.template.Engine.get_template>`
+    must be used instead of :func:`django.template.loader.get_template`
+    because the latter now returns a wrapper whose ``render`` method doesn't
+    accept a :class:`~django.template.Context`.
 
 If we had neglected to pass in the current ``context.autoescape`` value to our
 new ``Context`` in this example, the results would have *always* been
@@ -952,9 +961,9 @@ tag format that date-time:
 Initially, ``token.split_contents()`` will return three values:
 
 1. The tag name ``format_time``.
-2. The string ``"blog_entry.date_updated"`` (without the surrounding
+2. The string ``'blog_entry.date_updated'`` (without the surrounding
    quotes).
-3. The formatting string ``"%Y-%m-%d %I:%M %p"``. The return value from
+3. The formatting string ``'"%Y-%m-%d %I:%M %p"'``. The return value from
    ``split_contents()`` will include the leading and trailing quotes for
    string literals like this.
 
@@ -1161,7 +1170,6 @@ pass the resulting ``nodelist`` to the ``Node``::
 The only new concept here is the ``self.nodelist.render(context)`` in
 ``UpperNode.render()``.
 
-For more examples of complex rendering, see the source code for
-:ttag:`{% if %}<if>`, :ttag:`{% for %}<for>`, :ttag:`{% ifequal %}<ifequal>`
-or :ttag:`{% ifchanged %}<ifchanged>`. They live in
-``django/template/defaulttags.py``.
+For more examples of complex rendering, see the source code of
+:ttag:`{% for %}<for>` in ``django/template/defaulttags.py`` and
+:ttag:`{% if %}<if>` in ``django/template/smartif.py``.
