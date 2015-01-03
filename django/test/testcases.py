@@ -1255,8 +1255,6 @@ class LiveServerTestCase(TransactionTestCase):
             cls._tearDownClassInternal()
             raise cls.server_thread.error
 
-        super(LiveServerTestCase, cls).setUpClass()
-
     @classmethod
     def _tearDownClassInternal(cls):
         # There may not be a 'server_thread' attribute if setUpClass() for some
