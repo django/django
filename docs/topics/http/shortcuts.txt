@@ -124,8 +124,8 @@ Required arguments
 ``template_name``
     The full name of a template to use or sequence of template names. If a
     sequence is given, the first template that exists will be used. See the
-    :ref:`template loader documentation <ref-templates-api-the-python-api>`
-    for more information on how templates are found.
+    :ref:`template loading documentation <template-loading>` for more
+    information on how templates are found.
 
 Optional arguments
 ------------------

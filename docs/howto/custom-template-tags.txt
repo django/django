@@ -369,6 +369,8 @@ aware datetime, Django will convert it to the current time zone before passing
 it to your filter when appropriate, according to :ref:`rules for time zones
 conversions in templates <time-zones-in-templates>`.
 
+.. _howto-writing-custom-template-tags:
+
 Writing custom template tags
 ----------------------------
 

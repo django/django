@@ -253,8 +253,7 @@ lots of smaller subtemplates (using the ``{% extends %}`` or ``{%
 include %}`` tags).
 
 As a side effect, it is now much easier to support non-Django template
-languages. For more details, see the :ref:`notes on supporting
-non-Django template languages<topic-template-alternate-language>`.
+languages.
 
 Class-based template loaders
 ----------------------------
@@ -275,9 +274,8 @@ If you have developed your own custom template loaders we suggest to consider
 porting them to a class-based implementation because the code for backwards
 compatibility with function-based loaders starts its deprecation process in
 Django 1.2 and will be removed in Django 1.4.  There is a description of the
-API these loader classes must implement :ref:`here
-<topic-template-alternate-language>` and you can also examine the source code
-of the loaders shipped with Django.
+API these loader classes must implement in the template API reference and you
+can also examine the source code of the loaders shipped with Django.
 
 Natural keys in fixtures
 ------------------------
@@ -1172,5 +1170,4 @@ Function-based template loaders
 
 Django 1.2 changes the template loading mechanism to use a class-based
 approach. Old style function-based template loaders will still work, but should
-be updated to use the new :ref:`class-based template loaders
-<topic-template-alternate-language>`.
+be updated to use the new class-based template loaders.

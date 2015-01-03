@@ -2,11 +2,9 @@
 The Django template language
 ============================
 
-.. admonition:: About this document
-
-    This document explains the language syntax of the Django template system. If
-    you're looking for a more technical perspective on how it works and how to
-    extend it, see :doc:`/ref/templates/api`.
+This document explains the language syntax of the Django template system. If
+you're looking for a more technical perspective on how it works and how to
+extend it, see :doc:`/ref/templates/api`.
 
 Django's template language is designed to strike a balance between power and
 ease. It's designed to feel comfortable to those used to working with HTML. If
