@@ -15,6 +15,16 @@ def render_to_response_view(request):
     })
 
 
+def render_to_response_view_with_multiple_templates(request):
+    return render_to_response([
+        'shortcuts/no_such_template.html',
+        'shortcuts/render_test.html',
+    ], {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    })
+
+
 def render_to_response_view_with_request_context(request):
     return render_to_response('shortcuts/render_test.html', {
         'foo': 'FOO',
@@ -45,6 +55,16 @@ def render_to_response_with_context_instance_misuse(request):
 
 def render_view(request):
     return render(request, 'shortcuts/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    })
+
+
+def render_view_with_multiple_templates(request):
+    return render(request, [
+        'shortcuts/no_such_template.html',
+        'shortcuts/render_test.html',
+    ], {
         'foo': 'FOO',
         'bar': 'BAR',
     })
