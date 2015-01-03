@@ -124,24 +124,24 @@ class Command(BaseCommand):
 
         # Print some useful info
         if self.verbosity >= 1:
-            self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
+            self.info(self.style.MIGRATE_HEADING("Operations to perform:"))
             if run_syncdb and executor.loader.unmigrated_apps:
-                self.stdout.write(
+                self.info(
                     self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
                     (", ".join(executor.loader.unmigrated_apps))
                 )
             if target_app_labels_only:
-                self.stdout.write(
+                self.info(
                     self.style.MIGRATE_LABEL("  Apply all migrations: ") +
                     (", ".join(set(a for a, n in targets)) or "(none)")
                 )
             else:
                 if targets[0][1] is None:
-                    self.stdout.write(self.style.MIGRATE_LABEL(
+                    self.info(self.style.MIGRATE_LABEL(
                         "  Unapply all migrations: ") + "%s" % (targets[0][0], )
                     )
                 else:
-                    self.stdout.write(self.style.MIGRATE_LABEL(
+                    self.info(self.style.MIGRATE_LABEL(
                         "  Target specific migration: ") + "%s, from %s"
                         % (targets[0][1], targets[0][0])
                     )
@@ -152,7 +152,7 @@ class Command(BaseCommand):
         # the list of models about to be installed.
         if run_syncdb and executor.loader.unmigrated_apps:
             if self.verbosity >= 1:
-                self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
+                self.info(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
             created_models = self.sync_apps(connection, executor.loader.unmigrated_apps)
         else:
             created_models = []
@@ -172,10 +172,10 @@ class Command(BaseCommand):
 
         # Migrate!
         if self.verbosity >= 1:
-            self.stdout.write(self.style.MIGRATE_HEADING("Running migrations:"))
+            self.info(self.style.MIGRATE_HEADING("Running migrations:"))
         if not plan:
             if self.verbosity >= 1:
-                self.stdout.write("  No migrations to apply.")
+                self.info("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them how to fix it.
                 autodetector = MigrationAutodetector(
                     executor.loader.project_state(),
@@ -183,11 +183,11 @@ class Command(BaseCommand):
                 )
                 changes = autodetector.changes(graph=executor.loader.graph)
                 if changes:
-                    self.stdout.write(self.style.NOTICE(
+                    self.info(self.style.NOTICE(
                         "  Your models have changes that are not yet reflected "
                         "in a migration, and so won't be applied."
                     ))
-                    self.stdout.write(self.style.NOTICE(
+                    self.info(self.style.NOTICE(
                         "  Run 'manage.py makemigrations' to make new "
                         "migrations, and then re-run 'manage.py migrate' to "
                         "apply them."
@@ -202,21 +202,19 @@ class Command(BaseCommand):
     def migration_progress_callback(self, action, migration, fake=False):
         if self.verbosity >= 1:
             if action == "apply_start":
-                self.stdout.write("  Applying %s..." % migration, ending="")
-                self.stdout.flush()
+                self.info(("  Applying %s..." % migration).rstrip('\n'))
             elif action == "apply_success":
                 if fake:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED"))
+                    self.info(self.style.MIGRATE_SUCCESS(" FAKED"))
                 else:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
+                    self.info(self.style.MIGRATE_SUCCESS(" OK"))
             elif action == "unapply_start":
-                self.stdout.write("  Unapplying %s..." % migration, ending="")
-                self.stdout.flush()
+                self.info(("  Unapplying %s..." % migration).rstrip('\n'))
             elif action == "unapply_success":
                 if fake:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED"))
+                    self.info(self.style.MIGRATE_SUCCESS(" FAKED"))
                 else:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK"))
+                    self.info(self.style.MIGRATE_SUCCESS(" OK"))
 
     def sync_apps(self, connection, app_labels):
         "Runs the old syncdb-style operation on a list of app_labels."
@@ -252,7 +250,7 @@ class Command(BaseCommand):
 
             # Create the tables for each model
             if self.verbosity >= 1:
-                self.stdout.write("  Creating tables...\n")
+                self.info("  Creating tables...\n")
             with transaction.atomic(using=connection.alias, savepoint=connection.features.can_rollback_ddl):
                 deferred_sql = []
                 for app_name, model_list in manifest.items():
@@ -260,19 +258,19 @@ class Command(BaseCommand):
                         if model._meta.proxy or not model._meta.managed:
                             continue
                         if self.verbosity >= 3:
-                            self.stdout.write(
+                            self.info(
                                 "    Processing %s.%s model\n" % (app_name, model._meta.object_name)
                             )
                         with connection.schema_editor() as editor:
                             if self.verbosity >= 1:
-                                self.stdout.write("    Creating table %s\n" % model._meta.db_table)
+                                self.info("    Creating table %s\n" % model._meta.db_table)
                             editor.create_model(model)
                             deferred_sql.extend(editor.deferred_sql)
                             editor.deferred_sql = []
                         created_models.add(model)
 
                 if self.verbosity >= 1:
-                    self.stdout.write("    Running deferred SQL...\n")
+                    self.info("    Running deferred SQL...\n")
                 for statement in deferred_sql:
                     cursor.execute(statement)
         finally:
@@ -284,14 +282,14 @@ class Command(BaseCommand):
             # Install custom SQL for the app (but only if this
             # is a model we've just created)
             if self.verbosity >= 1:
-                self.stdout.write("  Installing custom SQL...\n")
+                self.info("  Installing custom SQL...\n")
             for app_name, model_list in manifest.items():
                 for model in model_list:
                     if model in created_models:
                         custom_sql = custom_sql_for_model(model, no_style(), connection)
                         if custom_sql:
                             if self.verbosity >= 2:
-                                self.stdout.write(
+                                self.info(
                                     "    Installing custom SQL for %s.%s model\n" %
                                     (app_name, model._meta.object_name)
                                 )
@@ -308,7 +306,7 @@ class Command(BaseCommand):
                                     traceback.print_exc()
                         else:
                             if self.verbosity >= 3:
-                                self.stdout.write(
+                                self.info(
                                     "    No custom SQL for %s.%s model\n" %
                                     (app_name, model._meta.object_name)
                                 )
@@ -348,7 +346,7 @@ class Command(BaseCommand):
         # For each app, print its migrations in order from oldest (roots) to
         # newest (leaves).
         for app_name in app_names:
-            self.stdout.write(app_name, self.style.MIGRATE_LABEL)
+            self.info(app_name, self.style.MIGRATE_LABEL)
             shown = set()
             for node in graph.leaf_nodes(app_name):
                 for plan_node in graph.forwards_plan(node):
@@ -359,10 +357,10 @@ class Command(BaseCommand):
                             title += " (%s squashed migrations)" % len(graph.nodes[plan_node].replaces)
                         # Mark it as applied/unapplied
                         if plan_node in loader.applied_migrations:
-                            self.stdout.write(" [X] %s" % title)
+                            self.info(" [X] %s" % title)
                         else:
-                            self.stdout.write(" [ ] %s" % title)
+                            self.info(" [ ] %s" % title)
                         shown.add(plan_node)
             # If we didn't print anything, then a small message
             if not shown:
-                self.stdout.write(" (no migrations)", self.style.MIGRATE_FAILURE)
+                self.info(" (no migrations)", self.style.MIGRATE_FAILURE)
