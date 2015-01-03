@@ -529,7 +529,7 @@ Internationalization: in template code
 
 .. highlightlang:: html+django
 
-Translations in :doc:`Django templates </topics/templates>` uses two template
+Translations in :doc:`Django templates </ref/templates/language>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
 access to these tags, put ``{% load i18n %}`` toward the top of your template.
 As with all template tags, this tag needs to be loaded in all templates which
