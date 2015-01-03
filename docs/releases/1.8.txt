@@ -161,12 +161,19 @@ Minor features
 * :class:`~django.contrib.auth.forms.PasswordResetForm` now
   has a method :meth:`~django.contrib.auth.forms.PasswordResetForm.send_email`
   that can be overridden to customize the mail to be sent.
+
 * The ``max_length`` of :attr:`Permission.name
   <django.contrib.auth.models.Permission.name>` has been increased from 50 to
   255 characters. Please run the database migration.
+
 * :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` and
   :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
   :class:`~django.db.models.ForeignKey`\s.
+
+* The default iteration count for the PBKDF2 password hasher has been
+  increased by 33%. This backwards compatible change will not affect users who
+  have subclassed ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to
+  change the default value.
 
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
