@@ -883,9 +883,8 @@ class FieldFlagsTests(test.TestCase):
 
     def test_model_and_reverse_model_should_equal_on_relations(self):
         for field in AllFieldsModel._meta.get_fields():
-            if field.has_relation and field.related_model:
-                if field.related_model is None:
-                    continue
+            is_concrete_forward_field = field.concrete and field.related_model
+            if is_concrete_forward_field:
                 reverse_field = field.rel
                 self.assertEqual(field.model, reverse_field.related_model)
                 self.assertEqual(field.related_model, reverse_field.model)
