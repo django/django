@@ -222,12 +222,12 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     """
     Secure password hashing using the PBKDF2 algorithm (recommended)
 
-    Configured to use PBKDF2 + HMAC + SHA256 with 12000 iterations.
+    Configured to use PBKDF2 + HMAC + SHA256 with 15000 iterations.
     The result is a 64 byte binary string.  Iterations may be changed
     safely but you must rename the algorithm if you change SHA256.
     """
     algorithm = "pbkdf2_sha256"
-    iterations = 12000
+    iterations = 15000
     digest = hashlib.sha256
 
     def encode(self, password, salt, iterations=None):
