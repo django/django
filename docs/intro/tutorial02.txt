@@ -578,7 +578,7 @@ more sensible to modify the *application's* templates, rather than those in the
 *project*. That way, you could include the polls application in any new project
 and be assured that it would find the custom templates it needed.
 
-See the :ref:`template loader documentation <template-loaders>` for more
+See the :ref:`template loading documentation <template-loading>` for more
 information about how Django finds its templates.
 
 Customize the admin index page

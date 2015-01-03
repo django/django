@@ -2,55 +2,21 @@
 The Django template language: For Python programmers
 ====================================================
 
-.. module:: django.template
-    :synopsis: Django's template system
+.. currentmodule:: django.template
 
 This document explains the Django template system from a technical
 perspective -- how it works and how to extend it. If you're just looking for
 reference on the language syntax, see :doc:`/ref/templates/language`.
+
+It assumes an understanding of templates, contexts, variables, tags, and
+rendering. Start with the :ref:`introduction to the Django template language
+<template-language-intro>` if you aren't familiar with these concepts.
 
 If you're looking to use the Django template system as part of another
 application -- i.e., without the rest of the framework -- make sure to read
 the `configuration`_ section later in this document.
 
 .. _configuration: `configuring the template system in standalone mode`_
-
-Basics
-======
-
-A **template** is a text document, or a normal Python string, that is marked-up
-using the Django template language. A template can contain **block tags** or
-**variables**.
-
-A **block tag** is a symbol within a template that does something.
-
-This definition is deliberately vague. For example, a block tag can output
-content, serve as a control structure (an "if" statement or "for" loop), grab
-content from a database or enable access to other template tags.
-
-Block tags are surrounded by ``"{%"`` and ``"%}"``.
-
-Example template with block tags:
-
-.. code-block:: html+django
-
-    {% if is_logged_in %}Thanks for logging in!{% else %}Please log in.{% endif %}
-
-A **variable** is a symbol within a template that outputs a value.
-
-Variable tags are surrounded by ``"{{"`` and ``"}}"``.
-
-Example template with variables:
-
-.. code-block:: html+django
-
-    My first name is {{ first_name }}. My last name is {{ last_name }}.
-
-A **context** is a "variable name" -> "variable value" mapping that is passed
-to a template.
-
-A template **renders** a context by replacing the variable "holes" with values
-from the context and executing all block tags.
 
 Using the template system
 =========================
@@ -87,7 +53,7 @@ takes one argument -- the raw template code::
 Rendering a context
 -------------------
 
-.. method:: render(context)
+.. method:: Template.render(context)
 
 Once you have a compiled ``Template`` object, you can render a context -- or
 multiple contexts -- with it. The ``Context`` class lives at
@@ -518,6 +484,11 @@ optional, third positional argument, ``processors``. In this example, the
     the same as a call to :func:`~django.shortcuts.render_to_response()` with a
     ``context_instance`` argument that forces the use of a ``RequestContext``.
 
+.. _context-processors:
+
+Context processors
+------------------
+
 Here's what each of the default processors does:
 
 django.contrib.auth.context_processors.auth
@@ -657,88 +628,6 @@ templates are readable by the Web server. They can have any extension you want,
 such as ``.html`` or ``.txt``, or they can have no extension at all.
 
 Note that these paths should use Unix-style forward slashes, even on Windows.
-
-.. _ref-templates-api-the-python-api:
-
-The Python API
-~~~~~~~~~~~~~~
-
-.. module:: django.template.loader
-
-``django.template.loader`` has two functions to load templates from files:
-
-.. function:: get_template(template_name[, dirs])
-
-    ``get_template`` returns the compiled template (a ``Template`` object) for
-    the template with the given name. If the template doesn't exist, it raises
-    ``django.template.TemplateDoesNotExist``.
-
-    .. versionchanged:: 1.7
-
-       The ``dirs`` parameter was added.
-
-    .. versionchanged:: 1.8
-
-       The ``dirs`` parameter was deprecated.
-
-.. function:: select_template(template_name_list[, dirs])
-
-    ``select_template`` is just like ``get_template``, except it takes a list
-    of template names. Of the list, it returns the first template that exists.
-
-    .. versionchanged:: 1.7
-
-       The ``dirs`` parameter was added.
-
-    .. versionchanged:: 1.8
-
-       The ``dirs`` parameter was deprecated.
-
-For example, if you call ``get_template('story_detail.html')`` and have the
-above :setting:`DIRS <TEMPLATES-DIRS>` option, here are the files Django will
-look for, in order:
-
-* ``/home/html/templates/lawrence.com/story_detail.html``
-* ``/home/html/templates/default/story_detail.html``
-
-If you call ``select_template(['story_253_detail.html', 'story_detail.html'])``,
-here's what Django will look for:
-
-* ``/home/html/templates/lawrence.com/story_253_detail.html``
-* ``/home/html/templates/default/story_253_detail.html``
-* ``/home/html/templates/lawrence.com/story_detail.html``
-* ``/home/html/templates/default/story_detail.html``
-
-When Django finds a template that exists, it stops looking.
-
-.. admonition:: Tip
-
-    You can use ``select_template()`` for super-flexible "templatability." For
-    example, if you've written a news story and want some stories to have
-    custom templates, use something like
-    ``select_template(['story_%s_detail.html' % story.id, 'story_detail.html'])``.
-    That'll allow you to use a custom template for an individual story, with a
-    fallback template for stories that don't have custom templates.
-
-Using subdirectories
-~~~~~~~~~~~~~~~~~~~~
-
-It's possible -- and preferable -- to organize templates in subdirectories of
-the template directory. The convention is to make a subdirectory for each
-Django app, with subdirectories within those subdirectories as needed.
-
-Do this for your own sanity. Storing all templates in the root level of a
-single directory gets messy.
-
-To load a template that's within a subdirectory, just use a slash, like so::
-
-    get_template('news/story_detail.html')
-
-Using the same :setting:`DIRS <TEMPLATES-DIRS>` option from above, this
-example ``get_template()`` call will attempt to load the following templates:
-
-* ``/home/html/templates/lawrence.com/news/story_detail.html``
-* ``/home/html/templates/default/news/story_detail.html``
 
 .. _template-loaders:
 
@@ -892,6 +781,26 @@ loaders that come with Django:
 Django uses the template loaders in order according to the ``'loaders'``
 option. It uses each loader until a loader finds a match.
 
+.. _custom-template-loaders:
+
+Custom loaders
+~~~~~~~~~~~~~~
+
+Custom ``Loader`` classes should inherit from
+``django.template.loaders.base.Loader`` and override the
+``load_template_source()`` method, which takes a ``template_name`` argument,
+loads the template from disk (or elsewhere), and returns a tuple:
+``(template_string, template_origin)``.
+
+.. versionchanged:: 1.8
+
+    ``django.template.loaders.base.Loader`` used to be defined at
+    ``django.template.loader.BaseLoader``.
+
+The ``load_template()`` method of the ``Loader`` class retrieves the template
+string by calling ``load_template_source()``, instantiates a ``Template`` from
+the template source, and returns a tuple: ``(template, template_origin)``.
+
 .. currentmodule:: django.template
 
 Template origin
@@ -927,48 +836,6 @@ When :setting:`TEMPLATE_DEBUG` is ``True`` template objects will have an
 
         The string used to create the template.
 
-The ``render_to_string`` shortcut
-===================================
-
-.. function:: loader.render_to_string(template_name, context=None, context_instance=None)
-
-To cut down on the repetitive nature of loading and rendering
-templates, Django provides a shortcut function which largely
-automates the process: ``render_to_string()`` in
-:mod:`django.template.loader`, which loads a template, renders it and
-returns the resulting string::
-
-    from django.template.loader import render_to_string
-    rendered = render_to_string('my_template.html', {'foo': 'bar'})
-
-The ``render_to_string`` shortcut takes one required argument --
-``template_name``, which should be the name of the template to load
-and render (or a list of template names, in which case Django will use
-the first template in the list that exists) -- and two optional arguments:
-
-``context``
-    A dictionary to be used as variables and values for the
-    template's context. This should be passed as the second
-    positional argument.
-
-    .. versionchanged:: 1.8
-
-       The ``context`` argument used to be called ``dictionary``. That name
-       is deprecated in Django 1.8 and will be removed in Django 2.0.
-
-``context_instance``
-    An instance of :class:`~django.template.Context` or a subclass (e.g., an
-    instance of :class:`~django.template.RequestContext`) to use as the
-    template's context. This can also be passed as the third positional argument.
-
-    .. deprecated:: 1.8
-
-       The ``context_instance`` argument is deprecated. Simply use ``context``.
-
-See also the :func:`~django.shortcuts.render_to_response()` shortcut, which
-calls ``render_to_string`` and feeds the result into an :class:`~django.http.HttpResponse`
-suitable for returning directly from a view.
-
 Configuring the template system in standalone mode
 ==================================================
 
@@ -998,71 +865,3 @@ and :setting:`TEMPLATE_DEBUG`. If you plan to use the :ttag:`url` template tag,
 you will also need to set the :setting:`ROOT_URLCONF` setting. All available
 settings are described in the :doc:`settings documentation </ref/settings>`,
 and any setting starting with ``TEMPLATE_`` is of obvious interest.
-
-.. _topic-template-alternate-language:
-
-Using an alternative template language
-======================================
-
-The Django ``Template`` and ``Loader`` classes implement a simple API for
-loading and rendering templates. By providing some simple wrapper classes that
-implement this API we can use third party template systems like `Jinja2
-<http://jinja.pocoo.org/docs/>`_. This
-allows us to use third-party template libraries without giving up useful Django
-features like the Django ``Context`` object and handy shortcuts like
-:func:`~django.shortcuts.render_to_response()`.
-
-The core component of the Django templating system is the ``Template`` class.
-This class has a very simple interface: it has a constructor that takes a single
-positional argument specifying the template string, and a ``render()`` method
-that takes a :class:`~django.template.Context` object and returns a string
-containing the rendered response.
-
-Suppose we're using a template language that defines a ``Template`` object with
-a ``render()`` method that takes a dictionary rather than a ``Context`` object.
-We can write a simple wrapper that implements the Django ``Template`` interface::
-
-    import some_template_language
-    class Template(some_template_language.Template):
-        def render(self, context):
-            # flatten the Django Context into a single dictionary.
-            context_dict = {}
-            for d in context.dicts:
-                context_dict.update(d)
-            return super(Template, self).render(context_dict)
-
-That's all that's required to make our fictional ``Template`` class compatible
-with the Django loading and rendering system!
-
-The next step is to write a ``Loader`` class that returns instances of our custom
-template class instead of the default :class:`~django.template.Template`. Custom ``Loader``
-classes should inherit from ``django.template.loaders.base.Loader`` and override
-the ``load_template_source()`` method, which takes a ``template_name`` argument,
-loads the template from disk (or elsewhere), and returns a tuple:
-``(template_string, template_origin)``.
-
-.. versionchanged:: 1.8
-
-    ``django.template.loaders.base.Loader`` used to be defined at
-    ``django.template.loader.BaseLoader``.
-
-The ``load_template()`` method of the ``Loader`` class retrieves the template
-string by calling ``load_template_source()``, instantiates a ``Template`` from
-the template source, and returns a tuple: ``(template, template_origin)``. Since
-this is the method that actually instantiates the ``Template``, we'll need to
-override it to use our custom template class instead. We can inherit from the
-builtin :class:`django.template.loaders.app_directories.Loader` to take advantage
-of the ``load_template_source()`` method implemented there::
-
-    from django.template.loaders import app_directories
-    class Loader(app_directories.Loader):
-        is_usable = True
-
-        def load_template(self, template_name, template_dirs=None):
-            source, origin = self.load_template_source(template_name, template_dirs)
-            template = Template(source)
-            return template, origin
-
-Finally, we need to modify our project settings, telling Django to use our custom
-loader. Now we can write all of our templates in our alternative template
-language while continuing to use the rest of the Django templating system.
