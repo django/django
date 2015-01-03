@@ -41,12 +41,12 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Installation <intro/install>`
 
 * **Tutorial:**
-  :doc:`Part 1 <intro/tutorial01>` |
-  :doc:`Part 2 <intro/tutorial02>` |
-  :doc:`Part 3 <intro/tutorial03>` |
-  :doc:`Part 4 <intro/tutorial04>` |
-  :doc:`Part 5 <intro/tutorial05>` |
-  :doc:`Part 6 <intro/tutorial06>`
+  :doc:`Part 1: Models <intro/tutorial01>` |
+  :doc:`Part 2: The admin site <intro/tutorial02>` |
+  :doc:`Part 3: Views and templates <intro/tutorial03>` |
+  :doc:`Part 4: Forms and generic views <intro/tutorial04>` |
+  :doc:`Part 5: Testing <intro/tutorial05>` |
+  :doc:`Part 6: Static files <intro/tutorial06>`
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
