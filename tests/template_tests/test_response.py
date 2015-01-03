@@ -1,17 +1,18 @@
 from __future__ import unicode_literals
 
+from datetime import datetime
 import os
 import pickle
 import time
-from datetime import datetime
 
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, SimpleTestCase
 from django.conf import settings
 from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
-from django.test import override_settings
+from django.test import ignore_warnings, override_settings
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 def test_processor(request):
@@ -25,7 +26,7 @@ class CustomURLConfMiddleware(object):
         request.urlconf = 'template_tests.alternate_urls'
 
 
-class SimpleTemplateResponseTest(TestCase):
+class SimpleTemplateResponseTest(SimpleTestCase):
 
     def _response(self, template='foo', *args, **kwargs):
         return SimpleTemplateResponse(Template(template), *args, **kwargs)
@@ -206,11 +207,14 @@ class SimpleTemplateResponseTest(TestCase):
         self.assertEqual(unpickled_response.cookies['key'].value, 'value')
 
 
-@override_settings(
-    TEMPLATE_CONTEXT_PROCESSORS=[test_processor_name],
-    TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates')),
-)
-class TemplateResponseTest(TestCase):
+@override_settings(TEMPLATES=[{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+    'OPTIONS': {
+        'context_processors': [test_processor_name],
+    },
+}])
+class TemplateResponseTest(SimpleTestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -233,6 +237,12 @@ class TemplateResponseTest(TestCase):
                                   Context({'foo': 'bar'})).render()
         self.assertEqual(response.content, b'bar')
 
+    def test_context_processor_priority(self):
+        # context processors should be overridden by passed-in context
+        response = self._response('{{ foo }}{{ processors }}',
+                                  {'processors': 'no'}).render()
+        self.assertEqual(response.content, b'no')
+
     def test_kwargs(self):
         response = self._response(content_type='application/json',
                                   status=504)
@@ -245,12 +255,13 @@ class TemplateResponseTest(TestCase):
         self.assertEqual(response['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_custom_app(self):
         response = self._response('{{ foo }}', current_app="foobar")
 
         rc = response.resolve_context(response.context_data)
 
-        self.assertEqual(rc.current_app, 'foobar')
+        self.assertEqual(rc.request.current_app, 'foobar')
 
     def test_pickling(self):
         # Create a template response. The context is
@@ -305,7 +316,7 @@ class TemplateResponseTest(TestCase):
     ],
     ROOT_URLCONF='template_tests.urls',
 )
-class CustomURLConfTest(TestCase):
+class CustomURLConfTest(SimpleTestCase):
 
     def test_custom_urlconf(self):
         response = self.client.get('/template_response_view/')
@@ -321,7 +332,7 @@ class CustomURLConfTest(TestCase):
     ],
     ROOT_URLCONF='template_tests.alternate_urls',
 )
-class CacheMiddlewareTest(TestCase):
+class CacheMiddlewareTest(SimpleTestCase):
 
     def test_middleware_caching(self):
         response = self.client.get('/template_response_view/')

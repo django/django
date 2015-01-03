@@ -82,9 +82,12 @@ class ArrayField(Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super(ArrayField, self).deconstruct()
-        path = 'django.contrib.postgres.fields.ArrayField'
-        args.insert(0, self.base_field)
-        kwargs['size'] = self.size
+        if path == 'django.contrib.postgres.fields.array.ArrayField':
+            path = 'django.contrib.postgres.fields.ArrayField'
+        kwargs.update({
+            'base_field': self.base_field,
+            'size': self.size,
+        })
         return name, path, args, kwargs
 
     def to_python(self, value):
@@ -93,14 +96,6 @@ class ArrayField(Field):
             vals = json.loads(value)
             value = [self.base_field.to_python(val) for val in vals]
         return value
-
-    def get_default(self):
-        """Overridden from the default to prevent string-mangling."""
-        if self.has_default():
-            if callable(self.default):
-                return self.default()
-            return self.default
-        return ''
 
     def value_to_string(self, obj):
         values = []
@@ -164,11 +159,11 @@ class ArrayField(Field):
 class ArrayContainsLookup(Lookup):
     lookup_name = 'contains'
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
-        type_cast = self.lhs.source.db_type(connection)
+        type_cast = self.lhs.output_field.db_type(connection)
         return '%s @> %s::%s' % (lhs, rhs, type_cast), params
 
 
@@ -176,9 +171,9 @@ class ArrayContainsLookup(Lookup):
 class ArrayContainedByLookup(Lookup):
     lookup_name = 'contained_by'
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
         return '%s <@ %s' % (lhs, rhs), params
 
@@ -187,9 +182,9 @@ class ArrayContainedByLookup(Lookup):
 class ArrayOverlapLookup(Lookup):
     lookup_name = 'overlap'
 
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
         return '%s && %s' % (lhs, rhs), params
 
@@ -202,8 +197,8 @@ class ArrayLenTransform(Transform):
     def output_field(self):
         return IntegerField()
 
-    def as_sql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs, params = compiler.compile(self.lhs)
         return 'array_length(%s, 1)' % lhs, params
 
 
@@ -214,8 +209,8 @@ class IndexTransform(Transform):
         self.index = index
         self.base_field = base_field
 
-    def as_sql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs, params = compiler.compile(self.lhs)
         return '%s[%s]' % (lhs, self.index), params
 
     @property
@@ -240,8 +235,8 @@ class SliceTransform(Transform):
         self.start = start
         self.end = end
 
-    def as_sql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
+    def as_sql(self, compiler, connection):
+        lhs, params = compiler.compile(self.lhs)
         return '%s[%s:%s]' % (lhs, self.start, self.end), params
 
 

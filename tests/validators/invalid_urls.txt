@@ -1,0 +1,12 @@
+foo
+http://
+http://example
+http://example.
+http://.com
+http://invalid-.com
+http://-invalid.com
+http://invalid.com-
+http://inv-.alid-.com
+http://inv-.-alid.com
+file://localhost/path
+git://example.com/

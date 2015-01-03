@@ -44,12 +44,12 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
                     "Invalid password format or unknown hashing algorithm."))
             else:
                 summary = format_html_join('',
-                                           "<strong>{0}</strong>: {1} ",
+                                           "<strong>{}</strong>: {} ",
                                            ((ugettext(key), value)
                                             for key, value in hasher.safe_summary(encoded).items())
                                            )
 
-        return format_html("<div{0}>{1}</div>", flatatt(final_attrs), summary)
+        return format_html("<div{}>{}</div>", flatatt(final_attrs), summary)
 
 
 class ReadOnlyPasswordHashField(forms.Field):
@@ -337,10 +337,15 @@ class AdminPasswordChangeForm(forms.Form):
         'password_mismatch': _("The two password fields didn't match."),
     }
     required_css_class = 'required'
-    password1 = forms.CharField(label=_("Password"),
-                                widget=forms.PasswordInput)
-    password2 = forms.CharField(label=_("Password (again)"),
-                                widget=forms.PasswordInput)
+    password1 = forms.CharField(
+        label=_("Password"),
+        widget=forms.PasswordInput,
+    )
+    password2 = forms.CharField(
+        label=_("Password (again)"),
+        widget=forms.PasswordInput,
+        help_text=_("Enter the same password as above, for verification."),
+    )
 
     def __init__(self, user, *args, **kwargs):
         self.user = user

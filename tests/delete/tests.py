@@ -5,7 +5,7 @@ from math import ceil
 from django.db import models, IntegrityError, connection
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 from .models import (R, RChild, S, T, A, M, MR, MRNull,
     create_a, get_default_r, User, Avatar, HiddenUser, HiddenUserProfile,
@@ -169,7 +169,7 @@ class DeletionTests(TestCase):
 
     def test_bulk(self):
         s = S.objects.create(r=R.objects.create())
-        for i in xrange(2 * GET_ITERATOR_CHUNK_SIZE):
+        for i in range(2 * GET_ITERATOR_CHUNK_SIZE):
             T.objects.create(s=s)
         #   1 (select related `T` instances)
         # + 1 (select related `U` instances)
@@ -332,10 +332,10 @@ class DeletionTests(TestCase):
     def test_large_delete_related(self):
         TEST_SIZE = 2000
         s = S.objects.create(r=R.objects.create())
-        for i in xrange(TEST_SIZE):
+        for i in range(TEST_SIZE):
             T.objects.create(s=s)
 
-        batch_size = max(connection.ops.bulk_batch_size(['pk'], xrange(TEST_SIZE)), 1)
+        batch_size = max(connection.ops.bulk_batch_size(['pk'], range(TEST_SIZE)), 1)
 
         # TEST_SIZE // batch_size (select related `T` instances)
         # + 1 (select related `U` instances)

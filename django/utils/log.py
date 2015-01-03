@@ -109,7 +109,7 @@ class AdminEmailHandler(logging.Handler):
                 record.getMessage()
             )
             filter = get_exception_reporter_filter(request)
-            request_repr = '\n{0}'.format(force_text(filter.get_request_repr(request)))
+            request_repr = '\n{}'.format(force_text(filter.get_request_repr(request)))
         except Exception:
             subject = '%s: %s' % (
                 record.levelname,
@@ -127,9 +127,10 @@ class AdminEmailHandler(logging.Handler):
         message = "%s\n\nRequest repr(): %s" % (self.format(record), request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
         html_message = reporter.get_traceback_html() if self.include_html else None
-        mail.mail_admins(subject, message, fail_silently=True,
-                         html_message=html_message,
-                         connection=self.connection())
+        self.send_mail(subject, message, fail_silently=True, html_message=html_message)
+
+    def send_mail(self, subject, message, *args, **kwargs):
+        mail.mail_admins(subject, message, *args, connection=self.connection(), **kwargs)
 
     def connection(self):
         return get_connection(backend=self.email_backend, fail_silently=True)

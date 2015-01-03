@@ -30,10 +30,3 @@ class SpatiaLiteCreation(DatabaseCreation):
                               style.SQL_FIELD(gqn(f.column)) + ');')
 
         return output
-
-    def _create_test_db_pre_migrate_sql(self):
-        """
-        Creates the spatial metadata tables.
-        """
-        cur = self.connection._cursor()
-        cur.execute("SELECT InitSpatialMetaData()")

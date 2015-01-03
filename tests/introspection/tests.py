@@ -2,18 +2,21 @@ from __future__ import unicode_literals
 
 from django.db import connection
 from django.db.utils import DatabaseError
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import Reporter, Article
 
 
-class IntrospectionTests(TestCase):
+class IntrospectionTests(TransactionTestCase):
+
+    available_apps = ['introspection']
+
     def test_table_names(self):
         tl = connection.introspection.table_names()
         self.assertEqual(tl, sorted(tl))
-        self.assertTrue(Reporter._meta.db_table in tl,
+        self.assertIn(Reporter._meta.db_table, tl,
                      "'%s' isn't in table_list()." % Reporter._meta.db_table)
-        self.assertTrue(Article._meta.db_table in tl,
+        self.assertIn(Article._meta.db_table, tl,
                      "'%s' isn't in table_list()." % Article._meta.db_table)
 
     def test_django_table_names(self):
@@ -25,13 +28,9 @@ class IntrospectionTests(TestCase):
                              "django_table_names() returned a non-Django table")
 
     def test_django_table_names_retval_type(self):
-        # Ticket #15216
-        with connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
-
+        #15216 - Table name is a list
         tl = connection.introspection.django_table_names(only_existing=True)
         self.assertIs(type(tl), list)
-
         tl = connection.introspection.django_table_names(only_existing=False)
         self.assertIs(type(tl), list)
 
@@ -60,7 +59,7 @@ class IntrospectionTests(TestCase):
     def test_sequence_list(self):
         sequences = connection.introspection.sequence_list()
         expected = {'table': Reporter._meta.db_table, 'column': 'id'}
-        self.assertTrue(expected in sequences,
+        self.assertIn(expected, sequences,
                      'Reporter sequence not found in sequence_list()')
 
     def test_get_table_description_names(self):

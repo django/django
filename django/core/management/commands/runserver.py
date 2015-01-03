@@ -12,7 +12,7 @@ from django.core.servers.basehttp import run, get_internal_wsgi_application
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
 from django.utils import autoreload
-from django.utils.encoding import get_system_encoding
+from django.utils.encoding import force_text, get_system_encoding
 from django.utils import six
 from django.core.exceptions import ImproperlyConfigured
 
@@ -40,6 +40,14 @@ class Command(BaseCommand):
             help='Tells Django to NOT use threading.')
         parser.add_argument('--noreload', action='store_false', dest='use_reloader', default=True,
             help='Tells Django to NOT use the auto-reloader.')
+
+    def execute(self, *args, **options):
+        if options.get('no_color'):
+            # We rely on the environment because it's currently the only
+            # way to reach WSGIRequestHandler. This seems an acceptable
+            # compromise considering `runserver` runs indefinitely.
+            os.environ[str("DJANGO_COLORS")] = str("nocolor")
+        super(Command, self).execute(*args, **options)
 
     def get_handler(self, *args, **options):
         """
@@ -140,7 +148,7 @@ class Command(BaseCommand):
             try:
                 error_text = ERRORS[e.errno]
             except KeyError:
-                error_text = str(e)
+                error_text = force_text(e)
             self.stderr.write("Error: %s" % error_text)
             # Need to use an OS exit because sys.exit doesn't work in a thread
             os._exit(1)

@@ -530,7 +530,7 @@ class GeoQuerySet(QuerySet):
             # transformation SQL.
             geom = geo_field.get_prep_value(settings['procedure_args'][name])
             params = geo_field.get_db_prep_lookup('contains', geom, connection=connection)
-            geom_placeholder = geo_field.get_placeholder(geom, connection)
+            geom_placeholder = geo_field.get_placeholder(geom, None, connection)
 
             # Replacing the procedure format with that of any needed
             # transformation SQL.

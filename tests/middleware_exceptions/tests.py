@@ -1,11 +1,13 @@
 import sys
 
 from django.conf import settings
+from django.core.exceptions import MiddlewareNotUsed
 from django.core.signals import got_request_exception
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.template import Template
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
+from django.test.utils import patch_logger
 
 
 class TestException(Exception):
@@ -832,3 +834,65 @@ class RootUrlconfTests(TestCase):
         # the previously defined settings.
         del settings.ROOT_URLCONF
         self.assertRaises(AttributeError, self.client.get, "/middleware_exceptions/view/")
+
+
+class MyMiddleware(object):
+
+    def __init__(self):
+        raise MiddlewareNotUsed
+
+    def process_request(self, request):
+        pass
+
+
+class MyMiddlewareWithExceptionMessage(object):
+
+    def __init__(self):
+        raise MiddlewareNotUsed('spam eggs')
+
+    def process_request(self, request):
+        pass
+
+
+@override_settings(
+    DEBUG=True,
+    ROOT_URLCONF='middleware_exceptions.urls',
+)
+class MiddlewareNotUsedTests(TestCase):
+
+    rf = RequestFactory()
+
+    def test_raise_exception(self):
+        request = self.rf.get('middleware_exceptions/view/')
+        with self.assertRaises(MiddlewareNotUsed):
+            MyMiddleware().process_request(request)
+
+    @override_settings(MIDDLEWARE_CLASSES=(
+        'middleware_exceptions.tests.MyMiddleware',
+    ))
+    def test_log(self):
+        with patch_logger('django.request', 'debug') as calls:
+            self.client.get('/middleware_exceptions/view/')
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(
+            calls[0],
+            "MiddlewareNotUsed: 'middleware_exceptions.tests.MyMiddleware'"
+        )
+
+    @override_settings(MIDDLEWARE_CLASSES=(
+        'middleware_exceptions.tests.MyMiddlewareWithExceptionMessage',
+    ))
+    def test_log_custom_message(self):
+        with patch_logger('django.request', 'debug') as calls:
+            self.client.get('/middleware_exceptions/view/')
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(
+            calls[0],
+            "MiddlewareNotUsed('middleware_exceptions.tests.MyMiddlewareWithExceptionMessage'): spam eggs"
+        )
+
+    @override_settings(DEBUG=False)
+    def test_do_not_log_when_debug_is_false(self):
+        with patch_logger('django.request', 'debug') as calls:
+            self.client.get('/middleware_exceptions/view/')
+        self.assertEqual(len(calls), 0)

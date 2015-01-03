@@ -3,14 +3,14 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from django.core import checks
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import connection
 from django.db import models, router, transaction, DEFAULT_DB_ALIAS
-from django.db.models import signals, FieldDoesNotExist, DO_NOTHING
+from django.db.models import signals, DO_NOTHING
 from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
-from django.db.models.related import PathInfo
-from django.db.models.sql.datastructures import Col
+from django.db.models.query_utils import PathInfo
+from django.db.models.expressions import Col
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_text, python_2_unicode_compatible
 
@@ -27,6 +27,7 @@ class GenericForeignKey(object):
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
         self.editable = False
+        self.rel = None
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
@@ -307,7 +308,7 @@ class GenericRelation(ForeignObject):
 
     def get_path_info(self):
         opts = self.rel.to._meta
-        target = opts.get_field_by_name(self.object_id_field_name)[0]
+        target = opts.pk
         return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
 
     def get_reverse_path_info(self):

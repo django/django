@@ -31,12 +31,13 @@
  to a non-existent file location (e.g., `GDAL_LIBRARY_PATH='/null/path'`;
  setting to None/False/'' will not work as a string must be given).
 """
-from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError, SRSException  # NOQA
+from django.contrib.gis.gdal.error import (check_err, GDALException,
+    OGRException, OGRIndexError, SRSException)  # NOQA
 from django.contrib.gis.gdal.geomtype import OGRGeomType  # NOQA
 
 __all__ = [
-    'check_err', 'OGRException', 'OGRIndexError', 'SRSException', 'OGRGeomType',
-    'HAS_GDAL',
+    'check_err', 'GDALException', 'OGRException', 'OGRIndexError',
+    'SRSException', 'OGRGeomType', 'HAS_GDAL',
 ]
 
 # Attempting to import objects that depend on the GDAL library.  The
@@ -46,6 +47,7 @@ try:
     from django.contrib.gis.gdal.driver import Driver  # NOQA
     from django.contrib.gis.gdal.datasource import DataSource  # NOQA
     from django.contrib.gis.gdal.libgdal import gdal_version, gdal_full_version, GDAL_VERSION  # NOQA
+    from django.contrib.gis.gdal.raster.source import GDALRaster  # NOQA
     from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform  # NOQA
     from django.contrib.gis.gdal.geometries import OGRGeometry  # NOQA
     HAS_GDAL = True
@@ -53,7 +55,7 @@ try:
         'Driver', 'DataSource', 'gdal_version', 'gdal_full_version',
         'GDAL_VERSION', 'SpatialReference', 'CoordTransform', 'OGRGeometry',
     ]
-except OGRException:
+except GDALException:
     HAS_GDAL = False
 
 try:

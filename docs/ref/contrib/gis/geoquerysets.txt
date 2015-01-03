@@ -1,5 +1,3 @@
-.. _ref-geoquerysets:
-
 =========================
 GeoQuerySet API Reference
 =========================
@@ -7,7 +5,6 @@ GeoQuerySet API Reference
 .. currentmodule:: django.contrib.gis.db.models
 
 .. class:: GeoQuerySet([model=None])
-
 
 .. _spatial-lookups:
 
@@ -730,7 +727,7 @@ the distance from the `Tasmanian`__ city of Hobart to every other
     :class:`~django.contrib.gis.measure.Distance` object, you can easily express
     the value in the units of your choice.  For example, ``city.distance.mi`` is
     the distance value in miles and ``city.distance.km`` is the distance value
-    in kilometers.  See the :ref:`ref-measure` for usage details and the list of
+    in kilometers.  See :doc:`measure` for usage details and the list of
     :ref:`supported_units`.
 
 __ https://github.com/django/django/blob/master/django/contrib/gis/tests/distapp/models.py
@@ -1233,4 +1230,4 @@ Returns the same as the :meth:`GeoQuerySet.union` aggregate method.
 .. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
 .. [#fnsdorelate] *See* `SDO_RELATE documentation <http://docs.oracle.com/cd/B19306_01/appdev.102/b14255/sdo_operat.htm#sthref845>`_, from Ch. 11 of the Oracle Spatial User's Guide and Manual.
 .. [#fncovers] For an explanation of this routine, read `Quirks of the "Contains" Spatial Predicate <http://lin-ear-th-inking.blogspot.com/2007/06/subtleties-of-ogc-covers-spatial.html>`_ by Martin Davis (a PostGIS developer).
-.. [#fncontainsproperly] Refer to the PostGIS ``ST_ContainsProperly`` `documentation <http://postgis.refractions.net/documentation/manual-1.4/ST_ContainsProperly.html>`_ for more details.
+.. [#fncontainsproperly] Refer to the PostGIS ``ST_ContainsProperly`` `documentation <http://postgis.net/docs/manual-1.5/ST_ContainsProperly.html>`_ for more details.

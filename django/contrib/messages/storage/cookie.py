@@ -41,8 +41,8 @@ class MessageDecoder(json.JSONDecoder):
                 return Message(*obj[2:])
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
-            return dict((key, self.process_messages(value))
-                        for key, value in six.iteritems(obj))
+            return {key: self.process_messages(value)
+                    for key, value in six.iteritems(obj)}
         return obj
 
     def decode(self, s, **kwargs):

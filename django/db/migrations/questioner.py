@@ -163,11 +163,15 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
         "Was this field really renamed?"
-        return self._boolean_input("Did you rename %s.%s to %s.%s (a %s)? [y/N]" % (model_name, old_name, model_name, new_name, field_instance.__class__.__name__), False)
+        msg = "Did you rename %s.%s to %s.%s (a %s)? [y/N]"
+        return self._boolean_input(msg % (model_name, old_name, model_name, new_name,
+                                          field_instance.__class__.__name__), False)
 
     def ask_rename_model(self, old_model_state, new_model_state):
         "Was this model really renamed?"
-        return self._boolean_input("Did you rename the %s.%s model to %s? [y/N]" % (old_model_state.app_label, old_model_state.name, new_model_state.name), False)
+        msg = "Did you rename the %s.%s model to %s? [y/N]"
+        return self._boolean_input(msg % (old_model_state.app_label, old_model_state.name,
+                                          new_model_state.name), False)
 
     def ask_merge(self, app_label):
         return self._boolean_input(

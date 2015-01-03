@@ -126,10 +126,10 @@ pygments_style = 'trac'
 # Links to Python's docs should reference the most recent version of the 3.x
 # branch, which is located at this URL.
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/3/', None),
+    'python': ('https://docs.python.org/3/', None),
     'sphinx': ('http://sphinx-doc.org/', None),
     'six': ('http://pythonhosted.org/six/', None),
-    'simplejson': ('http://simplejson.readthedocs.org/en/latest/', None),
+    'formtools': ('http://django-formtools.readthedocs.org/en/latest/', None),
 }
 
 # Python's docs don't change every week.

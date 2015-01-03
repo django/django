@@ -152,7 +152,7 @@ class SelectRelatedRegressTests(TestCase):
             self.assertEqual(qs[0].state, wa)
             # The select_related join wasn't promoted as there was already an
             # existing (even if trimmed) inner join to state.
-            self.assertFalse('LEFT OUTER' in str(qs.query))
+            self.assertNotIn('LEFT OUTER', str(qs.query))
         qs = Client.objects.select_related('state').order_by('name')
         with self.assertNumQueries(1):
             self.assertEqual(list(qs), [bob, jack])
@@ -160,7 +160,7 @@ class SelectRelatedRegressTests(TestCase):
             self.assertEqual(qs[1].state, wa)
             # The select_related join was promoted as there is already an
             # existing join.
-            self.assertTrue('LEFT OUTER' in str(qs.query))
+            self.assertIn('LEFT OUTER', str(qs.query))
 
     def test_regression_19870(self):
         hen = Hen.objects.create(name='Hen')

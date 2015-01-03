@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 import re
+import sys
 import uuid
 import warnings
 
@@ -20,9 +21,9 @@ from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
-from django.db.models import fields
-from django.db.models.sql import aggregates
-from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.db.models import fields, aggregates
+from django.utils.dateparse import parse_date, parse_datetime, parse_time, parse_duration
+from django.utils.duration import duration_string
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes
@@ -124,6 +125,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.uses_savepoints
 
     @cached_property
+    def can_share_in_memory_db(self):
+        return (
+            sys.version_info[:2] >= (3, 4) and
+            Database.__name__ == 'sqlite3.dbapi2' and
+            Database.sqlite_version_info >= (3, 7, 13)
+        )
+
+    @cached_property
     def supports_stddev(self):
         """Confirm support for STDDEV and related stats functions
 
@@ -163,8 +172,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         bad_fields = (fields.DateField, fields.DateTimeField, fields.TimeField)
         bad_aggregates = (aggregates.Sum, aggregates.Avg,
                           aggregates.Variance, aggregates.StdDev)
-        if (isinstance(aggregate.source, bad_fields) and
-                isinstance(aggregate, bad_aggregates)):
+        if aggregate.refs_field(bad_aggregates, bad_fields):
             raise NotImplementedError(
                 'You cannot use Sum, Avg, StdDev and Variance aggregations '
                 'on date/time fields in sqlite3 '
@@ -177,15 +185,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         # cause a collision with a field name).
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
 
-    def date_interval_sql(self, sql, connector, timedelta):
-        # It would be more straightforward if we could use the sqlite strftime
-        # function, but it does not allow for keeping six digits of fractional
-        # second information, nor does it allow for formatting date and datetime
-        # values differently. So instead we register our own function that
-        # formats the datetime combined with the delta in a manner suitable
-        # for comparisons.
-        return 'django_format_dtdelta(%s, "%s", "%d", "%d", "%d")' % (sql,
-            connector, timedelta.days, timedelta.seconds, timedelta.microseconds)
+    def date_interval_sql(self, timedelta):
+        return "'%s'" % duration_string(timedelta), []
+
+    def format_for_duration_arithmetic(self, sql):
+        """Do nothing here, we will handle it in the custom function."""
+        return sql
 
     def date_trunc_sql(self, lookup_type, field_name):
         # sqlite doesn't support DATE_TRUNC, so we fake it with a user-defined
@@ -279,9 +284,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return converters
 
     def convert_decimalfield_value(self, value, field):
-        if value is not None:
-            value = backend_utils.typecast_decimal(field.format_number(value))
-        return value
+        return backend_utils.typecast_decimal(field.format_number(value))
 
     def convert_datefield_value(self, value, field):
         if value is not None and not isinstance(value, datetime.date):
@@ -318,6 +321,14 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'django_power(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
+    def combine_duration_expression(self, connector, sub_expressions):
+        if connector not in ['+', '-']:
+            raise utils.DatabaseError('Invalid connector for timedelta: %s.' % connector)
+        fn_params = ["'%s'" % connector] + sub_expressions
+        if len(fn_params) > 3:
+            raise ValueError('Too many params for timedelta operations.')
+        return "django_format_dtdelta(%s)" % ', '.join(fn_params)
+
     def integer_field_range(self, internal_type):
         # SQLite doesn't enforce any integer constraints
         return (None, None)
@@ -325,6 +336,39 @@ class DatabaseOperations(BaseDatabaseOperations):
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'sqlite'
+    # SQLite doesn't actually support most of these types, but it "does the right
+    # thing" given more verbose field definitions, so leave them as is so that
+    # schema inspection is more useful.
+    data_types = {
+        'AutoField': 'integer',
+        'BinaryField': 'BLOB',
+        'BooleanField': 'bool',
+        'CharField': 'varchar(%(max_length)s)',
+        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
+        'DateField': 'date',
+        'DateTimeField': 'datetime',
+        'DecimalField': 'decimal',
+        'DurationField': 'bigint',
+        'FileField': 'varchar(%(max_length)s)',
+        'FilePathField': 'varchar(%(max_length)s)',
+        'FloatField': 'real',
+        'IntegerField': 'integer',
+        'BigIntegerField': 'bigint',
+        'IPAddressField': 'char(15)',
+        'GenericIPAddressField': 'char(39)',
+        'NullBooleanField': 'bool',
+        'OneToOneField': 'integer',
+        'PositiveIntegerField': 'integer unsigned',
+        'PositiveSmallIntegerField': 'smallint unsigned',
+        'SlugField': 'varchar(%(max_length)s)',
+        'SmallIntegerField': 'smallint',
+        'TextField': 'text',
+        'TimeField': 'time',
+        'UUIDField': 'char(32)',
+    }
+    data_types_suffix = {
+        'AutoField': 'AUTOINCREMENT',
+    }
     # SQLite requires LIKE statements to include an ESCAPE clause if the value
     # being escaped has a percent or underscore in it.
     # See http://www.sqlite.org/lang_expr.html for an explanation.
@@ -345,9 +389,22 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE %s ESCAPE '\\'",
     }
 
+    # The patterns below are used to generate SQL pattern lookup clauses when
+    # the right-hand side of the lookup isn't a raw string (it might be an expression
+    # or the result of a bilateral transformation).
+    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
+    # escaped on database side.
+    #
+    # Note: we use str.format() here for readability as '%' is used as a wildcard for
+    # the LIKE operator.
+    pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\', '\\'), '%%', '\%%'), '_', '\_')"
     pattern_ops = {
-        'startswith': "LIKE %s || '%%%%'",
-        'istartswith': "LIKE UPPER(%s) || '%%%%'",
+        'contains': r"LIKE '%%' || {} || '%%' ESCAPE '\'",
+        'icontains': r"LIKE '%%' || UPPER({}) || '%%' ESCAPE '\'",
+        'startswith': r"LIKE {} || '%%' ESCAPE '\'",
+        'istartswith': r"LIKE UPPER({}) || '%%' ESCAPE '\'",
+        'endswith': r"LIKE '%%' || {} ESCAPE '\'",
+        'iendswith': r"LIKE '%%' || UPPER({}) ESCAPE '\'",
     }
 
     Database = Database
@@ -390,6 +447,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 RuntimeWarning
             )
         kwargs.update({'check_same_thread': False})
+        if self.features.can_share_in_memory_db:
+            kwargs.update({'uri': True})
         return kwargs
 
     def get_new_connection(self, conn_params):
@@ -399,7 +458,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_datetime_extract", 3, _sqlite_datetime_extract)
         conn.create_function("django_datetime_trunc", 3, _sqlite_datetime_trunc)
         conn.create_function("regexp", 2, _sqlite_regexp)
-        conn.create_function("django_format_dtdelta", 5, _sqlite_format_dtdelta)
+        conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
         conn.create_function("django_power", 2, _sqlite_power)
         return conn
 
@@ -414,7 +473,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # If database is in memory, closing the connection destroys the
         # database. To prevent accidental data loss, ignore close requests on
         # an in-memory db.
-        if self.settings_dict['NAME'] != ":memory:":
+        if not self.is_in_memory_db(self.settings_dict['NAME']):
             BaseDatabaseWrapper.close(self)
 
     def _savepoint_allowed(self):
@@ -489,6 +548,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         savepoints when autocommit is disabled.
         """
         self.cursor().execute("BEGIN")
+
+    def is_in_memory_db(self, name):
+        return name == ":memory:" or "mode=memory" in name
 
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
@@ -576,19 +638,33 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname):
         return "%i-%02i-%02i %02i:%02i:%02i" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
 
-def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
+def _sqlite_format_dtdelta(conn, lhs, rhs):
+    """
+    LHS and RHS can be either:
+        - An integer number of microseconds
+        - A string representing a timedelta object
+        - A string representing a datetime
+    """
     try:
-        dt = backend_utils.typecast_timestamp(dt)
-        delta = datetime.timedelta(int(days), int(secs), int(usecs))
+        if isinstance(lhs, six.integer_types):
+            lhs = str(decimal.Decimal(lhs) / decimal.Decimal(1000000))
+        real_lhs = parse_duration(lhs)
+        if real_lhs is None:
+            real_lhs = backend_utils.typecast_timestamp(lhs)
+        if isinstance(rhs, six.integer_types):
+            rhs = str(decimal.Decimal(rhs) / decimal.Decimal(1000000))
+        real_rhs = parse_duration(rhs)
+        if real_rhs is None:
+            real_rhs = backend_utils.typecast_timestamp(rhs)
         if conn.strip() == '+':
-            dt = dt + delta
+            out = real_lhs + real_rhs
         else:
-            dt = dt - delta
+            out = real_lhs - real_rhs
     except (ValueError, TypeError):
         return None
     # typecast_timestamp returns a date or a datetime without timezone.
     # It will be formatted as "%Y-%m-%d" or "%Y-%m-%d %H:%M:%S[.%f]"
-    return str(dt)
+    return str(out)
 
 
 def _sqlite_regexp(re_pattern, re_string):

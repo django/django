@@ -15,6 +15,18 @@ class SeparateDatabaseAndState(Operation):
         self.database_operations = database_operations or []
         self.state_operations = state_operations or []
 
+    def deconstruct(self):
+        kwargs = {}
+        if self.database_operations:
+            kwargs['database_operations'] = self.database_operations
+        if self.state_operations:
+            kwargs['state_operations'] = self.state_operations
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs
+        )
+
     def state_forwards(self, app_label, state):
         for state_operation in self.state_operations:
             state_operation.state_forwards(app_label, state)
@@ -54,6 +66,20 @@ class RunSQL(Operation):
         self.sql = sql
         self.reverse_sql = reverse_sql
         self.state_operations = state_operations or []
+
+    def deconstruct(self):
+        kwargs = {
+            'sql': self.sql,
+        }
+        if self.reverse_sql is not None:
+            kwargs['reverse_sql'] = self.reverse_sql
+        if self.state_operations:
+            kwargs['state_operations'] = self.state_operations
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs
+        )
 
     @property
     def reversible(self):
@@ -112,6 +138,20 @@ class RunPython(Operation):
                 raise ValueError("RunPython must be supplied with callable arguments")
             self.reverse_code = reverse_code
 
+    def deconstruct(self):
+        kwargs = {
+            'code': self.code,
+        }
+        if self.reverse_code is not None:
+            kwargs['reverse_code'] = self.reverse_code
+        if self.atomic is not True:
+            kwargs['atomic'] = self.atomic
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs
+        )
+
     @property
     def reversible(self):
         return self.reverse_code is not None
@@ -126,12 +166,12 @@ class RunPython(Operation):
         # object, representing the versioned models as an app registry.
         # We could try to override the global cache, but then people will still
         # use direct imports, so we go with a documentation approach instead.
-        self.code(from_state.render(), schema_editor)
+        self.code(from_state.apps, schema_editor)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_code is None:
             raise NotImplementedError("You cannot reverse this operation")
-        self.reverse_code(from_state.render(), schema_editor)
+        self.reverse_code(from_state.apps, schema_editor)
 
     def describe(self):
         return "Raw Python operation"

@@ -264,7 +264,7 @@ class BaseConfigurator(object):
             c = self.resolve(c)
         props = config.pop('.', None)
         # Check for valid identifiers
-        kwargs = dict((k, config[k]) for k in config if valid_ident(k))
+        kwargs = {k: config[k] for k in config if valid_ident(k)}
         result = c(**kwargs)
         if props:
             for name, value in props.items():
@@ -502,7 +502,7 @@ class DictConfigurator(BaseConfigurator):
                 'address' in config:
                 config['address'] = self.as_tuple(config['address'])
             factory = klass
-        kwargs = dict((k, config[k]) for k in config if valid_ident(k))
+        kwargs = {k: config[k] for k in config if valid_ident(k)}
         try:
             result = factory(**kwargs)
         except TypeError as te:

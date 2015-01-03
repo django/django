@@ -8,13 +8,12 @@ import os
 import itertools
 
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template import (TemplateSyntaxError,
-    Context, Template, loader)
-import django.template.context
-from django.test import Client, TestCase, override_settings
-from django.test.client import encode_file, RequestFactory
+from django.template import TemplateSyntaxError, Context, Template
+from django.test import Client, TestCase, ignore_warnings, override_settings
+from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.template.response import SimpleTemplateResponse
+from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils._os import upath
 from django.utils.translation import ugettext_lazy
 from django.http import HttpResponse
@@ -25,10 +24,7 @@ from .models import CustomUser
 from .views import CustomTestException
 
 
-@override_settings(
-    TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),),
-    ROOT_URLCONF='test_client_regress.urls',
-)
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class AssertContainsTests(TestCase):
 
     def test_contains(self):
@@ -379,15 +375,24 @@ class AssertRedirectsTests(TestCase):
 
     def test_redirect_chain_to_self(self):
         "Redirections to self are caught and escaped"
-        response = self.client.get('/redirect_to_self/', {}, follow=True)
+        with self.assertRaises(RedirectCycleError) as context:
+            self.client.get('/redirect_to_self/', {}, follow=True)
+        response = context.exception.last_response
         # The chain of redirects stops once the cycle is detected.
         self.assertRedirects(response, '/redirect_to_self/',
             status_code=301, target_status_code=301)
         self.assertEqual(len(response.redirect_chain), 2)
 
+    def test_redirect_to_self_with_changing_query(self):
+        "Redirections don't loop forever even if query is changing"
+        with self.assertRaises(RedirectCycleError):
+            self.client.get('/redirect_to_self_with_changing_query_view/', {'counter': '0'}, follow=True)
+
     def test_circular_redirect(self):
         "Circular redirect chains are caught and escaped"
-        response = self.client.get('/circular_redirect_1/', {}, follow=True)
+        with self.assertRaises(RedirectCycleError) as context:
+            self.client.get('/circular_redirect_1/', {}, follow=True)
+        response = context.exception.last_response
         # The chain of redirects will get back to the starting point, but stop there.
         self.assertRedirects(response, '/circular_redirect_2/',
             status_code=301, target_status_code=301)
@@ -902,23 +907,18 @@ class ExceptionTests(TestCase):
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class TemplateExceptionTests(TestCase):
 
-    def setUp(self):
-        # Reset the loaders so they don't try to render cached templates.
-        if loader.template_source_loaders is not None:
-            for template_loader in loader.template_source_loaders:
-                if hasattr(template_loader, 'reset'):
-                    template_loader.reset()
-
-    @override_settings(
-        TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'bad_templates'),)
-    )
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'bad_templates')],
+    }])
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"
         try:
             self.client.get("/no_such_view/")
-            self.fail("Should get error about syntax error in template")
         except TemplateSyntaxError:
             pass
+        else:
+            self.fail("Should get error about syntax error in template")
 
 
 # We need two different tests to check URLconf substitution -  one to check
@@ -951,11 +951,12 @@ class zzUrlconfSubstitutionTests(TestCase):
 class ContextTests(TestCase):
     fixtures = ['testdata']
 
+    @ignore_warnings(category=RemovedInDjango19Warning)  # `request.REQUEST` is deprecated
     def test_single_context(self):
         "Context variables can be retrieved from a single context"
         response = self.client.get("/request_data/", data={'foo': 'whiz'})
         self.assertEqual(response.context.__class__, Context)
-        self.assertTrue('get-foo' in response.context)
+        self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'sausage')
@@ -966,12 +967,13 @@ class ContextTests(TestCase):
         except KeyError as e:
             self.assertEqual(e.args[0], 'does-not-exist')
 
+    @ignore_warnings(category=RemovedInDjango19Warning)  # `request.REQUEST` is deprecated
     def test_inherited_context(self):
         "Context variables can be retrieved from a list of contexts"
         response = self.client.get("/request_data_extended/", data={'foo': 'whiz'})
         self.assertEqual(response.context.__class__, ContextList)
         self.assertEqual(len(response.context), 2)
-        self.assertTrue('get-foo' in response.context)
+        self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'bacon')
@@ -997,16 +999,22 @@ class ContextTests(TestCase):
                           'python', 'dolly'},
                          l.keys())
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_15368(self):
         # Need to insert a context processor that assumes certain things about
         # the request instance. This triggers a bug caused by some ways of
         # copying RequestContext.
-        try:
-            django.template.context._standard_context_processors = (lambda request: {'path': request.special_path},)
+        with self.settings(TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'test_client_regress.context_processors.special',
+                ],
+            },
+        }]):
             response = self.client.get("/request_context_view/")
             self.assertContains(response, 'Path: /request_context_view/')
-        finally:
-            django.template.context._standard_context_processors = None
 
     def test_nested_requests(self):
         """
@@ -1228,10 +1236,21 @@ class RequestMethodStringDataTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'request method: PATCH')
 
+    def test_empty_string_data(self):
+        "Request a view with empty string data via request method GET/POST/HEAD"
+        # Regression test for #21740
+        response = self.client.get('/body/', data='', content_type='application/json')
+        self.assertEqual(response.content, b'')
+        response = self.client.post('/body/', data='', content_type='application/json')
+        self.assertEqual(response.content, b'')
+        response = self.client.head('/body/', data='', content_type='application/json')
+        self.assertEqual(response.content, b'')
+
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls',)
 class QueryStringTests(TestCase):
 
+    @ignore_warnings(category=RemovedInDjango19Warning)  # `request.REQUEST` is deprecated
     def test_get_like_requests(self):
         # See: https://code.djangoproject.com/ticket/10571.
         for method_name in ('get', 'head'):
@@ -1257,6 +1276,7 @@ class QueryStringTests(TestCase):
             self.assertEqual(response.context['request-foo'], None)
             self.assertEqual(response.context['request-bar'], 'bang')
 
+    @ignore_warnings(category=RemovedInDjango19Warning)  # `request.REQUEST` is deprecated
     def test_post_like_requests(self):
         # A POST-like request can pass a query string as data
         response = self.client.post("/request_data/", data={'foo': 'whiz'})

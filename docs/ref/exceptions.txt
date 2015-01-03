@@ -33,6 +33,19 @@ ObjectDoesNotExist and DoesNotExist
     See :meth:`~django.db.models.query.QuerySet.get()` for further information
     on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
 
+FieldDoesNotExist
+-----------------
+.. exception:: FieldDoesNotExist
+
+    The ``FieldDoesNotExist`` exception is raised by a model's
+    ``_meta.get_field()`` method when the requested field does not exist on the
+    model or on the model's parents.
+
+    .. versionchanged:: 1.8
+
+        This exception was previously defined only in
+        ``django.db.models.fields`` and wasn't part of the public API.
+
 MultipleObjectsReturned
 -----------------------
 .. exception:: MultipleObjectsReturned
@@ -216,6 +229,20 @@ Transaction exceptions are defined in :mod:`django.db.transaction`.
 
     The :exc:`TransactionManagementError` is raised for any and all problems
     related to database transactions.
+
+.. currentmodule:: django.test
+
+Testing Framework Exceptions
+============================
+
+Exceptions provided by the :mod:`django.test` package.
+
+.. exception:: client.RedirectCycleError
+
+    .. versionadded:: 1.8
+
+    :exc:`~client.RedirectCycleError` is raised when the test client detects a
+    loop or an overly long chain of redirects.
 
 Python Exceptions
 =================

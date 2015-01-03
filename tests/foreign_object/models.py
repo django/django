@@ -117,7 +117,8 @@ class ColConstraint(object):
     def __init__(self, alias, col, value):
         self.alias, self.col, self.value = alias, col, value
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
+        qn = compiler.quote_name_unless_alias
         return '%s.%s = %%s' % (qn(self.alias), qn(self.col)), [self.value]
 
 

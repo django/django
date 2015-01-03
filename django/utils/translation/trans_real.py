@@ -13,8 +13,8 @@ from django.apps import apps
 from django.conf import settings
 from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
+from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.test.signals import setting_changed
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.utils._os import upath
@@ -30,10 +30,6 @@ _active = local()
 
 # The default translation is based on the settings file.
 _default = None
-
-# This is a cache of settings.LANGUAGES in an OrderedDict for easy lookups by
-# key
-_supported = None
 
 # magic gettext number to separate context from message
 CONTEXT_SEPARATOR = "\x04"
@@ -64,9 +60,8 @@ def reset_cache(**kwargs):
     languages should no longer be accepted.
     """
     if kwargs['setting'] in ('LANGUAGES', 'LANGUAGE_CODE'):
-        global _supported
-        _supported = None
         check_for_language.cache_clear()
+        get_languages.cache_clear()
         get_supported_language_variant.cache_clear()
 
 
@@ -415,6 +410,14 @@ def check_for_language(lang_code):
     return False
 
 
+@lru_cache.lru_cache()
+def get_languages():
+    """
+    Cache of settings.LANGUAGES in an OrderedDict for easy lookups by key.
+    """
+    return OrderedDict(settings.LANGUAGES)
+
+
 @lru_cache.lru_cache(maxsize=1000)
 def get_supported_language_variant(lang_code, strict=False):
     """
@@ -428,9 +431,6 @@ def get_supported_language_variant(lang_code, strict=False):
     as the provided language codes are taken from the HTTP request. See also
     <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
     """
-    global _supported
-    if _supported is None:
-        _supported = OrderedDict(settings.LANGUAGES)
     if lang_code:
         # If 'fr-ca' is not supported, try special fallback or language-only 'fr'.
         possible_lang_codes = [lang_code]
@@ -440,13 +440,14 @@ def get_supported_language_variant(lang_code, strict=False):
             pass
         generic_lang_code = lang_code.split('-')[0]
         possible_lang_codes.append(generic_lang_code)
+        supported_lang_codes = get_languages()
 
         for code in possible_lang_codes:
-            if code in _supported and check_for_language(code):
+            if code in supported_lang_codes and check_for_language(code):
                 return code
         if not strict:
             # if fr-fr is not supported, try fr-ca.
-            for supported_code in _supported:
+            for supported_code in supported_lang_codes:
                 if supported_code.startswith(generic_lang_code + '-'):
                     return supported_code
     raise LookupError(lang_code)
@@ -480,18 +481,16 @@ def get_language_from_request(request, check_path=False):
     If check_path is True, the URL path prefix will be checked for a language
     code, otherwise this is skipped for backwards compatibility.
     """
-    global _supported
-    if _supported is None:
-        _supported = OrderedDict(settings.LANGUAGES)
-
     if check_path:
         lang_code = get_language_from_path(request.path_info)
         if lang_code is not None:
             return lang_code
 
+    supported_lang_codes = get_languages()
+
     if hasattr(request, 'session'):
         lang_code = request.session.get(LANGUAGE_SESSION_KEY)
-        if lang_code in _supported and lang_code is not None and check_for_language(lang_code):
+        if lang_code in supported_lang_codes and lang_code is not None and check_for_language(lang_code):
             return lang_code
 
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
@@ -545,8 +544,8 @@ def templatize(src, origin=None):
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
-    from django.template import (Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK,
-            TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
+    from django.template.base import (Lexer, TOKEN_TEXT, TOKEN_VAR,
+        TOKEN_BLOCK, TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
     src = force_text(src, settings.FILE_CHARSET)
     out = StringIO('')
     message_context = None

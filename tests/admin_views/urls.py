@@ -1,6 +1,6 @@
 from django.conf.urls import include, url
 
-from . import views, customadmin, admin
+from . import views, customadmin, custom_has_permission_admin, admin
 
 
 urlpatterns = [
@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^test_admin/admin4/', include(customadmin.simple_site.urls)),
     url(r'^test_admin/admin5/', include(admin.site2.urls)),
     url(r'^test_admin/admin7/', include(admin.site7.urls)),
+    url(r'^test_admin/has_permission_admin/', include(custom_has_permission_admin.site.urls)),
 ]

@@ -1,8 +1,7 @@
 from django.apps import apps
 from django.core import management
 from django.db.models import signals
-from django.test import TestCase
-from django.test.utils import override_system_checks
+from django.test import override_settings, TestCase
 from django.utils import six
 
 
@@ -62,9 +61,6 @@ class MigrateSignalTests(TestCase):
     def test_pre_migrate_call_time(self):
         self.assertEqual(pre_migrate_receiver.call_counter, 1)
 
-    # `auth` app is imported, but not installed in this test, so we need to
-    # exclude checks registered by this app.
-    @override_system_checks([])
     def test_pre_migrate_args(self):
         r = PreMigrateReceiver()
         signals.pre_migrate.connect(r, sender=APP_CONFIG)
@@ -72,6 +68,25 @@ class MigrateSignalTests(TestCase):
             verbosity=MIGRATE_VERBOSITY, interactive=MIGRATE_INTERACTIVE,
             load_initial_data=False, stdout=six.StringIO())
 
+        args = r.call_args
+        self.assertEqual(r.call_counter, 1)
+        self.assertEqual(set(args), set(PRE_MIGRATE_ARGS))
+        self.assertEqual(args['app_config'], APP_CONFIG)
+        self.assertEqual(args['verbosity'], MIGRATE_VERBOSITY)
+        self.assertEqual(args['interactive'], MIGRATE_INTERACTIVE)
+        self.assertEqual(args['using'], 'default')
+
+    @override_settings(MIGRATION_MODULES={'migrate_signals': 'migrate_signals.custom_migrations'})
+    def test_pre_migrate_migrations_only(self):
+        """
+        If all apps have migrations, pre_migrate should be sent.
+        """
+        r = PreMigrateReceiver()
+        signals.pre_migrate.connect(r, sender=APP_CONFIG)
+        stdout = six.StringIO()
+        management.call_command('migrate', database=MIGRATE_DATABASE,
+            verbosity=MIGRATE_VERBOSITY, interactive=MIGRATE_INTERACTIVE,
+            load_initial_data=False, stdout=stdout)
         args = r.call_args
         self.assertEqual(r.call_counter, 1)
         self.assertEqual(set(args), set(PRE_MIGRATE_ARGS))

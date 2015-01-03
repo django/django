@@ -509,6 +509,15 @@ For example, you could register a callback in an
         def ready(self):
             post_migrate.connect(my_callback, sender=self)
 
+.. note::
+
+    If you provide an :class:`~django.apps.AppConfig` instance as the sender
+    argument, please ensure that the signal is registered in
+    :meth:`~django.apps.AppConfig.ready`. ``AppConfig``\s are recreated for
+    tests that run with a modified set of :setting:`INSTALLED_APPS` (such as
+    when settings are overridden) and such signals should be connected for each
+    new ``AppConfig`` instance.
+
 post_syncdb
 -----------
 
@@ -656,6 +665,13 @@ This signal is sent when the value of a setting is changed through the
 It's actually sent twice: when the new value is applied ("setup") and when the
 original value is restored ("teardown"). Use the ``enter`` argument to
 distinguish between the two.
+
+You can also import this signal from ``django.core.signals`` to avoid importing
+from ``django.test`` in non-test situations.
+
+.. versionchanged:: 1.8
+
+    The signal was moved to ``django.core.signals`` as described above.
 
 Arguments sent with this signal:
 

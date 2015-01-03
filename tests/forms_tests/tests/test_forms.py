@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import copy
 import datetime
 import json
-import warnings
 
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -19,9 +18,10 @@ from django.forms import (
 from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Template, Context
-from django.test import TestCase
+from django.test import TestCase, ignore_warnings
 from django.test.utils import str_prefix
 from django.utils.datastructures import MultiValueDict, MergeDict
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe, SafeData
@@ -552,6 +552,7 @@ class FormsTestCase(TestCase):
 <li><label for="composers_id_1"><input type="checkbox" name="composers" value="P" id="composers_id_1" /> Paul McCartney</label></li>
 </ul>""")
 
+    @ignore_warnings(category=RemovedInDjango19Warning)  # MergeDict deprecation
     def test_multiple_choice_list_data(self):
         # Data for a MultipleChoiceField should be a list. QueryDict, MultiValueDict and
         # MergeDict (when created as a merge of MultiValueDicts) conveniently work with
@@ -573,11 +574,9 @@ class FormsTestCase(TestCase):
         self.assertEqual(f.errors, {})
 
         # MergeDict is deprecated, but is supported until removed.
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            data = MergeDict(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])))
-            f = SongForm(data)
-            self.assertEqual(f.errors, {})
+        data = MergeDict(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])))
+        f = SongForm(data)
+        self.assertEqual(f.errors, {})
 
     def test_multiple_hidden(self):
         class SongForm(Form):
@@ -955,7 +954,7 @@ class FormsTestCase(TestCase):
         f2 = MyForm()
 
         f1.fields['myfield'].validators[0] = MaxValueValidator(12)
-        self.assertFalse(f1.fields['myfield'].validators[0] == f2.fields['myfield'].validators[0])
+        self.assertNotEqual(f1.fields['myfield'].validators[0], f2.fields['myfield'].validators[0])
 
     def test_hidden_widget(self):
         # HiddenInput widgets are displayed differently in the as_table(), as_ul())
@@ -1384,7 +1383,7 @@ class FormsTestCase(TestCase):
         """
         class CustomWidget(TextInput):
             def render(self, name, value, attrs=None):
-                return format_html(str('<input{0} />'), ' id=custom')
+                return format_html(str('<input{} />'), ' id=custom')
 
         class SampleForm(Form):
             name = CharField(widget=CustomWidget)
@@ -2003,9 +2002,24 @@ class FormsTestCase(TestCase):
         field = ChoicesField()
         field2 = copy.deepcopy(field)
         self.assertIsInstance(field2, ChoicesField)
-        self.assertFalse(id(field2.fields) == id(field.fields))
-        self.assertFalse(id(field2.fields[0].choices) ==
-                         id(field.fields[0].choices))
+        self.assertIsNot(field2.fields, field.fields)
+        self.assertIsNot(field2.fields[0].choices, field.fields[0].choices)
+
+    def test_multivalue_initial_data(self):
+        """
+        #23674 -- invalid initial data should not break form.changed_data()
+        """
+        class DateAgeField(MultiValueField):
+            def __init__(self, fields=(), *args, **kwargs):
+                fields = (DateField(label="Date"), IntegerField(label="Age"))
+                super(DateAgeField, self).__init__(fields=fields, *args, **kwargs)
+
+        class DateAgeForm(Form):
+            date_age = DateAgeField()
+
+        data = {"date_age": ["1998-12-06", 16]}
+        form = DateAgeForm(data, initial={"date_age": ["200-10-10", 14]})
+        self.assertTrue(form.has_changed())
 
     def test_multivalue_optional_subfields(self):
         class PhoneField(MultiValueField):

@@ -5,7 +5,6 @@ import shutil
 import string
 import tempfile
 import unittest
-import warnings
 
 from django.conf import settings
 from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
@@ -20,7 +19,7 @@ from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core import management
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory, override_settings
+from django.test import TestCase, RequestFactory, ignore_warnings, override_settings
 from django.test.utils import patch_logger
 from django.utils import six
 from django.utils import timezone
@@ -286,7 +285,7 @@ class SessionTestsMixin(object):
             self.assertEqual({}, self.session.decode(bad_encode))
             # check that the failed decode is logged
             self.assertEqual(len(calls), 1)
-            self.assertTrue('corrupted' in calls[0])
+            self.assertIn('corrupted', calls[0])
 
     def test_actual_expiry(self):
         # this doesn't work with JSONSerializer (serializing timedelta)
@@ -393,12 +392,11 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
         with self.assertNumQueries(0):
             self.assertTrue(self.session.exists(self.session.session_key))
 
+    # Some backends might issue a warning
+    @ignore_warnings(module="django.core.cache.backends.base")
     def test_load_overlong_key(self):
-        # Some backends might issue a warning
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self.session._session_key = (string.ascii_letters + string.digits) * 20
-            self.assertEqual(self.session.load(), {})
+        self.session._session_key = (string.ascii_letters + string.digits) * 20
+        self.assertEqual(self.session.load(), {})
 
     @override_settings(SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
@@ -486,12 +484,11 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
     backend = CacheSession
 
+    # Some backends might issue a warning
+    @ignore_warnings(module="django.core.cache.backends.base")
     def test_load_overlong_key(self):
-        # Some backends might issue a warning
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self.session._session_key = (string.ascii_letters + string.digits) * 20
-            self.assertEqual(self.session.load(), {})
+        self.session._session_key = (string.ascii_letters + string.digits) * 20
+        self.assertEqual(self.session.load(), {})
 
     def test_default_cache(self):
         self.session.save()
@@ -601,7 +598,7 @@ class SessionMiddlewareTests(unittest.TestCase):
         # A deleted cookie header looks like:
         #  Set-Cookie: sessionid=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
         self.assertEqual(
-            'Set-Cookie: {0}=; expires=Thu, 01-Jan-1970 00:00:00 GMT; '
+            'Set-Cookie: {}=; expires=Thu, 01-Jan-1970 00:00:00 GMT; '
             'Max-Age=0; Path=/'.format(settings.SESSION_COOKIE_NAME),
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )

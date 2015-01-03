@@ -17,7 +17,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.template.base import TemplateDoesNotExist
 from django.test import TestCase, RequestFactory, override_settings
-from django.test.utils import override_with_test_loader
 from django.utils.encoding import force_text, force_bytes
 from django.utils import six
 from django.views.debug import CallableSettingWrapper, ExceptionReporter
@@ -64,18 +63,28 @@ class DebugViewTests(TestCase):
         response = self.client.get('/raises400/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
 
+    # Ensure no 403.html template exists to test the default case.
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    }])
     def test_403(self):
-        # Ensure no 403.html template exists to test the default case.
-        with override_with_test_loader({}):
-            response = self.client.get('/raises403/')
-            self.assertContains(response, '<h1>403 Forbidden</h1>', status_code=403)
+        response = self.client.get('/raises403/')
+        self.assertContains(response, '<h1>403 Forbidden</h1>', status_code=403)
 
+    # Set up a test 403.html template.
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.locmem.Loader', {
+                    '403.html': 'This is a test template for a 403 error.',
+                }),
+            ],
+        },
+    }])
     def test_403_template(self):
-        # Set up a test 403.html template.
-        with override_with_test_loader({'403.html': 'This is a test template '
-                                        'for a 403 Forbidden error.'}):
-            response = self.client.get('/raises403/')
-            self.assertContains(response, 'test template', status_code=403)
+        response = self.client.get('/raises403/')
+        self.assertContains(response, 'test template', status_code=403)
 
     def test_404(self):
         response = self.client.get('/raises404/')
@@ -115,7 +124,7 @@ class DebugViewTests(TestCase):
             # '<div class="context" id="c38123208">', not '<div class="context" id="c38,123,208"'
             self.assertContains(response, '<div class="context" id="', status_code=500)
             match = re.search(b'<div class="context" id="(?P<id>[^"]+)">', response.content)
-            self.assertFalse(match is None)
+            self.assertIsNotNone(match)
             id_repr = match.group('id')
             self.assertFalse(re.search(b'[^c0-9]', id_repr),
                              "Numeric IDs in debug response HTML page shouldn't be localized (value: %s)." % id_repr)
@@ -126,7 +135,7 @@ class DebugViewTests(TestCase):
                 self.client.get(reverse('template_exception', args=(n,)))
             except Exception:
                 raising_loc = inspect.trace()[-1][-2][0].strip()
-                self.assertFalse(raising_loc.find('raise BrokenException') == -1,
+                self.assertNotEqual(raising_loc.find('raise BrokenException'), -1,
                     "Failed to find 'raise BrokenException' in last frame of traceback, instead found: %s" %
                         raising_loc)
 
@@ -136,7 +145,10 @@ class DebugViewTests(TestCase):
         with NamedTemporaryFile(prefix=template_name) as tempfile:
             tempdir = os.path.dirname(tempfile.name)
             template_path = os.path.join(tempdir, template_name)
-            with override_settings(TEMPLATE_DIRS=(tempdir,)):
+            with override_settings(TEMPLATES=[{
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'DIRS': [tempdir],
+            }]):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
             self.assertContains(response, "%s (File does not exist)" % template_path, status_code=500, count=1)
 
@@ -148,7 +160,10 @@ class DebugViewTests(TestCase):
             tempdir = os.path.dirname(tempfile.name)
             template_path = os.path.join(tempdir, template_name)
             os.chmod(template_path, 0o0222)
-            with override_settings(TEMPLATE_DIRS=(tempdir,)):
+            with override_settings(TEMPLATES=[{
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'DIRS': [tempdir],
+            }]):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
             self.assertContains(response, "%s (File is not readable)" % template_path, status_code=500, count=1)
 
@@ -158,7 +173,10 @@ class DebugViewTests(TestCase):
             template_path = mkdtemp()
             template_name = os.path.basename(template_path)
             tempdir = os.path.dirname(template_path)
-            with override_settings(TEMPLATE_DIRS=(tempdir,)):
+            with override_settings(TEMPLATES=[{
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'DIRS': [tempdir],
+            }]):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
             self.assertContains(response, "%s (Not a file)" % template_path, status_code=500, count=1)
         finally:

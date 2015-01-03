@@ -1,6 +1,6 @@
+from itertools import takewhile
 import sys
 import os
-import operator
 
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
@@ -11,7 +11,7 @@ from django.db.migrations.questioner import MigrationQuestioner, InteractiveMigr
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
 from django.utils.six import iteritems
-from django.utils.six.moves import reduce
+from django.utils.six.moves import zip
 
 
 class Command(BaseCommand):
@@ -30,6 +30,8 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.')
         parser.add_argument('-n', '--name', action='store', dest='name', default=None,
             help="Use this name for migration file(s).")
+        parser.add_argument('-e', '--exit', action='store_true', dest='exit_code', default=False,
+            help='Exit with error code 1 if no changes needing migrations are found.')
 
     def handle(self, *app_labels, **options):
 
@@ -39,6 +41,7 @@ class Command(BaseCommand):
         self.merge = options.get('merge', False)
         self.empty = options.get('empty', False)
         self.migration_name = options.get('name', None)
+        self.exit_code = options.get('exit_code', False)
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
@@ -63,10 +66,10 @@ class Command(BaseCommand):
 
         # If app_labels is specified, filter out conflicting migrations for unspecified apps
         if app_labels:
-            conflicts = dict(
-                (app_label, conflict) for app_label, conflict in iteritems(conflicts)
+            conflicts = {
+                app_label: conflict for app_label, conflict in iteritems(conflicts)
                 if app_label in app_labels
-            )
+            }
 
         if conflicts and not self.merge:
             name_str = "; ".join(
@@ -100,10 +103,10 @@ class Command(BaseCommand):
             if not app_labels:
                 raise CommandError("You must supply at least one app label when using --empty.")
             # Make a fake changes() result we can pass to arrange_for_graph
-            changes = dict(
-                (app, [Migration("custom", app)])
+            changes = {
+                app: [Migration("custom", app)]
                 for app in app_labels
-            )
+            }
             changes = autodetector.arrange_for_graph(
                 changes=changes,
                 graph=loader.graph,
@@ -120,15 +123,20 @@ class Command(BaseCommand):
             migration_name=self.migration_name,
         )
 
-        # No changes? Tell them.
-        if not changes and self.verbosity >= 1:
-            if len(app_labels) == 1:
-                self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
-            elif len(app_labels) > 1:
-                self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
+        if not changes:
+            # No changes? Tell them.
+            if self.verbosity >= 1:
+                if len(app_labels) == 1:
+                    self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
+                elif len(app_labels) > 1:
+                    self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
+                else:
+                    self.stdout.write("No changes detected")
+
+            if self.exit_code:
+                sys.exit(1)
             else:
-                self.stdout.write("No changes detected")
-            return
+                return
 
         self.write_migration_files(changes)
 
@@ -187,24 +195,18 @@ class Command(BaseCommand):
                 migration = loader.get_migration(app_label, migration_name)
                 migration.ancestry = loader.graph.forwards_plan((app_label, migration_name))
                 merge_migrations.append(migration)
-            common_ancestor = None
-            for level in zip(*[m.ancestry for m in merge_migrations]):
-                if reduce(operator.eq, level):
-                    common_ancestor = level[0]
-                else:
-                    break
-            if common_ancestor is None:
+            all_items_equal = lambda seq: all(item == seq[0] for item in seq[1:])
+            merge_migrations_generations = zip(*[m.ancestry for m in merge_migrations])
+            common_ancestor_count = sum(1 for common_ancestor_generation
+                                        in takewhile(all_items_equal, merge_migrations_generations))
+            if not common_ancestor_count:
                 raise ValueError("Could not find common ancestor of %s" % migration_names)
             # Now work out the operations along each divergent branch
             for migration in merge_migrations:
-                migration.branch = migration.ancestry[
-                    (migration.ancestry.index(common_ancestor) + 1):
-                ]
-                migration.merged_operations = []
-                for node_app, node_name in migration.branch:
-                    migration.merged_operations.extend(
-                        loader.get_migration(node_app, node_name).operations
-                    )
+                migration.branch = migration.ancestry[common_ancestor_count:]
+                migrations_ops = (loader.get_migration(node_app, node_name).operations
+                                  for node_app, node_name in migration.branch)
+                migration.merged_operations = sum(migrations_ops, [])
             # In future, this could use some of the Optimizer code
             # (can_optimize_through) to automatically see if they're
             # mergeable. For now, we always just prompt the user.
@@ -222,7 +224,7 @@ class Command(BaseCommand):
                     for migration in merge_migrations
                 ]
                 try:
-                    biggest_number = max([x for x in numbers if x is not None])
+                    biggest_number = max(x for x in numbers if x is not None)
                 except ValueError:
                     biggest_number = 1
                 subclass = type("Migration", (Migration, ), {

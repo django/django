@@ -203,7 +203,7 @@ dictionary key, of course), regardless of your database engine.  Such
 placeholders will be replaced with parameters from the ``params``
 argument.
 
-.. note:: Dictionary params not supported with SQLite
+.. note::
 
    Dictionary params are not supported with the SQLite backend; with
    this backend, you must pass parameters as a list.
@@ -322,7 +322,7 @@ an unexpected behavior in magic method lookups (`Python ticket #9220`_).
 Django 1.7 explicitly added support to allow using a cursor as context
 manager.
 
-.. _`Python ticket #9220`: http://bugs.python.org/issue9220
+.. _`Python ticket #9220`: https://bugs.python.org/issue9220
 
 Using a cursor as a context manager::
 

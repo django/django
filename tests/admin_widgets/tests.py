@@ -190,9 +190,6 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     def setUp(self):
         self.client.login(username="super", password="secret")
 
-    def tearDown(self):
-        self.client.logout()
-
     def test_changelist_ForeignKey(self):
         response = self.client.get('/admin_widgets/car/')
         self.assertContains(response, '/auth/user/add/')
@@ -205,9 +202,6 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
 
     def setUp(self):
         self.client.login(username="super", password="secret")
-
-    def tearDown(self):
-        self.client.logout()
 
     def test_nonexistent_target_id(self):
         band = models.Band.objects.create(name='Bogey Blues')
@@ -963,7 +957,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
                          str(self.jenny.id), str(self.john.id)])
 
             # -----------------------------------------------------------------
-            # Check that chosing a filtered option sends it properly to the
+            # Check that choosing a filtered option sends it properly to the
             # 'to' box.
             input.send_keys('a')
             self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.jason.id)])
@@ -1046,7 +1040,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.switch_to.window('id_main_band')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
-        self.assertTrue('/band/42/' in link.get_attribute('href'))
+        self.assertIn('/band/42/', link.get_attribute('href'))
         link.click()
 
         # The field now contains the selected band's id
@@ -1058,7 +1052,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.switch_to.window('id_main_band')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
-        self.assertTrue('/band/98/' in link.get_attribute('href'))
+        self.assertIn('/band/98/', link.get_attribute('href'))
         link.click()
 
         # The field now contains the other selected band's id
@@ -1081,7 +1075,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.switch_to.window('id_supporting_bands')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
-        self.assertTrue('/band/42/' in link.get_attribute('href'))
+        self.assertIn('/band/42/', link.get_attribute('href'))
         link.click()
 
         # The field now contains the selected band's id
@@ -1093,7 +1087,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.switch_to.window('id_supporting_bands')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
-        self.assertTrue('/band/98/' in link.get_attribute('href'))
+        self.assertIn('/band/98/', link.get_attribute('href'))
         link.click()
 
         # The field now contains the two selected bands' ids

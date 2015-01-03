@@ -1,5 +1,4 @@
 import json
-import warnings
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -11,6 +10,7 @@ from django.template.loader import render_to_string
 from django.test import Client
 from django.test.client import CONTENT_TYPE_RE
 from django.test.utils import setup_test_environment
+from django.utils.six.moves.urllib.parse import urlencode
 
 
 class CustomTestException(Exception):
@@ -39,11 +39,8 @@ get_view = login_required(get_view)
 def request_data(request, template='base.html', data='sausage'):
     "A simple view that returns the request data in the context"
 
-    # request.REQUEST is deprecated, but needs testing until removed.
-    with warnings.catch_warnings(record=True):
-        warnings.simplefilter("always")
-        request_foo = request.REQUEST.get('foo')
-        request_bar = request.REQUEST.get('bar')
+    request_foo = request.REQUEST.get('foo')
+    request_bar = request.REQUEST.get('bar')
 
     return render_to_response(template, {
         'get-foo': request.GET.get('foo'),
@@ -83,6 +80,12 @@ def login_protected_redirect_view(request):
     "A view that redirects all requests to the GET view"
     return HttpResponseRedirect('/get_view/')
 login_protected_redirect_view = login_required(login_protected_redirect_view)
+
+
+def redirect_to_self_with_changing_query_view(request):
+    query = request.GET.copy()
+    query['counter'] += '0'
+    return HttpResponseRedirect('/redirect_to_self_with_changing_query_view/?%s' % urlencode(query))
 
 
 def set_session_view(request):

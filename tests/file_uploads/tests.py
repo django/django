@@ -17,7 +17,7 @@ from django.test import TestCase, client
 from django.test import override_settings
 from django.utils.encoding import force_bytes
 from django.utils.http import urlquote
-from django.utils.six import StringIO
+from django.utils.six import BytesIO, StringIO
 
 from . import uploadhandler
 from .models import FileModel
@@ -33,12 +33,14 @@ class FileUploadTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(FileUploadTests, cls).setUpClass()
         if not os.path.isdir(MEDIA_ROOT):
             os.makedirs(MEDIA_ROOT)
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(MEDIA_ROOT)
+        super(FileUploadTests, cls).tearDownClass()
 
     def test_simple_upload(self):
         with open(__file__, 'rb') as fp:
@@ -237,7 +239,7 @@ class FileUploadTests(TestCase):
         for name, filename, _ in cases:
             payload.write("\r\n".join([
                 '--' + client.BOUNDARY,
-                'Content-Disposition: form-data; name="{0}"; filename="{1}"',
+                'Content-Disposition: form-data; name="{}"; filename="{}"',
                 'Content-Type: application/octet-stream',
                 '',
                 'Oops.',
@@ -256,9 +258,37 @@ class FileUploadTests(TestCase):
         result = json.loads(response.content.decode('utf-8'))
         for name, _, expected in cases:
             got = result[name]
-            self.assertEqual(expected, got, 'Mismatch for {0}'.format(name))
-            self.assertTrue(len(got) < 256,
+            self.assertEqual(expected, got, 'Mismatch for {}'.format(name))
+            self.assertLess(len(got), 256,
                             "Got a long file name (%s characters)." % len(got))
+
+    def test_file_content(self):
+        tdir = tempfile.gettempdir()
+
+        file = tempfile.NamedTemporaryFile
+        with file(suffix=".ctype_extra", dir=tdir) as no_content_type, \
+                file(suffix=".ctype_extra", dir=tdir) as simple_file:
+            no_content_type.write(b'no content')
+            no_content_type.seek(0)
+
+            simple_file.write(b'text content')
+            simple_file.seek(0)
+            simple_file.content_type = 'text/plain'
+
+            string_io = StringIO('string content')
+            bytes_io = BytesIO(b'binary content')
+
+            response = self.client.post('/echo_content/', {
+                'no_content_type': no_content_type,
+                'simple_file': simple_file,
+                'string': string_io,
+                'binary': bytes_io,
+            })
+            received = json.loads(response.content.decode('utf-8'))
+            self.assertEqual(received['no_content_type'], 'no content')
+            self.assertEqual(received['simple_file'], 'text content')
+            self.assertEqual(received['string'], 'string content')
+            self.assertEqual(received['binary'], 'binary content')
 
     def test_content_type_extra(self):
         """Uploaded files may have content type parameters available."""
@@ -336,12 +366,12 @@ class FileUploadTests(TestCase):
             # Small file posting should work.
             response = self.client.post('/quota/', {'f': smallfile})
             got = json.loads(response.content.decode('utf-8'))
-            self.assertTrue('f' in got)
+            self.assertIn('f', got)
 
             # Large files don't go through.
             response = self.client.post("/quota/", {'f': bigfile})
             got = json.loads(response.content.decode('utf-8'))
-            self.assertTrue('f' not in got)
+            self.assertNotIn('f', got)
 
     def test_broken_custom_upload_handler(self):
         with tempfile.NamedTemporaryFile() as file:
@@ -494,12 +524,14 @@ class DirectoryCreationTests(TestCase):
     """
     @classmethod
     def setUpClass(cls):
+        super(DirectoryCreationTests, cls).setUpClass()
         if not os.path.isdir(MEDIA_ROOT):
             os.makedirs(MEDIA_ROOT)
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(MEDIA_ROOT)
+        super(DirectoryCreationTests, cls).tearDownClass()
 
     def setUp(self):
         self.obj = FileModel()

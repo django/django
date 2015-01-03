@@ -153,6 +153,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
 
 @skipIfCustomUser
+@override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)
 class CreatesuperuserManagementCommandTestCase(TestCase):
 
     def test_basic_usage(self):
@@ -274,7 +275,6 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             email="joe@somewhere.org",
             date_of_birth="1976-04-01",
             stdout=new_io,
-            skip_checks=True
         )
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, 'Superuser created successfully.')
@@ -298,7 +298,6 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 username="joe@somewhere.org",
                 stdout=new_io,
                 stderr=new_io,
-                skip_checks=True
             )
 
         self.assertEqual(CustomUser._default_manager.count(), 0)
@@ -335,6 +334,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         command.execute(
             stdin=sentinel,
             stdout=six.StringIO(),
+            stderr=six.StringIO(),
             interactive=False,
             verbosity=0,
             username='janet',
@@ -345,6 +345,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         command = createsuperuser.Command()
         command.execute(
             stdout=six.StringIO(),
+            stderr=six.StringIO(),
             interactive=False,
             verbosity=0,
             username='joe',
@@ -364,7 +365,6 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             email=email.email,
             group=group.pk,
             stdout=new_io,
-            skip_checks=True,
         )
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, 'Superuser created successfully.')
@@ -381,7 +381,6 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 username=email.pk,
                 email=non_existent_email,
                 stdout=new_io,
-                skip_checks=True,
             )
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserWithFK')
@@ -402,7 +401,6 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 interactive=True,
                 stdout=new_io,
                 stdin=MockTTY(),
-                skip_checks=True,
             )
 
             command_output = new_io.getvalue().strip()

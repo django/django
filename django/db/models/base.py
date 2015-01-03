@@ -9,19 +9,20 @@ from django.apps import apps
 from django.apps.config import MODELS_MODULE_NAME
 from django.conf import settings
 from django.core import checks
-from django.core.exceptions import (ObjectDoesNotExist,
+from django.core.exceptions import (FieldDoesNotExist, ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
 from django.db import (router, connections, transaction, DatabaseError,
     DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY)
+from django.db.models import signals
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.fields import AutoField, FieldDoesNotExist
+from django.db.models.fields import AutoField
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
 from django.db.models.manager import ensure_default_manager
 from django.db.models.options import Options
 from django.db.models.query import Q
 from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
-from django.db.models import signals
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str, force_text
@@ -100,13 +101,11 @@ class ModelBase(type):
                 msg = (
                     "Model class %s.%s doesn't declare an explicit app_label "
                     "and either isn't in an application in INSTALLED_APPS or "
-                    "else was imported before its application was loaded. " %
+                    "else was imported before its application was loaded. "
+                    "This will no longer be supported in Django 1.9." %
                     (module, name))
-                if abstract:
-                    msg += "Its app_label will be set to None in Django 1.9."
-                else:
-                    msg += "This will no longer be supported in Django 1.9."
-                warnings.warn(msg, RemovedInDjango19Warning, stacklevel=2)
+                if not abstract:
+                    warnings.warn(msg, RemovedInDjango19Warning, stacklevel=2)
 
                 model_module = sys.modules[new_class.__module__]
                 package_components = model_module.__name__.split('.')
@@ -554,6 +553,71 @@ class Model(six.with_metaclass(ModelBase)):
 
     pk = property(_get_pk_val, _set_pk_val)
 
+    def get_deferred_fields(self):
+        """
+        Returns a set containing names of deferred fields for this instance.
+        """
+        return {
+            f.attname for f in self._meta.concrete_fields
+            if isinstance(self.__class__.__dict__.get(f.attname), DeferredAttribute)
+        }
+
+    def refresh_from_db(self, using=None, fields=None, **kwargs):
+        """
+        Reloads field values from the database.
+
+        By default, the reloading happens from the database this instance was
+        loaded from, or by the read router if this instance wasn't loaded from
+        any database. The using parameter will override the default.
+
+        Fields can be used to specify which fields to reload. The fields
+        should be an iterable of field attnames. If fields is None, then
+        all non-deferred fields are reloaded.
+
+        When accessing deferred fields of an instance, the deferred loading
+        of the field will call this method.
+        """
+        if fields is not None:
+            if len(fields) == 0:
+                return
+            if any(LOOKUP_SEP in f for f in fields):
+                raise ValueError(
+                    'Found "%s" in fields argument. Relations and transforms '
+                    'are not allowed in fields.' % LOOKUP_SEP)
+
+        db = using if using is not None else self._state.db
+        if self._deferred:
+            non_deferred_model = self._meta.proxy_for_model
+        else:
+            non_deferred_model = self.__class__
+        db_instance_qs = non_deferred_model._default_manager.using(db).filter(pk=self.pk)
+
+        # Use provided fields, if not set then reload all non-deferred fields.
+        if fields is not None:
+            fields = list(fields)
+            db_instance_qs = db_instance_qs.only(*fields)
+        elif self._deferred:
+            deferred_fields = self.get_deferred_fields()
+            fields = [f.attname for f in self._meta.concrete_fields
+                      if f.attname not in deferred_fields]
+            db_instance_qs = db_instance_qs.only(*fields)
+
+        db_instance = db_instance_qs.get()
+        non_loaded_fields = db_instance.get_deferred_fields()
+        for field in self._meta.concrete_fields:
+            if field.attname in non_loaded_fields:
+                # This field wasn't refreshed - skip ahead.
+                continue
+            setattr(self, field.attname, getattr(db_instance, field.attname))
+            # Throw away stale foreign key references.
+            if field.rel and field.get_cache_name() in self.__dict__:
+                rel_instance = getattr(self, field.get_cache_name())
+                local_val = getattr(db_instance, field.attname)
+                related_val = getattr(rel_instance, field.related_field.attname)
+                if local_val != related_val:
+                    del self.__dict__[field.get_cache_name()]
+        self._state.db = db_instance._state.db
+
     def serializable_value(self, field_name):
         """
         Returns the value of the field name for this instance. If the field is
@@ -757,8 +821,14 @@ class Model(six.with_metaclass(ModelBase)):
             return update_fields is not None or filtered.exists()
         if self._meta.select_on_save and not forced_update:
             if filtered.exists():
-                filtered._update(values)
-                return True
+                # It may happen that the object is deleted from the DB right after
+                # this check, causing the subsequent UPDATE to return zero matching
+                # rows. The same result can occur in some rare cases when the
+                # database returns zero despite the UPDATE being executed
+                # successfully (a row is matched and updated). In order to
+                # distinguish these two cases, the object's existence in the
+                # database is again checked for if the UPDATE query returns 0.
+                return filtered._update(values) > 0 or filtered.exists()
             else:
                 return False
         return filtered._update(values) > 0
@@ -820,10 +890,10 @@ class Model(six.with_metaclass(ModelBase)):
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
-    def prepare_database_save(self, unused):
+    def prepare_database_save(self, field):
         if self.pk is None:
             raise ValueError("Unsaved model instance %r cannot be used in an ORM query." % self)
-        return self.pk
+        return getattr(self, field.rel.field_name)
 
     def clean(self):
         """
@@ -1155,8 +1225,7 @@ class Model(six.with_metaclass(ModelBase)):
         """ Perform all manager checks. """
 
         errors = []
-        managers = cls._meta.concrete_managers + cls._meta.abstract_managers
-        for __, __, manager in managers:
+        for __, manager, __ in cls._meta.managers:
             errors.extend(manager.check(**kwargs))
         return errors
 
@@ -1374,7 +1443,7 @@ class Model(six.with_metaclass(ModelBase)):
             try:
                 field = cls._meta.get_field(field_name,
                     many_to_many=True)
-            except models.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 errors.append(
                     checks.Error(
                         "'%s' refers to the non-existent field '%s'." % (option, field_name),
@@ -1415,8 +1484,6 @@ class Model(six.with_metaclass(ModelBase)):
     def _check_ordering(cls):
         """ Check "ordering" option -- is it a list of strings and do all fields
         exist? """
-
-        from django.db.models import FieldDoesNotExist
 
         if not cls._meta.ordering:
             return []
@@ -1589,6 +1656,8 @@ def model_unpickle(model_id, attrs, factory):
     Used to unpickle Model subclasses with deferred fields.
     """
     if isinstance(model_id, tuple):
+        if not apps.ready:
+            apps.populate(settings.INSTALLED_APPS)
         model = apps.get_model(*model_id)
     else:
         # Backwards compat - the model was cached directly in earlier versions.

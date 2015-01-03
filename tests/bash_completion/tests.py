@@ -7,7 +7,7 @@ import unittest
 
 from django.apps import apps
 from django.core.management import ManagementUtility
-from django.utils.six import StringIO
+from django.test.utils import captured_stdout
 
 
 class BashCompletionTests(unittest.TestCase):
@@ -20,12 +20,8 @@ class BashCompletionTests(unittest.TestCase):
     def setUp(self):
         self.old_DJANGO_AUTO_COMPLETE = os.environ.get('DJANGO_AUTO_COMPLETE')
         os.environ['DJANGO_AUTO_COMPLETE'] = '1'
-        self.output = StringIO()
-        self.old_stdout = sys.stdout
-        sys.stdout = self.output
 
     def tearDown(self):
-        sys.stdout = self.old_stdout
         if self.old_DJANGO_AUTO_COMPLETE:
             os.environ['DJANGO_AUTO_COMPLETE'] = self.old_DJANGO_AUTO_COMPLETE
         else:
@@ -53,21 +49,22 @@ class BashCompletionTests(unittest.TestCase):
 
     def _run_autocomplete(self):
         util = ManagementUtility(argv=sys.argv)
-        try:
-            util.autocomplete()
-        except SystemExit:
-            pass
-        return self.output.getvalue().strip().split('\n')
+        with captured_stdout() as stdout:
+            try:
+                util.autocomplete()
+            except SystemExit:
+                pass
+        return stdout.getvalue().strip().split('\n')
 
     def test_django_admin_py(self):
         "django_admin.py will autocomplete option flags"
-        self._user_input('django-admin sqlall --verb')
+        self._user_input('django-admin sqlmigrate --verb')
         output = self._run_autocomplete()
         self.assertEqual(output, ['--verbosity='])
 
     def test_manage_py(self):
         "manage.py will autocomplete option flags"
-        self._user_input('manage.py sqlall --verb')
+        self._user_input('manage.py sqlmigrate --verb')
         output = self._run_autocomplete()
         self.assertEqual(output, ['--verbosity='])
 
@@ -104,7 +101,7 @@ class BashCompletionTests(unittest.TestCase):
 
     def test_app_completion(self):
         "Application names will be autocompleted for an AppCommand"
-        self._user_input('django-admin sqlall a')
+        self._user_input('django-admin sqlmigrate a')
         output = self._run_autocomplete()
         a_labels = sorted(app_config.label
             for app_config in apps.get_app_configs()

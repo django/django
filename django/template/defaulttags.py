@@ -56,7 +56,7 @@ class CsrfTokenNode(Node):
             if csrf_token == 'NOTPROVIDED':
                 return format_html("")
             else:
-                return format_html("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />", csrf_token)
+                return format_html("<input type='hidden' name='csrfmiddlewaretoken' value='{}' />", csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
@@ -195,7 +195,7 @@ class ForNode(Node):
                     # Check loop variable count before unpacking
                     if num_loopvars != len_item:
                         warnings.warn(
-                            "Need {0} values to unpack in for loop; got {1}. "
+                            "Need {} values to unpack in for loop; got {}. "
                             "This will raise an exception in Django 2.0."
                             .format(num_loopvars, len_item),
                             RemovedInDjango20Warning)
@@ -210,7 +210,7 @@ class ForNode(Node):
                     context[self.loopvars[0]] = item
                 # In TEMPLATE_DEBUG mode provide source of the node which
                 # actually raised the exception
-                if settings.TEMPLATE_DEBUG:
+                if context.engine.debug:
                     for node in self.nodelist_loop:
                         try:
                             nodelist.append(node.render(context))
@@ -375,9 +375,9 @@ class RegroupNode(Node):
         return ''
 
 
-def include_is_allowed(filepath):
+def include_is_allowed(filepath, allowed_include_roots):
     filepath = os.path.abspath(filepath)
-    for root in settings.ALLOWED_INCLUDE_ROOTS:
+    for root in allowed_include_roots:
         if filepath.startswith(root):
             return True
     return False
@@ -391,7 +391,7 @@ class SsiNode(Node):
     def render(self, context):
         filepath = self.filepath.resolve(context)
 
-        if not include_is_allowed(filepath):
+        if not include_is_allowed(filepath, context.engine.allowed_include_roots):
             if settings.DEBUG:
                 return "[Didn't have permission to include file]"
             else:
@@ -403,7 +403,7 @@ class SsiNode(Node):
             output = ''
         if self.parsed:
             try:
-                t = Template(output, name=filepath)
+                t = Template(output, name=filepath, engine=context.engine)
                 return t.render(context)
             except TemplateSyntaxError as e:
                 if settings.DEBUG:
@@ -419,12 +419,19 @@ class LoadNode(Node):
 
 
 class NowNode(Node):
-    def __init__(self, format_string):
+    def __init__(self, format_string, asvar=None):
         self.format_string = format_string
+        self.asvar = asvar
 
     def render(self, context):
         tzinfo = timezone.get_current_timezone() if settings.USE_TZ else None
-        return date(datetime.now(tz=tzinfo), self.format_string)
+        formatted = date(datetime.now(tz=tzinfo), self.format_string)
+
+        if self.asvar:
+            context[self.asvar] = formatted
+            return ''
+        else:
+            return formatted
 
 
 class SpacelessNode(Node):
@@ -469,13 +476,20 @@ class URLNode(Node):
 
         view_name = self.view_name.resolve(context)
 
+        try:
+            current_app = context.request.current_app
+        except AttributeError:
+            # Change the fallback value to None when the deprecation path for
+            # Context.current_app completes in Django 2.0.
+            current_app = context.current_app
+
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,
         # re-raise the NoReverseMatch unless we're using the
         # {% url ... as var %} construct in which case return nothing.
         url = ''
         try:
-            url = reverse(view_name, args=args, kwargs=kwargs, current_app=context.current_app)
+            url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
         except NoReverseMatch:
             exc_info = sys.exc_info()
             if settings.SETTINGS_MODULE:
@@ -483,7 +497,7 @@ class URLNode(Node):
                 try:
                     url = reverse(project_name + '.' + view_name,
                               args=args, kwargs=kwargs,
-                              current_app=context.current_app)
+                              current_app=current_app)
                 except NoReverseMatch:
                     if self.asvar is None:
                         # Re-raise the original exception, not the one with
@@ -555,8 +569,8 @@ class WithNode(Node):
         return "<WithNode>"
 
     def render(self, context):
-        values = dict((key, val.resolve(context)) for key, val in
-                      six.iteritems(self.extra_context))
+        values = {key: val.resolve(context) for key, val in
+                  six.iteritems(self.extra_context)}
         with context.push(**values):
             return self.nodelist.render(context)
 
@@ -1200,10 +1214,14 @@ def now(parser, token):
         It is {% now "jS F Y H:i" %}
     """
     bits = token.split_contents()
+    asvar = None
+    if len(bits) == 4 and bits[-2] == 'as':
+        asvar = bits[-1]
+        bits = bits[:-2]
     if len(bits) != 2:
         raise TemplateSyntaxError("'now' statement takes one argument")
     format_string = bits[1][1:-1]
-    return NowNode(format_string)
+    return NowNode(format_string, asvar)
 
 
 @register.tag

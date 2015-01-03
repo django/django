@@ -5,14 +5,15 @@ Tests for stuff in django.utils.datastructures.
 import copy
 import pickle
 
-from django.test import SimpleTestCase
-from django.test.utils import IgnoreDeprecationWarningsMixin
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils.datastructures import (DictWrapper, ImmutableList,
     MultiValueDict, MultiValueDictKeyError, MergeDict, OrderedSet, SortedDict)
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
 
 
-class SortedDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):
+@ignore_warnings(category=RemovedInDjango19Warning)
+class SortedDictTests(SimpleTestCase):
     def setUp(self):
         super(SortedDictTests, self).setUp()
         self.d1 = SortedDict()
@@ -136,7 +137,8 @@ class SortedDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):
         self.assertEqual(list(reversed(self.d2)), [7, 0, 9, 1])
 
 
-class MergeDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):
+@ignore_warnings(category=RemovedInDjango19Warning)
+class MergeDictTests(SimpleTestCase):
 
     def test_simple_mergedict(self):
         d1 = {'chris': 'cool', 'camri': 'cute', 'cotton': 'adorable',
@@ -177,7 +179,7 @@ class MergeDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):
         self.assertEqual(sorted(six.iterkeys(mm)), ['key1', 'key2', 'key4'])
         self.assertEqual(len(list(six.itervalues(mm))), 3)
 
-        self.assertTrue('value1' in six.itervalues(mm))
+        self.assertIn('value1', six.itervalues(mm))
 
         self.assertEqual(
             sorted(six.iteritems(mm), key=lambda k: k[0]),

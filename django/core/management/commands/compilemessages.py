@@ -43,11 +43,15 @@ class Command(BaseCommand):
             'Can be used multiple times.')
         parser.add_argument('--exclude', '-x', dest='exclude', action='append', default=[],
             help='Locales to exclude. Default is none. Can be used multiple times.')
+        parser.add_argument('--use-fuzzy', '-f', dest='fuzzy', action='store_true', default=False,
+            help='Use fuzzy translations.')
 
     def handle(self, **options):
         locale = options.get('locale')
         exclude = options.get('exclude')
         self.verbosity = int(options.get('verbosity'))
+        if options.get('fuzzy'):
+            self.program_options = self.program_options + ['-f']
 
         if find_command(self.program) is None:
             raise CommandError("Can't find %s. Make sure you have GNU gettext "
@@ -56,7 +60,7 @@ class Command(BaseCommand):
         basedirs = [os.path.join('conf', 'locale'), 'locale']
         if os.environ.get('DJANGO_SETTINGS_MODULE'):
             from django.conf import settings
-            basedirs.extend([upath(path) for path in settings.LOCALE_PATHS])
+            basedirs.extend(upath(path) for path in settings.LOCALE_PATHS)
 
         # Gather existing directories.
         basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))

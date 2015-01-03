@@ -2,7 +2,6 @@ from unittest import skipUnless
 
 from django import http
 from django.apps import apps
-from django.conf import global_settings
 from django.contrib.messages import constants, utils, get_level, set_level
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
@@ -58,8 +57,17 @@ class BaseTests(object):
 
     def setUp(self):
         self.settings_override = override_settings_tags(
-            TEMPLATE_DIRS=(),
-            TEMPLATE_CONTEXT_PROCESSORS=global_settings.TEMPLATE_CONTEXT_PROCESSORS,
+            TEMPLATES=[{
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'DIRS': [],
+                'APP_DIRS': True,
+                'OPTIONS': {
+                    'context_processors': (
+                        'django.contrib.auth.context_processors.auth',
+                        'django.contrib.messages.context_processors.messages',
+                    ),
+                },
+            }],
             ROOT_URLCONF='django.contrib.messages.tests.urls',
             MESSAGE_TAGS='',
             MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__,
@@ -163,7 +171,7 @@ class BaseTests(object):
             add_url = reverse('add_message', args=(level,))
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
-            self.assertTrue('messages' in response.context)
+            self.assertIn('messages', response.context)
             messages = [Message(self.levels[level], msg) for msg in data['messages']]
             self.assertEqual(list(response.context['messages']), messages)
             for msg in data['messages']:
@@ -179,7 +187,7 @@ class BaseTests(object):
             add_url = reverse('add_template_response', args=(level,))
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
-            self.assertTrue('messages' in response.context)
+            self.assertIn('messages', response.context)
             for msg in data['messages']:
                 self.assertContains(response, msg)
 
@@ -192,7 +200,7 @@ class BaseTests(object):
         show_url = reverse('show_template_response')
         response = self.client.get(show_url)
 
-        self.assertTrue('DEFAULT_MESSAGE_LEVELS' in response.context)
+        self.assertIn('DEFAULT_MESSAGE_LEVELS', response.context)
         self.assertEqual(response.context['DEFAULT_MESSAGE_LEVELS'], DEFAULT_LEVELS)
 
     @override_settings(MESSAGE_LEVEL=constants.DEBUG)
@@ -207,11 +215,11 @@ class BaseTests(object):
         show_url = reverse('show_message')
         messages = []
         for level in ('debug', 'info', 'success', 'warning', 'error'):
-            messages.extend([Message(self.levels[level], msg) for msg in data['messages']])
+            messages.extend(Message(self.levels[level], msg) for msg in data['messages'])
             add_url = reverse('add_message', args=(level,))
             self.client.post(add_url, data)
         response = self.client.get(show_url)
-        self.assertTrue('messages' in response.context)
+        self.assertIn('messages', response.context)
         self.assertEqual(list(response.context['messages']), messages)
         for msg in data['messages']:
             self.assertContains(response, msg)
@@ -219,9 +227,15 @@ class BaseTests(object):
     @modify_settings(
         INSTALLED_APPS={'remove': 'django.contrib.messages'},
         MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
-        TEMPLATE_CONTEXT_PROCESSORS={'remove': 'django.contrib.messages.context_processors.messages'},
     )
-    @override_settings(MESSAGE_LEVEL=constants.DEBUG)
+    @override_settings(
+        MESSAGE_LEVEL=constants.DEBUG,
+        TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'APP_DIRS': True,
+        }],
+    )
     def test_middleware_disabled(self):
         """
         Tests that, when the middleware is disabled, an exception is raised
@@ -239,7 +253,13 @@ class BaseTests(object):
     @modify_settings(
         INSTALLED_APPS={'remove': 'django.contrib.messages'},
         MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
-        TEMPLATE_CONTEXT_PROCESSORS={'remove': 'django.contrib.messages.context_processors.messages'},
+    )
+    @override_settings(
+        TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'APP_DIRS': True,
+        }],
     )
     def test_middleware_disabled_fail_silently(self):
         """
@@ -255,7 +275,7 @@ class BaseTests(object):
             add_url = reverse('add_message', args=(level,))
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
-            self.assertFalse('messages' in response.context)
+            self.assertNotIn('messages', response.context)
 
     def stored_messages_count(self, storage, response):
         """

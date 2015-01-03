@@ -36,6 +36,7 @@ These functions make use of all of them.
 from __future__ import unicode_literals
 
 import base64
+import datetime
 import json
 import time
 import zlib
@@ -192,6 +193,8 @@ class TimestampSigner(Signer):
         value, timestamp = result.rsplit(self.sep, 1)
         timestamp = baseconv.base62.decode(timestamp)
         if max_age is not None:
+            if isinstance(max_age, datetime.timedelta):
+                max_age = max_age.total_seconds()
             # Check timestamp is not older than max_age
             age = time.time() - timestamp
             if age > max_age:

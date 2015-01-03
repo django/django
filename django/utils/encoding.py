@@ -105,8 +105,8 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
             # working unicode method. Try to handle this without raising a
             # further exception by individually forcing the exception args
             # to unicode.
-            s = ' '.join([force_text(arg, encoding, strings_only,
-                    errors) for arg in s])
+            s = ' '.join(force_text(arg, encoding, strings_only, errors)
+                         for arg in s)
     return s
 
 
@@ -152,8 +152,8 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
                 # An Exception subclass containing non-ASCII data that doesn't
                 # know how to print itself properly. We shouldn't raise a
                 # further exception.
-                return b' '.join([force_bytes(arg, encoding, strings_only,
-                        errors) for arg in s])
+                return b' '.join(force_bytes(arg, encoding, strings_only, errors)
+                                 for arg in s)
             return six.text_type(s).encode(encoding, errors)
     else:
         return s.encode(encoding, errors)
@@ -224,6 +224,23 @@ def uri_to_iri(uri):
     uri = force_bytes(uri)
     iri = unquote_to_bytes(uri) if six.PY3 else unquote(uri)
     return repercent_broken_unicode(iri).decode('utf-8')
+
+
+def escape_uri_path(path):
+    """
+    Escape the unsafe characters from the path portion of a Uniform Resource
+    Identifier (URI).
+    """
+    # These are the "reserved" and "unreserved" characters specified in
+    # sections 2.2 and 2.3 of RFC 2396:
+    #   reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ","
+    #   unreserved  = alphanum | mark
+    #   mark        = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
+    # The list of safe characters here is constructed substracting ";", "=",
+    # and "?" according to section 3.3 of RFC 2396.
+    # The reason for not subtracting and escaping "/" is that we are escaping
+    # the entire path, not a path segment.
+    return quote(force_bytes(path), safe=b"/:@&+$,-_.!~*'()")
 
 
 def repercent_broken_unicode(path):

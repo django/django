@@ -58,23 +58,6 @@ def to_list(value):
         value = [value]
     return value
 
-real_commit = transaction.commit
-real_rollback = transaction.rollback
-
-
-def nop(*args, **kwargs):
-    return
-
-
-def disable_transaction_methods():
-    transaction.commit = nop
-    transaction.rollback = nop
-
-
-def restore_transaction_methods():
-    transaction.commit = real_commit
-    transaction.rollback = real_rollback
-
 
 def assert_and_parse_html(self, html, user_msg, msg):
     try:
@@ -161,6 +144,24 @@ class SimpleTestCase(unittest.TestCase):
     _overridden_settings = None
     _modified_settings = None
 
+    @classmethod
+    def setUpClass(cls):
+        if cls._overridden_settings:
+            cls._cls_overridden_context = override_settings(**cls._overridden_settings)
+            cls._cls_overridden_context.enable()
+        if cls._modified_settings:
+            cls._cls_modified_context = modify_settings(cls._modified_settings)
+            cls._cls_modified_context.enable()
+
+    @classmethod
+    def tearDownClass(cls):
+        if hasattr(cls, '_cls_modified_context'):
+            cls._cls_modified_context.disable()
+            delattr(cls, '_cls_modified_context')
+        if hasattr(cls, '_cls_overridden_context'):
+            cls._cls_overridden_context.disable()
+            delattr(cls, '_cls_overridden_context')
+
     def __call__(self, result=None):
         """
         Wrapper around default __call__ method to perform common Django test
@@ -192,24 +193,18 @@ class SimpleTestCase(unittest.TestCase):
         * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
         * Clearing the mail test outbox.
         """
-        if self._overridden_settings:
-            self._overridden_context = override_settings(**self._overridden_settings)
-            self._overridden_context.enable()
-        if self._modified_settings:
-            self._modified_context = modify_settings(self._modified_settings)
-            self._modified_context.enable()
         self.client = self.client_class()
         self._urlconf_setup()
         mail.outbox = []
 
     def _urlconf_setup(self):
-        set_urlconf(None)
         if hasattr(self, 'urls'):
             warnings.warn(
                 "SimpleTestCase.urls is deprecated and will be removed in "
                 "Django 2.0. Use @override_settings(ROOT_URLCONF=...) "
                 "in %s instead." % self.__class__.__name__,
                 RemovedInDjango20Warning, stacklevel=2)
+            set_urlconf(None)
             self._old_root_urlconf = settings.ROOT_URLCONF
             settings.ROOT_URLCONF = self.urls
             clear_url_caches()
@@ -220,14 +215,10 @@ class SimpleTestCase(unittest.TestCase):
         * Putting back the original ROOT_URLCONF if it was changed.
         """
         self._urlconf_teardown()
-        if self._modified_settings:
-            self._modified_context.disable()
-        if self._overridden_settings:
-            self._overridden_context.disable()
 
     def _urlconf_teardown(self):
-        set_urlconf(None)
         if hasattr(self, '_old_root_urlconf'):
+            set_urlconf(None)
             settings.ROOT_URLCONF = self._old_root_urlconf
             clear_url_caches()
 
@@ -510,6 +501,12 @@ class SimpleTestCase(unittest.TestCase):
         if msg_prefix:
             msg_prefix += ": "
 
+        if template_name is not None and response is not None and not hasattr(response, 'templates'):
+            raise ValueError(
+                "assertTemplateUsed() and assertTemplateNotUsed() are only "
+                "usable on responses fetched using the Django test Client."
+            )
+
         if not hasattr(response, 'templates') or (response is None and template_name):
             if response:
                 template_name = response
@@ -789,10 +786,11 @@ class TransactionTestCase(SimpleTestCase):
 
             raise
 
-    def _databases_names(self, include_mirrors=True):
+    @classmethod
+    def _databases_names(cls, include_mirrors=True):
         # If the test case has a multi_db=True flag, act on all databases,
         # including mirrors or not. Otherwise, just on the default DB.
-        if getattr(self, 'multi_db', False):
+        if getattr(cls, 'multi_db', False):
             return [alias for alias in connections
                     if include_mirrors or not connections[alias].settings_dict['TEST']['MIRROR']]
         else:
@@ -830,7 +828,10 @@ class TransactionTestCase(SimpleTestCase):
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
                 call_command('loaddata', *self.fixtures,
-                             **{'verbosity': 0, 'database': db_name, 'skip_checks': True})
+                             **{'verbosity': 0, 'database': db_name})
+
+    def _should_reload_connections(self):
+        return True
 
     def _post_teardown(self):
         """Performs any post-test things. This includes:
@@ -842,14 +843,15 @@ class TransactionTestCase(SimpleTestCase):
         try:
             self._fixture_teardown()
             super(TransactionTestCase, self)._post_teardown()
-            # Some DB cursors include SQL statements as part of cursor
-            # creation. If you have a test that does rollback, the effect of
-            # these statements is lost, which can effect the operation of
-            # tests (e.g., losing a timezone setting causing objects to be
-            # created with the wrong time). To make sure this doesn't happen,
-            # get a clean connection at the start of every test.
-            for conn in connections.all():
-                conn.close()
+            if self._should_reload_connections():
+                # Some DB cursors include SQL statements as part of cursor
+                # creation. If you have a test that does a rollback, the effect
+                # of these statements is lost, which can affect the operation of
+                # tests (e.g., losing a timezone setting causing objects to be
+                # created with the wrong time). To make sure this doesn't
+                # happen, get a clean connection at the start of every test.
+                for conn in connections.all():
+                    conn.close()
         finally:
             if self.available_apps is not None:
                 apps.unset_available_apps()
@@ -864,8 +866,7 @@ class TransactionTestCase(SimpleTestCase):
         for db_name in self._databases_names(include_mirrors=False):
             # Flush the database
             call_command('flush', verbosity=0, interactive=False,
-                         database=db_name, skip_checks=True,
-                         reset_sequences=False,
+                         database=db_name, reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
                          inhibit_post_migrate=self.available_apps is not None)
 
@@ -903,50 +904,85 @@ def connections_support_transactions():
 
 class TestCase(TransactionTestCase):
     """
-    Does basically the same as TransactionTestCase, but surrounds every test
-    with a transaction, monkey-patches the real transaction management routines
-    to do nothing, and rollsback the test transaction at the end of the test.
-    You have to use TransactionTestCase, if you need transaction management
-    inside a test.
+    Similar to TransactionTestCase, but uses `transaction.atomic()` to achieve
+    test isolation.
+
+    In most situation, TestCase should be prefered to TransactionTestCase as
+    it allows faster execution. However, there are some situations where using
+    TransactionTestCase might be necessary (e.g. testing some transactional
+    behavior).
+
+    On database backends with no transaction support, TestCase behaves as
+    TransactionTestCase.
     """
+    @classmethod
+    def _enter_atomics(cls):
+        """Helper method to open atomic blocks for multiple databases"""
+        atomics = {}
+        for db_name in cls._databases_names():
+            atomics[db_name] = transaction.atomic(using=db_name)
+            atomics[db_name].__enter__()
+        return atomics
+
+    @classmethod
+    def _rollback_atomics(cls, atomics):
+        """Rollback atomic blocks opened through the previous method"""
+        for db_name in reversed(cls._databases_names()):
+            transaction.set_rollback(True, using=db_name)
+            atomics[db_name].__exit__(None, None, None)
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCase, cls).setUpClass()
+        if not connections_support_transactions():
+            return
+        cls.cls_atomics = cls._enter_atomics()
+
+        if cls.fixtures:
+            for db_name in cls._databases_names(include_mirrors=False):
+                    try:
+                        call_command('loaddata', *cls.fixtures, **{
+                            'verbosity': 0,
+                            'commit': False,
+                            'database': db_name,
+                        })
+                    except Exception:
+                        cls._rollback_atomics(cls.cls_atomics)
+                        raise
+        cls.setUpTestData()
+
+    @classmethod
+    def tearDownClass(cls):
+        if connections_support_transactions():
+            cls._rollback_atomics(cls.cls_atomics)
+            for conn in connections.all():
+                conn.close()
+        super(TestCase, cls).tearDownClass()
+
+    @classmethod
+    def setUpTestData(cls):
+        """Load initial data for the TestCase"""
+        pass
+
+    def _should_reload_connections(self):
+        if connections_support_transactions():
+            return False
+        return super(TestCase, self)._should_reload_connections()
 
     def _fixture_setup(self):
         if not connections_support_transactions():
+            # If the backend does not support transactions, we should reload
+            # class data before each test
+            self.setUpTestData()
             return super(TestCase, self)._fixture_setup()
 
         assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
-
-        self.atomics = {}
-        for db_name in self._databases_names():
-            self.atomics[db_name] = transaction.atomic(using=db_name)
-            self.atomics[db_name].__enter__()
-        # Remove this when the legacy transaction management goes away.
-        disable_transaction_methods()
-
-        for db_name in self._databases_names(include_mirrors=False):
-            if self.fixtures:
-                try:
-                    call_command('loaddata', *self.fixtures,
-                                 **{
-                                     'verbosity': 0,
-                                     'commit': False,
-                                     'database': db_name,
-                                     'skip_checks': True,
-                                 })
-                except Exception:
-                    self._fixture_teardown()
-                    raise
+        self.atomics = self._enter_atomics()
 
     def _fixture_teardown(self):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
-
-        # Remove this when the legacy transaction management goes away.
-        restore_transaction_methods()
-        for db_name in reversed(self._databases_names()):
-            # Hack to force a rollback
-            connections[db_name].needs_rollback = True
-            self.atomics[db_name].__exit__(None, None, None)
+        self._rollback_atomics(self.atomics)
 
 
 class CheckCondition(object):
@@ -1171,12 +1207,12 @@ class LiveServerTestCase(TransactionTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(LiveServerTestCase, cls).setUpClass()
         connections_override = {}
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to
             # the server thread.
-            if (conn.vendor == 'sqlite'
-                    and conn.settings_dict['NAME'] == ':memory:'):
+            if conn.vendor == 'sqlite' and conn.is_in_memory_db(conn.settings_dict['NAME']):
                 # Explicitly enable thread-shareability for this connection
                 conn.allow_thread_sharing = True
                 connections_override[conn.alias] = conn
@@ -1219,8 +1255,6 @@ class LiveServerTestCase(TransactionTestCase):
             cls._tearDownClassInternal()
             raise cls.server_thread.error
 
-        super(LiveServerTestCase, cls).setUpClass()
-
     @classmethod
     def _tearDownClassInternal(cls):
         # There may not be a 'server_thread' attribute if setUpClass() for some
@@ -1230,10 +1264,9 @@ class LiveServerTestCase(TransactionTestCase):
             cls.server_thread.terminate()
             cls.server_thread.join()
 
-        # Restore sqlite connections' non-shareability
+        # Restore sqlite in-memory database connections' non-shareability
         for conn in connections.all():
-            if (conn.vendor == 'sqlite'
-                    and conn.settings_dict['NAME'] == ':memory:'):
+            if conn.vendor == 'sqlite' and conn.is_in_memory_db(conn.settings_dict['NAME']):
                 conn.allow_thread_sharing = False
 
     @classmethod

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import warnings
-
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import (
     BooleanField, CharField, ChoiceField, DateField, DateTimeField,
@@ -11,7 +9,8 @@ from django.forms import (
     ModelMultipleChoiceField, MultipleChoiceField, RegexField,
     SplitDateTimeField, TimeField, URLField, utils, ValidationError,
 )
-from django.test import TestCase
+from django.test import ignore_warnings, TestCase
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -198,14 +197,13 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFormErrors(['REQUIRED'], f.clean, '')
         self.assertFormErrors(['INVALID DATE', 'INVALID TIME'], f.clean, ['a', 'b'])
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_ipaddressfield(self):
         e = {
             'required': 'REQUIRED',
             'invalid': 'INVALID IP ADDRESS',
         }
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            f = IPAddressField(error_messages=e)
+        f = IPAddressField(error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
         self.assertFormErrors(['INVALID IP ADDRESS'], f.clean, '127.0.0')
 

@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 import logging
 
 from django.conf import settings
-from django.core.context_processors import csrf
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH
 from django.template import RequestContext, Template
+from django.template.context_processors import csrf
 from django.test import TestCase, override_settings
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
 
@@ -119,7 +119,7 @@ class CsrfViewMiddlewareTest(TestCase):
         self.assertEqual(csrf_cookie['secure'], True)
         self.assertEqual(csrf_cookie['httponly'], True)
         self.assertEqual(csrf_cookie['path'], '/test/')
-        self.assertTrue('Cookie' in resp2.get('Vary', ''))
+        self.assertIn('Cookie', resp2.get('Vary', ''))
 
     def test_process_response_get_token_not_used(self):
         """
@@ -340,7 +340,7 @@ class CsrfViewMiddlewareTest(TestCase):
         req = self._get_GET_no_csrf_cookie_request()
         resp = view(req)
         self.assertTrue(resp.cookies.get(settings.CSRF_COOKIE_NAME, False))
-        self.assertTrue('Cookie' in resp.get('Vary', ''))
+        self.assertIn('Cookie', resp.get('Vary', ''))
 
     def test_ensures_csrf_cookie_with_middleware(self):
         """
@@ -357,7 +357,7 @@ class CsrfViewMiddlewareTest(TestCase):
         resp = view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE_NAME, False))
-        self.assertTrue('Cookie' in resp2.get('Vary', ''))
+        self.assertIn('Cookie', resp2.get('Vary', ''))
 
     def test_ensures_csrf_cookie_no_logging(self):
         """

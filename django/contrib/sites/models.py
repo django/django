@@ -33,6 +33,7 @@ def _simple_domain_name_validator(value):
 
 
 class SiteManager(models.Manager):
+    use_in_migrations = True
 
     def _get_site_by_id(self, site_id):
         if site_id not in SITE_CACHE:

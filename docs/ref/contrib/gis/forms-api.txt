@@ -1,5 +1,3 @@
-.. _ref-gis-forms-api:
-
 ===================
 GeoDjango Forms API
 ===================
@@ -163,7 +161,7 @@ Widget classes
     the inner ``Media`` class (see :ref:`assets-as-a-static-definition`). You
     can host a copy of ``openlayers.js``
     `tailored to your needs`_ on your own server or refer to a copy from a
-    content-delivery network like http://cdnjs.com/. This will also allow
+    content-delivery network like https://cdnjs.com/. This will also allow
     you to serve the JavaScript file(s) using the ``https`` protocol if needed.
 
     .. _tailored to your needs: http://docs.openlayers.org/library/deploying.html

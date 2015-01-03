@@ -15,6 +15,7 @@ except ImportError:
     pytz = None
 
 from django.conf import settings
+from django.utils import lru_cache
 from django.utils import six
 from django.utils.decorators import ContextDecorator
 
@@ -162,25 +163,21 @@ def get_fixed_timezone(offset):
     name = sign + hhmm
     return FixedOffset(offset, name)
 
-# In order to avoid accessing the settings at compile time,
-# wrap the expression in a function and cache the result.
-_localtime = None
 
-
+# In order to avoid accessing settings at compile time,
+# wrap the logic in a function and cache the result.
+@lru_cache.lru_cache()
 def get_default_timezone():
     """
     Returns the default time zone as a tzinfo instance.
 
     This is the time zone defined by settings.TIME_ZONE.
     """
-    global _localtime
-    if _localtime is None:
-        if isinstance(settings.TIME_ZONE, six.string_types) and pytz is not None:
-            _localtime = pytz.timezone(settings.TIME_ZONE)
-        else:
-            # This relies on os.environ['TZ'] being set to settings.TIME_ZONE.
-            _localtime = LocalTimezone()
-    return _localtime
+    if isinstance(settings.TIME_ZONE, six.string_types) and pytz is not None:
+        return pytz.timezone(settings.TIME_ZONE)
+    else:
+        # This relies on os.environ['TZ'] being set to settings.TIME_ZONE.
+        return LocalTimezone()
 
 
 # This function exists for consistency with get_current_timezone_name
@@ -350,10 +347,12 @@ def is_naive(value):
     return value.tzinfo is None or value.tzinfo.utcoffset(value) is None
 
 
-def make_aware(value, timezone):
+def make_aware(value, timezone=None):
     """
     Makes a naive datetime.datetime in a given time zone aware.
     """
+    if timezone is None:
+        timezone = get_current_timezone()
     if hasattr(timezone, 'localize'):
         # This method is available for pytz time zones.
         return timezone.localize(value, is_dst=None)
@@ -366,10 +365,12 @@ def make_aware(value, timezone):
         return value.replace(tzinfo=timezone)
 
 
-def make_naive(value, timezone):
+def make_naive(value, timezone=None):
     """
     Makes an aware datetime.datetime naive in a given time zone.
     """
+    if timezone is None:
+        timezone = get_current_timezone()
     # If `value` is naive, astimezone() will raise a ValueError,
     # so we don't need to perform a redundant check.
     value = value.astimezone(timezone)

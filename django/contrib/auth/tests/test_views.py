@@ -1,34 +1,33 @@
 from importlib import import_module
 import itertools
-import os
 import re
-import warnings
 
 from django.apps import apps
-from django.conf import global_settings, settings
+from django.conf import settings
 from django.contrib.sites.requests import RequestSite
 from django.contrib.admin.models import LogEntry
+from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
+from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
+    SetPasswordForm)
 from django.contrib.auth.models import User
+from django.contrib.auth.views import login as login_view
 from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import QueryDict, HttpRequest
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import urlparse, ParseResult
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.utils._os import upath
-from django.test import TestCase, override_settings
+from django.test import TestCase, ignore_warnings, override_settings
 from django.test.utils import patch_logger
 from django.middleware.csrf import CsrfViewMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 
-from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
-from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
-                SetPasswordForm)
 # Needed so model is installed when tests are run independently:
-from django.contrib.auth.tests.custom_user import CustomUser  # NOQA
-from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.contrib.auth.views import login as login_view
+from .custom_user import CustomUser  # NOQA
+from .settings import AUTH_TEMPLATES
+from .utils import skipIfCustomUser
 
 
 @override_settings(
@@ -36,10 +35,7 @@ from django.contrib.auth.views import login as login_view
         ('en', 'English'),
     ),
     LANGUAGE_CODE='en',
-    TEMPLATE_LOADERS=global_settings.TEMPLATE_LOADERS,
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-    ),
+    TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='django.contrib.auth.tests.urls',
@@ -55,13 +51,13 @@ class AuthViewsTestCase(TestCase):
             'username': username,
             'password': password,
         })
-        self.assertTrue(SESSION_KEY in self.client.session)
+        self.assertIn(SESSION_KEY, self.client.session)
         return response
 
     def logout(self):
         response = self.client.get('/admin/logout/')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(SESSION_KEY not in self.client.session)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
     def assertFormError(self, response, error):
         """Assert that error is found in response.context['form'] errors"""
@@ -129,7 +125,7 @@ class PasswordResetTest(AuthViewsTestCase):
         response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertTrue("http://" in mail.outbox[0].body)
+        self.assertIn("http://", mail.outbox[0].body)
         self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
         # optional multipart text/html email has been added.  Make sure original,
         # default functionality is 100% the same
@@ -148,8 +144,8 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertTrue(message.is_multipart())
         self.assertEqual(message.get_payload(0).get_content_type(), 'text/plain')
         self.assertEqual(message.get_payload(1).get_content_type(), 'text/html')
-        self.assertTrue('<html>' not in message.get_payload(0).get_payload())
-        self.assertTrue('<html>' in message.get_payload(1).get_payload())
+        self.assertNotIn('<html>', message.get_payload(0).get_payload())
+        self.assertIn('<html>', message.get_payload(1).get_payload())
 
     def test_email_found_custom_from(self):
         "Email is sent if a valid email address is provided for password reset when a custom from_email is provided."
@@ -158,18 +154,17 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual("staffmember@example.com", mail.outbox[0].from_email)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(ALLOWED_HOSTS=['adminsite.com'])
     def test_admin_reset(self):
         "If the reset view is marked as being for admin, the HTTP_HOST header is used for a domain override."
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            response = self.client.post('/admin_password_reset/',
-                {'email': 'staffmember@example.com'},
-                HTTP_HOST='adminsite.com'
-            )
+        response = self.client.post('/admin_password_reset/',
+            {'email': 'staffmember@example.com'},
+            HTTP_HOST='adminsite.com'
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertTrue("http://adminsite.com" in mail.outbox[0].body)
+        self.assertIn("http://adminsite.com", mail.outbox[0].body)
         self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
 
     # Skip any 500 handler action (like sending more mail...)
@@ -215,7 +210,7 @@ class PasswordResetTest(AuthViewsTestCase):
 
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
-        self.assertTrue(urlmatch is not None, "No URL found in sent email")
+        self.assertIsNotNone(urlmatch, "No URL found in sent email")
         return urlmatch.group(), urlmatch.groups()[0]
 
     def test_confirm_valid(self):
@@ -346,7 +341,7 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
 
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
-        self.assertTrue(urlmatch is not None, "No URL found in sent email")
+        self.assertIsNotNone(urlmatch, "No URL found in sent email")
         return urlmatch.group(), urlmatch.groups()[0]
 
     def test_confirm_valid_custom_user(self):
@@ -502,7 +497,7 @@ class LoginTest(AuthViewsTestCase):
                 'password': password,
             })
             self.assertEqual(response.status_code, 302)
-            self.assertFalse(bad_url in response.url,
+            self.assertNotIn(bad_url, response.url,
                              "%s should be blocked" % bad_url)
 
         # These URLs *should* still pass the security check
@@ -524,8 +519,7 @@ class LoginTest(AuthViewsTestCase):
                 'password': password,
             })
             self.assertEqual(response.status_code, 302)
-            self.assertTrue(good_url in response.url,
-                            "%s should be allowed" % good_url)
+            self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
 
     def test_login_form_contains_request(self):
         # 15198
@@ -683,7 +677,7 @@ class LoginRedirectUrlTest(AuthViewsTestCase):
 class LogoutTest(AuthViewsTestCase):
 
     def confirm_logged_out(self):
-        self.assertTrue(SESSION_KEY not in self.client.session)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
     def test_logout_default(self):
         "Logout without next_page option renders the default template"
@@ -696,7 +690,7 @@ class LogoutTest(AuthViewsTestCase):
         # Bug 14377
         self.login()
         response = self.client.get('/logout/')
-        self.assertTrue('site' in response.context)
+        self.assertIn('site', response.context)
 
     def test_logout_with_overridden_redirect_url(self):
         # Bug 11223
@@ -762,7 +756,7 @@ class LogoutTest(AuthViewsTestCase):
             self.login()
             response = self.client.get(nasty_url)
             self.assertEqual(response.status_code, 302)
-            self.assertFalse(bad_url in response.url,
+            self.assertNotIn(bad_url, response.url,
                              "%s should be blocked" % bad_url)
             self.confirm_logged_out()
 
@@ -783,8 +777,7 @@ class LogoutTest(AuthViewsTestCase):
             self.login()
             response = self.client.get(safe_url)
             self.assertEqual(response.status_code, 302)
-            self.assertTrue(good_url in response.url,
-                            "%s should be allowed" % good_url)
+            self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
             self.confirm_logged_out()
 
     def test_logout_preserve_language(self):

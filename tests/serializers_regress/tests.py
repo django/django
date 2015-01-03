@@ -11,7 +11,6 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 from unittest import skipUnless
-import warnings
 
 try:
     import yaml
@@ -24,8 +23,9 @@ from django.core.serializers.base import DeserializationError
 from django.core.serializers.xml_serializer import DTDForbidden
 from django.db import connection, models
 from django.http import HttpResponse
-from django.test import skipUnlessDBFeature, TestCase
+from django.test import ignore_warnings, skipUnlessDBFeature, TestCase
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.functional import curry
 
 from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, EmailData,
@@ -419,11 +419,11 @@ class SerializerTests(TestCase):
             serializers.get_serializer("nonsense")
         self.assertEqual(cm.exception.args, ("nonsense",))
 
-    def test_unregister_unkown_serializer(self):
+    def test_unregister_unknown_serializer(self):
         with self.assertRaises(SerializerDoesNotExist):
             serializers.unregister_serializer("nonsense")
 
-    def test_get_unkown_deserializer(self):
+    def test_get_unknown_deserializer(self):
         with self.assertRaises(SerializerDoesNotExist):
             serializers.get_deserializer("nonsense")
 
@@ -484,6 +484,7 @@ def serializerTest(format, self):
         self.assertEqual(count, klass.objects.count())
 
 
+@ignore_warnings(category=RemovedInDjango19Warning)  # for use_natural_keys
 def naturalKeySerializerTest(format, self):
     # Create all the objects defined in the test data
     objects = []
@@ -497,11 +498,9 @@ def naturalKeySerializerTest(format, self):
         instance_count[klass] = klass.objects.count()
 
     # use_natural_keys is deprecated and to be removed in Django 1.9
-    with warnings.catch_warnings(record=True):
-        warnings.simplefilter("always")
-        # Serialize the test database
-        serialized_data = serializers.serialize(format, objects, indent=2,
-            use_natural_keys=True)
+    # Serialize the test database
+    serialized_data = serializers.serialize(format, objects, indent=2,
+        use_natural_keys=True)
 
     for obj in serializers.deserialize(format, serialized_data):
         obj.save()
@@ -578,7 +577,7 @@ def naturalKeyTest(format, self):
 
 
 for format in [f for f in serializers.get_serializer_formats()
-               if not isinstance(serializers.get_serializer(f), serializers.BadSerializer)]:
+               if not isinstance(serializers.get_serializer(f), serializers.BadSerializer) and not f == 'geojson']:
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_natural_key_serializer', curry(naturalKeySerializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_serializer_fields', curry(fieldsTest, format))

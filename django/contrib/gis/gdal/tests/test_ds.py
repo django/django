@@ -6,7 +6,7 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import get_ds_file, TestDS, TEST_DATA
 
 if HAS_GDAL:
-    from django.contrib.gis.gdal import DataSource, Envelope, OGRGeometry, OGRException, OGRIndexError, GDAL_VERSION
+    from django.contrib.gis.gdal import DataSource, Envelope, OGRGeometry, GDALException, OGRIndexError, GDAL_VERSION
     from django.contrib.gis.gdal.field import OFTReal, OFTInteger, OFTString
 
     # List of acceptable data sources.
@@ -85,7 +85,7 @@ class DataSourceTest(unittest.TestCase):
     def test02_invalid_shp(self):
         "Testing invalid SHP files for the Data Source."
         for source in bad_ds:
-            self.assertRaises(OGRException, DataSource, source.ds)
+            self.assertRaises(GDALException, DataSource, source.ds)
 
     def test03a_layers(self):
         "Testing Data Source Layers."

@@ -131,9 +131,9 @@ binary data in the database.
 GeoDjango form widgets
 ~~~~~~~~~~~~~~~~~~~~~~
 
-GeoDjango now provides :ref:`form fields and widgets <ref-gis-forms-api>` for
-its geo-specialized fields. They are OpenLayers-based by default, but they can
-be customized to use any other JS framework.
+GeoDjango now provides :doc:`form fields and widgets </ref/contrib/gis/forms-api>`
+for its geo-specialized fields. They are OpenLayers-based by default, but they
+can be customized to use any other JS framework.
 
 ``check`` management command added for verifying compatibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -233,7 +233,7 @@ Minor features
   PostgreSQL.
 
 * The :ttag:`blocktrans` template tag now respects
-  :setting:`TEMPLATE_STRING_IF_INVALID` for variables not present in the
+  ``TEMPLATE_STRING_IF_INVALID`` for variables not present in the
   context, just like other template constructs.
 
 * ``SimpleLazyObject``\s will now present more helpful representations in shell
@@ -442,7 +442,7 @@ If you wish to delay updates to your test suite, you can set your
 to fully restore the old test behavior. ``DjangoTestSuiteRunner`` is deprecated
 but will not be removed from Django until version 1.8.
 
-.. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
+.. _recommendations in the Python documentation: https://docs.python.org/library/doctest.html#unittest-api
 
 Removal of ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner`` GeoDjango custom test runner
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -836,11 +836,11 @@ Object Relational Mapper changes
 Django 1.6 contains many changes to the ORM. These changes fall mostly in
 three categories:
 
-  1. Bug fixes (e.g. proper join clauses for generic relations, query
-     combining, join promotion, and join trimming fixes)
-  2. Preparation for new features. For example the ORM is now internally ready
-     for multicolumn foreign keys.
-  3. General cleanup.
+1. Bug fixes (e.g. proper join clauses for generic relations, query combining,
+   join promotion, and join trimming fixes)
+2. Preparation for new features. For example the ORM is now internally ready
+   for multicolumn foreign keys.
+3. General cleanup.
 
 These changes can result in some compatibility problems. For example, some
 queries will now generate different table aliases. This can affect
@@ -1021,7 +1021,7 @@ tags render their arguments as-is.
 Django 1.6 starts a process to correct this inconsistency. The ``future``
 template library provides alternate implementations of :ttag:`cycle` and
 :ttag:`firstof` that autoescape their inputs. If you're using these tags,
-you're encourage to include the following line at the top of your templates to
+you're encouraged to include the following line at the top of your templates to
 enable the new behavior::
 
     {% load cycle from future %}
@@ -1091,7 +1091,9 @@ private API, it will go through a regular deprecation path.
 
 ``Model._meta.get_(add|change|delete)_permission`` methods were deprecated.
 Even if they were not part of the public API they'll also go through
-a regular deprecation path.
+a regular deprecation path. You can replace them with
+``django.contrib.auth.get_permission_codename('action', Model._meta)`` where
+``'action'`` is ``'add'``, ``'change'``, or ``'delete'``.
 
 ``get_query_set`` and similar methods renamed to ``get_queryset``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1116,8 +1118,35 @@ you should rename the method and conditionally add an alias with the old name::
 If you are writing a library that needs to call the ``get_queryset`` method and
 must support old Django versions, you should write::
 
-    method = getattr(some_manager, 'get_queryset', some_manager.get_query_set)
-    method(params)
+    get_queryset = (some_manager.get_query_set
+                    if hasattr(some_manager, 'get_query_set')
+                    else some_manager.get_queryset)
+    return get_queryset() # etc
+
+In the general case of a custom manager that both implements its own
+``get_queryset`` method and calls that method, and needs to work with older Django
+versions, and libraries that have not been updated yet, it is useful to define
+a ``get_queryset_compat`` method as below and use it internally to your manager::
+
+    class YourCustomManager(models.Manager):
+        def get_queryset(self):
+            return YourCustomQuerySet() # for example
+
+        get_query_set = get_queryset
+
+        def active(self): # for example
+            return self.get_queryset_compat().filter(active=True)
+
+        def get_queryset_compat(self):
+            get_queryset = (self.get_query_set
+                            if hasattr(self, 'get_query_set')
+                            else self.get_queryset)
+            return get_queryset()
+
+This helps to minimize the changes that are needed, but also works correctly in
+the case of subclasses (such as ``RelatedManagers`` from Django 1.5) which might
+override either ``get_query_set`` or ``get_queryset``.
+
 
 ``shortcut`` view and URLconf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1183,7 +1212,7 @@ create a ``ModelForm`` that uses all fields for a model.
 For this reason, if you use these views for editing models, you must also supply
 the ``fields`` attribute (new in Django 1.6), which is a list of model fields
 and works in the same way as the :class:`~django.forms.ModelForm`
-``Meta.fields`` attribute. Alternatively, you can set set the ``form_class``
+``Meta.fields`` attribute. Alternatively, you can set the ``form_class``
 attribute to a ``ModelForm`` that explicitly defines the fields to be used.
 Defining an ``UpdateView`` or ``CreateView`` subclass to be used with a model
 but without an explicit list of fields is deprecated.

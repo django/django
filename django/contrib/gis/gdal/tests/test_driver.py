@@ -1,37 +1,46 @@
 import unittest
-from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 
 if HAS_GDAL:
-    from django.contrib.gis.gdal import Driver, OGRException
+    from django.contrib.gis.gdal import Driver, GDALException
 
 
-valid_drivers = ('ESRI Shapefile', 'MapInfo File', 'TIGER', 'S57', 'DGN',
-                 'Memory', 'CSV', 'GML', 'KML')
+valid_drivers = (
+    # vector
+    'ESRI Shapefile', 'MapInfo File', 'TIGER', 'S57', 'DGN', 'Memory', 'CSV',
+    'GML', 'KML',
+    # raster
+    'GTiff', 'JPEG', 'MEM', 'PNG',
+)
 
-invalid_drivers = ('Foo baz', 'clucka', 'ESRI Shp')
+invalid_drivers = ('Foo baz', 'clucka', 'ESRI Shp', 'ESRI rast')
 
-aliases = {'eSrI': 'ESRI Shapefile',
-           'TigER/linE': 'TIGER',
-           'SHAPE': 'ESRI Shapefile',
-           'sHp': 'ESRI Shapefile',
-           }
+aliases = {
+    'eSrI': 'ESRI Shapefile',
+    'TigER/linE': 'TIGER',
+    'SHAPE': 'ESRI Shapefile',
+    'sHp': 'ESRI Shapefile',
+    'tiFf': 'GTiff',
+    'tIf': 'GTiff',
+    'jPEg': 'JPEG',
+    'jpG': 'JPEG',
+}
 
 
-@skipUnless(HAS_GDAL, "GDAL is required")
+@unittest.skipUnless(HAS_GDAL, "GDAL is required")
 class DriverTest(unittest.TestCase):
 
     def test01_valid_driver(self):
-        "Testing valid OGR Data Source Drivers."
+        "Testing valid GDAL/OGR Data Source Drivers."
         for d in valid_drivers:
             dr = Driver(d)
             self.assertEqual(d, str(dr))
 
     def test02_invalid_driver(self):
-        "Testing invalid OGR Data Source Drivers."
+        "Testing invalid GDAL/OGR Data Source Drivers."
         for i in invalid_drivers:
-            self.assertRaises(OGRException, Driver, i)
+            self.assertRaises(GDALException, Driver, i)
 
     def test03_aliases(self):
         "Testing driver aliases."

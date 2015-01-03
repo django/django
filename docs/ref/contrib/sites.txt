@@ -209,8 +209,8 @@ subscribing to LJWorld.com alerts." Same goes for the email's message body.
 
 Note that an even more flexible (but more heavyweight) way of doing this would
 be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
-different template directories (:setting:`TEMPLATE_DIRS`), you could simply
-farm out to the template system like so::
+different template directories (:setting:`DIRS <TEMPLATES-DIRS>`), you could
+simply farm out to the template system like so::
 
     from django.core.mail import send_mail
     from django.template import loader, Context
@@ -474,7 +474,7 @@ a fallback when the database-backed sites framework is not available.
 
     .. versionchanged:: 1.7
 
-      This class used to be defined in ``django.contrib.sites.models``.
+        This class used to be defined in ``django.contrib.sites.models``.
 
 A :class:`~django.contrib.sites.requests.RequestSite` object has a similar
 interface to a normal :class:`~django.contrib.sites.models.Site` object,
@@ -500,10 +500,10 @@ Finally, to avoid repetitive fallback code, the framework provides a
 
     .. versionchanged:: 1.7
 
-      This function used to be defined in ``django.contrib.sites.models``.
+        This function used to be defined in ``django.contrib.sites.models``.
 
     .. versionchanged:: 1.8
 
-      This function will now lookup the current site based on
-      :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
-      :setting:`SITE_ID` setting is not defined.
+        This function will now lookup the current site based on
+        :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
+        :setting:`SITE_ID` setting is not defined.

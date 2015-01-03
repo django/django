@@ -15,6 +15,8 @@ DELETION = 3
 
 
 class LogEntryManager(models.Manager):
+    use_in_migrations = True
+
     def log_action(self, user_id, content_type_id, object_id, object_repr, action_flag, change_message=''):
         e = self.model(
             None, None, user_id, content_type_id, smart_text(object_id),

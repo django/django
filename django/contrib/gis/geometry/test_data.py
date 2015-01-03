@@ -8,10 +8,8 @@ import os
 from django.contrib import gis
 from django.utils import six
 from django.utils._os import upath
+from django.utils.functional import cached_property
 
-
-# This global used to store reference geometry data.
-GEOMETRIES = None
 
 # Path where reference test data is located.
 TEST_DATA = os.path.join(os.path.dirname(upath(gis.__file__)), 'tests', 'data')
@@ -26,7 +24,7 @@ def tuplize(seq):
 
 def strconvert(d):
     "Converts all keys in dictionary to str type."
-    return dict((str(k), v) for k, v in six.iteritems(d))
+    return {str(k): v for k, v in six.iteritems(d)}
 
 
 def get_ds_file(name, ext):
@@ -95,12 +93,9 @@ class TestDataMixin(object):
     Mixin used for GEOS/GDAL test cases that defines a `geometries`
     property, which returns and/or loads the reference geometry data.
     """
-    @property
+    @cached_property
     def geometries(self):
-        global GEOMETRIES
-        if GEOMETRIES is None:
-            # Load up the test geometry data from fixture into global.
-            with open(os.path.join(TEST_DATA, 'geometries.json')) as f:
-                geometries = json.load(f)
-            GEOMETRIES = TestGeomSet(**strconvert(geometries))
-        return GEOMETRIES
+        # Load up the test geometry data from fixture into global.
+        with open(os.path.join(TEST_DATA, 'geometries.json')) as f:
+            geometries = json.load(f)
+        return TestGeomSet(**strconvert(geometries))

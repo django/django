@@ -14,7 +14,7 @@ class DataTypesTestCase(TestCase):
     def test_boolean_type(self):
         d = Donut(name='Apple Fritter')
         self.assertFalse(d.is_frosted)
-        self.assertTrue(d.has_sprinkles is None)
+        self.assertIsNone(d.has_sprinkles)
         d.has_sprinkles = True
         self.assertTrue(d.has_sprinkles)
 

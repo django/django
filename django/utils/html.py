@@ -10,7 +10,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.safestring import SafeData, SafeText, mark_safe
 from django.utils import six
 from django.utils.six.moves.urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 from django.utils.text import normalize_newlines
@@ -19,7 +19,7 @@ from .html_parser import HTMLParser, HTMLParseError
 
 
 # Configuration for urlize() function.
-TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)', '"', '\'']
+TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)', '"', '\'', '!']
 WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
 
 # List of possible strings used for bullets in bulleted lists.
@@ -44,10 +44,14 @@ def escape(text):
     """
     Returns the given text with ampersands, quotes and angle brackets encoded
     for use in HTML.
+
+    This function always escapes its input, even if it's already escaped and
+    marked as such. This may result in double-escaping. If this is a concern,
+    use conditional_escape() instead.
     """
     return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;')
         .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
-escape = allow_lazy(escape, six.text_type)
+escape = allow_lazy(escape, six.text_type, SafeText)
 
 _js_escapes = {
     ord('\\'): '\\u005C',
@@ -70,12 +74,15 @@ _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
-escapejs = allow_lazy(escapejs, six.text_type)
+escapejs = allow_lazy(escapejs, six.text_type, SafeText)
 
 
 def conditional_escape(text):
     """
     Similar to escape(), except that it doesn't operate on pre-escaped strings.
+
+    This function relies on the __html__ convention used both by Django's
+    SafeData class and by third-party libraries like markupsafe.
     """
     if hasattr(text, '__html__'):
         return text.__html__()
@@ -90,7 +97,7 @@ def format_html(format_string, *args, **kwargs):
     of str.format or % interpolation to build up small HTML fragments.
     """
     args_safe = map(conditional_escape, args)
-    kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in six.iteritems(kwargs))
+    kwargs_safe = {k: conditional_escape(v) for (k, v) in six.iteritems(kwargs)}
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 
@@ -105,7 +112,7 @@ def format_html_join(sep, format_string, args_generator):
 
     Example:
 
-      format_html_join('\n', "<li>{0} {1}</li>", ((u.first_name, u.last_name)
+      format_html_join('\n', "<li>{} {}</li>", ((u.first_name, u.last_name)
                                                   for u in users))
 
     """

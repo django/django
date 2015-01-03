@@ -1,12 +1,14 @@
 from __future__ import unicode_literals
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import threading
+import warnings
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db import DatabaseError
 from django.db.models.fields import Field
+from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet, MAX_GET_RESULTS
 from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -134,7 +136,7 @@ class ModelInstanceCreationTests(TestCase):
         a.save()
 
         # You can use 'in' to test for membership...
-        self.assertTrue(a in Article.objects.all())
+        self.assertIn(a, Article.objects.all())
         # ... but there will often be more efficient ways if that is all you need:
         self.assertTrue(Article.objects.filter(id=a.id).exists())
 
@@ -171,12 +173,10 @@ class ModelTest(TestCase):
         some_pub_date = datetime(2014, 5, 16, 12, 1)
         a1 = Article.objects.create(headline='First', pub_date=some_pub_date)
         a2 = Article.objects.create(headline='Second', pub_date=some_pub_date)
-        self.assertTrue(a1 != a2)
-        self.assertFalse(a1 == a2)
-        self.assertTrue(a1 == Article.objects.get(id__exact=a1.id))
+        self.assertNotEqual(a1, a2)
+        self.assertEqual(a1, Article.objects.get(id__exact=a1.id))
 
-        self.assertTrue(Article.objects.get(id__exact=a1.id) != Article.objects.get(id__exact=a2.id))
-        self.assertFalse(Article.objects.get(id__exact=a2.id) == Article.objects.get(id__exact=a1.id))
+        self.assertNotEqual(Article.objects.get(id__exact=a1.id), Article.objects.get(id__exact=a2.id))
 
     def test_multiple_objects_max_num_fetched(self):
         """
@@ -286,7 +286,7 @@ class ModelTest(TestCase):
         )
 
         s = {a10, a11, a12}
-        self.assertTrue(Article.objects.get(headline='Article 11') in s)
+        self.assertIn(Article.objects.get(headline='Article 11'), s)
 
     def test_field_ordering(self):
         """
@@ -299,10 +299,10 @@ class ModelTest(TestCase):
         f1 = Field()
         f2 = Field(auto_created=True)
         f3 = Field()
-        self.assertTrue(f2 < f1)
-        self.assertTrue(f3 > f1)
-        self.assertFalse(f1 is None)
-        self.assertFalse(f2 in (None, 1, ''))
+        self.assertLess(f2, f1)
+        self.assertGreater(f3, f1)
+        self.assertIsNotNone(f1)
+        self.assertNotIn(f2, (None, 1, ''))
 
     def test_extra_method_select_argument_with_dashes_and_values(self):
         # The 'select' argument to extra() supports names with dashes in
@@ -703,7 +703,7 @@ class SelectOnSaveTests(TestCase):
         try:
             Article._base_manager.__class__ = FakeManager
             asos = ArticleSelectOnSave.objects.create(pub_date=datetime.now())
-            with self.assertNumQueries(2):
+            with self.assertNumQueries(3):
                 asos.save()
                 self.assertTrue(FakeQuerySet.called)
             # This is not wanted behavior, but this is how Django has always
@@ -715,3 +715,73 @@ class SelectOnSaveTests(TestCase):
                 asos.save(update_fields=['pub_date'])
         finally:
             Article._base_manager.__class__ = orig_class
+
+
+class ModelRefreshTests(TestCase):
+    def _truncate_ms(self, val):
+        # MySQL < 5.6.4 removes microseconds from the datetimes which can cause
+        # problems when comparing the original value to that loaded from DB
+        return val - timedelta(microseconds=val.microsecond)
+
+    def test_refresh(self):
+        a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
+        Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
+        Article.objects.filter(pk=a.pk).update(headline='new headline')
+        with self.assertNumQueries(1):
+            a.refresh_from_db()
+            self.assertEqual(a.headline, 'new headline')
+
+        orig_pub_date = a.pub_date
+        new_pub_date = a.pub_date + timedelta(10)
+        Article.objects.update(headline='new headline 2', pub_date=new_pub_date)
+        with self.assertNumQueries(1):
+            a.refresh_from_db(fields=['headline'])
+            self.assertEqual(a.headline, 'new headline 2')
+            self.assertEqual(a.pub_date, orig_pub_date)
+        with self.assertNumQueries(1):
+            a.refresh_from_db()
+            self.assertEqual(a.pub_date, new_pub_date)
+
+    def test_refresh_fk(self):
+        s1 = SelfRef.objects.create()
+        s2 = SelfRef.objects.create()
+        s3 = SelfRef.objects.create(selfref=s1)
+        s3_copy = SelfRef.objects.get(pk=s3.pk)
+        s3_copy.selfref.touched = True
+        s3.selfref = s2
+        s3.save()
+        with self.assertNumQueries(1):
+            s3_copy.refresh_from_db()
+        with self.assertNumQueries(1):
+            # The old related instance was thrown away (the selfref_id has
+            # changed). It needs to be reloaded on access, so one query
+            # executed.
+            self.assertFalse(hasattr(s3_copy.selfref, 'touched'))
+            self.assertEqual(s3_copy.selfref, s2)
+
+    def test_refresh_unsaved(self):
+        pub_date = self._truncate_ms(datetime.now())
+        a = Article.objects.create(pub_date=pub_date)
+        a2 = Article(id=a.pk)
+        with self.assertNumQueries(1):
+            a2.refresh_from_db()
+        self.assertEqual(a2.pub_date, pub_date)
+        self.assertEqual(a2._state.db, "default")
+
+    def test_refresh_no_fields(self):
+        a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
+        with self.assertNumQueries(0):
+            a.refresh_from_db(fields=[])
+
+
+class TestRelatedObjectDeprecation(TestCase):
+    def test_field_related_deprecation(self):
+        field = SelfRef._meta.get_field_by_name('selfref')[0]
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            self.assertIsInstance(field.related, ForeignObjectRel)
+            self.assertEqual(len(warns), 1)
+            self.assertEqual(
+                str(warns.pop().message),
+                'Usage of field.related has been deprecated. Use field.rel instead.'
+            )

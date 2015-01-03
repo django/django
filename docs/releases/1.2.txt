@@ -141,7 +141,7 @@ Improved CSRF protection
 ------------------------
 
 Django now has much improved protection against :doc:`Cross-Site Request Forgery
-(CSRF) attacks</ref/contrib/csrf>`. This type of attack occurs when a malicious
+(CSRF) attacks</ref/csrf>`. This type of attack occurs when a malicious
 Web site contains a link, a form button or some JavaScript that is intended to
 perform some action on your Web site, using the credentials of a logged-in user
 who visits the malicious site in their browser. A related type of attack, "login
@@ -267,9 +267,9 @@ opposed to functions, the only method available until Django 1.1.
 All the template loaders :ref:`shipped with Django <template-loaders>` have
 been ported to the new API but they still implement the function-based API and
 the template core machinery still accepts function-based loaders (builtin or
-third party) so there is no immediate need to modify your
-:setting:`TEMPLATE_LOADERS` setting in existing projects, things will keep
-working if you leave it untouched up to and including the Django 1.3 release.
+third party) so there is no immediate need to modify your ``TEMPLATE_LOADERS``
+setting in existing projects, things will keep working if you leave it
+untouched up to and including the Django 1.3 release.
 
 If you have developed your own custom template loaders we suggest to consider
 porting them to a class-based implementation because the code for backwards
@@ -351,7 +351,7 @@ are now included:
 * ``django.contrib.gis.db.backends.spatialite``
 
 GeoDjango now supports the rich capabilities added
-in the `PostGIS 1.5 release <http://postgis.refractions.net/documentation/manual-1.5/>`_.
+in the `PostGIS 1.5 release <http://postgis.net/docs/manual-1.5/>`_.
 New features include support for the :ref:`geography type <geography-type>`
 and enabling of :ref:`distance queries <distance-queries>`
 with non-point geometries on geographic coordinate systems.
@@ -370,13 +370,12 @@ methods are new in 1.2:
 * :meth:`~django.contrib.gis.db.models.GeoQuerySet.reverse_geom`
 * :meth:`~django.contrib.gis.db.models.GeoQuerySet.geohash`
 
-The :ref:`GEOS interface <ref-geos>` was updated to use
-thread-safe C library functions when available on the platform.
+The GEOS interface was updated to use thread-safe C library functions when
+available on the platform.
 
-The :ref:`GDAL interface <ref-gdal>` now allows the user to
-set a :attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on
-the features returned when iterating over a
-:class:`~django.contrib.gis.gdal.Layer`.
+The GDAL interface now allows the user to set a
+:attr:`~django.contrib.gis.gdal.Layer.spatial_filter` on the features returned
+when iterating over a :class:`~django.contrib.gis.gdal.Layer`.
 
 Finally, :doc:`GeoDjango's documentation </ref/contrib/gis/index>` is now
 included with Django's and is no longer
@@ -426,7 +425,7 @@ CSRF Protection
 ---------------
 
 We've made large changes to the way CSRF protection works, detailed in
-:doc:`the CSRF documentation </ref/contrib/csrf>`. Here are the major changes you
+:doc:`the CSRF documentation </ref/csrf>`. Here are the major changes you
 should be aware of:
 
 * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated and

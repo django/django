@@ -81,7 +81,7 @@ overridden:
   which will be used as the ``cleaned_data``.
 
   Since the field validation methods have been run by the time ``clean()`` is
-  called, you also have access to the form's errors attribute which
+  called, you also have access to the form's ``errors`` attribute which
   contains all the errors raised by cleaning of individual fields.
 
   Note that any errors raised by your :meth:`Form.clean()` override will not
@@ -325,13 +325,6 @@ write a cleaning method that operates on the ``recipients`` field, like so::
             # Always return the cleaned data, whether you have changed it or
             # not.
             return data
-
-Sometimes you may want to add an error message to a particular field from the
-form's :meth:`~Form.clean()` method, in which case you can use
-:meth:`~django.forms.Form.add_error()`. Note that this won't always be
-appropriate and the more typical situation is to raise a ``ValidationError``
-from , which is turned into a form-wide error that is available through the
-:meth:`Form.non_field_errors() <django.forms.Form.non_field_errors>` method.
 
 .. _validating-fields-with-clean:
 

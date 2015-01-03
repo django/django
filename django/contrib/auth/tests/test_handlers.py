@@ -29,7 +29,7 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         User.objects.create_user('test', 'test@example.com', 'test')
 
         # User not in database
-        self.assertTrue(check_password({}, 'unknown', '') is None)
+        self.assertIsNone(check_password({}, 'unknown', ''))
 
         # Valid user with correct password
         self.assertTrue(check_password({}, 'test', 'test'))
@@ -53,7 +53,7 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         CustomUser._default_manager.create_user('test@example.com', '1990-01-01', 'test')
 
         # User not in database
-        self.assertTrue(check_password({}, 'unknown', '') is None)
+        self.assertIsNone(check_password({}, 'unknown', ''))
 
         # Valid user with correct password'
         self.assertTrue(check_password({}, 'test@example.com', 'test'))

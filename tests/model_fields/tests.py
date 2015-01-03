@@ -3,11 +3,11 @@ from __future__ import unicode_literals
 import datetime
 from decimal import Decimal
 import unittest
-import warnings
 
 from django import test
 from django import forms
 from django.core import validators
+from django.core import checks
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction, models, IntegrityError
 from django.db.models.fields import (
@@ -181,6 +181,26 @@ class ForeignKeyTests(test.TestCase):
         fk_model_empty = FkToChar.objects.select_related('out').get(id=fk_model_empty.pk)
         self.assertEqual(fk_model_empty.out, char_model_empty)
 
+    def test_warning_when_unique_true_on_fk(self):
+        class FKUniqueTrue(models.Model):
+            fk_field = models.ForeignKey(Foo, unique=True)
+
+        model = FKUniqueTrue()
+        expected_warnings = [
+            checks.Warning(
+                'Setting unique=True on a ForeignKey has the same effect as using a OneToOneField.',
+                hint='ForeignKey(unique=True) is usually better served by a OneToOneField.',
+                obj=FKUniqueTrue.fk_field.field,
+                id='fields.W342',
+            )
+        ]
+        warnings = model.check()
+        self.assertEqual(warnings, expected_warnings)
+
+    def test_related_name_converted_to_text(self):
+        rel_name = Bar._meta.get_field_by_name('a')[0].rel.related_name
+        self.assertIsInstance(rel_name, six.text_type)
+
 
 class DateTimeFieldTests(unittest.TestCase):
     def test_datetimefield_to_python_usecs(self):
@@ -223,8 +243,8 @@ class BooleanFieldTests(unittest.TestCase):
         self.assertEqual(f.get_db_prep_lookup('exact', None, connection=connection), [None])
 
     def _test_to_python(self, f):
-        self.assertTrue(f.to_python(1) is True)
-        self.assertTrue(f.to_python(0) is False)
+        self.assertIs(f.to_python(1), True)
+        self.assertIs(f.to_python(0), False)
 
     def test_booleanfield_get_db_prep_lookup(self):
         self._test_get_db_prep_lookup(models.BooleanField())
@@ -778,16 +798,30 @@ class PromiseTest(test.TestCase):
             int)
 
     def test_IPAddressField(self):
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
-            self.assertIsInstance(
-                IPAddressField().get_prep_value(lazy_func()),
-                six.text_type)
-            lazy_func = lazy(lambda: 0, int)
-            self.assertIsInstance(
-                IPAddressField().get_prep_value(lazy_func()),
-                six.text_type)
+        lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
+        self.assertIsInstance(
+            IPAddressField().get_prep_value(lazy_func()),
+            six.text_type)
+        lazy_func = lazy(lambda: 0, int)
+        self.assertIsInstance(
+            IPAddressField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_IPAddressField_deprecated(self):
+        class IPAddressModel(models.Model):
+            ip = IPAddressField()
+
+        model = IPAddressModel()
+        self.assertEqual(
+            model.check(),
+            [checks.Warning(
+                'IPAddressField has been deprecated. Support for it '
+                '(except in historical migrations) will be removed in Django 1.9.',
+                hint='Use GenericIPAddressField instead.',
+                obj=IPAddressModel._meta.get_field('ip'),
+                id='fields.W900',
+            )],
+        )
 
     def test_GenericIPAddressField(self):
         lazy_func = lazy(lambda: '127.0.0.1', six.text_type)

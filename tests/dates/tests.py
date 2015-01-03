@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import FieldError
 from django.test import TestCase
 from django.utils import six
 
@@ -93,8 +93,9 @@ class DatesTests(TestCase):
     def test_dates_fails_when_given_invalid_field_argument(self):
         six.assertRaisesRegex(
             self,
-            FieldDoesNotExist,
-            "Article has no field named 'invalid_field'",
+            FieldError,
+            "Cannot resolve keyword u?'invalid_field' into field. Choices are: "
+            "categories, comments, id, pub_date, title",
             Article.objects.dates,
             "invalid_field",
             "year",

@@ -16,24 +16,28 @@ import warnings
 
 from django.conf import settings
 from django.core import management
+from django.core import signals
 from django.core.cache import (cache, caches, CacheKeyWarning,
-    InvalidCacheBackendError, DEFAULT_CACHE_ALIAS)
-from django.core.context_processors import csrf
-from django.db import connection, connections, router, transaction
+    InvalidCacheBackendError, DEFAULT_CACHE_ALIAS, get_cache,
+    close_caches)
+from django.db import connection, connections, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import HttpResponse, StreamingHttpResponse
 from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
 from django.middleware.csrf import CsrfViewMiddleware
 from django.template import Template
+from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
-from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
-from django.test.utils import IgnoreDeprecationWarningsMixin
+from django.test import (TestCase, TransactionTestCase, RequestFactory,
+    ignore_warnings, override_settings)
+from django.test.signals import setting_changed
 from django.utils import six
 from django.utils import timezone
 from django.utils import translation
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
 
@@ -216,7 +220,7 @@ def caches_setting_for_tests(base=None, **params):
     # This results in the following search order:
     # params -> _caches_setting_base -> base
     base = base or {}
-    setting = dict((k, base.copy()) for k in _caches_setting_base.keys())
+    setting = {k: base.copy() for k in _caches_setting_base.keys()}
     for key, cache_params in setting.items():
         cache_params.update(_caches_setting_base[key])
         cache_params.update(params)
@@ -912,12 +916,9 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self._perform_cull_test(caches['zero_cull'], 50, 18)
 
     def test_second_call_doesnt_crash(self):
-        stdout = six.StringIO()
-        management.call_command(
-            'createcachetable',
-            stdout=stdout
-        )
-        self.assertEqual(stdout.getvalue(),
+        out = six.StringIO()
+        management.call_command('createcachetable', stdout=out)
+        self.assertEqual(out.getvalue(),
             "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
 
     def test_createcachetable_with_table_argument(self):
@@ -926,14 +927,14 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         specifying the table name).
         """
         self.drop_table()
-        stdout = six.StringIO()
+        out = six.StringIO()
         management.call_command(
             'createcachetable',
             'test cache table',
             verbosity=2,
-            stdout=stdout
+            stdout=out,
         )
-        self.assertEqual(stdout.getvalue(),
+        self.assertEqual(out.getvalue(),
             "Cache table 'test cache table' created.\n")
 
     def test_clear_commits_transaction(self):
@@ -976,29 +977,25 @@ class DBCacheRouter(object):
 class CreateCacheTableForDBCacheTests(TestCase):
     multi_db = True
 
+    @override_settings(DATABASE_ROUTERS=[DBCacheRouter()])
     def test_createcachetable_observes_database_router(self):
-        old_routers = router.routers
-        try:
-            router.routers = [DBCacheRouter()]
-            # cache table should not be created on 'default'
-            with self.assertNumQueries(0, using='default'):
-                management.call_command('createcachetable',
-                                        database='default',
-                                        verbosity=0, interactive=False)
-            # cache table should be created on 'other'
-            # Queries:
-            #   1: check table doesn't already exist
-            #   2: create savepoint (if transactional DDL is supported)
-            #   3: create the table
-            #   4: create the index
-            #   5: release savepoint (if transactional DDL is supported)
-            num = 5 if connections['other'].features.can_rollback_ddl else 3
-            with self.assertNumQueries(num, using='other'):
-                management.call_command('createcachetable',
-                                        database='other',
-                                        verbosity=0, interactive=False)
-        finally:
-            router.routers = old_routers
+        # cache table should not be created on 'default'
+        with self.assertNumQueries(0, using='default'):
+            management.call_command('createcachetable',
+                                    database='default',
+                                    verbosity=0, interactive=False)
+        # cache table should be created on 'other'
+        # Queries:
+        #   1: check table doesn't already exist
+        #   2: create savepoint (if transactional DDL is supported)
+        #   3: create the table
+        #   4: create the index
+        #   5: release savepoint (if transactional DDL is supported)
+        num = 5 if connections['other'].features.can_rollback_ddl else 3
+        with self.assertNumQueries(num, using='other'):
+            management.call_command('createcachetable',
+                                    database='other',
+                                    verbosity=0, interactive=False)
 
 
 class PicklingSideEffect(object):
@@ -1135,6 +1132,24 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
         # culling isn't implemented, memcached deals with it.
         pass
 
+    def test_memcached_deletes_key_on_failed_set(self):
+        # By default memcached allows objects up to 1MB. For the cache_db session
+        # backend to always use the current session, memcached needs to delete
+        # the old key if it fails to set.
+        # pylibmc doesn't seem to have SERVER_MAX_VALUE_LENGTH as far as I can
+        # tell from a quick check of its source code. This is falling back to
+        # the default value exposed by python-memcached on my system.
+        max_value_length = getattr(cache._lib, 'SERVER_MAX_VALUE_LENGTH', 1048576)
+
+        cache.set('small_value', 'a')
+        self.assertEqual(cache.get('small_value'), 'a')
+
+        large_value = 'a' * (max_value_length + 1)
+        cache.set('small_value', large_value)
+        # small_value should be deleted, or set if configured to accept larger values
+        value = cache.get('small_value')
+        self.assertTrue(value is None or value == large_value)
+
 
 @override_settings(CACHES=caches_setting_for_tests(
     BACKEND='django.core.cache.backends.filebased.FileBasedCache',
@@ -1147,8 +1162,12 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
     def setUp(self):
         super(FileBasedCacheTests, self).setUp()
         self.dirname = tempfile.mkdtemp()
+        # Caches location cannot be modified through override_settings / modify_settings,
+        # hence settings are manipulated directly here and the setting_changed signal
+        # is triggered manually.
         for cache_params in settings.CACHES.values():
             cache_params.update({'LOCATION': self.dirname})
+        setting_changed.send(self.__class__, setting='CACHES', enter=False)
 
     def tearDown(self):
         super(FileBasedCacheTests, self).tearDown()
@@ -1202,10 +1221,10 @@ class CustomCacheKeyValidationTests(TestCase):
         }
     }
 )
-class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
+class GetCacheTests(TestCase):
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_simple(self):
-        from django.core.cache import caches, get_cache
         self.assertIsInstance(
             caches[DEFAULT_CACHE_ALIAS],
             get_cache('default').__class__
@@ -1220,18 +1239,21 @@ class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
         self.assertRaises(InvalidCacheBackendError, get_cache, 'does_not_exist')
 
     def test_close(self):
-        from django.core import signals
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_close_deprecated(self):
-        from django.core.cache import get_cache
-        from django.core import signals
         cache = get_cache('cache.closeable_cache.CacheClass')
         self.assertFalse(cache.closed)
-        signals.request_finished.send(self.__class__)
-        self.assertTrue(cache.closed)
+        # Ensure that we don't close the global cache instances.
+        signals.request_finished.disconnect(close_caches)
+        try:
+            signals.request_finished.send(self.__class__)
+            self.assertTrue(cache.closed)
+        finally:
+            signals.request_finished.connect(close_caches)
 
 
 DEFAULT_MEMORY_CACHES_SETTINGS = {
@@ -1362,9 +1384,8 @@ class CacheUtils(TestCase):
     def test_get_cache_key(self):
         request = self.factory.get(self.path)
         response = HttpResponse()
-        key_prefix = 'localprefix'
         # Expect None if no headers have been set yet.
-        self.assertIsNone(get_cache_key(request))
+        self.assertIsNone(get_cache_key(request, response))
         # Set headers to an empty list.
         learn_cache_key(request, response)
 
@@ -1374,6 +1395,7 @@ class CacheUtils(TestCase):
             '18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e'
         )
         # Verify that a specified key_prefix is taken into account.
+        key_prefix = 'localprefix'
         learn_cache_key(request, response, key_prefix=key_prefix)
         self.assertEqual(
             get_cache_key(request, key_prefix=key_prefix),
@@ -2058,22 +2080,6 @@ class TestWithTemplateResponse(TestCase):
         self.assertTrue(response.has_header('ETag'))
 
 
-@override_settings(ROOT_URLCONF="admin_views.urls")
-class TestEtagWithAdmin(TestCase):
-    # See https://code.djangoproject.com/ticket/16003
-
-    def test_admin(self):
-        with self.settings(USE_ETAGS=False):
-            response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 302)
-            self.assertFalse(response.has_header('ETag'))
-
-        with self.settings(USE_ETAGS=True):
-            response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 302)
-            self.assertTrue(response.has_header('ETag'))
-
-
 class TestMakeTemplateFragmentKey(TestCase):
     def test_without_vary_on(self):
         key = make_template_fragment_key('a.fragment')
@@ -2103,7 +2109,7 @@ class CacheHandlerTest(TestCase):
         cache1 = caches['default']
         cache2 = caches['default']
 
-        self.assertTrue(cache1 is cache2)
+        self.assertIs(cache1, cache2)
 
     def test_per_thread(self):
         """
@@ -2120,4 +2126,4 @@ class CacheHandlerTest(TestCase):
             t.start()
             t.join()
 
-        self.assertFalse(c[0] is c[1])
+        self.assertIsNot(c[0], c[1])

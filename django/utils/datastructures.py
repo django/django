@@ -346,7 +346,7 @@ class MultiValueDict(dict):
 
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
-        obj_dict['_data'] = dict((k, self.getlist(k)) for k in self)
+        obj_dict['_data'] = {k: self.getlist(k) for k in self}
         return obj_dict
 
     def __setstate__(self, obj_dict):
@@ -467,7 +467,7 @@ class MultiValueDict(dict):
         """
         Returns current object as a dict with singular values.
         """
-        return dict((key, self[key]) for key in self)
+        return {key: self[key] for key in self}
 
 
 class ImmutableList(tuple):

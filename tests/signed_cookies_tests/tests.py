@@ -1,10 +1,9 @@
 from __future__ import unicode_literals
 
-import time
-
 from django.core import signing
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase, override_settings
+from django.test.utils import freeze_time
 
 
 class SignedCookieTest(TestCase):
@@ -37,7 +36,7 @@ class SignedCookieTest(TestCase):
         self.assertRaises(signing.BadSignature,
             request.get_signed_cookie, 'c')
 
-    def test_default_argument_supresses_exceptions(self):
+    def test_default_argument_suppresses_exceptions(self):
         response = HttpResponse()
         response.set_signed_cookie('c', 'hello')
         request = HttpRequest()
@@ -46,22 +45,18 @@ class SignedCookieTest(TestCase):
 
     def test_max_age_argument(self):
         value = 'hello'
-        _time = time.time
-        time.time = lambda: 123456789
-        try:
+        with freeze_time(123456789):
             response = HttpResponse()
             response.set_signed_cookie('c', value)
             request = HttpRequest()
             request.COOKIES['c'] = response.cookies['c'].value
             self.assertEqual(request.get_signed_cookie('c'), value)
 
-            time.time = lambda: 123456800
+        with freeze_time(123456800):
             self.assertEqual(request.get_signed_cookie('c', max_age=12), value)
             self.assertEqual(request.get_signed_cookie('c', max_age=11), value)
             self.assertRaises(signing.SignatureExpired,
                 request.get_signed_cookie, 'c', max_age=10)
-        finally:
-            time.time = _time
 
     @override_settings(SECRET_KEY=b'\xe7')
     def test_signed_cookies_with_binary_key(self):

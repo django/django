@@ -42,7 +42,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
             login_url = settings.LOGIN_URL
         response = self.client.get(view_url)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(login_url in response.url)
+        self.assertIn(login_url, response.url)
         self.login()
         response = self.client.get(view_url)
         self.assertEqual(response.status_code, 200)

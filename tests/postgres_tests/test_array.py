@@ -6,12 +6,11 @@ from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
 from django.core import exceptions, serializers
 from django.core.management import call_command
 from django.db import models, IntegrityError, connection
-from django.db.migrations.writer import MigrationWriter
 from django import forms
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from .models import IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel, DateTimeArrayModel, NestedIntegerArrayModel
+from .models import IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel, DateTimeArrayModel, NestedIntegerArrayModel, ArrayFieldSubclass
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
@@ -47,6 +46,13 @@ class TestSaveLoad(TestCase):
         instance.save()
         loaded = IntegerArrayModel.objects.get()
         self.assertEqual(loaded.field, [1])
+
+    def test_default_null(self):
+        instance = NullableIntegerArrayModel()
+        instance.save()
+        loaded = NullableIntegerArrayModel.objects.get(pk=instance.pk)
+        self.assertEqual(loaded.field, None)
+        self.assertEqual(instance.field, loaded.field)
 
     def test_null_handling(self):
         instance = NullableIntegerArrayModel(field=None)
@@ -222,10 +228,14 @@ class TestMigrations(TestCase):
         new = ArrayField(*args, **kwargs)
         self.assertEqual(new.base_field.max_length, field.base_field.max_length)
 
-    def test_makemigrations(self):
-        field = ArrayField(models.CharField(max_length=20))
-        statement, imports = MigrationWriter.serialize(field)
-        self.assertEqual(statement, 'django.contrib.postgres.fields.ArrayField(models.CharField(max_length=20), size=None)')
+    def test_subclass_deconstruct(self):
+        field = ArrayField(models.IntegerField())
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, 'django.contrib.postgres.fields.ArrayField')
+
+        field = ArrayFieldSubclass()
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, 'postgres_tests.models.ArrayFieldSubclass')
 
     @override_settings(MIGRATION_MODULES={
         "postgres_tests": "postgres_tests.array_default_migrations",

@@ -70,7 +70,7 @@ csrf_token
 ^^^^^^^^^^
 
 This tag is used for CSRF protection, as described in the documentation for
-:doc:`Cross Site Request Forgeries </ref/contrib/csrf>`.
+:doc:`Cross Site Request Forgeries </ref/csrf>`.
 
 .. templatetag:: cycle
 
@@ -263,11 +263,11 @@ Sample usage::
 This is equivalent to::
 
     {% if var1 %}
-        {{ var1|safe }}
+        {{ var1 }}
     {% elif var2 %}
-        {{ var2|safe }}
+        {{ var2 }}
     {% elif var3 %}
-        {{ var3|safe }}
+        {{ var3 }}
     {% endif %}
 
 You can also use a literal string as a fallback value in case all
@@ -799,6 +799,18 @@ This would display as "It is the 4th of September".
 
         It is {% now "SHORT_DATETIME_FORMAT" %}
 
+
+You can also use the syntax ``{% now "Y" as current_year %}`` to store the
+output inside a variable. This is useful if you want to use ``{% now %}``
+inside a template tag like :ttag:`blocktrans` for example::
+
+    {% now "Y" as current_year %}
+    {% blocktrans %}Copyright {{ current_year }}{% endblocktrans %}
+
+.. versionadded:: 1.8
+
+The ability to use the "as" syntax was added.
+
 .. templatetag:: regroup
 
 regroup
@@ -821,13 +833,18 @@ This complex tag is best illustrated by way of an example: say that "places" is 
 ...and you'd like to display a hierarchical list that is ordered by country, like this:
 
 * India
-    * Mumbai: 19,000,000
-    * Calcutta: 15,000,000
+
+  * Mumbai: 19,000,000
+  * Calcutta: 15,000,000
+
 * USA
-    * New York: 20,000,000
-    * Chicago: 7,000,000
+
+  * New York: 20,000,000
+  * Chicago: 7,000,000
+
 * Japan
-    * Tokyo: 33,000,000
+
+  * Tokyo: 33,000,000
 
 
 You can use the ``{% regroup %}`` tag to group the list of cities by country.
@@ -881,15 +898,24 @@ With this input for ``cities``, the example ``{% regroup %}`` template code
 above would result in the following output:
 
 * India
-    * Mumbai: 19,000,000
+
+  * Mumbai: 19,000,000
+
 * USA
-    * New York: 20,000,000
+
+  * New York: 20,000,000
+
 * India
-    * Calcutta: 15,000,000
+
+  * Calcutta: 15,000,000
+
 * USA
-    * Chicago: 7,000,000
+
+  * Chicago: 7,000,000
+
 * Japan
-    * Tokyo: 33,000,000
+
+  * Tokyo: 33,000,000
 
 The easiest solution to this gotcha is to make sure in your view code that the
 data is ordered according to how you want to display it.
@@ -970,8 +996,8 @@ file are evaluated as template code, within the current context::
     {% ssi '/home/html/ljworld.com/includes/right_generic.html' parsed %}
 
 Note that if you use ``{% ssi %}``, you'll need to define
-:setting:`ALLOWED_INCLUDE_ROOTS` in your Django settings, as a security
-measure.
+``'allowed_include_roots'`` in the :setting:`OPTIONS <TEMPLATES-OPTIONS>` of
+your template engine, as a security measure.
 
 .. note::
     With the :ttag:`ssi` tag and the ``parsed`` parameter
@@ -1142,13 +1168,15 @@ If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100, the
 image in the above example will be 88 pixels wide
 (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
 
-.. versionchanged:: 1.7
-
 In some cases you might want to capture the result of ``widthratio`` in a
 variable. It can be useful, for instance, in a :ttag:`blocktrans` like this::
 
     {% widthratio this_value max_value max_width as width %}
     {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
+
+.. versionchanged:: 1.7
+
+    The ability to use "as" with this tag like in the example above was added.
 
 .. templatetag:: with
 
@@ -2024,9 +2052,9 @@ If ``some_list`` is ``['a', 'b', 'c']``, the output will be ``['a', 'b']``.
 slugify
 ^^^^^^^
 
-Converts to lowercase, removes non-word characters (alphanumerics and
-underscores) and converts spaces to hyphens. Also strips leading and trailing
-whitespace.
+Converts to ASCII. Converts spaces to hyphens. Removes characters that aren't
+alphanumerics, underscores, or hyphens. Converts to lowercase. Also strips
+leading and trailing whitespace.
 
 For example::
 
@@ -2043,7 +2071,7 @@ Formats the variable according to the argument, a string formatting specifier.
 This specifier uses Python string formatting syntax, with the exception that
 the leading "%" is dropped.
 
-See http://docs.python.org/library/stdtypes.html#string-formatting-operations
+See https://docs.python.org/library/stdtypes.html#string-formatting-operations
 for documentation of Python string formatting
 
 For example::

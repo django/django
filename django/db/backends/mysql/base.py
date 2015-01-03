@@ -1,7 +1,8 @@
 """
 MySQL database backend for Django.
 
-Requires MySQLdb: http://sourceforge.net/projects/mysql-python
+Requires mysqlclient: https://pypi.python.org/pypi/mysqlclient/
+MySQLdb is supported for Python 2 only: http://sourceforge.net/projects/mysql-python
 """
 from __future__ import unicode_literals
 
@@ -49,10 +50,6 @@ from django.utils.safestring import SafeBytes, SafeText
 from django.utils import six
 from django.utils import timezone
 
-# Raise exceptions for database warnings if DEBUG is on
-if settings.DEBUG:
-    warnings.filterwarnings("error", category=Database.Warning)
-
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
@@ -78,7 +75,7 @@ def adapt_datetime_with_timezone_support(value, conv):
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
         value = value.astimezone(timezone.utc).replace(tzinfo=None)
-    return Thing2Literal(value.strftime("%Y-%m-%d %H:%M:%S"), conv)
+    return Thing2Literal(value.strftime("%Y-%m-%d %H:%M:%S.%f"), conv)
 
 # MySQLdb-1.2.1 returns TIME columns as timedelta -- they are more like
 # timedelta in terms of actual behavior as they are signed and include days --
@@ -174,9 +171,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_forward_references = False
     # XXX MySQL DB-API drivers currently fail on binary data on Python 3.
     supports_binary_field = six.PY2
-    supports_microsecond_precision = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
+    can_introspect_autofield = True
     can_introspect_binary_field = False
     can_introspect_small_integer_field = True
     supports_timezones = False
@@ -187,27 +184,24 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     atomic_transactions = False
     supports_column_check_constraints = False
 
-    def __init__(self, connection):
-        super(DatabaseFeatures, self).__init__(connection)
-
     @cached_property
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
         with self.connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
-            # This command is MySQL specific; the second column
-            # will tell you the default table type of the created
-            # table. Since all Django's test tables will have the same
-            # table type, that's enough to evaluate the feature.
-            cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
+            cursor.execute("SELECT ENGINE FROM INFORMATION_SCHEMA.ENGINES WHERE SUPPORT = 'DEFAULT'")
             result = cursor.fetchone()
-            cursor.execute('DROP TABLE INTROSPECT_TEST')
-        return result[1]
+        return result[0]
 
     @cached_property
     def can_introspect_foreign_keys(self):
         "Confirm support for introspected foreign keys"
         return self._mysql_storage_engine != 'MyISAM'
+
+    @cached_property
+    def supports_microsecond_precision(self):
+        # See https://github.com/farcepest/MySQLdb1/issues/24 for the reason
+        # about requiring MySQLdb 1.2.5
+        return self.connection.mysql_version >= (5, 6, 4) and Database.version_info >= (1, 2, 5)
 
     @cached_property
     def has_zoneinfo_database(self):
@@ -292,9 +286,12 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql, params
 
-    def date_interval_sql(self, sql, connector, timedelta):
-        return "(%s %s INTERVAL '%d 0:0:%d:%d' DAY_MICROSECOND)" % (sql, connector,
-                timedelta.days, timedelta.seconds, timedelta.microseconds)
+    def date_interval_sql(self, timedelta):
+        return "INTERVAL '%d 0:0:%d:%d' DAY_MICROSECOND" % (
+            timedelta.days, timedelta.seconds, timedelta.microseconds), []
+
+    def format_for_duration_arithmetic(self, sql):
+        return 'INTERVAL %s MICROSECOND' % sql
 
     def drop_foreignkey_sql(self):
         return "DROP FOREIGN KEY"
@@ -363,8 +360,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             else:
                 raise ValueError("MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
 
-        # MySQL doesn't support microseconds
-        return six.text_type(value.replace(microsecond=0))
+        return six.text_type(value)
 
     def value_to_db_time(self, value):
         if value is None:
@@ -374,13 +370,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if timezone.is_aware(value):
             raise ValueError("MySQL backend does not support timezone-aware times.")
 
-        # MySQL doesn't support microseconds
-        return six.text_type(value.replace(microsecond=0))
-
-    def year_lookup_bounds_for_datetime_field(self, value):
-        # Again, no microseconds
-        first, second = super(DatabaseOperations, self).year_lookup_bounds_for_datetime_field(value)
-        return [first.replace(microsecond=0), second.replace(microsecond=0)]
+        return six.text_type(value)
 
     def max_name_length(self):
         return 64
@@ -403,6 +393,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_booleanfield_value)
         if internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
+        if internal_type == 'TextField':
+            converters.append(self.convert_textfield_value)
         return converters
 
     def convert_booleanfield_value(self, value, field):
@@ -415,9 +407,53 @@ class DatabaseOperations(BaseDatabaseOperations):
             value = uuid.UUID(value)
         return value
 
+    def convert_textfield_value(self, value, field):
+        if value is not None:
+            value = force_text(value)
+        return value
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
+    # This dictionary maps Field objects to their associated MySQL column
+    # types, as strings. Column-type strings can contain format strings; they'll
+    # be interpolated against the values of Field.__dict__ before being output.
+    # If a column type is set to None, it won't be included in the output.
+    _data_types = {
+        'AutoField': 'integer AUTO_INCREMENT',
+        'BinaryField': 'longblob',
+        'BooleanField': 'bool',
+        'CharField': 'varchar(%(max_length)s)',
+        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
+        'DateField': 'date',
+        'DateTimeField': 'datetime',
+        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'DurationField': 'bigint',
+        'FileField': 'varchar(%(max_length)s)',
+        'FilePathField': 'varchar(%(max_length)s)',
+        'FloatField': 'double precision',
+        'IntegerField': 'integer',
+        'BigIntegerField': 'bigint',
+        'IPAddressField': 'char(15)',
+        'GenericIPAddressField': 'char(39)',
+        'NullBooleanField': 'bool',
+        'OneToOneField': 'integer',
+        'PositiveIntegerField': 'integer UNSIGNED',
+        'PositiveSmallIntegerField': 'smallint UNSIGNED',
+        'SlugField': 'varchar(%(max_length)s)',
+        'SmallIntegerField': 'smallint',
+        'TextField': 'longtext',
+        'TimeField': 'time',
+        'UUIDField': 'char(32)',
+    }
+
+    @cached_property
+    def data_types(self):
+        if self.features.supports_microsecond_precision:
+            return dict(self._data_types, DateTimeField='datetime(6)', TimeField='time(6)')
+        else:
+            return self._data_types
+
     operators = {
         'exact': '= %s',
         'iexact': 'LIKE %s',
@@ -433,6 +469,24 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'endswith': 'LIKE BINARY %s',
         'istartswith': 'LIKE %s',
         'iendswith': 'LIKE %s',
+    }
+
+    # The patterns below are used to generate SQL pattern lookup clauses when
+    # the right-hand side of the lookup isn't a raw string (it might be an expression
+    # or the result of a bilateral transformation).
+    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
+    # escaped on database side.
+    #
+    # Note: we use str.format() here for readability as '%' is used as a wildcard for
+    # the LIKE operator.
+    pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\\', '\\\\'), '%%', '\%%'), '_', '\_')"
+    pattern_ops = {
+        'contains': "LIKE BINARY CONCAT('%%', {}, '%%')",
+        'icontains': "LIKE CONCAT('%%', {}, '%%')",
+        'startswith': "LIKE BINARY CONCAT({}, '%%')",
+        'istartswith': "LIKE CONCAT({}, '%%')",
+        'endswith': "LIKE BINARY CONCAT('%%', {})",
+        'iendswith': "LIKE CONCAT('%%', {})",
     }
 
     Database = Database

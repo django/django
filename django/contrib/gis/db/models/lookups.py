@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 import re
 
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import FieldDoesNotExist
 from django.db.models.lookups import Lookup
-from django.db.models.sql.expressions import SQLEvaluator
+from django.db.models.expressions import ExpressionNode, Col
 from django.utils import six
 
 gis_lookups = {}
@@ -64,27 +64,28 @@ class GISLookup(Lookup):
             params = [connection.ops.Adapter(value)]
         return ('%s', params)
 
-    def process_rhs(self, qn, connection):
-        rhs, rhs_params = super(GISLookup, self).process_rhs(qn, connection)
+    def process_rhs(self, compiler, connection):
+        rhs, rhs_params = super(GISLookup, self).process_rhs(compiler, connection)
 
         geom = self.rhs
-        if isinstance(self.rhs, SQLEvaluator):
+        if isinstance(self.rhs, Col):
             # Make sure the F Expression destination field exists, and
             # set an `srid` attribute with the same as that of the
             # destination.
-            geo_fld = self._check_geo_field(self.rhs.opts, self.rhs.expression.name)
-            if not geo_fld:
+            geo_fld = self.rhs.output_field
+            if not hasattr(geo_fld, 'srid'):
                 raise ValueError('No geographic field found in expression.')
             self.rhs.srid = geo_fld.srid
+        elif isinstance(self.rhs, ExpressionNode):
+            raise ValueError('Complex expressions not supported for GeometryField')
         elif isinstance(self.rhs, (list, tuple)):
             geom = self.rhs[0]
-
-        rhs = connection.ops.get_geom_placeholder(self.lhs.source, geom)
+        rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, geom, compiler)
         return rhs, rhs_params
 
-    def as_sql(self, qn, connection):
-        lhs_sql, sql_params = self.process_lhs(qn, connection)
-        rhs_sql, rhs_params = self.process_rhs(qn, connection)
+    def as_sql(self, compiler, connection):
+        lhs_sql, sql_params = self.process_lhs(compiler, connection)
+        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
         sql_params.extend(rhs_params)
 
         template_params = {'lhs': lhs_sql, 'rhs': rhs_sql}

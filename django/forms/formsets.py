@@ -9,7 +9,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 from django.utils.translation import ungettext, ugettext as _
 
 
@@ -138,7 +138,7 @@ class BaseFormSet(object):
         Instantiate forms at first property access.
         """
         # DoS protection is included in total_form_count()
-        forms = [self._construct_form(i) for i in xrange(self.total_form_count())]
+        forms = [self._construct_form(i) for i in range(self.total_form_count())]
         return forms
 
     def _construct_form(self, i, **kwargs):

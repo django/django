@@ -27,12 +27,22 @@ from django.utils import six
 from django.utils.six.moves.urllib.parse import urlparse, urlsplit
 from django.test.utils import ContextList
 
-__all__ = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')
+__all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'encode_multipart')
 
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
 CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')
+
+
+class RedirectCycleError(Exception):
+    """
+    The test client has been asked to follow a redirect loop.
+    """
+    def __init__(self, message, last_response):
+        super(RedirectCycleError, self).__init__(message)
+        self.last_response = last_response
+        self.redirect_chain = last_response.redirect_chain
 
 
 class FakePayload(object):
@@ -162,19 +172,19 @@ def encode_multipart(boundary, data):
                 if is_file(item):
                     lines.extend(encode_file(boundary, key, item))
                 else:
-                    lines.extend([to_bytes(val) for val in [
+                    lines.extend(to_bytes(val) for val in [
                         '--%s' % boundary,
                         'Content-Disposition: form-data; name="%s"' % key,
                         '',
                         item
-                    ]])
+                    ])
         else:
-            lines.extend([to_bytes(val) for val in [
+            lines.extend(to_bytes(val) for val in [
                 '--%s' % boundary,
                 'Content-Disposition: form-data; name="%s"' % key,
                 '',
                 value
-            ]])
+            ])
 
     lines.extend([
         to_bytes('--%s--' % boundary),
@@ -185,20 +195,25 @@ def encode_multipart(boundary, data):
 
 def encode_file(boundary, key, file):
     to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
+    filename = os.path.basename(file.name) if hasattr(file, 'name') else ''
     if hasattr(file, 'content_type'):
         content_type = file.content_type
+    elif filename:
+        content_type = mimetypes.guess_type(filename)[0]
     else:
-        content_type = mimetypes.guess_type(file.name)[0]
+        content_type = None
 
     if content_type is None:
         content_type = 'application/octet-stream'
+    if not filename:
+        filename = key
     return [
         to_bytes('--%s' % boundary),
         to_bytes('Content-Disposition: form-data; name="%s"; filename="%s"'
-                 % (key, os.path.basename(file.name))),
+                 % (key, filename)),
         to_bytes('Content-Type: %s' % content_type),
         b'',
-        file.read()
+        to_bytes(file.read())
     ]
 
 
@@ -279,8 +294,9 @@ class RequestFactory(object):
     def get(self, path, data=None, secure=False, **extra):
         "Construct a GET request."
 
+        data = {} if data is None else data
         r = {
-            'QUERY_STRING': urlencode(data or {}, doseq=True),
+            'QUERY_STRING': urlencode(data, doseq=True),
         }
         r.update(extra)
         return self.generic('GET', path, secure=secure, **r)
@@ -289,7 +305,8 @@ class RequestFactory(object):
              secure=False, **extra):
         "Construct a POST request."
 
-        post_data = self._encode_data(data or {}, content_type)
+        data = {} if data is None else data
+        post_data = self._encode_data(data, content_type)
 
         return self.generic('POST', path, post_data, content_type,
                             secure=secure, **extra)
@@ -297,11 +314,16 @@ class RequestFactory(object):
     def head(self, path, data=None, secure=False, **extra):
         "Construct a HEAD request."
 
+        data = {} if data is None else data
         r = {
-            'QUERY_STRING': urlencode(data or {}, doseq=True),
+            'QUERY_STRING': urlencode(data, doseq=True),
         }
         r.update(extra)
         return self.generic('HEAD', path, secure=secure, **r)
+
+    def trace(self, path, secure=False, **extra):
+        "Construct a TRACE request."
+        return self.generic('TRACE', path, secure=secure, **extra)
 
     def options(self, path, data='', content_type='application/octet-stream',
                 secure=False, **extra):
@@ -549,6 +571,15 @@ class Client(RequestFactory):
             response = self._handle_redirects(response, **extra)
         return response
 
+    def trace(self, path, data='', follow=False, secure=False, **extra):
+        """
+        Send a TRACE request to the server.
+        """
+        response = super(Client, self).trace(path, data=data, secure=secure, **extra)
+        if follow:
+            response = self._handle_redirects(response, **extra)
+        return response
+
     def login(self, **credentials):
         """
         Sets the Factory to appear as if it has successfully logged into a site.
@@ -614,11 +645,11 @@ class Client(RequestFactory):
 
         response.redirect_chain = []
         while response.status_code in (301, 302, 303, 307):
-            url = response.url
+            response_url = response.url
             redirect_chain = response.redirect_chain
-            redirect_chain.append((url, response.status_code))
+            redirect_chain.append((response_url, response.status_code))
 
-            url = urlsplit(url)
+            url = urlsplit(response_url)
             if url.scheme:
                 extra['wsgi.url_scheme'] = url.scheme
             if url.hostname:
@@ -629,7 +660,14 @@ class Client(RequestFactory):
             response = self.get(url.path, QueryDict(url.query), follow=False, **extra)
             response.redirect_chain = redirect_chain
 
-            # Prevent loops
-            if response.redirect_chain[-1] in response.redirect_chain[0:-1]:
-                break
+            if redirect_chain[-1] in redirect_chain[:-1]:
+                # Check that we're not redirecting to somewhere we've already
+                # been to, to prevent loops.
+                raise RedirectCycleError("Redirect loop detected.", last_response=response)
+            if len(redirect_chain) > 20:
+                # Such a lengthy chain likely also means a loop, but one with
+                # a growing path, changing view, or changing query argument;
+                # 20 is the value of "network.http.redirection-limit" from Firefox.
+                raise RedirectCycleError("Too many redirects.", last_response=response)
+
         return response

@@ -18,6 +18,7 @@ from django.db.models.query_utils import (Q, select_related_descend,
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import CURSOR
 from django.db.models import sql
+from django.db.models.expressions import Date, DateTime, F
 from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
@@ -66,7 +67,9 @@ class QuerySet(object):
     def as_manager(cls):
         # Address the circular dependency between `Queryset` and `Manager`.
         from django.db.models.manager import Manager
-        return Manager.from_queryset(cls)()
+        manager = Manager.from_queryset(cls)()
+        manager._built_as_manager = True
+        return manager
     as_manager.queryset_only = True
     as_manager = classmethod(as_manager)
 
@@ -154,8 +157,7 @@ class QuerySet(object):
             2. sql/compiler.results_iter()
                - Returns one row at time. At this point the rows are still just
                  tuples. In some cases the return values are converted to
-                 Python values at this location (see resolve_columns(),
-                 resolve_aggregate()).
+                 Python values at this location.
             3. self.iterator()
                - Responsible for turning the rows into model objects.
         """
@@ -241,7 +243,7 @@ class QuerySet(object):
         max_depth = self.query.max_depth
 
         extra_select = list(self.query.extra_select)
-        aggregate_select = list(self.query.aggregate_select)
+        annotation_select = list(self.query.annotation_select)
 
         only_load = self.query.get_loaded_field_names()
         fields = self.model._meta.concrete_fields
@@ -282,7 +284,7 @@ class QuerySet(object):
         db = self.db
         compiler = self.query.get_compiler(using=db)
         index_start = len(extra_select)
-        aggregate_start = index_start + len(init_list)
+        annotation_start = index_start + len(init_list)
 
         if fill_cache:
             klass_info = get_klass_info(model_cls, max_depth=max_depth,
@@ -290,18 +292,18 @@ class QuerySet(object):
         for row in compiler.results_iter():
             if fill_cache:
                 obj, _ = get_cached_row(row, index_start, db, klass_info,
-                                        offset=len(aggregate_select))
+                                        offset=len(annotation_select))
             else:
-                obj = model_cls.from_db(db, init_list, row[index_start:aggregate_start])
+                obj = model_cls.from_db(db, init_list, row[index_start:annotation_start])
 
             if extra_select:
                 for i, k in enumerate(extra_select):
                     setattr(obj, k, row[i])
 
-            # Add the aggregates to the model
-            if aggregate_select:
-                for i, aggregate in enumerate(aggregate_select):
-                    setattr(obj, aggregate, row[i + aggregate_start])
+            # Add the annotations to the model
+            if annotation_select:
+                for i, annotation in enumerate(annotation_select):
+                    setattr(obj, annotation, row[i + annotation_start])
 
             # Add the known related objects to the model, if there are any
             if self._known_related_objects:
@@ -330,14 +332,16 @@ class QuerySet(object):
         if self.query.distinct_fields:
             raise NotImplementedError("aggregate() + distinct(fields) not implemented.")
         for arg in args:
+            if not hasattr(arg, 'default_alias'):
+                raise TypeError("Complex aggregates require an alias")
             kwargs[arg.default_alias] = arg
 
         query = self.query.clone()
-        force_subq = query.low_mark != 0 or query.high_mark is not None
         for (alias, aggregate_expr) in kwargs.items():
-            query.add_aggregate(aggregate_expr, self.model, alias,
-                                is_summary=True)
-        return query.get_aggregation(using=self.db, force_subq=force_subq)
+            query.add_annotation(aggregate_expr, alias, is_summary=True)
+            if not query.annotations[alias].contains_aggregate:
+                raise TypeError("%s is not an aggregate expression" % alias)
+        return query.get_aggregation(self.db, kwargs.keys())
 
     def count(self):
         """
@@ -489,7 +493,7 @@ class QuerySet(object):
         for f in self.model._meta.fields:
             if f.attname in lookup:
                 lookup[f.name] = lookup.pop(f.attname)
-        params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
+        params = {k: v for k, v in kwargs.items() if LOOKUP_SEP not in k}
         params.update(defaults)
         return lookup, params
 
@@ -543,7 +547,7 @@ class QuerySet(object):
         if not id_list:
             return {}
         qs = self.filter(pk__in=id_list).order_by()
-        return dict((obj._get_pk_val(), obj) for obj in qs)
+        return {obj._get_pk_val(): obj for obj in qs}
 
     def delete(self):
         """
@@ -656,8 +660,12 @@ class QuerySet(object):
             "'kind' must be one of 'year', 'month' or 'day'."
         assert order in ('ASC', 'DESC'), \
             "'order' must be either 'ASC' or 'DESC'."
-        return self._clone(klass=DateQuerySet, setup=True,
-             _field_name=field_name, _kind=kind, _order=order)
+        return self.annotate(
+            datefield=Date(field_name, kind),
+            plain_field=F(field_name)
+        ).values_list(
+            'datefield', flat=True
+        ).distinct().filter(plain_field__isnull=False).order_by(('-' if order == 'DESC' else '') + 'datefield')
 
     def datetimes(self, field_name, kind, order='ASC', tzinfo=None):
         """
@@ -673,8 +681,12 @@ class QuerySet(object):
                 tzinfo = timezone.get_current_timezone()
         else:
             tzinfo = None
-        return self._clone(klass=DateTimeQuerySet, setup=True,
-                _field_name=field_name, _kind=kind, _order=order, _tzinfo=tzinfo)
+        return self.annotate(
+            datetimefield=DateTime(field_name, kind, tzinfo),
+            plain_field=F(field_name)
+        ).values_list(
+            'datetimefield', flat=True
+        ).distinct().filter(plain_field__isnull=False).order_by(('-' if order == 'DESC' else '') + 'datetimefield')
 
     def none(self):
         """
@@ -787,33 +799,40 @@ class QuerySet(object):
     def annotate(self, *args, **kwargs):
         """
         Return a query set in which the returned objects have been annotated
-        with data aggregated from related fields.
+        with extra data or aggregations.
         """
-        aggrs = OrderedDict()  # To preserve ordering of args
+        annotations = OrderedDict()  # To preserve ordering of args
         for arg in args:
-            if arg.default_alias in kwargs:
-                raise ValueError("The named annotation '%s' conflicts with the "
-                                 "default name for another annotation."
-                                 % arg.default_alias)
-            aggrs[arg.default_alias] = arg
-        aggrs.update(kwargs)
+            try:
+                # we can't do an hasattr here because py2 returns False
+                # if default_alias exists but throws a TypeError
+                if arg.default_alias in kwargs:
+                    raise ValueError("The named annotation '%s' conflicts with the "
+                                     "default name for another annotation."
+                                     % arg.default_alias)
+            except AttributeError:  # default_alias
+                raise TypeError("Complex annotations require an alias")
+            annotations[arg.default_alias] = arg
+        annotations.update(kwargs)
 
+        obj = self._clone()
         names = getattr(self, '_fields', None)
         if names is None:
             names = set(self.model._meta.get_all_field_names())
-        for aggregate in aggrs:
-            if aggregate in names:
+
+        # Add the annotations to the query
+        for alias, annotation in annotations.items():
+            if alias in names:
                 raise ValueError("The annotation '%s' conflicts with a field on "
-                    "the model." % aggregate)
-
-        obj = self._clone()
-
-        obj._setup_aggregate_query(list(aggrs))
-
-        # Add the aggregates to the query
-        for (alias, aggregate_expr) in aggrs.items():
-            obj.query.add_aggregate(aggregate_expr, self.model, alias,
-                is_summary=False)
+                                 "the model." % alias)
+            obj.query.add_annotation(annotation, alias, is_summary=False)
+        # expressions need to be added to the query before we know if they contain aggregates
+        added_aggregates = []
+        for alias, annotation in obj.query.annotations.items():
+            if alias in annotations and annotation.contains_aggregate:
+                added_aggregates.append(alias)
+        if added_aggregates:
+            obj._setup_aggregate_query(list(added_aggregates))
 
         return obj
 
@@ -1052,6 +1071,15 @@ class QuerySet(object):
         """
         return self.query.has_filters()
 
+    def is_compatible_query_object_type(self, opts):
+        model = self.model
+        return (
+            model == opts.concrete_model or
+            opts.concrete_model in model._meta.get_parent_list() or
+            model in opts.get_parent_list()
+        )
+    is_compatible_query_object_type.queryset_only = True
+
 
 class InstanceCheckMeta(type):
     def __instancecheck__(self, instance):
@@ -1087,9 +1115,9 @@ class ValuesQuerySet(QuerySet):
         # Purge any extra columns that haven't been explicitly asked for
         extra_names = list(self.query.extra_select)
         field_names = self.field_names
-        aggregate_names = list(self.query.aggregate_select)
+        annotation_names = list(self.query.annotation_select)
 
-        names = extra_names + field_names + aggregate_names
+        names = extra_names + field_names + annotation_names
 
         for row in self.query.get_compiler(self.db).results_iter():
             yield dict(zip(names, row))
@@ -1113,9 +1141,9 @@ class ValuesQuerySet(QuerySet):
 
         if self._fields:
             self.extra_names = []
-            self.aggregate_names = []
-            if not self.query._extra and not self.query._aggregates:
-                # Short cut - if there are no extra or aggregates, then
+            self.annotation_names = []
+            if not self.query._extra and not self.query._annotations:
+                # Short cut - if there are no extra or annotations, then
                 # the values() clause must be just field names.
                 self.field_names = list(self._fields)
             else:
@@ -1127,22 +1155,22 @@ class ValuesQuerySet(QuerySet):
                     # had selected previously.
                     if self.query._extra and f in self.query._extra:
                         self.extra_names.append(f)
-                    elif f in self.query.aggregate_select:
-                        self.aggregate_names.append(f)
+                    elif f in self.query.annotation_select:
+                        self.annotation_names.append(f)
                     else:
                         self.field_names.append(f)
         else:
             # Default to all fields.
             self.extra_names = None
             self.field_names = [f.attname for f in self.model._meta.concrete_fields]
-            self.aggregate_names = None
+            self.annotation_names = None
 
         self.query.select = []
         if self.extra_names is not None:
             self.query.set_extra_mask(self.extra_names)
         self.query.add_fields(self.field_names, True)
-        if self.aggregate_names is not None:
-            self.query.set_aggregate_mask(self.aggregate_names)
+        if self.annotation_names is not None:
+            self.query.set_annotation_mask(self.annotation_names)
 
     def _clone(self, klass=None, setup=False, **kwargs):
         """
@@ -1155,7 +1183,7 @@ class ValuesQuerySet(QuerySet):
             c._fields = self._fields[:]
         c.field_names = self.field_names
         c.extra_names = self.extra_names
-        c.aggregate_names = self.aggregate_names
+        c.annotation_names = self.annotation_names
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
         return c
@@ -1164,7 +1192,7 @@ class ValuesQuerySet(QuerySet):
         super(ValuesQuerySet, self)._merge_sanity_check(other)
         if (set(self.extra_names) != set(other.extra_names) or
                 set(self.field_names) != set(other.field_names) or
-                self.aggregate_names != other.aggregate_names):
+                self.annotation_names != other.annotation_names):
             raise TypeError("Merging '%s' classes must involve the same values in each case."
                     % self.__class__.__name__)
 
@@ -1174,9 +1202,9 @@ class ValuesQuerySet(QuerySet):
         """
         self.query.set_group_by()
 
-        if self.aggregate_names is not None:
-            self.aggregate_names.extend(aggregates)
-            self.query.set_aggregate_mask(self.aggregate_names)
+        if self.annotation_names is not None:
+            self.annotation_names.extend(aggregates)
+            self.query.set_annotation_mask(self.annotation_names)
 
         super(ValuesQuerySet, self)._setup_aggregate_query(aggregates)
 
@@ -1209,13 +1237,20 @@ class ValuesQuerySet(QuerySet):
                     % self.__class__.__name__)
         return self
 
+    def is_compatible_query_object_type(self, opts):
+        """
+        ValueQuerySets do not need to be checked for compatibility.
+        We trust that users of ValueQuerySets know what they are doing.
+        """
+        return True
+
 
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
         if self.flat and len(self._fields) == 1:
             for row in self.query.get_compiler(self.db).results_iter():
                 yield row[0]
-        elif not self.query.extra_select and not self.query.aggregate_select:
+        elif not self.query.extra_select and not self.query.annotation_select:
             for row in self.query.get_compiler(self.db).results_iter():
                 yield tuple(row)
         else:
@@ -1224,14 +1259,14 @@ class ValuesListQuerySet(ValuesQuerySet):
             # the fields to match the order in self._fields.
             extra_names = list(self.query.extra_select)
             field_names = self.field_names
-            aggregate_names = list(self.query.aggregate_select)
+            annotation_names = list(self.query.annotation_select)
 
-            names = extra_names + field_names + aggregate_names
+            names = extra_names + field_names + annotation_names
 
             # If a field list has been specified, use it. Otherwise, use the
-            # full list of fields, including extras and aggregates.
+            # full list of fields, including extras and annotations.
             if self._fields:
-                fields = list(self._fields) + [f for f in aggregate_names if f not in self._fields]
+                fields = list(self._fields) + [f for f in annotation_names if f not in self._fields]
             else:
                 fields = names
 
@@ -1245,57 +1280,6 @@ class ValuesListQuerySet(ValuesQuerySet):
             # Only assign flat if the clone didn't already get it from kwargs
             clone.flat = self.flat
         return clone
-
-
-class DateQuerySet(QuerySet):
-    def iterator(self):
-        return self.query.get_compiler(self.db).results_iter()
-
-    def _setup_query(self):
-        """
-        Sets up any special features of the query attribute.
-
-        Called by the _clone() method after initializing the rest of the
-        instance.
-        """
-        self.query.clear_deferred_loading()
-        self.query = self.query.clone(klass=sql.DateQuery, setup=True)
-        self.query.select = []
-        self.query.add_select(self._field_name, self._kind, self._order)
-
-    def _clone(self, klass=None, setup=False, **kwargs):
-        c = super(DateQuerySet, self)._clone(klass, False, **kwargs)
-        c._field_name = self._field_name
-        c._kind = self._kind
-        if setup and hasattr(c, '_setup_query'):
-            c._setup_query()
-        return c
-
-
-class DateTimeQuerySet(QuerySet):
-    def iterator(self):
-        return self.query.get_compiler(self.db).results_iter()
-
-    def _setup_query(self):
-        """
-        Sets up any special features of the query attribute.
-
-        Called by the _clone() method after initializing the rest of the
-        instance.
-        """
-        self.query.clear_deferred_loading()
-        self.query = self.query.clone(klass=sql.DateTimeQuery, setup=True, tzinfo=self._tzinfo)
-        self.query.select = []
-        self.query.add_select(self._field_name, self._kind, self._order)
-
-    def _clone(self, klass=None, setup=False, **kwargs):
-        c = super(DateTimeQuerySet, self)._clone(klass, False, **kwargs)
-        c._field_name = self._field_name
-        c._kind = self._kind
-        c._tzinfo = self._tzinfo
-        if setup and hasattr(c, '_setup_query'):
-            c._setup_query()
-        return c
 
 
 def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
@@ -1493,7 +1477,7 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
             if f.unique and rel_obj is not None:
                 # If the field is unique, populate the
                 # reverse descriptor cache on the related object
-                setattr(rel_obj, f.related.get_cache_name(), obj)
+                setattr(rel_obj, f.rel.get_cache_name(), obj)
 
     # Now do the same, but for reverse related objects.
     # Only handle the restricted case - i.e., don't do a depth
@@ -1513,7 +1497,7 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
             rel_obj, index_end = cached_row
             if obj is not None:
                 # populate the reverse descriptor cache
-                setattr(obj, f.related.get_cache_name(), rel_obj)
+                setattr(obj, f.rel.get_cache_name(), rel_obj)
             if rel_obj is not None:
                 # If the related object exists, populate
                 # the descriptor cache.

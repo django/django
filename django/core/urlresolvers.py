@@ -428,7 +428,7 @@ class RegexURLResolver(LocaleRegexProvider):
         if args and kwargs:
             raise ValueError("Don't mix *args and **kwargs in call to reverse()!")
         text_args = [force_text(v) for v in args]
-        text_kwargs = dict((k, force_text(v)) for (k, v) in kwargs.items())
+        text_kwargs = {k: force_text(v) for (k, v) in kwargs.items()}
 
         if not self._populated:
             self._populate()

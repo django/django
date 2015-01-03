@@ -41,12 +41,12 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Installation <intro/install>`
 
 * **Tutorial:**
-  :doc:`Part 1 <intro/tutorial01>` |
-  :doc:`Part 2 <intro/tutorial02>` |
-  :doc:`Part 3 <intro/tutorial03>` |
-  :doc:`Part 4 <intro/tutorial04>` |
-  :doc:`Part 5 <intro/tutorial05>` |
-  :doc:`Part 6 <intro/tutorial06>`
+  :doc:`Part 1: Models <intro/tutorial01>` |
+  :doc:`Part 2: The admin site <intro/tutorial02>` |
+  :doc:`Part 3: Views and templates <intro/tutorial03>` |
+  :doc:`Part 4: Forms and generic views <intro/tutorial04>` |
+  :doc:`Part 5: Testing <intro/tutorial05>` |
+  :doc:`Part 6: Static files <intro/tutorial06>`
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
@@ -86,7 +86,9 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Aggregation <topics/db/aggregation>` |
   :doc:`Custom fields <howto/custom-model-fields>` |
   :doc:`Multiple databases <topics/db/multi-db>` |
-  :doc:`Custom lookups <howto/custom-lookups>`
+  :doc:`Custom lookups <howto/custom-lookups>` |
+  :doc:`Query Expressions <ref/models/expressions>` |
+  :doc:`Database Functions <ref/models/database-functions>`
 
 * **Other:**
   :doc:`Supported databases <ref/databases>` |
@@ -171,10 +173,6 @@ manipulation of form data.
   :doc:`Formsets <topics/forms/formsets>` |
   :doc:`Customizing validation <ref/forms/validation>`
 
-* **Extras:**
-  :doc:`Form preview <ref/contrib/formtools/form-preview>` |
-  :doc:`Form wizard <ref/contrib/formtools/form-wizard>`
-
 The development process
 =======================
 
@@ -227,7 +225,7 @@ applications and Django provides multiple protection tools and mechanisms:
 * :doc:`Security overview <topics/security>`
 * :doc:`Disclosed security issues in Django <releases/security>`
 * :doc:`Clickjacking protection <ref/clickjacking>`
-* :doc:`Cross Site Request Forgery protection <ref/contrib/csrf>`
+* :doc:`Cross Site Request Forgery protection <ref/csrf>`
 * :doc:`Cryptographic signing <topics/signing>`
 * :ref:`Security Middleware <security-middleware>`
 

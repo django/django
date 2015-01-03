@@ -474,44 +474,44 @@ client and set the ``content_type`` argument.
 
 .. _simplejson-incompatibilities:
 
-System version of :mod:`simplejson` no longer used
+System version of ``simplejson`` no longer used
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :ref:`As explained below <simplejson-deprecation>`, Django 1.5 deprecates
 ``django.utils.simplejson`` in favor of Python 2.6's built-in :mod:`json`
 module. In theory, this change is harmless. Unfortunately, because of
-incompatibilities between versions of :mod:`simplejson`, it may trigger errors
+incompatibilities between versions of ``simplejson``, it may trigger errors
 in some circumstances.
 
 JSON-related features in Django 1.4 always used ``django.utils.simplejson``.
 This module was actually:
 
-- A system version of :mod:`simplejson`, if one was available (ie. ``import
+- A system version of ``simplejson``, if one was available (ie. ``import
   simplejson`` works), if it was more recent than Django's built-in copy or it
   had the C speedups, or
 - The :mod:`json` module from the standard library, if it was available (ie.
   Python 2.6 or greater), or
-- A built-in copy of version 2.0.7 of :mod:`simplejson`.
+- A built-in copy of version 2.0.7 of ``simplejson``.
 
 In Django 1.5, those features use Python's :mod:`json` module, which is based
-on version 2.0.9 of :mod:`simplejson`.
+on version 2.0.9 of ``simplejson``.
 
 There are no known incompatibilities between Django's copy of version 2.0.7 and
 Python's copy of version 2.0.9. However, there are some incompatibilities
-between other versions of :mod:`simplejson`:
+between other versions of ``simplejson``:
 
-- While the :mod:`simplejson` API is documented as always returning unicode
+- While the ``simplejson`` API is documented as always returning unicode
   strings, the optional C implementation can return a byte string. This was
   fixed in Python 2.7.
-- :class:`simplejson.JSONEncoder` gained a ``namedtuple_as_object`` keyword
+- ``simplejson.JSONEncoder`` gained a ``namedtuple_as_object`` keyword
   argument in version 2.2.
 
 More information on these incompatibilities is available in `ticket #18023`_.
 
-The net result is that, if you have installed :mod:`simplejson` and your code
+The net result is that, if you have installed ``simplejson`` and your code
 uses Django's serialization internals directly -- for instance
 ``django.core.serializers.json.DjangoJSONEncoder``, the switch from
-:mod:`simplejson` to :mod:`json` could break your code. (In general, changes to
+``simplejson`` to :mod:`json` could break your code. (In general, changes to
 internals aren't documented; we're making an exception here.)
 
 At this point, the maintainers of Django believe that using :mod:`json` from
@@ -771,14 +771,14 @@ In Django 1.7 and above, the iterator will be consumed immediately by
 
 Since Django 1.5 drops support for Python 2.5, we can now rely on the
 :mod:`json` module being available in Python's standard library, so we've
-removed our own copy of :mod:`simplejson`. You should now import :mod:`json`
+removed our own copy of ``simplejson``. You should now import :mod:`json`
 instead of ``django.utils.simplejson``.
 
 Unfortunately, this change might have unwanted side-effects, because of
-incompatibilities between versions of :mod:`simplejson` -- see the
+incompatibilities between versions of ``simplejson`` -- see the
 :ref:`backwards-incompatible changes <simplejson-incompatibilities>` section.
-If you rely on features added to :mod:`simplejson` after it became Python's
-:mod:`json`, you should import :mod:`simplejson` explicitly.
+If you rely on features added to ``simplejson`` after it became Python's
+:mod:`json`, you should import ``simplejson`` explicitly.
 
 ``django.utils.encoding.StrAndUnicode``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

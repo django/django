@@ -1,0 +1,16 @@
+http://www.djangoproject.com/
+HTTP://WWW.DJANGOPROJECT.COM/
+http://localhost/
+http://example.com/
+http://www.example.com/
+http://www.example.com:8000/test
+http://valid-with-hyphens.com/
+http://subdomain.example.com/
+http://200.8.9.10/
+http://200.8.9.10:8000/test
+http://su--b.valid-----hyphens.com/
+http://example.com?something=value
+http://example.com/index.php?something=value&another=value2
+https://example.com/
+ftp://example.com/
+ftps://example.com/

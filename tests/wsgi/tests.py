@@ -64,7 +64,7 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
 
         from .wsgi import application
 
-        self.assertTrue(app is application)
+        self.assertIs(app, application)
 
     @override_settings(WSGI_APPLICATION=None)
     def test_default(self):
@@ -85,7 +85,7 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
         try:
             app = get_internal_wsgi_application()
 
-            self.assertTrue(app is fake_app)
+            self.assertIs(app, fake_app)
         finally:
             basehttp.get_wsgi_application = _orig_get_wsgi_app
 

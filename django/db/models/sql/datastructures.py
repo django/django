@@ -2,33 +2,7 @@
 Useful auxiliary data structures for query construction. Not useful outside
 the SQL domain.
 """
-
-
-class Col(object):
-    def __init__(self, alias, target, source):
-        self.alias, self.target, self.source = alias, target, source
-
-    def as_sql(self, qn, connection):
-        return "%s.%s" % (qn(self.alias), qn(self.target.column)), []
-
-    @property
-    def output_field(self):
-        return self.source
-
-    def relabeled_clone(self, relabels):
-        return self.__class__(relabels.get(self.alias, self.alias), self.target, self.source)
-
-    def get_group_by_cols(self):
-        return [(self.alias, self.target.column)]
-
-    def get_lookup(self, name):
-        return self.output_field.get_lookup(name)
-
-    def get_transform(self, name):
-        return self.output_field.get_transform(name)
-
-    def prepare(self):
-        return self
+from django.db.models.sql.constants import INNER, LOUTER
 
 
 class EmptyResultSet(Exception):
@@ -51,40 +25,117 @@ class Empty(object):
     pass
 
 
-class Date(object):
+class Join(object):
     """
-    Add a date selection column.
+    Used by sql.Query and sql.SQLCompiler to generate JOIN clauses into the
+    FROM entry. For example, the SQL generated could be
+        LEFT OUTER JOIN "sometable" T1 ON ("othertable"."sometable_id" = "sometable"."id")
+
+    This class is primarily used in Query.alias_map. All entries in alias_map
+    must be Join compatible by providing the following attributes and methods:
+        - table_name (string)
+        - table_alias (possible alias for the table, can be None)
+        - join_type (can be None for those entries that aren't joined from
+          anything)
+        - parent_alias (which table is this join's parent, can be None similarly
+          to join_type)
+        - as_sql()
+        - relabeled_clone()
+
     """
-    def __init__(self, col, lookup_type):
-        self.col = col
-        self.lookup_type = lookup_type
+    def __init__(self, table_name, parent_alias, table_alias, join_type,
+                 join_field, nullable):
+        # Join table
+        self.table_name = table_name
+        self.parent_alias = parent_alias
+        # Note: table_alias is not necessarily known at instantiation time.
+        self.table_alias = table_alias
+        # LOUTER or INNER
+        self.join_type = join_type
+        # A list of 2-tuples to use in the ON clause of the JOIN.
+        # Each 2-tuple will create one join condition in the ON clause.
+        self.join_cols = join_field.get_joining_columns()
+        # Along which field (or ForeignObjectRel in the reverse join case)
+        self.join_field = join_field
+        # Is this join nullabled?
+        self.nullable = nullable
+
+    def as_sql(self, compiler, connection):
+        """
+        Generates the full
+           LEFT OUTER JOIN sometable ON sometable.somecol = othertable.othercol, params
+        clause for this join.
+        """
+        params = []
+        sql = []
+        alias_str = '' if self.table_alias == self.table_name else (' %s' % self.table_alias)
+        qn = compiler.quote_name_unless_alias
+        qn2 = connection.ops.quote_name
+        sql.append('%s %s%s ON (' % (self.join_type, qn(self.table_name), alias_str))
+        for index, (lhs_col, rhs_col) in enumerate(self.join_cols):
+            if index != 0:
+                sql.append(' AND ')
+            sql.append('%s.%s = %s.%s' % (
+                qn(self.parent_alias),
+                qn2(lhs_col),
+                qn(self.table_alias),
+                qn2(rhs_col),
+            ))
+        extra_cond = self.join_field.get_extra_restriction(
+            compiler.query.where_class, self.table_alias, self.parent_alias)
+        if extra_cond:
+            extra_sql, extra_params = compiler.compile(extra_cond)
+            extra_sql = 'AND (%s)' % extra_sql
+            params.extend(extra_params)
+            sql.append('%s' % extra_sql)
+        sql.append(')')
+        return ' '.join(sql), params
 
     def relabeled_clone(self, change_map):
-        return self.__class__((change_map.get(self.col[0], self.col[0]), self.col[1]))
+        new_parent_alias = change_map.get(self.parent_alias, self.parent_alias)
+        new_table_alias = change_map.get(self.table_alias, self.table_alias)
+        return self.__class__(
+            self.table_name, new_parent_alias, new_table_alias, self.join_type,
+            self.join_field, self.nullable)
 
-    def as_sql(self, qn, connection):
-        if isinstance(self.col, (list, tuple)):
-            col = '%s.%s' % tuple(qn(c) for c in self.col)
-        else:
-            col = self.col
-        return connection.ops.date_trunc_sql(self.lookup_type, col), []
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return (
+                self.table_name == other.table_name and
+                self.parent_alias == other.parent_alias and
+                self.join_field == other.join_field
+            )
+        return False
+
+    def demote(self):
+        new = self.relabeled_clone({})
+        new.join_type = INNER
+        return new
+
+    def promote(self):
+        new = self.relabeled_clone({})
+        new.join_type = LOUTER
+        return new
 
 
-class DateTime(object):
+class BaseTable(object):
     """
-    Add a datetime selection column.
+    The BaseTable class is used for base table references in FROM clause. For
+    example, the SQL "foo" in
+        SELECT * FROM "foo" WHERE somecond
+    could be generated by this class.
     """
-    def __init__(self, col, lookup_type, tzname):
-        self.col = col
-        self.lookup_type = lookup_type
-        self.tzname = tzname
+    join_type = None
+    parent_alias = None
+
+    def __init__(self, table_name, alias):
+        self.table_name = table_name
+        self.table_alias = alias
+
+    def as_sql(self, compiler, connection):
+        alias_str = '' if self.table_alias == self.table_name else (' %s' % self.table_alias)
+        base_sql = compiler.quote_name_unless_alias(self.table_name)
+        return base_sql + alias_str, []
 
     def relabeled_clone(self, change_map):
-        return self.__class__((change_map.get(self.col[0], self.col[0]), self.col[1]))
-
-    def as_sql(self, qn, connection):
-        if isinstance(self.col, (list, tuple)):
-            col = '%s.%s' % tuple(qn(c) for c in self.col)
-        else:
-            col = self.col
-        return connection.ops.datetime_trunc_sql(self.lookup_type, col, self.tzname)
+        return self.__class__(self.table_name, change_map.get(self.table_alias, self.table_alias))

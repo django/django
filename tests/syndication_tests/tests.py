@@ -8,6 +8,7 @@ try:
 except ImportError:
     pytz = None
 
+from django.contrib.sites.models import Site
 from django.contrib.syndication import views
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
@@ -55,6 +56,12 @@ class SyndicationFeedTest(FeedTestCase):
     """
     Tests for the high-level syndication feed framework.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(SyndicationFeedTest, cls).setUpClass()
+        # This cleanup is necessary because contrib.sites cache
+        # makes tests interfere with each other, see #11505
+        Site.objects.clear_cache()
 
     def test_rss2_feed(self):
         """

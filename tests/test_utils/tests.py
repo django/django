@@ -6,7 +6,7 @@ import unittest
 from django.conf.urls import url
 from django.core.files.storage import default_storage
 from django.core.urlresolvers import NoReverseMatch, reverse
-from django.db import connection
+from django.db import connection, router
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -385,6 +385,18 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 
+    def test_assert_used_on_http_response(self):
+        response = HttpResponse()
+        error_msg = (
+            'assertTemplateUsed() and assertTemplateNotUsed() are only '
+            'usable on responses fetched using the Django test Client.'
+        )
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateUsed(response, 'template.html')
+
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateNotUsed(response, 'template.html')
+
 
 class HTMLEqualTests(TestCase):
     def test_html_parser(self):
@@ -542,24 +554,24 @@ class HTMLEqualTests(TestCase):
         # equal html contains each other
         dom1 = parse_html('<p>foo')
         dom2 = parse_html('<p>foo</p>')
-        self.assertTrue(dom1 in dom2)
-        self.assertTrue(dom2 in dom1)
+        self.assertIn(dom1, dom2)
+        self.assertIn(dom2, dom1)
 
         dom2 = parse_html('<div><p>foo</p></div>')
-        self.assertTrue(dom1 in dom2)
-        self.assertTrue(dom2 not in dom1)
+        self.assertIn(dom1, dom2)
+        self.assertNotIn(dom2, dom1)
 
-        self.assertFalse('<p>foo</p>' in dom2)
-        self.assertTrue('foo' in dom2)
+        self.assertNotIn('<p>foo</p>', dom2)
+        self.assertIn('foo', dom2)
 
         # when a root element is used ...
         dom1 = parse_html('<p>foo</p><p>bar</p>')
         dom2 = parse_html('<p>foo</p><p>bar</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>foo</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>bar</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
 
     def test_count(self):
         # equal html contains each other one time
@@ -763,7 +775,7 @@ class SecondUrls:
 
 class OverrideSettingsTests(TestCase):
 
-    # #21518 -- If neither override_settings nor a settings_changed receiver
+    # #21518 -- If neither override_settings nor a setting_changed receiver
     # clears the URL cache between tests, then one of test_first or
     # test_second will fail.
 
@@ -830,3 +842,11 @@ class OverrideSettingsTests(TestCase):
         self.assertIsNone(default_storage.directory_permissions_mode)
         with self.settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o777):
             self.assertEqual(default_storage.directory_permissions_mode, 0o777)
+
+    def test_override_database_routers(self):
+        """
+        Overriding DATABASE_ROUTERS should update the master router.
+        """
+        test_routers = (object(),)
+        with self.settings(DATABASE_ROUTERS=test_routers):
+            self.assertSequenceEqual(router.routers, test_routers)

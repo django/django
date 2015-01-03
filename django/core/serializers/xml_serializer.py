@@ -187,7 +187,7 @@ class Deserializer(base.Deserializer):
         m2m_data = {}
 
         model_fields = Model._meta.get_all_field_names()
-        # Deseralize each field.
+        # Deserialize each field.
         for field_node in node.getElementsByTagName("field"):
             # If the field is missing the name attribute, bail (are you
             # sensing a pattern here?)

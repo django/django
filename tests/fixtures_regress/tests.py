@@ -8,6 +8,7 @@ import re
 import warnings
 
 from django.core import serializers
+from django.core.exceptions import ImproperlyConfigured
 from django.core.serializers.base import DeserializationError
 from django.core import management
 from django.core.management.base import CommandError
@@ -60,7 +61,7 @@ class TestFixtures(TestCase):
             name='Platypus',
             latin_name='Ornithorhynchus anatinus',
             count=2,
-            weight=2.2
+            weight=2.2,
         )
         animal.save()
         self.assertGreater(animal.id, 1)
@@ -75,7 +76,7 @@ class TestFixtures(TestCase):
             management.call_command(
                 'loaddata',
                 'sequence_extra',
-                verbosity=0
+                verbosity=0,
             )
 
     def test_loaddata_not_found_fields_ignore(self):
@@ -359,20 +360,20 @@ class TestFixtures(TestCase):
             name='Platypus',
             latin_name='Ornithorhynchus anatinus',
             count=2,
-            weight=2.2
+            weight=2.2,
         )
         animal.save()
 
-        stdout = StringIO()
+        out = StringIO()
         management.call_command(
             'dumpdata',
             'fixtures_regress.animal',
             format='json',
-            stdout=stdout
+            stdout=out,
         )
 
         # Output order isn't guaranteed, so check for parts
-        data = stdout.getvalue()
+        data = out.getvalue()
 
         # Get rid of artifacts like '000000002' to eliminate the differences
         # between different Python versions.
@@ -393,7 +394,7 @@ class TestFixtures(TestCase):
         """
         Regression for #11428 - Proxy models aren't included when you dumpdata
         """
-        stdout = StringIO()
+        out = StringIO()
         # Create an instance of the concrete class
         widget = Widget.objects.create(name='grommet')
         management.call_command(
@@ -401,10 +402,10 @@ class TestFixtures(TestCase):
             'fixtures_regress.widget',
             'fixtures_regress.widgetproxy',
             format='json',
-            stdout=stdout
+            stdout=out,
         )
         self.assertJSONEqual(
-            stdout.getvalue(),
+            out.getvalue(),
             """[{"pk": %d, "model": "fixtures_regress.widget", "fields": {"name": "grommet"}}]"""
             % widget.pk
         )
@@ -486,6 +487,58 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
 
+    def test_loaddata_with_m2m_to_self(self):
+        """
+        Regression test for ticket #17946.
+        """
+        management.call_command(
+            'loaddata',
+            'm2mtoself.json',
+            verbosity=0,
+        )
+
+    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
+                                     os.path.join(_cur_dir, 'fixtures_1')])
+    def test_fixture_dirs_with_duplicates(self):
+        """
+        settings.FIXTURE_DIRS cannot contain duplicates in order to avoid
+        repeated fixture loading.
+        """
+        self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "settings.FIXTURE_DIRS contains duplicates.",
+            management.call_command,
+            'loaddata',
+            'absolute.json',
+            verbosity=0,
+        )
+
+    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures')])
+    def test_fixture_dirs_with_default_fixture_path(self):
+        """
+        settings.FIXTURE_DIRS cannot contain a default fixtures directory
+        for application (app/fixtures) in order to avoid repeated fixture loading.
+        """
+        self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "'%s' is a default fixture directory for the '%s' app "
+            "and cannot be listed in settings.FIXTURE_DIRS."
+            % (os.path.join(_cur_dir, 'fixtures'), 'fixtures_regress'),
+            management.call_command,
+            'loaddata',
+            'absolute.json',
+            verbosity=0,
+        )
+
+    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
+                                     os.path.join(_cur_dir, 'fixtures_2')])
+    def test_loaddata_with_valid_fixture_dirs(self):
+        management.call_command(
+            'loaddata',
+            'absolute.json',
+            verbosity=0,
+        )
+
 
 class NaturalKeyFixtureTests(TestCase):
 
@@ -554,7 +607,7 @@ class NaturalKeyFixtureTests(TestCase):
             verbosity=0,
         )
 
-        stdout = StringIO()
+        out = StringIO()
         management.call_command(
             'dumpdata',
             'fixtures_regress.book',
@@ -564,10 +617,10 @@ class NaturalKeyFixtureTests(TestCase):
             format='json',
             use_natural_foreign_keys=True,
             use_natural_primary_keys=True,
-            stdout=stdout,
+            stdout=out,
         )
         self.assertJSONEqual(
-            stdout.getvalue(),
+            out.getvalue(),
             """[{"fields": {"main": null, "name": "Amazon"}, "model": "fixtures_regress.store"}, {"fields": {"main": null, "name": "Borders"}, "model": "fixtures_regress.store"}, {"fields": {"name": "Neal Stephenson"}, "model": "fixtures_regress.person"}, {"pk": 1, "model": "fixtures_regress.book", "fields": {"stores": [["Amazon"], ["Borders"]], "name": "Cryptonomicon", "author": ["Neal Stephenson"]}}]"""
         )
 
@@ -800,19 +853,19 @@ class M2MNaturalKeyFixtureTests(TestCase):
         a.b_set.add(b1)
         a.b_set.add(b2)
 
-        stdout = StringIO()
+        out = StringIO()
         management.call_command(
             'dumpdata',
             'fixtures_regress.M2MSimpleA',
             'fixtures_regress.M2MSimpleB',
             use_natural_foreign_keys=True,
-            stdout=stdout
+            stdout=out,
         )
 
         for model in [M2MSimpleA, M2MSimpleB]:
             model.objects.all().delete()
 
-        objects = serializers.deserialize("json", stdout.getvalue())
+        objects = serializers.deserialize("json", out.getvalue())
         for obj in objects:
             obj.save()
 
@@ -850,7 +903,13 @@ class TestLoadFixtureFromOtherAppDirectory(TestCase):
     #23612 -- fixtures path should be normalized to allow referencing relative
     paths on Windows.
     """
-    fixtures = ['fixtures_regress/fixtures/absolute.json']
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    # relative_prefix is something like tests/fixtures_regress or
+    # fixtures_regress depending on how runtests.py is invoked.
+    # All path separators must be / in order to be a proper regression test on
+    # Windows, so replace as appropriate.
+    relative_prefix = os.path.relpath(current_dir, os.getcwd()).replace('\\', '/')
+    fixtures = [relative_prefix + '/fixtures/absolute.json']
 
     def test_fixtures_loaded(self):
         count = Absolute.objects.count()

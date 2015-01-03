@@ -28,8 +28,8 @@ bit of i18n-related overhead in certain places of the framework. If you don't
 use internationalization, you should take the two seconds to set
 :setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
 make some optimizations so as not to load the internationalization machinery.
-You'll probably also want to remove ``'django.core.context_processors.i18n'``
-from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+You'll probably also want to remove ``'django.template.context_processors.i18n'``
+from the ``'context_processors'`` option of your :setting:`TEMPLATES` setting.
 
 .. note::
 
@@ -860,9 +860,8 @@ If you do this in your view:
 
 .. code-block:: python
 
-    return render_to_response('mytemplate.html', {
-        'available_languages': ['en', 'es', 'fr'],
-    }, RequestContext(request))
+    context = {'available_languages': ['en', 'es', 'fr']}
+    return render(request, 'mytemplate.html', context)
 
 you can iterate over those languages in the template::
 
@@ -873,7 +872,7 @@ There are also simple filters available for convenience:
 
 * ``{{ LANGUAGE_CODE|language_name }}`` ("German")
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
-* ``{{ LANGUAGE_CODE|bidi }}`` (False)
+* ``{{ LANGUAGE_CODE|language_bidi }}`` (False)
 
 .. _Django templates: ../templates_python/
 
@@ -1429,8 +1428,7 @@ files of this type, but if you want to create your own message files, or want to
 test or compile a changed message file, you will need the ``gettext`` utilities:
 
 * Download the following zip files from the GNOME servers
-  http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/ or from one
-  of its mirrors_
+  https://download.gnome.org/binaries/win32/dependencies/
 
   * ``gettext-runtime-X.zip``
   * ``gettext-tools-X.zip``
@@ -1447,14 +1445,48 @@ test or compile a changed message file, you will need the ``gettext`` utilities:
   * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
     ``Variable value`` field.
 
-.. _mirrors: http://ftp.gnome.org/pub/GNOME/MIRRORS
-
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
 translation utilities with a ``gettext`` package if the command ``xgettext
 --version`` entered at a Windows command prompt causes a popup window saying
 "xgettext.exe has generated errors and will be closed by Windows".
 
+.. _customizing-makemessages:
+
+Customizing the ``makemessages`` command
+----------------------------------------
+
+.. highlightlang:: python
+
+If you want to pass additional parameters to ``xgettext``, you need to create a
+custom :djadmin:`makemessages` command and override its ``xgettext_options``
+attribute::
+
+    from django.core.management.commands import makemessages
+
+    class Command(makemessages.Command):
+        xgettext_options = makemessages.Command.xgettext_options + ['--keyword=mytrans']
+
+If you need more flexibility, you could also add a new argument to your custom
+:djadmin:`makemessages` command::
+
+    from django.core.management.commands import makemessages
+
+    class Command(makemessages.Command):
+
+        def add_arguments(self, parser):
+            super(Command, self).add_arguments(parser)
+            parser.add_argument('--extra-keyword', dest='xgettext_keywords',
+                                action='append')
+
+        def handle(self, *args, **options):
+            xgettext_keywords = options.pop('xgettext_keywords')
+            if xgettext_keywords:
+                self.xgettext_options = (
+                    makemessages.Command.xgettext_options[:] +
+                    ['--keyword=%s' % kwd for kwd in xgettext_keywords]
+                )
+            super(Command, self).handle(*args, **options)
 
 Miscellaneous
 =============
@@ -1474,10 +1506,10 @@ As a convenience, Django comes with a view, :func:`django.views.i18n.set_languag
 that sets a user's language preference and redirects to a given URL or, by default,
 back to the previous page.
 
-Make sure that the following item is in your
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` list in your settings file::
+Make sure that the following context processor is enabled in the
+:setting:`TEMPLATES` setting in your settings file::
 
-    'django.core.context_processors.i18n'
+    'django.template.context_processors.i18n'
 
 Activate this view by adding the following line to your URLconf::
 

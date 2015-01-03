@@ -43,15 +43,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
-    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], override_uniques=None):
+    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], override_uniques=None,
+                      override_indexes=None):
         """
         Shortcut to transform a model from old_model into new_model
         """
         # Work out the new fields dict / mapping
-        body = dict((f.name, f) for f in model._meta.local_fields)
+        body = {f.name: f for f in model._meta.local_fields}
         # Since mapping might mix column names and default values,
         # its values must be already quoted.
-        mapping = dict((f.column, self.quote_name(f.column)) for f in model._meta.local_fields)
+        mapping = {f.column: self.quote_name(f.column) for f in model._meta.local_fields}
         # This maps field names (not columns) for things like unique_together
         rename_mapping = {}
         # If any of the new or altered fields is introducing a new PK,
@@ -68,15 +69,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Add in any created fields
         for field in create_fields:
             body[field.name] = field
-            # If there's a default, insert it into the copy map
-            if field.has_default():
+            # Choose a default and insert it into the copy map
+            if not isinstance(field, ManyToManyField):
                 mapping[field.column] = self.quote_value(
                     self.effective_default(field)
                 )
         # Add in any altered fields
         for (old_field, new_field) in alter_fields:
-            del body[old_field.name]
-            del mapping[old_field.column]
+            body.pop(old_field.name, None)
+            mapping.pop(old_field.column, None)
             body[new_field.name] = new_field
             if old_field.null and not new_field.null:
                 case_sql = "coalesce(%(col)s, %(default)s)" % {
@@ -110,11 +111,20 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 for unique in model._meta.unique_together
             ]
 
+        # Work out the new value for index_together, taking renames into
+        # account
+        if override_indexes is None:
+            override_indexes = [
+                [rename_mapping.get(n, n) for n in index]
+                for index in model._meta.index_together
+            ]
+
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
             'db_table': model._meta.db_table + "__new",
             'unique_together': override_uniques,
+            'index_together': override_indexes,
             'apps': apps,
         }
         meta = type("Meta", tuple(), meta_contents)
@@ -189,6 +199,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """Actually perform a "physical" (non-ManyToMany) field update."""
         # Alter by remaking table
         self._remake_table(model, alter_fields=[(old_field, new_field)])
+
+    def alter_index_together(self, model, old_index_together, new_index_together):
+        """
+        Deals with a model changing its index_together.
+        Note: The input index_togethers must be doubly-nested, not the single-
+        nested ["foo", "bar"] format.
+        """
+        self._remake_table(model, override_indexes=new_index_together)
 
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
         """

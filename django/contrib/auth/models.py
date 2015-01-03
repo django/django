@@ -29,6 +29,8 @@ user_logged_in.connect(update_last_login)
 
 
 class PermissionManager(models.Manager):
+    use_in_migrations = True
+
     def get_by_natural_key(self, codename, app_label, model):
         return self.get(
             codename=codename,
@@ -87,6 +89,8 @@ class GroupManager(models.Manager):
     """
     The manager for the auth's Group model.
     """
+    use_in_migrations = True
+
     def get_by_natural_key(self, name):
         return self.get(name=name)
 
@@ -160,6 +164,7 @@ class BaseUserManager(models.Manager):
 
 
 class UserManager(BaseUserManager):
+    use_in_migrations = True
 
     def _create_user(self, username, email, password,
                      is_staff, is_superuser, **extra_fields):

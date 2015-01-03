@@ -5,8 +5,8 @@ termcolors.py
 from django.utils import six
 
 color_names = ('black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white')
-foreground = dict((color_names[x], '3%s' % x) for x in range(8))
-background = dict((color_names[x], '4%s' % x) for x in range(8))
+foreground = {color_names[x]: '3%s' % x for x in range(8)}
+background = {color_names[x]: '4%s' % x for x in range(8)}
 
 RESET = '0'
 opt_dict = {'bold': '1', 'underscore': '4', 'blink': '5', 'reverse': '7', 'conceal': '8'}

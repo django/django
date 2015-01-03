@@ -123,8 +123,7 @@ class Command(BaseCommand):
                             field_type = 'NullBooleanField('
                         else:
                             extra_params['blank'] = True
-                            if field_type not in ('TextField(', 'CharField('):
-                                extra_params['null'] = True
+                            extra_params['null'] = True
 
                     field_desc = '%s = %s%s' % (
                         att_name,
@@ -135,9 +134,9 @@ class Command(BaseCommand):
                     if extra_params:
                         if not field_desc.endswith('('):
                             field_desc += ', '
-                        field_desc += ', '.join([
+                        field_desc += ', '.join(
                             '%s=%s' % (k, strip_prefix(repr(v)))
-                            for k, v in extra_params.items()])
+                            for k, v in extra_params.items())
                     field_desc += ')'
                     if comment_notes:
                         field_desc += '  # ' + ' '.join(comment_notes)

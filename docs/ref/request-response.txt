@@ -367,7 +367,7 @@ a subclass of dictionary. Exceptions are outlined here:
     Instantiates a ``QueryDict`` object based on ``query_string``.
 
     >>> QueryDict('a=1&a=2&c=3')
-    <QueryDict: {u'a': [u'1', u'2'], u'b': [u'1']}>
+    <QueryDict: {'a': ['1', '2'], 'c': ['3']}>
 
     If ``query_string`` is not passed in, the resulting ``QueryDict`` will be
     empty (it will have no keys or values).
@@ -651,6 +651,12 @@ Attributes
     This attribute exists so middleware can treat streaming responses
     differently from regular responses.
 
+.. attribute:: HttpResponse.closed
+
+    .. versionadded:: 1.8
+
+    ``True`` if the response has been closed.
+
 Methods
 -------
 
@@ -701,6 +707,12 @@ Methods
 
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
+
+.. method:: HttpResponse.setdefault(header, value)
+
+    .. versionadded:: 1.8
+
+    Sets a header unless it has already been set.
 
 .. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
 
@@ -768,6 +780,27 @@ Methods
 .. method:: HttpResponse.tell()
 
     This method makes an :class:`HttpResponse` instance a file-like object.
+
+.. method:: HttpResponse.getvalue()
+
+    .. versionadded:: 1.8
+
+    Returns the value of :attr:`HttpResponse.content`. This method makes
+    an :class:`HttpResponse` instance a stream-like object.
+
+.. method:: HttpResponse.writable()
+
+    .. versionadded:: 1.8
+
+    Always ``True``. This method makes an :class:`HttpResponse` instance a
+    stream-like object.
+
+.. method:: HttpResponse.writelines(lines)
+
+    .. versionadded:: 1.8
+
+    Writes a list of lines to the response. Line separators are not added. This
+    method makes an :class:`HttpResponse` instance a stream-like object.
 
 .. _HTTP status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
 
@@ -900,7 +933,7 @@ Without passing ``safe=False``, a :exc:`TypeError` will be raised.
 Changing the default JSON encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you need to use a differ JSON encoder class you can pass the ``encoder``
+If you need to use a different JSON encoder class you can pass the ``encoder``
 parameter to the constructor method::
 
     >>> response = JsonResponse(data, encoder=MyJSONEncoder)

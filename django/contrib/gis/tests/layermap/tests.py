@@ -8,9 +8,9 @@ import unittest
 from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.db import connection, router
+from django.db import connection
 from django.conf import settings
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.utils._os import upath
 
 if HAS_GDAL:
@@ -328,14 +328,8 @@ class OtherRouter(object):
 
 @skipUnless(HAS_GDAL, "LayerMapRouterTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
+@override_settings(DATABASE_ROUTERS=[OtherRouter()])
 class LayerMapRouterTest(TestCase):
-
-    def setUp(self):
-        self.old_routers = router.routers
-        router.routers = [OtherRouter()]
-
-    def tearDown(self):
-        router.routers = self.old_routers
 
     @unittest.skipUnless(len(settings.DATABASES) > 1, 'multiple databases required')
     def test_layermapping_default_db(self):

@@ -15,18 +15,17 @@ import socket
 import subprocess
 import sys
 import unittest
-import warnings
 
 import django
 from django import conf, get_version
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management import BaseCommand, CommandError, call_command
-from django.db import connection
+from django.core.management import BaseCommand, CommandError, call_command, color
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.utils._os import npath, upath
 from django.utils.six import StringIO
-from django.test import LiveServerTestCase, TestCase, override_settings
+from django.test import LiveServerTestCase, TestCase, ignore_warnings, mock, override_settings
 from django.test.runner import DiscoverRunner
 
 
@@ -36,6 +35,7 @@ if not os.path.exists(test_dir):
     open(os.path.join(test_dir, '__init__.py'), 'w').close()
 
 custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
+SYSTEM_CHECK_MSG = 'System check identified no issues'
 
 
 class AdminScriptTestCase(unittest.TestCase):
@@ -190,12 +190,12 @@ class AdminScriptTestCase(unittest.TestCase):
             self.assertIsNotNone(re.search(msg, stream),
                 "'%s' does not match actual output text '%s'" % (msg, stream))
         else:
-            self.assertTrue(msg in stream, "'%s' does not match actual output text '%s'" % (msg, stream))
+            self.assertIn(msg, stream, "'%s' does not match actual output text '%s'" % (msg, stream))
 
     def assertNotInOutput(self, stream, msg):
         "Utility assertion: assert that the given message doesn't exist in the output"
         stream = force_text(stream)
-        self.assertFalse(msg in stream, "'%s' matches actual output text '%s'" % (msg, stream))
+        self.assertNotIn(msg, stream, "'%s' matches actual output text '%s'" % (msg, stream))
 
 ##########################################################################
 # DJANGO ADMIN TESTS
@@ -209,21 +209,21 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "no settings: django-admin builtin commands fail with an error when no settings provided"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_bad_settings(self):
         "no settings: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "no settings: django-admin builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -241,35 +241,35 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "default: django-admin builtin commands fail with an error when no settings provided"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
         "default: django-admin builtin commands succeed if settings are provided as argument"
-        args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
+        args = ['check', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
         "default: django-admin builtin commands succeed if settings are provided in the environment"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_bad_settings(self):
         "default: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "default: django-admin builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -309,17 +309,17 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "fulldefault: django-admin builtin commands fail with an error when no settings provided"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
         "fulldefault: django-admin builtin commands succeed if a settings file is provided"
-        args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
+        args = ['check', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_sqlclear_builtin_with_settings(self):
         "fulldefault: django-admin builtin commands succeed if a setting file is provided"
@@ -330,21 +330,21 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_with_environment(self):
         "fulldefault: django-admin builtin commands succeed if the environment contains settings"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_bad_settings(self):
         "fulldefault: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "fulldefault: django-admin builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -383,35 +383,35 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "minimal: django-admin builtin commands fail with an error when no settings provided"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
         "minimal: django-admin builtin commands fail if settings are provided as argument"
-        args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
+        args = ['check', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_environment(self):
         "minimal: django-admin builtin commands fail if settings are provided in the environment"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_bad_settings(self):
         "minimal: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "minimal: django-admin builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -450,35 +450,35 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "alternate: django-admin builtin commands fail with an error when no settings provided"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
         "alternate: django-admin builtin commands succeed if settings are provided as argument"
-        args = ['sqlall', '--settings=test_project.alternate_settings', 'admin_scripts']
+        args = ['check', '--settings=test_project.alternate_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
         "alternate: django-admin builtin commands succeed if settings are provided in the environment"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_bad_settings(self):
         "alternate: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "alternate: django-admin builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -521,34 +521,34 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "alternate: django-admin builtin commands fail with an error when no settings provided"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
         "alternate: django-admin builtin commands succeed if settings are provided as argument"
-        args = ['sqlall', '--settings=test_project.alternate_settings', 'admin_scripts']
+        args = ['check', '--settings=test_project.alternate_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
         "alternate: django-admin builtin commands succeed if settings are provided in the environment"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_bad_settings(self):
         "alternate: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "alternate: django-admin builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -609,20 +609,20 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "directory: django-admin builtin commands fail with an error when no settings provided"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_bad_settings(self):
         "directory: django-admin builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "directory: django-admin builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -636,17 +636,17 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
 
     def test_builtin_with_settings(self):
         "directory: django-admin builtin commands succeed if settings are provided as argument"
-        args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
+        args = ['check', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
         "directory: django-admin builtin commands succeed if settings are provided in the environment"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
 
 ##########################################################################
@@ -660,21 +660,21 @@ class ManageNoSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "no settings: manage.py builtin commands fail with an error when no settings provided"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?(test_project\.)?settings'?", regex=True)
 
     def test_builtin_with_bad_settings(self):
         "no settings: manage.py builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "no settings: manage.py builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -692,35 +692,35 @@ class ManageDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "default: manage.py builtin commands succeed when default settings are appropriate"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_settings(self):
         "default: manage.py builtin commands succeed if settings are provided as argument"
-        args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
+        args = ['check', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
         "default: manage.py builtin commands succeed if settings are provided in the environment"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args, 'test_project.settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_bad_settings(self):
         "default: manage.py builtin commands succeed if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "default: manage.py builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -759,35 +759,35 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "fulldefault: manage.py builtin commands succeed when default settings are appropriate"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_settings(self):
         "fulldefault: manage.py builtin commands succeed if settings are provided as argument"
-        args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
+        args = ['check', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
         "fulldefault: manage.py builtin commands succeed if settings are provided in the environment"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args, 'test_project.settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_bad_settings(self):
         "fulldefault: manage.py builtin commands succeed if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "fulldefault: manage.py builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -826,35 +826,35 @@ class ManageMinimalSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "minimal: manage.py builtin commands fail with an error when no settings provided"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_settings(self):
         "minimal: manage.py builtin commands fail if settings are provided as argument"
-        args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
+        args = ['check', '--settings=test_project.settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_environment(self):
         "minimal: manage.py builtin commands fail if settings are provided in the environment"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args, 'test_project.settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_bad_settings(self):
         "minimal: manage.py builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "minimal: manage.py builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -893,39 +893,35 @@ class ManageAlternateSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "alternate: manage.py builtin commands fail with an error when no default settings provided"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?(test_project\.)?settings'?", regex=True)
 
     def test_builtin_with_settings(self):
         "alternate: manage.py builtin commands work with settings provided as argument"
-        args = ['sqlall', '--settings=alternate_settings', 'admin_scripts']
+        args = ['check', '--settings=alternate_settings', 'admin_scripts']
         out, err = self.run_manage(args)
-        expected = ('create table %s'
-                    % connection.ops.quote_name('admin_scripts_article'))
-        self.assertTrue(expected.lower() in out.lower())
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
         self.assertNoOutput(err)
 
     def test_builtin_with_environment(self):
         "alternate: manage.py builtin commands work if settings are provided in the environment"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args, 'alternate_settings')
-        expected = ('create table %s'
-                    % connection.ops.quote_name('admin_scripts_article'))
-        self.assertTrue(expected.lower() in out.lower())
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
         self.assertNoOutput(err)
 
     def test_builtin_with_bad_settings(self):
         "alternate: manage.py builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "alternate: manage.py builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -975,35 +971,35 @@ class ManageMultipleSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         "multiple: manage.py builtin commands fail with an error when no settings provided"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_settings(self):
         "multiple: manage.py builtin commands succeed if settings are provided as argument"
-        args = ['sqlall', '--settings=alternate_settings', 'admin_scripts']
+        args = ['check', '--settings=alternate_settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_environment(self):
         "multiple: manage.py can execute builtin commands if settings are provided in the environment"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args, 'alternate_settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, 'CREATE TABLE')
+        self.assertOutput(out, SYSTEM_CHECK_MSG)
 
     def test_builtin_with_bad_settings(self):
         "multiple: manage.py builtin commands fail if settings file (from argument) doesn't exist"
-        args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
+        args = ['check', '--settings=bad_settings', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
         "multiple: manage.py builtin commands fail if settings file (from environment) doesn't exist"
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
@@ -1050,7 +1046,7 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
         when settings with import errors is provided (#14130).
         """
         self.write_settings_with_import_error('settings.py')
-        args = ['sqlall', 'admin_scripts']
+        args = ['check', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named")
@@ -1162,7 +1158,7 @@ class ManageCheck(AdminScriptTestCase):
         args = ['check']
         out, err = self.run_manage(args)
         expected_err = (
-            "CommandError: System check identified some issues:\n"
+            "SystemCheckError: System check identified some issues:\n"
             "\n"
             "ERRORS:\n"
             "?: An error\n"
@@ -1386,19 +1382,105 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_specific_help(self):
         "--help can be used on a specific command"
-        args = ['sqlall', '--help']
+        args = ['check', '--help']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "Prints the CREATE TABLE, custom SQL and CREATE INDEX SQL statements for the\ngiven model module name(s).")
+        self.assertOutput(out, "Checks the entire Django project for potential problems.")
         self.assertEqual(out.count('optional arguments'), 1)
 
-    def test_no_color(self):
-        "--no-color prevent colorization of the output"
-        out = StringIO()
+    def test_color_style(self):
+        style = color.no_style()
+        self.assertEqual(style.ERROR('Hello, world!'), 'Hello, world!')
 
-        call_command('color_command', no_color=True, stdout=out)
-        self.assertEqual(os.environ.get('DJANGO_COLORS', ''), 'nocolor')
-        self.assertEqual(out.getvalue(), 'BEGIN\n')
+        style = color.make_style('nocolor')
+        self.assertEqual(style.ERROR('Hello, world!'), 'Hello, world!')
+
+        style = color.make_style('dark')
+        self.assertIn('Hello, world!', style.ERROR('Hello, world!'))
+        self.assertNotEqual(style.ERROR('Hello, world!'), 'Hello, world!')
+
+        # Default palette has color.
+        style = color.make_style('')
+        self.assertIn('Hello, world!', style.ERROR('Hello, world!'))
+        self.assertNotEqual(style.ERROR('Hello, world!'), 'Hello, world!')
+
+    def test_command_color(self):
+        class Command(BaseCommand):
+            requires_system_checks = False
+
+            def handle(self, *args, **options):
+                self.stdout.write('Hello, world!', self.style.ERROR)
+                self.stderr.write('Hello, world!', self.style.ERROR)
+
+        out = StringIO()
+        err = StringIO()
+        command = Command(stdout=out, stderr=err)
+        command.execute()
+        if color.supports_color():
+            self.assertIn('Hello, world!\n', out.getvalue())
+            self.assertIn('Hello, world!\n', err.getvalue())
+            self.assertNotEqual(out.getvalue(), 'Hello, world!\n')
+            self.assertNotEqual(err.getvalue(), 'Hello, world!\n')
+        else:
+            self.assertEqual(out.getvalue(), 'Hello, world!\n')
+            self.assertEqual(err.getvalue(), 'Hello, world!\n')
+
+    def test_command_no_color(self):
+        "--no-color prevent colorization of the output"
+        class Command(BaseCommand):
+            requires_system_checks = False
+
+            def handle(self, *args, **options):
+                self.stdout.write('Hello, world!', self.style.ERROR)
+                self.stderr.write('Hello, world!', self.style.ERROR)
+
+        out = StringIO()
+        err = StringIO()
+        command = Command(stdout=out, stderr=err, no_color=True)
+        command.execute()
+        self.assertEqual(out.getvalue(), 'Hello, world!\n')
+        self.assertEqual(err.getvalue(), 'Hello, world!\n')
+
+        out = StringIO()
+        err = StringIO()
+        command = Command(stdout=out, stderr=err)
+        command.execute(no_color=True)
+        self.assertEqual(out.getvalue(), 'Hello, world!\n')
+        self.assertEqual(err.getvalue(), 'Hello, world!\n')
+
+    def test_custom_stdout(self):
+        class Command(BaseCommand):
+            requires_system_checks = False
+
+            def handle(self, *args, **options):
+                self.stdout.write("Hello, World!")
+
+        out = StringIO()
+        command = Command(stdout=out)
+        command.execute()
+        self.assertEqual(out.getvalue(), "Hello, World!\n")
+        out.truncate(0)
+        new_out = StringIO()
+        command.execute(stdout=new_out)
+        self.assertEqual(out.getvalue(), "")
+        self.assertEqual(new_out.getvalue(), "Hello, World!\n")
+
+    def test_custom_stderr(self):
+        class Command(BaseCommand):
+            requires_system_checks = False
+
+            def handle(self, *args, **options):
+                self.stderr.write("Hello, World!")
+
+        err = StringIO()
+        command = Command(stderr=err)
+        command.execute()
+        self.assertEqual(err.getvalue(), "Hello, World!\n")
+        err.truncate(0)
+        new_err = StringIO()
+        command.execute(stderr=new_err)
+        self.assertEqual(err.getvalue(), "")
+        self.assertEqual(new_err.getvalue(), "Hello, World!\n")
 
     def test_base_command(self):
         "User BaseCommands can execute when a label is provided"
@@ -1454,40 +1536,36 @@ class CommandTypes(AdminScriptTestCase):
         Test run_from_argv properly terminates even with custom execute() (#19665)
         Also test proper traceback display.
         """
-        command = BaseCommand()
+        err = StringIO()
+        command = BaseCommand(stderr=err)
 
         def raise_command_error(*args, **kwargs):
             raise CommandError("Custom error")
 
-        old_stderr = sys.stderr
-        sys.stderr = err = StringIO()
-        try:
-            command.execute = lambda args: args  # This will trigger TypeError
+        command.execute = lambda args: args  # This will trigger TypeError
 
-            # If the Exception is not CommandError it should always
-            # raise the original exception.
-            with self.assertRaises(TypeError):
-                command.run_from_argv(['', ''])
+        # If the Exception is not CommandError it should always
+        # raise the original exception.
+        with self.assertRaises(TypeError):
+            command.run_from_argv(['', ''])
 
-            # If the Exception is CommandError and --traceback is not present
-            # this command should raise a SystemExit and don't print any
-            # traceback to the stderr.
-            command.execute = raise_command_error
-            err.truncate(0)
-            with self.assertRaises(SystemExit):
-                command.run_from_argv(['', ''])
-            err_message = err.getvalue()
-            self.assertNotIn("Traceback", err_message)
-            self.assertIn("CommandError", err_message)
+        # If the Exception is CommandError and --traceback is not present
+        # this command should raise a SystemExit and don't print any
+        # traceback to the stderr.
+        command.execute = raise_command_error
+        err.truncate(0)
+        with self.assertRaises(SystemExit):
+            command.run_from_argv(['', ''])
+        err_message = err.getvalue()
+        self.assertNotIn("Traceback", err_message)
+        self.assertIn("CommandError", err_message)
 
-            # If the Exception is CommandError and --traceback is present
-            # this command should raise the original CommandError as if it
-            # were not a CommandError.
-            err.truncate(0)
-            with self.assertRaises(CommandError):
-                command.run_from_argv(['', '', '--traceback'])
-        finally:
-            sys.stderr = old_stderr
+        # If the Exception is CommandError and --traceback is present
+        # this command should raise the original CommandError as if it
+        # were not a CommandError.
+        err.truncate(0)
+        with self.assertRaises(CommandError):
+            command.run_from_argv(['', '', '--traceback'])
 
     def test_run_from_argv_non_ascii_error(self):
         """
@@ -1497,12 +1575,23 @@ class CommandTypes(AdminScriptTestCase):
         def raise_command_error(*args, **kwargs):
             raise CommandError("Erreur personnalisée")
 
-        command = BaseCommand()
+        command = BaseCommand(stderr=StringIO())
         command.execute = raise_command_error
-        command.stderr = StringIO()
 
         with self.assertRaises(SystemExit):
             command.run_from_argv(['', ''])
+
+    def test_run_from_argv_closes_connections(self):
+        """
+        A command called from the command line should close connections after
+        being executed (#21255).
+        """
+        command = BaseCommand(stderr=StringIO())
+        command.handle = lambda *args, **kwargs: args
+        with mock.patch('django.core.management.base.connections') as mock_connections:
+            command.run_from_argv(['', ''])
+        # Test connections have been closed
+        self.assertTrue(mock_connections.close_all.called)
 
     def test_noargs(self):
         "NoArg Commands can be executed"
@@ -1574,11 +1663,10 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
         self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_requires_model_validation_and_requires_system_checks_both_defined(self):
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.core.management.base')
-            from .management.commands.validation_command import InvalidCommand
-            self.assertRaises(ImproperlyConfigured, InvalidCommand)
+        from .management.commands.validation_command import InvalidCommand
+        self.assertRaises(ImproperlyConfigured, InvalidCommand)
 
 
 class Discovery(TestCase):

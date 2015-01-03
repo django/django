@@ -18,7 +18,8 @@ from django.contrib.admin import BooleanFieldListFilter
 from django.utils.safestring import mark_safe
 from django.utils.six import StringIO
 
-from .models import (Article, Chapter, Child, Parent, Picture, Widget,
+from .models import (
+    Article, Chapter, Child, Parent, Picture, Widget,
     DooHickey, Grommet, Whatsit, FancyDoodad, Category, Link,
     PrePopulatedPost, PrePopulatedSubPost, CustomArticle, Section,
     ModelWithStringPrimaryKey, Color, Thing, Actor, Inquisition, Sketch,
@@ -36,8 +37,10 @@ from .models import (Article, Chapter, Child, Parent, Picture, Widget,
     FilteredManager, EmptyModelHidden, EmptyModelVisible, EmptyModelMixin,
     State, City, Restaurant, Worker, ParentWithDependentChildren,
     DependentChild, StumpJoke, FieldOverridePost, FunkyTag,
-    ReferencedByParent, ChildOfReferer, M2MReference, ReferencedByInline,
-    InlineReference, InlineReferer, Ingredient)
+    ReferencedByParent, ChildOfReferer, ReferencedByInline,
+    InlineReference, InlineReferer, Recipe, Ingredient, NotReferenced,
+    ExplicitlyProvidedPK, ImplicitlyGeneratedPK,
+)
 
 
 def callable_year(dt_value):
@@ -842,6 +845,25 @@ class InlineRefererAdmin(admin.ModelAdmin):
     inlines = [InlineReferenceInline]
 
 
+class GetFormsetsArgumentCheckingAdmin(admin.ModelAdmin):
+    fields = ['name']
+
+    def add_view(self, request, *args, **kwargs):
+        request.is_add_view = True
+        return super(GetFormsetsArgumentCheckingAdmin, self).add_view(request, *args, **kwargs)
+
+    def change_view(self, request, *args, **kwargs):
+        request.is_add_view = False
+        return super(GetFormsetsArgumentCheckingAdmin, self).change_view(request, *args, **kwargs)
+
+    def get_formsets_with_inlines(self, request, obj=None):
+        if request.is_add_view and obj is not None:
+            raise Exception("'obj' passed to get_formsets_with_inlines wasn't None during add_view")
+        if not request.is_add_view and obj is None:
+            raise Exception("'obj' passed to get_formsets_with_inlines was None during change_view")
+        return super(GetFormsetsArgumentCheckingAdmin, self).get_formsets_with_inlines(request, obj)
+
+
 site = admin.AdminSite(name="admin")
 site.site_url = '/my-site-url/'
 site.register(Article, ArticleAdmin)
@@ -901,7 +923,6 @@ site.register(Worker, WorkerAdmin)
 site.register(FunkyTag, FunkyTagAdmin)
 site.register(ReferencedByParent)
 site.register(ChildOfReferer)
-site.register(M2MReference)
 site.register(ReferencedByInline)
 site.register(InlineReferer, InlineRefererAdmin)
 
@@ -940,7 +961,11 @@ site.register(EmptyModelHidden, EmptyModelHiddenAdmin)
 site.register(EmptyModelVisible, EmptyModelVisibleAdmin)
 site.register(EmptyModelMixin, EmptyModelMixinAdmin)
 site.register(StumpJoke)
+site.register(Recipe)
 site.register(Ingredient)
+site.register(NotReferenced)
+site.register(ExplicitlyProvidedPK, GetFormsetsArgumentCheckingAdmin)
+site.register(ImplicitlyGeneratedPK, GetFormsetsArgumentCheckingAdmin)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group

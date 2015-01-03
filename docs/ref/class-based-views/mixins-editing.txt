@@ -49,10 +49,15 @@ FormMixin
         Retrieve the form class to instantiate. By default
         :attr:`.form_class`.
 
-    .. method:: get_form(form_class)
+    .. method:: get_form(form_class=None)
 
         Instantiate an instance of ``form_class`` using
         :meth:`~django.views.generic.edit.FormMixin.get_form_kwargs`.
+        If ``form_class`` isn't provided :meth:`get_form_class` will be used.
+
+        .. versionchanged:: 1.8
+
+            The ``form_class`` argument is not required anymore.
 
     .. method:: get_form_kwargs()
 
@@ -109,6 +114,17 @@ ModelFormMixin
     :attr:`~django.views.generic.detail.SingleObjectMixin.model` and
     :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` attributes,
     describing the type of object that the ``ModelForm`` is manipulating.
+
+    If you specify both the
+    :attr:`~django.views.generic.edit.ModelFormMixin.fields` and
+    :attr:`~django.views.generic.edit.FormMixin.form_class` attributes, an
+    :exc:`~django.core.exceptions.ImproperlyConfigured` exception will be
+    raised.
+
+    .. versionchanged:: 1.8
+
+        Previously if both ``fields`` and ``form_class`` were specified,
+        ``fields`` was silently ignored.
 
     **Mixins**
 

@@ -19,8 +19,8 @@ from django.conf import settings
 from django import forms
 from django.core import exceptions, validators, checks
 from django.utils.datastructures import DictWrapper
-from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.dateparse import parse_date, parse_datetime, parse_time, parse_duration
+from django.utils.duration import duration_string
 from django.utils.functional import cached_property, curry, total_ordering, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
@@ -31,13 +31,16 @@ from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 from django.utils.itercompat import is_iterable
 
+# imported for backwards compatibility
+from django.core.exceptions import FieldDoesNotExist  # NOQA
+
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode
 __all__ = [str(x) for x in (
     'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
     'BooleanField', 'CharField', 'CommaSeparatedIntegerField', 'DateField',
-    'DateTimeField', 'DecimalField', 'EmailField', 'Empty', 'Field',
-    'FieldDoesNotExist', 'FilePathField', 'FloatField',
+    'DateTimeField', 'DecimalField', 'DurationField', 'EmailField', 'Empty',
+    'Field', 'FieldDoesNotExist', 'FilePathField', 'FloatField',
     'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
     'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
     'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
@@ -59,10 +62,6 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 def _load_field(app_label, model_name, field_name):
     return apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
-
-
-class FieldDoesNotExist(Exception):
-    pass
 
 
 # A guide to Field parameters:
@@ -536,7 +535,7 @@ class Field(RegisterLookupMixin):
         # exactly which wacky database column type you want to use.
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         try:
-            return connection.creation.data_types[self.get_internal_type()] % data
+            return connection.data_types[self.get_internal_type()] % data
         except KeyError:
             return None
 
@@ -549,7 +548,7 @@ class Field(RegisterLookupMixin):
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         type_string = self.db_type(connection)
         try:
-            check_string = connection.creation.data_type_check_constraints[self.get_internal_type()] % data
+            check_string = connection.data_type_check_constraints[self.get_internal_type()] % data
         except KeyError:
             check_string = None
         return {
@@ -558,7 +557,7 @@ class Field(RegisterLookupMixin):
         }
 
     def db_type_suffix(self, connection):
-        return connection.creation.data_types_suffix.get(self.get_internal_type())
+        return connection.data_types_suffix.get(self.get_internal_type())
 
     def get_db_converters(self, connection):
         if hasattr(self, 'from_db_value'):
@@ -637,8 +636,6 @@ class Field(RegisterLookupMixin):
         """
         Perform preliminary non-db specific lookup checks and conversions
         """
-        if hasattr(value, 'prepare'):
-            return value.prepare()
         if hasattr(value, '_prepare'):
             return value._prepare()
 
@@ -724,14 +721,11 @@ class Field(RegisterLookupMixin):
         if self.has_default():
             if callable(self.default):
                 return self.default()
-            return force_text(self.default, strings_only=True)
+            return self.default
         if (not self.empty_strings_allowed or (self.null and
                    not connection.features.interprets_empty_strings_as_nulls)):
             return None
         return ""
-
-    def get_validator_unique_lookup_type(self):
-        return '%s__exact' % self.name
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
         """Returns choices with a default blank choices included, for use
@@ -785,9 +779,6 @@ class Field(RegisterLookupMixin):
         This is used by the serialization framework.
         """
         return smart_text(self._get_val_from_obj(obj))
-
-    def bind(self, fieldmapping, original, bound_field_class):
-        return bound_field_class(self, fieldmapping, original)
 
     def _get_choices(self):
         if isinstance(self._choices, collections.Iterator):
@@ -1402,9 +1393,13 @@ class DateTimeField(DateField):
             # For backwards compatibility, interpret naive datetimes in local
             # time. This won't work during DST change, but we can't do much
             # about it, so we let the exceptions percolate up the call stack.
-            warnings.warn("DateTimeField %s.%s received a naive datetime (%s)"
+            try:
+                name = '%s.%s' % (self.model.__name__, self.name)
+            except AttributeError:
+                name = '(unbound)'
+            warnings.warn("DateTimeField %s received a naive datetime (%s)"
                           " while time zone support is active." %
-                          (self.model.__name__, self.name, value),
+                          (name, value),
                           RuntimeWarning)
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
@@ -1537,7 +1532,7 @@ class DecimalField(Field):
             )
 
     def _format(self, value):
-        if isinstance(value, six.string_types) or value is None:
+        if isinstance(value, six.string_types):
             return value
         else:
             return self.format_number(value)
@@ -1572,6 +1567,57 @@ class DecimalField(Field):
         }
         defaults.update(kwargs)
         return super(DecimalField, self).formfield(**defaults)
+
+
+class DurationField(Field):
+    """Stores timedelta objects.
+
+    Uses interval on postgres, INVERAL DAY TO SECOND on Oracle, and bigint of
+    microseconds on other databases.
+    """
+    empty_strings_allowed = False
+    default_error_messages = {
+        'invalid': _("'%(value)s' value has an invalid format. It must be in "
+                     "[DD] [HH:[MM:]]ss[.uuuuuu] format.")
+    }
+    description = _("Duration")
+
+    def get_internal_type(self):
+        return "DurationField"
+
+    def to_python(self, value):
+        if value is None:
+            return value
+        if isinstance(value, datetime.timedelta):
+            return value
+        try:
+            parsed = parse_duration(value)
+        except ValueError:
+            pass
+        else:
+            if parsed is not None:
+                return parsed
+
+        raise exceptions.ValidationError(
+            self.error_messages['invalid'],
+            code='invalid',
+            params={'value': value},
+        )
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if connection.features.has_native_duration_field:
+            return value
+        return value.total_seconds() * 1000000
+
+    def get_db_converters(self, connection):
+        converters = []
+        if not connection.features.has_native_duration_field:
+            converters.append(connection.ops.convert_durationfield_value)
+        return converters + super(DurationField, self).get_db_converters(connection)
+
+    def value_to_string(self, obj):
+        val = self._get_val_from_obj(obj)
+        return '' if val is None else duration_string(val)
 
 
 class EmailField(CharField):
@@ -1705,6 +1751,23 @@ class IntegerField(Field):
     }
     description = _("Integer")
 
+    def check(self, **kwargs):
+        errors = super(IntegerField, self).check(**kwargs)
+        errors.extend(self._check_max_length_warning())
+        return errors
+
+    def _check_max_length_warning(self):
+        if self.max_length is not None:
+            return [
+                checks.Warning(
+                    "'max_length' is ignored when used with IntegerField",
+                    hint="Remove 'max_length' from field",
+                    obj=self,
+                    id='fields.W122',
+                )
+            ]
+        return []
+
     @cached_property
     def validators(self):
         # These validators can't be added at field initialization time since
@@ -1771,8 +1834,6 @@ class IPAddressField(Field):
     description = _("IPv4 address")
 
     def __init__(self, *args, **kwargs):
-        warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
-                      RemovedInDjango19Warning)
         kwargs['max_length'] = 15
         super(IPAddressField, self).__init__(*args, **kwargs)
 
@@ -1794,6 +1855,19 @@ class IPAddressField(Field):
         defaults = {'form_class': forms.IPAddressField}
         defaults.update(kwargs)
         return super(IPAddressField, self).formfield(**defaults)
+
+    def check(self, **kwargs):
+        errors = super(IPAddressField, self).check(**kwargs)
+        errors.append(
+            checks.Warning(
+                'IPAddressField has been deprecated. Support for it '
+                '(except in historical migrations) will be removed in Django 1.9.',
+                hint='Use GenericIPAddressField instead.',
+                obj=self,
+                id='fields.W900',
+            )
+        )
+        return errors
 
 
 class GenericIPAddressField(Field):

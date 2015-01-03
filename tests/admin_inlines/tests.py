@@ -1,11 +1,14 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django.contrib.admin import TabularInline, ModelAdmin
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings, RequestFactory
+from django.utils.encoding import force_text
 
 # local test models
 from .admin import InnerInline, site as admin_site
@@ -32,9 +35,6 @@ class TestInline(TestCase):
         result = self.client.login(username='super', password='secret')
         self.assertEqual(result, True)
         self.factory = RequestFactory()
-
-    def tearDown(self):
-        self.client.logout()
 
     def test_can_delete(self):
         """
@@ -356,9 +356,6 @@ class TestInlineMedia(TestCase):
         result = self.client.login(username='super', password='secret')
         self.assertEqual(result, True)
 
-    def tearDown(self):
-        self.client.logout()
-
     def test_inline_media_only_base(self):
         holder = Holder(dummy=13)
         holder.save()
@@ -403,6 +400,28 @@ class TestInlineAdminForm(TestCase):
         parent_ct = ContentType.objects.get_for_model(Parent)
         self.assertEqual(iaf.original.content_type, parent_ct)
 
+    def test_original_content_type_id_deprecated(self):
+        """
+        #23444 -- Verify a warning is raised when accessing
+        `original_content_type_id` attribute of `InlineAdminForm` object.
+        """
+        iaf = InlineAdminForm(None, None, {}, {}, None)
+        poll = Poll.objects.create(name="poll")
+        iaf2 = InlineAdminForm(None, None, {}, {}, poll)
+        poll_ct = ContentType.objects.get_for_model(Poll)
+        with warnings.catch_warnings(record=True) as recorded:
+            warnings.filterwarnings('always')
+            with self.assertRaises(AttributeError):
+                iaf.original_content_type_id
+            msg = force_text(recorded.pop().message)
+            self.assertEqual(
+                msg,
+                'InlineAdminForm.original_content_type_id is deprecated and will be '
+                'removed in Django 2.0. If you were using this attribute to construct '
+                'the "view on site" URL, use the `absolute_url` attribute instead.'
+            )
+            self.assertEqual(iaf2.original_content_type_id, poll_ct.id)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF="admin_inlines.urls")
@@ -412,9 +431,6 @@ class TestInlineProtectedOnDelete(TestCase):
     def setUp(self):
         result = self.client.login(username='super', password='secret')
         self.assertEqual(result, True)
-
-    def tearDown(self):
-        self.client.logout()
 
     def test_deleting_inline_with_protected_delete_does_not_validate(self):
         lotr = Novel.objects.create(name='Lord of the rings')
@@ -488,9 +504,6 @@ class TestInlinePermissions(TestCase):
         self.assertEqual(
             self.client.login(username='admin', password='secret'),
             True)
-
-    def tearDown(self):
-        self.client.logout()
 
     def test_inline_add_m2m_noperm(self):
         response = self.client.get('/admin/admin_inlines/author/add/')

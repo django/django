@@ -11,6 +11,12 @@ from .models import ChoicesModel, DataModel, MyModel, OtherModel
 
 
 class CustomField(TestCase):
+    def test_refresh(self):
+        d = DataModel.objects.create(data=[1, 2, 3])
+        d.refresh_from_db(fields=['data'])
+        self.assertIsInstance(d.data, list)
+        self.assertEqual(d.data, [1, 2, 3])
+
     def test_defer(self):
         d = DataModel.objects.create(data=[1, 2, 3])
 

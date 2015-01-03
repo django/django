@@ -10,6 +10,7 @@ from django.core import urlresolvers
 from django.core import signals
 from django.core.exceptions import MiddlewareNotUsed, PermissionDenied, SuspiciousOperation
 from django.db import connections, transaction
+from django.http.multipartparser import MultiPartParserError
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 from django.utils import six
@@ -48,7 +49,12 @@ class BaseHandler(object):
             mw_class = import_string(middleware_path)
             try:
                 mw_instance = mw_class()
-            except MiddlewareNotUsed:
+            except MiddlewareNotUsed as exc:
+                if settings.DEBUG:
+                    if six.text_type(exc):
+                        logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
+                    else:
+                        logger.debug('MiddlewareNotUsed: %r', middleware_path)
                 continue
 
             if hasattr(mw_instance, 'process_request'):
@@ -175,6 +181,15 @@ class BaseHandler(object):
                     'request': request
                 })
             response = self.get_exception_response(request, resolver, 403)
+
+        except MultiPartParserError:
+            logger.warning(
+                'Bad request (Unable to parse request body): %s', request.path,
+                extra={
+                    'status_code': 400,
+                    'request': request
+                })
+            response = self.get_exception_response(request, resolver, 400)
 
         except SuspiciousOperation as e:
             # The request logger receives events for any problematic request

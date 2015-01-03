@@ -257,8 +257,8 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
         self.assertEqual(lazydict['one'], 1)
         lazydict['one'] = -1
         self.assertEqual(lazydict['one'], -1)
-        self.assertTrue('one' in lazydict)
-        self.assertFalse('two' in lazydict)
+        self.assertIn('one', lazydict)
+        self.assertNotIn('two', lazydict)
         self.assertEqual(len(lazydict), 1)
         del lazydict['one']
         with self.assertRaises(KeyError):
@@ -267,9 +267,9 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
     def test_list_set(self):
         lazy_list = SimpleLazyObject(lambda: [1, 2, 3, 4, 5])
         lazy_set = SimpleLazyObject(lambda: {1, 2, 3, 4})
-        self.assertTrue(1 in lazy_list)
-        self.assertTrue(1 in lazy_set)
-        self.assertFalse(6 in lazy_list)
-        self.assertFalse(6 in lazy_set)
+        self.assertIn(1, lazy_list)
+        self.assertIn(1, lazy_set)
+        self.assertNotIn(6, lazy_list)
+        self.assertNotIn(6, lazy_set)
         self.assertEqual(len(lazy_list), 5)
         self.assertEqual(len(lazy_set), 4)

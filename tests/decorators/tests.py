@@ -64,7 +64,8 @@ full_decorator = compose(
 )
 
 # suppress the deprecation warning of memoize
-with warnings.catch_warnings(record=True):
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore')
     fully_decorated = memoize(fully_decorated, {}, 1)
 
 fully_decorated = full_decorator(fully_decorated)

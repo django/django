@@ -1,17 +1,19 @@
 from __future__ import unicode_literals
 
-from unittest import expectedFailure
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.views.generic.base import View
 from django.views.generic.edit import FormMixin, ModelFormMixin, CreateView
 
 from . import views
 from .models import Artist, Author
+from .test_forms import AuthorForm
 
 
 class FormMixinTests(TestCase):
@@ -39,6 +41,45 @@ class FormMixinTests(TestCase):
         set_mixin.prefix = test_string
         set_kwargs = set_mixin.get_form_kwargs()
         self.assertEqual(test_string, set_kwargs.get('prefix'))
+
+    def test_get_form(self):
+        class TestFormMixin(FormMixin):
+            request = RequestFactory().get('/')
+
+        self.assertIsInstance(
+            TestFormMixin().get_form(forms.Form), forms.Form,
+            'get_form() should use provided form class.'
+        )
+
+        class FormClassTestFormMixin(TestFormMixin):
+            form_class = forms.Form
+
+        self.assertIsInstance(
+            FormClassTestFormMixin().get_form(), forms.Form,
+            'get_form() should fallback to get_form_class() if none is provided.'
+        )
+
+    def test_get_form_missing_form_class_default_value(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.filterwarnings('always')
+
+            class MissingDefaultValue(FormMixin):
+                request = RequestFactory().get('/')
+                form_class = forms.Form
+
+                def get_form(self, form_class):
+                    return form_class(**self.get_form_kwargs())
+        self.assertEqual(len(w), 1)
+        self.assertEqual(w[0].category, RemovedInDjango20Warning)
+        self.assertEqual(
+            str(w[0].message),
+            '`generic_views.test_edit.MissingDefaultValue.get_form` method '
+            'must define a default value for its `form_class` argument.'
+        )
+
+        self.assertIsInstance(
+            MissingDefaultValue().get_form(), forms.Form,
+        )
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
@@ -69,8 +110,8 @@ class CreateViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context['form'], forms.ModelForm)
         self.assertIsInstance(res.context['view'], View)
-        self.assertFalse('object' in res.context)
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('object', res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/author_form.html')
 
         res = self.client.post('/edit/authors/create/',
@@ -114,8 +155,8 @@ class CreateViewTests(TestCase):
         res = self.client.get('/edit/authors/create/special/')
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.context['form'], views.AuthorForm)
-        self.assertFalse('object' in res.context)
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('object', res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/form.html')
 
         res = self.client.post('/edit/authors/create/special/',
@@ -167,6 +208,16 @@ class CreateViewTests(TestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, message):
             MyCreateView().get_form_class()
 
+    def test_define_both_fields_and_form_class(self):
+        class MyCreateView(CreateView):
+            model = Author
+            form_class = AuthorForm
+            fields = ['name']
+
+        message = "Specifying both 'fields' and 'form_class' is not permitted."
+        with self.assertRaisesMessage(ImproperlyConfigured, message):
+            MyCreateView().get_form_class()
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class UpdateViewTests(TestCase):
@@ -189,26 +240,6 @@ class UpdateViewTests(TestCase):
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, 'http://testserver/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (xkcd)>'])
-
-    @expectedFailure
-    def test_update_put(self):
-        a = Author.objects.create(
-            name='Randall Munroe',
-            slug='randall-munroe',
-        )
-        res = self.client.get('/edit/author/%d/update/' % a.pk)
-        self.assertEqual(res.status_code, 200)
-        self.assertTemplateUsed(res, 'generic_views/author_form.html')
-
-        res = self.client.put('/edit/author/%d/update/' % a.pk,
-                        {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'})
-        # Here is the expected failure. PUT data are not processed in any special
-        # way by django. So the request will equal to a POST without data, hence
-        # the form will be invalid and redisplayed with errors (status code 200).
-        # See also #12635
-        self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
-        self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])
 
     def test_update_invalid(self):
         a = Author.objects.create(
@@ -263,7 +294,7 @@ class UpdateViewTests(TestCase):
         self.assertIsInstance(res.context['form'], views.AuthorForm)
         self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
         self.assertEqual(res.context['thingy'], Author.objects.get(pk=a.pk))
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/form.html')
 
         res = self.client.post('/edit/author/%d/update/special/' % a.pk,
@@ -350,7 +381,7 @@ class DeleteViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
         self.assertEqual(res.context['thingy'], Author.objects.get(pk=a.pk))
-        self.assertFalse('author' in res.context)
+        self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/confirm_delete.html')
 
         res = self.client.post('/edit/author/%d/delete/special/' % a.pk)

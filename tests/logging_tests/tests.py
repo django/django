@@ -2,16 +2,17 @@
 from __future__ import unicode_literals
 
 import logging
-import tempfile
 import warnings
 
 from django.core import mail
+from django.core.files.temp import NamedTemporaryFile
 from django.test import TestCase, RequestFactory, override_settings
 from django.test.utils import patch_logger
 from django.utils.encoding import force_text
 from django.utils.deprecation import RemovedInNextVersionWarning
-from django.utils.log import (CallbackFilter, RequireDebugFalse,
-    RequireDebugTrue)
+from django.utils.log import (
+    AdminEmailHandler, CallbackFilter, RequireDebugFalse, RequireDebugTrue,
+)
 from django.utils.six import StringIO
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -100,6 +101,7 @@ class WarningLoggerTests(TestCase):
         # undocumented and (I assume) brittle.
         self._old_capture_state = bool(getattr(logging, '_warnings_showwarning', False))
         logging.captureWarnings(True)
+        warnings.filterwarnings('always')
 
         # this convoluted setup is to avoid printing this deprecation to
         # stderr during test running - as the test runner forces deprecations
@@ -123,12 +125,12 @@ class WarningLoggerTests(TestCase):
     def test_warnings_capture(self):
         warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
         output = force_text(self.outputs[0].getvalue())
-        self.assertTrue('Foo Deprecated' in output)
+        self.assertIn('Foo Deprecated', output)
 
     def test_warnings_capture_debug_false(self):
         warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
         output = force_text(self.outputs[0].getvalue())
-        self.assertFalse('Foo Deprecated' in output)
+        self.assertNotIn('Foo Deprecated', output)
 
     @override_settings(DEBUG=True)
     def test_error_filter_still_raises(self):
@@ -263,8 +265,8 @@ class AdminEmailHandlerTest(TestCase):
         self.logger.error(message)
 
         self.assertEqual(len(mail.outbox), 1)
-        self.assertFalse('\n' in mail.outbox[0].subject)
-        self.assertFalse('\r' in mail.outbox[0].subject)
+        self.assertNotIn('\n', mail.outbox[0].subject)
+        self.assertNotIn('\r', mail.outbox[0].subject)
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
     @override_settings(
@@ -340,6 +342,22 @@ class AdminEmailHandlerTest(TestCase):
         self.assertEqual(msg.to, ['admin@example.com'])
         self.assertEqual(msg.subject, "[Django] ERROR (EXTERNAL IP): message")
         self.assertIn("path:%s" % url_path, msg.body)
+
+    @override_settings(
+        MANAGERS=(('manager', 'manager@example.com'),),
+        DEBUG=False,
+    )
+    def test_customize_send_mail_method(self):
+        class ManagerEmailHandler(AdminEmailHandler):
+            def send_mail(self, subject, message, *args, **kwargs):
+                mail.mail_managers(subject, message, *args, connection=self.connection(), **kwargs)
+
+        handler = ManagerEmailHandler()
+        record = self.logger.makeRecord('name', logging.ERROR, 'function', 'lno', 'message', None, None)
+        self.assertEqual(len(mail.outbox), 0)
+        handler.emit(record)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['manager@example.com'])
 
 
 class SettingsConfigTest(AdminScriptTestCase):
@@ -433,11 +451,11 @@ args=(sys.stdout,)
 [formatter_simple]
 format=%(message)s
 """
-        self.temp_file = tempfile.NamedTemporaryFile()
+        self.temp_file = NamedTemporaryFile()
         self.temp_file.write(logging_conf.encode('utf-8'))
         self.temp_file.flush()
         sdict = {'LOGGING_CONFIG': '"logging.config.fileConfig"',
-                 'LOGGING': '"%s"' % self.temp_file.name}
+                 'LOGGING': 'r"%s"' % self.temp_file.name}
         self.write_settings('settings.py', sdict=sdict)
 
     def tearDown(self):

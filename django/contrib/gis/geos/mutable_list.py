@@ -10,7 +10,7 @@ Author: Aryeh Leib Taurog.
 """
 from django.utils.functional import total_ordering
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 @total_ordering
@@ -78,7 +78,7 @@ class ListMixin(object):
     def __getitem__(self, index):
         "Get the item(s) at the specified index/slice."
         if isinstance(index, slice):
-            return [self._get_single_external(i) for i in xrange(*index.indices(len(self)))]
+            return [self._get_single_external(i) for i in range(*index.indices(len(self)))]
         else:
             index = self._checkindex(index)
             return self._get_single_external(index)
@@ -98,7 +98,7 @@ class ListMixin(object):
 
         newLen = origLen - len(indexRange)
         newItems = (self._get_single_internal(i)
-                    for i in xrange(origLen)
+                    for i in range(origLen)
                     if i not in indexRange)
 
         self._rebuild(newLen, newItems)
@@ -114,7 +114,7 @@ class ListMixin(object):
 
     def __iter__(self):
         "Iterate over the items in the list"
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             yield self[i]
 
     ### Special methods for arithmetic operations ###
@@ -187,7 +187,7 @@ class ListMixin(object):
 
     def index(self, val):
         "Standard list index method"
-        for i in xrange(0, len(self)):
+        for i in range(0, len(self)):
             if self[i] == val:
                 return i
         raise ValueError('%s not found in object' % str(val))
@@ -294,7 +294,7 @@ class ListMixin(object):
         newVals = dict(zip(indexList, valueList))
 
         def newItems():
-            for i in xrange(newLen):
+            for i in range(newLen):
                 if i in newVals:
                     yield newVals[i]
                 else:
@@ -321,7 +321,7 @@ class ListMixin(object):
         newLen = origLen - stop + start + len(valueList)
 
         def newItems():
-            for i in xrange(origLen + 1):
+            for i in range(origLen + 1):
                 if i == start:
                     for val in valueList:
                         yield val

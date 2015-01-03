@@ -116,9 +116,9 @@ Use a dot (``.``) to access attributes of a variable.
 In the above example, ``{{ section.title }}`` will be replaced with the
 ``title`` attribute of the ``section`` object.
 
-If you use a variable that doesn't exist, the template system will insert
-the value of the :setting:`TEMPLATE_STRING_IF_INVALID` setting, which is set
-to ``''`` (the empty string) by default.
+If you use a variable that doesn't exist, the template system will insert the
+value of the ``string_if_invalid`` option, which is set to ``''`` (the empty
+string) by default.
 
 Note that "bar" in a template expression like ``{{ foo.bar }}`` will be
 interpreted as a literal string and not using the value of the variable "bar",
@@ -166,13 +166,13 @@ used template filters:
 
     If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
 
-:tfilter:`striptags`
-    Strips all [X]HTML tags. For example::
+:tfilter:`filesizeformat`
+    Formats the value like a "human-readable" file size (i.e. ``'13 KB'``,
+    ``'4.1 MB'``, ``'102 bytes'``, etc). For example::
 
-        {{ value|striptags }}
+        {{ value|filesizeformat }}
 
-    If ``value`` is ``"<b>Joel</b> <button>is</button> a
-    <span>slug</span>"``, the output will be ``"Joel is a slug"``.
+    If ``value`` is 123456789, the output would be ``117.7 MB``.
 
 Again, these are just a few examples; see the :ref:`built-in filter reference
 <ref-templates-builtins-filters>` for the complete list.
@@ -662,15 +662,18 @@ Custom tag and filter libraries
 ===============================
 
 Certain applications provide custom tag and filter libraries. To access them in
-a template, use the :ttag:`load` tag::
+a template, ensure the application is in :setting:`INSTALLED_APPS` (we'd add
+``'django.contrib.humanize'`` for this example), and then use the :ttag:`load`
+tag in a template::
 
     {% load humanize %}
 
     {{ 45000|intcomma }}
 
 In the above, the :ttag:`load` tag loads the ``humanize`` tag library, which then
-makes the ``intcomma`` filter available for use. Consult the documentation
-area in your admin to find the list of custom libraries in your installation.
+makes the ``intcomma`` filter available for use. If you've enabled
+:mod:`django.contrib.admindocs`, you can consult the documentation area in your
+admin to find the list of custom libraries in your installation.
 
 The :ttag:`load` tag can take multiple library names, separated by spaces.
 Example::

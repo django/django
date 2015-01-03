@@ -14,7 +14,7 @@ from django.contrib.gis.geometry.test_data import TestDataMixin
 
 from django.utils.encoding import force_bytes
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 from .. import HAS_GEOS
 
@@ -436,17 +436,13 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
     def test_polygon_comparison(self):
         p1 = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
         p2 = Polygon(((0, 0), (0, 1), (1, 0), (0, 0)))
-        self.assertTrue(p1 > p2)
-        self.assertFalse(p1 < p2)
-        self.assertFalse(p2 > p1)
-        self.assertTrue(p2 < p1)
+        self.assertGreater(p1, p2)
+        self.assertLess(p2, p1)
 
         p3 = Polygon(((0, 0), (0, 1), (1, 1), (2, 0), (0, 0)))
         p4 = Polygon(((0, 0), (0, 1), (2, 2), (1, 0), (0, 0)))
-        self.assertFalse(p4 < p3)
-        self.assertTrue(p3 < p4)
-        self.assertTrue(p4 > p3)
-        self.assertFalse(p3 > p4)
+        self.assertGreater(p4, p3)
+        self.assertLess(p3, p4)
 
     def test_multipolygons(self):
         "Testing MultiPolygon objects."
@@ -504,7 +500,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(len(p.ext_ring_cs), len(cs))  # Making sure __len__ works
 
                 # Checks __getitem__ and __setitem__
-                for i in xrange(len(p.ext_ring_cs)):
+                for i in range(len(p.ext_ring_cs)):
                     c1 = p.ext_ring_cs[i]  # Expected value
                     c2 = cs[i]  # Value from coordseq
                     self.assertEqual(c1, c2)
@@ -533,7 +529,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_intersection(self):
         "Testing intersects() and intersection()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             i1 = fromstr(self.geometries.intersect_geoms[i].wkt)
@@ -546,7 +542,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_union(self):
         "Testing union()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             u1 = fromstr(self.geometries.union_geoms[i].wkt)
@@ -558,7 +554,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_difference(self):
         "Testing difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             d1 = fromstr(self.geometries.diff_geoms[i].wkt)
@@ -570,7 +566,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_symdifference(self):
         "Testing sym_difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             d1 = fromstr(self.geometries.sdiff_geoms[i].wkt)
@@ -599,11 +595,11 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(len(exp_buf), len(buf))
 
             # Now assuring that each point in the buffer is almost equal
-            for j in xrange(len(exp_buf)):
+            for j in range(len(exp_buf)):
                 exp_ring = exp_buf[j]
                 buf_ring = buf[j]
                 self.assertEqual(len(exp_ring), len(buf_ring))
-                for k in xrange(len(exp_ring)):
+                for k in range(len(exp_ring)):
                     # Asserting the X, Y of each point are almost equal (due to floating point imprecision)
                     self.assertAlmostEqual(exp_ring[k][0], buf_ring[k][0], 9)
                     self.assertAlmostEqual(exp_ring[k][1], buf_ring[k][1], 9)
@@ -703,13 +699,13 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Polygon w/in the collection has its own rings.
         for tg in self.geometries.multipolygons:
             mpoly = fromstr(tg.wkt)
-            for i in xrange(len(mpoly)):
+            for i in range(len(mpoly)):
                 poly = mpoly[i]
                 old_poly = mpoly[i]
                 # Offsetting the each ring in the polygon by 500.
-                for j in xrange(len(poly)):
+                for j in range(len(poly)):
                     r = poly[j]
-                    for k in xrange(len(r)):
+                    for k in range(len(r)):
                         r[k] = (r[k][0] + 500., r[k][1] + 500.)
                     poly[j] = r
 
@@ -911,7 +907,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             g1 = g.transform(4326, clone=True)
             self.assertEqual(g1.tuple, g.tuple)
             self.assertEqual(g1.srid, 4326)
-            self.assertTrue(g1 is not g, "Clone didn't happen")
+            self.assertIsNot(g1, g, "Clone didn't happen")
 
         old_has_gdal = gdal.HAS_GDAL
         try:
@@ -927,7 +923,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             g1 = g.transform(4326, clone=True)
             self.assertEqual(g1.tuple, g.tuple)
             self.assertEqual(g1.srid, 4326)
-            self.assertTrue(g1 is not g, "Clone didn't happen")
+            self.assertIsNot(g1, g, "Clone didn't happen")
         finally:
             gdal.HAS_GDAL = old_has_gdal
 

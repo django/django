@@ -827,39 +827,59 @@ class Worker(models.Model):
 
 # Models for #23329
 class ReferencedByParent(models.Model):
-    pass
+    name = models.CharField(max_length=20, unique=True)
 
 
 class ParentWithFK(models.Model):
-    fk = models.ForeignKey(ReferencedByParent)
+    fk = models.ForeignKey(
+        ReferencedByParent, to_field='name', related_name='hidden+',
+    )
 
 
 class ChildOfReferer(ParentWithFK):
     pass
 
 
-class M2MReference(models.Model):
-    ref = models.ManyToManyField('self')
-
-
 # Models for #23431
 class ReferencedByInline(models.Model):
-    pass
+    name = models.CharField(max_length=20, unique=True)
 
 
 class InlineReference(models.Model):
-    fk = models.ForeignKey(ReferencedByInline, related_name='hidden+')
+    fk = models.ForeignKey(
+        ReferencedByInline, to_field='name', related_name='hidden+',
+    )
 
 
 class InlineReferer(models.Model):
     refs = models.ManyToManyField(InlineReference)
 
 
-# Models for #23604
+# Models for #23604 and #23915
 class Recipe(models.Model):
-    name = models.CharField(max_length=20)
+    rname = models.CharField(max_length=20, unique=True)
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=20)
-    recipes = models.ManyToManyField('Recipe', related_name='ingredients')
+    iname = models.CharField(max_length=20, unique=True)
+    recipes = models.ManyToManyField(Recipe, through='RecipeIngredient')
+
+
+class RecipeIngredient(models.Model):
+    ingredient = models.ForeignKey(Ingredient, to_field='iname')
+    recipe = models.ForeignKey(Recipe, to_field='rname')
+
+
+# Model for #23839
+class NotReferenced(models.Model):
+    # Don't point any FK at this model.
+    pass
+
+
+# Models for #23934
+class ExplicitlyProvidedPK(models.Model):
+    name = models.IntegerField(primary_key=True)
+
+
+class ImplicitlyGeneratedPK(models.Model):
+    name = models.IntegerField(unique=True)

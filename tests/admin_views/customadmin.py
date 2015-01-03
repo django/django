@@ -33,6 +33,9 @@ class Admin2(admin.AdminSite):
     def my_view(self, request):
         return HttpResponse("Django is a magical pony!")
 
+    def password_change(self, request, extra_context=None):
+        return super(Admin2, self).password_change(request, {'spam': 'eggs'})
+
 
 class UserLimitedAdmin(UserAdmin):
     # used for testing password change on a user not in queryset

@@ -146,6 +146,13 @@ Now, our ``my_callback`` function will be called each time a request finishes.
         versions of Django, signal registration usually happened in the
         ``models`` module.
 
+.. note::
+
+    The :meth:`~django.apps.AppConfig.ready` method may be executed more than
+    once during testing, so you may want to :ref:`guard your signals from
+    duplication <preventing-duplicate-signals>`, especially if you're planning
+    to send them within tests.
+
 .. _connecting-to-specific-signals:
 
 Connecting to signals sent by specific senders
@@ -271,7 +278,12 @@ Disconnecting signals
 .. method:: Signal.disconnect([receiver=None, sender=None, weak=True, dispatch_uid=None])
 
 To disconnect a receiver from a signal, call :meth:`Signal.disconnect`. The
-arguments are as described in :meth:`.Signal.connect`.
+arguments are as described in :meth:`.Signal.connect`. The method returns
+``True`` if a receiver was disconnected and ``False`` if not.
 
-The *receiver* argument indicates the registered receiver to disconnect. It may
-be ``None`` if ``dispatch_uid`` is used to identify the receiver.
+The ``receiver`` argument indicates the registered receiver to disconnect. It
+may be ``None`` if ``dispatch_uid`` is used to identify the receiver.
+
+.. versionchanged:: 1.8
+
+    The boolean return value was added.

@@ -92,7 +92,7 @@ def file_upload_echo(request):
     """
     Simple view to echo back info about uploaded files for tests.
     """
-    r = dict((k, f.name) for k, f in request.FILES.items())
+    r = {k: f.name for k, f in request.FILES.items()}
     return HttpResponse(json.dumps(r))
 
 
@@ -100,7 +100,7 @@ def file_upload_echo_content(request):
     """
     Simple view to echo back the content of uploaded files for tests.
     """
-    r = dict((k, f.read().decode('utf-8')) for k, f in request.FILES.items())
+    r = {k: f.read().decode('utf-8') for k, f in request.FILES.items()}
     return HttpResponse(json.dumps(r))
 
 
@@ -153,9 +153,9 @@ def file_upload_content_type_extra(request):
     """
     params = {}
     for file_name, uploadedfile in request.FILES.items():
-        params[file_name] = dict([
-            (k, smart_str(v)) for k, v in uploadedfile.content_type_extra.items()
-        ])
+        params[file_name] = {
+            k: smart_str(v) for k, v in uploadedfile.content_type_extra.items()
+        }
     return HttpResponse(json.dumps(params))
 
 

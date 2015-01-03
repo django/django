@@ -7,10 +7,10 @@ except ImportError:
     resource_string = None
 
 from django.apps import apps
-from django.conf import settings
 from django.template.base import TemplateDoesNotExist
-from django.template.loader import BaseLoader
 from django.utils import six
+
+from .base import Loader as BaseLoader
 
 
 class Loader(BaseLoader):
@@ -30,6 +30,6 @@ class Loader(BaseLoader):
                 except Exception:
                     continue
                 if six.PY2:
-                    resource = resource.decode(settings.FILE_CHARSET)
+                    resource = resource.decode(self.engine.file_charset)
                 return (resource, 'egg:%s:%s' % (app_config.name, pkg_name))
         raise TemplateDoesNotExist(template_name)

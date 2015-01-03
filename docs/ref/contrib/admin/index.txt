@@ -28,7 +28,8 @@ For reference, here are the requirements:
    in your :setting:`INSTALLED_APPS` list, add them.
 
 3. Add ``django.contrib.messages.context_processors.messages`` to
-   :setting:`TEMPLATE_CONTEXT_PROCESSORS` as well as
+   the ``'context_processors'`` option of the ``DjangoTemplates`` backend
+   defined in your :setting:`TEMPLATES` as well as
    :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
    :class:`django.contrib.messages.middleware.MessageMiddleware` to
    :setting:`MIDDLEWARE_CLASSES`. (These are all active by default, so
@@ -590,7 +591,7 @@ subclass::
               color_code = models.CharField(max_length=6)
 
               def colored_name(self):
-                  return format_html('<span style="color: #{0};">{1} {2}</span>',
+                  return format_html('<span style="color: #{};">{} {}</span>',
                                      self.color_code,
                                      self.first_name,
                                      self.last_name)
@@ -647,7 +648,7 @@ subclass::
             color_code = models.CharField(max_length=6)
 
             def colored_first_name(self):
-                return format_html('<span style="color: #{0};">{1}</span>',
+                return format_html('<span style="color: #{};">{}</span>',
                                    self.color_code,
                                    self.first_name)
 
@@ -1060,7 +1061,7 @@ subclass::
                 # line by a linebreak
                 return format_html_join(
                     mark_safe('<br/>'),
-                    '{0}',
+                    '{}',
                     ((line,) for line in instance.get_full_address()),
                 ) or "<span class='errors'>I can't determine this address.</span>"
 
@@ -1276,7 +1277,7 @@ templates used by the :class:`ModelAdmin` views:
     ``ModelForm`` instance and a boolean value based on whether it is adding or
     changing the parent object.
 
-    For example to attach ``request.user`` to each changed formset
+    For example, to attach ``request.user`` to each changed formset
     model instance::
 
         class ArticleAdmin(admin.ModelAdmin):
@@ -1286,6 +1287,8 @@ templates used by the :class:`ModelAdmin` views:
                     instance.user = request.user
                     instance.save()
                 formset.save_m2m()
+
+    See also :ref:`saving-objects-in-the-formset`.
 
 .. method:: ModelAdmin.get_ordering(request)
 
@@ -1413,8 +1416,14 @@ templates used by the :class:`ModelAdmin` views:
     filtering based on add, change, and delete permissions::
 
         class MyModelAdmin(admin.ModelAdmin):
+            inlines = (MyInline,)
+
             def get_inline_instances(self, request, obj=None):
                 return [inline(self.model, self.admin_site) for inline in self.inlines]
+
+    If you override this method, make sure that the returned inlines are
+    instances of the classes defined in :attr:`inlines` or you might encounter
+    a "Bad Request" error when adding related objects.
 
 .. method:: ModelAdmin.get_urls()
 
@@ -1486,15 +1495,19 @@ templates used by the :class:`ModelAdmin` views:
     Returns a :class:`~django.forms.ModelForm` class for use in the admin add
     and change views, see :meth:`add_view` and :meth:`change_view`.
 
-    If you wanted to hide a field from non-superusers, for example, you could
-    override ``get_form`` as follows::
+    The base implementation uses :func:`~django.forms.models.modelform_factory`
+    to subclass :attr:`~form`, modified by attributes such as :attr:`~fields`
+    and :attr:`~exclude`. So, for example, if you wanted to offer additional
+    fields to superusers, you could swap in a different base form like so::
 
         class MyModelAdmin(admin.ModelAdmin):
             def get_form(self, request, obj=None, **kwargs):
-                self.exclude = []
-                if not request.user.is_superuser:
-                    self.exclude.append('field_to_hide')
+                if request.user.is_superuser:
+                    kwargs['form'] = MySuperuserForm
                 return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
+
+    You may also simply return a custom :class:`~django.forms.ModelForm` class
+    directly.
 
 .. method:: ModelAdmin.get_formsets(request, obj=None)
 
@@ -1836,13 +1849,13 @@ jQuery
 Django admin Javascript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
-(version 1.11.1) is namespaced as ``django.jQuery``. If you want to use jQuery
+(version 1.11.2) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
 .. versionchanged:: 1.8
 
-    The embedded jQuery has been upgraded from 1.9.1 to 1.11.1.
+    The embedded jQuery has been upgraded from 1.9.1 to 1.11.2.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2325,8 +2338,9 @@ directory.
 
 In order to override one or more of them, first create an ``admin`` directory
 in your project's ``templates`` directory. This can be any of the directories
-you specified in :setting:`TEMPLATE_DIRS`. If you have customized the
-:setting:`TEMPLATE_LOADERS` setting, be sure
+you specified in the :setting:`DIRS <TEMPLATES-DIRS>` option of the
+``DjangoTemplates`` backend in the :setting:`TEMPLATES` setting. If you have
+customized the ``'loaders'`` option, be sure
 ``'django.template.loaders.filesystem.Loader'`` appears before
 ``'django.template.loaders.app_directories.Loader'`` so that your custom
 templates will be found by the template loading system before those that are
@@ -2379,7 +2393,7 @@ Therefore here is our new ``change_form.html`` :
             <li>
                 <a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% trans "View on site" %}</a>
             </li>
-        {% endif%}
+        {% endif %}
     {% endblock %}
 
 And that's it! If we placed this file in the ``templates/admin/my_app``
@@ -2429,18 +2443,13 @@ creating your own ``AdminSite`` instance (see below), and changing the
     this class is created as ``django.contrib.admin.site`` and you can
     register your models and ``ModelAdmin`` instances with it.
 
-    If you'd like to set up your own administrative site with custom
-    behavior, however, you're free to subclass ``AdminSite`` and override
-    or add anything you like. Then, simply create an instance of your
-    ``AdminSite`` subclass (the same way you'd instantiate any other
-    Python class), and register your models and ``ModelAdmin`` subclasses
-    with it instead of using the default.
-
     When constructing an instance of an ``AdminSite``, you can provide
     a unique instance name using the ``name`` argument to the constructor. This
     instance name is used to identify the instance, especially when
     :ref:`reversing admin URLs <admin-reverse-urls>`. If no instance name is
     provided, a default instance name of ``admin`` will be used.
+    See :ref:`customizing-adminsite` for an example of customizing the
+    :class:`AdminSite` class.
 
 ``AdminSite`` attributes
 ------------------------
@@ -2508,6 +2517,35 @@ Templates can override or extend base admin templates as described in
     Path to a custom template that will be used by the admin site password
     change done view.
 
+``AdminSite`` methods
+---------------------
+
+.. method:: AdminSite.each_context(request)
+
+    .. versionadded:: 1.7
+
+    Returns a dictionary of variables to put in the template context for
+    every page in the admin site.
+
+    Includes the following variables and values by default:
+
+    * ``site_header``: :attr:`AdminSite.site_header`
+    * ``site_title``: :attr:`AdminSite.site_title`
+    * ``site_url``: :attr:`AdminSite.site_url`
+    * ``has_permission``: :meth:`AdminSite.has_permission`
+
+    .. versionchanged:: 1.8
+
+        The ``request`` argument and the ``has_permission`` variable were added.
+
+.. method:: AdminSite.has_permission(request)
+
+    Returns ``True`` if the user for the given ``HttpRequest`` has permission
+    to view at least one page in the admin site. Defaults to requiring both
+    :attr:`User.is_active <django.contrib.auth.models.User.is_active>` and
+    :attr:`User.is_staff <django.contrib.auth.models.User.is_staff>` to be
+    ``True``.
+
 Hooking ``AdminSite`` instances into your URLconf
 -------------------------------------------------
 
@@ -2526,12 +2564,38 @@ In this example, we register the default ``AdminSite`` instance
         url(r'^admin/', include(admin.site.urls)),
     ]
 
-In this example, we register the ``AdminSite`` instance
-``myproject.admin.admin_site`` at the URL ``/myadmin/`` ::
+.. _customizing-adminsite:
 
-    # urls.py
+Customizing the :class:`AdminSite` class
+----------------------------------------
+
+If you'd like to set up your own admin site with custom behavior, you're free
+to subclass ``AdminSite`` and override or add anything you like. Then, simply
+create an instance of your ``AdminSite`` subclass (the same way you'd
+instantiate any other Python class) and register your models and
+``ModelAdmin`` subclasses with it instead of with the default site. Finally,
+update :file:`myproject/urls.py` to reference your :class:`AdminSite` subclass.
+
+.. snippet::
+    :filename: myapp/admin.py
+
+    from django.contrib.admin import AdminSite
+
+    from .models import MyModel
+
+    class MyAdminSite(AdminSite):
+        site_header = 'Monty Python administration'
+
+    admin_site = MyAdminSite(name='myadmin')
+    admin_site.register(MyModel)
+
+
+.. snippet::
+    :filename: myproject/urls.py
+
     from django.conf.urls import include, url
-    from myproject.admin import admin_site
+
+    from myapp.admin import admin_site
 
     urlpatterns = [
         url(r'^myadmin/', include(admin_site.urls)),
@@ -2584,11 +2648,16 @@ a pattern for your new view.
 .. note::
 
     Any view you render that uses the admin templates, or extends the base
-    admin template, should provide the ``current_app`` argument to
-    :class:`~django.template.RequestContext` or
-    :class:`~django.template.Context` when rendering the template.  It should
-    be set to either ``self.name`` if your view is on an ``AdminSite`` or
-    ``self.admin_site.name`` if your view is on a ``ModelAdmin``.
+    admin template, should set ``request.current_app`` before rendering the
+    template. It should be set to either ``self.name`` if your view is on an
+    ``AdminSite`` or ``self.admin_site.name`` if your view is on a
+    ``ModelAdmin``.
+
+    .. versionchanged:: 1.8
+
+       In previous versions of Django, you had to provide the ``current_app``
+       argument to :class:`~django.template.RequestContext` or
+       :class:`~django.template.Context` when rendering the template.
 
 .. _auth_password_reset:
 

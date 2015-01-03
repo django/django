@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand, CommandError
-from django.utils import six
 from django.conf import settings
 from django.db import connections, DEFAULT_DB_ALIAS, migrations
 from django.db.migrations.loader import AmbiguityError
@@ -7,6 +6,8 @@ from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.writer import MigrationWriter
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.migration import SwappableTuple
+from django.utils import six
+from django.utils.version import get_docs_version
 
 
 class Command(BaseCommand):
@@ -26,7 +27,9 @@ class Command(BaseCommand):
 
         self.verbosity = options.get('verbosity')
         self.interactive = options.get('interactive')
-        app_label, migration_name = options['app_label'], options['migration_name']
+        app_label = options['app_label']
+        migration_name = options['migration_name']
+        no_optimize = options['no_optimize']
 
         # Load the current graph state, check the app and migration they asked for exists
         executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
@@ -83,7 +86,7 @@ class Command(BaseCommand):
                 raise CommandError(
                     "You cannot squash squashed migrations! Please transition "
                     "it to a normal migration first: "
-                    "https://docs.djangoproject.com/en/1.7/topics/migrations/#squashing-migrations"
+                    "https://docs.djangoproject.com/en/%s/topics/migrations/#squashing-migrations" % get_docs_version()
                 )
             operations.extend(smigration.operations)
             for dependency in smigration.dependencies:
@@ -95,20 +98,25 @@ class Command(BaseCommand):
                 elif dependency[0] != smigration.app_label:
                     dependencies.add(dependency)
 
-        if self.verbosity > 0:
-            self.stdout.write(self.style.MIGRATE_HEADING("Optimizing..."))
+        if no_optimize:
+            if self.verbosity > 0:
+                self.stdout.write(self.style.MIGRATE_HEADING("(Skipping optimization.)"))
+            new_operations = operations
+        else:
+            if self.verbosity > 0:
+                self.stdout.write(self.style.MIGRATE_HEADING("Optimizing..."))
 
-        optimizer = MigrationOptimizer()
-        new_operations = optimizer.optimize(operations, migration.app_label)
+            optimizer = MigrationOptimizer()
+            new_operations = optimizer.optimize(operations, migration.app_label)
 
-        if self.verbosity > 0:
-            if len(new_operations) == len(operations):
-                self.stdout.write("  No optimizations possible.")
-            else:
-                self.stdout.write(
-                    "  Optimized from %s operations to %s operations." %
-                    (len(operations), len(new_operations))
-                )
+            if self.verbosity > 0:
+                if len(new_operations) == len(operations):
+                    self.stdout.write("  No optimizations possible.")
+                else:
+                    self.stdout.write(
+                        "  Optimized from %s operations to %s operations." %
+                        (len(operations), len(new_operations))
+                    )
 
         # Work out the value of replaces (any squashed ones we're re-squashing)
         # need to feed their replaces into ours

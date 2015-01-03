@@ -213,6 +213,23 @@ ones:
     unless you want to override the default primary-key behavior. For more,
     see :ref:`automatic-primary-key-fields`.
 
+    The primary key field is read-only. If you change the value of the primary
+    key on an existing object and then save it, a new object will be created
+    alongside the old one. For example::
+
+        from django.db import models
+
+        class Fruit(models.Model):
+            name = models.CharField(max_length=100, primary_key=True)
+
+    .. code-block:: pycon
+
+        >>> fruit = Fruit.objects.create(name='Apple')
+        >>> fruit.name = 'Pear'
+        >>> fruit.save()
+        >>> Fruit.objects.values_list('name', flat=True)
+        ['Apple', 'Pear']
+
 :attr:`~Field.unique`
     If ``True``, this field must be unique throughout the table.
 

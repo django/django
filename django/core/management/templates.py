@@ -16,6 +16,7 @@ from django.template import Template, Context
 from django.utils import archive
 from django.utils.six.moves.urllib.request import urlretrieve
 from django.utils._os import rmtree_errorhandler
+from django.utils.version import get_docs_version
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions
 
@@ -85,8 +86,7 @@ class TemplateCommand(BaseCommand):
                 raise CommandError("Destination directory '%s' does not "
                                    "exist, please create it first." % top_dir)
 
-        extensions = tuple(
-            handle_extensions(options['extensions'], ignored=()))
+        extensions = tuple(handle_extensions(options['extensions']))
         extra_files = []
         for file in options['files']:
             extra_files.extend(map(lambda x: x.strip(), file.split(',')))
@@ -101,15 +101,12 @@ class TemplateCommand(BaseCommand):
         base_name = '%s_name' % app_or_project
         base_subdir = '%s_template' % app_or_project
         base_directory = '%s_directory' % app_or_project
-        if django.VERSION[-2] != 'final':
-            docs_version = 'dev'
-        else:
-            docs_version = '%d.%d' % django.VERSION[:2]
 
         context = Context(dict(options, **{
             base_name: name,
             base_directory: top_dir,
-            'docs_version': docs_version,
+            'docs_version': get_docs_version(),
+            'django_version': django.__version__,
         }), autoescape=False)
 
         # Setup a stub settings environment for template rendering

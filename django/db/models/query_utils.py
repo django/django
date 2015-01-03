@@ -7,10 +7,20 @@ circular import difficulties.
 """
 from __future__ import unicode_literals
 
+from collections import namedtuple
+
 from django.apps import apps
+from django.core.exceptions import FieldDoesNotExist
 from django.db.backends import utils
+from django.db.models.constants import LOOKUP_SEP
 from django.utils import six
 from django.utils import tree
+
+
+# PathInfo is used when converting lookups (fk__somecol). The contents
+# describe the relation in Model terms (model Options and Fields for both
+# sides of the relation. The join_field is the field backing the relation.
+PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct')
 
 
 class InvalidQuery(Exception):
@@ -28,7 +38,7 @@ class QueryWrapper(object):
     def __init__(self, sql, params):
         self.data = sql, list(params)
 
-    def as_sql(self, qn=None, connection=None):
+    def as_sql(self, compiler=None, connection=None):
         return self.data
 
 
@@ -90,7 +100,6 @@ class DeferredAttribute(object):
         Retrieves and caches the value from the datastore on the first lookup.
         Returns the cached value.
         """
-        from django.db.models.fields import FieldDoesNotExist
         non_deferred_model = instance._meta.proxy_for_model
         opts = non_deferred_model._meta
 
@@ -108,14 +117,8 @@ class DeferredAttribute(object):
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance, name)
             if val is None:
-                # We use only() instead of values() here because we want the
-                # various data coercion methods (to_python(), etc.) to be
-                # called here.
-                val = getattr(
-                    non_deferred_model._base_manager.only(name).using(
-                        instance._state.db).get(pk=instance.pk),
-                    self.field_name
-                )
+                instance.refresh_from_db(fields=[self.field_name])
+                val = getattr(instance, self.field_name)
             data[self.field_name] = val
         return data[self.field_name]
 
@@ -210,7 +213,7 @@ def deferred_class_factory(model, attrs):
             proxy = True
             app_label = model._meta.app_label
 
-        overrides = dict((attr, DeferredAttribute(attr, model)) for attr in attrs)
+        overrides = {attr: DeferredAttribute(attr, model) for attr in attrs}
         overrides["Meta"] = Meta
         overrides["__module__"] = model.__module__
         overrides["_deferred"] = True
@@ -220,3 +223,17 @@ def deferred_class_factory(model, attrs):
 # The above function is also used to unpickle model instances with deferred
 # fields.
 deferred_class_factory.__safe_for_unpickling__ = True
+
+
+def refs_aggregate(lookup_parts, aggregates):
+    """
+    A little helper method to check if the lookup_parts contains references
+    to the given aggregates set. Because the LOOKUP_SEP is contained in the
+    default annotation names we must check each prefix of the lookup_parts
+    for a match.
+    """
+    for n in range(len(lookup_parts) + 1):
+        level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
+        if level_n_lookup in aggregates and aggregates[level_n_lookup].contains_aggregate:
+            return aggregates[level_n_lookup], lookup_parts[n:]
+    return False, ()

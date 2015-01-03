@@ -78,8 +78,8 @@ Three things to note about 404 views:
   checking every regular expression in the URLconf.
 
 * The 404 view is passed a :class:`~django.template.RequestContext` and
-  will have access to variables supplied by your
-  :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting (e.g., ``MEDIA_URL``).
+  will have access to variables supplied by your template context
+  processors (e.g. ``MEDIA_URL``).
 
 * If :setting:`DEBUG` is set to ``True`` (in your settings module), then
   your 404 view will never be used, and your URLconf will be displayed

@@ -78,10 +78,10 @@ class QueryDictTests(unittest.TestCase):
 
         if six.PY2:
             self.assertTrue(q.has_key('foo'))
-        self.assertTrue('foo' in q)
+        self.assertIn('foo', q)
         if six.PY2:
             self.assertFalse(q.has_key('bar'))
-        self.assertFalse('bar' in q)
+        self.assertNotIn('bar', q)
 
         self.assertEqual(list(six.iteritems(q)), [('foo', 'bar')])
         self.assertEqual(list(six.iterlists(q)), [('foo', ['bar'])])
@@ -118,7 +118,7 @@ class QueryDictTests(unittest.TestCase):
         q = QueryDict(mutable=True)
         q['name'] = 'john'
         del q['name']
-        self.assertFalse('name' in q)
+        self.assertNotIn('name', q)
 
     def test_basic_mutable_operations(self):
         q = QueryDict(mutable=True)
@@ -137,7 +137,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(q['foo'], 'another')
         if six.PY2:
             self.assertTrue(q.has_key('foo'))
-        self.assertTrue('foo' in q)
+        self.assertIn('foo', q)
 
         self.assertListEqual(sorted(list(six.iteritems(q))),
                              [('foo', 'another'), ('name', 'john')])
@@ -407,6 +407,15 @@ class HttpResponseTests(unittest.TestCase):
         r.write(b'def')
         self.assertEqual(r.content, b'abcdef')
 
+    def test_stream_interface(self):
+        r = HttpResponse('asdf')
+        self.assertEqual(r.getvalue(), b'asdf')
+
+        r = HttpResponse()
+        self.assertEqual(r.writable(), True)
+        r.writelines(['foo\n', 'bar\n', 'baz\n'])
+        self.assertEqual(r.content, b'foo\nbar\nbaz\n')
+
     def test_unsafe_redirect(self):
         bad_urls = [
             'data:text/html,<script>window.alert("xss")</script>',
@@ -537,6 +546,9 @@ class StreamingHttpResponseTests(TestCase):
         with self.assertRaises(Exception):
             r.tell()
 
+        r = StreamingHttpResponse(iter(['hello', 'world']))
+        self.assertEqual(r.getvalue(), b'helloworld')
+
 
 class FileCloseTests(TestCase):
 
@@ -609,8 +621,8 @@ class CookieTests(unittest.TestCase):
         """
         c = SimpleCookie()
         c['test'] = "An,awkward;value"
-        self.assertTrue(";" not in c.output().rstrip(';'))  # IE compat
-        self.assertTrue("," not in c.output().rstrip(';'))  # Safari compat
+        self.assertNotIn(";", c.output().rstrip(';'))  # IE compat
+        self.assertNotIn(",", c.output().rstrip(';'))  # Safari compat
 
     def test_decode(self):
         """
@@ -619,7 +631,7 @@ class CookieTests(unittest.TestCase):
         c = SimpleCookie()
         c['test'] = "An,awkward;value"
         c2 = SimpleCookie()
-        c2.load(c.output())
+        c2.load(c.output()[12:])
         self.assertEqual(c['test'].value, c2['test'].value)
 
     def test_decode_2(self):
@@ -629,20 +641,20 @@ class CookieTests(unittest.TestCase):
         c = SimpleCookie()
         c['test'] = b"\xf0"
         c2 = SimpleCookie()
-        c2.load(c.output())
+        c2.load(c.output()[12:])
         self.assertEqual(c['test'].value, c2['test'].value)
 
     def test_nonstandard_keys(self):
         """
         Test that a single non-standard cookie name doesn't affect all cookies. Ticket #13007.
         """
-        self.assertTrue('good_cookie' in parse_cookie('good_cookie=yes;bad:cookie=yes').keys())
+        self.assertIn('good_cookie', parse_cookie('good_cookie=yes;bad:cookie=yes').keys())
 
     def test_repeated_nonstandard_keys(self):
         """
         Test that a repeated non-standard name doesn't affect all cookies. Ticket #15852
         """
-        self.assertTrue('good_cookie' in parse_cookie('a:=b; a:=c; good_cookie=yes').keys())
+        self.assertIn('good_cookie', parse_cookie('a:=b; a:=c; good_cookie=yes').keys())
 
     def test_httponly_after_load(self):
         """
@@ -666,3 +678,15 @@ class CookieTests(unittest.TestCase):
         r = HttpResponse()
         r.set_cookie("a:.b/", 1)
         self.assertEqual(len(r.cookies.bad_cookies), 1)
+
+    def test_pickle(self):
+        rawdata = 'Customer="WILE_E_COYOTE"; Path=/acme; Version=1'
+        expected_output = 'Set-Cookie: %s' % rawdata
+
+        C = SimpleCookie()
+        C.load(rawdata)
+        self.assertEqual(C.output(), expected_output)
+
+        for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+            C1 = pickle.loads(pickle.dumps(C, protocol=proto))
+            self.assertEqual(C1.output(), expected_output)

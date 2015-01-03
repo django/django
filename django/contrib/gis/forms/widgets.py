@@ -60,7 +60,7 @@ class BaseGeometryWidget(Widget):
                     ogr = value.ogr
                     ogr.transform(self.map_srid)
                     value = ogr
-                except gdal.OGRException as err:
+                except gdal.GDALException as err:
                     logger.error(
                         "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
                             value.srid, self.map_srid, err)

@@ -60,7 +60,14 @@ class BaseCustomManager(models.Manager):
     def manager_only(self):
         return self.all()
 
+
 CustomManager = BaseCustomManager.from_queryset(CustomQuerySet)
+
+
+class DeconstructibleCustomManager(BaseCustomManager.from_queryset(CustomQuerySet)):
+
+    def __init__(self, a, b, c=1, d=2):
+        super(DeconstructibleCustomManager, self).__init__(a)
 
 
 class FunPeopleManager(models.Manager):
