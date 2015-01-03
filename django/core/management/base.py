@@ -205,21 +205,20 @@ class BaseCommand(object):
 
     ``leave_locale_alone``
         A boolean indicating whether the locale set in settings should be
-        preserved during the execution of the command instead of being
-        forcibly set to 'en-us'.
+        preserved during the execution of the command instead of translations
+        being deactivated.
 
         Default value is ``False``.
 
         Make sure you know what you are doing if you decide to change the value
         of this option in your custom command if it creates database content
         that is locale-sensitive and such content shouldn't contain any
-        translations (like it happens e.g. with django.contrim.auth
-        permissions) as making the locale differ from the de facto default
-        'en-us' might cause unintended effects.
+        translations (like it happens e.g. with django.contrib.auth
+        permissions) as activating any locale might cause unintended effects.
 
         This option can't be False when the can_import_settings option is set
-        to False too because attempting to set the locale needs access to
-        settings. This condition will generate a CommandError.
+        to False too because attempting to deactivate translations needs access
+        to settings. This condition will generate a CommandError.
     """
     # Metadata about this command.
     option_list = ()
@@ -430,12 +429,12 @@ class BaseCommand(object):
                                    "(%s) and 'can_import_settings' (%s) command "
                                    "options." % (self.leave_locale_alone,
                                                  self.can_import_settings))
-            # Switch to US English, because django-admin creates database
+            # Deactivate translations, because django-admin creates database
             # content like permissions, and those shouldn't contain any
             # translations.
             from django.utils import translation
             saved_locale = translation.get_language()
-            translation.activate('en-us')
+            translation.deactivate_all()
 
         try:
             if (self.requires_system_checks and
