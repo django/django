@@ -998,3 +998,21 @@ Attributes
 .. attribute:: StreamingHttpResponse.streaming
 
     This is always ``True``.
+
+FileResponse objects
+====================
+
+.. versionadded:: 1.8
+
+.. class:: FileResponse
+
+:class:`FileResponse` is a subclass of :class:`StreamingHttpResponse` optimized
+for binary files. It uses `wsgi.file_wrapper`_ if provided by the wsgi server,
+otherwise it streams the file out in small chunks.
+
+.. _wsgi.file_wrapper: https://www.python.org/dev/peps/pep-3333/#optional-platform-specific-file-handling
+
+``FileResponse`` expects a file open in binary mode like so::
+
+    >>> from django.http import FileResponse
+    >>> response = FileResponse(open('myfile.png', 'rb'))
