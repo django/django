@@ -145,8 +145,11 @@ The template layer provides a designer-friendly syntax for rendering the
 information to be presented to the user. Learn how this syntax can be used by
 designers and how it can be extended by programmers:
 
+* **The basics:**
+  :doc:`Overview <topics/templates>`
+
 * **For designers:**
-  :doc:`Syntax overview <topics/templates>` |
+  :doc:`Language overview <ref/templates/language>` |
   :doc:`Built-in tags and filters <ref/templates/builtins>` |
   :doc:`Web design helpers <ref/contrib/webdesign>` |
   :doc:`Humanization <ref/contrib/humanize>`
