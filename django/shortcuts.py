@@ -32,7 +32,7 @@ def render_to_response(template_name, context=None,
             and dirs is _dirs_undefined
             and dictionary is _dictionary_undefined):
         # No deprecated arguments were passed - use the new code path
-        content = loader.get_template(template_name).render(context)
+        content = loader.render_to_string(template_name, context)
 
     else:
         # Some deprecated arguments were passed - use the legacy code path
@@ -56,7 +56,8 @@ def render(request, template_name, context=None,
             and dirs is _dirs_undefined
             and dictionary is _dictionary_undefined):
         # No deprecated arguments were passed - use the new code path
-        content = loader.get_template(template_name).render(context, request)
+        # In Django 2.0, request should become a positional argument.
+        content = loader.render_to_string(template_name, context, request=request)
 
     else:
         # Some deprecated arguments were passed - use the legacy code path

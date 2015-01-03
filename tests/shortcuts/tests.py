@@ -14,6 +14,11 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.content, b'FOO.BAR..\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
+    def test_render_to_response_with_multiple_templates(self):
+        response = self.client.get('/render_to_response/multiple_templates/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'FOO.BAR..\n')
+
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_render_to_response_with_request_context(self):
         response = self.client.get('/render_to_response/request_context/')
@@ -50,6 +55,11 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.content, b'FOO.BAR../path/to/static/media/\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
         self.assertFalse(hasattr(response.context.request, 'current_app'))
+
+    def test_render_with_multiple_templates(self):
+        response = self.client.get('/render/multiple_templates/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'FOO.BAR../path/to/static/media/\n')
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_render_with_base_context(self):
