@@ -7,7 +7,7 @@ The Django template language: For Python programmers
 
 This document explains the Django template system from a technical
 perspective -- how it works and how to extend it. If you're just looking for
-reference on the language syntax, see :doc:`/topics/templates`.
+reference on the language syntax, see :doc:`/ref/templates/language`.
 
 If you're looking to use the Django template system as part of another
 application -- i.e., without the rest of the framework -- make sure to read

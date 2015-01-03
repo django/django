@@ -2449,7 +2449,7 @@ List of locations of the template source files searched by
 
 Note that these paths should use Unix-style forward slashes, even on Windows.
 
-See :doc:`/topics/templates`.
+See :doc:`/ref/templates/language`.
 
 .. setting:: TEMPLATE_LOADERS
 
