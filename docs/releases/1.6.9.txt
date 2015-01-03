@@ -2,7 +2,7 @@
 Django 1.6.9 release notes
 ==========================
 
-*Under development*
+*January 2, 2015*
 
 Django 1.6.9 fixes a regression in the 1.6.6 security release.
 
