@@ -1351,8 +1351,10 @@ The following functions will no longer accept the ``dictionary`` and
 Use the ``context`` parameter instead. When ``dictionary`` is passed as a
 positional argument, which is the most common idiom, no changes are needed.
 
-There is no replacement for ``context_instance``. All data must be passed to
-templates through the ``context`` dict.
+If you're passing a :class:`~django.template.Context` in ``context_instance``,
+pass a :class:`dict` in the ``context`` parameter instead. If you're passing a
+:class:`~django.template.RequestContext`, pass the request separately in the
+``request`` parameter.
 
 ``dirs`` argument of template-finding functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

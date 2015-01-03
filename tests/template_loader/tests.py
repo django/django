@@ -1,4 +1,5 @@
 from django.test import override_settings, SimpleTestCase
+from django.test.client import RequestFactory
 from django.template import TemplateDoesNotExist
 from django.template.loader import (
     get_template, select_template, render_to_string)
@@ -10,6 +11,11 @@ from django.template.loader import (
 }, {
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'APP_DIRS': True,
+    'OPTIONS': {
+        'context_processors': [
+            'django.template.context_processors.request',
+        ],
+    },
 }])
 class TemplateLoaderTests(SimpleTestCase):
 
@@ -65,6 +71,11 @@ class TemplateLoaderTests(SimpleTestCase):
     def test_render_to_string_second_engine(self):
         content = render_to_string("template_loader/goodbye.html")
         self.assertEqual(content, "Goodbye! (Django templates)\n")
+
+    def test_render_to_string_with_request(self):
+        request = RequestFactory().get('/foobar/')
+        content = render_to_string("template_loader/request.html", request=request)
+        self.assertEqual(content, "/foobar/\n")
 
     def test_render_to_string_using_engine(self):
         content = render_to_string("template_loader/hello.html", using="django")

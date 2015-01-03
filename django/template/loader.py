@@ -80,7 +80,7 @@ def render_to_string(template_name, context=None,
                      context_instance=_context_instance_undefined,
                      dirs=_dirs_undefined,
                      dictionary=_dictionary_undefined,
-                     using=None):
+                     request=None, using=None):
     """
     Loads a template and renders it with a context. Returns a string.
 
@@ -94,7 +94,7 @@ def render_to_string(template_name, context=None,
             template = select_template(template_name, using=using)
         else:
             template = get_template(template_name, using=using)
-        return template.render(context)
+        return template.render(context, request)
 
     else:
         # Some deprecated arguments were passed - use the legacy code path
@@ -104,6 +104,11 @@ def render_to_string(template_name, context=None,
                 # to Django templates. Remove Engine.render_to_string() at the
                 # same time as this code path in Django 2.0.
                 if isinstance(engine, DjangoTemplates):
+                    if request is not None:
+                        raise ValueError(
+                            "render_to_string doesn't support the request argument "
+                            "when some deprecated arguments are passed.")
+                        continue
                     # Hack -- use the internal Engine instance of DjangoTemplates.
                     return engine.engine.render_to_string(
                         template_name, context, context_instance, dirs, dictionary)
