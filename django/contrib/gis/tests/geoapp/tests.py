@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import re
+import sys
 from tempfile import NamedTemporaryFile
 
 from django.db import connection
@@ -208,9 +209,14 @@ class GeoModelTest(TestCase):
         """
         Test a dumpdata/loaddata cycle with geographic data.
         """
+        orig_stdout = sys.stdout
         out = six.StringIO()
         original_data = list(City.objects.all().order_by('name'))
-        call_command('dumpdata', 'geoapp.City', stdout=out)
+        try:
+            sys.stdout = out
+            call_command('dumpdata', 'geoapp.City')
+        finally:
+            sys.stdout = orig_stdout
         result = out.getvalue()
         houston = City.objects.get(name='Houston')
         self.assertIn('"point": "%s"' % houston.point.ewkt, result)

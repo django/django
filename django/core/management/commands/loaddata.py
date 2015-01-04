@@ -208,7 +208,7 @@ class Command(BaseCommand):
 
             if self.verbosity >= 2 and not fixture_files_in_dir:
                 self.info("No fixture '%s' in %s." %
-                                  (fixture_name, humanize(fixture_dir)))
+                          (fixture_name, humanize(fixture_dir)))
 
             # Check kept for backwards-compatibility; it isn't clear why
             # duplicates are only allowed in different directories.

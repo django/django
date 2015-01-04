@@ -5,7 +5,6 @@ import warnings
 from django.core import management
 from django.db import transaction
 from django.test import TestCase, TransactionTestCase
-from django.utils.six import StringIO
 
 from .models import Article, Book
 
@@ -121,7 +120,7 @@ class InitialSQLTests(TestCase):
         `app/models/sql` (the old location will work until Django 1.9)
         """
         with self.assertLogs('django.commands') as logger:
-            management.call_command("sqlcustom", "fixtures_model_package")  #, stdout=out)
+            management.call_command("sqlcustom", "fixtures_model_package")
         output = '\n'.join(logger.output)
         self.assertIn("INSERT INTO fixtures_model_package_book (name) VALUES ('My Book')", output)
         # value from deprecated search path models/sql (remove in Django 1.9)

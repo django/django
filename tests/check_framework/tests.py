@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import logging
-import sys
-
 from django.apps import apps
 from django.conf import settings
 from django.core import checks
@@ -16,7 +13,6 @@ from django.db import models
 from django.test import TestCase
 from django.test.utils import override_settings, override_system_checks
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
 
 from .models import SimpleModel
 

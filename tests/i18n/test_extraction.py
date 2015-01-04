@@ -20,7 +20,6 @@ from django.test.utils import captured_stderr, captured_stdout
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import six
-from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning
 
 

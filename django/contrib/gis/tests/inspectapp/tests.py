@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import re
+import sys
 from unittest import skipUnless
 
 from django.core.management import call_command
@@ -25,11 +26,10 @@ class InspectDbTests(TestCase):
         """
         Test the geo-enabled inspectdb command.
         """
-        out = StringIO()
-        call_command('inspectdb',
-                 table_name_filter=lambda tn: tn.startswith('inspectapp_'),
-                 stdout=out)
-        output = out.getvalue()
+        with self.assertLogs('django.commands') as logger:
+            call_command('inspectdb',
+                         table_name_filter=lambda tn: tn.startswith('inspectapp_'))
+        output = '\n'.join(logger.output)
         if connection.features.supports_geometry_field_introspection:
             self.assertIn('geom = models.PolygonField()', output)
             self.assertIn('point = models.PointField()', output)
@@ -119,8 +119,13 @@ class OGRInspectTest(TestCase):
 
     def test_management_command(self):
         shp_file = os.path.join(TEST_DATA, 'cities', 'cities.shp')
+        orig_stdout = sys.stdout
         out = StringIO()
-        call_command('ogrinspect', shp_file, 'City', stdout=out)
+        try:
+            sys.stdout = out
+            call_command('ogrinspect', shp_file, 'City')
+        finally:
+            sys.stdout = orig_stdout
         output = out.getvalue()
         self.assertIn('class City(models.Model):', output)
 

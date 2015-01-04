@@ -7,7 +7,7 @@ from unittest import skipUnless
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils.six import PY3, StringIO
+from django.utils.six import PY3
 
 from .models import ColumnTypes
 
@@ -30,7 +30,7 @@ class InspectDBTestCase(TestCase):
         """Call inspectdb and return a function to validate a field type in its output"""
         with self.assertLogs('django.commands') as logger:
             call_command('inspectdb',
-                          table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'))
+                         table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'))
 
         def assertFieldType(name, definition):
             out_def = re.search(r'^\s*%s = (models.*)$' % name, '\n'.join(logger.output), re.MULTILINE).groups()[0]

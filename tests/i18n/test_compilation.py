@@ -15,7 +15,6 @@ from django.utils import translation
 from django.utils.translation import ugettext
 from django.utils.encoding import force_text
 from django.utils._os import upath
-from django.utils.six import StringIO
 
 has_msgfmt = find_command('msgfmt')
 

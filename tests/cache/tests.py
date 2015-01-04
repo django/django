@@ -32,7 +32,6 @@ from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
 from django.test.signals import setting_changed
 from django.test.utils import IgnoreDeprecationWarningsMixin
-from django.utils import six
 from django.utils import timezone
 from django.utils import translation
 from django.utils.cache import (patch_vary_headers, get_cache_key,
