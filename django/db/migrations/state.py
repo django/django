@@ -50,7 +50,7 @@ class ProjectState(object):
             model_name = model_name.lower()
             try:
                 related_old = {
-                    f.model for f in
+                    f.related_model for f in
                     self.apps.get_model(app_label, model_name)._meta.related_objects
                 }
             except LookupError:
