@@ -178,10 +178,10 @@ class _AssertLogsContext(_BaseTestCaseContext):
         _BaseTestCaseContext.__init__(self, test_case)
         self.logger_name = logger_name
         if level:
-            if sys.version_info[0] == 2:
-                self.level = logging._levelNames.get(level, level)
-            else:
+            if getattr(logging, '_nameToLevel', False):
                 self.level = logging._nameToLevel.get(level, level)
+            else:
+                self.level = logging._levelNames.get(level, level)
         else:
             self.level = logging.INFO
         self.msg = None
