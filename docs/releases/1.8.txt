@@ -45,6 +45,17 @@ new official API have been deprecated and will eventually be removed. A
 :ref:`guide to migrating from the old API to the new API
 <migrating-old-meta-api>` has been provided.
 
+Multiple template engines
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.8 defines a stable API for integrating template backends. It includes
+built-in support for the Django template language and for Jinja2_. It supports
+rendering templates with multiple engines within the same project. Learn more
+about the new features in the :doc:`topic guide </topics/templates>` and check
+the :doc:`upgrade instructions </ref/templates/upgrading>` for details.
+
+.. _Jinja2: http://jinja.pocoo.org/
+
 Security enhancements
 ~~~~~~~~~~~~~~~~~~~~~
 
