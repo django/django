@@ -2,6 +2,7 @@ import copy
 from importlib import import_module
 import inspect
 
+from django.core.exceptions import FieldDoesNotExist
 from django.db import router
 from django.db.models.query import QuerySet
 from django.utils import six

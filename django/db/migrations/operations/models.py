@@ -39,24 +39,22 @@ class CreateModel(Operation):
         )
 
     def state_forwards(self, app_label, state):
-        state.models[app_label, self.name.lower()] = ModelState(
+        state.add_model(ModelState(
             app_label,
             self.name,
             list(self.fields),
             dict(self.options),
             tuple(self.bases),
             list(self.managers),
-        )
+        ))
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        apps = to_state.render()
-        model = apps.get_model(app_label, self.name)
+        model = to_state.apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        apps = from_state.render()
-        model = apps.get_model(app_label, self.name)
+        model = from_state.apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, model):
             schema_editor.delete_model(model)
 
@@ -100,17 +98,15 @@ class DeleteModel(Operation):
         )
 
     def state_forwards(self, app_label, state):
-        del state.models[app_label, self.name.lower()]
+        state.remove_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        apps = from_state.render()
-        model = apps.get_model(app_label, self.name)
+        model = from_state.apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, model):
             schema_editor.delete_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        apps = to_state.render()
-        model = apps.get_model(app_label, self.name)
+        model = to_state.apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
 
@@ -143,14 +139,21 @@ class RenameModel(Operation):
 
     def state_forwards(self, app_label, state):
         # Get all of the related objects we need to repoint
-        apps = state.render(skip_cache=True)
+        apps = state.apps
         model = apps.get_model(app_label, self.old_name)
+        model._meta.apps = apps
+
+        # Select all non hidden related objects except m2m related objects
+        all_related_objects = (f for f in model._meta.get_fields(include_hidden=True)
+                               if f.auto_created and not f.concrete and not f.hidden
+                               or (f.hidden and f.many_to_many))
+
         # Rename the model
         state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
         state.models[app_label, self.new_name.lower()].name = self.new_name
-        del state.models[app_label, self.old_name.lower()]
+        state.remove_model(app_label, self.old_name)
         # Repoint the FKs and M2Ms pointing to us
-        for related_object in model._meta.related_objects:
+        for related_object in all_related_objects:
             # Use the new related key for self referential related objects.
             if related_object.related_model == model:
                 related_key = (app_label, self.new_name.lower())
@@ -166,13 +169,13 @@ class RenameModel(Operation):
                     field.rel.to = "%s.%s" % (app_label, self.new_name)
                 new_fields.append((name, field))
             state.models[related_key].fields = new_fields
+            state.reload_model(*related_key)
+        state.reload_model(app_label, self.new_name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        new_apps = to_state.render()
-        new_model = new_apps.get_model(app_label, self.new_name)
+        new_model = to_state.apps.get_model(app_label, self.new_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
-            old_apps = from_state.render()
-            old_model = old_apps.get_model(app_label, self.old_name)
+            old_model = from_state.apps.get_model(app_label, self.old_name)
             # Move the main table
             schema_editor.alter_db_table(
                 new_model,
@@ -190,7 +193,7 @@ class RenameModel(Operation):
                         related_object.related_model._meta.app_label,
                         related_object.related_model._meta.object_name.lower(),
                     )
-                to_field = new_apps.get_model(
+                to_field = to_state.apps.get_model(
                     *related_key
                 )._meta.get_field(related_object.field.name)
                 schema_editor.alter_field(
@@ -236,13 +239,12 @@ class AlterModelTable(Operation):
 
     def state_forwards(self, app_label, state):
         state.models[app_label, self.name.lower()].options["db_table"] = self.table
+        state.reload_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        new_apps = to_state.render()
-        new_model = new_apps.get_model(app_label, self.name)
+        new_model = to_state.apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
-            old_apps = from_state.render()
-            old_model = old_apps.get_model(app_label, self.name)
+            old_model = from_state.apps.get_model(app_label, self.name)
             schema_editor.alter_db_table(
                 new_model,
                 old_model._meta.db_table,
@@ -293,13 +295,12 @@ class AlterUniqueTogether(Operation):
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
         model_state.options[self.option_name] = self.unique_together
+        state.reload_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        new_apps = to_state.render()
-        new_model = new_apps.get_model(app_label, self.name)
+        new_model = to_state.apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
-            old_apps = from_state.render()
-            old_model = old_apps.get_model(app_label, self.name)
+            old_model = from_state.apps.get_model(app_label, self.name)
             schema_editor.alter_unique_together(
                 new_model,
                 getattr(old_model._meta, self.option_name, set()),
@@ -342,13 +343,12 @@ class AlterIndexTogether(Operation):
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
         model_state.options[self.option_name] = self.index_together
+        state.reload_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        new_apps = to_state.render()
-        new_model = new_apps.get_model(app_label, self.name)
+        new_model = to_state.apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
-            old_apps = from_state.render()
-            old_model = old_apps.get_model(app_label, self.name)
+            old_model = from_state.apps.get_model(app_label, self.name)
             schema_editor.alter_index_together(
                 new_model,
                 getattr(old_model._meta, self.option_name, set()),
@@ -388,11 +388,12 @@ class AlterOrderWithRespectTo(Operation):
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
         model_state.options['order_with_respect_to'] = self.order_with_respect_to
+        state.reload_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        to_model = to_state.render().get_model(app_label, self.name)
+        to_model = to_state.apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
-            from_model = from_state.render().get_model(app_label, self.name)
+            from_model = from_state.apps.get_model(app_label, self.name)
             # Remove a field if we need to
             if from_model._meta.order_with_respect_to and not to_model._meta.order_with_respect_to:
                 schema_editor.remove_field(from_model, from_model._meta.get_field("_order"))
@@ -458,6 +459,7 @@ class AlterModelOptions(Operation):
         for key in self.ALTER_OPTION_KEYS:
             if key not in self.options and key in model_state.options:
                 del model_state.options[key]
+        state.reload_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         pass

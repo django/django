@@ -159,7 +159,7 @@ class StateTests(TestCase):
         Tests rendering a ProjectState into an Apps.
         """
         project_state = ProjectState()
-        project_state.add_model_state(ModelState(
+        project_state.add_model(ModelState(
             app_label="migrations",
             name="Tag",
             fields=[
@@ -168,7 +168,7 @@ class StateTests(TestCase):
                 ("hidden", models.BooleanField()),
             ],
         ))
-        project_state.add_model_state(ModelState(
+        project_state.add_model(ModelState(
             app_label="migrations",
             name="SubTag",
             fields=[
@@ -187,7 +187,7 @@ class StateTests(TestCase):
         base_mgr = models.Manager()
         mgr1 = FoodManager('a', 'b')
         mgr2 = FoodManager('x', 'y', c=3, d=4)
-        project_state.add_model_state(ModelState(
+        project_state.add_model(ModelState(
             app_label="migrations",
             name="Food",
             fields=[
@@ -201,7 +201,7 @@ class StateTests(TestCase):
             ]
         ))
 
-        new_apps = project_state.render()
+        new_apps = project_state.apps
         self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field("name").max_length, 100)
         self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field("hidden").null, False)
 
@@ -324,23 +324,23 @@ class StateTests(TestCase):
 
         # Make a ProjectState and render it
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(A))
-        project_state.add_model_state(ModelState.from_model(B))
-        project_state.add_model_state(ModelState.from_model(C))
-        project_state.add_model_state(ModelState.from_model(D))
-        project_state.add_model_state(ModelState.from_model(E))
-        project_state.add_model_state(ModelState.from_model(F))
-        final_apps = project_state.render()
+        project_state.add_model(ModelState.from_model(A))
+        project_state.add_model(ModelState.from_model(B))
+        project_state.add_model(ModelState.from_model(C))
+        project_state.add_model(ModelState.from_model(D))
+        project_state.add_model(ModelState.from_model(E))
+        project_state.add_model(ModelState.from_model(F))
+        final_apps = project_state.apps
         self.assertEqual(len(final_apps.get_models()), 6)
 
         # Now make an invalid ProjectState and make sure it fails
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(A))
-        project_state.add_model_state(ModelState.from_model(B))
-        project_state.add_model_state(ModelState.from_model(C))
-        project_state.add_model_state(ModelState.from_model(F))
+        project_state.add_model(ModelState.from_model(A))
+        project_state.add_model(ModelState.from_model(B))
+        project_state.add_model(ModelState.from_model(C))
+        project_state.add_model(ModelState.from_model(F))
         with self.assertRaises(InvalidBasesError):
-            project_state.render()
+            project_state.apps
 
     def test_render_unique_app_labels(self):
         """
@@ -358,10 +358,9 @@ class StateTests(TestCase):
 
         # Make a ProjectState and render it
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(A))
-        project_state.add_model_state(ModelState.from_model(B))
-        final_apps = project_state.render()
-        self.assertEqual(len(final_apps.get_models()), 2)
+        project_state.add_model(ModelState.from_model(A))
+        project_state.add_model(ModelState.from_model(B))
+        self.assertEqual(len(project_state.apps.get_models()), 2)
 
     def test_equality(self):
         """
@@ -370,7 +369,7 @@ class StateTests(TestCase):
 
         # Test two things that should be equal
         project_state = ProjectState()
-        project_state.add_model_state(ModelState(
+        project_state.add_model(ModelState(
             "migrations",
             "Tag",
             [
@@ -389,7 +388,7 @@ class StateTests(TestCase):
 
         # Make a very small change (max_len 99) and see if that affects it
         project_state = ProjectState()
-        project_state.add_model_state(ModelState(
+        project_state.add_model(ModelState(
             "migrations",
             "Tag",
             [
@@ -429,23 +428,22 @@ class StateTests(TestCase):
 
         # Make a valid ProjectState and render it
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(Author))
-        project_state.add_model_state(ModelState.from_model(Book))
-        project_state.add_model_state(ModelState.from_model(Magazine))
-        rendered_state = project_state.render()
-        self.assertEqual(len(rendered_state.get_models()), 3)
+        project_state.add_model(ModelState.from_model(Author))
+        project_state.add_model(ModelState.from_model(Book))
+        project_state.add_model(ModelState.from_model(Magazine))
+        self.assertEqual(len(project_state.apps.get_models()), 3)
 
         # now make an invalid one with a ForeignKey
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(Book))
+        project_state.add_model(ModelState.from_model(Book))
         with self.assertRaises(ValueError):
-            rendered_state = project_state.render()
+            project_state.apps
 
         # and another with ManyToManyField
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(Magazine))
+        project_state.add_model(ModelState.from_model(Magazine))
         with self.assertRaises(ValueError):
-            rendered_state = project_state.render()
+            project_state.apps
 
     def test_real_apps(self):
         """
@@ -463,14 +461,14 @@ class StateTests(TestCase):
 
         # If we just stick it into an empty state it should fail
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(TestModel))
+        project_state.add_model(ModelState.from_model(TestModel))
         with self.assertRaises(ValueError):
-            project_state.render()
+            project_state.apps
 
         # If we include the real app it should succeed
         project_state = ProjectState(real_apps=["contenttypes"])
-        project_state.add_model_state(ModelState.from_model(TestModel))
-        rendered_state = project_state.render()
+        project_state.add_model(ModelState.from_model(TestModel))
+        rendered_state = project_state.apps
         self.assertEqual(
             len([x for x in rendered_state.get_models() if x._meta.app_label == "migrations"]),
             1,
@@ -500,8 +498,8 @@ class StateTests(TestCase):
 
         # Make a valid ProjectState and render it
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(Author))
-        project_state.add_model_state(ModelState.from_model(Book))
+        project_state.add_model(ModelState.from_model(Author))
+        project_state.add_model(ModelState.from_model(Book))
         self.assertEqual(
             [name for name, field in project_state.models["migrations", "book"].fields],
             ["id", "author"],
@@ -536,6 +534,6 @@ class ModelStateTests(TestCase):
         self.assertEqual(repr(state), "<ModelState: 'app.Model'>")
 
         project_state = ProjectState()
-        project_state.add_model_state(state)
+        project_state.add_model(state)
         with self.assertRaisesMessage(InvalidBasesError, "Cannot resolve bases for [<ModelState: 'app.Model'>]"):
-            project_state.render()
+            project_state.apps

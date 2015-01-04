@@ -20,7 +20,6 @@ from django import forms
 from django.core import exceptions, validators, checks
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time, parse_duration
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.duration import duration_string
 from django.utils.functional import cached_property, curry, total_ordering, Promise
 from django.utils.text import capfirst
@@ -32,6 +31,8 @@ from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 from django.utils.itercompat import is_iterable
 
+# imported for backwards compatibility
+from django.core.exceptions import FieldDoesNotExist  # NOQA
 
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode
@@ -61,7 +62,6 @@ BLANK_CHOICE_DASH = [("", "---------")]
 # When the _meta object was formalized, this exception was moved to
 # django.core.exceptions. It is retained here for backwards compatibility
 # purposes.
-from django.core.exceptions import FieldDoesNotExist  # NOQA
 
 
 def _load_field(app_label, model_name, field_name):
@@ -1848,8 +1848,6 @@ class IPAddressField(Field):
     description = _("IPv4 address")
 
     def __init__(self, *args, **kwargs):
-        warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
-                      RemovedInDjango19Warning)
         kwargs['max_length'] = 15
         super(IPAddressField, self).__init__(*args, **kwargs)
 
@@ -1871,6 +1869,19 @@ class IPAddressField(Field):
         defaults = {'form_class': forms.IPAddressField}
         defaults.update(kwargs)
         return super(IPAddressField, self).formfield(**defaults)
+
+    def check(self, **kwargs):
+        errors = super(IPAddressField, self).check(**kwargs)
+        errors.append(
+            checks.Warning(
+                'IPAddressField has been deprecated. Support for it '
+                '(except in historical migrations) will be removed in Django 1.9.',
+                hint='Use GenericIPAddressField instead.',
+                obj=self,
+                id='fields.W900',
+            )
+        )
+        return errors
 
 
 class GenericIPAddressField(Field):

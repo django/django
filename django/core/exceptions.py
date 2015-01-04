@@ -6,7 +6,7 @@ from django.utils.encoding import force_text
 
 
 class FieldDoesNotExist(Exception):
-    """The requested field does not exist"""
+    """The requested model field does not exist"""
     pass
 
 
