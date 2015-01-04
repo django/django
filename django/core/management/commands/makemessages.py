@@ -60,7 +60,7 @@ class TranslatableFile(object):
         from django.utils.translation import templatize
 
         if command.verbosity > 1:
-            command.stdout.write('processing file %s in %s\n' % (self.file, self.dirpath))
+            command.info('processing file %s in %s' % (self.file, self.dirpath))
         file_ext = os.path.splitext(self.file)[1]
         if domain == 'djangojs':
             orig_file = os.path.join(self.dirpath, self.file)
@@ -125,7 +125,7 @@ class TranslatableFile(object):
                     (self.file, errors))
             elif command.verbosity > 0:
                 # Print warnings
-                command.stdout.write(errors)
+                command.info(errors)
         if msgs:
             if six.PY2:
                 msgs = msgs.decode('utf-8')
@@ -258,8 +258,9 @@ class Command(BaseCommand):
                 os.path.basename(sys.argv[0]), sys.argv[1]))
 
         if self.verbosity > 1:
-            self.stdout.write('examining files with the extensions: %s\n'
-                             % get_text_list(list(self.extensions), 'and'))
+            self.info(
+                'examining files with the extensions: %s' % get_text_list(list(self.extensions), 'and')
+            )
 
         self.invoked_for_django = False
         self.locale_paths = []
@@ -300,7 +301,7 @@ class Command(BaseCommand):
             # Build po files for each selected locale
             for locale in locales:
                 if self.verbosity > 0:
-                    self.stdout.write("processing locale %s\n" % locale)
+                    self.info("processing locale %s" % locale)
                 for potfile in potfiles:
                     self.write_po_file(potfile, locale)
         finally:
@@ -326,7 +327,7 @@ class Command(BaseCommand):
             try:
                 f.process(self, self.domain)
             except UnicodeDecodeError:
-                self.stdout.write("UnicodeDecodeError: skipped file %s in %s" % (f.file, f.dirpath))
+                self.info("UnicodeDecodeError: skipped file %s in %s" % (f.file, f.dirpath))
 
         potfiles = []
         for path in self.locale_paths:
@@ -342,7 +343,7 @@ class Command(BaseCommand):
                     raise CommandError(
                         "errors happened while running msguniq\n%s" % errors)
                 elif self.verbosity > 0:
-                    self.stdout.write(errors)
+                    self.info(errors)
             with io.open(potfile, 'w', encoding='utf-8') as fp:
                 fp.write(msgs)
             potfiles.append(potfile)
@@ -388,7 +389,7 @@ class Command(BaseCommand):
                         os.path.join(os.path.abspath(dirpath), dirname) in ignored_roots):
                     dirnames.remove(dirname)
                     if self.verbosity > 1:
-                        self.stdout.write('ignoring directory %s\n' % dirname)
+                        self.info('ignoring directory %s' % dirname)
                 elif dirname == 'locale':
                     dirnames.remove(dirname)
                     self.locale_paths.insert(0, os.path.join(os.path.abspath(dirpath), dirname))
@@ -397,7 +398,7 @@ class Command(BaseCommand):
                 file_ext = os.path.splitext(filename)[1]
                 if file_ext not in self.extensions or is_ignored(file_path, self.ignore_patterns):
                     if self.verbosity > 1:
-                        self.stdout.write('ignoring file %s in %s\n' % (filename, dirpath))
+                        self.info('ignoring file %s in %s' % (filename, dirpath))
                 else:
                     locale_dir = None
                     for path in self.locale_paths:
@@ -434,7 +435,7 @@ class Command(BaseCommand):
                     raise CommandError(
                         "errors happened while running msgmerge\n%s" % errors)
                 elif self.verbosity > 0:
-                    self.stdout.write(errors)
+                    self.info(errors)
         else:
             with io.open(potfile, 'r', encoding='utf-8') as fp:
                 msgs = fp.read()
@@ -453,7 +454,7 @@ class Command(BaseCommand):
                     raise CommandError(
                         "errors happened while running msgattrib\n%s" % errors)
                 elif self.verbosity > 0:
-                    self.stdout.write(errors)
+                    self.info(errors)
 
     def copy_plural_forms(self, msgs, locale):
         """
@@ -474,7 +475,7 @@ class Command(BaseCommand):
                 if m:
                     plural_form_line = force_str(m.group('value'))
                     if self.verbosity > 1:
-                        self.stdout.write("copying plural forms: %s\n" % plural_form_line)
+                        self.info("copying plural forms: %s" % plural_form_line)
                     lines = []
                     found = False
                     for line in msgs.split('\n'):

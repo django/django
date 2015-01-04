@@ -1,3 +1,4 @@
+import sys
 import warnings
 
 from collections import OrderedDict
@@ -154,13 +155,12 @@ class Command(BaseCommand):
                         yield obj
 
         try:
-            self.stdout.ending = None
             stream = open(output, 'w') if output else None
             try:
                 serializers.serialize(format, get_objects(), indent=indent,
                         use_natural_foreign_keys=use_natural_foreign_keys,
                         use_natural_primary_keys=use_natural_primary_keys,
-                        stream=stream or self.stdout)
+                        stream=stream or sys.stdout)
             finally:
                 if stream:
                     stream.close()

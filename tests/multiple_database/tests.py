@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 import pickle
 from operator import attrgetter
+import sys
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -1476,14 +1477,24 @@ class AuthTestCase(TestCase):
 
         # Check that dumping the default database doesn't try to include auth
         # because allow_migrate prohibits auth on default
+        orig_stdout = sys.stdout
         new_io = StringIO()
-        management.call_command('dumpdata', 'auth', format='json', database='default', stdout=new_io)
+        try:
+            sys.stdout = new_io
+            management.call_command('dumpdata', 'auth', format='json', database='default')
+        finally:
+            sys.stdout = orig_stdout
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, '[]')
 
         # Check that dumping the other database does include auth
+        orig_stdout = sys.stdout
         new_io = StringIO()
-        management.call_command('dumpdata', 'auth', format='json', database='other', stdout=new_io)
+        try:
+            sys.stdout = new_io
+            management.call_command('dumpdata', 'auth', format='json', database='other')
+        finally:
+            sys.stdout = orig_stdout
         command_output = new_io.getvalue().strip()
         self.assertIn('"email": "alice@example.com"', command_output)
 
@@ -1547,11 +1558,10 @@ class FixtureTestCase(TestCase):
     @override_settings(DATABASE_ROUTERS=[AntiPetRouter()])
     def test_pseudo_empty_fixtures(self):
         "A fixture can contain entries, but lead to nothing in the database; this shouldn't raise an error (ref #14068)"
-        new_io = StringIO()
-        management.call_command('loaddata', 'pets', stdout=new_io, stderr=new_io)
-        command_output = new_io.getvalue().strip()
+        with self.assertLogs('django.commands') as logger:
+            management.call_command('loaddata', 'pets')
         # No objects will actually be loaded
-        self.assertEqual(command_output, "Installed 0 object(s) (of 2) from 1 fixture(s)")
+        self.assertEqual(logger.output[0], "Installed 0 object(s) (of 2) from 1 fixture(s)")
 
 
 class PickleQuerySetTestCase(TestCase):

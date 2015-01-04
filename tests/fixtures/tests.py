@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+import sys
 import warnings
 
 from django.contrib.sites.models import Site
@@ -43,15 +44,23 @@ class DumpDataAssertMixin(object):
                          natural_foreign_keys=False, natural_primary_keys=False,
                          use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = six.StringIO()
-        management.call_command('dumpdata', *args, **{'format': format,
-                                                      'stdout': new_io,
-                                                      'stderr': new_io,
-                                                      'output': filename,
-                                                      'use_natural_foreign_keys': natural_foreign_keys,
-                                                      'use_natural_primary_keys': natural_primary_keys,
-                                                      'use_base_manager': use_base_manager,
-                                                      'exclude': exclude_list,
-                                                      'primary_keys': primary_keys})
+        orig_stdout = sys.stdout
+        orig_stderr = sys.stderr
+        try:
+            sys.stdout = new_io
+            sys.stderr = new_io
+            management.call_command('dumpdata', *args, **{'format': format,
+                                                          # 'stdout': new_io,
+                                                          # 'stderr': new_io,
+                                                          'output': filename,
+                                                          'use_natural_foreign_keys': natural_foreign_keys,
+                                                          'use_natural_primary_keys': natural_primary_keys,
+                                                          'use_base_manager': use_base_manager,
+                                                          'exclude': exclude_list,
+                                                          'primary_keys': primary_keys})
+        finally:
+            sys.stdout = orig_stdout
+            sys.stderr = orig_stderr
         if filename:
             with open(filename, "r") as f:
                 command_output = f.read()
@@ -392,18 +401,17 @@ class NonExistentFixtureTests(TestCase):
     available_apps = ['django.contrib.auth', 'django.contrib.contenttypes']
 
     def test_loaddata_not_existent_fixture_file(self):
-        stdout_output = six.StringIO()
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             # With verbosity=2, we get both stdout output and a warning
-            management.call_command(
-                'loaddata',
-                'this_fixture_doesnt_exist',
-                verbosity=2,
-                stdout=stdout_output,
-            )
+            with self.assertLogs('django.commands') as logger:
+                management.call_command(
+                    'loaddata',
+                    'this_fixture_doesnt_exist',
+                    verbosity=2,
+                )
         self.assertIn("No fixture 'this_fixture_doesnt_exist' in",
-            force_text(stdout_output.getvalue()))
+            force_text(logger.output))
         self.assertEqual(len(w), 1)
         self.assertEqual(force_text(w[0].message),
             "No fixture named 'this_fixture_doesnt_exist' found.")

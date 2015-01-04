@@ -363,7 +363,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
     .. versionadded:: 1.8
 
-    Logs a warning to ``stdout`` by default.
+    Logs a warning to ``stderr`` by default.
 
 .. method:: BaseCommand.error(msg, *args, **kwargs)
 

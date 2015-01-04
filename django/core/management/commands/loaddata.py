@@ -102,7 +102,7 @@ class Command(BaseCommand):
             sequence_sql = connection.ops.sequence_reset_sql(no_style(), self.models)
             if sequence_sql:
                 if self.verbosity >= 2:
-                    self.stdout.write("Resetting sequences\n")
+                    self.info("Resetting sequences")
                 with connection.cursor() as cursor:
                     for line in sequence_sql:
                         cursor.execute(line)
@@ -111,10 +111,10 @@ class Command(BaseCommand):
             if self.fixture_count == 0 and self.hide_empty:
                 pass
             elif self.fixture_object_count == self.loaded_object_count:
-                self.stdout.write("Installed %d object(s) from %d fixture(s)" %
+                self.info("Installed %d object(s) from %d fixture(s)" %
                     (self.loaded_object_count, self.fixture_count))
             else:
-                self.stdout.write("Installed %d object(s) (of %d) from %d fixture(s)" %
+                self.info("Installed %d object(s) (of %d) from %d fixture(s)" %
                     (self.loaded_object_count, self.fixture_object_count, self.fixture_count))
 
     def load_label(self, fixture_label):
@@ -130,7 +130,7 @@ class Command(BaseCommand):
                 objects_in_fixture = 0
                 loaded_objects_in_fixture = 0
                 if self.verbosity >= 2:
-                    self.stdout.write("Installing %s fixture '%s' from %s." %
+                    self.info("Installing %s fixture '%s' from %s." %
                         (ser_fmt, fixture_name, humanize(fixture_dir)))
 
                 objects = serializers.deserialize(ser_fmt, fixture,
@@ -180,7 +180,7 @@ class Command(BaseCommand):
         ser_fmts = serializers.get_public_serializer_formats() if ser_fmt is None else [ser_fmt]
 
         if self.verbosity >= 2:
-            self.stdout.write("Loading '%s' fixtures..." % fixture_name)
+            self.info("Loading '%s' fixtures..." % fixture_name)
 
         if os.path.isabs(fixture_name):
             fixture_dirs = [os.path.dirname(fixture_name)]
@@ -199,7 +199,7 @@ class Command(BaseCommand):
         fixture_files = []
         for fixture_dir in fixture_dirs:
             if self.verbosity >= 2:
-                self.stdout.write("Checking %s for fixtures..." % humanize(fixture_dir))
+                self.info("Checking %s for fixtures..." % humanize(fixture_dir))
             fixture_files_in_dir = []
             for candidate in glob.iglob(os.path.join(fixture_dir, fixture_name + '*')):
                 if os.path.basename(candidate) in targets:
@@ -207,7 +207,7 @@ class Command(BaseCommand):
                     fixture_files_in_dir.append((candidate, fixture_dir, fixture_name))
 
             if self.verbosity >= 2 and not fixture_files_in_dir:
-                self.stdout.write("No fixture '%s' in %s." %
+                self.info("No fixture '%s' in %s." %
                                   (fixture_name, humanize(fixture_dir)))
 
             # Check kept for backwards-compatibility; it isn't clear why

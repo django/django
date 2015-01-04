@@ -427,7 +427,7 @@ class BaseCommand(object):
             if isinstance(e, SystemCheckError):
                 self.error(str(e), no_color=True)
             else:
-                self.stderr.write('%s: %s' % (e.__class__.__name__, e))
+                self.error('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
 
     def execute(self, *args, **options):
@@ -478,10 +478,10 @@ class BaseCommand(object):
                     from django.db import connections, DEFAULT_DB_ALIAS
                     connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
                     if connection.ops.start_transaction_sql():
-                        self.stdout.write(self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()))
-                self.stdout.write(output)
+                        self.info(self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()))
+                self.info(output)
                 if self.output_transaction:
-                    self.stdout.write('\n' + self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()))
+                    self.info('\n' + self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()))
         finally:
             if saved_locale is not None:
                 translation.activate(saved_locale)

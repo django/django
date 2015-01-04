@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import json
 import os
 import re
+import sys
 import warnings
 
 from django.core import serializers
@@ -364,13 +365,17 @@ class TestFixtures(TestCase):
         )
         animal.save()
 
+        orig_stdout = sys.stdout
         out = StringIO()
-        management.call_command(
-            'dumpdata',
-            'fixtures_regress.animal',
-            format='json',
-            stdout=out,
-        )
+        try:
+            sys.stdout = out
+            management.call_command(
+                'dumpdata',
+                'fixtures_regress.animal',
+                format='json',
+            )
+        finally:
+            sys.stdout = orig_stdout
 
         # Output order isn't guaranteed, so check for parts
         data = out.getvalue()
@@ -394,16 +399,20 @@ class TestFixtures(TestCase):
         """
         Regression for #11428 - Proxy models aren't included when you dumpdata
         """
+        orig_stdout = sys.stdout
         out = StringIO()
         # Create an instance of the concrete class
         widget = Widget.objects.create(name='grommet')
-        management.call_command(
-            'dumpdata',
-            'fixtures_regress.widget',
-            'fixtures_regress.widgetproxy',
-            format='json',
-            stdout=out,
-        )
+        try:
+            sys.stdout = out
+            management.call_command(
+                'dumpdata',
+                'fixtures_regress.widget',
+                'fixtures_regress.widgetproxy',
+                format='json',
+            )
+        finally:
+            sys.stdout = orig_stdout
         self.assertJSONEqual(
             out.getvalue(),
             """[{"pk": %d, "model": "fixtures_regress.widget", "fields": {"name": "grommet"}}]"""
@@ -607,18 +616,22 @@ class NaturalKeyFixtureTests(TestCase):
             verbosity=0,
         )
 
+        orig_stdout = sys.stdout
         out = StringIO()
-        management.call_command(
-            'dumpdata',
-            'fixtures_regress.book',
-            'fixtures_regress.person',
-            'fixtures_regress.store',
-            verbosity=0,
-            format='json',
-            use_natural_foreign_keys=True,
-            use_natural_primary_keys=True,
-            stdout=out,
-        )
+        try:
+            sys.stdout = out
+            management.call_command(
+                'dumpdata',
+                'fixtures_regress.book',
+                'fixtures_regress.person',
+                'fixtures_regress.store',
+                verbosity=0,
+                format='json',
+                use_natural_foreign_keys=True,
+                use_natural_primary_keys=True,
+            )
+        finally:
+            sys.stdout = orig_stdout
         self.assertJSONEqual(
             out.getvalue(),
             """[{"fields": {"main": null, "name": "Amazon"}, "model": "fixtures_regress.store"}, {"fields": {"main": null, "name": "Borders"}, "model": "fixtures_regress.store"}, {"fields": {"name": "Neal Stephenson"}, "model": "fixtures_regress.person"}, {"pk": 1, "model": "fixtures_regress.book", "fields": {"stores": [["Amazon"], ["Borders"]], "name": "Cryptonomicon", "author": ["Neal Stephenson"]}}]"""
@@ -853,14 +866,18 @@ class M2MNaturalKeyFixtureTests(TestCase):
         a.b_set.add(b1)
         a.b_set.add(b2)
 
+        orig_stdout = sys.stdout
         out = StringIO()
-        management.call_command(
-            'dumpdata',
-            'fixtures_regress.M2MSimpleA',
-            'fixtures_regress.M2MSimpleB',
-            use_natural_foreign_keys=True,
-            stdout=out,
-        )
+        try:
+            sys.stdout = out
+            management.call_command(
+                'dumpdata',
+                'fixtures_regress.M2MSimpleA',
+                'fixtures_regress.M2MSimpleB',
+                use_natural_foreign_keys=True,
+            )
+        finally:
+            sys.stdout = orig_stdout
 
         for model in [M2MSimpleA, M2MSimpleB]:
             model.objects.all().delete()

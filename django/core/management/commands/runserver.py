@@ -107,7 +107,7 @@ class Command(BaseCommand):
         shutdown_message = options.get('shutdown_message', '')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
-        self.stdout.write("Performing system checks...\n\n")
+        self.info("Performing system checks...\n")
         self.validate(display_num_errors=True)
         try:
             self.check_migrations()
@@ -116,11 +116,11 @@ class Command(BaseCommand):
         now = datetime.now().strftime('%B %d, %Y - %X')
         if six.PY2:
             now = now.decode(get_system_encoding())
-        self.stdout.write((
+        self.info((
             "%(started_at)s\n"
             "Django version %(version)s, using settings %(settings)r\n"
             "Starting development server at http://%(addr)s:%(port)s/\n"
-            "Quit the server with %(quit_command)s.\n"
+            "Quit the server with %(quit_command)s."
         ) % {
             "started_at": now,
             "version": self.get_version(),
@@ -154,7 +154,7 @@ class Command(BaseCommand):
             os._exit(1)
         except KeyboardInterrupt:
             if shutdown_message:
-                self.stdout.write(shutdown_message)
+                self.info(shutdown_message)
             sys.exit(0)
 
     def check_migrations(self):
@@ -165,10 +165,10 @@ class Command(BaseCommand):
         executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
         plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
         if plan:
-            self.stdout.write(self.style.NOTICE(
+            self.info(self.style.NOTICE(
                 "\nYou have unapplied migrations; your app may not work properly until they are applied."
             ))
-            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
+            self.info(self.style.NOTICE("Run 'python manage.py migrate' to apply them."))
 
 # Kept for backward compatibility
 BaseRunserverCommand = Command

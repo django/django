@@ -98,7 +98,7 @@ class Command(BaseCommand):
         """
         for i, (dirpath, f) in enumerate(locations):
             if self.verbosity > 0:
-                self.stdout.write('processing file %s in %s\n' % (f, dirpath))
+                self.info('processing file %s in %s' % (f, dirpath))
             po_path = os.path.join(dirpath, f)
             if has_bom(po_path):
                 raise CommandError("The %s file has a BOM (Byte Order Mark). "
@@ -108,8 +108,8 @@ class Command(BaseCommand):
 
             # Check writability on first location
             if i == 0 and not is_writable(npath(base_path + '.mo')):
-                self.stderr.write("The po files under %s are in a seemingly not writable location. "
-                                  "mo files will not be updated/created." % dirpath)
+                self.error("The po files under %s are in a seemingly not writable location. "
+                           "mo files will not be updated/created." % dirpath)
                 return
 
             args = [self.program] + self.program_options + ['-o',

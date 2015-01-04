@@ -58,14 +58,14 @@ class ExtractorTests(SimpleTestCase):
 
     def _run_makemessages(self, **options):
         os.chdir(self.test_dir)
-        out = StringIO()
-        management.call_command('makemessages', locale=[LOCALE], verbosity=2,
-            stdout=out, **options)
-        output = out.getvalue()
+        with self.assertLogs('django.commands') as logger:
+            management.call_command(
+                'makemessages', locale=[LOCALE], verbosity=2, **options
+            )
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
-        return output, po_contents
+        return logger.output, po_contents
 
     def assertMsgId(self, msgid, s, use_quotes=True):
         q = '"'
@@ -224,19 +224,19 @@ class BasicExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         shutil.copyfile('./not_utf8.sample', './not_utf8.txt')
         self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'not_utf8.txt'))
-        out = StringIO()
-        management.call_command('makemessages', locale=[LOCALE], stdout=out)
+        with self.assertLogs('django.commands') as logger:
+            management.call_command('makemessages', locale=[LOCALE])
         self.assertIn("UnicodeDecodeError: skipped file not_utf8.txt in .",
-                      force_text(out.getvalue()))
+                      force_text(logger.output[0]))
 
     def test_extraction_warning(self):
         """test xgettext warning about multiple bare interpolation placeholders"""
         os.chdir(self.test_dir)
         shutil.copyfile('./code.sample', './code_sample.py')
         self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'code_sample.py'))
-        out = StringIO()
-        management.call_command('makemessages', locale=[LOCALE], stdout=out)
-        self.assertIn("code_sample.py:4", force_text(out.getvalue()))
+        with self.assertLogs('django.commands') as logger:
+            management.call_command('makemessages', locale=[LOCALE])
+        self.assertIn("code_sample.py:4", force_text(logger.output[0]))
 
     def test_template_message_context_extractor(self):
         """
@@ -456,7 +456,7 @@ class IgnoredExtractorTests(ExtractorTests):
         out, po_contents = self._run_makemessages(ignore_patterns=[
             'xxx_*',
         ])
-        self.assertIn("ignoring file xxx_ignored.html", out)
+        self.assertIn("ignoring file xxx_ignored.html in ./templates", out)
         self.assertNotMsgId('This should be ignored too.', po_contents)
 
     @override_settings(
@@ -664,26 +664,29 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
             execute_from_command_line(['django-admin', 'help', 'makemessages'])
 
     def test_one_locale_excluded(self):
-        management.call_command('makemessages', exclude=['it'], stdout=StringIO())
+        with self.assertLogs('django.commands'):
+            management.call_command('makemessages', exclude=['it'])
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')
 
     def test_multiple_locales_excluded(self):
-        management.call_command('makemessages', exclude=['it', 'fr'], stdout=StringIO())
+        with self.assertLogs('django.commands'):
+            management.call_command('makemessages', exclude=['it', 'fr'])
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertNotRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')
 
     def test_one_locale_excluded_with_locale(self):
-        management.call_command('makemessages', locale=['en', 'fr'], exclude=['fr'], stdout=StringIO())
+        with self.assertLogs('django.commands'):
+            management.call_command('makemessages', locale=['en', 'fr'], exclude=['fr'])
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertNotRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')
 
     def test_multiple_locales_excluded_with_locale(self):
-        management.call_command('makemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'],
-                                stdout=StringIO())
+        with self.assertLogs('django.commands'):
+            management.call_command('makemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'])
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertNotRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')

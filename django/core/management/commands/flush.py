@@ -93,7 +93,7 @@ Are you sure you want to do this?
                     app_options['app_label'] = app_label
                     call_command('loaddata', 'initial_data', **app_options)
         else:
-            self.stdout.write("Flush cancelled.\n")
+            self.info("Flush cancelled.")
 
     @staticmethod
     def emit_post_migrate(verbosity, interactive, database):

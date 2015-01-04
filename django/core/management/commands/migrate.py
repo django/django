@@ -202,14 +202,14 @@ class Command(BaseCommand):
     def migration_progress_callback(self, action, migration, fake=False):
         if self.verbosity >= 1:
             if action == "apply_start":
-                self.info(("  Applying %s..." % migration).rstrip('\n'))
+                self.info("  Applying %s..." % migration)
             elif action == "apply_success":
                 if fake:
                     self.info(self.style.MIGRATE_SUCCESS(" FAKED"))
                 else:
                     self.info(self.style.MIGRATE_SUCCESS(" OK"))
             elif action == "unapply_start":
-                self.info(("  Unapplying %s..." % migration).rstrip('\n'))
+                self.info("  Unapplying %s..." % migration)
             elif action == "unapply_success":
                 if fake:
                     self.info(self.style.MIGRATE_SUCCESS(" FAKED"))
@@ -250,7 +250,7 @@ class Command(BaseCommand):
 
             # Create the tables for each model
             if self.verbosity >= 1:
-                self.info("  Creating tables...\n")
+                self.info("  Creating tables...")
             with transaction.atomic(using=connection.alias, savepoint=connection.features.can_rollback_ddl):
                 deferred_sql = []
                 for app_name, model_list in manifest.items():
@@ -259,18 +259,18 @@ class Command(BaseCommand):
                             continue
                         if self.verbosity >= 3:
                             self.info(
-                                "    Processing %s.%s model\n" % (app_name, model._meta.object_name)
+                                "    Processing %s.%s model" % (app_name, model._meta.object_name)
                             )
                         with connection.schema_editor() as editor:
                             if self.verbosity >= 1:
-                                self.info("    Creating table %s\n" % model._meta.db_table)
+                                self.info("    Creating table %s" % model._meta.db_table)
                             editor.create_model(model)
                             deferred_sql.extend(editor.deferred_sql)
                             editor.deferred_sql = []
                         created_models.add(model)
 
                 if self.verbosity >= 1:
-                    self.info("    Running deferred SQL...\n")
+                    self.info("    Running deferred SQL...")
                 for statement in deferred_sql:
                     cursor.execute(statement)
         finally:
@@ -282,7 +282,7 @@ class Command(BaseCommand):
             # Install custom SQL for the app (but only if this
             # is a model we've just created)
             if self.verbosity >= 1:
-                self.info("  Installing custom SQL...\n")
+                self.info("  Installing custom SQL...")
             for app_name, model_list in manifest.items():
                 for model in model_list:
                     if model in created_models:
@@ -290,7 +290,7 @@ class Command(BaseCommand):
                         if custom_sql:
                             if self.verbosity >= 2:
                                 self.info(
-                                    "    Installing custom SQL for %s.%s model\n" %
+                                    "    Installing custom SQL for %s.%s model" %
                                     (app_name, model._meta.object_name)
                                 )
                             try:
@@ -298,8 +298,8 @@ class Command(BaseCommand):
                                     for sql in custom_sql:
                                         cursor.execute(sql)
                             except Exception as e:
-                                self.stderr.write(
-                                    "    Failed to install custom SQL for %s.%s model: %s\n"
+                                self.error(
+                                    "    Failed to install custom SQL for %s.%s model: %s"
                                     % (app_name, model._meta.object_name, e)
                                 )
                                 if self.show_traceback:
@@ -307,7 +307,7 @@ class Command(BaseCommand):
                         else:
                             if self.verbosity >= 3:
                                 self.info(
-                                    "    No custom SQL for %s.%s model\n" %
+                                    "    No custom SQL for %s.%s model" %
                                     (app_name, model._meta.object_name)
                                 )
         finally:

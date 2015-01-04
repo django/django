@@ -915,10 +915,10 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self._perform_cull_test(caches['zero_cull'], 50, 18)
 
     def test_second_call_doesnt_crash(self):
-        out = six.StringIO()
-        management.call_command('createcachetable', stdout=out)
-        self.assertEqual(out.getvalue(),
-            "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
+        with self.assertLogs('django.commands') as logger:
+            management.call_command('createcachetable', verbosity=2)
+        self.assertEqual('\n'.join(logger.output),
+            '\n'.join(["Cache table 'test cache table' already exists."] * len(settings.CACHES)))
 
     def test_createcachetable_with_table_argument(self):
         """
@@ -926,15 +926,14 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         specifying the table name).
         """
         self.drop_table()
-        out = six.StringIO()
-        management.call_command(
-            'createcachetable',
-            'test cache table',
-            verbosity=2,
-            stdout=out,
-        )
-        self.assertEqual(out.getvalue(),
-            "Cache table 'test cache table' created.\n")
+        with self.assertLogs('django.commands') as logger:
+            management.call_command(
+                'createcachetable',
+                'test cache table',
+                verbosity=2,
+            )
+        self.assertEqual(logger.output[0],
+            "Cache table 'test cache table' created.")
 
     def test_clear_commits_transaction(self):
         # Ensure the database transaction is committed (#19896)

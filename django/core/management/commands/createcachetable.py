@@ -42,7 +42,7 @@ class Command(BaseCommand):
 
         if tablename in connection.introspection.table_names():
             if self.verbosity > 0:
-                self.stdout.write("Cache table '%s' already exists." % tablename)
+                self.info("Cache table '%s' already exists." % tablename)
             return
 
         fields = (
@@ -85,4 +85,4 @@ class Command(BaseCommand):
                     curs.execute(statement)
 
         if self.verbosity > 1:
-            self.stdout.write("Cache table '%s' created." % tablename)
+            self.info("Cache table '%s' created." % tablename)

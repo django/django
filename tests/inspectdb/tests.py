@@ -15,28 +15,25 @@ from .models import ColumnTypes
 class InspectDBTestCase(TestCase):
 
     def test_stealth_table_name_filter_option(self):
-        out = StringIO()
         # Lets limit the introspection to tables created for models of this
         # application
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
-                     stdout=out)
+        with self.assertLogs('django.commands') as logger:
+            call_command('inspectdb',
+                         table_name_filter=lambda tn: tn.startswith('inspectdb_'))
         error_message = "inspectdb has examined a table that should have been filtered out."
         # contrib.contenttypes is one of the apps always installed when running
         # the Django test suite, check that one of its tables hasn't been
         # inspected
-        self.assertNotIn("class DjangoContentType(models.Model):", out.getvalue(), msg=error_message)
+        self.assertNotIn("class DjangoContentType(models.Model):", logger.output[0], msg=error_message)
 
     def make_field_type_asserter(self):
         """Call inspectdb and return a function to validate a field type in its output"""
-        out = StringIO()
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
-                     stdout=out)
-        output = out.getvalue()
+        with self.assertLogs('django.commands') as logger:
+            call_command('inspectdb',
+                          table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'))
 
         def assertFieldType(name, definition):
-            out_def = re.search(r'^\s*%s = (models.*)$' % name, output, re.MULTILINE).groups()[0]
+            out_def = re.search(r'^\s*%s = (models.*)$' % name, '\n'.join(logger.output), re.MULTILINE).groups()[0]
             self.assertEqual(definition, out_def)
 
         return assertFieldType
@@ -137,13 +134,12 @@ class InspectDBTestCase(TestCase):
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_attribute_name_not_python_keyword(self):
-        out = StringIO()
         # Lets limit the introspection to tables created for models of this
         # application
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
-                     stdout=out)
-        output = out.getvalue()
+        with self.assertLogs('django.commands') as logger:
+            call_command('inspectdb',
+                         table_name_filter=lambda tn: tn.startswith('inspectdb_'))
+        output = '\n'.join(logger.output)
         error_message = "inspectdb generated an attribute name which is a python keyword"
         # Recursive foreign keys should be set to 'self'
         self.assertIn("parent = models.ForeignKey('self')", output)
@@ -158,13 +154,12 @@ class InspectDBTestCase(TestCase):
 
     def test_digits_column_name_introspection(self):
         """Introspection of column names consist/start with digits (#16536/#17676)"""
-        out = StringIO()
         # Lets limit the introspection to tables created for models of this
         # application
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
-                     stdout=out)
-        output = out.getvalue()
+        with self.assertLogs('django.commands') as logger:
+            call_command('inspectdb',
+                         table_name_filter=lambda tn: tn.startswith('inspectdb_'))
+        output = '\n'.join(logger.output)
         error_message = "inspectdb generated a model field name which is a number"
         self.assertNotIn("    123 = models.CharField", output, msg=error_message)
         self.assertIn("number_123 = models.CharField", output)
@@ -181,11 +176,10 @@ class InspectDBTestCase(TestCase):
         Introspection of column names containing special characters,
         unsuitable for Python identifiers
         """
-        out = StringIO()
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
-                     stdout=out)
-        output = out.getvalue()
+        with self.assertLogs('django.commands') as logger:
+            call_command('inspectdb',
+                         table_name_filter=lambda tn: tn.startswith('inspectdb_'))
+        output = '\n'.join(logger.output)
         base_name = 'Field' if not connection.features.uppercases_column_names else 'field'
         self.assertIn("field = models.IntegerField()", output)
         self.assertIn("field_field = models.IntegerField(db_column='%s_')" % base_name, output)
@@ -203,29 +197,26 @@ class InspectDBTestCase(TestCase):
         Introspection of table names containing special characters,
         unsuitable for Python identifiers
         """
-        out = StringIO()
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
-                     stdout=out)
-        output = out.getvalue()
+        with self.assertLogs('django.commands') as logger:
+            call_command('inspectdb',
+                         table_name_filter=lambda tn: tn.startswith('inspectdb_'))
+        output = '\n'.join(logger.output)
         self.assertIn("class InspectdbSpecialTableName(models.Model):", output)
 
     def test_managed_models(self):
         """Test that by default the command generates models with `Meta.managed = False` (#14305)"""
-        out = StringIO()
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
-                     stdout=out)
-        output = out.getvalue()
+        with self.assertLogs('django.commands') as logger:
+            call_command('inspectdb',
+                         table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'))
+        output = '\n'.join(logger.output)
         self.longMessage = False
         self.assertIn("        managed = False", output, msg='inspectdb should generate unmanaged models.')
 
     def test_unique_together_meta(self):
-        out = StringIO()
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_uniquetogether'),
-                     stdout=out)
-        output = out.getvalue()
+        with self.assertLogs('django.commands') as logger:
+            call_command('inspectdb',
+                         table_name_filter=lambda tn: tn.startswith('inspectdb_uniquetogether'))
+        output = '\n'.join(logger.output)
         self.assertIn("        unique_together = (('field1', 'field2'),)", output, msg='inspectdb should generate unique_together.')
 
     @skipUnless(connection.vendor == 'sqlite',
@@ -234,17 +225,16 @@ class InspectDBTestCase(TestCase):
         """
         Introspection of columns with a custom field (#21090)
         """
-        out = StringIO()
         orig_data_types_reverse = connection.introspection.data_types_reverse
         try:
             connection.introspection.data_types_reverse = {
                 'text': 'myfields.TextField',
                 'bigint': 'BigIntegerField',
             }
-            call_command('inspectdb',
-                         table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
-                         stdout=out)
-            output = out.getvalue()
+            with self.assertLogs('django.commands') as logger:
+                call_command('inspectdb',
+                             table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'))
+            output = '\n'.join(logger.output)
             self.assertIn("text_field = myfields.TextField()", output)
             self.assertIn("big_int_field = models.BigIntegerField()", output)
         finally:

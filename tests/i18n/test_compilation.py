@@ -47,20 +47,20 @@ class PoFileTests(MessageCompilationTests):
 
     def test_bom_rejection(self):
         with self.assertRaises(CommandError) as cm:
-            call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+            with self.assertLogs('django.commands'):
+                call_command('compilemessages', locale=[self.LOCALE])
         self.assertIn("file has a BOM (Byte Order Mark)", cm.exception.args[0])
         self.assertFalse(os.path.exists(self.MO_FILE))
 
     def test_no_write_access(self):
         mo_file_en = 'locale/en/LC_MESSAGES/django.mo'
-        err_buffer = StringIO()
         # put file in read-only mode
         old_mode = os.stat(mo_file_en).st_mode
         os.chmod(mo_file_en, stat.S_IREAD)
         try:
-            call_command('compilemessages', locale=['en'], stderr=err_buffer, verbosity=0)
-            err = err_buffer.getvalue()
-            self.assertIn("not writable location", err)
+            with self.assertLogs('django.commands', level='WARNING') as logger:
+                call_command('compilemessages', locale=['en'], verbosity=0)
+            self.assertIn("not writable location", logger.output[0])
         finally:
             os.chmod(mo_file_en, old_mode)
 
@@ -76,7 +76,8 @@ class PoFileContentsTests(MessageCompilationTests):
         self.addCleanup(os.unlink, os.path.join(self.test_dir, self.MO_FILE))
 
     def test_percent_symbol_in_po_file(self):
-        call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+        with self.assertLogs('django.commands'):
+            call_command('compilemessages', locale=[self.LOCALE])
         self.assertTrue(os.path.exists(self.MO_FILE))
 
 
@@ -94,7 +95,8 @@ class PercentRenderingTests(MessageCompilationTests):
     def test_percent_symbol_escaping(self):
         with override_settings(LOCALE_PATHS=(os.path.join(self.test_dir, 'locale'),)):
             from django.template import Template, Context
-            call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+            with self.assertLogs('django.commands'):
+                call_command('compilemessages', locale=[self.LOCALE])
             with translation.override(self.LOCALE):
                 t = Template('{% load i18n %}{% trans "Looks like a str fmt spec %% o but shouldn\'t be interpreted as such" %}')
                 rendered = t.render(Context({}))
@@ -120,13 +122,15 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
 
     def test_one_locale(self):
         with override_settings(LOCALE_PATHS=(os.path.join(self.test_dir, 'locale'),)):
-            call_command('compilemessages', locale=['hr'], stdout=StringIO())
+            with self.assertLogs('django.commands'):
+                call_command('compilemessages', locale=['hr'])
 
             self.assertTrue(os.path.exists(self.MO_FILE_HR))
 
     def test_multiple_locales(self):
         with override_settings(LOCALE_PATHS=(os.path.join(self.test_dir, 'locale'),)):
-            call_command('compilemessages', locale=['hr', 'fr'], stdout=StringIO())
+            with self.assertLogs('django.commands'):
+                call_command('compilemessages', locale=['hr', 'fr'])
 
             self.assertTrue(os.path.exists(self.MO_FILE_HR))
             self.assertTrue(os.path.exists(self.MO_FILE_FR))
@@ -152,26 +156,29 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
             execute_from_command_line(['django-admin', 'help', 'compilemessages'])
 
     def test_one_locale_excluded(self):
-        call_command('compilemessages', exclude=['it'], stdout=StringIO())
+        with self.assertLogs('django.commands'):
+            call_command('compilemessages', exclude=['it'])
         self.assertTrue(os.path.exists(self.MO_FILE % 'en'))
         self.assertTrue(os.path.exists(self.MO_FILE % 'fr'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
 
     def test_multiple_locales_excluded(self):
-        call_command('compilemessages', exclude=['it', 'fr'], stdout=StringIO())
+        with self.assertLogs('django.commands'):
+            call_command('compilemessages', exclude=['it', 'fr'])
         self.assertTrue(os.path.exists(self.MO_FILE % 'en'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'fr'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
 
     def test_one_locale_excluded_with_locale(self):
-        call_command('compilemessages', locale=['en', 'fr'], exclude=['fr'], stdout=StringIO())
+        with self.assertLogs('django.commands'):
+            call_command('compilemessages', locale=['en', 'fr'], exclude=['fr'])
         self.assertTrue(os.path.exists(self.MO_FILE % 'en'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'fr'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
 
     def test_multiple_locales_excluded_with_locale(self):
-        call_command('compilemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'],
-                     stdout=StringIO())
+        with self.assertLogs('django.commands'):
+            call_command('compilemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'])
         self.assertTrue(os.path.exists(self.MO_FILE % 'en'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'fr'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
@@ -188,7 +195,8 @@ class CompilationErrorHandling(MessageCompilationTests):
 
     def test_error_reported_by_msgfmt(self):
         with self.assertRaises(CommandError):
-            call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+            with self.assertLogs('django.commands'):
+                call_command('compilemessages', locale=[self.LOCALE])
 
 
 class FuzzyTranslationTest(MessageCompilationTests):
@@ -203,14 +211,16 @@ class FuzzyTranslationTest(MessageCompilationTests):
 
     def test_nofuzzy_compiling(self):
         with override_settings(LOCALE_PATHS=(os.path.join(self.test_dir, 'locale'),)):
-            call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+            with self.assertLogs('django.commands'):
+                call_command('compilemessages', locale=[self.LOCALE])
             with translation.override(self.LOCALE):
                 self.assertEqual(ugettext('Lenin'), force_text('Ленин'))
                 self.assertEqual(ugettext('Vodka'), force_text('Vodka'))
 
     def test_fuzzy_compiling(self):
         with override_settings(LOCALE_PATHS=(os.path.join(self.test_dir, 'locale'),)):
-            call_command('compilemessages', locale=[self.LOCALE], fuzzy=True, stdout=StringIO())
+            with self.assertLogs('django.commands'):
+                call_command('compilemessages', locale=[self.LOCALE], fuzzy=True)
             with translation.override(self.LOCALE):
                 self.assertEqual(ugettext('Lenin'), force_text('Ленин'))
                 self.assertEqual(ugettext('Vodka'), force_text('Водка'))

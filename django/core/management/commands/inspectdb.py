@@ -23,7 +23,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         try:
             for line in self.handle_inspection(options):
-                self.stdout.write("%s\n" % line)
+                self.info(line)
         except NotImplementedError:
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
