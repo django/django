@@ -17,3 +17,6 @@ Bugfixes
   affect users who have subclassed
   ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
   default value.
+
+* Fixed a crash in the CSRF middleware when handling non-ASCII referer header
+  (:ticket:`23815`).
