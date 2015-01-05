@@ -1385,6 +1385,14 @@ of ``Field.rel``.  The latter is an instance of
 module has been removed and the ``Field.related`` attribute will be removed in
 Django 2.0.
 
+``ssi`` template tag
+~~~~~~~~~~~~~~~~~~~~
+
+The :ttag:`ssi` template tag allows files to be included in a template by
+absolute path. This is of limited use in most deployment situations, and
+the :ttag:`include` tag often makes more sense. This tag is now deprecated and
+will be removed in Django 2.0.
+
 .. removed-features-1.8:
 
 Features removed in 1.8

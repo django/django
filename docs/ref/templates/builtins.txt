@@ -705,8 +705,6 @@ available to the included template::
     been evaluated and rendered* - not blocks that can be overridden by, for
     example, an extending template.
 
-See also: :ttag:`{% ssi %}<ssi>`.
-
 .. templatetag:: load
 
 load
@@ -978,6 +976,11 @@ this example, the space around ``Hello`` won't be stripped::
 
 ssi
 ^^^
+
+.. deprecated:: 1.8
+
+    This tag has been deprecated and will be removed in Django 2.0. Use the
+    :ttag:`include` tag instead.
 
 Outputs the contents of a given file into the page.
 
