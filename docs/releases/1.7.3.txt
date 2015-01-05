@@ -11,4 +11,9 @@ Django 1.7.3 fixes several bugs in 1.7.2.
 Bugfixes
 ========
 
-* ...
+* The default iteration count for the PBKDF2 password hasher has been
+  increased by 25%. This part of the normal major release process was
+  inadvertently omitted in 1.7. This backwards compatible change will not
+  affect users who have subclassed
+  ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
+  default value.
