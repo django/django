@@ -148,7 +148,11 @@ class CsrfViewMiddleware(object):
                 # Barth et al. found that the Referer header is missing for
                 # same-domain requests in only about 0.2% of cases or less, so
                 # we can use strict Referer checking.
-                referer = request.META.get('HTTP_REFERER')
+                referer = force_text(
+                    request.META.get('HTTP_REFERER'),
+                    strings_only=True,
+                    errors='replace'
+                )
                 if referer is None:
                     return self._reject(request, REASON_NO_REFERER)
 

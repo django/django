@@ -300,6 +300,11 @@ class CsrfViewMiddlewareTest(TestCase):
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertNotEqual(None, req2)
         self.assertEqual(403, req2.status_code)
+        # Non-ASCII
+        req.META['HTTP_REFERER'] = b'\xd8B\xf6I\xdf'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertNotEqual(None, req2)
+        self.assertEqual(403, req2.status_code)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer(self):
