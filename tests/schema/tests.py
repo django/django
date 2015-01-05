@@ -424,7 +424,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Note,
-                Note._meta.get_field_by_name("info")[0],
+                Note._meta.get_field("info"),
                 new_field,
                 strict=True,
             )
