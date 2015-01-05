@@ -291,8 +291,7 @@ class SilencingCheckTests(TestCase):
         self.assertEqual(err.getvalue(), '')
 
 
-class CheckFrameworkReservedNamesTests(TestCase):
-
+class IsolateModelsMixin(object):
     def setUp(self):
         self.current_models = apps.all_models[__package__]
         self.saved_models = set(self.current_models)
@@ -302,6 +301,8 @@ class CheckFrameworkReservedNamesTests(TestCase):
             del self.current_models[model]
         apps.clear_cache()
 
+
+class CheckFrameworkReservedNamesTests(IsolateModelsMixin, TestCase):
     @override_settings(
         SILENCED_SYSTEM_CHECKS=['models.E20', 'fields.W342'],  # ForeignKey(unique=True)
         INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'check_framework']
