@@ -1,0 +1,14 @@
+===========================
+Django 1.4.18 release notes
+===========================
+
+*Under development*
+
+Django 1.4.18 fixes a regression on Python 2.5 in the 1.4.17 release.
+
+Bugfixes
+========
+
+* To maintain compatibility with Python 2.5, Django's vendored version of six,
+  :mod:`django.utils.six`, has been downgraded to 1.8.0 which is the last
+  version to support Python 2.5.
