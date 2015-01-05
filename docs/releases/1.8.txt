@@ -1009,6 +1009,11 @@ Miscellaneous
   different in some cases. There is no change to default values which are the
   result of a callable.
 
+* ``GenericIPAddressField.empty_strings_allowed`` is now ``False``. Database
+  backends that interpet empty strings as null (only Oracle among the backends
+  that Django includes) will no longer convert null values back to an empty
+  string. This is consistent with other backends.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8

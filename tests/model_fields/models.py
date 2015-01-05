@@ -176,6 +176,10 @@ class VerboseNameField(models.Model):
     field22 = models.URLField("verbose field22")
 
 
+class GenericIPAddress(models.Model):
+    ip = models.GenericIPAddressField(null=True, protocol='ipv4')
+
+
 ###############################################################################
 # These models aren't used in any test, just here to ensure they validate
 # successfully.

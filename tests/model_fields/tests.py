@@ -22,11 +22,11 @@ from django.utils import six
 from django.utils.functional import lazy
 
 from .models import (
-    Foo, Bar, Whiz, BigD, BigS, BigIntegerModel, Post, NullBooleanModel,
-    BooleanModel, PrimaryKeyCharModel, DataModel, Document, RenamedField,
-    DateTimeModel, VerboseNameField, FksToBooleans, FkToChar, FloatModel,
-    SmallIntegerModel, IntegerModel, PositiveSmallIntegerModel, PositiveIntegerModel,
-    WhizIter, WhizIterEmpty)
+    Bar, BigD, BigIntegerModel, BigS, BooleanModel, DataModel, DateTimeModel,
+    Document, FksToBooleans, FkToChar, FloatModel, Foo, GenericIPAddress,
+    IntegerModel, NullBooleanModel, PositiveIntegerModel, PositiveSmallIntegerModel,
+    Post, PrimaryKeyCharModel, RenamedField, SmallIntegerModel, VerboseNameField,
+    Whiz, WhizIter, WhizIterEmpty)
 
 
 class BasicFieldTests(test.TestCase):
@@ -687,6 +687,14 @@ class GenericIPAddressFieldTests(test.TestCase):
         model_field = models.GenericIPAddressField(protocol='IPv6')
         form_field = model_field.formfield()
         self.assertRaises(ValidationError, form_field.clean, '127.0.0.1')
+
+    def test_null_value(self):
+        """
+        Null values should be resolved to None in Python (#24078).
+        """
+        GenericIPAddress.objects.create()
+        o = GenericIPAddress.objects.get()
+        self.assertIsNone(o.ip)
 
 
 class PromiseTest(test.TestCase):

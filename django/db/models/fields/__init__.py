@@ -1910,7 +1910,7 @@ class IPAddressField(Field):
 
 
 class GenericIPAddressField(Field):
-    empty_strings_allowed = True
+    empty_strings_allowed = False
     description = _("IP address")
     default_error_messages = {}
 
