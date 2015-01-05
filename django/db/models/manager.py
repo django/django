@@ -92,7 +92,7 @@ class BaseManager(object):
         Raises a ValueError if the manager is dynamically generated.
         """
         qs_class = self._queryset_class
-        if getattr(self, '_built_as_manager', False):
+        if getattr(self, '_built_with_as_manager', False):
             # using MyQuerySet.as_manager()
             return (
                 True,  # as_manager
