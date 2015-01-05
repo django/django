@@ -442,6 +442,8 @@ class FileResponse(StreamingHttpResponse):
         if hasattr(value, 'read'):
             self.file_to_stream = value
             filelike = value
+            if hasattr(filelike, 'close'):
+                self._closable_objects.append(filelike)
             value = iter(lambda: filelike.read(self.block_size), b'')
         else:
             self.file_to_stream = None
