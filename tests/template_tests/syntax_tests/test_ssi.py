@@ -1,11 +1,12 @@
 import os
 
 from django.test import ignore_warnings, SimpleTestCase
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 
 from ..utils import ROOT, setup
 
 
+@ignore_warnings(category=RemovedInDjango20Warning)
 class SsiTagTests(SimpleTestCase):
 
     # Test normal behavior
