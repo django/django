@@ -125,6 +125,8 @@ details on these changes.
 
 * The ``--list`` option of the ``migrate`` management command will be removed.
 
+* The ``ssi`` template tag will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

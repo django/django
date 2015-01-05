@@ -13,7 +13,8 @@ from django.template import (base as template_base, loader,
 from django.template.engine import Engine
 from django.template.loaders import app_directories, filesystem
 from django.test import RequestFactory, SimpleTestCase
-from django.test.utils import override_settings, extend_sys_path
+from django.test.utils import extend_sys_path, ignore_warnings, override_settings
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils._os import upath
 
 
@@ -501,6 +502,7 @@ class RequestContextTests(unittest.TestCase):
             RequestContext(request, dict_=test_data, engine=engine))
 
 
+@ignore_warnings(category=RemovedInDjango20Warning)
 class SSITests(SimpleTestCase):
     def setUp(self):
         self.this_dir = os.path.dirname(os.path.abspath(upath(__file__)))
