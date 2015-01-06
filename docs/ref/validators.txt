@@ -165,11 +165,37 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         The optional ``schemes`` attribute was added.
 
+``DomainNameValidator``
+-----------------------
+
+.. class:: DomainNameValidator([accept_idna=True])
+
+    .. versionadded:: 1.8
+
+    A :class:`RegexValidator` that ensures a value looks like a domain name,
+    and raises an error code of ``'invalid'`` if it doesn't. In addition to the
+    optional arguments of its parent :class:`RegexValidator` class,
+    ``DomainNameValidator`` accepts an extra optional attribute:
+
+    .. attribute:: accept_idna
+
+        Encodes IDNA domain names. The default value is ``True``. If set to
+        ``False``, raises a :exc:`~django.core.exceptions.ValidationError` for
+        IDNA domain names.
+
 ``validate_email``
 ------------------
 .. data:: validate_email
 
     An :class:`EmailValidator` instance without any customizations.
+
+``validate_domain_name``
+------------------------
+.. data:: validate_domain_name
+
+    .. versionadded:: 1.8
+
+    A :class:`DomainNameValidator` instance without any customizations.
 
 ``validate_slug``
 -----------------
