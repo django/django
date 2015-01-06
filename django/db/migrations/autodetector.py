@@ -689,7 +689,6 @@ class MigrationAutodetector(object):
                 related_object_app_label = related_object.related_model._meta.app_label
                 object_name = related_object.related_model._meta.object_name
                 field_name = related_object.field.name
-
                 dependencies.append((related_object_app_label, object_name, field_name, False))
                 if not related_object.many_to_many:
                     dependencies.append((related_object_app_label, object_name, field_name, "alter"))

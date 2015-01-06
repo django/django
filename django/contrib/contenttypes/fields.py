@@ -45,7 +45,6 @@ class GenericForeignKey(object):
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
         self.model = cls
-
         self.cache_attr = "_%s_cache" % name
         cls._meta.add_field(self, virtual=True)
 

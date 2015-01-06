@@ -302,8 +302,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             class Meta:
                 abstract = True
 
-        # Calling include_related=False because, as this is an invalid model
-        # a relation to AbstractModel will not be found.
         field = Model._meta.get_field('foreign_key')
         errors = field.check()
         expected = [
@@ -325,8 +323,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         class Model(models.Model):
             m2m = models.ManyToManyField('AbstractModel')
 
-        # Calling include_related=False because, as this is an invalid model
-        # a relation to AbstractModel will not be found.
         field = Model._meta.get_field('m2m')
         errors = field.check(from_model=Model)
         expected = [

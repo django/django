@@ -2456,8 +2456,8 @@ class ManyToManyField(RelatedField):
         else:
             link_field_name = None
         for f in self.rel.through._meta.fields:
-            if f.is_relation and f.rel.to == related.related_model and \
-                    (link_field_name is None or link_field_name == f.name):
+            if (f.is_relation and f.rel.to == related.related_model and
+                    (link_field_name is None or link_field_name == f.name)):
                 setattr(self, cache_attr, getattr(f, attr))
                 return getattr(self, cache_attr)
 
