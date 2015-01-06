@@ -10,8 +10,8 @@ from unittest import skipIf
 from django.conf import settings
 from django.core import mail
 from django.http import (
-    HttpRequest, HttpResponse, StreamingHttpResponse, HttpResponsePermanentRedirect,
-    HttpResponseRedirect,
+    HttpRequest, HttpResponse, StreamingHttpResponse, FileResponse,
+    HttpResponseRedirect, HttpResponsePermanentRedirect,
 )
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
@@ -623,6 +623,20 @@ class GZipMiddlewareTest(TestCase):
         self.assertEqual(self.decompress(b''.join(r)), b''.join(self.sequence))
         self.assertEqual(r.get('Content-Encoding'), 'gzip')
         self.assertFalse(r.has_header('Content-Length'))
+
+    def test_compress_file_response(self):
+        """
+        Tests that compression is performed on FileResponse.
+        """
+        open_file = lambda: open(__file__, 'rb')
+        with open_file() as file1:
+            file_resp = FileResponse(file1)
+            file_resp['Content-Type'] = 'text/html; charset=UTF-8'
+            r = GZipMiddleware().process_response(self.req, file_resp)
+            with open_file() as file2:
+                self.assertEqual(self.decompress(b''.join(r)), file2.read())
+            self.assertEqual(r.get('Content-Encoding'), 'gzip')
+            self.assertIsNot(r.file_to_stream, file1)
 
     def test_compress_non_200_response(self):
         """
