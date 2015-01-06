@@ -45,5 +45,11 @@ class Template(object):
             if request is None:
                 context = Context(context)
             else:
-                context = RequestContext(request, context)
+                # The following pattern is required to ensure values from
+                # context override those from template context processors.
+                original_context = context
+                context = RequestContext(request)
+                if original_context:
+                    context.push(original_context)
+
         return self.template.render(context)
