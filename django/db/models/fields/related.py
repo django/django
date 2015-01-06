@@ -1264,10 +1264,11 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
 
 class ForeignObjectRel(object):
+    # Field flags
     auto_created = True
-    is_relation = True
-    editable = False
     concrete = False
+    editable = False
+    is_relation = True
 
     def __init__(self, field, to, related_name=None, limit_choices_to=None,
                  parent_link=False, on_delete=None, related_query_name=None):
