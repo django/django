@@ -8,7 +8,6 @@ import warnings
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
-from django.db.models.fields.related import ManyToManyField
 from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
@@ -584,7 +583,7 @@ class Options(object):
             include_parents=include_parents,
             include_hidden=include_hidden,
         )
-        fields = (obj for obj in fields if not isinstance(obj.field, ManyToManyField))
+        fields = (obj for obj in fields if not obj.many_to_many)
 
         if include_proxy_eq:
             children = chain.from_iterable(c._relation_tree
@@ -612,12 +611,12 @@ class Options(object):
             forward=False, reverse=True,
             include_parents=local_only is not True, include_hidden=True
         )
-        return [obj for obj in fields if isinstance(obj.field, ManyToManyField)]
+        return [obj for obj in fields if obj.many_to_many]
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_m2m_objects_with_model(self):
         fields = self._get_fields(forward=False, reverse=True, include_hidden=True)
-        return [self._map_model(obj) for obj in fields if isinstance(obj.field, ManyToManyField)]
+        return [self._map_model(obj) for obj in fields if obj.many_to_many]
 
     def get_base_chain(self, model):
         """
