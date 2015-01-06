@@ -310,6 +310,7 @@ class AllFieldsModel(models.Model):
     date = models.DateField()
     datetime = models.DateTimeField()
     decimal = models.DecimalField(decimal_places=2, max_digits=2)
+    duration = models.DurationField()
     email = models.EmailField()
     file_path = models.FilePathField()
     floatf = models.FloatField()
@@ -343,7 +344,6 @@ class AllFieldsModel(models.Model):
     content_type = models.ForeignKey(ContentType)
     gfk = GenericForeignKey()
     gr = GenericRelation(DataModel)
-    duration = models.DurationField()
 
 
 ###############################################################################
