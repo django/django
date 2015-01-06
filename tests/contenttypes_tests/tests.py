@@ -99,7 +99,7 @@ class IsolatedModelsTestCase(TestCase):
     def tearDown(self):
         apps.app_configs['contenttypes_tests'].models = self._old_models
         apps.all_models['contenttypes_tests'] = self._old_models
-        apps.clear_cache(expire_models_cache=True)
+        apps.clear_cache()
 
 
 @override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)

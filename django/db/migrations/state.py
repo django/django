@@ -201,7 +201,7 @@ class StateApps(Apps):
             self.app_configs[app_label] = AppConfigStub(app_label)
             self.app_configs[app_label].models = OrderedDict()
         self.app_configs[app_label].models[model._meta.model_name] = model
-        self.clear_cache(True)
+        self.clear_cache()
 
     def unregister_model(self, app_label, model_name):
         try:
@@ -209,7 +209,7 @@ class StateApps(Apps):
             del self.app_configs[app_label].models[model_name]
         except KeyError:
             pass
-        self.clear_cache(True)
+        self.clear_cache()
 
 
 class ModelState(object):
