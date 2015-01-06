@@ -39,7 +39,7 @@ class GenericForeignKey(object):
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
         self.editable = False
-        self.rel = True
+        self.rel = None
         self.column = None
 
     def contribute_to_class(self, cls, name, **kwargs):
