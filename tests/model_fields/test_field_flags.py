@@ -3,7 +3,6 @@ from django import test
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields.related import (
     ForeignObject, ForeignKey, OneToOneField, ManyToManyField,
@@ -219,17 +218,3 @@ class FieldFlagsTests(test.TestCase):
                 reverse_field = field.rel
                 self.assertEqual(field.model, reverse_field.related_model)
                 self.assertEqual(field.related_model, reverse_field.model)
-
-
-class GenericIPAddressFieldTests(test.TestCase):
-    def test_genericipaddressfield_formfield_protocol(self):
-        """
-        Test that GenericIPAddressField with a specified protocol does not
-        generate a formfield with no specified protocol. See #20740.
-        """
-        model_field = models.GenericIPAddressField(protocol='IPv4')
-        form_field = model_field.formfield()
-        self.assertRaises(ValidationError, form_field.clean, '::1')
-        model_field = models.GenericIPAddressField(protocol='IPv6')
-        form_field = model_field.formfield()
-        self.assertRaises(ValidationError, form_field.clean, '127.0.0.1')

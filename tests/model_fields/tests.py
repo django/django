@@ -676,6 +676,20 @@ class BinaryFieldTests(test.TestCase):
         self.assertRaises(ValidationError, dm.full_clean)
 
 
+class GenericIPAddressFieldTests(test.TestCase):
+    def test_genericipaddressfield_formfield_protocol(self):
+        """
+        Test that GenericIPAddressField with a specified protocol does not
+        generate a formfield with no specified protocol. See #20740.
+        """
+        model_field = models.GenericIPAddressField(protocol='IPv4')
+        form_field = model_field.formfield()
+        self.assertRaises(ValidationError, form_field.clean, '::1')
+        model_field = models.GenericIPAddressField(protocol='IPv6')
+        form_field = model_field.formfield()
+        self.assertRaises(ValidationError, form_field.clean, '127.0.0.1')
+
+
 class PromiseTest(test.TestCase):
     def test_AutoField(self):
         lazy_func = lazy(lambda: 1, int)
