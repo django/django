@@ -389,8 +389,8 @@ The distinction between :ref:`ref-forms-api-bound-unbound` is important:
   is valid. If an invalid bound form is rendered, it can include inline error
   messages telling the user what data to correct.
 
-The form's ``is_bound()`` method will tell you whether a form has data bound to
-it or not.
+The form's :attr:`~Form.is_bound` attribute will tell you whether a form has
+data bound to it or not.
 
 More on fields
 --------------
