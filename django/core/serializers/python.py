@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 from django.apps import apps
 from django.conf import settings
 from django.core.serializers import base
-from django.db import DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.encoding import force_text, is_protected_type
 from django.utils import six
 
@@ -118,7 +118,7 @@ def Deserializer(object_list, **options):
             field = Model._meta.get_field(field_name)
 
             # Handle M2M relations
-            if field.rel and field.many_to_many:
+            if field.rel and isinstance(field.rel, models.ManyToManyRel):
                 if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                     def m2m_convert(value):
                         if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
@@ -130,7 +130,7 @@ def Deserializer(object_list, **options):
                 m2m_data[field.name] = [m2m_convert(pk) for pk in field_value]
 
             # Handle FK fields
-            elif field.rel and (field.one_to_many or field.one_to_one):
+            elif field.rel and isinstance(field.rel, models.ManyToOneRel):
                 if field_value is not None:
                     if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                         if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):

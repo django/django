@@ -57,7 +57,7 @@ class BaseModelAdminChecks(object):
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E002')
         else:
-            if not field.concrete and field.one_to_many or not field.many_to_many:
+            if not field.one_to_many or not field.many_to_many:
                 return must_be('a ForeignKey or ManyToManyField',
                                option=label, obj=cls, id='admin.E003')
             else:
@@ -252,7 +252,7 @@ class BaseModelAdminChecks(object):
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E019')
         else:
-            if not (field.concrete and field.many_to_many):
+            if not field.concrete and field.many_to_many:
                 return must_be('a ManyToManyField', option=label, obj=cls, id='admin.E020')
             else:
                 return []

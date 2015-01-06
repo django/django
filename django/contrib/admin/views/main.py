@@ -379,7 +379,7 @@ class ChangeList(object):
             except FieldDoesNotExist:
                 pass
             else:
-                if field.one_to_many:
+                if isinstance(field.rel, models.ManyToOneRel):
                     return True
         return False
 
