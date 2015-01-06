@@ -515,7 +515,8 @@ class BaseDatabaseSchemaEditor(object):
         # Drop incoming FK constraints if we're a primary key and things are going
         # to change.
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
-            # '_meta.related_field' contains also M2M reverse fields, these will be filtered out
+            # '_meta.related_field' also contains M2M reverse fields, these
+            # will be filtered out
             for rel in _related_non_m2m_objects(new_field.model._meta):
                 rel_fk_names = self._constraint_names(rel.related_model, [rel.field.column], foreign_key=True)
                 for fk_name in rel_fk_names:
