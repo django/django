@@ -271,3 +271,18 @@ can be made to convert your code to the new API:
           # GenericForeignKey from the results.
           if not (field.one_to_many and field.related_model is None)
       )))
+
+  This provides a 100% backwards compatible replacement, ensuring that both
+  field names and attribute names ``ForeignKey``\s are included, but fields
+  associated with``GenericForeignKey``\s are not. A simpler version would be::
+
+      [f.name for f in MyModel._meta.get_fields()]
+
+  While this isn't 100% backwards compatible, it may be sufficient in many
+  situations.
+
+Although these have been presented as "drop-in" replacements for the old API,
+a simple drop-in replacement probably won't be the best approach in practice.
+Taking the time to refactor any field loops to make better use of the new API
+- and possibly include fields that were previously excluded - will almost
+certainly result in better code.
