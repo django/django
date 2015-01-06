@@ -1281,8 +1281,10 @@ class ForeignObjectRel(object):
         self.on_delete = on_delete
         self.symmetrical = False
 
-    # This and the following cached_properties can't be initialized in
-    # __init__ as the field doesn't have its model yet.
+    # Some of the following cached_properties can't be initialized in
+    # __init__ as the field doesn't have its model yet. Calling these methods
+    # before field.contribute_to_class() has been called will result in
+    # AttributeError
     @cached_property
     def model(self):
         return self.to
@@ -1305,6 +1307,9 @@ class ForeignObjectRel(object):
 
     @cached_property
     def related_model(self):
+        if not self.field.model:
+            raise AttributeError(
+                "This property can't be accessed before self.field.contribute_to_class has been called.")
         return self.field.model
 
     @cached_property
