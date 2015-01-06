@@ -435,7 +435,7 @@ class QuerySet(object):
         Returns a tuple of (object, created), where created is a boolean
         specifying whether an object was created.
         """
-        lookup, params = self._extract_model_params(defaults, **kwargs)
+        lookup, params = self._extract_model_params(defaults, lookup_parameters_allowed=False, **kwargs)
         self._for_write = True
         try:
             return self.get(**lookup), False
@@ -482,7 +482,7 @@ class QuerySet(object):
                 pass
             six.reraise(*exc_info)
 
-    def _extract_model_params(self, defaults, **kwargs):
+    def _extract_model_params(self, defaults, lookup_parameters_allowed=True, **kwargs):
         """
         Prepares `lookup` (kwargs that are valid model attributes), `params`
         (for creating a model instance) based on given kwargs; for use by
@@ -494,6 +494,10 @@ class QuerySet(object):
             if f.attname in lookup:
                 lookup[f.name] = lookup.pop(f.attname)
         params = {k: v for k, v in kwargs.items() if LOOKUP_SEP not in k}
+        lookup_parameters = set(kwargs.keys()) - set(params.keys())
+        if not lookup_parameters_allowed and lookup_parameters:
+            raise TypeError("Lookups are not allowed for get_or_create. "
+                            "Wrong parameters: %s" % list(lookup_parameters))
         params.update(defaults)
         return lookup, params
 

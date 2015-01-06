@@ -1680,6 +1680,14 @@ whenever a request to a page has a side effect on your data. For more, see
   chapter because it isn't related to that book, but it can't create it either
   because ``title`` field should be unique.
 
+.. warning::
+
+  Lookups usage is not allowed for ``get_or_create()``.
+  If you will try to use it, ``TypeError`` will be raised::
+
+      >>> Person.objects.get_or_create(name='Bob', birthday__gte=date(1800, 12, 12))
+      *** TypeError: Lookups are not allowed for get_or_create. Wrong parameters: ['birthday__gte']
+
 update_or_create
 ~~~~~~~~~~~~~~~~
 
