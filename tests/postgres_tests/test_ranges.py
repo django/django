@@ -196,7 +196,11 @@ class TestSerialization(TestCase):
     def test_dumping(self):
         instance = RangesModel(ints=NumericRange(0, 10), floats=NumericRange(empty=True))
         data = serializers.serialize('json', [instance])
-        self.assertEqual(json.loads(data), json.loads(self.test_data))
+        dumped = json.loads(data)
+        dumped[0]['fields']['ints'] = json.loads(dumped[0]['fields']['ints'])
+        check = json.loads(self.test_data)
+        check[0]['fields']['ints'] = json.loads(check[0]['fields']['ints'])
+        self.assertEqual(dumped, check)
 
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
