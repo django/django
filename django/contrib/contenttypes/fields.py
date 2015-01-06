@@ -22,15 +22,15 @@ class GenericForeignKey(object):
     fields.
     """
     # Field flags
+    auto_created = False
     concrete = False
     editable = False
     hidden = False
-    auto_created = False
 
     is_relation = True
-    one_to_many = True
     many_to_many = False
     many_to_one = False
+    one_to_many = True
     one_to_one = False
     related_model = None
 
@@ -259,9 +259,9 @@ class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
     # Field flags
     auto_created = False
+    many_to_many = False
     many_to_one = True
     one_to_many = False
-    many_to_many = False
     one_to_one = False
 
     def __init__(self, to, **kwargs):
