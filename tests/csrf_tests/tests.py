@@ -166,7 +166,7 @@ class CsrfViewMiddlewareTest(TestCase):
         """
         req = self._get_POST_request_with_token()
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(None, req2)
+        self.assertIsNone(req2)
 
     def test_process_request_csrf_cookie_no_token_exempt_view(self):
         """
@@ -175,7 +175,7 @@ class CsrfViewMiddlewareTest(TestCase):
         """
         req = self._get_POST_csrf_cookie_request()
         req2 = CsrfViewMiddleware().process_view(req, csrf_exempt(post_form_view), (), {})
-        self.assertEqual(None, req2)
+        self.assertIsNone(req2)
 
     def test_csrf_token_in_header(self):
         """
@@ -184,7 +184,7 @@ class CsrfViewMiddlewareTest(TestCase):
         req = self._get_POST_csrf_cookie_request()
         req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(None, req2)
+        self.assertIsNone(req2)
 
     def test_put_and_delete_rejected(self):
         """
@@ -209,13 +209,13 @@ class CsrfViewMiddlewareTest(TestCase):
         req.method = 'PUT'
         req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(None, req2)
+        self.assertIsNone(req2)
 
         req = self._get_GET_csrf_cookie_request()
         req.method = 'DELETE'
         req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(None, req2)
+        self.assertIsNone(req2)
 
     # Tests for the template tag method
     def test_token_node_no_csrf_cookie(self):
@@ -285,7 +285,7 @@ class CsrfViewMiddlewareTest(TestCase):
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://www.evil.org/somepage'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertNotEqual(None, req2)
+        self.assertIsNotNone(req2)
         self.assertEqual(403, req2.status_code)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
@@ -298,12 +298,12 @@ class CsrfViewMiddlewareTest(TestCase):
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'http://http://www.example.com/'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertNotEqual(None, req2)
+        self.assertIsNotNone(req2)
         self.assertEqual(403, req2.status_code)
         # Non-ASCII
         req.META['HTTP_REFERER'] = b'\xd8B\xf6I\xdf'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertNotEqual(None, req2)
+        self.assertIsNotNone(req2)
         self.assertEqual(403, req2.status_code)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
@@ -316,7 +316,7 @@ class CsrfViewMiddlewareTest(TestCase):
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://www.example.com/somepage'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(None, req2)
+        self.assertIsNone(req2)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer_2(self):
@@ -330,7 +330,7 @@ class CsrfViewMiddlewareTest(TestCase):
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://www.example.com'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(None, req2)
+        self.assertIsNone(req2)
 
     def test_ensures_csrf_cookie_no_middleware(self):
         """
@@ -469,7 +469,7 @@ class CsrfViewMiddlewareTest(TestCase):
 
         req = CsrfPostRequest(token, raise_error=False)
         resp = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(resp, None)
+        self.assertIsNone(resp)
 
         req = CsrfPostRequest(token, raise_error=True)
         resp = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
