@@ -101,7 +101,6 @@ def Deserializer(object_list, **options):
         if 'pk' in d:
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
         m2m_data = {}
-
         field_names = {f.name for f in Model._meta.get_fields()}
 
         # Handle each field
