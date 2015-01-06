@@ -258,6 +258,7 @@ class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
     # Field flags
     auto_created = False
+
     many_to_many = False
     many_to_one = True
     one_to_many = False
