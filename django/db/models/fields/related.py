@@ -98,7 +98,11 @@ signals.class_prepared.connect(do_pending_lookups)
 
 
 class RelatedField(Field):
-    generate_reverse_relation = True
+    # Field flags
+    one_to_many = False
+    one_to_one = False
+    many_to_many = False
+    many_to_one = False
 
     @cached_property
     def related_model(self):
@@ -1994,13 +1998,14 @@ class OneToOneField(ForeignKey):
     always returns the object pointed to (since there will only ever be one),
     rather than returning a list.
     """
-    related_accessor_class = SingleRelatedObjectDescriptor
-    description = _("One-to-one relationship")
-
+    # Field flags
     many_to_many = False
     one_to_many = False
     many_to_one = False
     one_to_one = True
+
+    related_accessor_class = SingleRelatedObjectDescriptor
+    description = _("One-to-one relationship")
 
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['unique'] = True

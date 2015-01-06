@@ -691,7 +691,7 @@ class MigrationAutodetector(object):
                 field_name = related_object.field.name
 
                 dependencies.append((related_object_app_label, object_name, field_name, False))
-                if not isinstance(related_object, models.ManyToManyRel):
+                if not related_object.many_to_many:
                     dependencies.append((related_object_app_label, object_name, field_name, "alter"))
 
             for name, field in sorted(related_fields.items()):

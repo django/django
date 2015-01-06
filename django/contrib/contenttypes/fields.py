@@ -21,6 +21,7 @@ class GenericForeignKey(object):
     Provides a generic relation to any object through content-type/object-id
     fields.
     """
+    # Field flags
     concrete = False
     editable = False
     hidden = False
@@ -37,7 +38,6 @@ class GenericForeignKey(object):
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
-        self.generate_reverse_relation = False
         self.editable = False
         self.rel = True
         self.column = None
@@ -257,8 +257,8 @@ class GenericForeignKey(object):
 
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
+    # Field flags
     auto_created = False
-
     many_to_one = True
     one_to_many = False
     many_to_many = False
