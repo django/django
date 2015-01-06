@@ -1,7 +1,6 @@
 import hashlib
 
 from django.db.backends.utils import truncate_name
-from django.db.models.fields.related import ManyToManyField
 from django.db.transaction import atomic
 from django.utils.encoding import force_bytes
 from django.utils.log import getLogger

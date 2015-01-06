@@ -8,7 +8,7 @@ certain test -- e.g. being a DateField or ForeignKey.
 import datetime
 
 from django.db import models
-from django.db.models.fields.related import ForeignObjectRel, ManyToManyField
+from django.db.models.fields.related import ForeignObjectRel
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.encoding import smart_text, force_text
 from django.utils.translation import ugettext_lazy as _

@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 from django.apps import apps
 from django.conf import settings
 from django.core.serializers import base
-from django.db import models, DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS
 from django.utils.encoding import force_text, is_protected_type
 from django.utils import six
 
