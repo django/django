@@ -133,7 +133,7 @@ class BaseValidator(object):
             check_isdict(cls, 'radio_fields', cls.radio_fields)
             for field, val in cls.radio_fields.items():
                 f = get_field(cls, model, 'radio_fields', field)
-                if not (isinstance(f, models.ForeignKey) or f.choices):
+                if f.auto_created or not f.one_to_many or f.choices:
                     raise ImproperlyConfigured("'%s.radio_fields['%s']' "
                             "is neither an instance of ForeignKey nor does "
                             "have choices set." % (cls.__name__, field))

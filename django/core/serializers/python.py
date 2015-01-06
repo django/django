@@ -119,7 +119,7 @@ def Deserializer(object_list, **options):
             field = Model._meta.get_field(field_name)
 
             # Handle M2M relations
-            if field.rel and isinstance(field.rel, models.ManyToManyRel):
+            if field.concrete and field.many_to_many:
                 if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                     def m2m_convert(value):
                         if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
@@ -131,7 +131,7 @@ def Deserializer(object_list, **options):
                 m2m_data[field.name] = [m2m_convert(pk) for pk in field_value]
 
             # Handle FK fields
-            elif field.rel and isinstance(field.rel, models.ManyToOneRel):
+            elif field.concrete and field.one_to_many:
                 if field_value is not None:
                     if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                         if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):

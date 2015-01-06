@@ -35,7 +35,7 @@ class CurrentSiteManager(models.Manager):
                 )
             ]
 
-        if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
+        if not f.concrete or not (field.one_to_many or field.many_to_many):
             return [
                 checks.Error(
                     "CurrentSiteManager cannot use '%s.%s' as it is not a ForeignKey or ManyToManyField." % (
