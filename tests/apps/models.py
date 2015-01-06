@@ -18,5 +18,3 @@ class SoAlternative(models.Model):
 
     class Meta:
         apps = new_apps
-
-new_apps_2 = Apps(['apps'])
