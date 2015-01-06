@@ -423,6 +423,21 @@ class FieldNamesTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_exact(self):
+        class Model(models.Model):
+            exact = models.BooleanField()
+
+        errors = Model.check()
+        expected = [
+            Error(
+                "'exact' is a reserved word that cannot be used as a field name.",
+                hint=None,
+                obj=Model._meta.get_field('exact'),
+                id='fields.E008',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
 
 class ShadowingFieldsTests(IsolatedModelsTestCase):
 
