@@ -140,14 +140,6 @@ class RelatedM2MTests(OptionsBaseTests):
         self.assertIn('friends_inherited_rel_+', [o.field.related_query_name() for o in related_m2m])
 
 
-class VirtualFieldsTests(OptionsBaseTests):
-
-    def test_virtual_fields(self):
-        for model, expected_names in TEST_RESULTS['virtual_fields'].items():
-            objects = model._meta.virtual_fields
-            self.assertEqual(sorted([f.name for f in objects]), sorted(expected_names))
-
-
 @test.ignore_warnings(category=RemovedInDjango20Warning)
 class GetFieldByNameTests(OptionsBaseTests):
 
@@ -194,11 +186,10 @@ class GetFieldByNameTests(OptionsBaseTests):
             )
 
 
+@test.ignore_warnings(category=RemovedInDjango20Warning)
 class GetAllFieldNamesTestCase(OptionsBaseTests):
 
     def test_get_all_field_names(self):
         for model, expected_names in TEST_RESULTS['get_all_field_names'].items():
-            with warnings.catch_warnings(record=True):
-                warnings.simplefilter("always")
-                objects = model._meta.get_all_field_names()
-                self.assertEqual(sorted(map(str, objects)), sorted(expected_names))
+            objects = model._meta.get_all_field_names()
+            self.assertEqual(sorted(map(str, objects)), sorted(expected_names))

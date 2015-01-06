@@ -1,15 +1,15 @@
-from django import test
 from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import related, CharField, Field
 from django.db.models.options import IMMUTABLE_WARNING, EMPTY_RELATION_TREE
+from django.test import TestCase
 
 from .models import Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating
 from .results import TEST_RESULTS
 
 
-class OptionsBaseTests(test.TestCase):
+class OptionsBaseTests(TestCase):
 
     def _map_related_query_names(self, res):
         return tuple((o.name, m) for o, m in res)
@@ -35,13 +35,13 @@ class OptionsBaseTests(test.TestCase):
 class GetFieldsTests(OptionsBaseTests):
 
     def test_get_fields_is_immutable(self):
+        msg = IMMUTABLE_WARNING % "get_fields()"
         for _ in range(2):
             # Running unit test twice to ensure both non-cached and cached result
             # are immutable.
             fields = Person._meta.get_fields()
-            with self.assertRaises(AttributeError) as err:
+            with self.assertRaisesMessage(AttributeError, msg):
                 fields += ["errors"]
-            self.assertEqual(str(err.exception), IMMUTABLE_WARNING % "get_fields()")
 
 
 class DataTests(OptionsBaseTests):
@@ -66,7 +66,7 @@ class DataTests(OptionsBaseTests):
             fields = model._meta.local_concrete_fields
             self.assertEqual([f.attname for f in fields], expected_result)
             for f in fields:
-                self.assertTrue(f.column is not None)
+                self.assertIsNotNone(f.column)
 
 
 class M2MTests(OptionsBaseTests):
@@ -171,21 +171,17 @@ class GetFieldByNameTests(OptionsBaseTests):
 
     def test_get_fields_only_searaches_forward_on_apps_not_ready(self):
         opts = Person._meta
-
         # If apps registry is not ready, get_field() searches over only
         # forward fields.
         opts.apps.ready = False
-
         try:
             # 'data_abstract' is a forward field, and therefore will be found
             self.assertTrue(opts.get_field('data_abstract'))
-
             msg = (
                 "Person has no field named 'relating_baseperson'. The app "
                 "cache isn't ready yet, so if this is a forward field, it "
                 "won't be available yet."
             )
-
             # 'data_abstract' is a reverse field, and will raise an exception
             with self.assertRaisesMessage(FieldDoesNotExist, msg):
                 opts.get_field('relating_baseperson')
@@ -193,7 +189,7 @@ class GetFieldByNameTests(OptionsBaseTests):
             opts.apps.ready = True
 
 
-class RelationTreeTests(test.TestCase):
+class RelationTreeTests(TestCase):
     all_models = (Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating)
 
     def setUp(self):
