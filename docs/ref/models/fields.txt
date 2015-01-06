@@ -1828,9 +1828,9 @@ Attributes for fields
 
 .. attribute:: Field.hidden
 
-    Boolean flag that indicates if a field is used to back other non-hidden
+    Boolean flag that indicates if a field is used to back another non-hidden
     field's functionality (e.g. the ``content_type`` and ``object_id`` fields
-    that make up a ``GenericForeignKey``). The hidden flag is used to
+    that make up a ``GenericForeignKey``). The ``hidden`` flag is used to
     distinguish what constitutes the public subset of fields on the model from
     all the fields on the model.
 

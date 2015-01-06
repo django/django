@@ -246,7 +246,7 @@ class Options(object):
 
     def _prepare(self, model):
         if self.order_with_respect_to:
-            # The apps registry will not be ready at this point, so we cannot
+            # The app registry will not be ready at this point, so we cannot
             # use get_field().
             query = self.order_with_respect_to
             try:
@@ -295,12 +295,12 @@ class Options(object):
             self.setup_pk(field)
 
         # If the field being added is a relation to another known field,
-        # expire the cache on this field, and the forward cache on the field
+        # expire the cache on this field and the forward cache on the field
         # being referenced, because there will be new relationships in the
         # cache. Otherwise, expire the cache of references *to* this field.
         # The mechanism for getting at the related model is slightly odd -
         # ideally, we'd just ask for field.related_model. However, related_model
-        # is a cached property, and all the models haven't been laoded yet, so
+        # is a cached property, and all the models haven't been loaded yet, so
         # we need to make sure we don't cache a string reference.
         if field.is_relation and hasattr(field.rel, 'to') and field.rel.to:
             try:
@@ -392,7 +392,6 @@ class Options(object):
         is_not_a_generic_foreign_key = lambda f: not (
             f.is_relation and f.one_to_many and not (hasattr(f.rel, 'to') and f.rel.to)
         )
-
         return make_immutable_fields_list(
             "fields",
             (f for f in self._get_fields(reverse=False) if
@@ -534,7 +533,7 @@ class Options(object):
 
             return field
         except KeyError:
-            # If the apps registry is not ready, reverse fields are
+            # If the app registry is not ready, reverse fields are
             # unavailable, therefore we throw a FieldDoesNotExist exception.
             if not self.apps.ready:
                 raise FieldDoesNotExist(
@@ -549,7 +548,7 @@ class Options(object):
                 raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
             # Retrieve field instance by name from cached or just-computed
-            # field map
+            # field map.
             return self.fields_map[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))

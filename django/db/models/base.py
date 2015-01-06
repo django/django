@@ -1440,8 +1440,8 @@ class Model(six.with_metaclass(ModelBase)):
     def _check_local_fields(cls, fields, option):
         from django.db import models
 
-        # In order to avoid hitting the relation tree prematurely, we use our own
-        # fields_map instead of using get_field()
+        # In order to avoid hitting the relation tree prematurely, we use our
+        # own fields_map instead of using get_field()
         forward_fields_map = {
             field.name: field for field in cls._meta._get_fields(reverse=False)
         }
