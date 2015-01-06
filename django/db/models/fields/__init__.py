@@ -147,7 +147,7 @@ class Field(RegisterLookupMixin):
         self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
         self.rel = rel
-        self.has_relation = self.rel is not None
+        self.is_relation = self.rel is not None
         self.default = default
         self.editable = editable
         self.serialize = serialize

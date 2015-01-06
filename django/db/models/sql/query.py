@@ -1386,7 +1386,7 @@ class Query(object):
                 # Fields that contain one-to-many relations with a generic
                 # model (like a GenericForeignKey) cannot generate reverse
                 # relations Therefore they cannote be used for reverse querying.
-                if field.has_relation and not field.related_model:
+                if field.is_relation and not field.related_model:
                     raise FieldError(
                         "Field %r does not generate an automatic reverse "
                         "relation and therefore cannot be used for reverse "

@@ -177,7 +177,7 @@ can be made to convert your code to the new API:
   - ``f.auto_created == False``, because the new ``get_field()``
     API will find "reverse" relations), and:
 
-  - ``f.has_relation and f.related_model is None``, because the new
+  - ``f.is_relation and f.related_model is None``, because the new
     ``get_field()`` API will find
     :class:``~django.contrib.contenttypes.fields.GenericForeignKey``
     relations;
@@ -192,7 +192,7 @@ can be made to convert your code to the new API:
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields()
-          if not f.has_relation
+          if not f.is_relation
               or f.one_to_one
               or (f.one_to_many and f.related_model)
       ]
@@ -202,7 +202,7 @@ can be made to convert your code to the new API:
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields()
-          if (not f.has_relation
+          if (not f.is_relation
                   or f.one_to_one
                   or (f.one_to_many and f.related_model)
               )
@@ -252,7 +252,7 @@ can be made to convert your code to the new API:
 
       [
           f for f in MyModel._meta.get_fields()
-          if not f.has_relation
+          if not f.is_relation
               or (f.one_to_many and f.related_model)
               or f.one_to_one
       ]
@@ -261,7 +261,7 @@ can be made to convert your code to the new API:
 
       [
           f for f in MyModel._meta.get_fields()
-          if (not f.has_relation
+          if (not f.is_relation
                   or (f.one_to_many and f.related_model)
                   or f.one_to_one
               )
@@ -272,7 +272,7 @@ can be made to convert your code to the new API:
 
       [
           f for f in MyModel._meta.get_fields(include_parents=False)
-          if (not f.has_relation
+          if (not f.is_relation
                   or (f.one_to_many and f.related_model)
                   or f.one_to_one)
               and f.concrete

@@ -1261,7 +1261,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
 class ForeignObjectRel(object):
     auto_created = True
-    has_relation = True
+    is_relation = True
     editable = False
     concrete = False
 
@@ -2451,7 +2451,7 @@ class ManyToManyField(RelatedField):
         else:
             link_field_name = None
         for f in self.rel.through._meta.fields:
-            if f.has_relation and f.rel.to == related.related_model and \
+            if f.is_relation and f.rel.to == related.related_model and \
                     (link_field_name is None or link_field_name == f.name):
                 setattr(self, cache_attr, getattr(f, attr))
                 return getattr(self, cache_attr)
@@ -2468,7 +2468,7 @@ class ManyToManyField(RelatedField):
             link_field_name = None
         for f in self.rel.through._meta.fields:
             # NOTE f.rel.to != f.related_model
-            if f.has_relation and f.rel.to == related.model:
+            if f.is_relation and f.rel.to == related.model:
                 if link_field_name is None and related.related_model == related.model:
                     # If this is an m2m-intermediate to self,
                     # the first foreign key you find will be

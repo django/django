@@ -297,7 +297,7 @@ def _get_non_gfk_field(opts, name):
     "not found" by get_field(). This could likely be cleaned up.
     """
     field = opts.get_field(name)
-    if field.has_relation and field.one_to_many and not field.related_model:
+    if field.is_relation and field.one_to_many and not field.related_model:
         raise FieldDoesNotExist()
     return field
 
@@ -444,7 +444,7 @@ def reverse_field_path(model, path):
                 break
 
         # Field should point to another model
-        if field.has_relation and not (field.auto_created and not field.concrete):
+        if field.is_relation and not (field.auto_created and not field.concrete):
             related_name = field.related_query_name()
             parent = field.rel.to
         else:

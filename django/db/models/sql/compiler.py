@@ -606,7 +606,7 @@ class SQLCompiler(object):
         connections to the root model).
         """
         def _get_field_choices():
-            direct_choices = (f.name for f in opts.fields if f.has_relation)
+            direct_choices = (f.name for f in opts.fields if f.is_relation)
             reverse_choices = (
                 f.field.related_query_name()
                 for f in opts.related_objects if f.field.unique
@@ -639,7 +639,7 @@ class SQLCompiler(object):
 
             if restricted:
                 next = requested.get(f.name, {})
-                if not f.has_relation:
+                if not f.is_relation:
                     # If a non-related field is used like a relation,
                     # or if a single non-relational field is given.
                     if next or (cur_depth == 1 and f.name in requested):

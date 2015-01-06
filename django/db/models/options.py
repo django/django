@@ -164,7 +164,7 @@ class Options(object):
         model = link.model._meta.concrete_model
         if model is self.model:
             model = None
-        m2m = link.has_relation and link.many_to_many
+        m2m = link.is_relation and link.many_to_many
         return link, model, direct, m2m
 
     @property
@@ -287,10 +287,9 @@ class Options(object):
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
-        field_has_relation = field.has_relation
         if virtual:
             self.virtual_fields.append(field)
-        elif field_has_relation and field.many_to_many:
+        elif field.is_relation and field.many_to_many:
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
         else:
             self.local_fields.insert(bisect(self.local_fields, field), field)
@@ -304,7 +303,7 @@ class Options(object):
         # ideally, we'd just ask for field.related_model. However, related_model
         # is a cached property, and all the models haven't been laoded yet, so
         # we need to make sure we don't cache a string reference.
-        if field_has_relation and hasattr(field.rel, 'to') and field.rel.to:
+        if field.is_relation and hasattr(field.rel, 'to') and field.rel.to:
             try:
                 field.rel.to._meta._expire_cache(forward=False)
             except AttributeError:
@@ -389,10 +388,10 @@ class Options(object):
         # use that property directly because related_model is a cached property,
         # and all the models may not have been loaded yet; we don't want to cache
         # the string reference to the related_model.
-        is_not_an_m2m_field = lambda f: not (f.has_relation and f.many_to_many)
-        is_not_a_generic_relation = lambda f: not (f.has_relation and f.many_to_one)
+        is_not_an_m2m_field = lambda f: not (f.is_relation and f.many_to_many)
+        is_not_a_generic_relation = lambda f: not (f.is_relation and f.many_to_one)
         is_not_a_generic_foreign_key = lambda f: not (
-            f.has_relation and f.one_to_many and not (hasattr(f.rel, 'to') and f.rel.to)
+            f.is_relation and f.one_to_many and not (hasattr(f.rel, 'to') and f.rel.to)
         )
 
         return make_immutable_fields_list(
@@ -448,7 +447,7 @@ class Options(object):
         return make_immutable_fields_list(
             "many_to_many",
             (f for f in self._get_fields(reverse=False)
-            if f.has_relation and f.many_to_many)
+            if f.is_relation and f.many_to_many)
         )
 
     @cached_property
@@ -567,7 +566,7 @@ class Options(object):
         for field in fields:
             # For backwards compatibility GenericForeignKey should not be
             # included in the results.
-            if field.has_relation and field.one_to_many and field.related_model is None:
+            if field.is_relation and field.one_to_many and field.related_model is None:
                 continue
 
             names.add(field.name)
@@ -681,7 +680,7 @@ class Options(object):
         for model in all_models:
             fields_with_relations = (
                 f for f in model._meta._get_fields(reverse=False)
-                if f.has_relation and f.related_model is not None
+                if f.is_relation and f.related_model is not None
             )
             if model._meta.auto_created:
                 fields_with_relations = (

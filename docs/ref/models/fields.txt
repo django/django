@@ -1814,7 +1814,7 @@ Attributes for fields
     Boolean flag that indicates if the field has a database column associated
     with it.
 
-.. attribute:: Field.has_relation
+.. attribute:: Field.is_relation
 
     Boolean flag that indicates if a field contains references to one or
     more other models for its functionality (e.g. ``ForeignKey``,
@@ -1847,7 +1847,7 @@ Attributes for fields with relations
 These attributes are used to query for the cardinality and other details of a
 relation. These attribute are present on all fields; however, they will only
 have meaningful values if the field is a relation type
-(:attr:`Field.has_relation=True <Field.has_relation>`).
+(:attr:`Field.is_relation=True <Field.is_relation>`).
 
 .. attribute:: Field.related_model
 
