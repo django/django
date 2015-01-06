@@ -1809,6 +1809,11 @@ Custom model fields should implement these flags.
 Attributes for fields
 =====================
 
+.. attribute:: Field.auto_created
+
+     Boolean flag that indicates if the field was automatically created, such
+     as the ``OneToOneField`` used by model inheritance.
+
 .. attribute:: Field.concrete
 
     Boolean flag that indicates if the field has a database column associated
