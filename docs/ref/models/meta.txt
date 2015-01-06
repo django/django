@@ -49,7 +49,7 @@ Retrieving a single field instance of a model by name
     by name.
 
     If a field with the given name is not found a
-    :class:`~django.core.exceptions.FieldDoesNotExist`` exception will be
+    :class:`~django.core.exceptions.FieldDoesNotExist` exception will be
     raised.
 
     .. code-block:: python
@@ -178,8 +178,7 @@ can be made to convert your code to the new API:
 
   - ``f.is_relation and f.related_model is None``, because the new
     ``get_field()`` API will find
-    :class:``~django.contrib.contenttypes.fields.GenericForeignKey``
-    relations;
+    :class:`~django.contrib.contenttypes.fields.GenericForeignKey` relations;
 
 * ``MyModel._meta.get_field_by_name(name)[0]``::
 
@@ -200,11 +199,11 @@ can be made to convert your code to the new API:
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields()
-          if (not f.is_relation
-                  or f.one_to_one
-                  or (f.one_to_many and f.related_model)
-              )
-              and f.concrete
+          if f.concrete and (
+              not f.is_relation
+              or f.one_to_one
+              or (f.one_to_many and f.related_model)
+          )
       ]
 
 * ``MyModel._meta.get_m2m_with_model()``::
@@ -212,8 +211,7 @@ can be made to convert your code to the new API:
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields()
-          if f.many_to_many
-              and not f.auto_created
+          if f.many_to_many and not f.auto_created
       ]
 
 * ``MyModel._meta.get_all_related_objects()``::
@@ -259,19 +257,20 @@ can be made to convert your code to the new API:
 
       [
           f for f in MyModel._meta.get_fields()
-          if (not f.is_relation
-                  or (f.one_to_many and f.related_model)
-                  or f.one_to_one
-              )
-              and f.concrete
+          if f.concrete and (
+              not f.is_relation
+              or (f.one_to_many and f.related_model)
+              or f.one_to_one
+          )
       ]
 
 * ``MyModel._meta.local_concrete_fields``::
 
       [
           f for f in MyModel._meta.get_fields(include_parents=False)
-          if (not f.is_relation
-                  or (f.one_to_many and f.related_model)
-                  or f.one_to_one)
-              and f.concrete
+          if f.concrete and (
+              not f.is_relation
+              or (f.one_to_many and f.related_model)
+              or f.one_to_one
+          )
       ]
