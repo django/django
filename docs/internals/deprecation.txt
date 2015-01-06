@@ -56,7 +56,7 @@ details on these changes.
 
 * ``django.template.resolve_variable`` will be removed.
 
-* The following methods will be removed from
+* The following private APIs will be removed from
   :class:`django.db.models.options.Options` (``Model._meta``):
 
   * ``get_field_by_name()``

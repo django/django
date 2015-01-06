@@ -32,28 +32,18 @@ What's new in Django 1.8
 ``Model._meta`` API
 ~~~~~~~~~~~~~~~~~~~
 
-Django now has an official API for ``Model._meta``, providing an officially
-supported way to :ref:`retrieve fields <model-meta-field-api>` and filter
-fields based on their :ref:`attributes <model-field-attributes>`.
+Django now has now formalized the API for :doc:`Model._meta
+</ref/models/meta>`, providing an officially supported way to :ref:`retrieve
+fields <model-meta-field-api>` and filter fields based on their
+:ref:`attributes <model-field-attributes>`.
 
 The ``Model._meta`` object has been part of Django since the days of pre-0.96
 "Magic Removal" -- it just wasn't an official, stable API. In recognition of
 this, we've endeavored to maintain backwards-compatibility with the old
 API endpoint where possible. However, API endpoints that aren't part of the
-new official API have been deprecated and will eventually be removed.
-
-The new API is composed of two methods:
-
-* :meth:`Options.get_field() <django.db.models.options.Options.get_field()>`
-  to retrieve a field by name.
-
-* :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
-  to retrieve a list of all fields on a model, including reverse and
-  many-to-many relationships.
-
-More details can be found in the :doc:`/ref/models/meta` docs. Details of
-the migration path for old ``Model._meta`` usage can be found in the
-:ref:`deprecated features <model_meta_upgrade>` section of this document.
+new official API have been deprecated and will eventually be removed. A
+:ref:`guide to migrating from the old API to the new API
+<migrating-old-meta-api>` has been provided.
 
 Security enhancements
 ~~~~~~~~~~~~~~~~~~~~~
@@ -397,8 +387,6 @@ Management Commands
 * Database connections are now always closed after a management command called
   from the command line has finished doing its job.
 
-* Commands from alternate package formats like eggs are now also discovered.
-
 * :djadmin:`dumpdata` now has the option :djadminopt:`--output` which allows
   specifying the file to which the serialized data is written.
 
@@ -463,9 +451,6 @@ Migrations
 
 * Migrations can now :ref:`serialize model managers
   <using-managers-in-migrations>` as part of the model state.
-
-* A :ref:`generic mechanism to handle the deprecation of model fields
-  <migrations-removing-model-fields>` was added.
 
 Models
 ^^^^^^
@@ -589,8 +574,6 @@ Requests and Responses
 * The new :meth:`HttpResponse.setdefault()
   <django.http.HttpResponse.setdefault>` method allows setting a header unless
   it has already been set.
-
-* You can use the new :class:`~django.http.FileResponse` to stream files.
 
 * The :func:`~django.views.decorators.http.condition` decorator for
   conditional view processing now supports the ``If-unmodified-since`` header.
@@ -1030,118 +1013,23 @@ Selected methods in ``django.db.models.options.Options``
 
 As part of the formalization of the ``Model._meta`` API (from the
 :class:`django.db.models.options.Options` class), a number of methods and
-properties have been deprecated, and will be removed in in Django 2.0. These
-old APIs can be replicated by invoking :meth:`Options.get_field()
-<django.db.models.options.Options.get_field()>`, or by invoking
-:meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
-to retrieve a list of all fields, and then filtering this list using the
-:ref:`field attributes <model-field-attributes>` that describe (or retrieve, in
-the case of ``_with_model`` variants) the properties of the desired fields.
+properties have been deprecated, and will be removed in in Django 2.0:
 
-Assuming you have a model named ``MyModel``, the following substitutions
-can be made to convert your code to the new API:
+* ``Options.get_field(name)``
+* ``Options.get_field_by_name(name)[0]``
+* ``Options.get_fields_with_model()``
+* ``Options.get_concrete_fields_with_model()``
+* ``Options.get_m2m_with_model()``
+* ``Options.get_all_related_objects()``
+* ``Options.get_all_related_objects_with_model()``
+* ``Options.get_all_related_many_to_many_objects()``
+* ``Options.get_all_related_m2m_objects_with_model()``
+* ``Options.fields``
+* ``Options.concrete_fields``
+* ``Options.local_concrete_fields``
 
-* ``MyModel._meta.get_field(name)``::
-
-      f = MyModel._meta.get_field(name)
-
-  then check if ``f.auto_created == False`` (because the new ``get_field()``
-  API will find "reverse" relations).
-
-* ``MyModel._meta.get_field_by_name(name)[0]``::
-
-      MyModel._meta.get_field(name)
-
-* ``MyModel._meta.get_fields_with_model()``::
-
-      [
-          (f, f.model if f.model != MyModel else None)
-          for f in MyModel._meta.get_fields()
-          if not f.has_relation
-              or f.one_to_one
-              or (f.one_to_many and f.related_model)
-      ]
-
-* ``MyModel._meta.get_concrete_fields_with_model()``::
-
-      [
-          (f, f.model if f.model != MyModel else None)
-          for f in MyModel._meta.get_fields()
-          if (not f.has_relation
-                  or f.one_to_one
-                  or (f.one_to_many and f.related_model)
-              )
-              and f.concrete
-      ]
-
-* ``MyModel._meta.get_m2m_with_model()``::
-
-      [
-          (f, f.model if f.model != MyModel else None)
-          for f in MyModel._meta.get_fields()
-          if f.many_to_many
-              and not f.auto_created
-      ]
-
-* ``MyModel._meta.get_all_related_objects()``::
-
-      [
-          f for f in MyModel._meta.get_fields()
-          if f.many_to_one and f.auto_created
-      ]
-
-* ``MyModel._meta.get_all_related_objects_with_model()``::
-
-      [
-          (f, f.model if f.model != MyModel else None)
-          for f in MyModel._meta.get_fields()
-          if f.many_to_one and f.auto_created
-      ]
-
-* ``MyModel._meta.get_all_related_many_to_many_objects()``::
-
-      [
-          f for f in MyModel._meta.get_fields(include_hidden=True)
-          if f.many_to_many and f.auto_created
-      ]
-
-* ``MyModel._meta.get_all_related_m2m_objects_with_model()``::
-
-      [
-          (f, f.model if f.model != MyModel else None)
-          for f in MyModel._meta.get_fields(include_hidden=True)
-          if f.many_to_many and f.auto_created
-      ]
-
-* ``MyModel._meta.fields``::
-
-      [
-          f for f in MyModel._meta.get_fields()
-          if not f.has_relation
-              or (f.one_to_many and f.related_model)
-              or f.one_to_one
-      ]
-
-* ``MyModel._meta.concrete_fields``::
-
-      [
-          f for f in MyModel._meta.get_fields()
-          if (not f.has_relation
-                  or (f.one_to_many and f.related_model)
-                  or f.one_to_one
-              )
-              and f.concrete
-      ]
-
-* ``MyModel._meta.local_concrete_fields``::
-
-      [
-          f for f in MyModel._meta.get_fields(include_parents=False)
-          if (not f.has_relation
-                  or (f.one_to_many and f.related_model)
-                  or f.one_to_one)
-              and f.concrete
-      ]
+A :ref:`migration guide <migrating-old-meta-api>` has been provided to assist
+in converting your code from the old API to the new, official API.
 
 Loading ``cycle`` and ``firstof`` template tags from ``future`` library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1530,14 +1418,6 @@ of ``Field.rel``.  The latter is an instance of
 ``django.db.models.related.RelatedObject``. The ``django.db.models.related``
 module has been removed and the ``Field.related`` attribute will be removed in
 Django 2.0.
-
-``ssi`` template tag
-~~~~~~~~~~~~~~~~~~~~
-
-The :ttag:`ssi` template tag allows files to be included in a template by
-absolute path. This is of limited use in most deployment situations, and
-the :ttag:`include` tag often makes more sense. This tag is now deprecated and
-will be removed in Django 2.0.
 
 .. removed-features-1.8:
 
