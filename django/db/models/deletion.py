@@ -61,11 +61,11 @@ def get_candidate_relations_to_delete(opts):
     candidate_model_fields = chain.from_iterable(
         opts.get_fields(include_hidden=True) for opts in candidate_models
     )
-    # Keep related objects not coming from ManyToManyFields from all candidate
-    # model fields.
+    # The candidate relations are the ones that come from N-1 and 1-1 relations.
+    # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
     return (
         f for f in candidate_model_fields
-        if f.auto_created and not f.concrete and not f.many_to_many
+        if f.auto_created and not f.concrete and (f.one_to_one or f.many_to_one)
     )
 
 
