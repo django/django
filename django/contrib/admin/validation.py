@@ -45,7 +45,7 @@ class BaseValidator(object):
                     # If we can't find a field on the model that matches, it could be an
                     # extra field on the form; nothing to check so move on to the next field.
                     continue
-                if f.concrete and f.many_to_many and not f.rel.through._meta.auto_created:
+                if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
                     raise ImproperlyConfigured("'%s.%s' "
                         "can't include the ManyToManyField field '%s' because "
                         "'%s' manually specifies a 'through' model." % (
@@ -57,7 +57,7 @@ class BaseValidator(object):
             check_isseq(cls, 'raw_id_fields', cls.raw_id_fields)
             for idx, field in enumerate(cls.raw_id_fields):
                 f = get_field(cls, model, 'raw_id_fields', field)
-                if not f.auto_created and not (f.one_to_many or f.many_to_many):
+                if not isinstance(f, (models.ForeignKey, models.ManyToManyField)):
                     raise ImproperlyConfigured("'%s.raw_id_fields[%d]', '%s' must "
                             "be either a ForeignKey or ManyToManyField."
                             % (cls.__name__, idx, field))
@@ -258,7 +258,7 @@ class ModelAdminValidator(BaseValidator):
                         else:
                             # getattr(model, field) could be an X_RelatedObjectsDescriptor
                             f = fetch_attr(cls, model, "list_display[%d]" % idx, field)
-                            if f.concrete and f.many_to_many:
+                            if isinstance(f, models.ManyToManyField):
                                 raise ImproperlyConfigured(
                                     "'%s.list_display[%d]', '%s' is a ManyToManyField "
                                     "which is not supported."

@@ -211,8 +211,8 @@ class RelatedFieldListFilter(FieldListFilter):
                 'display': val,
             }
         if (isinstance(self.field, ForeignObjectRel) and
-                (self.field.field.null or self.field.many_to_many) or
-                hasattr(self.field, 'rel') and (self.field.null or self.field.many_to_many)):
+                (self.field.field.null or isinstance(self.field.field, ManyToManyField)) or
+                hasattr(self.field, 'rel') and (self.field.null or isinstance(self.field, ManyToManyField))):
             yield {
                 'selected': bool(self.lookup_val_isnull),
                 'query_string': cl.get_query_string({
