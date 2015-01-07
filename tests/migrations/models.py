@@ -52,6 +52,10 @@ class UnmigratedModel(models.Model):
     pass
 
 
+class EmptyManager(models.Manager):
+    use_in_migrations = True
+
+
 class FoodQuerySet(models.query.QuerySet):
     pass
 
