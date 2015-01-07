@@ -61,9 +61,11 @@ Django core exception classes are defined in ``django.core.exceptions``.
     * ``DisallowedModelAdminToField``
     * ``DisallowedRedirect``
     * ``InvalidSessionKey``
+    * ``RequestDataTooBig``
     * ``SuspiciousFileOperation``
     * ``SuspiciousMultipartForm``
     * ``SuspiciousSession``
+    * ``TooManyFieldsSent``
 
     If a ``SuspiciousOperation`` exception reaches the WSGI handler level it is
     logged at the ``Error`` level and results in
