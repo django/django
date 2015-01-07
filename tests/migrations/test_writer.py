@@ -10,8 +10,8 @@ import unittest
 
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
-from django.db.migrations.writer import MigrationWriter, SettingsReference
-from django.test import TestCase, ignore_warnings
+from django.db.migrations.writer import MigrationWriter, OperationWriter, SettingsReference
+from django.test import SimpleTestCase, TestCase, ignore_warnings
 from django.conf import settings
 from django.utils import datetime_safe, six
 from django.utils.deconstruct import deconstructible
@@ -28,6 +28,79 @@ class TestModel1(object):
     def upload_to(self):
         return "somewhere dynamic"
     thing = models.FileField(upload_to=upload_to)
+
+
+class OperationWriterTests(SimpleTestCase):
+
+    def test_empty_signature(self):
+        operation = custom_migration_operations.operations.TestOperation()
+        writer = OperationWriter(operation)
+        writer.indentation = 0
+        buff, imports = writer.serialize()
+        self.assertEqual(imports, {'import custom_migration_operations.operations'})
+        self.assertEqual(
+            buff,
+            'custom_migration_operations.operations.TestOperation(\n'
+            '),'
+        )
+
+    def test_args_signature(self):
+        operation = custom_migration_operations.operations.ArgsOperation(1, 2)
+        writer = OperationWriter(operation)
+        writer.indentation = 0
+        buff, imports = writer.serialize()
+        self.assertEqual(imports, {'import custom_migration_operations.operations'})
+        self.assertEqual(
+            buff,
+            'custom_migration_operations.operations.ArgsOperation(\n'
+            '    arg1=1,\n'
+            '    arg2=2,\n'
+            '),'
+        )
+
+    def test_kwargs_signature(self):
+        operation = custom_migration_operations.operations.KwargsOperation(kwarg1=1)
+        writer = OperationWriter(operation)
+        writer.indentation = 0
+        buff, imports = writer.serialize()
+        self.assertEqual(imports, {'import custom_migration_operations.operations'})
+        self.assertEqual(
+            buff,
+            'custom_migration_operations.operations.KwargsOperation(\n'
+            '    kwarg1=1,\n'
+            '),'
+        )
+
+    def test_args_kwargs_signature(self):
+        operation = custom_migration_operations.operations.ArgsKwargsOperation(1, 2, kwarg2=4)
+        writer = OperationWriter(operation)
+        writer.indentation = 0
+        buff, imports = writer.serialize()
+        self.assertEqual(imports, {'import custom_migration_operations.operations'})
+        self.assertEqual(
+            buff,
+            'custom_migration_operations.operations.ArgsKwargsOperation(\n'
+            '    arg1=1,\n'
+            '    arg2=2,\n'
+            '    kwarg2=4,\n'
+            '),'
+        )
+
+    def test_expand_args_signature(self):
+        operation = custom_migration_operations.operations.ExpandArgsOperation([1, 2])
+        writer = OperationWriter(operation)
+        writer.indentation = 0
+        buff, imports = writer.serialize()
+        self.assertEqual(imports, {'import custom_migration_operations.operations'})
+        self.assertEqual(
+            buff,
+            'custom_migration_operations.operations.ExpandArgsOperation(\n'
+            '    arg=[\n'
+            '        1,\n'
+            '        2,\n'
+            '    ],\n'
+            '),'
+        )
 
 
 class WriterTests(TestCase):

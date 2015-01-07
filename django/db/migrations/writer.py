@@ -46,10 +46,38 @@ class OperationWriter(object):
         self.buff = []
 
     def serialize(self):
+
+        def _write(_arg_name, _arg_value):
+            if (_arg_name in self.operation.serialization_expand_args and
+                    isinstance(_arg_value, (list, tuple, dict))):
+                if isinstance(_arg_value, dict):
+                    self.feed('%s={' % _arg_name)
+                    self.indent()
+                    for key, value in _arg_value.items():
+                        key_string, key_imports = MigrationWriter.serialize(key)
+                        arg_string, arg_imports = MigrationWriter.serialize(value)
+                        self.feed('%s: %s,' % (key_string, arg_string))
+                        imports.update(key_imports)
+                        imports.update(arg_imports)
+                    self.unindent()
+                    self.feed('},')
+                else:
+                    self.feed('%s=[' % _arg_name)
+                    self.indent()
+                    for item in _arg_value:
+                        arg_string, arg_imports = MigrationWriter.serialize(item)
+                        self.feed('%s,' % arg_string)
+                        imports.update(arg_imports)
+                    self.unindent()
+                    self.feed('],')
+            else:
+                arg_string, arg_imports = MigrationWriter.serialize(_arg_value)
+                self.feed('%s=%s,' % (_arg_name, arg_string))
+                imports.update(arg_imports)
+
         imports = set()
         name, args, kwargs = self.operation.deconstruct()
         argspec = inspect.getargspec(self.operation.__init__)
-        normalized_kwargs = inspect.getcallargs(self.operation.__init__, *args, **kwargs)
 
         # See if this operation is in django.db.migrations. If it is,
         # We can just use the fact we already have that imported,
@@ -61,34 +89,20 @@ class OperationWriter(object):
             self.feed('%s.%s(' % (self.operation.__class__.__module__, name))
 
         self.indent()
-        for arg_name in argspec.args[1:]:
-            arg_value = normalized_kwargs[arg_name]
-            if (arg_name in self.operation.serialization_expand_args and
-                    isinstance(arg_value, (list, tuple, dict))):
-                if isinstance(arg_value, dict):
-                    self.feed('%s={' % arg_name)
-                    self.indent()
-                    for key, value in arg_value.items():
-                        key_string, key_imports = MigrationWriter.serialize(key)
-                        arg_string, arg_imports = MigrationWriter.serialize(value)
-                        self.feed('%s: %s,' % (key_string, arg_string))
-                        imports.update(key_imports)
-                        imports.update(arg_imports)
-                    self.unindent()
-                    self.feed('},')
-                else:
-                    self.feed('%s=[' % arg_name)
-                    self.indent()
-                    for item in arg_value:
-                        arg_string, arg_imports = MigrationWriter.serialize(item)
-                        self.feed('%s,' % arg_string)
-                        imports.update(arg_imports)
-                    self.unindent()
-                    self.feed('],')
-            else:
-                arg_string, arg_imports = MigrationWriter.serialize(arg_value)
-                self.feed('%s=%s,' % (arg_name, arg_string))
-                imports.update(arg_imports)
+
+        # Start at one because argspec includes "self"
+        for i, arg in enumerate(args, 1):
+            arg_value = arg
+            arg_name = argspec.args[i]
+            _write(arg_name, arg_value)
+
+        i = len(args)
+        # Only iterate over remaining arguments
+        for arg_name in argspec.args[i + 1:]:
+            if arg_name in kwargs:
+                arg_value = kwargs[arg_name]
+                _write(arg_name, arg_value)
+
         self.unindent()
         self.feed('),')
         return self.render(), imports
