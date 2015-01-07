@@ -164,14 +164,14 @@ These old APIs can be replicated by either:
   <model-field-attributes>` that describe (or retrieve, in the case of
   ``_with_model`` variants) the properties of the desired fields.
 
-Assuming you have a model named ``MyModel``, the following substitutions
-can be made to convert your code to the new API.
+Although it would be possible to provide replacements for the old API, a
+simple drop-in replacement probably won't be the best approach in practice.
+Taking the time to refactor any field loops to make better use of the new
+API - and possibly include fields that were previously excluded - will
+almost certainly result in better code.
 
-Although these are being presented as "drop-in" replacements for the old
-API, a simple drop-in replacement probably won't be the best approach in
-practice. Taking the time to refactor any field loops to make better use
-of the new API - and possibly include fields that were previously
-excluded - will almost certainly result in better code.
+Assuming you have a model named ``MyModel``, the following substitutions
+can be made to convert your code to the new API:
 
 * ``MyModel._meta.get_field(name)``::
 
