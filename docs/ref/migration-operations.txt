@@ -384,7 +384,7 @@ historical models.
 Some things to note:
 
 * You don't need to learn too much about ``ProjectState`` to just write simple
-  migrations; just know that it has a ``.render()`` method that turns it into
+  migrations; just know that it has an ``apps`` property that gives access to
   an app registry (which you can then call ``get_model`` on).
 
 * ``database_forwards`` and ``database_backwards`` both get two states passed
