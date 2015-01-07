@@ -190,6 +190,13 @@ class NonAggregateAnnotationTestCase(TestCase):
             lambda d: (d.other_name, d.other_chain, d.is_open, d.book_isbn)
         )
 
+    def test_null_annotation(self):
+        """
+        Test that annotating None onto a model round-trips
+        """
+        book = Book.objects.annotate(no_value=Value(None, output_field=IntegerField())).first()
+        self.assertIsNone(book.no_value)
+
     def test_column_field_ordering(self):
         """
         Test that columns are aligned in the correct order for
