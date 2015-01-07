@@ -50,15 +50,15 @@ class ProjectState(object):
             model_name = model_name.lower()
             try:
                 related_old = {
-                    f.model for f in
-                    self.apps.get_model(app_label, model_name)._meta.get_all_related_objects()
+                    f.related_model for f in
+                    self.apps.get_model(app_label, model_name)._meta.related_objects
                 }
             except LookupError:
                 related_old = set()
             self._reload_one_model(app_label, model_name)
             # Reload models if there are relations
             model = self.apps.get_model(app_label, model_name)
-            related_m2m = {f.rel.to for f, _ in model._meta.get_m2m_with_model()}
+            related_m2m = {f.related_model for f in model._meta.many_to_many}
             for rel_model in related_old.union(related_m2m):
                 self._reload_one_model(rel_model._meta.app_label, rel_model._meta.model_name)
             if related_m2m:

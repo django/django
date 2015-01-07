@@ -118,7 +118,10 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         seen = self.query.included_inherited_models.copy()
         if start_alias:
             seen[None] = start_alias
-        for field, model in opts.get_concrete_fields_with_model():
+        for field in opts.concrete_fields:
+            model = field.model._meta.concrete_model
+            if model is opts.model:
+                model = None
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.
                 continue

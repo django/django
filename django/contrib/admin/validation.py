@@ -346,7 +346,7 @@ class ModelAdminValidator(BaseValidator):
             check_isseq(cls, 'list_editable', cls.list_editable)
             for idx, field_name in enumerate(cls.list_editable):
                 try:
-                    field = model._meta.get_field_by_name(field_name)[0]
+                    field = model._meta.get_field(field_name)
                 except FieldDoesNotExist:
                     raise ImproperlyConfigured("'%s.list_editable[%d]' refers to a "
                         "field, '%s', not defined on %s.%s."

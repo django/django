@@ -776,7 +776,7 @@ class ModelRefreshTests(TestCase):
 
 class TestRelatedObjectDeprecation(TestCase):
     def test_field_related_deprecation(self):
-        field = SelfRef._meta.get_field_by_name('selfref')[0]
+        field = SelfRef._meta.get_field('selfref')
         with warnings.catch_warnings(record=True) as warns:
             warnings.simplefilter('always')
             self.assertIsInstance(field.related, ForeignObjectRel)
