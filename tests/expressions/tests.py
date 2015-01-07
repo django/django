@@ -5,7 +5,7 @@ import datetime
 
 from django.core.exceptions import FieldError
 from django.db import connection, transaction, DatabaseError
-from django.db.models import F
+from django.db.models import F, Value
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
@@ -171,6 +171,19 @@ class BasicExpressionsTests(TestCase):
                 "Max Mustermann",
             ],
             lambda c: six.text_type(c.point_of_contact),
+            ordered=False
+        )
+
+    def test_update_with_none(self):
+        Number.objects.create(integer=1, float=1.0)
+        Number.objects.create(integer=2)
+        Number.objects.filter(float__isnull=False).update(float=Value(None))
+        self.assertQuerysetEqual(
+            Number.objects.all(), [
+                None,
+                None,
+            ],
+            lambda n: n.float,
             ordered=False
         )
 
