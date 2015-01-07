@@ -483,6 +483,11 @@ class Value(ExpressionNode):
         self.value = value
 
     def as_sql(self, compiler, connection):
+        if self.value is None:
+            # cx_Oracle does not always convert None to the appropriate
+            # NULL type (like in case expressions using numbers), so we
+            # use a literal SQL NULL
+            return 'NULL', []
         return '%s', [self.value]
 
 
