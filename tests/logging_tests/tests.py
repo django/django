@@ -120,14 +120,18 @@ class WarningLoggerTests(TestCase):
 
     @override_settings(DEBUG=True)
     def test_warnings_capture(self):
-        warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
-        output = force_text(self.outputs[0].getvalue())
-        self.assertTrue('Foo Deprecated' in output)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('always')
+            warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
+            output = force_text(self.outputs[0].getvalue())
+            self.assertTrue('Foo Deprecated' in output)
 
     def test_warnings_capture_debug_false(self):
-        warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
-        output = force_text(self.outputs[0].getvalue())
-        self.assertFalse('Foo Deprecated' in output)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('always')
+            warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
+            output = force_text(self.outputs[0].getvalue())
+            self.assertNotIn('Foo Deprecated', output)
 
     @override_settings(DEBUG=True)
     def test_error_filter_still_raises(self):
