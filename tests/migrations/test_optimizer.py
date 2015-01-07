@@ -5,6 +5,8 @@ from django.db.migrations.optimizer import MigrationOptimizer
 from django.db import migrations
 from django.db import models
 
+from .models import CustomModelBase, EmptyManager
+
 
 class OptimizerTests(TestCase):
     """
@@ -55,13 +57,26 @@ class OptimizerTests(TestCase):
         """
         CreateModel should absorb RenameModels.
         """
+        managers = [('objects', EmptyManager())]
         self.assertOptimizesTo(
             [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[("name", models.CharField(max_length=255))],
+                    options={'verbose_name': 'Foo'},
+                    bases=(CustomModelBase),
+                    managers=managers,
+                ),
                 migrations.RenameModel("Foo", "Bar"),
             ],
             [
-                migrations.CreateModel("Bar", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel(
+                    "Bar",
+                    [("name", models.CharField(max_length=255))],
+                    options={'verbose_name': 'Foo'},
+                    bases=(CustomModelBase),
+                    managers=managers,
+                )
             ],
         )
 
@@ -159,16 +174,29 @@ class OptimizerTests(TestCase):
         """
         AddField should optimize into CreateModel.
         """
+        managers = [('objects', EmptyManager())]
         self.assertOptimizesTo(
             [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[("name", models.CharField(max_length=255))],
+                    options={'verbose_name': 'Foo'},
+                    bases=(CustomModelBase),
+                    managers=managers,
+                ),
                 migrations.AddField("Foo", "age", models.IntegerField()),
             ],
             [
-                migrations.CreateModel("Foo", [
-                    ("name", models.CharField(max_length=255)),
-                    ("age", models.IntegerField()),
-                ]),
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[
+                        ("name", models.CharField(max_length=255)),
+                        ("age", models.IntegerField()),
+                    ],
+                    options={'verbose_name': 'Foo'},
+                    bases=(CustomModelBase),
+                    managers=managers,
+                ),
             ],
         )
 
@@ -214,15 +242,28 @@ class OptimizerTests(TestCase):
         """
         AlterField should optimize into CreateModel.
         """
+        managers = [('objects', EmptyManager())]
         self.assertOptimizesTo(
             [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[("name", models.CharField(max_length=255))],
+                    options={'verbose_name': 'Foo'},
+                    bases=(CustomModelBase),
+                    managers=managers,
+                ),
                 migrations.AlterField("Foo", "name", models.IntegerField()),
             ],
             [
-                migrations.CreateModel("Foo", [
-                    ("name", models.IntegerField()),
-                ]),
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[
+                        ("name", models.IntegerField()),
+                    ],
+                    options={'verbose_name': 'Foo'},
+                    bases=(CustomModelBase),
+                    managers=managers,
+                ),
             ],
         )
 
@@ -230,15 +271,28 @@ class OptimizerTests(TestCase):
         """
         RenameField should optimize into CreateModel.
         """
+        managers = [('objects', EmptyManager())]
         self.assertOptimizesTo(
             [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[("name", models.CharField(max_length=255))],
+                    options={'verbose_name': 'Foo'},
+                    bases=(CustomModelBase),
+                    managers=managers,
+                ),
                 migrations.RenameField("Foo", "name", "title"),
             ],
             [
-                migrations.CreateModel("Foo", [
-                    ("title", models.CharField(max_length=255)),
-                ]),
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[
+                        ("title", models.CharField(max_length=255)),
+                    ],
+                    options={'verbose_name': 'Foo'},
+                    bases=(CustomModelBase),
+                    managers=managers,
+                ),
             ],
         )
 
@@ -277,18 +331,31 @@ class OptimizerTests(TestCase):
         """
         RemoveField should optimize into CreateModel.
         """
+        managers = [('objects', EmptyManager())]
         self.assertOptimizesTo(
             [
-                migrations.CreateModel("Foo", [
-                    ("name", models.CharField(max_length=255)),
-                    ("age", models.IntegerField()),
-                ]),
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[
+                        ("name", models.CharField(max_length=255)),
+                        ("age", models.IntegerField()),
+                    ],
+                    options={'verbose_name': 'Foo'},
+                    bases=(CustomModelBase),
+                    managers=managers,
+                ),
                 migrations.RemoveField("Foo", "age"),
             ],
             [
-                migrations.CreateModel("Foo", [
-                    ("name", models.CharField(max_length=255)),
-                ]),
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[
+                        ("name", models.CharField(max_length=255)),
+                    ],
+                    options={'verbose_name': 'Foo'},
+                    bases=(CustomModelBase),
+                    managers=managers,
+                ),
             ],
         )
 
