@@ -1790,3 +1790,95 @@ Field API reference
 
         This method must be added to fields prior to 1.7 to migrate its data
         using :doc:`/topics/migrations`.
+
+.. _model-field-attributes:
+
+=========================
+Field attribute reference
+=========================
+
+.. versionadded:: 1.8
+
+Every ``Field`` instance contains several attributes that allow
+introspecting its behavior. Use these attributes instead of ``isinstance``
+checks when you need to write code that depends on a field's functionality.
+These attributes can be used together with the :ref:`Model._meta API
+<model-meta-field-api>` to narrow down a search for specific field types.
+Custom model fields should implement these flags.
+
+Attributes for fields
+=====================
+
+.. attribute:: Field.auto_created
+
+     Boolean flag that indicates if the field was automatically created, such
+     as the ``OneToOneField`` used by model inheritance.
+
+.. attribute:: Field.concrete
+
+    Boolean flag that indicates if the field has a database column associated
+    with it.
+
+.. attribute:: Field.hidden
+
+    Boolean flag that indicates if a field is used to back another non-hidden
+    field's functionality (e.g. the ``content_type`` and ``object_id`` fields
+    that make up a ``GenericForeignKey``). The ``hidden`` flag is used to
+    distinguish what constitutes the public subset of fields on the model from
+    all the fields on the model.
+
+    .. note::
+
+        :meth:`Options.get_fields()
+        <django.db.models.options.Options.get_fields()>`
+        excludes hidden fields by default. Pass in ``include_hidden=True`` to
+        return hidden fields in the results.
+
+.. attribute:: Field.is_relation
+
+    Boolean flag that indicates if a field contains references to one or
+    more other models for its functionality (e.g. ``ForeignKey``,
+    ``ManyToManyField``, ``OneToOneField``, etc.).
+
+.. attribute:: Field.model
+
+    Returns the model on which the field is defined. If a field is defined on
+    a superclass of a model, ``model`` will refer to the superclass, not the
+    class of the instance.
+
+Attributes for fields with relations
+====================================
+
+These attributes are used to query for the cardinality and other details of a
+relation. These attribute are present on all fields; however, they will only
+have meaningful values if the field is a relation type
+(:attr:`Field.is_relation=True <Field.is_relation>`).
+
+.. attribute:: Field.one_to_many
+
+    Boolean flag that is ``True`` if the field has a one-to-many relation, such
+    as a ``ForeignKey``; ``False`` otherwise.
+
+.. attribute:: Field.one_to_one
+
+    Boolean flag that is ``True`` if the field has a one-to-one relation, such
+    as a ``OneToOneField``; ``False`` otherwise.
+
+.. attribute:: Field.many_to_many
+
+    Boolean flag that is ``True`` if the field has a many-to-many relation;
+    ``False`` otherwise. The only field included with Django where this is
+    ``True`` is ``ManyToManyField``.
+
+.. attribute:: Field.many_to_one
+
+    Boolean flag that is ``True`` if the field has a many-to-one relation, such
+    as a ``GenericRelation`` or the reverse of a ``ForeignKey``; ``False``
+    otherwise.
+
+.. attribute:: Field.related_model
+
+    Points to the model the field relates to. For example, ``Author`` in
+    ``ForeignKey(Author)``. If a field has a generic relation (such as a
+    ``GenericForeignKey`` or a ``GenericRelation``) then ``related_model``
+    will be ``None``.
