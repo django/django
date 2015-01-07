@@ -403,7 +403,8 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(tag.content_object.id, diamond.id)
 
     def test_query_content_type(self):
-        with six.assertRaisesRegex(self, FieldError, "^Cannot resolve keyword 'content_object' into field."):
+        msg = "Field 'content_object' does not generate an automatic reverse relation"
+        with self.assertRaisesMessage(FieldError, msg):
             TaggedItem.objects.get(content_object='')
 
 

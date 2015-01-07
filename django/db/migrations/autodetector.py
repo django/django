@@ -163,7 +163,7 @@ class MigrationAutodetector(object):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             for field_name, field in old_model_state.fields:
-                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(field_name)[0]
+                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(field_name)
                 if (hasattr(old_field, "rel") and getattr(old_field.rel, "through", None)
                         and not old_field.rel.through._meta.auto_created):
                     through_key = (
@@ -685,26 +685,14 @@ class MigrationAutodetector(object):
             # and the removal of all its own related fields, and if it's
             # a through model the field that references it.
             dependencies = []
-            for related_object in model._meta.get_all_related_objects():
-                dependencies.append((
-                    related_object.model._meta.app_label,
-                    related_object.model._meta.object_name,
-                    related_object.field.name,
-                    False,
-                ))
-                dependencies.append((
-                    related_object.model._meta.app_label,
-                    related_object.model._meta.object_name,
-                    related_object.field.name,
-                    "alter",
-                ))
-            for related_object in model._meta.get_all_related_many_to_many_objects():
-                dependencies.append((
-                    related_object.model._meta.app_label,
-                    related_object.model._meta.object_name,
-                    related_object.field.name,
-                    False,
-                ))
+            for related_object in model._meta.related_objects:
+                related_object_app_label = related_object.related_model._meta.app_label
+                object_name = related_object.related_model._meta.object_name
+                field_name = related_object.field.name
+                dependencies.append((related_object_app_label, object_name, field_name, False))
+                if not related_object.many_to_many:
+                    dependencies.append((related_object_app_label, object_name, field_name, "alter"))
+
             for name, field in sorted(related_fields.items()):
                 dependencies.append((app_label, model_name, name, False))
             # We're referenced in another field's through=
@@ -743,7 +731,7 @@ class MigrationAutodetector(object):
         for app_label, model_name, field_name in sorted(self.new_field_keys - self.old_field_keys):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
-            field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+            field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
             # Scan to see if this is actually a rename!
             field_dec = self.deep_deconstruct(field)
             for rem_app_label, rem_model_name, rem_field_name in sorted(self.old_field_keys - self.new_field_keys):
@@ -776,7 +764,7 @@ class MigrationAutodetector(object):
             self._generate_added_field(app_label, model_name, field_name)
 
     def _generate_added_field(self, app_label, model_name, field_name):
-        field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+        field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
         # Fields that are foreignkeys/m2ms depend on stuff
         dependencies = []
         if field.rel and field.rel.to:
@@ -847,8 +835,8 @@ class MigrationAutodetector(object):
             # Did the field change?
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_field_name = self.renamed_fields.get((app_label, model_name, field_name), field_name)
-            old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(old_field_name)[0]
-            new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+            old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(old_field_name)
+            new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
             # Implement any model renames on relations; these are handled by RenameModel
             # so we need to exclude them from the comparison
             if hasattr(new_field, "rel") and getattr(new_field.rel, "to", None):

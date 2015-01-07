@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import os
 import warnings
 
+from django.apps import apps
 from django.contrib.sites.models import Site
 from django.core import management
 from django.db import connection, IntegrityError
@@ -76,6 +77,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         ])
 
     def test_loading_and_dumping(self):
+        apps.clear_cache()
         Site.objects.all().delete()
         # Load fixture 1. Single JSON file, with two objects.
         management.call_command('loaddata', 'fixture1.json', verbosity=0)

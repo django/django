@@ -79,7 +79,7 @@ class PickleabilityTestCase(TestCase):
         m1 = M2MModel.objects.create()
         g1 = Group.objects.create(name='foof')
         m1.groups.add(g1)
-        m2m_through = M2MModel._meta.get_field_by_name('groups')[0].rel.through
+        m2m_through = M2MModel._meta.get_field('groups').rel.through
         original = m2m_through.objects.get()
         dumped = pickle.dumps(original)
         reloaded = pickle.loads(dumped)

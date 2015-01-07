@@ -217,9 +217,9 @@ The ``Field.__init__()`` method takes the following parameters:
 * :attr:`~django.db.models.Field.db_tablespace`: Only for index creation, if the
   backend supports :doc:`tablespaces </topics/db/tablespaces>`. You can usually
   ignore this option.
-* ``auto_created``: ``True`` if the field was automatically created, as for the
-  :class:`~django.db.models.OneToOneField` used by model inheritance. For
-  advanced use only.
+* :attr:`~django.db.models.Field.auto_created`: ``True`` if the field was
+  automatically created, as for the :class:`~django.db.models.OneToOneField`
+  used by model inheritance. For advanced use only.
 
 All of the options without an explanation in the above list have the same
 meaning they do for normal Django fields. See the :doc:`field documentation

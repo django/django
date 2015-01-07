@@ -260,7 +260,7 @@ class GenericRelationTests(TestCase):
         form = GenericRelationForm({'links': None})
         self.assertTrue(form.is_valid())
         form.save()
-        links = HasLinkThing._meta.get_field_by_name('links')[0]
+        links = HasLinkThing._meta.get_field('links')
         self.assertEqual(links.save_form_data_calls, 1)
 
     def test_ticket_22998(self):

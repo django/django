@@ -457,11 +457,10 @@ class LayerMapping(object):
 
     def geometry_field(self):
         "Returns the GeometryField instance associated with the geographic column."
-        # Use the `get_field_by_name` on the model's options so that we
+        # Use `get_field()` on the model's options so that we
         # get the correct field instance if there's model inheritance.
         opts = self.model._meta
-        fld, model, direct, m2m = opts.get_field_by_name(self.geom_field)
-        return fld
+        return opts.get_field(self.geom_field)
 
     def make_multi(self, geom_type, model_field):
         """

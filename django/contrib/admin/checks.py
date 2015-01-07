@@ -762,7 +762,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_list_editable_item(self, cls, model, field_name, label):
         try:
-            field = model._meta.get_field_by_name(field_name)[0]
+            field = model._meta.get_field(field_name)
         except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E121')

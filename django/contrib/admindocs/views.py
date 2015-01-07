@@ -262,7 +262,7 @@ class ModelDetailView(BaseAdminDocsView):
                 })
 
         # Gather related objects
-        for rel in opts.get_all_related_objects() + opts.get_all_related_many_to_many_objects():
+        for rel in opts.related_objects:
             verbose = _("related `%(app_label)s.%(object_name)s` objects") % {
                 'app_label': rel.opts.app_label,
                 'object_name': rel.opts.object_name,

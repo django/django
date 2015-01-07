@@ -56,6 +56,19 @@ details on these changes.
 
 * ``django.template.resolve_variable`` will be removed.
 
+* The following private APIs will be removed from
+  :class:`django.db.models.options.Options` (``Model._meta``):
+
+  * ``get_field_by_name()``
+  * ``get_all_field_names()``
+  * ``get_fields_with_model()``
+  * ``get_concrete_fields_with_model()``
+  * ``get_m2m_with_model()``
+  * ``get_all_related_objects()``
+  * ``get_all_related_objects_with_model()``
+  * ``get_all_related_many_to_many_objects()``
+  * ``get_all_related_m2m_objects_with_model()``
+
 * The ``error_message`` argument of ``django.forms.RegexField`` will be removed.
 
 * The ``unordered_list`` filter will no longer support old style lists.
