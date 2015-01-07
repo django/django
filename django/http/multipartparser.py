@@ -12,7 +12,7 @@ import cgi
 import sys
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousMultipartForm
+from django.core.exceptions import SuspiciousMultipartForm, SuspiciousOperation
 from django.core.files.uploadhandler import (
     SkipFile, StopFutureHandlers, StopUpload,
 )
@@ -104,6 +104,11 @@ class MultiPartParser(object):
         self._content_length = content_length
         self._upload_handlers = upload_handlers
 
+        # Limit the maximum request data size that will be parsed and stored in
+        # memory. File upload data is not included against this limit.
+        self._max_data_size = settings.DATA_UPLOAD_MAX_MEMORY_SIZE
+        self._data_size = 0
+
     def parse(self):
         """
         Parse the POST data and break it into a FILES MultiValueDict and a POST
@@ -166,15 +171,24 @@ class MultiPartParser(object):
                 field_name = force_text(field_name, encoding, errors='replace')
 
                 if item_type == FIELD:
+                    # avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE
+                    if self._max_data_size is not None:
+                        read_kwargs = {'size': self._max_data_size - self._data_size}
+                    else:
+                        read_kwargs = {}
                     # This is a post field, we can just set it in the post
                     if transfer_encoding == 'base64':
-                        raw_data = field_stream.read()
+                        raw_data = field_stream.read(**read_kwargs)
                         try:
                             data = base64.b64decode(raw_data)
                         except _BASE64_DECODE_ERROR:
                             data = raw_data
                     else:
-                        data = field_stream.read()
+                        data = field_stream.read(**read_kwargs)
+
+                    self._data_size += len(field_name) + len(data)
+                    if self._max_data_size is not None and field_stream.read(1):
+                        raise SuspiciousOperation('Request data too large')
 
                     self._post.appendlist(field_name,
                                           force_text(data, encoding, errors='replace'))

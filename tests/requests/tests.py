@@ -811,6 +811,73 @@ class HostValidationTests(SimpleTestCase):
             request.get_host()
 
 
+class DataUploadMaxMemorySizeGetTests(SimpleTestCase):
+
+    def _test_data_upload_max_memory_size_exceeded(self, content_length_header):
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'GET',
+            'wsgi.input': BytesIO(b''),
+            content_length_header: 3,
+        })
+
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=2):
+            with self.assertRaisesMessage(SuspiciousOperation, 'Request data too large'):
+                request.body
+
+        # no problem for body <= DATA_UPLOAD_MAX_MEMORY_SIZE
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=3):
+            request.body
+
+        # After a successful read, attributes on request are cached so need to
+        # create a new one.
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'GET',
+            'wsgi.input': BytesIO(b''),
+            content_length_header: 3,
+        })
+
+        # ... or DATA_UPLOAD_MAX_MEMORY_SIZE=None
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=None):
+            request.body
+
+    def test_data_upload_max_memory_size_exceeded_http_content_length(self):
+        self._test_data_upload_max_memory_size_exceeded('HTTP_CONTENT_LENGTH')
+
+    def test_data_upload_max_memory_size_exceeded_content_length(self):
+        self._test_data_upload_max_memory_size_exceeded('CONTENT_LENGTH')
+
+
+class DataUploadMaxMemorySizePostTests(SimpleTestCase):
+    def setUp(self):
+        payload = FakePayload("\r\n".join([
+            '--boundary',
+            'Content-Disposition: form-data; name="name"',
+            '',
+            'value',
+            '--boundary--'
+            ''
+        ]))
+        self.request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
+
+    def test_size_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=4):
+            with self.assertRaisesMessage(SuspiciousOperation, 'Request data too large'):
+                self.request._load_post_and_files()
+
+    def test_size_not_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=5):
+            self.request._load_post_and_files()
+
+    def test_no_limit(self):
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=None):
+            self.request._load_post_and_files()
+
+
 class BuildAbsoluteURITestCase(SimpleTestCase):
     """
     Regression tests for ticket #18314.

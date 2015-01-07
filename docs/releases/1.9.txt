@@ -811,6 +811,13 @@ by ``ForeignKey`` and ``GenericForeignKey`` changed from a series of
 ``Model.save()`` calls to a single ``QuerySet.update()`` call. The change means
 that ``pre_save`` and ``post_save`` signals aren't sent anymore. You can use
 the ``bulk=False`` keyword argument to revert to the previous behavior.
+Maximum size of a request body is now limited
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The new :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` setting limits the size that a
+request body may be before raising a
+:exc:`~django.core.exceptions.SuspiciousOperation` error. See its documentation
+for more details.
 
 Template ``LoaderOrigin`` and ``StringOrigin`` are removed
 ----------------------------------------------------------
