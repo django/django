@@ -211,6 +211,7 @@ class MigrationOptimizer(object):
                     fields=operation.fields,
                     options=operation.options,
                     bases=operation.bases,
+                    managers=operation.managers,
                 )
             ]
 
@@ -247,6 +248,7 @@ class MigrationOptimizer(object):
                     fields=operation.fields + [(other.name, other.field)],
                     options=operation.options,
                     bases=operation.bases,
+                    managers=operation.managers,
                 )
             ]
 
@@ -261,6 +263,7 @@ class MigrationOptimizer(object):
                     ],
                     options=operation.options,
                     bases=operation.bases,
+                    managers=operation.managers,
                 )
             ]
 
@@ -275,6 +278,7 @@ class MigrationOptimizer(object):
                     ],
                     options=operation.options,
                     bases=operation.bases,
+                    managers=operation.managers,
                 )
             ]
 
@@ -290,6 +294,7 @@ class MigrationOptimizer(object):
                     ],
                     options=operation.options,
                     bases=operation.bases,
+                    managers=operation.managers,
                 )
             ]
 
