@@ -298,7 +298,12 @@ class SQLCompiler(object):
         # be used by local fields.
         seen_models = {None: start_alias}
 
-        for field, model in opts.get_concrete_fields_with_model():
+        for field in opts.concrete_fields:
+            model = field.model._meta.concrete_model
+            # A proxy model will have a different model and concrete_model. We
+            # will assign None if the field belongs to this model.
+            if model == opts.model:
+                model = None
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.
                 continue
@@ -601,10 +606,10 @@ class SQLCompiler(object):
         connections to the root model).
         """
         def _get_field_choices():
-            direct_choices = (f.name for (f, _) in opts.get_fields_with_model() if f.rel)
+            direct_choices = (f.name for f in opts.fields if f.is_relation)
             reverse_choices = (
                 f.field.related_query_name()
-                for f in opts.get_all_related_objects() if f.field.unique
+                for f in opts.related_objects if f.field.unique
             )
             return chain(direct_choices, reverse_choices)
 
@@ -628,12 +633,13 @@ class SQLCompiler(object):
             else:
                 restricted = False
 
-        for f, model in opts.get_fields_with_model():
+        for f in opts.fields:
+            field_model = f.model._meta.concrete_model
             fields_found.add(f.name)
 
             if restricted:
                 next = requested.get(f.name, {})
-                if not f.rel:
+                if not f.is_relation:
                     # If a non-related field is used like a relation,
                     # or if a single non-relational field is given.
                     if next or (cur_depth == 1 and f.name in requested):
@@ -647,10 +653,6 @@ class SQLCompiler(object):
             else:
                 next = False
 
-            # The get_fields_with_model() returns None for fields that live
-            # in the field's local model. So, for those fields we want to use
-            # the f.model - that is the field's local model.
-            field_model = model or f.model
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):
                 continue
@@ -666,9 +668,9 @@ class SQLCompiler(object):
 
         if restricted:
             related_fields = [
-                (o.field, o.model)
-                for o in opts.get_all_related_objects()
-                if o.field.unique
+                (o.field, o.related_model)
+                for o in opts.related_objects
+                if o.field.unique and not o.many_to_many
             ]
             for f, model in related_fields:
                 if not select_related_descend(f, restricted, requested,
@@ -760,7 +762,7 @@ class SQLCompiler(object):
                     if self.query.select:
                         fields = [f.field for f in self.query.select]
                     elif self.query.default_cols:
-                        fields = self.query.get_meta().concrete_fields
+                        fields = list(self.query.get_meta().concrete_fields)
                     else:
                         fields = []
 

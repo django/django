@@ -758,7 +758,7 @@ class GeoQuerySet(QuerySet):
         elif geo_field not in opts.local_fields:
             # This geographic field is inherited from another model, so we have to
             # use the db table for the _parent_ model instead.
-            tmp_fld, parent_model, direct, m2m = opts.get_field_by_name(geo_field.name)
+            parent_model = geo_field.model._meta.concrete_model
             return self.query.get_compiler(self.db)._field_column(geo_field, parent_model._meta.db_table)
         else:
             return self.query.get_compiler(self.db)._field_column(geo_field)

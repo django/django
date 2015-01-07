@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from itertools import chain
 from operator import attrgetter
 
 from django.db import connections, transaction, IntegrityError
@@ -49,6 +50,23 @@ def SET_DEFAULT(collector, field, sub_objs, using):
 
 def DO_NOTHING(collector, field, sub_objs, using):
     pass
+
+
+def get_candidate_relations_to_delete(opts):
+    # Collect models that contain candidate relations to delete. This may include
+    # relations coming from proxy models.
+    candidate_models = {opts}
+    candidate_models = candidate_models.union(opts.concrete_model._meta.proxied_children)
+    # For each model, get all candidate fields.
+    candidate_model_fields = chain.from_iterable(
+        opts.get_fields(include_hidden=True) for opts in candidate_models
+    )
+    # The candidate relations are the ones that come from N-1 and 1-1 relations.
+    # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
+    return (
+        f for f in candidate_model_fields
+        if f.auto_created and not f.concrete and (f.one_to_one or f.many_to_one)
+    )
 
 
 class Collector(object):
@@ -134,8 +152,7 @@ class Collector(object):
             return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
-        for related in opts.get_all_related_objects(
-                include_hidden=True, include_proxy_eq=True):
+        for related in get_candidate_relations_to_delete(opts):
             if related.field.rel.on_delete is not DO_NOTHING:
                 return False
         for field in model._meta.virtual_fields:
@@ -184,7 +201,7 @@ class Collector(object):
         model = new_objs[0].__class__
 
         # Recursively collect concrete model's parent models, but not their
-        # related objects. These will be found by meta.get_all_related_objects()
+        # related objects. These will be found by meta.get_fields()
         concrete_model = model._meta.concrete_model
         for ptr in six.itervalues(concrete_model._meta.parents):
             if ptr:
@@ -199,8 +216,7 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-            for related in model._meta.get_all_related_objects(
-                    include_hidden=True, include_proxy_eq=True):
+            for related in get_candidate_relations_to_delete(model._meta):
                 field = related.field
                 if field.rel.on_delete == DO_NOTHING:
                     continue
@@ -225,7 +241,7 @@ class Collector(object):
         Gets a QuerySet of objects related to ``objs`` via the relation ``related``.
 
         """
-        return related.model._base_manager.using(self.using).filter(
+        return related.related_model._base_manager.using(self.using).filter(
             **{"%s__in" % related.field.name: objs}
         )
 

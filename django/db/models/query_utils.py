@@ -109,7 +109,7 @@ class DeferredAttribute(object):
             # self.field_name is the attname of the field, but only() takes the
             # actual name, so we need to translate it here.
             try:
-                f = opts.get_field_by_name(self.field_name)[0]
+                f = opts.get_field(self.field_name)
             except FieldDoesNotExist:
                 f = [f for f in opts.fields if f.attname == self.field_name][0]
             name = f.name
@@ -136,7 +136,7 @@ class DeferredAttribute(object):
         field is a primary key field.
         """
         opts = instance._meta
-        f = opts.get_field_by_name(name)[0]
+        f = opts.get_field(name)
         link_field = opts.get_ancestor_link(f.model)
         if f.primary_key and f != link_field:
             return getattr(instance, link_field.attname)

@@ -186,7 +186,7 @@ class Deserializer(base.Deserializer):
         # {m2m_accessor_attribute : [list_of_related_objects]})
         m2m_data = {}
 
-        model_fields = Model._meta.get_all_field_names()
+        field_names = {f.name for f in Model._meta.get_fields()}
         # Deserialize each field.
         for field_node in node.getElementsByTagName("field"):
             # If the field is missing the name attribute, bail (are you
@@ -198,7 +198,7 @@ class Deserializer(base.Deserializer):
             # Get the field from the Model. This will raise a
             # FieldDoesNotExist if, well, the field doesn't exist, which will
             # be propagated correctly unless ignorenonexistent=True is used.
-            if self.ignore and field_name not in model_fields:
+            if self.ignore and field_name not in field_names:
                 continue
             field = Model._meta.get_field(field_name)
 

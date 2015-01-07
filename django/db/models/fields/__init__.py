@@ -31,7 +31,9 @@ from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 from django.utils.itercompat import is_iterable
 
-# imported for backwards compatibility
+# When the _meta object was formalized, this exception was moved to
+# django.core.exceptions. It is retained here for backwards compatibility
+# purposes.
 from django.core.exceptions import FieldDoesNotExist  # NOQA
 
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
@@ -61,7 +63,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 
 def _load_field(app_label, model_name, field_name):
-    return apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+    return apps.get_model(app_label, model_name)._meta.get_field(field_name)
 
 
 # A guide to Field parameters:
@@ -116,6 +118,15 @@ class Field(RegisterLookupMixin):
     system_check_deprecated_details = None
     system_check_removed_details = None
 
+    # Field flags
+    hidden = False
+
+    many_to_many = None
+    many_to_one = None
+    one_to_many = None
+    one_to_one = None
+    related_model = None
+
     # Generic field type description, usually overridden by subclasses
     def _description(self):
         return _('Field of type: %(field_type)s') % {
@@ -137,6 +148,7 @@ class Field(RegisterLookupMixin):
         self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
         self.rel = rel
+        self.is_relation = self.rel is not None
         self.default = default
         self.editable = editable
         self.serialize = serialize
@@ -603,6 +615,7 @@ class Field(RegisterLookupMixin):
         if not self.name:
             self.name = name
         self.attname, self.column = self.get_attname_column()
+        self.concrete = self.column is not None
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 
@@ -610,7 +623,7 @@ class Field(RegisterLookupMixin):
         self.set_attributes_from_name(name)
         self.model = cls
         if virtual_only:
-            cls._meta.add_virtual_field(self)
+            cls._meta.add_field(self, virtual=True)
         else:
             cls._meta.add_field(self)
         if self.choices:

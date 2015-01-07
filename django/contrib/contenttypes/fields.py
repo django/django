@@ -21,6 +21,18 @@ class GenericForeignKey(object):
     Provides a generic relation to any object through content-type/object-id
     fields.
     """
+    # Field flags
+    auto_created = False
+    concrete = False
+    editable = False
+    hidden = False
+
+    is_relation = True
+    many_to_many = False
+    many_to_one = False
+    one_to_many = True
+    one_to_one = False
+    related_model = None
 
     def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
         self.ct_field = ct_field
@@ -28,12 +40,13 @@ class GenericForeignKey(object):
         self.for_concrete_model = for_concrete_model
         self.editable = False
         self.rel = None
+        self.column = None
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
         self.model = cls
         self.cache_attr = "_%s_cache" % name
-        cls._meta.add_virtual_field(self)
+        cls._meta.add_field(self, virtual=True)
 
         # Only run pre-initialization field assignment on non-abstract models
         if not cls._meta.abstract:
@@ -243,6 +256,13 @@ class GenericForeignKey(object):
 
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
+    # Field flags
+    auto_created = False
+
+    many_to_many = False
+    many_to_one = True
+    one_to_many = False
+    one_to_one = False
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
@@ -303,8 +323,7 @@ class GenericRelation(ForeignObject):
 
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
-        return [(self.rel.to._meta.get_field_by_name(self.object_id_field_name)[0],
-                 self.model._meta.pk)]
+        return [(self.rel.to._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
 
     def get_path_info(self):
         opts = self.rel.to._meta
@@ -345,7 +364,7 @@ class GenericRelation(ForeignObject):
                                                  for_concrete_model=self.for_concrete_model)
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
-        field = self.rel.to._meta.get_field_by_name(self.content_type_field_name)[0]
+        field = self.rel.to._meta.get_field(self.content_type_field_name)
         contenttype_pk = self.get_content_type().pk
         cond = where_class()
         lookup = field.get_lookup('exact')(Col(remote_alias, field, field), contenttype_pk)

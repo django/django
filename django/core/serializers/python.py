@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 from django.apps import apps
 from django.conf import settings
 from django.core.serializers import base
-from django.db import models, DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.encoding import force_text, is_protected_type
 from django.utils import six
 
@@ -101,12 +101,12 @@ def Deserializer(object_list, **options):
         if 'pk' in d:
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
         m2m_data = {}
-        model_fields = Model._meta.get_all_field_names()
+        field_names = {f.name for f in Model._meta.get_fields()}
 
         # Handle each field
         for (field_name, field_value) in six.iteritems(d["fields"]):
 
-            if ignore and field_name not in model_fields:
+            if ignore and field_name not in field_names:
                 # skip fields no longer on model
                 continue
 

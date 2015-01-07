@@ -138,7 +138,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Book,
-                Book._meta.get_field_by_name("author")[0],
+                Book._meta.get_field("author"),
                 new_field,
                 strict=True,
             )
@@ -393,7 +393,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Author,
-                Author._meta.get_field_by_name("name")[0],
+                Author._meta.get_field("name"),
                 new_field,
                 strict=True,
             )
@@ -424,7 +424,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Note,
-                Note._meta.get_field_by_name("info")[0],
+                Note._meta.get_field("info"),
                 new_field,
                 strict=True,
             )
@@ -451,7 +451,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Author,
-                Author._meta.get_field_by_name("height")[0],
+                Author._meta.get_field("height"),
                 new_field
             )
         # Ensure the field is right afterwards
@@ -479,7 +479,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 AuthorWithDefaultHeight,
-                AuthorWithDefaultHeight._meta.get_field_by_name("height")[0],
+                AuthorWithDefaultHeight._meta.get_field("height"),
                 new_field,
             )
         # Ensure the field is right afterwards
@@ -512,7 +512,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Book,
-                Book._meta.get_field_by_name("author")[0],
+                Book._meta.get_field("author"),
                 new_field,
                 strict=True,
             )
@@ -542,7 +542,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Author,
-                Author._meta.get_field_by_name("id")[0],
+                Author._meta.get_field("id"),
                 new_field,
                 strict=True,
             )
@@ -568,7 +568,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Author,
-                Author._meta.get_field_by_name("name")[0],
+                Author._meta.get_field("name"),
                 new_field,
                 strict=True,
             )
@@ -587,7 +587,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(TagM2MTest)
             editor.create_model(BookWithM2M)
         # Ensure there is now an m2m table there
-        columns = self.column_classes(BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)
+        columns = self.column_classes(BookWithM2M._meta.get_field("tags").rel.through)
         self.assertEqual(columns['tagm2mtest_id'][0], "IntegerField")
 
     def test_m2m_create_through(self):
@@ -661,7 +661,7 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(len(self.column_classes(AuthorTag)), 3)
         # "Alter" the field's blankness. This should not actually do anything.
         with connection.schema_editor() as editor:
-            old_field = AuthorWithM2MThrough._meta.get_field_by_name("tags")[0]
+            old_field = AuthorWithM2MThrough._meta.get_field("tags")
             new_field = ManyToManyField("schema.TagM2MTest", related_name="authors", through="AuthorTag")
             new_field.contribute_to_class(AuthorWithM2MThrough, "tags")
             editor.alter_field(
@@ -683,7 +683,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(TagM2MTest)
             editor.create_model(UniqueTest)
         # Ensure the M2M exists and points to TagM2MTest
-        constraints = self.get_constraints(BookWithM2M._meta.get_field_by_name("tags")[0].rel.through._meta.db_table)
+        constraints = self.get_constraints(BookWithM2M._meta.get_field("tags").rel.through._meta.db_table)
         if connection.features.supports_foreign_keys:
             for name, details in constraints.items():
                 if details['columns'] == ["tagm2mtest_id"] and details['foreign_key']:
@@ -698,11 +698,11 @@ class SchemaTests(TransactionTestCase):
             with connection.schema_editor() as editor:
                 editor.alter_field(
                     Author,
-                    BookWithM2M._meta.get_field_by_name("tags")[0],
+                    BookWithM2M._meta.get_field("tags"),
                     new_field,
                 )
             # Ensure old M2M is gone
-            self.assertRaises(DatabaseError, self.column_classes, BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)
+            self.assertRaises(DatabaseError, self.column_classes, BookWithM2M._meta.get_field("tags").rel.through)
             # Ensure the new M2M exists and points to UniqueTest
             constraints = self.get_constraints(new_field.rel.through._meta.db_table)
             if connection.features.supports_foreign_keys:
@@ -715,10 +715,10 @@ class SchemaTests(TransactionTestCase):
         finally:
             # Cleanup through table separately
             with connection.schema_editor() as editor:
-                editor.remove_field(BookWithM2M, BookWithM2M._meta.get_field_by_name("uniques")[0])
+                editor.remove_field(BookWithM2M, BookWithM2M._meta.get_field("uniques"))
             # Cleanup model states
             BookWithM2M._meta.local_many_to_many.remove(new_field)
-            del BookWithM2M._meta._m2m_cache
+            BookWithM2M._meta._expire_cache()
 
     @unittest.skipUnless(connection.features.supports_column_check_constraints, "No check constraints")
     def test_check_constraints(self):
@@ -741,7 +741,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Author,
-                Author._meta.get_field_by_name("height")[0],
+                Author._meta.get_field("height"),
                 new_field,
                 strict=True,
             )
@@ -754,7 +754,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(
                 Author,
                 new_field,
-                Author._meta.get_field_by_name("height")[0],
+                Author._meta.get_field("height"),
                 strict=True,
             )
         constraints = self.get_constraints(Author._meta.db_table)
@@ -781,7 +781,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Tag,
-                Tag._meta.get_field_by_name("slug")[0],
+                Tag._meta.get_field("slug"),
                 new_field,
                 strict=True,
             )
@@ -809,8 +809,8 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Tag,
-                Tag._meta.get_field_by_name("slug")[0],
-                TagUniqueRename._meta.get_field_by_name("slug2")[0],
+                Tag._meta.get_field("slug"),
+                TagUniqueRename._meta.get_field("slug2"),
                 strict=True,
             )
         # Ensure the field is still unique
@@ -976,7 +976,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Book,
-                Book._meta.get_field_by_name("title")[0],
+                Book._meta.get_field("title"),
                 new_field,
                 strict=True,
             )
@@ -990,7 +990,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(
                 Book,
                 new_field,
-                Book._meta.get_field_by_name("title")[0],
+                Book._meta.get_field("title"),
                 strict=True,
             )
         # Ensure the table is there and has the index again
@@ -1002,7 +1002,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.add_field(
                 Book,
-                BookWithSlug._meta.get_field_by_name("slug")[0],
+                BookWithSlug._meta.get_field("slug"),
             )
         self.assertIn(
             "slug",
@@ -1014,7 +1014,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(
                 BookWithSlug,
-                BookWithSlug._meta.get_field_by_name("slug")[0],
+                BookWithSlug._meta.get_field("slug"),
                 new_field2,
                 strict=True,
             )
@@ -1039,10 +1039,10 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name("slug")
         new_field.model = Tag
         with connection.schema_editor() as editor:
-            editor.remove_field(Tag, Tag._meta.get_field_by_name("id")[0])
+            editor.remove_field(Tag, Tag._meta.get_field("id"))
             editor.alter_field(
                 Tag,
-                Tag._meta.get_field_by_name("slug")[0],
+                Tag._meta.get_field("slug"),
                 new_field,
             )
         # Ensure the PK changed

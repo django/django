@@ -138,25 +138,27 @@ class RenameModel(Operation):
         )
 
     def state_forwards(self, app_label, state):
-        # Get all of the related objects we need to repoint
         apps = state.apps
         model = apps.get_model(app_label, self.old_name)
         model._meta.apps = apps
-        related_objects = model._meta.get_all_related_objects()
-        related_m2m_objects = model._meta.get_all_related_many_to_many_objects()
+        # Get all of the related objects we need to repoint
+        all_related_objects = (
+            f for f in model._meta.get_fields(include_hidden=True)
+            if f.auto_created and not f.concrete and not (f.hidden or f.many_to_many)
+        )
         # Rename the model
         state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
         state.models[app_label, self.new_name.lower()].name = self.new_name
         state.remove_model(app_label, self.old_name)
         # Repoint the FKs and M2Ms pointing to us
-        for related_object in (related_objects + related_m2m_objects):
+        for related_object in all_related_objects:
             # Use the new related key for self referential related objects.
-            if related_object.model == model:
+            if related_object.related_model == model:
                 related_key = (app_label, self.new_name.lower())
             else:
                 related_key = (
-                    related_object.model._meta.app_label,
-                    related_object.model._meta.object_name.lower(),
+                    related_object.related_model._meta.app_label,
+                    related_object.related_model._meta.object_name.lower(),
                 )
             new_fields = []
             for name, field in state.models[related_key].fields:
@@ -179,21 +181,19 @@ class RenameModel(Operation):
                 new_model._meta.db_table,
             )
             # Alter the fields pointing to us
-            related_objects = old_model._meta.get_all_related_objects()
-            related_m2m_objects = old_model._meta.get_all_related_many_to_many_objects()
-            for related_object in (related_objects + related_m2m_objects):
-                if related_object.model == old_model:
+            for related_object in old_model._meta.related_objects:
+                if related_object.related_model == old_model:
                     model = new_model
                     related_key = (app_label, self.new_name.lower())
                 else:
-                    model = related_object.model
+                    model = related_object.related_model
                     related_key = (
-                        related_object.model._meta.app_label,
-                        related_object.model._meta.object_name.lower(),
+                        related_object.related_model._meta.app_label,
+                        related_object.related_model._meta.object_name.lower(),
                     )
                 to_field = to_state.apps.get_model(
                     *related_key
-                )._meta.get_field_by_name(related_object.field.name)[0]
+                )._meta.get_field(related_object.field.name)
                 schema_editor.alter_field(
                     model,
                     related_object.field,
@@ -394,11 +394,11 @@ class AlterOrderWithRespectTo(Operation):
             from_model = from_state.apps.get_model(app_label, self.name)
             # Remove a field if we need to
             if from_model._meta.order_with_respect_to and not to_model._meta.order_with_respect_to:
-                schema_editor.remove_field(from_model, from_model._meta.get_field_by_name("_order")[0])
+                schema_editor.remove_field(from_model, from_model._meta.get_field("_order"))
             # Add a field if we need to (altering the column is untouched as
             # it's likely a rename)
             elif to_model._meta.order_with_respect_to and not from_model._meta.order_with_respect_to:
-                field = to_model._meta.get_field_by_name("_order")[0]
+                field = to_model._meta.get_field("_order")
                 if not field.has_default():
                     field.default = 0
                 schema_editor.add_field(
