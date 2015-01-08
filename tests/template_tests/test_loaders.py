@@ -210,12 +210,12 @@ class TemplateDirsOverrideTest(SimpleTestCase):
     def test_get_template(self):
         for dirs in self.dirs_iter:
             template = loader.get_template('test_dirs.html', dirs=dirs)
-            self.assertEqual(template.render(Context({})), 'spam eggs\n')
+            self.assertEqual(template.render(), 'spam eggs\n')
 
     def test_select_template(self):
         for dirs in self.dirs_iter:
             template = loader.select_template(['test_dirs.html'], dirs=dirs)
-            self.assertEqual(template.render(Context({})), 'spam eggs\n')
+            self.assertEqual(template.render(), 'spam eggs\n')
 
 
 @override_settings(TEMPLATES=[{
@@ -236,7 +236,7 @@ class PriorityCacheLoader(SimpleTestCase):
         Check that the order of template loader works. Refs #21460.
         """
         t1 = loader.get_template('priority/foo.html')
-        self.assertEqual(t1.render(Context({})), 'priority\n')
+        self.assertEqual(t1.render(), 'priority\n')
 
 
 @override_settings(TEMPLATES=[{
@@ -255,4 +255,4 @@ class PriorityLoader(SimpleTestCase):
         Check that the order of template loader works. Refs #21460.
         """
         t1 = loader.get_template('priority/foo.html')
-        self.assertEqual(t1.render(Context({})), 'priority\n')
+        self.assertEqual(t1.render(), 'priority\n')

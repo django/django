@@ -95,6 +95,8 @@ entire :setting:`TEMPLATES` setting instead.
 :mod:`django.template.loader`
 =============================
 
+.. _get_template-upgrade-django-18:
+
 :func:`~django.template.loader.get_template` and :func:`~django.template.loader.select_template`
 ------------------------------------------------------------------------------------------------
 

@@ -19,6 +19,16 @@ class DefaultsTests(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.locmem.Loader', {
+                    '404.html': '{{ csrf_token }}',
+                }),
+            ],
+        },
+    }])
     def test_csrf_token_in_404(self):
         """
         The 404 page should have the csrf_token available in the context
@@ -26,9 +36,8 @@ class DefaultsTests(TestCase):
         # See ticket #14565
         for url in self.non_existing_urls:
             response = self.client.get(url)
-            csrf_token = response.context['csrf_token']
-            self.assertNotEqual(str(csrf_token), 'NOTPROVIDED')
-            self.assertNotEqual(str(csrf_token), '')
+            self.assertNotEqual(response.content, 'NOTPROVIDED')
+            self.assertNotEqual(response.content, '')
 
     def test_server_error(self):
         "The server_error view raises a 500 status"

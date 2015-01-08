@@ -1,5 +1,7 @@
+from django.template import RequestContext
 from django.template.backends.django import DjangoTemplates
-from django.test import RequestFactory
+from django.test import ignore_warnings, RequestFactory
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from template_tests.test_response import test_processor_name
 
@@ -32,3 +34,20 @@ class DjangoTemplatesTests(TemplateStringsTests):
         # Check that context overrides context processors
         content = template.render({'processors': 'no'}, request)
         self.assertEqual(content, 'no')
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_request_context_conflicts_with_request(self):
+        template = self.engine.from_string('hello')
+
+        request = RequestFactory().get('/')
+        request_context = RequestContext(request)
+        # This doesn't raise an exception.
+        template.render(request_context, request)
+
+        other_request = RequestFactory().get('/')
+        msg = ("render() was called with a RequestContext and a request "
+               "argument which refer to different requests. Make sure "
+               "that the context argument is a dict or at least that "
+               "the two arguments refer to the same request.")
+        with self.assertRaisesMessage(ValueError, msg):
+            template.render(request_context, other_request)

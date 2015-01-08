@@ -1380,6 +1380,23 @@ to construct the "view on site" URL. This URL is now accessible using the
 sure to provide a default value for the ``form_class`` argument since it's
 now optional.
 
+Rendering templates loaded by :func:`~django.template.loader.get_template()` with a :class:`~django.template.Context`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The return type of :func:`~django.template.loader.get_template()` has changed
+in Django 1.8: instead of a :class:`django.template.Template`, it returns a
+``Template`` instance whose exact type depends on which backend loaded it.
+
+Both classes provide a ``render()`` method, however, the former takes a
+:class:`django.template.Context` as an argument while the latter expects a
+:class:`dict`. This change is enforced through a deprecation path for Django
+templates.
+
+Since it's easier to understand with examples, the :ref:`upgrade guide
+<get_template-upgrade-django-18>` shows how to adapt affected code.
+
+All this also applies to :func:`~django.template.loader.select_template()`.
+
 ``current_app`` argument of template-related APIs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
