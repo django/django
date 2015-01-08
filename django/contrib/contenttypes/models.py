@@ -4,7 +4,7 @@ from django.apps import apps
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import force_text
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -63,12 +63,10 @@ class ContentTypeManager(models.Manager):
         except self.model.DoesNotExist:
             # Not found in the database; we proceed to create it.  This time we
             # use get_or_create to take care of any race conditions.
-            # The smart_text() is needed around opts.verbose_name_raw because
-            # name_raw might be a django.utils.functional.__proxy__ object.
             ct, created = self.get_or_create(
                 app_label=opts.app_label,
                 model=opts.model_name,
-                defaults={'name': smart_text(opts.verbose_name_raw)},
+                defaults={'name': opts.verbose_name_raw},
             )
         self._add_to_cache(self.db, ct)
         return ct
@@ -110,7 +108,7 @@ class ContentTypeManager(models.Manager):
             ct = self.create(
                 app_label=opts.app_label,
                 model=opts.model_name,
-                name=smart_text(opts.verbose_name_raw),
+                name=opts.verbose_name_raw,
             )
             self._add_to_cache(self.db, ct)
             results[ct.model_class()] = ct
