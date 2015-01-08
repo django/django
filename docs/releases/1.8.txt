@@ -457,6 +457,11 @@ Migrations
 * A :ref:`generic mechanism to handle the deprecation of model fields
   <migrations-removing-model-fields>` was added.
 
+* The :attr:`RunPython.noop <django.db.migrations.operations.RunPython.noop>`
+  and :meth:`RunSQL.noop() <django.db.migrations.operations.RunSQL.noop>` class
+  attribute/method were added to ease in making ``RunPython`` and ``RunSQL``
+  operations reversible.
+
 Models
 ^^^^^^
 
