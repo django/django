@@ -247,7 +247,7 @@ class ModulesTestsPackages(IgnoreAllDeprecationWarningsMixin, unittest.TestCase)
             get_tests(app_config)
 
 
-class LabelDiscoveryTest(TestCase):
+class LabelDiscoveryTest(IgnoreAllDeprecationWarningsMixin, TestCase):
 
     @override_settings(INSTALLED_APPS=['test_runner.valid_app'])
     def test_discover_within_package(self):
