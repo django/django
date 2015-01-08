@@ -164,6 +164,9 @@ details on these changes.
 * ``GeoQuerySet`` aggregate methods ``collect()``, ``extent()``, ``extent3d()``,
   ``makeline()``, and ``union()`` will be removed.
 
+* Ability to specify ``ContentType.name`` when creating a content type instance
+  will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

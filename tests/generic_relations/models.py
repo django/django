@@ -29,7 +29,7 @@ class TaggedItem(models.Model):
     content_object = GenericForeignKey()
 
     class Meta:
-        ordering = ["tag", "content_type__name"]
+        ordering = ["tag", "content_type__model"]
 
     def __str__(self):
         return self.tag

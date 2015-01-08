@@ -52,24 +52,20 @@ class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
         default_objects = [
             ContentType.objects.db_manager('default').create(
                 model='examplemodela',
-                name='example model a',
                 app_label='app_a',
             ),
             ContentType.objects.db_manager('default').create(
                 model='examplemodelb',
-                name='example model b',
                 app_label='app_b',
             ),
         ]
         other_objects = [
             ContentType.objects.db_manager('other').create(
                 model='examplemodelb',
-                name='example model b',
                 app_label='app_b',
             ),
             ContentType.objects.db_manager('other').create(
                 model='examplemodela',
-                name='example model a',
                 app_label='app_a',
             ),
         ]
