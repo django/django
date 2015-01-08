@@ -245,6 +245,14 @@ operation that adds that field and so will try to run it again).
     The ability to pass parameters to the ``sql`` and ``reverse_sql`` queries
     was added.
 
+.. attribute:: RunSQL.noop
+
+    .. versionadded:: 1.8
+
+    Pass the ``RunSQL.noop`` attribute to ``sql`` or ``reverse_sql`` when you
+    want the operation not to do anything in the given direction. This is
+    especially useful in making the operation reversible.
+
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
 RunPython
@@ -320,6 +328,14 @@ set ``atomic=False``.
     give them the current database alias (available from
     ``schema_editor.connection.alias``, where ``schema_editor`` is the second
     argument to your function).
+
+.. staticmethod:: RunPython.noop
+
+    .. versionadded:: 1.8
+
+    Pass the ``RunPython.noop`` method to ``code`` or ``reverse_code`` when
+    you want the operation not to do anything in the given direction. This is
+    especially useful in making the operation reversible.
 
 SeparateDatabaseAndState
 ------------------------

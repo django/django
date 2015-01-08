@@ -7,5 +7,5 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     operations = [
-        migrations.RunPython(lambda apps, schema_editor: None)
+        migrations.RunPython(migrations.RunPython.noop)
     ]
