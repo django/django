@@ -1,6 +1,5 @@
 from django.apps import apps
 from django.db import DEFAULT_DB_ALIAS, router
-from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.six.moves import input
 
@@ -45,7 +44,6 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
 
     cts = [
         ContentType(
-            name=smart_text(model._meta.verbose_name_raw),
             app_label=app_label,
             model=model_name,
         )

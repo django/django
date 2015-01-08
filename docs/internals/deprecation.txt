@@ -147,6 +147,9 @@ details on these changes.
   and ``Storage.save()`` to be defined without a ``max_length`` argument will
   be removed.
 
+* Ability to specify ``ContentType.name`` when creating a content type instance
+  will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
