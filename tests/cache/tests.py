@@ -1350,6 +1350,9 @@ class CacheUtils(TestCase):
         self.path = '/cache/test/'
         self.factory = RequestFactory(HTTP_HOST=self.host)
 
+    def tearDown(self):
+        cache.clear()
+
     def _get_request_cache(self, method='GET', query_string=None, update_cache=None):
         request = self._get_request(self.host, self.path,
                                     method, query_string=query_string)
@@ -1385,7 +1388,7 @@ class CacheUtils(TestCase):
         request = self.factory.get(self.path)
         response = HttpResponse()
         # Expect None if no headers have been set yet.
-        self.assertIsNone(get_cache_key(request, response))
+        self.assertIsNone(get_cache_key(request))
         # Set headers to an empty list.
         learn_cache_key(request, response)
 
