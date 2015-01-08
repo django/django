@@ -211,6 +211,8 @@ def activate(language):
     Fetches the translation object for a given language and installs it as the
     current translation object for the current thread.
     """
+    if not language:
+        return
     if language in _DJANGO_DEPRECATED_LOCALES:
         msg = ("The use of the language code '%s' is deprecated. "
                "Please use the '%s' translation instead.")
@@ -235,6 +237,7 @@ def deactivate_all():
     for some reason.
     """
     _active.value = gettext_module.NullTranslations()
+    _active.value.to_language = lambda *args: None
 
 
 def get_language():

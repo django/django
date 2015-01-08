@@ -68,7 +68,7 @@ class TranslationTests(TestCase):
                 self.assertEqual(get_language(), 'pl')
             self.assertEqual(get_language(), 'de')
             with translation.override(None):
-                self.assertEqual(get_language(), settings.LANGUAGE_CODE)
+                self.assertEqual(get_language(), None)
             self.assertEqual(get_language(), 'de')
         finally:
             deactivate()
@@ -81,7 +81,7 @@ class TranslationTests(TestCase):
 
         @translation.override(None)
         def func_none():
-            self.assertEqual(get_language(), settings.LANGUAGE_CODE)
+            self.assertEqual(get_language(), None)
 
         try:
             activate('de')
