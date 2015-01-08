@@ -109,15 +109,14 @@ class SQLCompiler(object):
         for expr, _ in order_by:
             if expr.contains_aggregate:
                 continue
-            # Refs do not work on Oracle. Disable them for now. This should
-            # be OK as the order_by Ref is a reference to the select clause, and
-            # thus the reffed column is already included in the query.
+            # We can skip References to select clause, as all expressions in
+            # the select clause are already part of the group by.
             if isinstance(expr, Ref):
                 continue
             expressions.append(expr)
         having = self.query.having.get_group_by_cols()
-        for col in having:
-            expressions.append(col)
+        for expr in having:
+            expressions.append(expr)
         result = []
         seen = set()
         expressions = self.collapse_group_by(expressions, having)
@@ -265,7 +264,7 @@ class SQLCompiler(object):
                 if col not in self.query.extra_select:
                     order_by.append((RawSQL(*self.query.extra[col]), order, False))
                 else:
-                    order_by.append((RawSQL(self.connection.ops.quote_name(col), []),
+                    order_by.append((Ref(col, RawSQL(*self.query.extra[col])),
                                      order, True))
         result = []
         seen = set()
