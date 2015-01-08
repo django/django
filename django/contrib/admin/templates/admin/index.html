@@ -69,7 +69,7 @@
                 {% endif %}
                 <br/>
                 {% if entry.content_type %}
-                    <span class="mini quiet">{% filter capfirst %}{% trans entry.content_type.name %}{% endfilter %}</span>
+                    <span class="mini quiet">{% filter capfirst %}{{ entry.content_type }}{% endfilter %}</span>
                 {% else %}
                     <span class="mini quiet">{% trans 'Unknown content' %}</span>
                 {% endif %}
