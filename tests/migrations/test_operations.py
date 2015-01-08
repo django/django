@@ -1679,44 +1679,6 @@ class OperationTests(OperationTestBase):
         self.assertEqual(sorted(definition[2]), ["database_operations", "state_operations"])
 
 
-class MigrateNothingRouter(object):
-    """
-    A router that doesn't allow storing any model in any database.
-    """
-    def allow_migrate(self, db, model):
-        return False
-
-
-@override_settings(DATABASE_ROUTERS=[MigrateNothingRouter()])
-class MultiDBOperationTests(MigrationTestBase):
-    multi_db = True
-
-    def test_create_model(self):
-        """
-        Tests that CreateModel honours multi-db settings.
-        """
-        operation = migrations.CreateModel(
-            "Pony",
-            [
-                ("id", models.AutoField(primary_key=True)),
-                ("pink", models.IntegerField(default=1)),
-            ],
-        )
-        # Test the state alteration
-        project_state = ProjectState()
-        new_state = project_state.clone()
-        operation.state_forwards("test_crmo", new_state)
-        # Test the database alteration
-        self.assertTableNotExists("test_crmo_pony")
-        with connection.schema_editor() as editor:
-            operation.database_forwards("test_crmo", editor, project_state, new_state)
-        self.assertTableNotExists("test_crmo_pony")
-        # And test reversal
-        with connection.schema_editor() as editor:
-            operation.database_backwards("test_crmo", editor, new_state, project_state)
-        self.assertTableNotExists("test_crmo_pony")
-
-
 class SwappableOperationTests(OperationTestBase):
     """
     Tests that key operations ignore swappable models

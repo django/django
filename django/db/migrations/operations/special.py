@@ -63,10 +63,11 @@ class RunSQL(Operation):
     """
     noop = ''
 
-    def __init__(self, sql, reverse_sql=None, state_operations=None):
+    def __init__(self, sql, reverse_sql=None, state_operations=None, hints=None):
         self.sql = sql
         self.reverse_sql = reverse_sql
         self.state_operations = state_operations or []
+        self.hints = hints or {}
 
     def deconstruct(self):
         kwargs = {
@@ -76,6 +77,8 @@ class RunSQL(Operation):
             kwargs['reverse_sql'] = self.reverse_sql
         if self.state_operations:
             kwargs['state_operations'] = self.state_operations
+        if self.hints:
+            kwargs['hints'] = self.hints
         return (
             self.__class__.__name__,
             [],
@@ -91,12 +94,14 @@ class RunSQL(Operation):
             state_operation.state_forwards(app_label, state)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        self._run_sql(schema_editor, self.sql)
+        if self.allowed_to_migrate(schema_editor.connection.alias, None, hints=self.hints):
+            self._run_sql(schema_editor, self.sql)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_sql is None:
             raise NotImplementedError("You cannot reverse this operation")
-        self._run_sql(schema_editor, self.reverse_sql)
+        if self.allowed_to_migrate(schema_editor.connection.alias, None, hints=self.hints):
+            self._run_sql(schema_editor, self.reverse_sql)
 
     def describe(self):
         return "Raw SQL operation"
@@ -125,7 +130,7 @@ class RunPython(Operation):
 
     reduces_to_sql = False
 
-    def __init__(self, code, reverse_code=None, atomic=True):
+    def __init__(self, code, reverse_code=None, atomic=True, hints=None):
         self.atomic = atomic
         # Forwards code
         if not callable(code):
@@ -138,6 +143,7 @@ class RunPython(Operation):
             if not callable(reverse_code):
                 raise ValueError("RunPython must be supplied with callable arguments")
             self.reverse_code = reverse_code
+        self.hints = hints or {}
 
     def deconstruct(self):
         kwargs = {
@@ -147,6 +153,8 @@ class RunPython(Operation):
             kwargs['reverse_code'] = self.reverse_code
         if self.atomic is not True:
             kwargs['atomic'] = self.atomic
+        if self.hints:
+            kwargs['hints'] = self.hints
         return (
             self.__class__.__name__,
             [],
@@ -163,16 +171,18 @@ class RunPython(Operation):
         pass
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        # We now execute the Python code in a context that contains a 'models'
-        # object, representing the versioned models as an app registry.
-        # We could try to override the global cache, but then people will still
-        # use direct imports, so we go with a documentation approach instead.
-        self.code(from_state.apps, schema_editor)
+        if self.allowed_to_migrate(schema_editor.connection.alias, None, hints=self.hints):
+            # We now execute the Python code in a context that contains a 'models'
+            # object, representing the versioned models as an app registry.
+            # We could try to override the global cache, but then people will still
+            # use direct imports, so we go with a documentation approach instead.
+            self.code(from_state.apps, schema_editor)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_code is None:
             raise NotImplementedError("You cannot reverse this operation")
-        self.reverse_code(from_state.apps, schema_editor)
+        if self.allowed_to_migrate(schema_editor.connection.alias, None, hints=self.hints):
+            self.reverse_code(from_state.apps, schema_editor)
 
     def describe(self):
         return "Raw Python operation"
