@@ -3,9 +3,9 @@ This module holds simple classes to convert geospatial values from the
 database.
 """
 
+from django.contrib.gis.db.models.fields import GeoSelectFormatMixin
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
-from django.contrib.gis.db.models.fields import GeoSelectFormatMixin
 
 
 class BaseField(object):
@@ -51,7 +51,7 @@ class GeomField(GeoSelectFormatMixin, BaseField):
     Wrapper for Geometry values.  It is a lightweight alternative to
     using GeometryField (which requires an SQL query upon instantiation).
     """
-    # Hacky marker for get_db_converters
+    # Hacky marker for get_db_converters()
     geom_type = None
 
     def from_db_value(self, value, connection, context):

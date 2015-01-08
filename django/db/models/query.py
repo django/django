@@ -13,7 +13,7 @@ from django.db import (connections, router, transaction, IntegrityError,
     DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import AutoField, Empty
-from django.db.models.query_utils import (Q, deferred_class_factory, InvalidQuery)
+from django.db.models.query_utils import Q, deferred_class_factory, InvalidQuery
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import CURSOR
 from django.db.models import sql
@@ -234,8 +234,8 @@ class QuerySet(object):
         """
         db = self.db
         compiler = self.query.get_compiler(using=db)
-        # Execute the query. This will also fill compiler.select, klass_info and
-        # annotations.
+        # Execute the query. This will also fill compiler.select, klass_info,
+        # and annotations.
         results = compiler.execute_sql()
         select, klass_info, annotation_col_map = (compiler.select, compiler.klass_info,
                                                   compiler.annotation_col_map)
@@ -1288,8 +1288,9 @@ class RawQuerySet(object):
             else:
                 model_cls = self.model
             fields = [self.model_fields.get(c, None) for c in self.columns]
-            converters = compiler.get_converters([f.get_col(f.model._meta.db_table) if f else None
-                                                  for f in fields])
+            converters = compiler.get_converters([
+                f.get_col(f.model._meta.db_table) if f else None for f in fields
+            ])
             for values in query:
                 if converters:
                     values = compiler.apply_converters(values, converters)
@@ -1646,11 +1647,11 @@ class RelatedPopulator(object):
     """
     RelatedPopulator is used for select_related() object instantiation.
 
-    The idea is that each select_related() model will be populated by
+    The idea is that each select_related() model will be populated by a
     different RelatedPopulator instance. The RelatedPopulator instances get
     klass_info and select (computed in SQLCompiler) plus the used db as
     input for initialization. That data is used to compute which columns
-    to use, how to instantiate the model and how to populate the links
+    to use, how to instantiate the model, and how to populate the links
     between the objects.
 
     The actual creation of the objects is done in populate() method. This
@@ -1665,35 +1666,36 @@ class RelatedPopulator(object):
         #    - cols_start, cols_end: usually the columns in the row are
         #      in the same order model_cls.__init__ expects them, so we
         #      can instantiate by model_cls(*row[cols_start:cols_end])
-        #    - reorder_for_init: When select_related descents to a child
+        #    - reorder_for_init: When select_related descends to a child
         #      class, then we want to reuse the already selected parent
         #      data. However, in this case the parent data isn't necessarily
         #      in the same order that Model.__init__ expects it to be, so
         #      we have to reorder the parent data. The reorder_for_init
-        #      attribute contains a function to be used to reorder the
-        #      field data in the order __init__ expects it.
+        #      attribute contains a function used to reorder the field data
+        #      in the order __init__ expects it.
         #  - pk_idx: the index of the primary key field in the reordered
-        #    model data. Used to check if there exists a related object
-        #    at all.
+        #    model data. Used to check if a related object exists at all.
         #  - init_list: the field attnames fetched from the database. For
-        #    deferred models not the same as all attnames of the model's
-        #    fields.
+        #    deferred models this isn't the same as all attnames of the
+        #    model's fields.
         #  - related_populators: a list of RelatedPopulator instances if
-        #    select_related() descents to related models from this model.
+        #    select_related() descends to related models from this model.
         #  - cache_name, reverse_cache_name: the names to use for setattr
         #    when assigning the fetched object to the from_obj. If the
-        #    reverse_cache_name is set, then we set also the reverse link.
+        #    reverse_cache_name is set, then we also set the reverse link.
         select_fields = klass_info['select_fields']
         from_parent = klass_info['from_parent']
         if not from_parent:
             self.cols_start = select_fields[0]
             self.cols_end = select_fields[-1] + 1
-            self.init_list = [f[0].output_field.attname
-                         for f in select[self.cols_start:self.cols_end]]
+            self.init_list = [
+                f[0].output_field.attname for f in select[self.cols_start:self.cols_end]
+            ]
             self.reorder_for_init = None
         else:
             model_init_attnames = [
-                f.attname for f in klass_info['model']._meta.concrete_fields]
+                f.attname for f in klass_info['model']._meta.concrete_fields
+            ]
             reorder_map = []
             for idx in select_fields:
                 field = select[idx][0].output_field
@@ -1725,8 +1727,10 @@ class RelatedPopulator(object):
         model_cls = klass_info['model']
         if len(init_list) != len(model_cls._meta.concrete_fields):
             init_set = set(init_list)
-            skip = [f.attname for f in model_cls._meta.concrete_fields
-                    if f.attname not in init_set]
+            skip = [
+                f.attname for f in model_cls._meta.concrete_fields
+                if f.attname not in init_set
+            ]
             model_cls = deferred_class_factory(model_cls, skip)
         return model_cls
 

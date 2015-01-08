@@ -12,7 +12,7 @@ from django.test import TestCase, override_settings
 from .models import (
     ResolveThis, Item, RelatedItem, Child, Leaf, Proxy, SimpleItem, Feature,
     ItemAndSimpleItem, OneToOneItem, SpecialFeature, Location, Request,
-    ProxyRelated, Derived, Base
+    ProxyRelated, Derived, Base,
 )
 
 

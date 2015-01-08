@@ -129,7 +129,7 @@ class Query(object):
         # SELECT clause of the query.
         # The select is used for cases where we want to set up the select
         # clause to contain other than default fields (values(), subqueries...)
-        # Note taht annotations go to annotations dictionary.
+        # Note that annotations go to annotations dictionary.
         self.select = []
         self.tables = []    # Aliases in the order they are created.
         self.where = where()
@@ -1858,7 +1858,7 @@ class Query(object):
         """
         Callback used by get_deferred_field_names().
         """
-        target[model] = set(f.attname for f in fields)
+        target[model] = {f.attname for f in fields}
 
     def set_aggregate_mask(self, names):
         warnings.warn(

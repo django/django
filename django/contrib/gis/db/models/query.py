@@ -1,12 +1,16 @@
 from django.db import connections
 from django.db.models.expressions import RawSQL
-from django.db.models.query import QuerySet
 from django.db.models.fields import Field
+from django.db.models.query import QuerySet
 
 from django.contrib.gis.db.models import aggregates
-from django.contrib.gis.db.models.fields import get_srid_info, PointField, LineStringField, GeometryField
+from django.contrib.gis.db.models.fields import (
+    get_srid_info, LineStringField, GeometryField, PointField,
+)
 from django.contrib.gis.db.models.lookups import GISLookup
-from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GMLField
+from django.contrib.gis.db.models.sql import (
+    AreaField, DistanceField, GeomField, GMLField,
+)
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 
@@ -527,17 +531,17 @@ class GeoQuerySet(QuerySet):
 
         # If the result of this function needs to be converted.
         if settings.get('select_field', False):
-            sel_fld = settings['select_field']
+            select_field = settings['select_field']
             if connection.ops.oracle:
-                sel_fld.empty_strings_allowed = False
+                select_field.empty_strings_allowed = False
         else:
-            sel_fld = Field()
+            select_field = Field()
 
         # Finally, setting the extra selection attribute with
         # the format string expanded with the stored procedure
         # arguments.
         self.query.add_annotation(
-            RawSQL(fmt % settings['procedure_args'], settings['select_params'], sel_fld),
+            RawSQL(fmt % settings['procedure_args'], settings['select_params'], select_field),
             model_att)
         return self
 
@@ -618,17 +622,14 @@ class GeoQuerySet(QuerySet):
                     # (which will transform to the original SRID of the field rather
                     #  than to what was transformed to).
                     geom_args = False
-                    procedure_fmt = ('%s(%%(geo_col)s, %s)' % (
-                        backend.transform, srid))
+                    procedure_fmt = '%s(%%(geo_col)s, %s)' % (backend.transform, srid)
                     if geom.srid is None or geom.srid == srid:
                         # If the geom parameter srid is None, it is assumed the coordinates
                         # are in the transformed units.  A placeholder is used for the
                         # geometry parameter.  `GeomFromText` constructor is also needed
                         # to wrap geom placeholder for SpatiaLite.
                         if backend.spatialite:
-                            procedure_fmt += (
-                                ', %s(%%%%s, %s)' %
-                                (backend.from_text, srid))
+                            procedure_fmt += ', %s(%%%%s, %s)' % (backend.from_text, srid)
                         else:
                             procedure_fmt += ', %%s'
                     else:
@@ -641,8 +642,7 @@ class GeoQuerySet(QuerySet):
                                 backend.transform, backend.from_text,
                                 geom.srid, srid))
                         else:
-                            procedure_fmt += ', %s(%%%%s, %s)' % (
-                                backend.transform, srid)
+                            procedure_fmt += ', %s(%%%%s, %s)' % (backend.transform, srid)
                 else:
                     # `transform()` was not used on this GeoQuerySet.
                     procedure_fmt = '%(geo_col)s,%(geom)s'
@@ -758,16 +758,16 @@ class GeoQuerySet(QuerySet):
     # Private API utilities, subject to change.
     def _geo_field(self, field_name=None):
         """
-        Returns the first Geometry field encountered; or specified via the
-        `field_name` keyword.  The `field_name` may be a string specifying
-        the geometry field on this GeoQuery's model, or a lookup string
+        Returns the first Geometry field encountered or the one specified via
+        the `field_name` keyword. The `field_name` may be a string specifying
+        the geometry field on this GeoQuerySet's model, or a lookup string
         to a geometry field via a ForeignKey relation.
         """
         if field_name is None:
             # Incrementing until the first geographic field is found.
-            for fld in self.model._meta.fields:
-                if isinstance(fld, GeometryField):
-                    return fld
+            for field in self.model._meta.fields:
+                if isinstance(field, GeometryField):
+                    return field
             return False
         else:
             # Otherwise, check by the given field name -- which may be
@@ -779,7 +779,7 @@ class GeoQuerySet(QuerySet):
         Helper function that returns the database column for the given field.
         The table and column are returned (quoted) in the proper format, e.g.,
         `"geoapp_city"."point"`.  If `table_alias` is not specified, the
-        database table associated with the model of this `GeoQuery` will be
+        database table associated with the model of this `GeoQuerySet` will be
         used.  If `column` is specified, it will be used instead of the value
         in `field.column`.
         """

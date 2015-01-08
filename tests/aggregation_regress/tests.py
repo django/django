@@ -491,8 +491,8 @@ class AggregationTests(TestCase):
         # Regression for #15709 - Ensure each group_by field only exists once
         # per query
         qstr = str(Book.objects.values('publisher').annotate(max_pages=Max('pages')).order_by().query)
-        # Check that there are just one GROUP BY clause (zero punctuation means at least one
-        # clause)
+        # Check that there is just one GROUP BY clause (zero commas means at
+        # most one clause)
         self.assertEqual(qstr[qstr.index('GROUP BY'):].count(', '), 0)
 
     def test_duplicate_alias(self):
@@ -927,9 +927,9 @@ class AggregationTests(TestCase):
         # `name` and `age` should not be grouped on.
         _, _, group_by = results.query.get_compiler(using='default').pre_sql_setup()
         self.assertEqual(len(group_by), 1)
-        assert 'id' in group_by[0][0]
-        assert 'name' not in group_by[0][0]
-        assert 'age' not in group_by[0][0]
+        self.assertIn('id', group_by[0][0])
+        self.assertNotIn('name', group_by[0][0])
+        self.assertNotIn('age', group_by[0][0])
 
         # Ensure that we get correct results.
         self.assertEqual(
@@ -953,9 +953,9 @@ class AggregationTests(TestCase):
         results = Author.objects.only('id', 'name').annotate(num_contacts=Count('book_contact_set'))
         _, _, grouping = results.query.get_compiler(using='default').pre_sql_setup()
         self.assertEqual(len(grouping), 1)
-        assert 'id' in grouping[0][0]
-        assert 'name' not in grouping[0][0]
-        assert 'age' not in grouping[0][0]
+        self.assertIn('id', grouping[0][0])
+        self.assertNotIn('name', grouping[0][0])
+        self.assertNotIn('age', grouping[0][0])
 
         # Ensure that we get correct results.
         self.assertEqual(
@@ -980,9 +980,9 @@ class AggregationTests(TestCase):
             num_authors=Count('authors'))
         _, _, grouping = results.query.get_compiler(using='default').pre_sql_setup()
         self.assertEqual(len(grouping), 1)
-        assert 'id' in grouping[0][0]
-        assert 'name' not in grouping[0][0]
-        assert 'contact' not in grouping[0][0]
+        self.assertIn('id', grouping[0][0])
+        self.assertNotIn('name', grouping[0][0])
+        self.assertNotIn('contact', grouping[0][0])
 
         # Ensure that we get correct results.
         self.assertEqual(

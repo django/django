@@ -21,8 +21,8 @@ class SQLCompiler(object):
         self.connection = connection
         self.using = using
         self.quote_cache = {'*': '*'}
-        # The select, klass_info and annotations are needed by QuerySet.iterator()
-        # these are set as side-effect of executing the query. Note that we calculate
+        # The select, klass_info, and annotations are needed by QuerySet.iterator()
+        # these are set as a side-effect of executing the query. Note that we calculate
         # separately a list of extra select columns needed for grammatical correctness
         # of the query, but these columns are not included in self.select.
         self.select = None
@@ -72,35 +72,34 @@ class SQLCompiler(object):
         #    GROUP BY: name, pk
         #
         # In fact, the self.query.group_by is the minimal set to GROUP BY. It
-        # can't be ever restricted to smaller set, but additional columns in
-        # HAVING, ORDER BY and SELECT clauses are added to it. Unfortunately
+        # can't be ever restricted to a smaller set, but additional columns in
+        # HAVING, ORDER BY, and SELECT clauses are added to it. Unfortunately
         # the end result is that it is impossible to force the query to have
-        # a chosen GROUP BY clause - you can almost do this by using the
+        # a chosen GROUP BY clause - you can almost do this by using the form:
         #     .values(*wanted_cols).annotate(AnAggregate())
-        # form, but any later annotations, extra selects, values calls that
-        # refer some column outside of the wanted_cols, order_by or even
+        # but any later annotations, extra selects, values calls that
+        # refer some column outside of the wanted_cols, order_by, or even
         # filter calls can alter the GROUP BY clause.
 
         # The query.group_by is either None (no GROUP BY at all), True
-        # (group by select fields) or a list of expressions to be added
+        # (group by select fields), or a list of expressions to be added
         # to the group by.
         if self.query.group_by is None:
             return []
         expressions = []
         if self.query.group_by is not True:
-            # If the group by is set to a list (by .values() call
-            # most likely), then we need to add everything in it
-            # to the GROUP BY clause.
-            # Backwards compatibility hack for setting query.group_by. Remove when
-            # we have public API way of forcing the GROUP BY clause. Converts string
-            # references to expressions.
+            # If the group by is set to a list (by .values() call most likely),
+            # then we need to add everything in it to the GROUP BY clause.
+            # Backwards compatibility hack for setting query.group_by. Remove
+            # when  we have public API way of forcing the GROUP BY clause.
+            # Converts string references to expressions.
             for expr in self.query.group_by:
                 if not hasattr(expr, 'as_sql'):
                     expressions.append(self.query.resolve_ref(expr))
                 else:
                     expressions.append(expr)
         # Note that even if the group_by is set, it is only the minimal
-        # set to group by. So, we need to add cols in select, order_by and
+        # set to group by. So, we need to add cols in select, order_by, and
         # having into the select in any case.
         for expr, _, _ in select:
             cols = expr.get_group_by_cols()
@@ -129,11 +128,11 @@ class SQLCompiler(object):
         return result
 
     def collapse_group_by(self, expressions, having):
-        # If the DB can group by primary key, then lets group by the query's
-        # main model's primary key. Note that for PostgreSQL the GROUP BY
-        # clause must include the primary key of every table, but for MySQL
-        # it is enough to have the main table's primary key. Currently only
-        # the MySQL form is implemented.
+        # If the DB can group by primary key, then group by the primary key of
+        # query's main model. Note that for PostgreSQL the GROUP BY clause must
+        # include the primary key of every table, but for MySQL it is enough to
+        # have the main table's primary key. Currently only the MySQL form is
+        # implemented.
         # MySQLism: however, columns in HAVING clause must be added to the
         # GROUP BY.
         if self.connection.features.allows_group_by_pk:
@@ -151,19 +150,21 @@ class SQLCompiler(object):
 
     def get_select(self):
         """
-        Returns a list of 3-tuples of (expression, (sql, params), alias), a klass_info
-        structure and annotations found.
+        Returns three values:
+        - a list of 3-tuples of (expression, (sql, params), alias)
+        - a klass_info structure,
+        - a dictionary of annotations
 
-        The sql, params is what the expression will produce, and alias is the "AS alias"
-        for the column (possibly None).
+        The (sql, params) is what the expression will produce, and alias is the
+        "AS alias" for the column (possibly None).
 
         The klass_info structure contains the following information:
-            - Which model to instantiate
-            - Which columns for that model are present in the query (by position of the
-            - select clause).
-            - related_klass_infos: [f, klass_info] to descent into
+        - Which model to instantiate
+        - Which columns for that model are present in the query (by
+          position of the select clause).
+        - related_klass_infos: [f, klass_info] to descent into
 
-        The annoatations is a list of (attname, column position) tuples.
+        The annotations is a dictionary of {'attname': column position} values.
         """
         select = []
         klass_info = None
@@ -225,9 +226,7 @@ class SQLCompiler(object):
         elif not self.query.default_ordering:
             ordering = self.query.order_by
         else:
-            ordering = (self.query.order_by
-                        or self.query.get_meta().ordering
-                        or [])
+            ordering = (self.query.order_by or self.query.get_meta().ordering or [])
         if self.query.standard_ordering:
             asc, desc = ORDER_DIR['ASC']
         else:
@@ -313,8 +312,7 @@ class SQLCompiler(object):
         return r
 
     def compile(self, node, select_format=False):
-        vendor_impl = getattr(
-            node, 'as_' + self.connection.vendor, None)
+        vendor_impl = getattr(node, 'as_' + self.connection.vendor, None)
         if vendor_impl:
             sql, params = vendor_impl(self, self.connection)
         else:
@@ -343,7 +341,7 @@ class SQLCompiler(object):
                 return '', ()
             distinct_fields = self.get_distinct()
 
-            # This must come after 'select', 'ordering' and 'distinct' -- see
+            # This must come after 'select', 'ordering', and 'distinct' -- see
             # docstring of get_from_clause() for details.
             from_, f_params = self.get_from_clause()
 
@@ -383,7 +381,7 @@ class SQLCompiler(object):
             if grouping:
                 if distinct_fields:
                     raise NotImplementedError(
-                        "annotate() + distinct(fields) not implemented.")
+                        "annotate() + distinct(fields) is not implemented.")
                 if not order_by:
                     order_by = self.connection.ops.force_no_ordering()
                 result.append('GROUP BY %s' % ', '.join(grouping))
@@ -411,10 +409,13 @@ class SQLCompiler(object):
 
             if self.query.select_for_update and self.connection.features.has_select_for_update:
                 if self.connection.get_autocommit():
-                    raise TransactionManagementError("select_for_update cannot be used outside of a transaction.")
+                    raise TransactionManagementError(
+                        "select_for_update cannot be used outside of a transaction."
+                    )
 
-                # If we've been asked for a NOWAIT query but the backend does not support it,
-                # raise a DatabaseError otherwise we could get an unexpected deadlock.
+                # If we've been asked for a NOWAIT query but the backend does
+                # not support it, raise a DatabaseError otherwise we could get
+                # an unexpected deadlock.
                 nowait = self.query.select_for_update_nowait
                 if nowait and not self.connection.features.has_select_for_update_nowait:
                     raise DatabaseError('NOWAIT is not supported on this database backend.')
@@ -472,7 +473,7 @@ class SQLCompiler(object):
             if from_parent and model is not None and issubclass(
                     from_parent._meta.concrete_model, model._meta.concrete_model):
                 # Avoid loading data for already loaded parents.
-                # We end up here in the case select related resolvation tries
+                # We end up here in the case select_related() resolution
                 # proceeds from parent model to child model. In that case the
                 # parent model data is already present in the SELECT clause,
                 # and we want to avoid reloading the same data again.
@@ -647,15 +648,18 @@ class SQLCompiler(object):
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):
                 continue
-            klass_info = {'model': f.rel.to, 'field': f, 'reverse': False,
-                          'from_parent': False}
+            klass_info = {
+                'model': f.rel.to,
+                'field': f,
+                'reverse': False,
+                'from_parent': False,
+            }
             related_klass_infos.append(klass_info)
             select_fields = []
             _, _, _, joins, _ = self.query.setup_joins(
                 [f.name], opts, root_alias)
             alias = joins[-1]
-            columns = self.get_default_columns(start_alias=alias,
-                                               opts=f.rel.to._meta)
+            columns = self.get_default_columns(start_alias=alias, opts=f.rel.to._meta)
             for col in columns:
                 select_fields.append(len(select))
                 select.append((col, None))
@@ -681,8 +685,12 @@ class SQLCompiler(object):
                 _, _, _, joins, _ = self.query.setup_joins([related_field_name], opts, root_alias)
                 alias = joins[-1]
                 from_parent = issubclass(model, opts.model)
-                klass_info = {'model': model, 'field': f, 'reverse': True,
-                              'from_parent': from_parent}
+                klass_info = {
+                    'model': model,
+                    'field': f,
+                    'reverse': True,
+                    'from_parent': from_parent,
+                }
                 related_klass_infos.append(klass_info)
                 select_fields = []
                 columns = self.get_default_columns(
