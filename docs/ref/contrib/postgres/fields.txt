@@ -403,6 +403,7 @@ using in conjunction with lookups on
     >>> Dog.objects.filter(data__values__contains=['collie'])
     [<Dog: Meg>]
 
+.. _range-fields:
 
 Range Fields
 ------------
