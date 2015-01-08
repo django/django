@@ -4,7 +4,7 @@ Django 1.7.3 release notes
 
 *Under development*
 
-Django 1.7.3 fixes several bugs in 1.7.2.
+Django 1.7.3 fixes several bugs in 1.7.2 and adds minor updates.
 
 
 
@@ -20,3 +20,13 @@ Bugfixes
 
 * Fixed a crash in the CSRF middleware when handling non-ASCII referer header
   (:ticket:`23815`).
+
+
+
+Minor updates
+=============
+
+* Changed numeration behaviour in makemigrations after squashing
+  (:ticket:`23953`).
+  Now migrations numeration goes after the latest existing migration
+  instead of the squashed one.
