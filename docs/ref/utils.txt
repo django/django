@@ -1098,7 +1098,14 @@ For a complete discussion on the usage of the following see the
 
 .. function:: get_language()
 
-    Returns the currently selected language code.
+    Returns the currently selected language code. Returns ``None`` if
+    translations are temporarily deactivated (by :func:`deactivate_all()` or
+    when ``None`` is passed to :func:`override()`).
+
+    .. versionchanged:: 1.8
+
+        Before Django 1.8, ``get_language()`` always returned
+        :setting:`LANGUAGE_CODE` when translations were deactivated.
 
 .. function:: get_language_bidi()
 

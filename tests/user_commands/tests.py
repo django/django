@@ -2,7 +2,6 @@ import os
 
 from django.apps import apps
 from django.db import connection
-from django.conf import settings
 from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import find_command, popen_wrapper
@@ -48,13 +47,12 @@ class CommandTests(SimpleTestCase):
             management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
         self.assertIn("CommandError", stderr.getvalue())
 
-    def test_default_en_us_locale_set(self):
-        # Forces en_us when set to true
+    def test_deactivate_locale_set(self):
+        # Deactivate translation when set to true
         out = StringIO()
         with translation.override('pl'):
             management.call_command('leave_locale_alone_false', stdout=out)
-            # get_language returns settings.LANGUAGE_CODE for NullTranslations instances
-            self.assertEqual(out.getvalue(), "%s\n" % settings.LANGUAGE_CODE)
+            self.assertEqual(out.getvalue(), "")
 
     def test_configured_locale_preserved(self):
         # Leaves locale from settings when set to false
