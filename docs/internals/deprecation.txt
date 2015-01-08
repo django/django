@@ -108,6 +108,12 @@ details on these changes.
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` will
   be removed.
 
+* Django template objects returned by
+  :func:`~django.template.loader.get_template` and
+  :func:`~django.template.loader.select_template` won't accept a
+  :class:`~django.template.Context` in their
+  :meth:`~django.template.backends.base.Template.render()` method anymore.
+
 * The ``current_app`` parameter for the following function and classes will be
   removed:
 

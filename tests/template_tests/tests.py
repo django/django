@@ -156,7 +156,7 @@ class TemplateLoaderTests(SimpleTestCase):
         r = None
         try:
             tmpl = loader.select_template([load_name])
-            r = tmpl.render(template.Context({}))
+            r = tmpl.render()
         except template.TemplateDoesNotExist as e:
             self.assertEqual(e.args[0], 'missing.html')
         self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
@@ -182,7 +182,7 @@ class TemplateLoaderTests(SimpleTestCase):
         tmpl = loader.get_template(load_name)
         r = None
         try:
-            r = tmpl.render(template.Context({}))
+            r = tmpl.render()
         except template.TemplateDoesNotExist as e:
             self.assertEqual(e.args[0], 'missing.html')
         self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
@@ -207,7 +207,7 @@ class TemplateLoaderTests(SimpleTestCase):
         tmpl = loader.get_template(load_name)
         r = None
         try:
-            r = tmpl.render(template.Context({}))
+            r = tmpl.render()
         except template.TemplateDoesNotExist as e:
             self.assertEqual(e.args[0], 'missing.html')
         self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
@@ -216,7 +216,7 @@ class TemplateLoaderTests(SimpleTestCase):
         # result that behaves incorrectly on subsequent attempts.
         tmpl = loader.get_template(load_name)
         try:
-            tmpl.render(template.Context({}))
+            tmpl.render()
         except template.TemplateDoesNotExist as e:
             self.assertEqual(e.args[0], 'missing.html')
         self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
@@ -262,7 +262,7 @@ class TemplateLoaderTests(SimpleTestCase):
         t = loader.get_template('recursive_include.html')
         self.assertEqual(
             "Recursion!  A1  Recursion!  B1   B2   B3  Recursion!  C1",
-            t.render(Context({'comments': comments})).replace(' ', '').replace('\n', ' ').strip(),
+            t.render({'comments': comments}).replace(' ', '').replace('\n', ' ').strip(),
         )
 
 
@@ -400,7 +400,7 @@ class TemplateRegressionTests(SimpleTestCase):
         """
         t = loader.get_template('included_content.html')
         with self.assertRaises(urlresolvers.NoReverseMatch):
-            t.render(Context({}))
+            t.render()
 
     def test_debug_tag_non_ascii(self):
         """
