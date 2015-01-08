@@ -3850,6 +3850,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.get(full_url)
         self.selenium.find_element_by_class_name('deletelink').click()
         self.selenium.find_element_by_class_name('cancel-link').click()
+        self.wait_page_loaded()
         self.assertEqual(self.selenium.current_url, full_url)
         self.assertEqual(Pizza.objects.count(), 1)
 
@@ -3868,6 +3869,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.get(full_url)
         self.selenium.find_element_by_class_name('deletelink').click()
         self.selenium.find_element_by_class_name('cancel-link').click()
+        self.wait_page_loaded()
         self.assertEqual(self.selenium.current_url, full_url)
         self.assertEqual(Pizza.objects.count(), 1)
         self.assertEqual(Topping.objects.count(), 2)
