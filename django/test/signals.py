@@ -43,8 +43,8 @@ def update_installed_apps(**kwargs):
         from django.template.utils import get_app_template_dirs
         get_app_template_dirs.cache_clear()
         # Rebuild translations cache.
-        from django.utils.translation import trans_real
-        trans_real._translations = {}
+        from django.utils.translation.backends import gettext as backend
+        backend._translations = {}
 
 
 @receiver(setting_changed)
@@ -117,13 +117,13 @@ def clear_serializers_cache(**kwargs):
 @receiver(setting_changed)
 def language_changed(**kwargs):
     if kwargs['setting'] in {'LANGUAGES', 'LANGUAGE_CODE', 'LOCALE_PATHS'}:
-        from django.utils.translation import trans_real
-        trans_real._default = None
-        trans_real._active = threading.local()
+        from django.utils.translation.backends import gettext as backend
+        backend._default = None
+        backend._active = threading.local()
     if kwargs['setting'] in {'LANGUAGES', 'LOCALE_PATHS'}:
-        from django.utils.translation import trans_real
-        trans_real._translations = {}
-        trans_real.check_for_language.cache_clear()
+        from django.utils.translation.backends import gettext as backend
+        backend._translations = {}
+        backend.check_for_language.cache_clear()
 
 
 @receiver(setting_changed)

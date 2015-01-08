@@ -1,4 +1,4 @@
-"""Translation helper functions."""
+"""GNU gettext-based translation backend."""
 from __future__ import unicode_literals
 
 from collections import OrderedDict

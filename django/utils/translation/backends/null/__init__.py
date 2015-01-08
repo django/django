@@ -1,6 +1,7 @@
-# These are versions of the functions in django.utils.translation.trans_real
+"""Noop translation backend."""
+# These are versions of the functions in django.utils.translation.backends.gettext
 # that don't actually do anything. This is purely for performance, so that
-# settings.USE_I18N = False can use this module rather than trans_real.py.
+# settings.USE_I18N = False can use this module.
 
 from django.conf import settings
 from django.utils.encoding import force_text

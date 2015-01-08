@@ -2,10 +2,16 @@
 Internationalization support.
 """
 from __future__ import unicode_literals
+import os
+import pkgutil
 import re
+
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
+from django.utils.importlib import import_module
+from django.utils._os import upath
 from django.utils import six
 
 
@@ -47,16 +53,16 @@ class Trans(object):
     from _trans.__dict__.
 
     Note that storing the function with setattr will have a noticeable
-    performance effect, as access to the function goes the normal path,
-    instead of using __getattr__.
+    beneficial performance effect, as access to the function goes the normal
+    path, instead of using __getattr__.
     """
 
     def __getattr__(self, real_name):
         from django.conf import settings
         if settings.USE_I18N:
-            from django.utils.translation import trans_real as trans
+            trans = load_backend(settings.I18N_BACKEND)
         else:
-            from django.utils.translation import trans_null as trans
+            from django.utils.translation.backends import null as trans
         setattr(self, real_name, getattr(trans, real_name))
         return getattr(trans, real_name)
 
@@ -231,3 +237,30 @@ trim_whitespace_re = re.compile('\s*\n\s*')
 
 def trim_whitespace(s):
     return trim_whitespace_re.sub(' ', s.strip())
+
+
+def load_backend(backend_name):
+    # Look for a fully qualified i18n backend name
+    try:
+        return import_module(backend_name)
+    except ImportError as e_user:
+        # The backend wasn't found. Display a helpful error message listing all
+        # possible (built-in) backends.
+        backend_dir = os.path.join(os.path.dirname(upath(__file__)), 'backends')
+        try:
+            available_backends = [
+                name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
+                if ispkg and name != 'null']
+        except EnvironmentError:
+            available_backends = []
+        if backend_name not in ['django.utils.translation.backends.%s' % b for b in
+                                available_backends]:
+            backend_reprs = map(repr, sorted(available_backends))
+            error_msg = ("%r isn't an available i18n backend.\n"
+                         "Try using django.utils.translation.backends.XXX, where XXX "
+                         "is one of:\n    %s\nError was: %s" %
+                         (backend_name, ", ".join(backend_reprs), e_user))
+            raise ImproperlyConfigured(error_msg)
+        else:
+            # If there's some other error, this must be an error in Django
+            raise

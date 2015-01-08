@@ -142,6 +142,7 @@ LANGUAGES_BIDI = ("he", "ar", "fa", "ur")
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
+I18N_BACKEND = 'django.utils.translation.backends.gettext'
 LOCALE_PATHS = ()
 
 # Settings for language cookie
