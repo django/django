@@ -2,7 +2,7 @@ import datetime
 import json
 import unittest
 
-from django.contrib.postgres import forms as pg_forms
+from django.contrib.postgres import forms as pg_forms, fields as pg_fields
 from django.contrib.postgres.validators import RangeMaxValueValidator, RangeMinValueValidator
 from django.core import exceptions, serializers
 from django.db import connection
@@ -343,3 +343,28 @@ class TestFormField(TestCase):
         self.assertEqual(cm.exception.messages[0], 'This field is required.')
         value = field.clean([1, ''])
         self.assertEqual(value, NumericRange(1, None))
+
+    def test_model_field_formfield_integer(self):
+        model_field = pg_fields.IntegerRangeField()
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, pg_forms.IntegerRangeField)
+
+    def test_model_field_formfield_biginteger(self):
+        model_field = pg_fields.BigIntegerRangeField()
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, pg_forms.IntegerRangeField)
+
+    def test_model_field_formfield_float(self):
+        model_field = pg_fields.FloatRangeField()
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, pg_forms.FloatRangeField)
+
+    def test_model_field_formfield_date(self):
+        model_field = pg_fields.DateRangeField()
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, pg_forms.DateRangeField)
+
+    def test_model_field_formfield_datetime(self):
+        model_field = pg_fields.DateTimeRangeField()
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, pg_forms.DateTimeRangeField)

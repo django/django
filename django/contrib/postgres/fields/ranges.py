@@ -1,6 +1,6 @@
 import json
 
-from django.contrib.postgres import lookups
+from django.contrib.postgres import lookups, forms
 from django.db import models
 from django.utils import six
 
@@ -44,10 +44,15 @@ class RangeField(models.Field):
             "bounds": value._bounds,
         })
 
+    def formfield(self, **kwargs):
+        kwargs.setdefault('form_class', self.form_field)
+        return super(RangeField, self).formfield(**kwargs)
+
 
 class IntegerRangeField(RangeField):
     base_field = models.IntegerField()
     range_type = NumericRange
+    form_field = forms.IntegerRangeField
 
     def db_type(self, connection):
         return 'int4range'
@@ -56,6 +61,7 @@ class IntegerRangeField(RangeField):
 class BigIntegerRangeField(RangeField):
     base_field = models.BigIntegerField()
     range_type = NumericRange
+    form_field = forms.IntegerRangeField
 
     def db_type(self, connection):
         return 'int8range'
@@ -64,6 +70,7 @@ class BigIntegerRangeField(RangeField):
 class FloatRangeField(RangeField):
     base_field = models.FloatField()
     range_type = NumericRange
+    form_field = forms.FloatRangeField
 
     def db_type(self, connection):
         return 'numrange'
@@ -72,6 +79,7 @@ class FloatRangeField(RangeField):
 class DateTimeRangeField(RangeField):
     base_field = models.DateTimeField()
     range_type = DateTimeTZRange
+    form_field = forms.DateTimeRangeField
 
     def db_type(self, connection):
         return 'tstzrange'
@@ -80,6 +88,7 @@ class DateTimeRangeField(RangeField):
 class DateRangeField(RangeField):
     base_field = models.DateField()
     range_type = DateRange
+    form_field = forms.DateRangeField
 
     def db_type(self, connection):
         return 'daterange'
