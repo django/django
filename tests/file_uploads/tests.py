@@ -17,7 +17,7 @@ from django.test import TestCase, client
 from django.test import override_settings
 from django.utils.encoding import force_bytes
 from django.utils.http import urlquote
-from django.utils.six import BytesIO, StringIO
+from django.utils.six import BytesIO, PY2, StringIO
 
 from . import uploadhandler
 from .models import FileModel
@@ -108,7 +108,8 @@ class FileUploadTests(TestCase):
 
     def test_big_base64_newlines_upload(self):
         self._test_base64_upload(
-            "Big data" * 68000, encode=base64.encodestring)
+            # encodestring is a deprecated alias on Python 3
+            "Big data" * 68000, encode=base64.encodestring if PY2 else base64.encodebytes)
 
     def test_unicode_file_name(self):
         tdir = sys_tempfile.mkdtemp()
