@@ -61,6 +61,7 @@ class RunSQL(Operation):
     Also accepts a list of operations that represent the state change effected
     by this SQL change, in case it's custom column/table creation/deletion.
     """
+    noop = ''
 
     def __init__(self, sql, reverse_sql=None, state_operations=None):
         self.sql = sql
@@ -100,9 +101,9 @@ class RunSQL(Operation):
     def describe(self):
         return "Raw SQL operation"
 
-    def _run_sql(self, schema_editor, sql):
-        if isinstance(sql, (list, tuple)):
-            for sql in sql:
+    def _run_sql(self, schema_editor, sqls):
+        if isinstance(sqls, (list, tuple)):
+            for sql in sqls:
                 params = None
                 if isinstance(sql, (list, tuple)):
                     elements = len(sql)
@@ -111,8 +112,8 @@ class RunSQL(Operation):
                     else:
                         raise ValueError("Expected a 2-tuple but got %d" % elements)
                 schema_editor.execute(sql, params=params)
-        else:
-            statements = schema_editor.connection.ops.prepare_sql_script(sql)
+        elif sqls != RunSQL.noop:
+            statements = schema_editor.connection.ops.prepare_sql_script(sqls)
             for statement in statements:
                 schema_editor.execute(statement, params=None)
 
@@ -175,3 +176,7 @@ class RunPython(Operation):
 
     def describe(self):
         return "Raw Python operation"
+
+    @staticmethod
+    def noop(apps, schema_editor):
+        return None

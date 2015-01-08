@@ -9,5 +9,5 @@ class Migration(migrations.Migration):
     dependencies = [("migrations", "3_auto")]
 
     operations = [
-        migrations.RunPython(lambda apps, schema_editor: None)
+        migrations.RunPython(migrations.RunPython.noop)
     ]

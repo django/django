@@ -1494,6 +1494,15 @@ class OperationTests(OperationTestBase):
                 operation.database_backwards,
                 "test_runsql", editor, new_state, project_state)
 
+    def test_run_sql_noop(self):
+        """
+        #24098 - Tests no-op RunSQL operations.
+        """
+        operation = migrations.RunSQL(migrations.RunSQL.noop, migrations.RunSQL.noop)
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_runsql", editor, None, None)
+            operation.database_backwards("test_runsql", editor, None, None)
+
     def test_run_python(self):
         """
         Tests the RunPython operation
@@ -1619,6 +1628,17 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "RunPython")
         self.assertEqual(definition[1], [])
         self.assertEqual(sorted(definition[2]), ["atomic", "code"])
+
+    def test_run_python_noop(self):
+        """
+        #24098 - Tests no-op RunPython operations.
+        """
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        operation = migrations.RunPython(migrations.RunPython.noop, migrations.RunPython.noop)
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_runpython", editor, project_state, new_state)
+            operation.database_backwards("test_runpython", editor, new_state, project_state)
 
     @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_separate_database_and_state(self):
