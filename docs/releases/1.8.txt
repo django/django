@@ -462,6 +462,12 @@ Migrations
   attribute/method were added to ease in making ``RunPython`` and ``RunSQL``
   operations reversible.
 
+* The :class:`~django.db.migrations.operations.RunPython` and
+  :class:`~django.db.migrations.operations.RunSQL` operations now accept a
+  ``hints`` parameter that will be passed to :meth:`allow_migrate`. To take
+  advantage of this feature you must ensure that the ``allow_migrate()`` method
+  of all your routers accept ``**hints``.
+
 Models
 ^^^^^^
 
@@ -1028,6 +1034,14 @@ Miscellaneous
 
 * :func:`django.utils.translation.get_language()` now returns ``None`` instead
   of :setting:`LANGUAGE_CODE` when translations are temporarily deactivated.
+
+* The migration operations :class:`~django.db.migrations.operations.RunPython`
+  and :class:`~django.db.migrations.operations.RunSQL` now call the
+  :meth:`allow_migrate` method of database routers. In these cases the
+  ``model`` argument of ``allow_migrate()`` is set to ``None``, so the router
+  must properly handle this value. This is most useful when used together with
+  the newly introduced ``hints`` parameter for these operations, but it can
+  also be used to disable migrations from running on a particular database.
 
 .. _deprecated-features-1.8:
 
