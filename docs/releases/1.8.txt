@@ -1021,6 +1021,9 @@ Miscellaneous
   this will not happen any longer. It might be that new database migrations are
   generated (once) after migrating to 1.8.
 
+* :func:`django.utils.translation.get_language()` now returns ``None`` instead
+  of :setting:`LANGUAGE_CODE` when translations are temporarily deactivated.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
