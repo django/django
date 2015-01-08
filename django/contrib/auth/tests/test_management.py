@@ -568,7 +568,7 @@ class PermissionTestCase(TestCase):
         models.Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control" * 5
 
         six.assertRaisesRegex(self, exceptions.ValidationError,
-            "The verbose_name of permission is longer than 244 characters",
+            "The verbose_name of auth.permission is longer than 244 characters",
             create_permissions, auth_app_config, verbosity=0)
 
 

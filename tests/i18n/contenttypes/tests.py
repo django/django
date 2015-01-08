@@ -28,8 +28,3 @@ class ContentTypeTests(TestCase):
             self.assertEqual(six.text_type(company_type), 'Company')
         with translation.override('fr'):
             self.assertEqual(six.text_type(company_type), 'Société')
-
-    def test_field_override(self):
-        company_type = ContentType.objects.get(app_label='i18n', model='company')
-        company_type.name = 'Other'
-        self.assertEqual(six.text_type(company_type), 'Other')

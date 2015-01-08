@@ -110,8 +110,9 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     for perm in perms:
         if len(perm.name) > permission_name_max_length:
             raise exceptions.ValidationError(
-                "The verbose_name of %s is longer than %s characters" % (
-                    perm.content_type,
+                "The verbose_name of %s.%s is longer than %s characters" % (
+                    perm.content_type.app_label,
+                    perm.content_type.model,
                     verbose_name_max_length,
                 )
             )
