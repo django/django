@@ -240,6 +240,11 @@ def django_tests(verbosity, interactive, failfast, test_labels):
         )
         warnings.filterwarnings(
             'ignore',
+            'initial_data fixtures are deprecated. Use data migrations instead.',
+            RemovedInDjango19Warning
+        )
+        warnings.filterwarnings(
+            'ignore',
             'IPAddressField has been deprecated. Use GenericIPAddressField instead.',
             RemovedInDjango19Warning
         )
