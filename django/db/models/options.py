@@ -18,7 +18,7 @@ from django.utils.encoding import force_text, smart_text, python_2_unicode_compa
 from django.utils.functional import cached_property
 from django.utils.lru_cache import lru_cache
 from django.utils.text import camel_case_to_spaces
-from django.utils.translation import activate, deactivate_all, get_language, string_concat
+from django.utils.translation import override, string_concat
 
 EMPTY_RELATION_TREE = tuple()
 
@@ -339,11 +339,8 @@ class Options(object):
         (so that we get the same value regardless of currently active
         locale).
         """
-        lang = get_language()
-        deactivate_all()
-        raw = force_text(self.verbose_name)
-        activate(lang)
-        return raw
+        with override(None):
+            return force_text(self.verbose_name)
 
     @property
     def swapped(self):
