@@ -492,6 +492,9 @@ class Value(ExpressionNode):
             return 'NULL', []
         return '%s', [self.value]
 
+    def get_group_by_cols(self):
+        return []
+
 
 class DurationValue(Value):
     def as_sql(self, compiler, connection):
