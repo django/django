@@ -1034,7 +1034,7 @@ Selected methods in ``django.db.models.options.Options``
 
 As part of the formalization of the ``Model._meta`` API (from the
 :class:`django.db.models.options.Options` class), a number of methods have been
-deprecated and will be removed in in Django 2.0:
+deprecated and will be removed in Django 2.0:
 
 * ``get_all_field_names()``
 * ``get_all_related_objects()``
