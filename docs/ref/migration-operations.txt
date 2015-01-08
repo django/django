@@ -206,7 +206,7 @@ Special Operations
 RunSQL
 ------
 
-.. class:: RunSQL(sql, reverse_sql=None, state_operations=None)
+.. class:: RunSQL(sql, reverse_sql=None, state_operations=None, hints=None)
 
 Allows running of arbitrary SQL on the database - useful for more advanced
 features of database backends that Django doesn't support directly, like
@@ -235,6 +235,11 @@ operation here so that the autodetector still has an up-to-date state of the
 model (otherwise, when you next run ``makemigrations``, it won't see any
 operation that adds that field and so will try to run it again).
 
+The optional ``hints`` argument will be passed as ``**hints`` to the
+:meth:`allow_migrate` method of database routers to assist them in making
+routing decisions. See :ref:`topics-db-multi-db-hints` for more details on
+database hints.
+
 .. versionchanged:: 1.7.1
 
     If you want to include literal percent signs in a query without parameters
@@ -244,6 +249,8 @@ operation that adds that field and so will try to run it again).
 
     The ability to pass parameters to the ``sql`` and ``reverse_sql`` queries
     was added.
+
+    The ``hints`` argument was added.
 
 .. attribute:: RunSQL.noop
 
@@ -258,7 +265,7 @@ operation that adds that field and so will try to run it again).
 RunPython
 ---------
 
-.. class:: RunPython(code, reverse_code=None, atomic=True)
+.. class:: RunPython(code, reverse_code=None, atomic=True, hints=None)
 
 Runs custom Python code in a historical context. ``code`` (and ``reverse_code``
 if supplied) should be callable objects that accept two arguments; the first is
@@ -266,6 +273,15 @@ an instance of ``django.apps.registry.Apps`` containing historical models that
 match the operation's place in the project history, and the second is an
 instance of :class:`SchemaEditor
 <django.db.backends.schema.BaseDatabaseSchemaEditor>`.
+
+The optional ``hints`` argument will be passed as ``**hints`` to the
+:meth:`allow_migrate` method of database routers to assist them in making a
+routing decision. See :ref:`topics-db-multi-db-hints` for more details on
+database hints.
+
+.. versionadded:: 1.8
+
+    The ``hints`` argument was added.
 
 You are advised to write the code as a separate function above the ``Migration``
 class in the migration file, and just pass it to ``RunPython``. Here's an

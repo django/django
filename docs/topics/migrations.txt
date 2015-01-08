@@ -545,28 +545,26 @@ attribute::
             migrations.RunPython(forwards),
         ]
 
-You can also use your database router's ``allow_migrate()`` method, but keep in
-mind that the imported router needs to stay around as long as it is referenced
-inside a migration:
+.. versionadded:: 1.8
+
+You can also provide hints that will be passed to the :meth:`allow_migrate()`
+method of database routers as ``**hints``:
 
 .. snippet::
     :filename: myapp/dbrouters.py
 
     class MyRouter(object):
 
-        def allow_migrate(self, db, model):
-            return db == 'default'
+        def allow_migrate(self, db, model, **hints):
+            if 'target_db' in hints:
+                return db == hints['target_db']
+            return True
 
 Then, to leverage this in your migrations, do the following::
 
     from django.db import migrations
 
-    from myappname.dbrouters import MyRouter
-
     def forwards(apps, schema_editor):
-        MyModel = apps.get_model("myappname", "MyModel")
-        if not MyRouter().allow_migrate(schema_editor.connection.alias, MyModel):
-            return
         # Your migration code goes here
 
     class Migration(migrations.Migration):
@@ -576,7 +574,7 @@ Then, to leverage this in your migrations, do the following::
         ]
 
         operations = [
-            migrations.RunPython(forwards),
+            migrations.RunPython(forwards, hints={'target_db': 'default'}),
         ]
 
 More advanced migrations
