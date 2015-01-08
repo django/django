@@ -7,6 +7,7 @@ from django.db.models.fields import (BinaryField, BooleanField, CharField, Integ
     PositiveIntegerField, SlugField, TextField)
 from django.db.models.fields.related import ForeignKey, ManyToManyField, OneToOneField
 from django.db.transaction import atomic
+from .fields import CustomManyToManyField
 from .models import (Author, AuthorWithDefaultHeight, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough,
@@ -1303,3 +1304,47 @@ class SchemaTests(TransactionTestCase):
             cursor.execute("SELECT surname FROM schema_author;")
             item = cursor.fetchall()[0]
             self.assertEqual(item[0], None if connection.features.interprets_empty_strings_as_nulls else '')
+
+    def test_custom_manytomanyfield(self):
+        """
+        #24104 - Schema editors should look for many_to_many
+        """
+        # Create the tables
+        with connection.schema_editor() as editor:
+            editor.create_model(AuthorWithM2M)
+            editor.create_model(TagM2MTest)
+        # Create an M2M field
+        new_field = CustomManyToManyField("schema.TagM2MTest", related_name="authors")
+        new_field.contribute_to_class(AuthorWithM2M, "tags")
+        # Ensure there's no m2m table there
+        self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
+        try:
+            # Add the field
+            with connection.schema_editor() as editor:
+                editor.add_field(
+                    AuthorWithM2M,
+                    new_field,
+                )
+            # Ensure there is now an m2m table there
+            columns = self.column_classes(new_field.rel.through)
+            self.assertEqual(columns['tagm2mtest_id'][0], "IntegerField")
+
+            # "Alter" the field. This should not rename the DB table to itself.
+            with connection.schema_editor() as editor:
+                editor.alter_field(
+                    AuthorWithM2M,
+                    new_field,
+                    new_field,
+                )
+
+            # Remove the M2M table again
+            with connection.schema_editor() as editor:
+                editor.remove_field(
+                    AuthorWithM2M,
+                    new_field,
+                )
+            # Ensure there's no m2m table there
+            self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
+        finally:
+            # Cleanup model states
+            AuthorWithM2M._meta.local_many_to_many.remove(new_field)
