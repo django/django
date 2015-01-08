@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.test import TestCase, override_settings
 from django.db.migrations.autodetector import MigrationAutodetector
+from django.db.migrations.migration import Migration
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ProjectState, ModelState
 from django.db.migrations.graph import MigrationGraph
@@ -413,6 +414,34 @@ class AutodetectorTests(TestCase):
         self.assertEqual(changes["testapp"][0].dependencies, [("testapp", "0002_foobar")])
         self.assertEqual(changes["otherapp"][0].name, "0002_pony_stable")
         self.assertEqual(changes["otherapp"][0].dependencies, [("otherapp", "0001_initial")])
+
+    def test_arrange_for_graph_with_sqashed(self):
+        """
+        Tests auto-naming of migrations for graph matching with sqashed
+        migration. Ticket #23953.
+        """
+        # Make a fake graph
+        graph = MigrationGraph()
+        graph.add_node(("testapp", "0001_initial"), None)
+        graph.add_node(("testapp", "0002_foobar"), None)
+        graph.add_dependency("testapp.0002_foobar", ("testapp", "0002_foobar"), ("testapp", "0001_initial"))
+        # Make a fake migration
+        migration = Migration("0001_squashed_0002", "testapp")
+        # Set replaces list to mark migration as squashed
+        migration.replaces = [
+            "0001_initial",
+            "0002_foobar"
+        ]
+        graph.add_node(("testapp", "0001_squashed_0002"), migration)
+        # Use project state to make a new migration change set
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Run through arrange_for_graph
+        changes = autodetector.arrange_for_graph(changes, graph)
+        # Checks if migration has a proper name and number
+        self.assertEqual(changes["testapp"][0].name, "0003_author")
 
     def test_trim_apps(self):
         """

@@ -97,6 +97,21 @@ class MigrationGraph(object):
                 leaves.add(node)
         return sorted(leaves)
 
+    def extended_leaf_nodes(self, app=None):
+        """
+        Does the same as the method above but with flag as
+        the third element of each returning tuple
+        to determine if it is a squashed migration or not.
+        """
+        leaves = set()
+        for node in self.nodes:
+            if (not any(key[0] == node[0] for key in self.dependents.get(node, set()))
+                    and (not app or app == node[0])):
+                replaces = self.nodes[node].replaces if self.nodes[node] else None
+                replaces = replaces is not None and len(replaces)
+                leaves.add((node[0], node[1], replaces))
+        return sorted(leaves)
+
     def ensure_not_cyclic(self, start, get_children):
         # Algo from GvR:
         # http://neopythonic.blogspot.co.uk/2009/01/detecting-cycles-in-directed-graph.html

@@ -1014,7 +1014,7 @@ class MigrationAutodetector(object):
         and fixes the names and dependencies of the changes so they
         extend the graph from the leaf nodes for each app.
         """
-        leaves = graph.leaf_nodes()
+        leaves = graph.extended_leaf_nodes()
         name_map = {}
         for app_label, migrations in list(changes.items()):
             if not migrations:
@@ -1022,7 +1022,9 @@ class MigrationAutodetector(object):
             # Find the app label's current leaf node
             app_leaf = None
             for leaf in leaves:
-                if leaf[0] == app_label:
+                # Checks if it is a leaf of current application and it is
+                # not squashed
+                if leaf[0] == app_label and not leaf[2]:
                     app_leaf = leaf
                     break
             # Do they want an initial migration for this app?
@@ -1040,7 +1042,7 @@ class MigrationAutodetector(object):
             # Name each migration
             for i, migration in enumerate(migrations):
                 if i == 0 and app_leaf:
-                    migration.dependencies.append(app_leaf)
+                    migration.dependencies.append((app_leaf[0], app_leaf[1]))
                 if i == 0 and not app_leaf:
                     new_name = "0001_initial"
                 else:
