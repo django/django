@@ -82,6 +82,11 @@ class SimpleTemplateResponse(HttpResponse):
         """
         template = self.resolve_template(self.template_name)
         context = self.resolve_context(self.context_data)
+        # TODO - remove this hack - makes the tests pass until the next commit
+        try:
+            template = template.template
+        except AttributeError:
+            pass
         content = template.render(context)
         return content
 

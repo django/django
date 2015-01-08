@@ -1,9 +1,12 @@
 # Since this package contains a "django" module, this is required on Python 2.
 from __future__ import absolute_import
 
+import warnings
+
 from django.conf import settings
 from django.template.context import Context, RequestContext
 from django.template.engine import _dirs_undefined, Engine
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 from .base import BaseEngine
@@ -40,8 +43,33 @@ class Template(object):
         return self.template.origin
 
     def render(self, context=None, request=None):
-        # TODO: require context to be a dict -- through a deprecation path?
-        if not isinstance(context, Context):
+        # A deprecation path is required here to cover the following usage:
+        # >>> from django.template import Context
+        # >>> from django.template.loader import get_template
+        # >>> template = get_template('hello.html')
+        # >>> template.render(Context({'name': 'world'}))
+        # In Django 1.7 get_template() returned a django.template.Template.
+        # In Django 1.8 it returns a django.template.backends.django.Template.
+        # In Django 2.0 the isinstance checks should be removed. If passing a
+        # Context or a RequestContext works by accident, it won't be an issue
+        # per se, but it won't be officially supported either.
+        if isinstance(context, RequestContext):
+            if request is not None and request is not context.request:
+                raise ValueError(
+                    "render() was called with a RequestContext and a request "
+                    "argument which refer to different requests. Make sure "
+                    "that the context argument is a dict or at least that "
+                    "the two arguments refer to the same request.")
+            warnings.warn(
+                "render() must be called with a dict, not a RequestContext.",
+                RemovedInDjango20Warning, stacklevel=2)
+
+        elif isinstance(context, Context):
+            warnings.warn(
+                "render() must be called with a dict, not a Context.",
+                RemovedInDjango20Warning, stacklevel=2)
+
+        else:
             if request is None:
                 context = Context(context)
             else:

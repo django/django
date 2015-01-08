@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import HttpResponse, Http404
-from django.template import loader, TemplateDoesNotExist, RequestContext
+from django.template import loader, TemplateDoesNotExist
 from django.utils import feedgenerator
 from django.utils.encoding import force_text, iri_to_uri, smart_text
 from django.utils.html import escape
@@ -162,11 +162,11 @@ class Feed(object):
             context = self.get_context_data(item=item, site=current_site,
                                             obj=obj, request=request)
             if title_tmp is not None:
-                title = title_tmp.render(RequestContext(request, context))
+                title = title_tmp.render(context, request)
             else:
                 title = self.__get_dynamic_attr('item_title', item)
             if description_tmp is not None:
-                description = description_tmp.render(RequestContext(request, context))
+                description = description_tmp.render(context, request)
             else:
                 description = self.__get_dynamic_attr('item_description', item)
             link = add_domain(

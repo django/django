@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 from django.utils.encoding import force_text
 from django.template import Library
 from django.template.loader import get_template
-from django.template.context import Context
+
 
 register = Library()
 
@@ -412,11 +412,11 @@ def search_form(cl):
 @register.simple_tag
 def admin_list_filter(cl, spec):
     tpl = get_template(spec.template)
-    return tpl.render(Context({
+    return tpl.render({
         'title': spec.title,
         'choices': list(spec.choices(cl)),
         'spec': spec,
-    }))
+    })
 
 
 @register.inclusion_tag('admin/actions.html', takes_context=True)
