@@ -1101,6 +1101,10 @@ Miscellaneous
   the newly introduced ``hints`` parameter for these operations, but it can
   also be used to disable migrations from running on a particular database.
 
+* The ``name`` field of :class:`django.contrib.contenttypes.models.ContentType`
+  has been removed by a migration and replaced by a property. That means it's
+  not possible to query or filter a ``ContentType`` by this field any longer.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
