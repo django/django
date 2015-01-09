@@ -20,3 +20,5 @@ Bugfixes
 
 * Fixed a crash in the CSRF middleware when handling non-ASCII referer header
   (:ticket:`23815`).
+
+* Added correct formats for Greek (``el``).
