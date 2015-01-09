@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from importlib import import_module
 import itertools
 import os
@@ -9,7 +12,7 @@ from django.contrib.sites.requests import RequestSite
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.core import mail
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
 from django.http import QueryDict, HttpRequest
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
@@ -27,7 +30,7 @@ from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
 # Needed so model is installed when tests are run independently:
 from django.contrib.auth.tests.custom_user import CustomUser  # NOQA
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.contrib.auth.views import login as login_view
+from django.contrib.auth.views import login as login_view, redirect_to_login
 
 
 @override_settings(
@@ -652,6 +655,10 @@ class LoginURLSettings(AuthViewsTestCase):
         expected = 'http://remote.example.com/login/?next=%s' % quoted_next
         self.assertLoginURLEquals(expected)
 
+    @override_settings(LOGIN_URL=reverse_lazy('login'))
+    def test_lazy_login_url(self):
+        self.assertLoginURLEquals('/login/?next=/login_required/')
+
 
 @skipIfCustomUser
 class LoginRedirectUrlTest(AuthViewsTestCase):
@@ -675,6 +682,21 @@ class LoginRedirectUrlTest(AuthViewsTestCase):
     @override_settings(LOGIN_REDIRECT_URL='http://remote.example.com/welcome/')
     def test_remote(self):
         self.assertLoginRedirectURLEqual('http://remote.example.com/welcome/')
+
+
+class RedirectToLoginTests(AuthViewsTestCase):
+    """Tests for the redirect_to_login view"""
+    @override_settings(LOGIN_URL=reverse_lazy('login'))
+    def test_redirect_to_login_with_lazy(self):
+        login_redirect_response = redirect_to_login(next='/else/where/')
+        expected = '/login/?next=/else/where/'
+        self.assertEqual(expected, login_redirect_response.url)
+
+    @override_settings(LOGIN_URL=reverse_lazy('login'))
+    def test_redirect_to_login_with_lazy_and_unicode(self):
+        login_redirect_response = redirect_to_login(next='/else/where/झ/')
+        expected = '/login/?next=/else/where/%E0%A4%9D/'
+        self.assertEqual(expected, login_redirect_response.url)
 
 
 @skipIfCustomUser

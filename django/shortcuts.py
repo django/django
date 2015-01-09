@@ -11,6 +11,8 @@ from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.core import urlresolvers
 from django.utils import six
+from django.utils.encoding import force_text
+from django.utils.functional import Promise
 
 
 def render_to_response(*args, **kwargs):
@@ -147,6 +149,11 @@ def resolve_url(to, *args, **kwargs):
     # If it's a model, use get_absolute_url()
     if hasattr(to, 'get_absolute_url'):
         return to.get_absolute_url()
+
+    if isinstance(to, Promise):
+        # Expand the lazy instance, as it can cause issues when it is passed
+        # further to some Python functions like urlparse.
+        to = force_text(to)
 
     if isinstance(to, six.string_types):
         # Handle relative URLs
