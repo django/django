@@ -31,18 +31,27 @@ Attributes
 
 .. attribute:: SimpleTemplateResponse.template_name
 
-    The name of the template to be rendered. Accepts a
-    :class:`~django.template.Template` object, a path to a template or list
-    of template paths.
+    The name of the template to be rendered. Accepts a backend-dependent
+    template object (such as those returned by
+    :func:`~django.template.loader.get_template()`), the name of a template,
+    or a list of template names.
 
     Example: ``['foo.html', 'path/to/bar.html']``
 
+    .. deprecated:: 1.8
+
+        ``template_name`` used to accept a :class:`~django.template.Template`.
+
 .. attribute:: SimpleTemplateResponse.context_data
 
-    The context data to be used when rendering the template. It can be
-    a dictionary or a context object.
+    The context data to be used when rendering the template. It must be a
+    :class:`dict`.
 
     Example: ``{'foo': 123}``
+
+    .. deprecated:: 1.8
+
+        ``context_data`` used to accept a :class:`~django.template.Context`.
 
 .. attribute:: SimpleTemplateResponse.rendered_content
 
@@ -58,27 +67,35 @@ Methods
 
 .. method:: SimpleTemplateResponse.__init__(template, context=None, content_type=None, status=None, charset=None)
 
-    Instantiates a
-    :class:`~django.template.response.SimpleTemplateResponse` object
-    with the given template, context, content type, and HTTP status.
+    Instantiates a :class:`~django.template.response.SimpleTemplateResponse`
+    object with the given template, context, content type, HTTP status, and
+    charset.
 
     ``template``
-        The full name of a template, or a sequence of template names.
-        :class:`~django.template.Template` instances can also be used.
+        A backend-dependent template object (such as those returned by
+        :func:`~django.template.loader.get_template()`), the name of a template,
+        or a list of template names.
+
+        .. deprecated:: 1.8
+
+            ``template`` used to accept a :class:`~django.template.Template`.
 
     ``context``
-        A dictionary of values to add to the template context. By default,
-        this is an empty dictionary. :class:`~django.template.Context` objects
-        are also accepted as ``context`` values.
+        A :class:`dict` of values to add to the template context. By default,
+        this is an empty dictionary.
 
-    ``status``
-        The HTTP Status code for the response.
+        .. deprecated:: 1.8
+
+            ``context`` used to accept a :class:`~django.template.Context`.
 
     ``content_type``
         The value included in the HTTP ``Content-Type`` header, including the
         MIME type specification and the character set encoding. If
         ``content_type`` is specified, then its value is used. Otherwise,
         :setting:`DEFAULT_CONTENT_TYPE` is used.
+
+    ``status``
+        The HTTP status code for the response.
 
     ``charset``
         The charset in which the response will be encoded. If not given it will
@@ -91,22 +108,42 @@ Methods
 
 .. method:: SimpleTemplateResponse.resolve_context(context)
 
-    Converts context data into a context instance that can be used for
-    rendering a template. Accepts a dictionary of context data or a
-    context object. Returns a :class:`~django.template.Context`
-    instance containing the provided data.
+    Preprocesses context data that will be used for rendering a template.
+    Accepts a :class:`dict` of context data. By default, returns the same
+    :class:`dict`.
 
-    Override this method in order to customize context instantiation.
+    Override this method in order to customize the context.
+
+    .. versionchanged:: 1.8
+
+        ``resolve_context`` returns a :class:`dict`. It used to return a
+        :class:`~django.template.Context`.
+
+    .. deprecated:: 1.8
+
+        ``resolve_context`` no longer accepts a
+        :class:`~django.template.Context`.
 
 .. method:: SimpleTemplateResponse.resolve_template(template)
 
     Resolves the template instance to use for rendering. Accepts a
-    path of a template to use, or a sequence of template paths.
-    :class:`~django.template.Template` instances may also be provided.
-    Returns the :class:`~django.template.Template` instance to be
-    rendered.
+    backend-dependent template object (such as those returned by
+    :func:`~django.template.loader.get_template()`), the name of a template,
+    or a list of template names.
 
-    Override this method in order to customize template rendering.
+    Returns the backend-dependent template object instance to be rendered.
+
+    Override this method in order to customize template loading.
+
+    .. versionchanged:: 1.8
+
+        ``resolve_template`` returns backend-dependent template object. It
+        used to return a :class:`~django.template.Template`.
+
+    .. deprecated:: 1.8
+
+        ``resolve_template`` no longer accepts a
+        :class:`~django.template.Template`.
 
 .. method:: SimpleTemplateResponse.add_post_render_callback()
 
@@ -142,40 +179,46 @@ TemplateResponse objects
 .. class:: TemplateResponse()
 
     ``TemplateResponse`` is a subclass of
-    :class:`~django.template.response.SimpleTemplateResponse` that uses
-    a :class:`~django.template.RequestContext` instead of
-    a :class:`~django.template.Context`.
+    :class:`~django.template.response.SimpleTemplateResponse` that knows about
+    the current :class:`~django.http.HttpRequest`.
 
 Methods
 -------
 
 .. method:: TemplateResponse.__init__(request, template, context=None, content_type=None, status=None, current_app=None, charset=None)
 
-    Instantiates an ``TemplateResponse`` object with the given
-    template, context, MIME type and HTTP status.
+    Instantiates a :class:`~django.template.response.TemplateResponse` object
+    with the given request, template, context, content type, HTTP status, and
+    charset.
 
     ``request``
         An :class:`~django.http.HttpRequest` instance.
 
     ``template``
-        The full name of a template, or a sequence of template names.
-        :class:`~django.template.Template` instances can also be used.
+        A backend-dependent template object (such as those returned by
+        :func:`~django.template.loader.get_template()`), the name of a template,
+        or a list of template names.
+
+        .. deprecated:: 1.8
+
+            ``template`` used to accept a :class:`~django.template.Template`.
 
     ``context``
-        A dictionary of values to add to the template context. By default,
-        this is an empty dictionary. :class:`~django.template.Context` objects
-        are also accepted as ``context`` values. If you pass a
-        :class:`~django.template.Context` instance or subclass, it will be used
-        instead of creating a new :class:`~django.template.RequestContext`.
+        A :class:`dict` of values to add to the template context. By default,
+        this is an empty dictionary.
 
-    ``status``
-        The HTTP Status code for the response.
+        .. deprecated:: 1.8
+
+            ``context`` used to accept a :class:`~django.template.Context`.
 
     ``content_type``
         The value included in the HTTP ``Content-Type`` header, including the
         MIME type specification and the character set encoding. If
         ``content_type`` is specified, then its value is used. Otherwise,
         :setting:`DEFAULT_CONTENT_TYPE` is used.
+
+    ``status``
+        The HTTP status code for the response.
 
     ``current_app``
         A hint indicating which application contains the current view. See the
@@ -292,14 +335,13 @@ invoked immediately.
 Using TemplateResponse and SimpleTemplateResponse
 =================================================
 
-A TemplateResponse object can be used anywhere that a normal HttpResponse can be
-used. It can also be used as an alternative to calling
-:func:`~django.shortcuts.render()` or
+A :class:`TemplateResponse` object can be used anywhere that a normal
+:class:`django.http.HttpResponse` can be used. It can also be used as an
+alternative to calling :func:`~django.shortcuts.render()` or
 :func:`~django.shortcuts.render_to_response()`.
 
-For example, the following simple view returns a
-:class:`TemplateResponse()` with a simple template, and a context
-containing a queryset::
+For example, the following simple view returns a :class:`TemplateResponse`
+with a simple template and a context containing a queryset::
 
     from django.template.response import TemplateResponse
 

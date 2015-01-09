@@ -7,7 +7,7 @@ import time
 
 from django.test import RequestFactory, SimpleTestCase
 from django.conf import settings
-from django.template import Template, Context
+from django.template import Context, engines
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
 from django.test import ignore_warnings, override_settings
@@ -29,7 +29,8 @@ class CustomURLConfMiddleware(object):
 class SimpleTemplateResponseTest(SimpleTestCase):
 
     def _response(self, template='foo', *args, **kwargs):
-        return SimpleTemplateResponse(Template(template), *args, **kwargs)
+        template = engines['django'].from_string(template)
+        return SimpleTemplateResponse(template, *args, **kwargs)
 
     def test_template_resolving(self):
         response = SimpleTemplateResponse('first/test.html')
@@ -58,7 +59,8 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         self.assertEqual(response.content, b'foo')
 
         # rebaking doesn't change the rendered content
-        response.template_name = Template('bar{{ baz }}')
+        template = engines['django'].from_string('bar{{ baz }}')
+        response.template_name = template
         response.render()
         self.assertEqual(response.content, b'foo')
 
@@ -113,6 +115,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         response.render()
         self.assertEqual(response.content, b'bar')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_context_instance(self):
         response = self._response('{{ foo }}{{ processors }}',
                                   Context({'foo': 'bar'}))
@@ -220,8 +223,9 @@ class TemplateResponseTest(SimpleTestCase):
         self.factory = RequestFactory()
 
     def _response(self, template='foo', *args, **kwargs):
-        return TemplateResponse(self.factory.get('/'), Template(template),
-                                *args, **kwargs)
+        self._request = self.factory.get('/')
+        template = engines['django'].from_string(template)
+        return TemplateResponse(self._request, template, *args, **kwargs)
 
     def test_render(self):
         response = self._response('{{ foo }}{{ processors }}').render()
@@ -232,6 +236,7 @@ class TemplateResponseTest(SimpleTestCase):
                                   {'foo': 'bar'}).render()
         self.assertEqual(response.content, b'baryes')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_render_with_context(self):
         response = self._response('{{ foo }}{{ processors }}',
                                   Context({'foo': 'bar'})).render()
@@ -257,11 +262,8 @@ class TemplateResponseTest(SimpleTestCase):
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_custom_app(self):
-        response = self._response('{{ foo }}', current_app="foobar")
-
-        rc = response.resolve_context(response.context_data)
-
-        self.assertEqual(rc.request.current_app, 'foobar')
+        self._response('{{ foo }}', current_app="foobar")
+        self.assertEqual(self._request.current_app, 'foobar')
 
     def test_pickling(self):
         # Create a template response. The context is

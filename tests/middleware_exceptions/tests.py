@@ -5,7 +5,7 @@ from django.core.exceptions import MiddlewareNotUsed
 from django.core.signals import got_request_exception
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
-from django.template import Template
+from django.template import engines
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import patch_logger
 
@@ -63,7 +63,8 @@ class ResponseMiddleware(TestMiddleware):
 class TemplateResponseMiddleware(TestMiddleware):
     def process_template_response(self, request, response):
         super(TemplateResponseMiddleware, self).process_template_response(request, response)
-        return TemplateResponse(request, Template('Template Response Middleware'))
+        template = engines['django'].from_string('Template Response Middleware')
+        return TemplateResponse(request, template)
 
 
 class ExceptionMiddleware(TestMiddleware):

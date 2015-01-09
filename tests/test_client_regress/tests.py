@@ -8,7 +8,7 @@ import os
 import itertools
 
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template import TemplateSyntaxError, Context, Template
+from django.template import TemplateSyntaxError, Context, engines
 from django.test import Client, TestCase, ignore_warnings, override_settings
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
@@ -158,7 +158,8 @@ class AssertContainsTests(TestCase):
             without throwing an error.
             Refs #15826.
         """
-        response = SimpleTemplateResponse(Template('Hello'), status=200)
+        template = engines['django'].from_string('Hello')
+        response = SimpleTemplateResponse(template)
         self.assertContains(response, 'Hello')
 
     def test_assert_contains_using_non_template_response(self):
@@ -174,7 +175,8 @@ class AssertContainsTests(TestCase):
             without throwing an error.
             Refs #15826.
         """
-        response = SimpleTemplateResponse(Template('Hello'), status=200)
+        template = engines['django'].from_string('Hello')
+        response = SimpleTemplateResponse(template)
         self.assertNotContains(response, 'Bye')
 
     def test_assert_not_contains_using_non_template_response(self):

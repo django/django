@@ -1,7 +1,8 @@
 import warnings
 
 from django.http import HttpResponse
-from django.template import loader, Context, RequestContext
+from django.template import loader, Context, RequestContext, Template
+from django.template.backends.django import Template as BackendTemplate
 from django.template.context import _current_app_undefined
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -16,13 +17,29 @@ class SimpleTemplateResponse(HttpResponse):
 
     def __init__(self, template, context=None, content_type=None, status=None,
                  charset=None):
+        if isinstance(template, Template):
+            warnings.warn(
+                "{}'s template argument cannot be a django.template.Template "
+                "anymore. It may be a backend-specific template like those "
+                "created by get_template().".format(self.__class__.__name__),
+                RemovedInDjango20Warning, stacklevel=2)
+            template = BackendTemplate(template)
+
         # It would seem obvious to call these next two members 'template' and
         # 'context', but those names are reserved as part of the test Client
-        # API. To avoid the name collision, we use tricky-to-debug problems
+        # API. To avoid the name collision, we use different names.
         self.template_name = template
         self.context_data = context
 
         self._post_render_callbacks = []
+
+        # _request stores the current request object in subclasses that know
+        # about requests, like TemplateResponse. It's defined in the base class
+        # to minimize code duplication.
+        # It's called self._request because self.request gets overwritten by
+        # django.test.client.Client. Unlike template_name and context_data,
+        # _request should not be considered part of the public API.
+        self._request = None
 
         # content argument doesn't make sense here because it will be replaced
         # with rendered template so we always pass empty string in order to
@@ -62,14 +79,45 @@ class SimpleTemplateResponse(HttpResponse):
         else:
             return template
 
+    def _resolve_template(self, template):
+        # This wrapper deprecates returning a django.template.Template in
+        # subclasses that override resolve_template. It can be removed in
+        # Django 2.0.
+        new_template = self.resolve_template(template)
+        if isinstance(new_template, Template):
+            warnings.warn(
+                "{}.resolve_template() must return a backend-specific "
+                "template like those created by get_template(), not a "
+                "{}.".format(
+                    self.__class__.__name__, new_template.__class__.__name__),
+                RemovedInDjango20Warning, stacklevel=2)
+            new_template = BackendTemplate(new_template)
+        return new_template
+
     def resolve_context(self, context):
-        """Converts context data into a full Context object
-        (assuming it isn't already a Context object).
-        """
-        if isinstance(context, Context):
-            return context
-        else:
-            return Context(context)
+        return context
+
+    def _resolve_context(self, context):
+        # This wrapper deprecates returning a Context or a RequestContext in
+        # subclasses that override resolve_context. It can be removed in
+        # Django 2.0. If returning a Context or a RequestContext works by
+        # accident, it won't be an issue per se, but it won't be officially
+        # supported either.
+        new_context = self.resolve_context(context)
+        if isinstance(new_context, RequestContext) and self._request is None:
+            self._request = new_context.request
+        if isinstance(new_context, Context):
+            warnings.warn(
+                "{}.resolve_context() must return a dict, not a {}.".format(
+                    self.__class__.__name__, new_context.__class__.__name__),
+                RemovedInDjango20Warning, stacklevel=2)
+            # It would be tempting to do new_context = new_context.flatten()
+            # here but that would cause template context processors to run for
+            # TemplateResponse(request, template, Context({})), which would be
+            # backwards-incompatible. As a consequence another deprecation
+            # warning will be raised when rendering the template. There isn't
+            # much we can do about that.
+        return new_context
 
     @property
     def rendered_content(self):
@@ -80,14 +128,9 @@ class SimpleTemplateResponse(HttpResponse):
         response content, you must either call render(), or set the
         content explicitly using the value of this property.
         """
-        template = self.resolve_template(self.template_name)
-        context = self.resolve_context(self.context_data)
-        # TODO - remove this hack - makes the tests pass until the next commit
-        try:
-            template = template.template
-        except AttributeError:
-            pass
-        content = template.render(context)
+        template = self._resolve_template(self.template_name)
+        context = self._resolve_context(self.context_data)
+        content = template.render(context, self._request)
         return content
 
     def add_post_render_callback(self, callback):
@@ -147,10 +190,6 @@ class TemplateResponse(SimpleTemplateResponse):
 
     def __init__(self, request, template, context=None, content_type=None,
             status=None, current_app=_current_app_undefined, charset=None):
-        # self.request gets over-written by django.test.client.Client - and
-        # unlike context_data and template_name the _request should not
-        # be considered part of the public API.
-        self._request = request
         # As a convenience we'll allow callers to provide current_app without
         # having to avoid needing to create the RequestContext directly
         if current_app is not _current_app_undefined:
@@ -161,14 +200,4 @@ class TemplateResponse(SimpleTemplateResponse):
             request.current_app = current_app
         super(TemplateResponse, self).__init__(
             template, context, content_type, status, charset)
-
-    def resolve_context(self, context):
-        """Convert context data into a full RequestContext object
-        (assuming it isn't already a Context object).
-        """
-        if isinstance(context, Context):
-            return context
-        context_instance = RequestContext(self._request)
-        if context:
-            context_instance.push(context)
-        return context_instance
+        self._request = request
