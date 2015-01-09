@@ -320,7 +320,8 @@ New Features
 
 * Are there tests to "exercise" all of the new code?
 * Is there a release note in ``docs/releases/A.B.txt``?
-* Is there documentation for the feature and is it annotated appropriately with
+* Is there documentation for the feature and is it :ref:`annotated
+  appropriately <documenting-new-features>` with
   ``.. versionadded:: A.B`` or ``.. versionchanged:: A.B``?
 
 Deprecating a feature

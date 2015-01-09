@@ -216,6 +216,46 @@ General improvements, or other changes to the APIs that should be emphasized
 should use the "``.. versionchanged:: X.Y``" directive (with the same format
 as the ``versionadded`` mentioned above.
 
+These ``versionadded`` and ``versionchanged`` blocks should be "self-contained."
+In other words, since we only keep these annotations around for two releases,
+it's nice to be able to remove the annotation and its contents without having
+to reflow, reindent, or edit the surrounding text. For example, instead of
+putting the entire description of a new or changed feature in a block, do
+something like this::
+
+    .. class:: Author(first_name, last_name, middle_name=None)
+
+        A person who writes books.
+
+        ``first_name`` is ...
+
+        ...
+
+        ``middle_name`` is ...
+
+        .. versionchanged:: A.B
+
+            The ``middle_name`` argument was added.
+
+Put the changed annotation notes at the bottom of a section, not the top.
+
+Also, avoid referring to a specific version of Django outside a
+``versionadded`` or ``versionchanged`` block. Even inside a block, it's often
+redundant to do so as these annotations render as "New in Django A.B:" and
+"Changed in Django A.B", respectively.
+
+If a function, attribute, etc. is added, it's also okay to use a
+``versionadded`` annotation like this::
+
+    .. attribute:: Author.middle_name
+
+        .. versionadded:: A.B
+
+        An author's middle name.
+
+We can simply remove the ``.. versionadded:: A.B`` annotation without any
+indentation changes when the time comes.
+
 An example
 ----------
 
