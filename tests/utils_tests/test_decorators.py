@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.template import Template, Context
+from django.template import engines
 from django.template.response import TemplateResponse
 from django.test import TestCase, RequestFactory
 from django.utils.decorators import decorator_from_middleware
@@ -70,8 +70,8 @@ class DecoratorFromMiddlewareTests(TestCase):
 
         @full_dec
         def normal_view(request):
-            t = Template("Hello world")
-            return HttpResponse(t.render(Context({})))
+            template = engines['django'].from_string("Hello world")
+            return HttpResponse(template.render())
 
         request = self.rf.get('/')
         normal_view(request)
@@ -89,8 +89,8 @@ class DecoratorFromMiddlewareTests(TestCase):
 
         @full_dec
         def template_response_view(request):
-            t = Template("Hello world")
-            return TemplateResponse(request, t, {})
+            template = engines['django'].from_string("Hello world")
+            return TemplateResponse(request, template)
 
         request = self.rf.get('/')
         response = template_response_view(request)

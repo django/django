@@ -22,11 +22,11 @@ from django.core.cache import (cache, caches, CacheKeyWarning,
     close_caches)
 from django.db import connection, connections, transaction
 from django.core.cache.utils import make_template_fragment_key
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
 from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
 from django.middleware.csrf import CsrfViewMiddleware
-from django.template import Template
+from django.template import engines
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (TestCase, TransactionTestCase, RequestFactory,
@@ -2022,7 +2022,8 @@ class TestWithTemplateResponse(TestCase):
             ('Cookie    ,     Accept-Encoding', ('Accept-Encoding', 'cookie'), 'Cookie, Accept-Encoding'),
         )
         for initial_vary, newheaders, resulting_vary in headers:
-            response = TemplateResponse(HttpResponse(), Template("This is a test"))
+            template = engines['django'].from_string("This is a test")
+            response = TemplateResponse(HttpRequest(), template)
             if initial_vary is not None:
                 response['Vary'] = initial_vary
             patch_vary_headers(response, newheaders)
@@ -2030,7 +2031,8 @@ class TestWithTemplateResponse(TestCase):
 
     def test_get_cache_key(self):
         request = self.factory.get(self.path)
-        response = TemplateResponse(HttpResponse(), Template("This is a test"))
+        template = engines['django'].from_string("This is a test")
+        response = TemplateResponse(HttpRequest(), template)
         key_prefix = 'localprefix'
         # Expect None if no headers have been set yet.
         self.assertIsNone(get_cache_key(request))
@@ -2052,7 +2054,8 @@ class TestWithTemplateResponse(TestCase):
 
     def test_get_cache_key_with_query(self):
         request = self.factory.get(self.path, {'test': 1})
-        response = TemplateResponse(HttpResponse(), Template("This is a test"))
+        template = engines['django'].from_string("This is a test")
+        response = TemplateResponse(HttpRequest(), template)
         # Expect None if no headers have been set yet.
         self.assertIsNone(get_cache_key(request))
         # Set headers to an empty list.
@@ -2066,7 +2069,8 @@ class TestWithTemplateResponse(TestCase):
 
     @override_settings(USE_ETAGS=False)
     def test_without_etag(self):
-        response = TemplateResponse(HttpResponse(), Template("This is a test"))
+        template = engines['django'].from_string("This is a test")
+        response = TemplateResponse(HttpRequest(), template)
         self.assertFalse(response.has_header('ETag'))
         patch_response_headers(response)
         self.assertFalse(response.has_header('ETag'))
@@ -2075,7 +2079,8 @@ class TestWithTemplateResponse(TestCase):
 
     @override_settings(USE_ETAGS=True)
     def test_with_etag(self):
-        response = TemplateResponse(HttpResponse(), Template("This is a test"))
+        template = engines['django'].from_string("This is a test")
+        response = TemplateResponse(HttpRequest(), template)
         self.assertFalse(response.has_header('ETag'))
         patch_response_headers(response)
         self.assertFalse(response.has_header('ETag'))
