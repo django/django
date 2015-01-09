@@ -15,7 +15,6 @@ from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
@@ -45,12 +44,6 @@ accept_language_re = re.compile(r'''
 language_code_re = re.compile(r'^[a-z]{1,8}(?:-[a-z0-9]{1,8})*$', re.IGNORECASE)
 
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
-
-# some browsers use deprecated locales. refs #18419
-_DJANGO_DEPRECATED_LOCALES = {
-    'zh-cn': 'zh-hans',
-    'zh-tw': 'zh-hant',
-}
 
 
 @receiver(setting_changed)
@@ -213,11 +206,6 @@ def activate(language):
     """
     if not language:
         return
-    if language in _DJANGO_DEPRECATED_LOCALES:
-        msg = ("The use of the language code '%s' is deprecated. "
-               "Please use the '%s' translation instead.")
-        warnings.warn(msg % (language, _DJANGO_DEPRECATED_LOCALES[language]),
-                      RemovedInDjango19Warning, stacklevel=2)
     _active.value = translation(language)
 
 

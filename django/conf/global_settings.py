@@ -130,10 +130,8 @@ LANGUAGES = (
     ('uk', gettext_noop('Ukrainian')),
     ('ur', gettext_noop('Urdu')),
     ('vi', gettext_noop('Vietnamese')),
-    ('zh-cn', gettext_noop('Simplified Chinese')),
     ('zh-hans', gettext_noop('Simplified Chinese')),
     ('zh-hant', gettext_noop('Traditional Chinese')),
-    ('zh-tw', gettext_noop('Traditional Chinese')),
 )
 
 # Languages using BiDi (right-to-left) layout
