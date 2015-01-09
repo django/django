@@ -1691,14 +1691,14 @@ class Query(object):
         """
         Adds items from the 'ordering' sequence to the query's "order by"
         clause. These items are either field names (not column names) --
-        possibly with a direction prefix ('-' or '?') -- or ordinals,
-        corresponding to column positions in the 'select' list.
+        possibly with a direction prefix ('-' or '?') -- or OrderBy
+        expressions.
 
         If 'ordering' is empty, all ordering is cleared from the query.
         """
         errors = []
         for item in ordering:
-            if not ORDER_PATTERN.match(item):
+            if not hasattr(item, 'resolve_expression') and not ORDER_PATTERN.match(item):
                 errors.append(item)
         if errors:
             raise FieldError('Invalid order_by arguments: %s' % errors)

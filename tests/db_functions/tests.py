@@ -68,6 +68,37 @@ class FunctionTests(TestCase):
             lambda a: a.headline
         )
 
+    def test_coalesce_ordering(self):
+        Author.objects.create(name='John Smith', alias='smithj')
+        Author.objects.create(name='Rhonda')
+
+        authors = Author.objects.order_by(Coalesce('alias', 'name'))
+        self.assertQuerysetEqual(
+            authors, [
+                'Rhonda',
+                'John Smith',
+            ],
+            lambda a: a.name
+        )
+
+        authors = Author.objects.order_by(Coalesce('alias', 'name').asc())
+        self.assertQuerysetEqual(
+            authors, [
+                'Rhonda',
+                'John Smith',
+            ],
+            lambda a: a.name
+        )
+
+        authors = Author.objects.order_by(Coalesce('alias', 'name').desc())
+        self.assertQuerysetEqual(
+            authors, [
+                'John Smith',
+                'Rhonda',
+            ],
+            lambda a: a.name
+        )
+
     def test_concat(self):
         Author.objects.create(name='Jayden')
         Author.objects.create(name='John Smith', alias='smithj', goes_by='John')
@@ -184,6 +215,22 @@ class FunctionTests(TestCase):
 
         self.assertEqual(authors.filter(alias_length__lte=Length('name')).count(), 1)
 
+    def test_length_ordering(self):
+        Author.objects.create(name='John Smith', alias='smithj')
+        Author.objects.create(name='John Smith', alias='smithj1')
+        Author.objects.create(name='Rhonda', alias='ronny')
+
+        authors = Author.objects.order_by(Length('name'), Length('alias'))
+
+        self.assertQuerysetEqual(
+            authors, [
+                ('Rhonda', 'ronny'),
+                ('John Smith', 'smithj'),
+                ('John Smith', 'smithj1'),
+            ],
+            lambda a: (a.name, a.alias)
+        )
+
     def test_substr(self):
         Author.objects.create(name='John Smith', alias='smithj')
         Author.objects.create(name='Rhonda')
@@ -230,3 +277,25 @@ class FunctionTests(TestCase):
 
         with six.assertRaisesRegex(self, ValueError, "'pos' must be greater than 0"):
             Author.objects.annotate(raises=Substr('name', 0))
+
+    def test_nested_function_ordering(self):
+        Author.objects.create(name='John Smith')
+        Author.objects.create(name='Rhonda Simpson', alias='ronny')
+
+        authors = Author.objects.order_by(Length(Coalesce('alias', 'name')))
+        self.assertQuerysetEqual(
+            authors, [
+                'Rhonda Simpson',
+                'John Smith',
+            ],
+            lambda a: a.name
+        )
+
+        authors = Author.objects.order_by(Length(Coalesce('alias', 'name')).desc())
+        self.assertQuerysetEqual(
+            authors, [
+                'John Smith',
+                'Rhonda Simpson',
+            ],
+            lambda a: a.name
+        )
