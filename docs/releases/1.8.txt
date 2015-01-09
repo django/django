@@ -1397,6 +1397,21 @@ Since it's easier to understand with examples, the :ref:`upgrade guide
 
 All this also applies to :func:`~django.template.loader.select_template()`.
 
+:class:`~django.template.Template` and :class:`~django.template.Context` classes in template responses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some methods of :class:`~django.template.response.SimpleTemplateResponse` and
+:class:`~django.template.response.TemplateResponse` accepted
+:class:`django.template.Context` and :class:`django.template.Template` objects
+as arguments. They should now receive :class:`dict` and backend-dependent
+template objects respectively.
+
+This also applies to the return types if you have subclassed either template
+response class.
+
+Check the :doc:`template response API documentation </ref/template-response>`
+for details.
+
 ``current_app`` argument of template-related APIs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -114,6 +114,11 @@ details on these changes.
   :class:`~django.template.Context` in their
   :meth:`~django.template.backends.base.Template.render()` method anymore.
 
+* :doc:`Template response APIs </ref/template-response>` will enforce the use
+  of :class:`dict` and backend-dependent template objects instead of
+  :class:`~django.template.Context` and :class:`~django.template.Template`
+  respectively.
+
 * The ``current_app`` parameter for the following function and classes will be
   removed:
 
