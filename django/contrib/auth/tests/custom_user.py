@@ -211,7 +211,7 @@ class CustomUserNonListRequiredFields(AbstractBaseUser):
 
 
 class CustomUserBadRequiredFields(AbstractBaseUser):
-    "A user with a non-unique username"
+    "A user with a USERNAME_FIELD that appears in REQUIRED_FIELDS (invalid)"
     username = models.CharField(max_length=30, unique=True)
     date_of_birth = models.DateField()
 
