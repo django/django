@@ -7,7 +7,7 @@ from django.test import ignore_warnings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from .templatetags import custom
+from .templatetags import custom, inclusion
 
 
 class CustomFilterTests(TestCase):
@@ -112,139 +112,139 @@ class CustomTagTests(TestCase):
     def test_inclusion_tags(self):
         c = template.Context({'value': 42})
 
-        t = template.Template('{% load custom %}{% inclusion_no_params %}')
+        t = template.Template('{% load inclusion %}{% inclusion_no_params %}')
         self.assertEqual(t.render(c), 'inclusion_no_params - Expected result\n')
 
-        t = template.Template('{% load custom %}{% inclusion_one_param 37 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_one_param 37 %}')
         self.assertEqual(t.render(c), 'inclusion_one_param - Expected result: 37\n')
 
-        t = template.Template('{% load custom %}{% inclusion_explicit_no_context 37 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_explicit_no_context 37 %}')
         self.assertEqual(t.render(c), 'inclusion_explicit_no_context - Expected result: 37\n')
 
-        t = template.Template('{% load custom %}{% inclusion_no_params_with_context %}')
+        t = template.Template('{% load inclusion %}{% inclusion_no_params_with_context %}')
         self.assertEqual(t.render(c), 'inclusion_no_params_with_context - Expected result (context value: 42)\n')
 
-        t = template.Template('{% load custom %}{% inclusion_params_and_context 37 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_params_and_context 37 %}')
         self.assertEqual(t.render(c), 'inclusion_params_and_context - Expected result (context value: 42): 37\n')
 
-        t = template.Template('{% load custom %}{% inclusion_two_params 37 42 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_two_params 37 42 %}')
         self.assertEqual(t.render(c), 'inclusion_two_params - Expected result: 37, 42\n')
 
-        t = template.Template('{% load custom %}{% inclusion_one_default 37 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_one_default 37 %}')
         self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 37, hi\n')
 
-        t = template.Template('{% load custom %}{% inclusion_one_default 37 two="hello" %}')
+        t = template.Template('{% load inclusion %}{% inclusion_one_default 37 two="hello" %}')
         self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 37, hello\n')
 
-        t = template.Template('{% load custom %}{% inclusion_one_default one=99 two="hello" %}')
+        t = template.Template('{% load inclusion %}{% inclusion_one_default one=99 two="hello" %}')
         self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 99, hello\n')
 
         six.assertRaisesRegex(self, template.TemplateSyntaxError,
             "'inclusion_one_default' received unexpected keyword argument 'three'",
-            template.Template, '{% load custom %}{% inclusion_one_default 99 two="hello" three="foo" %}')
+            template.Template, '{% load inclusion %}{% inclusion_one_default 99 two="hello" three="foo" %}')
 
-        t = template.Template('{% load custom %}{% inclusion_one_default 37 42 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_one_default 37 42 %}')
         self.assertEqual(t.render(c), 'inclusion_one_default - Expected result: 37, 42\n')
 
-        t = template.Template('{% load custom %}{% inclusion_unlimited_args 37 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_unlimited_args 37 %}')
         self.assertEqual(t.render(c), 'inclusion_unlimited_args - Expected result: 37, hi\n')
 
-        t = template.Template('{% load custom %}{% inclusion_unlimited_args 37 42 56 89 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_unlimited_args 37 42 56 89 %}')
         self.assertEqual(t.render(c), 'inclusion_unlimited_args - Expected result: 37, 42, 56, 89\n')
 
-        t = template.Template('{% load custom %}{% inclusion_only_unlimited_args %}')
+        t = template.Template('{% load inclusion %}{% inclusion_only_unlimited_args %}')
         self.assertEqual(t.render(c), 'inclusion_only_unlimited_args - Expected result: \n')
 
-        t = template.Template('{% load custom %}{% inclusion_only_unlimited_args 37 42 56 89 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_only_unlimited_args 37 42 56 89 %}')
         self.assertEqual(t.render(c), 'inclusion_only_unlimited_args - Expected result: 37, 42, 56, 89\n')
 
         six.assertRaisesRegex(self, template.TemplateSyntaxError,
             "'inclusion_two_params' received too many positional arguments",
-            template.Template, '{% load custom %}{% inclusion_two_params 37 42 56 %}')
+            template.Template, '{% load inclusion %}{% inclusion_two_params 37 42 56 %}')
 
         six.assertRaisesRegex(self, template.TemplateSyntaxError,
             "'inclusion_one_default' received too many positional arguments",
-            template.Template, '{% load custom %}{% inclusion_one_default 37 42 56 %}')
+            template.Template, '{% load inclusion %}{% inclusion_one_default 37 42 56 %}')
 
         six.assertRaisesRegex(self, template.TemplateSyntaxError,
             "'inclusion_one_default' did not receive value\(s\) for the argument\(s\): 'one'",
-            template.Template, '{% load custom %}{% inclusion_one_default %}')
+            template.Template, '{% load inclusion %}{% inclusion_one_default %}')
 
         six.assertRaisesRegex(self, template.TemplateSyntaxError,
             "'inclusion_unlimited_args' did not receive value\(s\) for the argument\(s\): 'one'",
-            template.Template, '{% load custom %}{% inclusion_unlimited_args %}')
+            template.Template, '{% load inclusion %}{% inclusion_unlimited_args %}')
 
-        t = template.Template('{% load custom %}{% inclusion_unlimited_args_kwargs 37 40|add:2 56 eggs="scrambled" four=1|add:3 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_unlimited_args_kwargs 37 40|add:2 56 eggs="scrambled" four=1|add:3 %}')
         self.assertEqual(t.render(c), 'inclusion_unlimited_args_kwargs - Expected result: 37, 42, 56 / eggs=scrambled, four=4\n')
 
         six.assertRaisesRegex(self, template.TemplateSyntaxError,
             "'inclusion_unlimited_args_kwargs' received some positional argument\(s\) after some keyword argument\(s\)",
-            template.Template, '{% load custom %}{% inclusion_unlimited_args_kwargs 37 40|add:2 eggs="scrambled" 56 four=1|add:3 %}')
+            template.Template, '{% load inclusion %}{% inclusion_unlimited_args_kwargs 37 40|add:2 eggs="scrambled" 56 four=1|add:3 %}')
 
         six.assertRaisesRegex(self, template.TemplateSyntaxError,
             "'inclusion_unlimited_args_kwargs' received multiple values for keyword argument 'eggs'",
-            template.Template, '{% load custom %}{% inclusion_unlimited_args_kwargs 37 eggs="scrambled" eggs="scrambled" %}')
+            template.Template, '{% load inclusion %}{% inclusion_unlimited_args_kwargs 37 eggs="scrambled" eggs="scrambled" %}')
 
     def test_include_tag_missing_context(self):
         # The 'context' parameter must be present when takes_context is True
         six.assertRaisesRegex(self, template.TemplateSyntaxError,
             "'inclusion_tag_without_context_parameter' is decorated with takes_context=True so it must have a first argument of 'context'",
-            template.Template, '{% load custom %}{% inclusion_tag_without_context_parameter 123 %}')
+            template.Template, '{% load inclusion %}{% inclusion_tag_without_context_parameter 123 %}')
 
     def test_inclusion_tags_from_template(self):
         c = template.Context({'value': 42})
 
-        t = template.Template('{% load custom %}{% inclusion_no_params_from_template %}')
+        t = template.Template('{% load inclusion %}{% inclusion_no_params_from_template %}')
         self.assertEqual(t.render(c), 'inclusion_no_params_from_template - Expected result\n')
 
-        t = template.Template('{% load custom %}{% inclusion_one_param_from_template 37 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_one_param_from_template 37 %}')
         self.assertEqual(t.render(c), 'inclusion_one_param_from_template - Expected result: 37\n')
 
-        t = template.Template('{% load custom %}{% inclusion_explicit_no_context_from_template 37 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_explicit_no_context_from_template 37 %}')
         self.assertEqual(t.render(c), 'inclusion_explicit_no_context_from_template - Expected result: 37\n')
 
-        t = template.Template('{% load custom %}{% inclusion_no_params_with_context_from_template %}')
+        t = template.Template('{% load inclusion %}{% inclusion_no_params_with_context_from_template %}')
         self.assertEqual(t.render(c), 'inclusion_no_params_with_context_from_template - Expected result (context value: 42)\n')
 
-        t = template.Template('{% load custom %}{% inclusion_params_and_context_from_template 37 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_params_and_context_from_template 37 %}')
         self.assertEqual(t.render(c), 'inclusion_params_and_context_from_template - Expected result (context value: 42): 37\n')
 
-        t = template.Template('{% load custom %}{% inclusion_two_params_from_template 37 42 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_two_params_from_template 37 42 %}')
         self.assertEqual(t.render(c), 'inclusion_two_params_from_template - Expected result: 37, 42\n')
 
-        t = template.Template('{% load custom %}{% inclusion_one_default_from_template 37 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_one_default_from_template 37 %}')
         self.assertEqual(t.render(c), 'inclusion_one_default_from_template - Expected result: 37, hi\n')
 
-        t = template.Template('{% load custom %}{% inclusion_one_default_from_template 37 42 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_one_default_from_template 37 42 %}')
         self.assertEqual(t.render(c), 'inclusion_one_default_from_template - Expected result: 37, 42\n')
 
-        t = template.Template('{% load custom %}{% inclusion_unlimited_args_from_template 37 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_unlimited_args_from_template 37 %}')
         self.assertEqual(t.render(c), 'inclusion_unlimited_args_from_template - Expected result: 37, hi\n')
 
-        t = template.Template('{% load custom %}{% inclusion_unlimited_args_from_template 37 42 56 89 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_unlimited_args_from_template 37 42 56 89 %}')
         self.assertEqual(t.render(c), 'inclusion_unlimited_args_from_template - Expected result: 37, 42, 56, 89\n')
 
-        t = template.Template('{% load custom %}{% inclusion_only_unlimited_args_from_template %}')
+        t = template.Template('{% load inclusion %}{% inclusion_only_unlimited_args_from_template %}')
         self.assertEqual(t.render(c), 'inclusion_only_unlimited_args_from_template - Expected result: \n')
 
-        t = template.Template('{% load custom %}{% inclusion_only_unlimited_args_from_template 37 42 56 89 %}')
+        t = template.Template('{% load inclusion %}{% inclusion_only_unlimited_args_from_template 37 42 56 89 %}')
         self.assertEqual(t.render(c), 'inclusion_only_unlimited_args_from_template - Expected result: 37, 42, 56, 89\n')
 
     def test_inclusion_tag_registration(self):
         # Test that the decorators preserve the decorated function's docstring, name and attributes.
-        self.verify_tag(custom.inclusion_no_params, 'inclusion_no_params')
-        self.verify_tag(custom.inclusion_one_param, 'inclusion_one_param')
-        self.verify_tag(custom.inclusion_explicit_no_context, 'inclusion_explicit_no_context')
-        self.verify_tag(custom.inclusion_no_params_with_context, 'inclusion_no_params_with_context')
-        self.verify_tag(custom.inclusion_params_and_context, 'inclusion_params_and_context')
-        self.verify_tag(custom.inclusion_two_params, 'inclusion_two_params')
-        self.verify_tag(custom.inclusion_one_default, 'inclusion_one_default')
-        self.verify_tag(custom.inclusion_unlimited_args, 'inclusion_unlimited_args')
-        self.verify_tag(custom.inclusion_only_unlimited_args, 'inclusion_only_unlimited_args')
-        self.verify_tag(custom.inclusion_tag_without_context_parameter, 'inclusion_tag_without_context_parameter')
-        self.verify_tag(custom.inclusion_tag_use_l10n, 'inclusion_tag_use_l10n')
-        self.verify_tag(custom.inclusion_tag_current_app, 'inclusion_tag_current_app')
-        self.verify_tag(custom.inclusion_unlimited_args_kwargs, 'inclusion_unlimited_args_kwargs')
+        self.verify_tag(inclusion.inclusion_no_params, 'inclusion_no_params')
+        self.verify_tag(inclusion.inclusion_one_param, 'inclusion_one_param')
+        self.verify_tag(inclusion.inclusion_explicit_no_context, 'inclusion_explicit_no_context')
+        self.verify_tag(inclusion.inclusion_no_params_with_context, 'inclusion_no_params_with_context')
+        self.verify_tag(inclusion.inclusion_params_and_context, 'inclusion_params_and_context')
+        self.verify_tag(inclusion.inclusion_two_params, 'inclusion_two_params')
+        self.verify_tag(inclusion.inclusion_one_default, 'inclusion_one_default')
+        self.verify_tag(inclusion.inclusion_unlimited_args, 'inclusion_unlimited_args')
+        self.verify_tag(inclusion.inclusion_only_unlimited_args, 'inclusion_only_unlimited_args')
+        self.verify_tag(inclusion.inclusion_tag_without_context_parameter, 'inclusion_tag_without_context_parameter')
+        self.verify_tag(inclusion.inclusion_tag_use_l10n, 'inclusion_tag_use_l10n')
+        self.verify_tag(inclusion.inclusion_tag_current_app, 'inclusion_tag_current_app')
+        self.verify_tag(inclusion.inclusion_unlimited_args_kwargs, 'inclusion_unlimited_args_kwargs')
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_15070_current_app(self):
@@ -253,7 +253,7 @@ class CustomTagTests(TestCase):
         Context of the included/rendered template as well.
         """
         c = template.Context({})
-        t = template.Template('{% load custom %}{% inclusion_tag_current_app %}')
+        t = template.Template('{% load inclusion %}{% inclusion_tag_current_app %}')
         self.assertEqual(t.render(c).strip(), 'None')
 
         # That part produces the deprecation warning
@@ -266,7 +266,7 @@ class CustomTagTests(TestCase):
         Context of the included/rendered template as well.
         """
         c = template.Context({})
-        t = template.Template('{% load custom %}{% inclusion_tag_use_l10n %}')
+        t = template.Template('{% load inclusion %}{% inclusion_tag_use_l10n %}')
         self.assertEqual(t.render(c).strip(), 'None')
 
         c.use_l10n = True
