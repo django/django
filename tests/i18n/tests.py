@@ -972,11 +972,11 @@ class MiscTests(TestCase):
         self.assertEqual(g(r), 'es')
 
         # This tests the following scenario: there isn't a main language (zh)
-        # translation of Django but there is a translation to variation (zh_CN)
-        # the user sets zh-cn as the preferred language, it should be selected
+        # translation of Django but there is a translation to variation (zh-hans)
+        # the user sets zh-hans as the preferred language, it should be selected
         # by Django without falling back nor ignoring it.
-        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,de'}
-        self.assertEqual(g(r), 'zh-cn')
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-hans,de'}
+        self.assertEqual(g(r), 'zh-hans')
 
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'NL'}
         self.assertEqual('nl', g(r))
@@ -1022,32 +1022,6 @@ class MiscTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-tw,en'}
         self.assertEqual(g(r), 'zh-hant')
 
-    @override_settings(
-        LANGUAGES=(
-            ('en', 'English'),
-            ('zh-cn', 'Simplified Chinese'),
-            ('zh-hans', 'Simplified Chinese'),
-            ('zh-hant', 'Traditional Chinese'),
-            ('zh-tw', 'Traditional Chinese'),
-        )
-    )
-    def test_backwards_compatibility(self):
-        """
-        While the old chinese language codes are being deprecated, they should
-        still work as before the new language codes were introduced.
-
-        refs #18419 -- this is explicitly for backwards compatibility and
-        should be removed in Django 1.9
-        """
-        g = get_language_from_request
-        r = self.rf.get('/')
-        r.COOKIES = {}
-        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,en'}
-        self.assertEqual(g(r), 'zh-cn')
-
-        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-tw,en'}
-        self.assertEqual(g(r), 'zh-tw')
-
     def test_special_fallback_language(self):
         """
         Some languages may have special fallbacks that don't follow the simple
@@ -1085,12 +1059,12 @@ class MiscTests(TestCase):
         self.assertEqual(g(r), 'es')
 
         # This tests the following scenario: there isn't a main language (zh)
-        # translation of Django but there is a translation to variation (zh_CN)
-        # the user sets zh-cn as the preferred language, it should be selected
+        # translation of Django but there is a translation to variation (zh-hans)
+        # the user sets zh-hans as the preferred language, it should be selected
         # by Django without falling back nor ignoring it.
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'zh-cn'}
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'zh-hans'}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
-        self.assertEqual(g(r), 'zh-cn')
+        self.assertEqual(g(r), 'zh-hans')
 
     def test_get_language_from_path_real(self):
         g = trans_real.get_language_from_path
@@ -1238,8 +1212,8 @@ class TestLanguageInfo(TestCase):
         """
         li = get_language_info('zh-my')
         self.assertEqual(li['code'], 'zh-hans')
-        li = get_language_info('zh-cn')
-        self.assertEqual(li['code'], 'zh-cn')
+        li = get_language_info('zh-hans')
+        self.assertEqual(li['code'], 'zh-hans')
 
 
 class MultipleLocaleActivationTests(TestCase):
