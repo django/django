@@ -100,7 +100,8 @@ Query Expressions and Database Functions
 customize, and compose complex SQL expressions. This has enabled annotate
 to accept expressions other than aggregates. Aggregates are now able to
 reference multiple fields, as well as perform arithmetic, similar to ``F()``
-objects.
+objects. :meth:`~django.db.models.query.QuerySet.order_by` has also gained the
+ability to accept expressions.
 
 A collection of :doc:`database functions </ref/models/database-functions>` is
 also included with functionality such as

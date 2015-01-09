@@ -5,7 +5,7 @@ Query Expressions
 .. currentmodule:: django.db.models
 
 Query expressions describe a value or a computation that can be used as part of
-a filter, an annotation, or an aggregation. There are a number of built-in
+a filter, order by, annotation, or aggregate. There are a number of built-in
 expressions (documented below) that can be used to help you write queries.
 Expressions can be combined, or in some cases nested, to form more complex
 computations.
@@ -57,6 +57,10 @@ Some examples
 
     # Aggregates can contain complex computations also
     Company.objects.annotate(num_offerings=Count(F('products') + F('services')))
+
+    # Expressions can also be used in order_by()
+    Company.objects.order_by(Length('name').asc())
+    Company.objects.order_by(Length('name').desc())
 
 
 Built-in Expressions
@@ -427,6 +431,24 @@ calling the appropriate methods on the wrapped expression.
         this expression. ``get_group_by_cols()`` should be called on any
         nested expressions. ``F()`` objects, in particular, hold a reference
         to a column.
+
+    .. method:: asc()
+
+        Returns the expression ready to be sorted in ascending order.
+
+    .. method:: desc()
+
+        Returns the expression ready to be sorted in descending order.
+
+    .. method:: reverse_ordering()
+
+        Returns ``self`` with any modifications required to reverse the sort
+        order within an ``order_by`` call. As an example, an expression
+        implementing ``NULLS LAST`` would change its value to be
+        ``NULLS FIRST``. Modifications are only required for expressions that
+        implement sort order like ``OrderBy``. This method is called when
+        :meth:`~django.db.models.query.QuerySet.reverse()` is called on a
+        queryset.
 
 Writing your own Query Expressions
 ----------------------------------
