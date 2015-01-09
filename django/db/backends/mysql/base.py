@@ -300,7 +300,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         columns. If no ordering would otherwise be applied, we don't want any
         implicit sorting going on.
         """
-        return [(None, ("NULL", [], 'asc', False))]
+        return [(None, ("NULL", [], False))]
 
     def fulltext_search_sql(self, field_name):
         return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name

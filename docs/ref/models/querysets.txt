@@ -322,17 +322,28 @@ identical to::
 
     Entry.objects.order_by('blog__name')
 
+It is also possible to order a queryset by a related field, without incurring
+the cost of a JOIN, by referring to the ``_id`` of the related field::
+
+    # No Join
+    Entry.objects.order_by('blog_id')
+
+    # Join
+    Entry.objects.order_by('blog__id')
+
 .. versionadded:: 1.7
 
-    Note that it is also possible to order a queryset by a related field,
-    without incurring the cost of a JOIN, by referring to the ``_id`` of the
-    related field::
+    The ability to order a queryset by a related field, without incurring
+    the cost of a JOIN was added.
 
-        # No Join
-        Entry.objects.order_by('blog_id')
+You can also order by :doc:`query expressions </ref/models/expressions>` by
+calling ``asc()`` or ``desc()`` on the expression::
 
-        # Join
-        Entry.objects.order_by('blog__id')
+    Entry.objects.order_by(Coalesce('summary', 'headline').desc())
+
+.. versionadded:: 1.8
+
+    Ordering by query expressions was added.
 
 Be cautious when ordering by fields in related models if you are also using
 :meth:`distinct()`. See the note in :meth:`distinct` for an explanation of how
@@ -366,6 +377,16 @@ related model ordering can change the expected results.
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
+
+You can order by a field converted to lowercase with
+:class:`~django.db.models.functions.Lower` which will achieve case-consistent
+ordering::
+
+    Entry.objects.order_by(Lower('headline').desc())
+
+.. versionadded:: 1.8
+
+    The ability to order by expressions like ``Lower`` was added.
 
 If you don't want any ordering to be applied to a query, not even the default
 ordering, call :meth:`order_by()` with no parameters.

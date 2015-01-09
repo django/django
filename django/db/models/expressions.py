@@ -118,7 +118,7 @@ class CombinableMixin(object):
         )
 
 
-class ExpressionNode(CombinableMixin):
+class BaseExpression(object):
     """
     Base class for all query expressions.
     """
@@ -189,6 +189,10 @@ class ExpressionNode(CombinableMixin):
         """
         c = self.copy()
         c.is_summary = summarize
+        c.set_source_expressions([
+            expr.resolve_expression(query, allow_joins, reuse, summarize)
+            for expr in c.get_source_expressions()
+        ])
         return c
 
     def _prepare(self):
@@ -319,6 +323,22 @@ class ExpressionNode(CombinableMixin):
         """
         return [e._output_field_or_none for e in self.get_source_expressions()]
 
+    def asc(self):
+        return OrderBy(self)
+
+    def desc(self):
+        return OrderBy(self, descending=True)
+
+    def reverse_ordering(self):
+        return self
+
+
+class ExpressionNode(BaseExpression, CombinableMixin):
+    """
+    An expression that can be combined with other expressions.
+    """
+    pass
+
 
 class Expression(ExpressionNode):
 
@@ -411,6 +431,12 @@ class F(CombinableMixin):
 
     def refs_aggregate(self, existing_aggregates):
         return refs_aggregate(self.name.split(LOOKUP_SEP), existing_aggregates)
+
+    def asc(self):
+        return OrderBy(self)
+
+    def desc(self):
+        return OrderBy(self, descending=True)
 
 
 class Func(ExpressionNode):
@@ -524,15 +550,6 @@ class Random(ExpressionNode):
 
     def as_sql(self, compiler, connection):
         return connection.ops.random_function_sql(), []
-
-
-class ColIndexRef(ExpressionNode):
-    def __init__(self, idx):
-        self.idx = idx
-        super(ColIndexRef, self).__init__()
-
-    def as_sql(self, compiler, connection):
-        return str(self.idx), []
 
 
 class Col(ExpressionNode):
@@ -678,3 +695,43 @@ class DateTime(ExpressionNode):
             value = value.replace(tzinfo=None)
             value = timezone.make_aware(value, self.tzinfo)
         return value
+
+
+class OrderBy(BaseExpression):
+    template = '%(expression)s %(ordering)s'
+    descending_template = 'DESC'
+    ascending_template = 'ASC'
+
+    def __init__(self, expression, descending=False):
+        self.descending = descending
+        if not hasattr(expression, 'resolve_expression'):
+            raise ValueError('expression must be an expression type')
+        self.expression = expression
+
+    def set_source_expressions(self, exprs):
+        self.expression = exprs[0]
+
+    def get_source_expressions(self):
+        return [self.expression]
+
+    def as_sql(self, compiler, connection):
+        expression_sql, params = compiler.compile(self.expression)
+        placeholders = {'expression': expression_sql}
+        placeholders['ordering'] = 'DESC' if self.descending else 'ASC'
+        return (self.template % placeholders).rstrip(), params
+
+    def get_group_by_cols(self):
+        cols = []
+        for source in self.get_source_expressions():
+            cols.extend(source.get_group_by_cols())
+        return cols
+
+    def reverse_ordering(self):
+        self.descending = not self.descending
+        return self
+
+    def asc(self):
+        self.descending = False
+
+    def desc(self):
+        self.descending = True
