@@ -6,7 +6,7 @@ Welcome to Django 1.8!
 
 These release notes cover the `new features`_, as well as some `backwards
 incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.6 or older versions. We've also `begun the deprecation process for some
+1.7 or older versions. We've also `begun the deprecation process for some
 features`_, and some features have reached the end of their deprecation process
 and `have been removed`_.
 
