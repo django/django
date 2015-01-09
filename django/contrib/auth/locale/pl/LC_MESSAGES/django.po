@@ -292,7 +292,7 @@ msgstr "Reset hasła dla konta na stronie %(site_name)s"
 
 #: contrib/auth/tests/test_forms.py:387
 msgid "Enter a valid email address."
-msgstr "Wprowadź poprawną nazwę użytkownika."
+msgstr "Wprowadź poprawny adres email."
 
 #: contrib/auth/views.py:92
 msgid "Logged out"
