@@ -84,12 +84,3 @@ If you're unsure, answer 'no'.
         else:
             if verbosity >= 2:
                 print("Stale content types remain.")
-
-
-def update_all_contenttypes(**kwargs):
-    for app_config in apps.get_app_configs():
-        update_contenttypes(app_config, **kwargs)
-
-
-if __name__ == "__main__":
-    update_all_contenttypes()
