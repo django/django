@@ -468,6 +468,10 @@ Migrations
   advantage of this feature you must ensure that the ``allow_migrate()`` method
   of all your routers accept ``**hints``.
 
+* The :func:`~django.db.models.signals.pre_migrate` and
+  :func:`~django.db.models.signals.post_migrate` signals now dispatch the
+  migration ``plan``.
+
 Models
 ^^^^^^
 

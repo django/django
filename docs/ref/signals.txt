@@ -405,6 +405,13 @@ Arguments sent with this signal:
 ``using``
     The alias of database on which a command will operate.
 
+``plan``
+    .. versionadded:: 1.8
+
+    The migration plan; a list of two elements tuples containing
+    ``Migration`` instances coupled with a boolean telling whether or not
+    it will be applied backwards.
+
 pre_syncdb
 ----------
 
@@ -492,6 +499,13 @@ Arguments sent with this signal:
 ``using``
     The database alias used for synchronization. Defaults to the ``default``
     database.
+
+``plan``
+    .. versionadded:: 1.8
+
+    The migration plan; a list of two elements tuples containing
+    ``Migration`` instances coupled with a boolean telling whether or not
+    it was applied backwards.
 
 For example, you could register a callback in an
 :class:`~django.apps.AppConfig` like this::
