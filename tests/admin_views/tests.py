@@ -1506,13 +1506,11 @@ class AdminViewPermissionsTest(TestCase):
         change_link_text = 'change_id_section'
         self.client.get('/test_admin/admin/')
         self.client.post(login_url, self.adduser_login)
-        # The user can't add sections yet, so they shouldn't see the "add
-        # section" link.
+        # The user can't change sections yet, so they shouldn't see the "change section" link.
         response = self.client.get(url)
         self.assertFalse(get_change_related(response))
         self.assertNotContains(response, change_link_text)
-        # Allow the user to add sections too. Now they can see the "add
-        # section" link.
+        # Allow the user to change sections too. Now they can see the "change section" link.
         user = User.objects.get(username='adduser')
         perm = get_perm(Section, get_permission_codename('change', Section._meta))
         user.user_permissions.add(perm)
@@ -1534,13 +1532,11 @@ class AdminViewPermissionsTest(TestCase):
         delete_link_text = 'delete_id_sub_section'
         self.client.get('/test_admin/admin/')
         self.client.post(login_url, self.adduser_login)
-        # The user can't add sections yet, so they shouldn't see the "add
-        # section" link.
+        # The user can't delete sections yet, so they shouldn't see the "delete section" link.
         response = self.client.get(url)
         self.assertFalse(get_delete_related(response))
         self.assertNotContains(response, delete_link_text)
-        # Allow the user to add sections too. Now they can see the "add
-        # section" link.
+        # Allow the user to delete sections too. Now they can see the "delete section" link.
         user = User.objects.get(username='adduser')
         perm = get_perm(Section, get_permission_codename('delete', Section._meta))
         user.user_permissions.add(perm)
