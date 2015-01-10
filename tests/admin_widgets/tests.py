@@ -523,6 +523,19 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
         self.assertFalse(wrapper.can_change_related)
         self.assertFalse(wrapper.can_delete_related)
 
+    def test_on_delete_cascade_rel_cant_delete_related(self):
+        rel = models.Individual._meta.get_field('soulmate').rel
+        widget = forms.Select()
+        wrapper = widgets.RelatedFieldWidgetWrapper(
+            widget, rel, widget_admin_site,
+            can_add_related=True,
+            can_change_related=True,
+            can_delete_related=True,
+        )
+        self.assertTrue(wrapper.can_add_related)
+        self.assertTrue(wrapper.can_change_related)
+        self.assertFalse(wrapper.can_delete_related)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='admin_widgets.urls')
