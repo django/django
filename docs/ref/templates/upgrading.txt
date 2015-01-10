@@ -99,8 +99,12 @@ entire :setting:`TEMPLATES` setting instead.
 ------------------------------------------------------------------------------------------------
 
 In Django 1.8 :func:`~django.template.loader.get_template` and
-:func:`~django.template.loader.select_template` returns a backend-dependent
+:func:`~django.template.loader.select_template` return a backend-dependent
 ``Template`` instead of a :class:`django.template.Template`.
+
+For example, if :func:`~django.template.loader.get_template` loads a template
+with a :class:`~django.template.backends.django.DjangoTemplates` backend, then
+it returns a ``django.template.backends.django.Template``.
 
 ``Template`` objects must provide a
 :meth:`~django.template.backends.base.Template.render` method whose signature
@@ -147,7 +151,6 @@ Django template language and you have access to the current context, for
 instance in the ``render()`` method of a template tag, you can use the current
 :class:`~django.template.Engine` directly. Instead of::
 
-
     from django.template.loader import get_template
     template = get_template('included.html')
 
@@ -157,31 +160,52 @@ You can write::
 
 This will load the template with the current engine without triggering the
 multiple template engines machinery, which is usually the desired behavior.
+Unlike previous solutions, this returns a :class:`django.template.Template`,
+like :func:`~django.template.loader.get_template` used to in Django 1.7 and
+earlier, avoiding all backwards-compatibilty problems.
 
 ``get_template_from_string()``
 ------------------------------
 
 Private API ``get_template_from_string(template_code)`` was removed in Django
-1.8 because it had no way to choose an engine to compile the template. There
-are two solutions to replace it.
+1.8 because it had no way to choose an engine to compile the template.
 
-You can use a template engine's ``from_string()`` method::
+Three alternatives are available.
+
+If you control the project's setting, you can use one of the configured
+engines::
 
     from django.template import engines
 
     template = engines['django'].from_string(template_code)
 
-Or you can use the same trick as above, if you have access to the current
-context::
+This returns a backend-dependent ``Template`` object.
+
+For trivial templates that don't need context processors nor anything else,
+you can create a bare-bones engine and use its ``from_string()`` method::
+
+    from django.template import Engine
+
+    template = Engine().from_string(template_code)
+
+This returns a :class:`django.template.Template` because
+:class:`~django.template.Engine` is part of the Django template language's
+APIs. The multiple template engines machinery isn't involved here.
+
+Finally, if you have access to the current context, you can use the same trick
+as above::
 
     template = context.engine.from_string(template_code)
 
-Or you can instantiate a :class:`~django.template.Template` directly::
+``Template()``
+==============
 
-    from django.template import Template
+To a lesser extent, instantiating a template with ``Template(template_code)``
+suffers from the same issue as ``get_template_from_string()``.
 
-    template = Template(template_code)
+It still works when the :setting:`TEMPLATES` setting defines exactly one
+:class:`~django.template.backends.django.DjangoTemplates` backend, but
+pluggable applications can't control this requirement.
 
-The last solution requires that :setting:`TEMPLATES` defines exactly one
-:class:`~django.template.backends.django.DjangoTemplates` backend. That engine
-will automatically be used to render the template.
+The last two solutions described in the previous section are recommended in
+that case.
