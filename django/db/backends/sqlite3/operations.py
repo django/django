@@ -149,9 +149,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         return -1
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        # NB: The generated SQL below is specific to SQLite
-        # Note: The DELETE FROM... SQL generated below works for SQLite databases
-        # because constraints don't exist
         sql = ['%s %s %s;' % (
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),
@@ -160,6 +157,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Note: No requirement for reset of auto-incremented indices (cf. other
         # sql_flush() implementations). Just return SQL at this point
         return sql
+
+    def execute_sql_flush(self, using, sql_list):
+        # To prevent possible violation of foreign key constraints, deactivate
+        # constraints outside of the transaction created in super().
+        with self.connection.constraint_checks_disabled():
+            super().execute_sql_flush(using, sql_list)
 
     def adapt_datetimefield_value(self, value):
         if value is None:

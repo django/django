@@ -4,6 +4,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import transaction
 from django.db.backends import utils
 from django.utils import timezone
 from django.utils.dateparse import parse_duration
@@ -365,6 +366,13 @@ class BaseDatabaseOperations:
         PostgreSQL requires a cascade even if these tables are empty.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations must provide an sql_flush() method')
+
+    def execute_sql_flush(self, using, sql_list):
+        """Execute a list of SQL statements to flush the database."""
+        with transaction.atomic(using=using, savepoint=self.connection.features.can_rollback_ddl):
+            with self.connection.cursor() as cursor:
+                for sql in sql_list:
+                    cursor.execute(sql)
 
     def sequence_reset_by_name_sql(self, style, sequences):
         """

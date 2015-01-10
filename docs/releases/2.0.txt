@@ -435,6 +435,46 @@ raises an exception and should be replaced with::
 
     models.Index(fields=['headline', '-pub_date'], name='index_name')
 
+Foreign key constraints are now enabled on SQLite
+-------------------------------------------------
+
+This will appear as a backwards-incompatible change (``IntegrityError:
+FOREIGN KEY constraint failed``) if attempting to save an existing model
+instance that's violating a foreign key constraint.
+
+Foreign keys are now created with ``DEFERRABLE INITIALLY DEFERRED`` instead of
+``DEFERRABLE IMMEDIATE``. Thus, tables may need to be rebuilt to recreate
+foreign keys with the new definition, particularly if you're using a pattern
+like this::
+
+    from django.db import transaction
+
+    with transaction.atomic():
+        Book.objects.create(author_id=1)
+        Author.objects.create(id=1)
+
+If you don't recreate the foreign key as ``DEFERRED``, the first ``create()``
+would fail now that foreign key constraints are enforced.
+
+Backup your database first! After upgrading to Django 2.0, you can then
+rebuild tables using a script similar to this::
+
+    from django.apps import apps
+    from django.db import connection
+
+    for app in apps.get_app_configs():
+        for model in app.get_models(include_auto_created=True):
+            if model._meta.managed and not (model._meta.proxy or model._meta.swapped):
+                for base in model.__bases__:
+                    if hasattr(base, '_meta'):
+                        base._meta.local_many_to_many = []
+                model._meta.local_many_to_many = []
+                with connection.schema_editor() as editor:
+                    editor._remake_table(model)
+
+This script hasn't received extensive testing and needs adaption for various
+cases such as multiple databases. Feel free to contribute improvements.
+
 Miscellaneous
 -------------
 

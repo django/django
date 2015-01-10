@@ -1953,7 +1953,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(model, get_field(unique=True), field, strict=True)
             self.assertNotIn(constraint_name, self.get_constraints(model._meta.db_table))
 
-            if connection.features.supports_foreign_keys:
+            if editor.sql_create_fk:
                 constraint_name = "CamelCaseFKConstraint"
                 editor.execute(
                     editor.sql_create_fk % {
