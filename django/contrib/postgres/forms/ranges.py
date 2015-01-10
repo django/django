@@ -11,7 +11,7 @@ __all__ = ['IntegerRangeField', 'FloatRangeField', 'DateTimeRangeField', 'DateRa
 class BaseRangeField(forms.MultiValueField):
     default_error_messages = {
         'invalid': _('Enter two valid values.'),
-        'bound_order': _('The start of the range must not exceed the end of the range.'),
+        'bound_ordering': _('The start of the range must not exceed the end of the range.'),
     }
 
     def __init__(self, **kwargs):
@@ -34,13 +34,17 @@ class BaseRangeField(forms.MultiValueField):
             return None
         lower, upper = values
         if lower is not None and upper is not None and lower > upper:
-            raise exceptions.ValidationError(self.error_messages['bound_order'],
-                    code='bound_order')
+            raise exceptions.ValidationError(
+                self.error_messages['bound_ordering'],
+                code='bound_ordering',
+            )
         try:
             range_value = self.range_type(lower, upper)
         except TypeError:
-            raise exceptions.ValidationError(self.error_messages['invalid'],
-                    code='invalid')
+            raise exceptions.ValidationError(
+                self.error_messages['invalid'],
+                code='invalid',
+            )
         else:
             return range_value
 

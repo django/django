@@ -409,12 +409,12 @@ Range Fields
 ------------
 
 There are five range field types, corresponding to the built-in range types in
-PostgreSQL. These fields are used to store a range of values, for example the
+PostgreSQL. These fields are used to store a range of values; for example the
 start and end timestamps of an event, or the range of ages an activity is
 suitable for.
 
 All of the range fields translate to :ref:`psycopg2 Range objects
-<psycopg2:adapt-range>` in python, but also accept tuples as input if no bound
+<psycopg2:adapt-range>` in python, but also accept tuples as input if no bounds
 information is necessary. The default is lower bound included, upper bound
 excluded.
 
@@ -423,9 +423,9 @@ IntegerRangeField
 
 .. class:: IntegerRangeField(**options)
 
-    Stores a range of integers. Based on a
-    :class:`~django.db.models.IntegerField`. Represented by a ``int4range`` in
-    the database, and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
+    Stores a range of integers. Based on an
+    :class:`~django.db.models.IntegerField`. Represented by an ``int4range`` in
+    the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
 
 BigIntegerRangeField
@@ -434,8 +434,8 @@ BigIntegerRangeField
 .. class:: BigIntegerRangeField(**options)
 
     Stores a range of large integers. Based on a
-    :class:`~django.db.models.BigIntegerField`. Represented by a ``int8range``
-    in the database, and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
+    :class:`~django.db.models.BigIntegerField`. Represented by an ``int8range``
+    in the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
 
 FloatRangeField
@@ -445,7 +445,7 @@ FloatRangeField
 
     Stores a range of floating point values. Based on a
     :class:`~django.db.models.FloatField`. Represented by a ``numrange`` in the
-    database, and a :class:`~psycopg2:psycopg2.extras.NumericRange` in Python.
+    database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in Python.
 
 DateTimeRangeField
 ^^^^^^^^^^^^^^^^^^
@@ -454,7 +454,7 @@ DateTimeRangeField
 
     Stores a range of timestamps. Based on a
     :class:`~django.db.models.DateTimeField`. Represented by a ``tztsrange`` in
-    the database, and a :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` in
+    the database and a :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` in
     Python.
 
 DateRangeField
@@ -464,7 +464,7 @@ DateRangeField
 
     Stores a range of dates. Based on a
     :class:`~django.db.models.DateField`. Represented by a ``daterange`` in the
-    database, and a :class:`~psycopg2:psycopg2.extras.DateRange` in Python.
+    database and a :class:`~psycopg2:psycopg2.extras.DateRange` in Python.
 
 Querying Range Fields
 ^^^^^^^^^^^^^^^^^^^^^
@@ -473,12 +473,12 @@ There are a number of custom lookups and transforms for range fields. They are
 available on all the above fields, but we will use the following example
 model::
 
+    from django.contrib.postgres.fields import IntegerRangeField
     from django.db import models
-    from django.contrib.postgres.fields import DateTimeRangeField
 
     class Event(models.Model):
         name = models.CharField(max_length=200)
-        ages = models.IntegerRangeField()
+        ages = IntegerRangeField()
 
         def __str__(self):  # __unicode__ on Python 2
             return self.name
@@ -488,12 +488,16 @@ We will also use the following example objects::
     >>> Event.objects.create(name='Soft play', ages=(0, 10))
     >>> Event.objects.create(name='Pub trip', ages=(21, None))
 
+and ``NumericRange``:
+
+    >>> from psycopg2.extras import NumericRange
+
 Containment functions
 ~~~~~~~~~~~~~~~~~~~~~
 
 As with other PostgreSQL fields, there are three standard containment
 operators: ``contains``, ``contained_by`` and ``overlap``, using the SQL
-operators ``@>``, ``<@`` and ``&&`` respectively.
+operators ``@>``, ``<@``, and ``&&`` respectively.
 
 .. fieldlookup:: rangefield.contains
 
@@ -508,7 +512,7 @@ contains
 contained_by
 ''''''''''''
 
-    >>> Event.objects.filter(ages__contains=NumericRange(0, 15))
+    >>> Event.objects.filter(ages__contained_by=NumericRange(0, 15))
     [<Event: Soft play>]
 
 .. fieldlookup:: rangefield.overlap
@@ -533,8 +537,9 @@ the specific range comparison operators.
 fully_lt
 ''''''''
 
-The returned ranges are strictly less than than passed range, that is the upper
-bound of the retured range is less than the lower bound of the passed range.
+The returned ranges are strictly less than the passed range. In other words,
+all the points in the returned range are less than all those in the passed
+range.
 
     >>> Event.objects.filter(ages__fully_lt=NumericRange(11, 15))
     [<Event: Soft play>]
@@ -544,9 +549,9 @@ bound of the retured range is less than the lower bound of the passed range.
 fully_gt
 ''''''''
 
-The returned ranges are strictly greater than than passed range, that is the
-lower bound of the returned range is greater than the upper bound of the passed
-range.
+The returned ranges are strictly greater than the passed range. In other words,
+the all the points in the returned range are greater than all those in the
+passed range.
 
     >>> Event.objects.filter(ages__fully_gt=NumericRange(11, 15))
     [<Event: Pub trip>]
@@ -561,7 +566,7 @@ is the lower bound of the returned range is at least the lower bound of the
 passed range.
 
     >>> Event.objects.filter(ages__not_lt=NumericRange(0, 15))
-    [<Event: Soft play>]
+    [<Event: Soft play>, <Event: Pub trip>]
 
 .. fieldlookup:: rangefield.not_gt
 
@@ -569,8 +574,8 @@ not_gt
 ''''''
 
 The returned ranges do not contain any points greater than the passed range, that
-is the upper bound of the returned range is at most than the upper bound of
-the passed range.
+is the upper bound of the returned range is at most the upper bound of the
+passed range.
 
     >>> Event.objects.filter(ages__not_gt=NumericRange(3, 10))
     [<Event: Soft play>]
@@ -613,6 +618,8 @@ for the base field.
     >>> Event.objects.filter(ages__endswith=10)
     [<Event: Soft play>]
 
+.. fieldlookup:: rangefield.isempty
+
 isempty
 '''''''
 
@@ -626,21 +633,26 @@ Defining your own range types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 PostgreSQL allows the definition of custom range types. Django's model and form
-field implementations use base classes mentioned below, and psycopg2 provides
-a :func:`~psycopg2:psycopg2.extras.register_range` to allow use of custom range
+field implementations use base classes below, and psycopg2 provides a
+:func:`~psycopg2:psycopg2.extras.register_range` to allow use of custom range
 types.
 
 .. class:: RangeField(**options)
 
-    Base class for other range fields.
+    Base class for model range fields.
 
     .. attribute:: base_field
 
-        The model field used.
+        The model field to use.
 
     .. attribute:: range_type
 
-        The psycopg2 range type used.
+        The psycopg2 range type to use.
+
+    .. attribute:: form_field
+
+        The form field class to use. Should be a sublcass of
+        :class:`django.contrib.postgres.forms.BaseRangeField`.
 
 .. class:: django.contrib.postgres.forms.BaseRangeField
 
@@ -648,8 +660,8 @@ types.
 
     .. attribute:: base_field
 
-        The form field used.
+        The form field to use.
 
     .. attribute:: range_type
 
-        The psycopg2 range type used.
+        The psycopg2 range type to use.

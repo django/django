@@ -2,11 +2,11 @@ import datetime
 import json
 import unittest
 
+from django import forms
 from django.contrib.postgres import forms as pg_forms, fields as pg_fields
 from django.contrib.postgres.validators import RangeMaxValueValidator, RangeMinValueValidator
 from django.core import exceptions, serializers
 from django.db import connection
-from django import forms
 from django.test import TestCase
 from django.utils import timezone
 
@@ -89,8 +89,9 @@ class TestSaveLoad(TestCase):
 @skipUnlessPG92
 class TestQuerying(TestCase):
 
-    def setUp(self):
-        self.objs = [
+    @classmethod
+    def setUpTestData(cls):
+        cls.objs = [
             RangesModel.objects.create(ints=NumericRange(0, 10)),
             RangesModel.objects.create(ints=NumericRange(5, 15)),
             RangesModel.objects.create(ints=NumericRange(None, 0)),
@@ -191,7 +192,12 @@ class TestQuerying(TestCase):
 
 @skipUnlessPG92
 class TestSerialization(TestCase):
-    test_data = '[{"fields": {"ints": "{\\"upper\\": 10, \\"lower\\": 0, \\"bounds\\": \\"[)\\"}", "floats": "{\\"empty\\": true}", "bigints": null, "timestamps": null, "dates": null}, "model": "postgres_tests.rangesmodel", "pk": null}]'
+    test_data = (
+        '[{"fields": {"ints": "{\\"upper\\": 10, \\"lower\\": 0, '
+        '\\"bounds\\": \\"[)\\"}", "floats": "{\\"empty\\": true}", '
+        '"bigints": null, "timestamps": null, "dates": null}, '
+        '"model": "postgres_tests.rangesmodel", "pk": null}]'
+    )
 
     def test_dumping(self):
         instance = RangesModel(ints=NumericRange(0, 10), floats=NumericRange(empty=True))
@@ -310,7 +316,7 @@ class TestFormField(TestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['10', '2'])
         self.assertEqual(cm.exception.messages[0], 'The start of the range must not exceed the end of the range.')
-        self.assertEqual(cm.exception.code, 'bound_order')
+        self.assertEqual(cm.exception.code, 'bound_ordering')
 
     def test_open(self):
         field = pg_forms.IntegerRangeField()

@@ -155,7 +155,6 @@ HStoreField
         valid for a given field. This can be done using the
         :class:`~django.contrib.postgres.validators.KeysValidator`.
 
-
 Range Fields
 ------------
 
