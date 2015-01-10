@@ -309,6 +309,7 @@ irc
 iregex
 iriencode
 ise
+isempty
 isnull
 iso
 istartswith

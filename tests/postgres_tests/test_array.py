@@ -237,6 +237,7 @@ class TestMigrations(TestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, 'postgres_tests.models.ArrayFieldSubclass')
 
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
     @override_settings(MIGRATION_MODULES={
         "postgres_tests": "postgres_tests.array_default_migrations",
     })

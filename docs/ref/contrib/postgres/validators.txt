@@ -18,3 +18,16 @@ Validators
     .. note::
         Note that this checks only for the existence of a given key, not that
         the value of a key is non-empty.
+
+Range validators
+----------------
+
+.. class:: RangeMaxValueValidator(limit_value, message=None)
+
+    Validates that the upper bound of the range is not greater than
+    ``limit_value``.
+
+.. class:: RangeMinValueValidator(limit_value, message=None)
+
+    Validates that the lower bound of the range is not less than the
+    ``limit_value``.
