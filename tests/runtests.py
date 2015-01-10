@@ -217,7 +217,7 @@ def teardown(state):
         setattr(settings, key, value)
 
 
-def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels):
+def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels, debug_sql):
     state = setup(verbosity, test_labels)
     extra_tests = []
 
@@ -232,6 +232,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels)
         failfast=failfast,
         keepdb=keepdb,
         reverse=reverse,
+        debug_sql=debug_sql,
     )
     # Catch warnings thrown in test DB setup -- remove in Django 1.9
     with warnings.catch_warnings():
@@ -386,6 +387,9 @@ if __name__ == "__main__":
     parser.add_argument(
         '--selenium', action='store_true', dest='selenium', default=False,
         help='Run the Selenium tests as well (if Selenium is installed)')
+    parser.add_argument(
+        '--debug-sql', action='store_true', dest='debug_sql', default=False,
+        help='Turn on the SQL query logger within tests')
     options = parser.parse_args()
 
     # mock is a required dependency
@@ -421,6 +425,7 @@ if __name__ == "__main__":
     else:
         failures = django_tests(options.verbosity, options.interactive,
                                 options.failfast, options.keepdb,
-                                options.reverse, options.modules)
+                                options.reverse, options.modules,
+                                options.debug_sql)
         if failures:
             sys.exit(bool(failures))

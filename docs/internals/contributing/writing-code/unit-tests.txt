@@ -286,7 +286,7 @@ For example, suppose that the failing test that works on its own is
 
 .. code-block:: bash
 
-   $ ./runtests.py --bisect basic.tests.ModelTest.test_eq
+    $ ./runtests.py --bisect basic.tests.ModelTest.test_eq
 
 will try to determine a test that interferes with the given one. First, the
 test is run with the first half of the test suite. If a failure occurs, the
@@ -302,7 +302,7 @@ failure. So:
 
 .. code-block:: bash
 
-   $ ./runtests.py --pair basic.tests.ModelTest.test_eq
+    $ ./runtests.py --pair basic.tests.ModelTest.test_eq
 
 will pair ``test_eq`` with every test label.
 
@@ -313,7 +313,7 @@ the first one:
 
 .. code-block:: bash
 
-   $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
+    $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
 
 You can also try running any set of tests in reverse using the ``--reverse``
 option in order to verify that executing tests in a different order does not
@@ -321,8 +321,16 @@ cause any trouble:
 
 .. code-block:: bash
 
-   $ ./runtests.py basic --reverse
+    $ ./runtests.py basic --reverse
+
+If you wish to examine the SQL being run in failing tests, you can turn on
+:ref:`SQL logging <django-db-logger>` using the ``--debug-sql`` option. If you
+combine this with ``--verbosity=2``, all SQL queries will be output.
+
+.. code-block:: bash
+
+    $ ./runtests.py basic --debug-sql
 
 .. versionadded:: 1.8
 
-    The ``--reverse`` option was added.
+    The ``--reverse`` and ``--debug-sql`` options were added.
