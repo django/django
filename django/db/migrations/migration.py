@@ -115,29 +115,39 @@ class Migration(object):
         Takes a project_state representing all migrations prior to this one
         and a schema_editor for a live database and applies the migration
         in a reverse order.
+
+        The backwards migration process consists of two phases:
+
+        1. The intermediate states from right before the first until right
+           after the last operation inside this migration are preserved.
+        2. The operations are applied in reverse order using the states
+           recorded in step 1.
         """
-        # We need to pre-calculate the stack of project states
+        # Construct all the intermediate states we need for a reverse migration
         to_run = []
+        new_state = project_state
+        # Phase 1
         for operation in self.operations:
-            # If this operation cannot be represented as SQL, place a comment
-            # there instead
-            if collect_sql and not operation.reduces_to_sql:
-                schema_editor.collected_sql.append("--")
-                schema_editor.collected_sql.append("-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE "
-                                                   "WRITTEN AS SQL:")
-                schema_editor.collected_sql.append("-- %s" % operation.describe())
-                schema_editor.collected_sql.append("--")
-                continue
             # If it's irreversible, error out
             if not operation.reversible:
                 raise Migration.IrreversibleError("Operation %s in %s is not reversible" % (operation, self))
-            new_state = project_state.clone()
+            # Preserve new state from previous run to not tamper the same state
+            # over all operations
+            new_state = new_state.clone()
+            old_state = new_state.clone()
             operation.state_forwards(self.app_label, new_state)
-            to_run.append((operation, project_state, new_state))
-            project_state = new_state
-        # Now run them in reverse
-        to_run.reverse()
+            to_run.insert(0, (operation, old_state, new_state))
+
+        # Phase 2
         for operation, to_state, from_state in to_run:
+            if collect_sql:
+                if not operation.reduces_to_sql:
+                    schema_editor.collected_sql.append("--")
+                    schema_editor.collected_sql.append("-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE "
+                                                       "WRITTEN AS SQL:")
+                    schema_editor.collected_sql.append("-- %s" % operation.describe())
+                    schema_editor.collected_sql.append("--")
+                    continue
             if not schema_editor.connection.features.can_rollback_ddl and operation.atomic:
                 # We're forcing a transaction on a non-transactional-DDL backend
                 with atomic(schema_editor.connection.alias):
