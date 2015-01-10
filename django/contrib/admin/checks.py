@@ -130,6 +130,8 @@ class BaseModelAdminChecks(object):
                     id='admin.E011',
                 )
             ]
+        elif not isinstance(fieldset[1]['fields'], (list, tuple)):
+            return must_be('a list or tuple', option="fieldsets[1]['fields']", obj=cls, id='admin.E008')
 
         fields = flatten(fieldset[1]['fields'])
         if len(fields) != len(set(fields)):
