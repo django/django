@@ -80,25 +80,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             )
         return fields
 
-    def _name_to_index(self, cursor, table_name):
-        """
-        Returns a dictionary of {field_name: field_index} for the given table.
-        Indexes are 0-based.
-        """
-        return {d[0]: i for i, d in enumerate(self.get_table_description(cursor, table_name))}
-
     def get_relations(self, cursor, table_name):
         """
-        Returns a dictionary of {field_index: (field_index_other_table, other_table)}
-        representing all relationships to the given table. Indexes are 0-based.
+        Returns a dictionary of {field_name: (field_name_other_table, other_table)}
+        representing all relationships to the given table.
         """
-        my_field_dict = self._name_to_index(cursor, table_name)
         constraints = self.get_key_columns(cursor, table_name)
         relations = {}
         for my_fieldname, other_table, other_field in constraints:
-            other_field_index = self._name_to_index(cursor, other_table)[other_field]
-            my_field_index = my_field_dict[my_fieldname]
-            relations[my_field_index] = (other_field_index, other_table)
+            relations[my_fieldname] = (other_field, other_table)
         return relations
 
     def get_key_columns(self, cursor, table_name):
