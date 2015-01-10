@@ -18,11 +18,19 @@ class CharArrayModel(models.Model):
 
 
 class DateTimeArrayModel(models.Model):
-    field = ArrayField(models.DateTimeField())
+    datetimes = ArrayField(models.DateTimeField())
+    dates = ArrayField(models.DateField())
+    times = ArrayField(models.TimeField())
 
 
 class NestedIntegerArrayModel(models.Model):
     field = ArrayField(ArrayField(models.IntegerField()))
+
+
+class OtherTypesArrayModel(models.Model):
+    ips = ArrayField(models.GenericIPAddressField())
+    uuids = ArrayField(models.UUIDField())
+    decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2))
 
 
 class HStoreModel(models.Model):
