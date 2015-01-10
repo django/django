@@ -977,7 +977,7 @@ class BaseDatabaseOperations(object):
         """
         return cursor.lastrowid
 
-    def lookup_cast(self, lookup_type):
+    def lookup_cast(self, lookup_type, internal_type=None):
         """
         Returns the string to use in a query when performing lookups
         ("contains", "like", etc). The resulting string should contain a '%s'
