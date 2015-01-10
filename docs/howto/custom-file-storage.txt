@@ -96,12 +96,27 @@ how non-standard characters are converted to safe filenames.
 The code provided on ``Storage`` retains only alpha-numeric characters, periods
 and underscores from the original filename, removing everything else.
 
-.. method:: get_available_name(name)
+.. method:: get_available_name(name, max_length=None)
 
 Returns a filename that is available in the storage mechanism, possibly taking
 the provided filename into account. The ``name`` argument passed to this method
 will have already cleaned to a filename valid for the storage system, according
-to the ``get_valid_name()`` method described above.
+to the ``get_valid_name()`` method described above. The new filename length
+will not exceed ``max_length``, that is 100 by default, which matches similar
+argument of :class:`~django.db.models.FileField`.
+
+.. versionchanged:: 1.8
+
+    Added ``max_length`` argument to implement maximum filename length
+    constraint. Filenames exceeding this argument will get truncated.
+
+    Previously, when a file was uploaded to a field, if its length was close to
+    the field's ``max_length``, and such filename already presented on the
+    storage, appending an underscore and a char-sequence to the filename could
+    cause a database-level error.
+
+    If no free unique filename is available, :exc:`SuspiciousFileOperation
+    <SuspiciousOperation>` exception will be raised.
 
 .. versionchanged:: 1.7
 

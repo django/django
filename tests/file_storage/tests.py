@@ -8,6 +8,7 @@ import sys
 import tempfile
 import time
 import unittest
+import warnings
 from datetime import datetime, timedelta
 
 try:
@@ -16,14 +17,15 @@ except ImportError:
     import dummy_threading as threading
 
 from django.core.cache import cache
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, SuspiciousFileOperation
 from django.core.files.base import File, ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import (InMemoryUploadedFile, SimpleUploadedFile,
     TemporaryUploadedFile)
-from django.test import LiveServerTestCase, SimpleTestCase
+from django.test import LiveServerTestCase, SimpleTestCase, TestCase
 from django.test import override_settings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six.moves.urllib.request import urlopen
 from django.utils._os import upath
 
@@ -407,7 +409,7 @@ class FileStorageTests(unittest.TestCase):
 
 
 class CustomStorage(FileSystemStorage):
-    def get_available_name(self, name):
+    def get_available_name(self, name, max_length=100):
         """
         Append numbers to duplicate files rather than underscores, like Trac.
         """
@@ -433,7 +435,7 @@ class CustomStorageTests(FileStorageTests):
         self.storage.delete(second)
 
 
-class FileFieldStorageTests(unittest.TestCase):
+class FileFieldStorageTests(TestCase):
     def tearDown(self):
         shutil.rmtree(temp_storage_location)
 
@@ -502,6 +504,56 @@ class FileFieldStorageTests(unittest.TestCase):
         finally:
             for o in objs:
                 o.delete()
+
+    def test_file_truncation(self):
+        # Given the max_length is limited, when multiple files get uploaded under the same name,
+        # then the filename get truncated in order to fit in _(7 random chars).
+        # When most of the max_length is taken by dirname + extension and there are not enough
+        # characters in the filename to truncate, an exception should be raised.
+        objs = [Storage() for i in range(2)]
+        filename = 'filename.ext'
+
+        for o in objs:
+            o.limited_length.save(filename, ContentFile('Same Content'))
+        try:
+            # Testing truncation.
+            names = [o.limited_length.name for o in objs]
+            self.assertEqual(names[0], 'tests/%s' % filename)
+            six.assertRegex(self, names[1], 'tests/fi_%s.ext' % FILE_SUFFIX_REGEX)
+
+            # Testing exception is raised when filename is too short to truncate.
+            filename = 'short.longext'
+            objs[0].limited_length.save(filename, ContentFile('Same Content'))
+            self.assertRaisesMessage(
+                SuspiciousFileOperation, 'Storage can not find an available filename',
+                objs[1].limited_length.save, *(filename, ContentFile('Same Content'))
+            )
+        finally:
+            for o in objs:
+                o.delete()
+
+    def test_extended_length_storage(self):
+        # Testing FileField with max_length > 255. Most systems have filename
+        # length limitation of 255. Path takes extra chars.
+        filename = 251 * 'a'  # 4 chars for extension.
+        obj = Storage()
+        obj.extended_length.save('%s.txt' % filename, ContentFile('Same Content'))
+        self.assertEqual(obj.extended_length.name, 'tests/%s.txt' % filename)
+        self.assertEqual(obj.extended_length.read(), b'Same Content')
+        obj.extended_length.close()
+
+    def test_old_style_storage(self):
+        # Testing backward-compatibility with old-style storage backends that
+        # don't take ``max_length`` parameter in ``get_available_name()``.
+        # Deprecation warning should be raised.
+        obj = Storage()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            obj.old_style.save('django_test.txt', ContentFile('Same Content'))
+        self.assertIsInstance(w[0].category, RemovedInDjango20Warning.__class__)
+        self.assertEqual(obj.old_style.name, 'tests/django_test.txt')
+        self.assertEqual(obj.old_style.read(), b'Same Content')
+        obj.old_style.close()
 
     def test_filefield_default(self):
         # Default values allow an object to access a single file.

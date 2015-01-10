@@ -322,7 +322,12 @@ File Storage
 File Uploads
 ^^^^^^^^^^^^
 
-* ...
+* :meth:`Storage.get_available_name()
+  <django.core.files.storage.Storage.get_available_name>` now takes
+  ``max_length`` argument to implement storage-level maximum filename length
+  constraint. Filenames exceeding this argument will get truncated. This
+  prevents a database error, when appending a unique suffix to a long filename,
+  that already exists on the storage.
 
 Forms
 ^^^^^
@@ -525,6 +530,10 @@ Models
 
 * You can now get the set of deferred fields for a model using
   :meth:`Model.get_deferred_fields() <django.db.models.Model.get_deferred_fields>`.
+
+* :meth:`FieldFile.save()
+  <django.db.models.fields.FieldFile.save>` now takes ``**kwargs``. This allows
+  to pass ``max_length`` argument onto the storage.
 
 Signals
 ^^^^^^^
@@ -1430,6 +1439,14 @@ loader that inherits ``BaseLoader``, you must inherit ``Loader`` instead.
 
 Private API ``django.test.utils.TestTemplateLoader`` is deprecated in favor of
 ``django.template.loaders.locmem.Loader``.
+
+``django.core.files.storage.Storage.get_available_name()``’s ``max_length`` argument
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Storage`` subclasses that override the ``get_available_name()`` method should
+make sure to provide a default value for the ``max_length`` argument. Support
+for storages that do not accept this argument in ``get_available_name()`` will
+be removed in Django 2.0.
 
 ``qn`` replaced by ``compiler``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
