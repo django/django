@@ -246,7 +246,7 @@ WHEN (new.%(col_name)s IS NULL)
         cursor.execute('SELECT "%s".currval FROM dual' % sq_name)
         return cursor.fetchone()[0]
 
-    def lookup_cast(self, lookup_type):
+    def lookup_cast(self, lookup_type, internal_type=None):
         if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith'):
             return "UPPER(%s)"
         return "%s"

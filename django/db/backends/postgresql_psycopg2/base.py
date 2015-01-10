@@ -38,6 +38,16 @@ psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
 
+# Register support for inet[] manually so we don't have to handle the Inet()
+# object on load all the time.
+INETARRAY_OID = 1041
+INETARRAY = psycopg2.extensions.new_array_type(
+    (INETARRAY_OID,),
+    'INETARRAY',
+    psycopg2.extensions.UNICODE,
+)
+psycopg2.extensions.register_type(INETARRAY)
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'postgresql'
