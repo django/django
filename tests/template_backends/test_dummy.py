@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from django.http import HttpRequest
 from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.backends.dummy import TemplateStrings
 from django.test import SimpleTestCase
 
@@ -38,6 +38,14 @@ class TemplateStringsTests(SimpleTestCase):
     def test_get_template_non_existing(self):
         with self.assertRaises(TemplateDoesNotExist):
             self.engine.get_template('template_backends/non_existing.html')
+
+    def test_get_template_syntax_error(self):
+        # There's no way to trigger a syntax error with the dummy backend.
+        # The test still lives here to factor it between other backends.
+        if self.backend_name == 'dummy':
+            return
+        with self.assertRaises(TemplateSyntaxError):
+            self.engine.get_template('template_backends/syntax_error.html')
 
     def test_html_escaping(self):
         template = self.engine.get_template('template_backends/hello.html')

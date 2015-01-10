@@ -4,12 +4,11 @@ from __future__ import absolute_import
 import sys
 
 from django.conf import settings
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.utils import six
 from django.utils.module_loading import import_string
 
-from jinja2 import (
-    DebugUndefined, FileSystemLoader, TemplateNotFound, Undefined)
+import jinja2
 
 from .base import BaseEngine
 from .utils import csrf_input_lazy, csrf_token_lazy
@@ -28,10 +27,10 @@ class Jinja2(BaseEngine):
         environment_cls = import_string(environment)
 
         options.setdefault('autoescape', True)
-        options.setdefault('loader', FileSystemLoader(self.template_dirs))
+        options.setdefault('loader', jinja2.FileSystemLoader(self.template_dirs))
         options.setdefault('auto_reload', settings.DEBUG)
         options.setdefault('undefined',
-                           DebugUndefined if settings.DEBUG else Undefined)
+                           jinja2.DebugUndefined if settings.DEBUG else jinja2.Undefined)
 
         self.env = environment_cls(**options)
 
@@ -41,8 +40,11 @@ class Jinja2(BaseEngine):
     def get_template(self, template_name):
         try:
             return Template(self.env.get_template(template_name))
-        except TemplateNotFound as exc:
+        except jinja2.TemplateNotFound as exc:
             six.reraise(TemplateDoesNotExist, TemplateDoesNotExist(exc.args),
+                        sys.exc_info()[2])
+        except jinja2.TemplateSyntaxError as exc:
+            six.reraise(TemplateSyntaxError, TemplateSyntaxError(exc.args),
                         sys.exc_info()[2])
 
 
