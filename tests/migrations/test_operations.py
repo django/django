@@ -465,27 +465,33 @@ class OperationTests(OperationTestBase):
         # Test the state alteration
         operation = migrations.RenameModel("Pony", "Horse")
         self.assertEqual(operation.describe(), "Rename model Pony to Horse")
-        new_state = project_state.clone()
-        operation.state_forwards("test_rnmo", new_state)
-        self.assertNotIn(("test_rnmo", "pony"), new_state.models)
-        self.assertIn(("test_rnmo", "horse"), new_state.models)
-        # Remember, RenameModel also repoints all incoming FKs and M2Ms
-        self.assertEqual("test_rnmo.Horse", new_state.models["test_rnmo", "rider"].fields[1][1].rel.to)
-        # Test the database alteration
+        # Test initial state and database
+        self.assertIn(("test_rnmo", "pony"), project_state.models)
+        self.assertNotIn(("test_rnmo", "horse"), project_state.models)
         self.assertTableExists("test_rnmo_pony")
         self.assertTableNotExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
             self.assertFKExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_pony", "id"))
             self.assertFKNotExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_horse", "id"))
-        with connection.schema_editor() as editor:
-            operation.database_forwards("test_rnmo", editor, project_state, new_state)
+        # Migrate forwards
+        new_state = project_state.clone()
+        new_state = self.apply_operations("test_rnmo", new_state, [operation])
+        # Test new state and database
+        self.assertNotIn(("test_rnmo", "pony"), new_state.models)
+        self.assertIn(("test_rnmo", "horse"), new_state.models)
+        # RenameModel also repoints all incoming FKs and M2Ms
+        self.assertEqual("test_rnmo.Horse", new_state.models["test_rnmo", "rider"].fields[1][1].rel.to)
         self.assertTableNotExists("test_rnmo_pony")
         self.assertTableExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
             self.assertFKNotExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_pony", "id"))
             self.assertFKExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_horse", "id"))
-        # And test reversal
-        self.unapply_operations("test_rnmo", project_state, [operation])
+        # Migrate backwards
+        original_state = self.unapply_operations("test_rnmo", project_state, [operation])
+        # Test original state and database
+        self.assertIn(("test_rnmo", "pony"), original_state.models)
+        self.assertNotIn(("test_rnmo", "horse"), original_state.models)
+        self.assertEqual("Pony", original_state.models["test_rnmo", "rider"].fields[1][1].rel.to)
         self.assertTableExists("test_rnmo_pony")
         self.assertTableNotExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
