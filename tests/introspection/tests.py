@@ -110,17 +110,14 @@ class IntrospectionTests(TransactionTestCase):
             cursor.execute('DROP TABLE django_ixn_real_test_table;')
         self.assertEqual(datatype(desc[0][1], desc[0]), 'FloatField')
 
+    @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_relations(self):
         with connection.cursor() as cursor:
             relations = connection.introspection.get_relations(cursor, Article._meta.db_table)
 
-        # Older versions of MySQL don't have the chops to report on this stuff,
-        # so just skip it if no relations come back. If they do, though, we
-        # should test that the response is correct.
-        if relations:
-            # That's {field_index: (field_index_other_table, other_table)}
-            self.assertEqual(relations, {3: (0, Reporter._meta.db_table),
-                                         4: (0, Article._meta.db_table)})
+        # That's {field_index: (field_index_other_table, other_table)}
+        self.assertEqual(relations, {3: (0, Reporter._meta.db_table),
+                                     4: (0, Article._meta.db_table)})
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_key_columns(self):
