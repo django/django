@@ -746,7 +746,9 @@ class Field(RegisterLookupMixin):
             return QueryWrapper(('(%s)' % sql), params)
 
         if lookup_type in ('month', 'day', 'week_day', 'hour', 'minute',
-                           'second', 'search', 'regex', 'iregex'):
+                           'second', 'search', 'regex', 'iregex', 'contains',
+                           'icontains', 'iexact', 'startswith', 'endswith',
+                           'istartswith', 'iendswith'):
             return [value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
             return [self.get_db_prep_value(value, connection=connection,
@@ -754,14 +756,6 @@ class Field(RegisterLookupMixin):
         elif lookup_type in ('range', 'in'):
             return [self.get_db_prep_value(v, connection=connection,
                                            prepared=prepared) for v in value]
-        elif lookup_type in ('contains', 'icontains'):
-            return ["%%%s%%" % connection.ops.prep_for_like_query(value)]
-        elif lookup_type == 'iexact':
-            return [connection.ops.prep_for_iexact_query(value)]
-        elif lookup_type in ('startswith', 'istartswith'):
-            return ["%s%%" % connection.ops.prep_for_like_query(value)]
-        elif lookup_type in ('endswith', 'iendswith'):
-            return ["%%%s" % connection.ops.prep_for_like_query(value)]
         elif lookup_type == 'isnull':
             return []
         elif lookup_type == 'year':

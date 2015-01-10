@@ -222,6 +222,14 @@ default_lookups['exact'] = Exact
 
 class IExact(BuiltinLookup):
     lookup_name = 'iexact'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(IExact, self).process_rhs(qn, connection)
+        if params:
+            params[0] = connection.ops.prep_for_iexact_query(params[0])
+        return rhs, params
+
+
 default_lookups['iexact'] = IExact
 
 
@@ -317,31 +325,73 @@ class PatternLookup(BuiltinLookup):
 
 class Contains(PatternLookup):
     lookup_name = 'contains'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(Contains, self).process_rhs(qn, connection)
+        if params and not self.bilateral_transforms:
+            params[0] = "%%%s%%" % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
+
 default_lookups['contains'] = Contains
 
 
-class IContains(PatternLookup):
+class IContains(Contains):
     lookup_name = 'icontains'
+
+
 default_lookups['icontains'] = IContains
 
 
 class StartsWith(PatternLookup):
     lookup_name = 'startswith'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(StartsWith, self).process_rhs(qn, connection)
+        if params and not self.bilateral_transforms:
+            params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
+
 default_lookups['startswith'] = StartsWith
 
 
 class IStartsWith(PatternLookup):
     lookup_name = 'istartswith'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(IStartsWith, self).process_rhs(qn, connection)
+        if params and not self.bilateral_transforms:
+            params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
+
 default_lookups['istartswith'] = IStartsWith
 
 
 class EndsWith(PatternLookup):
     lookup_name = 'endswith'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(EndsWith, self).process_rhs(qn, connection)
+        if params and not self.bilateral_transforms:
+            params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
+
 default_lookups['endswith'] = EndsWith
 
 
 class IEndsWith(PatternLookup):
     lookup_name = 'iendswith'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(IEndsWith, self).process_rhs(qn, connection)
+        if params and not self.bilateral_transforms:
+            params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
+
 default_lookups['iendswith'] = IEndsWith
 
 
