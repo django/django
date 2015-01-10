@@ -71,8 +71,10 @@ class GEOSGeometry(GEOSBase, ListMixin):
             elif hex_regex.match(geo_input):
                 # Handling HEXEWKB input.
                 g = wkb_r().read(force_bytes(geo_input))
-            elif gdal.HAS_GDAL and json_regex.match(geo_input):
+            elif json_regex.match(geo_input):
                 # Handling GeoJSON input.
+                if not gdal.HAS_GDAL:
+                    raise ValueError('Initializing geometry from JSON input requires GDAL.')
                 g = wkb_r().read(gdal.OGRGeometry(geo_input).wkb)
             else:
                 raise ValueError('String or unicode input unrecognized as WKT EWKT, and HEXEWKB.')
