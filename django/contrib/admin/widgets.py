@@ -8,6 +8,7 @@ import copy
 from django import forms
 from django.contrib.admin.templatetags.admin_static import static
 from django.core.urlresolvers import reverse
+from django.db.models.deletion import CASCADE
 from django.forms.widgets import Media, RadioFieldRenderer
 from django.forms.utils import flatatt
 from django.template.loader import render_to_string
@@ -250,7 +251,9 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         # XXX: The UX does not support multiple selected values.
         multiple = getattr(widget, 'allow_multiple_selected', False)
         self.can_change_related = not multiple and can_change_related
-        self.can_delete_related = not multiple and can_delete_related
+        # XXX: The deletion UX can be confusing when dealing with cascading deletion.
+        cascade = getattr(rel, 'on_delete', None) is CASCADE
+        self.can_delete_related = not multiple and not cascade and can_delete_related
         # so we can check if the related object is registered with this AdminSite
         self.admin_site = admin_site
 

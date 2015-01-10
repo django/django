@@ -1526,12 +1526,12 @@ class AdminViewPermissionsTest(TestCase):
         the user has permission to delete that related item.
         """
         def get_delete_related(response):
-            return response.context['adminform'].form.fields['section'].widget.can_delete_related
+            return response.context['adminform'].form.fields['sub_section'].widget.can_delete_related
 
         login_url = reverse('admin:login')
         # Set up and log in user.
         url = '/test_admin/admin/admin_views/article/add/'
-        delete_link_text = 'delete_id_section'
+        delete_link_text = 'delete_id_sub_section'
         self.client.get('/test_admin/admin/')
         self.client.post(login_url, self.adduser_login)
         # The user can't add sections yet, so they shouldn't see the "add
