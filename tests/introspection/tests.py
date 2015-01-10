@@ -1,8 +1,10 @@
 from __future__ import unicode_literals
 
+from unittest import skipUnless
+
 from django.db import connection
 from django.db.utils import DatabaseError
-from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.test import TransactionTestCase, mock, skipUnlessDBFeature
 
 from .models import Reporter, Article
 
@@ -118,6 +120,16 @@ class IntrospectionTests(TransactionTestCase):
         # That's {field_index: (field_index_other_table, other_table)}
         self.assertEqual(relations, {3: (0, Reporter._meta.db_table),
                                      4: (0, Article._meta.db_table)})
+
+    @skipUnless(connection.vendor == 'sqlite', "This is an sqlite-specific issue")
+    def test_get_relations_alt_format(self):
+        """With SQLite, foreign keys can be added with different syntaxes."""
+        with connection.cursor() as cursor:
+            cursor.fetchone = mock.Mock(return_value=[
+                "CREATE TABLE track(id, art INTEGER, FOREIGN KEY(art) REFERENCES %s(id));" % Article._meta.db_table
+            ])
+            relations = connection.introspection.get_relations(cursor, 'mocked_table')
+        self.assertEqual(relations, {1: (0, Article._meta.db_table)})
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_key_columns(self):
