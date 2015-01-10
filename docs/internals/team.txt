@@ -513,6 +513,20 @@ Daniele Procida
     .. _ubuntuusers.de: http://ubuntuusers.de/
     .. _EuroPython 2014 website: https://ep2014.europython.eu/
 
+`Josh Smeaton`_
+    Josh was given the opportunity to work on a new Django app around version
+    1.1 after working with a homegrown PHP reporting framework. The simplicity
+    of the ORM and the power of the Admin were extremely liberating.
+
+    Still being involved with custom reporting applications, he decided to try
+    his hand at improving the ORM support for analytics. His contributions
+    focus on giving more power to users of the ORM.
+
+    Josh lives in Melbourne, Australia where he heads up development for a SaaS
+    telecommunications company.
+
+    .. _Josh Smeaton: https://github.com/jarshwah
+
 Past team members
 =================
 
