@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.db.backends import BaseDatabaseOperations
 
+from psycopg2.extras import Inet
+
 
 class DatabaseOperations(BaseDatabaseOperations):
 
@@ -212,3 +214,15 @@ class DatabaseOperations(BaseDatabaseOperations):
     def bulk_insert_sql(self, fields, num_values):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
         return "VALUES " + ", ".join([items_sql] * num_values)
+
+    def value_to_db_date(self, value):
+        return value
+
+    def value_to_db_datetime(self, value):
+        return value
+
+    def value_to_db_time(self, value):
+        return value
+
+    def value_to_db_ipaddress(self, value):
+        return Inet(value)

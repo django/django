@@ -581,6 +581,9 @@ class BaseDatabaseFeatures(object):
     supports_subqueries_in_group_by = True
     supports_bitwise_or = True
 
+    # Is there a true datatype for uuid?
+    has_native_uuid_field = False
+
     # Is there a true datatype for timedeltas?
     has_native_duration_field = False
 
@@ -1231,6 +1234,12 @@ class BaseDatabaseOperations(object):
         expected by the backend driver for decimal (numeric) columns.
         """
         return utils.format_number(value, max_digits, decimal_places)
+
+    def value_to_db_ipaddress(self, value):
+        """Transform a string representation of an ip address into the expected
+        type for the backend driver.
+        """
+        return value
 
     def year_lookup_bounds_for_date_field(self, value):
         """

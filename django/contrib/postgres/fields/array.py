@@ -4,9 +4,11 @@ from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
-from django.db.models import Field, Transform, IntegerField
+from django.db.models import Field, Transform, IntegerField, GenericIPAddressField
 from django.utils import six
 from django.utils.translation import string_concat, ugettext_lazy as _
+
+from psycopg2.extras import Inet
 
 
 __all__ = ['ArrayField']
@@ -70,9 +72,11 @@ class ArrayField(Field):
         size = self.size or ''
         return '%s[%s]' % (self.base_field.db_type(connection), size)
 
-    def get_prep_value(self, value):
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if isinstance(self.base_field, GenericIPAddressField):
+            return [Inet(i) for i in value]
         if isinstance(value, list) or isinstance(value, tuple):
-            return [self.base_field.get_prep_value(i) for i in value]
+            return [self.base_field.get_db_prep_value(i, connection, prepared) for i in value]
         return value
 
     def deconstruct(self):
