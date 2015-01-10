@@ -1,5 +1,7 @@
+import decimal
 import json
 import unittest
+import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
@@ -10,7 +12,11 @@ from django import forms
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from .models import IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel, DateTimeArrayModel, NestedIntegerArrayModel, ArrayFieldSubclass
+from .models import (
+    IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel,
+    DateTimeArrayModel, NestedIntegerArrayModel, OtherTypesArrayModel,
+    ArrayFieldSubclass,
+)
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
@@ -29,10 +35,16 @@ class TestSaveLoad(TestCase):
         self.assertEqual(instance.field, loaded.field)
 
     def test_dates(self):
-        instance = DateTimeArrayModel(field=[timezone.now()])
+        instance = DateTimeArrayModel(
+            datetimes=[timezone.now()],
+            dates=[timezone.now().date()],
+            times=[timezone.now().time()],
+        )
         instance.save()
         loaded = DateTimeArrayModel.objects.get()
-        self.assertEqual(instance.field, loaded.field)
+        self.assertEqual(instance.datetimes, loaded.datetimes)
+        self.assertEqual(instance.dates, loaded.dates)
+        self.assertEqual(instance.times, loaded.times)
 
     def test_tuples(self):
         instance = IntegerArrayModel(field=(1,))
@@ -69,6 +81,18 @@ class TestSaveLoad(TestCase):
         instance.save()
         loaded = NestedIntegerArrayModel.objects.get()
         self.assertEqual(instance.field, loaded.field)
+
+    def test_other_array_types(self):
+        instance = OtherTypesArrayModel(
+            ips=['192.168.0.1', '::1'],
+            uuids=[uuid.uuid4()],
+            decimals=[decimal.Decimal(1.25), 1.75],
+        )
+        instance.save()
+        loaded = OtherTypesArrayModel.objects.get()
+        self.assertEqual(instance.ips, loaded.ips)
+        self.assertEqual(instance.uuids, loaded.uuids)
+        self.assertEqual(instance.decimals, loaded.decimals)
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')

@@ -6,6 +6,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     can_return_id_from_insert = True
     has_real_datatype = True
+    has_native_uuid_field = True
     has_native_duration_field = True
     driver_supports_timedelta_args = True
     can_defer_constraint_checks = True
