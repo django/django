@@ -439,6 +439,8 @@ Messages to this logger have the following extra context:
 * ``request``: The request object that generated the logging
   message.
 
+.. _django-db-logger:
+
 ``django.db.backends``
 ~~~~~~~~~~~~~~~~~~~~~~
 

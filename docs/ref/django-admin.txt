@@ -1449,6 +1449,14 @@ This may help in debugging tests that aren't properly isolated and have side
 effects. :ref:`Grouping by test class <order-of-tests>` is preserved when using
 this option.
 
+.. django-admin-option:: --debug-sql
+
+.. versionadded:: 1.8
+
+The ``--debug-sql`` option can be used to enable :ref:`SQL logging
+<django-db-logger>` for failing tests. If :djadminopt:`--verbosity` is ``2``,
+then queries in passing tests are also output.
+
 testserver <fixture fixture ...>
 --------------------------------
 
