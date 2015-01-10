@@ -106,23 +106,22 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Walk through and look for references to other tables. SQLite doesn't
         # really have enforced references, but since it echoes out the SQL used
         # to create the table we can look for REFERENCES statements used there.
-        field_names = []
-        for field_index, field_desc in enumerate(results.split(',')):
+        for field_desc in results.split(','):
             field_desc = field_desc.strip()
             if field_desc.startswith("UNIQUE"):
                 continue
 
-            field_names.append(field_desc.split()[0].strip('"'))
             m = re.search('references (\S*) ?\(["|]?(.*)["|]?\)', field_desc, re.I)
             if not m:
                 continue
-
             table, column = [s.strip('"') for s in m.groups()]
+
             if field_desc.startswith("FOREIGN KEY"):
-                # Find index of the target FK field
+                # Find name of the target FK field
                 m = re.match('FOREIGN KEY\(([^\)]*)\).*', field_desc, re.I)
-                fkey_field = m.groups()[0].strip('"')
-                field_index = field_names.index(fkey_field)
+                field_name = m.groups()[0].strip('"')
+            else:
+                field_name = field_desc.split()[0].strip('"')
 
             cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s", [table])
             result = cursor.fetchall()[0]
@@ -130,14 +129,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             li, ri = other_table_results.index('('), other_table_results.rindex(')')
             other_table_results = other_table_results[li + 1:ri]
 
-            for other_index, other_desc in enumerate(other_table_results.split(',')):
+            for other_desc in other_table_results.split(','):
                 other_desc = other_desc.strip()
                 if other_desc.startswith('UNIQUE'):
                     continue
 
-                name = other_desc.split(' ', 1)[0].strip('"')
-                if name == column:
-                    relations[field_index] = (other_index, table)
+                other_name = other_desc.split(' ', 1)[0].strip('"')
+                if other_name == column:
+                    relations[field_name] = (other_name, table)
                     break
 
         return relations

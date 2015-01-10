@@ -117,19 +117,32 @@ class IntrospectionTests(TransactionTestCase):
         with connection.cursor() as cursor:
             relations = connection.introspection.get_relations(cursor, Article._meta.db_table)
 
-        # That's {field_index: (field_index_other_table, other_table)}
-        self.assertEqual(relations, {3: (0, Reporter._meta.db_table),
-                                     4: (0, Article._meta.db_table)})
+        # That's {field_name: (field_name_other_table, other_table)}
+        expected_relations = {
+            'reporter_id': ('id', Reporter._meta.db_table),
+            'response_to_id': ('id', Article._meta.db_table),
+        }
+        self.assertEqual(relations, expected_relations)
+
+        # Removing a field shouldn't disturb get_relations (#17785)
+        body = Article._meta.get_field('body')
+        with connection.schema_editor() as editor:
+            editor.remove_field(Article, body)
+        with connection.cursor() as cursor:
+            relations = connection.introspection.get_relations(cursor, Article._meta.db_table)
+        with connection.schema_editor() as editor:
+            editor.add_field(Article, body)
+        self.assertEqual(relations, expected_relations)
 
     @skipUnless(connection.vendor == 'sqlite', "This is an sqlite-specific issue")
     def test_get_relations_alt_format(self):
         """With SQLite, foreign keys can be added with different syntaxes."""
         with connection.cursor() as cursor:
             cursor.fetchone = mock.Mock(return_value=[
-                "CREATE TABLE track(id, art INTEGER, FOREIGN KEY(art) REFERENCES %s(id));" % Article._meta.db_table
+                "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES %s(id));" % Article._meta.db_table
             ])
             relations = connection.introspection.get_relations(cursor, 'mocked_table')
-        self.assertEqual(relations, {1: (0, Article._meta.db_table)})
+        self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_key_columns(self):
