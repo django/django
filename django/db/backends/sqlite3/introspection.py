@@ -106,16 +106,23 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Walk through and look for references to other tables. SQLite doesn't
         # really have enforced references, but since it echoes out the SQL used
         # to create the table we can look for REFERENCES statements used there.
+        field_names = []
         for field_index, field_desc in enumerate(results.split(',')):
             field_desc = field_desc.strip()
             if field_desc.startswith("UNIQUE"):
                 continue
 
-            m = re.search('references (.*) \(["|](.*)["|]\)', field_desc, re.I)
+            field_names.append(field_desc.split()[0].strip('"'))
+            m = re.search('references (\S*) ?\(["|]?(.*)["|]?\)', field_desc, re.I)
             if not m:
                 continue
 
             table, column = [s.strip('"') for s in m.groups()]
+            if field_desc.startswith("FOREIGN KEY"):
+                # Find index of the target FK field
+                m = re.match('FOREIGN KEY\(([^\)]*)\).*', field_desc, re.I)
+                fkey_field = m.groups()[0].strip('"')
+                field_index = field_names.index(fkey_field)
 
             cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s", [table])
             result = cursor.fetchall()[0]
