@@ -119,7 +119,7 @@ class Migration(object):
         The backwards migration process consists of two phases:
 
         1. The intermediate states from right before the first until right
-           after the last opertion inside this migration are preserved.
+           after the last operation inside this migration are preserved.
         2. The operations are applied in reverse order using the states
            recorded in step 1.
         """
