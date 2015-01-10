@@ -27,4 +27,5 @@ Bugfixes
 
 * Added correct formats for Greek (``el``) (:ticket:`23967`).
 
-* Fixed a migration crash when unapplying a migration (:ticket:`24110`).
+* Fixed a migration crash when unapplying a migration where multiple operations
+  interact with the same model (:ticket:`24110`).
