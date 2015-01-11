@@ -581,8 +581,6 @@ class BaseDatabaseFeatures(object):
     supports_subqueries_in_group_by = True
     supports_bitwise_or = True
 
-    supports_binary_field = True
-
     # Is there a true datatype for timedeltas?
     has_native_duration_field = False
 
