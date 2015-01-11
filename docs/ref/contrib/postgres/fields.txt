@@ -651,7 +651,7 @@ types.
 
     .. attribute:: form_field
 
-        The form field class to use. Should be a sublcass of
+        The form field class to use. Should be a subclass of
         :class:`django.contrib.postgres.forms.BaseRangeField`.
 
 .. class:: django.contrib.postgres.forms.BaseRangeField
