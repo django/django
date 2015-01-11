@@ -219,6 +219,36 @@ class DebugViewTests(TestCase):
         )
 
 
+@override_settings(
+    DEBUG=True,
+    ROOT_URLCONF="view_tests.urls",
+    # No template directories are configured, so no templates will be found.
+    TEMPLATES=[{
+        'BACKEND': 'django.template.backends.dummy.TemplateStrings',
+    }],
+)
+class NonDjangoTemplatesDebugViewTests(TestCase):
+
+    def test_400(self):
+        # Ensure that when DEBUG=True, technical_500_template() is called.
+        response = self.client.get('/raises400/')
+        self.assertContains(response, '<div class="context" id="', status_code=400)
+
+    def test_403(self):
+        response = self.client.get('/raises403/')
+        self.assertContains(response, '<h1>403 Forbidden</h1>', status_code=403)
+
+    def test_404(self):
+        response = self.client.get('/raises404/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_template_not_found_error(self):
+        # Raises a TemplateDoesNotExist exception and shows the debug view.
+        url = reverse('raises_template_does_not_exist', kwargs={"path": "notfound.html"})
+        response = self.client.get(url)
+        self.assertContains(response, '<div class="context" id="', status_code=500)
+
+
 class ExceptionReporterTests(TestCase):
     rf = RequestFactory()
 
