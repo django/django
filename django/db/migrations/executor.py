@@ -4,6 +4,7 @@ from django.db import migrations
 from django.apps.registry import apps as global_apps
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder
+from .state import ProjectState
 
 
 class MigrationExecutor(object):
@@ -18,12 +19,15 @@ class MigrationExecutor(object):
         self.recorder = MigrationRecorder(self.connection)
         self.progress_callback = progress_callback
 
-    def migration_plan(self, targets):
+    def migration_plan(self, targets, clean_start=False):
         """
         Given a set of targets, returns a list of (Migration instance, backwards?).
         """
         plan = []
-        applied = set(self.loader.applied_migrations)
+        if clean_start:
+            applied = set()
+        else:
+            applied = set(self.loader.applied_migrations)
         for target in targets:
             # If the target is (app_label, None), that means unmigrate everything
             if target[1] is None:
@@ -60,17 +64,31 @@ class MigrationExecutor(object):
     def migrate(self, targets, plan=None, fake=False):
         """
         Migrates the database up to the given targets.
+
+        Django first needs to create all project states before a migration is
+        (un)applied and in a second step run all the database operations.
         """
         if plan is None:
             plan = self.migration_plan(targets)
-        state = None
+        migrations_to_run = {m[0] for m in plan}
+        # Create the forwards plan Django would follow on an empty database
+        full_plan = self.migration_plan(self.loader.graph.leaf_nodes(), clean_start=True)
+        # Holds all states right before and right after a migration is applied
+        # if the migration is being run.
+        states = {}
+        state = ProjectState(real_apps=list(self.loader.unmigrated_apps))
+        state.apps  # Render all real_apps -- performance critical
+        # Phase 1 -- Store all required states
+        for migration, _ in full_plan:
+            if migration in migrations_to_run:
+                states[migration] = state.clone()
+            state = migration.mutate_state(state)  # state is cloned inside
+        # Phase 2 -- Run the migrations
         for migration, backwards in plan:
-            if state is None:
-                state = self.loader.project_state((migration.app_label, migration.name), at_end=False)
             if not backwards:
-                state = self.apply_migration(state, migration, fake=fake)
+                self.apply_migration(states[migration], migration, fake=fake)
             else:
-                state = self.unapply_migration(state, migration, fake=fake)
+                self.unapply_migration(states[migration], migration, fake=fake)
 
     def collect_sql(self, plan):
         """
