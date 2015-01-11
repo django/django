@@ -233,6 +233,96 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
 
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.lookuperror_a",
+            "migrations.migrations_test_apps.lookuperror_b",
+            "migrations.migrations_test_apps.lookuperror_c"
+        ]
+    )
+    def test_unrelated_model_lookups_forwards(self):
+        """
+        #24123 - Tests that all models of apps already applied which are
+        unrelated to the first app being applied are part of the initial model
+        state.
+        """
+        try:
+            executor = MigrationExecutor(connection)
+            self.assertTableNotExists("lookuperror_a_a1")
+            self.assertTableNotExists("lookuperror_b_b1")
+            self.assertTableNotExists("lookuperror_c_c1")
+            executor.migrate([("lookuperror_b", "0003_b3")])
+            self.assertTableExists("lookuperror_b_b3")
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+
+            # Migrate forwards -- This led to a lookup LookupErrors because
+            # lookuperror_b.B2 is already applied
+            executor.migrate([
+                ("lookuperror_a", "0004_a4"),
+                ("lookuperror_c", "0003_c3"),
+            ])
+            self.assertTableExists("lookuperror_a_a4")
+            self.assertTableExists("lookuperror_c_c3")
+
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+        finally:
+            # Cleanup
+            executor.migrate([
+                ("lookuperror_a", None),
+                ("lookuperror_b", None),
+                ("lookuperror_c", None),
+            ])
+            self.assertTableNotExists("lookuperror_a_a1")
+            self.assertTableNotExists("lookuperror_b_b1")
+            self.assertTableNotExists("lookuperror_c_c1")
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.lookuperror_a",
+            "migrations.migrations_test_apps.lookuperror_b",
+            "migrations.migrations_test_apps.lookuperror_c"
+        ]
+    )
+    def test_unrelated_model_lookups_backwards(self):
+        """
+        #24123 - Tests that all models of apps being unapplied which are
+        unrelated to the first app being unapplied are part of the initial
+        model state.
+        """
+        try:
+            executor = MigrationExecutor(connection)
+            self.assertTableNotExists("lookuperror_a_a1")
+            self.assertTableNotExists("lookuperror_b_b1")
+            self.assertTableNotExists("lookuperror_c_c1")
+            executor.migrate([
+                ("lookuperror_a", "0004_a4"),
+                ("lookuperror_b", "0003_b3"),
+                ("lookuperror_c", "0003_c3"),
+            ])
+            self.assertTableExists("lookuperror_b_b3")
+            self.assertTableExists("lookuperror_a_a4")
+            self.assertTableExists("lookuperror_c_c3")
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+
+            # Migrate backwards -- This led to a lookup LookupErrors because
+            # lookuperror_b.B2 is not in the initial state (unrelated to app c)
+            executor.migrate([("lookuperror_a", None)])
+
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+        finally:
+            # Cleanup
+            executor.migrate([
+                ("lookuperror_b", None),
+                ("lookuperror_c", None)
+            ])
+            self.assertTableNotExists("lookuperror_a_a1")
+            self.assertTableNotExists("lookuperror_b_b1")
+            self.assertTableNotExists("lookuperror_c_c1")
+
 
 class FakeLoader(object):
     def __init__(self, graph, applied):
