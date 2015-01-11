@@ -2,16 +2,16 @@ from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template.engine import Engine
 from django.template.response import TemplateResponse
 from django.utils import six
 from django.utils.text import capfirst
-from django.utils.translation import ugettext_lazy, ugettext as _
+from django.utils.translation import get_language, get_language_bidi, ugettext_lazy, ugettext as _
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 
@@ -173,9 +173,6 @@ class AdminSite(object):
         if not apps.is_installed('django.contrib.contenttypes'):
             raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in "
                 "your INSTALLED_APPS setting in order to use the admin application.")
-        if 'django.contrib.auth.context_processors.auth' not in Engine.get_default().context_processors:
-            raise ImproperlyConfigured("Enable 'django.contrib.auth.context_processors.auth' "
-                "in your TEMPLATES setting in order to use the admin application.")
 
     def admin_view(self, view, cacheable=False):
         """
@@ -282,6 +279,10 @@ class AdminSite(object):
             'site_header': self.site_header,
             'site_url': self.site_url,
             'has_permission': self.has_permission(request),
+            'messages': messages.get_messages(request),
+            'user': request.user,
+            'LANGUAGE_CODE': get_language(),
+            'LANGUAGE_BIDI': get_language_bidi(),
         }
 
     def password_change(self, request, extra_context=None):

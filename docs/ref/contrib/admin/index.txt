@@ -2540,10 +2540,16 @@ Templates can override or extend base admin templates as described in
     * ``site_title``: :attr:`AdminSite.site_title`
     * ``site_url``: :attr:`AdminSite.site_url`
     * ``has_permission``: :meth:`AdminSite.has_permission`
+    * ``messages``: `messages.get_messages`
+    * ``user``: `request.user`
+    * ``LANGUAGE_CODE``: `get_language`
+    * ``LANGUAGE_BIDI``: `get_language_bidi`
 
     .. versionchanged:: 1.8
 
-        The ``request`` argument and the ``has_permission`` variable were added.
+        The ``request`` argument and the ``has_permission``, ``messages``,
+        ``user``, ``LANGUAGE_CODE``, and ``LANGUAGE_BIDI``  variables were
+        added.
 
 .. method:: AdminSite.has_permission(request)
 
