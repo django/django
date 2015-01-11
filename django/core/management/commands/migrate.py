@@ -216,7 +216,7 @@ class Command(BaseCommand):
         # to do at this point.
         emit_post_migrate_signal(created_models, self.verbosity, self.interactive, connection.alias)
 
-    def migration_progress_callback(self, action, migration, fake=False):
+    def migration_progress_callback(self, action, migration=None, fake=False):
         if self.verbosity >= 1:
             compute_time = self.verbosity > 1
             if action == "apply_start":
@@ -241,6 +241,14 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED" + elapsed))
                 else:
                     self.stdout.write(self.style.MIGRATE_SUCCESS(" OK" + elapsed))
+            elif action == "render_start":
+                if compute_time:
+                    self.start = time.time()
+                self.stdout.write("  Rendering model states...", ending="")
+                self.stdout.flush()
+            elif action == "render_success":
+                elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
+                self.stdout.write(self.style.MIGRATE_SUCCESS(" DONE" + elapsed))
 
     def sync_apps(self, connection, app_labels):
         "Runs the old syncdb-style operation on a list of app_labels."
