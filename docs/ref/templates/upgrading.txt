@@ -162,7 +162,7 @@ This will load the template with the current engine without triggering the
 multiple template engines machinery, which is usually the desired behavior.
 Unlike previous solutions, this returns a :class:`django.template.Template`,
 like :func:`~django.template.loader.get_template` used to in Django 1.7 and
-earlier, avoiding all backwards-compatibilty problems.
+earlier, avoiding all backwards-compatibility problems.
 
 ``get_template_from_string()``
 ------------------------------
