@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db import models
-from django.core.exceptions import ViewDoesNotExist
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.http import Http404
 from django.core import urlresolvers
 from django.contrib.admindocs import utils
@@ -293,14 +293,21 @@ class TemplateDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         template = self.kwargs['template']
         templates = []
-        for dir in Engine.get_default().dirs:
-            template_file = os.path.join(dir, template)
-            templates.append({
-                'file': template_file,
-                'exists': os.path.exists(template_file),
-                'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
-                'order': list(Engine.get_default().dirs).index(dir),
-            })
+        try:
+            default_engine = Engine.get_default()
+        except ImproperlyConfigured:
+            # Non-trivial TEMPLATES settings aren't supported (#24125).
+            pass
+        else:
+            # This doesn't account for template loaders (#24128).
+            for index, directory in enumerate(default_engine.dirs):
+                template_file = os.path.join(directory, template)
+                templates.append({
+                    'file': template_file,
+                    'exists': os.path.exists(template_file),
+                    'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
+                    'order': index,
+                })
         kwargs.update({
             'name': template,
             'templates': templates,
