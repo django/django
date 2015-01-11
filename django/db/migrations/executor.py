@@ -77,7 +77,11 @@ class MigrationExecutor(object):
         # if the migration is being run.
         states = {}
         state = ProjectState(real_apps=list(self.loader.unmigrated_apps))
+        if self.progress_callback:
+            self.progress_callback("render_start")
         state.apps  # Render all real_apps -- performance critical
+        if self.progress_callback:
+            self.progress_callback("render_success")
         # Phase 1 -- Store all required states
         for migration, _ in full_plan:
             if migration in migrations_to_run:
