@@ -168,14 +168,25 @@ class AdminSite(object):
         installed, as well as the auth context processor.
         """
         if not apps.is_installed('django.contrib.admin'):
-            raise ImproperlyConfigured("Put 'django.contrib.admin' in "
-                "your INSTALLED_APPS setting in order to use the admin application.")
+            raise ImproperlyConfigured(
+                "Put 'django.contrib.admin' in your INSTALLED_APPS "
+                "setting in order to use the admin application.")
         if not apps.is_installed('django.contrib.contenttypes'):
-            raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in "
-                "your INSTALLED_APPS setting in order to use the admin application.")
-        if 'django.contrib.auth.context_processors.auth' not in Engine.get_default().context_processors:
-            raise ImproperlyConfigured("Enable 'django.contrib.auth.context_processors.auth' "
-                "in your TEMPLATES setting in order to use the admin application.")
+            raise ImproperlyConfigured(
+                "Put 'django.contrib.contenttypes' in your INSTALLED_APPS "
+                "setting in order to use the admin application.")
+        try:
+            default_template_engine = Engine.get_default()
+        except ImproperlyConfigured:
+            # Skip the check if the user has a non-trivial TEMPLATES setting
+            pass
+        else:
+            if ('django.contrib.auth.context_processors.auth'
+                    not in default_template_engine.context_processors):
+                raise ImproperlyConfigured(
+                    "Enable 'django.contrib.auth.context_processors.auth' "
+                    "in your TEMPLATES setting in order to use the admin "
+                    "application.")
 
     def admin_view(self, view, cacheable=False):
         """
