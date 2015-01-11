@@ -450,7 +450,6 @@ class SerializerTests(TestCase):
         self.assertEqual(base_data, proxy_proxy_data.replace('proxy', ''))
 
 
-@skipUnlessDBFeature('supports_binary_field')
 def serializerTest(format, self):
 
     # Create all the objects defined in the test data

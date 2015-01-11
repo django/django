@@ -655,7 +655,6 @@ class FileFieldTests(unittest.TestCase):
 class BinaryFieldTests(test.TestCase):
     binary_data = b'\x00\x46\xFE'
 
-    @test.skipUnlessDBFeature('supports_binary_field')
     def test_set_and_retrieve(self):
         data_set = (self.binary_data, six.memoryview(self.binary_data))
         for bdata in data_set:
