@@ -50,7 +50,10 @@ Prerequisite: flup
 Before you can start using FastCGI with Django, you'll need to install flup_, a
 Python library for dealing with FastCGI. Version 0.5 or newer should work fine.
 
+If using Python 3.x, you'll need to use flup6_ instead.
+
 .. _flup: http://www.saddi.com/software/flup/
+.. _flup6: https://pypi.python.org/pypi/flup6/
 
 Starting your FastCGI server
 ============================
