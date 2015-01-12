@@ -37,7 +37,6 @@ class HttpResponseBase(six.Iterator):
     """
 
     status_code = 200
-    reason_phrase = None        # Use default reason phrase for status code.
 
     def __init__(self, content_type=None, status=None, reason=None, charset=None):
         # _headers is a mapping of the lower-case name to the original case of
@@ -52,15 +51,24 @@ class HttpResponseBase(six.Iterator):
         self.closed = False
         if status is not None:
             self.status_code = status
-        if reason is not None:
-            self.reason_phrase = reason
-        elif self.reason_phrase is None:
-            self.reason_phrase = responses.get(self.status_code, 'Unknown Status Code')
+        self._reason_phrase = reason
         self._charset = charset
         if content_type is None:
             content_type = '%s; charset=%s' % (settings.DEFAULT_CONTENT_TYPE,
                                                self.charset)
         self['Content-Type'] = content_type
+
+    @property
+    def reason_phrase(self):
+        if self._reason_phrase is not None:
+            return self._reason_phrase
+        # Leave self._reason_phrase unset in order to use the default
+        # reason phrase for status code.
+        return responses.get(self.status_code, 'Unknown Status Code')
+
+    @reason_phrase.setter
+    def reason_phrase(self, value):
+        self._reason_phrase = value
 
     @property
     def charset(self):
