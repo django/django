@@ -54,6 +54,12 @@ class HttpResponseTests(SimpleTestCase):
         self.assertEqual(resp.status_code, 503)
         self.assertEqual(resp.reason_phrase, "Service Unavailable")
 
+    def test_change_status_code(self):
+        resp = HttpResponse()
+        resp.status_code = 503
+        self.assertEqual(resp.status_code, 503)
+        self.assertEqual(resp.reason_phrase, "Service Unavailable")
+
     def test_reason_phrase(self):
         reason = "I'm an anarchist coffee pot on crack."
         resp = HttpResponse(status=814, reason=reason)
