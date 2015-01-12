@@ -1,4 +1,5 @@
 import inspect
+import re
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
@@ -162,7 +163,15 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         Returns the supplied URL.
         """
         if self.success_url:
-            url = self.success_url % self.object.__dict__
+            if re.search(r'%\([^\)]+\)', self.success_url):
+                warnings.warn(
+                    "%()s placeholder style in success_url is deprecated. "
+                    "Please replace them by the {} Python format syntax.",
+                    RemovedInDjango20Warning, stacklevel=2
+                )
+                url = self.success_url % self.object.__dict__
+            else:
+                url = self.success_url.format(**self.object.__dict__)
         else:
             try:
                 url = self.object.get_absolute_url()
@@ -288,7 +297,15 @@ class DeletionMixin(object):
 
     def get_success_url(self):
         if self.success_url:
-            return self.success_url % self.object.__dict__
+            if re.search(r'%\([^\)]+\)', self.success_url):
+                warnings.warn(
+                    "%()s placeholder style in success_url is deprecated. "
+                    "Please replace them by the {} Python format syntax.",
+                    RemovedInDjango20Warning, stacklevel=2
+                )
+                return self.success_url % self.object.__dict__
+            else:
+                return self.success_url.format(**self.object.__dict__)
         else:
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")
