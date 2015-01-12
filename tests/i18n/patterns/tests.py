@@ -21,9 +21,6 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
     LOCALE_PATHS=(
         os.path.join(os.path.dirname(upath(__file__)), 'locale'),
     ),
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-    ),
     LANGUAGE_CODE='en-us',
     LANGUAGES=(
         ('nl', 'Dutch'),
@@ -35,6 +32,15 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
         'django.middleware.common.CommonMiddleware',
     ),
     ROOT_URLCONF='i18n.patterns.urls.default',
+    TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.i18n',
+            ],
+        },
+    }],
 )
 class URLTestCaseBase(TestCase):
     """

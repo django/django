@@ -781,7 +781,7 @@ TECHNICAL_500_TEMPLATE = ("""
         {% endfor %}
         </ul>
     {% else %}
-        <p>Django couldn't find any templates because your <code>TEMPLATE_LOADERS</code> setting is empty!</p>
+        <p>Django couldn't find any templates because your <code>'loaders'</code> option is empty!</p>
     {% endif %}
 </div>
 {% endif %}
@@ -900,7 +900,7 @@ Installed Middleware:
 {% for loader in loader_debug_info %}Using loader {{ loader.loader }}:
 {% for t in loader.templates %}{{ t.name }} ({{ t.status }})
 {% endfor %}{% endfor %}
-{% else %}Django couldn't find any templates because your TEMPLATE_LOADERS setting is empty!
+{% else %}Django couldn't find any templates because your 'loaders' option is empty!
 {% endif %}
 {% endif %}{% if template_info %}
 Template error:
@@ -1091,7 +1091,7 @@ Installed Middleware:
 {% for loader in loader_debug_info %}Using loader {{ loader.loader }}:
 {% for t in loader.templates %}{{ t.name }} ({{ t.status }})
 {% endfor %}{% endfor %}
-{% else %}Django couldn't find any templates because your TEMPLATE_LOADERS setting is empty!
+{% else %}Django couldn't find any templates because your 'loaders' option is empty!
 {% endif %}
 {% endif %}{% if template_info %}
 Template error:

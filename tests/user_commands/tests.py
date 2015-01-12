@@ -1,14 +1,15 @@
 import os
-import warnings
 
+from django.apps import apps
 from django.db import connection
 from django.core import management
-from django.core.management import BaseCommand, CommandError
+from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import find_command, popen_wrapper
-from django.test import SimpleTestCase
-from django.test.utils import captured_stderr, captured_stdout
+from django.test import SimpleTestCase, ignore_warnings
+from django.test.utils import captured_stderr, captured_stdout, extend_sys_path
 from django.utils import translation
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils._os import upath
 from django.utils.six import StringIO
 
 
@@ -46,12 +47,12 @@ class CommandTests(SimpleTestCase):
             management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
         self.assertIn("CommandError", stderr.getvalue())
 
-    def test_default_en_us_locale_set(self):
-        # Forces en_us when set to true
+    def test_deactivate_locale_set(self):
+        # Deactivate translation when set to true
         out = StringIO()
         with translation.override('pl'):
             management.call_command('leave_locale_alone_false', stdout=out)
-            self.assertEqual(out.getvalue(), "en-us\n")
+            self.assertEqual(out.getvalue(), "")
 
     def test_configured_locale_preserved(self):
         # Leaves locale from settings when set to false
@@ -73,6 +74,17 @@ class CommandTests(SimpleTestCase):
             if current_path is not None:
                 os.environ['PATH'] = current_path
 
+    def test_discover_commands_in_eggs(self):
+        """
+        Test that management commands can also be loaded from Python eggs.
+        """
+        egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
+        egg_name = '%s/basic.egg' % egg_dir
+        with extend_sys_path(egg_name):
+            with self.settings(INSTALLED_APPS=['commandegg']):
+                cmds = find_commands(os.path.join(apps.get_app_config('commandegg').path, 'management'))
+        self.assertEqual(cmds, ['eggcommand'])
+
     def test_call_command_option_parsing(self):
         """
         When passing the long option name to call_command, the available option
@@ -84,14 +96,13 @@ class CommandTests(SimpleTestCase):
         self.assertNotIn("opt_3", out.getvalue())
         self.assertNotIn("opt-3", out.getvalue())
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_optparse_compatibility(self):
         """
         optparse should be supported during Django 1.8/1.9 releases.
         """
         out = StringIO()
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
-            management.call_command('optparse_cmd', stdout=out)
+        management.call_command('optparse_cmd', stdout=out)
         self.assertEqual(out.getvalue(), "All right, let's dance Rock'n'Roll.\n")
 
         # Simulate command line execution

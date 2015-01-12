@@ -16,7 +16,7 @@ Install Python
 Django is a Python web framework, thus requiring Python to be installed on your
 machine.
 
-To install Python on your machine go to http://python.org/download/, and
+To install Python on your machine go to https://python.org/download/, and
 download a Windows MSI installer for Python. Once downloaded, run the MSI
 installer and follow the on-screen instructions.
 
@@ -33,14 +33,14 @@ Install Setuptools
 ==================
 
 To install Python packages on your computer, Setuptools is needed. Download the
-latest version of `Setuptools <http://pypi.python.org/pypi/setuptools>`_ for
+latest version of `Setuptools <https://pypi.python.org/pypi/setuptools>`_ for
 your Python version and follow the installation instructions given there.
 
 Install PIP
 ===========
 
 `PIP <http://www.pip-installer.org/>`_ is a package manager for Python that
-uses the `Python Package Index <http://pypi.python.org>`_ to install Python
+uses the `Python Package Index <https://pypi.python.org>`_ to install Python
 packages. PIP will later be used to install Django from PyPI. If you've
 installed Python 3.4, ``pip`` is included so you may skip this section.
 

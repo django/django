@@ -3,10 +3,11 @@ from __future__ import unicode_literals
 import os
 import warnings
 
+from django.apps import apps
 from django.contrib.sites.models import Site
 from django.core import management
 from django.db import connection, IntegrityError
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils.encoding import force_text
 from django.utils import six
 
@@ -76,6 +77,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         ])
 
     def test_loading_and_dumping(self):
+        apps.clear_cache()
         Site.objects.all().delete()
         # Load fixture 1. Single JSON file, with two objects.
         management.call_command('loaddata', 'fixture1.json', verbosity=0)
@@ -335,14 +337,12 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             management.call_command('loaddata', 'invalid.json', verbosity=0)
             self.assertIn("Could not load fixtures.Article(pk=1):", cm.exception.args[0])
 
+    @ignore_warnings(category=UserWarning, message="No fixture named")
     def test_loaddata_app_option(self):
         """
         Verifies that the --app option works.
         """
-        with warnings.catch_warnings():
-            # Ignore: No fixture named ...
-            warnings.filterwarnings("ignore", category=UserWarning)
-            management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="someotherapp")
+        management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="someotherapp")
         self.assertQuerysetEqual(Article.objects.all(), [])
         management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="fixtures")
         self.assertQuerysetEqual(Article.objects.all(), [
@@ -358,12 +358,11 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<Article: Who needs to use compressed data?>',
         ])
 
+    @ignore_warnings(category=UserWarning, message="No fixture named")
     def test_unmatched_identifier_loading(self):
         # Try to load db fixture 3. This won't load because the database identifier doesn't match
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=UserWarning)
-            management.call_command('loaddata', 'db_fixture_3', verbosity=0)
-            management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default')
+        management.call_command('loaddata', 'db_fixture_3', verbosity=0)
+        management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default')
         self.assertQuerysetEqual(Article.objects.all(), [])
 
     def test_output_formats(self):

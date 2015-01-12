@@ -108,8 +108,8 @@ class MigrationAutodetector(object):
 
         # Prepare some old/new state and model lists, separating
         # proxy models and ignoring unmigrated apps.
-        self.old_apps = self.from_state.render(ignore_swappable=True)
-        self.new_apps = self.to_state.render()
+        self.old_apps = self.from_state.concrete_apps
+        self.new_apps = self.to_state.apps
         self.old_model_keys = []
         self.old_proxy_keys = []
         self.old_unmanaged_keys = []
@@ -163,12 +163,12 @@ class MigrationAutodetector(object):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             for field_name, field in old_model_state.fields:
-                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(field_name)[0]
+                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(field_name)
                 if (hasattr(old_field, "rel") and getattr(old_field.rel, "through", None)
                         and not old_field.rel.through._meta.auto_created):
                     through_key = (
                         old_field.rel.through._meta.app_label,
-                        old_field.rel.through._meta.object_name.lower(),
+                        old_field.rel.through._meta.model_name,
                     )
                     self.through_users[through_key] = (app_label, old_model_name, field_name)
 
@@ -178,6 +178,7 @@ class MigrationAutodetector(object):
         self.generate_deleted_proxies()
         self.generate_created_proxies()
         self.generate_altered_options()
+        self.generate_altered_managers()
 
         # Generate field operations
         self.generate_renamed_fields()
@@ -321,47 +322,47 @@ class MigrationAutodetector(object):
         if dependency[2] is None and dependency[3] is True:
             return (
                 isinstance(operation, operations.CreateModel) and
-                operation.name.lower() == dependency[1].lower()
+                operation.name_lower == dependency[1].lower()
             )
         # Created field
         elif dependency[2] is not None and dependency[3] is True:
             return (
                 (
                     isinstance(operation, operations.CreateModel) and
-                    operation.name.lower() == dependency[1].lower() and
+                    operation.name_lower == dependency[1].lower() and
                     any(dependency[2] == x for x, y in operation.fields)
                 ) or
                 (
                     isinstance(operation, operations.AddField) and
-                    operation.model_name.lower() == dependency[1].lower() and
-                    operation.name.lower() == dependency[2].lower()
+                    operation.model_name_lower == dependency[1].lower() and
+                    operation.name_lower == dependency[2].lower()
                 )
             )
         # Removed field
         elif dependency[2] is not None and dependency[3] is False:
             return (
                 isinstance(operation, operations.RemoveField) and
-                operation.model_name.lower() == dependency[1].lower() and
-                operation.name.lower() == dependency[2].lower()
+                operation.model_name_lower == dependency[1].lower() and
+                operation.name_lower == dependency[2].lower()
             )
         # Removed model
         elif dependency[2] is None and dependency[3] is False:
             return (
                 isinstance(operation, operations.DeleteModel) and
-                operation.name.lower() == dependency[1].lower()
+                operation.name_lower == dependency[1].lower()
             )
         # Field being altered
         elif dependency[2] is not None and dependency[3] == "alter":
             return (
                 isinstance(operation, operations.AlterField) and
-                operation.model_name.lower() == dependency[1].lower() and
-                operation.name.lower() == dependency[2].lower()
+                operation.model_name_lower == dependency[1].lower() and
+                operation.name_lower == dependency[2].lower()
             )
         # order_with_respect_to being unset for a field
         elif dependency[2] is not None and dependency[3] == "order_wrt_unset":
             return (
                 isinstance(operation, operations.AlterOrderWithRespectTo) and
-                operation.name.lower() == dependency[1].lower() and
+                operation.name_lower == dependency[1].lower() and
                 (operation.order_with_respect_to or "").lower() != dependency[2].lower()
             )
         # Field is removed and part of an index/unique_together
@@ -369,7 +370,7 @@ class MigrationAutodetector(object):
             return (
                 isinstance(operation, (operations.AlterUniqueTogether,
                                        operations.AlterIndexTogether)) and
-                operation.name.lower() == dependency[1].lower()
+                operation.name_lower == dependency[1].lower()
             )
         # Unknown dependency. Raise an error.
         else:
@@ -446,13 +447,14 @@ class MigrationAutodetector(object):
         We also defer any model options that refer to collections of fields
         that might be deferred (e.g. unique_together, index_together).
         """
-        added_models = set(self.new_model_keys) - set(self.old_model_keys)
-        added_unmanaged_models = set(self.new_unmanaged_keys) - set(self.old_unmanaged_keys)
-        models = chain(
+        old_keys = set(self.old_model_keys).union(self.old_unmanaged_keys)
+        added_models = set(self.new_model_keys) - old_keys
+        added_unmanaged_models = set(self.new_unmanaged_keys) - old_keys
+        all_added_models = chain(
             sorted(added_models, key=self.swappable_first_key, reverse=True),
             sorted(added_unmanaged_models, key=self.swappable_first_key, reverse=True)
         )
-        for app_label, model_name in models:
+        for app_label, model_name in all_added_models:
             model_state = self.to_state.models[app_label, model_name]
             model_opts = self.new_apps.get_model(app_label, model_name)._meta
             # Gather related fields
@@ -503,6 +505,7 @@ class MigrationAutodetector(object):
                     fields=[d for d in model_state.fields if d[0] not in related_fields],
                     options=model_state.options,
                     bases=model_state.bases,
+                    managers=model_state.managers,
                 ),
                 dependencies=dependencies,
                 beginning=True,
@@ -607,6 +610,7 @@ class MigrationAutodetector(object):
                     fields=[],
                     options=model_state.options,
                     bases=model_state.bases,
+                    managers=model_state.managers,
                 ),
                 # Depend on the deletion of any possible non-proxy version of us
                 dependencies=dependencies,
@@ -622,19 +626,14 @@ class MigrationAutodetector(object):
         We also bring forward removal of any model options that refer to
         collections of fields - the inverse of generate_created_models().
         """
-        deleted_models = set(self.old_model_keys) - set(self.new_model_keys)
-        deleted_unmanaged_models = set(self.old_unmanaged_keys) - set(self.new_unmanaged_keys)
-        models = chain(sorted(deleted_models), sorted(deleted_unmanaged_models))
-        for app_label, model_name in models:
+        new_keys = set(self.new_model_keys).union(self.new_unmanaged_keys)
+        deleted_models = set(self.old_model_keys) - new_keys
+        deleted_unmanaged_models = set(self.old_unmanaged_keys) - new_keys
+        all_deleted_models = chain(sorted(deleted_models), sorted(deleted_unmanaged_models))
+        for app_label, model_name in all_deleted_models:
             model_state = self.from_state.models[app_label, model_name]
             model = self.old_apps.get_model(app_label, model_name)
             if not model._meta.managed:
-                self.add_operation(
-                    app_label,
-                    operations.DeleteModel(
-                        name=model_state.name,
-                    ),
-                )
                 # Skip here, no need to handle fields for unmanaged models
                 continue
 
@@ -686,30 +685,18 @@ class MigrationAutodetector(object):
             # and the removal of all its own related fields, and if it's
             # a through model the field that references it.
             dependencies = []
-            for related_object in model._meta.get_all_related_objects():
-                dependencies.append((
-                    related_object.model._meta.app_label,
-                    related_object.model._meta.object_name,
-                    related_object.field.name,
-                    False,
-                ))
-                dependencies.append((
-                    related_object.model._meta.app_label,
-                    related_object.model._meta.object_name,
-                    related_object.field.name,
-                    "alter",
-                ))
-            for related_object in model._meta.get_all_related_many_to_many_objects():
-                dependencies.append((
-                    related_object.model._meta.app_label,
-                    related_object.model._meta.object_name,
-                    related_object.field.name,
-                    False,
-                ))
+            for related_object in model._meta.related_objects:
+                related_object_app_label = related_object.related_model._meta.app_label
+                object_name = related_object.related_model._meta.object_name
+                field_name = related_object.field.name
+                dependencies.append((related_object_app_label, object_name, field_name, False))
+                if not related_object.many_to_many:
+                    dependencies.append((related_object_app_label, object_name, field_name, "alter"))
+
             for name, field in sorted(related_fields.items()):
                 dependencies.append((app_label, model_name, name, False))
             # We're referenced in another field's through=
-            through_user = self.through_users.get((app_label, model_state.name.lower()), None)
+            through_user = self.through_users.get((app_label, model_state.name_lower), None)
             if through_user:
                 dependencies.append((through_user[0], through_user[1], through_user[2], False))
             # Finally, make the operation, deduping any dependencies
@@ -744,7 +731,7 @@ class MigrationAutodetector(object):
         for app_label, model_name, field_name in sorted(self.new_field_keys - self.old_field_keys):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
-            field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+            field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
             # Scan to see if this is actually a rename!
             field_dec = self.deep_deconstruct(field)
             for rem_app_label, rem_model_name, rem_field_name in sorted(self.old_field_keys - self.new_field_keys):
@@ -774,70 +761,71 @@ class MigrationAutodetector(object):
         Fields that have been added
         """
         for app_label, model_name, field_name in sorted(self.new_field_keys - self.old_field_keys):
-            field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
-            # Fields that are foreignkeys/m2ms depend on stuff
-            dependencies = []
-            if field.rel and field.rel.to:
-                # Account for FKs to swappable models
-                swappable_setting = getattr(field, 'swappable_setting', None)
-                if swappable_setting is not None:
-                    dep_app_label = "__setting__"
-                    dep_object_name = swappable_setting
-                else:
-                    dep_app_label = field.rel.to._meta.app_label
-                    dep_object_name = field.rel.to._meta.object_name
-                dependencies = [(dep_app_label, dep_object_name, None, True)]
-                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
-                    dependencies.append((
-                        field.rel.through._meta.app_label,
-                        field.rel.through._meta.object_name,
-                        None,
-                        True
-                    ))
-            # You can't just add NOT NULL fields with no default
-            if not field.null and not field.has_default() and not isinstance(field, models.ManyToManyField):
-                field = field.clone()
-                field.default = self.questioner.ask_not_null_addition(field_name, model_name)
-                self.add_operation(
-                    app_label,
-                    operations.AddField(
-                        model_name=model_name,
-                        name=field_name,
-                        field=field,
-                        preserve_default=False,
-                    ),
-                    dependencies=dependencies,
-                )
+            self._generate_added_field(app_label, model_name, field_name)
+
+    def _generate_added_field(self, app_label, model_name, field_name):
+        field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
+        # Fields that are foreignkeys/m2ms depend on stuff
+        dependencies = []
+        if field.rel and field.rel.to:
+            # Account for FKs to swappable models
+            swappable_setting = getattr(field, 'swappable_setting', None)
+            if swappable_setting is not None:
+                dep_app_label = "__setting__"
+                dep_object_name = swappable_setting
             else:
-                self.add_operation(
-                    app_label,
-                    operations.AddField(
-                        model_name=model_name,
-                        name=field_name,
-                        field=field,
-                    ),
-                    dependencies=dependencies,
-                )
+                dep_app_label = field.rel.to._meta.app_label
+                dep_object_name = field.rel.to._meta.object_name
+            dependencies = [(dep_app_label, dep_object_name, None, True)]
+            if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                dependencies.append((
+                    field.rel.through._meta.app_label,
+                    field.rel.through._meta.object_name,
+                    None,
+                    True,
+                ))
+        # You can't just add NOT NULL fields with no default or fields
+        # which don't allow empty strings as default.
+        preserve_default = True
+        if (not field.null and not field.has_default() and
+                not isinstance(field, models.ManyToManyField) and
+                not (field.blank and field.empty_strings_allowed)):
+            field = field.clone()
+            field.default = self.questioner.ask_not_null_addition(field_name, model_name)
+            preserve_default = False
+        self.add_operation(
+            app_label,
+            operations.AddField(
+                model_name=model_name,
+                name=field_name,
+                field=field,
+                preserve_default=preserve_default,
+            ),
+            dependencies=dependencies,
+        )
 
     def generate_removed_fields(self):
         """
         Fields that have been removed.
         """
         for app_label, model_name, field_name in sorted(self.old_field_keys - self.new_field_keys):
-            self.add_operation(
-                app_label,
-                operations.RemoveField(
-                    model_name=model_name,
-                    name=field_name,
-                ),
-                # We might need to depend on the removal of an
-                # order_with_respect_to or index/unique_together operation;
-                # this is safely ignored if there isn't one
-                dependencies=[
-                    (app_label, model_name, field_name, "order_wrt_unset"),
-                    (app_label, model_name, field_name, "foo_together_change"),
-                ],
-            )
+            self._generate_removed_field(app_label, model_name, field_name)
+
+    def _generate_removed_field(self, app_label, model_name, field_name):
+        self.add_operation(
+            app_label,
+            operations.RemoveField(
+                model_name=model_name,
+                name=field_name,
+            ),
+            # We might need to depend on the removal of an
+            # order_with_respect_to or index/unique_together operation;
+            # this is safely ignored if there isn't one
+            dependencies=[
+                (app_label, model_name, field_name, "order_wrt_unset"),
+                (app_label, model_name, field_name, "foo_together_change"),
+            ],
+        )
 
     def generate_altered_fields(self):
         """
@@ -847,39 +835,44 @@ class MigrationAutodetector(object):
             # Did the field change?
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_field_name = self.renamed_fields.get((app_label, model_name, field_name), field_name)
-            old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(old_field_name)[0]
-            new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+            old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(old_field_name)
+            new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
             # Implement any model renames on relations; these are handled by RenameModel
             # so we need to exclude them from the comparison
             if hasattr(new_field, "rel") and getattr(new_field.rel, "to", None):
                 rename_key = (
                     new_field.rel.to._meta.app_label,
-                    new_field.rel.to._meta.object_name.lower(),
+                    new_field.rel.to._meta.model_name,
                 )
                 if rename_key in self.renamed_models:
                     new_field.rel.to = old_field.rel.to
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
             if old_field_dec != new_field_dec:
-                preserve_default = True
-                if (old_field.null and not new_field.null and not new_field.has_default() and
+                if (not isinstance(old_field, models.ManyToManyField) and
                         not isinstance(new_field, models.ManyToManyField)):
-                    field = new_field.clone()
-                    new_default = self.questioner.ask_not_null_alteration(field_name, model_name)
-                    if new_default is not models.NOT_PROVIDED:
-                        field.default = new_default
-                        preserve_default = False
-                else:
-                    field = new_field
-                self.add_operation(
-                    app_label,
-                    operations.AlterField(
-                        model_name=model_name,
-                        name=field_name,
-                        field=field,
-                        preserve_default=preserve_default,
+                    preserve_default = True
+                    if (old_field.null and not new_field.null and not new_field.has_default() and
+                            not isinstance(new_field, models.ManyToManyField)):
+                        field = new_field.clone()
+                        new_default = self.questioner.ask_not_null_alteration(field_name, model_name)
+                        if new_default is not models.NOT_PROVIDED:
+                            field.default = new_default
+                            preserve_default = False
+                    else:
+                        field = new_field
+                    self.add_operation(
+                        app_label,
+                        operations.AlterField(
+                            model_name=model_name,
+                            name=field_name,
+                            field=field,
+                            preserve_default=preserve_default,
+                        )
                     )
-                )
+                else:
+                    self._generate_removed_field(app_label, model_name, field_name)
+                    self._generate_added_field(app_label, model_name, field_name)
 
     def _generate_altered_foo_together(self, operation):
         option_name = operation.option_name
@@ -941,7 +934,18 @@ class MigrationAutodetector(object):
         makes an operation to represent them in state changes (in case Python
         code in migrations needs them)
         """
-        models_to_check = self.kept_model_keys.union(self.kept_proxy_keys).union(self.kept_unmanaged_keys)
+        models_to_check = self.kept_model_keys.union(
+            self.kept_proxy_keys
+        ).union(
+            self.kept_unmanaged_keys
+        ).union(
+            # unmanaged converted to managed
+            set(self.old_unmanaged_keys).intersection(self.new_model_keys)
+        ).union(
+            # managed converted to unmanaged
+            set(self.old_model_keys).intersection(self.new_unmanaged_keys)
+        )
+
         for app_label, model_name in sorted(models_to_check):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
@@ -988,6 +992,20 @@ class MigrationAutodetector(object):
                         order_with_respect_to=new_model_state.options.get('order_with_respect_to', None),
                     ),
                     dependencies=dependencies,
+                )
+
+    def generate_altered_managers(self):
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            if old_model_state.managers != new_model_state.managers:
+                self.add_operation(
+                    app_label,
+                    operations.AlterModelManagers(
+                        name=model_name,
+                        managers=new_model_state.managers,
+                    )
                 )
 
     def arrange_for_graph(self, changes, graph, migration_name=None):
@@ -1076,16 +1094,16 @@ class MigrationAutodetector(object):
         """
         if len(ops) == 1:
             if isinstance(ops[0], operations.CreateModel):
-                return ops[0].name.lower()
+                return ops[0].name_lower
             elif isinstance(ops[0], operations.DeleteModel):
-                return "delete_%s" % ops[0].name.lower()
+                return "delete_%s" % ops[0].name_lower
             elif isinstance(ops[0], operations.AddField):
-                return "%s_%s" % (ops[0].model_name.lower(), ops[0].name.lower())
+                return "%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
             elif isinstance(ops[0], operations.RemoveField):
-                return "remove_%s_%s" % (ops[0].model_name.lower(), ops[0].name.lower())
+                return "remove_%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
         elif len(ops) > 1:
             if all(isinstance(o, operations.CreateModel) for o in ops):
-                return "_".join(sorted(o.name.lower() for o in ops))
+                return "_".join(sorted(o.name_lower for o in ops))
         return "auto_%s" % datetime.datetime.now().strftime("%Y%m%d_%H%M")
 
     @classmethod

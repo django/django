@@ -169,8 +169,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update = True
     has_select_for_update_nowait = False
     supports_forward_references = False
-    # XXX MySQL DB-API drivers currently fail on binary data on Python 3.
-    supports_binary_field = six.PY2
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
     can_introspect_autofield = True
@@ -183,9 +181,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_release_savepoints = True
     atomic_transactions = False
     supports_column_check_constraints = False
-
-    def __init__(self, connection):
-        super(DatabaseFeatures, self).__init__(connection)
 
     @cached_property
     def _mysql_storage_engine(self):
@@ -289,9 +284,12 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql, params
 
-    def date_interval_sql(self, sql, connector, timedelta):
-        return "(%s %s INTERVAL '%d 0:0:%d:%d' DAY_MICROSECOND)" % (sql, connector,
-                timedelta.days, timedelta.seconds, timedelta.microseconds)
+    def date_interval_sql(self, timedelta):
+        return "INTERVAL '%d 0:0:%d:%d' DAY_MICROSECOND" % (
+            timedelta.days, timedelta.seconds, timedelta.microseconds), []
+
+    def format_for_duration_arithmetic(self, sql):
+        return 'INTERVAL %s MICROSECOND' % sql
 
     def drop_foreignkey_sql(self):
         return "DROP FOREIGN KEY"
@@ -302,7 +300,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         columns. If no ordering would otherwise be applied, we don't want any
         implicit sorting going on.
         """
-        return ["NULL"]
+        return [(None, ("NULL", [], 'asc', False))]
 
     def fulltext_search_sql(self, field_name):
         return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
@@ -387,27 +385,74 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'POW(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
-    def get_db_converters(self, internal_type):
-        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+    def get_db_converters(self, expression):
+        converters = super(DatabaseOperations, self).get_db_converters(expression)
+        internal_type = expression.output_field.get_internal_type()
         if internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
         if internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
+        if internal_type == 'TextField':
+            converters.append(self.convert_textfield_value)
         return converters
 
-    def convert_booleanfield_value(self, value, field):
+    def convert_booleanfield_value(self, value, expression, context):
         if value in (0, 1):
             value = bool(value)
         return value
 
-    def convert_uuidfield_value(self, value, field):
+    def convert_uuidfield_value(self, value, expression, context):
         if value is not None:
             value = uuid.UUID(value)
+        return value
+
+    def convert_textfield_value(self, value, expression, context):
+        if value is not None:
+            value = force_text(value)
         return value
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
+    # This dictionary maps Field objects to their associated MySQL column
+    # types, as strings. Column-type strings can contain format strings; they'll
+    # be interpolated against the values of Field.__dict__ before being output.
+    # If a column type is set to None, it won't be included in the output.
+    _data_types = {
+        'AutoField': 'integer AUTO_INCREMENT',
+        'BinaryField': 'longblob',
+        'BooleanField': 'bool',
+        'CharField': 'varchar(%(max_length)s)',
+        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
+        'DateField': 'date',
+        'DateTimeField': 'datetime',
+        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'DurationField': 'bigint',
+        'FileField': 'varchar(%(max_length)s)',
+        'FilePathField': 'varchar(%(max_length)s)',
+        'FloatField': 'double precision',
+        'IntegerField': 'integer',
+        'BigIntegerField': 'bigint',
+        'IPAddressField': 'char(15)',
+        'GenericIPAddressField': 'char(39)',
+        'NullBooleanField': 'bool',
+        'OneToOneField': 'integer',
+        'PositiveIntegerField': 'integer UNSIGNED',
+        'PositiveSmallIntegerField': 'smallint UNSIGNED',
+        'SlugField': 'varchar(%(max_length)s)',
+        'SmallIntegerField': 'smallint',
+        'TextField': 'longtext',
+        'TimeField': 'time',
+        'UUIDField': 'char(32)',
+    }
+
+    @cached_property
+    def data_types(self):
+        if self.features.supports_microsecond_precision:
+            return dict(self._data_types, DateTimeField='datetime(6)', TimeField='time(6)')
+        else:
+            return self._data_types
+
     operators = {
         'exact': '= %s',
         'iexact': 'LIKE %s',

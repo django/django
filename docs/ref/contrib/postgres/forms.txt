@@ -154,3 +154,48 @@ HStoreField
         On occasions it may be useful to require or restrict the keys which are
         valid for a given field. This can be done using the
         :class:`~django.contrib.postgres.validators.KeysValidator`.
+
+Range Fields
+------------
+
+This group of fields all share similar functionality for accepting range data.
+They are based on :class:`~django.forms.MultiValueField`. They treat one
+omitted value as an unbounded range. They also validate that the lower bound is
+not greater than the upper bound.
+
+IntegerRangeField
+~~~~~~~~~~~~~~~~~
+
+.. class:: IntegerRangeField
+
+    Based on :class:`~django.forms.IntegerField` and translates its input into
+    :class:`~psycopg2:psycopg2.extras.NumericRange`. Default for
+    :class:`~django.contrib.postgres.fields.IntegerRangeField` and
+    :class:`~django.contrib.postgres.fields.BigIntegerRangeField`.
+
+FloatRangeField
+~~~~~~~~~~~~~~~
+
+.. class:: FloatRangeField
+
+    Based on :class:`~django.forms.FloatField` and translates its input into
+    :class:`~psycopg2:psycopg2.extras.NumericRange`. Default for
+    :class:`~django.contrib.postgres.fields.FloatRangeField`.
+
+DateTimeRangeField
+~~~~~~~~~~~~~~~~~~
+
+.. class:: DateTimeRangeField
+
+    Based on :class:`~django.forms.DateTimeField` and translates its input into
+    :class:`~psycopg2:psycopg2.extras.DateTimeTZRange`. Default for
+    :class:`~django.contrib.postgres.fields.DateTimeRangeField`.
+
+DateRangeField
+~~~~~~~~~~~~~~
+
+.. class:: DateRangeField
+
+    Based on :class:`~django.forms.DateField` and translates its input into
+    :class:`~psycopg2:psycopg2.extras.DateRange`. Default for
+    :class:`~django.contrib.postgres.fields.DateRangeField`.

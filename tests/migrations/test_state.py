@@ -3,7 +3,8 @@ from django.db import models
 from django.db.migrations.state import ProjectState, ModelState, InvalidBasesError
 from django.test import TestCase
 
-from .models import ModelWithCustomBase
+from .models import (FoodManager, FoodQuerySet, ModelWithCustomBase,
+    NoMigrationFoodManager)
 
 
 class StateTests(TestCase):
@@ -54,11 +55,56 @@ class StateTests(TestCase):
                 verbose_name = "tome"
                 db_table = "test_tome"
 
+        class Food(models.Model):
+
+            food_mgr = FoodManager('a', 'b')
+            food_qs = FoodQuerySet.as_manager()
+            food_no_mgr = NoMigrationFoodManager('x', 'y')
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        class FoodNoManagers(models.Model):
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        class FoodNoDefaultManager(models.Model):
+
+            food_no_mgr = NoMigrationFoodManager('x', 'y')
+            food_mgr = FoodManager('a', 'b')
+            food_qs = FoodQuerySet.as_manager()
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        mgr1 = FoodManager('a', 'b')
+        mgr2 = FoodManager('x', 'y', c=3, d=4)
+
+        class FoodOrderedManagers(models.Model):
+            # The managers on this model should be orderd by their creation
+            # counter and not by the order in model body
+
+            food_no_mgr = NoMigrationFoodManager('x', 'y')
+            food_mgr2 = mgr2
+            food_mgr1 = mgr1
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
         project_state = ProjectState.from_apps(new_apps)
         author_state = project_state.models['migrations', 'author']
         author_proxy_state = project_state.models['migrations', 'authorproxy']
         sub_author_state = project_state.models['migrations', 'subauthor']
         book_state = project_state.models['migrations', 'book']
+        food_state = project_state.models['migrations', 'food']
+        food_no_managers_state = project_state.models['migrations', 'foodnomanagers']
+        food_no_default_manager_state = project_state.models['migrations', 'foodnodefaultmanager']
+        food_order_manager_state = project_state.models['migrations', 'foodorderedmanagers']
 
         self.assertEqual(author_state.app_label, "migrations")
         self.assertEqual(author_state.name, "Author")
@@ -89,26 +135,43 @@ class StateTests(TestCase):
         self.assertEqual(len(sub_author_state.fields), 2)
         self.assertEqual(sub_author_state.bases, ("migrations.author", ))
 
+        # The default manager is used in migrations
+        self.assertEqual([name for name, mgr in food_state.managers], ['food_mgr'])
+        self.assertEqual(food_state.managers[0][1].args, ('a', 'b', 1, 2))
+
+        # No explicit managers defined. Migrations will fall back to the default
+        self.assertEqual(food_no_managers_state.managers, [])
+
+        # food_mgr is used in migration but isn't the default mgr, hence add the
+        # default
+        self.assertEqual([name for name, mgr in food_no_default_manager_state.managers],
+                         ['food_no_mgr', 'food_mgr'])
+        self.assertEqual(food_no_default_manager_state.managers[0][1].__class__, models.Manager)
+        self.assertIsInstance(food_no_default_manager_state.managers[1][1], FoodManager)
+
+        self.assertEqual([name for name, mgr in food_order_manager_state.managers],
+                         ['food_mgr1', 'food_mgr2'])
+        self.assertEqual([mgr.args for name, mgr in food_order_manager_state.managers],
+                         [('a', 'b', 1, 2), ('x', 'y', 3, 4)])
+
     def test_render(self):
         """
         Tests rendering a ProjectState into an Apps.
         """
         project_state = ProjectState()
-        project_state.add_model_state(ModelState(
-            "migrations",
-            "Tag",
-            [
+        project_state.add_model(ModelState(
+            app_label="migrations",
+            name="Tag",
+            fields=[
                 ("id", models.AutoField(primary_key=True)),
                 ("name", models.CharField(max_length=100)),
                 ("hidden", models.BooleanField()),
             ],
-            {},
-            None,
         ))
-        project_state.add_model_state(ModelState(
-            "migrations",
-            "SubTag",
-            [
+        project_state.add_model(ModelState(
+            app_label="migrations",
+            name="SubTag",
+            fields=[
                 ('tag_ptr', models.OneToOneField(
                     auto_created=True,
                     primary_key=True,
@@ -118,14 +181,39 @@ class StateTests(TestCase):
                 )),
                 ("awesome", models.BooleanField()),
             ],
-            options={},
             bases=("migrations.Tag",),
         ))
 
-        new_apps = project_state.render()
-        self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field_by_name("name")[0].max_length, 100)
-        self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field_by_name("hidden")[0].null, False)
+        base_mgr = models.Manager()
+        mgr1 = FoodManager('a', 'b')
+        mgr2 = FoodManager('x', 'y', c=3, d=4)
+        project_state.add_model(ModelState(
+            app_label="migrations",
+            name="Food",
+            fields=[
+                ("id", models.AutoField(primary_key=True)),
+            ],
+            managers=[
+                # The ordering we really want is objects, mgr1, mgr2
+                ('default', base_mgr),
+                ('food_mgr2', mgr2),
+                ('food_mgr1', mgr1),
+            ]
+        ))
+
+        new_apps = project_state.apps
+        self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field("name").max_length, 100)
+        self.assertEqual(new_apps.get_model("migrations", "Tag")._meta.get_field("hidden").null, False)
+
         self.assertEqual(len(new_apps.get_model("migrations", "SubTag")._meta.local_fields), 2)
+
+        Food = new_apps.get_model("migrations", "Food")
+        managers = sorted(Food._meta.managers)
+        self.assertEqual([mgr.name for _, mgr, _ in managers],
+                         ['default', 'food_mgr1', 'food_mgr2'])
+        self.assertEqual([mgr.__class__ for _, mgr, _ in managers],
+                         [models.Manager, FoodManager, FoodManager])
+        self.assertIs(managers[0][1], Food._default_manager)
 
     def test_render_model_inheritance(self):
         class Book(models.Model):
@@ -236,23 +324,23 @@ class StateTests(TestCase):
 
         # Make a ProjectState and render it
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(A))
-        project_state.add_model_state(ModelState.from_model(B))
-        project_state.add_model_state(ModelState.from_model(C))
-        project_state.add_model_state(ModelState.from_model(D))
-        project_state.add_model_state(ModelState.from_model(E))
-        project_state.add_model_state(ModelState.from_model(F))
-        final_apps = project_state.render()
+        project_state.add_model(ModelState.from_model(A))
+        project_state.add_model(ModelState.from_model(B))
+        project_state.add_model(ModelState.from_model(C))
+        project_state.add_model(ModelState.from_model(D))
+        project_state.add_model(ModelState.from_model(E))
+        project_state.add_model(ModelState.from_model(F))
+        final_apps = project_state.apps
         self.assertEqual(len(final_apps.get_models()), 6)
 
         # Now make an invalid ProjectState and make sure it fails
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(A))
-        project_state.add_model_state(ModelState.from_model(B))
-        project_state.add_model_state(ModelState.from_model(C))
-        project_state.add_model_state(ModelState.from_model(F))
+        project_state.add_model(ModelState.from_model(A))
+        project_state.add_model(ModelState.from_model(B))
+        project_state.add_model(ModelState.from_model(C))
+        project_state.add_model(ModelState.from_model(F))
         with self.assertRaises(InvalidBasesError):
-            project_state.render()
+            project_state.apps
 
     def test_render_unique_app_labels(self):
         """
@@ -270,10 +358,9 @@ class StateTests(TestCase):
 
         # Make a ProjectState and render it
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(A))
-        project_state.add_model_state(ModelState.from_model(B))
-        final_apps = project_state.render()
-        self.assertEqual(len(final_apps.get_models()), 2)
+        project_state.add_model(ModelState.from_model(A))
+        project_state.add_model(ModelState.from_model(B))
+        self.assertEqual(len(project_state.apps.get_models()), 2)
 
     def test_equality(self):
         """
@@ -282,7 +369,7 @@ class StateTests(TestCase):
 
         # Test two things that should be equal
         project_state = ProjectState()
-        project_state.add_model_state(ModelState(
+        project_state.add_model(ModelState(
             "migrations",
             "Tag",
             [
@@ -301,7 +388,7 @@ class StateTests(TestCase):
 
         # Make a very small change (max_len 99) and see if that affects it
         project_state = ProjectState()
-        project_state.add_model_state(ModelState(
+        project_state.add_model(ModelState(
             "migrations",
             "Tag",
             [
@@ -341,23 +428,22 @@ class StateTests(TestCase):
 
         # Make a valid ProjectState and render it
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(Author))
-        project_state.add_model_state(ModelState.from_model(Book))
-        project_state.add_model_state(ModelState.from_model(Magazine))
-        rendered_state = project_state.render()
-        self.assertEqual(len(rendered_state.get_models()), 3)
+        project_state.add_model(ModelState.from_model(Author))
+        project_state.add_model(ModelState.from_model(Book))
+        project_state.add_model(ModelState.from_model(Magazine))
+        self.assertEqual(len(project_state.apps.get_models()), 3)
 
         # now make an invalid one with a ForeignKey
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(Book))
+        project_state.add_model(ModelState.from_model(Book))
         with self.assertRaises(ValueError):
-            rendered_state = project_state.render()
+            project_state.apps
 
         # and another with ManyToManyField
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(Magazine))
+        project_state.add_model(ModelState.from_model(Magazine))
         with self.assertRaises(ValueError):
-            rendered_state = project_state.render()
+            project_state.apps
 
     def test_real_apps(self):
         """
@@ -375,14 +461,14 @@ class StateTests(TestCase):
 
         # If we just stick it into an empty state it should fail
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(TestModel))
+        project_state.add_model(ModelState.from_model(TestModel))
         with self.assertRaises(ValueError):
-            project_state.render()
+            project_state.apps
 
         # If we include the real app it should succeed
         project_state = ProjectState(real_apps=["contenttypes"])
-        project_state.add_model_state(ModelState.from_model(TestModel))
-        rendered_state = project_state.render()
+        project_state.add_model(ModelState.from_model(TestModel))
+        rendered_state = project_state.apps
         self.assertEqual(
             len([x for x in rendered_state.get_models() if x._meta.app_label == "migrations"]),
             1,
@@ -412,8 +498,8 @@ class StateTests(TestCase):
 
         # Make a valid ProjectState and render it
         project_state = ProjectState()
-        project_state.add_model_state(ModelState.from_model(Author))
-        project_state.add_model_state(ModelState.from_model(Book))
+        project_state.add_model(ModelState.from_model(Author))
+        project_state.add_model(ModelState.from_model(Book))
         self.assertEqual(
             [name for name, field in project_state.models["migrations", "book"].fields],
             ["id", "author"],
@@ -448,6 +534,6 @@ class ModelStateTests(TestCase):
         self.assertEqual(repr(state), "<ModelState: 'app.Model'>")
 
         project_state = ProjectState()
-        project_state.add_model_state(state)
+        project_state.add_model(state)
         with self.assertRaisesMessage(InvalidBasesError, "Cannot resolve bases for [<ModelState: 'app.Model'>]"):
-            project_state.render()
+            project_state.apps

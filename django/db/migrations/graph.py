@@ -3,8 +3,10 @@ from collections import deque
 
 from django.db.migrations.state import ProjectState
 from django.utils.datastructures import OrderedSet
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class MigrationGraph(object):
     """
     Represents the digraph of all migrations in a project.
@@ -178,6 +180,7 @@ class CircularDependencyError(Exception):
     pass
 
 
+@python_2_unicode_compatible
 class NodeNotFoundError(LookupError):
     """
     Raised when an attempt on a node is made that is not available in the graph.
@@ -189,8 +192,6 @@ class NodeNotFoundError(LookupError):
 
     def __str__(self):
         return self.message
-
-    __unicode__ = __str__
 
     def __repr__(self):
         return "NodeNotFoundError(%r)" % self.node

@@ -853,7 +853,7 @@ Templates
   rendering of a template.
 
 * The following functions now accept a ``dirs`` parameter which is a list or
-  tuple to override :setting:`TEMPLATE_DIRS`:
+  tuple to override ``TEMPLATE_DIRS``:
 
   * :func:`django.template.loader.get_template()`
   * :func:`django.template.loader.select_template()`
@@ -1173,9 +1173,7 @@ errors are handled by different cache backends.
 ``django.core.cache.backends.locmem.LocMemCache`` used to fail silently when
 such an error occurs, which is inconsistent with other backends and leads to
 cache-specific errors. This has been fixed in Django 1.7, see
-`Ticket #21200`_ for more details.
-
-.. _Ticket #21200: https://code.djangoproject.com/ticket/21200
+:ticket:`21200` for more details.
 
 Cache keys are now generated from the request's absolute URL
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1199,10 +1197,8 @@ instance using default routing behavior, overriding any manually specified
 database routing. In Django 1.7, a value of ``None`` passed to db_manager will
 produce a router that *retains* any manually assigned database routing -- the
 manager will *not* be reset. This was necessary to resolve an inconsistency in
-the way routing information cascaded over joins. See `Ticket #13724`_ for more
+the way routing information cascaded over joins. See :ticket:`13724` for more
 details.
-
-.. _Ticket #13724: https://code.djangoproject.com/ticket/13724
 
 pytz may be required
 ~~~~~~~~~~~~~~~~~~~~
@@ -1524,11 +1520,10 @@ Custom SQL location for models package
 Previously, if models were organized in a package (``myapp/models/``) rather
 than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
 <initial-sql>` in ``myapp/models/sql/``. This bug has been fixed so that Django
-will search ``myapp/sql/`` as documented. The old location will continue to
-work until Django 1.9. After this issue was fixed, migrations were added which
-deprecates initial SQL data. Thus, while this change still exists, the
-deprecation is somewhat irrelevant as the entire feature will be removed in
-Django 2.0 when migrations become compulsory for all applications.
+will search ``myapp/sql/`` as documented. After this issue was fixed, migrations
+were added which deprecates initial SQL data. Thus, while this change still
+exists, the deprecation is irrelevant as the entire feature will be removed in
+Django 1.9.
 
 Reorganization of ``django.contrib.sites``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

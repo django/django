@@ -5,8 +5,6 @@ from django.db.backends import BaseDatabaseOperations
 
 
 class DatabaseOperations(BaseDatabaseOperations):
-    def __init__(self, connection):
-        super(DatabaseOperations, self).__init__(connection)
 
     def date_extract_sql(self, lookup_type, field_name):
         # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
@@ -15,23 +13,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "EXTRACT('dow' FROM %s) + 1" % field_name
         else:
             return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
-
-    def date_interval_sql(self, sql, connector, timedelta):
-        """
-        implements the interval functionality for expressions
-        format for Postgres:
-            (datefield + interval '3 days 200 seconds 5 microseconds')
-        """
-        modifiers = []
-        if timedelta.days:
-            modifiers.append('%s days' % timedelta.days)
-        if timedelta.seconds:
-            modifiers.append('%s seconds' % timedelta.seconds)
-        if timedelta.microseconds:
-            modifiers.append('%s microseconds' % timedelta.microseconds)
-        mods = ' '.join(modifiers)
-        conn = ' %s ' % connector
-        return '(%s)' % conn.join([sql, 'interval \'%s\'' % mods])
 
     def date_trunc_sql(self, lookup_type, field_name):
         # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC

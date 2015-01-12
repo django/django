@@ -2,7 +2,6 @@ from collections import defaultdict
 
 from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
     token_kwargs, Variable
-from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 from django.utils import six
 
@@ -102,7 +101,7 @@ class ExtendsNode(Node):
             raise TemplateSyntaxError(error_msg)
         if hasattr(parent, 'render'):
             return parent  # parent is a Template object
-        return get_template(parent)
+        return context.engine.get_template(parent)
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
@@ -143,7 +142,7 @@ class IncludeNode(Node):
             # Does this quack like a Template?
             if not callable(getattr(template, 'render', None)):
                 # If not, we'll try get_template
-                template = get_template(template)
+                template = context.engine.get_template(template)
             values = {
                 name: var.resolve(context)
                 for name, var in six.iteritems(self.extra_context)

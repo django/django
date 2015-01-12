@@ -22,9 +22,6 @@ class AdminCustomUrlsTest(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
 
-    def tearDown(self):
-        self.client.logout()
-
     def test_basic_add_GET(self):
         """
         Ensure GET on the add_view works.
@@ -53,7 +50,7 @@ class AdminCustomUrlsTest(TestCase):
         }
         response = self.client.post('/admin/admin_custom_urls/action/!add/', post_data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'dismissAddAnotherPopup')
+        self.assertContains(response, 'dismissAddRelatedObjectPopup')
         self.assertContains(response, 'Action added through a popup')
 
     def test_admin_URLs_no_clash(self):
@@ -90,9 +87,6 @@ class CustomRedirects(TestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
-
-    def tearDown(self):
-        self.client.logout()
 
     def test_post_save_add_redirect(self):
         """

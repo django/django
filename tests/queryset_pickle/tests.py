@@ -79,7 +79,7 @@ class PickleabilityTestCase(TestCase):
         m1 = M2MModel.objects.create()
         g1 = Group.objects.create(name='foof')
         m1.groups.add(g1)
-        m2m_through = M2MModel._meta.get_field_by_name('groups')[0].rel.through
+        m2m_through = M2MModel._meta.get_field('groups').rel.through
         original = m2m_through.objects.get()
         dumped = pickle.dumps(original)
         reloaded = pickle.loads(dumped)
@@ -99,6 +99,11 @@ class PickleabilityTestCase(TestCase):
     def test_specialized_queryset(self):
         self.assert_pickles(Happening.objects.values('name'))
         self.assert_pickles(Happening.objects.values('name').dates('when', 'year'))
+
+        # ValuesQuerySet with related field (#14515)
+        self.assert_pickles(
+            Event.objects.select_related('group').order_by('title').values_list('title', 'group__name')
+        )
 
     def test_pickle_prefetch_related_idempotence(self):
         g = Group.objects.create(name='foo')

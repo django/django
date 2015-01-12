@@ -24,8 +24,9 @@ from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (TestCase, TransactionTestCase, mock, override_settings,
     skipUnlessDBFeature, skipIfDBFeature)
-from django.test.utils import str_prefix, IgnoreAllDeprecationWarningsMixin
+from django.test.utils import ignore_warnings, str_prefix
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.six.moves import range
 
 from . import models
@@ -41,6 +42,8 @@ class DummyBackendTest(TestCase):
         conns = ConnectionHandler(DATABASES)
         self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'],
             'django.db.backends.dummy')
+        with self.assertRaises(ImproperlyConfigured):
+            conns[DEFAULT_DB_ALIAS].ensure_connection()
 
 
 @unittest.skipUnless(connection.vendor == 'oracle', "Test only for Oracle")
@@ -111,9 +114,10 @@ class SQLiteTests(TestCase):
         Check that auto_increment fields are created with the AUTOINCREMENT
         keyword in order to be monotonically increasing. Refs #10164.
         """
-        statements = connection.creation.sql_create_model(models.Square,
-            style=no_style())
-        match = re.search('"id" ([^,]+),', statements[0][0])
+        with connection.schema_editor(collect_sql=True) as editor:
+            editor.create_model(models.Square)
+            statements = editor.collected_sql
+        match = re.search('"id" ([^,]+),', statements[0])
         self.assertIsNotNone(match)
         self.assertEqual('integer NOT NULL PRIMARY KEY AUTOINCREMENT',
             match.group(1), "Wrong SQL used to create an auto-increment "
@@ -1016,7 +1020,7 @@ class DBConstraintTestCase(TestCase):
         self.assertEqual(models.Object.objects.count(), 2)
         self.assertEqual(obj.related_objects.count(), 1)
 
-        intermediary_model = models.Object._meta.get_field_by_name("related_objects")[0].rel.through
+        intermediary_model = models.Object._meta.get_field("related_objects").rel.through
         intermediary_model.objects.create(from_object_id=obj.id, to_object_id=12345)
         self.assertEqual(obj.related_objects.count(), 1)
         self.assertEqual(intermediary_model.objects.count(), 2)
@@ -1077,17 +1081,12 @@ class BackendUtilTests(TestCase):
                   '1234600000')
 
 
-class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):
+@ignore_warnings(category=UserWarning,
+                 message="Overriding setting DATABASES can lead to unexpected behavior")
+class DBTestSettingsRenamedTests(TestCase):
 
     mismatch_msg = ("Connection 'test-deprecation' has mismatched TEST "
                     "and TEST_* database settings.")
-
-    @classmethod
-    def setUpClass(cls):
-        super(DBTestSettingsRenamedTests, cls).setUpClass()
-        # Silence "UserWarning: Overriding setting DATABASES can lead to
-        # unexpected behavior."
-        cls.warning_classes.append(UserWarning)
 
     def setUp(self):
         super(DBTestSettingsRenamedTests, self).setUp()
@@ -1185,6 +1184,7 @@ class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):
         with override_settings(DATABASES=self.db_settings):
             self.handler.prepare_test_settings('test-deprecation')
 
+    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_old_settings_only(self):
         # should be able to define old settings without the new
         self.db_settings.update({
@@ -1198,3 +1198,21 @@ class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):
     def test_empty_settings(self):
         with override_settings(DATABASES=self.db_settings):
             self.handler.prepare_test_settings('default')
+
+
+@unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite specific test.')
+@skipUnlessDBFeature('can_share_in_memory_db')
+class TestSqliteThreadSharing(TransactionTestCase):
+    available_apps = ['backends']
+
+    def test_database_sharing_in_threads(self):
+        def create_object():
+            models.Object.objects.create()
+
+        create_object()
+
+        thread = threading.Thread(target=create_object)
+        thread.start()
+        thread.join()
+
+        self.assertEqual(models.Object.objects.count(), 2)

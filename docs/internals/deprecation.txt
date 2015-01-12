@@ -31,9 +31,6 @@ details on these changes.
 * Using an incorrect count of unpacked values in the ``for`` template tag
   will raise an exception rather than fail silently.
 
-* The ``DatabaseCreation`` class on each database backend will be removed,
-  and all table/schema editing will be moved to be via ``SchemaEditor`` instead.
-
 * The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
   Python path will be removed.
 
@@ -43,6 +40,8 @@ details on these changes.
 * The class :class:`~django.core.management.NoArgsCommand` will be removed. Use
   :class:`~django.core.management.BaseCommand` instead, which takes no arguments
   by default.
+
+* ``django.core.context_processors`` module will be removed.
 
 * ``django.db.models.sql.aggregates`` module will be removed.
 
@@ -56,6 +55,19 @@ details on these changes.
     ``append_aggregate_mask``.
 
 * ``django.template.resolve_variable`` will be removed.
+
+* The following private APIs will be removed from
+  :class:`django.db.models.options.Options` (``Model._meta``):
+
+  * ``get_field_by_name()``
+  * ``get_all_field_names()``
+  * ``get_fields_with_model()``
+  * ``get_concrete_fields_with_model()``
+  * ``get_m2m_with_model()``
+  * ``get_all_related_objects()``
+  * ``get_all_related_objects_with_model()``
+  * ``get_all_related_many_to_many_objects()``
+  * ``get_all_related_m2m_objects_with_model()``
 
 * The ``error_message`` argument of ``django.forms.RegexField`` will be removed.
 
@@ -85,8 +97,31 @@ details on these changes.
 * The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
   defined with no default value for its ``form_class`` argument will be removed.
 
+* The following settings will be removed:
+
+  * ``ALLOWED_INCLUDE_ROOTS``
+  * ``TEMPLATE_CONTEXT_PROCESSORS``
+  * ``TEMPLATE_DIRS``
+  * ``TEMPLATE_LOADERS``
+  * ``TEMPLATE_STRING_IF_INVALID``
+
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` will
   be removed.
+
+* The ``current_app`` parameter for the following function and classes will be
+  removed:
+
+  * ``django.shortcuts.render()``
+  * ``django.template.Context()``
+  * ``django.template.RequestContext()``
+  * ``django.template.response.TemplateResponse()``
+
+* The ``dictionary`` and ``context_instance`` parameters for the following
+  functions will be removed:
+
+  * ``django.shortcuts.render()``
+  * ``django.shortcuts.render_to_response()``
+  * ``django.template.loader.render_to_string()``
 
 * The ``dirs`` parameter for the following functions will be removed:
 
@@ -98,6 +133,15 @@ details on these changes.
 * Session verification will be enabled regardless of whether or not
   ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` is in
   ``MIDDLEWARE_CLASSES``.
+
+* Private attribute ``django.db.models.Field.related`` will be removed.
+
+* The ``--list`` option of the ``migrate`` management command will be removed.
+
+* The ``ssi`` template tag will be removed.
+
+* Support for the ``=`` comparison operator in the ``if`` template tag will be
+  removed.
 
 .. _deprecation-removed-in-1.9:
 
@@ -133,11 +177,8 @@ details on these changes.
   is loaded. In particular, it won't be possible to import models inside
   the root package of their application.
 
-* If models are organized in a package, Django will no longer look for
-  :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
-  custom SQL files to ``myapp/sql/``.
-
-* The model and form ``IPAddressField`` will be removed.
+* The model and form ``IPAddressField`` will be removed. A stub field will
+  remain for compatibility with historical migrations.
 
 * ``AppCommand.handle_app()`` will no longer be supported.
 
@@ -221,6 +262,9 @@ details on these changes.
 * The default value of the
   :attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
   attribute will change from ``True`` to ``False``.
+
+* ``django.contrib.sitemaps.FlatPageSitemap`` will be removed in favor of
+  ``django.contrib.flatpages.sitemaps.FlatPageSitemap``.
 
 .. _deprecation-removed-in-1.8:
 

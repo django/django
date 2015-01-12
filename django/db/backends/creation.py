@@ -1,8 +1,10 @@
 import hashlib
 import sys
 import time
+import warnings
 
 from django.conf import settings
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
 from django.utils.six.moves import input
 from django.utils.six import StringIO
@@ -24,10 +26,6 @@ class BaseDatabaseCreation(object):
     Fields, the SQL used to create and destroy tables, and the creation and
     destruction of test databases.
     """
-    data_types = {}
-    data_types_suffix = {}
-    data_type_check_constraints = {}
-
     def __init__(self, connection):
         self.connection = connection
 
@@ -192,13 +190,16 @@ class BaseDatabaseCreation(object):
         """
         Returns the CREATE INDEX SQL statements for a single model.
         """
+        warnings.warn("DatabaseCreation.sql_indexes_for_model is deprecated, "
+                      "use the equivalent method of the schema editor instead.",
+                      RemovedInDjango20Warning)
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []
         for f in model._meta.local_fields:
             output.extend(self.sql_indexes_for_field(model, f, style))
         for fs in model._meta.index_together:
-            fields = [model._meta.get_field_by_name(f)[0] for f in fs]
+            fields = [model._meta.get_field(f) for f in fs]
             output.extend(self.sql_indexes_for_fields(model, fields, style))
         return output
 
@@ -289,7 +290,7 @@ class BaseDatabaseCreation(object):
         for f in model._meta.local_fields:
             output.extend(self.sql_destroy_indexes_for_field(model, f, style))
         for fs in model._meta.index_together:
-            fields = [model._meta.get_field_by_name(f)[0] for f in fs]
+            fields = [model._meta.get_field(f) for f in fs]
             output.extend(self.sql_destroy_indexes_for_fields(model, fields, style))
         return output
 

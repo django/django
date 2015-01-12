@@ -136,10 +136,9 @@ bit is just the lowercased version of the model's name.
 
 .. note::
 
-    Thus, when (for example) the
-    :class:`django.template.loaders.app_directories.Loader` template loader is
-    enabled in :setting:`TEMPLATE_LOADERS`, a template location could be:
-    /path/to/project/books/templates/books/publisher_list.html
+    Thus, when (for example) the ``APP_DIRS`` option of a ``DjangoTemplates``
+    backend is set to True in :setting:`TEMPLATES`, a template location could
+    be: /path/to/project/books/templates/books/publisher_list.html
 
 This template will be rendered against a context containing a variable called
 ``object_list`` that contains all the publisher objects. A very simple template

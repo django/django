@@ -1,14 +1,11 @@
 from __future__ import unicode_literals
 
-import warnings
-
 from django import forms
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, ignore_warnings, override_settings
 
 from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
 
@@ -35,18 +32,20 @@ class ValidFormFieldsets(admin.ModelAdmin):
     )
 
 
+class MyAdmin(admin.ModelAdmin):
+    @classmethod
+    def check(cls, model, **kwargs):
+        return ['error!']
+
+
 @override_settings(
     SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
     INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'admin_checks']
 )
 class SystemChecksTestCase(TestCase):
 
+    @override_settings(DEBUG=True)
     def test_checks_are_performed(self):
-        class MyAdmin(admin.ModelAdmin):
-            @classmethod
-            def check(self, model, **kwargs):
-                return ['error!']
-
         admin.site.register(Song, MyAdmin)
         try:
             errors = checks.run_checks()
@@ -54,6 +53,22 @@ class SystemChecksTestCase(TestCase):
             self.assertEqual(errors, expected)
         finally:
             admin.site.unregister(Song)
+            admin.sites.system_check_errors = []
+
+    @override_settings(DEBUG=True)
+    def test_custom_adminsite(self):
+        class CustomAdminSite(admin.AdminSite):
+            pass
+
+        custom_site = CustomAdminSite()
+        custom_site.register(Song, MyAdmin)
+        try:
+            errors = checks.run_checks()
+            expected = ['error!']
+            self.assertEqual(errors, expected)
+        finally:
+            custom_site.unregister(Song)
+            admin.sites.system_check_errors = []
 
     def test_readonly_and_editable(self):
         class SongAdmin(admin.ModelAdmin):
@@ -571,6 +586,7 @@ class SystemChecksTestCase(TestCase):
         errors = FieldsOnFormOnlyAdmin.check(model=Song)
         self.assertEqual(errors, [])
 
+    @ignore_warnings(module='django.contrib.admin.options')
     def test_validator_compatibility(self):
         class MyValidator(object):
             def validate(self, cls, model):
@@ -579,18 +595,16 @@ class SystemChecksTestCase(TestCase):
         class MyModelAdmin(admin.ModelAdmin):
             validator_class = MyValidator
 
-        with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
-            errors = MyModelAdmin.check(model=Song)
+        errors = MyModelAdmin.check(model=Song)
 
-            expected = [
-                checks.Error(
-                    'error!',
-                    hint=None,
-                    obj=MyModelAdmin,
-                )
-            ]
-            self.assertEqual(errors, expected)
+        expected = [
+            checks.Error(
+                'error!',
+                hint=None,
+                obj=MyModelAdmin,
+            )
+        ]
+        self.assertEqual(errors, expected)
 
     def test_check_sublists_for_duplicates(self):
         class MyModelAdmin(admin.ModelAdmin):

@@ -2,11 +2,13 @@ from unittest import skipUnless
 
 from django.core.management.color import no_style
 from django.db import connection
-from django.test import TestCase
+from django.test import TestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango20Warning
 
-from .models import Article, IndexTogetherSingleList
+from .models import Article, ArticleTranslation, IndexTogetherSingleList
 
 
+@ignore_warnings(category=RemovedInDjango20Warning)
 class CreationIndexesTests(TestCase):
     """
     Test index handling by the to-be-deprecated connection.creation interface.
@@ -46,8 +48,16 @@ class SchemaIndexesTests(TestCase):
     Test index handling by the db.backends.schema infrastructure.
     """
     def test_index_together(self):
-        index_sql = connection.schema_editor()._model_indexes_sql(Article)
+        editor = connection.schema_editor()
+        index_sql = editor._model_indexes_sql(Article)
         self.assertEqual(len(index_sql), 1)
+        # Ensure the index name is properly quoted
+        self.assertIn(
+            connection.ops.quote_name(
+                editor._create_index_name(Article, ['headline', 'pub_date'], suffix='_idx')
+            ),
+            index_sql[0]
+        )
 
     def test_index_together_single_list(self):
         # Test for using index_together with a single list (#22172)
@@ -73,3 +83,17 @@ class SchemaIndexesTests(TestCase):
         """Test indexes are not created for related objects"""
         index_sql = connection.schema_editor()._model_indexes_sql(Article)
         self.assertEqual(len(index_sql), 1)
+
+    @skipUnless(connection.vendor == 'mysql', "This is a mysql-specific issue")
+    def test_no_index_for_foreignkey(self):
+        """
+        MySQL on InnoDB already creates indexes automatically for foreign keys.
+        (#14180).
+        """
+        storage = connection.introspection.get_storage_engine(
+            connection.cursor(), ArticleTranslation._meta.db_table
+        )
+        if storage != "InnoDB":
+            self.skip("This test only applies to the InnoDB storage engine")
+        index_sql = connection.schema_editor()._model_indexes_sql(ArticleTranslation)
+        self.assertEqual(index_sql, [])

@@ -33,7 +33,6 @@ import os
 import uuid
 from decimal import Decimal
 from unittest import skipIf
-import warnings
 
 try:
     from PIL import Image
@@ -43,16 +42,18 @@ except ImportError:
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import (
     BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
-    DecimalField, EmailField, Field, FileField, FilePathField, FloatField,
-    Form, forms, HiddenInput, ImageField, IntegerField, MultipleChoiceField,
-    NullBooleanField, NumberInput, PasswordInput, RadioSelect, RegexField,
-    SplitDateTimeField, TextInput, Textarea, TimeField, TypedChoiceField,
-    TypedMultipleChoiceField, URLField, UUIDField, ValidationError, Widget,
+    DecimalField, DurationField, EmailField, Field, FileField, FilePathField,
+    FloatField, Form, forms, HiddenInput, ImageField, IntegerField,
+    MultipleChoiceField, NullBooleanField, NumberInput, PasswordInput,
+    RadioSelect, RegexField, SplitDateTimeField, TextInput, Textarea,
+    TimeField, TypedChoiceField, TypedMultipleChoiceField, URLField, UUIDField,
+    ValidationError, Widget,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils import formats
 from django.utils import six
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils._os import upath
 
 
@@ -490,15 +491,14 @@ class FieldsTests(SimpleTestCase):
         f = DateField()
         self.assertRaisesMessage(ValidationError, "'Enter a valid date.'", f.clean, 'a\x00b')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)  # for _has_changed
     def test_datefield_changed(self):
         format = '%d/%m/%Y'
         f = DateField(input_formats=[format])
         d = datetime.date(2007, 9, 17)
         self.assertFalse(f.has_changed(d, '17/09/2007'))
         # Test for deprecated behavior _has_changed
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(f._has_changed(d, '17/09/2007'))
+        self.assertFalse(f._has_changed(d, '17/09/2007'))
 
     def test_datefield_strptime(self):
         """Test that field.strptime doesn't raise an UnicodeEncodeError (#16123)"""
@@ -611,6 +611,32 @@ class FieldsTests(SimpleTestCase):
 
     # RegexField ##################################################################
 
+    def test_durationfield_1(self):
+        f = DurationField()
+        self.assertEqual(datetime.timedelta(seconds=30), f.clean('30'))
+        self.assertEqual(
+            datetime.timedelta(minutes=15, seconds=30),
+            f.clean('15:30')
+        )
+        self.assertEqual(
+            datetime.timedelta(hours=1, minutes=15, seconds=30),
+            f.clean('1:15:30')
+        )
+        self.assertEqual(
+            datetime.timedelta(
+                days=1, hours=1, minutes=15, seconds=30, milliseconds=300),
+            f.clean('1 1:15:30.3')
+        )
+
+    def test_durationfield_2(self):
+        class DurationForm(Form):
+            duration = DurationField(initial=datetime.timedelta(hours=1))
+        f = DurationForm()
+        self.assertHTMLEqual(
+            '<input id="id_duration" type="text" name="duration" value="01:00:00">',
+            str(f['duration'])
+        )
+
     def test_regexfield_1(self):
         f = RegexField('^[0-9][A-F][0-9]$')
         self.assertEqual('2A2', f.clean('2A2'))
@@ -635,11 +661,9 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, ' 2A2')
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '2A2 ')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)  # error_message deprecation
     def test_regexfield_4(self):
-        # deprecated error_message argument; remove in Django 2.0
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
+        f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
         self.assertEqual('1234', f.clean('1234'))
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, '123')
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, 'abcd')
@@ -872,9 +896,7 @@ class FieldsTests(SimpleTestCase):
         """Test URLField correctly validates IPv6 (#18779)."""
         f = URLField()
         urls = (
-            'http://::/',
-            'http://6:21b4:92/',
-            'http://[12:34:3a53]/',
+            'http://[12:34::3a53]/',
             'http://[a34:9238::]:8080/',
         )
         for url in urls:

@@ -95,6 +95,8 @@ you can document in your view function docstrings include:
 
 For example::
 
+    from django.shortcuts import render
+
     from myapp.models import MyModel
 
     def my_view(request, slug):
@@ -102,8 +104,6 @@ For example::
         Display an individual :model:`myapp.MyModel`.
 
         **Context**
-
-        ``RequestContext``
 
         ``mymodel``
             An instance of :model:`myapp.MyModel`.
@@ -113,10 +113,8 @@ For example::
         :template:`myapp/my_template.html`
 
         """
-        return render_to_response('myapp/my_template.html', {
-            'mymodel': MyModel.objects.get(slug=slug)
-        }, context_instance=RequestContext(request))
-
+        context = {'mymodel': MyModel.objects.get(slug=slug)}
+        return render(request, 'myapp/my_template.html', context)
 
 Template tags and filters reference
 ===================================

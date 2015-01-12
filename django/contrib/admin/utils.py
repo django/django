@@ -5,6 +5,7 @@ import datetime
 import decimal
 
 from django.contrib.auth import get_permission_codename
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
@@ -24,7 +25,7 @@ def lookup_needs_distinct(opts, lookup_path):
     Returns True if 'distinct()' should be used to query the given lookup path.
     """
     field_name = lookup_path.split('__', 1)[0]
-    field = opts.get_field_by_name(field_name)[0]
+    field = opts.get_field(field_name)
     if hasattr(field, 'get_path_info') and any(path.m2m for path in field.get_path_info()):
         return True
     return False
@@ -264,8 +265,8 @@ def model_ngettext(obj, n=None):
 def lookup_field(name, obj, model_admin=None):
     opts = obj._meta
     try:
-        f = opts.get_field(name)
-    except models.FieldDoesNotExist:
+        f = _get_non_gfk_field(opts, name)
+    except FieldDoesNotExist:
         # For non-field values, the value is either a method, property or
         # returned via a callable.
         if callable(name):
@@ -290,6 +291,17 @@ def lookup_field(name, obj, model_admin=None):
     return f, attr, value
 
 
+def _get_non_gfk_field(opts, name):
+    """
+    For historical reasons, the admin app relies on GenericForeignKeys as being
+    "not found" by get_field(). This could likely be cleaned up.
+    """
+    field = opts.get_field(name)
+    if field.is_relation and field.one_to_many and not field.related_model:
+        raise FieldDoesNotExist()
+    return field
+
+
 def label_for_field(name, model, model_admin=None, return_attr=False):
     """
     Returns a sensible label for a field name. The name can be a callable,
@@ -300,13 +312,13 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     """
     attr = None
     try:
-        field = model._meta.get_field_by_name(name)[0]
+        field = _get_non_gfk_field(model._meta, name)
         try:
             label = field.verbose_name
         except AttributeError:
-            # field is likely a RelatedObject
+            # field is likely a ForeignObjectRel
             label = field.opts.verbose_name
-    except models.FieldDoesNotExist:
+    except FieldDoesNotExist:
         if name == "__unicode__":
             label = force_text(model._meta.verbose_name)
             attr = six.text_type
@@ -348,11 +360,10 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
 def help_text_for_field(name, model):
     help_text = ""
     try:
-        field_data = model._meta.get_field_by_name(name)
-    except models.FieldDoesNotExist:
+        field = _get_non_gfk_field(model._meta, name)
+    except FieldDoesNotExist:
         pass
     else:
-        field = field_data[0]
         if hasattr(field, 'help_text'):
             help_text = field.help_text
     return smart_text(help_text)
@@ -424,19 +435,21 @@ def reverse_field_path(model, path):
     parent = model
     pieces = path.split(LOOKUP_SEP)
     for piece in pieces:
-        field, model, direct, m2m = parent._meta.get_field_by_name(piece)
+        field = parent._meta.get_field(piece)
         # skip trailing data field if extant:
         if len(reversed_path) == len(pieces) - 1:  # final iteration
             try:
                 get_model_from_relation(field)
             except NotRelationField:
                 break
-        if direct:
+
+        # Field should point to another model
+        if field.is_relation and not (field.auto_created and not field.concrete):
             related_name = field.related_query_name()
             parent = field.rel.to
         else:
             related_name = field.field.name
-            parent = field.model
+            parent = field.related_model
         reversed_path.insert(0, related_name)
     return (parent, LOOKUP_SEP.join(reversed_path))
 
@@ -457,7 +470,7 @@ def get_fields_from_path(model, path):
             parent = get_model_from_relation(fields[-1])
         else:
             parent = model
-        fields.append(parent._meta.get_field_by_name(piece)[0])
+        fields.append(parent._meta.get_field(piece))
     return fields
 
 

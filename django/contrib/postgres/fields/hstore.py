@@ -1,9 +1,9 @@
 import json
 
-from django.contrib.postgres import forms
+from django.contrib.postgres import forms, lookups
 from django.contrib.postgres.fields.array import ArrayField
 from django.core import exceptions
-from django.db.models import Field, Lookup, Transform, TextField
+from django.db.models import Field, Transform, TextField
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
@@ -20,12 +20,6 @@ class HStoreField(Field):
 
     def db_type(self, connection):
         return 'hstore'
-
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-        if lookup_type == 'contains':
-            return [self.get_prep_value(value)]
-        return super(HStoreField, self).get_db_prep_lookup(lookup_type, value,
-                connection, prepared=False)
 
     def get_transform(self, name):
         transform = super(HStoreField, self).get_transform(name)
@@ -60,48 +54,20 @@ class HStoreField(Field):
         return super(HStoreField, self).formfield(**defaults)
 
 
-@HStoreField.register_lookup
-class HStoreContainsLookup(Lookup):
-    lookup_name = 'contains'
-
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
-        return '%s @> %s' % (lhs, rhs), params
+HStoreField.register_lookup(lookups.DataContains)
+HStoreField.register_lookup(lookups.ContainedBy)
 
 
 @HStoreField.register_lookup
-class HStoreContainedByLookup(Lookup):
-    lookup_name = 'contained_by'
-
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
-        return '%s <@ %s' % (lhs, rhs), params
-
-
-@HStoreField.register_lookup
-class HasKeyLookup(Lookup):
+class HasKeyLookup(lookups.PostgresSimpleLookup):
     lookup_name = 'has_key'
-
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
-        return '%s ? %s' % (lhs, rhs), params
+    operator = '?'
 
 
 @HStoreField.register_lookup
-class HasKeysLookup(Lookup):
+class HasKeysLookup(lookups.PostgresSimpleLookup):
     lookup_name = 'has_keys'
-
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
-        return '%s ?& %s' % (lhs, rhs), params
+    operator = '?&'
 
 
 class KeyTransform(Transform):
@@ -126,20 +92,14 @@ class KeyTransformFactory(object):
 
 
 @HStoreField.register_lookup
-class KeysTransform(Transform):
+class KeysTransform(lookups.FunctionTransform):
     lookup_name = 'keys'
+    function = 'akeys'
     output_field = ArrayField(TextField())
-
-    def as_sql(self, compiler, connection):
-        lhs, params = compiler.compile(self.lhs)
-        return 'akeys(%s)' % lhs, params
 
 
 @HStoreField.register_lookup
-class ValuesTransform(Transform):
+class ValuesTransform(lookups.FunctionTransform):
     lookup_name = 'values'
+    function = 'avals'
     output_field = ArrayField(TextField())
-
-    def as_sql(self, compiler, connection):
-        lhs, params = compiler.compile(self.lhs)
-        return 'avals(%s)' % lhs, params

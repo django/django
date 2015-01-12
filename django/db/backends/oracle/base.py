@@ -62,6 +62,7 @@ from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.db.backends.oracle.schema import DatabaseSchemaEditor
 from django.db.utils import InterfaceError
 from django.utils import six, timezone
+from django.utils.duration import duration_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
@@ -106,6 +107,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     has_zoneinfo_database = pytz is not None
     supports_bitwise_or = False
+    has_native_duration_field = True
     can_defer_constraint_checks = True
     supports_partially_nullable_unique_constraints = False
     truncates_names = True
@@ -198,19 +200,19 @@ WHEN (new.%(col_name)s IS NULL)
             # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions050.htm
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
-    def date_interval_sql(self, sql, connector, timedelta):
+    def date_interval_sql(self, timedelta):
         """
         Implements the interval functionality for expressions
         format for Oracle:
-        (datefield + INTERVAL '3 00:03:20.000000' DAY(1) TO SECOND(6))
+        INTERVAL '3 00:03:20.000000' DAY(1) TO SECOND(6)
         """
         minutes, seconds = divmod(timedelta.seconds, 60)
         hours, minutes = divmod(minutes, 60)
         days = str(timedelta.days)
         day_precision = len(days)
-        fmt = "(%s %s INTERVAL '%s %02d:%02d:%02d.%06d' DAY(%d) TO SECOND(6))"
-        return fmt % (sql, connector, days, hours, minutes, seconds,
-                timedelta.microseconds, day_precision)
+        fmt = "INTERVAL '%s %02d:%02d:%02d.%06d' DAY(%d) TO SECOND(6)"
+        return fmt % (days, hours, minutes, seconds, timedelta.microseconds,
+                day_precision), []
 
     def date_trunc_sql(self, lookup_type, field_name):
         # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
@@ -266,8 +268,9 @@ WHEN (new.%(col_name)s IS NULL)
             sql = field_name    # Cast to DATE removes sub-second precision.
         return sql, []
 
-    def get_db_converters(self, internal_type):
-        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+    def get_db_converters(self, expression):
+        converters = super(DatabaseOperations, self).get_db_converters(expression)
+        internal_type = expression.output_field.get_internal_type()
         if internal_type == 'TextField':
             converters.append(self.convert_textfield_value)
         elif internal_type == 'BinaryField':
@@ -283,28 +286,29 @@ WHEN (new.%(col_name)s IS NULL)
         converters.append(self.convert_empty_values)
         return converters
 
-    def convert_empty_values(self, value, field):
+    def convert_empty_values(self, value, expression, context):
         # Oracle stores empty strings as null. We need to undo this in
         # order to adhere to the Django convention of using the empty
         # string instead of null, but only if the field accepts the
         # empty string.
+        field = expression.output_field
         if value is None and field.empty_strings_allowed:
             value = ''
             if field.get_internal_type() == 'BinaryField':
                 value = b''
         return value
 
-    def convert_textfield_value(self, value, field):
+    def convert_textfield_value(self, value, expression, context):
         if isinstance(value, Database.LOB):
             value = force_text(value.read())
         return value
 
-    def convert_binaryfield_value(self, value, field):
+    def convert_binaryfield_value(self, value, expression, context):
         if isinstance(value, Database.LOB):
             value = force_bytes(value.read())
         return value
 
-    def convert_booleanfield_value(self, value, field):
+    def convert_booleanfield_value(self, value, expression, context):
         if value in (1, 0):
             value = bool(value)
         return value
@@ -312,16 +316,16 @@ WHEN (new.%(col_name)s IS NULL)
     # cx_Oracle always returns datetime.datetime objects for
     # DATE and TIMESTAMP columns, but Django wants to see a
     # python datetime.date, .time, or .datetime.
-    def convert_datefield_value(self, value, field):
+    def convert_datefield_value(self, value, expression, context):
         if isinstance(value, Database.Timestamp):
             return value.date()
 
-    def convert_timefield_value(self, value, field):
+    def convert_timefield_value(self, value, expression, context):
         if isinstance(value, Database.Timestamp):
             value = value.time()
         return value
 
-    def convert_uuidfield_value(self, value, field):
+    def convert_uuidfield_value(self, value, expression, context):
         if value is not None:
             value = uuid.UUID(value)
         return value
@@ -573,6 +577,48 @@ class _UninitializedOperatorsDescriptor(object):
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'oracle'
+    # This dictionary maps Field objects to their associated Oracle column
+    # types, as strings. Column-type strings can contain format strings; they'll
+    # be interpolated against the values of Field.__dict__ before being output.
+    # If a column type is set to None, it won't be included in the output.
+    #
+    # Any format strings starting with "qn_" are quoted before being used in the
+    # output (the "qn_" prefix is stripped before the lookup is performed.
+    data_types = {
+        'AutoField': 'NUMBER(11)',
+        'BinaryField': 'BLOB',
+        'BooleanField': 'NUMBER(1)',
+        'CharField': 'NVARCHAR2(%(max_length)s)',
+        'CommaSeparatedIntegerField': 'VARCHAR2(%(max_length)s)',
+        'DateField': 'DATE',
+        'DateTimeField': 'TIMESTAMP',
+        'DecimalField': 'NUMBER(%(max_digits)s, %(decimal_places)s)',
+        'DurationField': 'INTERVAL DAY(9) TO SECOND(6)',
+        'FileField': 'NVARCHAR2(%(max_length)s)',
+        'FilePathField': 'NVARCHAR2(%(max_length)s)',
+        'FloatField': 'DOUBLE PRECISION',
+        'IntegerField': 'NUMBER(11)',
+        'BigIntegerField': 'NUMBER(19)',
+        'IPAddressField': 'VARCHAR2(15)',
+        'GenericIPAddressField': 'VARCHAR2(39)',
+        'NullBooleanField': 'NUMBER(1)',
+        'OneToOneField': 'NUMBER(11)',
+        'PositiveIntegerField': 'NUMBER(11)',
+        'PositiveSmallIntegerField': 'NUMBER(11)',
+        'SlugField': 'NVARCHAR2(%(max_length)s)',
+        'SmallIntegerField': 'NUMBER(11)',
+        'TextField': 'NCLOB',
+        'TimeField': 'TIMESTAMP',
+        'URLField': 'VARCHAR2(%(max_length)s)',
+        'UUIDField': 'VARCHAR2(32)',
+    }
+    data_type_check_constraints = {
+        'BooleanField': '%(qn_column)s IN (0,1)',
+        'NullBooleanField': '(%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL)',
+        'PositiveIntegerField': '%(qn_column)s >= 0',
+        'PositiveSmallIntegerField': '%(qn_column)s >= 0',
+    }
+
     operators = _UninitializedOperatorsDescriptor()
 
     _standard_operators = {
@@ -792,6 +838,11 @@ class OracleParam(object):
                 default_timezone = timezone.get_default_timezone()
                 param = timezone.make_aware(param, default_timezone)
             param = Oracle_datetime.from_datetime(param.astimezone(timezone.utc))
+
+        if isinstance(param, datetime.timedelta):
+            param = duration_string(param)
+            if ' ' not in param:
+                param = '0 ' + param
 
         string_size = 0
         # Oracle doesn't recognize True and False correctly in Python 3.

@@ -705,8 +705,6 @@ available to the included template::
     been evaluated and rendered* - not blocks that can be overridden by, for
     example, an extending template.
 
-See also: :ttag:`{% ssi %}<ssi>`.
-
 .. templatetag:: load
 
 load
@@ -833,13 +831,18 @@ This complex tag is best illustrated by way of an example: say that "places" is 
 ...and you'd like to display a hierarchical list that is ordered by country, like this:
 
 * India
-    * Mumbai: 19,000,000
-    * Calcutta: 15,000,000
+
+  * Mumbai: 19,000,000
+  * Calcutta: 15,000,000
+
 * USA
-    * New York: 20,000,000
-    * Chicago: 7,000,000
+
+  * New York: 20,000,000
+  * Chicago: 7,000,000
+
 * Japan
-    * Tokyo: 33,000,000
+
+  * Tokyo: 33,000,000
 
 
 You can use the ``{% regroup %}`` tag to group the list of cities by country.
@@ -893,15 +896,24 @@ With this input for ``cities``, the example ``{% regroup %}`` template code
 above would result in the following output:
 
 * India
-    * Mumbai: 19,000,000
+
+  * Mumbai: 19,000,000
+
 * USA
-    * New York: 20,000,000
+
+  * New York: 20,000,000
+
 * India
-    * Calcutta: 15,000,000
+
+  * Calcutta: 15,000,000
+
 * USA
-    * Chicago: 7,000,000
+
+  * Chicago: 7,000,000
+
 * Japan
-    * Tokyo: 33,000,000
+
+  * Tokyo: 33,000,000
 
 The easiest solution to this gotcha is to make sure in your view code that the
 data is ordered according to how you want to display it.
@@ -965,6 +977,11 @@ this example, the space around ``Hello`` won't be stripped::
 ssi
 ^^^
 
+.. deprecated:: 1.8
+
+    This tag has been deprecated and will be removed in Django 2.0. Use the
+    :ttag:`include` tag instead.
+
 Outputs the contents of a given file into the page.
 
 Like a simple :ttag:`include` tag, ``{% ssi %}`` includes the contents of
@@ -982,8 +999,8 @@ file are evaluated as template code, within the current context::
     {% ssi '/home/html/ljworld.com/includes/right_generic.html' parsed %}
 
 Note that if you use ``{% ssi %}``, you'll need to define
-:setting:`ALLOWED_INCLUDE_ROOTS` in your Django settings, as a security
-measure.
+``'allowed_include_roots'`` in the :setting:`OPTIONS <TEMPLATES-OPTIONS>` of
+your template engine, as a security measure.
 
 .. note::
     With the :ttag:`ssi` tag and the ``parsed`` parameter
@@ -2057,7 +2074,7 @@ Formats the variable according to the argument, a string formatting specifier.
 This specifier uses Python string formatting syntax, with the exception that
 the leading "%" is dropped.
 
-See http://docs.python.org/library/stdtypes.html#string-formatting-operations
+See https://docs.python.org/library/stdtypes.html#string-formatting-operations
 for documentation of Python string formatting
 
 For example::

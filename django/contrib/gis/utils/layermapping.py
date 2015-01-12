@@ -8,11 +8,11 @@
 """
 import sys
 from decimal import Decimal, InvalidOperation as DecimalInvalidOperation
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import connections, router
 from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.gdal import (CoordTransform, DataSource,
-    OGRException, OGRGeometry, OGRGeomType, SpatialReference)
+    GDALException, OGRGeometry, OGRGeomType, SpatialReference)
 from django.contrib.gis.gdal.field import (
     OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime)
 from django.db import models, transaction
@@ -189,7 +189,7 @@ class LayerMapping(object):
             # for the given field name in the mapping.
             try:
                 model_field = self.model._meta.get_field(field_name)
-            except models.fields.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 raise LayerMapError('Given mapping field "%s" not in given Model fields.' % field_name)
 
             # Getting the string name for the Django field class (e.g., 'PointField').
@@ -207,7 +207,7 @@ class LayerMapping(object):
                         gtype = OGRGeomType(ogr_name + '25D')
                     else:
                         gtype = OGRGeomType(ogr_name)
-                except OGRException:
+                except GDALException:
                     raise LayerMapError('Invalid mapping for GeometryField "%s".' % field_name)
 
                 # Making sure that the OGR Layer's Geometry is compatible.
@@ -231,7 +231,7 @@ class LayerMapping(object):
                         idx = check_ogr_fld(ogr_field)
                         try:
                             rel_model._meta.get_field(rel_name)
-                        except models.fields.FieldDoesNotExist:
+                        except FieldDoesNotExist:
                             raise LayerMapError('ForeignKey mapping field "%s" not in %s fields.' %
                                                 (rel_name, rel_model.__class__.__name__))
                     fields_val = rel_model
@@ -304,7 +304,7 @@ class LayerMapping(object):
                 # Verify OGR geometry.
                 try:
                     val = self.verify_geom(feat.geom, model_field)
-                except OGRException:
+                except GDALException:
                     raise LayerMapError('Could not retrieve geometry from feature.')
             elif isinstance(model_field, models.base.ModelBase):
                 # The related _model_, not a field was passed in -- indicating
@@ -457,11 +457,10 @@ class LayerMapping(object):
 
     def geometry_field(self):
         "Returns the GeometryField instance associated with the geographic column."
-        # Use the `get_field_by_name` on the model's options so that we
+        # Use `get_field()` on the model's options so that we
         # get the correct field instance if there's model inheritance.
         opts = self.model._meta
-        fld, model, direct, m2m = opts.get_field_by_name(self.geom_field)
-        return fld
+        return opts.get_field(self.geom_field)
 
     def make_multi(self, geom_type, model_field):
         """

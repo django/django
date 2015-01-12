@@ -252,6 +252,14 @@ class ConnectionHandler(object):
     def all(self):
         return [self[alias] for alias in self]
 
+    def close_all(self):
+        for alias in self:
+            try:
+                connection = getattr(self._connections, alias)
+            except AttributeError:
+                continue
+            connection.close()
+
 
 class ConnectionRouter(object):
     def __init__(self, routers=None):
@@ -308,7 +316,7 @@ class ConnectionRouter(object):
                     return allow
         return obj1._state.db == obj2._state.db
 
-    def allow_migrate(self, db, model):
+    def allow_migrate(self, db, model, **hints):
         for router in self.routers:
             try:
                 try:
@@ -323,7 +331,7 @@ class ConnectionRouter(object):
                 # If the router doesn't have a method, skip to the next one.
                 pass
             else:
-                allow = method(db, model)
+                allow = method(db, model, **hints)
                 if allow is not None:
                     return allow
         return True

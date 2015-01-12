@@ -34,12 +34,12 @@ class CombinableMixin(object):
     BITOR = '|'
 
     def _combine(self, other, connector, reversed, node=None):
-        if isinstance(other, datetime.timedelta):
-            return DateModifierNode(self, connector, other)
-
         if not hasattr(other, 'resolve_expression'):
             # everything must be resolvable to an expression
-            other = Value(other)
+            if isinstance(other, datetime.timedelta):
+                other = DurationValue(other, output_field=fields.DurationField())
+            else:
+                other = Value(other)
 
         if reversed:
             return Expression(other, connector, self)
@@ -127,7 +127,7 @@ class ExpressionNode(CombinableMixin):
     is_summary = False
 
     def get_db_converters(self, connection):
-        return [self.convert_value]
+        return [self.convert_value] + self.output_field.get_db_converters(connection)
 
     def __init__(self, output_field=None):
         self._output_field = output_field
@@ -240,7 +240,7 @@ class ExpressionNode(CombinableMixin):
                         raise FieldError(
                             "Expression contains mixed types. You must set output_field")
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         """
         Expressions provide their own converters because users have the option
         of manually specifying the output_field which may be a different type
@@ -305,6 +305,8 @@ class ExpressionNode(CombinableMixin):
         return self
 
     def get_group_by_cols(self):
+        if not self.contains_aggregate:
+            return [self]
         cols = []
         for source in self.get_source_expressions():
             cols.extend(source.get_group_by_cols())
@@ -333,6 +335,18 @@ class Expression(ExpressionNode):
         self.lhs, self.rhs = exprs
 
     def as_sql(self, compiler, connection):
+        try:
+            lhs_output = self.lhs.output_field
+        except FieldError:
+            lhs_output = None
+        try:
+            rhs_output = self.rhs.output_field
+        except FieldError:
+            rhs_output = None
+        if (not connection.features.has_native_duration_field and
+                ((lhs_output and lhs_output.get_internal_type() == 'DurationField')
+                or (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
+            return DurationExpression(self.lhs, self.connector, self.rhs).as_sql(compiler, connection)
         expressions = []
         expression_params = []
         sql, params = compiler.compile(self.lhs)
@@ -354,45 +368,31 @@ class Expression(ExpressionNode):
         return c
 
 
-class DateModifierNode(Expression):
-    """
-    Node that implements the following syntax:
-    filter(end_date__gt=F('start_date') + datetime.timedelta(days=3, seconds=200))
-
-    which translates into:
-    POSTGRES:
-        WHERE end_date > (start_date + INTERVAL '3 days 200 seconds')
-
-    MYSQL:
-        WHERE end_date > (start_date + INTERVAL '3 0:0:200:0' DAY_MICROSECOND)
-
-    ORACLE:
-        WHERE end_date > (start_date + INTERVAL '3 00:03:20.000000' DAY(1) TO SECOND(6))
-
-    SQLITE:
-        WHERE end_date > django_format_dtdelta(start_date, "+" "3", "200", "0")
-        (A custom function is used in order to preserve six digits of fractional
-        second information on sqlite, and to format both date and datetime values.)
-
-    Note that microsecond comparisons are not well supported with MySQL, since
-    MySQL does not store microsecond information.
-
-    Only adding and subtracting timedeltas is supported, attempts to use other
-    operations raise a TypeError.
-    """
-    def __init__(self, lhs, connector, rhs):
-        if not isinstance(rhs, datetime.timedelta):
-            raise TypeError('rhs must be a timedelta.')
-        if connector not in (self.ADD, self.SUB):
-            raise TypeError('Connector must be + or -, not %s' % connector)
-        super(DateModifierNode, self).__init__(lhs, connector, Value(rhs))
+class DurationExpression(Expression):
+    def compile(self, side, compiler, connection):
+        if not isinstance(side, DurationValue):
+            try:
+                output = side.output_field
+            except FieldError:
+                pass
+            if output.get_internal_type() == 'DurationField':
+                sql, params = compiler.compile(side)
+                return connection.ops.format_for_duration_arithmetic(sql), params
+        return compiler.compile(side)
 
     def as_sql(self, compiler, connection):
-        timedelta = self.rhs.value
-        sql, params = compiler.compile(self.lhs)
-        if (timedelta.days == timedelta.seconds == timedelta.microseconds == 0):
-            return sql, params
-        return connection.ops.date_interval_sql(sql, self.connector, timedelta), params
+        expressions = []
+        expression_params = []
+        sql, params = self.compile(self.lhs, compiler, connection)
+        expressions.append(sql)
+        expression_params.extend(params)
+        sql, params = self.compile(self.rhs, compiler, connection)
+        expressions.append(sql)
+        expression_params.extend(params)
+        # order of precedence
+        expression_wrapper = '(%s)'
+        sql = connection.ops.combine_duration_expression(self.connector, expressions)
+        return expression_wrapper % sql, expression_params
 
 
 class F(CombinableMixin):
@@ -485,7 +485,54 @@ class Value(ExpressionNode):
         self.value = value
 
     def as_sql(self, compiler, connection):
+        if self.value is None:
+            # cx_Oracle does not always convert None to the appropriate
+            # NULL type (like in case expressions using numbers), so we
+            # use a literal SQL NULL
+            return 'NULL', []
         return '%s', [self.value]
+
+    def get_group_by_cols(self):
+        return []
+
+
+class DurationValue(Value):
+    def as_sql(self, compiler, connection):
+        if (connection.features.has_native_duration_field and
+                connection.features.driver_supports_timedelta_args):
+            return super(DurationValue, self).as_sql(compiler, connection)
+        return connection.ops.date_interval_sql(self.value)
+
+
+class RawSQL(ExpressionNode):
+    def __init__(self, sql, params, output_field=None):
+        if output_field is None:
+            output_field = fields.Field()
+        self.sql, self.params = sql, params
+        super(RawSQL, self).__init__(output_field=output_field)
+
+    def as_sql(self, compiler, connection):
+        return '(%s)' % self.sql, self.params
+
+    def get_group_by_cols(self):
+        return [self]
+
+
+class Random(ExpressionNode):
+    def __init__(self):
+        super(Random, self).__init__(output_field=fields.FloatField())
+
+    def as_sql(self, compiler, connection):
+        return connection.ops.random_function_sql(), []
+
+
+class ColIndexRef(ExpressionNode):
+    def __init__(self, idx):
+        self.idx = idx
+        super(ColIndexRef, self).__init__()
+
+    def as_sql(self, compiler, connection):
+        return str(self.idx), []
 
 
 class Col(ExpressionNode):
@@ -503,7 +550,10 @@ class Col(ExpressionNode):
         return self.__class__(relabels.get(self.alias, self.alias), self.target, self.output_field)
 
     def get_group_by_cols(self):
-        return [(self.alias, self.target.column)]
+        return [self]
+
+    def get_db_converters(self, connection):
+        return self.output_field.get_db_converters(connection)
 
 
 class Ref(ExpressionNode):
@@ -526,10 +576,10 @@ class Ref(ExpressionNode):
         return self
 
     def as_sql(self, compiler, connection):
-        return "%s" % compiler.quote_name_unless_alias(self.refs), []
+        return "%s" % connection.ops.quote_name(self.refs), []
 
     def get_group_by_cols(self):
-        return [(None, self.refs)]
+        return [self]
 
 
 class Date(ExpressionNode):
@@ -570,7 +620,7 @@ class Date(ExpressionNode):
         copy.lookup_type = self.lookup_type
         return copy
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         if isinstance(value, datetime.datetime):
             value = value.date()
         return value
@@ -618,7 +668,7 @@ class DateTime(ExpressionNode):
         copy.tzname = self.tzname
         return copy
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         if settings.USE_TZ:
             if value is None:
                 raise ValueError(

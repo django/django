@@ -175,6 +175,7 @@ Dreamhost
 Dreamweaver
 drilldown
 dropdown
+dropdowns
 drupal
 dumpdata
 Dunck
@@ -233,6 +234,9 @@ geolocalized
 geolocated
 geolocation
 geoquerysets
+georeference
+georeferenced
+georeferencing
 geospatial
 Geospatial
 Gettext
@@ -306,6 +310,7 @@ irc
 iregex
 iriencode
 ise
+isempty
 isnull
 iso
 istartswith
@@ -354,6 +359,7 @@ localhost
 localizable
 localtime
 Loïc
+loopback
 lorem
 lt
 lte
@@ -497,6 +503,7 @@ queryset
 querysets
 Querysets
 querystring
+queueing
 Quickstart
 quoteless
 Radziej
@@ -510,9 +517,11 @@ refactored
 refactorings
 refactors
 referer
+reflow
 regex
 regexes
 reimplement
+reindent
 reindex
 releasers
 removetags
@@ -531,6 +540,7 @@ Roald
 rss
 runfcgi
 runserver
+SaaS
 safeseq
 Sandvik
 savepoint
@@ -556,6 +566,7 @@ Shai
 shapefile
 shapefiles
 sharding
+showmigrations
 sid
 simultaneously
 sitemap
@@ -612,6 +623,7 @@ subpackages
 subqueries
 subquery
 subselect
+substr
 subtemplate
 subtemplates
 subviews
@@ -689,6 +701,7 @@ unmigrated
 unparseable
 unpickle
 unpickled
+unpickling
 unpythonic
 unregistration
 unrendered

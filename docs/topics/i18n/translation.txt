@@ -28,8 +28,8 @@ bit of i18n-related overhead in certain places of the framework. If you don't
 use internationalization, you should take the two seconds to set
 :setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
 make some optimizations so as not to load the internationalization machinery.
-You'll probably also want to remove ``'django.core.context_processors.i18n'``
-from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+You'll probably also want to remove ``'django.template.context_processors.i18n'``
+from the ``'context_processors'`` option of your :setting:`TEMPLATES` setting.
 
 .. note::
 
@@ -529,7 +529,7 @@ Internationalization: in template code
 
 .. highlightlang:: html+django
 
-Translations in :doc:`Django templates </topics/templates>` uses two template
+Translations in :doc:`Django templates </ref/templates/language>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
 access to these tags, put ``{% load i18n %}`` toward the top of your template.
 As with all template tags, this tag needs to be loaded in all templates which
@@ -1428,8 +1428,7 @@ files of this type, but if you want to create your own message files, or want to
 test or compile a changed message file, you will need the ``gettext`` utilities:
 
 * Download the following zip files from the GNOME servers
-  http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/ or from one
-  of its mirrors_
+  https://download.gnome.org/binaries/win32/dependencies/
 
   * ``gettext-runtime-X.zip``
   * ``gettext-tools-X.zip``
@@ -1445,8 +1444,6 @@ test or compile a changed message file, you will need the ``gettext`` utilities:
   * In the ``System variables`` list, click ``Path``, click ``Edit``.
   * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
     ``Variable value`` field.
-
-.. _mirrors: http://ftp.gnome.org/pub/GNOME/MIRRORS
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
@@ -1509,10 +1506,10 @@ As a convenience, Django comes with a view, :func:`django.views.i18n.set_languag
 that sets a user's language preference and redirects to a given URL or, by default,
 back to the previous page.
 
-Make sure that the following item is in your
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` list in your settings file::
+Make sure that the following context processor is enabled in the
+:setting:`TEMPLATES` setting in your settings file::
 
-    'django.core.context_processors.i18n'
+    'django.template.context_processors.i18n'
 
 Activate this view by adding the following line to your URLconf::
 

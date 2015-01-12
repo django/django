@@ -1,5 +1,6 @@
 from collections import deque
 import datetime
+import decimal
 import time
 import warnings
 
@@ -18,6 +19,7 @@ from django.db.backends.signals import connection_created
 from django.db.backends import utils
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper, ProgrammingError
+from django.utils.dateparse import parse_duration
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.functional import cached_property
 from django.utils import six
@@ -37,6 +39,12 @@ class BaseDatabaseWrapper(object):
     """
     Represents a database connection.
     """
+    # Mapping of Field objects to their column types.
+    data_types = {}
+    # Mapping of Field objects to their SQL suffix such as AUTOINCREMENT.
+    data_types_suffix = {}
+    # Mapping of Field objects to their SQL for CHECK constraints.
+    data_type_check_constraints = {}
     ops = None
     vendor = 'unknown'
     SchemaEditorClass = None
@@ -573,7 +581,14 @@ class BaseDatabaseFeatures(object):
     supports_subqueries_in_group_by = True
     supports_bitwise_or = True
 
-    supports_binary_field = True
+    # Is there a true datatype for timedeltas?
+    has_native_duration_field = False
+
+    # Does the database driver support timedeltas as arguments?
+    # This is only relevant when there is a native duration field.
+    # Specifically, there is a bug with cx_Oracle:
+    # https://bitbucket.org/anthony_tuininga/cx_oracle/issue/7/
+    driver_supports_timedelta_args = False
 
     # Do time/datetime fields have microsecond precision?
     supports_microsecond_precision = True
@@ -1245,13 +1260,19 @@ class BaseDatabaseOperations(object):
             second = timezone.make_aware(second, tz)
         return [first, second]
 
-    def get_db_converters(self, internal_type):
+    def get_db_converters(self, expression):
         """Get a list of functions needed to convert field data.
 
         Some field types on some backends do not provide data in the correct
         format, this is the hook for coverter functions.
         """
         return []
+
+    def convert_durationfield_value(self, value, expression, context):
+        if value is not None:
+            value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
+            value = parse_duration(value)
+        return value
 
     def check_aggregate_support(self, aggregate_func):
         """Check that the backend supports the provided aggregate
@@ -1271,6 +1292,9 @@ class BaseDatabaseOperations(object):
         """
         conn = ' %s ' % connector
         return conn.join(sub_expressions)
+
+    def combine_duration_expression(self, connector, sub_expressions):
+        return self.combine_expression(connector, sub_expressions)
 
     def modify_insert_params(self, placeholders, params):
         """Allow modification of insert parameters. Needed for Oracle Spatial

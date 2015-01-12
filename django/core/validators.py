@@ -66,14 +66,25 @@ class RegexValidator(object):
 
 @deconstructible
 class URLValidator(RegexValidator):
+    ul = '\u00a1-\uffff'  # unicode letters range (must be a unicode string, not a raw string)
+
+    # IP patterns
+    ipv4_re = r'(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'
+    ipv6_re = r'\[[0-9a-f:\.]+\]'  # (simple regex, validated later)
+
+    # Host patterns
+    hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]*[a-z' + ul + r'0-9])?'
+    domain_re = r'(?:\.[a-z' + ul + r'0-9]+(?:[a-z' + ul + r'0-9-]*[a-z' + ul + r'0-9]+)*)*'
+    tld_re = r'\.[a-z' + ul + r']{2,}\.?'
+    host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
+
     regex = re.compile(
         r'^(?:[a-z0-9\.\-]*)://'  # scheme is validated separately
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}(?<!-)\.?)|'  # domain...
-        r'localhost|'  # localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
-        r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
-        r'(?::\d+)?'  # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+        r'(?:\S+(?::\S*)?@)?'  # user:pass authentication
+        r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
+        r'(?::\d{2,5})?'  # port
+        r'(?:[/?#][^\s]*)?'  # resource path
+        r'$', re.IGNORECASE)
     message = _('Enter a valid URL.')
     schemes = ['http', 'https', 'ftp', 'ftps']
 
@@ -105,6 +116,14 @@ class URLValidator(RegexValidator):
             else:
                 raise
         else:
+            # Now verify IPv6 in the netloc part
+            host_match = re.search(r'^\[(.+)\](?::\d{2,5})?$', urlsplit(value).netloc)
+            if host_match:
+                potential_ip = host_match.groups()[0]
+                try:
+                    validate_ipv6_address(potential_ip)
+                except ValidationError:
+                    raise ValidationError(self.message, code=self.code)
             url = value
 
 

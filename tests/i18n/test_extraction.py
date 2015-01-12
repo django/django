@@ -12,9 +12,10 @@ import warnings
 from django.conf import settings
 from django.core import management
 from django.core.management import execute_from_command_line
+from django.core.management.base import CommandError
+from django.core.management.commands.makemessages import Command as MakeMessagesCommand
 from django.core.management.utils import find_command
-from django.test import SimpleTestCase
-from django.test import override_settings
+from django.test import mock, override_settings, SimpleTestCase
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils.encoding import force_text
 from django.utils._os import upath
@@ -66,14 +67,21 @@ class ExtractorTests(SimpleTestCase):
             po_contents = fp.read()
         return output, po_contents
 
-    def assertMsgId(self, msgid, s, use_quotes=True):
+    def _assertPoKeyword(self, keyword, expected_value, haystack, use_quotes=True):
         q = '"'
         if use_quotes:
-            msgid = '"%s"' % msgid
+            expected_value = '"%s"' % expected_value
             q = "'"
-        needle = 'msgid %s' % msgid
-        msgid = re.escape(msgid)
-        return self.assertTrue(re.search('^msgid %s' % msgid, s, re.MULTILINE), 'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q})
+        needle = '%s %s' % (keyword, expected_value)
+        expected_value = re.escape(expected_value)
+        return self.assertTrue(re.search('^%s %s' % (keyword, expected_value), haystack, re.MULTILINE),
+                               'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q})
+
+    def assertMsgId(self, msgid, haystack, use_quotes=True):
+        return self._assertPoKeyword('msgid', msgid, haystack, use_quotes=use_quotes)
+
+    def assertMsgStr(self, msgstr, haystack, use_quotes=True):
+        return self._assertPoKeyword('msgstr', msgstr, haystack, use_quotes=use_quotes)
 
     def assertNotMsgId(self, msgid, s, use_quotes=True):
         if use_quotes:
@@ -205,8 +213,7 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_force_en_us_locale(self):
         """Value of locale-munging option used by the command is the right one"""
-        from django.core.management.commands.makemessages import Command
-        self.assertTrue(Command.leave_locale_alone)
+        self.assertTrue(MakeMessagesCommand.leave_locale_alone)
 
     def test_extraction_error(self):
         os.chdir(self.test_dir)
@@ -347,8 +354,7 @@ class BasicExtractorTests(ExtractorTests):
         """
         Test that find_files only discover files having the proper extensions.
         """
-        from django.core.management.commands.makemessages import Command
-        cmd = Command()
+        cmd = MakeMessagesCommand()
         cmd.ignore_patterns = ['CVS', '.*', '*~', '*.pyc']
         cmd.symlinks = False
         cmd.domain = 'django'
@@ -365,6 +371,44 @@ class BasicExtractorTests(ExtractorTests):
         found_files = cmd.find_files(self.test_dir)
         found_exts = set([os.path.splitext(tfile.file)[1] for tfile in found_files])
         self.assertEqual(found_exts.difference({'.js'}), set())
+
+    @mock.patch('django.core.management.commands.makemessages.popen_wrapper')
+    def test_makemessages_gettext_version(self, mocked_popen_wrapper):
+        # "Normal" output:
+        mocked_popen_wrapper.return_value = (
+            "xgettext (GNU gettext-tools) 0.18.1\n"
+            "Copyright (C) 1995-1998, 2000-2010 Free Software Foundation, Inc.\n"
+            "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+            "This is free software: you are free to change and redistribute it.\n"
+            "There is NO WARRANTY, to the extent permitted by law.\n"
+            "Written by Ulrich Drepper.\n", '', 0)
+        cmd = MakeMessagesCommand()
+        self.assertEqual(cmd.gettext_version, (0, 18, 1))
+
+        # Version number with only 2 parts (#23788)
+        mocked_popen_wrapper.return_value = (
+            "xgettext (GNU gettext-tools) 0.17\n", '', 0)
+        cmd = MakeMessagesCommand()
+        self.assertEqual(cmd.gettext_version, (0, 17))
+
+        # Bad version output
+        mocked_popen_wrapper.return_value = (
+            "any other return value\n", '', 0)
+        cmd = MakeMessagesCommand()
+        with six.assertRaisesRegex(self, CommandError, "Unable to get gettext version. Is it installed?"):
+            cmd.gettext_version
+
+    def test_po_file_encoding_when_updating(self):
+        """Update of PO file doesn't corrupt it with non-UTF-8 encoding on Python3+Windows (#23271)"""
+        BR_PO_BASE = 'locale/pt_BR/LC_MESSAGES/django'
+        os.chdir(self.test_dir)
+        shutil.copyfile(BR_PO_BASE + '.pristine', BR_PO_BASE + '.po')
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'locale', 'pt_BR', 'LC_MESSAGES', 'django.po'))
+        management.call_command('makemessages', locale=['pt_BR'], verbosity=0)
+        self.assertTrue(os.path.exists(BR_PO_BASE + '.po'))
+        with io.open(BR_PO_BASE + '.po', 'r', encoding='utf-8') as fp:
+            po_contents = force_text(fp.read())
+            self.assertMsgStr("Größe", po_contents)
 
 
 class JavascriptExtractorTests(ExtractorTests):

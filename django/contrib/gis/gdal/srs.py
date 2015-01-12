@@ -34,7 +34,7 @@ from django.contrib.gis.gdal.error import SRSException
 from django.contrib.gis.gdal.prototypes import srs as capi
 
 from django.utils import six
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_text
 
 
 #### Spatial Reference class. ####
@@ -46,16 +46,19 @@ class SpatialReference(GDALBase):
     """
 
     #### Python 'magic' routines ####
-    def __init__(self, srs_input=''):
+    def __init__(self, srs_input='', srs_type='user'):
         """
         Creates a GDAL OSR Spatial Reference object from the given input.
         The input may be string of OGC Well Known Text (WKT), an integer
         EPSG code, a PROJ.4 string, and/or a projection "well known" shorthand
         string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
         """
-        srs_type = 'user'
 
-        if isinstance(srs_input, six.string_types):
+        if srs_type == 'wkt':
+            self.ptr = capi.new_srs(c_char_p(b''))
+            self.import_wkt(srs_input)
+            return
+        elif isinstance(srs_input, six.string_types):
             # Encoding to ASCII if unicode passed in.
             if isinstance(srs_input, six.text_type):
                 srs_input = srs_input.encode('ascii')
@@ -232,7 +235,7 @@ class SpatialReference(GDALBase):
         elif self.geographic:
             units, name = capi.angular_units(self.ptr, byref(c_char_p()))
         if name is not None:
-            name.decode()
+            name = force_text(name)
         return (units, name)
 
     #### Spheroid/Ellipsoid Properties ####

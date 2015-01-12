@@ -19,8 +19,8 @@ from django.conf import settings
 from django import forms
 from django.core import exceptions, validators, checks
 from django.utils.datastructures import DictWrapper
-from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.dateparse import parse_date, parse_datetime, parse_time, parse_duration
+from django.utils.duration import duration_string
 from django.utils.functional import cached_property, curry, total_ordering, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
@@ -31,13 +31,18 @@ from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 from django.utils.itercompat import is_iterable
 
+# When the _meta object was formalized, this exception was moved to
+# django.core.exceptions. It is retained here for backwards compatibility
+# purposes.
+from django.core.exceptions import FieldDoesNotExist  # NOQA
+
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode
 __all__ = [str(x) for x in (
     'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
     'BooleanField', 'CharField', 'CommaSeparatedIntegerField', 'DateField',
-    'DateTimeField', 'DecimalField', 'EmailField', 'Empty', 'Field',
-    'FieldDoesNotExist', 'FilePathField', 'FloatField',
+    'DateTimeField', 'DecimalField', 'DurationField', 'EmailField', 'Empty',
+    'Field', 'FieldDoesNotExist', 'FilePathField', 'FloatField',
     'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
     'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
     'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
@@ -58,11 +63,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 
 def _load_field(app_label, model_name, field_name):
-    return apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
-
-
-class FieldDoesNotExist(Exception):
-    pass
+    return apps.get_model(app_label, model_name)._meta.get_field(field_name)
 
 
 # A guide to Field parameters:
@@ -114,6 +115,17 @@ class Field(RegisterLookupMixin):
                              "%(date_field_label)s %(lookup_type)s."),
     }
     class_lookups = default_lookups.copy()
+    system_check_deprecated_details = None
+    system_check_removed_details = None
+
+    # Field flags
+    hidden = False
+
+    many_to_many = None
+    many_to_one = None
+    one_to_many = None
+    one_to_one = None
+    related_model = None
 
     # Generic field type description, usually overridden by subclasses
     def _description(self):
@@ -136,6 +148,7 @@ class Field(RegisterLookupMixin):
         self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
         self.rel = rel
+        self.is_relation = self.rel is not None
         self.default = default
         self.editable = editable
         self.serialize = serialize
@@ -192,6 +205,7 @@ class Field(RegisterLookupMixin):
         errors.extend(self._check_db_index())
         errors.extend(self._check_null_allowed_for_primary_keys())
         errors.extend(self._check_backend_specific_checks(**kwargs))
+        errors.extend(self._check_deprecation_details())
         return errors
 
     def _check_field_name(self):
@@ -290,6 +304,56 @@ class Field(RegisterLookupMixin):
 
     def _check_backend_specific_checks(self, **kwargs):
         return connection.validation.check_field(self, **kwargs)
+
+    def _check_deprecation_details(self):
+        if self.system_check_removed_details is not None:
+            return [
+                checks.Error(
+                    self.system_check_removed_details.get(
+                        'msg',
+                        '%s has been removed except for support in historical '
+                        'migrations.' % self.__class__.__name__
+                    ),
+                    hint=self.system_check_removed_details.get('hint'),
+                    obj=self,
+                    id=self.system_check_removed_details.get('id', 'fields.EXXX'),
+                )
+            ]
+        elif self.system_check_deprecated_details is not None:
+            return [
+                checks.Warning(
+                    self.system_check_deprecated_details.get(
+                        'msg',
+                        '%s has been deprecated.' % self.__class__.__name__
+                    ),
+                    hint=self.system_check_deprecated_details.get('hint'),
+                    obj=self,
+                    id=self.system_check_deprecated_details.get('id', 'fields.WXXX'),
+                )
+            ]
+        return []
+
+    def get_col(self, alias, source=None):
+        if source is None:
+            source = self
+        if alias != self.model._meta.db_table or source != self:
+            from django.db.models.expressions import Col
+            return Col(alias, self, source)
+        else:
+            return self.cached_col
+
+    @cached_property
+    def cached_col(self):
+        from django.db.models.expressions import Col
+        return Col(self.model._meta.db_table, self)
+
+    def select_format(self, compiler, sql, params):
+        """
+        Custom format for select clauses. For example, GIS columns need to be
+        selected as AsText(table.col) on MySQL as the table.col data can't be used
+        by Django.
+        """
+        return sql, params
 
     def deconstruct(self):
         """
@@ -536,7 +600,7 @@ class Field(RegisterLookupMixin):
         # exactly which wacky database column type you want to use.
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         try:
-            return connection.creation.data_types[self.get_internal_type()] % data
+            return connection.data_types[self.get_internal_type()] % data
         except KeyError:
             return None
 
@@ -549,7 +613,7 @@ class Field(RegisterLookupMixin):
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         type_string = self.db_type(connection)
         try:
-            check_string = connection.creation.data_type_check_constraints[self.get_internal_type()] % data
+            check_string = connection.data_type_check_constraints[self.get_internal_type()] % data
         except KeyError:
             check_string = None
         return {
@@ -558,7 +622,7 @@ class Field(RegisterLookupMixin):
         }
 
     def db_type_suffix(self, connection):
-        return connection.creation.data_types_suffix.get(self.get_internal_type())
+        return connection.data_types_suffix.get(self.get_internal_type())
 
     def get_db_converters(self, connection):
         if hasattr(self, 'from_db_value'):
@@ -573,6 +637,7 @@ class Field(RegisterLookupMixin):
         if not self.name:
             self.name = name
         self.attname, self.column = self.get_attname_column()
+        self.concrete = self.column is not None
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 
@@ -580,7 +645,7 @@ class Field(RegisterLookupMixin):
         self.set_attributes_from_name(name)
         self.model = cls
         if virtual_only:
-            cls._meta.add_virtual_field(self)
+            cls._meta.add_field(self, virtual=True)
         else:
             cls._meta.add_field(self)
         if self.choices:
@@ -681,7 +746,9 @@ class Field(RegisterLookupMixin):
             return QueryWrapper(('(%s)' % sql), params)
 
         if lookup_type in ('month', 'day', 'week_day', 'hour', 'minute',
-                           'second', 'search', 'regex', 'iregex'):
+                           'second', 'search', 'regex', 'iregex', 'contains',
+                           'icontains', 'iexact', 'startswith', 'endswith',
+                           'istartswith', 'iendswith'):
             return [value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
             return [self.get_db_prep_value(value, connection=connection,
@@ -689,14 +756,6 @@ class Field(RegisterLookupMixin):
         elif lookup_type in ('range', 'in'):
             return [self.get_db_prep_value(v, connection=connection,
                                            prepared=prepared) for v in value]
-        elif lookup_type in ('contains', 'icontains'):
-            return ["%%%s%%" % connection.ops.prep_for_like_query(value)]
-        elif lookup_type == 'iexact':
-            return [connection.ops.prep_for_iexact_query(value)]
-        elif lookup_type in ('startswith', 'istartswith'):
-            return ["%s%%" % connection.ops.prep_for_like_query(value)]
-        elif lookup_type in ('endswith', 'iendswith'):
-            return ["%%%s" % connection.ops.prep_for_like_query(value)]
         elif lookup_type == 'isnull':
             return []
         elif lookup_type == 'year':
@@ -780,9 +839,6 @@ class Field(RegisterLookupMixin):
         This is used by the serialization framework.
         """
         return smart_text(self._get_val_from_obj(obj))
-
-    def bind(self, fieldmapping, original, bound_field_class):
-        return bound_field_class(self, fieldmapping, original)
 
     def _get_choices(self):
         if isinstance(self._choices, collections.Iterator):
@@ -1573,6 +1629,59 @@ class DecimalField(Field):
         return super(DecimalField, self).formfield(**defaults)
 
 
+class DurationField(Field):
+    """Stores timedelta objects.
+
+    Uses interval on postgres, INVERAL DAY TO SECOND on Oracle, and bigint of
+    microseconds on other databases.
+    """
+    empty_strings_allowed = False
+    default_error_messages = {
+        'invalid': _("'%(value)s' value has an invalid format. It must be in "
+                     "[DD] [HH:[MM:]]ss[.uuuuuu] format.")
+    }
+    description = _("Duration")
+
+    def get_internal_type(self):
+        return "DurationField"
+
+    def to_python(self, value):
+        if value is None:
+            return value
+        if isinstance(value, datetime.timedelta):
+            return value
+        try:
+            parsed = parse_duration(value)
+        except ValueError:
+            pass
+        else:
+            if parsed is not None:
+                return parsed
+
+        raise exceptions.ValidationError(
+            self.error_messages['invalid'],
+            code='invalid',
+            params={'value': value},
+        )
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if connection.features.has_native_duration_field:
+            return value
+        if value is None:
+            return None
+        return value.total_seconds() * 1000000
+
+    def get_db_converters(self, connection):
+        converters = []
+        if not connection.features.has_native_duration_field:
+            converters.append(connection.ops.convert_durationfield_value)
+        return converters + super(DurationField, self).get_db_converters(connection)
+
+    def value_to_string(self, obj):
+        val = self._get_val_from_obj(obj)
+        return '' if val is None else duration_string(val)
+
+
 class EmailField(CharField):
     default_validators = [validators.validate_email]
     description = _("Email address")
@@ -1785,10 +1894,16 @@ class BigIntegerField(IntegerField):
 class IPAddressField(Field):
     empty_strings_allowed = False
     description = _("IPv4 address")
+    system_check_deprecated_details = {
+        'msg': (
+            'IPAddressField has been deprecated. Support for it (except in '
+            'historical migrations) will be removed in Django 1.9.'
+        ),
+        'hint': 'Use GenericIPAddressField instead.',
+        'id': 'fields.W900',
+    }
 
     def __init__(self, *args, **kwargs):
-        warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
-                      RemovedInDjango19Warning)
         kwargs['max_length'] = 15
         super(IPAddressField, self).__init__(*args, **kwargs)
 
@@ -1813,7 +1928,7 @@ class IPAddressField(Field):
 
 
 class GenericIPAddressField(Field):
-    empty_strings_allowed = True
+    empty_strings_allowed = False
     description = _("IP address")
     default_error_messages = {}
 

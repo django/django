@@ -4,10 +4,11 @@ from __future__ import unicode_literals
 from datetime import datetime
 import os
 from unittest import TestCase
-import warnings
 
+from django.test import ignore_warnings
 from django.utils import html, safestring
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 
 
@@ -120,14 +121,13 @@ class TestUtilsHtml(TestCase):
         for value, output in items:
             self.check_output(f, value, output)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_strip_entities(self):
         f = html.strip_entities
         # Strings that should come out untouched.
         values = ("&", "&a", "&a", "a&#a")
         for value in values:
-            with warnings.catch_warnings(record=True):
-                warnings.simplefilter("always")
-                self.check_output(f, value)
+            self.check_output(f, value)
         # Valid entities that should be stripped from the patterns.
         entities = ("&#1;", "&#12;", "&a;", "&fdasdfasdfasdf;")
         patterns = (
@@ -138,9 +138,7 @@ class TestUtilsHtml(TestCase):
         )
         for entity in entities:
             for in_pattern, output in patterns:
-                with warnings.catch_warnings(record=True):
-                    warnings.simplefilter("always")
-                    self.check_output(f, in_pattern % {'entity': entity}, output)
+                self.check_output(f, in_pattern % {'entity': entity}, output)
 
     def test_escapejs(self):
         f = html.escapejs
@@ -154,6 +152,7 @@ class TestUtilsHtml(TestCase):
         for value, output in items:
             self.check_output(f, value, output)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_remove_tags(self):
         f = html.remove_tags
         items = (
@@ -161,9 +160,7 @@ class TestUtilsHtml(TestCase):
             ("<a>x</a> <p><b>y</b></p>", "a b", "x <p>y</p>"),
         )
         for value, tags, output in items:
-            with warnings.catch_warnings(record=True):
-                warnings.simplefilter("always")
-                self.assertEqual(f(value, tags), output)
+            self.assertEqual(f(value, tags), output)
 
     def test_smart_urlquote(self):
         quote = html.smart_urlquote
