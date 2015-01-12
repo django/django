@@ -28,7 +28,7 @@ __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
     'save_instance', 'ModelChoiceField', 'ModelMultipleChoiceField',
     'ALL_FIELDS', 'BaseModelFormSet', 'modelformset_factory',
-    'BaseInlineFormSet', 'inlineformset_factory',
+    'BaseInlineFormSet', 'inlineformset_factory', 'modelform_factory',
 )
 
 ALL_FIELDS = '__all__'
