@@ -16,8 +16,10 @@ from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.db.models import Min, Max
 from django.http import HttpRequest
-from django.template import Context, RequestContext, Template, TemplateSyntaxError
-from django.test import TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature
+from django.template import (
+    context_processors, Context, RequestContext, Template, TemplateSyntaxError)
+from django.test import (
+    TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature)
 from django.test.utils import requires_tz_support
 from django.utils import six
 from django.utils import timezone
@@ -935,8 +937,10 @@ class TemplateTests(TestCase):
         Test the django.template.context_processors.tz template context processor.
         """
         tpl = Template("{{ TIME_ZONE }}")
-        self.assertEqual(tpl.render(Context()), "")
-        self.assertEqual(tpl.render(RequestContext(HttpRequest())), "Africa/Nairobi" if pytz else "EAT")
+        context = Context()
+        self.assertEqual(tpl.render(context), "")
+        request_context = RequestContext(HttpRequest(), processors=[context_processors.tz])
+        self.assertEqual(tpl.render(request_context), "Africa/Nairobi" if pytz else "EAT")
 
     @requires_tz_support
     def test_date_and_time_template_filters(self):
