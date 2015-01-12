@@ -208,6 +208,7 @@ Include a form in ``template.html`` that will ``POST`` to this view:
 .. code-block:: html+django
 
     {% load tz %}
+    {% get_current_timezone as TIME_ZONE %}
     <form action="{% url 'set_timezone' %}" method="POST">
         {% csrf_token %}
         <label for="timezone">Time zone:</label>
@@ -311,15 +312,14 @@ time zone is unset, the default time zone applies.
 get_current_timezone
 ~~~~~~~~~~~~~~~~~~~~
 
-When the ``django.template.context_processors.tz`` context processor is
-enabled -- by default, it is -- each :class:`~django.template.RequestContext`
-contains a ``TIME_ZONE`` variable that provides the name of the current time
-zone.
-
-If you don't use a :class:`~django.template.RequestContext`, you can obtain
-this value with the ``get_current_timezone`` tag::
+You can get the name of the current time zone using the
+``get_current_timezone`` tag::
 
     {% get_current_timezone as TIME_ZONE %}
+
+If you enable the ``django.template.context_processors.tz`` context processor,
+each :class:`~django.template.RequestContext` will contain a ``TIME_ZONE``
+variable with the value of ``get_current_timezone()``.
 
 Template filters
 ----------------

@@ -554,12 +554,9 @@ settings file, the default template engine contains the following context
 processors::
 
     [
-        'django.contrib.auth.context_processors.auth',
         'django.template.context_processors.debug',
-        'django.template.context_processors.i18n',
-        'django.template.context_processors.media',
-        'django.template.context_processors.static',
-        'django.template.context_processors.tz',
+        'django.template.context_processors.request',
+        'django.contrib.auth.context_processors.auth',
         'django.contrib.messages.context_processors.messages',
     ]
 
@@ -625,7 +622,7 @@ Built-in template context processors
 Context processors
 ------------------
 
-Here's what each of the default processors does:
+Here's what each of the built-in processors does:
 
 django.contrib.auth.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -695,8 +692,7 @@ django.template.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
-``request``, which is the current :class:`~django.http.HttpRequest`. Note that
-this processor is not enabled by default; you'll have to activate it.
+``request``, which is the current :class:`~django.http.HttpRequest`.
 
 django.contrib.messages.context_processors.messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
