@@ -163,7 +163,12 @@ Templates
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Unless :attr:`HttpResponse.reason_phrase
+  <django.http.HttpResponse.reason_phrase>` is explicitly set, it now is
+  determined by the current value of :attr:`HttpResponse.status_code
+  <django.http.HttpResponse.status_code>`. Modifying the value of
+  ``status_code`` outside of the constructor will also modify the value of
+  ``reason_phrase``.
 
 Tests
 ^^^^^
