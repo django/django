@@ -2,7 +2,7 @@ import os
 import sys
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.creation import BaseDatabaseCreation
+from django.db.backends.base.creation import BaseDatabaseCreation
 from django.utils.six.moves import input
 
 

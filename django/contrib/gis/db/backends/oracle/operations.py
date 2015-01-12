@@ -9,12 +9,13 @@
 """
 import re
 
-from django.db.backends.oracle.base import DatabaseOperations, Database
-from django.contrib.gis.db.backends.base import BaseSpatialOperations
+from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
+from django.db.backends.oracle.base import Database
+from django.db.backends.oracle.operations import DatabaseOperations
 from django.utils import six
 
 

@@ -1,4 +1,6 @@
-from django.db.backends.schema import BaseDatabaseSchemaEditor
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+
+import psycopg2
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -10,8 +12,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_text_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s text_pattern_ops)%(extra)s"
 
     def quote_value(self, value):
-        # Inner import so backend fails nicely if it's not present
-        import psycopg2
         return psycopg2.extensions.adapt(value)
 
     def _model_indexes_sql(self, model):

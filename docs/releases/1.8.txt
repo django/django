@@ -942,6 +942,19 @@ Database backend API
 The following changes to the database backend API are documented to assist
 those writing third-party backends in updating their code:
 
+* ``BaseDatabaseXXX`` classes have been moved to ``django.db.backends.base``.
+  Please import them from the new locations::
+
+    from django.db.backends.base.base import BaseDatabaseWrapper
+    from django.db.backends.base.client import BaseDatabaseClient
+    from django.db.backends.base.creation import BaseDatabaseCreation
+    from django.db.backends.base.features import BaseDatabaseFeatures
+    from django.db.backends.base.introspection import BaseDatabaseIntrospection
+    from django.db.backends.base.introspection import FieldInfo, TableInfo
+    from django.db.backends.base.operations import BaseDatabaseOperations
+    from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+    from django.db.backends.base.validation import BaseDatabaseValidation
+
 * The ``data_types``, ``data_types_suffix``, and
   ``data_type_check_constraints`` attributes have moved from the
   ``DatabaseCreation`` class to ``DatabaseWrapper``.

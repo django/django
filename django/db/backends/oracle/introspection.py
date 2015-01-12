@@ -2,7 +2,9 @@ import re
 
 import cx_Oracle
 
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
+from django.db.backends.base.introspection import (
+    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+)
 from django.utils.encoding import force_text
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
