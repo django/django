@@ -124,6 +124,53 @@ class SystemChecksTestCase(TestCase):
         errors = ValidFormFieldsets.check(model=Song)
         self.assertEqual(errors, [])
 
+    def test_fieldsets_tuple(self):
+        """
+        Tests for basic tuple/lists within field sets (#24089)
+        """
+        class NotATupleAdmin(admin.ModelAdmin):
+            list_display = ["pk", "title"]
+            list_editable = ["title"]
+            fieldsets = [
+                (None, {
+                    "fields": ("title")  # expect a comma
+                }),
+            ]
+        errors = NotATupleAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "The value of 'fieldsets[1]['fields']' must be a list or tuple.",
+                hint=None,
+                obj=NotATupleAdmin,
+                id='admin.E008',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_nonfirst_fieldset(self):
+        """
+        Tests for tuple/lists within the second fieldset
+        """
+        class NotATupleAdmin(admin.ModelAdmin):
+            fieldsets = [
+                (None, {
+                    "fields": ("title",)
+                }),
+                ('foo', {
+                    "fields": "author"  # not a tuple
+                }),
+            ]
+        errors = NotATupleAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "The value of 'fieldsets[1]['fields']' must be a list or tuple.",
+                hint=None,
+                obj=NotATupleAdmin,
+                id='admin.E008',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
     def test_exclude_values(self):
         """
         Tests for basic system checks of 'exclude' option values (#12689)
