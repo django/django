@@ -28,8 +28,6 @@ bit of i18n-related overhead in certain places of the framework. If you don't
 use internationalization, you should take the two seconds to set
 :setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
 make some optimizations so as not to load the internationalization machinery.
-You'll probably also want to remove ``'django.template.context_processors.i18n'``
-from the ``'context_processors'`` option of your :setting:`TEMPLATES` setting.
 
 .. note::
 
@@ -812,27 +810,28 @@ the second will always be in English.
 Other tags
 ----------
 
-Each ``RequestContext`` has access to three translation-specific variables:
-
-* ``LANGUAGES`` is a list of tuples in which the first element is the
-  :term:`language code` and the second is the language name (translated into
-  the currently active locale).
-
-* ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
-  Example: ``en-us``. (See :ref:`how-django-discovers-language-preference`.)
-
-* ``LANGUAGE_BIDI`` is the current locale's direction. If True, it's a
-  right-to-left language, e.g.: Hebrew, Arabic. If False it's a
-  left-to-right language, e.g.: English, French, German etc.
-
-If you don't use the ``RequestContext`` extension, you can get those values with
-three tags::
-
-    {% get_current_language as LANGUAGE_CODE %}
-    {% get_available_languages as LANGUAGES %}
-    {% get_current_language_bidi as LANGUAGE_BIDI %}
-
 These tags also require a ``{% load i18n %}``.
+
+* ``{% get_available_languages as LANGUAGES %}`` returns a list of tuples in
+  which the first element is the :term:`language code` and the second is the
+  language name (translated into the currently active locale).
+
+* ``{% get_current_language as LANGUAGE_CODE %}`` returns the current user's
+  preferred language, as a string.  Example: ``en-us``. (See
+  :ref:`how-django-discovers-language-preference`.)
+
+* ``{% get_current_language_bidi as LANGUAGE_BIDI %}`` returns the current
+  locale's direction. If True, it's a right-to-left language, e.g.: Hebrew,
+  Arabic. If False it's a left-to-right language, e.g.: English, French, German
+  etc.
+
+If you enable the ``django.template.context_processors.i18n`` context processor
+then each ``RequestContext`` will have access to ``LANGUAGES``,
+``LANGUAGE_CODE``, and ``LANGUAGE_BIDI`` as defined above.
+
+.. versionchanged:: 1.8
+
+    The ``i18n`` context processor is not enabled by default for new projects.
 
 You can also retrieve information about any of the available languages using
 provided template tags and filters. To get information about a single language,
@@ -1506,11 +1505,6 @@ As a convenience, Django comes with a view, :func:`django.views.i18n.set_languag
 that sets a user's language preference and redirects to a given URL or, by default,
 back to the previous page.
 
-Make sure that the following context processor is enabled in the
-:setting:`TEMPLATES` setting in your settings file::
-
-    'django.template.context_processors.i18n'
-
 Activate this view by adding the following line to your URLconf::
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
@@ -1542,10 +1536,13 @@ Here's example HTML template code:
 
 .. code-block:: html+django
 
+    {% load i18n %}
     <form action="{% url 'set_language' %}" method="post">
     {% csrf_token %}
     <input name="next" type="hidden" value="{{ redirect_to }}" />
     <select name="language">
+    {% get_current_language as LANGUAGE_CODE %}
+    {% get_available_languages as LANGUAGES %}
     {% get_language_info_list for LANGUAGES as languages %}
     {% for language in languages %}
     <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}>

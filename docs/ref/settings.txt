@@ -1873,10 +1873,9 @@ for :doc:`managing stored files </topics/files>`. It must end in a slash if set
 to a non-empty value. You will need to :ref:`configure these files to be served
 <serving-uploaded-files-in-development>` in both development and production.
 
-In order to use ``{{ MEDIA_URL }}`` in your templates, you must have
+If you want to use ``{{ MEDIA_URL }}`` in your templates, add
 ``'django.template.context_processors.media'`` in the ``'context_processors'``
-option of :setting:`TEMPLATES`. It's there by default, but be sure to include
-it if you override that setting and want this behavior.
+option of :setting:`TEMPLATES`.
 
 Example: ``"http://media.example.com/"``
 
