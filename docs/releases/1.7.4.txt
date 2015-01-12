@@ -9,4 +9,5 @@ Django 1.7.4 fixes several bugs in 1.7.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a migration crash when unapplying ``contrib.contenttypes``’s or
+  ``contrib.auth``’s first migration (:ticket:`24075`).
