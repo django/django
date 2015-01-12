@@ -2,7 +2,7 @@ import sys
 import time
 
 from django.conf import settings
-from django.db.backends.creation import BaseDatabaseCreation
+from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.utils import DatabaseError
 from django.utils.six.moves import input
 

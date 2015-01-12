@@ -2,7 +2,7 @@
 ``SchemaEditor``
 ================
 
-.. module:: django.db.backends.schema
+.. module:: django.db.backends.base.schema
 
 .. class:: BaseDatabaseSchemaEditor
 

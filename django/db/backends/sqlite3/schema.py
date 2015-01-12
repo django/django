@@ -1,10 +1,13 @@
 import codecs
 import copy
 from decimal import Decimal
-from django.utils import six
+
 from django.apps.registry import Apps
-from django.db.backends.schema import BaseDatabaseSchemaEditor
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.models.fields.related import ManyToManyField
+from django.utils import six
+
+import _sqlite3
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -13,8 +16,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s)"
 
     def quote_value(self, value):
-        # Inner import to allow nice failure for backend if not present
-        import _sqlite3
         try:
             value = _sqlite3.adapt(value)
         except _sqlite3.ProgrammingError:

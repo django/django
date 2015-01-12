@@ -1,4 +1,4 @@
-from django.db.backends.creation import BaseDatabaseCreation
+from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.backends.utils import truncate_name
 
 

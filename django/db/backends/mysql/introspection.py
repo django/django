@@ -1,9 +1,13 @@
 from collections import namedtuple
 import re
-from .base import FIELD_TYPE
+
 from django.utils.datastructures import OrderedSet
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
+from django.db.backends.base.introspection import (
+    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+)
 from django.utils.encoding import force_text
+
+from MySQLdb.constants import FIELD_TYPE
 
 FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra',))
 

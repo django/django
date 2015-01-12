@@ -4,7 +4,7 @@ import binascii
 
 from django.utils import six
 from django.utils.text import force_text
-from django.db.backends.schema import BaseDatabaseSchemaEditor
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.utils import DatabaseError
 
 

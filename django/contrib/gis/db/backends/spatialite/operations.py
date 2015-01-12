@@ -1,13 +1,13 @@
 import re
 import sys
 
-from django.contrib.gis.db.backends.base import BaseSpatialOperations
+from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.sqlite3.base import DatabaseOperations
+from django.db.backends.sqlite3.operations import DatabaseOperations
 from django.db.utils import DatabaseError
 from django.utils import six
 from django.utils.functional import cached_property
