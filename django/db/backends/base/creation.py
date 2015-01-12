@@ -3,16 +3,16 @@ import sys
 import time
 import warnings
 
+from django.apps import apps
 from django.conf import settings
+from django.core import serializers
+from django.db import router
+from django.db.backends.utils import truncate_name
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
-from django.utils.six.moves import input
 from django.utils.six import StringIO
-from django.db import router
-from django.apps import apps
-from django.core import serializers
+from django.utils.six.moves import input
 
-from .utils import truncate_name
 
 # The prefix to put on the default database name when creating
 # the test database.

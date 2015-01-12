@@ -1,20 +1,15 @@
 from django.conf import settings
-from django.db.backends import NO_DB_ALIAS
+from django.db.backends.base.base import NO_DB_ALIAS
 from django.db.backends.postgresql_psycopg2.base import (
     DatabaseWrapper as Psycopg2DatabaseWrapper,
-    DatabaseFeatures as Psycopg2DatabaseFeatures
 )
-from django.contrib.gis.db.backends.base import BaseSpatialFeatures
-from django.contrib.gis.db.backends.postgis.creation import PostGISCreation
-from django.contrib.gis.db.backends.postgis.introspection import PostGISIntrospection
-from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
-from django.contrib.gis.db.backends.postgis.schema import PostGISSchemaEditor
 from django.utils.functional import cached_property
 
-
-class DatabaseFeatures(BaseSpatialFeatures, Psycopg2DatabaseFeatures):
-    supports_3d_functions = True
-    supports_left_right_lookups = True
+from .creation import PostGISCreation
+from .features import DatabaseFeatures
+from .introspection import PostGISIntrospection
+from .operations import PostGISOperations
+from .schema import PostGISSchemaEditor
 
 
 class DatabaseWrapper(Psycopg2DatabaseWrapper):

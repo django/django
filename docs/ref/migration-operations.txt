@@ -272,7 +272,7 @@ if supplied) should be callable objects that accept two arguments; the first is
 an instance of ``django.apps.registry.Apps`` containing historical models that
 match the operation's place in the project history, and the second is an
 instance of :class:`SchemaEditor
-<django.db.backends.schema.BaseDatabaseSchemaEditor>`.
+<django.db.backends.base.schema.BaseDatabaseSchemaEditor>`.
 
 The optional ``hints`` argument will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making a

@@ -15,7 +15,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, reset_queries, transaction)
-from django.db.backends import BaseDatabaseWrapper
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.backends.utils import format_number, CursorWrapper
