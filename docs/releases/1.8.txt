@@ -1560,7 +1560,7 @@ testing was undocumented and untested. It's now deprecated in favor of ``==``.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The legacy ``%(<foo>)s`` syntax in :attr:`ModelFormMixin.success_url
- <django.views.generic.edit.ModelFormMixin.success_url>` is deprecated and
+<django.views.generic.edit.ModelFormMixin.success_url>` is deprecated and
 will be removed in Django 2.0.
 
 .. removed-features-1.8:
