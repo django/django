@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.db import DEFAULT_DB_ALIAS, router
+from django.db.migrations.loader import is_latest_migration_applied
 from django.db.models import signals
 from django.utils.encoding import smart_text
 from django.utils import six
@@ -11,6 +12,10 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
+    # TODO: Remove when migration plan / state is passed (#24100).
+    if not is_latest_migration_applied('contenttypes'):
+        return
+
     if not app_config.models_module:
         return
 

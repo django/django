@@ -11,6 +11,7 @@ from django.contrib.auth import models as auth_app, get_permission_codename
 from django.core import exceptions
 from django.core.management.base import CommandError
 from django.db import DEFAULT_DB_ALIAS, router
+from django.db.migrations.loader import is_latest_migration_applied
 from django.db.models import signals
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils import six
@@ -59,6 +60,10 @@ def _check_permission_clashing(custom, builtin, ctype):
 
 
 def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
+    # TODO: Remove when migration plan / state is passed (#24100).
+    if not is_latest_migration_applied('auth'):
+        return
+
     if not app_config.models_module:
         return
 
