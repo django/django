@@ -160,8 +160,14 @@ ModelFormMixin
 
         ``success_url`` may contain dictionary string formatting, which
         will be interpolated against the object's field attributes. For
-        example, you could use ``success_url="/polls/%(slug)s/"`` to
+        example, you could use ``success_url="/polls/{slug}/"`` to
         redirect to a URL composed out of the ``slug`` field on a model.
+
+        .. versionchanged:: 1.8
+
+            Support for the new brace-based Python formatting syntax has been
+            added. The old ``%(slug)s`` placeholder syntax support has been
+            deprecated and will be removed in Django 2.0.
 
     .. method:: get_form_class()
 
@@ -248,8 +254,14 @@ DeletionMixin
 
         ``success_url`` may contain dictionary string formatting, which will be
         interpolated against the object's field attributes. For example, you
-        could use ``success_url="/parent/%(parent_id)s/"`` to redirect to a URL
+        could use ``success_url="/parent/{parent_id}/"`` to redirect to a URL
         composed out of the ``parent_id`` field on a model.
+
+        .. versionchanged:: 1.8
+
+            Support for the new brace-based Python formatting syntax has been
+            added. The old ``%(slug)s`` placeholder syntax support has been
+            deprecated and will be removed in Django 2.0.
 
     .. method:: get_success_url()
 

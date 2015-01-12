@@ -158,6 +158,9 @@ details on these changes.
   and ``Storage.save()`` to be defined without a ``max_length`` argument will
   be removed.
 
+* Support for the legacy ``%(<foo>)s`` syntax in ``ModelFormMixin.success_url``
+  will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
