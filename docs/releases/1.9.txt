@@ -815,9 +815,8 @@ Maximum size of a request body is now limited
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The new :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` setting limits the size that a
-request body may be before raising a
-:exc:`~django.core.exceptions.SuspiciousOperation` error. See its documentation
-for more details.
+request body may be before a
+:exc:`~django.core.exceptions.SuspiciousOperation` is raised.
 
 Template ``LoaderOrigin`` and ``StringOrigin`` are removed
 ----------------------------------------------------------

@@ -879,11 +879,12 @@ DATA_UPLOAD_MAX_MEMORY_SIZE
 
 Default: ``2621440`` (i.e. 2.5 MB).
 
-The maximum size (in bytes) that a request body may be before raising a
-:exc:`~django.core.exceptions.SuspiciousOperation` error. This value is applied
+The maximum size (in bytes) that a request body may be before a
+:exc:`~django.core.exceptions.SuspiciousOperation` is raised. This value is applied
 when accessing ``request.body`` or ``request.POST`` and is calculated against
 the total request size excluding any file upload data. You can set it to
-``None`` to disable the check.
+``None`` to disable the check. When processing forms with very large field values,
+or with a large number of fields, this limit may need to be increased.
 
 See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
@@ -3254,6 +3255,7 @@ Globalization (``i18n``/``l10n``)
 
 HTTP
 ----
+* :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`
 * :setting:`DEFAULT_CHARSET`
 * :setting:`DEFAULT_CONTENT_TYPE`
 * :setting:`DISALLOWED_USER_AGENTS`

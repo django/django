@@ -104,9 +104,6 @@ class MultiPartParser(object):
         self._content_length = content_length
         self._upload_handlers = upload_handlers
 
-        # Limit the maximum request data size that will be parsed and stored in
-        # memory. File upload data is not included against this limit.
-        self._max_data_size = settings.DATA_UPLOAD_MAX_MEMORY_SIZE
         self._data_size = 0
 
     def parse(self):
@@ -172,8 +169,8 @@ class MultiPartParser(object):
 
                 if item_type == FIELD:
                     # avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE
-                    if self._max_data_size is not None:
-                        read_kwargs = {'size': self._max_data_size - self._data_size}
+                    if settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None:
+                        read_kwargs = {'size': settings.DATA_UPLOAD_MAX_MEMORY_SIZE - self._data_size}
                     else:
                         read_kwargs = {}
                     # This is a post field, we can just set it in the post
@@ -186,8 +183,8 @@ class MultiPartParser(object):
                     else:
                         data = field_stream.read(**read_kwargs)
 
-                    self._data_size += len(field_name) + len(data)
-                    if self._max_data_size is not None and field_stream.read(1):
+                    self._data_size += len(field_name) + len(data) + 2
+                    if settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and field_stream.read(1):
                         raise SuspiciousOperation('Request data too large')
 
                     self._post.appendlist(field_name,
