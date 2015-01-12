@@ -1,5 +1,5 @@
 {% block extrastyle %}
-{% load static %}
+{% load i18n static %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <style type="text/css">
   #{{ id }}_map { width: {{ map_width }}px; height: {{ map_height }}px; }
   #{{ id }}_map .aligned label { float:inherit; }
