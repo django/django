@@ -12,7 +12,11 @@ from django import forms
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from .models import IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel, DateTimeArrayModel, NestedIntegerArrayModel, OtherTypesArrayModel, ArrayFieldSubclass
+from .models import (
+    IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel,
+    DateTimeArrayModel, NestedIntegerArrayModel, OtherTypesArrayModel,
+    ArrayFieldSubclass,
+)
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
