@@ -59,7 +59,7 @@ The ``ContentType`` model
 .. class:: ContentType
 
     Each instance of :class:`~django.contrib.contenttypes.models.ContentType`
-    has three fields which, taken together, uniquely describe an installed
+    has two fields which, taken together, uniquely describe an installed
     model:
 
     .. attribute:: app_label
@@ -74,11 +74,18 @@ The ``ContentType`` model
 
         The name of the model class.
 
+    Additionally, the following property is available:
+
     .. attribute:: name
 
-        The human-readable name of the model. This is taken from the
+        The human-readable name of the content type. This is taken from the
         :attr:`verbose_name <django.db.models.Field.verbose_name>`
         attribute of the model.
+
+.. versionchanged:: 1.8
+
+    Before Django 1.8, the ``name`` property was a real field on the
+    ``ContentType`` model.
 
 Let's look at an example to see how this works. If you already have
 the :mod:`~django.contrib.contenttypes` application installed, and then add
@@ -94,9 +101,6 @@ created with the following values:
   path "django.contrib.sites").
 
 * :attr:`~django.contrib.contenttypes.models.ContentType.model`
-  will be set to ``'site'``.
-
-* :attr:`~django.contrib.contenttypes.models.ContentType.name`
   will be set to ``'site'``.
 
 .. _the verbose_name attribute: ../model-api/#verbose_name
