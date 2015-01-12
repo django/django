@@ -98,7 +98,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
         relations = {}
         for row in cursor.fetchall():
-            relations[row[0]] = (row[2], row[1].lower())
+            relations[row[0].lower()] = (row[2].lower(), row[1].lower())
         return relations
 
     def get_key_columns(self, cursor, table_name):
