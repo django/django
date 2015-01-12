@@ -1,7 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations
+from django.db import models, migrations
+
+
+def add_legacy_name(apps, schema_editor):
+    ContentType = apps.get_model('contenttypes', 'ContentType')
+    for ct in ContentType.objects.all():
+        try:
+            ct.name = apps.get_model(ct.app_label, ct.model)._meta.object_name
+        except:
+            ct.name = ct.model
+        ct.save()
 
 
 class Migration(migrations.Migration):
@@ -14,6 +24,15 @@ class Migration(migrations.Migration):
         migrations.AlterModelOptions(
             name='contenttype',
             options={'verbose_name': 'content type', 'verbose_name_plural': 'content types'},
+        ),
+        migrations.AlterField(
+            model_name='contenttype',
+            name='name',
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.RunPython(
+            migrations.RunPython.noop,
+            add_legacy_name,
         ),
         migrations.RemoveField(
             model_name='contenttype',
