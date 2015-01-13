@@ -299,7 +299,7 @@ This example is equivalent to::
         try:
             my_object = MyModel.objects.get(pk=1)
         except MyModel.DoesNotExist:
-            raise Http404
+            raise Http404("No MyModel matches the given query.")
 
 The most common use case is to pass a :class:`~django.db.models.Model`, as
 shown above. However, you can also pass a
@@ -369,4 +369,4 @@ This example is equivalent to::
     def my_view(request):
         my_objects = list(MyModel.objects.filter(published=True))
         if not my_objects:
-            raise Http404
+            raise Http404("No MyModel matches the given query.")

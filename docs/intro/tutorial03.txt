@@ -441,7 +441,7 @@ for a given poll. Here's the view:
         try:
             question = Question.objects.get(pk=question_id)
         except Question.DoesNotExist:
-            raise Http404
+            raise Http404("Question does not exist")
         return render(request, 'polls/detail.html', {'question': question})
 
 The new concept here: The view raises the :exc:`~django.http.Http404` exception
