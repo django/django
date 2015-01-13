@@ -315,24 +315,26 @@ class WhereNode(tree.Node):
         clone.relabel_aliases(change_map)
         return clone
 
+    @classmethod
+    def _contains_aggregate(cls, obj):
+        if not isinstance(obj, tree.Node):
+            return getattr(obj.lhs, 'contains_aggregate', False) or getattr(obj.rhs, 'contains_aggregate', False)
+        return any(cls._contains_aggregate(c) for c in obj.children)
+
     @cached_property
     def contains_aggregate(self):
-        def _contains_aggregate(obj):
-            if not isinstance(obj, tree.Node):
-                return getattr(obj.lhs, 'contains_aggregate', False) or getattr(obj.rhs, 'contains_aggregate', False)
-            return any(_contains_aggregate(c) for c in obj.children)
+        return self._contains_aggregate(self)
 
-        return _contains_aggregate(self)
+    @classmethod
+    def _refs_field(cls, obj, aggregate_types, field_types):
+        if not isinstance(obj, tree.Node):
+            if hasattr(obj.rhs, 'refs_field'):
+                return obj.rhs.refs_field(aggregate_types, field_types)
+            return False
+        return any(cls._refs_field(c, aggregate_types, field_types) for c in obj.children)
 
     def refs_field(self, aggregate_types, field_types):
-        def _refs_field(obj, aggregate_types, field_types):
-            if not isinstance(obj, tree.Node):
-                if hasattr(obj.rhs, 'refs_field'):
-                    return obj.rhs.refs_field(aggregate_types, field_types)
-                return False
-            return any(_refs_field(c, aggregate_types, field_types) for c in obj.children)
-
-        return _refs_field(self, aggregate_types, field_types)
+        return self._refs_field(self, aggregate_types, field_types)
 
 
 class EmptyWhere(WhereNode):
