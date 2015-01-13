@@ -2,7 +2,7 @@
 Django 1.6.10 release notes
 ===========================
 
-*Under development*
+*January 13, 2015*
 
 Django 1.6.10 fixes several security issues in 1.6.9.
 
