@@ -516,3 +516,56 @@ Versions affected
 * Django 1.5 `(patch) <https://github.com/django/django/commit/2a446c896e7c814661fb9c4f212b071b2a7fa446>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/f7c494f2506250b8cb5923714360a3642ed63e0f>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/2b31342cdf14fc20e07c43d258f1e7334ad664a6>`__
+
+January 13, 2015 - CVE-2015-0219
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-0219 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-0219&cid=2>`_:
+WSGI header spoofing via underscore/dash conflation.
+`Full description <https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch) <https://github.com/django/django/commit/4f6fffc1dc429f1ad428ecf8e6620739e8837450>`__
+* Django 1.6 `(patch) <https://github.com/django/django/commit/d7597b31d5c03106eeba4be14a33b32a5e25f4ee>`__
+* Django 1.7 `(patch) <https://github.com/django/django/commit/41b4bc73ee0da7b2e09f4af47fc1fd21144c710f>`__
+
+January 13, 2015 - CVE-2015-0220
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-0220 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-0220&cid=2>`_: Mitigated possible XSS attack via user-supplied redirect URLs. `Full description <https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch) <https://github.com/django/django/commit/4c241f1b710da6419d9dca160e80b23b82db7758>`__
+* Django 1.6 `(patch) <https://github.com/django/django/commit/72e0b033662faa11bb7f516f18a132728aa0ae28>`__
+* Django 1.7 `(patch) <https://github.com/django/django/commit/de67dedc771ad2edec15c1d00c083a1a084e1e89>`__
+
+January 13, 2015 - CVE-2015-0221
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-0221 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-0221&cid=2>`_:
+Denial-of-service attack against ``django.views.static.serve()``.
+`Full description <https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch) <https://github.com/django/django/commit/d020da6646c5142bc092247d218a3d1ce3e993f7>`__
+* Django 1.6 `(patch) <https://github.com/django/django/commit/553779c4055e8742cc832ed525b9ee34b174934f>`__
+* Django 1.7 `(patch) <https://github.com/django/django/commit/818e59a3f0fbadf6c447754d202d88df025f8f2a>`__
+
+January 13, 2015 - CVE-2015-0222
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-0222 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-0222&cid=2>`_:
+Database denial-of-service with ``ModelMultipleChoiceField``.
+`Full description <https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
+
+Versions affected
+-----------------
+
+* Django 1.6 `(patch) <https://github.com/django/django/commit/d7a06ee7e571b6dad07c0f5b519b1db02e2a476c>`__
+* Django 1.7 `(patch) <https://github.com/django/django/commit/bcfb47780ce7caecb409a9e9c1c314266e41d392>`__
