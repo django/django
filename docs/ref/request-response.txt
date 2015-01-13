@@ -629,6 +629,13 @@ Attributes
 
     The HTTP reason phrase for the response.
 
+    .. versionchanged:: 1.9
+
+        ``reason_phrase`` no longer defaults to all capital letters. It now
+        uses the `HTTP standard's`_ default reason phrases.
+
+        .. _`HTTP standard's`: https://www.ietf.org/rfc/rfc2616.txt
+
 .. attribute:: HttpResponse.streaming
 
     This is always ``False``.
@@ -979,6 +986,13 @@ Attributes
 .. attribute:: StreamingHttpResponse.reason_phrase
 
     The HTTP reason phrase for the response.
+
+    .. versionchanged:: 1.9
+
+        ``reason_phrase`` no longer defaults to all capital letters. It now
+        uses the `HTTP standard's`_ default reason phrases.
+
+        .. _`HTTP standard's`: https://www.ietf.org/rfc/rfc2616.txt
 
 .. attribute:: StreamingHttpResponse.streaming
 

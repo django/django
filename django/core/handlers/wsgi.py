@@ -16,9 +16,6 @@ from django.utils.encoding import force_str, force_text
 from django.utils.functional import cached_property
 from django.utils import six
 
-# For backwards compatibility -- lots of code uses this in the wild!
-from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT  # NOQA
-
 logger = logging.getLogger('django.request')
 
 # encode() and decode() expect the charset to be a native string.
