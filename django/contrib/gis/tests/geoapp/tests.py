@@ -482,6 +482,7 @@ class GeoQuerySetTest(TestCase):
 
         for val, exp in zip(extent, expected):
             self.assertAlmostEqual(exp, val, 4)
+        self.assertIsNone(City.objects.filter(name=('Smalltown')).extent())
 
     @skipUnlessDBFeature("has_force_rhr_method")
     def test_force_rhr(self):
