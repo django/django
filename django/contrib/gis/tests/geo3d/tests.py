@@ -222,6 +222,7 @@ class Geo3DTest(TestCase):
 
         for e3d in [extent1, extent2]:
             check_extent3d(e3d)
+        self.assertIsNone(City3D.objects.none().extent3d())
 
     def test_perimeter(self):
         """

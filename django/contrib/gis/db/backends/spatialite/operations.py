@@ -134,6 +134,8 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         """
         Convert the polygon data received from Spatialite to min/max values.
         """
+        if box is None:
+            return None
         shell = Geometry(box, srid).shell
         xmin, ymin = shell[0][:2]
         xmax, ymax = shell[2][:2]
