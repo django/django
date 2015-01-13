@@ -2,7 +2,7 @@
 Django 1.4.18 release notes
 ===========================
 
-*Under development*
+*January 13, 2015*
 
 Django 1.4.18 fixes several security issues in 1.4.17 as well as a regression
 on Python 2.5 in the 1.4.17 release.
