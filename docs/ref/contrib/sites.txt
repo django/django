@@ -88,7 +88,7 @@ This accomplishes several things quite nicely:
           try:
               a = Article.objects.get(id=article_id, sites__id=get_current_site(request).id)
           except Article.DoesNotExist:
-              raise Http404
+              raise Http404("Article does not exist on this site")
           # ...
 
 .. _ljworld.com: http://www.ljworld.com/
