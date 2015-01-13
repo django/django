@@ -223,6 +223,9 @@ class QuerySet(object):
         combined.query.combine(other.query, sql.OR)
         return combined
 
+    def __contains__(self, obj):
+        return isinstance(obj, self.model) and self.filter(pk=obj.pk).exists()
+
     ####################################
     # METHODS THAT DO DATABASE QUERIES #
     ####################################
