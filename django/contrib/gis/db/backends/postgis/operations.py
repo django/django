@@ -193,6 +193,8 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         the bounding box text returned by PostGIS (`box` argument), for
         example: "BOX(-90.0 30.0, -85.0 40.0)".
         """
+        if box is None:
+            return None
         ll, ur = box[4:-1].split(',')
         xmin, ymin = map(float, ll.split())
         xmax, ymax = map(float, ur.split())
@@ -204,6 +206,8 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         the 3d bounding-box text returned by PostGIS (`box3d` argument), for
         example: "BOX3D(-90.0 30.0 1, -85.0 40.0 2)".
         """
+        if box3d is None:
+            return None
         ll, ur = box3d[6:-1].split(',')
         xmin, ymin, zmin = map(float, ll.split())
         xmax, ymax, zmax = map(float, ur.split())
