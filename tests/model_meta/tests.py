@@ -169,24 +169,30 @@ class GetFieldByNameTests(OptionsBaseTests):
         self.assertEqual(field_info[1:], (None, True, False))
         self.assertIsInstance(field_info[0], GenericRelation)
 
-    def test_get_fields_only_searches_forward_on_apps_not_ready(self):
+    def test_get_fields_when_apps_not_ready(self):
         opts = Person._meta
         # If apps registry is not ready, get_field() searches over only
         # forward fields.
         opts.apps.ready = False
+        # Clear cached data.
+        opts.__dict__.pop('fields_map', None)
         try:
             # 'data_abstract' is a forward field, and therefore will be found
             self.assertTrue(opts.get_field('data_abstract'))
             msg = (
-                "Person has no field named 'relating_baseperson'. The app "
+                "Person has no field named 'some_missing_field'. The app "
                 "cache isn't ready yet, so if this is an auto-created related "
-                "field, it won't be available yet."
+                "field, it might not be available yet."
             )
-            # 'data_abstract' is a reverse field, and will raise an exception
             with self.assertRaisesMessage(FieldDoesNotExist, msg):
-                opts.get_field('relating_baseperson')
+                opts.get_field('some_missing_field')
+            # Be sure it's not cached
+            self.assertNotIn('fields_map', opts.__dict__)
         finally:
             opts.apps.ready = True
+        # At this point searching a related field would cache fields_map
+        opts.get_field('relating_baseperson')
+        self.assertIn('fields_map', opts.__dict__)
 
 
 class RelationTreeTests(TestCase):
