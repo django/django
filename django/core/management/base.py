@@ -415,9 +415,6 @@ class BaseCommand(object):
         if options.get('stderr'):
             self.stderr = OutputWrapper(options.get('stderr'), self.stderr.style_func)
 
-        if self.can_import_settings:
-            from django.conf import settings  # NOQA
-
         saved_locale = None
         if not self.leave_locale_alone:
             # Only mess with locales if we can assume we have a working
