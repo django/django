@@ -450,7 +450,6 @@ class FileStorageTests(FileStorageTestsBase):
             self.storage.move(src_name, '../../../../../../../../tmp/passwd')
 
 
-
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name):
         """
