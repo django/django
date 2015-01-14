@@ -36,6 +36,16 @@ psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
 
+# Register support for inet[] manually so we don't have to handle the Inet()
+# object on load all the time.
+INETARRAY_OID = 1041
+INETARRAY = psycopg2.extensions.new_array_type(
+    (INETARRAY_OID,),
+    'INETARRAY',
+    psycopg2.extensions.UNICODE,
+)
+psycopg2.extensions.register_type(INETARRAY)
+
 
 def utc_tzinfo_factory(offset):
     if offset != 0:
@@ -47,6 +57,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     can_return_id_from_insert = True
     has_real_datatype = True
+    has_native_uuid_field = True
     has_native_duration_field = True
     driver_supports_timedelta_args = True
     can_defer_constraint_checks = True

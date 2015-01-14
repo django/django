@@ -1983,7 +1983,7 @@ class GenericIPAddressField(Field):
     def get_db_prep_value(self, value, connection, prepared=False):
         if not prepared:
             value = self.get_prep_value(value)
-        return value or None
+        return connection.ops.value_to_db_ipaddress(value)
 
     def get_prep_value(self, value):
         value = super(GenericIPAddressField, self).get_prep_value(value)
@@ -2366,8 +2366,10 @@ class UUIDField(Field):
     def get_internal_type(self):
         return "UUIDField"
 
-    def get_prep_value(self, value):
+    def get_db_prep_value(self, value, connection, prepared=False):
         if isinstance(value, uuid.UUID):
+            if connection.features.has_native_uuid_field:
+                return value
             return value.hex
         if isinstance(value, six.string_types):
             return value.replace('-', '')
