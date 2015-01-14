@@ -32,7 +32,7 @@ class BaseDatabaseSchemaEditor(object):
 
     # Overrideable SQL templates
     sql_create_table = "CREATE TABLE %(table)s (%(definition)s)"
-    sql_create_table_unique = "UNIQUE (%(columns)s)"
+    sql_create_table_unique = "CONSTRAINT %(name)s UNIQUE (%(columns)s)"
     sql_rename_table = "ALTER TABLE %(old_table)s RENAME TO %(new_table)s"
     sql_retablespace_table = "ALTER TABLE %(table)s SET TABLESPACE %(new_tablespace)s"
     sql_delete_table = "DROP TABLE %(table)s CASCADE"
@@ -268,6 +268,9 @@ class BaseDatabaseSchemaEditor(object):
         for fields in model._meta.unique_together:
             columns = [model._meta.get_field(field).column for field in fields]
             column_sqls.append(self.sql_create_table_unique % {
+                # ticket #24102: constraint name may be useful for some backends
+                "table": self.quote_name(model._meta.db_table),
+                "name": self.quote_name(self._create_index_name(model, columns, suffix="_uniq")),
                 "columns": ", ".join(self.quote_name(column) for column in columns),
             })
         # Make the table
