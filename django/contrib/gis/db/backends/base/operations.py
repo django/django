@@ -102,6 +102,11 @@ class BaseSpatialOperations(object):
         """
         raise NotImplementedError('subclasses of BaseSpatialOperations must provide a geo_db_placeholder() method')
 
+    def check_aggregate_support(self, aggregate):
+        if aggregate.contains_aggregate == 'gis':
+            return aggregate.name in self.valid_aggregates
+        return super(BaseSpatialOperations, self).check_aggregate_support(aggregate)
+
     # Spatial SQL Construction
     def spatial_aggregate_sql(self, agg):
         raise NotImplementedError('Aggregate support not implemented for this spatial backend.')

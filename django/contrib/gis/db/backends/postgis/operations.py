@@ -43,7 +43,7 @@ class PostGISDistanceOperator(PostGISOperator):
         return super(PostGISDistanceOperator, self).as_sql(connection, lookup, template_params, sql_params)
 
 
-class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
+class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     name = 'postgis'
     postgis = True
     geography = True
@@ -178,14 +178,6 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                 )
             version = vtup[1:]
         return version
-
-    def check_aggregate_support(self, aggregate):
-        """
-        Checks if the given aggregate name is supported (that is, if it's
-        in `self.valid_aggregates`).
-        """
-        agg_name = aggregate.__class__.__name__
-        return agg_name in self.valid_aggregates
 
     def convert_extent(self, box, srid):
         """
