@@ -532,6 +532,10 @@ class FileFieldStorageTests(SimpleTestCase):
             for o in objs:
                 o.delete()
 
+    @unittest.skipIf(
+        sys.platform.startswith('win'),
+        "Windows supports at most 260 characters in a path.",
+    )
     def test_extended_length_storage(self):
         # Testing FileField with max_length > 255. Most systems have filename
         # length limitation of 255. Path takes extra chars.
