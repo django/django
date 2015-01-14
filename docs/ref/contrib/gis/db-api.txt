@@ -268,12 +268,9 @@ Method                                PostGIS  Oracle  SpatiaLite
 ====================================  =======  ======  ==========
 :meth:`GeoQuerySet.area`              X        X       X
 :meth:`GeoQuerySet.centroid`          X        X       X
-:meth:`GeoQuerySet.collect`           X                (from v3.0)
 :meth:`GeoQuerySet.difference`        X        X       X
 :meth:`GeoQuerySet.distance`          X        X       X
 :meth:`GeoQuerySet.envelope`          X                X
-:meth:`GeoQuerySet.extent`            X        X       (from v3.0)
-:meth:`GeoQuerySet.extent3d`          X
 :meth:`GeoQuerySet.force_rhr`         X
 :meth:`GeoQuerySet.geohash`           X
 :meth:`GeoQuerySet.geojson`           X                X
@@ -281,7 +278,6 @@ Method                                PostGIS  Oracle  SpatiaLite
 :meth:`GeoQuerySet.intersection`      X        X       X
 :meth:`GeoQuerySet.kml`               X                X
 :meth:`GeoQuerySet.length`            X        X       X
-:meth:`GeoQuerySet.make_line`         X
 :meth:`GeoQuerySet.mem_size`          X
 :meth:`GeoQuerySet.num_geom`          X        X       X
 :meth:`GeoQuerySet.num_points`        X        X       X
@@ -295,7 +291,23 @@ Method                                PostGIS  Oracle  SpatiaLite
 :meth:`GeoQuerySet.transform`         X        X       X
 :meth:`GeoQuerySet.translate`         X                X
 :meth:`GeoQuerySet.union`             X        X       X
-:meth:`GeoQuerySet.unionagg`          X        X       X
+====================================  =======  ======  ==========
+
+Aggregate Functions
+-------------------
+
+The following table provides a summary of what GIS-specific aggregate functions
+are available on each spatial backend. Please note that MySQL does not
+support any of these aggregates, and is thus excluded from the table.
+
+====================================  =======  ======  ==========
+Aggregate                             PostGIS  Oracle  SpatiaLite
+====================================  =======  ======  ==========
+:class:`Collect`                      X                (from v3.0)
+:class:`Extent`                       X        X       (from v3.0)
+:class:`Extent3D`                     X
+:class:`MakeLine`                     X
+:class:`Union`                        X        X       X
 ====================================  =======  ======  ==========
 
 .. rubric:: Footnotes

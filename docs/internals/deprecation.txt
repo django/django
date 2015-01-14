@@ -161,6 +161,9 @@ details on these changes.
 * Support for the legacy ``%(<foo>)s`` syntax in ``ModelFormMixin.success_url``
   will be removed.
 
+* ``GeoQuerySet`` aggregate methods ``collect()``, ``extent()``, ``extent3d()``,
+  ``makeline()``, and ``union()`` will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

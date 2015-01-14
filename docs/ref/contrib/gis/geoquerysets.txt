@@ -1090,87 +1090,72 @@ Spatial Aggregates
 Aggregate Methods
 -----------------
 
+.. deprecated:: 1.8
+
+    Aggregate methods are now deprecated. Prefer using their function-based
+    equivalents.
+
 ``collect``
 ~~~~~~~~~~~
 
 .. method:: GeoQuerySet.collect(**kwargs)
 
-*Availability*: PostGIS, Spatialite (>=3.0)
+.. deprecated:: 1.8
 
-Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
-column. This is analogous to a simplified version of the :meth:`GeoQuerySet.unionagg` method,
-except it can be several orders of magnitude faster than performing a union because
-it simply rolls up geometries into a collection or multi object, not caring about
-dissolving boundaries.
+    Use the :class:`Collect` aggregate instead.
+
+Shortcut for ``aggregate(Collect(<field>))``.
 
 ``extent``
 ~~~~~~~~~~
 
 .. method:: GeoQuerySet.extent(**kwargs)
 
-*Availability*: PostGIS, Oracle, Spatialite (>=3.0)
+.. deprecated:: 1.8
 
-Returns the extent of the ``GeoQuerySet`` as a four-tuple, comprising the
-lower left coordinate and the upper right coordinate.
+    Use the :class:`Extent` aggregate instead.
 
-Example::
-
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas'))
-    >>> print(qs.extent())
-    (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
+Shortcut for ``aggregate(Extent(<field>))``.
 
 ``extent3d``
 ~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.extent3d(**kwargs)
 
-*Availability*: PostGIS
+.. deprecated:: 1.8
 
-Returns the 3D extent of the ``GeoQuerySet`` as a six-tuple, comprising
-the lower left coordinate and upper right coordinate.
+    Use the :class:`Extent` aggregate instead.
 
-Example::
-
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas'))
-    >>> print(qs.extent3d())
-    (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
+Shortcut for ``aggregate(Extent3D(<field>))``.
 
 ``make_line``
 ~~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.make_line(**kwargs)
 
-*Availability*: PostGIS
+.. deprecated:: 1.8
 
-Returns a ``LineString`` constructed from the point field geometries in the
-``GeoQuerySet``.  Currently, ordering the queryset has no effect.
+    Use the :class:`MakeLine` aggregate instead.
 
-Example::
-
-     >>> print(City.objects.filter(name__in=('Houston', 'Dallas')).make_line())
-     LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
+Shortcut for ``aggregate(MakeLine(<field>))``.
 
 ``unionagg``
 ~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.unionagg(**kwargs)
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+.. deprecated:: 1.8
 
-This method returns a :class:`~django.contrib.gis.geos.GEOSGeometry` object
-comprising the union of every geometry in the queryset.  Please note that
-use of ``unionagg`` is processor intensive and may take a significant amount
-of time on large querysets.
+    Use the :class:`Union` aggregate instead.
 
-.. note::
+Shortcut for ``aggregate(Union(<field>))``.
 
-    If the computation time for using this method is too expensive,
-    consider using :meth:`GeoQuerySet.collect` instead.
+Aggregate Functions
+-------------------
 
-Example::
-
-    >>> u = Zipcode.objects.unionagg() # This may take a long time.
-    >>> u = Zipcode.objects.filter(poly__within=bbox).unionagg() # A more sensible approach.
+Django provides some GIS-specific aggregate functions. For details on how to
+use these aggregate functions, see :doc:`the topic guide on aggregation
+</topics/db/aggregation>`.
 
 =====================  =====================================================
 Keyword Argument       Description
@@ -1183,9 +1168,6 @@ Keyword Argument       Description
 
 __ http://docs.oracle.com/html/B14255_01/sdo_intro.htm#sthref150
 
-Aggregate Functions
--------------------
-
 Example::
 
     >>> from django.contrib.gis.db.models import Extent, Union
@@ -1196,35 +1178,84 @@ Example::
 
 .. class:: Collect(geo_field)
 
-Returns the same as the :meth:`GeoQuerySet.collect` aggregate method.
+*Availability*: PostGIS, Spatialite (≥3.0)
+
+Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
+column. This is analogous to a simplified version of the :class:`Union`
+aggregate, except it can be several orders of magnitude faster than performing
+a union because it simply rolls up geometries into a collection or multi object,
+not caring about dissolving boundaries.
 
 ``Extent``
 ~~~~~~~~~~
+
 .. class:: Extent(geo_field)
 
+*Availability*: PostGIS, Oracle, Spatialite (≥3.0)
 
-Returns the same as the :meth:`GeoQuerySet.extent` aggregate method.
+Returns the extent of all ``geo_field`` in the ``QuerySet`` as a four-tuple,
+comprising the lower left coordinate and the upper right coordinate.
+
+Example::
+
+    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent('poly'))
+    >>> print(qs[poly__extent])
+    (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
 ``Extent3D``
 ~~~~~~~~~~~~
 
 .. class:: Extent3D(geo_field)
 
-Returns the same as the :meth:`GeoQuerySet.extent3d` aggregate method.
+*Availability*: PostGIS
+
+Returns the 3D extent of all ``geo_field`` in the ``QuerySet`` as a six-tuple,
+comprising the lower left coordinate and upper right coordinate (each with x, y,
+and z coordinates).
+
+Example::
+
+    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent3D('poly'))
+    >>> print(qs[poly__extent3d])
+    (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
 
 ``MakeLine``
 ~~~~~~~~~~~~
 
 .. class:: MakeLine(geo_field)
 
-Returns the same as the :meth:`GeoQuerySet.make_line` aggregate method.
+*Availability*: PostGIS
+
+Returns a ``LineString`` constructed from the point field geometries in the
+``QuerySet``. Currently, ordering the queryset has no effect.
+
+Example::
+
+     >>> print(City.objects.filter(name__in=('Houston', 'Dallas')
+     ...      ).aggregate(MakeLine('poly'))[poly__makeline]
+     LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
 
 ``Union``
 ~~~~~~~~~
 
 .. class:: Union(geo_field)
 
-Returns the same as the :meth:`GeoQuerySet.union` aggregate method.
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+This method returns a :class:`~django.contrib.gis.geos.GEOSGeometry` object
+comprising the union of every geometry in the queryset. Please note that use of
+``Union`` is processor intensive and may take a significant amount of time on
+large querysets.
+
+.. note::
+
+    If the computation time for using this method is too expensive, consider
+    using :class:`Collect` instead.
+
+Example::
+
+    >>> u = Zipcode.objects.aggregate(Union(poly))  # This may take a long time.
+    >>> u = Zipcode.objects.filter(poly__within=bbox).aggregate(Union(poly))  # A more sensible approach.
 
 .. rubric:: Footnotes
 .. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
