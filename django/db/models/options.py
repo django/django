@@ -536,7 +536,7 @@ class Options(object):
             if not self.apps.ready:
                 raise FieldDoesNotExist(
                     "%s has no field named %r. The app cache isn't "
-                    "ready yet, so if this is a forward field, it won't "
+                    "ready yet, so if this is an auto-created related field, it won't "
                     "be available yet." % (self.object_name, field_name)
                 )
 
