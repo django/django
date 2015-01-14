@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import no_oracle
 from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango20Warning
 
 if HAS_GEOS:
     from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
@@ -64,7 +65,8 @@ class RelatedGeoModelTest(TestCase):
             check_pnt(GEOSGeometry(wkt, srid), qs[0].location.point)
 
     @skipUnlessDBFeature("supports_extent_aggr")
-    def test04a_related_extent_aggregate(self):
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_related_extent_aggregate(self):
         "Testing the `extent` GeoQuerySet aggregates on related geographic models."
         # This combines the Extent and Union aggregates into one query
         aggs = City.objects.aggregate(Extent('location__point'))
@@ -83,8 +85,22 @@ class RelatedGeoModelTest(TestCase):
             for ref_val, e_val in zip(ref, e):
                 self.assertAlmostEqual(ref_val, e_val, tol)
 
+    @skipUnlessDBFeature("supports_extent_aggr")
+    def test_related_extent_annotate(self):
+        """
+        Test annotation with Extent GeoAggregate.
+        """
+        cities = City.objects.annotate(points_extent=Extent('location__point')).order_by('name')
+        tol = 4
+        self.assertAlmostEqual(
+            cities[0].points_extent,
+            (-97.516111, 33.058333, -97.516111, 33.058333),
+            tol
+        )
+
     @skipUnlessDBFeature("has_unionagg_method")
-    def test04b_related_union_aggregate(self):
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_related_union_aggregate(self):
         "Testing the `unionagg` GeoQuerySet aggregates on related geographic models."
         # This combines the Extent and Union aggregates into one query
         aggs = City.objects.aggregate(Union('location__point'))
@@ -277,8 +293,12 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(None, b.author)
 
     @skipUnlessDBFeature("supports_collect_aggr")
-    def test14_collect(self):
-        "Testing the `collect` GeoQuerySet method and `Collect` aggregate."
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_collect(self):
+        """
+        Testing the (deprecated) `collect` GeoQuerySet method and `Collect`
+        aggregate.
+        """
         # Reference query:
         # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN
         #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id")

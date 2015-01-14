@@ -1,3 +1,5 @@
+import warnings
+
 from django.db import connections
 from django.db.models.expressions import RawSQL
 from django.db.models.fields import Field
@@ -15,6 +17,7 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 class GeoQuerySet(QuerySet):
@@ -65,6 +68,11 @@ class GeoQuerySet(QuerySet):
         This is analogous to a union operation, but much faster because
         boundaries are not dissolved.
         """
+        warnings.warn(
+            "The collect GeoQuerySet method is deprecated. Use the Collect() "
+            "aggregate in an aggregate() or annotate() method.",
+            RemovedInDjango20Warning, stacklevel=2
+        )
         return self._spatial_aggregate(aggregates.Collect, **kwargs)
 
     def difference(self, geom, **kwargs):
@@ -105,6 +113,11 @@ class GeoQuerySet(QuerySet):
         Returns the extent (aggregate) of the features in the GeoQuerySet.  The
         extent will be returned as a 4-tuple, consisting of (xmin, ymin, xmax, ymax).
         """
+        warnings.warn(
+            "The extent GeoQuerySet method is deprecated. Use the Extent() "
+            "aggregate in an aggregate() or annotate() method.",
+            RemovedInDjango20Warning, stacklevel=2
+        )
         return self._spatial_aggregate(aggregates.Extent, **kwargs)
 
     def extent3d(self, **kwargs):
@@ -113,6 +126,11 @@ class GeoQuerySet(QuerySet):
         GeoQuerySet. It is returned as a 6-tuple, comprising:
           (xmin, ymin, zmin, xmax, ymax, zmax).
         """
+        warnings.warn(
+            "The extent3d GeoQuerySet method is deprecated. Use the Extent3D() "
+            "aggregate in an aggregate() or annotate() method.",
+            RemovedInDjango20Warning, stacklevel=2
+        )
         return self._spatial_aggregate(aggregates.Extent3D, **kwargs)
 
     def force_rhr(self, **kwargs):
@@ -215,6 +233,11 @@ class GeoQuerySet(QuerySet):
         this GeoQuerySet and returns it.  This is a spatial aggregate
         method, and thus returns a geometry rather than a GeoQuerySet.
         """
+        warnings.warn(
+            "The make_line GeoQuerySet method is deprecated. Use the MakeLine() "
+            "aggregate in an aggregate() or annotate() method.",
+            RemovedInDjango20Warning, stacklevel=2
+        )
         return self._spatial_aggregate(aggregates.MakeLine, geo_field_type=PointField, **kwargs)
 
     def mem_size(self, **kwargs):
@@ -398,6 +421,11 @@ class GeoQuerySet(QuerySet):
         None if the GeoQuerySet is empty.  The `tolerance` keyword is for
         Oracle backends only.
         """
+        warnings.warn(
+            "The unionagg GeoQuerySet method is deprecated. Use the Union() "
+            "aggregate in an aggregate() or annotate() method.",
+            RemovedInDjango20Warning, stacklevel=2
+        )
         return self._spatial_aggregate(aggregates.Union, **kwargs)
 
     ### Private API -- Abstracted DRY routines. ###

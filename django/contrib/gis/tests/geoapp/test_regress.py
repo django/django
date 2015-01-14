@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
+from django.contrib.gis.db.models import Extent
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.shortcuts import render_to_kmz
 from django.contrib.gis.tests.utils import no_oracle
@@ -44,7 +45,7 @@ class GeoRegressionTests(TestCase):
         "Testing `extent` on a table with a single point. See #11827."
         pnt = City.objects.get(name='Pueblo').point
         ref_ext = (pnt.x, pnt.y, pnt.x, pnt.y)
-        extent = City.objects.filter(name='Pueblo').extent()
+        extent = City.objects.filter(name='Pueblo').aggregate(Extent('point'))['point__extent']
         for ref_val, val in zip(ref_ext, extent):
             self.assertAlmostEqual(ref_val, val, 4)
 
