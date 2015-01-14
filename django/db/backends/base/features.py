@@ -224,6 +224,7 @@ class BaseDatabaseFeatures(object):
     def supports_stddev(self):
         """Confirm support for STDDEV and related stats functions."""
         class StdDevPop(object):
+            contains_aggregate = True
             sql_function = 'STDDEV_POP'
 
         try:

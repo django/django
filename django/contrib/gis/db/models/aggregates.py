@@ -7,6 +7,7 @@ __all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union']
 class GeoAggregate(Aggregate):
     template = None
     function = None
+    contains_aggregate = 'gis'
     is_extent = False
 
     def as_sql(self, compiler, connection):
