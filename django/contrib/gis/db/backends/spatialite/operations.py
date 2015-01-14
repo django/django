@@ -13,7 +13,7 @@ from django.utils import six
 from django.utils.functional import cached_property
 
 
-class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
+class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     name = 'spatialite'
     spatialite = True
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
@@ -120,15 +120,6 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     @cached_property
     def geojson(self):
         return 'AsGeoJSON' if self.spatial_version >= (3, 0, 0) else None
-
-    def check_aggregate_support(self, aggregate):
-        """
-        Checks if the given aggregate name is supported (that is, if it's
-        in `self.valid_aggregates`).
-        """
-        super(SpatiaLiteOperations, self).check_aggregate_support(aggregate)
-        agg_name = aggregate.__class__.__name__
-        return agg_name in self.valid_aggregates
 
     def convert_extent(self, box, srid):
         """

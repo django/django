@@ -5,7 +5,7 @@ from django.contrib.gis.db.backends.base import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 
 
-class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
+class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     mysql = True
     name = 'mysql'
