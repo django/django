@@ -6,7 +6,8 @@ from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils._os import upath
 
 if HAS_GEOS:
@@ -206,6 +207,7 @@ class Geo3DTest(TestCase):
         # Ordering of points in the resulting geometry may vary between implementations
         self.assertSetEqual({p.ewkt for p in ref_union}, {p.ewkt for p in union})
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_extent(self):
         """
         Testing the Extent3D aggregate for 3D models.
@@ -223,6 +225,7 @@ class Geo3DTest(TestCase):
         for e3d in [extent1, extent2]:
             check_extent3d(e3d)
         self.assertIsNone(City3D.objects.none().extent3d())
+        self.assertIsNone(City3D.objects.none().aggregate(Extent3D('point'))['point__extent3d'])
 
     def test_perimeter(self):
         """

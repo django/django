@@ -1,5 +1,5 @@
 from django.db.models.aggregates import Aggregate
-from django.contrib.gis.db.models.fields import GeometryField, ExtentField
+from django.contrib.gis.db.models.fields import ExtentField
 
 __all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union']
 
@@ -20,9 +20,9 @@ class GeoAggregate(Aggregate):
             self.template = '%(function)s(SDOAGGRTYPE(%(expressions)s,%(tolerance)s))'
         return self.as_sql(compiler, connection)
 
-    def prepare(self, query=None, allow_joins=True, reuse=None, summarize=False):
-        c = super(GeoAggregate, self).prepare(query, allow_joins, reuse, summarize)
-        if not isinstance(self.expressions[0].output_field, GeometryField):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+        c = super(GeoAggregate, self).resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        if not hasattr(c.input_field.field, 'geom_type'):
             raise ValueError('Geospatial aggregates only allowed on geometry fields.')
         return c
 

@@ -1580,6 +1580,14 @@ The legacy ``%(<foo>)s`` syntax in :attr:`ModelFormMixin.success_url
 <django.views.generic.edit.ModelFormMixin.success_url>` is deprecated and
 will be removed in Django 2.0.
 
+``GeoQuerySet`` aggregate methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``collect()``, ``extent()``, ``extent3d()``, ``makeline()``, and ``union()``
+aggregate methods are deprecated and should be replaced by their function-based
+aggregate equivalents (``Collect``, ``Extent``, ``Extent3D``, ``MakeLine``, and
+``Union``).
+
 .. removed-features-1.8:
 
 Features removed in 1.8
