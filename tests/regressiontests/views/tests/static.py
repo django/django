@@ -41,7 +41,8 @@ class StaticTests(TestCase):
         first_chunk = iter(response).next()
         self.assertEqual(len(first_chunk), STREAM_CHUNK_SIZE)
         second_chunk = response.next()
-        self.assertEqual(len(second_chunk), 1451)
+        # strip() to prevent OS line endings from causing differences
+        self.assertEqual(len(second_chunk.strip()), 1449)
 
     def test_unknown_mime_type(self):
         response = self.client.get('/views/%s/file.unknown' % self.prefix)
