@@ -52,7 +52,7 @@ class SDORelate(SpatialOperator):
         return super(SDORelate, self).as_sql(connection, lookup, template_params, sql_params)
 
 
-class OracleOperations(DatabaseOperations, BaseSpatialOperations):
+class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     name = 'oracle'
     oracle = True
