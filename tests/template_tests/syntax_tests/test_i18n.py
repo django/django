@@ -412,3 +412,14 @@ class I18nTagTests(SimpleTestCase):
     def test_i18n38_2(self):
         output = self.engine.render_to_string('i18n38_2', {'langcodes': ['it', 'no']})
         self.assertEqual(output, 'it: Italian/italiano bidi=False; no: Norwegian/norsk bidi=False; ')
+
+    @setup({'i18n_decimal': '{{ obj }}'})
+    def test_i18n_decimal(self):
+        import decimal
+
+        class MyDecimal(decimal.Decimal):
+            def __str__(self):
+                return '$' + super(MyDecimal, self).__str__()
+
+        output = self.engine.render_to_string('i18n_decimal', {'obj': MyDecimal('3.22')})
+        self.assertEqual(output, '$3.22')
