@@ -1,5 +1,7 @@
 from functools import partial
 
+from django.contrib.gis.db.models import aggregates
+
 
 class BaseSpatialFeatures(object):
     gis_enabled = True
@@ -61,15 +63,15 @@ class BaseSpatialFeatures(object):
     # Specifies whether the Collect and Extent aggregates are supported by the database
     @property
     def supports_collect_aggr(self):
-        return 'Collect' in self.connection.ops.valid_aggregates
+        return aggregates.Collect not in self.connection.ops.disallowed_aggregates
 
     @property
     def supports_extent_aggr(self):
-        return 'Extent' in self.connection.ops.valid_aggregates
+        return aggregates.Extent not in self.connection.ops.disallowed_aggregates
 
     @property
     def supports_make_line_aggr(self):
-        return 'MakeLine' in self.connection.ops.valid_aggregates
+        return aggregates.MakeLine not in self.connection.ops.disallowed_aggregates
 
     def __init__(self, *args):
         super(BaseSpatialFeatures, self).__init__(*args)

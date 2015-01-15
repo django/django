@@ -49,7 +49,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     geography = True
     geom_func_prefix = 'ST_'
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
-    valid_aggregates = {'Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union'}
 
     Adapter = PostGISAdapter
     Adaptor = Adapter  # Backwards-compatibility alias.
@@ -360,20 +359,11 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         else:
             raise Exception('Could not determine PROJ.4 version from PostGIS.')
 
-    def spatial_aggregate_sql(self, agg):
-        """
-        Returns the spatial aggregate SQL template and function for the
-        given Aggregate instance.
-        """
-        agg_name = agg.__class__.__name__
-        if not self.check_aggregate_support(agg):
-            raise NotImplementedError('%s spatial aggregate is not implemented for this backend.' % agg_name)
-        agg_name = agg_name.lower()
-        if agg_name == 'union':
-            agg_name += 'agg'
-        sql_template = '%(function)s(%(expressions)s)'
-        sql_function = getattr(self, agg_name)
-        return sql_template, sql_function
+    def spatial_aggregate_name(self, agg_name):
+        if agg_name == 'Extent3D':
+            return self.extent3d
+        else:
+            return self.geom_func_prefix + agg_name
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
