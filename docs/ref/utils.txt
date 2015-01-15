@@ -831,6 +831,9 @@ appropriate entities.
 
     Can be called multiple times on a single string.
 
+    For building up fragments of HTML, you should normally be using
+    :func:`django.utils.html.format_html` instead.
+
     String marked safe will become unsafe again if modified. For example::
 
         >>> mystr = '<b>Hello World</b>   '
