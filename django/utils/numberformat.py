@@ -25,6 +25,8 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
     # sign
     sign = ''
     if isinstance(number, Decimal):
+        if type(number).__str__ is not Decimal.__str__:
+            return six.text_type(number)
         str_number = '{:f}'.format(number)
     else:
         str_number = six.text_type(number)
