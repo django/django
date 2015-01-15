@@ -257,6 +257,6 @@ class MigrateTests(TestCase):
                 INSTALLED_APPS=["django.contrib.contenttypes"],
                 MIGRATION_MODULES={'contenttypes': 'django.contrib.contenttypes.migrations'},
             ):
-                call_command("migrate", "contenttypes", "zero", stdout=six.StringIO())
+                call_command("migrate", "contenttypes", "zero", verbosity=0)
         finally:
-            call_command("migrate", stdout=six.StringIO())
+            call_command("migrate", verbosity=0)
