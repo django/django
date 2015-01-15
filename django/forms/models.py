@@ -124,8 +124,6 @@ def model_to_dict(instance, fields=None, exclude=None):
     fields will be excluded from the returned dict, even if they are listed in
     the ``fields`` argument.
     """
-    # avoid a circular import
-    from django.db.models.fields.related import ManyToManyField
     opts = instance._meta
     data = {}
     for f in chain(opts.concrete_fields, opts.virtual_fields, opts.many_to_many):
@@ -135,7 +133,7 @@ def model_to_dict(instance, fields=None, exclude=None):
             continue
         if exclude and f.name in exclude:
             continue
-        if isinstance(f, ManyToManyField):
+        if f.many_to_many:
             # If the object doesn't have a primary key yet, just use an empty
             # list for its m2m fields. Calling f.value_from_object will raise
             # an exception.
@@ -187,7 +185,8 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
     from django.db.models.fields import Field as ModelField
     sortable_virtual_fields = [f for f in opts.virtual_fields
                                if isinstance(f, ModelField)]
-    for f in sorted(chain(opts.concrete_fields, sortable_virtual_fields, opts.many_to_many)):
+    reverse_m2m = [f for f in opts.get_fields() if f.many_to_many and f.auto_created] if fields is not None else []
+    for f in sorted(chain(opts.concrete_fields, sortable_virtual_fields, opts.many_to_many, reverse_m2m)):
         if not getattr(f, 'editable', False):
             continue
         if fields is not None and f.name not in fields:

@@ -249,6 +249,7 @@ class BaseModelAdminChecks(object):
         check that given field exists and is a ManyToManyField. """
 
         try:
+            return []  # TODO FIXME
             field = model._meta.get_field(field_name)
         except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,

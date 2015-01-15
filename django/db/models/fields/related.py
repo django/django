@@ -1262,16 +1262,17 @@ class ReverseManyRelatedObjectsDescriptor(object):
             manager.add(*value)
 
 
-class ForeignObjectRel(object):
-    # Field flags
-    auto_created = True
-    concrete = False
-    editable = False
-    is_relation = True
+class ForeignObjectRel(RelatedField):
 
     def __init__(self, field, to, related_name=None, limit_choices_to=None,
                  parent_link=False, on_delete=None, related_query_name=None):
+        super(ForeignObjectRel, self).__init__()
+        self.auto_created = True
+        self.concrete = False
+        self.editable = False
+        self.is_relation = True
         self.field = field
+        self.rel = field
         self.to = to
         self.related_name = related_name
         self.related_query_name = related_query_name
@@ -1303,7 +1304,13 @@ class ForeignObjectRel(object):
 
     @cached_property
     def name(self):
-        return self.field.related_query_name()
+        name = self.field.related_accessor_name()
+        if '+' not in name:
+            return name
+
+    @property
+    def attname(self):
+        return self.name
 
     @cached_property
     def related_model(self):
@@ -1450,6 +1457,8 @@ class ManyToManyRel(ForeignObjectRel):
         super(ManyToManyRel, self).__init__(
             field, to, related_name=related_name,
             limit_choices_to=limit_choices_to, related_query_name=related_query_name)
+        self.blank = True
+        self.editable = True
         self.symmetrical = symmetrical
         self.multiple = True
         self.through = through
@@ -1474,6 +1483,23 @@ class ManyToManyRel(ForeignObjectRel):
                 if rel and rel.to == self.to:
                     break
         return field.foreign_related_fields[0]
+
+    def formfield(self, **kwargs):
+        self.name = self.field.related_query_name()  # HACK
+        db = kwargs.pop('using', None)
+        defaults = {
+            'form_class': forms.ModelMultipleChoiceField,
+            'queryset': self.rel.to._default_manager.using(db),
+        }
+        defaults.update(kwargs)
+        # If initial is passed in, it's a list of related objects, but the
+        # MultipleChoiceField takes a list of IDs.
+        if defaults.get('initial') is not None:
+            initial = defaults['initial']
+            if callable(initial):
+                initial = initial()
+            defaults['initial'] = [i._get_pk_val() for i in initial]
+        return super(ManyToManyRel, self).formfield(**defaults)
 
 
 class ForeignObject(RelatedField):
@@ -1503,6 +1529,10 @@ class ForeignObject(RelatedField):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
 
         super(ForeignObject, self).__init__(**kwargs)
+
+    @property
+    def to(self):
+        return self.model
 
     def check(self, **kwargs):
         errors = super(ForeignObject, self).check(**kwargs)
@@ -2132,6 +2162,15 @@ class ManyToManyField(RelatedField):
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
 
         super(ManyToManyField, self).__init__(**kwargs)
+        self.limit_choices_to = {}  # This is in reverse direction.
+
+    @property
+    def to(self):
+        return self.model
+
+    @property
+    def through(self):
+        return self.rel.through
 
     def check(self, **kwargs):
         errors = super(ManyToManyField, self).check(**kwargs)
@@ -2440,6 +2479,21 @@ class ManyToManyField(RelatedField):
 
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)
+
+    def get_related_field(self):
+        """
+        Returns the field in the 'to' object to which this relationship is tied.
+        Provided for symmetry with ManyToManyRel.
+        """
+        opts = self.through._meta
+        if self.rel.through_fields:
+            field = opts.get_field(self.through_fields[0])
+        else:
+            for field in opts.fields:
+                rel = getattr(field, 'rel', None)
+                if rel and rel.to == self.to:
+                    break
+        return field.foreign_related_fields[0]
 
     def _get_m2m_db_table(self, opts):
         "Function that can be curried to provide the m2m table name for this relation"
