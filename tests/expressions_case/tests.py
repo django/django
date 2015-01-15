@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from operator import attrgetter, itemgetter
+import unittest
 from uuid import UUID
 
 from django.core.exceptions import FieldError
@@ -11,6 +12,11 @@ from django.db.models import F, Q, Value, Min, Max
 from django.db.models.expressions import Case, When
 from django.test import TestCase
 from django.utils import six
+
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
 
 from .models import CaseTestModel, O2OCaseTestModel, FKCaseTestModel, Client
 
@@ -726,6 +732,7 @@ class CaseExpressionTests(TestCase):
             transform=attrgetter('integer', 'float')
         )
 
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_update_image(self):
         CaseTestModel.objects.update(
             image=Case(
