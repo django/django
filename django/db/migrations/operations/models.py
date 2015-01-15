@@ -171,6 +171,27 @@ class RenameModel(Operation):
                     related_object.field,
                     to_field,
                 )
+            # Rename M2M fields whose name is based on this model's name.
+            fields = zip(old_model._meta.local_many_to_many, new_model._meta.local_many_to_many)
+            for (old_field, new_field) in fields:
+                # Skip self-referential fields as these are renamed above.
+                if new_field.model == new_field.related.parent_model or not new_field.rel.through._meta.auto_created:
+                    continue
+                # Rename the M2M table that's based on this model's name.
+                old_m2m_model = old_field.rel.through
+                new_m2m_model = new_field.rel.through
+                schema_editor.alter_db_table(
+                    new_m2m_model,
+                    old_m2m_model._meta.db_table,
+                    new_m2m_model._meta.db_table,
+                )
+                # Rename the column in the M2M table that's based on this
+                # model's name.
+                schema_editor.alter_field(
+                    new_m2m_model,
+                    old_m2m_model._meta.get_field(old_model._meta.model_name),
+                    new_m2m_model._meta.get_field(new_model._meta.model_name),
+                )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self.new_name, self.old_name = self.old_name, self.new_name
