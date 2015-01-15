@@ -603,6 +603,23 @@ substring filtering.
 
 .. _documented at sqlite.org: http://www.sqlite.org/faq.html#q18
 
+Old SQLite and ``CASE`` expressions
+-----------------------------------
+
+SQLite 3.6.23.1 and older contains a bug when `handling query parameters`_ in
+a ``CASE`` expression that contains an ``ELSE`` and arithmetic.
+
+SQLite 3.6.23.1 was released in March 2010, and most current binary
+distributions for different platforms include a newer version of SQLite, with
+the notable exception of the Python 2.7 installers for Windows.
+
+As of this writing, the latest release for Windows - Python 2.7.9 - includes
+SQLite 3.6.21. You can install ``pysqlite2`` or replace ``sqlite3.dll`` (by
+default installed in ``C:\Python27\DLLs``) with a newer version from
+http://www.sqlite.org/ to remedy this issue.
+
+.. _handling query parameters: https://code.djangoproject.com/ticket/24148
+
 .. _using-newer-versions-of-pysqlite:
 
 Using newer versions of the SQLite DB-API 2.0 driver
