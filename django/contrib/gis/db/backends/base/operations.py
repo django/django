@@ -46,11 +46,7 @@ class BaseSpatialOperations(object):
     union = False
 
     # Aggregates
-    collect = False
-    extent = False
-    extent3d = False
-    make_line = False
-    unionagg = False
+    disallowed_aggregates = ()
 
     # Serialization
     geohash = False
@@ -103,12 +99,13 @@ class BaseSpatialOperations(object):
         raise NotImplementedError('subclasses of BaseSpatialOperations must provide a geo_db_placeholder() method')
 
     def check_aggregate_support(self, aggregate):
-        if aggregate.contains_aggregate == 'gis':
-            return aggregate.name in self.valid_aggregates
-        return super(BaseSpatialOperations, self).check_aggregate_support(aggregate)
+        if isinstance(aggregate, self.disallowed_aggregates):
+            raise NotImplementedError(
+                "%s spatial aggregation is not supported by this database backend." % aggregate.name
+            )
+        super(BaseSpatialOperations, self).check_aggregate_support(aggregate)
 
-    # Spatial SQL Construction
-    def spatial_aggregate_sql(self, agg):
+    def spatial_aggregate_name(self, agg_name):
         raise NotImplementedError('Aggregate support not implemented for this spatial backend.')
 
     # Routines for getting the OGC-compliant models.

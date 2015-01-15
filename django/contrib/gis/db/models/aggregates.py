@@ -5,23 +5,20 @@ __all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union']
 
 
 class GeoAggregate(Aggregate):
-    template = None
     function = None
-    contains_aggregate = 'gis'
     is_extent = False
 
     def as_sql(self, compiler, connection):
-        if connection.ops.oracle:
-            if not hasattr(self, 'tolerance'):
-                self.tolerance = 0.05
-            self.extra['tolerance'] = self.tolerance
-
-        template, function = connection.ops.spatial_aggregate_sql(self)
-        if template is None:
-            template = '%(function)s(%(expressions)s)'
-        self.extra['template'] = self.extra.get('template', template)
-        self.extra['function'] = self.extra.get('function', function)
+        self.function = connection.ops.spatial_aggregate_name(self.name)
         return super(GeoAggregate, self).as_sql(compiler, connection)
+
+    def as_oracle(self, compiler, connection):
+        if not hasattr(self, 'tolerance'):
+            self.tolerance = 0.05
+        self.extra['tolerance'] = self.tolerance
+        if not self.is_extent:
+            self.template = '%(function)s(SDOAGGRTYPE(%(expressions)s,%(tolerance)s))'
+        return self.as_sql(compiler, connection)
 
     def prepare(self, query=None, allow_joins=True, reuse=None, summarize=False):
         c = super(GeoAggregate, self).prepare(query, allow_joins, reuse, summarize)
