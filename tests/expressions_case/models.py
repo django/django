@@ -3,6 +3,11 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
+
 
 @python_2_unicode_compatible
 class CaseTestModel(models.Model):
@@ -22,7 +27,8 @@ class CaseTestModel(models.Model):
     file = models.FileField(null=True, db_column='file_field')
     file_path = models.FilePathField(null=True)
     float = models.FloatField(null=True, db_column='float_field')
-    image = models.ImageField(null=True)
+    if Image:
+        image = models.ImageField(null=True)
     ip_address = models.IPAddressField(null=True)
     generic_ip_address = models.GenericIPAddressField(null=True)
     null_boolean = models.NullBooleanField()
