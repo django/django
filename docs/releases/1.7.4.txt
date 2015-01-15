@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed a migration crash when unapplying ``contrib.contenttypes``’s or
   ``contrib.auth``’s first migration (:ticket:`24075`).
+
+* Made the migration's ``RenameModel`` operation rename ``ManyToManyField``
+  tables (:ticket:`24135`).
