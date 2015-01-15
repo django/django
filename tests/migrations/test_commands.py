@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import codecs
+import importlib
 import os
 import shutil
 
@@ -685,6 +686,11 @@ class MakeMigrationsTests(MigrationTestBase):
         migration_name_0001 = "my_initial_migration"
         content = cmd("0001", migration_name_0001)
         self.assertIn("dependencies=[\n]", content)
+
+        # Python 3.3+ importlib caches os.listdir() on some platforms like
+        # Mac OS X (#23850).
+        if hasattr(importlib, 'invalidate_caches'):
+            importlib.invalidate_caches()
 
         # generate an empty migration
         migration_name_0002 = "my_custom_migration"
