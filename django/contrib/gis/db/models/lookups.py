@@ -66,6 +66,9 @@ class GISLookup(Lookup):
 
     def process_rhs(self, compiler, connection):
         rhs, rhs_params = super(GISLookup, self).process_rhs(compiler, connection)
+        if hasattr(self.rhs, '_as_sql'):
+            # If rhs is some QuerySet, don't touch it
+            return rhs, rhs_params
 
         geom = self.rhs
         if isinstance(self.rhs, Col):
