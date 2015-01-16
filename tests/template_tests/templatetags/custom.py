@@ -1,4 +1,5 @@
 import operator
+import warnings
 
 from django import template
 from django.template.defaultfilters import stringfilter
@@ -125,83 +126,17 @@ def minustwo_overridden_name(value):
 register.simple_tag(lambda x: x - 1, name='minusone')
 
 
-@register.assignment_tag
-def assignment_no_params():
-    """Expected assignment_no_params __doc__"""
-    return "assignment_no_params - Expected result"
-assignment_no_params.anything = "Expected assignment_no_params __dict__"
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore')
 
+    @register.assignment_tag
+    def assignment_no_params():
+        """Expected assignment_no_params __doc__"""
+        return "assignment_no_params - Expected result"
+    assignment_no_params.anything = "Expected assignment_no_params __dict__"
 
-@register.assignment_tag
-def assignment_one_param(arg):
-    """Expected assignment_one_param __doc__"""
-    return "assignment_one_param - Expected result: %s" % arg
-assignment_one_param.anything = "Expected assignment_one_param __dict__"
-
-
-@register.assignment_tag(takes_context=False)
-def assignment_explicit_no_context(arg):
-    """Expected assignment_explicit_no_context __doc__"""
-    return "assignment_explicit_no_context - Expected result: %s" % arg
-assignment_explicit_no_context.anything = "Expected assignment_explicit_no_context __dict__"
-
-
-@register.assignment_tag(takes_context=True)
-def assignment_no_params_with_context(context):
-    """Expected assignment_no_params_with_context __doc__"""
-    return "assignment_no_params_with_context - Expected result (context value: %s)" % context['value']
-assignment_no_params_with_context.anything = "Expected assignment_no_params_with_context __dict__"
-
-
-@register.assignment_tag(takes_context=True)
-def assignment_params_and_context(context, arg):
-    """Expected assignment_params_and_context __doc__"""
-    return "assignment_params_and_context - Expected result (context value: %s): %s" % (context['value'], arg)
-assignment_params_and_context.anything = "Expected assignment_params_and_context __dict__"
-
-
-@register.assignment_tag
-def assignment_two_params(one, two):
-    """Expected assignment_two_params __doc__"""
-    return "assignment_two_params - Expected result: %s, %s" % (one, two)
-assignment_two_params.anything = "Expected assignment_two_params __dict__"
-
-
-@register.assignment_tag
-def assignment_one_default(one, two='hi'):
-    """Expected assignment_one_default __doc__"""
-    return "assignment_one_default - Expected result: %s, %s" % (one, two)
-assignment_one_default.anything = "Expected assignment_one_default __dict__"
-
-
-@register.assignment_tag
-def assignment_unlimited_args(one, two='hi', *args):
-    """Expected assignment_unlimited_args __doc__"""
-    return "assignment_unlimited_args - Expected result: %s" % (', '.join(six.text_type(arg) for arg in [one, two] + list(args)))
-assignment_unlimited_args.anything = "Expected assignment_unlimited_args __dict__"
-
-
-@register.assignment_tag
-def assignment_only_unlimited_args(*args):
-    """Expected assignment_only_unlimited_args __doc__"""
-    return "assignment_only_unlimited_args - Expected result: %s" % ', '.join(six.text_type(arg) for arg in args)
-assignment_only_unlimited_args.anything = "Expected assignment_only_unlimited_args __dict__"
-
-
-@register.assignment_tag
-def assignment_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
-    """Expected assignment_unlimited_args_kwargs __doc__"""
-    # Sort the dictionary by key to guarantee the order for testing.
-    sorted_kwarg = sorted(six.iteritems(kwargs), key=operator.itemgetter(0))
-    return "assignment_unlimited_args_kwargs - Expected result: %s / %s" % (
-        ', '.join(six.text_type(arg) for arg in [one, two] + list(args)),
-        ', '.join('%s=%s' % (k, v) for (k, v) in sorted_kwarg)
-    )
-assignment_unlimited_args_kwargs.anything = "Expected assignment_unlimited_args_kwargs __dict__"
-
-
-@register.assignment_tag(takes_context=True)
-def assignment_tag_without_context_parameter(arg):
-    """Expected assignment_tag_without_context_parameter __doc__"""
-    return "Expected result"
-assignment_tag_without_context_parameter.anything = "Expected assignment_tag_without_context_parameter __dict__"
+    @register.assignment_tag(takes_context=True)
+    def assignment_tag_without_context_parameter(arg):
+        """Expected assignment_tag_without_context_parameter __doc__"""
+        return "Expected result"
+    assignment_tag_without_context_parameter.anything = "Expected assignment_tag_without_context_parameter __dict__"
