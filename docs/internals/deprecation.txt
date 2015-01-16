@@ -20,6 +20,8 @@ details on these changes.
 
 * The ``django.forms.extras`` package will be removed.
 
+* The ``assignment_tag`` helper will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

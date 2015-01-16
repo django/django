@@ -61,7 +61,8 @@ from django.apps import apps
 from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatibility
     ContextPopException)
 from django.utils import lru_cache
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (RemovedInDjango20Warning,
+    RemovedInDjango21Warning)
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,
     get_text_list)
@@ -1021,9 +1022,9 @@ def token_kwargs(bits, parser, support_legacy=False):
 def parse_bits(parser, bits, params, varargs, varkw, defaults,
                takes_context, name):
     """
-    Parses bits for template tag helpers (simple_tag, include_tag and
-    assignment_tag), in particular by detecting syntax errors and by
-    extracting positional and keyword arguments.
+    Parses bits for template tag helpers simple_tag and inclusion_tag, in
+    particular by detecting syntax errors and by extracting positional and
+    keyword arguments.
     """
     if takes_context:
         if params[0] == 'context':
@@ -1099,9 +1100,9 @@ def generic_tag_compiler(parser, token, params, varargs, varkw, defaults,
 
 class TagHelperNode(Node):
     """
-    Base class for tag helper nodes such as SimpleNode, InclusionNode and
-    AssignmentNode. Manages the positional and keyword arguments to be passed
-    to the decorated function.
+    Base class for tag helper nodes such as SimpleNode and InclusionNode.
+    Manages the positional and keyword arguments to be passed to the decorated
+    function.
     """
 
     def __init__(self, takes_context, args, kwargs):
@@ -1191,17 +1192,31 @@ class Library(object):
             params, varargs, varkw, defaults = getargspec(func)
 
             class SimpleNode(TagHelperNode):
+                def __init__(self, takes_context, args, kwargs, target_var):
+                    super(SimpleNode, self).__init__(takes_context, args, kwargs)
+                    self.target_var = target_var
 
                 def render(self, context):
                     resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
-                    return func(*resolved_args, **resolved_kwargs)
+                    output = func(*resolved_args, **resolved_kwargs)
+                    if self.target_var is not None:
+                        context[self.target_var] = output
+                        return ''
+                    return output
 
             function_name = (name or
                 getattr(func, '_decorated_function', func).__name__)
-            compile_func = partial(generic_tag_compiler,
-                params=params, varargs=varargs, varkw=varkw,
-                defaults=defaults, name=function_name,
-                takes_context=takes_context, node_class=SimpleNode)
+
+            def compile_func(parser, token):
+                bits = token.split_contents()[1:]
+                target_var = None
+                if len(bits) >= 2 and bits[-2] == 'as':
+                    target_var = bits[-1]
+                    bits = bits[:-2]
+                args, kwargs = parse_bits(parser, bits, params,
+                    varargs, varkw, defaults, takes_context, function_name)
+                return SimpleNode(takes_context, args, kwargs, target_var)
+
             compile_func.__doc__ = func.__doc__
             self.tag(function_name, compile_func)
             return func
@@ -1216,46 +1231,12 @@ class Library(object):
             raise TemplateSyntaxError("Invalid arguments provided to simple_tag")
 
     def assignment_tag(self, func=None, takes_context=None, name=None):
-        def dec(func):
-            params, varargs, varkw, defaults = getargspec(func)
-
-            class AssignmentNode(TagHelperNode):
-                def __init__(self, takes_context, args, kwargs, target_var):
-                    super(AssignmentNode, self).__init__(takes_context, args, kwargs)
-                    self.target_var = target_var
-
-                def render(self, context):
-                    resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
-                    context[self.target_var] = func(*resolved_args, **resolved_kwargs)
-                    return ''
-
-            function_name = (name or
-                getattr(func, '_decorated_function', func).__name__)
-
-            def compile_func(parser, token):
-                bits = token.split_contents()[1:]
-                if len(bits) < 2 or bits[-2] != 'as':
-                    raise TemplateSyntaxError(
-                        "'%s' tag takes at least 2 arguments and the "
-                        "second last argument must be 'as'" % function_name)
-                target_var = bits[-1]
-                bits = bits[:-2]
-                args, kwargs = parse_bits(parser, bits, params,
-                    varargs, varkw, defaults, takes_context, function_name)
-                return AssignmentNode(takes_context, args, kwargs, target_var)
-
-            compile_func.__doc__ = func.__doc__
-            self.tag(function_name, compile_func)
-            return func
-
-        if func is None:
-            # @register.assignment_tag(...)
-            return dec
-        elif callable(func):
-            # @register.assignment_tag
-            return dec(func)
-        else:
-            raise TemplateSyntaxError("Invalid arguments provided to assignment_tag")
+        warnings.warn(
+            "assignment_tag() is deprecated. Use simple_tag() instead",
+            RemovedInDjango21Warning,
+            stacklevel=2,
+        )
+        return self.simple_tag(func, takes_context, name)
 
     def inclusion_tag(self, file_name, takes_context=False, name=None):
         def dec(func):
