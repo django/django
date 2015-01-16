@@ -5,6 +5,7 @@ import io
 import os
 import re
 import shutil
+import sys
 import warnings
 
 from django.core import management
@@ -14,7 +15,7 @@ from django.utils._os import upath
 from django.utils import six
 from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning
-from django.utils.unittest import SkipTest
+from django.utils.unittest import expectedFailure, SkipTest
 
 
 LOCALE='de'
@@ -140,6 +141,10 @@ class BasicExtractorTests(ExtractorTests):
         management.call_command('makemessages', locale=[LOCALE], stdout=stdout)
         self.assertIn("UnicodeDecodeError: skipped file not_utf8.txt in .",
                       force_text(stdout.getvalue()))
+
+    # This issue is fixed in 1.8+ (#23312).
+    if six.PY3 and sys.platform.startswith('win'):
+        test_unicode_decode_error = expectedFailure(test_unicode_decode_error)
 
     def test_extraction_warning(self):
         """test xgettext warning about multiple bare interpolation placeholders"""
