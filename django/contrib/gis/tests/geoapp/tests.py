@@ -493,6 +493,15 @@ class GeoQuerySetTest(TestCase):
         self.assertIsNone(City.objects.filter(name=('Smalltown')).extent())
         self.assertIsNone(City.objects.filter(name=('Smalltown')).aggregate(Extent('point'))['point__extent'])
 
+    @skipUnlessDBFeature("supports_extent_aggr")
+    def test_extent_with_limit(self):
+        """
+        Testing if extent supports limit.
+        """
+        extent1 = City.objects.all().aggregate(Extent('point'))['point__extent']
+        extent2 = City.objects.all()[:3].aggregate(Extent('point'))['point__extent']
+        self.assertNotEqual(extent1, extent2)
+
     @skipUnlessDBFeature("has_force_rhr_method")
     def test_force_rhr(self):
         "Testing GeoQuerySet.force_rhr()."
