@@ -221,6 +221,15 @@ class CustomUserBadRequiredFields(AbstractBaseUser):
     class Meta:
         app_label = 'auth'
 
+
+class CustomUserUUID(AbstractUser):
+    "A user with a UUID as primary key to test interactions with the login logic"
+    uuid = models.UUIDField(primary_key=True)
+
+    class Meta:
+        app_label = 'auth'
+
+
 # Undo swap hack
 AbstractUser._meta.local_many_to_many = old_au_local_m2m
 PermissionsMixin._meta.local_many_to_many = old_pm_local_m2m
