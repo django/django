@@ -375,7 +375,7 @@ Testing responses
 
 The ``get()`` and ``post()`` methods both return a ``Response`` object. This
 ``Response`` object is *not* the same as the ``HttpResponse`` object returned
-Django views; the test response object has some additional data useful for
+by Django views; the test response object has some additional data useful for
 test code to verify.
 
 Specifically, a ``Response`` object has the following attributes:
