@@ -293,10 +293,11 @@ class GeometryField(GeoSelectFormatMixin, Field):
                              (lookup_type, self.__class__.__name__))
 
     def get_prep_lookup(self, lookup_type, value):
-        if lookup_type == 'isnull':
-            return bool(value)
-        else:
+        if lookup_type == 'contains':
+            # 'contains' name might conflict with the "normal" contains lookup,
+            # for which the value is not prepared, but left as-is.
             return self.get_prep_value(value)
+        return super(GeometryField, self).get_prep_lookup(lookup_type, value)
 
     def get_db_prep_save(self, value, connection):
         "Prepares the value for saving in the database."
