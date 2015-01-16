@@ -1367,8 +1367,8 @@ moved to the `django-localflavor`_ package (version 1.1+).
 
 .. _django-localflavor: https://pypi.python.org/pypi/django-localflavor
 
-``django.contrib.admin.helpers.InlineAdminForm.original_content_type_id``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``InlineAdminForm.original_content_type_id``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``original_content_type_id`` attribute on ``InlineAdminForm`` has been
 deprecated and will be removed in Django 2.0. Historically, it was used
