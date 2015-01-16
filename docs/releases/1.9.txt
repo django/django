@@ -1,0 +1,286 @@
+============================================
+Django 1.9 release notes - UNDER DEVELOPMENT
+============================================
+
+Welcome to Django 1.9!
+
+These release notes cover the `new features`_, as well as some `backwards
+incompatible changes`_ you'll want to be aware of when upgrading from Django
+1.8 or older versions. We've :ref:`dropped some features
+<deprecation-removed-in-1.9>` that have reached the end of their deprecation
+cycle, and we've `begun the deprecation process for some features`_.
+
+.. _`new features`: `What's new in Django 1.9`_
+.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.9`_
+.. _`dropped some features`: `Features removed in 1.9`_
+.. _`begun the deprecation process for some features`: `Features deprecated in 1.9`_
+
+Python compatibility
+====================
+
+Like Django 1.8, Django 1.9 requires Python 2.7 or above, though we
+**highly recommend** the latest minor release. We've dropped support for
+Python 3.2 and added support for Python 3.5.
+
+What's new in Django 1.9
+========================
+
+...
+
+Minor features
+~~~~~~~~~~~~~~
+
+:mod:`django.contrib.admin`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.auth`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.gis`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.messages`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.redirects`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.sessions`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.sites`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.syndication`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+Cache
+^^^^^
+
+* ...
+
+Email
+^^^^^
+
+* ...
+
+File Storage
+^^^^^^^^^^^^
+
+* ...
+
+File Uploads
+^^^^^^^^^^^^
+
+* ...
+
+Forms
+^^^^^
+
+* ...
+
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+Management Commands
+^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+Models
+^^^^^^
+
+* ...
+
+Signals
+^^^^^^^
+
+* ...
+
+Templates
+^^^^^^^^^
+
+* ...
+
+Requests and Responses
+^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+Tests
+^^^^^
+
+* ...
+
+Validators
+^^^^^^^^^^
+
+* ...
+
+Backwards incompatible changes in 1.9
+=====================================
+
+.. warning::
+
+    In addition to the changes outlined in this section, be sure to review the
+    :doc:`deprecation timeline </internals/deprecation>` for any features that
+    have been removed. If you haven't updated your code within the
+    deprecation timeline for a given feature, its removal may appear as a
+    backwards incompatible change.
+
+...
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* ...
+
+.. _deprecated-features-1.9:
+
+Features deprecated in 1.9
+==========================
+
+...
+
+.. removed-features-1.9:
+
+Features removed in 1.9
+=======================
+
+These features have reached the end of their deprecation cycle and so have been
+removed in Django 1.9 (please see the :ref:`deprecation timeline
+<deprecation-removed-in-1.9>` for more details):
+
+* ``django.utils.dictconfig`` is removed.
+
+* ``django.utils.importlib`` is removed.
+
+* ``django.utils.tzinfo`` is removed.
+
+* ``django.utils.unittest`` is removed.
+
+* The ``syncdb`` command is removed.
+
+* ``django.db.models.signals.pre_syncdb`` and
+  ``django.db.models.signals.post_syncdb`` is removed.
+
+* Support for ``allow_syncdb`` on database routers is removed.
+
+* The legacy method of syncing apps without migrations is removed,
+  and migrations are compulsory for all apps. This includes automatic
+  loading of ``initial_data`` fixtures and support for initial SQL data.
+
+* All models need to be defined inside an installed application or declare an
+  explicit :attr:`~django.db.models.Options.app_label`. Furthermore, it isn't
+  possible to import them before their application is loaded. In particular, it
+  isn't possible to import models inside the root package of an application.
+
+* The model and form ``IPAddressField`` is removed. A stub field remains for
+  compatibility with historical migrations.
+
+* ``AppCommand.handle_app()`` is no longer be supported.
+
+* ``RequestSite`` is located in ``django.contrib.sites.requests`` and
+  ``get_current_site`` in ``django.contrib.sites.shortcuts``.
+
+* FastCGI support via the ``runfcgi`` management command is removed.
+
+* ``django.utils.datastructures.SortedDict`` is removed.
+
+* ``ModelAdmin.declared_fieldsets`` is removed.
+
+* Instances of ``util.py`` in the Django codebase have been renamed to
+  ``utils.py`` in an effort to unify all util and utils references.
+  The modules that provided backwards compatibility are removed:
+
+  * ``django.contrib.admin.util``
+  * ``django.contrib.gis.db.backends.util``
+  * ``django.db.backends.util``
+  * ``django.forms.util``
+
+* ``ModelAdmin.get_formsets`` is removed.
+
+* The backward compatible shims introduced to rename the
+  ``BaseMemcachedCache._get_memcache_timeout()`` method to
+  ``get_backend_timeout()`` is removed.
+
+* The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` are removed.
+
+* The ``use_natural_keys`` argument for ``serializers.serialize()`` is removed.
+
+* ``django.forms.get_declared_fields`` is removed.
+
+* The ability to use a ``SplitDateTimeWidget`` with ``DateTimeField`` is
+  removed.
+
+* The ``WSGIRequest.REQUEST`` property is removed.
+
+* The class ``django.utils.datastructures.MergeDict`` is removed.
+
+* The ``zh-cn`` and ``zh-tw`` language codes are removed.
+
+* The internal ``django.utils.functional.memoize()`` is removed.
+
+* ``django.core.cache.get_cache`` is removed.
+
+* ``django.db.models.loading`` is removed.
+
+* Passing callable arguments to querysets is no longer possible.
+
+* ``BaseCommand.requires_model_validation`` is removed in favor of
+  ``requires_system_checks``. Admin validators is replaced by admin checks.
+
+* ``ModelAdmin.validator`` is removed in favor of the new ``checks``
+  attribute.
+
+* ``django.db.backends.DatabaseValidation.validate_field`` is removed in
+  favor of the ``check_field`` method.
+
+* ``django.utils.module_loading.import_by_path`` is removed in favor of
+  ``django.utils.module_loading.import_string``.
+
+* ``ssi`` and ``url`` template tags are removed from the ``future`` template
+  tag library.
+
+* ``django.utils.text.javascript_quote()`` is removed.
+
+* Database test settings as independent entries in the database settings,
+  prefixed by ``TEST_``, are no longer supported.
+
+* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+  :class:`~django.forms.ModelMultipleChoiceField` is removed.
+
+* The default value of the
+  :attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
+  attribute has changed from ``True`` to ``False``.
+
+* ``django.contrib.sitemaps.FlatPageSitemap`` is removed in favor of
+  ``django.contrib.flatpages.sitemaps.FlatPageSitemap``.
