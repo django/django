@@ -276,16 +276,16 @@ print(article.headline)"""
         with NamedTemporaryFile(mode='w+', suffix=".py", dir='.') as script:
             script.write(script_template % pickle.dumps(a))
             script.flush()
+            env = {
+                # Needed to run test outside of tests directory
+                str('PYTHONPATH'): os.pathsep.join(sys.path),
+                # Needed on Windows because http://bugs.python.org/issue8557
+                str('PATH'): os.environ['PATH'],
+            }
+            if 'SYSTEMROOT' in os.environ:  # Windows http://bugs.python.org/issue20614
+                env[str('SYSTEMROOT')] = os.environ['SYSTEMROOT']
             try:
-                result = subprocess.check_output(
-                    [sys.executable, script.name],
-                    env={
-                        # Needed to run test outside of tests directory
-                        str('PYTHONPATH'): os.pathsep.join(sys.path),
-                        # Needed on Windows because http://bugs.python.org/issue8557
-                        str('PATH'): os.environ['PATH'],
-                    }
-                )
+                result = subprocess.check_output([sys.executable, script.name], env=env)
             except subprocess.CalledProcessError:
                 self.fail("Unable to reload model pickled data")
         self.assertEqual(result.strip().decode(), "Some object")
