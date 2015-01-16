@@ -34,7 +34,7 @@ The short version of the steps involved is:
 
 #. Upload the package(s) to the ``djangoproject.com`` server.
 
-#. Unless this is a pre-release, add the new version(s) to PyPI.
+#. Upload the new version(s) to PyPI.
 
 #. Declare the new version in the admin on ``djangoproject.com``.
 
@@ -315,7 +315,7 @@ Now you're ready to actually put the release out there. To do this:
 
 #. Go to the `Add release page in the admin`__, enter the new release number
    exactly as it appears in the name of the tarball (Django-<version>.tar.gz).
-   So for example enter "1.5.1" or "1.4-rc-2", etc. If the release is part of
+   So for example enter "1.5.1" or "1.4c2", etc. If the release is part of
    an LTS branch, mark it so.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
