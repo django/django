@@ -233,16 +233,6 @@ Minor features
   ``OGRException`` has been kept for backwards compatibility but should not be
   used any longer.
 
-:mod:`django.contrib.messages`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* ...
-
-:mod:`django.contrib.redirects`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* ...
-
 :mod:`django.contrib.sessions`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -266,16 +256,6 @@ Minor features
 * The default :class:`~django.contrib.sites.models.Site` created when running
   ``migrate`` now respects the :setting:`SITE_ID` setting (instead of always
   using ``pk=1``).
-
-:mod:`django.contrib.staticfiles`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* ...
-
-:mod:`django.contrib.syndication`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* ...
 
 Cache
 ^^^^^
@@ -331,11 +311,6 @@ File Storage
   long filename that already exists on the storage. See the :ref:`deprecation
   note <storage-max-length-update>` about adding this argument to your custom
   storage classes.
-
-File Uploads
-^^^^^^^^^^^^
-
-* ...
 
 Forms
 ^^^^^
