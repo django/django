@@ -136,43 +136,49 @@ class WriterTests(TestCase):
         self.assertEqual(value.null, new_value.null)
         self.assertEqual(value.unique, new_value.unique)
 
-    def test_serialize(self):
-        """
-        Tests various different forms of the serializer.
-        This does not care about formatting, just that the parsed result is
-        correct, so we always exec() the result and check that.
-        """
-        # Basic values
+    def test_serialize_numbers(self):
         self.assertSerializedEqual(1)
         self.assertSerializedEqual(1.2)
         self.assertTrue(math.isinf(self.serialize_round_trip(float("inf"))))
         self.assertTrue(math.isinf(self.serialize_round_trip(float("-inf"))))
         self.assertTrue(math.isnan(self.serialize_round_trip(float("nan"))))
+
+    def test_serialize_constants(self):
         self.assertSerializedEqual(None)
+        self.assertSerializedEqual(True)
+        self.assertSerializedEqual(False)
+
+    def test_serialize_strings(self):
         self.assertSerializedEqual(b"foobar")
         string, imports = MigrationWriter.serialize(b"foobar")
         self.assertEqual(string, "b'foobar'")
         self.assertSerializedEqual("föobár")
         string, imports = MigrationWriter.serialize("foobar")
         self.assertEqual(string, "'foobar'")
+
+    def test_serialize_collections(self):
         self.assertSerializedEqual({1: 2})
         self.assertSerializedEqual(["a", 2, True, None])
         self.assertSerializedEqual({2, 3, "eighty"})
         self.assertSerializedEqual({"lalalala": ["yeah", "no", "maybe"]})
         self.assertSerializedEqual(_('Hello'))
-        # Builtins
-        self.assertSerializedEqual([list, tuple, dict, set])
-        string, imports = MigrationWriter.serialize([list, tuple, dict, set])
-        self.assertEqual(string, "[list, tuple, dict, set]")
-        self.assertEqual(imports, set())
-        # Functions
+
+    def test_serialize_builtin_types(self):
+        self.assertSerializedEqual([list, tuple, dict, set, frozenset])
+        self.assertSerializedResultEqual(
+            [list, tuple, dict, set, frozenset],
+            ("[list, tuple, dict, set, frozenset]", set())
+        )
+
+    def test_serialize_functions(self):
         with six.assertRaisesRegex(self, ValueError, 'Cannot serialize function: lambda'):
             self.assertSerializedEqual(lambda x: 42)
         self.assertSerializedEqual(models.SET_NULL)
         string, imports = MigrationWriter.serialize(models.SET(42))
         self.assertEqual(string, 'models.SET(42)')
         self.serialize_round_trip(models.SET(42))
-        # Datetime stuff
+
+    def test_serialize_datetime(self):
         self.assertSerializedEqual(datetime.datetime.utcnow())
         self.assertSerializedEqual(datetime.datetime.utcnow)
         self.assertSerializedEqual(datetime.datetime.today())
@@ -181,41 +187,46 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(datetime.date.today)
         self.assertSerializedEqual(datetime.datetime.now().time())
         self.assertSerializedEqual(datetime.datetime(2014, 1, 1, 1, 1, tzinfo=get_default_timezone()))
-        self.assertSerializedEqual(datetime.datetime(2014, 1, 1, 1, 1, tzinfo=FixedOffset(180)))
-        safe_date = datetime_safe.date(2014, 3, 31)
-        string, imports = MigrationWriter.serialize(safe_date)
-        self.assertEqual(string, repr(datetime.date(2014, 3, 31)))
-        self.assertEqual(imports, {'import datetime'})
-        safe_time = datetime_safe.time(10, 25)
-        string, imports = MigrationWriter.serialize(safe_time)
-        self.assertEqual(string, repr(datetime.time(10, 25)))
-        self.assertEqual(imports, {'import datetime'})
-        safe_datetime = datetime_safe.datetime(2014, 3, 31, 16, 4, 31)
-        string, imports = MigrationWriter.serialize(safe_datetime)
-        self.assertEqual(string, repr(datetime.datetime(2014, 3, 31, 16, 4, 31)))
-        self.assertEqual(imports, {'import datetime'})
-        timezone_aware_datetime = datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)
-        string, imports = MigrationWriter.serialize(timezone_aware_datetime)
-        self.assertEqual(string, "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)")
-        self.assertEqual(imports, {'import datetime', 'from django.utils.timezone import utc'})
-        # Django fields
+        self.assertSerializedEqual(datetime.datetime(2013, 12, 31, 22, 1, tzinfo=FixedOffset(180)))
+        self.assertSerializedResultEqual(
+            datetime.datetime(2014, 1, 1, 1, 1),
+            ("datetime.datetime(2014, 1, 1, 1, 1)", {'import datetime'})
+        )
+        self.assertSerializedResultEqual(
+            datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc),
+            (
+                "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
+                {'import datetime', 'from django.utils.timezone import utc'},
+            )
+        )
+
+    def test_serialize_datetime_safe(self):
+        self.assertSerializedResultEqual(
+            datetime_safe.date(2014, 3, 31),
+            ("datetime.date(2014, 3, 31)", {'import datetime'})
+        )
+        self.assertSerializedResultEqual(
+            datetime_safe.time(10, 25),
+            ("datetime.time(10, 25)", {'import datetime'})
+        )
+        self.assertSerializedResultEqual(
+            datetime_safe.datetime(2014, 3, 31, 16, 4, 31),
+            ("datetime.datetime(2014, 3, 31, 16, 4, 31)", {'import datetime'})
+        )
+
+    def test_serialize_fields(self):
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
         self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
-        # Setting references
+
+    def test_serialize_settings(self):
         self.assertSerializedEqual(SettingsReference(settings.AUTH_USER_MODEL, "AUTH_USER_MODEL"))
         self.assertSerializedResultEqual(
             SettingsReference("someapp.model", "AUTH_USER_MODEL"),
-            (
-                "settings.AUTH_USER_MODEL",
-                {"from django.conf import settings"},
-            )
+            ("settings.AUTH_USER_MODEL", {"from django.conf import settings"})
         )
         self.assertSerializedResultEqual(
             ((x, x * x) for x in range(3)),
-            (
-                "((0, 0), (1, 1), (2, 4))",
-                set(),
-            )
+            ("((0, 0), (1, 1), (2, 4))", set())
         )
 
     def test_serialize_compiled_regex(self):
@@ -316,6 +327,15 @@ class WriterTests(TestCase):
                 '^Could not find function upload_to in migrations.test_writer'):
             self.serialize_round_trip(TestModel2.thing)
 
+    def test_serialize_managers(self):
+        self.assertSerializedEqual(models.Manager())
+        self.assertSerializedResultEqual(
+            FoodQuerySet.as_manager(),
+            ('migrations.models.FoodQuerySet.as_manager()', {'import migrations.models'})
+        )
+        self.assertSerializedEqual(FoodManager('a', 'b'))
+        self.assertSerializedEqual(FoodManager('x', 'y', c=3, d=4))
+
     def test_simple_migration(self):
         """
         Tests serializing a simple migration.
@@ -399,25 +419,6 @@ class WriterTests(TestCase):
             result['custom_migration_operations'].more_operations.TestOperation
         )
 
-    def test_serialize_datetime(self):
-        """
-        #23365 -- Timezone-aware datetimes should be allowed.
-        """
-        # naive datetime
-        naive_datetime = datetime.datetime(2014, 1, 1, 1, 1)
-        self.assertEqual(MigrationWriter.serialize_datetime(naive_datetime),
-                         "datetime.datetime(2014, 1, 1, 1, 1)")
-
-        # datetime with utc timezone
-        utc_datetime = datetime.datetime(2014, 1, 1, 1, 1, tzinfo=utc)
-        self.assertEqual(MigrationWriter.serialize_datetime(utc_datetime),
-                         "datetime.datetime(2014, 1, 1, 1, 1, tzinfo=utc)")
-
-        # datetime with FixedOffset tzinfo
-        fixed_offset_datetime = datetime.datetime(2014, 1, 1, 1, 1, tzinfo=FixedOffset(180))
-        self.assertEqual(MigrationWriter.serialize_datetime(fixed_offset_datetime),
-                         "datetime.datetime(2013, 12, 31, 22, 1, tzinfo=utc)")
-
     def test_deconstruct_class_arguments(self):
         # Yes, it doesn't make sense to use a class as a default for a
         # CharField. It does make sense for custom fields though, for example
@@ -428,12 +429,3 @@ class WriterTests(TestCase):
 
         string = MigrationWriter.serialize(models.CharField(default=DeconstructableInstances))[0]
         self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructableInstances)")
-
-    def test_serialize_managers(self):
-        self.assertSerializedEqual(models.Manager())
-        self.assertSerializedResultEqual(
-            FoodQuerySet.as_manager(),
-            ('migrations.models.FoodQuerySet.as_manager()', {'import migrations.models'})
-        )
-        self.assertSerializedEqual(FoodManager('a', 'b'))
-        self.assertSerializedEqual(FoodManager('x', 'y', c=3, d=4))
