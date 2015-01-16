@@ -466,7 +466,7 @@ class SQLCompiler(object):
         if obj.low_mark == 0 and obj.high_mark is None and not self.query.distinct_fields:
             # If there is no slicing in use, then we can safely drop all ordering
             obj.clear_ordering(True)
-        return obj.get_compiler(connection=self.connection).as_sql()
+        return obj.get_compiler(connection=self.connection).as_sql(subquery=True)
 
     def get_default_columns(self, start_alias=None, opts=None, from_parent=None):
         """

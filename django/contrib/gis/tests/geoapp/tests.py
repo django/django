@@ -890,6 +890,21 @@ class GeoQuerySetTest(TestCase):
         self.assertIsNone(qs.unionagg(field_name='point'))
         self.assertIsNone(qs.aggregate(Union('point'))['point__union'])
 
+    def test_within_subquery(self):
+        """
+        Test that using a queryset inside a geo lookup is working (using a subquery)
+        (#14483).
+        """
+        tex_cities = City.objects.filter(
+            point__within=Country.objects.filter(name='Texas').values('mpoly')).order_by('name')
+        expected = ['Dallas', 'Houston']
+        if not connection.features.supports_real_shape_operations:
+            expected.append('Oklahoma City')
+        self.assertEqual(
+            list(tex_cities.values_list('name', flat=True)),
+            expected
+        )
+
     def test_non_concrete_field(self):
         NonConcreteModel.objects.create(point=Point(0, 0), name='name')
         list(NonConcreteModel.objects.all())
