@@ -99,7 +99,7 @@ class OperationWriter(object):
         i = len(args)
         # Only iterate over remaining arguments
         for arg_name in argspec.args[i + 1:]:
-            if arg_name in kwargs:
+            if arg_name in kwargs:  # Don't sort to maintain signature order
                 arg_value = kwargs[arg_name]
                 _write(arg_name, arg_value)
 
@@ -138,7 +138,7 @@ class MigrationWriter(object):
             "replaces_str": "",
         }
 
-        imports = set()
+        imports = {"from django.db import migrations, models"}
 
         # Deconstruct operations
         operations = []
@@ -169,14 +169,17 @@ class MigrationWriter(object):
                 imports.remove(line)
                 self.needs_manual_porting = True
         imports.discard("from django.db import models")
-        items["imports"] = "\n".join(imports) + "\n" if imports else ""
+        # Sort imports by the package / module to be imported (the part after
+        # "from" in "from ... import ..." or after "import" in "import ...").
+        sorted_imports = sorted(imports, key=lambda i: i.split()[1])
+        items["imports"] = "\n".join(sorted_imports) + "\n" if imports else ""
         if migration_imports:
             items["imports"] += (
                 "\n\n# Functions from the following migrations need manual "
                 "copying.\n# Move them and any dependencies into this file, "
                 "then update the\n# RunPython operations to refer to the local "
                 "versions:\n# %s"
-            ) % "\n# ".join(migration_imports)
+            ) % "\n# ".join(sorted(migration_imports))
         # If there's a replaces, make a string for it
         if self.migration.replaces:
             items['replaces_str'] = "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
@@ -244,7 +247,7 @@ class MigrationWriter(object):
             arg_string, arg_imports = cls.serialize(arg)
             strings.append(arg_string)
             imports.update(arg_imports)
-        for kw, arg in kwargs.items():
+        for kw, arg in sorted(kwargs.items()):
             arg_string, arg_imports = cls.serialize(arg)
             imports.update(arg_imports)
             strings.append("%s=%s" % (kw, arg_string))
@@ -297,7 +300,7 @@ class MigrationWriter(object):
         elif isinstance(value, dict):
             imports = set()
             strings = []
-            for k, v in value.items():
+            for k, v in sorted(value.items()):
                 k_string, k_imports = cls.serialize(k)
                 v_string, v_imports = cls.serialize(v)
                 imports.update(k_imports)
@@ -443,7 +446,6 @@ MIGRATION_TEMPLATE = """\
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
 %(imports)s
 
 class Migration(migrations.Migration):

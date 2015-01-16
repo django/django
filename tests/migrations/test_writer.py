@@ -216,7 +216,15 @@ class WriterTests(TestCase):
 
     def test_serialize_fields(self):
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
+        self.assertSerializedResultEqual(
+            models.CharField(max_length=255),
+            ("models.CharField(max_length=255)", {"from django.db import models"})
+        )
         self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
+        self.assertSerializedResultEqual(
+            models.TextField(null=True, blank=True),
+            ("models.TextField(blank=True, null=True)", {'from django.db import models'})
+        )
 
     def test_serialize_settings(self):
         self.assertSerializedEqual(SettingsReference(settings.AUTH_USER_MODEL, "AUTH_USER_MODEL"))
@@ -417,6 +425,26 @@ class WriterTests(TestCase):
         self.assertNotEqual(
             result['custom_migration_operations'].operations.TestOperation,
             result['custom_migration_operations'].more_operations.TestOperation
+        )
+
+    def test_sorted_imports(self):
+        """
+        #24155 - Tests ordering of imports.
+        """
+        migration = type(str("Migration"), (migrations.Migration,), {
+            "operations": [
+                migrations.AddField("mymodel", "myfield", models.DateTimeField(
+                    default=datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc),
+                )),
+            ]
+        })
+        writer = MigrationWriter(migration)
+        output = writer.as_string().decode('utf-8')
+        self.assertIn(
+            "import datetime\n"
+            "from django.db import migrations, models\n"
+            "from django.utils.timezone import utc\n",
+            output
         )
 
     def test_deconstruct_class_arguments(self):
