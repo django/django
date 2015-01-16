@@ -137,7 +137,9 @@ Signals
 Templates
 ^^^^^^^^^
 
-* ...
+* Template tags created with the :meth:`~django.template.Library.simple_tag`
+  helper can now store results in a template variable by using the ``as``
+  argument.
 
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -193,6 +195,15 @@ Miscellaneous
 
 Features deprecated in 1.9
 ==========================
+
+``assignment_tag()``
+~~~~~~~~~~~~~~~~~~~~
+
+Django 1.4 added the ``assignment_tag`` helper to ease the creation of
+template tags that store results in a template variable. The
+:meth:`~django.template.Library.simple_tag` helper has gained this same
+ability, making the ``assignment_tag`` obsolete. Tags that use
+``assignment_tag`` should be updated to use ``simple_tag``.
 
 Miscellaneous
 ~~~~~~~~~~~~~

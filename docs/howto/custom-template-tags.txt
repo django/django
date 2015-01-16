@@ -388,7 +388,7 @@ Simple tags
 .. method:: django.template.Library.simple_tag()
 
 Many template tags take a number of arguments -- strings or template variables
--- and return a string after doing some processing based solely on
+-- and return a result after doing some processing based solely on
 the input arguments and some external information. For example, a
 ``current_time`` tag might accept a format string and return the time as a
 string formatted accordingly.
@@ -458,6 +458,18 @@ positional arguments. For example:
 .. code-block:: html+django
 
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
+
+.. versionadded:: 1.9
+
+It's possible to store the tag results in a template variable rather than
+directly outputting it. This is done by using the ``as`` argument followed by
+the variable name. Doing so enables you to output the content yourself where
+you see fit:
+
+.. code-block:: html+django
+
+    {% get_current_time "%Y-%m-%d %I:%M %p" as the_time %}
+    <p>The time is {{ the_time }}.</p>
 
 .. _howto-custom-template-tags-inclusion-tags:
 
@@ -602,11 +614,15 @@ Assignment tags
 
 .. method:: django.template.Library.assignment_tag()
 
+.. deprecated:: 1.9
+
+    ``simple_tag`` can now store results in a template variable and should
+    be used instead.
+
 To ease the creation of tags setting a variable in the context, Django provides
 a helper function, ``assignment_tag``. This function works the same way as
-:ref:`simple_tag<howto-custom-template-tags-simple-tags>`, except that it
-stores the tag's result in a specified context variable instead of directly
-outputting it.
+:meth:`~django.template.Library.simple_tag` except that it stores the tag's
+result in a specified context variable instead of directly outputting it.
 
 Our earlier ``current_time`` function could thus be written like this::
 
@@ -621,38 +637,6 @@ followed by the variable name, and output it yourself where you see fit:
 
     {% get_current_time "%Y-%m-%d %I:%M %p" as the_time %}
     <p>The time is {{ the_time }}.</p>
-
-If your template tag needs to access the current context, you can use the
-``takes_context`` argument when registering your tag::
-
-    @register.assignment_tag(takes_context=True)
-    def get_current_time(context, format_string):
-        timezone = context['timezone']
-        return your_get_current_time_method(timezone, format_string)
-
-Note that the first parameter to the function *must* be called ``context``.
-
-For more information on how the ``takes_context`` option works, see the section
-on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
-
-``assignment_tag`` functions may accept any number of positional or keyword
-arguments. For example::
-
-    @register.assignment_tag
-    def my_tag(a, b, *args, **kwargs):
-        warning = kwargs['warning']
-        profile = kwargs['profile']
-        ...
-        return ...
-
-Then in the template any number of arguments, separated by spaces, may be
-passed to the template tag. Like in Python, the values for keyword arguments
-are set using the equal sign ("``=``") and must be provided after the
-positional arguments. For example:
-
-.. code-block:: html+django
-
-    {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile as the_result %}
 
 Advanced custom template tags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
