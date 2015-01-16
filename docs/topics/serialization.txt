@@ -330,7 +330,7 @@ Consider the following two models::
         birthdate = models.DateField()
 
         class Meta:
-            unique_together = (('first_name', 'last_name'),)
+            unique_together = [('first_name', 'last_name')]
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
@@ -375,7 +375,7 @@ name::
         birthdate = models.DateField()
 
         class Meta:
-            unique_together = (('first_name', 'last_name'),)
+            unique_together = [('first_name', 'last_name')]
 
 Now books can use that natural key to refer to ``Person`` objects::
 
@@ -429,7 +429,7 @@ Firstly, you need to add another method -- this time to the model itself::
             return (self.first_name, self.last_name)
 
         class Meta:
-            unique_together = (('first_name', 'last_name'),)
+            unique_together = [('first_name', 'last_name')]
 
 That method should always return a natural key tuple -- in this
 example, ``(first name, last name)``. Then, when you call
@@ -522,14 +522,14 @@ example above::
         author = models.ForeignKey(Person)
 
         def natural_key(self):
-            return (self.name,) + self.author.natural_key()
+            return [self.name] + self.author.natural_key()
 
 The natural key for a ``Book`` is a combination of its name and its
 author. This means that ``Person`` must be serialized before ``Book``.
 To define this dependency, we add one extra line::
 
         def natural_key(self):
-            return (self.name,) + self.author.natural_key()
+            return [self.name] + self.author.natural_key()
         natural_key.dependencies = ['example_app.person']
 
 This definition ensures that all ``Person`` objects are serialized before

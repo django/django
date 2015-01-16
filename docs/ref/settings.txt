@@ -1763,10 +1763,10 @@ Here's a sample settings file::
 
     from django.utils.translation import ugettext_lazy as _
 
-    LANGUAGES = (
+    LANGUAGES = [
         ('de', _('German')),
         ('en', _('English')),
-    )
+    ]
 
 .. setting:: LOCALE_PATHS
 
@@ -1780,10 +1780,10 @@ See :ref:`how-django-discovers-translations`.
 
 Example::
 
-    LOCALE_PATHS = (
+    LOCALE_PATHS = [
         '/home/www/project/common_files/locale',
         '/var/local/translations/locale',
-    )
+    ]
 
 Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
 directories containing the actual translation files.
@@ -2774,7 +2774,7 @@ Settings for :mod:`django.contrib.auth`.
 AUTHENTICATION_BACKENDS
 -----------------------
 
-Default: ``('django.contrib.auth.backends.ModelBackend',)``
+Default: ``['django.contrib.auth.backends.ModelBackend']``
 
 A tuple of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :ref:`authentication backends documentation
@@ -3220,11 +3220,11 @@ static file serving view.
 This should be set to a list or tuple of strings that contain full paths to
 your additional files directory(ies) e.g.::
 
-    STATICFILES_DIRS = (
+    STATICFILES_DIRS = [
         "/home/special.polls.com/polls/static",
         "/home/polls.com/polls/static",
         "/opt/webfiles/common",
-    )
+    ]
 
 Note that these paths should use Unix-style forward slashes, even on Windows
 (e.g. ``"C:/Users/user/mysite/extra_static_content"``).
@@ -3236,10 +3236,10 @@ In case you want to refer to files in one of the locations with an additional
 namespace, you can **optionally** provide a prefix as ``(prefix, path)``
 tuples, e.g.::
 
-    STATICFILES_DIRS = (
+    STATICFILES_DIRS = [
         # ...
         ("downloads", "/opt/webfiles/stats"),
-    )
+    ]
 
 For example, assuming you have :setting:`STATIC_URL` set to ``'/static/'``, the
 :djadmin:`collectstatic` management command would collect the "stats" files

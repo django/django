@@ -233,19 +233,19 @@ operations to ``cache_replica``, and all write operations to
 
         def db_for_read(self, model, **hints):
             "All cache read operations go to the replica"
-            if model._meta.app_label in ('django_cache',):
+            if model._meta.app_label in ['django_cache']:
                 return 'cache_replica'
             return None
 
         def db_for_write(self, model, **hints):
             "All cache write operations go to primary"
-            if model._meta.app_label in ('django_cache',):
+            if model._meta.app_label in ['django_cache']:
                 return 'cache_primary'
             return None
 
         def allow_migrate(self, db, model):
             "Only install the cache model on primary"
-            if model._meta.app_label in ('django_cache',):
+            if model._meta.app_label in ['django_cache']:
                 return db == 'cache_primary'
             return None
 
@@ -447,11 +447,11 @@ entire site. You'll need to add
 ``'django.middleware.cache.FetchFromCacheMiddleware'`` to your
 :setting:`MIDDLEWARE_CLASSES` setting, as in this example::
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE_CLASSES = [
         'django.middleware.cache.UpdateCacheMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.cache.FetchFromCacheMiddleware',
-    )
+    ]
 
 .. note::
 

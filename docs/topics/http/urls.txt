@@ -540,7 +540,7 @@ Or in Python code::
         # ...
         year = 2006
         # ...
-        return HttpResponseRedirect(reverse('news-year-archive', args=(year,)))
+        return HttpResponseRedirect(reverse('news-year-archive', args=[year]))
 
 If, for some reason, it was decided that the URLs where content for yearly
 article archives are published at should be changed then you would only need to

@@ -23,7 +23,7 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`:
             return self.headline
 
         class Meta:
-            ordering = ('headline',)
+            ordering = ['headline']
 
 What follows are examples of operations that can be performed using the Python
 API facilities.

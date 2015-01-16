@@ -159,11 +159,11 @@ both appearing in the "To:"::
 This sends a message to john@example.com and jane@example.com, with them both
 receiving a separate email::
 
-    datatuple = (
+    datatuples = [
         ('Subject', 'Message.', 'from@example.com', ['john@example.com']),
         ('Subject', 'Message.', 'from@example.com', ['jane@example.com']),
-    )
-    send_mass_mail(datatuple)
+    ]
+    send_mass_mail(datatuples)
 
 Preventing header injection
 ===========================

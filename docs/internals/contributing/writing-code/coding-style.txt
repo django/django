@@ -159,10 +159,10 @@ Model style
     class MyModel(models.Model):
         DIRECTION_UP = 'U'
         DIRECTION_DOWN = 'D'
-        DIRECTION_CHOICES = (
+        DIRECTION_CHOICES = [
             (DIRECTION_UP, 'Up'),
             (DIRECTION_DOWN, 'Down'),
-        )
+        ]
 
 Use of ``django.conf.settings``
 -------------------------------

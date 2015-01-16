@@ -55,10 +55,12 @@ for a :class:`~django.forms.extras.widgets.SelectDateWidget`::
     from django import forms
     from django.forms.extras.widgets import SelectDateWidget
 
-    BIRTH_YEAR_CHOICES = ('1980', '1981', '1982')
-    FAVORITE_COLORS_CHOICES = (('blue', 'Blue'),
-                                ('green', 'Green'),
-                                ('black', 'Black'))
+    BIRTH_YEAR_CHOICES = ['1980', '1981', '1982']
+    FAVORITE_COLORS_CHOICES = [
+        ('blue', 'Blue'),
+        ('green', 'Green'),
+        ('black', 'Black'),
+    ]
 
     class SimpleForm(forms.Form):
         birth_year = forms.DateField(widget=SelectDateWidget(years=BIRTH_YEAR_CHOICES))
@@ -84,14 +86,14 @@ changing :attr:`ChoiceField.choices` will update :attr:`Select.choices`. For
 example::
 
     >>> from django import forms
-    >>> CHOICES = (('1', 'First',), ('2', 'Second',))
+    >>> CHOICES = [('1', 'First'), ('2', 'Second')]
     >>> choice_field = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
     >>> choice_field.choices
     [('1', 'First'), ('2', 'Second')]
     >>> choice_field.widget.choices
     [('1', 'First'), ('2', 'Second')]
-    >>> choice_field.widget.choices = ()
-    >>> choice_field.choices = (('1', 'First and only',),)
+    >>> choice_field.widget.choices = []
+    >>> choice_field.choices = [('1', 'First and only')]
     >>> choice_field.widget.choices
     [('1', 'First and only')]
 
@@ -334,11 +336,11 @@ foundation for custom widgets.
                 # create choices for days, months, years
                 # example below, the rest snipped for brevity.
                 years = [(year, year) for year in (2011, 2012, 2013)]
-                _widgets = (
+                _widgets = [
                     widgets.Select(attrs=attrs, choices=days),
                     widgets.Select(attrs=attrs, choices=months),
                     widgets.Select(attrs=attrs, choices=years),
-                )
+                ]
                 super(DateSelectorWidget, self).__init__(_widgets, attrs)
 
             def decompress(self, value):

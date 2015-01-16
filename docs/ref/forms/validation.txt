@@ -151,7 +151,7 @@ following guidelines:
       # Bad
       ValidationError(
           _('Invalid value: %s'),
-          params=('42',),
+          params=['42'],
       )
 
 * Wrap the message with ``gettext`` to enable translation::
