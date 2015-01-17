@@ -71,7 +71,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         'contains_properly': PostGISOperator(func='ST_ContainsProperly'),
         'coveredby': PostGISOperator(func='ST_CoveredBy', geography=True),
         'covers': PostGISOperator(func='ST_Covers', geography=True),
-        'crosses': PostGISOperator(func='ST_Crosses)'),
+        'crosses': PostGISOperator(func='ST_Crosses'),
         'disjoint': PostGISOperator(func='ST_Disjoint'),
         'equals': PostGISOperator(func='ST_Equals'),
         'intersects': PostGISOperator(func='ST_Intersects', geography=True),
