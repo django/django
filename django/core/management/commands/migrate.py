@@ -173,7 +173,7 @@ class Command(BaseCommand):
             created_models = self.sync_apps(connection, executor.loader.unmigrated_apps)
         else:
             created_models = []
-            emit_pre_migrate_signal([], self.verbosity, self.interactive, connection.alias)
+            emit_pre_migrate_signal([], self.verbosity, self.interactive, connection.alias, plan)
 
         # The test runner requires us to flush after a syncdb but before migrations,
         # so do that here.
@@ -214,7 +214,7 @@ class Command(BaseCommand):
 
         # Send the post_migrate signal, so individual apps can do whatever they need
         # to do at this point.
-        emit_post_migrate_signal(created_models, self.verbosity, self.interactive, connection.alias)
+        emit_post_migrate_signal(created_models, self.verbosity, self.interactive, connection.alias, plan)
 
     def migration_progress_callback(self, action, migration=None, fake=False):
         if self.verbosity >= 1:

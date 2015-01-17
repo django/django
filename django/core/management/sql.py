@@ -242,7 +242,9 @@ def custom_sql_for_model(model, style, connection):
     return output
 
 
-def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
+def emit_pre_migrate_signal(create_models, verbosity, interactive, db, plan=None):
+    if plan is None:
+        plan = []
     # Emit the pre_migrate signal for every application.
     for app_config in apps.get_app_configs():
         if app_config.models_module is None:
@@ -254,7 +256,9 @@ def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
             app_config=app_config,
             verbosity=verbosity,
             interactive=interactive,
-            using=db)
+            using=db,
+            plan=plan,
+        )
         # For backwards-compatibility -- remove in Django 1.9.
         models.signals.pre_syncdb.send(
             sender=app_config.models_module,
@@ -265,7 +269,9 @@ def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
             db=db)
 
 
-def emit_post_migrate_signal(created_models, verbosity, interactive, db):
+def emit_post_migrate_signal(created_models, verbosity, interactive, db, plan=None):
+    if plan is None:
+        plan = []
     # Emit the post_migrate signal for every application.
     for app_config in apps.get_app_configs():
         if app_config.models_module is None:
@@ -277,7 +283,9 @@ def emit_post_migrate_signal(created_models, verbosity, interactive, db):
             app_config=app_config,
             verbosity=verbosity,
             interactive=interactive,
-            using=db)
+            using=db,
+            plan=plan,
+        )
         # For backwards-compatibility -- remove in Django 1.9.
         models.signals.post_syncdb.send(
             sender=app_config.models_module,
