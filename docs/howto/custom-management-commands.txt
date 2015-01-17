@@ -282,23 +282,7 @@ All attributes can be set in your derived class and can be used in
 .. versionadded:: 1.7
 
   A boolean; if ``True``, the entire Django project will be checked for
-  potential problems prior to executing the command. If
-  ``requires_system_checks`` is missing, the value of
-  ``requires_model_validation`` is used. If the latter flag is missing
-  as well, the default value (``True``) is used. Defining both
-  ``requires_system_checks`` and ``requires_model_validation`` will result
-  in an error.
-
-.. attribute:: BaseCommand.requires_model_validation
-
-.. deprecated:: 1.7
-    Replaced by ``requires_system_checks``
-
-  A boolean; if ``True``, validation of installed models will be
-  performed prior to executing the command. Default value is
-  ``True``. To validate an individual application's models
-  rather than all applications' models, call
-  :meth:`~BaseCommand.validate` from :meth:`~BaseCommand.handle`.
+  potential problems prior to executing the command. Default value is ``True``.
 
 .. attribute:: BaseCommand.leave_locale_alone
 
