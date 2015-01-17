@@ -8,7 +8,7 @@ class MessageMiddleware(object):
     """
 
     def process_request(self, request):
-        request._messages = default_storage(request)
+        request.messages = default_storage(request)
 
     def process_response(self, request, response):
         """
@@ -19,8 +19,8 @@ class MessageMiddleware(object):
         """
         # A higher middleware layer may return a request which does not contain
         # messages storage, so make no assumption that it will be there.
-        if hasattr(request, '_messages'):
-            unstored_messages = request._messages.update(response)
+        if hasattr(request, 'messages'):
+            unstored_messages = request.messages.update(response)
             if unstored_messages and settings.DEBUG:
                 raise ValueError('Not all temporary messages could be stored.')
         return response
