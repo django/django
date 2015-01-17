@@ -721,47 +721,12 @@ class ModelAdmin(BaseModelAdmin):
             self.get_changelist_form(request), extra=0,
             fields=self.list_editable, **defaults)
 
-    def _get_formsets(self, request, obj):
-        """
-        Helper function that exists to allow the deprecation warning to be
-        executed while this function continues to return a generator.
-        """
-        for inline in self.get_inline_instances(request, obj):
-            yield inline.get_formset(request, obj)
-
-    def get_formsets(self, request, obj=None):
-        warnings.warn(
-            "ModelAdmin.get_formsets() is deprecated and will be removed in "
-            "Django 1.9. Use ModelAdmin.get_formsets_with_inlines() instead.",
-            RemovedInDjango19Warning, stacklevel=2
-        )
-        return self._get_formsets(request, obj)
-
     def get_formsets_with_inlines(self, request, obj=None):
         """
         Yields formsets and the corresponding inlines.
         """
-        # We call get_formsets() [deprecated] and check if it triggers a
-        # warning. If it does, then it's ours and we can safely ignore it, but
-        # if it doesn't then it has been overridden so we must warn about the
-        # deprecation.
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            formsets = self.get_formsets(request, obj)
-
-        if len(w) != 1 or not issubclass(w[0].category, RemovedInDjango19Warning):
-            warnings.warn(
-                "ModelAdmin.get_formsets() is deprecated and will be removed in "
-                "Django 1.9. Use ModelAdmin.get_formsets_with_inlines() instead.",
-                RemovedInDjango19Warning, stacklevel=2
-            )
-            if formsets:
-                zipped = zip(formsets, self.get_inline_instances(request, None))
-                for formset, inline in zipped:
-                    yield formset, inline
-        else:
-            for inline in self.get_inline_instances(request, obj):
-                yield inline.get_formset(request, obj), inline
+        for inline in self.get_inline_instances(request, obj):
+            yield inline.get_formset(request, obj), inline
 
     def get_paginator(self, request, queryset, per_page, orphans=0, allow_empty_first_page=True):
         return self.paginator(queryset, per_page, orphans, allow_empty_first_page)
