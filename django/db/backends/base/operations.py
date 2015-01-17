@@ -1,12 +1,14 @@
 import datetime
 import decimal
 from importlib import import_module
+import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends import utils
 from django.utils import six, timezone
 from django.utils.dateparse import parse_duration
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 
 
@@ -517,12 +519,20 @@ class BaseDatabaseOperations(object):
         return value
 
     def check_aggregate_support(self, aggregate_func):
-        """Check that the backend supports the provided aggregate
+        warnings.warn(
+            "check_aggregate_support has been deprecated. Use "
+            "check_expression_support instead.",
+            RemovedInDjango21Warning, stacklevel=2)
+        return self.check_expression_support(aggregate_func)
 
-        This is used on specific backends to rule out known aggregates
-        that are known to have faulty implementations. If the named
-        aggregate function has a known problem, the backend should
-        raise NotImplementedError.
+    def check_expression_support(self, expression):
+        """
+        Check that the backend supports the provided expression.
+
+        This is used on specific backends to rule out known expressions
+        that have problematic or nonexistent implementations. If the
+        expression has a known problem, the backend should raise
+        NotImplementedError.
         """
         pass
 

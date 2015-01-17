@@ -25,17 +25,6 @@ class Aggregate(Func):
         c._patch_aggregate(query)  # backward-compatibility support
         return c
 
-    def refs_field(self, aggregate_types, field_types):
-        try:
-            return (isinstance(self, aggregate_types) and
-                    isinstance(self.input_field._output_field_or_none, field_types))
-        except FieldError:
-            # Sometimes we don't know the input_field's output type (for example,
-            # doing Sum(F('datetimefield') + F('datefield'), output_type=DateTimeField())
-            # is OK, but the Expression(F('datetimefield') + F('datefield')) doesn't
-            # have any output field.
-            return False
-
     @property
     def input_field(self):
         return self.source_expressions[0]
