@@ -1,7 +1,7 @@
 import os
 
 from django.test import ignore_warnings, SimpleTestCase
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from ..utils import ROOT, setup
 
@@ -32,16 +32,14 @@ class SsiTagTests(SimpleTestCase):
         self.assertEqual(output, ''),
 
     # Test passing as a variable
-    @ignore_warnings(category=RemovedInDjango19Warning)
-    @setup({'ssi04': '{% load ssi from future %}{% ssi ssi_file %}'})
+    @setup({'ssi04': '{% ssi ssi_file %}'})
     def test_ssi04(self):
         output = self.engine.render_to_string('ssi04', {
             'ssi_file': os.path.join(ROOT, 'templates', 'ssi_include.html')
         })
         self.assertEqual(output, 'This is for testing an ssi include. {{ test }}\n')
 
-    @ignore_warnings(category=RemovedInDjango19Warning)
-    @setup({'ssi05': '{% load ssi from future %}{% ssi ssi_file %}'})
+    @setup({'ssi05': '{% ssi ssi_file %}'})
     def test_ssi05(self):
         output = self.engine.render_to_string('ssi05', {'ssi_file': 'no_file'})
         self.assertEqual(output, '')
