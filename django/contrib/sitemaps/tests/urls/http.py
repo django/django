@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from django.conf.urls import url
 from django.conf.urls.i18n import i18n_patterns
-from django.contrib.sitemaps import Sitemap, GenericSitemap, FlatPageSitemap, views
+from django.contrib.sitemaps import Sitemap, GenericSitemap, views
 from django.http import HttpResponse
 from django.utils import timezone
 from django.views.decorators.cache import cache_page
@@ -90,10 +90,6 @@ generic_sitemaps = {
     'generic': GenericSitemap({'queryset': TestModel.objects.all()}),
 }
 
-flatpage_sitemaps = {
-    'flatpages': FlatPageSitemap,
-}
-
 
 urlpatterns = [
     url(r'^simple/index\.xml$', views.index, {'sitemaps': simple_sitemaps}),
@@ -128,9 +124,6 @@ urlpatterns = [
         name='django.contrib.sitemaps.views.sitemap'),
     url(r'^generic/sitemap\.xml$', views.sitemap,
         {'sitemaps': generic_sitemaps},
-        name='django.contrib.sitemaps.views.sitemap'),
-    url(r'^flatpages/sitemap\.xml$', views.sitemap,
-        {'sitemaps': flatpage_sitemaps},
         name='django.contrib.sitemaps.views.sitemap'),
     url(r'^cached/index\.xml$', cache_page(1)(views.index),
         {'sitemaps': simple_sitemaps, 'sitemap_url_name': 'cached_sitemap'}),

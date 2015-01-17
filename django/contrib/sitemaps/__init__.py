@@ -1,11 +1,8 @@
-import warnings
-
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core import urlresolvers, paginator
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.six.moves.urllib.parse import urlencode
 from django.utils.six.moves.urllib.request import urlopen
 
@@ -133,27 +130,6 @@ class Sitemap(object):
         if all_items_lastmod and latest_lastmod:
             self.latest_lastmod = latest_lastmod
         return urls
-
-
-class FlatPageSitemap(Sitemap):
-    # This class is not a subclass of
-    # django.contrib.flatpages.sitemaps.FlatPageSitemap to avoid a
-    # circular import problem.
-
-    def __init__(self):
-        warnings.warn(
-            "'django.contrib.sitemaps.FlatPageSitemap' is deprecated. "
-            "Use 'django.contrib.flatpages.sitemaps.FlatPageSitemap' instead.",
-            RemovedInDjango19Warning,
-            stacklevel=2
-        )
-
-    def items(self):
-        if not django_apps.is_installed('django.contrib.sites'):
-            raise ImproperlyConfigured("FlatPageSitemap requires django.contrib.sites, which isn't installed.")
-        Site = django_apps.get_model('sites.Site')
-        current_site = Site.objects.get_current()
-        return current_site.flatpage_set.filter(registration_required=False)
 
 
 class GenericSitemap(Sitemap):
