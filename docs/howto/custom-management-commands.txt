@@ -41,9 +41,9 @@ The ``closepoll.py`` module has only one requirement -- it must define a class
 
 .. admonition:: Standalone scripts
 
-  Custom management commands are especially useful for running standalone
-  scripts or for scripts that are periodically executed from the UNIX crontab
-  or from Windows scheduled tasks control panel.
+    Custom management commands are especially useful for running standalone
+    scripts or for scripts that are periodically executed from the UNIX crontab
+    or from Windows scheduled tasks control panel.
 
 To implement the command, edit ``polls/management/commands/closepoll.py`` to
 look like this::
@@ -69,13 +69,15 @@ look like this::
 
                 self.stdout.write('Successfully closed poll "%s"' % poll_id)
 
-Before Django 1.8, management commands were based on the :py:mod:`optparse`
-module, and positional arguments were passed in ``*args`` while optional
-arguments were passed in ``**options``. Now that management commands use
-:py:mod:`argparse` for argument parsing, all arguments are passed in
-``**options`` by default, unless you name your positional arguments to ``args``
-(compatibility mode). You are encouraged to exclusively use ``**options`` for
-new commands.
+.. versionchanged:: 1.8
+
+    Before Django 1.8, management commands were based on the :py:mod:`optparse`
+    module, and positional arguments were passed in ``*args`` while optional
+    arguments were passed in ``**options``. Now that management commands use
+    :py:mod:`argparse` for argument parsing, all arguments are passed in
+    ``**options`` by default, unless you name your positional arguments to
+    ``args`` (compatibility mode). You are encouraged to exclusively use
+    ``**options`` for new commands.
 
 .. _management-commands-output:
 
@@ -227,81 +229,79 @@ All attributes can be set in your derived class and can be used in
 
 .. attribute:: BaseCommand.args
 
-  A string listing the arguments accepted by the command,
-  suitable for use in help messages; e.g., a command which takes
-  a list of application names might set this to '<app_label
-  app_label ...>'.
+    A string listing the arguments accepted by the command,
+    suitable for use in help messages; e.g., a command which takes
+    a list of application names might set this to '<app_label
+    app_label ...>'.
 
-  .. deprecated:: 1.8
+    .. deprecated:: 1.8
 
-      This should be done now in the :meth:`~BaseCommand.add_arguments()`
-      method, by calling the ``parser.add_argument()`` method. See the
-      ``closepoll`` example above.
+        This should be done now in the :meth:`~BaseCommand.add_arguments()`
+        method, by calling the ``parser.add_argument()`` method. See the
+        ``closepoll`` example above.
 
 .. attribute:: BaseCommand.can_import_settings
 
-  A boolean indicating whether the command needs to be able to
-  import Django settings; if ``True``, ``execute()`` will verify
-  that this is possible before proceeding. Default value is
-  ``True``.
+    A boolean indicating whether the command needs to be able to
+    import Django settings; if ``True``, ``execute()`` will verify
+    that this is possible before proceeding. Default value is
+    ``True``.
 
 .. attribute:: BaseCommand.help
 
-  A short description of the command, which will be printed in the
-  help message when the user runs the command
-  ``python manage.py help <command>``.
+    A short description of the command, which will be printed in the
+    help message when the user runs the command
+    ``python manage.py help <command>``.
 
 .. attribute:: BaseCommand.missing_args_message
 
-.. versionadded:: 1.8
+    .. versionadded:: 1.8
 
-  If your command defines mandatory positional arguments, you can customize
-  the message error returned in the case of missing arguments. The default is
-  output by :py:mod:`argparse` ("too few arguments").
+    If your command defines mandatory positional arguments, you can customize
+    the message error returned in the case of missing arguments. The default is
+    output by :py:mod:`argparse` ("too few arguments").
 
 .. attribute:: BaseCommand.option_list
 
-  This is the list of ``optparse`` options which will be fed
-  into the command's ``OptionParser`` for parsing arguments.
+    This is the list of ``optparse`` options which will be fed
+    into the command's ``OptionParser`` for parsing arguments.
 
-  .. deprecated:: 1.8
+    .. deprecated:: 1.8
 
-      You should now override the :meth:`~BaseCommand.add_arguments` method to
-      add custom arguments accepted by your command.
-      See :ref:`the example above <custom-commands-options>`.
+        You should now override the :meth:`~BaseCommand.add_arguments` method
+        to add custom arguments accepted by your command. See :ref:`the example
+        above <custom-commands-options>`.
 
 .. attribute:: BaseCommand.output_transaction
 
-  A boolean indicating whether the command outputs SQL
-  statements; if ``True``, the output will automatically be
-  wrapped with ``BEGIN;`` and ``COMMIT;``. Default value is
-  ``False``.
+    A boolean indicating whether the command outputs SQL statements; if
+    ``True``, the output will automatically be wrapped with ``BEGIN;`` and
+    ``COMMIT;``. Default value is ``False``.
 
 .. attribute:: BaseCommand.requires_system_checks
 
-.. versionadded:: 1.7
-
-  A boolean; if ``True``, the entire Django project will be checked for
-  potential problems prior to executing the command. Default value is ``True``.
+    A boolean; if ``True``, the entire Django project will be checked for
+    potential problems prior to executing the command. Default value is ``True``.
 
 .. attribute:: BaseCommand.leave_locale_alone
 
-  A boolean indicating whether the locale set in settings should be preserved
-  during the execution of the command instead of being forcibly set to 'en-us'.
+    A boolean indicating whether the locale set in settings should be preserved
+    during the execution of the command instead of being forcibly set to 'en-us'.
 
-  Default value is ``False``.
+    Default value is ``False``.
 
-  Make sure you know what you are doing if you decide to change the value of
-  this option in your custom command if it creates database content that
-  is locale-sensitive and such content shouldn't contain any translations (like
-  it happens e.g. with django.contrib.auth permissions) as making the locale
-  differ from the de facto default 'en-us' might cause unintended effects. See
-  the `Management commands and locales`_ section above for further details.
+    Make sure you know what you are doing if you decide to change the value of
+    this option in your custom command if it creates database content that
+    is locale-sensitive and such content shouldn't contain any translations
+    (like it happens e.g. with django.contrib.auth permissions) as making the
+    locale differ from the de facto default 'en-us' might cause unintended
+    effects. Seethe `Management commands and locales`_ section above for
+    further details.
 
-  This option can't be ``False`` when the
-  :data:`~BaseCommand.can_import_settings` option is set to ``False`` too
-  because attempting to set the locale needs access to settings. This condition
-  will generate a :class:`CommandError`.
+    This option can't be ``False`` when the
+    :data:`~BaseCommand.can_import_settings` option is set to ``False`` too
+    because attempting to set the locale needs access to settings. This
+    condition will generate a :class:`CommandError`.
 
 Methods
 -------
@@ -321,7 +321,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. method:: BaseCommand.add_arguments(parser)
 
-.. versionadded:: 1.8
+    .. versionadded:: 1.8
 
     Entry point to add parser arguments to handle command line arguments passed
     to the command. Custom commands should override this method to add both
@@ -351,7 +351,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. method:: BaseCommand.check(app_configs=None, tags=None, display_num_errors=False)
 
-.. versionadded:: 1.7
+    .. versionadded:: 1.7
 
     Uses the system check framework to inspect the entire Django project for
     potential problems. Serious problems are raised as a :class:`CommandError`;
@@ -363,8 +363,8 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. method:: BaseCommand.validate(app=None, display_num_errors=False)
 
-.. deprecated:: 1.7
-    Replaced with the :djadmin:`check` command
+    .. deprecated:: 1.7
+        Replaced with the :djadmin:`check` command
 
     If ``app`` is None, then all installed apps are checked for errors.
 
@@ -390,17 +390,16 @@ each application.
 
 .. class:: LabelCommand
 
-A management command which takes one or more arbitrary arguments
-(labels) on the command line, and does something with each of
-them.
+A management command which takes one or more arbitrary arguments (labels) on
+the command line, and does something with each of them.
 
 Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
 :meth:`~LabelCommand.handle_label`, which will be called once for each label.
 
 .. method:: LabelCommand.handle_label(label, **options)
 
-    Perform the command's actions for ``label``, which will be the
-    string as given on the command line.
+    Perform the command's actions for ``label``, which will be the string as
+    given on the command line.
 
 .. class:: NoArgsCommand
 
@@ -425,16 +424,13 @@ Command exceptions
 
 .. class:: CommandError
 
-Exception class indicating a problem while executing a management
-command.
+Exception class indicating a problem while executing a management command.
 
-If this exception is raised during the execution of a management
-command from a command line console, it will be caught and turned into a
-nicely-printed error message to the appropriate output stream (i.e., stderr);
-as a result, raising this exception (with a sensible description of the
-error) is the preferred way to indicate that something has gone
-wrong in the execution of a command.
+If this exception is raised during the execution of a management command from a
+command line console, it will be caught and turned into a nicely-printed error
+message to the appropriate output stream (i.e., stderr); as a result, raising
+this exception (with a sensible description of the error) is the preferred way
+to indicate that something has gone wrong in the execution of a command.
 
-If a management command is called from code through
-:ref:`call_command <call-command>`, it's up to you to catch the exception
-when needed.
+If a management command is called from code through :ref:`call_command
+<call-command>`, it's up to you to catch the exception when needed.
