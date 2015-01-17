@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:17+0200\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/sites/apps.py:8
+#: contrib/sites/apps.py:11
 msgid "Sites"
 msgstr ""
 
@@ -21,18 +21,18 @@ msgstr ""
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr ""
 
-#: contrib/sites/models.py:67
+#: contrib/sites/models.py:81
 msgid "domain name"
 msgstr ""
 
-#: contrib/sites/models.py:69
+#: contrib/sites/models.py:83
 msgid "display name"
 msgstr ""
 
-#: contrib/sites/models.py:74
+#: contrib/sites/models.py:88
 msgid "site"
 msgstr ""
 
-#: contrib/sites/models.py:75
+#: contrib/sites/models.py:89
 msgid "sites"
 msgstr ""
