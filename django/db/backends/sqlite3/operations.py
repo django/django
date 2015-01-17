@@ -4,7 +4,7 @@ import datetime
 import uuid
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, FieldError
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.operations import BaseDatabaseOperations
@@ -33,15 +33,21 @@ class DatabaseOperations(BaseDatabaseOperations):
         limit = 999 if len(fields) > 1 else 500
         return (limit // len(fields)) if len(fields) > 0 else len(objs)
 
-    def check_aggregate_support(self, aggregate):
+    def check_expression_support(self, expression):
         bad_fields = (fields.DateField, fields.DateTimeField, fields.TimeField)
-        bad_aggregates = (aggregates.Sum, aggregates.Avg,
-                          aggregates.Variance, aggregates.StdDev)
-        if aggregate.refs_field(bad_aggregates, bad_fields):
-            raise NotImplementedError(
-                'You cannot use Sum, Avg, StdDev and Variance aggregations '
-                'on date/time fields in sqlite3 '
-                'since date/time is saved as text.')
+        bad_aggregates = (aggregates.Sum, aggregates.Avg, aggregates.Variance, aggregates.StdDev)
+        if isinstance(expression, bad_aggregates):
+            try:
+                output_field = expression.input_field.output_field
+                if isinstance(output_field, bad_fields):
+                    raise NotImplementedError(
+                        'You cannot use Sum, Avg, StdDev and Variance aggregations '
+                        'on date/time fields in sqlite3 '
+                        'since date/time is saved as text.')
+            except FieldError:
+                # not every sub-expression has an output_field which is fine to
+                # ignore
+                pass
 
     def date_extract_sql(self, lookup_type, field_name):
         # sqlite doesn't support extract, so we fake it with the user-defined

@@ -98,12 +98,12 @@ class BaseSpatialOperations(object):
         """
         raise NotImplementedError('subclasses of BaseSpatialOperations must provide a geo_db_placeholder() method')
 
-    def check_aggregate_support(self, aggregate):
-        if isinstance(aggregate, self.disallowed_aggregates):
+    def check_expression_support(self, expression):
+        if isinstance(expression, self.disallowed_aggregates):
             raise NotImplementedError(
-                "%s spatial aggregation is not supported by this database backend." % aggregate.name
+                "%s spatial aggregation is not supported by this database backend." % expression.name
             )
-        super(BaseSpatialOperations, self).check_aggregate_support(aggregate)
+        super(BaseSpatialOperations, self).check_expression_support(expression)
 
     def spatial_aggregate_name(self, agg_name):
         raise NotImplementedError('Aggregate support not implemented for this spatial backend.')
