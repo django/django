@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import warnings
 
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
@@ -9,8 +8,7 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
-from django.test import RequestFactory, TestCase, ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.test import RequestFactory, TestCase, override_settings
 
 # local test models
 from .admin import MediaInline, MediaPermanentInline, site as admin_site
@@ -432,49 +430,6 @@ class GenericInlineModelAdminTest(TestCase):
         form = ma.get_formset(None).form
         self.assertEqual(form._meta.fields, ['url', 'description'])
 
-    def test_get_formsets_with_inlines(self):
-        """
-        get_formsets() triggers a deprecation warning when get_formsets is
-        overridden.
-        """
-        class MediaForm(ModelForm):
-            class Meta:
-                model = Media
-                exclude = ['url']
-
-        class MediaInline(GenericTabularInline):
-            exclude = ['description']
-            form = MediaForm
-            model = Media
-
-        class EpisodeAdmin(admin.ModelAdmin):
-            inlines = [
-                MediaInline
-            ]
-
-            def get_formsets(self, request, obj=None):
-                return []
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            ma = EpisodeAdmin(Episode, self.site)
-            list(ma.get_formsets_with_inlines(request))
-            # Verify that the deprecation warning was triggered when get_formsets was called
-            # This verifies that we called that method.
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, RemovedInDjango19Warning))
-
-        class EpisodeAdmin(admin.ModelAdmin):
-            inlines = [
-                MediaInline
-            ]
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            ma = EpisodeAdmin(Episode, self.site)
-            list(ma.get_formsets_with_inlines(request))
-            self.assertEqual(len(w), 0)
-
-    @ignore_warnings(category=RemovedInDjango19Warning)
     def test_get_formsets_with_inlines_returns_tuples(self):
         """
         Ensure that get_formsets_with_inlines() returns the correct tuples.
@@ -496,22 +451,6 @@ class GenericInlineModelAdminTest(TestCase):
             inlines = [
                 AlternateInline, MediaInline
             ]
-        ma = EpisodeAdmin(Episode, self.site)
-        inlines = ma.get_inline_instances(request)
-        for (formset, inline), other_inline in zip(ma.get_formsets_with_inlines(request), inlines):
-            self.assertIsInstance(formset, other_inline.get_formset(request).__class__)
-
-        class EpisodeAdmin(admin.ModelAdmin):
-            inlines = [
-                AlternateInline, MediaInline
-            ]
-
-            def get_formsets(self, request, obj=None):
-                # Override get_formsets to force the usage of get_formsets in
-                # ModelAdmin.get_formsets_with_inlines() then ignore the
-                # warning raised by ModelAdmin.get_formsets_with_inlines()
-                return self._get_formsets(request, obj)
-
         ma = EpisodeAdmin(Episode, self.site)
         inlines = ma.get_inline_instances(request)
         for (formset, inline), other_inline in zip(ma.get_formsets_with_inlines(request), inlines):
