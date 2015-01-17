@@ -1490,6 +1490,11 @@ templates used by the :class:`ModelAdmin` views:
 
         url(r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
 
+    .. versionadded:: 1.9
+
+    ``ModelAdmin`` views have ``model_admin`` attributes. Other
+    ``AdminSite`` views have ``admin_site`` attributes.
+
 .. method:: ModelAdmin.get_form(request, obj=None, **kwargs)
 
     Returns a :class:`~django.forms.ModelForm` class for use in the admin add

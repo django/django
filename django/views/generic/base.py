@@ -69,6 +69,8 @@ class View(object):
             self.args = args
             self.kwargs = kwargs
             return self.dispatch(request, *args, **kwargs)
+        view.view_class = cls
+        view.view_initkwargs = initkwargs
 
         # take name and docstring from class
         update_wrapper(view, cls, updated=())
