@@ -31,14 +31,14 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
 
     connection = connections[using]
 
-    if connection.ops.postgis:
-        # PostGIS will take care of transformation.
+    if connection.features.has_kml_method:
+        # Database will take care of transformation.
         placemarks = klass._default_manager.using(using).kml(field_name=field_name)
     else:
-        # There's no KML method on Oracle or MySQL, so we use the `kml`
+        # If the database offers no KML method, we use the `kml`
         # attribute of the lazy geometry instead.
         placemarks = []
-        if connection.ops.oracle:
+        if connection.features.has_transform_method:
             qs = klass._default_manager.using(using).transform(4326, field_name=field_name)
         else:
             qs = klass._default_manager.using(using).all()
