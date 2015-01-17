@@ -1531,6 +1531,8 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_formsets_with_inlines(request, obj=None)
 
+    .. versionadded:: 1.7
+
     Yields (``FormSet``, :class:`InlineModelAdmin`) pairs for use in admin add
     and change views.
 
