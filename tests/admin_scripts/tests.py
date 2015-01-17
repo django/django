@@ -19,13 +19,11 @@ import unittest
 import django
 from django import conf, get_version
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, call_command, color
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.utils._os import npath, upath
 from django.utils.six import StringIO
-from django.test import LiveServerTestCase, TestCase, ignore_warnings, mock, override_settings
+from django.test import LiveServerTestCase, TestCase, mock, override_settings
 from django.test.runner import DiscoverRunner
 
 
