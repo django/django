@@ -501,18 +501,6 @@ class DateTimeField(BaseTemporalField):
         if isinstance(value, datetime.date):
             result = datetime.datetime(value.year, value.month, value.day)
             return from_current_timezone(result)
-        if isinstance(value, list):
-            # Input comes from a SplitDateTimeWidget, for example. So, it's two
-            # components: date and time.
-            warnings.warn(
-                'Using SplitDateTimeWidget with DateTimeField is deprecated. '
-                'Use SplitDateTimeField instead.',
-                RemovedInDjango19Warning, stacklevel=2)
-            if len(value) != 2:
-                raise ValidationError(self.error_messages['invalid'], code='invalid')
-            if value[0] in self.empty_values and value[1] in self.empty_values:
-                return None
-            value = '%s %s' % tuple(value)
         result = super(DateTimeField, self).to_python(value)
         return from_current_timezone(result)
 
