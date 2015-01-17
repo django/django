@@ -502,12 +502,6 @@ For each field, we describe the default widget used if you don't specify
 
     See also :ref:`format localization <format-localization>`.
 
-    .. deprecated:: 1.7
-
-        The ability to use :class:`SplitDateTimeWidget` with ``DateTimeField``
-        has been deprecated and will be removed in Django 1.9. Use
-        :class:`SplitDateTimeField` instead.
-
 ``DecimalField``
 ~~~~~~~~~~~~~~~~
 
