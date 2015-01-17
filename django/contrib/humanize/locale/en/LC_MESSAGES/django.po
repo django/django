@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:17+0200\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -207,48 +207,48 @@ msgstr ""
 msgid "five"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:153
+#: contrib/humanize/templatetags/humanize.py:154
 msgid "six"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:153
+#: contrib/humanize/templatetags/humanize.py:154
 msgid "seven"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:153
+#: contrib/humanize/templatetags/humanize.py:154
 msgid "eight"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:153
+#: contrib/humanize/templatetags/humanize.py:154
 msgid "nine"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:177 contrib/humanize/tests.py:145
+#: contrib/humanize/templatetags/humanize.py:178 contrib/humanize/tests.py:145
 msgid "today"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:179 contrib/humanize/tests.py:145
+#: contrib/humanize/templatetags/humanize.py:180 contrib/humanize/tests.py:145
 msgid "tomorrow"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:181 contrib/humanize/tests.py:145
+#: contrib/humanize/templatetags/humanize.py:182 contrib/humanize/tests.py:145
 msgid "yesterday"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:201
+#: contrib/humanize/templatetags/humanize.py:202
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s ago"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:204
-#: contrib/humanize/templatetags/humanize.py:232
+#: contrib/humanize/templatetags/humanize.py:205
+#: contrib/humanize/templatetags/humanize.py:233
 msgid "now"
 msgstr ""
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
-#: contrib/humanize/templatetags/humanize.py:209
+#: contrib/humanize/templatetags/humanize.py:210
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
@@ -257,7 +257,7 @@ msgstr[1] ""
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
-#: contrib/humanize/templatetags/humanize.py:216
+#: contrib/humanize/templatetags/humanize.py:217
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
@@ -266,14 +266,14 @@ msgstr[1] ""
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
-#: contrib/humanize/templatetags/humanize.py:223
+#: contrib/humanize/templatetags/humanize.py:224
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:229
+#: contrib/humanize/templatetags/humanize.py:230
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s from now"
@@ -281,7 +281,7 @@ msgstr ""
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
-#: contrib/humanize/templatetags/humanize.py:237
+#: contrib/humanize/templatetags/humanize.py:238
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
@@ -290,7 +290,7 @@ msgstr[1] ""
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
-#: contrib/humanize/templatetags/humanize.py:244
+#: contrib/humanize/templatetags/humanize.py:245
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
@@ -299,7 +299,7 @@ msgstr[1] ""
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
-#: contrib/humanize/templatetags/humanize.py:251
+#: contrib/humanize/templatetags/humanize.py:252
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
