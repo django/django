@@ -60,7 +60,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         """Confirm support for STDDEV and related stats functions
 
         SQLite supports STDDEV as an extension package; so
-        connection.ops.check_aggregate_support() can't unilaterally
+        connection.ops.check_expression_support() can't unilaterally
         rule out support for STDDEV. We need to manually check
         whether the call works.
         """

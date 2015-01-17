@@ -9,6 +9,9 @@ class GeoAggregate(Aggregate):
     is_extent = False
 
     def as_sql(self, compiler, connection):
+        # this will be called again in parent, but it's needed now - before
+        # we get the spatial_aggregate_name
+        connection.ops.check_expression_support(self)
         self.function = connection.ops.spatial_aggregate_name(self.name)
         return super(GeoAggregate, self).as_sql(compiler, connection)
 
