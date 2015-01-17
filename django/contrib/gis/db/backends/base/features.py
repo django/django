@@ -42,6 +42,10 @@ class BaseSpatialFeatures(object):
         return 'contained' in self.connection.ops.gis_operators
 
     @property
+    def supports_crosses_lookup(self):
+        return 'crosses' in self.connection.ops.gis_operators
+
+    @property
     def supports_dwithin_lookup(self):
         return 'dwithin' in self.connection.ops.gis_operators
 

@@ -286,6 +286,21 @@ class GeoLookupTest(TestCase):
             self.assertEqual(1, len(qs))
             self.assertEqual('Texas', qs[0].name)
 
+    @skipUnlessDBFeature("supports_crosses_lookup")
+    def test_crosses_lookup(self):
+        Track.objects.create(
+            name='Line1',
+            line=LineString([(-95, 29), (-60, 0)])
+        )
+        self.assertEqual(
+            Track.objects.filter(line__crosses=LineString([(-95, 0), (-60, 29)])).count(),
+            1
+        )
+        self.assertEqual(
+            Track.objects.filter(line__crosses=LineString([(-95, 30), (0, 30)])).count(),
+            0
+        )
+
     @skipUnlessDBFeature("supports_left_right_lookups")
     def test_left_right_lookups(self):
         "Testing the 'left' and 'right' lookup types."
