@@ -1514,26 +1514,6 @@ templates used by the :class:`ModelAdmin` views:
     You may also simply return a custom :class:`~django.forms.ModelForm` class
     directly.
 
-.. method:: ModelAdmin.get_formsets(request, obj=None)
-
-    .. deprecated:: 1.7
-        Use :meth:`get_formsets_with_inlines()` instead.
-
-    Yields  :class:`InlineModelAdmin`\s for use in admin add and change views.
-
-    For example if you wanted to display a particular inline only in the change
-    view, you could override ``get_formsets`` as follows::
-
-        class MyModelAdmin(admin.ModelAdmin):
-            inlines = [MyInline, SomeOtherInline]
-
-            def get_formsets(self, request, obj=None):
-                for inline in self.get_inline_instances(request, obj):
-                    # hide MyInline in the add view
-                    if isinstance(inline, MyInline) and obj is None:
-                        continue
-                    yield inline.get_formset(request, obj)
-
 .. method:: ModelAdmin.get_formsets_with_inlines(request, obj=None)
 
     Yields (``FormSet``, :class:`InlineModelAdmin`) pairs for use in admin add
