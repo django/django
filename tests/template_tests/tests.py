@@ -8,8 +8,11 @@ import unittest
 from django import template
 from django.contrib.auth.models import Group
 from django.core import urlresolvers
-from django.template import (base as template_base, loader,
-    Context, RequestContext, Template, TemplateSyntaxError)
+from django.template import (
+    base as template_base, loader,
+    Context, RequestContext, Template,
+    TemplateCyclicDependencyError, TemplateSyntaxError,
+)
 from django.template.engine import Engine
 from django.template.loaders import app_directories, filesystem
 from django.test import RequestFactory, SimpleTestCase
@@ -264,6 +267,26 @@ class TemplateLoaderTests(SimpleTestCase):
             "Recursion!  A1  Recursion!  B1   B2   B3  Recursion!  C1",
             t.render({'comments': comments}).replace(' ', '').replace('\n', ' ').strip(),
         )
+
+    def test_extends_cyclic(self):
+        """
+        #22232 - Tests for circular extension of templates
+        which leads to RuntimeError Recursion Depth Exceeded
+        """
+        with self.assertRaises(TemplateCyclicDependencyError):
+            t = loader.get_template('cyclic_extends_child.html')
+            t.render({})
+
+        with self.assertRaises(TemplateCyclicDependencyError):
+            t = loader.get_template('cyclic_extends_self.html')
+            t.render({})
+
+        t = loader.get_template('cyclic_extends_variable.html')
+        with self.assertRaises(TemplateCyclicDependencyError):
+            t.render({'var': 'cyclic_extends_self.html'})
+
+        with self.assertRaises(TemplateCyclicDependencyError):
+            t.render({'var': 'cyclic_extends_parent.html'})
 
 
 class TemplateRegressionTests(SimpleTestCase):
