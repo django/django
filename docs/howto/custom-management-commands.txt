@@ -406,22 +406,6 @@ each application.
     :class:`~django.apps.AppConfig` instance corresponding to an application
     label given on the command line.
 
-.. versionchanged:: 1.7
-
-    Previously, :class:`AppCommand` subclasses had to implement
-    ``handle_app(app, **options)`` where ``app`` was a models module. The new
-    API makes it possible to handle applications without a models module. The
-    fastest way to migrate is as follows::
-
-        def handle_app_config(app_config, **options):
-            if app_config.models_module is None:
-                return                                  # Or raise an exception.
-            app = app_config.models_module
-            # Copy the implementation of handle_app(app_config, **options) here.
-
-    However, you may be able to simplify the implementation by using directly
-    the attributes of ``app_config``.
-
 .. class:: LabelCommand
 
 A management command which takes one or more arbitrary arguments
