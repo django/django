@@ -1081,12 +1081,12 @@ class ModelChoiceIterator(object):
         if self.field.cache_choices:
             if self.field.choice_cache is None:
                 self.field.choice_cache = [
-                    self.choice(obj) for obj in self.queryset.iterator()
+                    self.choice(obj) for obj in self.queryset.all()
                 ]
             for choice in self.field.choice_cache:
                 yield choice
         else:
-            for obj in self.queryset.iterator():
+            for obj in self.queryset.all():
                 yield self.choice(obj)
 
     def __len__(self):

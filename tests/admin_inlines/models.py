@@ -262,3 +262,18 @@ class Profile(models.Model):
     collection = models.ForeignKey(ProfileCollection, blank=True, null=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+
+
+# models for #5372
+class PrefetchInlineDetail(models.Model):
+    name = models.CharField(max_length=255)
+
+
+class PrefetchHolder(models.Model):
+    name = models.CharField(max_length=255)
+
+
+class PrefetchInline(models.Model):
+    name = models.CharField(max_length=255)
+    detail = models.ForeignKey(PrefetchInlineDetail)
+    holder = models.ForeignKey(PrefetchHolder)
