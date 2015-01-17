@@ -303,17 +303,15 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. method:: BaseCommand.get_version()
 
-    Return the Django version, which should be correct for all
-    built-in Django commands. User-supplied commands can
-    override this method to return their own version.
+    Returns the Django version, which should be correct for all built-in Django
+    commands. User-supplied commands can override this method to return their
+    own version.
 
 .. method:: BaseCommand.execute(*args, **options)
 
-    Try to execute this command, performing model validation if
-    needed (as controlled by the attribute
-    :attr:`requires_model_validation`). If the command raises a
-    :class:`CommandError`, intercept it and print it sensibly to
-    stderr.
+    Tries to execute this command, performing system checks if needed (as
+    controlled by the :attr:`requires_system_checks` attribute). If the command
+    raises a :class:`CommandError`, it's intercepted and printed to stderr.
 
 .. admonition:: Calling a management command in your code
 
