@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from unittest import skipUnless
-import warnings
-
-from django.test import SimpleTestCase, ignore_warnings
-from django.test.utils import reset_warning_registry
+from django.test import SimpleTestCase
 from django.utils import six, text
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils.translation import override
@@ -197,30 +192,3 @@ class TestUtilsText(SimpleTestCase):
     def test_get_valid_filename(self):
         filename = "^&'@{}[],$=!-#()%+~_123.txt"
         self.assertEqual(text.get_valid_filename(filename), "-_123.txt")
-
-    @ignore_warnings(category=RemovedInDjango19Warning)
-    def test_javascript_quote(self):
-        input = "<script>alert('Hello \\xff.\n Welcome\there\r');</script>"
-        output = r"<script>alert(\'Hello \\xff.\n Welcome\there\r\');<\/script>"
-        self.assertEqual(text.javascript_quote(input), output)
-
-        # Exercising quote_double_quotes keyword argument
-        input = '"Text"'
-        self.assertEqual(text.javascript_quote(input), '"Text"')
-        self.assertEqual(text.javascript_quote(input, quote_double_quotes=True),
-                         '&quot;Text&quot;')
-
-    @ignore_warnings(category=RemovedInDjango19Warning)
-    @skipUnless(IS_WIDE_BUILD, 'Not running in a wide build of Python')
-    def test_javascript_quote_unicode(self):
-        input = "<script>alert('Hello \\xff.\n Wel𝕃come\there\r');</script>"
-        output = r"<script>alert(\'Hello \\xff.\n Wel𝕃come\there\r\');<\/script>"
-        self.assertEqual(text.javascript_quote(input), output)
-
-    def test_deprecation(self):
-        reset_warning_registry()
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            text.javascript_quote('thingy')
-            self.assertEqual(len(w), 1)
-            self.assertIn('escapejs()', repr(w[0].message))
