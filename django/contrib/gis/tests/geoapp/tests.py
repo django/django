@@ -630,14 +630,21 @@ class GeoQuerySetTest(TestCase):
         for ptown in [ptown1, ptown2]:
             self.assertEqual('<Point><coordinates>-104.609252,38.255001</coordinates></Point>', ptown.kml)
 
-    # Only PostGIS has support for the MakeLine aggregate.
-    @skipUnlessDBFeature("supports_make_line_aggr")
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_make_line(self):
         """
         Testing the (deprecated) `make_line` GeoQuerySet method and the MakeLine
         aggregate.
         """
+        if not connection.features.supports_make_line_aggr:
+            # Only PostGIS has support for the MakeLine aggregate. For other
+            # backends, test that NotImplementedError is raised
+            self.assertRaises(
+                NotImplementedError,
+                City.objects.all().aggregate, MakeLine('point')
+            )
+            return
+
         # Ensuring that a `TypeError` is raised on models without PointFields.
         self.assertRaises(TypeError, State.objects.make_line)
         self.assertRaises(TypeError, Country.objects.make_line)
