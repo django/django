@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 from itertools import chain
-import warnings
 
 from django.core.exceptions import (
     ImproperlyConfigured, ValidationError, NON_FIELD_ERRORS, FieldError)
@@ -18,7 +17,6 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
     MultipleHiddenInput)
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import smart_text, force_text
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
