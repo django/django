@@ -1662,11 +1662,6 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
         self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
 
-    @ignore_warnings(category=RemovedInDjango19Warning)
-    def test_requires_model_validation_and_requires_system_checks_both_defined(self):
-        from .management.commands.validation_command import InvalidCommand
-        self.assertRaises(ImproperlyConfigured, InvalidCommand)
-
 
 class Discovery(TestCase):
 
