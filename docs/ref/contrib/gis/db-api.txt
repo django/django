@@ -25,21 +25,19 @@ GeoDjango currently provides the following spatial database backends:
 MySQL Spatial Limitations
 -------------------------
 
-MySQL's spatial extensions only support bounding box operations
-(what MySQL calls minimum bounding rectangles, or MBR).  Specifically,
-`MySQL does not conform to the OGC standard
-<http://dev.mysql.com/doc/refman/5.6/en/spatial-relation-functions.html>`_:
-
-    Currently, MySQL does not implement these functions
-    [``Contains``, ``Crosses``, ``Disjoint``, ``Intersects``, ``Overlaps``,
-    ``Touches``, ``Within``]
-    according to the specification.  Those that are implemented return
-    the same result as the corresponding MBR-based functions.
+Before MySQL 5.6.1, spatial extensions only supported bounding box operations
+(what MySQL calls minimum bounding rectangles, or MBR). Specifically, MySQL did
+not conform to the OGC standard.
 
 In other words, while spatial lookups such as :lookup:`contains <gis-contains>`
-are available in GeoDjango when using MySQL, the results returned are really
+are available in GeoDjango when using MySQL, the results returned were really
 equivalent to what would be returned when using :lookup:`bbcontains`
 on a different spatial backend.
+
+.. versionadded:: 1.9
+
+    Django 1.9 added support for spatial functions operating on real geometries
+    instead of mere bounding boxes, on MySQL 5.6.1 and above.
 
 .. warning::
 

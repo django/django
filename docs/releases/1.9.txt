@@ -72,6 +72,9 @@ Minor features
   Setters for raster properties such as projection or pixel values have
   been added.
 
+* On MySQL 5.6.1 and above, support for spatial lookup functions operating on
+  real geometries instead of mere bounding boxes has been added.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
