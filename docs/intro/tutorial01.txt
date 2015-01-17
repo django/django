@@ -544,18 +544,10 @@ Now, run :djadmin:`migrate` again to create those model tables in your database:
 .. code-block:: bash
 
     $ python manage.py migrate
-
     Operations to perform:
-      Synchronize unmigrated apps: sessions, admin, messages, auth, staticfiles, contenttypes
-      Apply all migrations: polls
-    Synchronizing apps without migrations:
-      Creating tables...
-      Installing custom SQL...
-      Installing indexes...
-    Installed 0 object(s) from 0 fixture(s)
+      Apply all migrations: admin, contenttypes, polls, auth, sessions
     Running migrations:
-      Applying polls.0001_initial... OK
-
+      Applying <migration name>... OK
 
 The :djadmin:`migrate` command takes all the migrations that haven't been
 applied (Django tracks which ones are applied using a special table in your
