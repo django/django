@@ -5,7 +5,7 @@ The django.template namespace contains two independent subsystems:
 
 1. Multiple Template Engines: support for pluggable template backends,
    built-in backends and backend-independent APIs
-2. Django Template Langage: Django's own template engine, including its
+2. Django Template Language: Django's own template engine, including its
    built-in loaders, context processors, tags and filters.
 
 Ideally these subsystems would be implemented in distinct packages. However
