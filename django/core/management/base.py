@@ -572,26 +572,9 @@ class AppCommand(BaseCommand):
         Perform the command's actions for app_config, an AppConfig instance
         corresponding to an application label given on the command line.
         """
-        try:
-            # During the deprecation path, keep delegating to handle_app if
-            # handle_app_config isn't implemented in a subclass.
-            handle_app = self.handle_app
-        except AttributeError:
-            # Keep only this exception when the deprecation completes.
-            raise NotImplementedError(
-                "Subclasses of AppCommand must provide"
-                "a handle_app_config() method.")
-        else:
-            warnings.warn(
-                "AppCommand.handle_app() is superseded by "
-                "AppCommand.handle_app_config().",
-                RemovedInDjango19Warning, stacklevel=2)
-            if app_config.models_module is None:
-                raise CommandError(
-                    "AppCommand cannot handle app '%s' in legacy mode "
-                    "because it doesn't have a models module."
-                    % app_config.label)
-            return handle_app(app_config.models_module, **options)
+        raise NotImplementedError(
+            "Subclasses of AppCommand must provide"
+            "a handle_app_config() method.")
 
 
 class LabelCommand(BaseCommand):
