@@ -247,21 +247,7 @@ Sitemap class reference
 Shortcuts
 =========
 
-The sitemap framework provides a couple convenience classes for common cases:
-
-.. class:: FlatPageSitemap
-
-    .. deprecated:: 1.8
-
-        Use :class:`django.contrib.flatpages.sitemaps.FlatPageSitemap` instead.
-
-    The :class:`django.contrib.sitemaps.FlatPageSitemap` class looks at all
-    publicly visible :mod:`flatpages <django.contrib.flatpages>`
-    defined for the current :setting:`SITE_ID` (see the
-    :mod:`sites documentation <django.contrib.sites>`) and
-    creates an entry in the sitemap. These entries include only the
-    :attr:`~Sitemap.location` attribute -- not :attr:`~Sitemap.lastmod`,
-    :attr:`~Sitemap.changefreq` or :attr:`~Sitemap.priority`.
+The sitemap framework provides a convenience class for a common case:
 
 .. class:: GenericSitemap
 
