@@ -297,14 +297,6 @@ class BaseExpression(object):
                 return agg, lookup
         return False, ()
 
-    def refs_field(self, aggregate_types, field_types):
-        """
-        Helper method for check_aggregate_support on backends
-        """
-        return any(
-            node.refs_field(aggregate_types, field_types)
-            for node in self.get_source_expressions())
-
     def prepare_database_save(self, field):
         return self
 
@@ -401,6 +393,7 @@ class DurationExpression(Expression):
         return compiler.compile(side)
 
     def as_sql(self, compiler, connection):
+        connection.ops.check_expression_support(self)
         expressions = []
         expression_params = []
         sql, params = self.compile(self.lhs, compiler, connection)
@@ -473,6 +466,7 @@ class Func(ExpressionNode):
         return c
 
     def as_sql(self, compiler, connection, function=None, template=None):
+        connection.ops.check_expression_support(self)
         sql_parts = []
         params = []
         for arg in self.source_expressions:
@@ -511,6 +505,7 @@ class Value(ExpressionNode):
         self.value = value
 
     def as_sql(self, compiler, connection):
+        connection.ops.check_expression_support(self)
         val = self.value
         # check _output_field to avoid triggering an exception
         if self._output_field is not None:
@@ -536,6 +531,7 @@ class Value(ExpressionNode):
 
 class DurationValue(Value):
     def as_sql(self, compiler, connection):
+        connection.ops.check_expression_support(self)
         if (connection.features.has_native_duration_field and
                 connection.features.driver_supports_timedelta_args):
             return super(DurationValue, self).as_sql(compiler, connection)
@@ -650,6 +646,7 @@ class When(ExpressionNode):
         return c
 
     def as_sql(self, compiler, connection, template=None):
+        connection.ops.check_expression_support(self)
         template_params = {}
         sql_params = []
         condition_sql, condition_params = compiler.compile(self.condition)
@@ -715,6 +712,7 @@ class Case(ExpressionNode):
         return c
 
     def as_sql(self, compiler, connection, template=None, extra=None):
+        connection.ops.check_expression_support(self)
         if not self.cases:
             return compiler.compile(self.default)
         template_params = dict(extra) if extra else {}
@@ -851,6 +849,7 @@ class OrderBy(BaseExpression):
         return [self.expression]
 
     def as_sql(self, compiler, connection):
+        connection.ops.check_expression_support(self)
         expression_sql, params = compiler.compile(self.expression)
         placeholders = {'expression': expression_sql}
         placeholders['ordering'] = 'DESC' if self.descending else 'ASC'

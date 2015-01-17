@@ -153,17 +153,6 @@ class WhereNode(tree.Node):
     def contains_aggregate(self):
         return self._contains_aggregate(self)
 
-    @classmethod
-    def _refs_field(cls, obj, aggregate_types, field_types):
-        if not isinstance(obj, tree.Node):
-            if hasattr(obj.rhs, 'refs_field'):
-                return obj.rhs.refs_field(aggregate_types, field_types)
-            return False
-        return any(cls._refs_field(c, aggregate_types, field_types) for c in obj.children)
-
-    def refs_field(self, aggregate_types, field_types):
-        return self._refs_field(self, aggregate_types, field_types)
-
 
 class EmptyWhere(WhereNode):
     def add(self, data, connector):
