@@ -16,10 +16,9 @@ from optparse import OptionParser
 
 import django
 from django.core import checks
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import connections
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str
 
 
