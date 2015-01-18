@@ -7,13 +7,11 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 import copy
 import datetime
-import warnings
 
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.forms.fields import Field, FileField
 from django.forms.utils import flatatt, ErrorDict, ErrorList
 from django.forms.widgets import Media, MediaDefiningClass, TextInput, Textarea
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import smart_text, force_text, python_2_unicode_compatible
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
@@ -29,45 +27,6 @@ def pretty_name(name):
     if not name:
         return ''
     return name.replace('_', ' ').capitalize()
-
-
-def get_declared_fields(bases, attrs, with_base_fields=True):
-    """
-    Create a list of form field instances from the passed in 'attrs', plus any
-    similar fields on the base classes (in 'bases'). This is used by both the
-    Form and ModelForm metaclasses.
-
-    If 'with_base_fields' is True, all fields from the bases are used.
-    Otherwise, only fields in the 'declared_fields' attribute on the bases are
-    used. The distinction is useful in ModelForm subclassing.
-    Also integrates any additional media definitions.
-    """
-
-    warnings.warn(
-        "get_declared_fields is deprecated and will be removed in Django 1.9.",
-        RemovedInDjango19Warning,
-        stacklevel=2,
-    )
-
-    fields = [
-        (field_name, attrs.pop(field_name))
-        for field_name, obj in list(six.iteritems(attrs)) if isinstance(obj, Field)
-    ]
-    fields.sort(key=lambda x: x[1].creation_counter)
-
-    # If this class is subclassing another Form, add that Form's fields.
-    # Note that we loop over the bases in *reverse*. This is necessary in
-    # order to preserve the correct order of fields.
-    if with_base_fields:
-        for base in bases[::-1]:
-            if hasattr(base, 'base_fields'):
-                fields = list(six.iteritems(base.base_fields)) + fields
-    else:
-        for base in bases[::-1]:
-            if hasattr(base, 'declared_fields'):
-                fields = list(six.iteritems(base.declared_fields)) + fields
-
-    return OrderedDict(fields)
 
 
 class DeclarativeFieldsMetaclass(MediaDefiningClass):
