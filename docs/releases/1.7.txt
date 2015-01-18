@@ -1767,6 +1767,12 @@ available without importing ``django.contrib.sites.models`` when
 ``django.contrib.sites.shortcuts``. The old import locations will work until
 Django 1.9.
 
+``django.forms.forms.get_declared_fields()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django no longer uses this functional internally. Even though it's a private
+API, it'll go through the normal deprecation cycle.
+
 .. removed-features-1.7:
 
 Features removed in 1.7
