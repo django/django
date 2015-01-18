@@ -1472,7 +1472,7 @@ loader that inherits ``BaseLoader``, you must inherit ``Loader`` instead.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Private API ``django.test.utils.TestTemplateLoader`` is deprecated in favor of
-``django.template.loaders.locmem.Loader``.
+``django.template.loaders.locmem.Loader`` and will be removed in Django 1.9.
 
 .. _storage-max-length-update:
 
