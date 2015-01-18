@@ -4,8 +4,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, ignore_warnings, override_settings
+from django.test import TestCase, override_settings
 
 from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
 
@@ -634,26 +633,6 @@ class SystemChecksTestCase(TestCase):
 
         errors = FieldsOnFormOnlyAdmin.check(model=Song)
         self.assertEqual(errors, [])
-
-    @ignore_warnings(module='django.contrib.admin.options')
-    def test_validator_compatibility(self):
-        class MyValidator(object):
-            def validate(self, cls, model):
-                raise ImproperlyConfigured("error!")
-
-        class MyModelAdmin(admin.ModelAdmin):
-            validator_class = MyValidator
-
-        errors = MyModelAdmin.check(model=Song)
-
-        expected = [
-            checks.Error(
-                'error!',
-                hint=None,
-                obj=MyModelAdmin,
-            )
-        ]
-        self.assertEqual(errors, expected)
 
     def test_check_sublists_for_duplicates(self):
         class MyModelAdmin(admin.ModelAdmin):

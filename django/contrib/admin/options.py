@@ -2,13 +2,11 @@ from collections import OrderedDict
 import copy
 import operator
 from functools import partial, reduce, update_wrapper
-import warnings
 
 from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin import validation
 from django.contrib.admin.checks import (BaseModelAdminChecks, ModelAdminChecks,
     InlineModelAdminChecks)
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
@@ -18,9 +16,8 @@ from django.contrib.admin.utils import (quote, unquote, flatten_fieldsets,
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.auth import get_permission_codename
-from django.core import checks
 from django.core.exceptions import (PermissionDenied, ValidationError,
-    FieldDoesNotExist, FieldError, ImproperlyConfigured)
+    FieldDoesNotExist, FieldError)
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, router
@@ -38,7 +35,6 @@ from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils import six
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import escape, escapejs
 from django.utils.http import urlencode
@@ -111,42 +107,11 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     ordering = None
     view_on_site = True
     show_full_result_count = True
-
-    # Validation of ModelAdmin definitions
-    # Old, deprecated style:
-    validator_class = None
-    default_validator_class = validation.BaseValidator
-    # New style:
     checks_class = BaseModelAdminChecks
 
     @classmethod
-    def validate(cls, model):
-        warnings.warn(
-            'ModelAdmin.validate() is deprecated. Use "check()" instead.',
-            RemovedInDjango19Warning)
-        if cls.validator_class:
-            validator = cls.validator_class()
-        else:
-            validator = cls.default_validator_class()
-        validator.validate(cls, model)
-
-    @classmethod
     def check(cls, model, **kwargs):
-        if cls.validator_class:
-            warnings.warn(
-                'ModelAdmin.validator_class is deprecated. '
-                'ModelAdmin validators must be converted to use '
-                'the system check framework.',
-                RemovedInDjango19Warning)
-            validator = cls.validator_class()
-            try:
-                validator.validate(cls, model)
-            except ImproperlyConfigured as e:
-                return [checks.Error(e.args[0], hint=None, obj=cls)]
-            else:
-                return []
-        else:
-            return cls.checks_class().check(cls, model, **kwargs)
+        return cls.checks_class().check(cls, model, **kwargs)
 
     def __init__(self):
         overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
@@ -546,11 +511,6 @@ class ModelAdmin(BaseModelAdmin):
     actions_on_top = True
     actions_on_bottom = False
     actions_selection_counter = True
-
-    # validation
-    # Old, deprecated style:
-    default_validator_class = validation.ModelAdminValidator
-    # New style:
     checks_class = ModelAdminChecks
 
     def __init__(self, model, admin_site):
@@ -1763,7 +1723,6 @@ class InlineModelAdmin(BaseModelAdmin):
     verbose_name_plural = None
     can_delete = True
     show_change_link = False
-
     checks_class = InlineModelAdminChecks
 
     def __init__(self, parent_model, admin_site):
