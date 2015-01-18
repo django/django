@@ -1,13 +1,10 @@
 from collections import Counter, defaultdict, OrderedDict
-import os
 import sys
 import threading
 import warnings
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.utils import lru_cache
-from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils._os import upath
 
 from .config import AppConfig
 
@@ -151,7 +148,7 @@ class Apps(object):
 
     # This method is performance-critical at least for Django's test suite.
     @lru_cache.lru_cache(maxsize=None)
-    def get_models(self, app_mod=None, include_auto_created=False,
+    def get_models(self, include_auto_created=False,
                    include_deferred=False, include_swapped=False):
         """
         Returns a list of all installed models.
@@ -166,16 +163,6 @@ class Apps(object):
         Set the corresponding keyword argument to True to include such models.
         """
         self.check_models_ready()
-        if app_mod:
-            warnings.warn(
-                "The app_mod argument of get_models is deprecated.",
-                RemovedInDjango19Warning, stacklevel=2)
-            app_label = app_mod.__name__.split('.')[-2]
-            try:
-                return list(self.get_app_config(app_label).get_models(
-                    include_auto_created, include_deferred, include_swapped))
-            except LookupError:
-                return []
 
         result = []
         for app_config in self.app_configs.values():
@@ -343,104 +330,6 @@ class Apps(object):
         if self.ready:
             for model in self.get_models(include_auto_created=True):
                 model._meta._expire_cache()
-
-    ### DEPRECATED METHODS GO BELOW THIS LINE ###
-
-    def load_app(self, app_name):
-        """
-        Loads the app with the provided fully qualified name, and returns the
-        model module.
-        """
-        warnings.warn(
-            "load_app(app_name) is deprecated.",
-            RemovedInDjango19Warning, stacklevel=2)
-        app_config = AppConfig.create(app_name)
-        app_config.import_models(self.all_models[app_config.label])
-        self.app_configs[app_config.label] = app_config
-        self.clear_cache()
-        return app_config.models_module
-
-    def app_cache_ready(self):
-        warnings.warn(
-            "app_cache_ready() is deprecated in favor of the ready property.",
-            RemovedInDjango19Warning, stacklevel=2)
-        return self.ready
-
-    def get_app(self, app_label):
-        """
-        Returns the module containing the models for the given app_label.
-        """
-        warnings.warn(
-            "get_app_config(app_label).models_module supersedes get_app(app_label).",
-            RemovedInDjango19Warning, stacklevel=2)
-        try:
-            models_module = self.get_app_config(app_label).models_module
-        except LookupError as exc:
-            # Change the exception type for backwards compatibility.
-            raise ImproperlyConfigured(*exc.args)
-        if models_module is None:
-            raise ImproperlyConfigured(
-                "App '%s' doesn't have a models module." % app_label)
-        return models_module
-
-    def get_apps(self):
-        """
-        Returns a list of all installed modules that contain models.
-        """
-        warnings.warn(
-            "[a.models_module for a in get_app_configs()] supersedes get_apps().",
-            RemovedInDjango19Warning, stacklevel=2)
-        app_configs = self.get_app_configs()
-        return [app_config.models_module for app_config in app_configs
-                if app_config.models_module is not None]
-
-    def _get_app_package(self, app):
-        return '.'.join(app.__name__.split('.')[:-1])
-
-    def get_app_package(self, app_label):
-        warnings.warn(
-            "get_app_config(label).name supersedes get_app_package(label).",
-            RemovedInDjango19Warning, stacklevel=2)
-        return self._get_app_package(self.get_app(app_label))
-
-    def _get_app_path(self, app):
-        if hasattr(app, '__path__'):        # models/__init__.py package
-            app_path = app.__path__[0]
-        else:                               # models.py module
-            app_path = app.__file__
-        return os.path.dirname(upath(app_path))
-
-    def get_app_path(self, app_label):
-        warnings.warn(
-            "get_app_config(label).path supersedes get_app_path(label).",
-            RemovedInDjango19Warning, stacklevel=2)
-        return self._get_app_path(self.get_app(app_label))
-
-    def get_app_paths(self):
-        """
-        Returns a list of paths to all installed apps.
-
-        Useful for discovering files at conventional locations inside apps
-        (static files, templates, etc.)
-        """
-        warnings.warn(
-            "[a.path for a in get_app_configs()] supersedes get_app_paths().",
-            RemovedInDjango19Warning, stacklevel=2)
-        self.check_apps_ready()
-        app_paths = []
-        for app in self.get_apps():
-            app_paths.append(self._get_app_path(app))
-        return app_paths
-
-    def register_models(self, app_label, *models):
-        """
-        Register a set of models as belonging to an app.
-        """
-        warnings.warn(
-            "register_models(app_label, *models) is deprecated.",
-            RemovedInDjango19Warning, stacklevel=2)
-        for model in models:
-            self.register_model(app_label, model)
 
 
 apps = Apps(installed_apps=None)
