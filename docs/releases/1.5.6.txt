@@ -95,7 +95,7 @@ field classes did not correctly convert their arguments:
 
 * :class:`~django.db.models.FilePathField`
 * :class:`~django.db.models.GenericIPAddressField`
-* :class:`~django.db.models.IPAddressField`
+* ``IPAddressField``
 
 These three fields have been updated to convert their arguments to the
 correct types before querying.

@@ -27,7 +27,7 @@ from django.utils import formats
 from django.utils.encoding import smart_text, force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.dateparse import parse_duration
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning, RenameMethodsBase
+from django.utils.deprecation import RemovedInDjango20Warning, RenameMethodsBase
 from django.utils.duration import duration_string
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
@@ -43,7 +43,7 @@ __all__ = (
     'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
-    'SplitDateTimeField', 'IPAddressField', 'GenericIPAddressField', 'FilePathField',
+    'SplitDateTimeField', 'GenericIPAddressField', 'FilePathField',
     'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField', 'UUIDField',
 )
 
@@ -1204,20 +1204,6 @@ class SplitDateTimeField(MultiValueField):
             result = datetime.datetime.combine(*data_list)
             return from_current_timezone(result)
         return None
-
-
-class IPAddressField(CharField):
-    default_validators = [validators.validate_ipv4_address]
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
-                      RemovedInDjango19Warning)
-        super(IPAddressField, self).__init__(*args, **kwargs)
-
-    def to_python(self, value):
-        if value in self.empty_values:
-            return ''
-        return value.strip()
 
 
 class GenericIPAddressField(CharField):

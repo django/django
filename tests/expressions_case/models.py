@@ -29,7 +29,6 @@ class CaseTestModel(models.Model):
     float = models.FloatField(null=True, db_column='float_field')
     if Image:
         image = models.ImageField(null=True)
-    ip_address = models.IPAddressField(null=True)
     generic_ip_address = models.GenericIPAddressField(null=True)
     null_boolean = models.NullBooleanField()
     positive_integer = models.PositiveIntegerField(null=True)
