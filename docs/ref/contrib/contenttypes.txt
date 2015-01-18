@@ -300,10 +300,11 @@ model:
        is ``True``. This mirrors the ``for_concrete_model`` argument to
        :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`.
 
-    .. versionchanged:: 1.7
+    .. deprecated:: 1.7
 
         This class used to be defined in ``django.contrib.contenttypes.generic``.
-
+        Support for importing from this old location will be removed in Django
+        1.9.
 
 .. admonition:: Primary key type compatibility
 
@@ -369,9 +370,11 @@ Reverse generic relations
 
 .. class:: GenericRelation
 
-    .. versionchanged:: 1.7
+    .. deprecated:: 1.7
 
         This class used to be defined in ``django.contrib.contenttypes.generic``.
+        Support for importing from this old location will be removed in Django
+        1.9.
 
     .. attribute:: related_query_name
 
@@ -496,9 +499,11 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
 
 .. class:: BaseGenericInlineFormSet
 
-    .. versionchanged:: 1.7
+    .. deprecated:: 1.7
 
         This class used to be defined in ``django.contrib.contenttypes.generic``.
+        Support for importing from this old location will be removed in Django
+        1.9.
 
 .. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True, min_num=None, validate_min=False)
 
@@ -517,9 +522,11 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
         :class:`~django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model`
         argument on ``GenericForeignKey``.
 
-    .. versionchanged:: 1.7
+    .. deprecated:: 1.7
 
         This function used to be defined in ``django.contrib.contenttypes.generic``.
+        Support for importing from this old location will be removed in Django
+        1.9.
 
     .. versionchanged:: 1.7
 
@@ -559,9 +566,11 @@ information.
         The name of the integer field that represents the ID of the related
         object. Defaults to ``object_id``.
 
-    .. versionchanged:: 1.7
+    .. deprecated:: 1.7
 
         This class used to be defined in ``django.contrib.contenttypes.generic``.
+        Support for importing from this old location will be removed in Django
+        1.9.
 
 .. class:: GenericTabularInline
 .. class:: GenericStackedInline
@@ -569,6 +578,8 @@ information.
     Subclasses of :class:`GenericInlineModelAdmin` with stacked and tabular
     layouts, respectively.
 
-    .. versionchanged:: 1.7
+    .. deprecated:: 1.7
 
         These classes used to be defined in ``django.contrib.contenttypes.generic``.
+        Support for importing from this old location will be removed in Django
+        1.9.
