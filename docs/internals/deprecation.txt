@@ -238,7 +238,7 @@ details on these changes.
 * The ``use_natural_keys`` argument for ``serializers.serialize()`` will be
   removed. Use ``use_natural_foreign_keys`` instead.
 
-* ``django.forms.get_declared_fields`` will be removed.
+* Private API ``django.forms.forms.get_declared_fields()`` will be removed.
 
 * The ability to use a ``SplitDateTimeWidget`` with ``DateTimeField`` will be
   removed.
