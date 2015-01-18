@@ -1779,6 +1779,13 @@ Django 1.9.
 Django no longer uses this functional internally. Even though it's a private
 API, it'll go through the normal deprecation cycle.
 
+Private Query Lookup APIs
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Private APIs ``django.db.models.sql.where.WhereNode.make_atom()`` and
+``django.db.models.sql.where.Constraint`` are deprecated in favor of the new
+:doc:`custom lookups API </ref/models/lookups>`.
+
 .. removed-features-1.7:
 
 Features removed in 1.7
