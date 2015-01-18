@@ -24,7 +24,7 @@ from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
         ORDER_PATTERN, INNER, LOUTER)
 from django.db.models.sql.datastructures import (
     EmptyResultSet, Empty, MultiJoin, Join, BaseTable)
-from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
+from django.db.models.sql.where import (WhereNode, EverythingNode,
     ExtraWhere, AND, OR, EmptyWhere)
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -1130,10 +1130,6 @@ class Query(object):
         clause = self.where_class()
         if reffed_aggregate:
             condition = self.build_lookup(lookups, reffed_aggregate, value)
-            if not condition:
-                # Backwards compat for custom lookups
-                assert len(lookups) == 1
-                condition = (reffed_aggregate, lookups[0], value)
             clause.add(condition, AND)
             return clause, []
 
@@ -1176,20 +1172,7 @@ class Query(object):
             else:
                 col = targets[0].get_col(alias, field)
             condition = self.build_lookup(lookups, col, value)
-            if not condition:
-                # Backwards compat for custom lookups
-                if lookups[0] not in self.query_terms:
-                    raise FieldError(
-                        "Join on field '%s' not permitted. Did you "
-                        "misspell '%s' for the lookup type?" %
-                        (col.output_field.name, lookups[0]))
-                if len(lookups) > 1:
-                    raise FieldError("Nested lookup '%s' not supported." %
-                                     LOOKUP_SEP.join(lookups))
-                condition = (Constraint(alias, targets[0].column, field), lookups[0], value)
-                lookup_type = lookups[-1]
-            else:
-                lookup_type = condition.lookup_name
+            lookup_type = condition.lookup_name
 
         clause.add(condition, AND)
 

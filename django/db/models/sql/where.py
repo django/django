@@ -1,19 +1,8 @@
 """
 Code to manage the creation and SQL rendering of 'where' constraints.
 """
-
-import collections
-import datetime
-from itertools import repeat
-import warnings
-
-from django.conf import settings
-from django.db.models.fields import DateTimeField, Field
-from django.db.models.sql.datastructures import EmptyResultSet, Empty
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.db.models.sql.datastructures import EmptyResultSet
 from django.utils.functional import cached_property
-from django.utils.six.moves import range
-from django.utils import timezone
 from django.utils import tree
 
 
@@ -37,10 +26,9 @@ class WhereNode(tree.Node):
     The class is tied to the Query class that created it (in order to create
     the correct SQL).
 
-    A child is usually a tuple of:
-        (Constraint(alias, targetcol, field), lookup_type, value)
-    where value can be either raw Python value, or Query, ExpressionNode or
-    something else knowing how to turn itself into SQL.
+    A child is usually an expression producing boolean values. Most likely the
+    expression is a Lookup instance, but other types of objects fulfilling the
+    required API could be used too (for example, sql.where.EverythingNode).
 
     However, a child could also be any class with as_sql() and either
     relabeled_clone() method or relabel_aliases() and clone() methods. The
@@ -48,39 +36,6 @@ class WhereNode(tree.Node):
     variable.
     """
     default = AND
-
-    def _prepare_data(self, data):
-        """
-        Prepare data for addition to the tree. If the data is a list or tuple,
-        it is expected to be of the form (obj, lookup_type, value), where obj
-        is a Constraint object, and is then slightly munged before being
-        stored (to avoid storing any reference to field objects). Otherwise,
-        the 'data' is stored unchanged and can be any class with an 'as_sql()'
-        method.
-        """
-        if not isinstance(data, (list, tuple)):
-            return data
-        obj, lookup_type, value = data
-        if isinstance(value, collections.Iterator):
-            # Consume any generators immediately, so that we can determine
-            # emptiness and transform any non-empty values correctly.
-            value = list(value)
-
-        # The "value_annotation" parameter is used to pass auxiliary information
-        # about the value(s) to the query construction. Specifically, datetime
-        # and empty values need special handling. Other types could be used
-        # here in the future (using Python types is suggested for consistency).
-        if (isinstance(value, datetime.datetime)
-                or (isinstance(obj.field, DateTimeField) and lookup_type != 'isnull')):
-            value_annotation = datetime.datetime
-        elif hasattr(value, 'value_annotation'):
-            value_annotation = value.value_annotation
-        else:
-            value_annotation = bool(value)
-
-        if hasattr(obj, 'prepare'):
-            value = obj.prepare(lookup_type, value)
-        return (obj, lookup_type, value_annotation, value)
 
     def as_sql(self, compiler, connection):
         """
@@ -102,11 +57,7 @@ class WhereNode(tree.Node):
 
         for child in self.children:
             try:
-                if hasattr(child, 'as_sql'):
-                    sql, params = compiler.compile(child)
-                else:
-                    # A leaf node in the tree.
-                    sql, params = self.make_atom(child, compiler, connection)
+                sql, params = compiler.compile(child)
             except EmptyResultSet:
                 nothing_childs += 1
             else:
@@ -157,124 +108,8 @@ class WhereNode(tree.Node):
     def get_group_by_cols(self):
         cols = []
         for child in self.children:
-            if hasattr(child, 'get_group_by_cols'):
-                cols.extend(child.get_group_by_cols())
-            else:
-                if isinstance(child[0], Constraint):
-                    cols.append((child[0].alias, child[0].col))
-                if hasattr(child[3], 'get_group_by_cols'):
-                    cols.extend(child[3].get_group_by_cols())
+            cols.extend(child.get_group_by_cols())
         return cols
-
-    def make_atom(self, child, compiler, connection):
-        """
-        Turn a tuple (Constraint(table_alias, column_name, db_type),
-        lookup_type, value_annotation, params) into valid SQL.
-
-        The first item of the tuple may also be an Aggregate.
-
-        Returns the string for the SQL fragment and the parameters to use for
-        it.
-        """
-        warnings.warn(
-            "The make_atom() method will be removed in Django 1.9. Use Lookup class instead.",
-            RemovedInDjango19Warning)
-        lvalue, lookup_type, value_annotation, params_or_value = child
-        field_internal_type = lvalue.field.get_internal_type() if lvalue.field else None
-
-        if isinstance(lvalue, Constraint):
-            try:
-                lvalue, params = lvalue.process(lookup_type, params_or_value, connection)
-            except EmptyShortCircuit:
-                raise EmptyResultSet
-        else:
-            raise TypeError("'make_atom' expects a Constraint as the first "
-                            "item of its 'child' argument.")
-
-        if isinstance(lvalue, tuple):
-            # A direct database column lookup.
-            field_sql, field_params = self.sql_for_columns(lvalue, compiler, connection, field_internal_type), []
-        else:
-            # A smart object with an as_sql() method.
-            field_sql, field_params = compiler.compile(lvalue)
-
-        is_datetime_field = value_annotation is datetime.datetime
-        cast_sql = connection.ops.datetime_cast_sql() if is_datetime_field else '%s'
-
-        if hasattr(params, 'as_sql'):
-            extra, params = compiler.compile(params)
-            cast_sql = ''
-        else:
-            extra = ''
-
-        params = field_params + params
-
-        if (len(params) == 1 and params[0] == '' and lookup_type == 'exact'
-                and connection.features.interprets_empty_strings_as_nulls):
-            lookup_type = 'isnull'
-            value_annotation = True
-
-        if lookup_type in connection.operators:
-            format = "%s %%s %%s" % (connection.ops.lookup_cast(lookup_type),)
-            return (format % (field_sql,
-                              connection.operators[lookup_type] % cast_sql,
-                              extra), params)
-
-        if lookup_type == 'in':
-            if not value_annotation:
-                raise EmptyResultSet
-            if extra:
-                return ('%s IN %s' % (field_sql, extra), params)
-            max_in_list_size = connection.ops.max_in_list_size()
-            if max_in_list_size and len(params) > max_in_list_size:
-                # Break up the params list into an OR of manageable chunks.
-                in_clause_elements = ['(']
-                for offset in range(0, len(params), max_in_list_size):
-                    if offset > 0:
-                        in_clause_elements.append(' OR ')
-                    in_clause_elements.append('%s IN (' % field_sql)
-                    group_size = min(len(params) - offset, max_in_list_size)
-                    param_group = ', '.join(repeat('%s', group_size))
-                    in_clause_elements.append(param_group)
-                    in_clause_elements.append(')')
-                in_clause_elements.append(')')
-                return ''.join(in_clause_elements), params
-            else:
-                return ('%s IN (%s)' % (field_sql,
-                                        ', '.join(repeat('%s', len(params)))),
-                        params)
-        elif lookup_type in ('range', 'year'):
-            return ('%s BETWEEN %%s and %%s' % field_sql, params)
-        elif is_datetime_field and lookup_type in ('month', 'day', 'week_day',
-                                                   'hour', 'minute', 'second'):
-            tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
-            sql, tz_params = connection.ops.datetime_extract_sql(lookup_type, field_sql, tzname)
-            return ('%s = %%s' % sql, tz_params + params)
-        elif lookup_type in ('month', 'day', 'week_day'):
-            return ('%s = %%s'
-                    % connection.ops.date_extract_sql(lookup_type, field_sql), params)
-        elif lookup_type == 'isnull':
-            assert value_annotation in (True, False), "Invalid value_annotation for isnull"
-            return ('%s IS %sNULL' % (field_sql, ('' if value_annotation else 'NOT ')), ())
-        elif lookup_type == 'search':
-            return (connection.ops.fulltext_search_sql(field_sql), params)
-        elif lookup_type in ('regex', 'iregex'):
-            return connection.ops.regex_lookup(lookup_type) % (field_sql, cast_sql), params
-
-        raise TypeError('Invalid lookup_type: %r' % lookup_type)
-
-    def sql_for_columns(self, data, qn, connection, internal_type=None):
-        """
-        Returns the SQL fragment used for the left-hand side of a column
-        constraint (for example, the "T1.foo" portion in the clause
-        "WHERE ... T1.foo = 6") and a list of parameters.
-        """
-        table_alias, name, db_type = data
-        if table_alias:
-            lhs = '%s.%s' % (qn(table_alias), qn(name))
-        else:
-            lhs = qn(name)
-        return connection.ops.field_cast_sql(db_type, internal_type) % lhs
 
     def relabel_aliases(self, change_map):
         """
@@ -287,13 +122,6 @@ class WhereNode(tree.Node):
                 child.relabel_aliases(change_map)
             elif hasattr(child, 'relabeled_clone'):
                 self.children[pos] = child.relabeled_clone(change_map)
-            elif isinstance(child, (list, tuple)):
-                # tuple starting with Constraint
-                child = (child[0].relabeled_clone(change_map),) + child[1:]
-                if hasattr(child[3], 'relabeled_clone'):
-                    child = (child[0], child[1], child[2]) + (
-                        child[3].relabeled_clone(change_map),)
-                self.children[pos] = child
 
     def clone(self):
         """
@@ -370,56 +198,6 @@ class ExtraWhere(object):
     def as_sql(self, compiler=None, connection=None):
         sqls = ["(%s)" % sql for sql in self.sqls]
         return " AND ".join(sqls), list(self.params or ())
-
-
-class Constraint(object):
-    """
-    An object that can be passed to WhereNode.add() and knows how to
-    pre-process itself prior to including in the WhereNode.
-    """
-    def __init__(self, alias, col, field):
-        warnings.warn(
-            "The Constraint class will be removed in Django 1.9. Use Lookup class instead.",
-            RemovedInDjango19Warning)
-        self.alias, self.col, self.field = alias, col, field
-
-    def prepare(self, lookup_type, value):
-        if self.field and not hasattr(value, 'as_sql'):
-            return self.field.get_prep_lookup(lookup_type, value)
-        return value
-
-    def process(self, lookup_type, value, connection):
-        """
-        Returns a tuple of data suitable for inclusion in a WhereNode
-        instance.
-        """
-        # Because of circular imports, we need to import this here.
-        from django.db.models.base import ObjectDoesNotExist
-        try:
-            if self.field:
-                params = self.field.get_db_prep_lookup(lookup_type, value,
-                    connection=connection, prepared=True)
-                db_type = self.field.db_type(connection=connection)
-            else:
-                # This branch is used at times when we add a comparison to NULL
-                # (we don't really want to waste time looking up the associated
-                # field object at the calling location).
-                params = Field().get_db_prep_lookup(lookup_type, value,
-                    connection=connection, prepared=True)
-                db_type = None
-        except ObjectDoesNotExist:
-            raise EmptyShortCircuit
-
-        return (self.alias, self.col, db_type), params
-
-    def relabeled_clone(self, change_map):
-        if self.alias not in change_map:
-            return self
-        else:
-            new = Empty()
-            new.__class__ = self.__class__
-            new.alias, new.col, new.field = change_map[self.alias], self.col, self.field
-            return new
 
 
 class SubqueryConstraint(object):
