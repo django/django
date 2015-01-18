@@ -15,10 +15,8 @@ from django.core.signals import request_started
 from django.db import reset_queries
 from django.http import request
 from django.template import Template
-from django.template.loaders import locmem
 from django.test.signals import template_rendered, setting_changed
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
 
@@ -143,16 +141,6 @@ def get_runner(settings, test_runner_class=None):
     test_module = __import__(test_module_name, {}, {}, force_str(test_path[-1]))
     test_runner = getattr(test_module, test_path[-1])
     return test_runner
-
-
-class TestTemplateLoader(locmem.Loader):
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "django.test.utils.TestTemplateLoader was renamed to "
-            "django.template.loaders.locmem.Loader.",
-            RemovedInDjango19Warning, stacklevel=2)
-        super(TestTemplateLoader, self).__init__(*args, **kwargs)
 
 
 class override_settings(object):
