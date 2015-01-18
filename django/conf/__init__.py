@@ -110,12 +110,12 @@ class Settings(BaseSettings):
                 self._explicit_settings.add(setting)
 
         if self.SECRET_KEY_FILE and not self.SECRET_KEY:
-            import stat as s
+            import stat
 
             # Verify that file permissions are set to be
             # only user readable and writable.
             mode = os.stat(self.SECRET_KEY_FILE).st_mode
-            if bool((s.S_IRGRP | s.S_IWGRP | s.S_IXGRP | s.S_IROTH | s.S_IWOTH | s.S_IXOTH) & mode):
+            if bool((stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH) & mode):
                 raise FilePermissionError("The SECRET_KEY_FILE permissions are not secure.  Set the file permissions to be only user readable and writable.")
 
             try:
