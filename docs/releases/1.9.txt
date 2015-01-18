@@ -273,6 +273,8 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
 * ``django.db.backends.DatabaseValidation.validate_field`` is removed in
   favor of the ``check_field`` method.
 
+* The ``check`` management command is removed.
+
 * ``django.utils.module_loading.import_by_path`` is removed in favor of
   ``django.utils.module_loading.import_string``.
 
