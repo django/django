@@ -52,6 +52,11 @@ file_filter = django/contrib/messages/locale/<lang>/LC_MESSAGES/django.po
 source_file = django/contrib/messages/locale/en/LC_MESSAGES/django.po
 source_lang = en
 
+[django.contrib-postgres]
+file_filter = django/contrib/postgres/locale/<lang>/LC_MESSAGES/django.po
+source_file = django/contrib/postgres/locale/en/LC_MESSAGES/django.po
+source_lang = en
+
 [django.contrib-redirects]
 file_filter = django/contrib/redirects/locale/<lang>/LC_MESSAGES/django.po
 source_file = django/contrib/redirects/locale/en/LC_MESSAGES/django.po
