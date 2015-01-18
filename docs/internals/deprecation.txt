@@ -269,6 +269,8 @@ details on these changes.
 * ``django.db.backends.DatabaseValidation.validate_field`` will be removed in
   favor of the ``check_field`` method.
 
+* The ``check`` management command will be removed.
+
 * ``django.utils.module_loading.import_by_path`` will be removed in favor of
   ``django.utils.module_loading.import_string``.
 
