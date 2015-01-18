@@ -298,6 +298,9 @@ details on these changes.
 
 * The ``django.contrib.contenttypes.generic`` module will be removed.
 
+* Private APIs ``django.db.models.sql.where.WhereNode.make_atom()`` and
+  ``django.db.models.sql.where.Constraint`` will be removed.
+
 .. _deprecation-removed-in-1.8:
 
 1.8
