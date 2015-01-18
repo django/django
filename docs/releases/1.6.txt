@@ -876,10 +876,8 @@ Miscellaneous
   :class:`~django.forms.ModelMultipleChoiceField`.
 
 * Some :attr:`~django.forms.Field.error_messages` for
-  :class:`~django.forms.IntegerField`,
-  :class:`~django.forms.EmailField`,
-  :class:`~django.forms.IPAddressField`,
-  :class:`~django.forms.GenericIPAddressField`, and
+  :class:`~django.forms.IntegerField`, :class:`~django.forms.EmailField`,
+  ``IPAddressField``, :class:`~django.forms.GenericIPAddressField`, and
   :class:`~django.forms.SlugField` have been suppressed because they
   duplicated error messages already provided by validators tied to the fields.
 

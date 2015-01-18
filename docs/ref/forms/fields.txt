@@ -719,22 +719,6 @@ For each field, we describe the default widget used if you don't specify
 
     These control the range of values permitted in the field.
 
-``IPAddressField``
-~~~~~~~~~~~~~~~~~~
-
-.. class:: IPAddressField(**kwargs)
-
-    .. deprecated:: 1.7
-        This field has been deprecated in favor of
-        :class:`~django.forms.GenericIPAddressField`.
-
-    * Default widget: :class:`TextInput`
-    * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
-    * Validates that the given value is a valid IPv4 address, using a regular
-      expression.
-    * Error message keys: ``required``, ``invalid``
-
 ``GenericIPAddressField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

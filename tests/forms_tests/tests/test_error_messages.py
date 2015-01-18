@@ -5,12 +5,11 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import (
     BooleanField, CharField, ChoiceField, DateField, DateTimeField,
     DecimalField, EmailField, FileField, FloatField, Form,
-    GenericIPAddressField, IntegerField, IPAddressField, ModelChoiceField,
+    GenericIPAddressField, IntegerField, ModelChoiceField,
     ModelMultipleChoiceField, MultipleChoiceField, RegexField,
     SplitDateTimeField, TimeField, URLField, utils, ValidationError,
 )
-from django.test import ignore_warnings, TestCase
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.test import TestCase
 from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -196,16 +195,6 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
         f = SplitDateTimeField(error_messages=e)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
         self.assertFormErrors(['INVALID DATE', 'INVALID TIME'], f.clean, ['a', 'b'])
-
-    @ignore_warnings(category=RemovedInDjango19Warning)
-    def test_ipaddressfield(self):
-        e = {
-            'required': 'REQUIRED',
-            'invalid': 'INVALID IP ADDRESS',
-        }
-        f = IPAddressField(error_messages=e)
-        self.assertFormErrors(['REQUIRED'], f.clean, '')
-        self.assertFormErrors(['INVALID IP ADDRESS'], f.clean, '127.0.0')
 
     def test_generic_ipaddressfield(self):
         e = {

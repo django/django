@@ -28,13 +28,13 @@ from django.utils import six
 from django.utils.functional import curry
 
 from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, EmailData,
-    FileData, FilePathData, DecimalData, FloatData, IntegerData, IPAddressData,
+    FileData, FilePathData, DecimalData, FloatData, IntegerData,
     GenericIPAddressData, NullBooleanData, PositiveIntegerData,
     PositiveSmallIntegerData, SlugData, SmallData, TextData, TimeData,
     GenericData, Anchor, UniqueAnchor, FKData, M2MData, O2OData,
     FKSelfData, M2MSelfData, FKDataToField, FKDataToO2O, M2MIntermediateData,
     Intermediate, BooleanPKData, CharPKData, EmailPKData, FilePathPKData,
-    DecimalPKData, FloatPKData, IntegerPKData, IPAddressPKData,
+    DecimalPKData, FloatPKData, IntegerPKData,
     GenericIPAddressPKData, PositiveIntegerPKData,
     PositiveSmallIntegerPKData, SlugPKData, SmallPKData,
     AutoNowDateTimeData, ModifyingSaveData, InheritAbstractModel, BaseModel,
@@ -241,8 +241,6 @@ test_data = [
     (data_obj, 82, IntegerData, 0),
     (data_obj, 83, IntegerData, None),
     #(XX, ImageData
-    (data_obj, 90, IPAddressData, "127.0.0.1"),
-    (data_obj, 91, IPAddressData, None),
     (data_obj, 95, GenericIPAddressData, "fe80:1424:2223:6cff:fe8a:2e8a:2151:abcd"),
     (data_obj, 96, GenericIPAddressData, None),
     (data_obj, 100, NullBooleanData, True),
@@ -341,7 +339,6 @@ The end."""),
     (pk_obj, 681, IntegerPKData, -123456789),
     (pk_obj, 682, IntegerPKData, 0),
     # (XX, ImagePKData
-    (pk_obj, 690, IPAddressPKData, "127.0.0.1"),
     (pk_obj, 695, GenericIPAddressPKData, "fe80:1424:2223:6cff:fe8a:2e8a:2151:abcd"),
     # (pk_obj, 700, NullBooleanPKData, True),
     # (pk_obj, 701, NullBooleanPKData, False),

@@ -1894,13 +1894,13 @@ class BigIntegerField(IntegerField):
 class IPAddressField(Field):
     empty_strings_allowed = False
     description = _("IPv4 address")
-    system_check_deprecated_details = {
+    system_check_removed_details = {
         'msg': (
-            'IPAddressField has been deprecated. Support for it (except in '
-            'historical migrations) will be removed in Django 1.9.'
+            'IPAddressField has been removed except for support in '
+            'historical migrations.'
         ),
         'hint': 'Use GenericIPAddressField instead.',
-        'id': 'fields.W900',
+        'id': 'fields.E900',
     }
 
     def __init__(self, *args, **kwargs):
@@ -1920,11 +1920,6 @@ class IPAddressField(Field):
 
     def get_internal_type(self):
         return "IPAddressField"
-
-    def formfield(self, **kwargs):
-        defaults = {'form_class': forms.IPAddressField}
-        defaults.update(kwargs)
-        return super(IPAddressField, self).formfield(**defaults)
 
 
 class GenericIPAddressField(Field):

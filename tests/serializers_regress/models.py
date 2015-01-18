@@ -65,10 +65,6 @@ class BigIntegerData(models.Model):
 #    data = models.ImageField(null=True)
 
 
-class IPAddressData(models.Model):
-    data = models.IPAddressField(null=True)
-
-
 class GenericIPAddressData(models.Model):
     data = models.GenericIPAddressField(null=True)
 
@@ -243,10 +239,6 @@ class IntegerPKData(models.Model):
 
 # class ImagePKData(models.Model):
 #    data = models.ImageField(primary_key=True)
-
-
-class IPAddressPKData(models.Model):
-    data = models.IPAddressField(primary_key=True)
 
 
 class GenericIPAddressPKData(models.Model):
