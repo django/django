@@ -20,6 +20,17 @@ TEMPLATE = """{% if messages %}
 {% endif %}
 """
 
+TEMPLATE2 = """{% if request.messages %}
+<ul class="messages">
+    {% for message in request.messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+        {{ message }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+"""
+
 
 @never_cache
 def add(request, message_type):
@@ -53,6 +64,12 @@ def show(request):
 
 
 @never_cache
+def show2(request):
+    template = engines['django'].from_string(TEMPLATE2)
+    return HttpResponse(template.render(request=request))
+
+
+@never_cache
 def show_template_response(request):
     template = engines['django'].from_string(TEMPLATE)
     return TemplateResponse(request, template)
@@ -73,6 +90,7 @@ urlpatterns = [
     url('^add/(debug|info|success|warning|error)/$', add, name='add_message'),
     url('^add/msg/$', ContactFormViewWithMsg.as_view(), name='add_success_msg'),
     url('^show/$', show, name='show_message'),
+    url('^show2/$', show2, name='show_message2'),
     url('^template_response/add/(debug|info|success|warning|error)/$',
         add_template_response, name='add_template_response'),
     url('^template_response/show/$', show_template_response, name='show_template_response'),

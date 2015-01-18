@@ -177,6 +177,27 @@ class BaseTests(object):
             for msg in data['messages']:
                 self.assertContains(response, msg)
 
+    @override_settings(
+        TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {'context_processors': ['django.template.context_processors.request']},
+        }])
+    def test_request_message(self):
+        """
+        Tests request.messages.
+        """
+        data = {
+            'messages': ['Test message %d' % x for x in range(5)],
+        }
+        show_url = reverse('show_message2')
+        add_url = reverse('add_message', args=('success',))
+        self.client.post(add_url, data)
+        response = self.client.get(show_url)
+        messages = [Message(self.levels['success'], msg) for msg in data['messages']]
+        self.assertEqual(list(response.context['request'].messages), messages)
+        for msg in data['messages']:
+            self.assertContains(response, msg)
+
     @override_settings(MESSAGE_LEVEL=constants.DEBUG)
     def test_with_template_response(self):
         data = {
@@ -318,7 +339,7 @@ class BaseTests(object):
 
         # get_level returns the default level if it hasn't been set.
         storage = self.get_storage()
-        request._messages = storage
+        request.messages = storage
         self.assertEqual(get_level(request), constants.INFO)
 
         # Only messages of sufficient level get recorded.
@@ -328,7 +349,7 @@ class BaseTests(object):
     def test_low_level(self):
         request = self.get_request()
         storage = self.storage_class(request)
-        request._messages = storage
+        request.messages = storage
 
         self.assertTrue(set_level(request, 5))
         self.assertEqual(get_level(request), 5)
@@ -339,7 +360,7 @@ class BaseTests(object):
     def test_high_level(self):
         request = self.get_request()
         storage = self.storage_class(request)
-        request._messages = storage
+        request.messages = storage
 
         self.assertTrue(set_level(request, 30))
         self.assertEqual(get_level(request), 30)

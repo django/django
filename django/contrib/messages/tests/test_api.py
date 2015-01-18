@@ -24,14 +24,14 @@ class ApiTest(TestCase):
     def test_ok(self):
         msg = 'some message'
 
-        self.request._messages = self.storage
+        self.request.messages = self.storage
         messages.add_message(self.request, messages.DEBUG, msg)
         self.assertIn(msg, self.storage.store)
 
     def test_request_is_none(self):
         msg = 'some message'
 
-        self.request._messages = self.storage
+        self.request.messages = self.storage
 
         with self.assertRaises(TypeError):
             messages.add_message(None, messages.DEBUG, msg)

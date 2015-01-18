@@ -21,8 +21,8 @@ def add_message(request, level, message, extra_tags='', fail_silently=False):
     if not isinstance(request, HttpRequest):
         raise TypeError("add_message() argument must be an HttpRequest object, "
                         "not '%s'." % request.__class__.__name__)
-    if hasattr(request, '_messages'):
-        return request._messages.add(level, message, extra_tags)
+    if hasattr(request, 'messages'):
+        return request.messages.add(level, message, extra_tags)
     if not fail_silently:
         raise MessageFailure('You cannot add messages without installing '
                     'django.contrib.messages.middleware.MessageMiddleware')
@@ -33,8 +33,8 @@ def get_messages(request):
     Returns the message storage on the request if it exists, otherwise returns
     an empty list.
     """
-    if hasattr(request, '_messages'):
-        return request._messages
+    if hasattr(request, 'messages'):
+        return request.messages
     else:
         return []
 
@@ -46,8 +46,8 @@ def get_level(request):
     The default level is the ``MESSAGE_LEVEL`` setting. If this is not found,
     the ``INFO`` level is used.
     """
-    if hasattr(request, '_messages'):
-        storage = request._messages
+    if hasattr(request, 'messages'):
+        storage = request.messages
     else:
         storage = default_storage(request)
     return storage.level
@@ -61,9 +61,9 @@ def set_level(request, level):
     If set to ``None``, the default level will be used (see the ``get_level``
     method).
     """
-    if not hasattr(request, '_messages'):
+    if not hasattr(request, 'messages'):
         return False
-    request._messages.level = level
+    request.messages.level = level
     return True
 
 
