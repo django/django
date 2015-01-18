@@ -292,6 +292,8 @@ details on these changes.
 * ``django.contrib.sitemaps.FlatPageSitemap`` will be removed in favor of
   ``django.contrib.flatpages.sitemaps.FlatPageSitemap``.
 
+* Private API ``django.test.utils.TestTemplateLoader`` will be removed.
+
 .. _deprecation-removed-in-1.8:
 
 1.8
