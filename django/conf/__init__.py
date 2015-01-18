@@ -120,7 +120,7 @@ class Settings(BaseSettings):
 
             try:
                 with open(self.SECRET_KEY_FILE, 'r') as file:
-                    self.SECRET_KEY = file.read()
+                    self.SECRET_KEY = file.read().strip()
             except IOError:
                 raise ImproperlyConfigured("Unable to read SECRET_KEY_FILE: %s" % self.SECRET_KEY_FILE)
 
