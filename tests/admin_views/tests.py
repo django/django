@@ -9,7 +9,6 @@ import unittest
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
-from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import (NoReverseMatch,
     get_script_prefix, resolve, reverse, set_script_prefix)
 # Register auth models with the admin.
@@ -22,7 +21,6 @@ from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.utils import quote
-from django.contrib.admin.validation import ModelAdminValidator
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group, User, Permission
@@ -5270,23 +5268,6 @@ class InlineAdminViewOnSiteTest(TestCase):
         self.assertContains(response,
                             '"/worker_inline/%s/%s/"' % (worker.surname, worker.name),
                             )
-
-
-class AdminGenericRelationTests(TestCase):
-    def test_generic_relation_fk_list_filter(self):
-        """
-        Validates a model with a generic relation to a model with
-        a foreign key can specify the generic+fk relationship
-        path as a list_filter. See trac #21428.
-        """
-        class GenericFKAdmin(ModelAdmin):
-            list_filter = ('tags__content_type',)
-
-        validator = ModelAdminValidator()
-        try:
-            validator.validate_list_filter(GenericFKAdmin, Plot)
-        except ImproperlyConfigured:
-            self.fail("Couldn't validate a GenericRelation -> FK path in ModelAdmin.list_filter")
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
