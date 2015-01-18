@@ -261,8 +261,10 @@ class SQLCompiler(object):
                 # on verbatim.
                 table, col = col.split('.', 1)
                 order_by.append((
-                    OrderBy(RawSQL('%s.%s' % (self.quote_name_unless_alias(table), col), [])),
-                    False))
+                    OrderBy(
+                        RawSQL('%s.%s' % (self.quote_name_unless_alias(table), col), []),
+                        descending=descending
+                    ), False))
                 continue
 
             if not self.query._extra or col not in self.query._extra:
