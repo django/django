@@ -304,15 +304,6 @@ When this option is specified, Django will not provide the primary key in the
 serialized data of this object since it can be calculated during
 deserialization.
 
-.. django-admin-option:: --natural
-
-.. deprecated:: 1.7
-    Equivalent to the :djadminopt:`--natural-foreign` option; use that instead.
-
-Use :ref:`natural keys <topics-serialization-natural-keys>` to represent
-any foreign key and many-to-many relationship with a model that provides
-a natural key definition.
-
 .. django-admin-option:: --pks
 
 By default, ``dumpdata`` will output all the records of the model, but

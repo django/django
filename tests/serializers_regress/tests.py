@@ -23,9 +23,8 @@ from django.core.serializers.base import DeserializationError
 from django.core.serializers.xml_serializer import DTDForbidden
 from django.db import connection, models
 from django.http import HttpResponse
-from django.test import ignore_warnings, skipUnlessDBFeature, TestCase
+from django.test import skipUnlessDBFeature, TestCase
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.functional import curry
 
 from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, EmailData,
@@ -483,7 +482,6 @@ def serializerTest(format, self):
         self.assertEqual(count, klass.objects.count())
 
 
-@ignore_warnings(category=RemovedInDjango19Warning)  # for use_natural_keys
 def naturalKeySerializerTest(format, self):
     # Create all the objects defined in the test data
     objects = []
@@ -496,10 +494,9 @@ def naturalKeySerializerTest(format, self):
     for klass in instance_count:
         instance_count[klass] = klass.objects.count()
 
-    # use_natural_keys is deprecated and to be removed in Django 1.9
     # Serialize the test database
     serialized_data = serializers.serialize(format, objects, indent=2,
-        use_natural_keys=True)
+        use_natural_foreign_keys=True)
 
     for obj in serializers.deserialize(format, serialized_data):
         obj.save()
