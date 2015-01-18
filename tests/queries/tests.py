@@ -5,7 +5,6 @@ import datetime
 from operator import attrgetter
 import pickle
 import unittest
-import warnings
 
 from django.core.exceptions import FieldError
 from django.db import connection, DEFAULT_DB_ALIAS
@@ -15,7 +14,6 @@ from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
 from django.utils.six.moves import range
 
@@ -1163,17 +1161,6 @@ class Queries1Tests(BaseQuerysetTest):
             qs,
             ['<Author: a1>', '<Author: a2>', '<Author: a3>', '<Author: a4>']
         )
-
-    def test_callable_args(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            qs = Tag.objects.filter(name__startswith=lambda: 't')
-            self.assertQuerysetEqual(
-                qs,
-                ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>']
-            )
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, RemovedInDjango19Warning))
 
 
 class Queries2Tests(TestCase):
