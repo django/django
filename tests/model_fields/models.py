@@ -168,16 +168,15 @@ class VerboseNameField(models.Model):
     # Don't want to depend on Pillow in this test
     #field_image = models.ImageField("verbose field")
     field12 = models.IntegerField("verbose field12")
-    field13 = models.IPAddressField("verbose field13")
-    field14 = models.GenericIPAddressField("verbose field14", protocol="ipv4")
-    field15 = models.NullBooleanField("verbose field15")
-    field16 = models.PositiveIntegerField("verbose field16")
-    field17 = models.PositiveSmallIntegerField("verbose field17")
-    field18 = models.SlugField("verbose field18")
-    field19 = models.SmallIntegerField("verbose field19")
-    field20 = models.TextField("verbose field20")
-    field21 = models.TimeField("verbose field21")
-    field22 = models.URLField("verbose field22")
+    field13 = models.GenericIPAddressField("verbose field13", protocol="ipv4")
+    field14 = models.NullBooleanField("verbose field14")
+    field15 = models.PositiveIntegerField("verbose field15")
+    field16 = models.PositiveSmallIntegerField("verbose field16")
+    field17 = models.SlugField("verbose field17")
+    field18 = models.SmallIntegerField("verbose field18")
+    field19 = models.TextField("verbose field19")
+    field20 = models.TimeField("verbose field20")
+    field21 = models.URLField("verbose field21")
 
 
 class GenericIPAddress(models.Model):
@@ -323,7 +322,6 @@ class AllFieldsModel(models.Model):
     file_path = models.FilePathField()
     floatf = models.FloatField()
     integer = models.IntegerField()
-    ip_address = models.IPAddressField()
     generic_ip = models.GenericIPAddressField()
     null_boolean = models.NullBooleanField()
     positive_integer = models.PositiveIntegerField()

@@ -1591,8 +1591,8 @@ better handle the case of selectively showing inlines on a ``ModelAdmin``.
 ``IPAddressField``
 ~~~~~~~~~~~~~~~~~~
 
-The :class:`django.db.models.IPAddressField` and
-:class:`django.forms.IPAddressField` fields have been deprecated in favor of
+The ``django.db.models.IPAddressField`` and ``django.forms.IPAddressField``
+fields have been deprecated in favor of
 :class:`django.db.models.GenericIPAddressField` and
 :class:`django.forms.GenericIPAddressField`.
 
