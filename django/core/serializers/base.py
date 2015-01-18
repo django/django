@@ -1,11 +1,8 @@
 """
 Module for abstract serializer/unserializer base classes.
 """
-import warnings
-
 from django.db import models
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 
 
 class SerializerDoesNotExist(KeyError):
@@ -40,11 +37,7 @@ class Serializer(object):
 
         self.stream = options.pop("stream", six.StringIO())
         self.selected_fields = options.pop("fields", None)
-        self.use_natural_keys = options.pop("use_natural_keys", False)
-        if self.use_natural_keys:
-            warnings.warn("``use_natural_keys`` is deprecated; use ``use_natural_foreign_keys`` instead.",
-                RemovedInDjango19Warning)
-        self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False) or self.use_natural_keys
+        self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False)
         self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
 
         self.start_serialization()
