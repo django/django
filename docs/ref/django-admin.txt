@@ -1737,14 +1737,14 @@ with ``True`` or ``False``, as you can see with the ``interactive`` option above
 Named arguments can be passed by using either one of the following syntaxes::
 
       # Similar to the command line
-      management.call_command('dumpdata', '--natural')
+      management.call_command('dumpdata', '--natural-foreign')
 
       # Named argument similar to the command line minus the initial dashes and
       # with internal dashes replaced by underscores
-      management.call_command('dumpdata', natural=True)
+      management.call_command('dumpdata', natural_foreign=True)
 
-      # `use_natural_keys` is the option destination variable
-      management.call_command('dumpdata', use_natural_keys=True)
+      # `use_natural_foreign_keys` is the option destination variable
+      management.call_command('dumpdata', use_natural_foreign_keys=True)
 
 .. versionchanged:: 1.8
 
