@@ -308,7 +308,7 @@ class ReverseLazyTest(TestCase):
 
     def test_redirect_with_lazy_reverse(self):
         response = self.client.get('/redirect/')
-        self.assertRedirects(response, "/redirected_to/", status_code=301)
+        self.assertRedirects(response, "/redirected_to/", status_code=302)
 
     def test_user_permission_with_lazy_reverse(self):
         User.objects.create_user('alfred', 'alfred@example.com', password='testpw')
