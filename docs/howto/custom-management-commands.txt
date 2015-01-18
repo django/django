@@ -361,13 +361,6 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     performed. ``tags`` can be a list of check tags, like ``compatibility`` or
     ``models``.
 
-.. method:: BaseCommand.validate(app=None, display_num_errors=False)
-
-    .. deprecated:: 1.7
-        Replaced with the :djadmin:`check` command
-
-    If ``app`` is None, then all installed apps are checked for errors.
-
 .. _ref-basecommand-subclasses:
 
 BaseCommand subclasses
