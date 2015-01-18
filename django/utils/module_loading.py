@@ -4,11 +4,8 @@ import copy
 from importlib import import_module
 import os
 import sys
-import warnings
 
-from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 
 
 def import_string(dotted_path):
@@ -30,24 +27,6 @@ def import_string(dotted_path):
         msg = 'Module "%s" does not define a "%s" attribute/class' % (
             dotted_path, class_name)
         six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
-
-
-def import_by_path(dotted_path, error_prefix=''):
-    """
-    Import a dotted module path and return the attribute/class designated by the
-    last name in the path. Raise ImproperlyConfigured if something goes wrong.
-    """
-    warnings.warn(
-        'import_by_path() has been deprecated. Use import_string() instead.',
-        RemovedInDjango19Warning, stacklevel=2)
-    try:
-        attr = import_string(dotted_path)
-    except ImportError as e:
-        msg = '%sError importing module %s: "%s"' % (
-            error_prefix, dotted_path, e)
-        six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
-                    sys.exc_info()[2])
-    return attr
 
 
 def autodiscover_modules(*args, **kwargs):
