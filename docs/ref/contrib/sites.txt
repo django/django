@@ -472,9 +472,10 @@ a fallback when the database-backed sites framework is not available.
         Sets the ``name`` and ``domain`` attributes to the value of
         :meth:`~django.http.HttpRequest.get_host`.
 
-    .. versionchanged:: 1.7
+    .. deprecated:: 1.7
 
-        This class used to be defined in ``django.contrib.sites.models``.
+        This class used to be defined in ``django.contrib.sites.models``. The
+        old import location will work until Django 1.9.
 
 A :class:`~django.contrib.sites.requests.RequestSite` object has a similar
 interface to a normal :class:`~django.contrib.sites.models.Site` object,
@@ -498,9 +499,10 @@ Finally, to avoid repetitive fallback code, the framework provides a
     object or a :class:`~django.contrib.sites.requests.RequestSite` object
     based on the request.
 
-    .. versionchanged:: 1.7
+    .. deprecated:: 1.7
 
         This function used to be defined in ``django.contrib.sites.models``.
+        The old import location will work until Django 1.9.
 
     .. versionchanged:: 1.8
 
