@@ -337,17 +337,17 @@ inspectdb
 
 .. django-admin:: inspectdb
 
-Introspects the database tables in the database pointed-to by the
+Introspects the database tables and views in the database pointed-to by the
 :setting:`NAME` setting and outputs a Django model module (a ``models.py``
 file) to standard output.
 
 Use this if you have a legacy database with which you'd like to use Django.
-The script will inspect the database and create a model for each table within
-it.
+The script will inspect the database and create a model for each table or view
+within it.
 
 As you might expect, the created models will have an attribute for every field
-in the table. Note that ``inspectdb`` has a few special cases in its field-name
-output:
+in the table or view. Note that ``inspectdb`` has a few special cases in its
+field-name output:
 
 * If ``inspectdb`` cannot map a column's type to a model field type, it'll
   use ``TextField`` and will insert the Python comment
@@ -389,6 +389,11 @@ it because ``True`` is its default value).
 
 The :djadminopt:`--database` option may be used to specify the
 database to introspect.
+
+.. versionadded:: 1.8
+
+    A feature to inspect database views was added. In previous versions, only
+    tables (not views) were inspected.
 
 loaddata <fixture fixture ...>
 ------------------------------
