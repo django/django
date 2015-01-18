@@ -5,18 +5,11 @@ import pickle
 
 from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase, RemovedInDjango19Warning
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 
 
-class BaseMemcachedCacheMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('_get_memcache_timeout', 'get_backend_timeout', RemovedInDjango19Warning),
-    )
-
-
-class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache)):
+class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
         super(BaseMemcachedCache, self).__init__(params)
         if isinstance(server, six.string_types):
