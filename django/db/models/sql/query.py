@@ -27,7 +27,7 @@ from django.db.models.sql.datastructures import (
 from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
     ExtraWhere, AND, OR, EmptyWhere)
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.tree import Node
 
@@ -973,11 +973,6 @@ class Query(object):
                 raise ValueError("Cannot use None as a query value")
             lookups[-1] = 'isnull'
             value = True
-        elif callable(value):
-            warnings.warn(
-                "Passing callable arguments to queryset is deprecated.",
-                RemovedInDjango19Warning, stacklevel=2)
-            value = value()
         elif hasattr(value, 'resolve_expression'):
             pre_joins = self.alias_refcount.copy()
             value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
