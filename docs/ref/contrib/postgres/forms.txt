@@ -161,7 +161,8 @@ Range Fields
 This group of fields all share similar functionality for accepting range data.
 They are based on :class:`~django.forms.MultiValueField`. They treat one
 omitted value as an unbounded range. They also validate that the lower bound is
-not greater than the upper bound.
+not greater than the upper bound. All of these fields use
+:class:`~django.contrib.postgres.fields.RangeWidget`.
 
 IntegerRangeField
 ~~~~~~~~~~~~~~~~~
@@ -199,3 +200,26 @@ DateRangeField
     Based on :class:`~django.forms.DateField` and translates its input into
     :class:`~psycopg2:psycopg2.extras.DateRange`. Default for
     :class:`~django.contrib.postgres.fields.DateRangeField`.
+
+Widgets
+-------
+
+RangeWidget
+~~~~~~~~~~~
+
+.. class:: RangeWidget(base_widget, attrs=None)
+
+    Widget used by all of the range fields.
+    Based on :class:`~django.forms.MultiWidget`.
+
+    :class:`~RangeWidget` has one required argument:
+
+    .. attribute:: base_widget
+
+        A :class:`~RangeWidget` comprises a 2-tuple of ``base_widget``.
+
+    .. method:: decompress(value)
+
+        Takes a single "compressed" value of a field, for example a
+        :class:`~django.contrib.postgres.fields.DateRangeField`,
+        and returns a tuple representing and lower and upper bound.

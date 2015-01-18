@@ -1,5 +1,6 @@
 from django.core import exceptions
 from django import forms
+from django.forms.widgets import MultiWidget
 from django.utils.translation import ugettext_lazy as _
 
 from psycopg2.extras import NumericRange, DateRange, DateTimeTZRange
@@ -15,8 +16,7 @@ class BaseRangeField(forms.MultiValueField):
     }
 
     def __init__(self, **kwargs):
-        widget = forms.MultiWidget([self.base_field.widget, self.base_field.widget])
-        kwargs.setdefault('widget', widget)
+        kwargs.setdefault('widget', RangeWidget(self.base_field.widget))
         kwargs.setdefault('fields', [self.base_field(required=False), self.base_field(required=False)])
         kwargs.setdefault('required', False)
         kwargs.setdefault('require_all_fields', False)
@@ -67,3 +67,14 @@ class DateTimeRangeField(BaseRangeField):
 class DateRangeField(BaseRangeField):
     base_field = forms.DateField
     range_type = DateRange
+
+
+class RangeWidget(MultiWidget):
+    def __init__(self, base_widget, attrs=None):
+        widgets = (base_widget, base_widget)
+        super(RangeWidget, self).__init__(widgets, attrs)
+
+    def decompress(self, value):
+        if value:
+            return (value.lower, value.upper)
+        return (None, None)
