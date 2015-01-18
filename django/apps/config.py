@@ -110,9 +110,6 @@ class AppConfig(object):
 
         # If we're reaching this point, we must attempt to load the app config
         # class located at <mod_path>.<cls_name>
-
-        # Avoid django.utils.module_loading.import_by_path because it
-        # masks errors -- it reraises ImportError as ImproperlyConfigured.
         mod = import_module(mod_path)
         try:
             cls = getattr(mod, cls_name)
