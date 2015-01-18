@@ -1481,8 +1481,8 @@ versions prior to 2.7. They have been deprecated.
 ``django.utils.module_loading.import_by_path``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The current :meth:`~django.utils.module_loading.import_by_path` function
-catches ``AttributeError``, ``ImportError`` and ``ValueError`` exceptions,
+The current ``django.utils.module_loading.import_by_path`` function
+catches ``AttributeError``, ``ImportError``, and ``ValueError`` exceptions,
 and re-raises :exc:`~django.core.exceptions.ImproperlyConfigured`. Such
 exception masking makes it needlessly hard to diagnose circular import
 problems, because it makes it look like the problem comes from inside Django.

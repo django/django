@@ -755,15 +755,6 @@ Functions for working with Python modules.
 
         from django.core.exceptions import ValidationError
 
-.. function:: import_by_path(dotted_path, error_prefix='')
-
-    .. deprecated:: 1.7
-       Use :meth:`~django.utils.module_loading.import_string` instead.
-
-    Imports a dotted module path and returns the attribute/class designated by
-    the last name in the path. Raises :exc:`~django.core.exceptions.ImproperlyConfigured`
-    if something goes wrong.
-
 ``django.utils.safestring``
 ===========================
 
