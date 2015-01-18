@@ -1343,17 +1343,6 @@ To run on 1.2.3.4:7000 with a ``test`` fixture::
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
 
-validate
---------
-
-.. django-admin:: validate
-
-.. deprecated:: 1.7
-    Replaced by the :djadmin:`check` command.
-
-Validates all installed models (according to the :setting:`INSTALLED_APPS`
-setting) and prints validation errors to standard output.
-
 Commands provided by applications
 =================================
 

@@ -222,7 +222,7 @@ resolving those problems. The framework is extensible so you can add your
 own checks for your own apps and libraries.
 
 To perform system checks, you use the :djadmin:`check` management command.
-This command replaces the older :djadmin:`validate` management command.
+This command replaces the older ``validate`` management command.
 
 New ``Prefetch`` object for advanced ``prefetch_related`` operations.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1681,7 +1681,8 @@ deprecated, use ``SplitDateTimeWidget`` with
 ``validate``
 ~~~~~~~~~~~~
 
-:djadmin:`validate` command is deprecated in favor of :djadmin:`check` command.
+The ``validate`` management command is deprecated in favor of the
+:djadmin:`check` command.
 
 ``django.core.management.BaseCommand``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

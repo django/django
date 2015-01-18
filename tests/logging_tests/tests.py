@@ -385,7 +385,7 @@ class SettingsConfigTest(AdminScriptTestCase):
 
     def test_circular_dependency(self):
         # validate is just an example command to trigger settings configuration
-        out, err = self.run_manage(['validate'])
+        out, err = self.run_manage(['check'])
         self.assertNoOutput(err)
         self.assertOutput(out, "System check identified no issues (0 silenced).")
 
@@ -466,6 +466,6 @@ format=%(message)s
         self.remove_settings('settings.py')
 
     def test_custom_logging(self):
-        out, err = self.run_manage(['validate'])
+        out, err = self.run_manage(['check'])
         self.assertNoOutput(err)
         self.assertOutput(out, "System check identified no issues (0 silenced).")
