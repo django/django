@@ -228,9 +228,9 @@ details on these changes.
 
 * ``ModelAdmin.get_formsets`` will be removed.
 
-* Remove the backward compatible shims introduced to rename the
+* The backward compatibility shim introduced to rename the
   ``BaseMemcachedCache._get_memcache_timeout()`` method to
-  ``get_backend_timeout()``.
+  ``get_backend_timeout()`` will be removed.
 
 * The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` will be removed.
   Use :djadminopt:`--natural-foreign` instead.
@@ -263,8 +263,10 @@ details on these changes.
   ``requires_system_checks``. Admin validators will be replaced by admin
   checks.
 
-* ``ModelAdmin.validator`` will be removed in favor of the new ``checks``
-  attribute.
+* The ``ModelAdmin.validator_class`` and ``default_validator_class`` attributes
+  will be removed.
+
+* ``ModelAdmin.validate()`` will be removed.
 
 * ``django.db.backends.DatabaseValidation.validate_field`` will be removed in
   favor of the ``check_field`` method.
@@ -293,6 +295,8 @@ details on these changes.
   ``django.contrib.flatpages.sitemaps.FlatPageSitemap``.
 
 * Private API ``django.test.utils.TestTemplateLoader`` will be removed.
+
+* The ``django.contrib.contenttypes.generic`` module will be removed.
 
 .. _deprecation-removed-in-1.8:
 
