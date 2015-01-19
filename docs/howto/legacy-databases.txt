@@ -66,7 +66,7 @@ change the :attr:`~django.db.models.Options.managed` option above to ``True``
 
 .. versionadded:: 1.8
 
-Feature to inspect database views was added to PostgreSQL, MySQL, Oracle and SQLite.
+Feature to inspect database views was added to MySQL, Oracle, PostgreSQL and SQLite.
 
 Install the core Django tables
 ==============================

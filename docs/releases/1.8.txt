@@ -415,8 +415,8 @@ Management Commands
   introspect :class:`~django.db.models.AutoField` for MySQL and PostgreSQL
   databases.
 
-* :djadmin:`inspectdb` now able to introspect ``database View`` for MySQL, 
-  PostgreSQL, Oracle and SQLite. 
+* :djadmin:`inspectdb` now introspects database views on MySQL, Oracle, PostgreSQL
+  and SQLite.
 
 * When calling management commands from code through :ref:`call_command
   <call-command>` and passing options, the option name can match the command
