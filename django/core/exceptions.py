@@ -73,7 +73,7 @@ class ImproperlyConfigured(Exception):
     pass
 
 
-class FilePermissionError(Exception):
+class InsecureFilePermissionError(Exception):
     """File permissions are insecure"""
     pass
 

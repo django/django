@@ -12,7 +12,7 @@ import time     # Needed for Windows
 import warnings
 
 from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured, FilePermissionError
+from django.core.exceptions import ImproperlyConfigured, InsecureFilePermissionError
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import LazyObject, empty
 from django.utils import six
@@ -116,7 +116,7 @@ class Settings(BaseSettings):
             # only user readable and writable.
             mode = os.stat(self.SECRET_KEY_FILE).st_mode
             if bool((stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH) & mode):
-                raise FilePermissionError("The SECRET_KEY_FILE permissions are not secure.  Set the file permissions to be only user readable and writable.")
+                raise InsecureFilePermissionError("The SECRET_KEY_FILE permissions are not secure.  Set the file permissions to be only user readable and writable.")
 
             try:
                 with open(self.SECRET_KEY_FILE, 'r') as file:
