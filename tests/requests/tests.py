@@ -18,6 +18,7 @@ from django.test.client import FakePayload
 from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.http import cookie_date, urlencode
+from django.utils.six.moves import http_cookies
 from django.utils.six.moves.urllib.parse import urlencode as original_urlencode
 from django.utils.timezone import utc
 
@@ -186,7 +187,7 @@ class RequestsTests(SimpleTestCase):
         example_cookie = response.cookies['example']
         # A compat cookie may be in use -- check that it has worked
         # both as an output string, and using the cookie attributes
-        self.assertTrue('; httponly' in str(example_cookie))
+        self.assertIn('; %s' % http_cookies.Morsel._reserved['httponly'], str(example_cookie))
         self.assertTrue(example_cookie['httponly'])
 
     def test_limited_stream(self):
