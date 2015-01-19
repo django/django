@@ -108,7 +108,7 @@ class Command(BaseCommand):
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
         self.stdout.write("Performing system checks...\n\n")
-        self.validate(display_num_errors=True)
+        self.check(display_num_errors=True)
         try:
             self.check_migrations()
         except ImproperlyConfigured:
