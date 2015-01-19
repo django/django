@@ -13,7 +13,7 @@ from django.test import Client, TestCase, ignore_warnings, override_settings
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.template.response import SimpleTemplateResponse
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils._os import upath
 from django.utils.translation import ugettext_lazy
 from django.http import HttpResponse
