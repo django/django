@@ -25,7 +25,6 @@ from django.db.models.options import Options
 from django.db.models.query import Q
 from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import curry
 from django.utils.six.moves import zip
@@ -106,7 +105,7 @@ class ModelBase(type):
                     "This will no longer be supported in Django 1.9." %
                     (module, name))
                 if not abstract:
-                    warnings.warn(msg, RemovedInDjango19Warning, stacklevel=2)
+                    warnings.warn(msg, DeprecationWarning, stacklevel=2)
 
                 model_module = sys.modules[new_class.__module__]
                 package_components = model_module.__name__.split('.')
