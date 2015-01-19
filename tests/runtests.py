@@ -15,13 +15,13 @@ from django.conf import settings
 from django.db import connection
 from django.test import TransactionTestCase, TestCase
 from django.test.utils import get_runner
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango20Warning, RemovedInDjango21Warning
 from django.utils._os import upath
 from django.utils import six
 
 
-warnings.simplefilter("error", RemovedInDjango19Warning)
 warnings.simplefilter("error", RemovedInDjango20Warning)
+warnings.simplefilter("error", RemovedInDjango21Warning)
 
 CONTRIB_MODULE_PATH = 'django.contrib'
 
