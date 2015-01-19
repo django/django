@@ -217,8 +217,8 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
 
 * ``AppCommand.handle_app()`` is no longer be supported.
 
-* ``RequestSite`` is located in ``django.contrib.sites.requests`` and
-  ``get_current_site`` in ``django.contrib.sites.shortcuts``.
+* ``RequestSite`` and ``get_current_site()`` are no longer importable from
+  ``django.contrib.sites.models``.
 
 * FastCGI support via the ``runfcgi`` management command is removed.
 
@@ -226,9 +226,7 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
 
 * ``ModelAdmin.declared_fieldsets`` is removed.
 
-* Instances of ``util.py`` in the Django codebase have been renamed to
-  ``utils.py`` in an effort to unify all util and utils references.
-  The modules that provided backwards compatibility are removed:
+* The ``util`` modules that provided backwards compatibility are removed:
 
   * ``django.contrib.admin.util``
   * ``django.contrib.gis.db.backends.util``
@@ -245,7 +243,7 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
 
 * The ``use_natural_keys`` argument for ``serializers.serialize()`` is removed.
 
-* ``django.forms.get_declared_fields`` is removed.
+* Private API ``django.forms.forms.get_declared_fields()`` is removed.
 
 * The ability to use a ``SplitDateTimeWidget`` with ``DateTimeField`` is
   removed.
@@ -267,8 +265,10 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
 * ``BaseCommand.requires_model_validation`` is removed in favor of
   ``requires_system_checks``. Admin validators is replaced by admin checks.
 
-* ``ModelAdmin.validator`` is removed in favor of the new ``checks``
-  attribute.
+* The ``ModelAdmin.validator_class`` and ``default_validator_class`` attributes
+  are removed.
+
+* ``ModelAdmin.validate()`` is removed.
 
 * ``django.db.backends.DatabaseValidation.validate_field`` is removed in
   favor of the ``check_field`` method.
@@ -295,3 +295,7 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
 
 * ``django.contrib.sitemaps.FlatPageSitemap`` is removed in favor of
   ``django.contrib.flatpages.sitemaps.FlatPageSitemap``.
+
+* Private API ``django.test.utils.TestTemplateLoader`` is removed.
+
+* The ``django.contrib.contenttypes.generic`` module is removed.
