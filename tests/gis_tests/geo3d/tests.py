@@ -4,6 +4,9 @@ import os
 import re
 from unittest import skipUnless
 
+from django.contrib.gis.db.models.functions import (
+    AsGeoJSON, AsKML, Length, Perimeter, Scale, Translate,
+)
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
@@ -73,18 +76,7 @@ bbox_data = (
 )
 
 
-@skipUnless(HAS_GDAL, "GDAL is required for Geo3DTest.")
-@skipUnlessDBFeature("gis_enabled", "supports_3d_storage")
-class Geo3DTest(TestCase):
-    """
-    Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
-    tries to test the features that can handle 3D and that are also
-    available within GeoDjango.  For more information, see the PostGIS docs
-    on the routines that support 3D:
-
-    http://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
-    """
-
+class Geo3DLoadingHelper(object):
     def _load_interstate_data(self):
         # Interstate (2D / 3D and Geographic/Projected variants)
         for name, line, exp_z in interstate_data:
@@ -108,6 +100,19 @@ class Geo3DTest(TestCase):
         bbox_3d = Polygon(tuple((x, y, z) for (x, y), z in zip(bbox_2d[0].coords, bbox_z)), srid=32140)
         Polygon2D.objects.create(name='2D BBox', poly=bbox_2d)
         Polygon3D.objects.create(name='3D BBox', poly=bbox_3d)
+
+
+@skipUnless(HAS_GDAL, "GDAL is required for Geo3DTest.")
+@skipUnlessDBFeature("gis_enabled", "supports_3d_storage")
+class Geo3DTest(Geo3DLoadingHelper, TestCase):
+    """
+    Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
+    tries to test the features that can handle 3D and that are also
+    available within GeoDjango.  For more information, see the PostGIS docs
+    on the routines that support 3D:
+
+    http://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
+    """
 
     def test_3d_hasz(self):
         """
@@ -301,4 +306,94 @@ class Geo3DTest(TestCase):
         ztranslations = (5.23, 23, -17)
         for ztrans in ztranslations:
             for city in City3D.objects.translate(0, 0, ztrans):
+                self.assertEqual(city_dict[city.name][2] + ztrans, city.translate.z)
+
+
+@skipUnless(HAS_GDAL, "GDAL is required for Geo3DTest.")
+@skipUnlessDBFeature("gis_enabled", "supports_3d_functions")
+class Geo3DFunctionsTests(Geo3DLoadingHelper, TestCase):
+    def test_kml(self):
+        """
+        Test KML() function with Z values.
+        """
+        self._load_city_data()
+        h = City3D.objects.annotate(kml=AsKML('point', precision=6)).get(name='Houston')
+        # KML should be 3D.
+        # `SELECT ST_AsKML(point, 6) FROM geo3d_city3d WHERE name = 'Houston';`
+        ref_kml_regex = re.compile(r'^<Point><coordinates>-95.363\d+,29.763\d+,18</coordinates></Point>$')
+        self.assertTrue(ref_kml_regex.match(h.kml))
+
+    def test_geojson(self):
+        """
+        Test GeoJSON() function with Z values.
+        """
+        self._load_city_data()
+        h = City3D.objects.annotate(geojson=AsGeoJSON('point', precision=6)).get(name='Houston')
+        # GeoJSON should be 3D
+        # `SELECT ST_AsGeoJSON(point, 6) FROM geo3d_city3d WHERE name='Houston';`
+        ref_json_regex = re.compile(r'^{"type":"Point","coordinates":\[-95.363151,29.763374,18(\.0+)?\]}$')
+        self.assertTrue(ref_json_regex.match(h.geojson))
+
+    def test_perimeter(self):
+        """
+        Testing Perimeter() function on 3D fields.
+        """
+        self._load_polygon_data()
+        # Reference query for values below:
+        #  `SELECT ST_Perimeter3D(poly), ST_Perimeter2D(poly) FROM geo3d_polygon3d;`
+        ref_perim_3d = 76859.2620451
+        ref_perim_2d = 76859.2577803
+        tol = 6
+        poly2d = Polygon2D.objects.annotate(perimeter=Perimeter('poly')).get(name='2D BBox')
+        self.assertAlmostEqual(ref_perim_2d, poly2d.perimeter.m, tol)
+        poly3d = Polygon3D.objects.annotate(perimeter=Perimeter('poly')).get(name='3D BBox')
+        self.assertAlmostEqual(ref_perim_3d, poly3d.perimeter.m, tol)
+
+    def test_length(self):
+        """
+        Testing Length() function on 3D fields.
+        """
+        # ST_Length_Spheroid Z-aware, and thus does not need to use
+        # a separate function internally.
+        # `SELECT ST_Length_Spheroid(line, 'SPHEROID["GRS 1980",6378137,298.257222101]')
+        #    FROM geo3d_interstate[2d|3d];`
+        self._load_interstate_data()
+        tol = 3
+        ref_length_2d = 4368.1721949481
+        ref_length_3d = 4368.62547052088
+        inter2d = Interstate2D.objects.annotate(length=Length('line')).get(name='I-45')
+        self.assertAlmostEqual(ref_length_2d, inter2d.length.m, tol)
+        inter3d = Interstate3D.objects.annotate(length=Length('line')).get(name='I-45')
+        self.assertAlmostEqual(ref_length_3d, inter3d.length.m, tol)
+
+        # Making sure `ST_Length3D` is used on for a projected
+        # and 3D model rather than `ST_Length`.
+        # `SELECT ST_Length(line) FROM geo3d_interstateproj2d;`
+        ref_length_2d = 4367.71564892392
+        # `SELECT ST_Length3D(line) FROM geo3d_interstateproj3d;`
+        ref_length_3d = 4368.16897234101
+        inter2d = InterstateProj2D.objects.annotate(length=Length('line')).get(name='I-45')
+        self.assertAlmostEqual(ref_length_2d, inter2d.length.m, tol)
+        inter3d = InterstateProj3D.objects.annotate(length=Length('line')).get(name='I-45')
+        self.assertAlmostEqual(ref_length_3d, inter3d.length.m, tol)
+
+    def test_scale(self):
+        """
+        Testing Scale() function on Z values.
+        """
+        self._load_city_data()
+        # Mapping of City name to reference Z values.
+        zscales = (-3, 4, 23)
+        for zscale in zscales:
+            for city in City3D.objects.annotate(scale=Scale('point', 1.0, 1.0, zscale)):
+                self.assertEqual(city_dict[city.name][2] * zscale, city.scale.z)
+
+    def test_translate(self):
+        """
+        Testing Translate() function on Z values.
+        """
+        self._load_city_data()
+        ztranslations = (5.23, 23, -17)
+        for ztrans in ztranslations:
+            for city in City3D.objects.annotate(translate=Translate('point', 0, 0, ztrans)):
                 self.assertEqual(city_dict[city.name][2] + ztrans, city.translate.z)

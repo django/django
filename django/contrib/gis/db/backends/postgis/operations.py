@@ -88,6 +88,13 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         'distance_lte': PostGISDistanceOperator(func='ST_Distance', op='<=', geography=True),
     }
 
+    unsupported_functions = set()
+    function_names = {
+        'BoundingCircle': 'ST_MinimumBoundingCircle',
+        'MemSize': 'ST_Mem_Size',
+        'NumPoints': 'ST_NPoints',
+    }
+
     def __init__(self, connection):
         super(PostGISOperations, self).__init__(connection)
 
