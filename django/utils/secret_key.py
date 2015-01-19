@@ -29,7 +29,7 @@ def create_secret_key_file(path):
     if hasattr(os, "O_NOFOLLOW"):
         flags |= os.O_NOFOLLOW
 
-    fd = os.open(path, flags, 0600)
+    fd = os.open(path, flags, mode=0o600)
 
     try:
         with os.fdopen(fd, 'w') as file:
