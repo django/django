@@ -1693,10 +1693,16 @@ value of the former flag is used. Defining both ``requires_system_checks`` and
 
 The ``check()`` method has replaced the old ``validate()`` method.
 
-``ModelAdmin.validator``
-~~~~~~~~~~~~~~~~~~~~~~~~
+``ModelAdmin`` validators
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``ModelAdmin.validator`` is deprecated in favor of new ``checks`` attribute.
+The ``ModelAdmin.validator_class`` and ``default_validator_class`` attributes
+are deprecated in favor of the new ``checks_class`` attribute.
+
+The ``ModelAdmin.validate()`` method is deprecated in favor of
+``ModelAdmin.check()``.
+
+The ``django.contrib.admin.validation`` module is deprecated.
 
 ``django.db.backends.DatabaseValidation.validate_field``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
