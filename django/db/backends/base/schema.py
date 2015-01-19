@@ -488,18 +488,6 @@ class BaseDatabaseSchemaEditor(object):
                      old_db_params, new_db_params, strict=False):
         """Actually perform a "physical" (non-ManyToMany) field update."""
 
-        # Has unique been removed?
-        if old_field.unique and (not new_field.unique or (not old_field.primary_key and new_field.primary_key)):
-            # Find the unique constraint for this field
-            constraint_names = self._constraint_names(model, [old_field.column], unique=True)
-            if strict and len(constraint_names) != 1:
-                raise ValueError("Found wrong number (%s) of unique constraints for %s.%s" % (
-                    len(constraint_names),
-                    model._meta.db_table,
-                    old_field.column,
-                ))
-            for constraint_name in constraint_names:
-                self.execute(self._delete_constraint_sql(self.sql_delete_unique, model, constraint_name))
         # Drop any FK constraints, we'll remake them later
         fks_dropped = set()
         if old_field.rel and old_field.db_constraint:
@@ -513,6 +501,18 @@ class BaseDatabaseSchemaEditor(object):
             for fk_name in fk_names:
                 fks_dropped.add((old_field.column,))
                 self.execute(self._delete_constraint_sql(self.sql_delete_fk, model, fk_name))
+        # Has unique been removed?
+        if old_field.unique and (not new_field.unique or (not old_field.primary_key and new_field.primary_key)):
+            # Find the unique constraint for this field
+            constraint_names = self._constraint_names(model, [old_field.column], unique=True)
+            if strict and len(constraint_names) != 1:
+                raise ValueError("Found wrong number (%s) of unique constraints for %s.%s" % (
+                    len(constraint_names),
+                    model._meta.db_table,
+                    old_field.column,
+                ))
+            for constraint_name in constraint_names:
+                self.execute(self._delete_constraint_sql(self.sql_delete_unique, model, constraint_name))
         # Drop incoming FK constraints if we're a primary key and things are going
         # to change.
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
