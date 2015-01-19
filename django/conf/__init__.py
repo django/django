@@ -116,11 +116,10 @@ class Settings(BaseSettings):
             except IOError:
                 raise ImproperlyConfigured("Unable to read SECRET_KEY_FILE: %s" % self.SECRET_KEY_FILE)
 
-            # Verify that file permissions are set to be
-            # only user readable and writable.
+            # Verify that file permissions are not other readable/writable
             import stat
             mode = os.stat(self.SECRET_KEY_FILE).st_mode
-            if bool((stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH) & mode):
+            if bool((stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH) & mode):
                 raise InsecureFilePermissionError("The SECRET_KEY_FILE permissions are not secure.  Set the file permissions to be only user readable and writable.")
 
         if not self.SECRET_KEY:
