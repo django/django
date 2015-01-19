@@ -391,7 +391,7 @@ database to introspect.
 
 .. versionadded:: 1.8
 
-Feature to inspect database views was added to MySQL, Oracle, PostgreSQL and SQLite.
+    Feature to inspect database views was added to MySQL, Oracle, PostgreSQL and SQLite.
 
 loaddata <fixture fixture ...>
 ------------------------------
