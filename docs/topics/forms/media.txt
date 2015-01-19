@@ -55,9 +55,9 @@ Here's a simple example::
     class CalendarWidget(forms.TextInput):
         class Media:
             css = {
-                'all': ('pretty.css',)
+                'all': ['pretty.css']
             }
-            js = ('animations.js', 'actions.js')
+            js = ['animations.js', 'actions.js']
 
 This code defines a ``CalendarWidget``, which will be based on ``TextInput``.
 Every time the CalendarWidget is used on a form, that form will be directed
@@ -95,8 +95,8 @@ provide two CSS options -- one for the screen, and one for print::
 
     class Media:
         css = {
-            'screen': ('pretty.css',),
-            'print': ('newspaper.css',)
+            'screen': ['pretty.css'],
+            'print': ['newspaper.css'],
         }
 
 If a group of CSS files are appropriate for multiple output media types,
@@ -106,9 +106,9 @@ requirements::
 
     class Media:
         css = {
-            'screen': ('pretty.css',),
-            'tv,projector': ('lo_res.css',),
-            'print': ('newspaper.css',)
+            'screen': ['pretty.css'],
+            'tv,projector': ['lo_res.css'],
+            'print': ['newspaper.css'],
         }
 
 If this last CSS definition were to be rendered, it would become the following HTML::
@@ -138,9 +138,9 @@ example above::
     >>> class FancyCalendarWidget(CalendarWidget):
     ...     class Media:
     ...         css = {
-    ...             'all': ('fancy.css',)
+    ...             'all': ['fancy.css']
     ...         }
-    ...         js = ('whizbang.js',)
+    ...         js = ['whizbang.js']
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
@@ -158,9 +158,9 @@ an ``extend=False`` declaration to the ``Media`` declaration::
     ...     class Media:
     ...         extend = False
     ...         css = {
-    ...             'all': ('fancy.css',)
+    ...             'all': ['fancy.css']
     ...         }
-    ...         js = ('whizbang.js',)
+    ...         js = ['whizbang.js']
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
@@ -188,8 +188,8 @@ be defined in a dynamic fashion::
 
     class CalendarWidget(forms.TextInput):
         def _media(self):
-            return forms.Media(css={'all': ('pretty.css',)},
-                               js=('animations.js', 'actions.js'))
+            return forms.Media(css={'all': ['pretty.css']},
+                               js=['animations.js', 'actions.js'])
         media = property(_media)
 
 See the section on `Media objects`_ for more details on how to construct
@@ -220,9 +220,9 @@ was ``None``::
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
-    ...             'all': ('/css/pretty.css',),
+    ...             'all': ['/css/pretty.css'],
     ...         }
-    ...         js = ('animations.js', 'http://othersite.com/actions.js')
+    ...         js = ['animations.js', 'http://othersite.com/actions.js']
 
     >>> w = CalendarWidget()
     >>> print(w.media)
@@ -279,13 +279,13 @@ specified by both::
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
-    ...             'all': ('pretty.css',)
+    ...             'all': ['pretty.css']
     ...         }
-    ...         js = ('animations.js', 'actions.js')
+    ...         js = ['animations.js', 'actions.js']
 
     >>> class OtherWidget(forms.TextInput):
     ...     class Media:
-    ...         js = ('whizbang.js',)
+    ...         js = ['whizbang.js']
 
     >>> w1 = CalendarWidget()
     >>> w2 = OtherWidget()
@@ -331,7 +331,7 @@ form::
     ...
     ...     class Media:
     ...         css = {
-    ...             'all': ('layout.css',)
+    ...             'all': ['layout.css'],
     ...         }
 
     >>> f = ContactForm()

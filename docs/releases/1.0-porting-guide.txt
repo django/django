@@ -118,7 +118,7 @@ New (1.0) ``admin.py``::
     class AuthorAdmin(admin.ModelAdmin):
         list_display = ['first_name', 'last_name']
         prepopulated_fields = {
-            'slug': ('first_name', 'last_name')
+            'slug': ['first_name', 'last_name']
         }
 
     admin.site.register(Author, AuthorAdmin)

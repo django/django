@@ -244,10 +244,10 @@ subclass::
         from django.contrib import admin
 
         class AuthorAdmin(admin.ModelAdmin):
-            fields = ('name', 'title')
+            fields = ['name', 'title']
 
         class AuthorAdmin(admin.ModelAdmin):
-            exclude = ('birth_date',)
+            exclude = ['birth_date']
 
     Since the Author model only has three fields, ``name``, ``title``, and
     ``birth_date``, the forms resulting from the above declarations will
@@ -264,7 +264,7 @@ subclass::
     :class:`django.contrib.flatpages.models.FlatPage` model as follows::
 
         class FlatPageAdmin(admin.ModelAdmin):
-            fields = ('url', 'title', 'content')
+            fields = ['url', 'title', 'content']
 
     In the above example, only the fields ``url``, ``title`` and ``content``
     will be displayed, sequentially, in the form. ``fields`` can contain
@@ -282,7 +282,7 @@ subclass::
     own line::
 
         class FlatPageAdmin(admin.ModelAdmin):
-            fields = (('url', 'title'), 'content')
+            fields = [('url', 'title'), 'content']
 
     .. admonition:: Note
 
@@ -314,15 +314,15 @@ subclass::
         from django.contrib import admin
 
         class FlatPageAdmin(admin.ModelAdmin):
-            fieldsets = (
+            fieldsets = [
                 (None, {
-                    'fields': ('url', 'title', 'content', 'sites')
+                    'fields': ['url', 'title', 'content', 'sites'],
                 }),
                 ('Advanced options', {
-                    'classes': ('collapse',),
-                    'fields': ('enable_comments', 'registration_required', 'template_name')
+                    'classes': ['collapse'],
+                    'fields': ['enable_comments', 'registration_required', 'template_name'],
                 }),
-            )
+            ]
 
     This results in an admin page that looks like:
 
@@ -336,13 +336,13 @@ subclass::
     The ``field_options`` dictionary can have the following keys:
 
     * ``fields``
-        A tuple of field names to display in this fieldset. This key is
+        An iterable of field names to display in this fieldset. This key is
         required.
 
         Example::
 
             {
-            'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
+            'fields': ['first_name', 'last_name', 'address', 'city', 'state'],
             }
 
         As with the :attr:`~ModelAdmin.fields` option, to display multiple
@@ -351,7 +351,7 @@ subclass::
         the same line::
 
             {
-            'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
+            'fields': [('first_name', 'last_name'), 'address', 'city', 'state'],
             }
 
         ``fields`` can contain values defined in
@@ -367,7 +367,7 @@ subclass::
         Example::
 
             {
-            'classes': ('wide', 'extrapretty'),
+            'classes': ['wide', 'extrapretty'],
             }
 
         Two useful classes defined by the default admin site stylesheet are
@@ -506,7 +506,7 @@ subclass::
 
     Example::
 
-        list_display = ('first_name', 'last_name')
+        list_display = ['first_name', 'last_name']
 
     If you don't set ``list_display``, the admin site will display a single
     column that displays the ``__str__()`` (``__unicode__()`` on Python 2)
@@ -517,7 +517,7 @@ subclass::
     * A field of the model. For example::
 
           class PersonAdmin(admin.ModelAdmin):
-              list_display = ('first_name', 'last_name')
+              list_display = ['first_name', 'last_name']
 
     * A callable that accepts one parameter for the model instance. For
       example::
@@ -527,13 +527,13 @@ subclass::
           upper_case_name.short_description = 'Name'
 
           class PersonAdmin(admin.ModelAdmin):
-              list_display = (upper_case_name,)
+              list_display = [upper_case_name]
 
     * A string representing an attribute on the ``ModelAdmin``. This
       behaves same as the callable. For example::
 
           class PersonAdmin(admin.ModelAdmin):
-              list_display = ('upper_case_name',)
+              list_display = ['upper_case_name']
 
               def upper_case_name(self, obj):
                   return ("%s %s" % (obj.first_name, obj.last_name)).upper()
@@ -555,7 +555,7 @@ subclass::
               decade_born_in.short_description = 'Birth decade'
 
           class PersonAdmin(admin.ModelAdmin):
-              list_display = ('name', 'decade_born_in')
+              list_display = ['name', 'decade_born_in']
 
     A few special cases to note about ``list_display``:
 
@@ -599,7 +599,7 @@ subclass::
               colored_name.allow_tags = True
 
           class PersonAdmin(admin.ModelAdmin):
-              list_display = ('first_name', 'last_name', 'colored_name')
+              list_display = ['first_name', 'last_name', 'colored_name']
 
     * If the string given is a method of the model, ``ModelAdmin`` or a
       callable that returns True or False Django will display a pretty
@@ -620,14 +620,14 @@ subclass::
               born_in_fifties.boolean = True
 
           class PersonAdmin(admin.ModelAdmin):
-              list_display = ('name', 'born_in_fifties')
+              list_display = ['name', 'born_in_fifties']
 
 
     * The ``__str__()`` (``__unicode__()`` on Python 2) method is just
       as valid in ``list_display`` as any other model method, so it's
       perfectly OK to do this::
 
-          list_display = ('__str__', 'some_other_field')
+          list_display = ['__str__', 'some_other_field']
 
     * Usually, elements of ``list_display`` that aren't actual database
       fields can't be used in sorting (because Django does all the sorting
@@ -656,7 +656,7 @@ subclass::
             colored_first_name.admin_order_field = 'first_name'
 
         class PersonAdmin(admin.ModelAdmin):
-            list_display = ('first_name', 'colored_first_name')
+            list_display = ['first_name', 'colored_first_name']
 
       The above will tell Django to order by the ``first_name`` field when
       trying to sort by ``colored_first_name`` in the admin.
@@ -687,7 +687,7 @@ subclass::
               full_name = property(my_property)
 
           class PersonAdmin(admin.ModelAdmin):
-              list_display = ('full_name',)
+              list_display = ['full_name']
 
 
     * The field names in ``list_display`` will also appear as CSS classes in
@@ -728,13 +728,13 @@ subclass::
     linked on the change list page::
 
         class PersonAdmin(admin.ModelAdmin):
-            list_display = ('first_name', 'last_name', 'birthday')
-            list_display_links = ('first_name', 'last_name')
+            list_display = ['first_name', 'last_name', 'birthday']
+            list_display_links = ['first_name', 'last_name']
 
     In this example, the change list page grid will have no links::
 
         class AuditEntryAdmin(admin.ModelAdmin):
-            list_display = ('timestamp', 'message')
+            list_display = ['timestamp', 'message']
             list_display_links = None
 
     .. versionchanged:: 1.7
@@ -779,13 +779,13 @@ subclass::
       ``IntegerField``, ``ForeignKey`` or ``ManyToManyField``, for example::
 
           class PersonAdmin(admin.ModelAdmin):
-              list_filter = ('is_staff', 'company')
+              list_filter = ['is_staff', 'company']
 
       Field names in ``list_filter`` can also span relations
       using the ``__`` lookup, for example::
 
           class PersonAdmin(admin.UserAdmin):
-              list_filter = ('company__name',)
+              list_filter = ['company__name']
 
     * a class inheriting from ``django.contrib.admin.SimpleListFilter``,
       which you need to provide the ``title`` and ``parameter_name``
@@ -834,7 +834,7 @@ subclass::
                                                birthday__lte=date(1999, 12, 31))
 
            class PersonAdmin(admin.ModelAdmin):
-               list_filter = (DecadeBornListFilter,)
+               list_filter = [DecadeBornListFilter]
 
       .. note::
 
@@ -877,9 +877,9 @@ subclass::
       ``django.contrib.admin.FieldListFilter``, for example::
 
           class PersonAdmin(admin.ModelAdmin):
-              list_filter = (
+              list_filter = [
                   ('is_staff', admin.BooleanFieldListFilter),
-              )
+              ]
 
       .. versionadded:: 1.8
 
@@ -887,9 +887,9 @@ subclass::
       involved in that relation using ``RelatedOnlyFieldListFilter``::
 
           class BookAdmin(admin.ModelAdmin):
-              list_filter = (
+              list_filter = [
                   ('author', admin.RelatedOnlyFieldListFilter),
-              )
+              ]
 
       Assuming ``author`` is a ``ForeignKey`` to a ``User`` model, this will
       limit the ``list_filter`` choices to the users who have written a book
@@ -940,7 +940,7 @@ subclass::
     ``select_related`` as parameters. For example::
 
         class ArticleAdmin(admin.ModelAdmin):
-            list_select_related = ('author', 'category')
+            list_select_related = ['author', 'category']
 
     will call ``select_related('author', 'category')``.
 
@@ -971,7 +971,7 @@ subclass::
     fields it should prepopulate from::
 
         class ArticleAdmin(admin.ModelAdmin):
-            prepopulated_fields = {"slug": ("title",)}
+            prepopulated_fields = {"slug": ["title"]}
 
     When set, the given fields will use a bit of JavaScript to populate from
     the fields assigned. The main use for this functionality is to
@@ -1017,7 +1017,7 @@ subclass::
     ``ManyToManyField``::
 
         class ArticleAdmin(admin.ModelAdmin):
-            raw_id_fields = ("newspaper",)
+            raw_id_fields = ['newspaper']
 
     The ``raw_id_fields`` ``Input`` widget should contain a primary key if the
     field is a ``ForeignKey`` or a comma separated list of values if the field
@@ -1053,7 +1053,7 @@ subclass::
         from django.utils.safestring import mark_safe
 
         class PersonAdmin(admin.ModelAdmin):
-            readonly_fields = ('address_report',)
+            readonly_fields = ['address_report']
 
             def address_report(self, instance):
                 # assuming get_full_address() returns a list of strings
@@ -1062,7 +1062,7 @@ subclass::
                 return format_html_join(
                     mark_safe('<br/>'),
                     '{}',
-                    ((line,) for line in instance.get_full_address()),
+                    ([line] for line in instance.get_full_address()),
                 ) or "<span class='errors'>I can't determine this address.</span>"
 
             # short_description functions like a model field's verbose_name
@@ -1323,8 +1323,8 @@ templates used by the :class:`ModelAdmin` views:
     For example, to enable search by integer field, you could use::
 
         class PersonAdmin(admin.ModelAdmin):
-            list_display = ('name', 'age')
-            search_fields = ('name',)
+            list_display = ['name', 'age']
+            search_fields = ['name']
 
             def get_search_results(self, request, queryset, search_term):
                 queryset, use_distinct = super(PersonAdmin, self).get_search_results(request, queryset, search_term)
@@ -1416,7 +1416,7 @@ templates used by the :class:`ModelAdmin` views:
     filtering based on add, change, and delete permissions::
 
         class MyModelAdmin(admin.ModelAdmin):
-            inlines = (MyInline,)
+            inlines = [MyInline]
 
             def get_inline_instances(self, request, obj=None):
                 return [inline(self.model, self.admin_site) for inline in self.inlines]
@@ -1573,12 +1573,12 @@ templates used by the :class:`ModelAdmin` views:
         class MyModelAdmin(admin.ModelAdmin):
             def formfield_for_choice_field(self, db_field, request, **kwargs):
                 if db_field.name == "status":
-                    kwargs['choices'] = (
+                    kwargs['choices'] = [
                         ('accepted', 'Accepted'),
                         ('denied', 'Denied'),
-                    )
+                    ]
                     if request.user.is_superuser:
-                        kwargs['choices'] += (('ready', 'Ready for deployment'),)
+                        kwargs['choices'] += [('ready', 'Ready for deployment')]
                 return super(MyModelAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
 
     .. admonition:: Note
@@ -1826,9 +1826,9 @@ on your ``ModelAdmin``::
     class ArticleAdmin(admin.ModelAdmin):
         class Media:
             css = {
-                "all": ("my_styles.css",)
+                "all": ["my_styles.css"]
             }
-            js = ("my_code.js",)
+            js = ["my_code.js"]
 
 The :doc:`staticfiles app </ref/contrib/staticfiles>` prepends
 :setting:`STATIC_URL` (or :setting:`MEDIA_URL` if :setting:`STATIC_URL` is
@@ -2041,7 +2041,7 @@ The ``InlineModelAdmin`` class adds:
 
         class BookInline(admin.TabularInline):
             model = Book
-            raw_id_fields = ("pages",)
+            raw_id_fields = ['pages']
 
 
 .. attribute:: InlineModelAdmin.template
@@ -2190,7 +2190,7 @@ so by defining an ``InlineModelAdmin`` object for the relationship::
         inlines = [
             MembershipInline,
         ]
-        exclude = ('members',)
+        exclude = ['members']
 
 There are two features worth noting in this example.
 
@@ -2253,10 +2253,10 @@ customized using any of the options available to ``InlineModelAdmin`` classes.
 Now create admin views for the ``Person`` and ``Group`` models::
 
     class PersonAdmin(admin.ModelAdmin):
-        inlines = (MembershipInline,)
+        inlines = [MembershipInline]
 
     class GroupAdmin(admin.ModelAdmin):
-        inlines = (MembershipInline,)
+        inlines = [MembershipInline]
 
 Finally, register your ``Person`` and ``Group`` models with the admin site::
 
@@ -2717,7 +2717,7 @@ call::
 
     >>> from django.core import urlresolvers
     >>> c = Choice.objects.get(...)
-    >>> change_url = urlresolvers.reverse('admin:polls_choice_change', args=(c.id,))
+    >>> change_url = urlresolvers.reverse('admin:polls_choice_change', args=[c.id])
 
 This will find the first registered instance of the admin application
 (whatever the instance name), and resolve to the view for changing
@@ -2729,7 +2729,7 @@ if you specifically wanted the admin view from the admin instance named
 ``custom``, you would need to call::
 
     >>> change_url = urlresolvers.reverse('admin:polls_choice_change',
-    ...                                   args=(c.id,), current_app='custom')
+    ...                                   args=[c.id], current_app='custom')
 
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.

@@ -20,7 +20,7 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
             return self.title
 
         class Meta:
-            ordering = ('title',)
+            ordering = ['title']
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
@@ -30,7 +30,7 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
             return self.headline
 
         class Meta:
-            ordering = ('headline',)
+            ordering = ['headline']
 
 What follows are examples of operations that can be performed using the Python
 API facilities. Note that if you are using :ref:`an intermediate model

@@ -151,11 +151,11 @@ Consider this set of models::
     from django.db import models
     from django.forms import ModelForm
 
-    TITLE_CHOICES = (
+    TITLE_CHOICES = [
         ('MR', 'Mr.'),
         ('MRS', 'Mrs.'),
         ('MS', 'Ms.'),
-    )
+    ]
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
@@ -495,7 +495,7 @@ For example, if you want the ``CharField`` for the ``name`` attribute of
     class AuthorForm(ModelForm):
         class Meta:
             model = Author
-            fields = ('name', 'title', 'birth_date')
+            fields = ['name', 'title', 'birth_date']
             widgets = {
                 'name': Textarea(attrs={'cols': 80, 'rows': 20}),
             }
@@ -514,7 +514,7 @@ the ``name`` field::
     class AuthorForm(ModelForm):
         class Meta:
             model = Author
-            fields = ('name', 'title', 'birth_date')
+            fields = ['name', 'title', 'birth_date']
             labels = {
                 'name': _('Writer'),
             }
@@ -619,7 +619,7 @@ attribute on the ``Meta`` class.
     >>> class AuthorForm(ModelForm):
     ...     class Meta:
     ...         model = Author
-    ...         localized_fields = ('birth_date',)
+    ...         localized_fields = ['birth_date']
 
 If ``localized_fields`` is set to the special value ``'__all__'``, all fields
 will be localized.
@@ -644,7 +644,7 @@ the ``Meta.fields`` or ``Meta.excludes`` lists::
 
     >>> class RestrictedArticleForm(EnhancedArticleForm):
     ...     class Meta(ArticleForm.Meta):
-    ...         exclude = ('body',)
+    ...         exclude = ['body']
 
 This adds the extra method from the ``EnhancedArticleForm`` and modifies
 the original ``ArticleForm.Meta`` to remove one field.
@@ -685,7 +685,7 @@ to make::
 
     >>> from django.forms.models import modelform_factory
     >>> from myapp.models import Book
-    >>> BookForm = modelform_factory(Book, fields=("author", "title"))
+    >>> BookForm = modelform_factory(Book, fields=["author", "title"])
 
 This can also be used to make simple modifications to existing forms, for
 example by specifying the widgets to be used for a given field::
@@ -701,7 +701,7 @@ documentation.
 
 ... or enable localization for specific fields::
 
-    >>> Form = modelform_factory(Author, form=AuthorForm, localized_fields=("birth_date",))
+    >>> Form = modelform_factory(Author, form=AuthorForm, localized_fields=["birth_date"])
 
 .. _model-formsets:
 
@@ -781,7 +781,7 @@ you can create a custom model form that has custom validation::
     class AuthorForm(forms.ModelForm):
         class Meta:
             model = Author
-            fields = ('name', 'title')
+            fields = ['name', 'title']
 
         def clean_name(self):
             # custom validation for the name field
@@ -803,13 +803,13 @@ Controlling which fields are used with ``fields`` and ``exclude``
 By default, a model formset uses all fields in the model that are not marked
 with ``editable=False``. However, this can be overridden at the formset level::
 
-    >>> AuthorFormSet = modelformset_factory(Author, fields=('name', 'title'))
+    >>> AuthorFormSet = modelformset_factory(Author, fields=['name', 'title'])
 
 Using ``fields`` restricts the formset to use only the given fields.
 Alternatively, you can take an "opt-out" approach, specifying which fields to
 exclude::
 
-    >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
+    >>> AuthorFormSet = modelformset_factory(Author, exclude=['birth_date'])
 
 Specifying widgets to use in the form with ``widgets``
 ------------------------------------------------------
@@ -829,7 +829,7 @@ Using the ``localized_fields`` parameter, you can enable localization for
 fields in the form.
 
     >>> AuthorFormSet = modelformset_factory(
-    ...     Author, localized_fields=('value',))
+    ...     Author, localized_fields=['value'])
 
 If ``localized_fields`` is set to the special value ``'__all__'``, all fields
 will be localized.

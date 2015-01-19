@@ -42,7 +42,7 @@ Example::
 
     serialize('geojson', City.objects.all(),
               geometry_field='point',
-              fields=('name',))
+              fields=['name'])
 
 Would output::
 

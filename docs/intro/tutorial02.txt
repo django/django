@@ -389,7 +389,7 @@ object:
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question_text', 'pub_date')
+        list_display = ['question_text', 'pub_date']
 
 Just for good measure, let's also include the ``was_published_recently`` custom
 method from Tutorial 1:
@@ -399,7 +399,7 @@ method from Tutorial 1:
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question_text', 'pub_date', 'was_published_recently')
+        list_display = ['question_text', 'pub_date', 'was_published_recently']
 
 Now the question change list page looks like this:
 
