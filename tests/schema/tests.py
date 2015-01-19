@@ -5,12 +5,12 @@ from django.test import TransactionTestCase
 from django.db import connection, DatabaseError, IntegrityError, OperationalError
 from django.db.models.fields import (BinaryField, BooleanField, CharField, IntegerField,
     PositiveIntegerField, SlugField, TextField)
-from django.db.models.fields.related import ManyToManyField, ForeignKey
+from django.db.models.fields.related import ForeignKey, ManyToManyField, OneToOneField
 from django.db.transaction import atomic
 from .models import (Author, AuthorWithDefaultHeight, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough,
-    AuthorWithEvenLongerName, BookWeak, Note)
+    AuthorWithEvenLongerName, BookWeak, Note, BookWithO2O)
 
 
 class SchemaTests(TransactionTestCase):
@@ -28,7 +28,7 @@ class SchemaTests(TransactionTestCase):
         Author, AuthorWithM2M, Book, BookWithLongName, BookWithSlug,
         BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest,
         Thing, TagThrough, BookWithM2MThrough, AuthorWithEvenLongerName,
-        BookWeak,
+        BookWeak, BookWithO2O,
     ]
 
     # Utility functions
@@ -527,6 +527,106 @@ class SchemaTests(TransactionTestCase):
                 break
         else:
             self.fail("No FK constraint for author_id found")
+
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_alter_o2o_to_fk(self):
+        """
+        #24163 - Tests altering of OneToOne to FK
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(BookWithO2O)
+        # Ensure the field is right to begin with
+        columns = self.column_classes(BookWithO2O)
+        self.assertEqual(columns['author_id'][0], "IntegerField")
+        # Make sure the FK and unique constraints are present
+        constraints = self.get_constraints(BookWithO2O._meta.db_table)
+        author_is_fk = False
+        author_is_unique = False
+        for name, details in constraints.items():
+            if details['columns'] == ['author_id']:
+                if details['foreign_key'] and details['foreign_key'] == ('schema_author', 'id'):
+                    author_is_fk = True
+                if details['unique']:
+                    author_is_unique = True
+        self.assertTrue(author_is_fk, "No FK constraint for author_id found")
+        self.assertTrue(author_is_unique, "No unique constraint for author_id found")
+        # Alter the O2O to FK
+        new_field = ForeignKey(Author)
+        new_field.set_attributes_from_name("author")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                BookWithO2O,
+                BookWithO2O._meta.get_field("author"),
+                new_field,
+                strict=True,
+            )
+        # Ensure the field is right afterwards
+        columns = self.column_classes(Book)
+        self.assertEqual(columns['author_id'][0], "IntegerField")
+        # Make sure the FK constraint is present and unique constraint is absent
+        constraints = self.get_constraints(Book._meta.db_table)
+        author_is_fk = False
+        author_is_unique = True
+        for name, details in constraints.items():
+            if details['columns'] == ['author_id']:
+                if details['foreign_key'] and details['foreign_key'] == ('schema_author', 'id'):
+                    author_is_fk = True
+                if not details['unique']:
+                    author_is_unique = False
+        self.assertTrue(author_is_fk, "No FK constraint for author_id found")
+        self.assertFalse(author_is_unique, "Unique constraint for author_id found")
+
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_alter_fk_to_o2o(self):
+        """
+        #24163 - Tests altering of FK to OneToOne
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        # Ensure the field is right to begin with
+        columns = self.column_classes(Book)
+        self.assertEqual(columns['author_id'][0], "IntegerField")
+        # Make sure the FK constraint is present and unique constraint is absent
+        constraints = self.get_constraints(Book._meta.db_table)
+        author_is_fk = False
+        author_is_unique = True
+        for name, details in constraints.items():
+            if details['columns'] == ['author_id']:
+                if details['foreign_key'] and details['foreign_key'] == ('schema_author', 'id'):
+                    author_is_fk = True
+                if not details['unique']:
+                    author_is_unique = False
+        self.assertTrue(author_is_fk, "No FK constraint for author_id found")
+        self.assertFalse(author_is_unique, "Unique constraint for author_id found")
+        # Alter the O2O to FK
+        new_field = OneToOneField(Author)
+        new_field.set_attributes_from_name("author")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                Book,
+                Book._meta.get_field("author"),
+                new_field,
+                strict=True,
+            )
+        # Ensure the field is right afterwards
+        columns = self.column_classes(BookWithO2O)
+        self.assertEqual(columns['author_id'][0], "IntegerField")
+        # Make sure the FK and unique constraints are present
+        constraints = self.get_constraints(BookWithO2O._meta.db_table)
+        author_is_fk = False
+        author_is_unique = False
+        for name, details in constraints.items():
+            if details['columns'] == ['author_id']:
+                if details['foreign_key'] and details['foreign_key'] == ('schema_author', 'id'):
+                    author_is_fk = True
+                if details['unique']:
+                    author_is_unique = True
+        self.assertTrue(author_is_fk, "No FK constraint for author_id found")
+        self.assertTrue(author_is_unique, "No unique constraint for author_id found")
 
     def test_alter_implicit_id_to_explicit(self):
         """
