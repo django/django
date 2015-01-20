@@ -389,7 +389,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         # MultiWidget and MultiValueField #############################################
         # MultiWidgets are widgets composed of other widgets. They are usually
         # combined with MultiValueFields - a field that is composed of other fields.
-        # MulitWidgets can themselved be composed of other MultiWidgets.
+        # MulitWidgets can themselves be composed of other MultiWidgets.
         # SplitDateTimeWidget is one example of a MultiWidget.
 
         class ComplexMultiWidget(MultiWidget):
