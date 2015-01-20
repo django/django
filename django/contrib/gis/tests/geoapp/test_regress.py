@@ -83,7 +83,7 @@ class GeoRegressionTests(TestCase):
 
         val1 = Truth.objects.get(pk=t1.pk).val
         val2 = Truth.objects.get(pk=t2.pk).val
-        # verify types -- should't be 0/1
+        # verify types -- shouldn't be 0/1
         self.assertIsInstance(val1, bool)
         self.assertIsInstance(val2, bool)
         # verify values

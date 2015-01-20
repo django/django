@@ -195,7 +195,7 @@ class MigrationLoader(object):
         for key, migration in normal.items():
             for parent in migration.dependencies:
                 reverse_dependencies.setdefault(parent, set()).add(key)
-        # Remeber the possible replacements to generate more meaningful error
+        # Remember the possible replacements to generate more meaningful error
         # messages
         reverse_replacements = {}
         for key, migration in replacing.items():

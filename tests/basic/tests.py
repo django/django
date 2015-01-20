@@ -357,7 +357,7 @@ class ModelTest(TestCase):
         Article.objects.create(headline=lazy, pub_date=datetime.now())
         article = Article.objects.get()
         self.assertEqual(article.headline, notlazy)
-        # test that assign + save works with Promise objecs
+        # test that assign + save works with Promise objects
         article.headline = lazy
         article.save()
         self.assertEqual(article.headline, notlazy)
