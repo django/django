@@ -158,8 +158,20 @@ class ArrayContains(lookups.DataContains):
         return sql, params
 
 
-ArrayField.register_lookup(lookups.ContainedBy)
-ArrayField.register_lookup(lookups.Overlap)
+@ArrayField.register_lookup
+class ArrayContainedBy(lookups.ContainedBy):
+    def as_sql(self, qn, connection):
+        sql, params = super(ArrayContainedBy, self).as_sql(qn, connection)
+        sql += '::%s' % self.lhs.output_field.db_type(connection)
+        return sql, params
+
+
+@ArrayField.register_lookup
+class ArrayOverlap(lookups.Overlap):
+    def as_sql(self, qn, connection):
+        sql, params = super(ArrayOverlap, self).as_sql(qn, connection)
+        sql += '::%s' % self.lhs.output_field.db_type(connection)
+        return sql, params
 
 
 @ArrayField.register_lookup
