@@ -57,11 +57,10 @@ You can evaluate a ``QuerySet`` in the following ways:
 * **len().** A ``QuerySet`` is evaluated when you call ``len()`` on it.
   This, as you might expect, returns the length of the result list.
 
-  Note: *Don't* use ``len()`` on ``QuerySet``\s if all you want to do is
-  determine the number of records in the set. It's much more efficient to
-  handle a count at the database level, using SQL's ``SELECT COUNT(*)``,
-  and Django provides a ``count()`` method for precisely this reason. See
-  ``count()`` below.
+  Note: If you only need to determine the number of records in the set (and
+  don't need the actual objects), it's much more efficient to handle a count
+  at the database level using SQL's ``SELECT COUNT(*)``. Django provides a
+  :meth:`~QuerySet.count` method for precisely this reason.
 
 * **list().** Force evaluation of a ``QuerySet`` by calling ``list()`` on
   it. For example::
@@ -76,9 +75,8 @@ You can evaluate a ``QuerySet`` in the following ways:
       if Entry.objects.filter(headline="Test"):
          print("There is at least one Entry with the headline Test")
 
-  Note: *Don't* use this if all you want to do is determine if at least one
-  result exists, and don't need the actual objects. It's more efficient to
-  use :meth:`~QuerySet.exists` (see below).
+  Note: If you only want to determine if at least one result exists (and don't
+  need the actual objects), it's more efficient to use :meth:`~QuerySet.exists`.
 
 .. _pickling QuerySets:
 
@@ -1775,6 +1773,11 @@ Depending on which database you're using (e.g. PostgreSQL vs. MySQL),
 ``count()`` may return a long integer instead of a normal Python integer. This
 is an underlying implementation quirk that shouldn't pose any real-world
 problems.
+
+Note that if you want the number of items in a ``QuerySet`` and are also
+retrieving model instances from it (for example, by iterating over it), it's
+probably more efficient to use ``len(queryset)`` which won't cause an extra
+database query like ``count()`` would.
 
 in_bulk
 ~~~~~~~
