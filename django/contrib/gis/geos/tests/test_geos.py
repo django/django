@@ -63,7 +63,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         # Anything that is either not None or the acceptable pointer type will
         # result in a TypeError when trying to assign it to the `ptr` property.
-        # Thus, memmory addresses (integers) and pointers of the incorrect type
+        # Thus, memory addresses (integers) and pointers of the incorrect type
         # (in `bad_ptrs`) will not be allowed.
         bad_ptrs = (5, ctypes.c_char_p(b'foobar'))
         for bad_ptr in bad_ptrs:
