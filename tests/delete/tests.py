@@ -324,7 +324,7 @@ class DeletionTests(TestCase):
         # One query for Avatar.objects.all() and then one related fast delete for
         # each batch.
         fetches_to_mem = 1 + batches
-        # The Avatar objecs are going to be deleted in batches of GET_ITERATOR_CHUNK_SIZE
+        # The Avatar objects are going to be deleted in batches of GET_ITERATOR_CHUNK_SIZE
         queries = fetches_to_mem + TEST_SIZE // GET_ITERATOR_CHUNK_SIZE
         self.assertNumQueries(queries, Avatar.objects.all().delete)
         self.assertFalse(Avatar.objects.exists())

@@ -269,7 +269,7 @@ class TestUtilsHashPass(SimpleTestCase):
             def setter(password):
                 state['upgraded'] = True
 
-            # Check that no upgrade is triggerd
+            # Check that no upgrade is triggered
             self.assertTrue(check_password('letmein', encoded, setter))
             self.assertFalse(state['upgraded'])
 
@@ -298,7 +298,7 @@ class TestUtilsHashPass(SimpleTestCase):
             algo, iterations, salt, hash = encoded.split('$', 3)
             self.assertEqual(iterations, '1')
 
-            # Check that no upgrade is triggerd
+            # Check that no upgrade is triggered
             self.assertTrue(check_password('letmein', encoded, setter))
             self.assertFalse(state['upgraded'])
 

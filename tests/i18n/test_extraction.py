@@ -510,7 +510,7 @@ class SymlinkExtractorTests(ExtractorTests):
             else:
                 # On Python >= 3.2) os.symlink() exists always but then can
                 # fail at runtime when user hasn't the needed permissions on
-                # WIndows versions that support symbolink links (>= 6/Vista).
+                # Windows versions that support symbolink links (>= 6/Vista).
                 # See Python issue 9333 (http://bugs.python.org/issue9333).
                 # Skip the test in that case
                 try:

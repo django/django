@@ -90,7 +90,7 @@ class ManyToManySignalsTest(TestCase):
         })
         self.assertEqual(self.m2m_changed_messages, expected_messages)
 
-        # give the BMW and Toyata some doors as well
+        # give the BMW and Toyota some doors as well
         self.doors.car_set.add(self.bmw, self.toyota)
         expected_messages.append({
             'instance': self.doors,

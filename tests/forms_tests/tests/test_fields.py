@@ -1026,7 +1026,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_typedchoicefield_4(self):
         # Even more weirdness: if you have a valid choice but your coercion function
-        # can't coerce, yo'll still get a validation error. Don't do this!
+        # can't coerce, you'll still get a validation error. Don't do this!
         f = TypedChoiceField(choices=[('A', 'A'), ('B', 'B')], coerce=int)
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. B is not one of the available choices.'", f.clean, 'B')
         # Required fields require values

@@ -456,7 +456,7 @@ class GeoQuerySetTest(TestCase):
         geom = Point(5, 23)
         qs = Country.objects.all().difference(geom).sym_difference(geom).union(geom)
 
-        # XXX For some reason SpatiaLite does something screwey with the Texas geometry here.  Also,
+        # XXX For some reason SpatiaLite does something screwy with the Texas geometry here.  Also,
         # XXX it doesn't like the null intersection.
         if spatialite:
             qs = qs.exclude(name='Texas')
@@ -599,7 +599,7 @@ class GeoQuerySetTest(TestCase):
     @skipUnlessDBFeature("has_gml_method")
     def test_gml(self):
         "Testing GML output from the database using GeoQuerySet.gml()."
-        # Should throw a TypeError when tyring to obtain GML from a
+        # Should throw a TypeError when trying to obtain GML from a
         # non-geometry field.
         qs = City.objects.all()
         self.assertRaises(TypeError, qs.gml, field_name='name')

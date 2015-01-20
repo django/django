@@ -1067,7 +1067,7 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(revision1.repository, repository)
         self.assertEqual(revision1.revision, '146239817507f148d448db38840db7c3cbf47c76')
 
-        # attempt to save the same revision against against the same repo.
+        # attempt to save the same revision against the same repo.
         data = {
             'revision_set-TOTAL_FORMS': '1',
             'revision_set-INITIAL_FORMS': '0',

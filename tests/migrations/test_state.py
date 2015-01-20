@@ -86,7 +86,7 @@ class StateTests(TestCase):
         mgr2 = FoodManager('x', 'y', c=3, d=4)
 
         class FoodOrderedManagers(models.Model):
-            # The managers on this model should be orderd by their creation
+            # The managers on this model should be ordered by their creation
             # counter and not by the order in model body
 
             food_no_mgr = NoMigrationFoodManager('x', 'y')

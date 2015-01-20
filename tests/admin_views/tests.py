@@ -1788,7 +1788,7 @@ class AdminViewsNoUrlTest(TestCase):
         self.client.get('/test_admin/admin/')
         r = self.client.post(reverse('admin:login'), self.changeuser_login)
         r = self.client.get('/test_admin/admin/')
-        # we shouldn' get an 500 error caused by a NoReverseMatch
+        # we shouldn't get a 500 error caused by a NoReverseMatch
         self.assertEqual(r.status_code, 200)
         self.client.get('/test_admin/admin/logout/')
 

@@ -771,7 +771,7 @@ class FkConstraintsTests(TransactionTestCase):
         models.Article.objects.create(headline='Another article',
                                       pub_date=datetime.datetime(1988, 5, 15),
                                       reporter=self.r, reporter_proxy=r_proxy)
-        # Retreive the second article from the DB
+        # Retrieve the second article from the DB
         a2 = models.Article.objects.get(headline='Another article')
         a2.reporter_proxy_id = 30
         self.assertRaises(IntegrityError, a2.save)
