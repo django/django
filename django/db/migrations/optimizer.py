@@ -229,7 +229,7 @@ class MigrationOptimizer(object):
 
     def reduce_create_model_add_field(self, operation, other, in_between):
         if operation.name_lower == other.model_name_lower:
-            # Don't allow optimisations of FKs through models they reference
+            # Don't allow optimizations of FKs through models they reference
             if hasattr(other.field, "rel") and other.field.rel:
                 for between in in_between:
                     # Check that it doesn't point to the model
