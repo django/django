@@ -970,6 +970,14 @@ field to ``Author``::
     entry.save()
     entry.authors = old_authors # saves new many2many relations
 
+.. note::
+
+    Note that this behaviour expects the primary key to be an
+    :class:`~django.db.models.AutoField`. If you have chosen another primary
+    key type, such as :class:`~django.db.models.UUIDField` you will need to
+    explicitly set a new primary key as the database will not generate a new
+    one.
+
 .. _topics-db-queries-update:
 
 Updating multiple objects at once
