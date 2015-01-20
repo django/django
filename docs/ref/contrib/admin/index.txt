@@ -663,7 +663,7 @@ subclass::
 
       .. versionadded:: 1.7
 
-      To indicate descending order with ``admin_model_field`` you can use a
+      To indicate descending order with ``admin_order_field`` you can use a
       hyphen prefix on the field name. Using the above example, this would
       look like::
 
