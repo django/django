@@ -402,7 +402,7 @@ class Query(object):
             # Remove any aggregates marked for reduction from the subquery
             # and move them to the outer AggregateQuery.
             col_cnt = 0
-            for alias, expression in inner_query.annotation_select.items():
+            for alias, expression in list(inner_query.annotation_select.items()):
                 if expression.is_summary:
                     expression, col_cnt = inner_query.rewrite_cols(expression, col_cnt)
                     outer_query.annotations[alias] = expression.relabeled_clone(relabels)
