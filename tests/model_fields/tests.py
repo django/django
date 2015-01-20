@@ -333,7 +333,7 @@ class BooleanFieldTests(unittest.TestCase):
 
         # Test select_related('fk_field_name')
         ma = FksToBooleans.objects.select_related('bf').get(pk=m1.id)
-        # verify types -- should't be 0/1
+        # verify types -- shouldn't be 0/1
         self.assertIsInstance(ma.bf.bfield, bool)
         self.assertIsInstance(ma.nbf.nbfield, bool)
         # verify values

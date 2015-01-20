@@ -187,7 +187,7 @@ class FileUploadTests(TestCase):
         # trying such an attack.
         scary_file_names = [
             "/tmp/hax0rd.txt",          # Absolute path, *nix-style.
-            "C:\\Windows\\hax0rd.txt",  # Absolute path, win-syle.
+            "C:\\Windows\\hax0rd.txt",  # Absolute path, win-style.
             "C:/Windows/hax0rd.txt",    # Absolute path, broken-style.
             "\\tmp\\hax0rd.txt",        # Absolute path, broken in a different way.
             "/tmp\\hax0rd.txt",         # Absolute path, broken by mixing.

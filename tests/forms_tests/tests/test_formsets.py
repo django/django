@@ -893,7 +893,7 @@ class FormsFormsetTestCase(TestCase):
         except IndexError:
             pass
 
-        # Formets can override the default iteration order
+        # Formsets can override the default iteration order
         class BaseReverseFormSet(BaseFormSet):
             def __iter__(self):
                 return reversed(self.forms)

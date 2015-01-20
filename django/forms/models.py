@@ -538,7 +538,7 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
             "'exclude' explicitly is prohibited."
         )
 
-    # Instatiate type(form) in order to use the same metaclass as form.
+    # Instantiate type(form) in order to use the same metaclass as form.
     return type(form)(class_name, (form,), form_class_attrs)
 
 

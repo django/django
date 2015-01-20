@@ -117,7 +117,7 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
         self.assertEqual(settings.TEST, 'override')
 
     def test_setupclass_override(self):
-        """Test that settings are overriden within setUpClass -- refs #21281"""
+        """Test that settings are overridden within setUpClass -- refs #21281"""
         self.assertEqual(self.foo, 'override')
 
     @override_settings(TEST='override2')

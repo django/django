@@ -112,7 +112,7 @@ class BaseDatabaseCreation(object):
                     queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
                     for obj in queryset.iterator():
                         yield obj
-        # Serialise to a string
+        # Serialize to a string
         out = StringIO()
         serializers.serialize("json", get_objects(), indent=None, stream=out)
         return out.getvalue()

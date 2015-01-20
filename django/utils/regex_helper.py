@@ -165,7 +165,7 @@ def normalize(pattern):
                         else:
                             result.append(Group((("%%(%s)s" % param), None)))
             elif ch in "*?+{":
-                # Quanitifers affect the previous item in the result list.
+                # Quantifiers affect the previous item in the result list.
                 count, ch = get_quantifier(ch, pattern_iter)
                 if ch:
                     # We had to look ahead, but it wasn't need to compute the

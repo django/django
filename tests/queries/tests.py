@@ -1758,7 +1758,7 @@ class DisjunctiveFilterTests(TestCase):
         # Another variation on the disjunctive filtering theme.
 
         # For the purposes of this regression test, it's important that there is no
-        # Join object releated to the LeafA we create.
+        # Join object related to the LeafA we create.
         LeafA.objects.create(data='first')
         self.assertQuerysetEqual(LeafA.objects.all(), ['<LeafA: first>'])
         self.assertQuerysetEqual(
