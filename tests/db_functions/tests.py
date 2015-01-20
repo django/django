@@ -278,6 +278,18 @@ class FunctionTests(TestCase):
         with six.assertRaisesRegex(self, ValueError, "'pos' must be greater than 0"):
             Author.objects.annotate(raises=Substr('name', 0))
 
+    def test_substr_with_expressions(self):
+        Author.objects.create(name='John Smith', alias='smithj')
+        Author.objects.create(name='Rhonda')
+        authors = Author.objects.annotate(name_part=Substr('name', V(5), V(3)))
+        self.assertQuerysetEqual(
+            authors.order_by('name'), [
+                ' Sm',
+                'da',
+            ],
+            lambda a: a.name_part
+        )
+
     def test_nested_function_ordering(self):
         Author.objects.create(name='John Smith')
         Author.objects.create(name='Rhonda Simpson', alias='ronny')
