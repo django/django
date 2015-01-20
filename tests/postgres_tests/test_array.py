@@ -156,6 +156,18 @@ class TestQuerying(TestCase):
             []
         )
 
+    def test_contained_by_charfield(self):
+        self.assertSequenceEqual(
+            CharArrayModel.objects.filter(field__contained_by=['text']),
+            []
+        )
+
+    def test_overlap_charfield(self):
+        self.assertSequenceEqual(
+            CharArrayModel.objects.filter(field__overlap=['text']),
+            []
+        )
+
     def test_index(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__0=2),
