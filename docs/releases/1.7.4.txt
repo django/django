@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed a migration crash on MySQL when migrating from a ``OneToOneField`` to a
   ``ForeignKey`` (:ticket:`24163`).
+
+* Prevented the ``static.serve`` view from producing ``ResourceWarning``\s in
+  certain circumstances (security fix regression, :ticket:`24193`).

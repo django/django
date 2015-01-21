@@ -5,10 +5,10 @@ from os import path
 import unittest
 
 from django.conf.urls.static import static
-from django.http import HttpResponseNotModified
+from django.http import FileResponse, HttpResponseNotModified
 from django.test import SimpleTestCase, override_settings
 from django.utils.http import http_date
-from django.views.static import was_modified_since, STREAM_CHUNK_SIZE
+from django.views.static import was_modified_since
 
 from .. import urls
 from ..urls import media_dir
@@ -37,10 +37,11 @@ class StaticTests(SimpleTestCase):
         "The static view should stream files in chunks to avoid large memory usage"
         response = self.client.get('/%s/%s' % (self.prefix, 'long-line.txt'))
         first_chunk = next(response.streaming_content)
-        self.assertEqual(len(first_chunk), STREAM_CHUNK_SIZE)
+        self.assertEqual(len(first_chunk), FileResponse.block_size)
         second_chunk = next(response.streaming_content)
         # strip() to prevent OS line endings from causing differences
         self.assertEqual(len(second_chunk.strip()), 1449)
+        response.close()
 
     def test_unknown_mime_type(self):
         response = self.client.get('/%s/file.unknown' % self.prefix)
