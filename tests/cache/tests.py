@@ -1508,10 +1508,10 @@ class CacheHEADTest(TestCase):
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         },
     },
-    LANGUAGES=(
+    LANGUAGES=[
         ('en', 'English'),
         ('es', 'Spanish'),
-    ),
+    ],
 )
 class CacheI18nTest(TestCase):
 

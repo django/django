@@ -333,7 +333,7 @@ class TemplateResponseTest(SimpleTestCase):
 
 
 @override_settings(
-    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+    MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + [
         'template_tests.test_response.CustomURLConfMiddleware'
     ],
     ROOT_URLCONF='template_tests.urls',
@@ -348,7 +348,7 @@ class CustomURLConfTest(SimpleTestCase):
 
 @override_settings(
     CACHE_MIDDLEWARE_SECONDS=2.0,
-    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+    MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + [
         'django.middleware.cache.FetchFromCacheMiddleware',
         'django.middleware.cache.UpdateCacheMiddleware',
     ],

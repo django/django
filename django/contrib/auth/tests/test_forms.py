@@ -21,7 +21,7 @@ from .utils import skipIfCustomUser
 
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class UserCreationFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -89,7 +89,7 @@ class UserCreationFormTest(TestCase):
 
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class AuthenticationFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -202,7 +202,7 @@ class AuthenticationFormTest(TestCase):
 
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class SetPasswordFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -230,7 +230,7 @@ class SetPasswordFormTest(TestCase):
 
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class PasswordChangeFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -279,7 +279,7 @@ class PasswordChangeFormTest(TestCase):
 
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class UserChangeFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -359,7 +359,7 @@ class UserChangeFormTest(TestCase):
 
 @skipIfCustomUser
 @override_settings(
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,
 )

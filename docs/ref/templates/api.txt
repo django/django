@@ -802,7 +802,7 @@ loaders that come with Django:
 
     For example, for this setting::
 
-        INSTALLED_APPS = ('myproject.polls', 'myproject.music')
+        INSTALLED_APPS = ['myproject.polls', 'myproject.music']
 
     ...then ``get_template('foo.html')`` will look for ``foo.html`` in these
     directories, in this order:

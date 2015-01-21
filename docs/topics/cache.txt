@@ -437,11 +437,11 @@ entire site. You'll need to add
 ``'django.middleware.cache.FetchFromCacheMiddleware'`` to your
 :setting:`MIDDLEWARE_CLASSES` setting, as in this example::
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE_CLASSES = [
         'django.middleware.cache.UpdateCacheMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.cache.FetchFromCacheMiddleware',
-    )
+    ]
 
 .. note::
 

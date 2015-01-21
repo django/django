@@ -30,7 +30,7 @@ from django.test import override_settings
 from .views import get_view, post_view, trace_view
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client.urls',)
 class ClientTest(TestCase):
     fixtures = ['testdata.json']
@@ -530,7 +530,7 @@ class ClientTest(TestCase):
 
 
 @override_settings(
-    MIDDLEWARE_CLASSES=('django.middleware.csrf.CsrfViewMiddleware',),
+    MIDDLEWARE_CLASSES=['django.middleware.csrf.CsrfViewMiddleware'],
     ROOT_URLCONF='test_client.urls',
 )
 class CSRFEnabledClientTests(TestCase):

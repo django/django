@@ -51,7 +51,7 @@ class I18NTests(TestCase):
         # we force saving language to a cookie rather than a session
         # by excluding session middleware and those which do require it
         test_settings = dict(
-            MIDDLEWARE_CLASSES=('django.middleware.common.CommonMiddleware',),
+            MIDDLEWARE_CLASSES=['django.middleware.common.CommonMiddleware'],
             LANGUAGE_COOKIE_NAME='mylanguage',
             LANGUAGE_COOKIE_AGE=3600 * 7 * 2,
             LANGUAGE_COOKIE_DOMAIN='.example.com',
@@ -193,9 +193,13 @@ class JsI18NTestsMultiPackage(TestCase):
             self.assertContains(response, 'este texto de app3 debe ser traducido')
 
     def test_i18n_with_locale_paths(self):
-        extended_locale_paths = settings.LOCALE_PATHS + (
-            path.join(path.dirname(
-                path.dirname(path.abspath(upath(__file__)))), 'app3', 'locale'),)
+        extended_locale_paths = settings.LOCALE_PATHS + [
+            path.join(
+                path.dirname(path.dirname(path.abspath(upath(__file__)))),
+                'app3',
+                'locale',
+            ),
+        ]
         with self.settings(LANGUAGE_CODE='es-ar', LOCALE_PATHS=extended_locale_paths):
             with override('es-ar'):
                 response = self.client.get('/jsi18n/')

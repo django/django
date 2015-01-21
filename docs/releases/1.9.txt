@@ -176,6 +176,12 @@ Database backend API
   doesn't implement this. You may want to review the implementation on the
   backends that Django includes for reference (:ticket:`24245`).
 
+Default settings that were tuples are now lists
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default settings in ``django.conf.global_settings`` were a combination of
+lists and tuples. All settings that were formerly tuples are now lists.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

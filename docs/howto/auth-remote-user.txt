@@ -31,20 +31,20 @@ First, you must add the
 :setting:`MIDDLEWARE_CLASSES` setting **after** the
 :class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE_CLASSES = [
         '...',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.RemoteUserMiddleware',
         '...',
-    )
+    ]
 
 Next, you must replace the :class:`~django.contrib.auth.backends.ModelBackend`
 with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
 :setting:`AUTHENTICATION_BACKENDS` setting::
 
-    AUTHENTICATION_BACKENDS = (
+    AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.RemoteUserBackend',
-    )
+    ]
 
 With this setup, ``RemoteUserMiddleware`` will detect the username in
 ``request.META['REMOTE_USER']`` and will authenticate and auto-login that user

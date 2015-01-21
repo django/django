@@ -92,7 +92,7 @@ class PercentRenderingTests(MessageCompilationTests):
         self.addCleanup(os.unlink, os.path.join(self.test_dir, self.MO_FILE))
 
     def test_percent_symbol_escaping(self):
-        with override_settings(LOCALE_PATHS=(os.path.join(self.test_dir, 'locale'),)):
+        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             from django.template import Template, Context
             call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
             with translation.override(self.LOCALE):
@@ -119,13 +119,13 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
         self.addCleanup(self.rmfile, os.path.join(localedir, self.MO_FILE_FR))
 
     def test_one_locale(self):
-        with override_settings(LOCALE_PATHS=(os.path.join(self.test_dir, 'locale'),)):
+        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=['hr'], stdout=StringIO())
 
             self.assertTrue(os.path.exists(self.MO_FILE_HR))
 
     def test_multiple_locales(self):
-        with override_settings(LOCALE_PATHS=(os.path.join(self.test_dir, 'locale'),)):
+        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=['hr', 'fr'], stdout=StringIO())
 
             self.assertTrue(os.path.exists(self.MO_FILE_HR))
@@ -202,14 +202,14 @@ class FuzzyTranslationTest(MessageCompilationTests):
         gettext_module._translations = {}  # flush cache or test will be useless
 
     def test_nofuzzy_compiling(self):
-        with override_settings(LOCALE_PATHS=(os.path.join(self.test_dir, 'locale'),)):
+        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
             with translation.override(self.LOCALE):
                 self.assertEqual(ugettext('Lenin'), force_text('Ленин'))
                 self.assertEqual(ugettext('Vodka'), force_text('Vodka'))
 
     def test_fuzzy_compiling(self):
-        with override_settings(LOCALE_PATHS=(os.path.join(self.test_dir, 'locale'),)):
+        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=[self.LOCALE], fuzzy=True, stdout=StringIO())
             with translation.override(self.LOCALE):
                 self.assertEqual(ugettext('Lenin'), force_text('Ленин'))

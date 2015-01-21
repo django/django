@@ -24,6 +24,6 @@ DATABASES = {
 SECRET_KEY = "django_tests_secret_key"
 
 # Use a fast hasher to speed up tests.
-PASSWORD_HASHERS = (
+PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
-)
+]

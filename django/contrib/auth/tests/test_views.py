@@ -22,7 +22,9 @@ from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import urlparse, ParseResult
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.test import TestCase, ignore_warnings, override_settings
+from django.test import (
+    TestCase, ignore_warnings, modify_settings, override_settings,
+)
 from django.test.utils import patch_logger
 from django.middleware.csrf import CsrfViewMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -34,13 +36,13 @@ from .utils import skipIfCustomUser
 
 
 @override_settings(
-    LANGUAGES=(
+    LANGUAGES=[
         ('en', 'English'),
-    ),
+    ],
     LANGUAGE_CODE='en',
     TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='django.contrib.auth.tests.urls',
 )
 class AuthViewsTestCase(TestCase):
@@ -444,9 +446,9 @@ class ChangePasswordTest(AuthViewsTestCase):
         self.assertURLEqual(response.url, '/password_reset/')
 
 
-@override_settings(MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
-])
+@modify_settings(MIDDLEWARE_CLASSES={
+    'append': 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+})
 class SessionAuthenticationTests(AuthViewsTestCase):
     def test_user_password_change_updates_session(self):
         """
@@ -815,14 +817,14 @@ class LogoutTest(AuthViewsTestCase):
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'pl')
 
 
+# Redirect in test_user_change_password will fail if session auth hash
+# isn't updated after password change (#21649)
 @skipIfCustomUser
+@modify_settings(MIDDLEWARE_CLASSES={
+    'append': 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+})
 @override_settings(
-    # Redirect in test_user_change_password will fail if session auth hash
-    # isn't updated after password change (#21649)
-    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
-        'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
-    ],
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='django.contrib.auth.tests.urls_admin',
 )
 class ChangelistTests(AuthViewsTestCase):

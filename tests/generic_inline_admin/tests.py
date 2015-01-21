@@ -17,7 +17,7 @@ from .models import Episode, Media, EpisodePermanent, Category
 
 # Set TEMPLATE_DEBUG to True to ensure {% include %} will raise exceptions.
 # That is how inlines are rendered and #9498 will bubble up if it is an issue.
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    TEMPLATE_DEBUG=True,
                    ROOT_URLCONF="generic_inline_admin.urls")
 class GenericAdminViewTest(TestCase):
@@ -123,7 +123,7 @@ class GenericAdminViewTest(TestCase):
         self.assertTrue(formset.get_queryset().ordered)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="generic_inline_admin.urls")
 class GenericInlineAdminParametersTest(TestCase):
     fixtures = ['users.xml']
@@ -270,7 +270,7 @@ class GenericInlineAdminParametersTest(TestCase):
         self.assertEqual(formset.max_num, 2)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="generic_inline_admin.urls")
 class GenericInlineAdminWithUniqueTogetherTest(TestCase):
     fixtures = ['users.xml']

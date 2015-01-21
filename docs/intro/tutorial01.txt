@@ -422,7 +422,7 @@ look like this:
 .. snippet::
     :filename: mysite/settings.py
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -430,7 +430,7 @@ look like this:
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'polls',
-    )
+    ]
 
 Now Django knows to include the ``polls`` app. Let's run another command:
 

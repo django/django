@@ -721,8 +721,7 @@ class CustomLayoutExtractionTests(ExtractorTests):
             management.call_command('makemessages', locale=LOCALE, verbosity=0)
 
     @override_settings(
-        LOCALE_PATHS=(os.path.join(
-            this_directory, 'project_dir', 'project_locale'),)
+        LOCALE_PATHS=[os.path.join(this_directory, 'project_dir', 'project_locale')],
     )
     def test_project_locale_paths(self):
         """

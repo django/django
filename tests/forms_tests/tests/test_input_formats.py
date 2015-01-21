@@ -10,7 +10,7 @@ from django.test import SimpleTestCase
 class LocalizedTimeTests(SimpleTestCase):
     def setUp(self):
         # nl/formats.py has customized TIME_INPUT_FORMATS:
-        # ('%H:%M:%S', '%H.%M:%S', '%H.%M', '%H:%M')
+        # ['%H:%M:%S', '%H.%M:%S', '%H.%M', '%H:%M']
         activate('nl')
 
     def tearDown(self):

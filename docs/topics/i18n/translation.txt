@@ -848,7 +848,7 @@ information for a list of languages (e.g. active languages as specified in
 view <set_language-redirect-view>` for an example of how to display a language
 selector using ``{% get_language_info_list %}``.
 
-In addition to :setting:`LANGUAGES` style nested tuples,
+In addition to :setting:`LANGUAGES` style list of tuples,
 ``{% get_language_info_list %}`` supports simple lists of language codes.
 If you do this in your view:
 
@@ -1684,11 +1684,11 @@ matters, you should follow these guidelines:
 
 For example, your :setting:`MIDDLEWARE_CLASSES` might look like this::
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE_CLASSES = [
        'django.contrib.sessions.middleware.SessionMiddleware',
        'django.middleware.locale.LocaleMiddleware',
        'django.middleware.common.CommonMiddleware',
-    )
+    ]
 
 (For more on middleware, see the :doc:`middleware documentation
 </topics/http/middleware>`.)
@@ -1734,10 +1734,10 @@ Notes:
   languages (because your application doesn't provide all those languages),
   set :setting:`LANGUAGES` to a list of languages. For example::
 
-      LANGUAGES = (
+      LANGUAGES = [
         ('de', _('German')),
         ('en', _('English')),
-      )
+      ]
 
   This example restricts languages that are available for automatic
   selection to German and English (and any sublanguage, like de-ch or
@@ -1752,10 +1752,10 @@ Notes:
 
       from django.utils.translation import ugettext_lazy as _
 
-      LANGUAGES = (
+      LANGUAGES = [
           ('de', _('German')),
           ('en', _('English')),
-      )
+      ]
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each

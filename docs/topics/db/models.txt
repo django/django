@@ -70,11 +70,11 @@ For example, if the models for your application live in the module
 application by the :djadmin:`manage.py startapp <startapp>` script),
 :setting:`INSTALLED_APPS` should read, in part::
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         #...
         'myapp',
         #...
-    )
+    ]
 
 When you add new apps to :setting:`INSTALLED_APPS`, be sure to run
 :djadmin:`manage.py migrate <migrate>`, optionally making migrations
