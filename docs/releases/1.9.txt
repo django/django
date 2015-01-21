@@ -177,7 +177,11 @@ Miscellaneous
 Features deprecated in 1.9
 ==========================
 
-...
+Miscellaneous
+~~~~~~~~~~~~~
+
+* The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` has
+  been deprecated as it has no effect.
 
 .. removed-features-1.9:
 
