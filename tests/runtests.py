@@ -50,13 +50,13 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-ALWAYS_MIDDLEWARE_CLASSES = (
+ALWAYS_MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-)
+]
 
 
 def get_test_modules():
@@ -116,7 +116,7 @@ def setup(verbosity, test_labels):
     settings.STATIC_URL = '/static/'
     settings.STATIC_ROOT = os.path.join(TEMP_DIR, 'static')
     # Remove the following line in Django 2.0.
-    settings.TEMPLATE_DIRS = (TEMPLATE_DIR,)
+    settings.TEMPLATE_DIRS = [TEMPLATE_DIR]
     settings.TEMPLATES = [{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [TEMPLATE_DIR],

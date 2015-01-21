@@ -7,14 +7,14 @@ from .settings import FLATPAGES_TEMPLATES
 
 
 @override_settings(
-    MIDDLEWARE_CLASSES=(
+    MIDDLEWARE_CLASSES=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    ),
+    ],
     ROOT_URLCONF='django.contrib.flatpages.tests.urls',
     TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,

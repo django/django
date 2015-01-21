@@ -606,7 +606,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), '[Django] Subject')
 
-    @override_settings(ADMINS=(), MANAGERS=())
+    @override_settings(ADMINS=[], MANAGERS=[])
     def test_empty_admins(self):
         """
         Test that mail_admins/mail_managers doesn't connect to the mail server

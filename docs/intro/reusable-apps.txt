@@ -159,10 +159,10 @@ this. For a small app like polls, this process isn't too difficult.
 
        1. Add "polls" to your INSTALLED_APPS setting like this::
 
-           INSTALLED_APPS = (
+           INSTALLED_APPS = [
                ...
                'polls',
-           )
+           ]
 
        2. Include the polls URLconf in your project urls.py like this::
 

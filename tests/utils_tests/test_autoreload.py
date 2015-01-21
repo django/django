@@ -27,7 +27,7 @@ class TestFilenameGenerator(TestCase):
                                    'nl', 'LC_MESSAGES', 'django.mo'),
                       filenames)
 
-    @override_settings(LOCALE_PATHS=(LOCALE_PATH,))
+    @override_settings(LOCALE_PATHS=[LOCALE_PATH])
     def test_locale_paths_setting(self):
         """
         Test that gen_filenames also yields from LOCALE_PATHS locales.

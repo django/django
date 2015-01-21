@@ -167,7 +167,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertEqual(six.text_type(f.help_text), 'Hold down "Control", or "Command" on a Mac, to select more than one.')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls')
 class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
@@ -182,7 +182,7 @@ class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
         self.assertContains(response, "Volkswagon Passat")
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls')
 class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
@@ -195,7 +195,7 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
         self.assertContains(response, '/auth/user/add/')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls')
 class AdminForeignKeyRawIdWidget(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
@@ -537,7 +537,7 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
         self.assertFalse(wrapper.can_delete_related)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls')
 class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
@@ -715,7 +715,7 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
 
 @skipIf(pytz is None, "this test requires pytz")
 @override_settings(TIME_ZONE='Asia/Singapore')
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls')
 class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
@@ -783,7 +783,7 @@ class DateTimePickerShortcutsSeleniumIETests(DateTimePickerShortcutsSeleniumFire
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls')
 class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
@@ -1038,7 +1038,7 @@ class HorizontalVerticalFilterSeleniumIETests(HorizontalVerticalFilterSeleniumFi
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls')
 class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
@@ -1129,7 +1129,7 @@ class AdminRawIdWidgetSeleniumIETests(AdminRawIdWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='admin_widgets.urls')
 class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps

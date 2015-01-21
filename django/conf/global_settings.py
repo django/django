@@ -21,13 +21,13 @@ DEBUG_PROPAGATE_EXCEPTIONS = False
 USE_ETAGS = False
 
 # People who get code error notifications.
-# In the format (('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com'))
-ADMINS = ()
+# In the format [('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com')]
+ADMINS = []
 
-# Tuple of IP addresses, as strings, that:
+# List of IP addresses, as strings, that:
 #   * See debug comments, when DEBUG is true
 #   * Receive x-headers
-INTERNAL_IPS = ()
+INTERNAL_IPS = []
 
 # Hosts/domain names that are valid for this site.
 # "*" matches anything, ".example.com" matches example.com and all subdomains
@@ -47,7 +47,7 @@ USE_TZ = False
 LANGUAGE_CODE = 'en-us'
 
 # Languages we provide translations for, out of the box.
-LANGUAGES = (
+LANGUAGES = [
     ('af', gettext_noop('Afrikaans')),
     ('ar', gettext_noop('Arabic')),
     ('ast', gettext_noop('Asturian')),
@@ -132,15 +132,15 @@ LANGUAGES = (
     ('vi', gettext_noop('Vietnamese')),
     ('zh-hans', gettext_noop('Simplified Chinese')),
     ('zh-hant', gettext_noop('Traditional Chinese')),
-)
+]
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ("he", "ar", "fa", "ur")
+LANGUAGES_BIDI = ["he", "ar", "fa", "ur"]
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
-LOCALE_PATHS = ()
+LOCALE_PATHS = []
 
 # Settings for language cookie
 LANGUAGE_COOKIE_NAME = 'django_language'
@@ -197,24 +197,24 @@ EMAIL_SSL_KEYFILE = None
 EMAIL_TIMEOUT = None
 
 # List of strings representing installed apps.
-INSTALLED_APPS = ()
+INSTALLED_APPS = []
 
 # List of locations of the template source files, in search order.
-TEMPLATE_DIRS = ()
+TEMPLATE_DIRS = []
 
 # List of callables that know how to import templates from various sources.
 # See the comments in django/core/template/loader.py for interface
 # documentation.
-TEMPLATE_LOADERS = (
+TEMPLATE_LOADERS = [
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
     # 'django.template.loaders.eggs.Loader',
-)
+]
 
 # List of processors used by RequestContext to populate the context.
 # Each one should be a callable that takes the request object as its
 # only parameter and returns a dictionary to add to the context.
-TEMPLATE_CONTEXT_PROCESSORS = (
+TEMPLATE_CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
     'django.template.context_processors.debug',
     'django.template.context_processors.i18n',
@@ -223,7 +223,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.template.context_processors.tz',
     # 'django.template.context_processors.request',
     'django.contrib.messages.context_processors.messages',
-)
+]
 
 # Output to use in template system for invalid (e.g. misspelled) variables.
 TEMPLATE_STRING_IF_INVALID = ''
@@ -251,31 +251,31 @@ FORCE_SCRIPT_NAME = None
 # that are not allowed to visit any page, systemwide. Use this for bad
 # robots/crawlers. Here are a few examples:
 #     import re
-#     DISALLOWED_USER_AGENTS = (
+#     DISALLOWED_USER_AGENTS = [
 #         re.compile(r'^NaverBot.*'),
 #         re.compile(r'^EmailSiphon.*'),
 #         re.compile(r'^SiteSucker.*'),
 #         re.compile(r'^sohu-search')
-#     )
-DISALLOWED_USER_AGENTS = ()
+#     ]
+DISALLOWED_USER_AGENTS = []
 
 ABSOLUTE_URL_OVERRIDES = {}
 
-# Tuple of strings representing allowed prefixes for the {% ssi %} tag.
-# Example: ('/home/html', '/var/www')
-ALLOWED_INCLUDE_ROOTS = ()
+# List of strings representing allowed prefixes for the {% ssi %} tag.
+# Example: ['/home/html', '/var/www']
+ALLOWED_INCLUDE_ROOTS = []
 
 # List of compiled regular expression objects representing URLs that need not
 # be reported by BrokenLinkEmailsMiddleware. Here are a few examples:
 #    import re
-#    IGNORABLE_404_URLS = (
+#    IGNORABLE_404_URLS = [
 #        re.compile(r'^/apple-touch-icon.*\.png$'),
 #        re.compile(r'^/favicon.ico$),
 #        re.compile(r'^/robots.txt$),
 #        re.compile(r'^/phpmyadmin/),
 #        re.compile(r'\.(cgi|php|pl)$'),
-#    )
-IGNORABLE_404_URLS = ()
+#    ]
+IGNORABLE_404_URLS = []
 
 # A secret key for this particular Django installation. Used in secret-key
 # hashing algorithms. Set this in your settings, or Django will complain
@@ -302,10 +302,10 @@ STATIC_ROOT = None
 STATIC_URL = None
 
 # List of upload handler classes to be applied in order.
-FILE_UPLOAD_HANDLERS = (
+FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
-)
+]
 
 # Maximum size, in bytes, of a request before it will be streamed to the
 # file system instead of into memory.
@@ -366,30 +366,30 @@ SHORT_DATETIME_FORMAT = 'm/d/Y P'
 # See all available format string here:
 # http://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
-DATE_INPUT_FORMATS = (
+DATE_INPUT_FORMATS = [
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
     '%b %d %Y', '%b %d, %Y',             # 'Oct 25 2006', 'Oct 25, 2006'
     '%d %b %Y', '%d %b, %Y',             # '25 Oct 2006', '25 Oct, 2006'
     '%B %d %Y', '%B %d, %Y',             # 'October 25 2006', 'October 25, 2006'
     '%d %B %Y', '%d %B, %Y',             # '25 October 2006', '25 October, 2006'
-)
+]
 
 # Default formats to be used when parsing times from input boxes, in order
 # See all available format string here:
 # http://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
-TIME_INPUT_FORMATS = (
+TIME_INPUT_FORMATS = [
     '%H:%M:%S',     # '14:30:59'
     '%H:%M:%S.%f',  # '14:30:59.000200'
     '%H:%M',        # '14:30'
-)
+]
 
 # Default formats to be used when parsing dates and times from input boxes,
 # in order
 # See all available format string here:
 # http://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
-DATETIME_INPUT_FORMATS = (
+DATETIME_INPUT_FORMATS = [
     '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
     '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
     '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
@@ -402,7 +402,7 @@ DATETIME_INPUT_FORMATS = (
     '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
     '%m/%d/%y %H:%M',        # '10/25/06 14:30'
     '%m/%d/%y',              # '10/25/06'
-)
+]
 
 # First day of week, to be used on calendars
 # 0 means Sunday, 1 means Monday...
@@ -453,10 +453,10 @@ SECURE_PROXY_SSL_HEADER = None
 # List of middleware classes to use.  Order is important; in the request phase,
 # this middleware classes will be applied in the order given, and in the
 # response phase the middleware will be applied in reverse order.
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-)
+]
 
 ############
 # SESSIONS #
@@ -508,7 +508,7 @@ CACHE_MIDDLEWARE_ALIAS = 'default'
 
 AUTH_USER_MODEL = 'auth.User'
 
-AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
 LOGIN_URL = '/accounts/login/'
 
@@ -522,7 +522,7 @@ PASSWORD_RESET_TIMEOUT_DAYS = 3
 # the first hasher in this list is the preferred algorithm.  any
 # password using different algorithms will be converted automatically
 # upon login
-PASSWORD_HASHERS = (
+PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
@@ -532,7 +532,7 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher',
     'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
     'django.contrib.auth.hashers.CryptPasswordHasher',
-)
+]
 
 ###########
 # SIGNING #
@@ -596,25 +596,25 @@ TEST_NON_SERIALIZED_APPS = []
 ############
 
 # The list of directories to search for fixtures
-FIXTURE_DIRS = ()
+FIXTURE_DIRS = []
 
 ###############
 # STATICFILES #
 ###############
 
 # A list of locations of additional static files
-STATICFILES_DIRS = ()
+STATICFILES_DIRS = []
 
 # The default file storage backend used during the build process
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # List of finder classes that know how to find static files in
 # various locations.
-STATICFILES_FINDERS = (
+STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
+]
 
 ##############
 # MIGRATIONS #

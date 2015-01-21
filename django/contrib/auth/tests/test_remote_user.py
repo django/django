@@ -23,10 +23,15 @@ class RemoteUserTest(TestCase):
     known_user2 = 'knownuser2'
 
     def setUp(self):
-        self.curr_middleware = settings.MIDDLEWARE_CLASSES
-        self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.MIDDLEWARE_CLASSES += (self.middleware,)
-        settings.AUTHENTICATION_BACKENDS += (self.backend,)
+        self.curr_middleware = list(settings.MIDDLEWARE_CLASSES)
+        self.curr_auth = list(settings.AUTHENTICATION_BACKENDS)
+        settings.MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES + [self.middleware]
+        settings.AUTHENTICATION_BACKENDS = settings.AUTHENTICATION_BACKENDS + [self.backend]
+
+    def tearDown(self):
+        """Restores settings to avoid breaking other tests."""
+        settings.MIDDLEWARE_CLASSES = self.curr_middleware
+        settings.AUTHENTICATION_BACKENDS = self.curr_auth
 
     def test_no_remote_user(self):
         """
@@ -142,11 +147,6 @@ class RemoteUserTest(TestCase):
         # In backends that create a new user, username is "newnewuser"
         # In backends that do not create new users, it is '' (anonymous user)
         self.assertNotEqual(response.context['user'].username, 'knownuser')
-
-    def tearDown(self):
-        """Restores settings to avoid breaking other tests."""
-        settings.MIDDLEWARE_CLASSES = self.curr_middleware
-        settings.AUTHENTICATION_BACKENDS = self.curr_auth
 
 
 class RemoteUserNoCreateBackend(RemoteUserBackend):

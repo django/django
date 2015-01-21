@@ -60,7 +60,7 @@ class PermWrapperTests(TestCase):
 
 @skipIfCustomUser
 @override_settings(
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='django.contrib.auth.tests.urls',
     TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,                           # required for loading the fixture

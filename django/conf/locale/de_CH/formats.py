@@ -17,16 +17,16 @@ FIRST_DAY_OF_WEEK = 1  # Monday
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
-DATE_INPUT_FORMATS = (
+DATE_INPUT_FORMATS = [
     '%d.%m.%Y', '%d.%m.%y',     # '25.10.2006', '25.10.06'
     # '%d. %B %Y', '%d. %b. %Y',  # '25. October 2006', '25. Oct. 2006'
-)
-DATETIME_INPUT_FORMATS = (
+]
+DATETIME_INPUT_FORMATS = [
     '%d.%m.%Y %H:%M:%S',    # '25.10.2006 14:30:59'
     '%d.%m.%Y %H:%M:%S.%f',  # '25.10.2006 14:30:59.000200'
     '%d.%m.%Y %H:%M',       # '25.10.2006 14:30'
     '%d.%m.%Y',             # '25.10.2006'
-)
+]
 
 # these are the separators for non-monetary numbers. For monetary numbers,
 # the DECIMAL_SEPARATOR is a . (decimal point) and the THOUSAND_SEPARATOR is a

@@ -9,7 +9,7 @@ Settings
 .. warning::
 
     Be careful when you override settings, especially when the default value
-    is a non-empty tuple or dictionary, such as :setting:`MIDDLEWARE_CLASSES`
+    is a non-empty list or dictionary, such as :setting:`MIDDLEWARE_CLASSES`
     and :setting:`STATICFILES_FINDERS`. Make sure you keep the components
     required by the features of Django you wish to use.
 
@@ -45,14 +45,14 @@ of the case of the actual model class name.
 ADMINS
 ------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
-A tuple that lists people who get code error notifications. When
+A list of all the people who get code error notifications. When
 ``DEBUG=False`` and a view raises an exception, Django will email these people
-with the full exception information. Each member of the tuple should be a tuple
+with the full exception information. Each item in the list should be a tuple
 of (Full name, email address). Example::
 
-    (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
+    [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
 
 Note that Django will email *all* of these people whenever an error happens.
 See :doc:`/howto/error-reporting` for more information.
@@ -104,7 +104,7 @@ are bypassing this security protection.
 ALLOWED_INCLUDE_ROOTS
 ---------------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
 .. deprecated:: 1.8
 
@@ -117,11 +117,11 @@ Default: ``()`` (Empty tuple)
     :setting:`OPTIONS <TEMPLATES-OPTIONS>` of a ``DjangoTemplates`` backend
     instead.
 
-A tuple of strings representing allowed prefixes for the ``{% ssi %}`` template
+A list of strings representing allowed prefixes for the ``{% ssi %}`` template
 tag. This is a security measure, so that template authors can't access files
 that they shouldn't be accessing.
 
-For example, if :setting:`ALLOWED_INCLUDE_ROOTS` is ``('/home/html', '/var/www')``,
+For example, if :setting:`ALLOWED_INCLUDE_ROOTS` is ``['/home/html', '/var/www']``,
 then ``{% ssi /home/html/foo.txt %}`` would work, but ``{% ssi /etc/passwd %}``
 wouldn't.
 
@@ -853,15 +853,15 @@ DATE_INPUT_FORMATS
 
 Default::
 
-    (
+    [
         '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
         '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
         '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
         '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
         '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
-    )
+    ]
 
-A tuple of formats that will be accepted when inputting data on a date field.
+A list of formats that will be accepted when inputting data on a date field.
 Formats will be tried in order, using the first valid one. Note that these
 format strings use Python's datetime_ module syntax, not the format strings
 from the ``date`` Django template tag.
@@ -894,7 +894,7 @@ DATETIME_INPUT_FORMATS
 
 Default::
 
-    (
+    [
         '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
         '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
         '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
@@ -907,9 +907,9 @@ Default::
         '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
         '%m/%d/%y %H:%M',        # '10/25/06 14:30'
         '%m/%d/%y',              # '10/25/06'
-    )
+    ]
 
-A tuple of formats that will be accepted when inputting data on a datetime
+A list of formats that will be accepted when inputting data on a datetime
 field. Formats will be tried in order, using the first valid one. Note that
 these format strings use Python's datetime_ module syntax, not the format
 strings from the ``date`` Django template tag.
@@ -1076,7 +1076,7 @@ backend supports it (see :doc:`/topics/db/tablespaces`).
 DISALLOWED_USER_AGENTS
 ----------------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
 List of compiled regular expression objects representing User-Agent strings that
 are not allowed to visit any page, systemwide. Use this for bad robots/crawlers.
@@ -1247,10 +1247,10 @@ FILE_UPLOAD_HANDLERS
 
 Default::
 
-    ("django.core.files.uploadhandler.MemoryFileUploadHandler",
-     "django.core.files.uploadhandler.TemporaryFileUploadHandler")
+    ["django.core.files.uploadhandler.MemoryFileUploadHandler",
+     "django.core.files.uploadhandler.TemporaryFileUploadHandler"]
 
-A tuple of handlers to use for uploading. Changing this setting allows complete
+A list of handlers to use for uploading. Changing this setting allows complete
 customization -- even replacement -- of Django's upload process.
 
 See :doc:`/topics/files` for details.
@@ -1349,7 +1349,7 @@ Monday and so on.
 FIXTURE_DIRS
 -------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
 List of directories searched for fixture files, in addition to the
 ``fixtures`` directory of each application, in search order.
@@ -1419,7 +1419,7 @@ Available formats are :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`,
 IGNORABLE_404_URLS
 ------------------
 
-Default: ``()``
+Default: ``[]`` (Empty list)
 
 List of compiled regular expression objects describing URLs that should be
 ignored when reporting HTTP 404 errors via email (see
@@ -1438,9 +1438,9 @@ This is only used if
 INSTALLED_APPS
 --------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
-A tuple of strings designating all applications that are enabled in this
+A list of strings designating all applications that are enabled in this
 Django installation. Each string should be a dotted Python path to:
 
 * an application configuration class, or
@@ -1479,9 +1479,9 @@ listed first in :setting:`INSTALLED_APPS` has precedence.
 INTERNAL_IPS
 ------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
-A tuple of IP addresses, as strings, that:
+A list of IP addresses, as strings, that:
 
 * See debug comments, when :setting:`DEBUG` is ``True``
 * Receive X headers in admindocs if the ``XViewMiddleware`` is installed (see
@@ -1581,14 +1581,14 @@ deletes the one.
 LANGUAGES
 ---------
 
-Default: A tuple of all available languages. This list is continually growing
+Default: A list of all available languages. This list is continually growing
 and including a copy here would inevitably become rapidly out of date. You can
 see the current list of translated languages by looking in
 ``django/conf/global_settings.py`` (or view the `online source`_).
 
 .. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
 
-The list is a tuple of two-tuples in the format
+The list is a list of two-tuples in the format
 (:term:`language code<language code>`, ``language name``) -- for example,
 ``('ja', 'Japanese')``.
 This specifies which languages are available for language selection. See
@@ -1605,27 +1605,27 @@ Here's a sample settings file::
 
     from django.utils.translation import ugettext_lazy as _
 
-    LANGUAGES = (
+    LANGUAGES = [
         ('de', _('German')),
         ('en', _('English')),
-    )
+    ]
 
 .. setting:: LOCALE_PATHS
 
 LOCALE_PATHS
 ------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
-A tuple of directories where Django looks for translation files.
+A list of directories where Django looks for translation files.
 See :ref:`how-django-discovers-translations`.
 
 Example::
 
-    LOCALE_PATHS = (
+    LOCALE_PATHS = [
         '/home/www/project/common_files/locale',
         '/var/local/translations/locale',
-    )
+    ]
 
 Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
 directories containing the actual translation files.
@@ -1671,9 +1671,9 @@ configuration process will be skipped.
 MANAGERS
 --------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
-A tuple in the same format as :setting:`ADMINS` that specifies who should get
+A list in the same format as :setting:`ADMINS` that specifies who should get
 broken link notifications when
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
 
@@ -1735,10 +1735,10 @@ MIDDLEWARE_CLASSES
 
 Default::
 
-    ('django.middleware.common.CommonMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware')
+    ['django.middleware.common.CommonMiddleware',
+     'django.middleware.csrf.CsrfViewMiddleware']
 
-A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
+A list of middleware classes to use. See :doc:`/topics/http/middleware`.
 
 .. setting:: MIGRATION_MODULES
 
@@ -2220,20 +2220,20 @@ TEMPLATE_CONTEXT_PROCESSORS
 
 Default::
 
-    ("django.contrib.auth.context_processors.auth",
+    ["django.contrib.auth.context_processors.auth",
     "django.template.context_processors.debug",
     "django.template.context_processors.i18n",
     "django.template.context_processors.media",
     "django.template.context_processors.static",
     "django.template.context_processors.tz",
-    "django.contrib.messages.context_processors.messages")
+    "django.contrib.messages.context_processors.messages"]
 
 .. deprecated:: 1.8
 
     Set the ``'context_processors'`` option in the :setting:`OPTIONS
     <TEMPLATES-OPTIONS>` of a ``DjangoTemplates`` backend instead.
 
-A tuple of callables that are used to populate the context in ``RequestContext``.
+A list of callables that are used to populate the context in ``RequestContext``.
 These callables take a request object as their argument and return a dictionary
 of items to be merged into the context.
 
@@ -2265,7 +2265,7 @@ See also :setting:`DEBUG`.
 TEMPLATE_DIRS
 -------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
 .. deprecated:: 1.8
 
@@ -2286,15 +2286,15 @@ TEMPLATE_LOADERS
 
 Default::
 
-     ('django.template.loaders.filesystem.Loader',
-      'django.template.loaders.app_directories.Loader')
+     ['django.template.loaders.filesystem.Loader',
+      'django.template.loaders.app_directories.Loader']
 
 .. deprecated:: 1.8
 
     Set the ``'loaders'`` option in the :setting:`OPTIONS <TEMPLATES-OPTIONS>`
     of a ``DjangoTemplates`` backend instead.
 
-A tuple of template loader classes, specified as strings. Each ``Loader`` class
+A list of template loader classes, specified as strings. Each ``Loader`` class
 knows how to import templates from a particular source. Optionally, a tuple can be
 used instead of a string. The first item in the tuple should be the ``Loader``’s
 module, subsequent items are passed to the ``Loader`` during initialization. See
@@ -2381,13 +2381,13 @@ TIME_INPUT_FORMATS
 
 Default::
 
-    (
+    [
         '%H:%M:%S',     # '14:30:59'
         '%H:%M:%S.%f',  # '14:30:59.000200'
         '%H:%M',        # '14:30'
-    )
+    ]
 
-A tuple of formats that will be accepted when inputting data on a time field.
+A list of formats that will be accepted when inputting data on a time field.
 Formats will be tried in order, using the first valid one. Note that these
 format strings use Python's datetime_ module syntax, not the format strings
 from the ``date`` Django template tag.
@@ -2601,9 +2601,9 @@ Settings for :mod:`django.contrib.auth`.
 AUTHENTICATION_BACKENDS
 -----------------------
 
-Default: ``('django.contrib.auth.backends.ModelBackend',)``
+Default: ``['django.contrib.auth.backends.ModelBackend']``
 
-A tuple of authentication backend classes (as strings) to use when attempting to
+A list of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :ref:`authentication backends documentation
 <authentication-backends>` for details.
 
@@ -2683,13 +2683,13 @@ See :ref:`auth_password_storage`.
 
 Default::
 
-    ('django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    ['django.contrib.auth.hashers.PBKDF2PasswordHasher',
      'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
      'django.contrib.auth.hashers.BCryptPasswordHasher',
      'django.contrib.auth.hashers.SHA1PasswordHasher',
      'django.contrib.auth.hashers.MD5PasswordHasher',
      'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
-     'django.contrib.auth.hashers.CryptPasswordHasher')
+     'django.contrib.auth.hashers.CryptPasswordHasher']
 
 .. _settings-messages:
 
@@ -3029,21 +3029,21 @@ You may need to :ref:`configure these files to be served in development
 STATICFILES_DIRS
 ----------------
 
-Default: ``[]``
+Default: ``[]`` (Empty list)
 
 This setting defines the additional locations the staticfiles app will traverse
 if the ``FileSystemFinder`` finder is enabled, e.g. if you use the
 :djadmin:`collectstatic` or :djadmin:`findstatic` management command or use the
 static file serving view.
 
-This should be set to a list or tuple of strings that contain full paths to
+This should be set to a list of strings that contain full paths to
 your additional files directory(ies) e.g.::
 
-    STATICFILES_DIRS = (
+    STATICFILES_DIRS = [
         "/home/special.polls.com/polls/static",
         "/home/polls.com/polls/static",
         "/opt/webfiles/common",
-    )
+    ]
 
 Note that these paths should use Unix-style forward slashes, even on Windows
 (e.g. ``"C:/Users/user/mysite/extra_static_content"``).
@@ -3055,10 +3055,10 @@ In case you want to refer to files in one of the locations with an additional
 namespace, you can **optionally** provide a prefix as ``(prefix, path)``
 tuples, e.g.::
 
-    STATICFILES_DIRS = (
+    STATICFILES_DIRS = [
         # ...
         ("downloads", "/opt/webfiles/stats"),
-    )
+    ]
 
 For example, assuming you have :setting:`STATIC_URL` set to ``'/static/'``, the
 :djadmin:`collectstatic` management command would collect the "stats" files
@@ -3094,8 +3094,8 @@ STATICFILES_FINDERS
 
 Default::
 
-    ("django.contrib.staticfiles.finders.FileSystemFinder",
-     "django.contrib.staticfiles.finders.AppDirectoriesFinder")
+    ["django.contrib.staticfiles.finders.FileSystemFinder",
+     "django.contrib.staticfiles.finders.AppDirectoriesFinder"]
 
 The list of finder backends that know how to find static files in
 various locations.

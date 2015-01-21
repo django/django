@@ -188,7 +188,7 @@ class AssertContainsTests(TestCase):
         self.assertNotContains(response, 'Bye')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
 class AssertTemplateUsedTests(TestCase):
     fixtures = ['testdata.json']
@@ -810,7 +810,7 @@ class AssertFormsetErrorTests(TestCase):
                                     **kwargs)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
 class LoginTests(TestCase):
     fixtures = ['testdata']
@@ -833,7 +833,7 @@ class LoginTests(TestCase):
 
 
 @override_settings(
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     SESSION_ENGINE='test_client_regress.session',
     ROOT_URLCONF='test_client_regress.urls',
 )
@@ -879,7 +879,7 @@ class URLEscapingTests(TestCase):
         self.assertEqual(response.content, b'Hi, Arthur')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
 class ExceptionTests(TestCase):
     fixtures = ['testdata.json']
@@ -948,7 +948,7 @@ class zzUrlconfSubstitutionTests(TestCase):
             reverse('arg_view', args=['somename'])
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
 class ContextTests(TestCase):
     fixtures = ['testdata']
@@ -1023,7 +1023,7 @@ class ContextTests(TestCase):
         self.assertEqual(response.context['nested'], 'yes')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
 class SessionTests(TestCase):
     fixtures = ['testdata.json']

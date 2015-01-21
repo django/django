@@ -71,7 +71,7 @@ from django.conf import settings
 
 data = %r
 
-settings.configure(DEBUG=False, INSTALLED_APPS=('model_regress',), SECRET_KEY = "blah")
+settings.configure(DEBUG=False, INSTALLED_APPS=['model_regress'], SECRET_KEY = "blah")
 article = pickle.loads(data)
 print(article.headline)"""
         a = Article.objects.create(

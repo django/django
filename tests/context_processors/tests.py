@@ -48,7 +48,7 @@ class RequestContextProcessorTests(TestCase):
 
 @override_settings(
     DEBUG=True,
-    INTERNAL_IPS=('127.0.0.1',),
+    INTERNAL_IPS=['127.0.0.1'],
     ROOT_URLCONF='context_processors.urls',
     TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

@@ -205,7 +205,7 @@ def get_javascript_catalog(locale, domain, packages):
         path = os.path.join(os.path.dirname(upath(p.__file__)), 'locale')
         paths.append(path)
     # add the filesystem paths listed in the LOCALE_PATHS setting
-    paths.extend(list(reversed(settings.LOCALE_PATHS)))
+    paths.extend(reversed(settings.LOCALE_PATHS))
     # first load all english languages files for defaults
     for path in paths:
         try:
