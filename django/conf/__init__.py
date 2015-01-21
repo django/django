@@ -15,7 +15,6 @@ from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import LazyObject, empty
-from django.utils import six
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
@@ -103,8 +102,8 @@ class Settings(BaseSettings):
                 setting_value = getattr(mod, setting)
 
                 if (setting in tuple_settings and
-                        isinstance(setting_value, six.string_types)):
-                    raise ImproperlyConfigured("The %s setting must be a tuple. "
+                        not isinstance(setting_value, (list, tuple))):
+                    raise ImproperlyConfigured("The %s setting must be a list or a tuple. "
                             "Please fix your settings." % setting)
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)

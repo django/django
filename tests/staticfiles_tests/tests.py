@@ -33,16 +33,16 @@ TEST_SETTINGS = {
     'STATIC_URL': '/static/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
-    'STATICFILES_DIRS': (
+    'STATICFILES_DIRS': [
         os.path.join(TEST_ROOT, 'project', 'documents'),
         ('prefix', os.path.join(TEST_ROOT, 'project', 'prefixed')),
-    ),
-    'STATICFILES_FINDERS': (
+    ],
+    'STATICFILES_FINDERS': [
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'django.contrib.staticfiles.finders.DefaultStorageFinder',
-    ),
-    'INSTALLED_APPS': (
+    ],
+    'INSTALLED_APPS': [
         'django.contrib.contenttypes',
         'django.contrib.auth',
         'django.contrib.admin.apps.SimpleAdminConfig',
@@ -50,7 +50,7 @@ TEST_SETTINGS = {
         'staticfiles_tests',
         'staticfiles_tests.apps.test',
         'staticfiles_tests.apps.no_label',
-    ),
+    ],
 }
 from django.contrib.staticfiles.management.commands.collectstatic import Command as CollectstaticCommand
 
@@ -600,8 +600,8 @@ class TestHashedFiles(object):
             self.assertIn(b"other.d41d8cd98f00.css", content)
 
     @override_settings(
-        STATICFILES_DIRS=(os.path.join(TEST_ROOT, 'project', 'faulty'),),
-        STATICFILES_FINDERS=('django.contrib.staticfiles.finders.FileSystemFinder',),
+        STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'faulty')],
+        STATICFILES_FINDERS=['django.contrib.staticfiles.finders.FileSystemFinder'],
     )
     def test_post_processing_failure(self):
         """
@@ -898,7 +898,7 @@ class TestDefaultStorageFinder(StaticFilesTestCase, FinderTestCase):
 
 
 @override_settings(
-    STATICFILES_FINDERS=('django.contrib.staticfiles.finders.FileSystemFinder',),
+    STATICFILES_FINDERS=['django.contrib.staticfiles.finders.FileSystemFinder'],
     STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'documents')],
 )
 class TestMiscFinder(TestCase):

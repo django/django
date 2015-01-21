@@ -664,7 +664,7 @@ class AdminLogNodeTestCase(TestCase):
         self.assertEqual(template.render(context), '')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="admin_changelist.urls")
 class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 

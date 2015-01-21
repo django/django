@@ -441,12 +441,12 @@ class IsOverriddenTest(TestCase):
             self.assertTrue(settings.is_overridden('ALLOWED_HOSTS'))
 
 
-class TestTupleSettings(unittest.TestCase):
+class TestListSettings(unittest.TestCase):
     """
-    Make sure settings that should be tuples throw ImproperlyConfigured if they
-    are set to a string instead of a tuple.
+    Make sure settings that should be lists or tuples throw
+    ImproperlyConfigured if they are set to a string instead of a list or tuple.
     """
-    tuple_settings = (
+    list_or_tuple_settings = (
         "ALLOWED_INCLUDE_ROOTS",
         "INSTALLED_APPS",
         "TEMPLATE_DIRS",
@@ -456,8 +456,8 @@ class TestTupleSettings(unittest.TestCase):
     def test_tuple_settings(self):
         settings_module = ModuleType('fake_settings_module')
         settings_module.SECRET_KEY = 'foo'
-        for setting in self.tuple_settings:
-            setattr(settings_module, setting, ('non_tuple_value'))
+        for setting in self.list_or_tuple_settings:
+            setattr(settings_module, setting, ('non_list_or_tuple_value'))
             sys.modules['fake_settings_module'] = settings_module
             try:
                 with self.assertRaises(ImproperlyConfigured):

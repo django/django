@@ -132,8 +132,8 @@ handler* -- a small class that handles file data as it gets uploaded. Upload
 handlers are initially defined in the :setting:`FILE_UPLOAD_HANDLERS` setting,
 which defaults to::
 
-    ("django.core.files.uploadhandler.MemoryFileUploadHandler",
-     "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+    ["django.core.files.uploadhandler.MemoryFileUploadHandler",
+     "django.core.files.uploadhandler.TemporaryFileUploadHandler"]
 
 Together :class:`MemoryFileUploadHandler` and
 :class:`TemporaryFileUploadHandler` provide Django's default file upload

@@ -868,9 +868,9 @@ class MiddlewareNotUsedTests(TestCase):
         with self.assertRaises(MiddlewareNotUsed):
             MyMiddleware().process_request(request)
 
-    @override_settings(MIDDLEWARE_CLASSES=(
+    @override_settings(MIDDLEWARE_CLASSES=[
         'middleware_exceptions.tests.MyMiddleware',
-    ))
+    ])
     def test_log(self):
         with patch_logger('django.request', 'debug') as calls:
             self.client.get('/middleware_exceptions/view/')
@@ -880,9 +880,9 @@ class MiddlewareNotUsedTests(TestCase):
             "MiddlewareNotUsed: 'middleware_exceptions.tests.MyMiddleware'"
         )
 
-    @override_settings(MIDDLEWARE_CLASSES=(
+    @override_settings(MIDDLEWARE_CLASSES=[
         'middleware_exceptions.tests.MyMiddlewareWithExceptionMessage',
-    ))
+    ])
     def test_log_custom_message(self):
         with patch_logger('django.request', 'debug') as calls:
             self.client.get('/middleware_exceptions/view/')
