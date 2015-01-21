@@ -768,10 +768,12 @@ class ComplexAggregateTestCase(TestCase):
         self.assertEqual(b3.sums, Approximate(Decimal("383.69"), places=2))
 
     def test_complex_aggregations_require_kwarg(self):
-        with six.assertRaisesRegex(self, TypeError, 'Complex expressions require an alias'):
+        with six.assertRaisesRegex(self, TypeError, 'Complex annotations require an alias'):
             Author.objects.annotate(Sum(F('age') + F('friends__age')))
         with six.assertRaisesRegex(self, TypeError, 'Complex aggregates require an alias'):
             Author.objects.aggregate(Sum('age') / Count('age'))
+        with six.assertRaisesRegex(self, TypeError, 'Complex aggregates require an alias'):
+            Author.objects.aggregate(Sum(Value(1)))
 
     def test_aggregate_over_complex_annotation(self):
         qs = Author.objects.annotate(

@@ -288,7 +288,13 @@ class QuerySet(object):
         if self.query.distinct_fields:
             raise NotImplementedError("aggregate() + distinct(fields) not implemented.")
         for arg in args:
-            if not hasattr(arg, 'default_alias'):
+            # The default_alias property may raise a TypeError, so we use
+            # a try/except construct rather than hasattr in order to remain
+            # consistent between PY2 and PY3 (hasattr would swallow
+            # the TypeError on PY2).
+            try:
+                arg.default_alias
+            except (AttributeError, TypeError):
                 raise TypeError("Complex aggregates require an alias")
             kwargs[arg.default_alias] = arg
 
@@ -759,14 +765,16 @@ class QuerySet(object):
         """
         annotations = OrderedDict()  # To preserve ordering of args
         for arg in args:
+            # The default_alias property may raise a TypeError, so we use
+            # a try/except construct rather than hasattr in order to remain
+            # consistent between PY2 and PY3 (hasattr would swallow
+            # the TypeError on PY2).
             try:
-                # we can't do an hasattr here because py2 returns False
-                # if default_alias exists but throws a TypeError
                 if arg.default_alias in kwargs:
                     raise ValueError("The named annotation '%s' conflicts with the "
                                      "default name for another annotation."
                                      % arg.default_alias)
-            except AttributeError:  # default_alias
+            except (AttributeError, TypeError):
                 raise TypeError("Complex annotations require an alias")
             annotations[arg.default_alias] = arg
         annotations.update(kwargs)
