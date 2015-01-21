@@ -10,6 +10,7 @@ import stat
 import posixpath
 import re
 
+from django.core.files import File
 from django.http import (Http404, HttpResponse, HttpResponseRedirect,
     HttpResponseNotModified, StreamingHttpResponse)
 from django.template import loader, Template, Context, TemplateDoesNotExist
@@ -18,6 +19,13 @@ from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext as _, ugettext_lazy
 
 STREAM_CHUNK_SIZE = 4096
+
+
+class ChunkedFile(File):
+    DEFAULT_CHUNK_SIZE = STREAM_CHUNK_SIZE
+
+    def __iter__(self):
+        return self.chunks()
 
 
 def serve(request, path, document_root=None, show_indexes=False):
@@ -64,7 +72,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     content_type, encoding = mimetypes.guess_type(fullpath)
     content_type = content_type or 'application/octet-stream'
     f = open(fullpath, 'rb')
-    response = StreamingHttpResponse(iter(lambda: f.read(STREAM_CHUNK_SIZE), b''),
+    response = StreamingHttpResponse(ChunkedFile(f),
                                      content_type=content_type)
     response["Last-Modified"] = http_date(statobj.st_mtime)
     if stat.S_ISREG(statobj.st_mode):
