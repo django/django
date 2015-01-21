@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from copy import copy
 from datetime import date
 
 from django.conf import settings
@@ -34,8 +35,8 @@ class BaseModelBackendTest(object):
     backend = 'django.contrib.auth.backends.ModelBackend'
 
     def setUp(self):
-        self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.AUTHENTICATION_BACKENDS = (self.backend,)
+        self.curr_auth = copy(settings.AUTHENTICATION_BACKENDS)
+        settings.AUTHENTICATION_BACKENDS = [self.backend]
         self.create_users()
 
     def tearDown(self):
@@ -172,7 +173,7 @@ class BaseModelBackendTest(object):
         user = self.UserModel._default_manager.get(pk=self.superuser.pk)
         self.assertEqual(len(user.get_all_permissions()), len(Permission.objects.all()))
 
-    @override_settings(PASSWORD_HASHERS=('django.contrib.auth.tests.test_auth_backends.CountingMD5PasswordHasher',))
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.tests.test_auth_backends.CountingMD5PasswordHasher'])
     def test_authentication_timing(self):
         """Hasher is run once regardless of whether the user exists. Refs #20760."""
         # Re-set the password, because this tests overrides PASSWORD_HASHERS
@@ -344,8 +345,8 @@ class RowlevelBackendTest(TestCase):
     backend = 'django.contrib.auth.tests.test_auth_backends.SimpleRowlevelBackend'
 
     def setUp(self):
-        self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.AUTHENTICATION_BACKENDS = tuple(self.curr_auth) + (self.backend,)
+        self.curr_auth = copy(settings.AUTHENTICATION_BACKENDS)
+        settings.AUTHENTICATION_BACKENDS = self.curr_auth + [self.backend]
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
         self.user2 = User.objects.create_user('test2', 'test2@example.com', 'test')
         self.user3 = User.objects.create_user('test3', 'test3@example.com', 'test')
@@ -385,8 +386,8 @@ class AnonymousUserBackendTest(TestCase):
     backend = 'django.contrib.auth.tests.test_auth_backends.SimpleRowlevelBackend'
 
     def setUp(self):
-        self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.AUTHENTICATION_BACKENDS = (self.backend,)
+        self.curr_auth = copy(settings.AUTHENTICATION_BACKENDS)
+        settings.AUTHENTICATION_BACKENDS = [self.backend]
         self.user1 = AnonymousUser()
 
     def tearDown(self):
@@ -429,8 +430,8 @@ class InActiveUserBackendTest(TestCase):
     backend = 'django.contrib.auth.tests.test_auth_backends.SimpleRowlevelBackend'
 
     def setUp(self):
-        self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.AUTHENTICATION_BACKENDS = (self.backend,)
+        self.curr_auth = copy(settings.AUTHENTICATION_BACKENDS)
+        settings.AUTHENTICATION_BACKENDS = [self.backend]
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
         self.user1.is_active = False
         self.user1.save()
@@ -476,19 +477,18 @@ class PermissionDeniedBackendTest(TestCase):
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
         self.user1.save()
 
-    @override_settings(AUTHENTICATION_BACKENDS=(backend, ) +
-            tuple(settings.AUTHENTICATION_BACKENDS))
+    @override_settings(AUTHENTICATION_BACKENDS=[backend] +
+            settings.AUTHENTICATION_BACKENDS)
     def test_permission_denied(self):
         "user is not authenticated after a backend raises permission denied #2550"
         self.assertEqual(authenticate(username='test', password='test'), None)
 
-    @override_settings(AUTHENTICATION_BACKENDS=tuple(
-        settings.AUTHENTICATION_BACKENDS) + (backend, ))
+    @override_settings(AUTHENTICATION_BACKENDS=settings.AUTHENTICATION_BACKENDS + [backend])
     def test_authenticates(self):
         self.assertEqual(authenticate(username='test', password='test'), self.user1)
 
-    @override_settings(AUTHENTICATION_BACKENDS=(backend, ) +
-            tuple(settings.AUTHENTICATION_BACKENDS))
+    @override_settings(AUTHENTICATION_BACKENDS=[backend] +
+            settings.AUTHENTICATION_BACKENDS)
     def test_has_perm_denied(self):
         content_type = ContentType.objects.get_for_model(Group)
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
@@ -497,8 +497,8 @@ class PermissionDeniedBackendTest(TestCase):
         self.assertIs(self.user1.has_perm('auth.test'), False)
         self.assertIs(self.user1.has_module_perms('auth'), False)
 
-    @override_settings(AUTHENTICATION_BACKENDS=tuple(
-        settings.AUTHENTICATION_BACKENDS) + (backend, ))
+    @override_settings(AUTHENTICATION_BACKENDS=settings.AUTHENTICATION_BACKENDS +
+            [backend])
     def test_has_perm(self):
         content_type = ContentType.objects.get_for_model(Group)
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
@@ -528,7 +528,7 @@ class ChangedBackendSettingsTest(TestCase):
                                  self.TEST_EMAIL,
                                  self.TEST_PASSWORD)
 
-    @override_settings(AUTHENTICATION_BACKENDS=(backend, ))
+    @override_settings(AUTHENTICATION_BACKENDS=[backend])
     def test_changed_backend_settings(self):
         """
         Tests that removing a backend configured in AUTHENTICATION_BACKENDS
@@ -546,8 +546,8 @@ class ChangedBackendSettingsTest(TestCase):
         request.session = self.client.session
 
         # Remove NewModelBackend
-        with self.settings(AUTHENTICATION_BACKENDS=(
-                'django.contrib.auth.backends.ModelBackend',)):
+        with self.settings(AUTHENTICATION_BACKENDS=[
+                'django.contrib.auth.backends.ModelBackend']):
             # Get the user from the request
             user = get_user(request)
 
@@ -581,7 +581,7 @@ class TypeErrorBackendTest(TestCase):
     def setUp(self):
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
 
-    @override_settings(AUTHENTICATION_BACKENDS=(backend, ))
+    @override_settings(AUTHENTICATION_BACKENDS=[backend])
     def test_type_error_raised(self):
         self.assertRaises(TypeError, authenticate, username='test', password='test')
 
@@ -622,7 +622,7 @@ class ImportedBackendTests(TestCase):
 
     backend = 'django.contrib.auth.tests.backend_alias.ImportedModelBackend'
 
-    @override_settings(AUTHENTICATION_BACKENDS=(backend, ))
+    @override_settings(AUTHENTICATION_BACKENDS=[backend])
     def test_backend_path(self):
         username = 'username'
         password = 'password'

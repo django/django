@@ -18,19 +18,19 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
 
 @override_settings(
     USE_I18N=True,
-    LOCALE_PATHS=(
+    LOCALE_PATHS=[
         os.path.join(os.path.dirname(upath(__file__)), 'locale'),
-    ),
+    ],
     LANGUAGE_CODE='en-us',
-    LANGUAGES=(
+    LANGUAGES=[
         ('nl', 'Dutch'),
         ('en', 'English'),
         ('pt-br', 'Brazilian Portuguese'),
-    ),
-    MIDDLEWARE_CLASSES=(
+    ],
+    MIDDLEWARE_CLASSES=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
-    ),
+    ],
     ROOT_URLCONF='i18n.patterns.urls.default',
     TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -193,10 +193,10 @@ class URLRedirectTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
 
     @override_settings(
-        MIDDLEWARE_CLASSES=(
+        MIDDLEWARE_CLASSES=[
             'i18n.patterns.tests.PermanentRedirectLocaleMiddleWare',
             'django.middleware.common.CommonMiddleware',
-        ),
+        ],
     )
     def test_custom_redirect_class(self):
         response = self.client.get('/account/register/', HTTP_ACCEPT_LANGUAGE='en')

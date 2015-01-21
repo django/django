@@ -52,13 +52,13 @@ all of its authentication backends. If the first authentication method fails,
 Django tries the second one, and so on, until all backends have been attempted.
 
 The list of authentication backends to use is specified in the
-:setting:`AUTHENTICATION_BACKENDS` setting. This should be a tuple of Python
+:setting:`AUTHENTICATION_BACKENDS` setting. This should be a list of Python
 path names that point to Python classes that know how to authenticate. These
 classes can be anywhere on your Python path.
 
 By default, :setting:`AUTHENTICATION_BACKENDS` is set to::
 
-    ('django.contrib.auth.backends.ModelBackend',)
+    ['django.contrib.auth.backends.ModelBackend']
 
 That's the basic authentication backend that checks the Django users database
 and queries the built-in permissions. It does not provide protection against

@@ -1074,7 +1074,7 @@ class NewFormsTests(TestCase):
 
 
 @override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True,
-                  PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                  PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                   ROOT_URLCONF='timezones.urls')
 class AdminTests(TestCase):
 

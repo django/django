@@ -21,8 +21,8 @@ Here's how to define :setting:`TEMPLATES` in your settings module.
 If you're using the default value of ``TEMPLATE_LOADERS``, that is, if it
 isn't defined in your settings file or if it's set to::
 
-    ('django.template.loaders.filesystem.Loader',
-     'django.template.loaders.app_directories.Loader')
+    ['django.template.loaders.filesystem.Loader',
+     'django.template.loaders.app_directories.Loader']
 
 then you should define :setting:`TEMPLATES` as follows::
 

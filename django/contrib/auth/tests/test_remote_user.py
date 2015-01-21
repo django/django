@@ -17,16 +17,18 @@ class RemoteUserTest(TestCase):
     middleware = 'django.contrib.auth.middleware.RemoteUserMiddleware'
     backend = 'django.contrib.auth.backends.RemoteUserBackend'
     header = 'REMOTE_USER'
+    INITIAL_MIDDLEWARE_CLASSES = getattr(settings, 'MIDDLEWARE_CLASSES', [])
+    INITIAL_AUTHENTICATION_BACKENDS = getattr(settings, 'AUTHENTICATION_BACKENDS', [])
 
     # Usernames to be passed in REMOTE_USER for the test_known_user test case.
     known_user = 'knownuser'
     known_user2 = 'knownuser2'
 
     def setUp(self):
-        self.curr_middleware = settings.MIDDLEWARE_CLASSES
-        self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.MIDDLEWARE_CLASSES += (self.middleware,)
-        settings.AUTHENTICATION_BACKENDS += (self.backend,)
+        settings.MIDDLEWARE_CLASSES = (self.INITIAL_MIDDLEWARE_CLASSES +
+                                    [self.middleware])
+        settings.AUTHENTICATION_BACKENDS = (self.INITIAL_AUTHENTICATION_BACKENDS +
+                                        [self.backend])
 
     def test_no_remote_user(self):
         """
@@ -145,8 +147,8 @@ class RemoteUserTest(TestCase):
 
     def tearDown(self):
         """Restores settings to avoid breaking other tests."""
-        settings.MIDDLEWARE_CLASSES = self.curr_middleware
-        settings.AUTHENTICATION_BACKENDS = self.curr_auth
+        settings.MIDDLEWARE_CLASSES = self.INITIAL_MIDDLEWARE_CLASSES
+        settings.AUTHENTICATION_BACKENDS = self.INITIAL_AUTHENTICATION_BACKENDS
 
 
 class RemoteUserNoCreateBackend(RemoteUserBackend):

@@ -320,9 +320,9 @@ design. If during your tests you are authenticating many users, you may want
 to use a custom settings file and set the :setting:`PASSWORD_HASHERS` setting
 to a faster hashing algorithm::
 
-    PASSWORD_HASHERS = (
+    PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.MD5PasswordHasher',
-    )
+    ]
 
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
 algorithm used in fixtures, if any.

@@ -42,9 +42,9 @@ from .models import Company, TestModel
 
 
 here = os.path.dirname(os.path.abspath(upath(__file__)))
-extended_locale_paths = settings.LOCALE_PATHS + (
+extended_locale_paths = settings.LOCALE_PATHS + [
     os.path.join(here, 'other', 'locale'),
-)
+]
 
 
 @contextmanager
@@ -397,7 +397,7 @@ class TranslationTests(TestCase):
         self.assertEqual(trans_real.to_language('en_US'), 'en-us')
         self.assertEqual(trans_real.to_language('sr_Lat'), 'sr-lat')
 
-    @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),))
+    @override_settings(LOCALE_PATHS=[os.path.join(here, 'other', 'locale')])
     def test_bad_placeholder_1(self):
         """
         Error in translation file should not crash template rendering
@@ -409,7 +409,7 @@ class TranslationTests(TestCase):
             rendered = t.render(Context({'person': 'James'}))
             self.assertEqual(rendered, 'My name is James.')
 
-    @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),))
+    @override_settings(LOCALE_PATHS=[os.path.join(here, 'other', 'locale')])
     def test_bad_placeholder_2(self):
         """
         Error in translation file should not crash template rendering
@@ -998,11 +998,11 @@ class MiscTests(TestCase):
         self.assertEqual('zh-hant', g(r))
 
     @override_settings(
-        LANGUAGES=(
+        LANGUAGES=[
             ('en', 'English'),
             ('zh-hans', 'Simplified Chinese'),
             ('zh-hant', 'Traditional Chinese'),
-        )
+        ]
     )
     def test_support_for_deprecated_chinese_language_codes(self):
         """
@@ -1112,7 +1112,7 @@ class MiscTests(TestCase):
         r.COOKIES = {}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-br'}
         self.assertEqual('pt-br', g(r))
-        with self.settings(LANGUAGES=(('en', 'English'),)):
+        with self.settings(LANGUAGES=[('en', 'English')]):
             self.assertNotEqual('pt-br', g(r))
 
 
@@ -1342,14 +1342,14 @@ class MultipleLocaleActivationTests(TestCase):
 
 @override_settings(
     USE_I18N=True,
-    LANGUAGES=(
+    LANGUAGES=[
         ('en', 'English'),
         ('fr', 'French'),
-    ),
-    MIDDLEWARE_CLASSES=(
+    ],
+    MIDDLEWARE_CLASSES=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
-    ),
+    ],
     ROOT_URLCONF='i18n.urls',
 )
 class LocaleMiddlewareTests(TestCase):
@@ -1362,11 +1362,11 @@ class LocaleMiddlewareTests(TestCase):
         self.assertContains(response, "Yes/No")
 
     @override_settings(
-        MIDDLEWARE_CLASSES=(
+        MIDDLEWARE_CLASSES=[
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.middleware.locale.LocaleMiddleware',
             'django.middleware.common.CommonMiddleware',
-        ),
+        ],
     )
     def test_language_not_saved_to_session(self):
         """Checks that current language is not automatically saved to
@@ -1378,15 +1378,15 @@ class LocaleMiddlewareTests(TestCase):
 
 @override_settings(
     USE_I18N=True,
-    LANGUAGES=(
+    LANGUAGES=[
         ('bg', 'Bulgarian'),
         ('en-us', 'English'),
         ('pt-br', 'Portugese (Brazil)'),
-    ),
-    MIDDLEWARE_CLASSES=(
+    ],
+    MIDDLEWARE_CLASSES=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
-    ),
+    ],
     ROOT_URLCONF='i18n.urls'
 )
 class CountrySpecificLanguageTests(TestCase):

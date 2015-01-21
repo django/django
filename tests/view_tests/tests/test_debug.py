@@ -546,7 +546,7 @@ class ExceptionReportTestMixin(object):
         """
         Asserts that potentially sensitive info are displayed in the email report.
         """
-        with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
+        with self.settings(ADMINS=[('Admin', 'admin@fattie-breakie.com')]):
             mail.outbox = []  # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
             view(request)
@@ -579,7 +579,7 @@ class ExceptionReportTestMixin(object):
         """
         Asserts that certain sensitive info are not displayed in the email report.
         """
-        with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
+        with self.settings(ADMINS=[('Admin', 'admin@fattie-breakie.com')]):
             mail.outbox = []  # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
             view(request)
@@ -619,7 +619,7 @@ class ExceptionReportTestMixin(object):
         """
         Asserts that no variables or POST parameters are displayed in the email report.
         """
-        with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
+        with self.settings(ADMINS=[('Admin', 'admin@fattie-breakie.com')]):
             mail.outbox = []  # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
             view(request)
