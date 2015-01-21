@@ -1,7 +1,9 @@
 import sys
 import threading
+import warnings
 import weakref
 
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.six.moves import range
 
 if sys.version_info < (3, 4):
@@ -133,7 +135,7 @@ class Signal(object):
                 self.receivers.append((lookup_key, receiver))
             self.sender_receivers_cache.clear()
 
-    def disconnect(self, receiver=None, sender=None, weak=True, dispatch_uid=None):
+    def disconnect(self, receiver=None, sender=None, weak=None, dispatch_uid=None):
         """
         Disconnect receiver from sender for signal.
 
@@ -149,12 +151,12 @@ class Signal(object):
             sender
                 The registered sender to disconnect
 
-            weak
-                The weakref state to disconnect
-
             dispatch_uid
                 the unique identifier of the receiver to disconnect
         """
+        if weak is not None:
+            warnings.warn("Passing `weak` to disconnect has no effect.",
+                RemovedInDjango21Warning, stacklevel=2)
         if dispatch_uid:
             lookup_key = (dispatch_uid, _make_id(sender))
         else:
