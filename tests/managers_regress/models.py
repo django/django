@@ -129,6 +129,7 @@ class Child7(Parent):
 @python_2_unicode_compatible
 class RelatedModel(models.Model):
     test_gfk = GenericRelation('RelationModel', content_type_field='gfk_ctype', object_id_field='gfk_id')
+    exact = models.NullBooleanField()
 
     def __str__(self):
         return force_text(self.pk)
@@ -140,8 +141,8 @@ class RelationModel(models.Model):
 
     m2m = models.ManyToManyField(RelatedModel, related_name='test_m2m')
 
-    gfk_ctype = models.ForeignKey(ContentType)
-    gfk_id = models.IntegerField()
+    gfk_ctype = models.ForeignKey(ContentType, null=True)
+    gfk_id = models.IntegerField(null=True)
     gfk = GenericForeignKey(ct_field='gfk_ctype', fk_field='gfk_id')
 
     def __str__(self):
