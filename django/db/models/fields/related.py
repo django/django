@@ -681,7 +681,7 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
         def __init__(self, instance):
             super(RelatedManager, self).__init__()
             self.instance = instance
-            self.core_filters = {'%s__exact' % rel_field.name: instance}
+            self.core_filters = {rel_field.name: instance}
             self.model = rel_model
 
         def __call__(self, **kwargs):
