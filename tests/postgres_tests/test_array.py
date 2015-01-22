@@ -9,7 +9,7 @@ from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
 from django.core import exceptions, serializers
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
-from django.test import TestCase, override_settings
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.utils import timezone
 
 from .models import (
@@ -243,7 +243,9 @@ class TestChecks(TestCase):
         self.assertEqual(errors[0].id, 'postgres.E002')
 
 
-class TestMigrations(TestCase):
+class TestMigrations(TransactionTestCase):
+
+    available_apps = ['postgres_tests']
 
     def test_deconstruct(self):
         field = ArrayField(models.IntegerField())
@@ -278,7 +280,15 @@ class TestMigrations(TestCase):
     })
     def test_adding_field_with_default(self):
         # See #22962
+        table_name = 'postgres_tests_integerarraydefaultmodel'
+        with connection.cursor() as cursor:
+            self.assertNotIn(table_name, connection.introspection.table_names(cursor))
         call_command('migrate', 'postgres_tests', verbosity=0)
+        with connection.cursor() as cursor:
+            self.assertIn(table_name, connection.introspection.table_names(cursor))
+        call_command('migrate', 'postgres_tests', 'zero', verbosity=0)
+        with connection.cursor() as cursor:
+            self.assertNotIn(table_name, connection.introspection.table_names(cursor))
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
