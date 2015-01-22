@@ -1,0 +1,7 @@
+input[maxlength] + span {
+    margin-left: 1em;
+}
+
+input[maxlength] + span .count {
+    margin-right: .5em;
+}
