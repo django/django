@@ -423,3 +423,18 @@ class OptimizerTests(TestCase):
                 migrations.CreateModel("Bar", [("width", models.IntegerField())]),
             ],
         )
+
+    def test_add_field_optimization(self):
+        """
+        Adding multiple field to same models should generate one AddFieldList operation
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.AddField("Foo", "field1", models.IntegerField),
+                migrations.AddField("Foo", "field2", models.IntegerField),
+             ],
+            [
+                migrations.AddFieldList("Foo", [("field1", models.IntegerField),
+                                                ("field2", models.IntegerField)])
+            ],
+        )

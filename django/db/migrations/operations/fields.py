@@ -78,6 +78,10 @@ class AddField(Operation):
         return self.references_model(model_name) and name.lower() == self.name_lower
 
 
+class AddFieldList(Operation):
+    pass
+
+
 class RemoveField(Operation):
     """
     Removes a field from a model.
