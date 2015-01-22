@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.apps import apps
+from django.contrib.sites.models import Site
 from django.test import TestCase
 from django.test.utils import modify_settings, override_settings
 
@@ -11,6 +12,13 @@ from django.test.utils import modify_settings, override_settings
 )
 @modify_settings(INSTALLED_APPS={'append': ['django.contrib.sitemaps']},)
 class FlatpagesSitemapTests(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super(FlatpagesSitemapTests, cls).setUpClass()
+        # This cleanup is necessary because contrib.sites cache
+        # makes tests interfere with each other, see #11505
+        Site.objects.clear_cache()
 
     @classmethod
     def setUpTestData(cls):
