@@ -186,3 +186,24 @@ class Base(models.Model):
 
 class SubBase(Base):
     sub_id = models.IntegerField(primary_key=True)
+
+
+class GrandParent(models.Model):
+    first_name = models.CharField(max_length=80)
+    last_name = models.CharField(max_length=80)
+    email = models.EmailField(unique=True)
+
+    class Meta:
+        unique_together = ('first_name', 'last_name')
+
+
+class Parent(GrandParent):
+    pass
+
+
+class Child(Parent):
+    pass
+
+
+class GrandChild(Child):
+    pass
