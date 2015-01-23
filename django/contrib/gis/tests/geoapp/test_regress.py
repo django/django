@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from django.contrib.gis.db.models import Extent
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.shortcuts import render_to_kmz
 from django.contrib.gis.tests.utils import no_oracle
@@ -11,6 +10,7 @@ from django.db.models import Count, Min
 from django.test import TestCase, skipUnlessDBFeature
 
 if HAS_GEOS:
+    from django.contrib.gis.db.models import Extent
     from .models import City, PennsylvaniaCity, State, Truth
 
 
