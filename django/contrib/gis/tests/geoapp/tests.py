@@ -5,7 +5,6 @@ from tempfile import NamedTemporaryFile
 
 from django.db import connection
 from django.contrib.gis import gdal
-from django.contrib.gis.db.models import Extent, MakeLine, Union
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import no_oracle, oracle, postgis, spatialite
 from django.core.management import call_command
@@ -14,6 +13,7 @@ from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 if HAS_GEOS:
+    from django.contrib.gis.db.models import Extent, MakeLine, Union
     from django.contrib.gis.geos import (fromstr, GEOSGeometry,
         Point, LineString, LinearRing, Polygon, GeometryCollection)
     from .models import Country, City, PennsylvaniaCity, State, Track, NonConcreteModel, Feature, MinusOneSRID
