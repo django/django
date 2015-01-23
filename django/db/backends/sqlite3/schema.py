@@ -4,7 +4,6 @@ from decimal import Decimal
 from django.utils import six
 from django.apps.registry import Apps
 from django.db.backends.schema import BaseDatabaseSchemaEditor
-from django.db.models.fields.related import ManyToManyField
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -70,7 +69,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         for field in create_fields:
             body[field.name] = field
             # Choose a default and insert it into the copy map
-            if not isinstance(field, ManyToManyField):
+            if not field.get_internal_type() == 'ManyToManyField':
                 mapping[field.column] = self.quote_value(
                     self.effective_default(field)
                 )
@@ -93,7 +92,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             del body[field.name]
             del mapping[field.column]
             # Remove any implicit M2M tables
-            if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
+            if field.get_internal_type() == 'ManyToManyField' and field.rel.through._meta.auto_created:
                 return self.delete_model(field.rel.through)
         # Work inside a new app registry
         apps = Apps()
@@ -172,7 +171,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         table instead (for M2M fields)
         """
         # Special-case implicit M2M tables
-        if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
+        if field.get_internal_type() == 'ManyToManyField' and field.rel.through._meta.auto_created:
             return self.create_model(field.rel.through)
         self._remake_table(model, create_fields=[field])
 
@@ -182,7 +181,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         but for M2Ms may involve deleting a table.
         """
         # M2M fields are a special case
-        if isinstance(field, ManyToManyField):
+        if field.get_internal_type() == 'ManyToManyField':
             # For implicit M2M tables, delete the auto-created table
             if field.rel.through._meta.auto_created:
                 self.delete_model(field.rel.through)
