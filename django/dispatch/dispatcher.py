@@ -64,9 +64,9 @@ class Signal(object):
 
                 Receivers must be able to accept keyword arguments.
 
-                If receivers have a dispatch_uid attribute, the receiver will
-                not be added if another receiver already exists with that
-                dispatch_uid.
+                If a receiver is connected with a dispatch_uid argument, it
+                will not be added if another receiver was already connected
+                with that dispatch_uid.
 
             sender
                 The sender to which the receiver should respond. Must either be
