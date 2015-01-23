@@ -38,6 +38,7 @@ class StaticTests(SimpleTestCase):
         first_chunk = next(response.streaming_content)
         self.assertEqual(len(first_chunk), FileResponse.block_size)
         second_chunk = next(response.streaming_content)
+        response.close()
         # strip() to prevent OS line endings from causing differences
         self.assertEqual(len(second_chunk.strip()), 1449)
 
