@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 from django.db import connection
@@ -82,9 +83,12 @@ class TestDebugSQL(unittest.TestCase):
         ]
 
     verbose_expected_outputs = [
-        'runTest (test_runner.test_debug_sql.FailingTest) ... FAIL',
-        'runTest (test_runner.test_debug_sql.ErrorTest) ... ERROR',
-        'runTest (test_runner.test_debug_sql.PassingTest) ... ok',
+        # Output format changed in Python 3.5+
+        x.format('' if sys.version_info < (3, 5) else 'TestDebugSQL.') for x in [
+            'runTest (test_runner.test_debug_sql.{}FailingTest) ... FAIL',
+            'runTest (test_runner.test_debug_sql.{}ErrorTest) ... ERROR',
+            'runTest (test_runner.test_debug_sql.{}PassingTest) ... ok',
+        ]
     ]
     if six.PY3:
         verbose_expected_outputs += [
