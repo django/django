@@ -79,6 +79,9 @@ class GeomValue(Value):
             self.value = connection.ops.Adapter(self.value)
         return super(GeomValue, self).as_sql(compiler, connection)
 
+    def as_sqlite(self, compiler, connection):
+        return 'GeomFromText(%%s, %s)' % self.srid, [connection.ops.Adapter(self.value)]
+
 
 class GeoFuncWithGeoParam(GeoFunc):
     def __init__(self, expression, geom, *expressions, **extra):
@@ -92,6 +95,18 @@ class GeoFuncWithGeoParam(GeoFunc):
             raise ValueError("Please provide a geometry attribute with a defined SRID.")
         geom = GeomValue(geom)
         super(GeoFuncWithGeoParam, self).__init__(expression, geom, *expressions, **extra)
+
+
+class SQLiteDecimalToFloatMixin(object):
+    """
+    By default, Decimal values are converted to str by the SQLite backend, which
+    is not acceptable by the GIS functions expecting numeric values.
+    """
+    def as_sqlite(self, compiler, connection):
+        for expr in self.get_source_expressions():
+            if hasattr(expr, 'value') and isinstance(expr.value, Decimal):
+                expr.value = float(expr.value)
+        return super(SQLiteDecimalToFloatMixin, self).as_sql(compiler, connection)
 
 
 class Area(GeoFunc):
@@ -143,7 +158,10 @@ class AsGML(GeoFunc):
 
 
 class AsKML(AsGML):
-    pass
+    def as_sqlite(self, compiler, connection):
+        # No version parameter
+        self.source_expressions.pop(0)
+        return super(AsKML, self).as_sql(compiler, connection)
 
 
 class AsSVG(GeoFunc):
@@ -261,6 +279,15 @@ class Length(DistanceResultMixin, GeoFunc):
                 self.function = connection.ops.length3d
         return super(Length, self).as_sql(compiler, connection)
 
+    def as_sqlite(self, compiler, connection):
+        geo_field = GeometryField(srid=self.srid)
+        if geo_field.geodetic(connection):
+            if self.spheroid:
+                self.function = 'GeodesicLength'
+            else:
+                self.function = 'GreatCircleLength'
+        return super(Length, self).as_sql(compiler, connection)
+
 
 class MemSize(GeoFunc):
     output_field_class = IntegerField
@@ -272,6 +299,11 @@ class NumGeometries(GeoFunc):
 
 class NumPoints(GeoFunc):
     output_field_class = IntegerField
+
+    def as_sqlite(self, compiler, connection):
+        if self.source_expressions[self.geom_param_pos].output_field.geom_type != 'LINESTRING':
+            raise TypeError("Spatialite NumPoints can only operate on LineString content")
+        return super(NumPoints, self).as_sql(compiler, connection)
 
 
 class Perimeter(DistanceResultMixin, GeoFunc):
@@ -292,7 +324,7 @@ class Reverse(GeoFunc):
     pass
 
 
-class Scale(GeoFunc):
+class Scale(SQLiteDecimalToFloatMixin, GeoFunc):
     def __init__(self, expression, x, y, z=0.0, **extra):
         expressions = [
             expression,
@@ -304,7 +336,7 @@ class Scale(GeoFunc):
         super(Scale, self).__init__(*expressions, **extra)
 
 
-class SnapToGrid(GeoFunc):
+class SnapToGrid(SQLiteDecimalToFloatMixin, GeoFunc):
     def __init__(self, expression, *args, **extra):
         nargs = len(args)
         expressions = [expression]
@@ -342,9 +374,20 @@ class Transform(GeoFunc):
         # Make srid the resulting srid of the transformation
         return self.source_expressions[self.geom_param_pos + 1].value
 
+    def convert_value(self, value, expression, connection, context):
+        value = super(Transform, self).convert_value(value, expression, connection, context)
+        if not connection.ops.postgis and not value.srid:
+            # Some backends do not set the srid on the returning geometry
+            value.srid = self.srid
+        return value
+
 
 class Translate(Scale):
-    pass
+    def as_sqlite(self, compiler, connection):
+        # Always provide the z parameter
+        if len(self.source_expressions) < 4:
+            self.source_expressions.append(Value(0))
+        return super(Translate, self).as_sqlite(compiler, connection)
 
 
 class Union(GeoFuncWithGeoParam):

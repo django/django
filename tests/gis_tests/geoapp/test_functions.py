@@ -172,15 +172,22 @@ class GISFunctionsTests(TestCase):
     @skipUnlessDBFeature("has_Difference_function")
     def test_difference(self):
         geom = Point(5, 23, srid=4326)
-        qs = Country.objects.annotate(difference=functions.Difference('mpoly', geom))
+        qs = Country.objects.annotate(diff=functions.Difference('mpoly', geom))
+        # For some reason SpatiaLite does something screwy with the Texas geometry here.
+        if spatialite:
+            qs = qs.exclude(name='Texas')
+
         for c in qs:
-            self.assertEqual(c.mpoly.difference(geom), c.difference)
+            self.assertEqual(c.mpoly.difference(geom), c.diff)
 
     @skipUnlessDBFeature("has_Difference_function")
     def test_difference_mixed_srid(self):
         """Testing with mixed SRID (Country has default 4326)."""
         geom = Point(556597.4, 2632018.6, srid=3857)  # Spherical mercator
         qs = Country.objects.annotate(difference=functions.Difference('mpoly', geom))
+        # For some reason SpatiaLite does something screwy with the Texas geometry here.
+        if spatialite:
+            qs = qs.exclude(name='Texas')
         for c in qs:
             self.assertEqual(c.mpoly.difference(geom), c.difference)
 
@@ -220,7 +227,12 @@ class GISFunctionsTests(TestCase):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(inter=functions.Intersection('mpoly', geom))
         for c in qs:
-            self.assertEqual(c.mpoly.intersection(geom), c.inter)
+            if spatialite:
+                # When the intersection is empty, Spatialite returns None
+                expected = None
+            else:
+                expected = c.mpoly.intersection(geom)
+            self.assertEqual(c.inter, expected)
 
     @skipUnlessDBFeature("has_MemSize_function")
     def test_memsize(self):
@@ -416,8 +428,8 @@ class GISFunctionsTests(TestCase):
             union=functions.Union('mpoly', geom),
         )
 
-        # XXX For some reason SpatiaLite does something screwey with the Texas geometry here.  Also,
-        # XXX it doesn't like the null intersection.
+        # For some reason SpatiaLite does something screwey with the Texas geometry here.
+        # Also, it doesn't like the null intersection.
         if spatialite:
             qs = qs.exclude(name='Texas')
         else:

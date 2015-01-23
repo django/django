@@ -1,3 +1,9 @@
+"""
+SQL functions reference lists:
+http://www.gaia-gis.it/spatialite-2.4.0/spatialite-sql-2.4.html
+http://www.gaia-gis.it/spatialite-3.0.0-BETA/spatialite-sql-3.0.0.html
+http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.1.html
+"""
 import re
 import sys
 
@@ -73,6 +79,21 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         'distance_lt': SpatialOperator(func='Distance', op='<'),
         'distance_lte': SpatialOperator(func='Distance', op='<='),
     }
+
+    function_names = {
+        'Length': 'ST_Length',
+        'Reverse': 'ST_Reverse',
+        'Scale': 'ScaleCoords',
+        'Translate': 'ST_Translate',
+        'Union': 'ST_Union',
+    }
+
+    @cached_property
+    def unsupported_functions(self):
+        unsupported = {'BoundingCircle', 'ForceRHR', 'GeoHash', 'MemSize'}
+        if self.spatial_version < (4, 0, 0):
+            unsupported.add('Reverse')
+        return unsupported
 
     @cached_property
     def spatial_version(self):

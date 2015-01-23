@@ -617,13 +617,15 @@ class DistanceFunctionsTests(TestCase):
         len_m1 = 473504.769553813
         len_m2 = 4617.668
 
-        if connection.features.supports_distance_geodetic:
+        if connection.features.supports_length_geodetic:
             qs = Interstate.objects.annotate(length=Length('path'))
             tol = 2 if oracle else 3
             self.assertAlmostEqual(len_m1, qs[0].length.m, tol)
+            # TODO: test with spheroid argument (True and False)
         else:
             # Does not support geodetic coordinate systems.
-            self.assertRaises(ValueError, Interstate.objects.annotate(length=Length('path')))
+            with self.assertRaises(ValueError):
+                Interstate.objects.annotate(length=Length('path'))
 
         # Now doing length on a projected coordinate system.
         i10 = SouthTexasInterstate.objects.annotate(length=Length('path')).get(name='I-10')
