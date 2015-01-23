@@ -1,9 +1,9 @@
+# -*- encoding: utf-8 -*-
 """
 A subset of the tests in tests/servers/tests exercicing
 django.contrib.staticfiles.testing.StaticLiveServerTestCase instead of
 django.test.LiveServerTestCase.
 """
-
 import os
 
 from django.core.exceptions import ImproperlyConfigured
