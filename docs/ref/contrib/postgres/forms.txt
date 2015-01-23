@@ -162,7 +162,7 @@ This group of fields all share similar functionality for accepting range data.
 They are based on :class:`~django.forms.MultiValueField`. They treat one
 omitted value as an unbounded range. They also validate that the lower bound is
 not greater than the upper bound. All of these fields use
-:class:`~django.contrib.postgres.fields.RangeWidget`.
+:class:`~django.contrib.postgres.forms.RangeWidget`.
 
 IntegerRangeField
 ~~~~~~~~~~~~~~~~~
