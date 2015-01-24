@@ -438,7 +438,8 @@ class DistanceFunctionsTests(TestCase):
         # Tolerance has to be lower for Oracle
         tol = 2
         for i, z in enumerate(SouthTexasZipcode.objects.annotate(area=Area('poly')).order_by('name')):
-            self.assertAlmostEqual(area_sq_m[i], z.area.sq_m, tol)
+            # MySQL is returning a raw float value
+            self.assertAlmostEqual(area_sq_m[i], z.area.sq_m if hasattr(z.area, 'sq_m') else z.area, tol)
 
     @skipUnlessDBFeature("has_Distance_function")
     def test_distance_simple(self):
@@ -624,12 +625,12 @@ class DistanceFunctionsTests(TestCase):
             # TODO: test with spheroid argument (True and False)
         else:
             # Does not support geodetic coordinate systems.
-            with self.assertRaises(ValueError):
-                Interstate.objects.annotate(length=Length('path'))
+            with self.assertRaises(NotImplementedError):
+                list(Interstate.objects.annotate(length=Length('path')))
 
         # Now doing length on a projected coordinate system.
         i10 = SouthTexasInterstate.objects.annotate(length=Length('path')).get(name='I-10')
-        self.assertAlmostEqual(len_m2, i10.length.m, 2)
+        self.assertAlmostEqual(len_m2, i10.length.m if isinstance(i10.length, D) else i10.length, 2)
         self.assertTrue(
             SouthTexasInterstate.objects.annotate(length=Length('path')).filter(length__gt=4000).exists()
         )
@@ -652,7 +653,7 @@ class DistanceFunctionsTests(TestCase):
         for city in qs:
             self.assertEqual(0, city.perim.m)
 
-    @skipUnlessDBFeature("has_Area_function", "has_Distance_function")
+    @skipUnlessDBFeature("supports_null_geometries", "has_Area_function", "has_Distance_function")
     def test_measurement_null_fields(self):
         """
         Test the measurement functions on fields with NULL values.

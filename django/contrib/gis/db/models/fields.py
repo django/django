@@ -169,7 +169,10 @@ class GeometryField(GeoSelectFormatMixin, Field):
         Returns true if this field's SRID corresponds with a coordinate
         system that uses non-projected units (e.g., latitude/longitude).
         """
-        return self.units_name(connection).lower() in self.geodetic_units
+        units_name = self.units_name(connection)
+        # Some backends like MySQL cannot determine units name. In that case,
+        # test if srid is 4326 (WGS84), even if this is over-simplification.
+        return units_name.lower() in self.geodetic_units if units_name else self.srid == 4326
 
     def get_distance(self, value, lookup_type, connection):
         """

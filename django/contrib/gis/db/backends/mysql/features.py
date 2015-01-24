@@ -6,6 +6,8 @@ from django.db.backends.mysql.features import \
 class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     has_spatialrefsys_table = False
     supports_add_srs_entry = False
+    supports_distance_geodetic = False
+    supports_length_geodetic = False
     supports_distances_lookups = False
     supports_transform = False
     supports_real_shape_operations = False
