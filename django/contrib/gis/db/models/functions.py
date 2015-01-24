@@ -79,6 +79,9 @@ class GeomValue(Value):
             self.value = connection.ops.Adapter(self.value)
         return super(GeomValue, self).as_sql(compiler, connection)
 
+    def as_mysql(self, compiler, connection):
+        return 'GeomFromText(%%s, %s)' % self.srid, [connection.ops.Adapter(self.value)]
+
     def as_sqlite(self, compiler, connection):
         return 'GeomFromText(%%s, %s)' % self.srid, [connection.ops.Adapter(self.value)]
 
@@ -119,8 +122,12 @@ class Area(GeoFunc):
                 self.output_field = AreaField('sq_m')
             elif not self.output_field.geodetic(connection):
                 # Getting the area units of the geographic field.
-                self.output_field = AreaField(
-                    AreaMeasure.unit_attname(self.output_field.units_name(connection)))
+                units = self.output_field.units_name(connection)
+                if units:
+                    self.output_field = AreaField(
+                        AreaMeasure.unit_attname(self.output_field.units_name(connection)))
+                else:
+                    self.output_field = FloatField()
             else:
                 # TODO: Do we want to support raw number areas for geodetic fields?
                 raise NotImplementedError('Area on geodetic coordinate systems not supported.')
@@ -198,8 +205,14 @@ class DistanceResultMixin(object):
         if geo_field.geodetic(connection):
             dist_att = 'm'
         else:
-            dist_att = DistanceMeasure.unit_attname(geo_field.units_name(connection))
-        return DistanceMeasure(**{dist_att: value})
+            units = geo_field.units_name(connection)
+            if units:
+                dist_att = DistanceMeasure.unit_attname(units)
+            else:
+                dist_att = None
+        if dist_att:
+            return DistanceMeasure(**{dist_att: value})
+        return value
 
 
 class Distance(DistanceResultMixin, GeoFuncWithGeoParam):
@@ -262,6 +275,12 @@ class Length(DistanceResultMixin, GeoFunc):
     def __init__(self, expr1, spheroid=True, **extra):
         self.spheroid = spheroid
         super(Length, self).__init__(expr1, **extra)
+
+    def as_sql(self, compiler, connection):
+        geo_field = GeometryField(srid=self.srid)  # Fake field to get SRID info
+        if geo_field.geodetic(connection) and not connection.features.supports_length_geodetic:
+            raise NotImplementedError("This backend doesn't support Length on geodetic fields")
+        return super(Length, self).as_sql(compiler, connection)
 
     def as_postgresql(self, compiler, connection):
         geo_field = GeometryField(srid=self.srid)  # Fake field to get SRID info

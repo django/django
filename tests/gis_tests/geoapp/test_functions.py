@@ -9,7 +9,7 @@ from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
-from ..utils import oracle, postgis, spatialite
+from ..utils import mysql, oracle, postgis, spatialite
 
 if HAS_GEOS:
     from django.contrib.gis.geos import LineString, Point, Polygon, fromstr
@@ -165,8 +165,8 @@ class GISFunctionsTests(TestCase):
     @skipUnlessDBFeature("has_Centroid_function")
     def test_centroid(self):
         qs = State.objects.exclude(poly__isnull=True).annotate(centroid=functions.Centroid('poly'))
+        tol = 1.8 if mysql else (0.1 if oracle else 0.00001)
         for state in qs:
-            tol = 0.1  # High tolerance due to oracle
             self.assertTrue(state.poly.centroid.equals_exact(state.centroid, tol))
 
     @skipUnlessDBFeature("has_Difference_function")
@@ -248,9 +248,9 @@ class GISFunctionsTests(TestCase):
         qs = City.objects.filter(point__isnull=False).annotate(num_geom=functions.NumGeometries('point'))
         for city in qs:
             # Oracle and PostGIS 2.0+ will return 1 for the number of
-            # geometries on non-collections, whereas PostGIS < 2.0.0
+            # geometries on non-collections, whereas PostGIS < 2.0.0 and MySQL
             # will return None.
-            if postgis and connection.ops.spatial_version < (2, 0, 0):
+            if (postgis and connection.ops.spatial_version < (2, 0, 0)) or mysql:
                 self.assertIsNone(city.num_geom)
             else:
                 self.assertEqual(1, city.num_geom)
@@ -261,8 +261,8 @@ class GISFunctionsTests(TestCase):
         Track.objects.create(name='Foo', line=LineString(coords))
         qs = Track.objects.annotate(num_points=functions.NumPoints('line'))
         self.assertEqual(qs.first().num_points, 2)
-        if spatialite:
-            # Spatialite can only count points on LineStrings
+        if spatialite or mysql:
+            # Spatialite and MySQL can only count points on LineStrings
             return
 
         for c in Country.objects.annotate(num_points=functions.NumPoints('mpoly')):
@@ -455,5 +455,7 @@ class GISFunctionsTests(TestCase):
         geom = Point(-95.363151, 29.763374, srid=4326)
         ptown = City.objects.annotate(union=functions.Union('point', geom)).get(name='Dallas')
         tol = 0.00001
-        expected = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)', srid=4326)
-        self.assertTrue(expected.equals_exact(ptown.union, tol))
+        # Undefined ordering
+        expected1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)', srid=4326)
+        expected2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)', srid=4326)
+        self.assertTrue(expected1.equals_exact(ptown.union, tol) or expected2.equals_exact(ptown.union, tol))
