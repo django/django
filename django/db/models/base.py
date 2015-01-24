@@ -19,7 +19,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
-    OneToOneField, add_lazy_relation)
+    OneToOneField, add_lazy_relation, resolve_relation)
 from django.db.models.manager import ensure_default_manager
 from django.db.models.options import Options
 from django.db.models.query import Q
@@ -219,7 +219,7 @@ class ModelBase(type):
             # Locate OneToOneField instances.
             for field in base._meta.local_fields:
                 if isinstance(field, OneToOneField):
-                    parent_links[field.rel.to] = field
+                    parent_links[resolve_relation(new_class, field.rel.to)] = field
 
         # Do the appropriate setup for any model parents.
         for base in parents:
@@ -243,8 +243,9 @@ class ModelBase(type):
             if not base._meta.abstract:
                 # Concrete classes...
                 base = base._meta.concrete_model
-                if base in parent_links:
-                    field = parent_links[base]
+                base_label = resolve_relation(new_class, base)
+                if base_label in parent_links:
+                    field = parent_links[base_label]
                 elif not is_proxy:
                     attr_name = '%s_ptr' % base._meta.model_name
                     field = OneToOneField(base, name=attr_name,

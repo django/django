@@ -26,6 +26,104 @@ from django import forms
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
 
+class LazyModelOperations(object):
+    """
+    This class connects itself to Django's class_prepared signal. Use "add()"
+    when you have some model names, and want to pass the corresponding model
+    to a function once the models are loaded.
+    """
+
+    def __init__(self):
+        signals.class_prepared.connect(self.do_pending_lookups)
+
+    @staticmethod
+    def model_key(model_or_name):
+        """
+        Returns an (app_label, model_name) tuple from a model or string.
+        """
+        if isinstance(model_or_name, six.string_types):
+            app_label, model_name = model_or_name.split(".")
+        else:
+            # It's actually a model class.
+            app_label = model_or_name._meta.app_label
+            model_name = model_or_name._meta.object_name
+        return app_label, model_name
+
+    @classmethod
+    def add(cls, apps, function, *models_or_names, **kwargs):
+        """
+        Take a function and a number of models or model names, and when all
+        the corresponding models have been loaded, call the function with
+        the model classes and any optional as its arguments.
+
+        Each element of models_or names may be
+            * an actual model class
+            * a string of the form "app_label.ModelName"
+            * a tuple of strings of the form (app_label, model_name)
+
+        The function passed to this method must accept n positional arguments,
+        where n=len(models_or_names), plus whatever keyword arguments you pass
+        in kwargs.
+        """
+
+        # Eagerly parse all model strings so we can fail immediately
+        # if any are plainly invalid.
+        model_keys = [cls.model_key(m) if not isinstance(m, tuple) else m
+                      for m in models_or_names]
+
+        # If this function depends on more than one model, recursively call add
+        # for each, partially applying the given function on each iteration.
+        model_key, more_models = model_keys[0], model_keys[1:]
+        if more_models:
+            inner_function = function
+            function = lambda model, **kwargs: cls.add(apps, curry(inner_function, model),
+                                                       *more_models, **kwargs)
+
+        # If the model is already loaded, pass it to the function immediately.
+        # Otherwise, delay execution until the class is prepared.
+        try:
+            model_class = apps.get_registered_model(*model_key)
+        except LookupError:
+            apps._pending_lookups.setdefault(model_key, []).append((function, kwargs))
+        else:
+            function(model_class, **kwargs)
+
+    @staticmethod
+    def do_pending_lookups(sender, **_):
+        """
+        Receive ``class_prepared``, and pass the freshly prepared
+        model to each function waiting for it.
+        """
+        key = (sender._meta.app_label, sender.__name__)
+        while key in sender._meta.apps._pending_lookups:
+            for function, kwargs in sender._meta.apps._pending_lookups.pop(key):
+                function(sender, **kwargs)
+
+
+def resolve_relation(cls, relation):
+    # Check for recursive relations
+    if relation == RECURSIVE_RELATIONSHIP_CONSTANT:
+        relation = cls
+
+    # Look for an "app.Model" relation
+    if isinstance(relation, six.string_types):
+        try:
+            app_label, model_name = relation.split(".")
+        except ValueError:
+            # If we can't split, assume a model in current app
+            app_label = cls._meta.app_label
+            model_name = relation
+        relation = app_label, model_name
+    else:
+        relation = relation._meta.app_label, relation.__name__
+
+    return relation
+
+lazy_model_ops = LazyModelOperations()
+
+do_pending_lookups = lazy_model_ops.do_pending_lookups
+
+
 def add_lazy_relation(cls, field, relation, operation):
     """
     Adds a lookup on ``cls`` when a related field is defined using a string,
@@ -51,49 +149,14 @@ def add_lazy_relation(cls, field, relation, operation):
 
     operation is the work that must be performed once the relation can be resolved.
     """
-    # Check for recursive relations
-    if relation == RECURSIVE_RELATIONSHIP_CONSTANT:
-        app_label = cls._meta.app_label
-        model_name = cls.__name__
 
-    else:
-        # Look for an "app.Model" relation
+    relation = resolve_relation(cls, relation)
 
-        if isinstance(relation, six.string_types):
-            try:
-                app_label, model_name = relation.split(".")
-            except ValueError:
-                # If we can't split, assume a model in current app
-                app_label = cls._meta.app_label
-                model_name = relation
-        else:
-            # it's actually a model class
-            app_label = relation._meta.app_label
-            model_name = relation._meta.object_name
+    # Rearrange args for LazyModelOperations
+    function = lambda local, related, field: operation(field, related, local)
 
-    # Try to look up the related model, and if it's already loaded resolve the
-    # string right away. If get_registered_model raises a LookupError, it means
-    # that the related model isn't loaded yet, so we need to pend the relation
-    # until the class is prepared.
-    try:
-        model = cls._meta.apps.get_registered_model(app_label, model_name)
-    except LookupError:
-        key = (app_label, model_name)
-        value = (cls, field, operation)
-        cls._meta.apps._pending_lookups.setdefault(key, []).append(value)
-    else:
-        operation(field, model, cls)
-
-
-def do_pending_lookups(sender, **kwargs):
-    """
-    Handle any pending relations to the sending model. Sent from class_prepared.
-    """
-    key = (sender._meta.app_label, sender.__name__)
-    for cls, field, operation in sender._meta.apps._pending_lookups.pop(key, []):
-        operation(field, sender, cls)
-
-signals.class_prepared.connect(do_pending_lookups)
+    # Now pass this to LazyModelOperations
+    lazy_model_ops.add(cls._meta.apps, function, cls, relation, field=field)
 
 
 class RelatedField(Field):
