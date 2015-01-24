@@ -17,7 +17,7 @@ from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo
 from django.utils.encoding import force_text, smart_text
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango20Warning, RemovedInDjango19Warning
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
 from django.core import exceptions
@@ -67,6 +67,16 @@ def lazy_related_operation(function, model, related_model, **kwargs):
     related_model = resolve_relation(model, related_model)
     apps = model._meta.apps
     return apps.lazy_model_operation(function, model, related_model, **kwargs)
+
+
+def add_lazy_relation(cls, field, relation, operation):
+    warnings.warn(
+        "add_lazy_relation() has been replaced by lazy_related_operation() "
+        "and related methods on the Apps class, and will be no longer be "
+        "available in Django 1.9.", RemovedInDjango19Warning, stacklevel=2)
+    # Rearrange args for new Apps.lazy_model_operation
+    function = lambda local, related, field: operation(field, related, local)
+    lazy_related_operation(function, cls, relation, field=field)
 
 
 class RelatedField(Field):
