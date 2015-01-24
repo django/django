@@ -19,7 +19,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
-    OneToOneField, resolve_relation, lazy_model_ops)
+    OneToOneField, resolve_relation, lazy_related_operation)
 from django.db.models.manager import ensure_default_manager
 from django.db.models.options import Options
 from django.db.models.query import Q
@@ -219,7 +219,8 @@ class ModelBase(type):
             # Locate OneToOneField instances.
             for field in base._meta.local_fields:
                 if isinstance(field, OneToOneField):
-                    parent_links[resolve_relation(new_class, field.rel.to)] = field
+                    related = resolve_relation(new_class, field.rel.to, always_text=True)
+                    parent_links[related] = field
 
         # Do the appropriate setup for any model parents.
         for base in parents:
@@ -243,7 +244,7 @@ class ModelBase(type):
             if not base._meta.abstract:
                 # Concrete classes...
                 base = base._meta.concrete_model
-                base_label = resolve_relation(new_class, base)
+                base_label = "%s.%s" % (base._meta.app_label, base.__name__)
                 if base_label in parent_links:
                     field = parent_links[base_label]
                 elif not is_proxy:
@@ -336,9 +337,9 @@ class ModelBase(type):
                     'set_%s_order' % cls.__name__.lower(),
                     curry(method_set_order, cls)
                 )
-            lazy_model_ops.add_related(make_foreign_order_accessors,
-                                       cls, opts.order_with_respect_to.rel.to,
-                                       field=opts.order_with_respect_to)
+            lazy_related_operation(make_foreign_order_accessors,
+                                   cls, opts.order_with_respect_to.rel.to,
+                                   field=opts.order_with_respect_to)
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
