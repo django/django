@@ -584,3 +584,20 @@ class MultiParserTests(unittest.TestCase):
         for raw_line, expected_title in test_data:
             parsed = parse_header(raw_line)
             self.assertEqual(parsed[1]['title'], expected_title)
+
+    def test_rfc2231_wrong_title(self):
+        """
+        Test wrongly formatted RFC 2231 headers (missing double single quotes).
+        Parsing should not crash (#24209).
+        """
+        test_data = (
+            (b"Content-Type: application/x-stuff; title*='This%20is%20%2A%2A%2Afun%2A%2A%2A",
+             b"'This%20is%20%2A%2A%2Afun%2A%2A%2A"),
+            (b"Content-Type: application/x-stuff; title*='foo.html",
+             b"'foo.html"),
+            (b"Content-Type: application/x-stuff; title*=bar.html",
+             b"bar.html"),
+        )
+        for raw_line, expected_title in test_data:
+            parsed = parse_header(raw_line)
+            self.assertEqual(parsed[1]['title'], expected_title)
