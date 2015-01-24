@@ -88,6 +88,17 @@ class LazyModelOperations(object):
         else:
             function(model_class, **kwargs)
 
+    @classmethod
+    def add_related(cls, function, local_model, related_model, **kwargs):
+        """
+        A wrapper for add() restricted to two models, where the "related_model"
+        argument may be "self" or a model name without an app label, and will
+        be resolved relative to the "local_model" argument when "add()" is called.
+        """
+        related_model = resolve_relation(local_model, related_model)
+        return cls.add(local_model._meta.apps, function,
+                       local_model, related_model, **kwargs)
+
     @staticmethod
     def do_pending_lookups(sender, **_):
         """
@@ -122,41 +133,6 @@ def resolve_relation(cls, relation):
 lazy_model_ops = LazyModelOperations()
 
 do_pending_lookups = lazy_model_ops.do_pending_lookups
-
-
-def add_lazy_relation(cls, field, relation, operation):
-    """
-    Adds a lookup on ``cls`` when a related field is defined using a string,
-    i.e.::
-
-        class MyModel(Model):
-            fk = ForeignKey("AnotherModel")
-
-    This string can be:
-
-        * RECURSIVE_RELATIONSHIP_CONSTANT (i.e. "self") to indicate a recursive
-          relation.
-
-        * The name of a model (i.e "AnotherModel") to indicate another model in
-          the same app.
-
-        * An app-label and model name (i.e. "someapp.AnotherModel") to indicate
-          another model in a different app.
-
-    If the other model hasn't yet been loaded -- almost a given if you're using
-    lazy relationships -- then the relation won't be set up until the
-    class_prepared signal fires at the end of model initialization.
-
-    operation is the work that must be performed once the relation can be resolved.
-    """
-
-    relation = resolve_relation(cls, relation)
-
-    # Rearrange args for LazyModelOperations
-    function = lambda local, related, field: operation(field, related, local)
-
-    # Now pass this to LazyModelOperations
-    lazy_model_ops.add(cls._meta.apps, function, cls, relation, field=field)
 
 
 class RelatedField(Field):
@@ -361,10 +337,10 @@ class RelatedField(Field):
             self.rel.related_name = related_name
         other = self.rel.to
         if isinstance(other, six.string_types) or other._meta.pk is None:
-            def resolve_related_class(field, model, cls):
+            def resolve_related_class(cls, model, field):
                 field.rel.to = model
                 field.do_related_class(model, cls)
-            add_lazy_relation(cls, self, other, resolve_related_class)
+            lazy_model_ops.add_related(resolve_related_class, cls, other, field=self)
         else:
             self.do_related_class(other, cls)
 
@@ -2108,9 +2084,9 @@ def create_many_to_many_intermediary_model(field, klass):
         to_model = field.rel.to
         to = to_model.split('.')[-1]
 
-        def set_managed(field, model, cls):
+        def set_managed(cls, model, field):
             field.rel.through._meta.managed = model._meta.managed or cls._meta.managed
-        add_lazy_relation(klass, field, to_model, set_managed)
+        lazy_model_ops.add_related(set_managed, klass, to_model, field=field)
     elif isinstance(field.rel.to, six.string_types):
         to = klass._meta.object_name
         to_model = klass
@@ -2598,10 +2574,11 @@ class ManyToManyField(RelatedField):
 
         # Populate some necessary rel arguments so that cross-app relations
         # work correctly.
-        if isinstance(self.rel.through, six.string_types):
-            def resolve_through_model(field, model, cls):
+        if self.rel.through:
+            def resolve_through_model(_, model, field):
                 field.rel.through = model
-            add_lazy_relation(cls, self, self.rel.through, resolve_through_model)
+            lazy_model_ops.add_related(resolve_through_model,
+                                       cls, self.rel.through, field=self)
 
     def contribute_to_related_class(self, cls, related):
         # Internal M2Ms (i.e., those with a related name ending with '+')
