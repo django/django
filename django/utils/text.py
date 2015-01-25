@@ -286,6 +286,39 @@ def compress_string(s):
 
 ustring_re = re.compile(u"([\u0080-\uffff])")
 
+# Backported from django 1.5
+class StreamingBuffer(object):
+    def __init__(self):
+        self.vals = []
+
+    def write(self, val):
+        self.vals.append(val)
+
+    def read(self):
+        ret = b''.join(self.vals)
+        self.vals = []
+        return ret
+
+    def flush(self):
+        return
+
+    def close(self):
+        return
+
+# Backported from django 1.5
+# Like compress_string, but for iterators of strings.
+def compress_sequence(sequence):
+    buf = StreamingBuffer()
+    zfile = GzipFile(mode='wb', compresslevel=6, fileobj=buf)
+    # Output headers...
+    yield buf.read()
+    for item in sequence:
+        zfile.write(item)
+        zfile.flush()
+        yield buf.read()
+    zfile.close()
+    yield buf.read()
+
 def javascript_quote(s, quote_double_quotes=False):
 
     def fix(match):
