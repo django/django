@@ -60,14 +60,6 @@ class BaseStaticFilesTestCase(object):
     Test case with a couple utility assertions.
     """
     def setUp(self):
-        # Clear the cached staticfiles_storage out, this is because when it first
-        # gets accessed (by some other test), it evaluates settings.STATIC_ROOT,
-        # since we're planning on changing that we need to clear out the cache.
-        storage.staticfiles_storage._wrapped = empty
-        # Clear the cached staticfile finders, so they are reinitialized every
-        # run and pick up changes in settings.STATICFILES_DIRS.
-        finders.get_finder.cache_clear()
-
         self.testfiles_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test')
         # To make sure SVN doesn't hangs itself with the non-ASCII characters
         # during checkout, we actually create one file dynamically.
@@ -130,15 +122,18 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
     """
     def setUp(self):
         super(BaseCollectionTestCase, self).setUp()
-        self.old_root = settings.STATIC_ROOT
-        settings.STATIC_ROOT = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
+        temp_dir = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
+        # Override the STATIC_ROOT for all tests from setUp to tearDown
+        # rather than as a context manager
+        self.patched_settings = self.settings(STATIC_ROOT=temp_dir)
+        self.patched_settings.enable()
         self.run_collectstatic()
         # Use our own error handler that can handle .svn dirs on Windows
-        self.addCleanup(shutil.rmtree, settings.STATIC_ROOT,
+        self.addCleanup(shutil.rmtree, temp_dir,
                         ignore_errors=True, onerror=rmtree_errorhandler)
 
     def tearDown(self):
-        settings.STATIC_ROOT = self.old_root
+        self.patched_settings.disable()
         super(BaseCollectionTestCase, self).tearDown()
 
     def run_collectstatic(self, **kwargs):

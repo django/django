@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 import unittest
 
 from django.conf.urls import url
+from django.contrib.staticfiles.finders import get_finders, get_finder
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import default_storage
 from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import connection, router
@@ -14,6 +16,7 @@ from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBF
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
+from django.utils._os import abspathu
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
@@ -850,3 +853,56 @@ class OverrideSettingsTests(TestCase):
         test_routers = (object(),)
         with self.settings(DATABASE_ROUTERS=test_routers):
             self.assertSequenceEqual(router.routers, test_routers)
+
+    def test_override_static_url(self):
+        """
+        Overriding the STATIC_URL setting should be reflected in the
+        base_url attribute of
+        django.contrib.staticfiles.storage.staticfiles_storage.
+        """
+        with self.settings(STATIC_URL='/test/'):
+            self.assertEqual(staticfiles_storage.base_url, '/test/')
+
+    def test_override_static_root(self):
+        """
+        Overriding the STATIC_ROOT setting should be reflected in the
+        location attribute of
+        django.contrib.staticfiles.storage.staticfiles_storage.
+        """
+        with self.settings(STATIC_ROOT='/tmp/test'):
+            self.assertEqual(staticfiles_storage.location, abspathu('/tmp/test'))
+
+    def test_override_staticfiles_storage(self):
+        """
+        Overriding the STATICFILES_STORAGE setting should be reflected in
+        the value of django.contrib.staticfiles.storage.staticfiles_storage.
+        """
+        new_class = 'CachedStaticFilesStorage'
+        new_storage = 'django.contrib.staticfiles.storage.' + new_class
+        with self.settings(STATICFILES_STORAGE=new_storage):
+            self.assertEqual(staticfiles_storage.__class__.__name__, new_class)
+
+    def test_override_staticfiles_finders(self):
+        """
+        Overriding the STATICFILES_FINDERS setting should be reflected in
+        the return value of django.contrib.staticfiles.finders.get_finders.
+        """
+        current = get_finders()
+        self.assertGreater(len(list(current)), 1)
+        finders = ['django.contrib.staticfiles.finders.FileSystemFinder']
+        with self.settings(STATICFILES_FINDERS=finders):
+            self.assertEqual(len(list(get_finders())), len(finders))
+
+    def test_override_staticfiles_dirs(self):
+        """
+        Overriding the STATICFILES_DIRS setting should be reflected in
+        the locations attribute of the
+        django.contrib.staticfiles.finders.FileSystemFinder instance.
+        """
+        finder = get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
+        test_path = '/tmp/test'
+        expected_location = ('', test_path)
+        self.assertNotIn(expected_location, finder.locations)
+        with self.settings(STATICFILES_DIRS=[test_path]):
+            finder = get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
+            self.assertIn(expected_location, finder.locations)
