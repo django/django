@@ -43,11 +43,11 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import (
     BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
     DecimalField, DurationField, EmailField, Field, FileField, FilePathField,
-    FloatField, Form, forms, HiddenInput, ImageField, IntegerField,
-    MultipleChoiceField, NullBooleanField, NumberInput, PasswordInput,
-    RadioSelect, RegexField, SplitDateTimeField, TextInput, Textarea,
-    TimeField, TypedChoiceField, TypedMultipleChoiceField, URLField, UUIDField,
-    ValidationError, Widget,
+    FloatField, Form, forms, GenericIPAddressField, HiddenInput, ImageField,
+    IntegerField, MultipleChoiceField, NullBooleanField, NumberInput,
+    PasswordInput, RadioSelect, RegexField, SlugField, SplitDateTimeField,
+    TextInput, Textarea, TimeField, TypedChoiceField, TypedMultipleChoiceField,
+    URLField, UUIDField, ValidationError, Widget,
 )
 from django.test import SimpleTestCase, ignore_warnings
 from django.utils import formats
@@ -906,6 +906,10 @@ class FieldsTests(SimpleTestCase):
         f = URLField(required=False)
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 23)
 
+    def test_urlfield_normalization(self):
+        f = URLField()
+        self.assertEqual(f.clean('http://example.com/     '), 'http://example.com/')
+
     # BooleanField ################################################################
 
     def test_booleanfield_1(self):
@@ -1384,6 +1388,96 @@ class FieldsTests(SimpleTestCase):
         self.assertTrue(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['2008-05-06', '12:40:00']))
         self.assertFalse(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:40']))
         self.assertTrue(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:41']))
+
+    # GenericIPAddressField #######################################################
+
+    def test_generic_ipaddress_invalid_arguments(self):
+        self.assertRaises(ValueError, GenericIPAddressField, protocol="hamster")
+        self.assertRaises(ValueError, GenericIPAddressField, protocol="ipv4", unpack_ipv4=True)
+
+    def test_generic_ipaddress_as_generic(self):
+        # The edge cases of the IPv6 validation code are not deeply tested
+        # here, they are covered in the tests for django.utils.ipv6
+        f = GenericIPAddressField()
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
+        self.assertEqual(f.clean(' 127.0.0.1 '), '127.0.0.1')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, 'foo')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '127.0.0.')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '1.2.3.4.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '256.125.1.5')
+        self.assertEqual(f.clean(' fe80::223:6cff:fe8a:2e8a '), 'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean(' 2a02::223:6cff:fe8a:2e8a '), '2a02::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '12345:2:3:4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3::4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3:4:5:6:7:8')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1:2')
+
+    def test_generic_ipaddress_as_ipv4_only(self):
+        f = GenericIPAddressField(protocol="IPv4")
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
+        self.assertEqual(f.clean(' 127.0.0.1 '), '127.0.0.1')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, 'foo')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, '127.0.0.')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, '1.2.3.4.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, '256.125.1.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, 'fe80::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, '2a02::223:6cff:fe8a:2e8a')
+
+    def test_generic_ipaddress_as_ipv6_only(self):
+        f = GenericIPAddressField(protocol="IPv6")
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv6 address.'", f.clean, '127.0.0.1')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv6 address.'", f.clean, 'foo')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv6 address.'", f.clean, '127.0.0.')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv6 address.'", f.clean, '1.2.3.4.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv6 address.'", f.clean, '256.125.1.5')
+        self.assertEqual(f.clean(' fe80::223:6cff:fe8a:2e8a '), 'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean(' 2a02::223:6cff:fe8a:2e8a '), '2a02::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '12345:2:3:4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3::4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3:4:5:6:7:8')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1:2')
+
+    def test_generic_ipaddress_as_generic_not_required(self):
+        f = GenericIPAddressField(required=False)
+        self.assertEqual(f.clean(''), '')
+        self.assertEqual(f.clean(None), '')
+        self.assertEqual(f.clean('127.0.0.1'), '127.0.0.1')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, 'foo')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '127.0.0.')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '1.2.3.4.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '256.125.1.5')
+        self.assertEqual(f.clean(' fe80::223:6cff:fe8a:2e8a '), 'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean(' 2a02::223:6cff:fe8a:2e8a '), '2a02::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '12345:2:3:4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3::4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3:4:5:6:7:8')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1:2')
+
+    def test_generic_ipaddress_normalization(self):
+        # Test the normalizing code
+        f = GenericIPAddressField()
+        self.assertEqual(f.clean(' ::ffff:0a0a:0a0a  '), '::ffff:10.10.10.10')
+        self.assertEqual(f.clean(' ::ffff:10.10.10.10  '), '::ffff:10.10.10.10')
+        self.assertEqual(f.clean(' 2001:000:a:0000:0:fe:fe:beef  '), '2001:0:a::fe:fe:beef')
+        self.assertEqual(f.clean(' 2001::a:0000:0:fe:fe:beef  '), '2001:0:a::fe:fe:beef')
+
+        f = GenericIPAddressField(unpack_ipv4=True)
+        self.assertEqual(f.clean(' ::ffff:0a0a:0a0a'), '10.10.10.10')
+
+    # SlugField ###################################################################
+
+    def test_slugfield_normalization(self):
+        f = SlugField()
+        self.assertEqual(f.clean('    aa-bb-cc    '), 'aa-bb-cc')
+
+    # UUIDField ###################################################################
 
     def test_uuidfield_1(self):
         field = UUIDField()
