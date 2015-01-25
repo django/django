@@ -11,9 +11,10 @@ from django.core.validators import RegexValidator
 from django.forms import (
     BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
     DateTimeField, EmailField, FileField, FloatField, Form, forms, HiddenInput,
-    IntegerField, MultipleChoiceField, MultipleHiddenInput, MultiValueField,
-    NullBooleanField, PasswordInput, RadioSelect, Select, SplitDateTimeField,
-    Textarea, TextInput, TimeField, ValidationError, widgets
+    ImageField, IntegerField, MultipleChoiceField, MultipleHiddenInput,
+    MultiValueField, NullBooleanField, PasswordInput, RadioSelect, Select,
+    SplitDateTimeField, SplitHiddenDateTimeWidget, Textarea, TextInput,
+    TimeField, ValidationError,
 )
 from django.forms.utils import ErrorList
 from django.http import QueryDict
@@ -21,7 +22,7 @@ from django.template import Template, Context
 from django.test import TestCase
 from django.test.utils import str_prefix
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_text
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
@@ -1945,7 +1946,7 @@ class FormsTestCase(TestCase):
 
     def test_label_split_datetime_not_displayed(self):
         class EventForm(Form):
-            happened_at = SplitDateTimeField(widget=widgets.SplitHiddenDateTimeWidget)
+            happened_at = SplitDateTimeField(widget=SplitHiddenDateTimeWidget)
 
         form = EventForm()
         self.assertHTMLEqual(form.as_ul(), '<input type="hidden" name="happened_at_0" id="id_happened_at_0" /><input type="hidden" name="happened_at_1" id="id_happened_at_1" />')
@@ -2399,6 +2400,31 @@ class FormsTestCase(TestCase):
 <tr><th><label for="id_last_name">Last name:</label></th><td><input id="id_last_name" name="last_name" type="text" value="Lennon" /></td></tr>"""
         )
 
+    def test_errorlist_override(self):
+        @python_2_unicode_compatible
+        class DivErrorList(ErrorList):
+            def __str__(self):
+                return self.as_divs()
+
+            def as_divs(self):
+                if not self:
+                    return ''
+                return '<div class="errorlist">%s</div>' % ''.join(
+                    '<div class="error">%s</div>' % force_text(e) for e in self)
+
+        class CommentForm(Form):
+            name = CharField(max_length=50, required=False)
+            email = EmailField()
+            comment = CharField()
+
+        data = dict(email='invalid')
+        f = CommentForm(data, auto_id=False, error_class=DivErrorList)
+        self.assertHTMLEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50" /></p>
+<div class="errorlist"><div class="error">Enter a valid email address.</div></div>
+<p>Email: <input type="email" name="email" value="invalid" /></p>
+<div class="errorlist"><div class="error">This field is required.</div></div>
+<p>Comment: <input type="text" name="comment" /></p>""")
+
     def test_baseform_repr(self):
         """
         BaseForm.__repr__() should contain some basic information about the
@@ -2423,3 +2449,66 @@ class FormsTestCase(TestCase):
         self.assertRaises(AttributeError, lambda: p.cleaned_data)
         self.assertFalse(p.is_valid())
         self.assertEqual(p.cleaned_data, {'first_name': 'John', 'last_name': 'Lennon'})
+
+    def test_accessing_clean(self):
+        class UserForm(Form):
+            username = CharField(max_length=10)
+            password = CharField(widget=PasswordInput)
+
+            def clean(self):
+                data = self.cleaned_data
+
+                if not self.errors:
+                    data['username'] = data['username'].lower()
+
+                return data
+
+        f = UserForm({'username': 'SirRobin', 'password': 'blue'})
+        self.assertTrue(f.is_valid())
+        self.assertEqual(f.cleaned_data['username'], 'sirrobin')
+
+    def test_changing_cleaned_data_nothing_returned(self):
+        class UserForm(Form):
+            username = CharField(max_length=10)
+            password = CharField(widget=PasswordInput)
+
+            def clean(self):
+                self.cleaned_data['username'] = self.cleaned_data['username'].lower()
+                # don't return anything
+
+        f = UserForm({'username': 'SirRobin', 'password': 'blue'})
+        self.assertTrue(f.is_valid())
+        self.assertEqual(f.cleaned_data['username'], 'sirrobin')
+
+    def test_changing_cleaned_data_in_clean(self):
+        class UserForm(Form):
+            username = CharField(max_length=10)
+            password = CharField(widget=PasswordInput)
+
+            def clean(self):
+                data = self.cleaned_data
+
+                # Return a different dict. We have not changed self.cleaned_data.
+                return {
+                    'username': data['username'].lower(),
+                    'password': 'this_is_not_a_secret',
+                }
+
+        f = UserForm({'username': 'SirRobin', 'password': 'blue'})
+        self.assertTrue(f.is_valid())
+        self.assertEqual(f.cleaned_data['username'], 'sirrobin')
+
+    def test_multipart_encoded_form(self):
+        class FormWithoutFile(Form):
+            username = CharField()
+
+        class FormWithFile(Form):
+            username = CharField()
+            file = FileField()
+
+        class FormWithImage(Form):
+            image = ImageField()
+
+        self.assertFalse(FormWithoutFile().is_multipart())
+        self.assertTrue(FormWithFile().is_multipart())
+        self.assertTrue(FormWithImage().is_multipart())
