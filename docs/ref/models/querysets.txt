@@ -329,11 +329,6 @@ the cost of a JOIN, by referring to the ``_id`` of the related field::
     # Join
     Entry.objects.order_by('blog__id')
 
-.. versionadded:: 1.7
-
-    The ability to order a queryset by a related field, without incurring
-    the cost of a JOIN was added.
-
 You can also order by :doc:`query expressions </ref/models/expressions>` by
 calling ``asc()`` or ``desc()`` on the expression::
 
@@ -578,12 +573,6 @@ A few subtleties that are worth mentioning:
 
 * Calling :meth:`only()` and :meth:`defer()` after ``values()`` doesn't make
   sense, so doing so will raise a ``NotImplementedError``.
-
-.. versionadded:: 1.7
-
-    The last point above is new. Previously, calling :meth:`only()` and
-    :meth:`defer()` after ``values()`` was allowed, but it either crashed or
-    returned incorrect results.
 
 It is useful when you know you're only going to need values from a small number
 of the available fields and you won't need the functionality of a model
@@ -856,11 +845,6 @@ Chaining ``select_related`` calls works in a similar way to other methods -
 that is that ``select_related('foo', 'bar')`` is equivalent to
 ``select_related('foo').select_related('bar')``.
 
-.. versionchanged:: 1.7
-
-    Previously the latter would have been equivalent to
-    ``select_related('bar')``.
-
 prefetch_related
 ~~~~~~~~~~~~~~~~
 
@@ -1010,8 +994,6 @@ profile for your use case!
 
 Note that if you use ``iterator()`` to run the query, ``prefetch_related()``
 calls will be ignored since these two optimizations do not make sense together.
-
-.. versionadded:: 1.7
 
 You can use the :class:`~django.db.models.Prefetch` object to further control
 the prefetch operation.
@@ -1483,11 +1465,6 @@ a transaction outside of one.
 Using ``select_for_update()`` on backends which do not support
 ``SELECT ... FOR UPDATE`` (such as SQLite) will have no effect.
 
-.. versionchanged:: 1.6.3
-
-    It is now an error to execute a query with ``select_for_update()`` in
-    autocommit mode. With earlier releases in the 1.6 series it was a no-op.
-
 .. warning::
 
     Although ``select_for_update()`` normally fails in autocommit mode, since
@@ -1502,11 +1479,6 @@ raw
 ~~~
 
 .. method:: raw(raw_query, params=None, translations=None)
-
-.. versionchanged:: 1.7
-
-    ``raw`` was moved to the ``QuerySet`` class. It was previously only on
-    :class:`~django.db.models.Manager`.
 
 Takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
@@ -1702,8 +1674,6 @@ update_or_create
 ~~~~~~~~~~~~~~~~
 
 .. method:: update_or_create(defaults=None, **kwargs)
-
-.. versionadded:: 1.7
 
 A convenience method for updating an object with the given ``kwargs``, creating
 a new one if necessary. The ``defaults`` is a dictionary of (field, value)
@@ -2119,8 +2089,6 @@ as_manager
 
 .. classmethod:: as_manager()
 
-.. versionadded:: 1.7
-
 Class method that returns an instance of :class:`~django.db.models.Manager`
 with a copy of the ``QuerySet``’s methods. See
 :ref:`create-manager-with-queryset-methods` for more details.
@@ -2175,12 +2143,9 @@ SQL equivalents::
 iexact
 ~~~~~~
 
-Case-insensitive exact match.
-
-.. versionchanged:: 1.7
-
-    If the value provided for comparison is ``None``, it will be interpreted
-    as an SQL ``NULL`` (see :lookup:`isnull` for more details).
+Case-insensitive exact match. If the value provided for comparison is ``None``,
+it will be interpreted as an SQL ``NULL`` (see :lookup:`isnull` for more
+details).
 
 Example::
 
@@ -2889,8 +2854,6 @@ in particular, it is not otherwise possible to use ``OR`` in ``QuerySets``.
 
 ``Prefetch()`` objects
 ----------------------
-
-.. versionadded:: 1.7
 
 .. class:: Prefetch(lookup, queryset=None, to_attr=None)
 

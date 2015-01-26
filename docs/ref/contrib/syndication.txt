@@ -954,10 +954,6 @@ They share this interface:
       :class:`django.utils.feedgenerator.Enclosure`.
     * ``categories`` should be a sequence of Unicode objects.
 
-    .. versionadded:: 1.7
-
-        The optional ``updateddate`` argument was added.
-
 :meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.
 

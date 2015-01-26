@@ -40,11 +40,6 @@ a model object and return its URL. This is a way of inserting or overriding
 Note that the model name used in this setting should be all lower-case, regardless
 of the case of the actual model class name.
 
-.. versionchanged:: 1.7.1
-
-    ``ABSOLUTE_URL_OVERRIDES`` now works on models that don't declare
-    ``get_absolute_url()``.
-
 .. setting:: ADMINS
 
 ADMINS
@@ -85,21 +80,9 @@ responsible to provide your own validation of the ``Host`` header (perhaps in a
 middleware; if so this middleware must be listed first in
 :setting:`MIDDLEWARE_CLASSES`).
 
-.. versionchanged:: 1.7
-
-    In previous versions of Django, if you wanted to also allow the
-    `fully qualified domain name (FQDN)`_, which some browsers can send in the
-    ``Host`` header, you had to explicitly add another ``ALLOWED_HOSTS`` entry
-    that included a trailing period. This entry could also be a subdomain
-    wildcard::
-
-        ALLOWED_HOSTS = [
-            '.example.com',  # Allow domain and subdomains
-            '.example.com.',  # Also allow FQDN and subdomains
-        ]
-
-    In Django 1.7, the trailing dot is stripped when performing host validation,
-    thus an entry with a trailing dot isn't required.
+Django also allows the `fully qualified domain name (FQDN)`_ of any entries.
+Some browsers include a trailing dot in the ``Host`` header which Django
+strips when performing host validation.
 
 .. _`fully qualified domain name (FQDN)`: http://en.wikipedia.org/wiki/Fully_qualified_domain_name
 
@@ -270,11 +253,8 @@ TIMEOUT
 
 Default: 300
 
-The number of seconds before a cache entry is considered stale.
-
-.. versionadded:: 1.7
-
-If the value of this settings is ``None``, cache entries will not expire.
+The number of seconds before a cache entry is considered stale. If the value of
+this settings is ``None``, cache entries will not expire.
 
 .. setting:: CACHES-VERSION
 
@@ -328,8 +308,6 @@ See :doc:`/topics/cache`.
 
 CSRF_COOKIE_AGE
 ---------------
-
-.. versionadded:: 1.7
 
 Default: ``31449600`` (1 year, in seconds)
 
@@ -608,16 +586,6 @@ The username to use when connecting to the database. Not used with SQLite.
 TEST
 ~~~~
 
-.. versionchanged:: 1.7
-
-    All :setting:`TEST <DATABASE-TEST>` sub-entries used to be independent
-    entries in the database settings dictionary, with a ``TEST_`` prefix.
-    For backwards compatibility with older versions of Django, you can define
-    both versions of the settings as long as they match.
-    Further, ``TEST_CREATE``, ``TEST_USER_CREATE`` and ``TEST_PASSWD``
-    were changed to ``CREATE_DB``, ``CREATE_USER`` and ``PASSWORD``
-    respectively.
-
 Default: ``{}``
 
 A dictionary of settings for test databases; for more details about the
@@ -702,8 +670,6 @@ See :ref:`the-test-database`.
 
 SERIALIZE
 ^^^^^^^^^
-
-.. versionadded:: 1.7.1
 
 Boolean value to control whether or not the default test runner serializes the
 database into an in-memory JSON string before running tests (used to restore
@@ -1210,8 +1176,6 @@ experiencing hanging connections, see the implicit TLS setting
 EMAIL_USE_SSL
 -------------
 
-.. versionadded:: 1.7
-
 Default: ``False``
 
 Whether to use an implicit TLS (secure) connection when talking to the SMTP
@@ -1305,8 +1269,6 @@ the file system. See :doc:`/topics/files` for details.
 
 FILE_UPLOAD_DIRECTORY_PERMISSIONS
 ---------------------------------
-
-.. versionadded:: 1.7
 
 Default: ``None``
 
@@ -1486,10 +1448,6 @@ Django installation. Each string should be a dotted Python path to:
 
 :doc:`Learn more about application configurations </ref/applications>`.
 
-.. versionchanged:: 1.7
-
-    :setting:`INSTALLED_APPS` now supports application configurations.
-
 .. admonition:: Use the application registry for introspection
 
     Your code should never access :setting:`INSTALLED_APPS` directly. Use
@@ -1559,8 +1517,6 @@ See :ref:`how-django-discovers-language-preference` for more details.
 LANGUAGE_COOKIE_AGE
 -------------------
 
-.. versionadded:: 1.7
-
 Default: ``None`` (expires at browser close)
 
 The age of the language cookie, in seconds.
@@ -1569,8 +1525,6 @@ The age of the language cookie, in seconds.
 
 LANGUAGE_COOKIE_DOMAIN
 ----------------------
-
-.. versionadded:: 1.7
 
 Default: ``None``
 
@@ -1603,8 +1557,6 @@ you want (but should be different from :setting:`SESSION_COOKIE_NAME`). See
 
 LANGUAGE_COOKIE_PATH
 --------------------
-
-.. versionadded:: 1.7
 
 Default: ``/``
 
@@ -1712,10 +1664,6 @@ configuration method by default.
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
 
-.. versionchanged:: 1.7
-
-    Previously, the default value was ``'django.utils.log.dictConfig'``.
-
 .. _dictConfig: https://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
 .. setting:: MANAGERS
@@ -1791,13 +1739,6 @@ Default::
      'django.middleware.csrf.CsrfViewMiddleware')
 
 A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
-
-.. versionchanged:: 1.7
-
-    :class:`~django.contrib.sessions.middleware.SessionMiddleware`,
-    :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`, and
-    :class:`~django.contrib.messages.middleware.MessageMiddleware` were removed
-    from this setting.
 
 .. setting:: MIGRATION_MODULES
 
@@ -2177,8 +2118,6 @@ See also the :doc:`/topics/signing` documentation.
 SILENCED_SYSTEM_CHECKS
 ----------------------
 
-.. versionadded:: 1.7
-
 Default: ``[]``
 
 A list of identifiers of messages generated by the system check framework
@@ -2390,8 +2329,6 @@ The name of the class to use for starting the test suite. See
 
 TEST_NON_SERIALIZED_APPS
 ------------------------
-
-.. versionadded:: 1.7
 
 Default: ``[]``
 
@@ -2903,10 +2840,6 @@ scripting vulnerability into full hijacking of a user's session. There's not
 much excuse for leaving this off, either: if your code depends on reading
 session cookies from Javascript, you're probably doing it wrong.
 
-.. versionadded:: 1.7
-
-This setting also affects cookies set by :mod:`django.contrib.messages`.
-
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 .. setting:: SESSION_COOKIE_NAME
@@ -2950,10 +2883,6 @@ excuse to leave this off. It will prevent you from using sessions on insecure
 requests and that's a good thing.
 
 .. _Firesheep: http://codebutler.com/firesheep
-
-.. versionadded:: 1.7
-
-This setting also affects cookies set by :mod:`django.contrib.messages`.
 
 .. setting:: SESSION_ENGINE
 

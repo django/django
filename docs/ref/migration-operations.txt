@@ -188,10 +188,6 @@ Note that not all changes are possible on all databases - for example, you
 cannot change a text-type field like ``models.TextField()`` into a number-type
 field like ``models.IntegerField()`` on most databases.
 
-.. versionchanged:: 1.7.1
-
-    The ``preserve_default`` argument was added.
-
 RenameField
 -----------
 
@@ -239,11 +235,6 @@ The optional ``hints`` argument will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making
 routing decisions. See :ref:`topics-db-multi-db-hints` for more details on
 database hints.
-
-.. versionchanged:: 1.7.1
-
-    If you want to include literal percent signs in a query without parameters
-    you don't need to double them anymore.
 
 .. versionchanged:: 1.8
 

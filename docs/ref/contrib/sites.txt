@@ -389,8 +389,6 @@ define :class:`~django.contrib.sites.managers.CurrentSiteManager`.
 Site middleware
 ===============
 
-.. versionadded:: 1.7
-
 If you often use this pattern::
 
     from django.contrib.sites.models import Site

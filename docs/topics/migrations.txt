@@ -5,8 +5,6 @@ Migrations
 .. module:: django.db.migrations
    :synopsis: Schema migration support for Django models
 
-.. versionadded:: 1.7
-
 Migrations are Django's way of propagating changes you make to your models
 (adding a field, deleting a model, etc.) into your database schema. They're
 designed to be mostly automatic, but you'll need to know when to make
@@ -662,10 +660,6 @@ Django can serialize the following:
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
-
-.. versionchanged:: 1.7.1
-
-    Support for serializing timezone-aware datetimes was added.
 
 Django can serialize the following on Python 3 only:
 

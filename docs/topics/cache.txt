@@ -206,13 +206,6 @@ If you are using multiple databases, :djadmin:`createcachetable` observes the
 Like :djadmin:`migrate`, :djadmin:`createcachetable` won't touch an existing
 table. It will only create missing tables.
 
-.. versionchanged:: 1.7
-
-    Before Django 1.7, :djadmin:`createcachetable` created one table at a time.
-    You had to pass the name of the table you wanted to create, and if you were
-    using multiple databases, you had to use the :djadminopt:`--database`
-    option. For backwards compatibility, this is still possible.
-
 Multiple databases
 ~~~~~~~~~~~~~~~~~~
 
@@ -369,9 +362,6 @@ behavior. These arguments are provided as additional keys in the
 
 * :setting:`TIMEOUT <CACHES-TIMEOUT>`: The default timeout, in
   seconds, to use for the cache. This argument defaults to ``300`` seconds (5 minutes).
-
-  .. versionadded:: 1.7
-
   You can set ``TIMEOUT`` to ``None`` so that, by default, cache keys never
   expire.
 
@@ -662,12 +652,10 @@ equivalent:
 This feature is useful in avoiding repetition in templates. You can set the
 timeout in a variable, in one place, and just reuse that value.
 
-.. versionadded:: 1.7
-
-    By default, the cache tag will try to use the cache called
-    "template_fragments". If no such cache exists, it will fall back to using
-    the default cache. You may select an alternate cache backend to use with
-    the ``using`` keyword argument, which must be the last argument to the tag.
+By default, the cache tag will try to use the cache called "template_fragments".
+If no such cache exists, it will fall back to using the default cache. You may
+select an alternate cache backend to use with the ``using`` keyword argument,
+which must be the last argument to the tag.
 
 .. code-block:: html+django
 
@@ -718,8 +706,6 @@ Accessing the cache
 -------------------
 
 .. data:: django.core.cache.caches
-
-    .. versionadded:: 1.7
 
     You can access the caches configured in the :setting:`CACHES` setting
     through a dict-like object: ``django.core.cache.caches``. Repeated
@@ -1047,11 +1033,6 @@ differences such as cookies or language preferences. However, if this page
 produces different content based on some difference in request headers -- such
 as a cookie, or a language, or a user-agent -- you'll need to use the ``Vary``
 header to tell caching mechanisms that the page output depends on those things.
-
-.. versionchanged:: 1.7
-
-    Cache keys use the request's fully-qualified URL rather than just the path
-    and query string.
 
 To do this in Django, use the convenient
 :func:`django.views.decorators.vary.vary_on_headers` view decorator, like so::

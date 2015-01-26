@@ -102,18 +102,14 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     .. attribute:: inverse_match
 
-        .. versionadded:: 1.7
-
         The match mode for :attr:`regex`. Defaults to ``False``.
 
     .. attribute:: flags
 
-        .. versionadded:: 1.7
-
-        The flags used when compiling the regular expression string :attr:`regex`.
-        If :attr:`regex` is a pre-compiled regular expression, and :attr:`flags` is overridden,
-        :exc:`TypeError` is raised.
-        Defaults to `0`.
+        The flags used when compiling the regular expression string
+        :attr:`regex`. If :attr:`regex` is a pre-compiled regular expression,
+        and :attr:`flags` is overridden, :exc:`TypeError` is raised. Defaults
+        to ``0``.
 
 ``EmailValidator``
 ------------------
@@ -164,10 +160,6 @@ to, or in lieu of custom ``field.clean()`` methods.
         Web site provides a full list of `valid URI schemes`_.
 
         .. _valid URI schemes: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
-
-    .. versionchanged:: 1.7
-
-        The optional ``schemes`` attribute was added.
 
     .. versionchanged:: 1.8
 

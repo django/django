@@ -2,8 +2,6 @@
 Custom Lookups
 ==============
 
-.. versionadded:: 1.7
-
 .. currentmodule:: django.db.models
 
 Django offers a wide variety of :ref:`built-in lookups <field-lookups>` for

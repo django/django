@@ -665,11 +665,8 @@ the variable ``template_name``::
 
     {% include template_name %}
 
-.. versionchanged:: 1.7
-
-    The variable may also be any object with a ``render()`` method that
-    accepts a context. This allows you to reference a compiled ``Template`` in
-    your context.
+The variable may also be any object with a ``render()`` method that accepts a
+context. This allows you to reference a compiled ``Template`` in your context.
 
 An included template is rendered within the context of the template that
 includes it. This example produces the output ``"Hello, John"``:
@@ -1176,10 +1173,6 @@ variable. It can be useful, for instance, in a :ttag:`blocktrans` like this::
 
     {% widthratio this_value max_value max_width as width %}
     {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
-
-.. versionchanged:: 1.7
-
-    The ability to use "as" with this tag like in the example above was added.
 
 .. templatetag:: with
 
@@ -2153,11 +2146,6 @@ When used without a format string::
 ...the formatting string defined in the :setting:`TIME_FORMAT` setting will be
 used, without applying any localization.
 
-.. versionchanged:: 1.7
-
-    The ability to receive and act on values with attached timezone
-    information was added in Django 1.7.
-
 .. templatefilter:: timesince
 
 timesince
@@ -2234,8 +2222,6 @@ If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel i..."``.
 
 truncatechars_html
 ^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 1.7
 
 Similar to :tfilter:`truncatechars`, except that it is aware of HTML tags. Any
 tags that are opened in the string and not closed before the truncation point

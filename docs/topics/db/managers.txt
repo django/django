@@ -242,8 +242,6 @@ the manager ``Person.people``.
 Creating ``Manager`` with ``QuerySet`` methods
 ----------------------------------------------
 
-.. versionadded:: 1.7
-
 In lieu of the above approach which requires duplicating methods on both the
 ``QuerySet`` and the ``Manager``, :meth:`QuerySet.as_manager()
 <django.db.models.query.QuerySet.as_manager>` can be used to create an instance

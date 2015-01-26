@@ -275,8 +275,6 @@ Error messages  defined on :attr:`model fields
 <validating-objects>` step and no corresponding error messages are defined at
 the form level.
 
-.. versionadded:: 1.7
-
 You can override the error messages from ``NON_FIELD_ERRORS`` raised by model
 validation by adding the :data:`~django.core.exceptions.NON_FIELD_ERRORS` key
 to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` class::
@@ -656,14 +654,10 @@ There are a couple of things to note, however.
   used. This means the child's ``Meta``, if it exists, otherwise the
   ``Meta`` of the first parent, etc.
 
-.. versionchanged:: 1.7
-
 * It's possible to inherit from both ``Form`` and ``ModelForm`` simultaneously,
   however, you must ensure that ``ModelForm`` appears first in the MRO. This is
   because these classes rely on different metaclasses and a class can only have
   one metaclass.
-
-.. versionadded:: 1.7
 
 * It's possible to declaratively remove a ``Field`` inherited from a parent class by
   setting the name to be ``None`` on the subclass.

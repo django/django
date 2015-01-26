@@ -34,7 +34,7 @@ model system.
     so if your handler is a local function, it may be garbage collected.  To
     prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
 
-.. versionadded:: 1.7
+.. note::
 
     Model signals ``sender`` model can be lazily referenced when connecting a
     receiver by specifying its full application label. For example, an
@@ -579,9 +579,7 @@ Arguments sent with this signal:
     don't exist, in the "teardown" phase, ``value`` is ``None``.
 
 ``enter``
-    .. versionadded:: 1.7
-
-        A boolean; ``True`` if the setting is applied, ``False`` if restored.
+    A boolean; ``True`` if the setting is applied, ``False`` if restored.
 
 template_rendered
 -----------------

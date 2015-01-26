@@ -115,10 +115,6 @@ The ``django.template.loader`` module defines two functions to load templates.
     If you want to restrict the search to a particular template engine, pass
     the engine's :setting:`NAME <TEMPLATES-NAME>` in the ``using`` argument.
 
-    .. versionchanged:: 1.7
-
-       The ``dirs`` parameter was added.
-
     .. deprecated:: 1.8
 
        The ``dirs`` parameter was deprecated.
@@ -137,10 +133,6 @@ The ``django.template.loader`` module defines two functions to load templates.
     ``select_template()`` is just like ``get_template()``, except it takes a
     list of template names. It tries each name in order and returns the first
     template that exists.
-
-    .. versionchanged:: 1.7
-
-       The ``dirs`` parameter was added.
 
     .. deprecated:: 1.8
 

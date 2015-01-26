@@ -737,15 +737,11 @@ For example::
 
   .. method:: crosses(other)
 
-    .. versionadded:: 1.7
-
     .. note::
 
        GEOS 3.3 is *required* to use this predicate.
 
   .. method:: disjoint(other)
-
-    .. versionadded:: 1.7
 
     .. note::
 
@@ -755,23 +751,17 @@ For example::
 
   .. method:: overlaps(other)
 
-    .. versionadded:: 1.7
-
     .. note::
 
        GEOS 3.3 is *required* to use this predicate.
 
   .. method:: touches(other)
 
-    .. versionadded:: 1.7
-
     .. note::
 
        GEOS 3.3 is *required* to use this predicate.
 
   .. method:: within(other)
-
-    .. versionadded:: 1.7
 
     .. note::
 

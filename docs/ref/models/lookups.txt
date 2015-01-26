@@ -7,8 +7,6 @@ Lookup API reference
 
 .. currentmodule:: django.db.models
 
-.. versionadded:: 1.7
-
 This document has the API references of lookups, the Django API for building
 the ``WHERE`` clause of a database query. To learn how to *use* lookups, see
 :doc:`/topics/db/queries`; to learn how to *create* new lookups, see
