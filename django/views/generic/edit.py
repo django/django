@@ -12,6 +12,8 @@ from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 from django.views.generic.detail import (SingleObjectMixin,
                         SingleObjectTemplateResponseMixin, BaseDetailView)
 
+PERCENT_PLACEHOLDER_REGEX = re.compile(r'%\([^\)]+\)')  # RemovedInDjango20Warning
+
 
 class FormMixinBase(type):
     def __new__(cls, name, bases, attrs):
@@ -163,7 +165,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         Returns the supplied URL.
         """
         if self.success_url:
-            if re.search(r'%\([^\)]+\)', self.success_url):
+            if PERCENT_PLACEHOLDER_REGEX.search(self.success_url):
                 warnings.warn(
                     "%()s placeholder style in success_url is deprecated. "
                     "Please replace them by the {} Python format syntax.",
@@ -297,7 +299,7 @@ class DeletionMixin(object):
 
     def get_success_url(self):
         if self.success_url:
-            if re.search(r'%\([^\)]+\)', self.success_url):
+            if PERCENT_PLACEHOLDER_REGEX.search(self.success_url):
                 warnings.warn(
                     "%()s placeholder style in success_url is deprecated. "
                     "Please replace them by the {} Python format syntax.",
