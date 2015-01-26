@@ -65,7 +65,7 @@ Attributes
 Methods
 -------
 
-.. method:: SimpleTemplateResponse.__init__(template, context=None, content_type=None, status=None, charset=None)
+.. method:: SimpleTemplateResponse.__init__(template, context=None, content_type=None, status=None, charset=None, using=None)
 
     Instantiates a :class:`~django.template.response.SimpleTemplateResponse`
     object with the given template, context, content type, HTTP status, and
@@ -102,9 +102,13 @@ Methods
         be extracted from ``content_type``, and if that is unsuccessful, the
         :setting:`DEFAULT_CHARSET` setting will be used.
 
-    .. versionadded:: 1.8
+    ``using``
+        The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
+        loading the template.
 
-        The ``charset`` parameter was added.
+    .. versionchanged:: 1.8
+
+        The ``charset`` and ``using`` parameters were added.
 
 .. method:: SimpleTemplateResponse.resolve_context(context)
 
@@ -185,7 +189,7 @@ TemplateResponse objects
 Methods
 -------
 
-.. method:: TemplateResponse.__init__(request, template, context=None, content_type=None, status=None, current_app=None, charset=None)
+.. method:: TemplateResponse.__init__(request, template, context=None, content_type=None, status=None, current_app=None, charset=None, using=None)
 
     Instantiates a :class:`~django.template.response.TemplateResponse` object
     with the given request, template, context, content type, HTTP status, and
@@ -235,9 +239,13 @@ Methods
         be extracted from ``content_type``, and if that is unsuccessful, the
         :setting:`DEFAULT_CHARSET` setting will be used.
 
-    .. versionadded:: 1.8
+    ``using``
+        The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
+        loading the template.
 
-        The ``charset`` parameter was added.
+    .. versionchanged:: 1.8
+
+        The ``charset`` and ``using`` parameters were added.
 
 The rendering process
 =====================
