@@ -15,7 +15,7 @@ introduce controlled coupling for convenience's sake.
 ``render``
 ==========
 
-.. function:: render(request, template_name[, context][, context_instance][, content_type][, status][, current_app][, dirs])
+.. function:: render(request, template_name[, context][, context_instance][, content_type][, status][, current_app][, dirs][, using])
 
    Combines a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -77,6 +77,14 @@ Optional arguments
        The ``current_app`` argument is deprecated. Instead you should set
        ``request.current_app``.
 
+``using``
+    The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
+    loading the template.
+
+.. versionchanged:: 1.8
+
+    The ``using`` parameter was added.
+
 .. deprecated:: 1.8
 
    The ``dirs`` parameter was deprecated.
@@ -109,7 +117,7 @@ This example is equivalent to::
 ``render_to_response``
 ======================
 
-.. function:: render_to_response(template_name[, context][, context_instance][, content_type][, status][, dirs])
+.. function:: render_to_response(template_name[, context][, context_instance][, content_type][, status][, dirs][, using])
 
    Renders a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -159,9 +167,13 @@ Optional arguments
 ``status``
     The status code for the response. Defaults to ``200``.
 
+``using``
+    The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
+    loading the template.
+
 .. versionchanged:: 1.8
 
-   The ``status`` parameter was added.
+   The ``status`` and ``using`` parameters were added.
 
 .. deprecated:: 1.8
 

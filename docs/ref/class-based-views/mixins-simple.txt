@@ -49,6 +49,15 @@ TemplateResponseMixin
         a ``template_name`` will raise a
         :class:`django.core.exceptions.ImproperlyConfigured` exception.
 
+    .. attribute:: template_engine
+
+        .. versionadded:: 1.8
+
+        The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
+        loading the template. ``template_engine`` is passed as the ``using``
+        keyword argument to ``response_class``. Default is ``None``, which
+        tells Django to search for the template in all configured engines.
+
     .. attribute:: response_class
 
         The response class to be returned by ``render_to_response`` method.
