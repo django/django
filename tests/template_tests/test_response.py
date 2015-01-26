@@ -11,6 +11,7 @@ from django.template import Context, engines
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
 from django.test import ignore_warnings, override_settings
+from django.test.utils import require_jinja2
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -132,6 +133,15 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         response = SimpleTemplateResponse('', {}, 'application/json', 504)
         self.assertEqual(response['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
+
+    @require_jinja2
+    def test_using(self):
+        response = SimpleTemplateResponse('template_tests/using.html').render()
+        self.assertEqual(response.content, b'DTL\n')
+        response = SimpleTemplateResponse('template_tests/using.html', using='django').render()
+        self.assertEqual(response.content, b'DTL\n')
+        response = SimpleTemplateResponse('template_tests/using.html', using='jinja2').render()
+        self.assertEqual(response.content, b'Jinja2\n')
 
     def test_post_callbacks(self):
         "Rendering a template response triggers the post-render callbacks"
@@ -259,6 +269,16 @@ class TemplateResponseTest(SimpleTestCase):
                                     'application/json', 504)
         self.assertEqual(response['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
+
+    @require_jinja2
+    def test_using(self):
+        request = self.factory.get('/')
+        response = TemplateResponse(request, 'template_tests/using.html').render()
+        self.assertEqual(response.content, b'DTL\n')
+        response = TemplateResponse(request, 'template_tests/using.html', using='django').render()
+        self.assertEqual(response.content, b'DTL\n')
+        response = TemplateResponse(request, 'template_tests/using.html', using='jinja2').render()
+        self.assertEqual(response.content, b'Jinja2\n')
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_custom_app(self):

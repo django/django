@@ -114,6 +114,7 @@ class TemplateResponseMixin(object):
     A mixin that can be used to render a template.
     """
     template_name = None
+    template_engine = None
     response_class = TemplateResponse
     content_type = None
 
@@ -130,6 +131,7 @@ class TemplateResponseMixin(object):
             request=self.request,
             template=self.get_template_names(),
             context=context,
+            using=self.template_engine,
             **response_kwargs
         )
 

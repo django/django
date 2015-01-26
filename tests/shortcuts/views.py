@@ -43,6 +43,18 @@ def render_to_response_view_with_dirs(request):
     return render_to_response('render_dirs_test.html', dirs=dirs)
 
 
+def render_to_response_view_with_status(request):
+    return render_to_response('shortcuts/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    }, status=403)
+
+
+def render_to_response_view_with_using(request):
+    using = request.GET.get('using')
+    return render_to_response('shortcuts/using.html', using=using)
+
+
 def context_processor(request):
     return {'bar': 'context processor output'}
 
@@ -93,6 +105,11 @@ def render_view_with_status(request):
         'foo': 'FOO',
         'bar': 'BAR',
     }, status=403)
+
+
+def render_view_with_using(request):
+    using = request.GET.get('using')
+    return render(request, 'shortcuts/using.html', using=using)
 
 
 def render_view_with_current_app(request):

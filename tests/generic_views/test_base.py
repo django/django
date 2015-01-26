@@ -7,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory, override_settings
+from django.test.utils import require_jinja2
 from django.views.generic import View, TemplateView, RedirectView
 
 from . import views
@@ -278,9 +279,22 @@ class TemplateViewTest(TestCase):
 
     def test_template_name_required(self):
         """
-        A template view must provide a template name
+        A template view must provide a template name.
         """
         self.assertRaises(ImproperlyConfigured, self.client.get, '/template/no_template/')
+
+    @require_jinja2
+    def test_template_engine(self):
+        """
+        A template view may provide a template engine.
+        """
+        request = self.rf.get('/using/')
+        view = TemplateView.as_view(template_name='generic_views/using.html')
+        self.assertEqual(view(request).render().content, b'DTL\n')
+        view = TemplateView.as_view(template_name='generic_views/using.html', template_engine='django')
+        self.assertEqual(view(request).render().content, b'DTL\n')
+        view = TemplateView.as_view(template_name='generic_views/using.html', template_engine='jinja2')
+        self.assertEqual(view(request).render().content, b'Jinja2\n')
 
     def test_template_params(self):
         """
