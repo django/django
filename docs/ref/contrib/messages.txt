@@ -198,8 +198,6 @@ Even if you know there is only just one message, you should still iterate over
 the ``messages`` sequence, because otherwise the message storage will not be cleared
 for the next request.
 
-.. versionadded:: 1.7
-
 The context processor also provides a ``DEFAULT_MESSAGE_LEVELS`` variable which
 is a mapping of the message level names to their numeric value::
 
@@ -213,8 +211,6 @@ is a mapping of the message level names to their numeric value::
         {% endfor %}
     </ul>
     {% endif %}
-
-
 
 **Outside of templates**, you can use
 :func:`~django.contrib.messages.get_messages`::
@@ -252,8 +248,6 @@ The ``Message`` class
 
     * ``extra_tags``: A string containing custom tags for this message,
       separated by spaces. It's empty by default.
-
-    .. versionadded:: 1.7
 
     * ``level_tag``: The string representation of the level. By default, it's
       the lowercase version of the name of the associated constant, but this
@@ -437,8 +431,6 @@ behavior:
 * :setting:`MESSAGE_LEVEL`
 * :setting:`MESSAGE_STORAGE`
 * :setting:`MESSAGE_TAGS`
-
-.. versionadded:: 1.7
 
 For backends that use cookies, the settings for the cookie are taken from
 the session cookie settings:

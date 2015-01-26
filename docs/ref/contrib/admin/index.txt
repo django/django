@@ -102,8 +102,6 @@ The register decorator
 
 .. function:: register(*models, [site=django.admin.sites.site])
 
-    .. versionadded:: 1.7
-
     There is also a decorator for registering your ``ModelAdmin`` classes::
 
         from django.contrib import admin
@@ -134,14 +132,10 @@ application and imports it.
 
 .. class:: apps.AdminConfig
 
-    .. versionadded:: 1.7
-
     This is the default :class:`~django.apps.AppConfig` class for the admin.
     It calls :func:`~django.contrib.admin.autodiscover()` when Django starts.
 
 .. class:: apps.SimpleAdminConfig
-
-    .. versionadded:: 1.7
 
     This class works like :class:`~django.contrib.admin.apps.AdminConfig`,
     except it doesn't call :func:`~django.contrib.admin.autodiscover()`.
@@ -151,26 +145,14 @@ application and imports it.
     This function attempts to import an ``admin`` module in each installed
     application. Such modules are expected to register models with the admin.
 
-    .. versionchanged:: 1.7
-
-        Previous versions of Django recommended calling this function directly
-        in the URLconf. As of Django 1.7 this isn't needed anymore.
-        :class:`~django.contrib.admin.apps.AdminConfig` takes care of running
-        the auto-discovery automatically.
+    Typically you won't need to call this function directly as
+    :class:`~django.contrib.admin.apps.AdminConfig` calls it when Django starts.
 
 If you are using a custom ``AdminSite``, it is common to import all of the
 ``ModelAdmin`` subclasses into your code and register them to the custom
 ``AdminSite``. In that case, in order to disable auto-discovery, you should
 put ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
 ``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS` setting.
-
-.. versionchanged:: 1.7
-
-    In previous versions, the admin needed to be instructed to look for
-    ``admin.py`` files with :func:`~django.contrib.admin.autodiscover()`.
-    As of Django 1.7, auto-discovery is enabled by default and must be
-    explicitly disabled when it's undesirable.
-
 
 ``ModelAdmin`` options
 ----------------------
@@ -661,8 +643,6 @@ subclass::
       The above will tell Django to order by the ``first_name`` field when
       trying to sort by ``colored_first_name`` in the admin.
 
-      .. versionadded:: 1.7
-
       To indicate descending order with ``admin_order_field`` you can use a
       hyphen prefix on the field name. Using the above example, this would
       look like::
@@ -736,10 +716,6 @@ subclass::
         class AuditEntryAdmin(admin.ModelAdmin):
             list_display = ('timestamp', 'message')
             list_display_links = None
-
-    .. versionchanged:: 1.7
-
-        ``None`` was added as a valid ``list_display_links`` value.
 
 .. _admin-list-editable:
 
@@ -1176,8 +1152,6 @@ subclass::
 
 .. attribute:: ModelAdmin.view_on_site
 
-    .. versionadded:: 1.7
-
     Set ``view_on_site`` to control whether or not to display the "View on site" link.
     This link should bring you to a URL where you can display the saved object.
 
@@ -1373,13 +1347,7 @@ templates used by the :class:`ModelAdmin` views:
     names on the changelist that will be linked to the change view, as described
     in the :attr:`ModelAdmin.list_display_links` section.
 
-    .. versionchanged:: 1.7
-
-        ``None`` was added as a valid ``get_list_display_links()`` return value.
-
 .. method:: ModelAdmin.get_fields(request, obj=None)
-
-    .. versionadded:: 1.7
 
     The ``get_fields`` method is given the ``HttpRequest`` and the ``obj``
     being edited (or ``None`` on an add form) and is expected to return a list
@@ -1399,8 +1367,6 @@ templates used by the :class:`ModelAdmin` views:
     :attr:`~ModelAdmin.list_filter` attribute.
 
 .. method:: ModelAdmin.get_search_fields(request)
-
-    .. versionadded:: 1.7
 
     The ``get_search_fields`` method is given the ``HttpRequest`` and is expected
     to return the same kind of sequence type as for the
@@ -1723,8 +1689,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.response_delete(request, obj_display, obj_id)
 
-    .. versionadded:: 1.7
-
     Determines the :class:`~django.http.HttpResponse` for the
     :meth:`delete_view` stage.
 
@@ -1743,8 +1707,6 @@ templates used by the :class:`ModelAdmin` views:
         The ``obj_id`` parameter was added.
 
 .. method:: ModelAdmin.get_changeform_initial_data(request)
-
-    .. versionadded:: 1.7
 
     A hook for the initial data on admin change forms. By default, fields are
     given initial values from ``GET`` parameters. For instance,
@@ -2021,8 +1983,6 @@ The ``InlineModelAdmin`` class adds:
 
 .. attribute:: InlineModelAdmin.min_num
 
-    .. versionadded:: 1.7
-
     This controls the minimum number of forms to show in the inline.
     See :func:`~django.forms.models.modelformset_factory` for more information.
 
@@ -2113,8 +2073,6 @@ The ``InlineModelAdmin`` class adds:
                 return max_num
 
 .. method:: InlineModelAdmin.get_min_num(request, obj=None, **kwargs)
-
-    .. versionadded:: 1.7
 
     Returns the minimum number of inline forms to use. By default,
     returns the :attr:`InlineModelAdmin.min_num` attribute.
@@ -2451,14 +2409,10 @@ Templates can override or extend base admin templates as described in
 
 .. attribute:: AdminSite.site_header
 
-    .. versionadded:: 1.7
-
     The text to put at the top of each admin page, as an ``<h1>`` (a string).
     By default, this is "Django administration".
 
 .. attribute:: AdminSite.site_title
-
-    .. versionadded:: 1.7
 
     The text to put at the end of each admin page's ``<title>`` (a string). By
     default, this is "Django site admin".
@@ -2471,8 +2425,6 @@ Templates can override or extend base admin templates as described in
     ``site_url`` is ``/``. Set it to ``None`` to remove the link.
 
 .. attribute:: AdminSite.index_title
-
-    .. versionadded:: 1.7
 
     The text to put at the top of the admin index page (a string). By default,
     this is "Site administration".
@@ -2513,8 +2465,6 @@ Templates can override or extend base admin templates as described in
 ---------------------
 
 .. method:: AdminSite.each_context(request)
-
-    .. versionadded:: 1.7
 
     Returns a dictionary of variables to put in the template context for
     every page in the admin site.

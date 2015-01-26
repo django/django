@@ -230,12 +230,6 @@ meaning they do for normal Django fields. See the :doc:`field documentation
 Field deconstruction
 --------------------
 
-.. versionadded:: 1.7
-
-    ``deconstruct()`` is part of the migrations framework in Django 1.7 and
-    above. If you have custom fields from previous versions they will
-    need this method added before you can use them with migrations.
-
 The counterpoint to writing your ``__init__()`` method is writing the
 ``deconstruct()`` method. This method tells Django how to take an instance
 of your new field and reduce it to a serialized form - in particular, what
@@ -590,11 +584,8 @@ valid Django filter lookups: ``exact``, ``iexact``, ``contains``, ``icontains``,
 ``endswith``, ``iendswith``, ``range``, ``year``, ``month``, ``day``,
 ``isnull``, ``search``, ``regex``, and ``iregex``.
 
-.. versionadded:: 1.7
-
-    If you are using :doc:`Custom lookups </howto/custom-lookups>` the
-    ``lookup_type`` can be any ``lookup_name`` used by the project's custom
-    lookups.
+If you are using :doc:`custom lookups </howto/custom-lookups>`, the
+``lookup_type`` can be any ``lookup_name`` used by the project's custom lookups.
 
 Your method must be prepared to handle all of these ``lookup_type`` values and
 should raise either a ``ValueError`` if the ``value`` is of the wrong sort (a

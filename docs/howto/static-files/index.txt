@@ -158,12 +158,6 @@ during execution of these tests in a way very similar to what we get at
 development time with ``DEBUG = True``, i.e. without having to collect them
 using :djadmin:`collectstatic` first.
 
-.. versionadded:: 1.7
-
-    :class:`django.contrib.staticfiles.testing.StaticLiveServerTestCase` is new
-    in Django 1.7. Previously its functionality was provided by
-    :class:`django.test.LiveServerTestCase`.
-
 Deployment
 ==========
 

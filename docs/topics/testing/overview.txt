@@ -152,10 +152,8 @@ entirely!). If you want to use a different database name, specify
 :setting:`NAME <TEST_NAME>` in the :setting:`TEST <DATABASE-TEST>`
 dictionary for any given database in :setting:`DATABASES`.
 
-.. versionchanged:: 1.7
-
-    On PostgreSQL, :setting:`USER` will also need read access to the built-in
-    ``postgres`` database.
+On PostgreSQL, :setting:`USER` will also need read access to the built-in
+``postgres`` database.
 
 Aside from using a separate database, the test runner will otherwise
 use all of the same database settings you have in your settings file:
@@ -175,12 +173,6 @@ If using a SQLite in-memory database with Python 3.4+ and SQLite 3.7.13+,
 `shared cache <https://www.sqlite.org/sharedcache.html>`_ will be enabled, so
 you can write tests with ability to share the database between threads.
 
-.. versionchanged:: 1.7
-
-   The different options in the :setting:`TEST <DATABASE-TEST>` database
-   setting used to be separate options in the database settings dictionary,
-   prefixed with ``TEST_``.
-
 .. versionadded:: 1.8
 
     The ability to use SQLite with a shared cache as described above was added.
@@ -194,10 +186,8 @@ you can write tests with ability to share the database between threads.
     your tests. *It is a bad idea to have such import-time database queries in
     your code* anyway - rewrite your code so that it doesn't do this.
 
-    .. versionadded:: 1.7
-
-        This also applies to customized implementations of
-        :meth:`~django.apps.AppConfig.ready()`.
+    This also applies to customized implementations of
+    :meth:`~django.apps.AppConfig.ready()`.
 
 .. seealso::
 

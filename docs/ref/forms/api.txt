@@ -125,8 +125,6 @@ if validation has side effects, those side effects will only be triggered once.
 
 .. method:: Form.errors.as_data()
 
-.. versionadded:: 1.7
-
 Returns a ``dict`` that maps fields to their original ``ValidationError``
 instances.
 
@@ -150,8 +148,6 @@ messages in ``Form.errors``.
 
 .. method:: Form.errors.as_json(escape_html=False)
 
-.. versionadded:: 1.7
-
 Returns the errors serialized as JSON.
 
     >>> f.errors.as_json()
@@ -170,8 +166,6 @@ set ``escape_html=True`` and error messages will be escaped so you can use them
 directly in HTML.
 
 .. method:: Form.add_error(field, error)
-
-.. versionadded:: 1.7
 
 This method allows adding errors to specific fields from within the
 ``Form.clean()`` method, or from outside the form altogether; for instance
@@ -762,10 +756,6 @@ Python 2)::
     <p>Sender: <input type="email" name="sender" value="invalid email address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
 
-.. versionchanged:: 1.7
-
-    ``django.forms.util`` was renamed to ``django.forms.utils``.
-
 More granular output
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -1017,10 +1007,8 @@ classes::
     <li>Instrument: <input type="text" name="instrument" /></li>
     <li>Haircut type: <input type="text" name="haircut_type" /></li>
 
-.. versionadded:: 1.7
-
-* It's possible to declaratively remove a ``Field`` inherited from a parent
-  class by setting the name to be ``None`` on the subclass. For example::
+It's possible to declaratively remove a ``Field`` inherited from a parent class
+by setting the name to be ``None`` on the subclass. For example::
 
     >>> from django import forms
 

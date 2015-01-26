@@ -442,8 +442,6 @@ If you ``pop()`` too much, it'll raise
     ...
     ContextPopException
 
-.. versionadded:: 1.7
-
 You can also use ``push()`` as a context manager to ensure a matching ``pop()``
 is called.
 
@@ -489,8 +487,6 @@ Using a ``Context`` as a stack comes in handy in :ref:`some custom template
 tags <howto-writing-custom-template-tags>`.
 
 .. method:: Context.flatten()
-
-.. versionadded:: 1.7
 
 Using ``flatten()`` method you can get whole ``Context`` stack as one dictionary
 including builtin variables.
@@ -704,10 +700,6 @@ variables:
   via the :doc:`messages framework </ref/contrib/messages>`.
 * ``DEFAULT_MESSAGE_LEVELS`` -- A mapping of the message level names to
   :ref:`their numeric value <message-level-constants>`.
-
-.. versionchanged:: 1.7
-
-       The ``DEFAULT_MESSAGE_LEVELS`` variable was added.
 
 Writing your own context processors
 -----------------------------------
@@ -940,8 +932,6 @@ the template source, and returns a tuple: ``(template, template_origin)``.
 
 Template origin
 ===============
-
-.. versionadded:: 1.7
 
 When an :class:`~django.template.Engine` is initialized with ``debug=True``,
 its templates have an ``origin`` attribute depending on the source they are

@@ -343,8 +343,6 @@ excessive.
 ``validate_min``
 ~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.7
-
 If ``validate_min=True`` is passed to
 :func:`~django.forms.formsets.formset_factory`, validation will also check
 that the number of forms in the data set, minus those marked for
@@ -370,11 +368,6 @@ deletion, is greater than or equal to ``min_num``.
     [{}, {}]
     >>> formset.non_form_errors()
     ['Please submit 3 or more forms.']
-
-.. versionchanged:: 1.7
-
-   The ``min_num`` and ``validate_min`` parameters were added to
-   :func:`~django.forms.formsets.formset_factory`.
 
 Dealing with ordering and deletion of forms
 -------------------------------------------
@@ -502,29 +495,15 @@ If you are using a :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`,
 model instances for deleted forms will be deleted when you call
 ``formset.save()``.
 
-.. versionchanged:: 1.7
+If you call ``formset.save(commit=False)``, objects will not be deleted
+automatically.  You'll need to call ``delete()`` on each of the
+:attr:`formset.deleted_objects
+<django.forms.models.BaseModelFormSet.deleted_objects>` to actually delete
+them::
 
-    If you call ``formset.save(commit=False)``, objects will not be deleted
-    automatically.  You'll need to call ``delete()`` on each of the
-    :attr:`formset.deleted_objects
-    <django.forms.models.BaseModelFormSet.deleted_objects>` to actually delete
-    them::
-
-        >>> instances = formset.save(commit=False)
-        >>> for obj in formset.deleted_objects:
-        ...     obj.delete()
-
-    If you want to maintain backwards compatibility with Django 1.6 and earlier,
-    you can do something like this::
-
-        >>> try:
-        >>>     # For Django 1.7+
-        >>>     for obj in formset.deleted_objects:
-        >>>         obj.delete()
-        >>> except AssertionError:
-        >>>     # Django 1.6 and earlier already deletes the objects, trying to
-        >>>     # delete them a second time raises an AssertionError.
-        >>>     pass
+    >>> instances = formset.save(commit=False)
+    >>> for obj in formset.deleted_objects:
+    ...     obj.delete()
 
 On the other hand, if you are using a plain ``FormSet``, it's up to you to
 handle ``formset.deleted_forms``, perhaps in your formset's ``save()`` method,

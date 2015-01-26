@@ -4,8 +4,6 @@ Applications
 
 .. module:: django.apps
 
-.. versionadded:: 1.7
-
 Django contains a registry of installed applications that stores configuration
 and provides introspection. It also maintains a list of available :doc:`models
 </topics/db/models>`.

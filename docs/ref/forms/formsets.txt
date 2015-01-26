@@ -13,7 +13,3 @@ Formset API reference. For introductory material about formsets, see the
     Returns a ``FormSet`` class for the given ``form`` class.
 
     See :ref:`formsets` for example usage.
-
-    .. versionchanged:: 1.7
-
-        The ``min_num`` and ``validate_min`` parameters were added.

@@ -351,8 +351,6 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. method:: BaseCommand.check(app_configs=None, tags=None, display_num_errors=False)
 
-    .. versionadded:: 1.7
-
     Uses the system check framework to inspect the entire Django project for
     potential problems. Serious problems are raised as a :class:`CommandError`;
     warnings are output to stderr; minor notifications are output to stdout.

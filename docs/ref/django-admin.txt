@@ -5,11 +5,6 @@ django-admin and manage.py
 ``django-admin`` is Django's command-line utility for administrative tasks.
 This document outlines all it can do.
 
-.. versionchanged:: 1.7
-
-    Prior to Django 1.7, ``django-admin`` was only installed as
-    ``django-admin.py``.
-
 In addition, ``manage.py`` is automatically created in each Django project.
 ``manage.py`` is a thin wrapper around ``django-admin`` that takes care of
 several things for you before delegating to ``django-admin``:
@@ -20,10 +15,6 @@ several things for you before delegating to ``django-admin``:
   it points to your project's ``settings.py`` file.
 
 * It calls :func:`django.setup()` to initialize various internals of Django.
-
-.. versionadded:: 1.7
-
-    :func:`django.setup()` didn't exist in previous versions of Django.
 
 The ``django-admin`` script should be on your system path if you installed
 Django via its ``setup.py`` utility. If it's not on your path, you can find it
@@ -104,8 +95,6 @@ check <appname appname ...>
 ---------------------------
 
 .. django-admin:: check
-
-.. versionchanged:: 1.7
 
 Uses the :doc:`system check framework </ref/checks>` to inspect
 the entire Django project for common problems.
@@ -192,18 +181,13 @@ createcachetable
 
 .. django-admin:: createcachetable
 
-Creates the cache tables for use with the database cache backend. See
-:doc:`/topics/cache` for more information.
+Creates the cache tables for use with the database cache backend using the
+information from your settings file. See :doc:`/topics/cache` for more
+information.
 
 The :djadminopt:`--database` option can be used to specify the database
-onto which the cachetable will be installed.
-
-.. versionchanged:: 1.7
-
-    It is no longer necessary to provide the cache table name or the
-    :djadminopt:`--database` option. Django takes this information from your
-    settings file. If you have configured multiple caches or multiple databases,
-    all cache tables are created.
+onto which the cache table will be installed, but since this information is
+pulled from your settings by default, it's typically not needed.
 
 dbshell
 -------
@@ -286,8 +270,6 @@ from which data will be dumped.
 
 .. django-admin-option:: --natural-foreign
 
-.. versionadded:: 1.7
-
 When this option is specified, Django will use the ``natural_key()`` model
 method to serialize any foreign key and many-to-many relationship to objects of
 the type that defines the method. If you are dumping ``contrib.auth``
@@ -297,8 +279,6 @@ should probably be using this flag. See the :ref:`natural keys
 and the next option.
 
 .. django-admin-option:: --natural-primary
-
-.. versionadded:: 1.7
 
 When this option is specified, Django will not provide the primary key in the
 serialized data of this object since it can be calculated during
@@ -414,10 +394,6 @@ models that may have been removed since the fixture was originally generated.
 
 The :djadminopt:`--app` option can be used to specify a single app to look
 for fixtures in rather than looking through all apps.
-
-.. versionchanged:: 1.7
-
-    ``--app`` was added.
 
 .. versionchanged:: 1.8
 
@@ -605,12 +581,6 @@ Example usage::
     django-admin makemessages -x pt_BR
     django-admin makemessages -x pt_BR -x fr
 
-
-.. versionchanged:: 1.7
-
-    Added the ``--previous`` option to the ``msgmerge`` command when merging
-    with existing po files.
-
 .. django-admin-option:: --domain
 
 Use the ``--domain`` or ``-d`` option to change the domain of the messages files.
@@ -671,8 +641,6 @@ makemigrations [<app_label>]
 
 .. django-admin:: makemigrations
 
-.. versionadded:: 1.7
-
 Creates new migrations based on the changes detected to your models.
 Migrations, their relationship with apps and more are covered in depth in
 :doc:`the migrations documentation</topics/migrations>`.
@@ -721,8 +689,6 @@ migrate [<app_label> [<migrationname>]]
 ---------------------------------------
 
 .. django-admin:: migrate
-
-.. versionadded:: 1.7
 
 Synchronizes the database state with the current set of models and migrations.
 Migrations, their relationship with apps and more are covered in depth in
@@ -788,10 +754,6 @@ needed. You don't need to restart the server for code changes to take effect.
 However, some actions like adding files don't trigger a restart, so you'll
 have to restart the server in these cases.
 
-.. versionchanged:: 1.7
-
-    Compiling translation files now also restarts the development server.
-
 If you are using Linux and install `pyinotify`_, kernel signals will be used to
 autoreload the server (rather than polling file modification timestamps each
 second). This offers better scaling to large projects, reduction in response
@@ -799,10 +761,6 @@ time to code modification, more robust change detection, and battery usage
 reduction.
 
 .. _pyinotify: https://pypi.python.org/pypi/pyinotify/
-
-.. versionadded:: 1.7
-
-    ``pyinotify`` support was added.
 
 When you start the server, and each time you change Python code while the
 server is running, the server will check your entire Django project for errors (see
@@ -1468,8 +1426,6 @@ that ``django-admin`` should print to the console.
 
 .. django-admin-option:: --no-color
 
-.. versionadded:: 1.7
-
 Example usage::
 
     django-admin sqlall --no-color
@@ -1620,12 +1576,6 @@ would specify the use of all the colors in the light color palette,
 *except* for the colors for errors and notices which would be
 overridden as specified.
 
-.. versionadded:: 1.7
-
-Support for color-coded output from ``django-admin`` / ``manage.py``
-utilities on Windows by relying on the ANSICON application was added in Django
-1.7.
-
 .. _ANSICON: http://adoxa.altervista.org/ansicon/
 
 Bash completion
@@ -1641,9 +1591,7 @@ distribution. It enables tab-completion of ``django-admin`` and
 * Type ``sql``, then [TAB], to see all available options whose names start
   with ``sql``.
 
-
 See :doc:`/howto/custom-management-commands` for how to add customized actions.
-
 
 ==========================================
 Running management commands from your code

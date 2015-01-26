@@ -2,8 +2,6 @@
 System check framework
 ======================
 
-.. versionadded:: 1.7
-
 .. module:: django.core.checks
 
 The system check framework is a set of static checks for validating Django

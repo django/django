@@ -683,11 +683,6 @@ For example::
     MyModel(id=1) != MultitableInherited(id=1)
     MyModel(id=1) != MyModel(id=2)
 
-.. versionchanged:: 1.7
-
-    In previous versions only instances of the exact same class and same
-    primary key value were considered equal.
-
 ``__hash__``
 ------------
 
@@ -699,11 +694,6 @@ value then a ``TypeError`` will be raised (otherwise the ``__hash__``
 method would return different values before and after the instance is
 saved, but changing the ``__hash__`` value of an instance `is forbidden
 in Python`_).
-
-.. versionchanged:: 1.7
-
-    In previous versions instance's without primary key value were
-    hashable.
 
 .. _is forbidden in Python: https://docs.python.org/reference/datamodel.html#object.__hash__
 

@@ -62,11 +62,6 @@ This will download and install Django.
 After the installation has completed, you can verify your Django installation
 by executing ``django-admin --version`` in the command prompt.
 
-.. versionchanged:: 1.7
-
-    In Django 1.7, a ``.exe`` has been introduced, so just use
-    ``django-admin`` in place of ``django-admin.py`` in the command prompt.
-
 See :ref:`database-installation` for information on database installation
 with Django.
 

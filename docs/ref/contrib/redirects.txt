@@ -89,20 +89,14 @@ Middleware
 
     .. attribute:: response_gone_class
 
-        ..  versionadded:: 1.7
-
         The :class:`~django.http.HttpResponse` class used when a
-        :class:`~django.contrib.redirects.models.Redirect` is not
-        found for the requested path or has a blank ``new_path``
-        value.
+        :class:`~django.contrib.redirects.models.Redirect` is not found for the
+        requested path or has a blank ``new_path`` value.
 
         Defaults to :class:`~django.http.HttpResponseGone`.
 
     .. attribute:: response_redirect_class
 
-        ..  versionadded:: 1.7
-
-        The :class:`~django.http.HttpResponse` class that handles the
-        redirect.
+        The :class:`~django.http.HttpResponse` class that handles the redirect.
 
         Defaults to :class:`~django.http.HttpResponsePermanentRedirect`.

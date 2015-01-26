@@ -314,16 +314,6 @@ Also note that Django expects the ``"%s"`` placeholder, *not* the ``"?"``
 placeholder, which is used by the SQLite Python bindings. This is for the sake
 of consistency and sanity.
 
-.. versionchanged:: 1.7
-
-:pep:`249` does not state whether a cursor should be usable as a context
-manager. Prior to Python 2.7, a cursor was usable as a context manager due
-an unexpected behavior in magic method lookups (`Python ticket #9220`_).
-Django 1.7 explicitly added support to allow using a cursor as context
-manager.
-
-.. _`Python ticket #9220`: https://bugs.python.org/issue9220
-
 Using a cursor as a context manager::
 
     with connection.cursor() as c:

@@ -970,8 +970,6 @@ Slightly complex built-in ``Field`` classes
 
     .. attribute:: require_all_fields
 
-        .. versionadded:: 1.7
-
         Defaults to ``True``, in which case a ``required`` validation error
         will be raised if no value is supplied for any field.
 

@@ -477,12 +477,6 @@ There are a few restrictions on the intermediate model:
   :attr:`symmetrical=False <ManyToManyField.symmetrical>` (see
   :ref:`the model field reference <manytomany-arguments>`).
 
-.. versionchanged:: 1.7
-
-    In Django 1.6 and earlier, intermediate models containing more than one
-    foreign key to any of the models involved in the many-to-many relationship
-    used to be prohibited.
-
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
 creating some many-to-many relationships. You do this by creating instances of
@@ -1303,41 +1297,9 @@ inheritance hierarchies as simple and straightforward as possible so that you
 won't have to struggle to work out where a particular piece of information is
 coming from.
 
-.. versionchanged:: 1.7
-
-Before Django 1.7, inheriting from multiple models that had an ``id`` primary
-key field did not raise an error, but could result in data loss. For example,
-consider these models (which no longer validate due to the clashing ``id``
-fields)::
-
-    class Article(models.Model):
-        headline = models.CharField(max_length=50)
-        body = models.TextField()
-
-    class Book(models.Model):
-        title = models.CharField(max_length=50)
-
-    class BookReview(Book, Article):
-        pass
-
-This snippet demonstrates how creating a child object overwrote the value of a
-previously created parent object::
-
-    >>> article = Article.objects.create(headline='Some piece of news.')
-    >>> review = BookReview.objects.create(
-    ...     headline='Review of Little Red Riding Hood.',
-    ...     title='Little Red Riding Hood')
-    >>>
-    >>> assert Article.objects.get(pk=article.pk).headline == article.headline
-    Traceback (most recent call last):
-      File "<console>", line 1, in <module>
-    AssertionError
-    >>> # the "Some piece of news." headline has been overwritten.
-    >>> Article.objects.get(pk=article.pk).headline
-    'Review of Little Red Riding Hood.'
-
-To properly use multiple inheritance, you can use an explicit
-:class:`~django.db.models.AutoField` in the base models::
+Note that inheriting from multiple models that have a common ``id`` primary
+key field will raise an error. To properly use multiple inheritance, you can
+use an explicit :class:`~django.db.models.AutoField` in the base models::
 
     class Article(models.Model):
         article_id = models.AutoField(primary_key=True)

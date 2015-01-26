@@ -650,8 +650,6 @@ Selector and checkbox widgets
     The outer ``<ul>`` container will receive the ``id`` attribute defined on
     the widget.
 
-.. versionchanged:: 1.7
-
     When looping over the radio buttons, the ``label`` and ``input`` tags include
     ``for`` and ``id`` attributes, respectively. Each radio button has an
     ``id_for_label`` attribute to output the element's ID.
@@ -677,11 +675,9 @@ Selector and checkbox widgets
 Like :class:`RadioSelect`, you can now loop over the individual checkboxes making
 up the lists. See the documentation of :class:`RadioSelect` for more details.
 
-.. versionchanged:: 1.7
-
-    When looping over the checkboxes, the ``label`` and ``input`` tags include
-    ``for`` and ``id`` attributes, respectively. Each checkbox has an
-    ``id_for_label`` attribute to output the element's ID.
+When looping over the checkboxes, the ``label`` and ``input`` tags include
+``for`` and ``id`` attributes, respectively. Each checkbox has an
+``id_for_label`` attribute to output the element's ID.
 
 .. _file-upload-widgets:
 
@@ -768,8 +764,6 @@ Composite widgets
         The default is a list containing the current year and the next 9 years.
 
     .. attribute:: SelectDateWidget.months
-
-        .. versionadded:: 1.7
 
         An optional dict of months to use in the "months" select box.
 

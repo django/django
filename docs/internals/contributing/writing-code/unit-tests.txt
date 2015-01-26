@@ -39,17 +39,6 @@ sample settings module that uses the SQLite database. To run the tests:
    $ cd django-repo/tests
    $ PYTHONPATH=..:$PYTHONPATH ./runtests.py
 
-.. versionchanged:: 1.7
-
-    Older versions of Django required specifying a settings file:
-
-    .. code-block:: bash
-
-        $ PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
-
-    ``runtests.py`` now uses ``test_sqlite`` by default if settings aren't
-    provided through either ``--settings`` or :envvar:`DJANGO_SETTINGS_MODULE`.
-
 You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
 checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
 See :ref:`installing-development-version`.
@@ -94,12 +83,6 @@ details for each database:
 Test databases get their names by prepending ``test_`` to the value of the
 :setting:`NAME` settings for the databases defined in :setting:`DATABASES`.
 These test databases are deleted when the tests are finished.
-
-.. versionchanged:: 1.7
-
-    Before Django 1.7, the :setting:`NAME` setting was mandatory and had to
-    be the name of an existing database to which the given user had permission
-    to connect.
 
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,

@@ -414,15 +414,11 @@ Attributes
 
 .. attribute:: DiscoverRunner.test_suite
 
-    .. versionadded:: 1.7
-
     The class used to build the test suite. By default it is set to
     ``unittest.TestSuite``. This can be overridden if you wish to implement
     different logic for collecting tests.
 
 .. attribute:: DiscoverRunner.test_runner
-
-    .. versionadded:: 1.7
 
     This is the class of the low-level test runner which is used to execute
     the individual tests and format the results. By default it is set to
@@ -594,11 +590,9 @@ can be useful during testing.
     ``False`` to speed up creation time if you don't have any test classes
     with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
 
-    .. versionadded:: 1.7.1
-
-        If you are using the default test runner, you can control this with the
-        the :setting:`SERIALIZE <TEST_SERIALIZE>` entry in the
-        :setting:`TEST <DATABASE-TEST>` dictionary
+    If you are using the default test runner, you can control this with the
+    the :setting:`SERIALIZE <TEST_SERIALIZE>` entry in the :setting:`TEST
+    <DATABASE-TEST>` dictionary.
 
     ``keepdb`` determines if the test run should use an existing
     database, or create a new one. If ``True``, the existing
@@ -611,10 +605,6 @@ can be useful during testing.
     ``create_test_db()`` has the side effect of modifying the value of
     :setting:`NAME` in :setting:`DATABASES` to match the name of the test
     database.
-
-    .. versionchanged:: 1.7
-
-        The ``serialize`` argument was added.
 
     .. versionchanged:: 1.8
 

@@ -77,10 +77,6 @@ Optional arguments
        The ``current_app`` argument is deprecated. Instead you should set
        ``request.current_app``.
 
-.. versionchanged:: 1.7
-
-   The ``dirs`` parameter was added.
-
 .. deprecated:: 1.8
 
    The ``dirs`` parameter was deprecated.
@@ -167,10 +163,6 @@ Optional arguments
 
    The ``status`` parameter was added.
 
-.. versionchanged:: 1.7
-
-   The ``dirs`` parameter was added.
-
 .. deprecated:: 1.8
 
    The ``dirs`` parameter was deprecated.
@@ -222,10 +214,6 @@ This example is equivalent to::
 
    By default issues a temporary redirect; pass ``permanent=True`` to issue a
    permanent redirect.
-
-   .. versionchanged:: 1.7
-
-       The ability to use relative URLs was added.
 
 Examples
 --------

@@ -109,14 +109,6 @@ free unique filename cannot be found, a :exc:`SuspiciousFileOperation
 If a file with ``name`` already exists, an underscore plus a random 7 character
 alphanumeric string is appended to the filename before the extension.
 
-.. versionchanged:: 1.7
-
-    Previously, an underscore followed by a number (e.g. ``"_1"``, ``"_2"``,
-    etc.) was appended to the filename until an available name in the destination
-    directory was found. A malicious user could exploit this deterministic
-    algorithm to create a denial-of-service attack. This change was also made
-    in Django 1.6.6, 1.5.9, and 1.4.14.
-
 .. versionchanged:: 1.8
 
     The ``max_length`` argument was added.
