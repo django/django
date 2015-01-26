@@ -5,6 +5,7 @@ import inspect
 from django.core import exceptions, serializers
 from django.db import connection
 from django.test import TestCase
+from django.utils import six
 
 from .fields import Small, CustomTypedField
 from .models import ChoicesModel, DataModel, MyModel, OtherModel, CustomDbGeneratedFieldModel
@@ -128,7 +129,7 @@ class CustomField(TestCase):
         o.save()
 
         self.assertNotEqual(o.pk, None)
-        self.assertTrue(isinstance(o.pk, int))
+        self.assertTrue(isinstance(o.pk, six.integer_types))
 
 
 class TestDbType(TestCase):

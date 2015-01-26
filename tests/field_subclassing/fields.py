@@ -101,9 +101,9 @@ class CustomDbGeneratedField(models.Field):
     empty_strings_allowed = False
 
     def db_type(self, connection):
-        if connection.settings_dict['ENGINE'] == 'django.db.backends.mysql':
+        if connection.vendor == 'mysql':
             return 'integer AUTO_INCREMENT'
-        elif connection.settings_dict['ENGINE'] == 'django.db.backends.postgresql_psycopg2':
+        elif connection.vendor == 'postgresql':
             return 'serial'
         else:
             return 'integer'
