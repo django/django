@@ -165,6 +165,8 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         Returns the supplied URL.
         """
         if self.success_url:
+            # force_text can be removed with deprecation warning
+            self.success_url = force_text(self.success_url)
             if PERCENT_PLACEHOLDER_REGEX.search(self.success_url):
                 warnings.warn(
                     "%()s placeholder style in success_url is deprecated. "
@@ -299,6 +301,8 @@ class DeletionMixin(object):
 
     def get_success_url(self):
         if self.success_url:
+            # force_text can be removed with deprecation warning
+            self.success_url = force_text(self.success_url)
             if PERCENT_PLACEHOLDER_REGEX.search(self.success_url):
                 warnings.warn(
                     "%()s placeholder style in success_url is deprecated. "
