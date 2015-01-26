@@ -33,7 +33,7 @@ LANG_INFO = {
         'bidi': True,
         'code': 'az',
         'name': 'Azerbaijani',
-        'name_local': 'azərbaycan dili',
+        'name_local': 'Azərbaycanca',
     },
     'be': {
         'bidi': False,
