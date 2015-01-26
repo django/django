@@ -187,6 +187,10 @@ Miscellaneous
   will be removed in Django 2.1. The more general ``check_expression_support()``
   should be used instead.
 
+``django.forms.extras`` is deprecated. You can find
+  :class:`~django.forms.SelectDateWidget` in ``django.forms.widgets``
+  (or simply ``django.forms``) instead.
+
 .. removed-features-1.9:
 
 Features removed in 1.9
