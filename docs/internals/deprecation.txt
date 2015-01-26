@@ -18,6 +18,8 @@ details on these changes.
 * The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` will
   be removed.
 
+* The ``django.forms.extras`` package will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

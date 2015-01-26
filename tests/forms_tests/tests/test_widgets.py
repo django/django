@@ -12,10 +12,9 @@ from django.forms import (
     ChoiceField, ClearableFileInput, DateField, DateInput, DateTimeInput,
     FileInput, Form, HiddenInput, MultipleChoiceField, MultipleHiddenInput,
     MultiValueField, MultiWidget, NullBooleanSelect, PasswordInput,
-    RadioSelect, Select, SelectMultiple, SplitDateTimeField,
+    RadioSelect, Select, SelectDateWidget, SelectMultiple, SplitDateTimeField,
     SplitDateTimeWidget, Textarea, TextInput, TimeInput, ValidationError,
 )
-from django.forms.extras import SelectDateWidget
 from django.forms.widgets import RadioFieldRenderer
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six, translation
