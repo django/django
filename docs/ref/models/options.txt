@@ -24,16 +24,11 @@ Available ``Meta`` options
 
 .. attribute:: Options.app_label
 
-    If a model exists outside of the standard locations (:file:`models.py` or
-    a ``models`` package in an app), the model must define which app it is part
-    of::
+    If a model exists outside of an application in :setting:`INSTALLED_APPS` or
+    if it's imported before its application was loaded, it must define which
+    app it is part of::
 
         app_label = 'myapp'
-
-    .. versionadded:: 1.7
-
-        ``app_label`` is no longer required for models that are defined
-        outside the ``models`` module of an application.
 
 ``db_table``
 ------------
@@ -275,8 +270,6 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.default_permissions
 
-    .. versionadded:: 1.7
-
     Defaults to ``('add', 'change', 'delete')``. You may customize this list,
     for example, by setting this to an empty list if your app doesn't require
     any of the default permissions. It must be specified on the model before
@@ -336,10 +329,8 @@ Django quotes column and table names behind the scenes.
     :class:`~django.db.models.ManyToManyField`, try using a signal or
     an explicit :attr:`through <ManyToManyField.through>` model.
 
-    .. versionchanged:: 1.7
-
-        The ``ValidationError`` raised during model validation when the
-        constraint is violated has the ``unique_together`` error code.
+    The ``ValidationError`` raised during model validation when the constraint
+    is violated has the ``unique_together`` error code.
 
 ``index_together``
 ------------------
@@ -354,8 +345,6 @@ Django quotes column and table names behind the scenes.
 
     This list of fields will be indexed together (i.e. the appropriate
     ``CREATE INDEX`` statement will be issued.)
-
-    .. versionchanged:: 1.7
 
     For convenience, ``index_together`` can be a single list when dealing with a single
     set of fields::

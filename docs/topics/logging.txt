@@ -498,8 +498,6 @@ specific logger following this example:
 ``django.db.backends.schema``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.7
-
 Logs the SQL queries that are executed during schema changes to the database by
 the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
 queries executed by :class:`~django.db.migrations.operations.RunPython`.

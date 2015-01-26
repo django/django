@@ -51,21 +51,10 @@ The FileSystemStorage Class
         The file system permissions that the file will receive when it is
         saved. Defaults to :setting:`FILE_UPLOAD_PERMISSIONS`.
 
-        .. versionadded:: 1.7
-
-            The ``file_permissions_mode`` attribute was added. Previously files
-            always received :setting:`FILE_UPLOAD_PERMISSIONS` permissions.
-
     .. attribute:: directory_permissions_mode
 
         The file system permissions that the directory will receive when it is
         saved. Defaults to :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
-
-        .. versionadded:: 1.7
-
-            The ``directory_permissions_mode`` attribute was added. Previously
-            directories always received
-            :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS` permissions.
 
     .. note::
 
@@ -128,15 +117,6 @@ The Storage Class
         If a file with ``name`` already exists, an underscore plus a random
         7 character alphanumeric string is appended to the filename before
         the extension.
-
-        .. versionchanged:: 1.7
-
-            Previously, an underscore followed by a number (e.g. ``"_1"``,
-            ``"_2"``, etc.) was appended to the filename until an available
-            name in the destination directory was found. A malicious user could
-            exploit this deterministic algorithm to create a denial-of-service
-            attack. This change was also made in Django 1.6.6, 1.5.9, and
-            1.4.14.
 
         .. versionchanged:: 1.8
 

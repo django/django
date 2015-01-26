@@ -345,10 +345,6 @@ SyndicationFeed
         objects except ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
         objects, and ``enclosure``, which is an instance of the ``Enclosure`` class.
 
-        .. versionadded:: 1.7
-
-            The optional ``updateddate`` argument was added.
-
     .. method:: num_items()
 
     .. method:: root_attributes()
@@ -742,8 +738,6 @@ Functions for working with Python modules.
 
 .. function:: import_string(dotted_path)
 
-    .. versionadded:: 1.7
-
     Imports a dotted module path and returns the attribute/class designated by
     the last name in the path. Raises ``ImportError`` if the import failed. For
     example::
@@ -849,14 +843,10 @@ appropriate entities.
 
 .. class:: FixedOffset(offset=None, name=None)
 
-    .. versionadded:: 1.7
-
     A :class:`~datetime.tzinfo` subclass modeling a fixed offset from UTC.
     ``offset`` is an integer number of minutes east of UTC.
 
 .. function:: get_fixed_timezone(offset)
-
-    .. versionadded:: 1.7
 
     Returns a :class:`~datetime.tzinfo` instance that represents a time zone
     with a fixed offset from UTC.

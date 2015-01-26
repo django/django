@@ -17,10 +17,6 @@ Django supports addition, subtraction, multiplication, division, modulo
 arithmetic, and the power operator on query expressions, using Python constants,
 variables, and even other expressions.
 
-.. versionadded:: 1.7
-
-    Support for the power operator ``**`` was added.
-
 Some examples
 =============
 

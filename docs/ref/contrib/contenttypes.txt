@@ -366,8 +366,6 @@ Reverse generic relations
 
     .. attribute:: related_query_name
 
-        .. versionadded:: 1.7
-
         The relation on the related object back to this object doesn't exist by
         default. Setting ``related_query_name`` creates a relation from the
         related object back to this one. This allows querying and filtering
@@ -391,8 +389,6 @@ be used to retrieve their associated ``TaggedItems``::
     >>> t2.save()
     >>> b.tags.all()
     [<TaggedItem: django>, <TaggedItem: python>]
-
-.. versionadded:: 1.7
 
 Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 ``related_query_name`` set allows querying from the related object::
@@ -502,15 +498,10 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
     :class:`~django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model`
     argument on ``GenericForeignKey``.
 
-    .. versionchanged:: 1.7
-
-        ``min_num`` and ``validate_min`` were added.
-
-
 .. module:: django.contrib.contenttypes.admin
 
 Generic relations in admin
-------------------------------------
+--------------------------
 
 The :mod:`django.contrib.contenttypes.admin` module provides
 :class:`~django.contrib.contenttypes.admin.GenericTabularInline` and

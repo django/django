@@ -436,18 +436,16 @@ different User model.
         class Article(models.Model):
             author = models.ForeignKey(settings.AUTH_USER_MODEL)
 
-    .. versionadded:: 1.7
+    When connecting to signals sent by the ``User`` model, you should specify
+    the custom model using the :setting:`AUTH_USER_MODEL` setting. For example::
 
-        When connecting to signals sent by the User model, you should specify the
-        custom model using the :setting:`AUTH_USER_MODEL` setting. For example::
+        from django.conf import settings
+        from django.db.models.signals import post_save
 
-            from django.conf import settings
-            from django.db.models.signals import post_save
+        def post_save_receiver(signal, sender, instance, **kwargs):
+            pass
 
-            def post_save_receiver(signal, sender, instance, **kwargs):
-                pass
-
-            post_save.connect(post_save_receiver, sender=settings.AUTH_USER_MODEL)
+        post_save.connect(post_save_receiver, sender=settings.AUTH_USER_MODEL)
 
     Generally speaking, you should reference the User model with the
     :setting:`AUTH_USER_MODEL` setting in code that is executed at import
@@ -636,8 +634,6 @@ The following methods are available on any subclass of
         been called for this user.
 
     .. method:: models.AbstractBaseUser.get_session_auth_hash()
-
-        .. versionadded:: 1.7
 
         Returns an HMAC of the password field. Used for
         :ref:`session-invalidation-on-password-change`.

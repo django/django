@@ -405,8 +405,6 @@ into the primary key of an actual ``Person`` object.
     fields will be effectively unique, you can still use those fields
     as a natural key.
 
-.. versionadded:: 1.7
-
 Deserialization of objects with no primary key will always check whether the
 model's manager has a ``get_by_natural_key()`` method and if so, use it to
 populate the deserialized object's primary key.

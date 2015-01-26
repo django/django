@@ -34,8 +34,6 @@ All attributes should be considered read-only, unless stated otherwise below.
 
 .. attribute:: HttpRequest.scheme
 
-    .. versionadded:: 1.7
-
     A string representing the scheme of the request (``http`` or ``https``
     usually).
 
@@ -864,8 +862,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 JsonResponse objects
 ====================
-
-.. versionadded:: 1.7
 
 .. class:: JsonResponse
 

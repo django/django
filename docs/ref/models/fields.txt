@@ -156,8 +156,6 @@ This lets you construct choices dynamically. But if you find yourself hacking
 database table with a :class:`ForeignKey`. :attr:`~Field.choices` is meant for
 static data that doesn't change much, if ever.
 
-.. versionadded:: 1.7
-
 Unless :attr:`blank=False<Field.blank>` is set on the field along with a
 :attr:`~Field.default` then a label containing ``"---------"`` will be rendered
 with the select box. To override this behavior, add a tuple to ``choices``
@@ -240,10 +238,6 @@ want to override.
 Error message keys include ``null``, ``blank``, ``invalid``, ``invalid_choice``,
 ``unique``, and ``unique_for_date``. Additional error message keys are
 specified for each field in the `Field types`_ section below.
-
-.. versionadded:: 1.7
-
-The ``unique_for_date`` error message key was added.
 
 ``help_text``
 -------------
@@ -591,10 +585,6 @@ A file-upload field.
 Has two optional arguments:
 
 .. attribute:: FileField.upload_to
-
-    .. versionchanged:: 1.7
-
-        ``upload_to`` was required in older versions of Django.
 
     A local filesystem path that will be appended to your :setting:`MEDIA_ROOT`
     setting to determine the value of the
@@ -987,12 +977,10 @@ databases supported by Django.
 A large text field. The default form widget for this field is a
 :class:`~django.forms.Textarea`.
 
-.. versionchanged:: 1.7
-
-    If you specify a ``max_length`` attribute, it will be reflected in the
-    :class:`~django.forms.Textarea` widget of the auto-generated form field.
-    However it is not enforced at the model or database level. Use a
-    :class:`CharField` for that.
+If you specify a ``max_length`` attribute, it will be reflected in the
+:class:`~django.forms.Textarea` widget of the auto-generated form field.
+However it is not enforced at the model or database level. Use a
+:class:`CharField` for that.
 
 .. admonition:: MySQL users
 
@@ -1156,11 +1144,6 @@ define the details of how the relation works.
     :attr:`~django.contrib.admin.ModelAdmin.raw_id_fields` in the
     ``ModelAdmin`` for the model.
 
-    .. versionchanged:: 1.7
-
-        Previous versions of Django do not allow passing a callable as a value
-        for ``limit_choices_to``.
-
     .. note::
 
         If a callable is used for ``limit_choices_to``, it will be invoked
@@ -1280,8 +1263,6 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 .. attribute:: ForeignKey.swappable
 
-    .. versionadded:: 1.7
-
     Controls the migration framework's reaction if this :class:`ForeignKey`
     is pointing at a swappable model. If it is ``True`` - the default -
     then if the :class:`ForeignKey` is pointing at a model which matches
@@ -1400,8 +1381,6 @@ that control how the relationship functions.
 
 .. attribute:: ManyToManyField.through_fields
 
-    .. versionadded:: 1.7
-
     Only used when a custom intermediary model is specified. Django will
     normally determine which fields of the intermediary model to use in order
     to establish a many-to-many relationship automatically. However,
@@ -1469,8 +1448,6 @@ that control how the relationship functions.
     It is an error to pass both ``db_constraint`` and ``through``.
 
 .. attribute:: ManyToManyField.swappable
-
-    .. versionadded:: 1.7
 
     Controls the migration framework's reaction if this :class:`ManyToManyField`
     is pointing at a swappable model. If it is ``True`` - the default -
@@ -1699,8 +1676,6 @@ Field API reference
         ``"year"``, ``"month"``, ``"day"``, ``"isnull"``, ``"search"``,
         ``"regex"``, and ``"iregex"``.
 
-        .. versionadded:: 1.7
-
         If you are using :doc:`Custom lookups </ref/models/lookups>` the
         ``lookup_type`` can be any ``lookup_name`` registered in the field.
 
@@ -1751,8 +1726,6 @@ Field API reference
         See :ref:`specifying-form-field-for-model-field` for usage.
 
     .. method:: deconstruct()
-
-        .. versionadded:: 1.7
 
         Returns a 4-tuple with enough information to recreate the field:
 
