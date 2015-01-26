@@ -637,7 +637,7 @@ Forms
   value.
 
 * :attr:`SelectDateWidget.months
-  <django.forms.extras.widgets.SelectDateWidget.months>` can be used to
+  <django.forms.SelectDateWidget.months>` can be used to
   customize the wording of the months displayed in the select widget.
 
 * The ``min_num`` and ``validate_min`` parameters were added to
@@ -1378,7 +1378,7 @@ Miscellaneous
   the current class *and* on a parent ``Form``.
 
 * The ``required`` argument of
-  :class:`~django.forms.extras.widgets.SelectDateWidget` has been removed.
+  :class:`~django.forms.SelectDateWidget` has been removed.
   This widget now respects the form field's ``is_required`` attribute like
   other widgets.
 

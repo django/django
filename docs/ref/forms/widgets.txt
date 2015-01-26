@@ -49,11 +49,10 @@ Setting arguments for widgets
 
 Many widgets have optional extra arguments; they can be set when defining the
 widget on the field. In the following example, the
-:attr:`~django.forms.extras.widgets.SelectDateWidget.years` attribute is set
-for a :class:`~django.forms.extras.widgets.SelectDateWidget`::
+:attr:`~django.forms.SelectDateWidget.years` attribute is set for a
+:class:`~django.forms.SelectDateWidget`::
 
     from django import forms
-    from django.forms.extras.widgets import SelectDateWidget
 
     BIRTH_YEAR_CHOICES = ('1980', '1981', '1982')
     FAVORITE_COLORS_CHOICES = (('blue', 'Blue'),
@@ -61,7 +60,7 @@ for a :class:`~django.forms.extras.widgets.SelectDateWidget`::
                                 ('black', 'Black'))
 
     class SimpleForm(forms.Form):
-        birth_year = forms.DateField(widget=SelectDateWidget(years=BIRTH_YEAR_CHOICES))
+        birth_year = forms.DateField(widget=forms.SelectDateWidget(years=BIRTH_YEAR_CHOICES))
         favorite_colors = forms.MultipleChoiceField(required=False,
             widget=forms.CheckboxSelectMultiple, choices=FAVORITE_COLORS_CHOICES)
 
@@ -752,8 +751,6 @@ Composite widgets
     Similar to :class:`SplitDateTimeWidget`, but uses :class:`HiddenInput` for
     both date and time.
 
-.. currentmodule:: django.forms.extras.widgets
-
 ``SelectDateWidget``
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -807,3 +804,9 @@ Composite widgets
             # A custom empty label with tuple
             field1 = forms.DateField(widget=SelectDateWidget(
                 empty_label=("Choose Year", "Choose Month", "Choose Day"))
+
+    .. versionchanged:: 1.9
+
+        This widget used to be located in the ``django.forms.extras.widgets``
+        package. It is now defined in ``django.forms.widgets`` and like the
+        other widgets it can be imported directly from ``django.forms``.
