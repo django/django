@@ -514,6 +514,7 @@ class GZipMiddlewareTest(TestCase):
     short_string = "This string is too short to be worth compressing."
     compressible_string = 'a' * 500
     uncompressible_string = ''.join(chr(random.randint(0, 255)) for _ in xrange(500))
+    iterator_as_content = iter(compressible_string)
 
     def setUp(self):
         self.req = HttpRequest()
@@ -588,6 +589,18 @@ class GZipMiddlewareTest(TestCase):
         r = GZipMiddleware().process_response(self.req, self.resp)
         self.assertEqual(r.content, self.uncompressible_string)
         self.assertEqual(r.get('Content-Encoding'), None)
+
+    def test_streaming_compression(self):
+        """
+        Tests that iterators as response content return a compressed stream without consuming
+        the whole response.content while doing so.
+        See #24158.
+        """
+        self.resp.content = self.iterator_as_content
+        r = GZipMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.decompress(''.join(r.content)), self.compressible_string)
+        self.assertEqual(r.get('Content-Encoding'), 'gzip')
+        self.assertEqual(r.get('Content-Length'), None)
 
 
 class ETagGZipMiddlewareTest(TestCase):
