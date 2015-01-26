@@ -16,7 +16,7 @@ class SimpleTemplateResponse(HttpResponse):
     rendering_attrs = ['template_name', 'context_data', '_post_render_callbacks']
 
     def __init__(self, template, context=None, content_type=None, status=None,
-                 charset=None):
+                 charset=None, using=None):
         if isinstance(template, Template):
             warnings.warn(
                 "{}'s template argument cannot be a django.template.Template "
@@ -30,6 +30,8 @@ class SimpleTemplateResponse(HttpResponse):
         # API. To avoid the name collision, we use different names.
         self.template_name = template
         self.context_data = context
+
+        self.using = using
 
         self._post_render_callbacks = []
 
@@ -73,9 +75,9 @@ class SimpleTemplateResponse(HttpResponse):
     def resolve_template(self, template):
         "Accepts a template object, path-to-template or list of paths"
         if isinstance(template, (list, tuple)):
-            return loader.select_template(template)
+            return loader.select_template(template, using=self.using)
         elif isinstance(template, six.string_types):
-            return loader.get_template(template)
+            return loader.get_template(template, using=self.using)
         else:
             return template
 
@@ -189,7 +191,8 @@ class TemplateResponse(SimpleTemplateResponse):
     rendering_attrs = SimpleTemplateResponse.rendering_attrs + ['_request', '_current_app']
 
     def __init__(self, request, template, context=None, content_type=None,
-            status=None, current_app=_current_app_undefined, charset=None):
+            status=None, current_app=_current_app_undefined, charset=None,
+            using=None):
         # As a convenience we'll allow callers to provide current_app without
         # having to avoid needing to create the RequestContext directly
         if current_app is not _current_app_undefined:
@@ -199,5 +202,5 @@ class TemplateResponse(SimpleTemplateResponse):
                 RemovedInDjango20Warning, stacklevel=2)
             request.current_app = current_app
         super(TemplateResponse, self).__init__(
-            template, context, content_type, status, charset)
+            template, context, content_type, status, charset, using)
         self._request = request

@@ -3,7 +3,7 @@ import logging
 import re
 import sys
 import time
-from unittest import skipUnless
+from unittest import skipIf, skipUnless
 import warnings
 from functools import wraps
 from xml.dom.minidom import parseString, Node
@@ -19,6 +19,11 @@ from django.test.signals import template_rendered, setting_changed
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
+
+try:
+    import jinja2
+except ImportError:
+    jinja2 = None
 
 
 __all__ = (
@@ -573,3 +578,20 @@ def freeze_time(t):
         yield
     finally:
         time.time = _real_time
+
+
+def require_jinja2(test_func):
+    """
+    Decorator to enable a Jinja2 template engine in addition to the regular
+    Django template engine for a test or skip it if Jinja2 isn't available.
+    """
+    test_func = skipIf(jinja2 is None, "this test requires jinja2")(test_func)
+    test_func = override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+    }, {
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',
+        'APP_DIRS': True,
+        'OPTIONS': {'keep_trailing_newline': True},
+    }])(test_func)
+    return test_func
