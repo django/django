@@ -295,7 +295,7 @@ class StreamingBuffer(object):
         self.vals.append(val)
 
     def read(self):
-        ret = b''.join(self.vals)
+        ret = ''.join(self.vals)
         self.vals = []
         return ret
 
