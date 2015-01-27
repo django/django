@@ -25,7 +25,8 @@ sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
 class GroupAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     ordering = ('name',)
-    filter_horizontal = ('permissions',)
+    fields = ['name', 'users', 'permissions']
+    filter_horizontal = ('users', 'permissions',)
 
     def formfield_for_manytomany(self, db_field, request=None, **kwargs):
         if db_field.name == 'permissions':
