@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import datetime
@@ -25,8 +26,9 @@ from .models import (
     Bar, BigD, BigIntegerModel, BigS, BooleanModel, DataModel, DateTimeModel,
     Document, FksToBooleans, FkToChar, FloatModel, Foo, GenericIPAddress,
     IntegerModel, NullBooleanModel, PositiveIntegerModel, PositiveSmallIntegerModel,
-    Post, PrimaryKeyCharModel, RenamedField, SmallIntegerModel, VerboseNameField,
-    Whiz, WhizIter, WhizIterEmpty)
+    Post, PrimaryKeyCharModel, RenamedField, SmallIntegerModel, UnicodeSlugField,
+    VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
+)
 
 
 class BasicFieldTests(test.TestCase):
@@ -427,6 +429,14 @@ class SlugFieldTests(test.TestCase):
         bs = BigS.objects.create(s='slug' * 50)
         bs = BigS.objects.get(pk=bs.pk)
         self.assertEqual(bs.s, 'slug' * 50)
+
+    def test_slugfield_unicode_max_length(self):
+        """
+        Make sure SlugField  with unicode=True honors max_length (#9706)
+        """
+        bs = UnicodeSlugField.objects.create(s='你好你好' * 50)
+        bs = UnicodeSlugField.objects.get(pk=bs.pk)
+        self.assertEqual(bs.s, '你好你好' * 50)
 
 
 class ValidationTest(test.TestCase):

@@ -700,6 +700,7 @@ class MainPrepopulated(models.Model):
                  ('option two', 'Option Two')))
     slug1 = models.SlugField(blank=True)
     slug2 = models.SlugField(blank=True)
+    slug3 = models.SlugField(blank=True, unicode=True)
 
 
 class RelatedPrepopulated(models.Model):

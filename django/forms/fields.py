@@ -1224,6 +1224,12 @@ class GenericIPAddressField(CharField):
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
 
+    def __init__(self, *args, **kwargs):
+        self.unicode = kwargs.pop('unicode', False)
+        if self.unicode:
+            self.default_validators = [validators.validate_unicode_slug]
+        super(SlugField, self).__init__(*args, **kwargs)
+
     def clean(self, value):
         value = self.to_python(value).strip()
         return super(SlugField, self).clean(value)

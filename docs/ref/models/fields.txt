@@ -970,6 +970,14 @@ It is often useful to automatically prepopulate a SlugField based on the value
 of some other value.  You can do this automatically in the admin using
 :attr:`~django.contrib.admin.ModelAdmin.prepopulated_fields`.
 
+.. attribute:: SlugField.unicode
+
+    If ``True``, the field accepts unicode letters. Defaults to ``False``.
+
+.. versionchanged:: 1.8
+
+    The ``unicode`` parameter was added.
+
 ``SmallIntegerField``
 ---------------------
 

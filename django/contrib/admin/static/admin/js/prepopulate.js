@@ -1,11 +1,12 @@
 (function($) {
-    $.fn.prepopulate = function(dependencies, maxLength) {
+    $.fn.prepopulate = function(dependencies, maxLength, unicode) {
         /*
             Depends on urlify.js
             Populates a selected field with the values of the dependent fields,
             URLifies and shortens the string.
             dependencies - array of dependent fields ids
             maxLength - maximum length of the URLify'd string
+            unicode - unicode support of the URLify'd string
         */
         return this.each(function() {
             var prepopulatedField = $(this);
@@ -23,7 +24,7 @@
                         values.push(field.val());
                     }
                 });
-                prepopulatedField.val(URLify(values.join(' '), maxLength));
+                prepopulatedField.val(URLify(values.join(' '), maxLength, unicode));
             };
 
             prepopulatedField.data('_changed', false);
