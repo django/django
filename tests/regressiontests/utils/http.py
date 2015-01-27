@@ -64,7 +64,7 @@ class TestUtilsHttp(unittest.TestCase):
         # bad input
         for n in [-1, sys.maxint+1, '1', 'foo', {1:2}, (1,2,3)]:
             self.assertRaises(ValueError, http.int_to_base36, n)
-        
+
         for n in ['#', ' ']:
             self.assertRaises(ValueError, http.base36_to_int, n)
 
@@ -73,7 +73,7 @@ class TestUtilsHttp(unittest.TestCase):
 
         # non-integer input
         self.assertRaises(TypeError, http.int_to_base36, 3.141)
-        
+
         # more explicit output testing
         for n, b36 in [(0, '0'), (1, '1'), (42, '16'), (818469960, 'django')]:
             self.assertEqual(http.int_to_base36(n), b36)
@@ -97,7 +97,8 @@ class TestUtilsHttp(unittest.TestCase):
                         'http:/\//example.com',
                         'http:\/example.com',
                         'http:/\example.com',
-                        'javascript:alert("XSS")'):
+                        'javascript:alert("XSS")'
+                        '\njavascript:alert(x)'):
             self.assertFalse(http.is_safe_url(bad_url, host='testserver'), "%s should be blocked" % bad_url)
         for good_url in ('/view/?param=http://example.com',
                      '/view/?param=https://example.com',
