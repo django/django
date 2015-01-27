@@ -236,6 +236,7 @@ class IntegerField(Field):
     default_error_messages = {
         'invalid': _('Enter a whole number.'),
     }
+    re_decimal = re.compile(r'\.0*\s*$')
 
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
         self.max_value, self.min_value = max_value, min_value
@@ -259,8 +260,9 @@ class IntegerField(Field):
             return None
         if self.localize:
             value = formats.sanitize_separators(value)
+        # Strip trailing decimal and zeros.
         try:
-            value = int(str(value))
+            value = int(self.re_decimal.sub('', str(value)))
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
