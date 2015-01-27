@@ -137,6 +137,28 @@ class OrderingTests(TestCase):
             attrgetter("headline")
         )
 
+    def test_reverse_ordering_pure(self):
+        qs1 = Article.objects.order_by(F('headline').asc())
+        qs2 = qs1.reverse()
+        self.assertQuerysetEqual(
+            qs1, [
+                "Article 1",
+                "Article 2",
+                "Article 3",
+                "Article 4",
+            ],
+            attrgetter("headline")
+        )
+        self.assertQuerysetEqual(
+            qs2, [
+                "Article 4",
+                "Article 3",
+                "Article 2",
+                "Article 1",
+            ],
+            attrgetter("headline")
+        )
+
     def test_extra_ordering(self):
         """
         Ordering can be based on fields included from an 'extra' clause
