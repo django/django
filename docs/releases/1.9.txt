@@ -167,6 +167,12 @@ Backwards incompatible changes in 1.9
 
 ...
 
+Removed CSS related to IE6&7
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+All files related to IE6&7, specifcally CSS files and images, have been
+removed and their references with admin views have been deleted. Django
+1.9+ will longer support IE6&7.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
