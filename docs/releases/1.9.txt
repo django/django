@@ -165,12 +165,11 @@ Backwards incompatible changes in 1.9
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
-...
-
 Miscellaneous
 ~~~~~~~~~~~~~
 
-* ...
+* CSS and images in ``contrib.admin`` to support Internet Explorer 6 & 7 have
+  been removed as these browsers have reached end-of-life.
 
 .. _deprecated-features-1.9:
 
