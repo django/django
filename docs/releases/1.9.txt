@@ -183,6 +183,11 @@ Miscellaneous
 * The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` has
   been deprecated as it has no effect.
 
+* The ``check_aggregate_support()`` method of
+  ``django.db.backends.base.BaseDatabaseOperations`` has been deprecated and
+  will be removed in Django 2.1. The more general ``check_expression_support()``
+  should be used instead.
+
 .. removed-features-1.9:
 
 Features removed in 1.9
