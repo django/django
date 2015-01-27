@@ -247,6 +247,23 @@ class FieldsTests(SimpleTestCase):
         f1 = IntegerField(localize=True)
         self.assertWidgetRendersTo(f1, '<input id="id_f" name="f" type="text" />')
 
+    def test_integerfield_float(self):
+        f = IntegerField()
+        self.assertEqual(1, f.clean(1.0))
+        self.assertEqual(1, f.clean('1.0'))
+        self.assertEqual(1, f.clean(b'1.0'))
+        self.assertEqual(1, f.clean(' 1.0 '))
+        self.assertEqual(1, f.clean('1.'))
+        self.assertEqual(1, f.clean(' 1. '))
+        self.assertRaisesMessage(ValidationError, "'Enter a whole number.'", f.clean, '1.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a whole number.'", f.clean, '…')
+
+    def test_integerfield_big_num(self):
+        f = IntegerField()
+        self.assertEqual(9223372036854775808, f.clean(9223372036854775808))
+        self.assertEqual(9223372036854775808, f.clean('9223372036854775808'))
+        self.assertEqual(9223372036854775808, f.clean('9223372036854775808.0'))
+
     def test_integerfield_subclass(self):
         """
         Test that class-defined widget is not overwritten by __init__ (#22245).
