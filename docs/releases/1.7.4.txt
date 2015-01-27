@@ -2,7 +2,7 @@
 Django 1.7.4 release notes
 ==========================
 
-*Under development*
+*January 27, 2015*
 
 Django 1.7.4 fixes several bugs in 1.7.3.
 
