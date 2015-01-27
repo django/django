@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 
-class CombinableMixin(object):
+class Combinable(object):
     """
     Provides the ability to combine one or two objects with
     some connector. For example F('foo') + F('bar').
@@ -184,6 +184,7 @@ class BaseExpression(object):
            in this query
          * reuse: a set of reusable joins for multijoins
          * summarize: a terminal aggregate clause
+         * for_save: whether this expression about to be used in a save or update
 
         Returns: an ExpressionNode to be added to the query.
         """
@@ -297,9 +298,6 @@ class BaseExpression(object):
                 return agg, lookup
         return False, ()
 
-    def prepare_database_save(self, field):
-        return self
-
     def get_group_by_cols(self):
         if not self.contains_aggregate:
             return [self]
@@ -325,7 +323,7 @@ class BaseExpression(object):
         return self
 
 
-class ExpressionNode(BaseExpression, CombinableMixin):
+class ExpressionNode(BaseExpression, Combinable):
     """
     An expression that can be combined with other expressions.
     """
