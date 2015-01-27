@@ -6,10 +6,17 @@ import uuid
 
 from django.core.exceptions import FieldError
 from django.db import connection, transaction, DatabaseError
-from django.db.models import F, Value, TimeField, UUIDField
+from django.db.models import TimeField, UUIDField
+from django.db.models.aggregates import Avg, Count, Max, Min, StdDev, Sum, Variance
+from django.db.models.expressions import (
+    Case, Col, Date, DateTime, F, Func, OrderBy,
+    Random, RawSQL, Ref, Value, When
+)
+from django.db.models.functions import Coalesce, Concat, Length, Lower, Substr, Upper
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
+from django.utils.timezone import utc
 
 from .models import Company, Employee, Number, Experiment, Time, UUID
 
@@ -812,3 +819,40 @@ class ValueTests(TestCase):
         UUID.objects.create()
         UUID.objects.update(uuid=Value(uuid.UUID('12345678901234567890123456789012'), output_field=UUIDField()))
         self.assertEqual(UUID.objects.get().uuid, uuid.UUID('12345678901234567890123456789012'))
+
+
+class ReprTests(TestCase):
+
+    def test_expressions(self):
+        self.assertEqual(
+            repr(Case(When(a=1))),
+            "<Case: CASE WHEN <Q: (AND: ('a', 1))> THEN Value(None), ELSE Value(None)>"
+        )
+        self.assertEqual(repr(Col('alias', 'field')), "Col(alias, field)")
+        self.assertEqual(repr(Date('published', 'exact')), "Date(published, exact)")
+        self.assertEqual(repr(DateTime('published', 'exact', utc)), "DateTime(published, exact, UTC)")
+        self.assertEqual(repr(F('published')), "F(published)")
+        self.assertEqual(repr(F('cost') + F('tax')), "<Expression: F(cost) + F(tax)>")
+        self.assertEqual(repr(Func('published', function='TO_CHAR')), "Func(F(published), function=TO_CHAR)")
+        self.assertEqual(repr(OrderBy(Value(1))), 'OrderBy(Value(1), descending=False)')
+        self.assertEqual(repr(Random()), "Random()")
+        self.assertEqual(repr(RawSQL('table.col', [])), "RawSQL(table.col, [])")
+        self.assertEqual(repr(Ref('sum_cost', Sum('cost'))), "Ref(sum_cost, Sum(F(cost)))")
+        self.assertEqual(repr(Value(1)), "Value(1)")
+
+    def test_functions(self):
+        self.assertEqual(repr(Coalesce('a', 'b')), "Coalesce(F(a), F(b))")
+        self.assertEqual(repr(Concat('a', 'b')), "Concat(ConcatPair(F(a), F(b)))")
+        self.assertEqual(repr(Length('a')), "Length(F(a))")
+        self.assertEqual(repr(Lower('a')), "Lower(F(a))")
+        self.assertEqual(repr(Substr('a', 1, 3)), "Substr(F(a), Value(1), Value(3))")
+        self.assertEqual(repr(Upper('a')), "Upper(F(a))")
+
+    def test_aggregates(self):
+        self.assertEqual(repr(Avg('a')), "Avg(F(a))")
+        self.assertEqual(repr(Count('a')), "Count(F(a), distinct=False)")
+        self.assertEqual(repr(Max('a')), "Max(F(a))")
+        self.assertEqual(repr(Min('a')), "Min(F(a))")
+        self.assertEqual(repr(StdDev('a')), "StdDev(F(a), sample=False)")
+        self.assertEqual(repr(Sum('a')), "Sum(F(a))")
+        self.assertEqual(repr(Variance('a', sample=True)), "Variance(F(a), sample=True)")

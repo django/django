@@ -340,6 +340,12 @@ class Expression(ExpressionNode):
         self.lhs = lhs
         self.rhs = rhs
 
+    def __repr__(self):
+        return "<{}: {}>".format(self.__class__.__name__, self)
+
+    def __str__(self):
+        return "{} {} {}".format(self.lhs, self.connector, self.rhs)
+
     def get_source_expressions(self):
         return [self.lhs, self.rhs]
 
@@ -408,7 +414,7 @@ class DurationExpression(Expression):
         return expression_wrapper % sql, expression_params
 
 
-class F(CombinableMixin):
+class F(Combinable):
     """
     An object capable of resolving references to existing query objects.
     """
@@ -418,6 +424,9 @@ class F(CombinableMixin):
          * name: the name of the field this expression references
         """
         self.name = name
+
+    def __repr__(self):
+        return "{}({})".format(self.__class__.__name__, self.name)
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return query.resolve_ref(self.name, allow_joins, reuse, summarize)
@@ -445,6 +454,13 @@ class Func(ExpressionNode):
         super(Func, self).__init__(output_field=output_field)
         self.source_expressions = self._parse_expressions(*expressions)
         self.extra = extra
+
+    def __repr__(self):
+        args = self.arg_joiner.join(str(arg) for arg in self.source_expressions)
+        extra = ', '.join(str(key) + '=' + str(val) for key, val in self.extra.items())
+        if extra:
+            return "{}({}, {})".format(self.__class__.__name__, args, extra)
+        return "{}({})".format(self.__class__.__name__, args)
 
     def get_source_expressions(self):
         return self.source_expressions
@@ -504,6 +520,9 @@ class Value(ExpressionNode):
         super(Value, self).__init__(output_field=output_field)
         self.value = value
 
+    def __repr__(self):
+        return "{}({})".format(self.__class__.__name__, self.value)
+
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
         val = self.value
@@ -545,6 +564,9 @@ class RawSQL(ExpressionNode):
         self.sql, self.params = sql, params
         super(RawSQL, self).__init__(output_field=output_field)
 
+    def __repr__(self):
+        return "{}({}, {})".format(self.__class__.__name__, self.sql, self.params)
+
     def as_sql(self, compiler, connection):
         return '(%s)' % self.sql, self.params
 
@@ -556,6 +578,9 @@ class Random(ExpressionNode):
     def __init__(self):
         super(Random, self).__init__(output_field=fields.FloatField())
 
+    def __repr__(self):
+        return "Random()"
+
     def as_sql(self, compiler, connection):
         return connection.ops.random_function_sql(), []
 
@@ -566,6 +591,10 @@ class Col(ExpressionNode):
             source = target
         super(Col, self).__init__(output_field=source)
         self.alias, self.target = alias, target
+
+    def __repr__(self):
+        return "{}({}, {})".format(
+            self.__class__.__name__, self.alias, self.target)
 
     def as_sql(self, compiler, connection):
         qn = compiler.quote_name_unless_alias
@@ -588,8 +617,10 @@ class Ref(ExpressionNode):
     """
     def __init__(self, refs, source):
         super(Ref, self).__init__()
-        self.source = source
-        self.refs = refs
+        self.refs, self.source = refs, source
+
+    def __repr__(self):
+        return "{}({}, {})".format(self.__class__.__name__, self.refs, self.source)
 
     def get_source_expressions(self):
         return [self.source]
@@ -743,6 +774,9 @@ class Date(ExpressionNode):
         self.col = None
         self.lookup_type = lookup_type
 
+    def __repr__(self):
+        return "{}({}, {})".format(self.__class__.__name__, self.lookup, self.lookup_type)
+
     def get_source_expressions(self):
         return [self.col]
 
@@ -792,6 +826,10 @@ class DateTime(ExpressionNode):
             self.tzname = timezone._get_timezone_name(tzinfo)
         self.tzinfo = tzinfo
 
+    def __repr__(self):
+        return "{}({}, {}, {})".format(
+            self.__class__.__name__, self.lookup, self.lookup_type, self.tzinfo)
+
     def get_source_expressions(self):
         return [self.col]
 
@@ -833,14 +871,16 @@ class DateTime(ExpressionNode):
 
 class OrderBy(BaseExpression):
     template = '%(expression)s %(ordering)s'
-    descending_template = 'DESC'
-    ascending_template = 'ASC'
 
     def __init__(self, expression, descending=False):
         self.descending = descending
         if not hasattr(expression, 'resolve_expression'):
             raise ValueError('expression must be an expression type')
         self.expression = expression
+
+    def __repr__(self):
+        return "{}({}, descending={})".format(
+            self.__class__.__name__, self.expression, self.descending)
 
     def set_source_expressions(self, exprs):
         self.expression = exprs[0]

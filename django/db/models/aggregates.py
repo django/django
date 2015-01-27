@@ -94,6 +94,13 @@ class Count(Aggregate):
         super(Count, self).__init__(
             expression, distinct='DISTINCT ' if distinct else '', output_field=IntegerField(), **extra)
 
+    def __repr__(self):
+        return "{}({}, distinct={})".format(
+            self.__class__.__name__,
+            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
+            'False' if self.extra['distinct'] == '' else 'True',
+        )
+
     def convert_value(self, value, connection, context):
         if value is None:
             return 0
@@ -117,6 +124,13 @@ class StdDev(Aggregate):
         self.function = 'STDDEV_SAMP' if sample else 'STDDEV_POP'
         super(StdDev, self).__init__(expression, output_field=FloatField(), **extra)
 
+    def __repr__(self):
+        return "{}({}, sample={})".format(
+            self.__class__.__name__,
+            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
+            'False' if self.function == 'STDDEV_POP' else 'True',
+        )
+
     def convert_value(self, value, connection, context):
         if value is None:
             return value
@@ -134,6 +148,13 @@ class Variance(Aggregate):
     def __init__(self, expression, sample=False, **extra):
         self.function = 'VAR_SAMP' if sample else 'VAR_POP'
         super(Variance, self).__init__(expression, output_field=FloatField(), **extra)
+
+    def __repr__(self):
+        return "{}({}, sample={})".format(
+            self.__class__.__name__,
+            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
+            'False' if self.function == 'VAR_POP' else 'True',
+        )
 
     def convert_value(self, value, connection, context):
         if value is None:
