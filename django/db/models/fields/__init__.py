@@ -157,13 +157,10 @@ class Field(RegisterLookupMixin):
         self.unique_for_year = unique_for_year
         self._choices = choices or []
         self.help_text = help_text
+        self.db_index = db_index
         self.db_column = db_column
         self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
         self.auto_created = auto_created
-
-        # Set db_index to True if the field has a relationship and doesn't
-        # explicitly set db_index.
-        self.db_index = db_index
 
         # Adjust the appropriate creation counter, and save our local copy.
         if auto_created:
