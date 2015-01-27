@@ -1,0 +1,17 @@
+===========================
+Django 1.4.17 release notes
+===========================
+
+*January 2, 2015*
+
+Django 1.4.17 fixes a regression in the 1.4.14 security release.
+
+Additionally, Django's vendored version of six, :mod:`django.utils.six`, has
+been upgraded to the latest release (1.9.0).
+
+Bugfixes
+========
+
+* Fixed a regression with dynamically generated inlines and allowed field
+  references in the admin
+  (`#23754 <http://code.djangoproject.com/ticket/23754>`_).
