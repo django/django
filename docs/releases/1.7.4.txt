@@ -20,3 +20,7 @@ Bugfixes
 
 * Prevented the ``static.serve`` view from producing ``ResourceWarning``\s in
   certain circumstances (security fix regression, :ticket:`24193`).
+
+* Fixed schema check for ManyToManyField to look for internal type instead
+  of checking class instance, so you can write custom m2m-like fields with the
+  same behavior. (:ticket:`24104`).
