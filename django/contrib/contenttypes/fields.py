@@ -33,7 +33,7 @@ class GenericForeignKey(object):
     one_to_one = False
     related_model = None
 
-    def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
+    def __init__(self, ct_field='content_type', fk_field='object_id', for_concrete_model=True):
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
@@ -253,6 +253,17 @@ class GenericForeignKey(object):
         setattr(instance, self.cache_attr, value)
 
 
+class GenericRel(ForeignObjectRel):
+    def __init__(self, field, to, related_name=None, related_query_name=None, limit_choices_to=None):
+        super(GenericRel, self).__init__(
+            field, to,
+            related_name=related_query_name or '+',
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            on_delete=DO_NOTHING,
+        )
+
+
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
     # Field flags
@@ -263,30 +274,31 @@ class GenericRelation(ForeignObject):
     one_to_many = False
     one_to_one = False
 
-    def __init__(self, to, **kwargs):
-        kwargs['verbose_name'] = kwargs.get('verbose_name', None)
-        kwargs['rel'] = GenericRel(
-            self, to,
-            related_query_name=kwargs.pop('related_query_name', None),
-            limit_choices_to=kwargs.pop('limit_choices_to', None),
-        )
-        # Override content-type/object-id field names on the related class
-        self.object_id_field_name = kwargs.pop("object_id_field", "object_id")
-        self.content_type_field_name = kwargs.pop("content_type_field", "content_type")
+    rel_class = GenericRel
 
-        self.for_concrete_model = kwargs.pop("for_concrete_model", True)
+    def __init__(self, to, object_id_field='object_id', content_type_field='content_type',
+            for_concrete_model=True, related_query_name=None, limit_choices_to=None, **kwargs):
+        kwargs['rel'] = self.rel_class(
+            self, to,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+        )
 
         kwargs['blank'] = True
         kwargs['editable'] = False
         kwargs['serialize'] = False
+
         # This construct is somewhat of an abuse of ForeignObject. This field
         # represents a relation from pk to object_id field. But, this relation
         # isn't direct, the join is generated reverse along foreign key. So,
         # the from_field is object_id field, to_field is pk because of the
         # reverse join.
         super(GenericRelation, self).__init__(
-            to, to_fields=[],
-            from_fields=[self.object_id_field_name], **kwargs)
+            to, from_fields=[object_id_field], to_fields=[], **kwargs)
+
+        self.object_id_field_name = object_id_field
+        self.content_type_field_name = content_type_field
+        self.for_concrete_model = for_concrete_model
 
     def check(self, **kwargs):
         errors = super(GenericRelation, self).check(**kwargs)
@@ -571,10 +583,3 @@ def create_generic_related_manager(superclass):
         update_or_create.alters_data = True
 
     return GenericRelatedObjectManager
-
-
-class GenericRel(ForeignObjectRel):
-    def __init__(self, field, to, related_name=None, limit_choices_to=None, related_query_name=None):
-        super(GenericRel, self).__init__(field=field, to=to, related_name=related_query_name or '+',
-                                         limit_choices_to=limit_choices_to, on_delete=DO_NOTHING,
-                                         related_query_name=related_query_name)

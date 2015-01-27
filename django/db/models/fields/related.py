@@ -1269,17 +1269,18 @@ class ForeignObjectRel(object):
     editable = False
     is_relation = True
 
-    def __init__(self, field, to, related_name=None, limit_choices_to=None,
-                 parent_link=False, on_delete=None, related_query_name=None):
+    def __init__(self, field, to, related_name=None, related_query_name=None,
+            limit_choices_to=None, parent_link=False, on_delete=None):
         self.field = field
         self.to = to
         self.related_name = related_name
         self.related_query_name = related_query_name
         self.limit_choices_to = {} if limit_choices_to is None else limit_choices_to
-        self.multiple = True
         self.parent_link = parent_link
         self.on_delete = on_delete
+
         self.symmetrical = False
+        self.multiple = True
 
     # Some of the following cached_properties can't be initialized in
     # __init__ as the field doesn't have its model yet. Calling these methods
@@ -1408,11 +1409,17 @@ class ForeignObjectRel(object):
 
 
 class ManyToOneRel(ForeignObjectRel):
-    def __init__(self, field, to, field_name, related_name=None, limit_choices_to=None,
-                 parent_link=False, on_delete=None, related_query_name=None):
+    def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
+            limit_choices_to=None, parent_link=False, on_delete=None):
         super(ManyToOneRel, self).__init__(
-            field, to, related_name=related_name, limit_choices_to=limit_choices_to,
-            parent_link=parent_link, on_delete=on_delete, related_query_name=related_query_name)
+            field, to,
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            parent_link=parent_link,
+            on_delete=on_delete,
+        )
+
         self.field_name = field_name
 
     def get_related_field(self):
@@ -1431,29 +1438,40 @@ class ManyToOneRel(ForeignObjectRel):
 
 
 class OneToOneRel(ManyToOneRel):
-    def __init__(self, field, to, field_name, related_name=None, limit_choices_to=None,
-                 parent_link=False, on_delete=None, related_query_name=None):
-        super(OneToOneRel, self).__init__(field, to, field_name,
-                related_name=related_name, limit_choices_to=limit_choices_to,
-                parent_link=parent_link, on_delete=on_delete, related_query_name=related_query_name)
+    def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
+            limit_choices_to=None, parent_link=False, on_delete=None):
+        super(OneToOneRel, self).__init__(
+            field, to, field_name,
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            parent_link=parent_link,
+            on_delete=on_delete,
+        )
+
         self.multiple = False
 
 
 class ManyToManyRel(ForeignObjectRel):
-    def __init__(self, field, to, related_name=None, limit_choices_to=None,
-                 symmetrical=True, through=None, through_fields=None,
-                 db_constraint=True, related_query_name=None):
+    def __init__(self, field, to, related_name=None, related_query_name=None,
+            limit_choices_to=None, symmetrical=True, through=None, through_fields=None,
+            db_constraint=True):
+        super(ManyToManyRel, self).__init__(
+            field, to,
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+        )
+
         if through and not db_constraint:
             raise ValueError("Can't supply a through model and db_constraint=False")
+        self.through = through
+
         if through_fields and not through:
             raise ValueError("Cannot specify through_fields without a through model")
-        super(ManyToManyRel, self).__init__(
-            field, to, related_name=related_name,
-            limit_choices_to=limit_choices_to, related_query_name=related_query_name)
-        self.symmetrical = symmetrical
-        self.multiple = True
-        self.through = through
         self.through_fields = through_fields
+
+        self.symmetrical = symmetrical
         self.db_constraint = db_constraint
 
     def is_hidden(self):
@@ -1485,24 +1503,26 @@ class ForeignObject(RelatedField):
 
     requires_unique_target = True
     related_accessor_class = ForeignRelatedObjectsDescriptor
+    rel_class = ForeignObjectRel
 
-    def __init__(self, to, from_fields, to_fields, swappable=True, **kwargs):
+    def __init__(self, to, from_fields, to_fields, rel=None, related_name=None,
+            related_query_name=None, limit_choices_to=None, parent_link=False,
+            on_delete=CASCADE, swappable=True, **kwargs):
+        if rel is None:
+            rel = self.rel_class(
+                self, to,
+                related_name=related_name,
+                related_query_name=related_query_name,
+                limit_choices_to=limit_choices_to,
+                parent_link=parent_link,
+                on_delete=on_delete,
+            )
+
+        super(ForeignObject, self).__init__(rel=rel, **kwargs)
+
         self.from_fields = from_fields
         self.to_fields = to_fields
         self.swappable = swappable
-
-        if 'rel' not in kwargs:
-            kwargs['rel'] = ForeignObjectRel(
-                self, to,
-                related_name=kwargs.pop('related_name', None),
-                related_query_name=kwargs.pop('related_query_name', None),
-                limit_choices_to=kwargs.pop('limit_choices_to', None),
-                parent_link=kwargs.pop('parent_link', False),
-                on_delete=kwargs.pop('on_delete', CASCADE),
-            )
-        kwargs['verbose_name'] = kwargs.get('verbose_name', None)
-
-        super(ForeignObject, self).__init__(**kwargs)
 
     def check(self, **kwargs):
         errors = super(ForeignObject, self).check(**kwargs)
@@ -1793,17 +1813,20 @@ class ForeignKey(ForeignObject):
     one_to_many = True
     one_to_one = False
 
+    rel_class = ManyToOneRel
+
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _('%(model)s instance with %(field)s %(value)r does not exist.')
     }
     description = _("Foreign Key (type determined by related field)")
 
-    def __init__(self, to, to_field=None, rel_class=ManyToOneRel,
-                 db_constraint=True, **kwargs):
+    def __init__(self, to, to_field=None, related_name=None, related_query_name=None,
+            limit_choices_to=None, parent_link=False, on_delete=CASCADE,
+            db_constraint=True, **kwargs):
         try:
             to._meta.model_name
-        except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
+        except AttributeError:
             assert isinstance(to, six.string_types), (
                 "%s(%r) is invalid. First parameter to ForeignKey must be "
                 "either a model, a model name, or the string %r" % (
@@ -1817,20 +1840,21 @@ class ForeignKey(ForeignObject):
             # be correct until contribute_to_class is called. Refs #12190.
             to_field = to_field or (to._meta.pk and to._meta.pk.name)
 
-        if 'db_index' not in kwargs:
-            kwargs['db_index'] = True
+        kwargs['rel'] = self.rel_class(
+            self, to, to_field,
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            parent_link=parent_link,
+            on_delete=on_delete,
+        )
+
+        kwargs['db_index'] = kwargs.get('db_index', True)
+
+        super(ForeignKey, self).__init__(
+            to, from_fields=['self'], to_fields=[to_field], **kwargs)
 
         self.db_constraint = db_constraint
-
-        kwargs['rel'] = rel_class(
-            self, to, to_field,
-            related_name=kwargs.pop('related_name', None),
-            related_query_name=kwargs.pop('related_query_name', None),
-            limit_choices_to=kwargs.pop('limit_choices_to', None),
-            parent_link=kwargs.pop('parent_link', False),
-            on_delete=kwargs.pop('on_delete', CASCADE),
-        )
-        super(ForeignKey, self).__init__(to, ['self'], [to_field], **kwargs)
 
     def check(self, **kwargs):
         errors = super(ForeignKey, self).check(**kwargs)
@@ -2010,11 +2034,13 @@ class OneToOneField(ForeignKey):
     one_to_one = True
 
     related_accessor_class = SingleRelatedObjectDescriptor
+    rel_class = OneToOneRel
+
     description = _("One-to-one relationship")
 
     def __init__(self, to, to_field=None, **kwargs):
         kwargs['unique'] = True
-        super(OneToOneField, self).__init__(to, to_field, OneToOneRel, **kwargs)
+        super(OneToOneField, self).__init__(to, to_field, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(OneToOneField, self).deconstruct()
@@ -2100,12 +2126,17 @@ class ManyToManyField(RelatedField):
     one_to_many = False
     one_to_one = False
 
+    rel_class = ManyToManyRel
+
     description = _("Many-to-many relationship")
 
-    def __init__(self, to, db_constraint=True, swappable=True, **kwargs):
+    def __init__(self, to, related_name=None, related_query_name=None,
+            limit_choices_to=None, symmetrical=None, through=None,
+            through_fields=None, db_constraint=True, db_table=None,
+            swappable=True, **kwargs):
         try:
             to._meta
-        except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
+        except AttributeError:
             assert isinstance(to, six.string_types), (
                 "%s(%r) is invalid. First parameter to ManyToManyField must be "
                 "either a model, a model name, or the string %r" %
@@ -2114,24 +2145,30 @@ class ManyToManyField(RelatedField):
             # Class names must be ASCII in Python 2.x, so we forcibly coerce it
             # here to break early if there's a problem.
             to = str(to)
-        kwargs['verbose_name'] = kwargs.get('verbose_name', None)
-        kwargs['rel'] = ManyToManyRel(
+
+        if symmetrical is None:
+            symmetrical = (to == RECURSIVE_RELATIONSHIP_CONSTANT)
+
+        if through is not None:
+            assert db_table is None, (
+                "Cannot specify a db_table if an intermediary model is used."
+            )
+
+        kwargs['rel'] = self.rel_class(
             self, to,
-            related_name=kwargs.pop('related_name', None),
-            related_query_name=kwargs.pop('related_query_name', None),
-            limit_choices_to=kwargs.pop('limit_choices_to', None),
-            symmetrical=kwargs.pop('symmetrical', to == RECURSIVE_RELATIONSHIP_CONSTANT),
-            through=kwargs.pop('through', None),
-            through_fields=kwargs.pop('through_fields', None),
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            symmetrical=symmetrical,
+            through=through,
+            through_fields=through_fields,
             db_constraint=db_constraint,
         )
 
-        self.swappable = swappable
-        self.db_table = kwargs.pop('db_table', None)
-        if kwargs['rel'].through is not None:
-            assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
-
         super(ManyToManyField, self).__init__(**kwargs)
+
+        self.db_table = db_table
+        self.swappable = swappable
 
     def check(self, **kwargs):
         errors = super(ManyToManyField, self).check(**kwargs)
@@ -2201,10 +2238,11 @@ class ManyToManyField(RelatedField):
 
         else:
 
-            assert from_model is not None, \
-                "ManyToManyField with intermediate " \
-                "tables cannot be checked if you don't pass the model " \
+            assert from_model is not None, (
+                "ManyToManyField with intermediate "
+                "tables cannot be checked if you don't pass the model "
                 "where the field is attached to."
+            )
 
             # Set some useful local variables
             to_model = self.rel.to
@@ -2323,10 +2361,11 @@ class ManyToManyField(RelatedField):
             # fields on the through model, and also be foreign keys to the
             # expected models
             else:
-                assert from_model is not None, \
-                    "ManyToManyField with intermediate " \
-                    "tables cannot be checked if you don't pass the model " \
+                assert from_model is not None, (
+                    "ManyToManyField with intermediate "
+                    "tables cannot be checked if you don't pass the model "
                     "where the field is attached to."
+                )
 
                 source, through, target = from_model, self.rel.through, self.rel.to
                 source_field_name, target_field_name = self.rel.through_fields[:2]
