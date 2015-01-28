@@ -348,14 +348,6 @@ class HttpResponseTests(unittest.TestCase):
         #'\xde\x9e' == unichr(1950).encode('utf-8')
         self.assertEqual(r.content, b'123\xde\x9e')
 
-        # with Content-Encoding header
-        r = HttpResponse()
-        r['Content-Encoding'] = 'winning'
-        r.content = [b'abc', b'def']
-        self.assertEqual(r.content, b'abcdef')
-        self.assertRaises(TypeError if six.PY3 else UnicodeEncodeError,
-                          setattr, r, 'content', ['\u079e'])
-
         # .content can safely be accessed multiple times.
         r = HttpResponse(iter(['hello', 'world']))
         self.assertEqual(r.content, r.content)
@@ -511,6 +503,14 @@ class StreamingHttpResponseTests(TestCase):
         r = StreamingHttpResponse(['abc', 'def'])
         self.assertEqual(list(r), [b'abc', b'def'])
         self.assertEqual(list(r), [])
+
+        # iterating over Unicode strings still yields bytestring chunks.
+        r.streaming_content = iter(['hello', 'café'])
+        chunks = list(r)
+        # '\xc3\xa9' == unichr(233).encode('utf-8')
+        self.assertEqual(chunks, [b'hello', b'caf\xc3\xa9'])
+        for chunk in chunks:
+            self.assertIsInstance(chunk, six.binary_type)
 
         # streaming responses don't have a `content` attribute.
         self.assertFalse(hasattr(r, 'content'))
