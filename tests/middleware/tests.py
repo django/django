@@ -599,6 +599,7 @@ class GZipMiddlewareTest(TestCase):
     compressible_string = b'a' * 500
     uncompressible_string = b''.join(six.int2byte(random.randint(0, 255)) for _ in range(500))
     sequence = [b'a' * 500, b'b' * 200, b'a' * 300]
+    sequence_unicode = ['a' * 500, 'é' * 200, 'a' * 300]
 
     def setUp(self):
         self.req = RequestFactory().get('/')
@@ -610,6 +611,8 @@ class GZipMiddlewareTest(TestCase):
         self.resp['Content-Type'] = 'text/html; charset=UTF-8'
         self.stream_resp = StreamingHttpResponse(self.sequence)
         self.stream_resp['Content-Type'] = 'text/html; charset=UTF-8'
+        self.stream_resp_unicode = StreamingHttpResponse(self.sequence_unicode)
+        self.stream_resp_unicode['Content-Type'] = 'text/html; charset=UTF-8'
 
     @staticmethod
     def decompress(gzipped_string):
@@ -630,6 +633,15 @@ class GZipMiddlewareTest(TestCase):
         """
         r = GZipMiddleware().process_response(self.req, self.stream_resp)
         self.assertEqual(self.decompress(b''.join(r)), b''.join(self.sequence))
+        self.assertEqual(r.get('Content-Encoding'), 'gzip')
+        self.assertFalse(r.has_header('Content-Length'))
+
+    def test_compress_streaming_response_unicode(self):
+        """
+        Tests that compression is performed on responses with streaming Unicode content.
+        """
+        r = GZipMiddleware().process_response(self.req, self.stream_resp_unicode)
+        self.assertEqual(self.decompress(b''.join(r)), b''.join(x.encode('utf-8') for x in self.sequence_unicode))
         self.assertEqual(r.get('Content-Encoding'), 'gzip')
         self.assertFalse(r.has_header('Content-Length'))
 
