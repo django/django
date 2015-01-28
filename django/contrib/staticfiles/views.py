@@ -7,11 +7,10 @@ import os
 import posixpath
 
 from django.conf import settings
+from django.contrib.staticfiles import finders
 from django.http import Http404
 from django.utils.six.moves.urllib.parse import unquote
 from django.views import static
-
-from django.contrib.staticfiles import finders
 
 
 def serve(request, path, insecure=False, **kwargs):

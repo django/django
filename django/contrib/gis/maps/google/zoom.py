@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 
-from django.contrib.gis.geos import GEOSGeometry, LinearRing, Polygon, Point
+from math import atan, exp, log, pi, sin
+
+from django.contrib.gis.geos import GEOSGeometry, LinearRing, Point, Polygon
 from django.contrib.gis.maps.google.gmap import GoogleMapException
 from django.utils.six.moves import range
-from math import pi, sin, log, exp, atan
 
 # Constants used for degree to radian conversion, and vice-versa.
 DTOR = pi / 180.

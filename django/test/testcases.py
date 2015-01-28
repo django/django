@@ -1,10 +1,7 @@
 from __future__ import unicode_literals
 
-from collections import Counter
-from copy import copy
 import difflib
 import errno
-from functools import wraps
 import json
 import os
 import posixpath
@@ -14,33 +11,39 @@ import sys
 import threading
 import unittest
 import warnings
+from collections import Counter
+from copy import copy
+from functools import wraps
 from unittest.util import safe_repr
 
 from django.apps import apps
 from django.conf import settings
 from django.core import mail
-from django.core.exceptions import ValidationError, ImproperlyConfigured
-from django.core.handlers.wsgi import get_path_info, WSGIHandler
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.commands import flush
 from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.core.urlresolvers import clear_url_caches, set_urlconf
-from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
+from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import setting_changed, template_rendered
-from django.test.utils import (CaptureQueriesContext, ContextList,
-    override_settings, modify_settings, compare_xml)
+from django.test.utils import (
+    CaptureQueriesContext, ContextList, compare_xml, modify_settings,
+    override_settings,
+)
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
-from django.utils import six
-from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit, urlparse, unquote
+from django.utils.six.moves.urllib.parse import (
+    unquote, urlparse, urlsplit, urlunsplit,
+)
 from django.utils.six.moves.urllib.request import url2pathname
 from django.views.static import serve
-
 
 __all__ = ('TestCase', 'TransactionTestCase',
            'SimpleTestCase', 'skipIfDBFeature', 'skipUnlessDBFeature')

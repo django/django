@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import time
 import warnings
 
-from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
+from django.core.exceptions import DjangoRuntimeWarning, ImproperlyConfigured
 from django.utils.module_loading import import_string
 
 

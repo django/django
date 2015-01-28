@@ -1,24 +1,28 @@
 from __future__ import unicode_literals
 
-from copy import deepcopy
 import datetime
 import uuid
+from copy import deepcopy
 
 from django.core.exceptions import FieldError
-from django.db import connection, transaction, DatabaseError
+from django.db import DatabaseError, connection, transaction
 from django.db.models import TimeField, UUIDField
-from django.db.models.aggregates import Avg, Count, Max, Min, StdDev, Sum, Variance
-from django.db.models.expressions import (
-    Case, Col, Date, DateTime, F, Func, OrderBy,
-    Random, RawSQL, Ref, Value, When
+from django.db.models.aggregates import (
+    Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
-from django.db.models.functions import Coalesce, Concat, Length, Lower, Substr, Upper
+from django.db.models.expressions import (
+    F, Case, Col, Date, DateTime, Func, OrderBy, Random, RawSQL, Ref, Value,
+    When,
+)
+from django.db.models.functions import (
+    Coalesce, Concat, Length, Lower, Substr, Upper,
+)
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
 from django.utils.timezone import utc
 
-from .models import Company, Employee, Number, Experiment, Time, UUID
+from .models import UUID, Company, Employee, Experiment, Number, Time
 
 
 class BasicExpressionsTests(TestCase):

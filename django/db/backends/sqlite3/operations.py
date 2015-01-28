@@ -4,14 +4,14 @@ import datetime
 import uuid
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, FieldError
+from django.core.exceptions import FieldError, ImproperlyConfigured
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models import fields, aggregates
+from django.db.models import aggregates, fields
+from django.utils import six, timezone
 from django.utils.dateparse import parse_date, parse_time
 from django.utils.duration import duration_string
-from django.utils import six, timezone
 
 from .utils import parse_datetime_with_timezone_support
 

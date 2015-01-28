@@ -2,22 +2,21 @@ from __future__ import unicode_literals
 
 import os
 import sys
-from unittest import skipUnless
 import warnings
+from unittest import skipUnless
 
-from django.apps import apps, AppConfig
+from django.apps import AppConfig, apps
 from django.apps.registry import Apps
 from django.contrib.admin.models import LogEntry
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.test import TestCase, override_settings
 from django.test.utils import extend_sys_path
-from django.utils._os import upath
 from django.utils import six
+from django.utils._os import upath
 
 from .default_config_app.apps import CustomConfig
-from .models import TotallyNormal, SoAlternative, new_apps
-
+from .models import SoAlternative, TotallyNormal, new_apps
 
 # Small list with a variety of cases for tests that iterate on installed apps.
 # Intentionally not in alphabetical order to check if the order is preserved.

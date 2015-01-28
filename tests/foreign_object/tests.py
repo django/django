@@ -1,13 +1,16 @@
 import datetime
 from operator import attrgetter
 
-from .models import (
-    Country, Person, Group, Membership, Friendship, Article,
-    ArticleTranslation, ArticleTag, ArticleIdea, NewsArticle)
+from django import forms
+from django.core.exceptions import FieldError
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import translation
-from django.core.exceptions import FieldError
-from django import forms
+
+from .models import (
+    Article, ArticleIdea, ArticleTag, ArticleTranslation, Country, Friendship,
+    Group, Membership, NewsArticle, Person,
+)
+
 
 # Note that these tests are testing internal implementation details.
 # ForeignObject is not part of public API.

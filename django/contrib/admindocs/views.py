@@ -1,23 +1,25 @@
-from importlib import import_module
 import inspect
 import os
 import re
+from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db import models
-from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.http import Http404
-from django.core import urlresolvers
 from django.contrib.admindocs import utils
-from django.template.base import (builtins, get_library,
-    get_templatetags_modules, InvalidTemplateLibrary, libraries)
+from django.core import urlresolvers
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.db import models
+from django.http import Http404
+from django.template.base import (
+    InvalidTemplateLibrary, builtins, get_library, get_templatetags_modules,
+    libraries,
+)
 from django.template.engine import Engine
-from django.utils.decorators import method_decorator
-from django.utils._os import upath
 from django.utils import six
+from django.utils._os import upath
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
 

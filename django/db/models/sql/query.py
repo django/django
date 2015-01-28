@@ -6,26 +6,27 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
-from string import ascii_uppercase
-from itertools import count, product
-
-from collections import Mapping, OrderedDict
 import copy
-from itertools import chain
 import warnings
+from collections import Mapping, OrderedDict
+from itertools import chain, count, product
+from string import ascii_uppercase
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
-from django.db.models.query_utils import PathInfo, Q, refs_aggregate
-from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
-        ORDER_PATTERN, INNER, LOUTER)
+from django.db.models.query_utils import Q, PathInfo, refs_aggregate
+from django.db.models.sql.constants import (
+    INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, QUERY_TERMS, SINGLE,
+)
 from django.db.models.sql.datastructures import (
-    EmptyResultSet, Empty, MultiJoin, Join, BaseTable)
-from django.db.models.sql.where import (WhereNode, ExtraWhere, AND, OR,
-        NothingNode)
+    BaseTable, Empty, EmptyResultSet, Join, MultiJoin,
+)
+from django.db.models.sql.where import (
+    AND, OR, ExtraWhere, NothingNode, WhereNode,
+)
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text

@@ -1,16 +1,19 @@
 from __future__ import unicode_literals
+
 from datetime import date
 
+from django.contrib.auth import BACKEND_SESSION_KEY, authenticate, get_user
 from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.models import User, Group, Permission, AnonymousUser
+from django.contrib.auth.hashers import MD5PasswordHasher
+from django.contrib.auth.models import AnonymousUser, Group, Permission, User
+from django.contrib.auth.tests.custom_user import (
+    CustomPermissionsUser, CustomUser, ExtensionUser,
+)
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.contrib.auth.tests.custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.contrib.auth import authenticate, BACKEND_SESSION_KEY, get_user
 from django.http import HttpRequest
 from django.test import TestCase, modify_settings, override_settings
-from django.contrib.auth.hashers import MD5PasswordHasher
 
 
 class CountingMD5PasswordHasher(MD5PasswordHasher):

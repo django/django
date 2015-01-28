@@ -1,5 +1,7 @@
-import cx_Oracle
 import sys
+
+import cx_Oracle
+
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils import six
 

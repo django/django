@@ -3,7 +3,9 @@ import unittest
 from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.geometry.test_data import get_ds_file, TestDS, TEST_DATA
+from django.contrib.gis.geometry.test_data import (
+    TEST_DATA, TestDS, get_ds_file,
+)
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import DataSource, Envelope, OGRGeometry, GDALException, OGRIndexError, GDAL_VERSION

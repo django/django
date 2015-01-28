@@ -18,12 +18,11 @@
 #
 #  $ python scripts/manage_translations.py lang_stats --language=es --resources=admin
 
-from argparse import ArgumentParser
 import os
-from subprocess import call, Popen, PIPE
+from argparse import ArgumentParser
+from subprocess import PIPE, Popen, call
 
 from django.core.management import call_command
-
 
 HAVE_JS = ['admin']
 

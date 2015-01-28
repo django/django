@@ -1,14 +1,13 @@
 from datetime import datetime, tzinfo
 
+from django.template import Library, Node, TemplateSyntaxError
+from django.utils import six, timezone
+
 try:
     import pytz
 except ImportError:
     pytz = None
 
-from django.template import Node
-from django.template import TemplateSyntaxError, Library
-from django.utils import six
-from django.utils import timezone
 
 register = Library()
 

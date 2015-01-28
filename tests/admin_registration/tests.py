@@ -6,7 +6,7 @@ from django.contrib.admin.sites import site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from .models import Person, Place, Location, Traveler
+from .models import Location, Person, Place, Traveler
 
 
 class NameAdmin(admin.ModelAdmin):

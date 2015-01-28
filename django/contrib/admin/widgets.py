@@ -9,15 +9,17 @@ from django import forms
 from django.contrib.admin.templatetags.admin_static import static
 from django.core.urlresolvers import reverse
 from django.db.models.deletion import CASCADE
-from django.forms.widgets import Media, RadioFieldRenderer
 from django.forms.utils import flatatt
+from django.forms.widgets import Media, RadioFieldRenderer
 from django.template.loader import render_to_string
-from django.utils.html import escape, format_html, format_html_join, smart_urlquote
+from django.utils import six
+from django.utils.encoding import force_text
+from django.utils.html import (
+    escape, format_html, format_html_join, smart_urlquote,
+)
+from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
-from django.utils.safestring import mark_safe
-from django.utils.encoding import force_text
-from django.utils import six
 
 
 class FilteredSelectMultiple(forms.SelectMultiple):

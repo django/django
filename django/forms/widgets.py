@@ -6,15 +6,17 @@ from __future__ import unicode_literals
 
 import copy
 import datetime
-from itertools import chain
 import re
+from itertools import chain
 
 from django.conf import settings
 from django.forms.utils import flatatt, to_current_timezone
 from django.utils import datetime_safe, formats, six
 from django.utils.datastructures import MultiValueDict
 from django.utils.dates import MONTHS
-from django.utils.encoding import force_str, force_text, python_2_unicode_compatible
+from django.utils.encoding import (
+    force_str, force_text, python_2_unicode_compatible,
+)
 from django.utils.formats import get_format
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe

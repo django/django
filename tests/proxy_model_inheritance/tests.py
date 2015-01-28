@@ -7,8 +7,9 @@ from django.test import TestCase, TransactionTestCase
 from django.test.utils import extend_sys_path
 from django.utils._os import upath
 
-from .models import (ConcreteModel, ConcreteModelSubclass,
-    ConcreteModelSubclassProxy)
+from .models import (
+    ConcreteModel, ConcreteModelSubclass, ConcreteModelSubclassProxy,
+)
 
 
 class ProxyModelInheritanceTests(TransactionTestCase):

@@ -1,9 +1,9 @@
+from template_tests.test_response import test_processor_name
+
 from django.template import RequestContext
 from django.template.backends.django import DjangoTemplates
-from django.test import ignore_warnings, RequestFactory
+from django.test import RequestFactory, ignore_warnings
 from django.utils.deprecation import RemovedInDjango20Warning
-
-from template_tests.test_response import test_processor_name
 
 from .test_dummy import TemplateStringsTests
 

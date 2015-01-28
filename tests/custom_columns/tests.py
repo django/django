@@ -4,7 +4,7 @@ from django.core.exceptions import FieldError
 from django.test import TestCase
 from django.utils import six
 
-from .models import Author, Article
+from .models import Article, Author
 
 
 class CustomColumnsTests(TestCase):

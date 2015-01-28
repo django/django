@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
 
-from .models import Action, Person, Car
+from .models import Action, Car, Person
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],

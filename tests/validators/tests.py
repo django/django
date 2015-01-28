@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime, timedelta
 import io
 import os
 import re
 import types
+from datetime import datetime, timedelta
 from unittest import TestCase
 
 from django.core.exceptions import ValidationError
@@ -13,13 +13,12 @@ from django.core.validators import (
     BaseValidator, EmailValidator, MaxLengthValidator, MaxValueValidator,
     MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
     validate_comma_separated_integer_list, validate_email, validate_integer,
-    validate_ipv46_address, validate_ipv4_address, validate_ipv6_address,
+    validate_ipv4_address, validate_ipv6_address, validate_ipv46_address,
     validate_slug,
 )
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
 from django.utils._os import upath
-
 
 NOW = datetime.now()
 EXTENDED_SCHEMES = ['http', 'https', 'ftp', 'ftps', 'git', 'file']

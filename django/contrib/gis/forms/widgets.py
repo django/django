@@ -4,11 +4,10 @@ import logging
 
 from django.conf import settings
 from django.contrib.gis import gdal
-from django.contrib.gis.geos import GEOSGeometry, GEOSException
+from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Widget
 from django.template import loader
-from django.utils import six
-from django.utils import translation
+from django.utils import six, translation
 
 logger = logging.getLogger('django.contrib.gis')
 

@@ -11,7 +11,7 @@ from django.utils.encoding import force_bytes, smart_str
 
 from .models import FileModel
 from .tests import UNICODE_FILENAME, UPLOAD_TO
-from .uploadhandler import QuotaUploadHandler, ErroringUploadHandler
+from .uploadhandler import ErroringUploadHandler, QuotaUploadHandler
 
 
 def file_upload_view(request):

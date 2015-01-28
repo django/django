@@ -9,7 +9,7 @@
 import logging
 import os
 import re
-from ctypes import c_char_p, Structure, CDLL, CFUNCTYPE, POINTER
+from ctypes import CDLL, CFUNCTYPE, POINTER, Structure, c_char_p
 from ctypes.util import find_library
 
 from django.contrib.gis.geos.error import GEOSException

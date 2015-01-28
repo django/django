@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.template import Template, Context, TemplateSyntaxError
+from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase, override_settings
 
 from .settings import FLATPAGES_TEMPLATES

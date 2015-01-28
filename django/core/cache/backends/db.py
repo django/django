@@ -2,17 +2,17 @@
 import base64
 from datetime import datetime
 
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.db import DatabaseError, connections, router, transaction
+from django.db.backends.utils import typecast_timestamp
+from django.utils import six, timezone
+from django.utils.encoding import force_bytes
+
 try:
     from django.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
-
-from django.conf import settings
-from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
-from django.db import connections, transaction, router, DatabaseError
-from django.db.backends.utils import typecast_timestamp
-from django.utils import timezone, six
-from django.utils.encoding import force_bytes
 
 
 class Options(object):

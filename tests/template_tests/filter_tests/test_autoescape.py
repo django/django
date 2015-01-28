@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from ..utils import setup, SafeClass, UnsafeClass
+from ..utils import SafeClass, UnsafeClass, setup
 
 
 class AutoescapeStringfilterTests(SimpleTestCase):

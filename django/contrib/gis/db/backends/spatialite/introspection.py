@@ -1,5 +1,7 @@
 from django.contrib.gis.gdal import OGRGeomType
-from django.db.backends.sqlite3.introspection import DatabaseIntrospection, FlexibleFieldLookupDict
+from django.db.backends.sqlite3.introspection import (
+    DatabaseIntrospection, FlexibleFieldLookupDict,
+)
 from django.utils import six
 
 

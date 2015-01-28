@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
+
 from collections import namedtuple
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
 from django.utils.encoding import force_text
-
 
 FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 

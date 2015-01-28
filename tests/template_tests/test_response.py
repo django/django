@@ -1,16 +1,18 @@
 from __future__ import unicode_literals
 
-from datetime import datetime
 import os
 import pickle
 import time
+from datetime import datetime
 
-from django.test import RequestFactory, SimpleTestCase
 from django.conf import settings
 from django.template import Context, engines
-from django.template.response import (TemplateResponse, SimpleTemplateResponse,
-                                      ContentNotRenderedError)
-from django.test import ignore_warnings, override_settings
+from django.template.response import (
+    ContentNotRenderedError, SimpleTemplateResponse, TemplateResponse,
+)
+from django.test import (
+    RequestFactory, SimpleTestCase, ignore_warnings, override_settings,
+)
 from django.test.utils import require_jinja2
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning

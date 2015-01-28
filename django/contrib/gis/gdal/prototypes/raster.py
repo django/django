@@ -2,12 +2,14 @@
 This module houses the ctypes function prototypes for GDAL DataSource (raster)
 related data structures.
 """
-from ctypes import c_char_p, c_double, c_int, c_void_p, POINTER
+from ctypes import POINTER, c_char_p, c_double, c_int, c_void_p
 from functools import partial
 
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
-    double_output, int_output, void_output, voidptr_output)
+from django.contrib.gis.gdal.prototypes.generation import (
+    const_string_output, double_output, int_output, void_output,
+    voidptr_output,
+)
 
 # For more detail about c function names and definitions see
 # http://gdal.org/gdal_8h.html

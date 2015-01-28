@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 from django.contrib.auth.forms import AuthenticationForm
 
-from . import models, admin as base_admin
+from . import admin as base_admin, models
 
 PERMISSION_NAME = 'admin_views.%s' % get_permission_codename('change', models.Article._meta)
 

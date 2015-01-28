@@ -3,13 +3,15 @@ from __future__ import unicode_literals
 import os
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, clear_url_caches, set_script_prefix
+from django.core.urlresolvers import (
+    clear_url_caches, reverse, set_script_prefix,
+)
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
+from django.template import Context, Template
 from django.test import TestCase, override_settings
-from django.template import Template, Context
-from django.utils._os import upath
 from django.utils import translation
+from django.utils._os import upath
 
 
 class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):

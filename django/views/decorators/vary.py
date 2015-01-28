@@ -1,4 +1,5 @@
 from functools import wraps
+
 from django.utils.cache import patch_vary_headers
 from django.utils.decorators import available_attrs
 

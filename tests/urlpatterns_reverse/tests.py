@@ -7,23 +7,25 @@ from __future__ import unicode_literals
 import sys
 import unittest
 
-from django.contrib.auth.models import User
+from admin_scripts.tests import AdminScriptTestCase
+
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.core.urlresolvers import (reverse, reverse_lazy, resolve, get_callable,
-    get_resolver, NoReverseMatch, Resolver404, ResolverMatch, RegexURLResolver,
-    RegexURLPattern)
-from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.core.urlresolvers import (
+    NoReverseMatch, RegexURLPattern, RegexURLResolver, Resolver404,
+    ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
+)
+from django.http import (
+    HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect,
+)
 from django.shortcuts import redirect
 from django.test import TestCase, ignore_warnings, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from admin_scripts.tests import AdminScriptTestCase
-
-from . import urlconf_outer, middleware, views
+from . import middleware, urlconf_outer, views
 from .views import empty_view
-
 
 resolve_test_data = (
     # These entries are in the format: (path, url_name, app_name, namespace, view_name, func, args, kwargs)

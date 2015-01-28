@@ -1,6 +1,6 @@
 from django.contrib.postgres.fields import (
-    ArrayField, HStoreField, IntegerRangeField, BigIntegerRangeField,
-    FloatRangeField, DateTimeRangeField, DateRangeField,
+    ArrayField, BigIntegerRangeField, DateRangeField, DateTimeRangeField,
+    FloatRangeField, HStoreField, IntegerRangeField,
 )
 from django.db import connection, models
 

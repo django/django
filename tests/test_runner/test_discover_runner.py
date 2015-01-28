@@ -1,5 +1,5 @@
-from contextlib import contextmanager
 import os
+from contextlib import contextmanager
 from unittest import TestSuite, TextTestRunner, defaultTestLoader
 
 from django.test import TestCase

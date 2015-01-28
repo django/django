@@ -11,14 +11,15 @@ from itertools import dropwhile
 
 import django
 from django.conf import settings
-from django.core.management.base import CommandError, BaseCommand
-from django.core.management.utils import (handle_extensions, find_command,
-    popen_wrapper)
+from django.core.management.base import BaseCommand, CommandError
+from django.core.management.utils import (
+    find_command, handle_extensions, popen_wrapper,
+)
+from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property, total_ordering
-from django.utils import six
-from django.utils.text import get_text_list
 from django.utils.jslex import prepare_js_for_gettext
+from django.utils.text import get_text_list
 
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 STATUS_OK = 0

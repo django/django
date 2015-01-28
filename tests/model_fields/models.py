@@ -2,20 +2,22 @@ import os
 import tempfile
 import uuid
 
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
+from django.contrib.contenttypes.models import ContentType
+from django.core.files.storage import FileSystemStorage
+from django.db import models
+from django.db.models.fields.files import ImageField, ImageFieldFile
+from django.db.models.fields.related import (
+    ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
+)
+from django.utils import six
+
 try:
     from PIL import Image
 except ImportError:
     Image = None
-
-from django.core.files.storage import FileSystemStorage
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.contrib.contenttypes.models import ContentType
-from django.db.models.fields.related import (
-    ForeignObject, ForeignKey, ManyToManyField, OneToOneField,
-)
-from django.db import models
-from django.db.models.fields.files import ImageFieldFile, ImageField
-from django.utils import six
 
 
 class Foo(models.Model):

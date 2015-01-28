@@ -1,6 +1,6 @@
 import copy
-from importlib import import_module
 import inspect
+from importlib import import_module
 
 from django.db import router
 from django.db.models.query import QuerySet

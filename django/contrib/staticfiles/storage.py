@@ -1,22 +1,25 @@
 from __future__ import unicode_literals
-from collections import OrderedDict
+
 import hashlib
+import json
 import os
 import posixpath
 import re
-import json
+from collections import OrderedDict
 
 from django.conf import settings
-from django.core.cache import (caches, InvalidCacheBackendError,
-                               cache as default_cache)
+from django.contrib.staticfiles.utils import check_settings, matches_patterns
+from django.core.cache import (
+    InvalidCacheBackendError, cache as default_cache, caches,
+)
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
-from django.utils.six.moves.urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
-
-from django.contrib.staticfiles.utils import check_settings, matches_patterns
+from django.utils.six.moves.urllib.parse import (
+    unquote, urldefrag, urlsplit, urlunsplit,
+)
 
 
 class StaticFilesStorage(FileSystemStorage):

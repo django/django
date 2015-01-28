@@ -6,11 +6,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
-from django.http import HttpRequest, Http404
+from django.http import Http404, HttpRequest
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.utils import six
 
-from .models import ConcreteModel, ProxyModel, FooWithoutUrl, FooWithUrl, FooWithBrokenAbsoluteUrl
+from .models import (
+    ConcreteModel, FooWithBrokenAbsoluteUrl, FooWithoutUrl, FooWithUrl,
+    ProxyModel,
+)
 
 
 class ContentTypesTests(TestCase):

@@ -3,7 +3,7 @@ Classes to represent the definitions of aggregate functions.
 """
 from django.core.exceptions import FieldError
 from django.db.models.expressions import Func, Value
-from django.db.models.fields import IntegerField, FloatField
+from django.db.models.fields import FloatField, IntegerField
 
 __all__ = [
     'Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',

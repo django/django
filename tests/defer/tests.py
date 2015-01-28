@@ -3,7 +3,9 @@ from __future__ import unicode_literals
 from django.db.models.query_utils import DeferredAttribute, InvalidQuery
 from django.test import TestCase
 
-from .models import Secondary, Primary, Child, BigChild, ChildProxy, RefreshPrimaryProxy
+from .models import (
+    BigChild, Child, ChildProxy, Primary, RefreshPrimaryProxy, Secondary,
+)
 
 
 class AssertionMixin(object):

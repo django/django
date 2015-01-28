@@ -11,7 +11,7 @@ from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text
 
 from .base import Database
-from .utils import convert_unicode, InsertIdVar, Oracle_datetime
+from .utils import InsertIdVar, Oracle_datetime, convert_unicode
 
 
 class DatabaseOperations(BaseDatabaseOperations):

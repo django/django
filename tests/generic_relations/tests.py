@@ -8,10 +8,11 @@ from django.db.models import Q
 from django.test import TestCase
 from django.utils import six
 
-from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
-                     Vegetable, Mineral, Gecko, Rock, ManualPK,
-                     ForProxyModelModel, ForConcreteModelModel,
-                     ProxyRelatedModel, ConcreteRelatedModel, AllowsNullGFK)
+from .models import (
+    AllowsNullGFK, Animal, Comparison, ConcreteRelatedModel,
+    ForConcreteModelModel, ForProxyModelModel, Gecko, ManualPK, Mineral,
+    ProxyRelatedModel, Rock, TaggedItem, ValuableTaggedItem, Vegetable,
+)
 
 
 class GenericRelationsTests(TestCase):

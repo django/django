@@ -1,7 +1,6 @@
 from django.conf.urls import include, url
 
-from . import views, customadmin, custom_has_permission_admin, admin
-
+from . import admin, custom_has_permission_admin, customadmin, views
 
 urlpatterns = [
     url(r'^test_admin/admin/doc/', include('django.contrib.admindocs.urls')),

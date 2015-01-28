@@ -5,7 +5,7 @@ from django.core import exceptions, serializers
 from django.db import models
 from django.test import TestCase
 
-from .models import UUIDModel, NullableUUIDModel, PrimaryKeyUUIDModel
+from .models import NullableUUIDModel, PrimaryKeyUUIDModel, UUIDModel
 
 
 class TestSaveLoad(TestCase):

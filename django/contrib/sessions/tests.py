@@ -1,32 +1,34 @@
 import base64
-from datetime import timedelta
 import os
 import shutil
 import string
 import tempfile
 import unittest
+from datetime import timedelta
 
 from django.conf import settings
-from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 from django.contrib.sessions.backends.cache import SessionStore as CacheSession
-from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
+from django.contrib.sessions.backends.cached_db import \
+    SessionStore as CacheDBSession
+from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 from django.contrib.sessions.backends.file import SessionStore as FileSession
-from django.contrib.sessions.backends.signed_cookies import SessionStore as CookieSession
-from django.contrib.sessions.models import Session
+from django.contrib.sessions.backends.signed_cookies import \
+    SessionStore as CookieSession
+from django.contrib.sessions.exceptions import InvalidSessionKey
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.contrib.sessions.models import Session
+from django.core import management
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
-from django.core import management
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory, ignore_warnings, override_settings
+from django.test import (
+    RequestFactory, TestCase, ignore_warnings, override_settings,
+)
 from django.test.utils import patch_logger
-from django.utils import six
-from django.utils import timezone
+from django.utils import six, timezone
 from django.utils.encoding import force_text
 from django.utils.six.moves import http_cookies
-
-from django.contrib.sessions.exceptions import InvalidSessionKey
 
 
 class SessionTestsMixin(object):

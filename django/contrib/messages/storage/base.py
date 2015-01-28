@@ -1,9 +1,8 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.contrib.messages import constants, utils
-
+from django.utils.encoding import force_text, python_2_unicode_compatible
 
 LEVEL_TAGS = utils.get_level_tags()
 

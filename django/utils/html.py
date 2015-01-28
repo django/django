@@ -5,17 +5,18 @@ from __future__ import unicode_literals
 import re
 import warnings
 
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, force_str
+from django.utils.encoding import force_str, force_text
 from django.utils.functional import allow_lazy
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
-from django.utils import six
-from django.utils.six.moves.urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
+from django.utils.six.moves.urllib.parse import (
+    parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
+)
 from django.utils.text import normalize_newlines
 
-from .html_parser import HTMLParser, HTMLParseError
-
+from .html_parser import HTMLParseError, HTMLParser
 
 # Configuration for urlize() function.
 TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)', '"', '\'', '!']

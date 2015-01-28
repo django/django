@@ -9,22 +9,22 @@ import sys
 import tempfile
 import unittest
 
-from django.template import Context, Template
 from django.conf import settings
+from django.contrib.staticfiles import finders, storage
+from django.contrib.staticfiles.management.commands import collectstatic
+from django.contrib.staticfiles.management.commands.collectstatic import \
+    Command as CollectstaticCommand
 from django.core.cache.backends.base import BaseCache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
+from django.template import Context, Template
 from django.test import TestCase, override_settings
+from django.utils import six
+from django.utils._os import rmtree_errorhandler, symlinks_supported, upath
 from django.utils.encoding import force_text
 from django.utils.functional import empty
-from django.utils._os import rmtree_errorhandler, upath, symlinks_supported
-from django.utils import six
-
-from django.contrib.staticfiles import finders, storage
-from django.contrib.staticfiles.management.commands import collectstatic
 
 from .storage import DummyStorage
-
 
 TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {
@@ -52,7 +52,6 @@ TEST_SETTINGS = {
         'staticfiles_tests.apps.no_label',
     ],
 }
-from django.contrib.staticfiles.management.commands.collectstatic import Command as CollectstaticCommand
 
 
 class BaseStaticFilesTestCase(object):

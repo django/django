@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
+from psycopg2.extras import Inet
+
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
-
-from psycopg2.extras import Inet
 
 
 class DatabaseOperations(BaseDatabaseOperations):

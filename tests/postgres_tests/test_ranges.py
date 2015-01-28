@@ -2,15 +2,17 @@ import datetime
 import json
 import unittest
 
+from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
+
 from django import forms
-from django.contrib.postgres import forms as pg_forms, fields as pg_fields
-from django.contrib.postgres.validators import RangeMaxValueValidator, RangeMinValueValidator
+from django.contrib.postgres import fields as pg_fields, forms as pg_forms
+from django.contrib.postgres.validators import (
+    RangeMaxValueValidator, RangeMinValueValidator,
+)
 from django.core import exceptions, serializers
 from django.db import connection
 from django.test import TestCase
 from django.utils import timezone
-
-from psycopg2.extras import NumericRange, DateTimeTZRange, DateRange
 
 from .models import RangesModel
 

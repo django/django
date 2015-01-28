@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from .. import Warning, register, Tags
+from .. import Tags, Warning, register
 
 
 @register(Tags.compatibility)

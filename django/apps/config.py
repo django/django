@@ -1,10 +1,9 @@
-from importlib import import_module
 import os
+from importlib import import_module
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
-from django.utils.module_loading import module_has_submodule
 from django.utils._os import upath
-
+from django.utils.module_loading import module_has_submodule
 
 MODELS_MODULE_NAME = 'models'
 

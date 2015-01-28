@@ -1,20 +1,19 @@
 from __future__ import unicode_literals
 
 import base64
-from datetime import datetime, timedelta
 import logging
 import string
+from datetime import datetime, timedelta
 
 from django.conf import settings
+from django.contrib.sessions.exceptions import SuspiciousSession
 from django.core.exceptions import SuspiciousOperation
-from django.utils.crypto import constant_time_compare
-from django.utils.crypto import get_random_string
-from django.utils.crypto import salted_hmac
 from django.utils import timezone
+from django.utils.crypto import (
+    constant_time_compare, get_random_string, salted_hmac,
+)
 from django.utils.encoding import force_bytes, force_text
 from django.utils.module_loading import import_string
-
-from django.contrib.sessions.exceptions import SuspiciousSession
 
 # session_key should not be case sensitive because some backends can store it
 # on case insensitive file systems.

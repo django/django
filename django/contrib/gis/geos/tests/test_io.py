@@ -6,7 +6,7 @@ from unittest import skipUnless
 
 from django.utils.six import memoryview
 
-from ..import HAS_GEOS
+from ..import HAS_GEOS  # isort:skip
 
 if HAS_GEOS:
     from .. import GEOSGeometry, WKTReader, WKTWriter, WKBReader, WKBWriter

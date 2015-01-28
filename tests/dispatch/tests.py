@@ -7,7 +7,6 @@ from types import TracebackType
 
 from django.dispatch import Signal, receiver
 
-
 if sys.platform.startswith('java'):
     def garbage_collect():
         # Some JVM GCs will execute finalizers in a different thread, meaning

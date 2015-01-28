@@ -1,13 +1,12 @@
 from __future__ import unicode_literals
 
-from django.utils.six import StringIO
+from swappable_models.models import Article
 
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.test import TestCase, override_settings
-
-from swappable_models.models import Article
+from django.utils.six import StringIO
 
 
 class SwappableModelTests(TestCase):

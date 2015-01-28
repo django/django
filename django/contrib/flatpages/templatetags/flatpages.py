@@ -3,7 +3,6 @@ from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.shortcuts import get_current_site
 
-
 register = template.Library()
 
 

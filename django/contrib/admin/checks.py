@@ -3,11 +3,15 @@ from __future__ import unicode_literals
 
 from itertools import chain
 
-from django.contrib.admin.utils import get_fields_from_path, NotRelationField, flatten
+from django.contrib.admin.utils import (
+    NotRelationField, flatten, get_fields_from_path,
+)
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
-from django.forms.models import BaseModelForm, _get_foreign_key, BaseModelFormSet
+from django.forms.models import (
+    BaseModelForm, BaseModelFormSet, _get_foreign_key,
+)
 
 
 def check_admin_app(**kwargs):

@@ -12,10 +12,9 @@ import re
 from django.conf import settings
 from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
+from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.encoding import force_text
 from django.utils.http import same_origin
-from django.utils.crypto import constant_time_compare, get_random_string
-
 
 logger = logging.getLogger('django.request')
 

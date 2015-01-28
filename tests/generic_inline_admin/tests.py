@@ -10,9 +10,8 @@ from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
 from django.test import RequestFactory, TestCase, override_settings
 
-# local test models
 from .admin import MediaInline, MediaPermanentInline, site as admin_site
-from .models import Episode, Media, EpisodePermanent, Category
+from .models import Category, Episode, EpisodePermanent, Media
 
 
 # Set TEMPLATE_DEBUG to True to ensure {% include %} will raise exceptions.

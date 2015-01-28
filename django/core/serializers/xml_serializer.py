@@ -4,15 +4,16 @@ XML serializer.
 
 from __future__ import unicode_literals
 
-from django.apps import apps
-from django.conf import settings
-from django.core.serializers import base
-from django.db import models, DEFAULT_DB_ALIAS
-from django.utils.xmlutils import SimplerXMLGenerator
-from django.utils.encoding import smart_text
 from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
+
+from django.apps import apps
+from django.conf import settings
+from django.core.serializers import base
+from django.db import DEFAULT_DB_ALIAS, models
+from django.utils.encoding import smart_text
+from django.utils.xmlutils import SimplerXMLGenerator
 
 
 class Serializer(base.Serializer):

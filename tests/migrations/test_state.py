@@ -1,11 +1,14 @@
 from django.apps.registry import Apps
 from django.db import models
 from django.db.migrations.operations import RemoveField
-from django.db.migrations.state import ProjectState, ModelState, InvalidBasesError
+from django.db.migrations.state import (
+    InvalidBasesError, ModelState, ProjectState,
+)
 from django.test import TestCase
 
-from .models import (FoodManager, FoodQuerySet, ModelWithCustomBase,
-    NoMigrationFoodManager)
+from .models import (
+    FoodManager, FoodQuerySet, ModelWithCustomBase, NoMigrationFoodManager,
+)
 
 
 class StateTests(TestCase):

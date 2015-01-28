@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 from django.db.models import Q
 from django.test import TestCase
 
-from .models import (SystemDetails, Item, PropertyValue, SystemInfo, Forum,
-    Post, Comment)
+from .models import (
+    Comment, Forum, Item, Post, PropertyValue, SystemDetails, SystemInfo,
+)
 
 
 class NullFkTests(TestCase):

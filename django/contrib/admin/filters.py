@@ -7,15 +7,17 @@ certain test -- e.g. being a DateField or ForeignKey.
 """
 import datetime
 
+from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.utils import (
+    get_limit_choices_to_from_path, get_model_from_relation,
+    prepare_lookup_value, reverse_field_path,
+)
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models.fields.related import ForeignObjectRel, ManyToManyField
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.utils.encoding import smart_text, force_text
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from django.contrib.admin.utils import (get_model_from_relation,
-    reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value)
-from django.contrib.admin.options import IncorrectLookupParameters
+from django.utils.encoding import force_text, smart_text
+from django.utils.translation import ugettext_lazy as _
 
 
 class ListFilter(object):

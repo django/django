@@ -8,9 +8,10 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import TestCase
 
-from .models import (CustomPKModel, UniqueTogetherModel, UniqueFieldsModel,
-    UniqueForDateModel, ModelToValidate, Post, FlexibleDatePost,
-    UniqueErrorsModel)
+from .models import (
+    CustomPKModel, FlexibleDatePost, ModelToValidate, Post, UniqueErrorsModel,
+    UniqueFieldsModel, UniqueForDateModel, UniqueTogetherModel,
+)
 
 
 class GetUniqueCheckTests(unittest.TestCase):

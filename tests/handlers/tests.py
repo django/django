@@ -3,12 +3,13 @@
 from __future__ import unicode_literals
 
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
-from django.core.signals import request_started, request_finished
+from django.core.signals import request_finished, request_started
 from django.db import close_old_connections, connection
-from django.test import RequestFactory, TestCase, TransactionTestCase
-from django.test import override_settings
-from django.utils.encoding import force_str
+from django.test import (
+    RequestFactory, TestCase, TransactionTestCase, override_settings,
+)
 from django.utils import six
+from django.utils.encoding import force_str
 
 
 class HandlerTests(TestCase):

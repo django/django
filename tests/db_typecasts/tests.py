@@ -6,7 +6,6 @@ import unittest
 from django.db.backends import utils as typecasts
 from django.utils import six
 
-
 TEST_CASES = {
     'typecast_date': (
         ('', None),

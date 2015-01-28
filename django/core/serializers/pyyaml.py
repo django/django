@@ -5,14 +5,16 @@ Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 """
 
 import decimal
-import yaml
 import sys
 from io import StringIO
 
-from django.db import models
+import yaml
+
 from django.core.serializers.base import DeserializationError
-from django.core.serializers.python import Serializer as PythonSerializer
-from django.core.serializers.python import Deserializer as PythonDeserializer
+from django.core.serializers.python import (
+    Deserializer as PythonDeserializer, Serializer as PythonSerializer,
+)
+from django.db import models
 from django.utils import six
 
 # Use the C (faster) implementation if possible

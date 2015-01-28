@@ -4,8 +4,8 @@ Test URLs for auth admins.
 
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin, GroupAdmin
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.admin import GroupAdmin, UserAdmin
+from django.contrib.auth.models import Group, User
 from django.contrib.auth.urls import urlpatterns
 
 # Create a silo'd admin site for just the user/group admins.

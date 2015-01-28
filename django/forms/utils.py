@@ -3,21 +3,17 @@ from __future__ import unicode_literals
 import json
 import sys
 
+from django.conf import settings
+from django.core.exceptions import ValidationError  # backwards compatibility
+from django.utils import six, timezone
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.html import escape, format_html, format_html_join
+from django.utils.translation import ugettext_lazy as _
+
 try:
     from collections import UserList
 except ImportError:  # Python 2
     from UserList import UserList
-
-from django.conf import settings
-from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.html import format_html, format_html_join, escape
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-from django.utils import six
-
-# Import ValidationError so that it can be imported from this
-# module to maintain backwards compatibility.
-from django.core.exceptions import ValidationError
 
 
 def flatatt(attrs):

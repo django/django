@@ -6,7 +6,6 @@ from django.db.models.sql.datastructures import EmptyResultSet
 from django.utils import tree
 from django.utils.functional import cached_property
 
-
 # Connection types
 AND = 'AND'
 OR = 'OR'

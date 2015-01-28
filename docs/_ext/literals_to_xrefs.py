@@ -4,8 +4,8 @@ with new-style references.
 """
 
 import re
-import sys
 import shelve
+import sys
 
 refre = re.compile(r'``([^`\s]+?)``')
 

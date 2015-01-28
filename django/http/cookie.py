@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
+
 import sys
 
-from django.utils.encoding import force_str
 from django.utils import six
+from django.utils.encoding import force_str
 from django.utils.six.moves import http_cookies
-
 
 # Some versions of Python 2.7 and later won't need this encoding bug fix:
 _cookie_encodes_correctly = http_cookies.SimpleCookie().value_encode(';') == (';', '"\\073"')

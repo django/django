@@ -1,13 +1,12 @@
 import warnings
 
-from django.conf.urls import patterns, url, include
+from django.conf.urls import include, patterns, url
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .views import (
     absolute_kwargs_view, defaults_view, empty_view, empty_view_partial,
     empty_view_wrapped, nested_view,
 )
-
 
 other_patterns = [
     url(r'non_path_include/$', empty_view, name='non_path_include'),

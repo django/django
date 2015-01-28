@@ -1,10 +1,9 @@
-from django.core import exceptions
+from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
+
 from django import forms
+from django.core import exceptions
 from django.forms.widgets import MultiWidget
 from django.utils.translation import ugettext_lazy as _
-
-from psycopg2.extras import NumericRange, DateRange, DateTimeTZRange
-
 
 __all__ = ['IntegerRangeField', 'FloatRangeField', 'DateTimeRangeField', 'DateRangeField']
 

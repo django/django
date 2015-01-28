@@ -12,35 +12,35 @@ import datetime
 import decimal
 from unittest import skipUnless
 
-try:
-    import yaml
-except ImportError:
-    yaml = None
-
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.xml_serializer import DTDForbidden
 from django.db import connection, models
 from django.http import HttpResponse
-from django.test import skipUnlessDBFeature, TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils.functional import curry
 
-from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, EmailData,
-    FileData, FilePathData, DecimalData, FloatData, IntegerData,
-    GenericIPAddressData, NullBooleanData, PositiveIntegerData,
-    PositiveSmallIntegerData, SlugData, SmallData, TextData, TimeData,
-    GenericData, Anchor, UniqueAnchor, FKData, M2MData, O2OData,
-    FKSelfData, M2MSelfData, FKDataToField, FKDataToO2O, M2MIntermediateData,
-    Intermediate, BooleanPKData, CharPKData, EmailPKData, FilePathPKData,
-    DecimalPKData, FloatPKData, IntegerPKData,
-    GenericIPAddressPKData, PositiveIntegerPKData,
-    PositiveSmallIntegerPKData, SlugPKData, SmallPKData,
-    AutoNowDateTimeData, ModifyingSaveData, InheritAbstractModel, BaseModel,
-    ExplicitInheritBaseModel, InheritBaseModel, ProxyBaseModel,
-    ProxyProxyBaseModel, BigIntegerData, LengthModel, Tag, ComplexModel,
-    NaturalKeyAnchor, FKDataNaturalKey)
+from .models import (
+    Anchor, AutoNowDateTimeData, BaseModel, BigIntegerData, BinaryData,
+    BooleanData, BooleanPKData, CharData, CharPKData, ComplexModel, DateData,
+    DateTimeData, DecimalData, DecimalPKData, EmailData, EmailPKData,
+    ExplicitInheritBaseModel, FileData, FilePathData, FilePathPKData, FKData,
+    FKDataNaturalKey, FKDataToField, FKDataToO2O, FKSelfData, FloatData,
+    FloatPKData, GenericData, GenericIPAddressData, GenericIPAddressPKData,
+    InheritAbstractModel, InheritBaseModel, IntegerData, IntegerPKData,
+    Intermediate, LengthModel, M2MData, M2MIntermediateData, M2MSelfData,
+    ModifyingSaveData, NaturalKeyAnchor, NullBooleanData, O2OData,
+    PositiveIntegerData, PositiveIntegerPKData, PositiveSmallIntegerData,
+    PositiveSmallIntegerPKData, ProxyBaseModel, ProxyProxyBaseModel, SlugData,
+    SlugPKData, SmallData, SmallPKData, Tag, TextData, TimeData, UniqueAnchor,
+)
+
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 # A set of functions that can be used to recreate
 # test data objects of various kinds.

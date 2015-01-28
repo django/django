@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.forms import (CharField, DateField, FileField, Form, IntegerField,
-    SplitDateTimeField, ValidationError, formsets)
+from django.forms import (
+    CharField, DateField, FileField, Form, IntegerField, SplitDateTimeField,
+    ValidationError, formsets,
+)
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
 from django.test import TestCase

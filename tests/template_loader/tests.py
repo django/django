@@ -1,8 +1,9 @@
-from django.test import override_settings, SimpleTestCase
-from django.test.client import RequestFactory
 from django.template import TemplateDoesNotExist
 from django.template.loader import (
-    get_template, select_template, render_to_string)
+    get_template, render_to_string, select_template,
+)
+from django.test import SimpleTestCase, override_settings
+from django.test.client import RequestFactory
 
 
 @override_settings(TEMPLATES=[{

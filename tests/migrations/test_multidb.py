@@ -1,15 +1,15 @@
 import unittest
 
-try:
-    import sqlparse
-except ImportError:
-    sqlparse = None
-
-from django.db import migrations, models, connection
+from django.db import connection, migrations, models
 from django.db.migrations.state import ProjectState
 from django.test import override_settings
 
 from .test_operations import OperationTestBase
+
+try:
+    import sqlparse
+except ImportError:
+    sqlparse = None
 
 
 class AgnosticRouter(object):

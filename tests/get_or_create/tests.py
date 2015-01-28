@@ -1,14 +1,16 @@
 from __future__ import unicode_literals
 
-from datetime import date
 import traceback
+from datetime import date
 
-from django.db import IntegrityError, DatabaseError
-from django.utils.encoding import DjangoUnicodeDecodeError
+from django.db import DatabaseError, IntegrityError
 from django.test import TestCase, TransactionTestCase, ignore_warnings
+from django.utils.encoding import DjangoUnicodeDecodeError
 
-from .models import (DefaultPerson, Person, ManualPrimaryKeyTest, Profile,
-    Tag, Thing, Publisher, Author, Book)
+from .models import (
+    Author, Book, DefaultPerson, ManualPrimaryKeyTest, Person, Profile,
+    Publisher, Tag, Thing,
+)
 
 
 class GetOrCreateTests(TestCase):

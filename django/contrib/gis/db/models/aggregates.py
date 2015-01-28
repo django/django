@@ -1,5 +1,5 @@
-from django.db.models.aggregates import Aggregate
 from django.contrib.gis.db.models.fields import ExtentField
+from django.db.models.aggregates import Aggregate
 
 __all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union']
 

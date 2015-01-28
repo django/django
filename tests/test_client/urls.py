@@ -4,7 +4,6 @@ from django.views.generic import RedirectView
 
 from . import views
 
-
 urlpatterns = [
     url(r'^get_view/$', views.get_view, name='get_view'),
     url(r'^post_view/$', views.post_view),

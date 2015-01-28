@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-from django.db import models, connection
+from django.db import connection, models
 from django.db.backends.utils import truncate_name
 from django.test import TestCase
 
-from .models.publication import Publication
 from .models.article import Article, Site
+from .models.publication import Publication
 
 
 class Advertisement(models.Model):

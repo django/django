@@ -5,9 +5,8 @@ import os
 
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
+from django.utils import six, translation
 from django.utils._os import upath
-from django.utils import six
-from django.utils import translation
 
 
 @override_settings(

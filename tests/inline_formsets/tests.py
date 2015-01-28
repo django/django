@@ -4,7 +4,7 @@ from django.forms.models import inlineformset_factory
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
-from .models import Poet, Poem, School, Parent, Child
+from .models import Child, Parent, Poem, Poet, School
 
 
 class DeletionTests(TestCase):

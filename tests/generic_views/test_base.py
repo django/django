@@ -6,9 +6,9 @@ import unittest
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import require_jinja2
-from django.views.generic import View, TemplateView, RedirectView
+from django.views.generic import RedirectView, TemplateView, View
 
 from . import views
 

@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
 
-from django.db import connection
-from django.db.models import Q
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D  # alias for Distance
-from django.contrib.gis.tests.utils import oracle, postgis, spatialite, no_oracle
+from django.contrib.gis.tests.utils import (
+    no_oracle, oracle, postgis, spatialite,
+)
+from django.db import connection
+from django.db.models import Q
 from django.test import TestCase, skipUnlessDBFeature
 
 if HAS_GEOS:

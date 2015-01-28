@@ -83,4 +83,4 @@ class SessionStore(DBStore):
 
 
 # At bottom to avoid circular import
-from django.contrib.sessions.models import Session
+from django.contrib.sessions.models import Session  # isort:skip

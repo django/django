@@ -1,13 +1,14 @@
+from django import forms
 from django.conf.urls import url
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.urlresolvers import reverse
-from django import forms
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import engines
 from django.template.response import TemplateResponse
 from django.views.decorators.cache import never_cache
-from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import FormView
+
 
 TEMPLATE = """{% if messages %}
 <ul class="messages">

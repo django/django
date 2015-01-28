@@ -4,13 +4,15 @@ from __future__ import unicode_literals
 from unittest import skipUnless
 
 from django.conf.global_settings import PASSWORD_HASHERS
-from django.contrib.auth.hashers import (is_password_usable, BasePasswordHasher,
-    check_password, make_password, PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher,
-    get_hasher, identify_hasher, UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH)
+from django.contrib.auth.hashers import (
+    UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH,
+    BasePasswordHasher, PBKDF2PasswordHasher, PBKDF2SHA1PasswordHasher,
+    check_password, get_hasher, identify_hasher, is_password_usable,
+    make_password,
+)
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils import six
-
 
 try:
     import crypt

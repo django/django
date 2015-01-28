@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.test import override_settings, SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from django.utils.six.moves.urllib.parse import urljoin
 
 from ..utils import setup

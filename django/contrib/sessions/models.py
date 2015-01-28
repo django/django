@@ -60,4 +60,4 @@ class Session(models.Model):
 
 
 # At bottom to avoid circular import
-from django.contrib.sessions.backends.db import SessionStore
+from django.contrib.sessions.backends.db import SessionStore  # isort:skip

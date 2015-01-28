@@ -1,7 +1,6 @@
 from django.conf import settings
 
-from .. import register, Tags, Warning
-
+from .. import Tags, Warning, register
 
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5

@@ -1,8 +1,8 @@
+from django.apps.registry import apps as global_apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
-from django.test import modify_settings, override_settings, TestCase
-from django.apps.registry import apps as global_apps
+from django.test import TestCase, modify_settings, override_settings
 
 from .test_base import MigrationTestBase
 

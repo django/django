@@ -1,10 +1,7 @@
 from django.conf import settings
+from django.core.checks.security import base, csrf, sessions
 from django.test import TestCase
 from django.test.utils import override_settings
-
-from django.core.checks.security import base
-from django.core.checks.security import csrf
-from django.core.checks.security import sessions
 
 
 class CheckSessionCookieSecureTest(TestCase):

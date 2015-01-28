@@ -6,9 +6,8 @@ import unittest
 from unittest import skipUnless
 
 from django.conf import settings
-from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.geoip import HAS_GEOIP
-
+from django.contrib.gis.geos import HAS_GEOS
 from django.utils import six
 
 if HAS_GEOIP:

@@ -1,14 +1,10 @@
-# The GDAL C library, OGR exception, and the Field object
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException, OGRIndexError
 from django.contrib.gis.gdal.field import Field
 from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
-
-# ctypes function prototypes
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api
-
-from django.utils.encoding import force_bytes, force_text
 from django.utils import six
+from django.utils.encoding import force_bytes, force_text
 from django.utils.six.moves import range
 
 

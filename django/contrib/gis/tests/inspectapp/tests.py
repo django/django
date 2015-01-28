@@ -4,11 +4,11 @@ import os
 import re
 from unittest import skipUnless
 
+from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.geometry.test_data import TEST_DATA
 from django.core.management import call_command
 from django.db import connection, connections
 from django.test import TestCase, skipUnlessDBFeature
-from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.geometry.test_data import TEST_DATA
 from django.utils.six import StringIO
 
 if HAS_GDAL:

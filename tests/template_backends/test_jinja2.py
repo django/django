@@ -4,6 +4,8 @@ from __future__ import absolute_import
 
 from unittest import skipIf
 
+from .test_dummy import TemplateStringsTests
+
 try:
     import jinja2
 except ImportError:
@@ -11,8 +13,6 @@ except ImportError:
     Jinja2 = None
 else:
     from django.template.backends.jinja2 import Jinja2
-
-from .test_dummy import TemplateStringsTests
 
 
 @skipIf(jinja2 is None, "this test requires jinja2")

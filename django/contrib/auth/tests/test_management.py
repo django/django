@@ -1,23 +1,28 @@
 from __future__ import unicode_literals
 
-from datetime import date
 import locale
 import sys
+from datetime import date
 
 from django.apps import apps
-from django.contrib.auth import models, management
+from django.contrib.auth import management, models
 from django.contrib.auth.checks import check_user_model
 from django.contrib.auth.management import create_permissions
-from django.contrib.auth.management.commands import changepassword, createsuperuser
-from django.contrib.auth.models import User, Group
-from django.contrib.auth.tests.custom_user import CustomUser, CustomUserWithFK, Email
+from django.contrib.auth.management.commands import (
+    changepassword, createsuperuser,
+)
+from django.contrib.auth.models import Group, User
+from django.contrib.auth.tests.custom_user import (
+    CustomUser, CustomUserWithFK, Email,
+)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
-from django.core import checks
-from django.core import exceptions
+from django.core import checks, exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase, override_settings, override_system_checks, skipUnlessDBFeature
+from django.test import (
+    TestCase, override_settings, override_system_checks, skipUnlessDBFeature,
+)
 from django.utils import six
 from django.utils.encoding import force_str
 

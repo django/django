@@ -7,19 +7,18 @@ import sys
 import types
 
 from django.conf import settings
-from django.core.urlresolvers import resolve, Resolver404
-from django.http import (HttpResponse, HttpResponseNotFound, HttpRequest,
-    build_request_repr)
+from django.core.urlresolvers import Resolver404, resolve
+from django.http import (
+    HttpRequest, HttpResponse, HttpResponseNotFound, build_request_repr,
+)
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
+from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
-from django.utils.html import escape
 from django.utils.encoding import force_bytes, smart_text
-from django.utils import lru_cache
+from django.utils.html import escape
 from django.utils.module_loading import import_string
-from django.utils import six
 from django.utils.translation import ugettext as _
-
 
 # Minimal Django templates engine to render the error templates
 # regardless of the project's TEMPLATES setting.

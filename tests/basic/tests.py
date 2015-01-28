@@ -1,21 +1,22 @@
 from __future__ import unicode_literals
 
-from datetime import datetime, timedelta
 import threading
 import warnings
+from datetime import datetime, timedelta
 
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.db import connections, DEFAULT_DB_ALIAS
-from django.db import DatabaseError
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.manager import BaseManager
-from django.db.models.query import QuerySet, EmptyQuerySet
-from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.db.models.query import EmptyQuerySet, QuerySet
+from django.test import (
+    TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 from django.utils import six
 from django.utils.translation import ugettext_lazy
 
-from .models import Article, SelfRef, ArticleSelectOnSave
+from .models import Article, ArticleSelectOnSave, SelfRef
 
 
 class ModelInstanceCreationTests(TestCase):

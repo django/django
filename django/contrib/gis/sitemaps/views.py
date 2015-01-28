@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
 from django.apps import apps
-from django.http import Http404
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.shortcuts import render_to_kml, render_to_kmz
 from django.core.exceptions import FieldDoesNotExist
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, connections
+from django.http import Http404
 
 
 def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB_ALIAS):

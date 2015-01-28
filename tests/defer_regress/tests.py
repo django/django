@@ -6,13 +6,15 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.backends.db import SessionStore
 from django.db.models import Count
-from django.db.models.query_utils import deferred_class_factory, DeferredAttribute
+from django.db.models.query_utils import (
+    DeferredAttribute, deferred_class_factory,
+)
 from django.test import TestCase, override_settings
 
 from .models import (
-    ResolveThis, Item, RelatedItem, Child, Leaf, Proxy, SimpleItem, Feature,
-    ItemAndSimpleItem, OneToOneItem, SpecialFeature, Location, Request,
-    ProxyRelated, Derived, Base,
+    Base, Child, Derived, Feature, Item, ItemAndSimpleItem, Leaf, Location,
+    OneToOneItem, Proxy, ProxyRelated, RelatedItem, Request, ResolveThis,
+    SimpleItem, SpecialFeature,
 )
 
 

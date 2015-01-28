@@ -1,13 +1,15 @@
-from itertools import takewhile
-import sys
 import os
+import sys
+from itertools import takewhile
 
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 from django.db.migrations import Migration
-from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.autodetector import MigrationAutodetector
-from django.db.migrations.questioner import MigrationQuestioner, InteractiveMigrationQuestioner
+from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.questioner import (
+    InteractiveMigrationQuestioner, MigrationQuestioner,
+)
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
 from django.utils.six import iteritems

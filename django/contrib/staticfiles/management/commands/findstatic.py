@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
 import os
-from django.core.management.base import LabelCommand
-from django.utils.encoding import force_text
 
 from django.contrib.staticfiles import finders
+from django.core.management.base import LabelCommand
+from django.utils.encoding import force_text
 
 
 class Command(LabelCommand):

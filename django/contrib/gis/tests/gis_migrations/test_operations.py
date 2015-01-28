@@ -4,7 +4,7 @@ from django.contrib.gis.tests.utils import mysql
 from django.db import connection, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
-from django.test import skipUnlessDBFeature, TransactionTestCase
+from django.test import TransactionTestCase, skipUnlessDBFeature
 
 if connection.features.gis_enabled:
     from django.contrib.gis.db.models import fields

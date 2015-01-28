@@ -3,15 +3,15 @@ from __future__ import unicode_literals
 import threading
 import time
 
+from multiple_database.routers import TestRouter
+
 from django.conf import settings
-from django.db import transaction, connection, router
-from django.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
+from django.db import connection, router, transaction
+from django.db.utils import DEFAULT_DB_ALIAS, ConnectionHandler, DatabaseError
 from django.test import (
     TransactionTestCase, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )
-
-from multiple_database.routers import TestRouter
 
 from .models import Person
 

@@ -7,14 +7,14 @@ from operator import attrgetter
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
-from django.db import connections, router, DEFAULT_DB_ALIAS, transaction
+from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import TestCase, override_settings
 from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
-from .routers import TestRouter, AuthRouter, WriteRouter
+from .routers import AuthRouter, TestRouter, WriteRouter
 
 
 class QueryTestCase(TestCase):

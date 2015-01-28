@@ -5,9 +5,13 @@ import threading
 import time
 from unittest import skipIf, skipUnless
 
-from django.db import (connection, transaction,
-    DatabaseError, Error, IntegrityError, OperationalError)
-from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.db import (
+    DatabaseError, Error, IntegrityError, OperationalError, connection,
+    transaction,
+)
+from django.test import (
+    TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 from django.utils import six
 
 from .models import Reporter

@@ -1,6 +1,6 @@
 import os
 
-from django.test import ignore_warnings, SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from ..utils import ROOT, setup

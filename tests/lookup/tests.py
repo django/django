@@ -8,7 +8,7 @@ from django.core.exceptions import FieldError
 from django.db import connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from .models import Author, Article, Tag, Game, Season, Player, MyISAMArticle
+from .models import Article, Author, Game, MyISAMArticle, Player, Season, Tag
 
 
 class LookupTests(TestCase):

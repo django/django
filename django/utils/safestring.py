@@ -4,8 +4,8 @@ without further escaping in HTML. Marking something as a "safe string" means
 that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
-from django.utils.functional import curry, Promise
 from django.utils import six
+from django.utils.functional import Promise, curry
 
 
 class EscapeData(object):

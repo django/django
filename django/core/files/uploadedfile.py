@@ -7,8 +7,8 @@ import os
 from io import BytesIO
 
 from django.conf import settings
-from django.core.files.base import File
 from django.core.files import temp as tempfile
+from django.core.files.base import File
 from django.utils.encoding import force_str
 
 __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',

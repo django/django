@@ -4,8 +4,8 @@ from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.core.signals import got_request_exception
 from django.http import HttpResponse
-from django.template.response import TemplateResponse
 from django.template import engines
+from django.template.response import TemplateResponse
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import patch_logger
 

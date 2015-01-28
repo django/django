@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-from collections import OrderedDict
 import keyword
 import re
+from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, connections
 
 
 class Command(BaseCommand):

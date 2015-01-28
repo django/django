@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from .models.default_related_name import Author, Editor, Book
+from .models.default_related_name import Author, Book, Editor
 
 
 class DefaultRelatedNameTests(TestCase):

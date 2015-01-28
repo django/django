@@ -1,5 +1,5 @@
-from unittest import skipIf
 import warnings
+from unittest import skipIf
 
 from django.test import SimpleTestCase
 

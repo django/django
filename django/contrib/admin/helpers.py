@@ -3,22 +3,23 @@ from __future__ import unicode_literals
 import warnings
 
 from django import forms
-from django.contrib.admin.utils import (flatten_fieldsets, lookup_field,
-    display_for_field, label_for_field, help_text_for_field)
+from django.conf import settings
 from django.contrib.admin.templatetags.admin_static import static
+from django.contrib.admin.utils import (
+    display_for_field, flatten_fieldsets, help_text_for_field, label_for_field,
+    lookup_field,
+)
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-
 
 ACTION_CHECKBOX_NAME = '_selected_action'
 

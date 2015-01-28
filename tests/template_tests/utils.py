@@ -2,8 +2,8 @@
 
 from __future__ import unicode_literals
 
-import os
 import functools
+import os
 
 from django import template
 from django.template import Library
@@ -13,7 +13,6 @@ from django.test.utils import override_settings
 from django.utils._os import upath
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
-
 
 ROOT = os.path.dirname(os.path.abspath(upath(__file__)))
 

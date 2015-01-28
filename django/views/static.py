@@ -6,13 +6,15 @@ from __future__ import unicode_literals
 
 import mimetypes
 import os
-import stat
 import posixpath
 import re
+import stat
 
-from django.http import (Http404, HttpResponse, HttpResponseRedirect,
-    HttpResponseNotModified, FileResponse)
-from django.template import loader, Template, Context, TemplateDoesNotExist
+from django.http import (
+    FileResponse, Http404, HttpResponse, HttpResponseNotModified,
+    HttpResponseRedirect,
+)
+from django.template import Context, Template, TemplateDoesNotExist, loader
 from django.utils.http import http_date, parse_http_date
 from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext as _, ugettext_lazy

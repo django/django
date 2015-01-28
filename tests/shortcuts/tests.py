@@ -1,6 +1,6 @@
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.test import TestCase, ignore_warnings, override_settings
 from django.test.utils import require_jinja2
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 @override_settings(

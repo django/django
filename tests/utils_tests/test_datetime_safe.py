@@ -1,6 +1,9 @@
 import unittest
+from datetime import (
+    date as original_date, datetime as original_datetime,
+    time as original_time,
+)
 
-from datetime import date as original_date, datetime as original_datetime, time as original_time
 from django.utils.datetime_safe import date, datetime, time
 
 

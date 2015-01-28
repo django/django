@@ -5,12 +5,12 @@ import unicodedata
 from gzip import GzipFile
 from io import BytesIO
 
-from django.utils.encoding import force_text
-from django.utils.functional import allow_lazy, SimpleLazyObject
 from django.utils import six
-from django.utils.six.moves import html_entities
-from django.utils.translation import ugettext_lazy, ugettext as _, pgettext
+from django.utils.encoding import force_text
+from django.utils.functional import SimpleLazyObject, allow_lazy
 from django.utils.safestring import SafeText, mark_safe
+from django.utils.six.moves import html_entities
+from django.utils.translation import pgettext, ugettext as _, ugettext_lazy
 
 if six.PY2:
     # Import force_unicode even though this module doesn't use it, because some

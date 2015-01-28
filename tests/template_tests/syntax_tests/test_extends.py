@@ -2,7 +2,6 @@ from django.test import SimpleTestCase
 
 from ..utils import setup
 
-
 inheritance_templates = {
     'inheritance01': "1{% block first %}&{% endblock %}3{% block second %}_{% endblock %}",
     'inheritance02': "{% extends 'inheritance01' %}"

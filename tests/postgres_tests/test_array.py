@@ -3,19 +3,18 @@ import json
 import unittest
 import uuid
 
+from django import forms
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
 from django.core import exceptions, serializers
 from django.core.management import call_command
-from django.db import models, IntegrityError, connection
-from django import forms
+from django.db import IntegrityError, connection, models
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from .models import (
-    IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel,
-    DateTimeArrayModel, NestedIntegerArrayModel, OtherTypesArrayModel,
-    ArrayFieldSubclass,
+    ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
+    NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
 )
 
 

@@ -10,7 +10,6 @@ from django.conf import settings
 from django.utils.encoding import force_bytes
 from django.utils.timezone import utc
 
-
 logger = logging.getLogger('django.db.backends')
 
 

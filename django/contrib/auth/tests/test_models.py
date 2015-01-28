@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser, Group, Permission, User, UserManager
+from django.contrib.auth.models import (
+    AbstractUser, Group, Permission, User, UserManager,
+)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail

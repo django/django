@@ -2,7 +2,9 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from .models import Person, Movie, Event, Screening, ScreeningNullFK, Package, PackageNullFK
+from .models import (
+    Event, Movie, Package, PackageNullFK, Person, Screening, ScreeningNullFK,
+)
 
 
 # These are tests for #16715. The basic scheme is always the same: 3 models with

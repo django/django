@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, connections
 
 
 class Command(BaseCommand):

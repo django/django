@@ -9,18 +9,19 @@ from collections import OrderedDict
 from itertools import chain
 
 from django.core.exceptions import (
-    ImproperlyConfigured, ValidationError, NON_FIELD_ERRORS, FieldError)
-from django.forms.fields import Field, ChoiceField
-from django.forms.forms import DeclarativeFieldsMetaclass, BaseForm
+    NON_FIELD_ERRORS, FieldError, ImproperlyConfigured, ValidationError,
+)
+from django.forms.fields import ChoiceField, Field
+from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
-from django.forms.widgets import (SelectMultiple, HiddenInput,
-    MultipleHiddenInput)
+from django.forms.widgets import (
+    HiddenInput, MultipleHiddenInput, SelectMultiple,
+)
 from django.utils import six
-from django.utils.encoding import smart_text, force_text
-from django.utils.text import get_text_list, capfirst
-from django.utils.translation import ugettext_lazy as _, ugettext
-
+from django.utils.encoding import force_text, smart_text
+from django.utils.text import capfirst, get_text_list
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',

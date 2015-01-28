@@ -4,6 +4,7 @@ from django.template import Context, Template
 from django.utils.translation import ugettext as _
 from django.utils.version import get_docs_version
 
+
 # We include the template inline since we need to be able to reliably display
 # this error message, especially for the sake of developers, and there isn't any
 # other way of making it available independent of what is in the settings file.

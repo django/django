@@ -1,24 +1,24 @@
 from __future__ import unicode_literals
 
+import unittest
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from operator import attrgetter, itemgetter
-import unittest
 from uuid import UUID
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
-from django.db.models import F, Q, Value, Min, Max
+from django.db.models import F, Q, Max, Min, Value
 from django.db.models.expressions import Case, When
 from django.test import TestCase
 from django.utils import six
+
+from .models import CaseTestModel, Client, FKCaseTestModel, O2OCaseTestModel
 
 try:
     from PIL import Image
 except ImportError:
     Image = None
-
-from .models import CaseTestModel, O2OCaseTestModel, FKCaseTestModel, Client
 
 
 class CaseExpressionTests(TestCase):

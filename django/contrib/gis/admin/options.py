@@ -1,7 +1,7 @@
 from django.contrib.admin import ModelAdmin
 from django.contrib.gis.admin.widgets import OpenLayersWidget
-from django.contrib.gis.gdal import HAS_GDAL, OGRGeomType
 from django.contrib.gis.db import models
+from django.contrib.gis.gdal import HAS_GDAL, OGRGeomType
 
 
 class GeoModelAdmin(ModelAdmin):

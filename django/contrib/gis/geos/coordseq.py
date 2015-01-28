@@ -3,11 +3,12 @@
  by GEOSGeometry to house the actual coordinates of the Point,
  LineString, and LinearRing geometries.
 """
-from ctypes import c_double, c_uint, byref
+from ctypes import byref, c_double, c_uint
+
+from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase, numpy
 from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
 from django.contrib.gis.geos.libgeos import CS_PTR
-from django.contrib.gis.geos import prototypes as capi
 from django.utils.six.moves import range
 
 

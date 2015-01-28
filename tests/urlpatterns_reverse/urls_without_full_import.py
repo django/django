@@ -3,8 +3,7 @@
 # import pattern.
 from django.conf.urls import url
 
-from .views import empty_view, bad_view
-
+from .views import bad_view, empty_view
 
 urlpatterns = [
     url(r'^test_view/$', empty_view, name="test_view"),

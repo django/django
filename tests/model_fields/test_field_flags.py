@@ -1,16 +1,14 @@
 from django import test
-
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.db import models
 from django.db.models.fields.related import (
-    ForeignObject, ForeignKey, OneToOneField, ManyToManyField,
-    ManyToOneRel, ForeignObjectRel,
+    ForeignKey, ForeignObject, ForeignObjectRel, ManyToManyField, ManyToOneRel,
+    OneToOneField,
 )
 
 from .models import AllFieldsModel
-
 
 NON_CONCRETE_FIELDS = (
     ForeignObject,

@@ -4,7 +4,7 @@ from django.db.models import Max
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import str_prefix
 
-from .models import Tag, Celebrity, Fan, Staff, StaffTag
+from .models import Celebrity, Fan, Staff, StaffTag, Tag
 
 
 @skipUnlessDBFeature('can_distinct_on_fields')

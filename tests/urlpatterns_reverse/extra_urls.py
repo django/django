@@ -2,10 +2,9 @@
 Some extra URL patterns that are included at the top level.
 """
 
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 
 from .views import empty_view
-
 
 urlpatterns = [
     url(r'^e-places/([0-9]+)/$', empty_view, name='extra-places'),

@@ -1,12 +1,11 @@
 from __future__ import unicode_literals
 
-from datetime import datetime
 import sys
 import unittest
+from datetime import datetime
 
+from django.utils import http, six
 from django.utils.datastructures import MultiValueDict
-from django.utils import http
-from django.utils import six
 
 
 class TestUtilsHttp(unittest.TestCase):

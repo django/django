@@ -4,14 +4,16 @@ import datetime
 from operator import attrgetter
 
 from django.core.exceptions import ValidationError
+from django.db import router
+from django.db.models.sql import InsertQuery
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils.timezone import get_fixed_timezone
-from django.db import router
-from django.db.models.sql import InsertQuery
 
-from .models import (Worker, Article, Party, Event, Department,
-    BrokenUnicodeMethod, NonAutoPK, Model1, Model2, Model3)
+from .models import (
+    Article, BrokenUnicodeMethod, Department, Event, Model1, Model2, Model3,
+    NonAutoPK, Party, Worker,
+)
 
 
 class ModelTests(TestCase):

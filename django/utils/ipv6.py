@@ -2,8 +2,8 @@
 # Copyright 2007 Google Inc. http://code.google.com/p/ipaddr-py/
 # Licensed under the Apache License, Version 2.0 (the "License").
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
 from django.utils.six.moves import range
+from django.utils.translation import ugettext_lazy as _
 
 
 def clean_ipv6_address(ip_str, unpack_ipv4=False,

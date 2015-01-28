@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.test import TestCase, mock, override_settings
+from django.contrib.auth.models import AbstractBaseUser
+from django.db import connection, models
 from django.db.migrations.autodetector import MigrationAutodetector
-from django.db.migrations.questioner import MigrationQuestioner
-from django.db.migrations.state import ProjectState, ModelState
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.loader import MigrationLoader
-from django.db import models, connection
-from django.contrib.auth.models import AbstractBaseUser
+from django.db.migrations.questioner import MigrationQuestioner
+from django.db.migrations.state import ModelState, ProjectState
+from django.test import TestCase, mock, override_settings
 
 from .models import FoodManager, FoodQuerySet
 

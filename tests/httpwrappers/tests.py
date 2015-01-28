@@ -11,16 +11,17 @@ from django.core.exceptions import SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import request_finished
 from django.db import close_old_connections
-from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
-                         HttpResponsePermanentRedirect, HttpResponseNotAllowed,
-                         HttpResponseNotModified, StreamingHttpResponse,
-                         SimpleCookie, BadHeaderError, JsonResponse,
-                         parse_cookie)
+from django.http import (
+    BadHeaderError, HttpResponse, HttpResponseNotAllowed,
+    HttpResponseNotModified, HttpResponsePermanentRedirect,
+    HttpResponseRedirect, JsonResponse, QueryDict, SimpleCookie,
+    StreamingHttpResponse, parse_cookie,
+)
 from django.test import TestCase
-from django.utils.encoding import smart_str, force_text
-from django.utils.functional import lazy
-from django.utils._os import upath
 from django.utils import six
+from django.utils._os import upath
+from django.utils.encoding import force_text, smart_str
+from django.utils.functional import lazy
 
 lazystr = lazy(force_text, six.text_type)
 

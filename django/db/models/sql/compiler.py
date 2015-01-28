@@ -1,15 +1,16 @@
-from itertools import chain
 import re
 import warnings
+from itertools import chain
 
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import OrderBy, Random, RawSQL, Ref
-from django.db.models.query_utils import select_related_descend, QueryWrapper
-from django.db.models.sql.constants import (CURSOR, SINGLE, MULTI, NO_RESULTS,
-        ORDER_DIR, GET_ITERATOR_CHUNK_SIZE)
+from django.db.models.query_utils import QueryWrapper, select_related_descend
+from django.db.models.sql.constants import (
+    CURSOR, GET_ITERATOR_CHUNK_SIZE, MULTI, NO_RESULTS, ORDER_DIR, SINGLE,
+)
 from django.db.models.sql.datastructures import EmptyResultSet
-from django.db.models.sql.query import get_order_dir, Query
+from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
 from django.utils.deprecation import RemovedInDjango20Warning

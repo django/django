@@ -4,9 +4,9 @@
 # Uses whatever cache backend is set in the test settings file.
 from __future__ import unicode_literals
 
+import copy
 import os
 import re
-import copy
 import shutil
 import tempfile
 import threading
@@ -15,35 +15,38 @@ import unittest
 import warnings
 
 from django.conf import settings
-from django.core import management
-from django.core import signals
-from django.core.cache import cache, caches, CacheKeyWarning, DEFAULT_CACHE_ALIAS
-from django.db import connection, connections, transaction
+from django.core import management, signals
+from django.core.cache import (
+    DEFAULT_CACHE_ALIAS, CacheKeyWarning, cache, caches,
+)
 from django.core.cache.utils import make_template_fragment_key
+from django.db import connection, connections, transaction
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
-from django.middleware.cache import (FetchFromCacheMiddleware,
-    UpdateCacheMiddleware, CacheMiddleware)
+from django.middleware.cache import (
+    CacheMiddleware, FetchFromCacheMiddleware, UpdateCacheMiddleware,
+)
 from django.middleware.csrf import CsrfViewMiddleware
 from django.template import engines
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
-from django.test import (TestCase, TransactionTestCase, RequestFactory,
-    override_settings)
+from django.test import (
+    RequestFactory, TestCase, TransactionTestCase, override_settings,
+)
 from django.test.signals import setting_changed
-from django.utils import six
-from django.utils import timezone
-from django.utils import translation
-from django.utils.cache import (patch_vary_headers, get_cache_key,
-    learn_cache_key, patch_cache_control, patch_response_headers)
+from django.utils import six, timezone, translation
+from django.utils.cache import (
+    get_cache_key, learn_cache_key, patch_cache_control,
+    patch_response_headers, patch_vary_headers,
+)
 from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
+
+from .models import Poll, expensive_calculation
 
 try:    # Use the same idiom as in cache backends
     from django.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
-
-from .models import Poll, expensive_calculation
 
 
 # functions/classes for complex data type tests

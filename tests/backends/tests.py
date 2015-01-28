@@ -4,26 +4,30 @@ from __future__ import unicode_literals
 
 import copy
 import datetime
-from decimal import Decimal, Rounded
 import re
 import threading
 import unittest
 import warnings
+from decimal import Decimal, Rounded
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
-from django.db import (connection, connections, DEFAULT_DB_ALIAS,
-    DatabaseError, IntegrityError, reset_queries, transaction)
+from django.db import (
+    DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connection, connections,
+    reset_queries, transaction,
+)
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
-from django.db.backends.utils import format_number, CursorWrapper
-from django.db.models import Sum, Avg, Variance, StdDev
+from django.db.backends.signals import connection_created
+from django.db.backends.utils import CursorWrapper, format_number
+from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
-from django.test import (TestCase, TransactionTestCase, mock, override_settings,
-    skipUnlessDBFeature, skipIfDBFeature)
+from django.test import (
+    TestCase, TransactionTestCase, mock, override_settings, skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.six.moves import range

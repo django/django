@@ -4,20 +4,20 @@ Timezone-related classes and functions.
 This module uses pytz when it's available and fallbacks when it isn't.
 """
 
-from datetime import datetime, timedelta, tzinfo
-from threading import local
 import sys
 import time as _time
+from datetime import datetime, timedelta, tzinfo
+from threading import local
+
+from django.conf import settings
+from django.utils import lru_cache, six
+from django.utils.decorators import ContextDecorator
 
 try:
     import pytz
 except ImportError:
     pytz = None
 
-from django.conf import settings
-from django.utils import lru_cache
-from django.utils import six
-from django.utils.decorators import ContextDecorator
 
 __all__ = [
     'utc', 'get_fixed_timezone',

@@ -1,14 +1,13 @@
 from django.db.models import Q, Sum
-from django.db.utils import IntegrityError
-from django.test import TestCase, skipIfDBFeature
-from django.forms.models import modelform_factory
 from django.db.models.deletion import ProtectedError
+from django.db.utils import IntegrityError
+from django.forms.models import modelform_factory
+from django.test import TestCase, skipIfDBFeature
 
 from .models import (
-    Address, Place, Restaurant, Link, CharLink, TextLink,
-    Person, Contact, Note, Organization, OddRelation1, OddRelation2, Company,
-    Developer, Team, Guild, Tag, Board, HasLinkThing, A, B, C, D,
-    Related, Content, Node,
+    A, B, C, D, Address, Board, CharLink, Company, Contact, Content, Developer,
+    Guild, HasLinkThing, Link, Node, Note, OddRelation1, OddRelation2,
+    Organization, Person, Place, Related, Restaurant, Tag, Team, TextLink,
 )
 
 
