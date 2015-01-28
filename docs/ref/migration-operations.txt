@@ -345,6 +345,12 @@ set ``atomic=False``.
     ``schema_editor.connection.alias``, where ``schema_editor`` is the second
     argument to your function).
 
+.. warning::
+
+    When migrating data across two apps, ``dependencies`` should include the target
+    app, otherwise you will get an error stating "LookupError: No installed app with
+    label '``myappname``'".
+
 .. staticmethod:: RunPython.noop
 
     .. versionadded:: 1.8
