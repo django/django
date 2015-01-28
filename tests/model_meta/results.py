@@ -1,6 +1,4 @@
-from .models import (
-    AbstractPerson, BasePerson, Person, Relating, Relation,
-)
+from .models import AbstractPerson, BasePerson, Person, Relating, Relation
 
 TEST_RESULTS = {
     'get_all_field_names': {

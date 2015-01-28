@@ -1,8 +1,7 @@
 from django.template.base import Context, TemplateSyntaxError
 from django.test import SimpleTestCase
 
-from ..utils import setup, SilentGetItemClass, SilentAttrClass, SomeClass
-
+from ..utils import SilentAttrClass, SilentGetItemClass, SomeClass, setup
 
 basic_templates = {
     'basic-syntax01': 'something cool',

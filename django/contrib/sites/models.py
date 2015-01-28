@@ -4,10 +4,9 @@ import string
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
-from django.db.models.signals import pre_save, pre_delete
+from django.db.models.signals import pre_delete, pre_save
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-
 
 SITE_CACHE = {}
 

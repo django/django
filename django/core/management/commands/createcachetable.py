@@ -2,7 +2,9 @@ from django.conf import settings
 from django.core.cache import caches
 from django.core.cache.backends.db import BaseDatabaseCache
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
+from django.db import (
+    DEFAULT_DB_ALIAS, connections, models, router, transaction,
+)
 from django.db.utils import DatabaseError
 from django.utils.encoding import force_text
 

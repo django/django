@@ -6,10 +6,12 @@ import warnings
 from django.apps import apps
 from django.contrib.sites.models import Site
 from django.core import management
-from django.db import connection, IntegrityError
-from django.test import TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature
-from django.utils.encoding import force_text
+from django.db import IntegrityError, connection
+from django.test import (
+    TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
+)
 from django.utils import six
+from django.utils.encoding import force_text
 
 from .models import Article, Spy, Tag, Visa
 

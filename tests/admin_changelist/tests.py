@@ -5,25 +5,28 @@ import datetime
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.templatetags.admin_list import pagination
-from django.contrib.admin.views.main import ChangeList, SEARCH_VAR, ALL_VAR
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR, ChangeList
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template import Context, Template
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
-from django.utils import formats
-from django.utils import six
+from django.utils import formats, six
 
-from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
-    GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
-    DynamicListDisplayLinksChildAdmin, CustomPaginationAdmin,
-    FilteredChildAdmin, CustomPaginator, site as custom_site,
-    SwallowAdmin, DynamicListFilterChildAdmin, InvitationAdmin,
-    DynamicSearchFieldsChildAdmin, NoListDisplayLinksParentAdmin)
-from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
-    Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
-    UnorderedObject, OrderedObject, CustomIdUser)
+from .admin import (
+    BandAdmin, ChildAdmin, ChordsBandAdmin, CustomPaginationAdmin,
+    CustomPaginator, DynamicListDisplayChildAdmin,
+    DynamicListDisplayLinksChildAdmin, DynamicListFilterChildAdmin,
+    DynamicSearchFieldsChildAdmin, FilteredChildAdmin, GroupAdmin,
+    InvitationAdmin, NoListDisplayLinksParentAdmin, ParentAdmin, QuartetAdmin,
+    SwallowAdmin, site as custom_site,
+)
+from .models import (
+    Band, Child, ChordsBand, ChordsMusician, CustomIdUser, Event, Genre, Group,
+    Invitation, Membership, Musician, OrderedObject, Parent, Quartet, Swallow,
+    UnorderedObject,
+)
 
 
 @override_settings(ROOT_URLCONF="admin_changelist.urls")

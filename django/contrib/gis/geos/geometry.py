@@ -4,32 +4,19 @@
 """
 from __future__ import unicode_literals
 
-# Python, ctypes and types dependencies.
 from ctypes import addressof, byref, c_double
 
-# super-class for mutable list behavior
-from django.contrib.gis.geos.mutable_list import ListMixin
-
 from django.contrib.gis.gdal.error import SRSException
-
-# GEOS-related dependencies.
+from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
+from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase, gdal
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
 from django.contrib.gis.geos.libgeos import GEOM_PTR
-
-# All other functions in this module come from the ctypes
-# prototypes module -- which handles all interaction with
-# the underlying GEOS library.
-from django.contrib.gis.geos import prototypes as capi
-
-# These functions provide access to a thread-local instance
-# of their corresponding GEOS I/O class.
-from django.contrib.gis.geos.prototypes.io import wkt_r, wkt_w, wkb_r, wkb_w, ewkb_w
-
-# For recognizing geometry input.
-from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
-
+from django.contrib.gis.geos.mutable_list import ListMixin
+from django.contrib.gis.geos.prototypes.io import (
+    ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w,
+)
 from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 
@@ -684,11 +671,12 @@ class GEOSGeometry(GEOSBase, ListMixin):
 
 # Class mapping dictionary.  Has to be at the end to avoid import
 # conflicts with GEOSGeometry.
-from django.contrib.gis.geos.linestring import LineString, LinearRing
-from django.contrib.gis.geos.point import Point
-from django.contrib.gis.geos.polygon import Polygon
-from django.contrib.gis.geos.collections import GeometryCollection, MultiPoint, MultiLineString, MultiPolygon
-from django.contrib.gis.geos.prepared import PreparedGeometry
+from django.contrib.gis.geos.linestring import LineString, LinearRing  # isort:skip
+from django.contrib.gis.geos.point import Point                     # isort:skip
+from django.contrib.gis.geos.polygon import Polygon                 # isort:skip
+from django.contrib.gis.geos.collections import (                   # isort:skip
+    GeometryCollection, MultiPoint, MultiLineString, MultiPolygon)
+from django.contrib.gis.geos.prepared import PreparedGeometry       # isort:skip
 GEOS_CLASSES = {
     0: Point,
     1: LineString,

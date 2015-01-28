@@ -1,4 +1,5 @@
-from django.db.backends.oracle.base import DatabaseWrapper as OracleDatabaseWrapper
+from django.db.backends.oracle.base import \
+    DatabaseWrapper as OracleDatabaseWrapper
 
 from .features import DatabaseFeatures
 from .introspection import OracleIntrospection

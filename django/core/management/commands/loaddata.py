@@ -5,6 +5,7 @@ import gzip
 import os
 import warnings
 import zipfile
+from itertools import product
 
 from django.apps import apps
 from django.conf import settings
@@ -12,13 +13,14 @@ from django.core import serializers
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
-from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
-      IntegrityError, DatabaseError)
+from django.db import (
+    DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connections, router,
+    transaction,
+)
 from django.utils import lru_cache
+from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-from django.utils._os import upath
-from itertools import product
 
 try:
     import bz2

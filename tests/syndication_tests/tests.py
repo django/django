@@ -3,21 +3,20 @@ from __future__ import unicode_literals
 import datetime
 from xml.dom import minidom
 
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
 from django.contrib.sites.models import Site
 from django.contrib.syndication import views
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
 from django.test.utils import requires_tz_support
-from django.utils.feedgenerator import rfc2822_date, rfc3339_date
 from django.utils import timezone
+from django.utils.feedgenerator import rfc2822_date, rfc3339_date
 
 from .models import Entry
 
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 TZ = timezone.get_default_timezone()
 

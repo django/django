@@ -7,9 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 
-from . import models
-from . import views
-
+from . import models, views
 
 urlpatterns = [
     # TemplateView

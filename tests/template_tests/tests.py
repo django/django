@@ -8,15 +8,18 @@ import unittest
 from django import template
 from django.contrib.auth.models import Group
 from django.core import urlresolvers
-from django.template import (base as template_base, loader,
-    Context, RequestContext, Template, TemplateSyntaxError)
+from django.template import (
+    Context, RequestContext, Template, TemplateSyntaxError,
+    base as template_base, loader,
+)
 from django.template.engine import Engine
 from django.template.loaders import app_directories, filesystem
 from django.test import RequestFactory, SimpleTestCase
-from django.test.utils import extend_sys_path, ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test.utils import (
+    extend_sys_path, ignore_warnings, override_settings,
+)
 from django.utils._os import upath
-
+from django.utils.deprecation import RemovedInDjango20Warning
 
 TESTS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(upath(__file__))))
 

@@ -1,14 +1,15 @@
 from __future__ import unicode_literals
 
+import zipfile
 from io import BytesIO
 from xml.dom import minidom
-import zipfile
 
 from django.conf import settings
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.sites.models import Site
 from django.test import (
-    TestCase, ignore_warnings, modify_settings, override_settings, skipUnlessDBFeature
+    TestCase, ignore_warnings, modify_settings, override_settings,
+    skipUnlessDBFeature,
 )
 from django.utils.deprecation import RemovedInDjango20Warning
 

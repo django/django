@@ -11,8 +11,11 @@ __all__ = ['geos_boundary', 'geos_buffer', 'geos_cascaded_union',
            'geos_interpolate_normalized']
 
 from ctypes import c_double, c_int
+
 from django.contrib.gis.geos.libgeos import GEOM_PTR
-from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_minus_one, check_string
+from django.contrib.gis.geos.prototypes.errcheck import (
+    check_geom, check_minus_one, check_string,
+)
 from django.contrib.gis.geos.prototypes.geom import geos_char_p
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 

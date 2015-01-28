@@ -1,5 +1,6 @@
-from ctypes import c_char_p, c_float, c_int, string_at, Structure, POINTER
-from django.contrib.gis.geoip.libgeoip import lgeoip, free
+from ctypes import POINTER, Structure, c_char_p, c_float, c_int, string_at
+
+from django.contrib.gis.geoip.libgeoip import free, lgeoip
 
 
 #### GeoIP C Structure definitions ####

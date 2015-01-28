@@ -3,12 +3,12 @@ from __future__ import absolute_import
 
 import sys
 
+import jinja2
+
 from django.conf import settings
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.utils import six
 from django.utils.module_loading import import_string
-
-import jinja2
 
 from .base import BaseEngine
 from .utils import csrf_input_lazy, csrf_token_lazy

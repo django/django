@@ -1,11 +1,10 @@
 from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
+    GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.deletion import ProtectedError
-
+from django.utils.encoding import python_2_unicode_compatible
 
 __all__ = ('Link', 'Place', 'Restaurant', 'Person', 'Address',
            'CharLink', 'TextLink', 'OddRelation1', 'OddRelation2',

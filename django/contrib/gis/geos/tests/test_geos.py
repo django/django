@@ -4,16 +4,14 @@ import ctypes
 import json
 import random
 import unittest
-from unittest import skipUnless
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
+from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
-
 from django.contrib.gis.geometry.test_data import TestDataMixin
-
-from django.utils.encoding import force_bytes
 from django.utils import six
+from django.utils.encoding import force_bytes
 from django.utils.six.moves import range
 
 from .. import HAS_GEOS

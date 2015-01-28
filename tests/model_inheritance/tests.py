@@ -10,9 +10,10 @@ from django.test.utils import CaptureQueriesContext
 from django.utils import six
 
 from .models import (
-    Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place, Post,
-    Restaurant, Student, Supplier, Worker, MixinModel,
-    Title, Copy, Base, SubBase, GrandParent, GrandChild)
+    Base, Chef, CommonInfo, Copy, GrandChild, GrandParent, ItalianRestaurant,
+    MixinModel, ParkingLot, Place, Post, Restaurant, Student, SubBase,
+    Supplier, Title, Worker,
+)
 
 
 class ModelInheritanceTests(TestCase):

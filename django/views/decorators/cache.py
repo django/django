@@ -1,7 +1,10 @@
 from functools import wraps
-from django.utils.decorators import decorator_from_middleware_with_args, available_attrs
-from django.utils.cache import patch_cache_control, add_never_cache_headers
+
 from django.middleware.cache import CacheMiddleware
+from django.utils.cache import add_never_cache_headers, patch_cache_control
+from django.utils.decorators import (
+    available_attrs, decorator_from_middleware_with_args,
+)
 
 
 def cache_page(*args, **kwargs):

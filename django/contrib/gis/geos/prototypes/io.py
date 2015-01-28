@@ -1,11 +1,13 @@
 import threading
-from ctypes import byref, c_char_p, c_int, c_char, c_size_t, Structure, POINTER
+from ctypes import POINTER, Structure, byref, c_char, c_char_p, c_int, c_size_t
+
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.libgeos import GEOM_PTR
-from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_string, check_sized_string
+from django.contrib.gis.geos.prototypes.errcheck import (
+    check_geom, check_sized_string, check_string,
+)
 from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
-
 from django.utils import six
 from django.utils.encoding import force_bytes
 

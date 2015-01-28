@@ -10,22 +10,22 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import RegexValidator
 from django.forms import (
     BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
-    DateTimeField, EmailField, FileField, FloatField, Form, forms, HiddenInput,
+    DateTimeField, EmailField, FileField, FloatField, Form, HiddenInput,
     ImageField, IntegerField, MultipleChoiceField, MultipleHiddenInput,
     MultiValueField, NullBooleanField, PasswordInput, RadioSelect, Select,
     SplitDateTimeField, SplitHiddenDateTimeWidget, Textarea, TextInput,
-    TimeField, ValidationError,
+    TimeField, ValidationError, forms,
 )
 from django.forms.utils import ErrorList
 from django.http import QueryDict
-from django.template import Template, Context
+from django.template import Context, Template
 from django.test import TestCase
 from django.test.utils import str_prefix
+from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe, SafeData
-from django.utils import six
+from django.utils.safestring import SafeData, mark_safe
 
 
 class Person(Form):

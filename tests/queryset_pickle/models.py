@@ -1,6 +1,6 @@
 import datetime
 
-from django.db import models, DJANGO_VERSION_PICKLE_KEY
+from django.db import DJANGO_VERSION_PICKLE_KEY, models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_major_version
 

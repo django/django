@@ -3,6 +3,7 @@
  unary and binary predicate operations on geometries.
 """
 from ctypes import c_char, c_char_p, c_double
+
 from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import check_predicate
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc

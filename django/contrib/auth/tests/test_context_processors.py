@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.context_processors import PermLookupDict, PermWrapper
+from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.context_processors import PermWrapper, PermLookupDict
 from django.db.models import Q
 from django.test import TestCase, override_settings
 

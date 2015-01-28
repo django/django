@@ -3,16 +3,15 @@ from __future__ import unicode_literals
 import datetime
 from unittest import skipIf
 
+from django.test import TestCase, override_settings
+from django.utils import timezone
+
+from .models import Article, Category, Comment
+
 try:
     import pytz
 except ImportError:
     pytz = None
-
-from django.test import TestCase, override_settings
-from django.utils import timezone
-
-
-from .models import Article, Comment, Category
 
 
 class DateTimesTests(TestCase):

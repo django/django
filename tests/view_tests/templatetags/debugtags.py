@@ -2,7 +2,6 @@ from django import template
 
 from ..views import BrokenException
 
-
 register = template.Library()
 
 

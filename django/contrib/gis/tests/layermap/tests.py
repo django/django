@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from copy import copy
-from decimal import Decimal
 import os
 import unittest
+from copy import copy
+from decimal import Decimal
 from unittest import skipUnless
 
+from django.conf import settings
 from django.contrib.gis.gdal import HAS_GDAL
 from django.db import connection
-from django.conf import settings
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.utils._os import upath
 

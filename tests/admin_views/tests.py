@@ -1,61 +1,61 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
 import os
 import re
-import datetime
 import unittest
 
-from django.core import mail
-from django.core.checks import Error
-from django.core.files import temp as tempfile
-from django.core.urlresolvers import (NoReverseMatch,
-    get_script_prefix, resolve, reverse, set_script_prefix)
-# Register auth models with the admin.
-from django.contrib.auth import get_permission_codename
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
-from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.admin.models import DELETION, LogEntry
 from django.contrib.admin.options import TO_FIELD_VAR
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import IS_POPUP_VAR
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.auth.models import Group, User, Permission
+from django.contrib.auth import REDIRECT_FIELD_NAME, get_permission_codename
+from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core import mail
+from django.core.checks import Error
+from django.core.files import temp as tempfile
+from django.core.urlresolvers import (
+    NoReverseMatch, get_script_prefix, resolve, reverse, set_script_prefix,
+)
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import (
+    TestCase, modify_settings, override_settings, skipUnlessDBFeature,
+)
 from django.test.utils import patch_logger
-from django.test import modify_settings, override_settings
-from django.utils import formats
-from django.utils import translation
+from django.utils import formats, six, translation
+from django.utils._os import upath
 from django.utils.cache import get_max_age
-from django.utils.encoding import iri_to_uri, force_bytes, force_text
+from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.six.moves.urllib.parse import parse_qsl, urljoin, urlparse
-from django.utils._os import upath
-from django.utils import six
 
-# local test models
-from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
-    Gallery, ModelWithStringPrimaryKey, Person, Persona, Picture, Podcast,
-    Section, Subscriber, Vodcast, Language, Collector, Widget, Grommet,
-    DooHickey, FancyDoodad, Whatsit, Category, Post, Plot, FunkyTag, Chapter,
-    Book, Promo, WorkHour, Employee, Question, Answer, Inquisition, Actor,
-    FoodDelivery, RowLevelChangePermissionModel, Paper, CoverLetter, Story,
-    OtherStory, ComplexSortedPerson, PluggableSearchPerson, Parent, Child, AdminOrderedField,
-    AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
-    Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
-    Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
-    Telegram, Pizza, Topping, FilteredManager, City, Restaurant, Worker,
-    ParentWithDependentChildren, Character, FieldOverridePost, Color2)
 from . import customadmin
-from .admin import site, site2, CityAdmin
+from .admin import CityAdmin, site, site2
+from .models import (
+    Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
+    AdminOrderedModelMethod, Answer, Article, BarAccount, Book, Category,
+    Chapter, Character, Child, Choice, City, Collector, Color2,
+    ComplexSortedPerson, CoverLetter, CustomArticle, DooHickey, Employee,
+    EmptyModel, FancyDoodad, FieldOverridePost, FilteredManager, FooAccount,
+    FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language,
+    MainPrepopulated, ModelWithStringPrimaryKey, OtherStory, Paper, Parent,
+    ParentWithDependentChildren, Person, Persona, Picture, Pizza, Plot,
+    PluggableSearchPerson, Podcast, Post, Promo, Question, RelatedPrepopulated,
+    Report, Restaurant, RowLevelChangePermissionModel, Section, ShortMessage,
+    Simple, Story, Subscriber, Telegram, Topping, UnchangeableObject,
+    UndeletableObject, UnorderedObject, Vodcast, Whatsit, Widget, Worker,
+    WorkHour,
+)
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \

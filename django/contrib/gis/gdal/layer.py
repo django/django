@@ -1,21 +1,20 @@
-# Needed ctypes routines
-from ctypes import c_double, byref
+from ctypes import byref, c_double
 
-# Other GDAL imports.
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import GDALException, OGRIndexError, SRSException
+from django.contrib.gis.gdal.error import (
+    GDALException, OGRIndexError, SRSException,
+)
 from django.contrib.gis.gdal.feature import Feature
 from django.contrib.gis.gdal.field import OGRFieldTypes
-from django.contrib.gis.gdal.geomtype import OGRGeomType
 from django.contrib.gis.gdal.geometries import OGRGeometry
+from django.contrib.gis.gdal.geomtype import OGRGeomType
+from django.contrib.gis.gdal.prototypes import (
+    ds as capi, geom as geom_api, srs as srs_api,
+)
 from django.contrib.gis.gdal.srs import SpatialReference
-
-# GDAL ctypes function prototypes.
-from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api, srs as srs_api
-
-from django.utils.encoding import force_bytes, force_text
 from django.utils import six
+from django.utils.encoding import force_bytes, force_text
 from django.utils.six.moves import range
 
 

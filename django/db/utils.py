@@ -1,15 +1,14 @@
-from importlib import import_module
 import os
 import pkgutil
+from importlib import import_module
 from threading import local
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import six
+from django.utils._os import upath
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
-from django.utils._os import upath
-from django.utils import six
-
 
 DEFAULT_DB_ALIAS = 'default'
 DJANGO_VERSION_PICKLE_KEY = '_django_version'

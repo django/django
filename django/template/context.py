@@ -1,8 +1,7 @@
-from copy import copy
 import warnings
+from copy import copy
 
 from django.utils.deprecation import RemovedInDjango20Warning
-
 
 # Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ('django.template.context_processors.csrf',)

@@ -6,7 +6,7 @@ from django.contrib.admin.checks import InlineModelAdminChecks
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.forms import (
-    BaseGenericInlineFormSet, generic_inlineformset_factory
+    BaseGenericInlineFormSet, generic_inlineformset_factory,
 )
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist

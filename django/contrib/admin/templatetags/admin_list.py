@@ -2,24 +2,25 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.admin.utils import (lookup_field, display_for_field,
-    display_for_value, label_for_field)
-from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
-    ORDER_VAR, PAGE_VAR, SEARCH_VAR)
 from django.contrib.admin.templatetags.admin_static import static
+from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from django.contrib.admin.utils import (
+    display_for_field, display_for_value, label_for_field, lookup_field,
+)
+from django.contrib.admin.views.main import (
+    ALL_VAR, EMPTY_CHANGELIST_VALUE, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
+)
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import NoReverseMatch
 from django.db import models
+from django.template import Library
+from django.template.loader import get_template
 from django.utils import formats
+from django.utils.encoding import force_text
 from django.utils.html import escapejs, format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
-from django.utils.encoding import force_text
-from django.template import Library
-from django.template.loader import get_template
-
 
 register = Library()
 

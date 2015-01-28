@@ -3,30 +3,35 @@ from __future__ import unicode_literals
 import datetime
 import re
 import sys
-from unittest import skipIf
 import warnings
+from unittest import skipIf
 from xml.dom.minidom import parseString
+
+from django.core import serializers
+from django.core.urlresolvers import reverse
+from django.db.models import Max, Min
+from django.http import HttpRequest
+from django.template import (
+    Context, RequestContext, Template, TemplateSyntaxError, context_processors,
+)
+from django.test import (
+    TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
+)
+from django.test.utils import requires_tz_support
+from django.utils import six, timezone
+
+from .forms import (
+    EventForm, EventLocalizedForm, EventLocalizedModelForm, EventModelForm,
+    EventSplitForm,
+)
+from .models import (
+    AllDayEvent, Event, MaybeEvent, Session, SessionEvent, Timestamp,
+)
 
 try:
     import pytz
 except ImportError:
     pytz = None
-
-from django.core import serializers
-from django.core.urlresolvers import reverse
-from django.db.models import Min, Max
-from django.http import HttpRequest
-from django.template import (
-    context_processors, Context, RequestContext, Template, TemplateSyntaxError)
-from django.test import (
-    TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature)
-from django.test.utils import requires_tz_support
-from django.utils import six
-from django.utils import timezone
-
-from .forms import EventForm, EventSplitForm, EventLocalizedForm, EventModelForm, EventLocalizedModelForm
-from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp, AllDayEvent
-
 
 # These tests use the EAT (Eastern Africa Time) and ICT (Indochina Time)
 # who don't have Daylight Saving Time, so we can represent them easily

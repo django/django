@@ -9,22 +9,19 @@ import sys
 import types
 import unittest
 
+from django.template import Context, TemplateDoesNotExist, loader
+from django.template.engine import Engine
+from django.template.loaders import cached, eggs
+from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.utils import six
+from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.six import StringIO
+
 try:
     import pkg_resources
 except ImportError:
     pkg_resources = None
-
-
-from django.template import TemplateDoesNotExist, Context
-from django.template.loaders import cached, eggs
-from django.template.engine import Engine
-from django.template import loader
-from django.test import SimpleTestCase, ignore_warnings, override_settings
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils._os import upath
-from django.utils.six import StringIO
-
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(upath(__file__)), 'templates')
 

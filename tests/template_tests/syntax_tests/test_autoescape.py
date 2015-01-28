@@ -2,7 +2,7 @@ from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 
-from ..utils import setup, SafeClass, UnsafeClass
+from ..utils import SafeClass, UnsafeClass, setup
 
 
 class AutoescapeTagTests(SimpleTestCase):

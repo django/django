@@ -1,7 +1,6 @@
 from django.db.models.sql import aggregates
 from django.db.models.sql.aggregates import *  # NOQA
 
-
 __all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union'] + aggregates.__all__
 
 

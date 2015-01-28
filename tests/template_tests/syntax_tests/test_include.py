@@ -1,9 +1,8 @@
 from django.template import Context, TemplateDoesNotExist, TemplateSyntaxError
 from django.test import SimpleTestCase
 
-from .test_basic import basic_templates
 from ..utils import setup
-
+from .test_basic import basic_templates
 
 include_fail_templates = {
     'include-fail1': '{% load bad_tag %}{% badtag %}',

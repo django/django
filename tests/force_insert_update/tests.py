@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
 
-from django.db import transaction, IntegrityError, DatabaseError
+from django.db import DatabaseError, IntegrityError, transaction
 from django.test import TestCase
 
-from .models import (Counter, WithCustomPK, InheritedCounter, ProxyCounter,
-                     SubCounter)
+from .models import (
+    Counter, InheritedCounter, ProxyCounter, SubCounter, WithCustomPK,
+)
 
 
 class ForceTests(TestCase):

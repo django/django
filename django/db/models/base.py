@@ -2,33 +2,40 @@ from __future__ import unicode_literals
 
 import copy
 import inspect
-from itertools import chain
 import sys
 import warnings
+from itertools import chain
 
 from django.apps import apps
 from django.apps.config import MODELS_MODULE_NAME
 from django.conf import settings
 from django.core import checks
-from django.core.exceptions import (FieldDoesNotExist, ObjectDoesNotExist,
-    MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
-from django.db import (router, connections, transaction, DatabaseError,
-    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY)
+from django.core.exceptions import (
+    NON_FIELD_ERRORS, FieldDoesNotExist, FieldError, MultipleObjectsReturned,
+    ObjectDoesNotExist, ValidationError,
+)
+from django.db import (
+    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, DatabaseError, connections,
+    router, transaction,
+)
 from django.db.models import signals
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField
-from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
-    OneToOneField, add_lazy_relation)
+from django.db.models.fields.related import (
+    ForeignObjectRel, ManyToOneRel, OneToOneField, add_lazy_relation,
+)
 from django.db.models.manager import ensure_default_manager
 from django.db.models.options import Options
 from django.db.models.query import Q
-from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
+from django.db.models.query_utils import (
+    DeferredAttribute, deferred_class_factory,
+)
 from django.utils import six
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import curry
 from django.utils.six.moves import zip
-from django.utils.text import get_text_list, capfirst
+from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_version
 

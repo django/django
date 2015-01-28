@@ -10,7 +10,6 @@ from shutil import copystat
 
 from django.core.files import locks
 
-
 __all__ = ['file_move_safe']
 
 

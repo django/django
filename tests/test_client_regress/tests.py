@@ -4,21 +4,21 @@ Regression tests for the Test Client, especially the customized assertions.
 """
 from __future__ import unicode_literals
 
-import os
 import itertools
+import os
 
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template import TemplateSyntaxError, Context, engines
+from django.contrib.auth.models import User
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.core.urlresolvers import NoReverseMatch, reverse
+from django.http import HttpResponse
+from django.template import Context, TemplateSyntaxError, engines
+from django.template.response import SimpleTemplateResponse
 from django.test import Client, TestCase, ignore_warnings, override_settings
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
-from django.template.response import SimpleTemplateResponse
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
-from django.http import HttpResponse
-from django.contrib.auth.signals import user_logged_out, user_logged_in
-from django.contrib.auth.models import User
 
 from .models import CustomUser
 from .views import CustomTestException

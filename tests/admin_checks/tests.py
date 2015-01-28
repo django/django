@@ -6,7 +6,7 @@ from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
 from django.test import TestCase, override_settings
 
-from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
+from .models import Album, Book, City, Influence, Song, State, TwoAlbumFKAndAnE
 
 
 class SongForm(forms.ModelForm):

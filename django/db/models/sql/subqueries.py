@@ -9,7 +9,6 @@ from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS
 from django.db.models.sql.query import Query
 from django.utils import six
 
-
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
 
 

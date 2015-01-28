@@ -1,34 +1,39 @@
-from collections import OrderedDict
 import copy
 import operator
+from collections import OrderedDict
 from functools import partial, reduce, update_wrapper
 
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin import widgets, helpers
-from django.contrib.admin.checks import (BaseModelAdminChecks, ModelAdminChecks,
-    InlineModelAdminChecks)
+from django.contrib.admin import helpers, widgets
+from django.contrib.admin.checks import (
+    BaseModelAdminChecks, InlineModelAdminChecks, ModelAdminChecks,
+)
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
-from django.contrib.admin.utils import (quote, unquote, flatten_fieldsets,
-    get_deleted_objects, model_format_dict, NestedObjects,
-    lookup_needs_distinct)
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from django.contrib.admin.utils import (
+    NestedObjects, flatten_fieldsets, get_deleted_objects,
+    lookup_needs_distinct, model_format_dict, quote, unquote,
+)
 from django.contrib.auth import get_permission_codename
-from django.core.exceptions import (PermissionDenied, ValidationError,
-    FieldDoesNotExist, FieldError)
+from django.core.exceptions import (
+    FieldDoesNotExist, FieldError, PermissionDenied, ValidationError,
+)
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
-from django.db import models, transaction, router
+from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.sql.constants import QUERY_TERMS
-from django.forms.formsets import all_valid, DELETION_FIELD_NAME
-from django.forms.models import (modelform_factory, modelformset_factory,
-    inlineformset_factory, BaseInlineFormSet, modelform_defines_fields)
-from django.forms.widgets import SelectMultiple, CheckboxSelectMultiple
+from django.forms.formsets import DELETION_FIELD_NAME, all_valid
+from django.forms.models import (
+    BaseInlineFormSet, inlineformset_factory, modelform_defines_fields,
+    modelform_factory, modelformset_factory,
+)
+from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
 from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.shortcuts import get_object_or_404
@@ -38,13 +43,10 @@ from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import escape, escapejs
 from django.utils.http import urlencode
-from django.utils.text import capfirst, get_text_list
-from django.utils.translation import string_concat
-from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext
 from django.utils.safestring import mark_safe
+from django.utils.text import capfirst, get_text_list
+from django.utils.translation import string_concat, ugettext as _, ungettext
 from django.views.decorators.csrf import csrf_protect
-
 
 IS_POPUP_VAR = '_popup'
 TO_FIELD_VAR = '_to_field'

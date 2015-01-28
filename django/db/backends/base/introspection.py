@@ -2,7 +2,6 @@ from collections import namedtuple
 
 from django.utils import six
 
-
 # Structure returned by DatabaseIntrospection.get_table_list()
 TableInfo = namedtuple('TableInfo', ['name', 'type'])
 

@@ -6,16 +6,16 @@ from unittest import skipUnless
 
 from django.apps import apps
 from django.conf import settings
-from django.contrib.sitemaps import Sitemap, GenericSitemap
+from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import ignore_warnings, modify_settings, override_settings
+from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.formats import localize
-from django.utils._os import upath
 from django.utils.translation import activate, deactivate
 
-from .base import TestModel, SitemapTestsBase
+from .base import SitemapTestsBase, TestModel
 
 
 class HTTPSitemapTests(SitemapTestsBase):

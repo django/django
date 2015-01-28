@@ -5,21 +5,21 @@ import os
 import random
 import sys
 import time
-from email import (charset as Charset, encoders as Encoders,
-    message_from_string, generator)
+from email import (
+    charset as Charset, encoders as Encoders, generator, message_from_string,
+)
+from email.header import Header
 from email.message import Message
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
-from email.header import Header
-from email.utils import formatdate, getaddresses, formataddr, parseaddr
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import formataddr, formatdate, getaddresses, parseaddr
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
-from django.utils.encoding import force_text
 from django.utils import six
-
+from django.utils.encoding import force_text
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.

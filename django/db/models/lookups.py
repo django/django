@@ -1,5 +1,5 @@
-from copy import copy
 import inspect
+from copy import copy
 
 from django.conf import settings
 from django.utils import timezone

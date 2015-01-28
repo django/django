@@ -1,13 +1,15 @@
 from django.apps import apps
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
 from django.core.exceptions import FieldDoesNotExist
-from django.db.models.fields import related, CharField, Field
-from django.db.models.options import IMMUTABLE_WARNING, EMPTY_RELATION_TREE
+from django.db.models.fields import CharField, Field, related
+from django.db.models.options import EMPTY_RELATION_TREE, IMMUTABLE_WARNING
 from django.test import TestCase
 
 from .models import (
-    Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating,
-    CommonAncestor, FirstParent, SecondParent, Child
+    AbstractPerson, BasePerson, Child, CommonAncestor, FirstParent, Person,
+    ProxyPerson, Relating, Relation, SecondParent,
 )
 from .results import TEST_RESULTS
 

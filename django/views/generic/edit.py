@@ -8,9 +8,10 @@ from django.http import HttpResponseRedirect
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
-from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
-from django.views.generic.detail import (SingleObjectMixin,
-                        SingleObjectTemplateResponseMixin, BaseDetailView)
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from django.views.generic.detail import (
+    BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,
+)
 
 PERCENT_PLACEHOLDER_REGEX = re.compile(r'%\([^\)]+\)')  # RemovedInDjango20Warning
 

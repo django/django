@@ -1,23 +1,22 @@
-from datetime import datetime
 import errno
-from inspect import getargspec
 import os
 import warnings
+from datetime import datetime
+from inspect import getargspec
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
-from django.core.files import locks, File
+from django.core.files import File, locks
 from django.core.files.move import file_move_safe
+from django.utils._os import abspathu, safe_join
 from django.utils.crypto import get_random_string
-from django.utils.encoding import force_text, filepath_to_uri
+from django.utils.deconstruct import deconstructible
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import filepath_to_uri, force_text
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
 from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
-from django.utils._os import safe_join, abspathu
-from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango20Warning
-
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
 

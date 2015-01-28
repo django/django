@@ -1,14 +1,15 @@
 from __future__ import unicode_literals
-from collections import OrderedDict
+
 import copy
+from collections import OrderedDict
 
 from django.apps import AppConfig
 from django.apps.registry import Apps, apps as global_apps
-from django.db import models
-from django.db.models.options import DEFAULT_NAMES, normalize_together
-from django.db.models.fields.related import do_pending_lookups
-from django.db.models.fields.proxy import OrderWrt
 from django.conf import settings
+from django.db import models
+from django.db.models.fields.proxy import OrderWrt
+from django.db.models.fields.related import do_pending_lookups
+from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.utils import six
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property

@@ -3,16 +3,18 @@ from __future__ import unicode_literals
 import re
 
 from django import forms
+from django.contrib.auth.forms import (
+    AuthenticationForm, PasswordChangeForm, PasswordResetForm,
+    ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget, SetPasswordForm,
+    UserChangeForm, UserCreationForm,
+)
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
-    PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm,
-    ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget)
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
-from django.forms.fields import Field, CharField
+from django.forms.fields import CharField, Field
 from django.test import TestCase, override_settings
-from django.utils.encoding import force_text
 from django.utils import translation
+from django.utils.encoding import force_text
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 

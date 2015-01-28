@@ -3,8 +3,7 @@ Serialize data to/from JSON
 """
 
 # Avoid shadowing the standard library json module
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import decimal
@@ -12,8 +11,9 @@ import json
 import sys
 
 from django.core.serializers.base import DeserializationError
-from django.core.serializers.python import Serializer as PythonSerializer
-from django.core.serializers.python import Deserializer as PythonDeserializer
+from django.core.serializers.python import (
+    Deserializer as PythonDeserializer, Serializer as PythonSerializer,
+)
 from django.utils import six
 from django.utils.timezone import is_aware
 

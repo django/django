@@ -5,13 +5,12 @@ from calendar import timegm
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http import HttpResponse, Http404
-from django.template import loader, TemplateDoesNotExist
-from django.utils import feedgenerator
+from django.http import Http404, HttpResponse
+from django.template import TemplateDoesNotExist, loader
+from django.utils import feedgenerator, six
 from django.utils.encoding import force_text, iri_to_uri, smart_text
 from django.utils.html import escape
 from django.utils.http import http_date
-from django.utils import six
 from django.utils.timezone import get_default_timezone, is_naive, make_aware
 
 

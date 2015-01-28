@@ -2,7 +2,8 @@
  This module is for the miscellaneous GEOS routines, particularly the
  ones that return the area, distance, and length.
 """
-from ctypes import c_int, c_double, POINTER
+from ctypes import POINTER, c_double, c_int
+
 from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import check_dbl, check_string
 from django.contrib.gis.geos.prototypes.geom import geos_char_p

@@ -1,13 +1,13 @@
 """Translation helper functions."""
 from __future__ import unicode_literals
 
-from collections import OrderedDict
+import gettext as gettext_module
 import os
 import re
 import sys
-import gettext as gettext_module
-from threading import local
 import warnings
+from collections import OrderedDict
+from threading import local
 
 from django.apps import apps
 from django.conf import settings
@@ -15,12 +15,14 @@ from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.utils.encoding import force_text
+from django.utils import lru_cache, six
 from django.utils._os import upath
-from django.utils.safestring import mark_safe, SafeData
-from django.utils import six, lru_cache
+from django.utils.encoding import force_text
+from django.utils.safestring import SafeData, mark_safe
 from django.utils.six import StringIO
-from django.utils.translation import TranslatorCommentWarning, trim_whitespace, LANGUAGE_SESSION_KEY
+from django.utils.translation import (
+    LANGUAGE_SESSION_KEY, TranslatorCommentWarning, trim_whitespace,
+)
 
 # Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.

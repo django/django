@@ -1,9 +1,8 @@
 from django.db.models.fields.related import (
+    RECURSIVE_RELATIONSHIP_CONSTANT, ManyToManyField, ManyToManyRel,
+    RelatedField, ReverseManyRelatedObjectsDescriptor,
     create_many_to_many_intermediary_model,
-    ManyToManyField, ManyToManyRel, RelatedField,
-    RECURSIVE_RELATIONSHIP_CONSTANT, ReverseManyRelatedObjectsDescriptor,
 )
-
 from django.utils.functional import curry
 
 

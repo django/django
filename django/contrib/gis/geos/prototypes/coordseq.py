@@ -1,6 +1,9 @@
-from ctypes import c_double, c_int, c_uint, POINTER
-from django.contrib.gis.geos.libgeos import GEOM_PTR, CS_PTR
-from django.contrib.gis.geos.prototypes.errcheck import last_arg_byref, GEOSException
+from ctypes import POINTER, c_double, c_int, c_uint
+
+from django.contrib.gis.geos.libgeos import CS_PTR, GEOM_PTR
+from django.contrib.gis.geos.prototypes.errcheck import (
+    GEOSException, last_arg_byref,
+)
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
 

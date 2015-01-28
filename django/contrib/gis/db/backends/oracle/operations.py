@@ -9,7 +9,8 @@
 """
 import re
 
-from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
+from django.contrib.gis.db.backends.base.operations import \
+    BaseSpatialOperations
 from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
@@ -18,7 +19,6 @@ from django.contrib.gis.measure import Distance
 from django.db.backends.oracle.base import Database
 from django.db.backends.oracle.operations import DatabaseOperations
 from django.utils import six
-
 
 DEFAULT_TOLERANCE = '0.05'
 

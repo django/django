@@ -1,9 +1,8 @@
 from django.apps import apps
 from django.core import management
 from django.db.models import signals
-from django.test import override_settings, TestCase
+from django.test import TestCase, override_settings
 from django.utils import six
-
 
 APP_CONFIG = apps.get_app_config('migrate_signals')
 PRE_MIGRATE_ARGS = ['app_config', 'verbosity', 'interactive', 'using']

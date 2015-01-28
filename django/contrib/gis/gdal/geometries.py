@@ -38,33 +38,27 @@
   >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
   True True
 """
-# Python library requisites.
 import sys
 from binascii import a2b_hex, b2a_hex
-from ctypes import byref, string_at, c_char_p, c_double, c_ubyte, c_void_p
+from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 
-# Getting GDAL prerequisites
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import GDALException, OGRIndexError, SRSException
+from django.contrib.gis.gdal.error import (
+    GDALException, OGRIndexError, SRSException,
+)
 from django.contrib.gis.gdal.geomtype import OGRGeomType
-from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
-
-# Getting the ctypes prototype functions that interface w/the GDAL C library.
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
-
-# For recognizing geometry input.
-from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
-
+from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
+from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
 from django.utils import six
 from django.utils.six.moves import range
+
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
 # The OGR_G_* routines are relevant here.
-
-
 class OGRGeometry(GDALBase):
     "Generally encapsulates an OGR geometry."
 

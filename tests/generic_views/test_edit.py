@@ -2,14 +2,14 @@ from __future__ import unicode_literals
 
 import warnings
 
+from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
-from django import forms
 from django.test import TestCase, ignore_warnings, override_settings
 from django.test.client import RequestFactory
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.views.generic.base import View
-from django.views.generic.edit import FormMixin, ModelFormMixin, CreateView
+from django.views.generic.edit import CreateView, FormMixin, ModelFormMixin
 
 from . import views
 from .models import Artist, Author

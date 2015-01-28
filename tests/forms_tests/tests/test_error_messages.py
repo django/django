@@ -7,11 +7,11 @@ from django.forms import (
     DecimalField, EmailField, FileField, FloatField, Form,
     GenericIPAddressField, IntegerField, ModelChoiceField,
     ModelMultipleChoiceField, MultipleChoiceField, RegexField,
-    SplitDateTimeField, TimeField, URLField, utils, ValidationError,
+    SplitDateTimeField, TimeField, URLField, ValidationError, utils,
 )
 from django.test import TestCase
-from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.safestring import mark_safe
 
 
 class AssertFormErrorsMixin(object):

@@ -3,10 +3,9 @@ import json
 from django.contrib.postgres import forms, lookups
 from django.contrib.postgres.fields.array import ArrayField
 from django.core import exceptions
-from django.db.models import Field, Transform, TextField
+from django.db.models import Field, TextField, Transform
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
-
 
 __all__ = ['HStoreField']
 
