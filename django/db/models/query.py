@@ -398,6 +398,11 @@ class QuerySet(object):
         obj.save(force_insert=True, using=self.db)
         return obj
 
+    def _populate_pk_values(self, objs):
+        for obj in objs:
+            if obj.pk is None:
+                obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
+
     def bulk_create(self, objs, batch_size=None):
         """
         Inserts each of the instances into the database. This does *not* call
@@ -422,6 +427,8 @@ class QuerySet(object):
         self._for_write = True
         connection = connections[self.db]
         fields = self.model._meta.local_concrete_fields
+        objs = list(objs)
+        self._populate_pk_values(objs)
         with transaction.atomic(using=self.db, savepoint=False):
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
                     and self.model._meta.has_auto_field):

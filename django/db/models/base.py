@@ -771,6 +771,9 @@ class Model(six.with_metaclass(ModelBase)):
                        if f.name in update_fields or f.attname in update_fields]
 
         pk_val = self._get_pk_val(meta)
+        if pk_val is None:
+            pk_val = meta.pk.get_pk_value_on_save(self)
+            setattr(self, meta.pk.attname, pk_val)
         pk_set = pk_val is not None
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")
