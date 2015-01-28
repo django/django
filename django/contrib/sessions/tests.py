@@ -513,7 +513,8 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertNotEqual(caches['sessions'].get(self.session.cache_key), None)
 
 
-class SessionMiddlewareTests(unittest.TestCase):
+# DB flushing required since Session objects created, so use TestCase
+class SessionMiddlewareTests(TestCase):
 
     @override_settings(SESSION_COOKIE_SECURE=True)
     def test_secure_session_cookie(self):
