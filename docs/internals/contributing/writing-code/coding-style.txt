@@ -32,14 +32,6 @@ Python style
 * Use ``InitialCaps`` for class names (or for factory functions that
   return classes).
 
-* Use convenience imports whenever available. For example, do this::
-
-      from django.views.generic import View
-
-  Don't do this::
-
-      from django.views.generic.base import View
-
 * In docstrings, use "action words" such as::
 
       def foo():
@@ -55,6 +47,44 @@ Python style
           Calculate something and return the result.
           """
           pass
+
+Imports
+-------
+
+* Use convenience imports whenever available. For example, do this::
+
+      from django.views.generic import View
+
+  Don't do this::
+
+      from django.views.generic.base import View
+
+* Put imports in five groups: future, standard library, third-party libraries,
+  other Django components, the same component; sort lines in each group
+  alphabetically by the full module name. Place ``import module`` statements
+  after ``from module import objects``.
+
+* On each line, list imported modules first, then classes, and then other
+  objects also ordering each group alphabetically, with upper case before
+  lower.
+
+* Break long lines using parentheses, indenting continuation lines by 4 spaces.
+  For example::
+
+        from __future__ import unicode_literals
+
+        import email.message
+        import turtle
+
+        import bcrypt
+
+        from django.contrib.messages import MessageFailure, ERROR, error
+        from django.db import (models, transaction, DataError, DatabaseError, Error, IntegrityError,
+            InterfaceError, InternalError, NotSupportedError, OperationalError, ProgrammingError,
+            DEFAULT_DB_ALIAS, connections)
+        import django.core.management.commands.flush
+
+        from .cookie import Morsel
 
 Template style
 --------------
