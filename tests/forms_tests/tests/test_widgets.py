@@ -1145,8 +1145,8 @@ beatle J R Ringo False""")
             <input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" /></td></tr>
             """,
         )
-
         self.assertEqual(f.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')
+
 
 class NullBooleanSelectLazyForm(Form):
     """Form to test for lazy evaluation. Refs #17190"""
