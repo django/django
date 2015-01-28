@@ -1970,6 +1970,9 @@ class ForeignKey(ForeignObject):
         else:
             return self.related_field.get_db_prep_save(value, connection=connection)
 
+    def get_internal_type(self):
+        return "ForeignKey"
+
     def value_to_string(self, obj):
         if not obj:
             # In required many-to-one fields with only one available choice,
@@ -2052,6 +2055,9 @@ class OneToOneField(ForeignKey):
         if self.rel.parent_link:
             return None
         return super(OneToOneField, self).formfield(**kwargs)
+
+    def get_internal_type(self):
+        return "OneToOneField"
 
     def save_form_data(self, instance, data):
         if isinstance(data, self.rel.to):
@@ -2479,6 +2485,9 @@ class ManyToManyField(RelatedField):
 
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)
+
+    def get_internal_type(self):
+        return "ManyToManyField"
 
     def _get_m2m_db_table(self, opts):
         "Function that can be curried to provide the m2m table name for this relation"
