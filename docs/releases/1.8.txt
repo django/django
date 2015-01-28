@@ -526,6 +526,9 @@ Models
 * You can now get the set of deferred fields for a model using
   :meth:`Model.get_deferred_fields() <django.db.models.Model.get_deferred_fields>`.
 
+* Model field ``default``’s are now used when primary key field's are set to
+  ``None``.
+
 Signals
 ^^^^^^^
 
