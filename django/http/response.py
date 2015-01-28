@@ -218,10 +218,6 @@ class HttpResponseBase(six.Iterator):
         # an instance of a subclass, this function returns `bytes(value)`.
         # This doesn't make a copy when `value` already contains bytes.
 
-        # If content is already encoded (eg. gzip), assume bytes.
-        if self.has_header('Content-Encoding'):
-            return bytes(value)
-
         # Handle string types -- we can't rely on force_bytes here because:
         # - under Python 3 it attempts str conversion first
         # - when self._charset != 'utf-8' it re-encodes the content
