@@ -8,13 +8,11 @@ import random
 import tempfile
 import time
 import zlib
+
 from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
 from django.core.files.move import file_move_safe
 from django.utils.encoding import force_bytes
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
+from django.utils.six.moves import cPickle as pickle
 
 
 class FileBasedCache(BaseCache):
