@@ -10,10 +10,7 @@ from django.db.backends import utils
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
 from django.utils.functional import cached_property
-try:
-    from django.utils.six.moves import _thread as thread
-except ImportError:
-    from django.utils.six.moves import _dummy_thread as thread
+from django.utils.six.moves import _thread as thread
 
 
 NO_DB_ALIAS = '__no_db__'
