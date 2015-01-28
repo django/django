@@ -217,6 +217,15 @@ Note that ``lambda``\s cannot be used for field options like ``default``
 because they cannot be :ref:`serialized by migrations <migration-serializing>`.
 See that documentation for other caveats.
 
+The default value is used when new model instances are created and a value
+isn't provided for the field. When the field is a primary key, the default is
+also used when the field is set to ``None``.
+
+.. versionchanged:: 1.8
+
+    The default wasn't used for ``None`` primary key values in previous
+    versions.
+
 ``editable``
 ------------
 
