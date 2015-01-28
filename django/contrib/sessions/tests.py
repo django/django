@@ -606,7 +606,7 @@ class SessionMiddlewareTests(TestCase):
         )
 
 
-class CookieSessionTests(SessionTestsMixin, TestCase):
+class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
 
     backend = CookieSession
 
