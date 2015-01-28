@@ -2,14 +2,10 @@
 
 from contextlib import contextmanager
 import time
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
 
 from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
+from django.utils.six.moves import cPickle as pickle
 from django.utils.synch import RWLock
-
 
 # Global in-memory store of cache data. Keyed by name, to provide
 # multiple named local memory caches.
