@@ -1,10 +1,7 @@
 from __future__ import unicode_literals
 
 import sys
-try:
-    import threading
-except ImportError:
-    threading = None
+import threading
 import time
 from unittest import skipIf, skipUnless
 

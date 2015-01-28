@@ -6,15 +6,11 @@ import os
 import shutil
 import sys
 import tempfile
+import threading
 import time
 import unittest
 import warnings
 from datetime import datetime, timedelta
-
-try:
-    import threading
-except ImportError:
-    import dummy_threading as threading
 
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousOperation, SuspiciousFileOperation
