@@ -52,3 +52,7 @@ class CustomManyToManyField(RelatedField):
     _get_m2m_attr = ManyToManyField.__dict__['_get_m2m_attr']
     _get_m2m_reverse_attr = ManyToManyField.__dict__['_get_m2m_reverse_attr']
     _get_m2m_db_table = ManyToManyField.__dict__['_get_m2m_db_table']
+
+
+class InheritedManyToManyField(ManyToManyField):
+    pass
