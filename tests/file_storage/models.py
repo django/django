@@ -9,8 +9,8 @@ import os
 import random
 import tempfile
 
-from django.db import models
 from django.core.files.storage import FileSystemStorage
+from django.db import models
 
 
 class OldStyleFSStorage(FileSystemStorage):

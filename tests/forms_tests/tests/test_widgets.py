@@ -16,11 +16,11 @@ from django.forms import (
     SplitDateTimeWidget, Textarea, TextInput, TimeInput, ValidationError,
 )
 from django.forms.widgets import RadioFieldRenderer
-from django.utils.safestring import mark_safe, SafeData
-from django.utils import six, translation
 from django.test import TestCase, override_settings
+from django.utils import six, translation
 from django.utils.dates import MONTHS_AP
 from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.safestring import SafeData, mark_safe
 
 from ..models import Article
 

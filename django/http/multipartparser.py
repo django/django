@@ -13,12 +13,14 @@ import sys
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousMultipartForm
+from django.core.files.uploadhandler import (
+    SkipFile, StopFutureHandlers, StopUpload,
+)
+from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
-from django.utils import six
 from django.utils.six.moves.urllib.parse import unquote
 from django.utils.text import unescape_entities
-from django.core.files.uploadhandler import StopUpload, SkipFile, StopFutureHandlers
 
 __all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
 

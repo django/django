@@ -3,7 +3,9 @@
 from unittest import TestCase
 
 from django.http import HttpRequest
-from django.template import Context, RequestContext, Variable, VariableDoesNotExist
+from django.template import (
+    Context, RequestContext, Variable, VariableDoesNotExist,
+)
 from django.template.context import RenderContext
 
 

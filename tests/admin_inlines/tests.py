@@ -2,21 +2,22 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django.contrib.admin import TabularInline, ModelAdmin
-from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from django.contrib.admin import ModelAdmin, TabularInline
 from django.contrib.admin.helpers import InlineAdminForm
-from django.contrib.auth.models import User, Permission
+from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase, override_settings, RequestFactory
+from django.test import RequestFactory, TestCase, override_settings
 from django.utils.encoding import force_text
 
-# local test models
 from .admin import InnerInline, site as admin_site
-from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
-    OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
-    ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
-    Sighting, Novel, Chapter, FootNote, BinaryTree, SomeParentModel,
-    SomeChildModel, Poll, Question, Inner4Stacked, Inner4Tabular, Holder4)
+from .models import (
+    Author, BinaryTree, Book, Chapter, Child, ChildModel1, ChildModel2,
+    Fashionista, FootNote, Holder, Holder2, Holder3, Holder4, Inner, Inner2,
+    Inner3, Inner4Stacked, Inner4Tabular, Novel, OutfitItem, Parent,
+    ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
+    Question, Sighting, SomeChildModel, SomeParentModel, Teacher,
+)
 
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
 

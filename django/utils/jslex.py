@@ -1,6 +1,7 @@
 """JsLex: a lexer for Javascript"""
 # Originally from https://bitbucket.org/ned/jslex
 from __future__ import unicode_literals
+
 import re
 
 

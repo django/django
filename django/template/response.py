@@ -1,7 +1,7 @@
 import warnings
 
 from django.http import HttpResponse
-from django.template import loader, Context, RequestContext, Template
+from django.template import Context, RequestContext, Template, loader
 from django.template.backends.django import Template as BackendTemplate
 from django.template.context import _current_app_undefined
 from django.utils import six

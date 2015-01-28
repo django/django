@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
-from django.test.utils import override_settings
 from django.test.testcases import skipIfDBFeature
+from django.test.utils import override_settings
 
 from .base import IsolatedModelsTestCase
 

@@ -2,24 +2,25 @@
 from __future__ import unicode_literals
 
 import asyncore
-from email.mime.text import MIMEText
 import os
 import shutil
 import smtpd
 import sys
 import tempfile
 import threading
-from smtplib import SMTPException, SMTP
+from email.mime.text import MIMEText
+from smtplib import SMTP, SMTPException
 from ssl import SSLError
 
 from django.core import mail
-from django.core.mail import (EmailMessage, mail_admins, mail_managers,
-        EmailMultiAlternatives, send_mail, send_mass_mail)
-from django.core.mail.backends import console, dummy, locmem, filebased, smtp
+from django.core.mail import (
+    EmailMessage, EmailMultiAlternatives, mail_admins, mail_managers,
+    send_mail, send_mass_mail,
+)
+from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError
-from django.test import SimpleTestCase
-from django.test import override_settings
-from django.utils.encoding import force_text, force_bytes
+from django.test import SimpleTestCase, override_settings
+from django.utils.encoding import force_bytes, force_text
 from django.utils.six import PY3, StringIO, binary_type
 from django.utils.translation import ugettext_lazy
 

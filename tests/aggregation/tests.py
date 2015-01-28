@@ -1,22 +1,21 @@
 from __future__ import unicode_literals
 
 import datetime
-from decimal import Decimal
 import re
+from decimal import Decimal
 
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    Avg, Sum, Count, Max, Min,
-    Aggregate, F, Value, Func,
-    IntegerField, FloatField, DecimalField)
+    F, Aggregate, Avg, Count, DecimalField, FloatField, Func, IntegerField,
+    Max, Min, Sum, Value,
+)
 from django.test import TestCase, ignore_warnings
-from django.test.utils import Approximate
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import Approximate, CaptureQueriesContext
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from .models import Author, Publisher, Book, Store
+from .models import Author, Book, Publisher, Store
 
 
 class BaseAggregateTestCase(TestCase):

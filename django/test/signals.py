@@ -1,13 +1,13 @@
 import os
-import time
 import threading
+import time
 import warnings
 
 from django.conf import settings
 from django.core.signals import setting_changed
 from django.db import connections, router
 from django.db.utils import ConnectionRouter
-from django.dispatch import receiver, Signal
+from django.dispatch import Signal, receiver
 from django.utils import timezone
 from django.utils.functional import empty
 

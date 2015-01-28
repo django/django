@@ -4,10 +4,9 @@ from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
-from django.db.models import Field, Transform, IntegerField
+from django.db.models import Field, IntegerField, Transform
 from django.utils import six
 from django.utils.translation import string_concat, ugettext_lazy as _
-
 
 __all__ = ['ArrayField']
 

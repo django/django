@@ -3,11 +3,11 @@ Various edge-cases for model managers.
 """
 
 from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
+    GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible, force_text
+from django.utils.encoding import force_text, python_2_unicode_compatible
 
 
 class OnlyFred(models.Manager):

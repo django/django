@@ -1,11 +1,11 @@
-from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from django.db import connections, DEFAULT_DB_ALIAS, migrations
-from django.db.migrations.loader import AmbiguityError
+from django.core.management.base import BaseCommand, CommandError
+from django.db import DEFAULT_DB_ALIAS, connections, migrations
 from django.db.migrations.executor import MigrationExecutor
-from django.db.migrations.writer import MigrationWriter
-from django.db.migrations.optimizer import MigrationOptimizer
+from django.db.migrations.loader import AmbiguityError
 from django.db.migrations.migration import SwappableTuple
+from django.db.migrations.optimizer import MigrationOptimizer
+from django.db.migrations.writer import MigrationWriter
 from django.utils import six
 from django.utils.version import get_docs_version
 

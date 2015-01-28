@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 
-from datetime import datetime, date
+from datetime import date, datetime
 
 from django.test import TestCase, override_settings
 from django.test.utils import TZ_SUPPORT, requires_tz_support
+from django.utils import dateformat, translation
 from django.utils.dateformat import format
-from django.utils import dateformat
-from django.utils.timezone import utc, get_fixed_timezone, get_default_timezone, make_aware
-from django.utils import translation
+from django.utils.timezone import (
+    get_default_timezone, get_fixed_timezone, make_aware, utc,
+)
 
 
 @override_settings(TIME_ZONE='Europe/Copenhagen')

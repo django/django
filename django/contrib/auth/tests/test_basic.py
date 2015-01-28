@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.exceptions import ImproperlyConfigured

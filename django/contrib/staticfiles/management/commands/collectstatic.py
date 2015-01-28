@@ -3,14 +3,13 @@ from __future__ import unicode_literals
 import os
 from collections import OrderedDict
 
+from django.contrib.staticfiles.finders import get_finders
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage
-from django.core.management.base import CommandError, BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.utils.encoding import smart_text
 from django.utils.six.moves import input
-
-from django.contrib.staticfiles.finders import get_finders
-from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 class Command(BaseCommand):

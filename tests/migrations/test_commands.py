@@ -7,8 +7,8 @@ import os
 import shutil
 
 from django.apps import apps
+from django.core.management import CommandError, call_command
 from django.db import connection, models
-from django.core.management import call_command, CommandError
 from django.db.migrations import questioner
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six

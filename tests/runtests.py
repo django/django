@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from argparse import ArgumentParser
 import logging
 import os
 import shutil
@@ -7,18 +6,20 @@ import subprocess
 import sys
 import tempfile
 import warnings
+from argparse import ArgumentParser
 
 import django
 from django import contrib
 from django.apps import apps
 from django.conf import settings
 from django.db import connection
-from django.test import TransactionTestCase, TestCase
+from django.test import TestCase, TransactionTestCase
 from django.test.utils import get_runner
-from django.utils.deprecation import RemovedInDjango20Warning, RemovedInDjango21Warning
-from django.utils._os import upath
 from django.utils import six
-
+from django.utils._os import upath
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 
 warnings.simplefilter("error", RemovedInDjango20Warning)
 warnings.simplefilter("error", RemovedInDjango21Warning)

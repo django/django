@@ -4,10 +4,10 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core import mail
 from django.forms import fields
 from django.forms.forms import Form, ValidationError
-from django.forms.formsets import formset_factory, BaseFormSet
+from django.forms.formsets import BaseFormSet, formset_factory
 from django.http import (
-    HttpResponse, HttpResponseRedirect, HttpResponseNotFound,
-    HttpResponseNotAllowed, HttpResponseBadRequest,
+    HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed,
+    HttpResponseNotFound, HttpResponseRedirect,
 )
 from django.shortcuts import render_to_response
 from django.template import Context, Template

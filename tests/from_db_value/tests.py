@@ -2,7 +2,7 @@ from django.db import connection
 from django.db.models import Max
 from django.test import TestCase
 
-from .models import CashModel, Cash
+from .models import Cash, CashModel
 
 
 class FromDBValueTest(TestCase):

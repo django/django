@@ -5,15 +5,17 @@ import pickle
 from decimal import Decimal
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
+from django.core.exceptions import FieldError
+from django.db.models import F, Q, Avg, Count, Max, StdDev, Sum, Variance
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
 
-from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
-        ItemTag, WithManualPK, Alfa, Bravo, Charlie)
+from .models import (
+    Alfa, Author, Book, Bravo, Charlie, Clues, Entries, HardbackBook, ItemTag,
+    Publisher, WithManualPK,
+)
 
 
 class AggregationTests(TestCase):

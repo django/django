@@ -1,4 +1,4 @@
-from django.test import TestCase, override_settings, Client
+from django.test import Client, TestCase, override_settings
 from django.utils.translation import override
 
 

@@ -1,10 +1,9 @@
 from django.contrib import admin
-from django.core.paginator import Paginator
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 
-from .models import Event, Child, Parent, Swallow
-
+from .models import Child, Event, Parent, Swallow
 
 site = admin.AdminSite(name="admin")
 

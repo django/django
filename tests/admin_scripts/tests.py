@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 """
 A series of tests to establish that the command-line management tools work as
-advertised - especially with regards to the handling of the DJANGO_SETTINGS_MODULE
-and default settings.py files.
+advertised - especially with regards to the handling of the
+DJANGO_SETTINGS_MODULE and default settings.py files.
 """
+from __future__ import unicode_literals
 
 import codecs
 import os
@@ -19,13 +18,14 @@ import unittest
 import django
 from django import conf, get_version
 from django.conf import settings
-from django.core.management import BaseCommand, CommandError, call_command, color
-from django.utils.encoding import force_text
-from django.utils._os import npath, upath
-from django.utils.six import StringIO
+from django.core.management import (
+    BaseCommand, CommandError, call_command, color,
+)
 from django.test import LiveServerTestCase, TestCase, mock, override_settings
 from django.test.runner import DiscoverRunner
-
+from django.utils._os import npath, upath
+from django.utils.encoding import force_text
+from django.utils.six import StringIO
 
 test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
 if not os.path.exists(test_dir):

@@ -1,22 +1,21 @@
 from __future__ import unicode_literals
 
 import datetime
-from decimal import Decimal
 import unittest
+from decimal import Decimal
 
-from django import test
-from django import forms
-from django.core import validators
-from django.core import checks
+from django import forms, test
+from django.core import checks, validators
 from django.core.exceptions import ValidationError
-from django.db import connection, transaction, models, IntegrityError
+from django.db import IntegrityError, connection, models, transaction
 from django.db.models.fields import (
-    AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
-    CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
-    EmailField, FilePathField, FloatField, IntegerField, IPAddressField,
-    GenericIPAddressField, NOT_PROVIDED, NullBooleanField, PositiveIntegerField,
+    NOT_PROVIDED, AutoField, BigIntegerField, BinaryField, BooleanField,
+    CharField, CommaSeparatedIntegerField, DateField, DateTimeField,
+    DecimalField, EmailField, FilePathField, FloatField, GenericIPAddressField,
+    IntegerField, IPAddressField, NullBooleanField, PositiveIntegerField,
     PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
-    TimeField, URLField)
+    TimeField, URLField,
+)
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
 from django.utils.functional import lazy
@@ -24,9 +23,10 @@ from django.utils.functional import lazy
 from .models import (
     Bar, BigD, BigIntegerModel, BigS, BooleanModel, DataModel, DateTimeModel,
     Document, FksToBooleans, FkToChar, FloatModel, Foo, GenericIPAddress,
-    IntegerModel, NullBooleanModel, PositiveIntegerModel, PositiveSmallIntegerModel,
-    Post, PrimaryKeyCharModel, RenamedField, SmallIntegerModel, VerboseNameField,
-    Whiz, WhizIter, WhizIterEmpty)
+    IntegerModel, NullBooleanModel, PositiveIntegerModel,
+    PositiveSmallIntegerModel, Post, PrimaryKeyCharModel, RenamedField,
+    SmallIntegerModel, VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
+)
 
 
 class BasicFieldTests(test.TestCase):

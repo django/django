@@ -5,9 +5,8 @@ import warnings
 
 from django.conf import settings
 from django.template.context import Context, RequestContext
-from django.template.engine import _dirs_undefined, Engine
+from django.template.engine import Engine, _dirs_undefined
 from django.utils.deprecation import RemovedInDjango20Warning
-
 
 from .base import BaseEngine
 

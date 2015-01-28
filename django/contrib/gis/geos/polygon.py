@@ -1,8 +1,9 @@
-from ctypes import c_uint, byref
-from django.contrib.gis.geos.geometry import GEOSGeometry
-from django.contrib.gis.geos.libgeos import get_pointer_arr, GEOM_PTR
-from django.contrib.gis.geos.linestring import LinearRing
+from ctypes import byref, c_uint
+
 from django.contrib.gis.geos import prototypes as capi
+from django.contrib.gis.geos.geometry import GEOSGeometry
+from django.contrib.gis.geos.libgeos import GEOM_PTR, get_pointer_arr
+from django.contrib.gis.geos.linestring import LinearRing
 from django.utils import six
 from django.utils.six.moves import range
 

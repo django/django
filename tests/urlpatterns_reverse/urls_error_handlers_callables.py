@@ -2,7 +2,6 @@
 
 from .views import empty_view
 
-
 urlpatterns = []
 
 handler400 = empty_view

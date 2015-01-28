@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 
-from datetime import date, time, datetime, timedelta
 import unittest
+from datetime import date, datetime, time, timedelta
 
-from django.utils.dateparse import parse_date, parse_time, parse_datetime, parse_duration
+from django.utils.dateparse import (
+    parse_date, parse_datetime, parse_duration, parse_time,
+)
 from django.utils.timezone import get_fixed_timezone
 
 

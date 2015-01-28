@@ -1,15 +1,15 @@
 import os
 
 from django.apps import apps
-from django.db import connection
 from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import find_command, popen_wrapper
+from django.db import connection
 from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import captured_stderr, captured_stdout, extend_sys_path
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six import StringIO
 
 

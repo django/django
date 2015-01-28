@@ -2,12 +2,12 @@
 from __future__ import unicode_literals
 
 import datetime
-import tempfile
 import os
+import tempfile
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
+    GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import FileSystemStorage

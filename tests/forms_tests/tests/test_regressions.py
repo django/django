@@ -10,7 +10,7 @@ from django.test import TestCase, ignore_warnings
 from django.utils import translation
 from django.utils.translation import gettext_lazy, ugettext_lazy
 
-from forms_tests.models import Cheese
+from ..models import Cheese
 
 
 class FormsRegressionsTestCase(TestCase):

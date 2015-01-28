@@ -1,11 +1,10 @@
 import json
 
-from django.contrib.postgres import lookups, forms
+from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
+
+from django.contrib.postgres import forms, lookups
 from django.db import models
 from django.utils import six
-
-from psycopg2.extras import Range, NumericRange, DateRange, DateTimeTZRange
-
 
 __all__ = [
     'RangeField', 'IntegerRangeField', 'BigIntegerRangeField',

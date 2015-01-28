@@ -5,9 +5,11 @@ Tests for stuff in django.utils.datastructures.
 import copy
 
 from django.test import SimpleTestCase
-from django.utils.datastructures import (DictWrapper, ImmutableList,
-    MultiValueDict, MultiValueDictKeyError, OrderedSet)
 from django.utils import six
+from django.utils.datastructures import (
+    DictWrapper, ImmutableList, MultiValueDict, MultiValueDictKeyError,
+    OrderedSet,
+)
 
 
 class OrderedSetTests(SimpleTestCase):

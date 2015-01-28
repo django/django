@@ -6,12 +6,13 @@ import shutil
 import tempfile
 
 from django.conf import settings
-from django.contrib.sessions.backends.base import SessionBase, CreateError, VALID_KEY_CHARS
-from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
+from django.contrib.sessions.backends.base import (
+    VALID_KEY_CHARS, CreateError, SessionBase,
+)
+from django.contrib.sessions.exceptions import InvalidSessionKey
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.utils import timezone
 from django.utils.encoding import force_text
-
-from django.contrib.sessions.exceptions import InvalidSessionKey
 
 
 class SessionStore(SessionBase):

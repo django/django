@@ -1,17 +1,16 @@
-from collections import deque
-from contextlib import contextmanager
 import time
 import warnings
+from collections import deque
+from contextlib import contextmanager
 
 from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
-from django.db.backends.signals import connection_created
 from django.db.backends import utils
+from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
 from django.utils.functional import cached_property
 from django.utils.six.moves import _thread as thread
-
 
 NO_DB_ALIAS = '__no_db__'
 

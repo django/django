@@ -1,5 +1,7 @@
+from django.db.migrations.graph import (
+    CircularDependencyError, MigrationGraph, NodeNotFoundError,
+)
 from django.test import TestCase
-from django.db.migrations.graph import CircularDependencyError, MigrationGraph, NodeNotFoundError
 from django.utils.encoding import force_text
 
 

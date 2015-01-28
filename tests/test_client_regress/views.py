@@ -2,9 +2,9 @@ import json
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.core.serializers.json import DjangoJSONEncoder
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.test import Client

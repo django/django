@@ -3,14 +3,19 @@ Django's standard crypto functions and utilities.
 """
 from __future__ import unicode_literals
 
-import hmac
-import struct
-import hashlib
 import binascii
+import hashlib
+import hmac
+import random
+import struct
 import time
 
+from django.conf import settings
+from django.utils import six
+from django.utils.encoding import force_bytes
+from django.utils.six.moves import range
+
 # Use the system PRNG if possible
-import random
 try:
     random = random.SystemRandom()
     using_sysrandom = True
@@ -19,11 +24,6 @@ except NotImplementedError:
     warnings.warn('A secure pseudo-random number generator is not available '
                   'on your system. Falling back to Mersenne Twister.')
     using_sysrandom = False
-
-from django.conf import settings
-from django.utils.encoding import force_bytes
-from django.utils import six
-from django.utils.six.moves import range
 
 
 def salted_hmac(key_salt, value, secret=None):

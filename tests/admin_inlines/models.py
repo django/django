@@ -3,11 +3,12 @@ Testing of admin inline formsets.
 
 """
 from __future__ import unicode_literals
+
 import random
 
-from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 

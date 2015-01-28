@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-from django.test import TestCase
 from django.core.exceptions import FieldError
+from django.test import TestCase
 
 from .models import (
-    Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species, HybridSpecies,
-    Pizza, TaggedItem, Bookmark,
+    Bookmark, Domain, Family, Genus, HybridSpecies, Kingdom, Klass, Order,
+    Phylum, Pizza, Species, TaggedItem,
 )
 
 

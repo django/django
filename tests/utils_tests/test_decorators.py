@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.template import engines
 from django.template.response import TemplateResponse
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory, TestCase
 from django.utils.decorators import decorator_from_middleware
 
 

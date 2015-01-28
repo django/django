@@ -10,7 +10,6 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
-
 callable_default_counter = itertools.count()
 callable_default = lambda: next(callable_default_counter)
 

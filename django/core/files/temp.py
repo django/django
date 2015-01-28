@@ -18,6 +18,7 @@ full range of keyword arguments available in Python 2.6+ and 3.0+.
 
 import os
 import tempfile
+
 from django.core.files.utils import FileProxyMixin
 
 __all__ = ('NamedTemporaryFile', 'gettempdir',)

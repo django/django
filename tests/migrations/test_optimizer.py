@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from django.test import TestCase
+from django.db import migrations, models
 from django.db.migrations.optimizer import MigrationOptimizer
-from django.db import migrations
-from django.db import models
+from django.test import TestCase
 
 from .models import CustomModelBase, EmptyManager
 

@@ -2,17 +2,19 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.contrib.admin import (site, ModelAdmin, SimpleListFilter,
-    BooleanFieldListFilter, AllValuesFieldListFilter, RelatedOnlyFieldListFilter)
+from django.contrib.admin import (
+    AllValuesFieldListFilter, BooleanFieldListFilter, ModelAdmin,
+    RelatedOnlyFieldListFilter, SimpleListFilter, site,
+)
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, RequestFactory, override_settings
-from django.utils.encoding import force_text
+from django.test import RequestFactory, TestCase, override_settings
 from django.utils import six
+from django.utils.encoding import force_text
 
-from .models import Book, Department, Employee, Bookmark, TaggedItem
+from .models import Book, Bookmark, Department, Employee, TaggedItem
 
 
 def select_by(dictlist, key, value):

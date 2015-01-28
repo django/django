@@ -5,10 +5,10 @@ from functools import update_wrapper
 
 from django import http
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.template.response import TemplateResponse
-from django.utils.decorators import classonlymethod
 from django.utils import six
+from django.utils.decorators import classonlymethod
 
 logger = logging.getLogger('django.request')
 

@@ -6,7 +6,9 @@ from . import engines
 from .backends.django import DjangoTemplates
 from .base import Origin, TemplateDoesNotExist
 from .engine import (
-    _context_instance_undefined, _dictionary_undefined, _dirs_undefined)
+    _context_instance_undefined, _dictionary_undefined, _dirs_undefined,
+)
+from .loaders import base
 
 
 class LoaderOrigin(Origin):
@@ -140,10 +142,6 @@ def render_to_string(template_name, context=None,
 
 def _engine_list(using=None):
     return engines.all() if using is None else [engines[using]]
-
-
-# This line must remain at the bottom to avoid import loops.
-from .loaders import base
 
 
 class BaseLoader(base.Loader):

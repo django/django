@@ -1,7 +1,7 @@
 """Adds xref targets to the top of files."""
 
-import sys
 import os
+import sys
 
 testing = False
 

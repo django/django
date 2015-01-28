@@ -2,14 +2,15 @@ from __future__ import unicode_literals
 
 from math import ceil
 
-from django.db import models, IntegrityError, connection
+from django.db import IntegrityError, connection, models
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
-from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils.six.moves import range
 
-from .models import (R, RChild, S, T, A, M, MR, MRNull,
-    create_a, get_default_r, User, Avatar, HiddenUser, HiddenUserProfile,
-    M2MTo, M2MFrom, Parent, Child, Base)
+from .models import (
+    A, M, MR, R, S, T, Avatar, Base, Child, HiddenUser, HiddenUserProfile,
+    M2MFrom, M2MTo, MRNull, Parent, RChild, User, create_a, get_default_r,
+)
 
 
 class OnDeleteTests(TestCase):

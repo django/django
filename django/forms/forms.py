@@ -4,20 +4,21 @@ Form classes
 
 from __future__ import unicode_literals
 
-from collections import OrderedDict
 import copy
 import datetime
+from collections import OrderedDict
 
-from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms.fields import Field, FileField
-from django.forms.utils import flatatt, ErrorDict, ErrorList
-from django.forms.widgets import Media, MediaDefiningClass, TextInput, Textarea
-from django.utils.encoding import smart_text, force_text, python_2_unicode_compatible
+from django.forms.utils import ErrorDict, ErrorList, flatatt
+from django.forms.widgets import Media, MediaDefiningClass, Textarea, TextInput
+from django.utils import six
+from django.utils.encoding import (
+    force_text, python_2_unicode_compatible, smart_text,
+)
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from django.utils import six
-
 
 __all__ = ('BaseForm', 'Form')
 

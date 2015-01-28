@@ -10,12 +10,14 @@ from unittest import expectedFailure
 from django import forms
 from django.test import TestCase
 
-from .models import (Place, Restaurant, ItalianRestaurant, ParkingLot,
-    ParkingLot2, ParkingLot3, Supplier, Wholesaler, Child, SelfRefParent,
-    SelfRefChild, ArticleWithAuthor, M2MChild, QualityControl, DerivedM,
-    Person, BirthdayParty, BachelorParty, MessyBachelorParty,
-    InternalCertificationAudit, BusStation, TrainStation, User, Profile,
-    ParkingLot4A, ParkingLot4B, Senator)
+from .models import (
+    ArticleWithAuthor, BachelorParty, BirthdayParty, BusStation, Child,
+    DerivedM, InternalCertificationAudit, ItalianRestaurant, M2MChild,
+    MessyBachelorParty, ParkingLot, ParkingLot2, ParkingLot3, ParkingLot4A,
+    ParkingLot4B, Person, Place, Profile, QualityControl, Restaurant,
+    SelfRefChild, SelfRefParent, Senator, Supplier, TrainStation, User,
+    Wholesaler,
+)
 
 
 class ModelInheritanceTest(TestCase):

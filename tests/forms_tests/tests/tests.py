@@ -5,13 +5,17 @@ import datetime
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
-from django.forms import Form, ModelForm, FileField, ModelChoiceField, CharField
+from django.forms import (
+    CharField, FileField, Form, ModelChoiceField, ModelForm,
+)
 from django.forms.models import ModelFormMetaclass
 from django.test import TestCase
 from django.utils import six
 
-from ..models import (ChoiceModel, ChoiceOptionModel, ChoiceFieldModel,
-    FileModel, Group, BoundaryModel, Defaults, OptionalMultiChoiceModel)
+from ..models import (
+    BoundaryModel, ChoiceFieldModel, ChoiceModel, ChoiceOptionModel, Defaults,
+    FileModel, Group, OptionalMultiChoiceModel,
+)
 
 
 class ChoiceFieldForm(ModelForm):

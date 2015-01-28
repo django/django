@@ -1,5 +1,8 @@
 import threading
-from django.contrib.gis.geos.libgeos import lgeos, notice_h, error_h, CONTEXT_PTR
+
+from django.contrib.gis.geos.libgeos import (
+    CONTEXT_PTR, error_h, lgeos, notice_h,
+)
 
 
 class GEOSContextHandle(object):

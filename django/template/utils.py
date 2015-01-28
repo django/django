@@ -1,13 +1,12 @@
-from collections import Counter, OrderedDict
 import os
 import sys
 import warnings
+from collections import Counter, OrderedDict
 
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache
-from django.utils import six
+from django.utils import lru_cache, six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string

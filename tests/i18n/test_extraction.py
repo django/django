@@ -6,23 +6,23 @@ import os
 import re
 import shutil
 import time
-from unittest import SkipTest, skipUnless
 import warnings
+from unittest import SkipTest, skipUnless
 
 from django.conf import settings
 from django.core import management
 from django.core.management import execute_from_command_line
 from django.core.management.base import CommandError
-from django.core.management.commands.makemessages import Command as MakeMessagesCommand
+from django.core.management.commands.makemessages import \
+    Command as MakeMessagesCommand
 from django.core.management.utils import find_command
-from django.test import mock, override_settings, SimpleTestCase
+from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, captured_stdout
-from django.utils.encoding import force_text
-from django.utils._os import upath
 from django.utils import six
+from django.utils._os import upath
+from django.utils.encoding import force_text
 from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning
-
 
 LOCALE = 'de'
 has_xgettext = find_command('xgettext')

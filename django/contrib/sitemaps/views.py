@@ -1,5 +1,5 @@
-from calendar import timegm
 import datetime
+from calendar import timegm
 from functools import wraps
 
 from django.contrib.sites.shortcuts import get_current_site

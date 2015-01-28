@@ -1,7 +1,9 @@
-from ctypes import c_char_p, c_int, c_size_t, c_ubyte, POINTER
+from ctypes import POINTER, c_char_p, c_int, c_size_t, c_ubyte
+
 from django.contrib.gis.geos.libgeos import CS_PTR, GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import (
-    check_geom, check_minus_one, check_sized_string, check_string, check_zero)
+    check_geom, check_minus_one, check_sized_string, check_string, check_zero,
+)
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
 # This is the return type used by binary output (WKB, HEX) routines.

@@ -1,5 +1,8 @@
 from ctypes import c_char
-from django.contrib.gis.geos.libgeos import GEOM_PTR, PREPGEOM_PTR, geos_version_info
+
+from django.contrib.gis.geos.libgeos import (
+    GEOM_PTR, PREPGEOM_PTR, geos_version_info,
+)
 from django.contrib.gis.geos.prototypes.errcheck import check_predicate
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 

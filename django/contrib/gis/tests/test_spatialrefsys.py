@@ -1,12 +1,12 @@
 import unittest
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.tests.utils import (oracle, postgis, spatialite,
-    SpatialRefSys)
+from django.contrib.gis.tests.utils import (
+    SpatialRefSys, oracle, postgis, spatialite,
+)
 from django.db import connection
 from django.test import skipUnlessDBFeature
 from django.utils import six
-
 
 test_srs = ({
     'srid': 4326,

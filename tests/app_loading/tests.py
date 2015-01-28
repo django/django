@@ -5,8 +5,8 @@ import os
 from django.apps import apps
 from django.test import TestCase
 from django.test.utils import extend_sys_path
-from django.utils._os import upath
 from django.utils import six
+from django.utils._os import upath
 
 
 class EggLoadingTest(TestCase):

@@ -9,7 +9,6 @@ from django.conf.urls import url
 
 from .views import empty_view
 
-
 urlpatterns = [
     url(r'^part/(?P<value>\w+)/$', empty_view, name="part"),
     url(r'^part2/(?:(?P<value>\w+)/)?$', empty_view, name="part2"),

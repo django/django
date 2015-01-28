@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from os import path
 
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from django.utils._os import upath
 from django.views import defaults, i18n, static
 
 from . import views
-
 
 base_dir = path.dirname(path.abspath(upath(__file__)))
 media_dir = path.join(base_dir, 'media')

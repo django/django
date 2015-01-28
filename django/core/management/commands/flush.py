@@ -4,12 +4,12 @@ import sys
 from importlib import import_module
 
 from django.apps import apps
-from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
-from django.core.management.sql import sql_flush, emit_post_migrate_signal
-from django.utils.six.moves import input
+from django.core.management.sql import emit_post_migrate_signal, sql_flush
+from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
 from django.utils import six
+from django.utils.six.moves import input
 
 
 class Command(BaseCommand):

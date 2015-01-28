@@ -1,27 +1,28 @@
 from __future__ import unicode_literals
 
-from operator import attrgetter
 import warnings
+from operator import attrgetter
 
+from django import forms
 from django.apps import apps
-from django.core import checks
+from django.core import checks, exceptions
 from django.core.exceptions import FieldDoesNotExist
 from django.db import connection, connections, router, transaction
 from django.db.backends import utils
-from django.db.models import signals, Q
-from django.db.models.deletion import SET_NULL, SET_DEFAULT, CASCADE
-from django.db.models.fields import (AutoField, Field, IntegerField,
-    PositiveIntegerField, PositiveSmallIntegerField, BLANK_CHOICE_DASH)
+from django.db.models import Q, signals
+from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
+from django.db.models.fields import (
+    BLANK_CHOICE_DASH, AutoField, Field, IntegerField, PositiveIntegerField,
+    PositiveSmallIntegerField,
+)
 from django.db.models.lookups import IsNull
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo
-from django.utils.encoding import force_text, smart_text
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_text, smart_text
+from django.utils.functional import cached_property, curry
 from django.utils.translation import ugettext_lazy as _
-from django.utils.functional import curry, cached_property
-from django.core import exceptions
-from django import forms
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 

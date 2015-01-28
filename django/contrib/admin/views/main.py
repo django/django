@@ -1,22 +1,26 @@
-from collections import OrderedDict
 import sys
-
-from django.core.exceptions import FieldDoesNotExist, SuspiciousOperation, ImproperlyConfigured
-from django.core.paginator import InvalidPage
-from django.core.urlresolvers import reverse
-from django.db import models
-from django.utils import six
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext, ugettext_lazy
-from django.utils.http import urlencode
+from collections import OrderedDict
 
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import (
     DisallowedModelAdminLookup, DisallowedModelAdminToField,
 )
-from django.contrib.admin.options import IncorrectLookupParameters, IS_POPUP_VAR, TO_FIELD_VAR
-from django.contrib.admin.utils import (quote, get_fields_from_path,
-    lookup_needs_distinct, prepare_lookup_value)
+from django.contrib.admin.options import (
+    IS_POPUP_VAR, TO_FIELD_VAR, IncorrectLookupParameters,
+)
+from django.contrib.admin.utils import (
+    get_fields_from_path, lookup_needs_distinct, prepare_lookup_value, quote,
+)
+from django.core.exceptions import (
+    FieldDoesNotExist, ImproperlyConfigured, SuspiciousOperation,
+)
+from django.core.paginator import InvalidPage
+from django.core.urlresolvers import reverse
+from django.db import models
+from django.utils import six
+from django.utils.encoding import force_text
+from django.utils.http import urlencode
+from django.utils.translation import ugettext, ugettext_lazy
 
 # Changelist settings
 ALL_VAR = 'all'

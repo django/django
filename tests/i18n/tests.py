@@ -1,45 +1,40 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-from contextlib import contextmanager
 import datetime
 import decimal
 import gettext as gettext_module
-from importlib import import_module
 import os
 import pickle
+from contextlib import contextmanager
+from importlib import import_module
 from threading import local
 from unittest import skipUnless
 
 from django import forms
 from django.conf import settings
-from django.template import Template, Context
+from django.template import Context, Template
 from django.template.base import TemplateSyntaxError
-from django.test import TestCase, RequestFactory, override_settings
-from django.utils import translation
-from django.utils.formats import (get_format, date_format, time_format,
-    localize, localize_input, iter_format_modules, get_format_modules,
-    reset_format_cache, sanitize_separators)
-from django.utils.numberformat import format as nformat
+from django.test import RequestFactory, TestCase, override_settings
+from django.utils import six, translation
 from django.utils._os import upath
-from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
-from django.utils import six
+from django.utils.formats import (
+    date_format, get_format, get_format_modules, iter_format_modules, localize,
+    localize_input, reset_format_cache, sanitize_separators, time_format,
+)
+from django.utils.numberformat import format as nformat
+from django.utils.safestring import SafeBytes, SafeString, SafeText, mark_safe
 from django.utils.six import PY3
-from django.utils.translation import (activate, deactivate,
-    get_language, get_language_from_request, get_language_info,
-    to_locale, trans_real,
-    gettext, gettext_lazy,
-    ugettext, ugettext_lazy,
-    ngettext_lazy,
-    ungettext_lazy,
-    pgettext, pgettext_lazy,
-    npgettext, npgettext_lazy,
-    check_for_language,
-    string_concat, LANGUAGE_SESSION_KEY)
+from django.utils.translation import (
+    LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
+    get_language, get_language_from_request, get_language_info, gettext,
+    gettext_lazy, ngettext_lazy, npgettext, npgettext_lazy, pgettext,
+    pgettext_lazy, string_concat, to_locale, trans_real, ugettext,
+    ugettext_lazy, ungettext_lazy,
+)
 
-from .forms import I18nForm, SelectDateForm, CompanyForm
+from .forms import CompanyForm, I18nForm, SelectDateForm
 from .models import Company, TestModel
-
 
 here = os.path.dirname(os.path.abspath(upath(__file__)))
 extended_locale_paths = settings.LOCALE_PATHS + [

@@ -1,6 +1,5 @@
-from django.test import TestCase, RequestFactory
-
 from django.contrib import messages
+from django.test import RequestFactory, TestCase
 
 
 class DummyStorage(object):

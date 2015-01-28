@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase
 
-from ..utils import setup, SomeClass, SomeOtherException, UTF8Class
+from ..utils import SomeClass, SomeOtherException, UTF8Class, setup
 
 
 class FilterSyntaxTests(SimpleTestCase):

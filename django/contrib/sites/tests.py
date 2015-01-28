@@ -11,7 +11,7 @@ from django.test.utils import captured_stdout
 from . import models
 from .management import create_default_site
 from .middleware import CurrentSiteMiddleware
-from .models import clear_site_cache, Site
+from .models import Site, clear_site_cache
 from .requests import RequestSite
 from .shortcuts import get_current_site
 

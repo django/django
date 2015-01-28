@@ -2,12 +2,11 @@ from __future__ import unicode_literals
 
 from django.conf.urls import url
 from django.contrib.gis import views as gis_views
-from django.contrib.sitemaps import views as sitemap_views
 from django.contrib.gis.sitemaps import views as gis_sitemap_views
+from django.contrib.sitemaps import views as sitemap_views
 
 from .feeds import feed_dict
 from .sitemaps import sitemaps
-
 
 urlpatterns = [
     url(r'^feeds/(?P<url>.*)/$', gis_views.feed, {'feed_dict': feed_dict}),

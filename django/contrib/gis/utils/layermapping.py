@@ -8,14 +8,17 @@
 """
 import sys
 from decimal import Decimal, InvalidOperation as DecimalInvalidOperation
-from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
-from django.db import connections, router
+
 from django.contrib.gis.db.models import GeometryField
-from django.contrib.gis.gdal import (CoordTransform, DataSource,
-    GDALException, OGRGeometry, OGRGeomType, SpatialReference)
+from django.contrib.gis.gdal import (
+    CoordTransform, DataSource, GDALException, OGRGeometry, OGRGeomType,
+    SpatialReference,
+)
 from django.contrib.gis.gdal.field import (
-    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime)
-from django.db import models, transaction
+    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime,
+)
+from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
+from django.db import connections, models, router, transaction
 from django.utils import six
 from django.utils.encoding import force_text
 

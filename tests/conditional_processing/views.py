@@ -1,7 +1,7 @@
-from django.views.decorators.http import condition, etag, last_modified
 from django.http import HttpResponse
+from django.views.decorators.http import condition, etag, last_modified
 
-from .tests import FULL_RESPONSE, LAST_MODIFIED, ETAG
+from .tests import ETAG, FULL_RESPONSE, LAST_MODIFIED
 
 
 def index(request):

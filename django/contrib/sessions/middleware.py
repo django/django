@@ -1,5 +1,5 @@
-from importlib import import_module
 import time
+from importlib import import_module
 
 from django.conf import settings
 from django.utils.cache import patch_vary_headers

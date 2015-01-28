@@ -2,7 +2,6 @@ from django.conf.urls import url
 
 from . import views
 
-
 urlpatterns = [
     url('^condition/$', views.index),
     url('^condition/last_modified/$', views.last_modified_view1),

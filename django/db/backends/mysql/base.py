@@ -15,9 +15,9 @@ from django.conf import settings
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.utils.encoding import force_str
 from django.db.backends.mysql.schema import DatabaseSchemaEditor
 from django.utils import six, timezone
+from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
 
@@ -27,16 +27,16 @@ except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
 
-from MySQLdb.converters import conversions, Thing2Literal
-from MySQLdb.constants import FIELD_TYPE, CLIENT
+from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
+from MySQLdb.converters import Thing2Literal, conversions       # isort:skip
 
 # Some of these import MySQLdb, so import them after checking if it's installed.
-from .client import DatabaseClient
-from .creation import DatabaseCreation
-from .features import DatabaseFeatures
-from .introspection import DatabaseIntrospection
-from .operations import DatabaseOperations
-from .validation import DatabaseValidation
+from .client import DatabaseClient                          # isort:skip
+from .creation import DatabaseCreation                      # isort:skip
+from .features import DatabaseFeatures                      # isort:skip
+from .introspection import DatabaseIntrospection            # isort:skip
+from .operations import DatabaseOperations                  # isort:skip
+from .validation import DatabaseValidation                  # isort:skip
 
 # We want version (1, 2, 1, 'final', 2) or later. We can't just use
 # lexicographic ordering in this check because then (1, 2, 1, 'gamma')

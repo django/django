@@ -3,14 +3,16 @@ from __future__ import unicode_literals
 import datetime
 
 from django.conf import settings
-from django.db import transaction, DEFAULT_DB_ALIAS, models
+from django.db import DEFAULT_DB_ALIAS, models, transaction
 from django.db.utils import ConnectionHandler
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
-    PlayedWithNote, Email, Researcher, Food, Eaten, Policy, Version, Location,
-    Item, Image, File, Photo, FooFile, FooImage, FooPhoto, FooFileProxy, Login,
-    OrgUnit, OrderedPerson, House)
+from .models import (
+    Award, AwardNote, Book, Child, Eaten, Email, File, Food, FooFile,
+    FooFileProxy, FooImage, FooPhoto, House, Image, Item, Location, Login,
+    OrderedPerson, OrgUnit, Person, Photo, PlayedWith, PlayedWithNote, Policy,
+    Researcher, Toy, Version,
+)
 
 
 # Can't run this test under SQLite, because you can't

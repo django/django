@@ -4,8 +4,8 @@ import datetime
 import unittest
 
 from django.test.utils import requires_tz_support
-from django.utils.timesince import timesince, timeuntil
 from django.utils import timezone
+from django.utils.timesince import timesince, timeuntil
 
 
 class TimesinceTests(unittest.TestCase):

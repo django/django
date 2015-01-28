@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import post_save, pre_save
 from django.test import TestCase
 
-from .models import Person, Employee, ProxyEmployee, Profile, Account
+from .models import Account, Employee, Person, Profile, ProxyEmployee
 
 
 class UpdateOnlyFieldsTests(TestCase):

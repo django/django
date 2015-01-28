@@ -2,22 +2,24 @@
 from __future__ import unicode_literals
 
 import gzip
-from io import BytesIO
 import random
 import re
+from io import BytesIO
 from unittest import skipIf
 
 from django.conf import settings
 from django.core import mail
 from django.http import (
-    HttpRequest, HttpResponse, StreamingHttpResponse, FileResponse,
-    HttpResponseRedirect, HttpResponsePermanentRedirect,
+    FileResponse, HttpRequest, HttpResponse, HttpResponsePermanentRedirect,
+    HttpResponseRedirect, StreamingHttpResponse,
 )
 from django.middleware.clickjacking import XFrameOptionsMiddleware
-from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
-from django.middleware.http import ConditionalGetMiddleware
+from django.middleware.common import (
+    BrokenLinkEmailsMiddleware, CommonMiddleware,
+)
 from django.middleware.gzip import GZipMiddleware
-from django.test import TestCase, RequestFactory, override_settings
+from django.middleware.http import ConditionalGetMiddleware
+from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import patch_logger
 from django.utils import six
 from django.utils.encoding import force_str

@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from io import BytesIO, StringIO
-import os
 import gzip
+import os
 import tempfile
 import unittest
 import zlib
+from io import BytesIO, StringIO
 
 from django.core.files import File
-from django.core.files.move import file_move_safe
 from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
+from django.core.files.move import file_move_safe
 from django.core.files.temp import NamedTemporaryFile
-from django.utils._os import upath
+from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
 from django.utils import six
+from django.utils._os import upath
 
 try:
     from PIL import Image

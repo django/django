@@ -2,7 +2,6 @@ from django.conf.urls import url
 
 from . import feeds
 
-
 urlpatterns = [
     url(r'^syndication/rss2/$', feeds.TestRss2Feed()),
     url(r'^syndication/rss2/guid_ispermalink_true/$',

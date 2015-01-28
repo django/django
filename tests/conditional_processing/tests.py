@@ -5,7 +5,6 @@ from datetime import datetime
 
 from django.test import TestCase, override_settings
 
-
 FULL_RESPONSE = 'Test conditional get response'
 LAST_MODIFIED = datetime(2007, 10, 21, 23, 21, 47)
 LAST_MODIFIED_STR = 'Sun, 21 Oct 2007 23:21:47 GMT'

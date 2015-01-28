@@ -1,6 +1,5 @@
-from django.test import LiveServerTestCase
-
 from django.contrib.staticfiles.handlers import StaticFilesHandler
+from django.test import LiveServerTestCase
 
 
 class StaticLiveServerTestCase(LiveServerTestCase):

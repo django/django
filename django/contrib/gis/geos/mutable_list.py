@@ -8,8 +8,8 @@ See also http://www.aryehleib.com/MutableLists.html
 
 Author: Aryeh Leib Taurog.
 """
-from django.utils.functional import total_ordering
 from django.utils import six
+from django.utils.functional import total_ordering
 from django.utils.six.moves import range
 
 

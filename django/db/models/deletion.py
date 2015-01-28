@@ -2,7 +2,7 @@ from collections import OrderedDict
 from itertools import chain
 from operator import attrgetter
 
-from django.db import connections, transaction, IntegrityError
+from django.db import IntegrityError, connections, transaction
 from django.db.models import signals, sql
 from django.utils import six
 

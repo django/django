@@ -1,7 +1,7 @@
-from collections import Counter, defaultdict, OrderedDict
 import sys
 import threading
 import warnings
+from collections import Counter, OrderedDict, defaultdict
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.utils import lru_cache

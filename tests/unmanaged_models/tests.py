@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db import connection
 from django.test import TestCase
 
-from .models import A01, A02, B01, B02, C01, C02, Unmanaged2, Managed1
+from .models import A01, A02, B01, B02, C01, C02, Managed1, Unmanaged2
 
 
 class SimpleTests(TestCase):

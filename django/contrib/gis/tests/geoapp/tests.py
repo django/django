@@ -3,11 +3,13 @@ from __future__ import unicode_literals
 import re
 from tempfile import NamedTemporaryFile
 
-from django.db import connection
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import no_oracle, oracle, postgis, spatialite
+from django.contrib.gis.tests.utils import (
+    no_oracle, oracle, postgis, spatialite,
+)
 from django.core.management import call_command
+from django.db import connection
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning

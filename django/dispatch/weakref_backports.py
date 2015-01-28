@@ -66,4 +66,3 @@ class WeakMethod(ref):
         return True
 
     __hash__ = ref.__hash__
-

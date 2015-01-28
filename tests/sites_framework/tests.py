@@ -6,8 +6,9 @@ from django.core import checks
 from django.db import models
 from django.test import TestCase
 
-from .models import (SyndicatedArticle, ExclusiveArticle, CustomArticle,
-    AbstractArticle)
+from .models import (
+    AbstractArticle, CustomArticle, ExclusiveArticle, SyndicatedArticle,
+)
 
 
 class SitesFrameworkTestCase(TestCase):

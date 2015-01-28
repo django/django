@@ -2,17 +2,18 @@
 import gettext
 import json
 import os
-from os import path
 import unittest
+from os import path
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import (
-    LiveServerTestCase, TestCase, modify_settings, override_settings)
+    LiveServerTestCase, TestCase, modify_settings, override_settings,
+)
 from django.utils import six
 from django.utils._os import upath
 from django.utils.module_loading import import_string
-from django.utils.translation import override, LANGUAGE_SESSION_KEY
+from django.utils.translation import LANGUAGE_SESSION_KEY, override
 
 from ..urls import locale_dir
 

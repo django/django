@@ -5,7 +5,7 @@ try:
 except ImportError:
     ContextDecorator = None
 
-from functools import wraps, update_wrapper, WRAPPER_ASSIGNMENTS
+from functools import WRAPPER_ASSIGNMENTS, update_wrapper, wraps
 
 from django.utils import six
 

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import transaction, IntegrityError
+from django.db import IntegrityError, transaction
 from django.test import TestCase, skipIfDBFeature
 from django.utils import six
 
-from .models import Employee, Business, Bar, Foo
+from .models import Bar, Business, Employee, Foo
 
 
 class BasicCustomPKTests(TestCase):

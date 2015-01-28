@@ -1,18 +1,17 @@
 from __future__ import unicode_literals
 
-import re
 import datetime
-
+import re
 from itertools import chain
 
-from django.utils import six
 from django.conf import settings
 from django.db import models
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
-from django.db.migrations.questioner import MigrationQuestioner
-from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.operations.models import AlterModelOptions
+from django.db.migrations.optimizer import MigrationOptimizer
+from django.db.migrations.questioner import MigrationQuestioner
+from django.utils import six
 
 from .topological_sort import stable_topological_sort
 

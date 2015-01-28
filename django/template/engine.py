@@ -1,15 +1,13 @@
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache
-from django.utils import six
+from django.utils import lru_cache, six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
 from .base import Context, Lexer, Parser, Template, TemplateDoesNotExist
 from .context import _builtin_context_processors
-
 
 _context_instance_undefined = object()
 _dictionary_undefined = object()

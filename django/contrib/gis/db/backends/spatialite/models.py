@@ -1,10 +1,10 @@
 """
  The GeometryColumns and SpatialRefSys models for the SpatiaLite backend.
 """
-from django.db import connection, models
-from django.db.backends.signals import connection_created
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.contrib.gis.db.backends.spatialite.base import DatabaseWrapper
+from django.db import connection, models
+from django.db.backends.signals import connection_created
 from django.utils.encoding import python_2_unicode_compatible
 
 

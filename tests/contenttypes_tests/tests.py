@@ -2,10 +2,10 @@
 from __future__ import unicode_literals
 
 from django.apps.registry import Apps, apps
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
-)
 from django.contrib.contenttypes import management
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.db import connections, models
@@ -13,7 +13,7 @@ from django.test import TestCase, override_settings
 from django.test.utils import captured_stdout
 from django.utils.encoding import force_str, force_text
 
-from .models import Author, Article, SchemeIncludedURL
+from .models import Article, Author, SchemeIncludedURL
 
 
 @override_settings(ROOT_URLCONF='contenttypes_tests.urls')

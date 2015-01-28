@@ -1,8 +1,7 @@
 from django.conf import settings
 from django.db.backends.base.base import NO_DB_ALIAS
-from django.db.backends.postgresql_psycopg2.base import (
-    DatabaseWrapper as Psycopg2DatabaseWrapper,
-)
+from django.db.backends.postgresql_psycopg2.base import \
+    DatabaseWrapper as Psycopg2DatabaseWrapper
 from django.utils.functional import cached_property
 
 from .creation import PostGISCreation

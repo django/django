@@ -3,23 +3,22 @@ from __future__ import unicode_literals
 import collections
 import datetime
 import decimal
-from importlib import import_module
 import inspect
 import math
 import os
 import re
 import sys
 import types
+from importlib import import_module
 
 from django.apps import apps
-from django.db import models, migrations
+from django.db import migrations, models
 from django.db.migrations.loader import MigrationLoader
 from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 from django.utils.timezone import utc
 from django.utils.version import get_docs_version
-
 
 COMPILED_REGEX_TYPE = type(re.compile(''))
 

@@ -6,7 +6,7 @@ from django.db import connection
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, mock, skipUnlessDBFeature
 
-from .models import Reporter, Article
+from .models import Article, Reporter
 
 
 class IntrospectionTests(TransactionTestCase):

@@ -2,11 +2,17 @@ import datetime
 import itertools
 import unittest
 
-from django.db import connection, DatabaseError, IntegrityError, OperationalError
+from django.db import (
+    DatabaseError, IntegrityError, OperationalError, connection,
+)
 from django.db.models import Model
-from django.db.models.fields import (BinaryField, BooleanField, CharField, DateTimeField,
-    IntegerField, PositiveIntegerField, SlugField, TextField)
-from django.db.models.fields.related import ForeignKey, ManyToManyField, OneToOneField
+from django.db.models.fields import (
+    BinaryField, BooleanField, CharField, DateTimeField, IntegerField,
+    PositiveIntegerField, SlugField, TextField,
+)
+from django.db.models.fields.related import (
+    ForeignKey, ManyToManyField, OneToOneField,
+)
 from django.db.transaction import atomic
 from django.test import TransactionTestCase
 
@@ -14,7 +20,7 @@ from .fields import CustomManyToManyField, InheritedManyToManyField
 from .models import (
     Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book, BookWeak,
     BookWithLongName, BookWithO2O, BookWithSlug, Note, Tag, TagIndexed,
-    TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps
+    TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
 )
 
 

@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
 import os
-from subprocess import PIPE, Popen
 import sys
+from subprocess import PIPE, Popen
 
-from django.utils.encoding import force_text, DEFAULT_LOCALE_ENCODING
 from django.utils import six
+from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_text
 
 from .base import CommandError
 

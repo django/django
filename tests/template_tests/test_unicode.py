@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 from unittest import TestCase
 
-from django.template import Template, Context
+from django.template import Context, Template
 from django.template.base import TemplateEncodingError
-from django.utils.safestring import SafeData
 from django.utils import six
+from django.utils.safestring import SafeData
 
 
 class UnicodeTests(TestCase):

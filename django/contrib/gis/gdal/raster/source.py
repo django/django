@@ -1,5 +1,5 @@
-from ctypes import addressof, byref, c_double
 import os
+from ctypes import addressof, byref, c_double
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.driver import Driver
@@ -8,10 +8,11 @@ from django.contrib.gis.gdal.prototypes import raster as capi
 from django.contrib.gis.gdal.raster.band import GDALBand
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.utils import six
-from django.utils.six.moves import range
-from django.utils.encoding import (force_bytes, force_text,
-    python_2_unicode_compatible)
+from django.utils.encoding import (
+    force_bytes, force_text, python_2_unicode_compatible,
+)
 from django.utils.functional import cached_property
+from django.utils.six.moves import range
 
 
 class TransformPoint(list):

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
 

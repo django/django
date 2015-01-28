@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
 import mimetypes
-from os import path
 import unittest
+from os import path
 
 from django.conf.urls.static import static
 from django.http import FileResponse, HttpResponseNotModified

@@ -8,15 +8,13 @@ import os
 import socket
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import LiveServerTestCase
-from django.test import override_settings
+from django.test import LiveServerTestCase, override_settings
+from django.utils._os import upath
 from django.utils.http import urlencode
 from django.utils.six.moves.urllib.error import HTTPError
 from django.utils.six.moves.urllib.request import urlopen
-from django.utils._os import upath
 
 from .models import Person
-
 
 TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {

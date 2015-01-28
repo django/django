@@ -4,8 +4,8 @@ from django.template.defaultfilters import date
 from django.test import SimpleTestCase
 from django.utils import timezone
 
-from .timezone_utils import TimezoneTestCase
 from ..utils import setup
+from .timezone_utils import TimezoneTestCase
 
 
 class DateTests(TimezoneTestCase):

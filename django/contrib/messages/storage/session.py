@@ -1,7 +1,9 @@
 import json
 
 from django.contrib.messages.storage.base import BaseStorage
-from django.contrib.messages.storage.cookie import MessageEncoder, MessageDecoder
+from django.contrib.messages.storage.cookie import (
+    MessageDecoder, MessageEncoder,
+)
 from django.utils import six
 
 

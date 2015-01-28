@@ -5,8 +5,8 @@ import subprocess
 import sys
 import warnings
 
-from django.db import models, DJANGO_VERSION_PICKLE_KEY
 from django.core.files.temp import NamedTemporaryFile
+from django.db import DJANGO_VERSION_PICKLE_KEY, models
 from django.test import TestCase
 from django.utils.encoding import force_text
 from django.utils.version import get_major_version, get_version

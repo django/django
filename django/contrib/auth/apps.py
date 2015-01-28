@@ -1,6 +1,6 @@
 from django.apps import AppConfig
-from django.core import checks
 from django.contrib.auth.checks import check_user_model
+from django.core import checks
 from django.db.models.signals import post_migrate
 from django.utils.translation import ugettext_lazy as _
 

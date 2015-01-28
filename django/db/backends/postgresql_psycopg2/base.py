@@ -9,7 +9,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeText, SafeBytes
+from django.utils.safestring import SafeBytes, SafeText
 
 try:
     import psycopg2 as Database
@@ -20,14 +20,14 @@ except ImportError as e:
     raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
 
 # Some of these import psycopg2, so import them after checking if it's installed.
-from .client import DatabaseClient
-from .creation import DatabaseCreation
-from .features import DatabaseFeatures
-from .introspection import DatabaseIntrospection
-from .operations import DatabaseOperations
-from .schema import DatabaseSchemaEditor
-from .utils import utc_tzinfo_factory
-from .version import get_version
+from .client import DatabaseClient                          # isort:skip
+from .creation import DatabaseCreation                      # isort:skip
+from .features import DatabaseFeatures                      # isort:skip
+from .introspection import DatabaseIntrospection            # isort:skip
+from .operations import DatabaseOperations                  # isort:skip
+from .schema import DatabaseSchemaEditor                    # isort:skip
+from .utils import utc_tzinfo_factory                       # isort:skip
+from .version import get_version                            # isort:skip
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError

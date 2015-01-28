@@ -10,7 +10,6 @@ from django.utils import six
 from django.utils._os import upath
 from django.utils.functional import cached_property
 
-
 # Path where reference test data is located.
 TEST_DATA = os.path.join(os.path.dirname(upath(gis.__file__)), 'tests', 'data')
 

@@ -13,19 +13,18 @@ import warnings
 from datetime import datetime, timedelta
 
 from django.core.cache import cache
-from django.core.exceptions import SuspiciousOperation, SuspiciousFileOperation
-from django.core.files.base import File, ContentFile
+from django.core.exceptions import SuspiciousFileOperation, SuspiciousOperation
+from django.core.files.base import ContentFile, File
 from django.core.files.storage import FileSystemStorage, get_storage_class
-from django.core.files.uploadedfile import (InMemoryUploadedFile, SimpleUploadedFile,
-    TemporaryUploadedFile)
-from django.test import LiveServerTestCase, SimpleTestCase
-from django.test import override_settings
+from django.core.files.uploadedfile import (
+    InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
+)
+from django.test import LiveServerTestCase, SimpleTestCase, override_settings
 from django.utils import six
-from django.utils.six.moves.urllib.request import urlopen
 from django.utils._os import upath
+from django.utils.six.moves.urllib.request import urlopen
 
 from .models import Storage, temp_storage, temp_storage_location
-
 
 FILE_SUFFIX_REGEX = '[A-Za-z0-9]{7}'
 

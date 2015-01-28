@@ -1,14 +1,14 @@
 from __future__ import unicode_literals
 
-from datetime import date, datetime
 import time
 import unittest
+from datetime import date, datetime
 
 from django.core.exceptions import FieldError
-from django.db import models
-from django.db import connection
+from django.db import connection, models
 from django.test import TestCase, override_settings
 from django.utils import timezone
+
 from .models import Author, MySQLUnixTimestamp
 
 

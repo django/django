@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 import logging
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
-from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH
+from django.middleware.csrf import CSRF_KEY_LENGTH, CsrfViewMiddleware
 from django.template import RequestContext, Template
 from django.template.context_processors import csrf
 from django.test import TestCase, override_settings
-from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
+from django.views.decorators.csrf import (
+    csrf_exempt, ensure_csrf_cookie, requires_csrf_token,
+)
 
 
 # Response/views used for CsrfResponseMiddleware and CsrfViewMiddleware tests

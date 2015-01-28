@@ -1,5 +1,4 @@
-from django.template import Node
-from django.template import TemplateSyntaxError, Library
+from django.template import Library, Node, TemplateSyntaxError
 from django.utils import formats
 from django.utils.encoding import force_text
 

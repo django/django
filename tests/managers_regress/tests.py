@@ -7,18 +7,8 @@ from django.test import TestCase, override_settings
 from django.utils.encoding import force_text
 
 from .models import (
-    Child1,
-    Child2,
-    Child3,
-    Child4,
-    Child5,
-    Child6,
-    Child7,
-    AbstractBase1,
-    AbstractBase2,
-    AbstractBase3,
-    RelatedModel,
-    RelationModel,
+    AbstractBase1, AbstractBase2, AbstractBase3, Child1, Child2, Child3,
+    Child4, Child5, Child6, Child7, RelatedModel, RelationModel,
 )
 
 

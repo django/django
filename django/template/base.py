@@ -52,31 +52,34 @@ u'<html></html>'
 from __future__ import unicode_literals
 
 import re
+import warnings
 from functools import partial
 from importlib import import_module
 from inspect import getargspec, getcallargs
-import warnings
 
 from django.apps import apps
-from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatibility
-    ContextPopException)
-from django.utils import lru_cache
-from django.utils.deprecation import (RemovedInDjango20Warning,
-    RemovedInDjango21Warning)
-from django.utils.itercompat import is_iterable
-from django.utils.text import (smart_split, unescape_string_literal,
-    get_text_list)
-from django.utils.encoding import force_str, force_text
-from django.utils.translation import ugettext_lazy, pgettext_lazy
-from django.utils.safestring import (SafeData, EscapeData, mark_safe,
-    mark_for_escaping)
+from django.template.context import (  # NOQA: imported for backwards compatibility
+    BaseContext, Context, ContextPopException, RequestContext,
+)
+from django.utils import lru_cache, six
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
+from django.utils.encoding import (
+    force_str, force_text, python_2_unicode_compatible,
+)
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
+from django.utils.itercompat import is_iterable
 from django.utils.module_loading import module_has_submodule
-from django.utils import six
+from django.utils.safestring import (
+    EscapeData, SafeData, mark_for_escaping, mark_safe,
+)
+from django.utils.text import (
+    get_text_list, smart_split, unescape_string_literal,
+)
 from django.utils.timezone import template_localtime
-from django.utils.encoding import python_2_unicode_compatible
-
+from django.utils.translation import pgettext_lazy, ugettext_lazy
 
 TOKEN_TEXT = 0
 TOKEN_VAR = 1

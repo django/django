@@ -1,7 +1,6 @@
 from django.conf import settings
 
-from .. import register, Tags, Warning
-
+from .. import Tags, Warning, register
 
 W003 = Warning(
     "You don't appear to be using Django's built-in "

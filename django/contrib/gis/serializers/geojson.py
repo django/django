@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.core.serializers.base import SerializerDoesNotExist, SerializationError
+from django.core.serializers.base import (
+    SerializationError, SerializerDoesNotExist,
+)
 from django.core.serializers.json import Serializer as JSONSerializer
 
 if HAS_GDAL:

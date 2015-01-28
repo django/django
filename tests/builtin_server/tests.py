@@ -1,11 +1,10 @@
 from __future__ import unicode_literals
 
-from io import BytesIO
 import sys
 import traceback
+from io import BytesIO
 from unittest import TestCase
 from wsgiref import simple_server
-
 
 # If data is too large, socket will choke, so write chunks no larger than 32MB
 # at a time. The rationale behind the 32MB can be found on Django's Trac:

@@ -5,9 +5,9 @@ import warnings
 from django.apps import apps
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
-from django.utils.translation import ugettext_lazy as _
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 
 class ContentTypeManager(models.Manager):

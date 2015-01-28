@@ -3,11 +3,12 @@ This module is for inspecting OGR data sources and generating either
 models for GeoDjango and/or mapping dictionaries for use with the
 `LayerMapping` utility.
 """
-from django.utils.six.moves import zip
-# Requires GDAL to use.
 from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.gdal.field import OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime
+from django.contrib.gis.gdal.field import (
+    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime,
+)
 from django.utils import six
+from django.utils.six.moves import zip
 
 
 def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):

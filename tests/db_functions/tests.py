@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 
-from django.db.models import TextField, CharField, Value as V
+from django.db.models import CharField, TextField, Value as V
 from django.db.models.functions import (
-    Coalesce, Concat, Lower, Upper, Length, Substr,
+    Coalesce, Concat, Length, Lower, Substr, Upper,
 )
 from django.test import TestCase
 from django.utils import six, timezone
 
-from .models import Author, Article
+from .models import Article, Author
 
 
 lorem_ipsum = """

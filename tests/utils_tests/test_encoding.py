@@ -1,13 +1,13 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-import unittest
 import datetime
+import unittest
 
 from django.utils import six
 from django.utils.encoding import (
-    filepath_to_uri, force_bytes, force_text, escape_uri_path,
-    iri_to_uri, uri_to_iri, smart_text,
+    escape_uri_path, filepath_to_uri, force_bytes, force_text, iri_to_uri,
+    smart_text, uri_to_iri,
 )
 from django.utils.http import urlquote_plus
 

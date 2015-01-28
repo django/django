@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 
-import io
 import gzip
+import io
 
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, StreamingHttpResponse
+from django.http import (
+    HttpRequest, HttpResponse, HttpResponseRedirect, StreamingHttpResponse,
+)
 from django.http.utils import conditional_content_removal, fix_location_header
 from django.test import TestCase
 

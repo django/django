@@ -1,12 +1,12 @@
-from importlib import import_module
 import os
 import tempfile
+from importlib import import_module
 
 from django import conf
 from django.contrib import admin
 from django.test import TestCase, override_settings
-from django.utils.autoreload import gen_filenames
 from django.utils._os import upath
+from django.utils.autoreload import gen_filenames
 
 LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')
 
