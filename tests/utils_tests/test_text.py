@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from unittest import skipUnless
+import json
 import warnings
+from unittest import skipUnless
 
 from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import reset_warning_registry
@@ -197,6 +198,15 @@ class TestUtilsText(SimpleTestCase):
     def test_get_valid_filename(self):
         filename = "^&'@{}[],$=!-#()%+~_123.txt"
         self.assertEqual(text.get_valid_filename(filename), "-_123.txt")
+
+    def test_compress_sequence(self):
+        data = [{'key': i} for i in range(10)]
+        seq = list(json.JSONEncoder().iterencode(data))
+        seq = [s.encode('utf-8') for s in seq]
+        actual_length = len(b''.join(seq))
+        out = text.compress_sequence(seq)
+        compressed_length = len(b''.join(out))
+        self.assertTrue(compressed_length < actual_length)
 
     @ignore_warnings(category=RemovedInDjango19Warning)
     def test_javascript_quote(self):

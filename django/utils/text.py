@@ -304,6 +304,8 @@ class StreamingBuffer(object):
         self.vals.append(val)
 
     def read(self):
+        if not self.vals:
+            return b''
         ret = b''.join(self.vals)
         self.vals = []
         return ret
@@ -323,8 +325,9 @@ def compress_sequence(sequence):
     yield buf.read()
     for item in sequence:
         zfile.write(item)
-        zfile.flush()
-        yield buf.read()
+        data = buf.read()
+        if data:
+            yield data
     zfile.close()
     yield buf.read()
 
