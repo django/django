@@ -507,7 +507,8 @@ class StreamingHttpResponseTests(TestCase):
         # iterating over Unicode strings still yields bytestring chunks.
         r.streaming_content = iter(['hello', 'café'])
         chunks = list(r)
-        self.assertEqual(chunks, [b'hello', b'café'])
+        # '\xc3\xa9' == unichr(233).encode('utf-8')
+        self.assertEqual(chunks, [b'hello', b'caf\xc3\xa9'])
         for chunk in chunks:
             self.assertIsInstance(chunk, six.binary_type)
 
