@@ -1374,11 +1374,6 @@ class ForeignObjectRel(object):
         # example custom multicolumn joins currently have no remote field).
         self.field_name = None
 
-    def get_lookup_constraint(self, constraint_class, alias, targets, sources, lookup_type,
-                              raw_value):
-        return self.field.get_lookup_constraint(constraint_class, alias, targets, sources,
-                                                lookup_type, raw_value)
-
     def get_accessor_name(self, model=None):
         # This method encapsulates the logic that decides what name to give an
         # accessor descriptor that retrieves related many-to-one or
