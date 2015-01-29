@@ -135,12 +135,31 @@ Related objects reference
         :class:`~django.db.models.ForeignKey`\s where ``null=True`` and it also
         accepts the ``bulk`` keyword argument.
 
+    .. method:: set(objs, clear=False)
+
+        .. versionadded:: 1.9
+
+        Replace the set of related objects::
+
+            >>> new_list = [obj1, obj2, obj3]
+            >>> e.related_set.set(new_list)
+
+        This method accepts a ``clear`` argument to control how to perform the
+        operation. If ``False`` (the default), the elements missing from the
+        new set are removed using ``remove()`` and only the new ones are added.
+        If ``clear=True``, the ``clear()`` method is called instead and the
+        whole set is added at once.
+
+        Note that since ``set()`` is a compound operation, it is subject to
+        race conditions. For instance, new objects may be added to the database
+        in between the call to ``clear()`` and the call to ``add()``.
+
     .. note::
 
-       Note that ``add()``, ``create()``, ``remove()``, and ``clear()`` all
-       apply database changes immediately for all types of related fields. In
-       other words, there is no need to call ``save()`` on either end of the
-       relationship.
+       Note that ``add()``, ``create()``, ``remove()``, ``clear()``, and
+       ``set()`` all apply database changes immediately for all types of
+       related fields. In other words, there is no need to call ``save()``
+       on either end of the relationship.
 
        Also, if you are using :ref:`an intermediate model
        <intermediary-manytomany>` for a many-to-many relationship, some of the
@@ -158,6 +177,12 @@ new iterable of objects to it::
     >>> e.related_set = new_list
 
 If the foreign key relationship has ``null=True``, then the related manager
-will first call ``clear()`` to disassociate any existing objects in the related
-set before adding the contents of ``new_list``. Otherwise the objects in
-``new_list`` will be added to the existing related object set.
+will first disassociate any existing objects in the related set before adding
+the contents of ``new_list``. Otherwise the objects in ``new_list`` will be
+added to the existing related object set.
+
+.. versionchanged:1.9
+
+    In earlier versions, direct assignment used to perform ``clear()`` followed
+    by ``add()``. It now performs a ``set()`` with the keyword argument
+    ``clear=False``.

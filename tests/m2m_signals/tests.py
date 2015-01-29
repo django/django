@@ -254,6 +254,38 @@ class ManyToManySignalsTest(TestCase):
         self.vw.default_parts = [self.wheelset, self.doors, self.engine]
         expected_messages.append({
             'instance': self.vw,
+            'action': 'pre_remove',
+            'reverse': False,
+            'model': Part,
+            'objects': [p6],
+        })
+        expected_messages.append({
+            'instance': self.vw,
+            'action': 'post_remove',
+            'reverse': False,
+            'model': Part,
+            'objects': [p6],
+        })
+        expected_messages.append({
+            'instance': self.vw,
+            'action': 'pre_add',
+            'reverse': False,
+            'model': Part,
+            'objects': [self.doors, self.engine, self.wheelset],
+        })
+        expected_messages.append({
+            'instance': self.vw,
+            'action': 'post_add',
+            'reverse': False,
+            'model': Part,
+            'objects': [self.doors, self.engine, self.wheelset],
+        })
+        self.assertEqual(self.m2m_changed_messages, expected_messages)
+
+        # set by clearing.
+        self.vw.default_parts.set([self.wheelset, self.doors, self.engine], clear=True)
+        expected_messages.append({
+            'instance': self.vw,
             'action': 'pre_clear',
             'reverse': False,
             'model': Part,
@@ -280,22 +312,28 @@ class ManyToManySignalsTest(TestCase):
         })
         self.assertEqual(self.m2m_changed_messages, expected_messages)
 
+        # set by only removing what's necessary.
+        self.vw.default_parts.set([self.wheelset, self.doors], clear=False)
+        expected_messages.append({
+            'instance': self.vw,
+            'action': 'pre_remove',
+            'reverse': False,
+            'model': Part,
+            'objects': [self.engine],
+        })
+        expected_messages.append({
+            'instance': self.vw,
+            'action': 'post_remove',
+            'reverse': False,
+            'model': Part,
+            'objects': [self.engine],
+        })
+        self.assertEqual(self.m2m_changed_messages, expected_messages)
+
         # Check that signals still work when model inheritance is involved
         c4 = SportsCar.objects.create(name='Bugatti', price='1000000')
         c4b = Car.objects.get(name='Bugatti')
         c4.default_parts = [self.doors]
-        expected_messages.append({
-            'instance': c4,
-            'action': 'pre_clear',
-            'reverse': False,
-            'model': Part,
-        })
-        expected_messages.append({
-            'instance': c4,
-            'action': 'post_clear',
-            'reverse': False,
-            'model': Part,
-        })
         expected_messages.append({
             'instance': c4,
             'action': 'pre_add',
@@ -342,18 +380,6 @@ class ManyToManySignalsTest(TestCase):
         self.alice.friends = [self.bob, self.chuck]
         expected_messages.append({
             'instance': self.alice,
-            'action': 'pre_clear',
-            'reverse': False,
-            'model': Person,
-        })
-        expected_messages.append({
-            'instance': self.alice,
-            'action': 'post_clear',
-            'reverse': False,
-            'model': Person,
-        })
-        expected_messages.append({
-            'instance': self.alice,
             'action': 'pre_add',
             'reverse': False,
             'model': Person,
@@ -371,18 +397,6 @@ class ManyToManySignalsTest(TestCase):
         self.alice.fans = [self.daisy]
         expected_messages.append({
             'instance': self.alice,
-            'action': 'pre_clear',
-            'reverse': False,
-            'model': Person,
-        })
-        expected_messages.append({
-            'instance': self.alice,
-            'action': 'post_clear',
-            'reverse': False,
-            'model': Person,
-        })
-        expected_messages.append({
-            'instance': self.alice,
             'action': 'pre_add',
             'reverse': False,
             'model': Person,
@@ -398,18 +412,6 @@ class ManyToManySignalsTest(TestCase):
         self.assertEqual(self.m2m_changed_messages, expected_messages)
 
         self.chuck.idols = [self.alice, self.bob]
-        expected_messages.append({
-            'instance': self.chuck,
-            'action': 'pre_clear',
-            'reverse': True,
-            'model': Person,
-        })
-        expected_messages.append({
-            'instance': self.chuck,
-            'action': 'post_clear',
-            'reverse': True,
-            'model': Person,
-        })
         expected_messages.append({
             'instance': self.chuck,
             'action': 'pre_add',

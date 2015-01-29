@@ -1190,6 +1190,9 @@ be found in the :doc:`related objects reference </ref/models/relations>`.
 ``clear()``
     Removes all objects from the related object set.
 
+``set(objs)``
+    Replace the set of related objects.
+
 To assign the members of a related set in one fell swoop, just assign to it
 from any iterable object. The iterable can contain object instances, or just
 a list of primary key values. For example::
