@@ -40,21 +40,13 @@ Python style
 
       from django.views.generic.base import View
 
-* In docstrings, use "action words" such as::
-
-      def foo():
-          """
-          Calculates something and returns the result.
-          """
-          pass
-
-  Here's an example of what not to do::
+* In docstrings, follow :pep:`257`. For example::
 
       def foo():
           """
           Calculate something and return the result.
           """
-          pass
+          ...
 
 Template style
 --------------
