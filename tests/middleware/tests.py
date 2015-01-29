@@ -68,11 +68,19 @@ class CommonMiddlewareTest(TestCase):
     def test_append_slash_no_redirect_on_POST_in_DEBUG(self):
         """
         Tests that while in debug mode, an exception is raised with a warning
-        when a failed attempt is made to POST to an URL which would normally be
-        redirected to a slashed version.
+        when a failed attempt is made to POST, PUT or PATCH to an URL which
+        would normally be redirected to a slashed version.
         """
         request = self.rf.get('/slash')
         request.method = 'POST'
+        with six.assertRaisesRegex(self, RuntimeError, 'end in a slash'):
+            CommonMiddleware().process_request(request)
+        request = self.rf.get('/slash')
+        request.method = 'PUT'
+        with six.assertRaisesRegex(self, RuntimeError, 'end in a slash'):
+            CommonMiddleware().process_request(request)
+        request = self.rf.get('/slash')
+        request.method = 'PATCH'
         with six.assertRaisesRegex(self, RuntimeError, 'end in a slash'):
             CommonMiddleware().process_request(request)
 
