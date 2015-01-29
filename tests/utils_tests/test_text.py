@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import json
+
 from django.test import SimpleTestCase
 from django.utils import six, text
 from django.utils.encoding import force_text
@@ -192,3 +194,12 @@ class TestUtilsText(SimpleTestCase):
     def test_get_valid_filename(self):
         filename = "^&'@{}[],$=!-#()%+~_123.txt"
         self.assertEqual(text.get_valid_filename(filename), "-_123.txt")
+
+    def test_compress_sequence(self):
+        data = [{'key': i} for i in range(10)]
+        seq = list(json.JSONEncoder().iterencode(data))
+        seq = [s.encode('utf-8') for s in seq]
+        actual_length = len(b''.join(seq))
+        out = text.compress_sequence(seq)
+        compressed_length = len(b''.join(out))
+        self.assertTrue(compressed_length < actual_length)
