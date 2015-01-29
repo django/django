@@ -400,6 +400,16 @@ of its methods and attributes are either changed or renamed.
 
 The aim of these changes is to provide a documented API for relation fields.
 
+``GeoManager`` and ``GeoQuerySet`` custom methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All custom ``GeoQuerySet`` methods (``area()``, ``distance()``, ``gml()``, ...)
+have been replaced by equivalent geographic expressions in annotations (see in
+new features). Hence the need to set a custom ``GeoManager`` to GIS-enabled
+models is now obsolete. As soon as your code doesn't call any of the deprecated
+methods, you can simply remove the ``objects = GeoManager()`` lines from your
+models.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

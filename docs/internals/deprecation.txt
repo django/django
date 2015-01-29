@@ -35,6 +35,8 @@ details on these changes.
 * The ``django.contrib.auth.tests.utils.skipIfCustomUser()`` decorator will be
   removed.
 
+* The ``GeoManager`` and ``GeoQuerySet`` classes will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0
