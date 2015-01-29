@@ -332,6 +332,45 @@ class ManyToManyTests(TestCase):
             ])
         self.assertQuerysetEqual(self.a3.publications.all(), [])
 
+    def test_set(self):
+        self.p2.article_set.set([self.a4, self.a3])
+        self.assertQuerysetEqual(self.p2.article_set.all(),
+            [
+                '<Article: NASA finds intelligent life on Earth>',
+                '<Article: Oxygen-free diet works wonders>',
+            ])
+        self.assertQuerysetEqual(self.a4.publications.all(),
+                                 ['<Publication: Science News>'])
+        self.a4.publications.set([self.p3.id])
+        self.assertQuerysetEqual(self.p2.article_set.all(),
+                                 ['<Article: NASA finds intelligent life on Earth>'])
+        self.assertQuerysetEqual(self.a4.publications.all(),
+                                 ['<Publication: Science Weekly>'])
+
+        self.p2.article_set.set([])
+        self.assertQuerysetEqual(self.p2.article_set.all(), [])
+        self.a4.publications.set([])
+        self.assertQuerysetEqual(self.a4.publications.all(), [])
+
+        self.p2.article_set.set([self.a4, self.a3], clear=True)
+        self.assertQuerysetEqual(self.p2.article_set.all(),
+            [
+                '<Article: NASA finds intelligent life on Earth>',
+                '<Article: Oxygen-free diet works wonders>',
+            ])
+        self.assertQuerysetEqual(self.a4.publications.all(),
+                                 ['<Publication: Science News>'])
+        self.a4.publications.set([self.p3.id], clear=True)
+        self.assertQuerysetEqual(self.p2.article_set.all(),
+                                 ['<Article: NASA finds intelligent life on Earth>'])
+        self.assertQuerysetEqual(self.a4.publications.all(),
+                                 ['<Publication: Science Weekly>'])
+
+        self.p2.article_set.set([], clear=True)
+        self.assertQuerysetEqual(self.p2.article_set.all(), [])
+        self.a4.publications.set([], clear=True)
+        self.assertQuerysetEqual(self.a4.publications.all(), [])
+
     def test_assign(self):
         # Relation sets can be assigned. Assignment clears any existing set members
         self.p2.article_set = [self.a4, self.a3]

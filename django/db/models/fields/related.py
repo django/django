@@ -796,6 +796,34 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
                             obj.save(update_fields=[rel_field.name])
             _clear.alters_data = True
 
+        def set(self, objs, **kwargs):
+            clear = kwargs.pop('clear', False)
+
+            if rel_field.null:
+                db = router.db_for_write(self.model, instance=self.instance)
+                with transaction.atomic(using=db, savepoint=False):
+                    if clear:
+                        # Force evaluation of `objs` in case it's a queryset whose value
+                        # could be affected by `manager.clear()`. Refs #19816.
+                        objs = tuple(objs)
+
+                        self.clear()
+                        self.add(*objs)
+                    else:
+                        old_objs = set(self.using(db).all())
+                        new_objs = []
+                        for obj in objs:
+                            if obj in old_objs:
+                                old_objs.remove(obj)
+                            else:
+                                new_objs.append(obj)
+
+                        self.remove(*old_objs)
+                        self.add(*new_objs)
+            else:
+                self.add(*objs)
+        set.alters_data = True
+
     return RelatedManager
 
 
@@ -815,18 +843,8 @@ class ForeignRelatedObjectsDescriptor(object):
         return self.related_manager_cls(instance)
 
     def __set__(self, instance, value):
-        # Force evaluation of `value` in case it's a queryset whose
-        # value could be affected by `manager.clear()`. Refs #19816.
-        value = tuple(value)
-
         manager = self.__get__(instance)
-        db = router.db_for_write(manager.model, instance=manager.instance)
-        with transaction.atomic(using=db, savepoint=False):
-            # If the foreign key can support nulls, then completely clear the related set.
-            # Otherwise, just move the named objects into the set.
-            if self.related.field.null:
-                manager.clear()
-            manager.add(*value)
+        manager.set(value)
 
     @cached_property
     def related_manager_cls(self):
@@ -1001,6 +1019,43 @@ def create_many_related_manager(superclass, rel):
                     instance=self.instance, reverse=self.reverse,
                     model=self.model, pk_set=None, using=db)
         clear.alters_data = True
+
+        def set(self, objs, **kwargs):
+            if not rel.through._meta.auto_created:
+                opts = self.through._meta
+                raise AttributeError(
+                    "Cannot set values on a ManyToManyField which specifies an "
+                    "intermediary model. Use %s.%s's Manager instead." %
+                    (opts.app_label, opts.object_name)
+                )
+
+            clear = kwargs.pop('clear', False)
+
+            db = router.db_for_write(self.through, instance=self.instance)
+            with transaction.atomic(using=db, savepoint=False):
+                if clear:
+                    # Force evaluation of `objs` in case it's a queryset whose value
+                    # could be affected by `manager.clear()`. Refs #19816.
+                    objs = tuple(objs)
+
+                    self.clear()
+                    self.add(*objs)
+                else:
+                    old_ids = set(self.using(db).values_list(self.target_field.related_field.attname, flat=True))
+
+                    new_objs = []
+                    for obj in objs:
+                        fk_val = (self.target_field.get_foreign_related_value(obj)[0]
+                            if isinstance(obj, self.model) else obj)
+
+                        if fk_val in old_ids:
+                            old_ids.remove(fk_val)
+                        else:
+                            new_objs.append(obj)
+
+                    self.remove(*old_ids)
+                    self.add(*new_objs)
+        set.alters_data = True
 
         def create(self, **kwargs):
             # This check needs to be done here, since we can't later remove this
@@ -1181,22 +1236,8 @@ class ManyRelatedObjectsDescriptor(object):
         return manager
 
     def __set__(self, instance, value):
-        if not self.related.field.rel.through._meta.auto_created:
-            opts = self.related.field.rel.through._meta
-            raise AttributeError(
-                "Cannot set values on a ManyToManyField which specifies an "
-                "intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name)
-            )
-
-        # Force evaluation of `value` in case it's a queryset whose
-        # value could be affected by `manager.clear()`. Refs #19816.
-        value = tuple(value)
-
         manager = self.__get__(instance)
-        db = router.db_for_write(manager.through, instance=manager.instance)
-        with transaction.atomic(using=db, savepoint=False):
-            manager.clear()
-            manager.add(*value)
+        manager.set(value)
 
 
 class ReverseManyRelatedObjectsDescriptor(object):
@@ -1251,15 +1292,8 @@ class ReverseManyRelatedObjectsDescriptor(object):
                 "intermediary model.  Use %s.%s's Manager instead." % (opts.app_label, opts.object_name)
             )
 
-        # Force evaluation of `value` in case it's a queryset whose
-        # value could be affected by `manager.clear()`. Refs #19816.
-        value = tuple(value)
-
         manager = self.__get__(instance)
-        db = router.db_for_write(manager.through, instance=manager.instance)
-        with transaction.atomic(using=db, savepoint=False):
-            manager.clear()
-            manager.add(*value)
+        manager.set(value)
 
 
 class ForeignObjectRel(object):
