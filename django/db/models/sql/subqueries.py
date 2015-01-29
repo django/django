@@ -209,4 +209,7 @@ class AggregateQuery(Query):
     compiler = 'SQLAggregateCompiler'
 
     def add_subquery(self, query, using):
-        self.subquery, self.sub_params = query.get_compiler(using).as_sql(with_col_aliases=True)
+        self.subquery, self.sub_params = query.get_compiler(using).as_sql(
+            with_col_aliases=True,
+            subquery=True,
+        )

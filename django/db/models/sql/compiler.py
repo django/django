@@ -30,6 +30,7 @@ class SQLCompiler(object):
         self.annotation_col_map = None
         self.klass_info = None
         self.ordering_parts = re.compile(r'(.*)\s(ASC|DESC)(.*)')
+        self.subquery = False
 
     def setup_query(self):
         if all(self.query.alias_refcount[a] == 0 for a in self.query.tables):
@@ -342,11 +343,11 @@ class SQLCompiler(object):
             sql, params = vendor_impl(self, self.connection)
         else:
             sql, params = node.as_sql(self, self.connection)
-        if select_format:
+        if select_format and not self.subquery:
             return node.output_field.select_format(self, sql, params)
         return sql, params
 
-    def as_sql(self, with_limits=True, with_col_aliases=False):
+    def as_sql(self, with_limits=True, with_col_aliases=False, subquery=False):
         """
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
@@ -359,6 +360,7 @@ class SQLCompiler(object):
         # However we do not want to get rid of stuff done in pre_sql_setup(),
         # as the pre_sql_setup will modify query state in a way that forbids
         # another run of it.
+        self.subquery = subquery
         refcounts_before = self.query.alias_refcount.copy()
         try:
             extra_select, order_by, group_by = self.pre_sql_setup()
@@ -1115,9 +1117,9 @@ class SQLAggregateCompiler(SQLCompiler):
             raise EmptyResultSet
         sql, params = [], []
         for annotation in self.query.annotation_select.values():
-            agg_sql, agg_params = self.compile(annotation)
-            sql.append(agg_sql)
-            params.extend(agg_params)
+            ann_sql, ann_params = self.compile(annotation, select_format=True)
+            sql.append(ann_sql)
+            params.extend(ann_params)
         self.col_count = len(self.query.annotation_select)
         sql = ', '.join(sql)
         params = tuple(params)
