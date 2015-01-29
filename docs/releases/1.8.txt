@@ -938,6 +938,9 @@ those writing third-party backends in updating their code:
   ``data_type_check_constraints`` attributes have moved from the
   ``DatabaseCreation`` class to ``DatabaseWrapper``.
 
+* The ``SQLCompiler.as_sql()`` method now takes a ``subquery`` parameter
+  (:ticket:`24164`).
+
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
