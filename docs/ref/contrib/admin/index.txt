@@ -2164,6 +2164,11 @@ model to represent the many-to-many relationship, you must tell Django's admin
 to *not* display this widget - otherwise you will end up with two widgets on
 your admin page for managing the relation.
 
+Note that when using this technique the
+:data:`~django.db.models.signals.m2m_changed` signals aren't triggered. This
+is because as far as the admin is concerned, ``through`` is just a model with
+two foreign key fields rather than a many-to-many relation.
+
 In all other respects, the ``InlineModelAdmin`` is exactly the same as any
 other. You can customize the appearance using any of the normal
 ``ModelAdmin`` properties.
