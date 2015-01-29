@@ -15,7 +15,9 @@ from django.db.models.expressions import RawSQL
 from django.db.models.fields import Field
 from django.db.models.query import QuerySet
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 
 
 class GeoQuerySet(QuerySet):
@@ -513,6 +515,11 @@ class GeoQuerySet(QuerySet):
           The name of the model attribute to attach the output of
           the spatial function to.
         """
+        warnings.warn(
+            "The %s GeoQuerySet method is deprecated. See GeoDjango Functions "
+            "documentation to find the expression-based replacement." % att,
+            RemovedInDjango21Warning, stacklevel=2
+        )
         # Default settings.
         settings.setdefault('desc', None)
         settings.setdefault('geom_args', ())

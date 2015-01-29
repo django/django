@@ -11,7 +11,9 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 
 if HAS_GEOS:
     from django.contrib.gis.db.models import Union, Extent3D
@@ -172,6 +174,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         lm.save()
         self.assertEqual(3, MultiPoint3D.objects.count())
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_kml(self):
         """
         Test GeoQuerySet.kml() with Z values.
@@ -183,6 +186,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         ref_kml_regex = re.compile(r'^<Point><coordinates>-95.363\d+,29.763\d+,18</coordinates></Point>$')
         self.assertTrue(ref_kml_regex.match(h.kml))
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_geojson(self):
         """
         Test GeoQuerySet.geojson() with Z values.
@@ -234,6 +238,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         self.assertIsNone(City3D.objects.none().extent3d())
         self.assertIsNone(City3D.objects.none().aggregate(Extent3D('point'))['point__extent3d'])
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @skipUnlessDBFeature("supports_3d_functions")
     def test_perimeter(self):
         """
@@ -252,6 +257,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
                                Polygon3D.objects.perimeter().get(name='3D BBox').perimeter.m,
                                tol)
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @skipUnlessDBFeature("supports_3d_functions")
     def test_length(self):
         """
@@ -285,6 +291,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
                                InterstateProj3D.objects.length().get(name='I-45').length.m,
                                tol)
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @skipUnlessDBFeature("supports_3d_functions")
     def test_scale(self):
         """
@@ -297,6 +304,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
             for city in City3D.objects.scale(1.0, 1.0, zscale):
                 self.assertEqual(city_dict[city.name][2] * zscale, city.scale.z)
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @skipUnlessDBFeature("supports_3d_functions")
     def test_translate(self):
         """

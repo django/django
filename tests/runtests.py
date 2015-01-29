@@ -158,6 +158,11 @@ def setup(verbosity, test_labels):
         'django.contrib.webdesign will be removed in Django 2.0.',
         RemovedInDjango20Warning
     )
+    warnings.filterwarnings(
+        'ignore',
+        'The GeoManager class is deprecated.',
+        RemovedInDjango21Warning
+    )
 
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()

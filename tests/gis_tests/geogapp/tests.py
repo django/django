@@ -10,8 +10,9 @@ from django.contrib.gis.db.models.functions import Area, Distance
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango21Warning
 
 from ..utils import oracle, postgis
 
@@ -43,6 +44,7 @@ class GeographyTest(TestCase):
             self.assertEqual(['Dallas', 'Houston', 'Oklahoma City'], cities)
 
     @skipUnlessDBFeature("has_distance_method", "supports_distance_geodetic")
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test03_distance_method(self):
         "Testing GeoQuerySet.distance() support on non-point geography fields."
         # `GeoQuerySet.distance` is not allowed geometry fields.
@@ -95,6 +97,7 @@ class GeographyTest(TestCase):
             self.assertEqual(state, c.state)
 
     @skipUnlessDBFeature("has_area_method", "supports_distance_geodetic")
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test06_geography_area(self):
         "Testing that Area calculations work on geography columns."
         # SELECT ST_Area(poly) FROM geogapp_zipcode WHERE code='77002';
