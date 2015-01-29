@@ -247,7 +247,7 @@ You can't modify the number of positional arguments in an already migrated
 custom field without raising a ``TypeError``. The old migration will call the
 modified ``__init__`` method with the old signature. So if you need a new
 argument, please create a keyword argument and add something like
-``assert kwargs.get('argument_name') is not None`` in the constructor.
+``assert 'argument_name' in kwargs`` in the constructor.
 
 .. _using-managers-in-migrations:
 
