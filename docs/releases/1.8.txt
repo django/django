@@ -918,6 +918,44 @@ Also private APIs ``django.template.base.compile_string()``,
 ``django.template.loader.find_template()``, and
 ``django.template.loader.get_template_from_string()`` were removed.
 
+``model`` attribute on private model relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In earlier versions of Django, on a model with a reverse foreign key
+relationship (for example), ``model._meta.get_all_related_objects()`` returned
+the relationship as a ``django.db.models.related.RelatedObject`` with the
+``model`` attribute set to the source of the relationship. Now, this method
+returns the relationship as ``django.db.models.fields.related.ManyToOneRel``
+(private API ``RelatedObject`` has been removed), and the ``model`` attribute
+is set to the target of the relationship instead of the source. The source
+model is accessible on the ``related_model`` attribute instead.
+
+Consider this example from the tutorial in Django 1.8::
+
+    >>> p = Poll.objects.get(pk=1)
+    >>> p._meta.get_all_related_objects()
+    [<ManyToOneRel: polls.choice>]
+    >>> p._meta.get_all_related_objects()[0].model
+    <class 'polls.models.Poll'>
+    >>> p._meta.get_all_related_objects()[0].related_model
+    <class 'polls.models.Choice'>
+
+and compare it to the behavior on older versions::
+
+    >>> p._meta.get_all_related_objects()
+    [<RelatedObject: polls:choice related to poll>]
+    >>> p._meta.get_all_related_objects()[0].model
+    <class 'polls.models.Choice'>
+
+To access the source model, you can use a pattern like this to write code that
+will work with both Django 1.8 and older versions::
+
+    for relation in opts.get_all_related_objects():
+        to_model = getattr(relation, 'related_model', relation.model)
+
+Also note that ``get_all_related_objects()`` is deprecated in 1.8. See the
+:ref:`upgrade guide <migrating-old-meta-api>` for the new API.
+
 Database backend API
 ~~~~~~~~~~~~~~~~~~~~
 
