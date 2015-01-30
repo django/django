@@ -10,7 +10,7 @@ from django.db import DatabaseError
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.manager import BaseManager
-from django.db.models.query import QuerySet, EmptyQuerySet, MAX_GET_RESULTS
+from django.db.models.query import QuerySet, EmptyQuerySet
 from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six
 from django.utils.translation import ugettext_lazy
@@ -177,30 +177,6 @@ class ModelTest(TestCase):
         self.assertEqual(a1, Article.objects.get(id__exact=a1.id))
 
         self.assertNotEqual(Article.objects.get(id__exact=a1.id), Article.objects.get(id__exact=a2.id))
-
-    def test_multiple_objects_max_num_fetched(self):
-        """
-        #6785 - get() should fetch a limited number of results.
-        """
-        Article.objects.bulk_create(
-            Article(headline='Area %s' % i, pub_date=datetime(2005, 7, 28))
-            for i in range(MAX_GET_RESULTS)
-        )
-        six.assertRaisesRegex(
-            self,
-            MultipleObjectsReturned,
-            "get\(\) returned more than one Article -- it returned %d!" % MAX_GET_RESULTS,
-            Article.objects.get,
-            headline__startswith='Area',
-        )
-        Article.objects.create(headline='Area %s' % MAX_GET_RESULTS, pub_date=datetime(2005, 7, 28))
-        six.assertRaisesRegex(
-            self,
-            MultipleObjectsReturned,
-            "get\(\) returned more than one Article -- it returned more than %d!" % MAX_GET_RESULTS,
-            Article.objects.get,
-            headline__startswith='Area',
-        )
 
     @skipUnlessDBFeature('supports_microsecond_precision')
     def test_microsecond_precision(self):
