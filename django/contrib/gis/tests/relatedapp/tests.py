@@ -192,7 +192,6 @@ class RelatedGeoModelTest(TestCase):
 
     def test07_values(self):
         "Testing values() and values_list() and GeoQuerySets."
-        # GeoQuerySet and GeoValuesQuerySet, and GeoValuesListQuerySet respectively.
         gqs = Location.objects.all()
         gvqs = Location.objects.values()
         gvlqs = Location.objects.values_list()
@@ -264,7 +263,7 @@ class RelatedGeoModelTest(TestCase):
         "Testing `Count` aggregate use with the `GeoManager` on non geo-fields. See #11087."
         # Should only be one author (Trevor Paglen) returned by this query, and
         # the annotation should have 3 for the number of books, see #11087.
-        # Also testing with a `GeoValuesQuerySet`, see #11489.
+        # Also testing with a values(), see #11489.
         qs = Author.objects.annotate(num_books=Count('books')).filter(num_books__gt=1)
         vqs = Author.objects.values('name').annotate(num_books=Count('books')).filter(num_books__gt=1)
         self.assertEqual(1, len(qs))

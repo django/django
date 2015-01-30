@@ -753,12 +753,12 @@ class Queries1Tests(BaseQuerysetTest):
         # Multi-valued values() and values_list() querysets should raise errors.
         self.assertRaisesMessage(
             TypeError,
-            'Cannot use a multi-field ValuesQuerySet as a filter value.',
+            'Cannot use multi-field values as a filter value.',
             lambda: Tag.objects.filter(name__in=Tag.objects.filter(parent=self.t1).values('name', 'id'))
         )
         self.assertRaisesMessage(
             TypeError,
-            'Cannot use a multi-field ValuesListQuerySet as a filter value.',
+            'Cannot use multi-field values as a filter value.',
             lambda: Tag.objects.filter(name__in=Tag.objects.filter(parent=self.t1).values_list('name', 'id'))
         )
 
@@ -1288,13 +1288,12 @@ class Queries3Tests(BaseQuerysetTest):
         )
 
     def test_ticket22023(self):
-        # only() and defer() are not applicable for ValuesQuerySet
-        with self.assertRaisesMessage(NotImplementedError,
-                "ValuesQuerySet does not implement only()"):
+        with self.assertRaisesMessage(TypeError,
+                "Cannot call only() after .values() or .values_list()"):
             Valid.objects.values().only()
 
-        with self.assertRaisesMessage(NotImplementedError,
-                "ValuesQuerySet does not implement defer()"):
+        with self.assertRaisesMessage(TypeError,
+                "Cannot call defer() after .values() or .values_list()"):
             Valid.objects.values().defer()
 
 

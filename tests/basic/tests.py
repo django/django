@@ -10,7 +10,7 @@ from django.db import DatabaseError
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.manager import BaseManager
-from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet, MAX_GET_RESULTS
+from django.db.models.query import QuerySet, EmptyQuerySet, MAX_GET_RESULTS
 from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six
 from django.utils.translation import ugettext_lazy
@@ -383,7 +383,6 @@ class ModelTest(TestCase):
         with self.assertNumQueries(0):
             qs = Article.objects.none().values_list('pk')
             self.assertIsInstance(qs, EmptyQuerySet)
-            self.assertIsInstance(qs, ValuesListQuerySet)
             self.assertEqual(len(qs), 0)
 
     def test_emptyqs_customqs(self):
