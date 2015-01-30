@@ -161,7 +161,7 @@ Karen Tracey
     in the Django community for his work on South, the schema migrations
     library.
 
-    Andrew lives in San Franciso, CA, USA.
+    Andrew lives in San Francisco, CA, USA.
 
     .. _Andrew Godwin: http://www.aeracode.org/
 
