@@ -115,13 +115,6 @@ GeoJSON , WKT, or HEXEWKB).
 A complete reference can be found in the :ref:`spatial lookup reference
 <spatial-lookups>`.
 
-.. note::
-
-    GeoDjango constructs spatial SQL with the :class:`GeoQuerySet`, a
-    subclass of :class:`~django.db.models.query.QuerySet`.  The
-    :class:`GeoManager` instance attached to your model is what
-    enables use of :class:`GeoQuerySet`.
-
 .. _distance-queries:
 
 Distance Queries
@@ -152,7 +145,7 @@ The following distance lookups are available:
 .. note::
 
     For *measuring*, rather than querying on distances, use the
-    :meth:`GeoQuerySet.distance` method.
+    :class:`~django.contrib.gis.db.models.functions.Distance` function.
 
 Distance lookups take a tuple parameter comprising:
 
@@ -255,43 +248,47 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite
 :lookup:`strictly_below`           X
 =================================  =========  ========  ============ ==========
 
-.. _geoqueryset-method-compatibility:
+.. _database-functions-compatibility:
 
-``GeoQuerySet`` Methods
------------------------
-The following table provides a summary of what :class:`GeoQuerySet` methods
-are available on each spatial backend.  Please note that MySQL does not
-support any of these methods, and is thus excluded from the table.
+Database functions
+------------------
 
-====================================  =======  ======  ==========
-Method                                PostGIS  Oracle  SpatiaLite
-====================================  =======  ======  ==========
-:meth:`GeoQuerySet.area`              X        X       X
-:meth:`GeoQuerySet.centroid`          X        X       X
-:meth:`GeoQuerySet.difference`        X        X       X
-:meth:`GeoQuerySet.distance`          X        X       X
-:meth:`GeoQuerySet.envelope`          X                X
-:meth:`GeoQuerySet.force_rhr`         X
-:meth:`GeoQuerySet.geohash`           X
-:meth:`GeoQuerySet.geojson`           X                X
-:meth:`GeoQuerySet.gml`               X        X       X
-:meth:`GeoQuerySet.intersection`      X        X       X
-:meth:`GeoQuerySet.kml`               X                X
-:meth:`GeoQuerySet.length`            X        X       X
-:meth:`GeoQuerySet.mem_size`          X
-:meth:`GeoQuerySet.num_geom`          X        X       X
-:meth:`GeoQuerySet.num_points`        X        X       X
-:meth:`GeoQuerySet.perimeter`         X        X
-:meth:`GeoQuerySet.point_on_surface`  X        X       X
-:meth:`GeoQuerySet.reverse_geom`      X        X
-:meth:`GeoQuerySet.scale`             X                X
-:meth:`GeoQuerySet.snap_to_grid`      X
-:meth:`GeoQuerySet.svg`               X                X
-:meth:`GeoQuerySet.sym_difference`    X        X       X
-:meth:`GeoQuerySet.transform`         X        X       X
-:meth:`GeoQuerySet.translate`         X                X
-:meth:`GeoQuerySet.union`             X        X       X
-====================================  =======  ======  ==========
+.. module:: django.contrib.gis.db.models.functions
+   :synopsis: GeoDjango's database functions.
+
+The following table provides a summary of what geography-specific database
+functions are available on each spatial backend.
+
+====================================  =======  ======  =====  ==========
+Method                                PostGIS  Oracle  MySQL  SpatiaLite
+====================================  =======  ======  =====  ==========
+:class:`Area`                         X        X       X      X
+:class:`AsGeoJSON`                    X                       X
+:class:`AsGML`                        X        X              X
+:class:`AsKML`                        X                       X
+:class:`AsSVG`                        X                       X
+:class:`BoundingCircle`               X
+:class:`Centroid`                     X        X              X
+:class:`Difference`                   X        X              X
+:class:`Distance`                     X        X       X      X
+:class:`Envelope`                     X                       X
+:class:`ForceRHR`                     X
+:class:`GeoHash`                      X
+:class:`Intersection`                 X        X              X
+:class:`Length`                       X        X       X      X
+:class:`MemSize`                      X
+:class:`NumGeometries`                X        X              X
+:class:`NumPoints`                    X        X              X
+:class:`Perimeter`                    X        X              X
+:class:`PointOnSurface`               X        X              X
+:class:`Reverse`                      X        X              X (≥ 4.0)
+:class:`Scale`                        X                       X
+:class:`SnapToGrid`                   X                       X
+:class:`SymDifference`                X        X              X
+:class:`Transform`                    X        X              X
+:class:`Translate`                    X                       X
+:class:`Union`                        X        X              X
+====================================  =======  ======  =====  ==========
 
 Aggregate Functions
 -------------------
@@ -300,15 +297,17 @@ The following table provides a summary of what GIS-specific aggregate functions
 are available on each spatial backend. Please note that MySQL does not
 support any of these aggregates, and is thus excluded from the table.
 
-====================================  =======  ======  ==========
-Aggregate                             PostGIS  Oracle  SpatiaLite
-====================================  =======  ======  ==========
-:class:`Collect`                      X                (from v3.0)
-:class:`Extent`                       X        X       (from v3.0)
-:class:`Extent3D`                     X
-:class:`MakeLine`                     X
-:class:`Union`                        X        X       X
-====================================  =======  ======  ==========
+.. currentmodule:: django.contrib.gis.db.models
+
+=======================  =======  ======  ==========
+Aggregate                PostGIS  Oracle  SpatiaLite
+=======================  =======  ======  ==========
+:class:`Collect`         X                (from v3.0)
+:class:`Extent`          X        X       (from v3.0)
+:class:`Extent3D`        X
+:class:`MakeLine`        X
+:class:`Union`           X        X       X
+=======================  =======  ======  ==========
 
 .. rubric:: Footnotes
 .. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).

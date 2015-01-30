@@ -492,6 +492,7 @@ Multi
 multicolumn
 multijoins
 multiline
+multilinestring
 multipart
 multipolygon
 multithreaded
