@@ -483,6 +483,31 @@ class ShadowingFieldsTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_multigeneration_inheritance(self):
+        class GrandParent(models.Model):
+            clash = models.IntegerField()
+
+        class Parent(GrandParent):
+            pass
+
+        class Child(Parent):
+            pass
+
+        class GrandChild(Child):
+            clash = models.IntegerField()
+
+        errors = GrandChild.check()
+        expected = [
+            Error(
+                "The field 'clash' clashes with the field 'clash' "
+                "from model 'invalid_models_tests.grandparent'.",
+                hint=None,
+                obj=GrandChild._meta.get_field('clash'),
+                id='models.E006',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
     def test_id_clash(self):
         class Target(models.Model):
             pass
