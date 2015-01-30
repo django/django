@@ -44,8 +44,7 @@ def construct_instance(form, instance, fields=None, exclude=None):
     cleaned_data = form.cleaned_data
     file_field_list = []
     for f in opts.fields:
-        if not f.editable or isinstance(f, models.AutoField) \
-                or f.name not in cleaned_data:
+        if not f.editable or f.db_generated or f.name not in cleaned_data:
             continue
         if fields is not None and f.name not in fields:
             continue

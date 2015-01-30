@@ -12,7 +12,7 @@ from django.core import exceptions
 from django.db import (connections, router, transaction, IntegrityError,
     DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import AutoField, Empty
+from django.db.models.fields import Empty
 from django.db.models.query_utils import Q, deferred_class_factory, InvalidQuery
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import CURSOR
@@ -379,14 +379,14 @@ class QuerySet(object):
         fields = self.model._meta.local_concrete_fields
         with transaction.atomic(using=self.db, savepoint=False):
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
-                    and self.model._meta.has_auto_field):
+                    and self.model._meta.pk.db_generated):
                 self._batched_insert(objs, fields, batch_size)
             else:
                 objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
                 if objs_with_pk:
                     self._batched_insert(objs_with_pk, fields, batch_size)
                 if objs_without_pk:
-                    fields = [f for f in fields if not isinstance(f, AutoField)]
+                    fields = [f for f in fields if not f.db_generated]
                     self._batched_insert(objs_without_pk, fields, batch_size)
 
         return objs

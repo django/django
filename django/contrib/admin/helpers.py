@@ -301,26 +301,14 @@ class InlineAdminForm(AdminForm):
 
     def needs_explicit_pk_field(self):
         # Auto fields are editable (oddly), so need to check for auto or non-editable pk
-        if self.form._meta.model._meta.has_auto_field or not self.form._meta.model._meta.pk.editable:
+        if self.form._meta.model._meta.pk.db_generated or not self.form._meta.model._meta.pk.editable:
             return True
         # Also search any parents for an auto field. (The pk info is propagated to child
         # models so that does not need to be checked in parents.)
         for parent in self.form._meta.model._meta.get_parent_list():
-            if parent._meta.has_auto_field:
+            if parent._meta.pk.db_generated:
                 return True
         return False
-
-    def field_count(self):
-        # tabular.html uses this function for colspan value.
-        num_of_fields = 0
-        if self.has_auto_field():
-            num_of_fields += 1
-        num_of_fields += len(self.fieldsets[0][1]["fields"])
-        if self.formset.can_order:
-            num_of_fields += 1
-        if self.formset.can_delete:
-            num_of_fields += 1
-        return num_of_fields
 
     def pk_field(self):
         return AdminField(self.form, self.formset._pk_field.name, False)

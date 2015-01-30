@@ -94,3 +94,20 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.TextField)):
 class CustomTypedField(models.TextField):
     def db_type(self, connection):
         return 'custom_field'
+
+
+class CustomDbGeneratedField(models.Field):
+    db_generated = True
+    empty_strings_allowed = False
+
+    def db_type(self, connection):
+        if connection.vendor == 'mysql':
+            return 'integer AUTO_INCREMENT'
+        elif connection.vendor == 'postgresql':
+            return 'serial'
+        else:
+            return 'integer'
+
+    def get_internal_type(self):
+        return "NotAutoField"
+

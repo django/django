@@ -5,9 +5,10 @@ import inspect
 from django.core import exceptions, serializers
 from django.db import connection
 from django.test import TestCase
+from django.utils import six
 
 from .fields import Small, CustomTypedField
-from .models import ChoicesModel, DataModel, MyModel, OtherModel
+from .models import ChoicesModel, DataModel, MyModel, OtherModel, CustomDbGeneratedFieldModel
 
 
 class CustomField(TestCase):
@@ -121,6 +122,14 @@ class CustomField(TestCase):
         o = ChoicesModel.objects.create(data=Small('d', 'e'))
         with self.assertRaises(exceptions.ValidationError):
             o.full_clean()
+
+    def test_db_generated_primary_key(self):
+        o = CustomDbGeneratedFieldModel()
+        self.assertEqual(o.pk, None)
+        o.save()
+
+        self.assertNotEqual(o.pk, None)
+        self.assertTrue(isinstance(o.pk, six.integer_types))
 
 
 class TestDbType(TestCase):

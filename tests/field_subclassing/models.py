@@ -4,7 +4,7 @@ Tests for field subclassing.
 from django.db import models
 from django.utils.encoding import force_text
 
-from .fields import Small, SmallField, SmallerField, JSONField
+from .fields import Small, SmallField, SmallerField, JSONField, CustomDbGeneratedField
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -33,3 +33,7 @@ class ChoicesModel(models.Model):
 
 class DataModel(models.Model):
     data = JSONField()
+
+
+class CustomDbGeneratedFieldModel(models.Model):
+    id = CustomDbGeneratedField(primary_key=True)
