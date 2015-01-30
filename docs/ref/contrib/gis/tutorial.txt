@@ -631,8 +631,8 @@ a ``contains`` lookup using the ``pnt_wkt`` as the parameter::
     >>> qs
     [<WorldBorder: United States>]
 
-Here, you retrieved a ``GeoQuerySet`` with only one model: the border of
-the United States (exactly what you would expect).
+Here, you retrieved a ``QuerySet`` with only one model: the border of the
+United States (exactly what you would expect).
 
 Similarly, you may also use a :doc:`GEOS geometry object <geos>`.
 Here, you can combine the ``intersects`` spatial lookup with the ``get``
@@ -718,8 +718,12 @@ the GEOS library::
     >>> pnt.contains(sm.mpoly)
     False
 
-``GeoQuerySet`` Methods
------------------------
+Geographic annotations
+----------------------
+
+GeoDjango also offers a set of geographic annotations to compute distances and
+several other operations (intersection, difference, etc.). See the
+:doc:`functions` documentation.
 
 
 Putting your data on the map

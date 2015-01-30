@@ -62,6 +62,11 @@ Minor features
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* All ``GeoQuerySet`` methods have been deprecated and replaced by
+  :doc:`equivalent database functions </ref/contrib/gis/functions>`. As soon
+  as the legacy methods have been replaced in your code, you should even be
+  able to remove the special ``GeoManager`` from your GIS-enabled classes.
+
 * The GDAL interface now supports instantiating file-based and in-memory
   :ref:`GDALRaster objects <raster-data-source-objects>` from raw data.
   Setters for raster properties such as projection or pixel values have

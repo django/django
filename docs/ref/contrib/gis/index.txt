@@ -18,6 +18,7 @@ of spatially enabled data.
    db-api
    forms-api
    geoquerysets
+   functions
    measure
    geos
    gdal
