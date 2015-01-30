@@ -12,7 +12,7 @@ from django.core import exceptions
 from django.db import (connections, router, transaction, IntegrityError,
     DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import AutoField, Empty
+from django.db.models.fields import AutoField
 from django.db.models.query_utils import Q, deferred_class_factory, InvalidQuery
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import CURSOR
@@ -34,16 +34,130 @@ REPR_OUTPUT_SIZE = 20
 EmptyResultSet = sql.EmptyResultSet
 
 
-def _pickle_queryset(class_bases, class_dict):
-    """
-    Used by `__reduce__` to create the initial version of the `QuerySet` class
-    onto which the output of `__getstate__` will be applied.
+class BaseIterator(object):
+    def __init__(self, queryset):
+        self.queryset = queryset
 
-    See `__reduce__` for more details.
+
+class ModelIterator(BaseIterator):
     """
-    new = Empty()
-    new.__class__ = type(class_bases[0].__name__, class_bases, class_dict)
-    return new
+    Iterator that yields a model instance for each row.
+    """
+
+    def __iter__(self):
+        queryset = self.queryset
+        db = queryset.db
+        compiler = queryset.query.get_compiler(using=db)
+        # Execute the query. This will also fill compiler.select, klass_info,
+        # and annotations.
+        results = compiler.execute_sql()
+        select, klass_info, annotation_col_map = (compiler.select, compiler.klass_info,
+                                                  compiler.annotation_col_map)
+        if klass_info is None:
+            return
+        model_cls = klass_info['model']
+        select_fields = klass_info['select_fields']
+        model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
+        init_list = [f[0].output_field.attname
+                     for f in select[model_fields_start:model_fields_end]]
+        if len(init_list) != len(model_cls._meta.concrete_fields):
+            init_set = set(init_list)
+            skip = [f.attname for f in model_cls._meta.concrete_fields
+                    if f.attname not in init_set]
+            model_cls = deferred_class_factory(model_cls, skip)
+        related_populators = get_related_populators(klass_info, select, db)
+        for row in compiler.results_iter(results):
+            obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
+            if related_populators:
+                for rel_populator in related_populators:
+                    rel_populator.populate(row, obj)
+            if annotation_col_map:
+                for attr_name, col_pos in annotation_col_map.items():
+                    setattr(obj, attr_name, row[col_pos])
+
+            # Add the known related objects to the model, if there are any
+            if queryset._known_related_objects:
+                for field, rel_objs in queryset._known_related_objects.items():
+                    # Avoid overwriting objects loaded e.g. by select_related
+                    if hasattr(obj, field.get_cache_name()):
+                        continue
+                    pk = getattr(obj, field.get_attname())
+                    try:
+                        rel_obj = rel_objs[pk]
+                    except KeyError:
+                        pass  # may happen in qs1 | qs2 scenarios
+                    else:
+                        setattr(obj, field.name, rel_obj)
+
+            yield obj
+
+
+class ValuesIterator(BaseIterator):
+    """
+    Iterator returned by QuerySet.values() that yields a dict
+    for each row.
+    """
+
+    def __iter__(self):
+        queryset = self.queryset
+        query = queryset.query
+        compiler = query.get_compiler(queryset.db)
+
+        field_names = list(query.values_select)
+        extra_names = list(query.extra_select)
+        annotation_names = list(query.annotation_select)
+
+        # extra(select=...) cols are always at the start of the row.
+        names = extra_names + field_names + annotation_names
+
+        for row in compiler.results_iter():
+            yield dict(zip(names, row))
+
+
+class ValuesListIterator(BaseIterator):
+    """
+    Iterator returned by QuerySet.values_lists(flat=False)
+    that yields a tuple for each row.
+    """
+
+    def __iter__(self):
+        queryset = self.queryset
+        query = queryset.query
+        compiler = query.get_compiler(queryset.db)
+
+        if not query.extra_select and not query.annotation_select:
+            for row in compiler.results_iter():
+                yield tuple(row)
+        else:
+            field_names = list(query.values_select)
+            extra_names = list(query.extra_select)
+            annotation_names = list(query.annotation_select)
+
+            # extra(select=...) cols are always at the start of the row.
+            names = extra_names + field_names + annotation_names
+
+            if queryset._fields:
+                # Reorder according to fields.
+                fields = list(queryset._fields) + [f for f in annotation_names if f not in queryset._fields]
+            else:
+                fields = names
+
+            for row in compiler.results_iter():
+                data = dict(zip(names, row))
+                yield tuple(data[f] for f in fields)
+
+
+class FlatValuesListIterator(BaseIterator):
+    """
+    Iterator returned by QuerySet.values_lists(flat=True) that
+    yields single values.
+    """
+
+    def __iter__(self):
+        queryset = self.queryset
+        compiler = queryset.query.get_compiler(queryset.db)
+        for row in compiler.results_iter():
+            yield row[0]
 
 
 class QuerySet(object):
@@ -61,7 +175,9 @@ class QuerySet(object):
         self._for_write = False
         self._prefetch_related_lookups = []
         self._prefetch_done = False
-        self._known_related_objects = {}        # {rel_field, {pk: rel_obj}}
+        self._known_related_objects = {}  # {rel_field, {pk: rel_obj}}
+        self._iterator_class = ModelIterator
+        self._fields = None
 
     def as_manager(cls):
         # Address the circular dependency between `Queryset` and `Manager`.
@@ -114,26 +230,6 @@ class QuerySet(object):
             warnings.warn(msg, RuntimeWarning, stacklevel=2)
 
         self.__dict__.update(state)
-
-    def __reduce__(self):
-        """
-        Used by pickle to deal with the types that we create dynamically when
-        specialized queryset such as `ValuesQuerySet` are used in conjunction
-        with querysets that are *subclasses* of `QuerySet`.
-
-        See `_clone` implementation for more details.
-        """
-        if hasattr(self, '_specialized_queryset_class'):
-            class_bases = (
-                self._specialized_queryset_class,
-                self._base_queryset_class,
-            )
-            class_dict = {
-                '_specialized_queryset_class': self._specialized_queryset_class,
-                '_base_queryset_class': self._base_queryset_class,
-            }
-            return _pickle_queryset, (class_bases, class_dict), self.__getstate__()
-        return super(QuerySet, self).__reduce__()
 
     def __repr__(self):
         data = list(self[:REPR_OUTPUT_SIZE + 1])
@@ -232,50 +328,7 @@ class QuerySet(object):
         An iterator over the results from applying this QuerySet to the
         database.
         """
-        db = self.db
-        compiler = self.query.get_compiler(using=db)
-        # Execute the query. This will also fill compiler.select, klass_info,
-        # and annotations.
-        results = compiler.execute_sql()
-        select, klass_info, annotation_col_map = (compiler.select, compiler.klass_info,
-                                                  compiler.annotation_col_map)
-        if klass_info is None:
-            return
-        model_cls = klass_info['model']
-        select_fields = klass_info['select_fields']
-        model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
-        init_list = [f[0].output_field.attname
-                     for f in select[model_fields_start:model_fields_end]]
-        if len(init_list) != len(model_cls._meta.concrete_fields):
-            init_set = set(init_list)
-            skip = [f.attname for f in model_cls._meta.concrete_fields
-                    if f.attname not in init_set]
-            model_cls = deferred_class_factory(model_cls, skip)
-        related_populators = get_related_populators(klass_info, select, db)
-        for row in compiler.results_iter(results):
-            obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
-            if related_populators:
-                for rel_populator in related_populators:
-                    rel_populator.populate(row, obj)
-            if annotation_col_map:
-                for attr_name, col_pos in annotation_col_map.items():
-                    setattr(obj, attr_name, row[col_pos])
-
-            # Add the known related objects to the model, if there are any
-            if self._known_related_objects:
-                for field, rel_objs in self._known_related_objects.items():
-                    # Avoid overwriting objects loaded e.g. by select_related
-                    if hasattr(obj, field.get_cache_name()):
-                        continue
-                    pk = getattr(obj, field.get_attname())
-                    try:
-                        rel_obj = rel_objs[pk]
-                    except KeyError:
-                        pass               # may happen in qs1 | qs2 scenarios
-                    else:
-                        setattr(obj, field.name, rel_obj)
-
-            yield obj
+        return self._iterator_class(self)
 
     def aggregate(self, *args, **kwargs):
         """
@@ -518,6 +571,9 @@ class QuerySet(object):
         assert self.query.can_filter(), \
             "Cannot use 'limit' or 'offset' with delete."
 
+        if self._fields is not None:
+            raise TypeError("Cannot call delete() after .values() or .values_list()")
+
         del_query = self._clone()
 
         # The delete is actually 2 queries - one to find related objects,
@@ -600,18 +656,64 @@ class QuerySet(object):
                 params=params, translations=translations,
                 using=using)
 
+    def _values(self, *fields):
+        clone = self._clone()
+        clone._fields = fields
+
+        query = clone.query
+        query.select_related = False
+        query.clear_deferred_loading()
+        query.clear_select_fields()
+
+        if query.group_by is True:
+            query.add_fields((f.attname for f in self.model._meta.concrete_fields), False)
+            query.set_group_by()
+            query.clear_select_fields()
+
+        if fields:
+            field_names = []
+            extra_names = []
+            annotation_names = []
+            if not query._extra and not query._annotations:
+                # Shortcut - if there are no extra or annotations, then
+                # the values() clause must be just field names.
+                field_names = list(fields)
+            else:
+                query.default_cols = False
+                for f in fields:
+                    if f in query.extra_select:
+                        extra_names.append(f)
+                    elif f in query.annotation_select:
+                        annotation_names.append(f)
+                    else:
+                        field_names.append(f)
+            query.set_extra_mask(extra_names)
+            query.set_annotation_mask(annotation_names)
+        else:
+            field_names = [f.attname for f in self.model._meta.concrete_fields]
+
+        query.values_select = field_names
+        query.add_fields(field_names, True)
+
+        return clone
+
     def values(self, *fields):
-        return self._clone(klass=ValuesQuerySet, setup=True, _fields=fields)
+        clone = self._values(*fields)
+        clone._iterator_class = ValuesIterator
+        return clone
 
     def values_list(self, *fields, **kwargs):
         flat = kwargs.pop('flat', False)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to values_list: %s'
                     % (list(kwargs),))
+
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
-        return self._clone(klass=ValuesListQuerySet, setup=True, flat=flat,
-                _fields=fields)
+
+        clone = self._values(*fields)
+        clone._iterator_class = FlatValuesListIterator if flat else ValuesListIterator
+        return clone
 
     def dates(self, field_name, kind, order='ASC'):
         """
@@ -779,26 +881,26 @@ class QuerySet(object):
             annotations[arg.default_alias] = arg
         annotations.update(kwargs)
 
-        obj = self._clone()
-        names = getattr(self, '_fields', None)
+        clone = self._clone()
+        names = self._fields
         if names is None:
             names = {f.name for f in self.model._meta.get_fields()}
 
-        # Add the annotations to the query
         for alias, annotation in annotations.items():
             if alias in names:
                 raise ValueError("The annotation '%s' conflicts with a field on "
                                  "the model." % alias)
-            obj.query.add_annotation(annotation, alias, is_summary=False)
-        # expressions need to be added to the query before we know if they contain aggregates
-        added_aggregates = []
-        for alias, annotation in obj.query.annotations.items():
-            if alias in annotations and annotation.contains_aggregate:
-                added_aggregates.append(alias)
-        if added_aggregates:
-            obj._setup_aggregate_query(list(added_aggregates))
+            clone.query.add_annotation(annotation, alias, is_summary=False)
 
-        return obj
+        for alias, annotation in clone.query.annotations.items():
+            if alias in annotations and annotation.contains_aggregate:
+                if clone._fields is None:
+                    clone.query.group_by = True
+                else:
+                    clone.query.set_group_by()
+                break
+
+        return clone
 
     def order_by(self, *field_names):
         """
@@ -848,6 +950,8 @@ class QuerySet(object):
         parameter, in which case all deferrals are removed (None acts as a
         reset option).
         """
+        if self._fields is not None:
+            raise TypeError("Cannot call defer() after .values() or .values_list()")
         clone = self._clone()
         if fields == (None,):
             clone.query.clear_deferred_loading()
@@ -861,6 +965,8 @@ class QuerySet(object):
         method and that are not already specified as deferred are loaded
         immediately when the queryset is evaluated.
         """
+        if self._fields is not None:
+            raise TypeError("Cannot call only() after .values() or .values_list()")
         if fields == (None,):
             # Can only pass None to defer(), not only(), as the rest option.
             # That won't stop people trying to do this, so let's be explicit.
@@ -934,29 +1040,19 @@ class QuerySet(object):
             self.model._base_manager._insert(batch, fields=fields,
                                              using=self.db)
 
-    def _clone(self, klass=None, setup=False, **kwargs):
-        if klass is None:
-            klass = self.__class__
-        elif not issubclass(self.__class__, klass):
-            base_queryset_class = getattr(self, '_base_queryset_class', self.__class__)
-            class_bases = (klass, base_queryset_class)
-            class_dict = {
-                '_base_queryset_class': base_queryset_class,
-                '_specialized_queryset_class': klass,
-            }
-            klass = type(klass.__name__, class_bases, class_dict)
-
+    def _clone(self, **kwargs):
         query = self.query.clone()
         if self._sticky_filter:
             query.filter_is_sticky = True
-        c = klass(model=self.model, query=query, using=self._db, hints=self._hints)
-        c._for_write = self._for_write
-        c._prefetch_related_lookups = self._prefetch_related_lookups[:]
-        c._known_related_objects = self._known_related_objects
-        c.__dict__.update(kwargs)
-        if setup and hasattr(c, '_setup_query'):
-            c._setup_query()
-        return c
+        clone = self.__class__(model=self.model, query=query, using=self._db, hints=self._hints)
+        clone._for_write = self._for_write
+        clone._prefetch_related_lookups = self._prefetch_related_lookups[:]
+        clone._known_related_objects = self._known_related_objects
+        clone._iterator_class = self._iterator_class
+        clone._fields = self._fields
+
+        clone.__dict__.update(kwargs)
+        return clone
 
     def _fetch_all(self):
         if self._result_cache is None:
@@ -980,11 +1076,14 @@ class QuerySet(object):
 
     def _merge_sanity_check(self, other):
         """
-        Checks that we are merging two comparable QuerySet classes. By default
-        this does nothing, but see the ValuesQuerySet for an example of where
-        it's useful.
+        Checks that we are merging two comparable QuerySet classes.
         """
-        pass
+        if self._fields is not None and (
+                set(self.query.values_select) != set(other.query.values_select) or
+                set(self.query.extra_select) != set(other.query.extra_select) or
+                set(self.query.annotation_select) != set(other.query.annotation_select)):
+            raise TypeError("Merging '%s' classes must involve the same values in each case."
+                    % self.__class__.__name__)
 
     def _merge_known_related_objects(self, other):
         """
@@ -993,23 +1092,29 @@ class QuerySet(object):
         for field, objects in other._known_related_objects.items():
             self._known_related_objects.setdefault(field, {}).update(objects)
 
-    def _setup_aggregate_query(self, aggregates):
-        """
-        Prepare the query for computing a result that contains aggregate annotations.
-        """
-        if self.query.group_by is None:
-            self.query.group_by = True
-
     def _prepare(self):
+        if self._fields is not None:
+            # values() queryset can only be used as nested queries
+            # if they are set up to select only a single field.
+            if len(self._fields or self.model._meta.concrete_fields) > 1:
+                raise TypeError('Cannot use multi-field values as a filter value.')
         return self
 
     def _as_sql(self, connection):
         """
         Returns the internal query's SQL and parameters (as a tuple).
         """
-        obj = self.values("pk")
-        if obj._db is None or connection == connections[obj._db]:
-            return obj.query.get_compiler(connection=connection).as_nested_sql()
+        if self._fields is not None:
+            # values() queryset can only be used as nested queries
+            # if they are set up to select only a single field.
+            if len(self._fields or self.model._meta.concrete_fields) > 1:
+                raise TypeError('Cannot use multi-field values as a filter value.')
+            clone = self._clone()
+        else:
+            clone = self.values('pk')
+
+        if clone._db is None or connection == connections[clone._db]:
+            return clone.query.get_compiler(connection=connection).as_nested_sql()
         raise ValueError("Can't do subqueries with queries on different DBs.")
 
     # When used as part of a nested query, a queryset will never be an "always
@@ -1035,6 +1140,9 @@ class QuerySet(object):
     def is_compatible_query_object_type(self, opts):
         model = self.model
         return (
+            # We trust that users of values() know what they are doing.
+            self._fields is not None or
+            # Otherwise check that models are compatible.
             model == opts.concrete_model or
             opts.concrete_model in model._meta.get_parent_list() or
             model in opts.get_parent_list()
@@ -1055,195 +1163,6 @@ class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
 
     def __init__(self, *args, **kwargs):
         raise TypeError("EmptyQuerySet can't be instantiated")
-
-
-class ValuesQuerySet(QuerySet):
-    def __init__(self, *args, **kwargs):
-        super(ValuesQuerySet, self).__init__(*args, **kwargs)
-        # select_related isn't supported in values(). (FIXME -#3358)
-        self.query.select_related = False
-
-        # QuerySet.clone() will also set up the _fields attribute with the
-        # names of the model fields to select.
-
-    def only(self, *fields):
-        raise NotImplementedError("ValuesQuerySet does not implement only()")
-
-    def defer(self, *fields):
-        raise NotImplementedError("ValuesQuerySet does not implement defer()")
-
-    def iterator(self):
-        # Purge any extra columns that haven't been explicitly asked for
-        extra_names = list(self.query.extra_select)
-        field_names = self.field_names
-        annotation_names = list(self.query.annotation_select)
-
-        names = extra_names + field_names + annotation_names
-
-        for row in self.query.get_compiler(self.db).results_iter():
-            yield dict(zip(names, row))
-
-    def delete(self):
-        # values().delete() doesn't work currently - make sure it raises an
-        # user friendly error.
-        raise TypeError("Queries with .values() or .values_list() applied "
-                        "can't be deleted")
-
-    def _setup_query(self):
-        """
-        Constructs the field_names list that the values query will be
-        retrieving.
-
-        Called by the _clone() method after initializing the rest of the
-        instance.
-        """
-        if self.query.group_by is True:
-            self.query.add_fields([f.attname for f in self.model._meta.concrete_fields], False)
-            self.query.set_group_by()
-        self.query.clear_deferred_loading()
-        self.query.clear_select_fields()
-        if self._fields:
-            self.extra_names = []
-            self.annotation_names = []
-            if not self.query._extra and not self.query._annotations:
-                # Short cut - if there are no extra or annotations, then
-                # the values() clause must be just field names.
-                self.field_names = list(self._fields)
-            else:
-                self.query.default_cols = False
-                self.field_names = []
-                for f in self._fields:
-                    # we inspect the full extra_select list since we might
-                    # be adding back an extra select item that we hadn't
-                    # had selected previously.
-                    if self.query._extra and f in self.query._extra:
-                        self.extra_names.append(f)
-                    elif f in self.query.annotation_select:
-                        self.annotation_names.append(f)
-                    else:
-                        self.field_names.append(f)
-        else:
-            # Default to all fields.
-            self.extra_names = None
-            self.field_names = [f.attname for f in self.model._meta.concrete_fields]
-            self.annotation_names = None
-
-        self.query.select = []
-        if self.extra_names is not None:
-            self.query.set_extra_mask(self.extra_names)
-        self.query.add_fields(self.field_names, True)
-        if self.annotation_names is not None:
-            self.query.set_annotation_mask(self.annotation_names)
-
-    def _clone(self, klass=None, setup=False, **kwargs):
-        """
-        Cloning a ValuesQuerySet preserves the current fields.
-        """
-        c = super(ValuesQuerySet, self)._clone(klass, **kwargs)
-        if not hasattr(c, '_fields'):
-            # Only clone self._fields if _fields wasn't passed into the cloning
-            # call directly.
-            c._fields = self._fields[:]
-        c.field_names = self.field_names
-        c.extra_names = self.extra_names
-        c.annotation_names = self.annotation_names
-        if setup and hasattr(c, '_setup_query'):
-            c._setup_query()
-        return c
-
-    def _merge_sanity_check(self, other):
-        super(ValuesQuerySet, self)._merge_sanity_check(other)
-        if (set(self.extra_names) != set(other.extra_names) or
-                set(self.field_names) != set(other.field_names) or
-                self.annotation_names != other.annotation_names):
-            raise TypeError("Merging '%s' classes must involve the same values in each case."
-                    % self.__class__.__name__)
-
-    def _setup_aggregate_query(self, aggregates):
-        """
-        Prepare the query for computing a result that contains aggregate annotations.
-        """
-        self.query.set_group_by()
-
-        if self.annotation_names is not None:
-            self.annotation_names.extend(aggregates)
-            self.query.set_annotation_mask(self.annotation_names)
-
-        super(ValuesQuerySet, self)._setup_aggregate_query(aggregates)
-
-    def _as_sql(self, connection):
-        """
-        For ValuesQuerySet (and subclasses like ValuesListQuerySet), they can
-        only be used as nested queries if they're already set up to select only
-        a single field (in which case, that is the field column that is
-        returned). This differs from QuerySet.as_sql(), where the column to
-        select is set up by Django.
-        """
-        if ((self._fields and len(self._fields) > 1) or
-                (not self._fields and len(self.model._meta.fields) > 1)):
-            raise TypeError('Cannot use a multi-field %s as a filter value.'
-                    % self.__class__.__name__)
-
-        obj = self._clone()
-        if obj._db is None or connection == connections[obj._db]:
-            return obj.query.get_compiler(connection=connection).as_nested_sql()
-        raise ValueError("Can't do subqueries with queries on different DBs.")
-
-    def _prepare(self):
-        """
-        Validates that we aren't trying to do a query like
-        value__in=qs.values('value1', 'value2'), which isn't valid.
-        """
-        if ((self._fields and len(self._fields) > 1) or
-                (not self._fields and len(self.model._meta.fields) > 1)):
-            raise TypeError('Cannot use a multi-field %s as a filter value.'
-                    % self.__class__.__name__)
-        return self
-
-    def is_compatible_query_object_type(self, opts):
-        """
-        ValueQuerySets do not need to be checked for compatibility.
-        We trust that users of ValueQuerySets know what they are doing.
-        """
-        return True
-
-
-class ValuesListQuerySet(ValuesQuerySet):
-    def iterator(self):
-        compiler = self.query.get_compiler(self.db)
-        if self.flat and len(self._fields) == 1:
-            for row in compiler.results_iter():
-                yield row[0]
-        elif not self.query.extra_select and not self.query.annotation_select:
-            for row in compiler.results_iter():
-                yield tuple(row)
-        else:
-            # When extra(select=...) or an annotation is involved, the extra
-            # cols are always at the start of the row, and we need to reorder
-            # the fields to match the order in self._fields.
-            extra_names = list(self.query.extra_select)
-            field_names = self.field_names
-            annotation_names = list(self.query.annotation_select)
-
-            names = extra_names + field_names + annotation_names
-
-            # If a field list has been specified, use it. Otherwise, use the
-            # full list of fields, including extras and annotations.
-            if self._fields:
-                fields = list(self._fields) + [f for f in annotation_names if f not in self._fields]
-            else:
-                fields = names
-
-            for row in compiler.results_iter():
-                data = dict(zip(names, row))
-                yield tuple(data[f] for f in fields)
-
-    def _clone(self, *args, **kwargs):
-        clone = super(ValuesListQuerySet, self)._clone(*args, **kwargs)
-        if not hasattr(clone, "flat"):
-            # Only assign flat if the clone didn't already get it from kwargs
-            clone.flat = self.flat
-        return clone
 
 
 class RawQuerySet(object):
