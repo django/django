@@ -511,7 +511,7 @@ class AggregationTests(TestCase):
         # Regression for #14707 -- If you're using a values query set, some potential conflicts are avoided.
 
         # age is a field on Author, so it shouldn't be allowed as an aggregate.
-        # But age isn't included in the ValuesQuerySet, so it is.
+        # But age isn't included in values(), so it is.
         results = Author.objects.values('name').annotate(age=Count('book_contact_set')).order_by('name')
         self.assertEqual(len(results), 9)
         self.assertEqual(results[0]['name'], 'Adrian Holovaty')

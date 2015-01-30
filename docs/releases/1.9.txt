@@ -178,6 +178,8 @@ Miscellaneous
 
   .. _`httplib.responses`: https://docs.python.org/2/library/httplib.html#httplib.responses
 
+* ``ValuesQuerySet`` and ``ValuesListQuerySet`` have been removed.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9

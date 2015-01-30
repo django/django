@@ -148,7 +148,14 @@ class Query(object):
         self.distinct_fields = []
         self.select_for_update = False
         self.select_for_update_nowait = False
+
         self.select_related = False
+        # Arbitrary limit for select_related to prevents infinite recursion.
+        self.max_depth = 5
+
+        # Holds the selects defined by a call to values() or values_list()
+        # excluding annotation_select and extra_select.
+        self.values_select = []
 
         # SQL annotation-related attributes
         # The _annotations will be an OrderedDict when used. Due to the cost
@@ -157,10 +164,6 @@ class Query(object):
         self._annotations = None  # Maps alias -> Annotation Expression
         self.annotation_select_mask = None
         self._annotation_select_cache = None
-
-        # Arbitrary maximum limit for select_related. Prevents infinite
-        # recursion. Can be changed by the depth parameter to select_related().
-        self.max_depth = 5
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
@@ -273,6 +276,7 @@ class Query(object):
         obj.select_for_update = self.select_for_update
         obj.select_for_update_nowait = self.select_for_update_nowait
         obj.select_related = self.select_related
+        obj.values_select = self.values_select[:]
         obj._annotations = self._annotations.copy() if self._annotations is not None else None
         if self.annotation_select_mask is None:
             obj.annotation_select_mask = None
@@ -1616,6 +1620,7 @@ class Query(object):
         columns.
         """
         self.select = []
+        self.values_select = []
 
     def add_select(self, col):
         self.default_cols = False

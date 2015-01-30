@@ -514,8 +514,8 @@ values
 
 .. method:: values(*fields)
 
-Returns a ``ValuesQuerySet`` — a ``QuerySet`` subclass that returns
-dictionaries when used as an iterable, rather than model-instance objects.
+Returns a ``QuerySet`` that returns dictionaries, rather than model instances,
+when used as an iterable.
 
 Each of those dictionaries represents an object, with the keys corresponding to
 the attribute names of model objects.
@@ -585,14 +585,12 @@ A few subtleties that are worth mentioning:
     :meth:`defer()` after ``values()`` was allowed, but it either crashed or
     returned incorrect results.
 
-A ``ValuesQuerySet`` is useful when you know you're only going to need values
-from a small number of the available fields and you won't need the
-functionality of a model instance object. It's more efficient to select only
-the fields you need to use.
+It is useful when you know you're only going to need values from a small number
+of the available fields and you won't need the functionality of a model
+instance object. It's more efficient to select only the fields you need to use.
 
-Finally, note that a ``ValuesQuerySet`` is a subclass of ``QuerySet`` and it
-implements most of the same methods. You can call ``filter()`` on it,
-``order_by()``, etc. That means that these two calls are identical::
+Finally, note that you can call ``filter()``, ``order_by()``, etc. after the
+``values()`` call, that means that these two calls are identical::
 
     Blog.objects.values().order_by('id')
     Blog.objects.order_by('id').values()
@@ -644,11 +642,6 @@ It is an error to pass in ``flat`` when there is more than one field.
 
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
-
-Note that this method returns a ``ValuesListQuerySet``. This class behaves
-like a list. Most of the time this is enough, but if you require an actual
-Python list object, you can simply call ``list()`` on it, which will evaluate
-the queryset.
 
 dates
 ~~~~~
@@ -2280,10 +2273,10 @@ This queryset will be evaluated as subselect statement::
 
     SELECT ... WHERE blog.id IN (SELECT id FROM ... WHERE NAME LIKE '%Cheddar%')
 
-If you pass in a ``ValuesQuerySet`` or ``ValuesListQuerySet`` (the result of
-calling ``values()`` or ``values_list()`` on a queryset) as the value to an
-``__in`` lookup, you need to ensure you are only extracting one field in the
-result. For example, this will work (filtering on the blog names)::
+If you pass in a ``QuerySet`` resulting from ``values()`` or ``values_list()``
+as the value to an ``__in`` lookup, you need to ensure you are only extracting
+one field in the result. For example, this will work (filtering on the blog
+names)::
 
     inner_qs = Blog.objects.filter(name__contains='Ch').values('name')
     entries = Entry.objects.filter(blog__name__in=inner_qs)

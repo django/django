@@ -204,7 +204,7 @@ class SubqueryConstraint(object):
             if query._db and connection.alias != query._db:
                 raise ValueError("Can't do subqueries with queries on different DBs.")
             # Do not override already existing values.
-            if not hasattr(query, 'field_names'):
+            if query._fields is None:
                 query = query.values(*self.targets)
             else:
                 query = query._clone()
