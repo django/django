@@ -23,10 +23,6 @@ from django.utils import six
 from django.utils import timezone
 from django.utils.version import get_version
 
-# The maximum number (one less than the max to be precise) of results to fetch
-# in a get() query
-MAX_GET_RESULTS = 20
-
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
 
@@ -379,21 +375,17 @@ class QuerySet(object):
         clone = self.filter(*args, **kwargs)
         if self.query.can_filter():
             clone = clone.order_by()
-        if (not clone.query.select_for_update or
-                connections[self.db].features.supports_select_for_update_with_limit):
-            clone = clone[:MAX_GET_RESULTS + 1]
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
         if not num:
             raise self.model.DoesNotExist(
                 "%s matching query does not exist." %
-                self.model._meta.object_name)
-        raise self.model.MultipleObjectsReturned(
-            "get() returned more than one %s -- it returned %s!" % (
-                self.model._meta.object_name,
-                num if num <= MAX_GET_RESULTS else 'more than %s' % MAX_GET_RESULTS
+                self.model._meta.object_name
             )
+        raise self.model.MultipleObjectsReturned(
+            "get() returned more than one %s -- it returned %s!" %
+            (self.model._meta.object_name, num)
         )
 
     def create(self, **kwargs):
