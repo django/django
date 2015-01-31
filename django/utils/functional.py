@@ -95,6 +95,7 @@ def lazy(func, *resultclasses):
                     cls.__str__ = cls.__text_cast
                 else:
                     cls.__unicode__ = cls.__text_cast
+                    cls.__str__ = cls.__bytes_cast_encoded
             elif cls._delegate_bytes:
                 if six.PY3:
                     cls.__bytes__ = cls.__bytes_cast
@@ -116,6 +117,9 @@ def lazy(func, *resultclasses):
 
         def __bytes_cast(self):
             return bytes(func(*self.__args, **self.__kw))
+
+        def __bytes_cast_encoded(self):
+            return func(*self.__args, **self.__kw).encode('utf-8')
 
         def __cast(self):
             if self._delegate_bytes:
