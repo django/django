@@ -830,7 +830,7 @@ class ReprTests(TestCase):
         )
         self.assertEqual(repr(Col('alias', 'field')), "Col(alias, field)")
         self.assertEqual(repr(Date('published', 'exact')), "Date(published, exact)")
-        self.assertEqual(repr(DateTime('published', 'exact', utc)), "DateTime(published, exact, UTC)")
+        self.assertEqual(repr(DateTime('published', 'exact', utc)), "DateTime(published, exact, %s)" % utc)
         self.assertEqual(repr(F('published')), "F(published)")
         self.assertEqual(repr(F('cost') + F('tax')), "<Expression: F(cost) + F(tax)>")
         self.assertEqual(repr(Func('published', function='TO_CHAR')), "Func(F(published), function=TO_CHAR)")
