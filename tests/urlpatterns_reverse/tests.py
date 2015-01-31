@@ -318,6 +318,17 @@ class ReverseLazyTest(TestCase):
         response = self.client.get('/login_required_view/')
         self.assertEqual(response.status_code, 200)
 
+    def test_inserting_reverse_lazy_into_string(self):
+        self.assertEqual(
+            'Some URL: %s' % reverse_lazy('some-login-page'),
+            'Some URL: /login/'
+        )
+        if six.PY2:
+            self.assertEqual(
+                b'Some URL: %s' % reverse_lazy('some-login-page'),
+                'Some URL: /login/'
+            )
+
 
 class ReverseLazySettingsTest(AdminScriptTestCase):
     """
