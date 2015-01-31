@@ -195,13 +195,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
 
-    def _set_isolation_level(self, isolation_level):
-        assert isolation_level in range(1, 5)     # Use set_autocommit for level = 0
-        if self.psycopg2_version >= (2, 4, 2):
-            self.connection.set_session(isolation_level=isolation_level)
-        else:
-            self.connection.set_isolation_level(isolation_level)
-
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:
             if self.psycopg2_version >= (2, 4, 2):
