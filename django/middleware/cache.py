@@ -64,12 +64,6 @@ class UpdateCacheMiddleware(object):
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.cache = caches[self.cache_alias]
 
-    def _session_accessed(self, request):
-        try:
-            return request.session.accessed
-        except AttributeError:
-            return False
-
     def _should_update_cache(self, request, response):
         return hasattr(request, '_cache_update_cache') and request._cache_update_cache
 
