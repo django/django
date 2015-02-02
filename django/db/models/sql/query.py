@@ -1390,11 +1390,6 @@ class Query(object):
                 break
         return path, final_field, targets, names[pos + 1:]
 
-    def raise_field_error(self, opts, name):
-        available = list(get_field_names_from_opts(opts)) + list(self.annotation_select)
-        raise FieldError("Cannot resolve keyword %r into field. "
-                         "Choices are: %s" % (name, ", ".join(available)))
-
     def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True):
         """
         Compute the necessary table joins for the passage through the fields
