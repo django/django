@@ -847,23 +847,15 @@ out the `full reference`_ for more details.
 
 .. versionchanged:: 1.7
 
-    Before Django 1.7 ``LiveServerTestCase`` used to rely on the
-    :doc:`staticfiles contrib app </howto/static-files/index>` to get the
-    static assets of the application(s) under test transparently served at their
-    expected locations during the execution of these tests.
+    In older versions, ``LiveServerTestCase`` relied on the :doc:`staticfiles
+    contrib app </howto/static-files/index>` to transparently serve static
+    files during the execution of tests. This functionality has been moved to
+    the :class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`
+    subclass, so use that subclass if you need :ref:`the original behavior
+    <staticfiles-testing-support>`.
 
-    In Django 1.7 this dependency of core functionality on a ``contrib``
-    application has been removed, because of which ``LiveServerTestCase``
-    ability in this respect has been retrofitted to simply publish the contents
-    of the file system under :setting:`STATIC_ROOT` at the :setting:`STATIC_URL`
-    URL.
-
-    If you use the ``staticfiles`` app in your project and need to perform live
-    testing then you might want to consider using the
-    :class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`
-    subclass shipped with it instead because it's the one that implements the
-    original behavior now. See :ref:`the relevant documentation
-    <staticfiles-testing-support>` for more details.
+    ``LiveServerTestCase`` now simply publishes the contents of the file system
+    under :setting:`STATIC_ROOT` at the :setting:`STATIC_URL`.
 
 .. note::
 
