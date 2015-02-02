@@ -2033,17 +2033,6 @@ def is_reverse_o2o(field):
     return not hasattr(field, 'rel') and field.field.unique
 
 
-def alias_diff(refcounts_before, refcounts_after):
-    """
-    Given the before and after copies of refcounts works out which aliases
-    have been added to the after copy.
-    """
-    # Use -1 as default value so that any join that is created, then trimmed
-    # is seen as added.
-    return set(t for t in refcounts_after
-               if refcounts_after[t] > refcounts_before.get(t, -1))
-
-
 class JoinPromoter(object):
     """
     A class to abstract away join promotion problems for complex filter
