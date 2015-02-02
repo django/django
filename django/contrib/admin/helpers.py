@@ -310,18 +310,6 @@ class InlineAdminForm(AdminForm):
                 return True
         return False
 
-    def field_count(self):
-        # tabular.html uses this function for colspan value.
-        num_of_fields = 0
-        if self.has_auto_field():
-            num_of_fields += 1
-        num_of_fields += len(self.fieldsets[0][1]["fields"])
-        if self.formset.can_order:
-            num_of_fields += 1
-        if self.formset.can_delete:
-            num_of_fields += 1
-        return num_of_fields
-
     def pk_field(self):
         return AdminField(self.form, self.formset._pk_field.name, False)
 
