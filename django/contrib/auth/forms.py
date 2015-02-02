@@ -20,15 +20,6 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 
 
-UNMASKED_DIGITS_TO_SHOW = 6
-
-
-def mask_password(password):
-    shown = password[:UNMASKED_DIGITS_TO_SHOW]
-    masked = "*" * max(len(password) - UNMASKED_DIGITS_TO_SHOW, 0)
-    return shown + masked
-
-
 class ReadOnlyPasswordHashWidget(forms.Widget):
     def render(self, name, value, attrs):
         encoded = value
