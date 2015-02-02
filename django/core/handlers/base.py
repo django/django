@@ -46,6 +46,9 @@ class BaseHandler(object):
 
         request_middleware = []
         for middleware_path in settings.MIDDLEWARE_CLASSES:
+            if middleware_path in (None, ''):
+                continue
+
             mw_class = import_string(middleware_path)
             try:
                 mw_instance = mw_class()
