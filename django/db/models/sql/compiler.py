@@ -542,7 +542,9 @@ class SQLCompiler(object):
         name, order = get_order_dir(name, default_order)
         descending = True if order == 'DESC' else False
         pieces = name.split(LOOKUP_SEP)
-        field, targets, alias, joins, path, opts = self._setup_joins(pieces, opts, alias)
+        field, targets, alias, joins, path, opts = self._setup_joins(
+            pieces, opts, alias,
+        )
 
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model unless the attribute name

@@ -15,6 +15,10 @@ from django.db.models.fields import (
     BLANK_CHOICE_DASH, AutoField, Field, IntegerField, PositiveIntegerField,
     PositiveSmallIntegerField,
 )
+from django.db.models.fields.related_lookups import (
+    RelatedExact, RelatedGreaterThan, RelatedGreaterThanOrEqual, RelatedIn,
+    RelatedLessThan, RelatedLessThanOrEqual,
+)
 from django.db.models.lookups import IsNull
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo
@@ -1303,10 +1307,12 @@ class ForeignObjectRel(object):
     concrete = False
     editable = False
     is_relation = True
+    null = True
 
     def __init__(self, field, to, related_name=None, related_query_name=None,
             limit_choices_to=None, parent_link=False, on_delete=None):
         self.field = field
+        self.rel = field
         self.to = to
         self.related_name = related_name
         self.related_query_name = related_query_name
@@ -1364,6 +1370,28 @@ class ForeignObjectRel(object):
     def one_to_one(self):
         return self.field.one_to_one
 
+    def get_prep_lookup(self, lookup_name, value):
+        return self.field.get_prep_lookup(lookup_name, value)
+
+    def get_internal_type(self):
+        return self.field.get_internal_type()
+
+    @property
+    def db_type(self):
+        return self.field.db_type
+
+    @property
+    def foreign_related_fields(self):
+        return self.field.local_related_fields
+
+    @property
+    def local_related_fields(self):
+        return self.field.foreign_related_fields
+
+    @property
+    def related_fields(self):
+        return [(r[1], r[0]) for r in self.field.related_fields]
+
     def __repr__(self):
         return '<%s: %s.%s>' % (type(self).__name__, self.opts.app_label, self.opts.model_name)
 
@@ -1408,6 +1436,9 @@ class ForeignObjectRel(object):
         # By default foreign object doesn't relate to any remote field (for
         # example custom multicolumn joins currently have no remote field).
         self.field_name = None
+
+    def get_lookup(self, lookup_name):
+        return self.field.get_lookup(lookup_name)
 
     def get_accessor_name(self, model=None):
         # This method encapsulates the logic that decides what name to give an
@@ -1757,62 +1788,25 @@ class ForeignObject(RelatedField):
         pathinfos = [PathInfo(from_opts, opts, (opts.pk,), self.rel, not self.unique, False)]
         return pathinfos
 
-    def get_lookup_constraint(self, constraint_class, alias, targets, sources, lookups,
-                              raw_value):
-        from django.db.models.sql.where import SubqueryConstraint, AND, OR
-        root_constraint = constraint_class()
-        assert len(targets) == len(sources)
-        if len(lookups) > 1:
-            raise exceptions.FieldError('Relation fields do not support nested lookups')
-        lookup_type = lookups[0]
+    def get_lookup(self, lookup_name):
+        if lookup_name == 'in':
+            return RelatedIn
+        elif lookup_name == 'exact':
+            return RelatedExact
+        elif lookup_name == 'gt':
+            return RelatedGreaterThan
+        elif lookup_name == 'gte':
+            return RelatedGreaterThanOrEqual
+        elif lookup_name == 'lt':
+            return RelatedLessThan
+        elif lookup_name == 'lte':
+            return RelatedLessThanOrEqual
+        elif lookup_name != 'isnull':
+            raise TypeError('Related Field got invalid lookup: %s' % lookup_name)
+        return super(ForeignObject, self).get_lookup(lookup_name)
 
-        def get_normalized_value(value):
-            from django.db.models import Model
-            if isinstance(value, Model):
-                value_list = []
-                for source in sources:
-                    # Account for one-to-one relations when sent a different model
-                    while not isinstance(value, source.model) and source.rel:
-                        source = source.rel.to._meta.get_field(source.rel.field_name)
-                    value_list.append(getattr(value, source.attname))
-                return tuple(value_list)
-            elif not isinstance(value, tuple):
-                return (value,)
-            return value
-
-        is_multicolumn = len(self.related_fields) > 1
-        if (hasattr(raw_value, '_as_sql') or
-                hasattr(raw_value, 'get_compiler')):
-            root_constraint.add(SubqueryConstraint(alias, [target.column for target in targets],
-                                                   [source.name for source in sources], raw_value),
-                                AND)
-        elif lookup_type == 'isnull':
-            root_constraint.add(IsNull(targets[0].get_col(alias, sources[0]), raw_value), AND)
-        elif (lookup_type == 'exact' or (lookup_type in ['gt', 'lt', 'gte', 'lte']
-                                         and not is_multicolumn)):
-            value = get_normalized_value(raw_value)
-            for target, source, val in zip(targets, sources, value):
-                lookup_class = target.get_lookup(lookup_type)
-                root_constraint.add(
-                    lookup_class(target.get_col(alias, source), val), AND)
-        elif lookup_type in ['range', 'in'] and not is_multicolumn:
-            values = [get_normalized_value(value) for value in raw_value]
-            value = [val[0] for val in values]
-            lookup_class = targets[0].get_lookup(lookup_type)
-            root_constraint.add(lookup_class(targets[0].get_col(alias, sources[0]), value), AND)
-        elif lookup_type == 'in':
-            values = [get_normalized_value(value) for value in raw_value]
-            root_constraint.connector = OR
-            for value in values:
-                value_constraint = constraint_class()
-                for source, target, val in zip(sources, targets, value):
-                    lookup_class = target.get_lookup('exact')
-                    lookup = lookup_class(target.get_col(alias, source), val)
-                    value_constraint.add(lookup, AND)
-                root_constraint.add(value_constraint, OR)
-        else:
-            raise TypeError('Related Field got invalid lookup: %s' % lookup_type)
-        return root_constraint
+    def get_transform(self, *args, **kwargs):
+        raise NotImplementedError('Relational fields do not support transforms')
 
     @property
     def attnames(self):
@@ -2000,6 +1994,9 @@ class ForeignKey(ForeignObject):
             return None
         else:
             return self.related_field.get_db_prep_save(value, connection=connection)
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        return self.related_field.get_db_prep_value(value, connection, prepared)
 
     def value_to_string(self, obj):
         if not obj:

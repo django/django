@@ -164,7 +164,7 @@ class FieldListFilter(ListFilter):
 class RelatedFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         other_model = get_model_from_relation(field)
-        if hasattr(field, 'rel'):
+        if hasattr(field, 'rel') and hasattr(field.rel, 'get_related_field'):
             rel_name = field.rel.get_related_field().name
         else:
             rel_name = other_model._meta.pk.name
