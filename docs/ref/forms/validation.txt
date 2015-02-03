@@ -36,7 +36,7 @@ overridden:
   ``ValidationError``.
 
 * The ``validate()`` method on a Field handles field-specific validation
-  that is not suitable for a validator, It takes a value that has been
+  that is not suitable for a validator. It takes a value that has been
   coerced to correct datatype and raises ``ValidationError`` on any error.
   This method does not return anything and shouldn't alter the value. You
   should override it to handle validation logic that you can't or don't
@@ -261,7 +261,7 @@ available and for an example of how to write a validator.
 Form field default cleaning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let's firstly create a custom form field that validates its input is a string
+Let's first create a custom form field that validates its input is a string
 containing comma-separated email addresses. The full class looks like this::
 
     from django import forms
