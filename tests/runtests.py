@@ -74,7 +74,6 @@ def get_test_modules():
     for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):
             if ('.' in f or
-                    f.startswith('sql') or
                     os.path.basename(f) in SUBDIRS_TO_SKIP or
                     os.path.isfile(f) or
                     not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
