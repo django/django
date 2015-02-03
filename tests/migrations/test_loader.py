@@ -159,7 +159,7 @@ class LoaderTests(TestCase):
             migration_loader.get_migration_by_prefix("migrations", "blarg")
 
     def test_load_import_error(self):
-        with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.import_error"}):
+        with override_settings(MIGRATION_MODULES={"migrations": "import_error_package"}):
             with self.assertRaises(ImportError):
                 MigrationLoader(connection)
 
