@@ -1,0 +1,69 @@
+===========================
+Writing database migrations
+===========================
+
+This document explains how to structure and write database migrations for
+different scenarios you might encounter. For introductory material on
+migrations, see :doc:`the topic guide </topics/migrations>`.
+
+.. _data-migrations-and-multiple-databases:
+
+Data migrations and multiple databases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using multiple databases, you may need to figure out whether or not to
+run a migration against a particular database. For example, you may want to
+**only** run a migration on a particular database.
+
+In order to do that you can check the database connection's alias inside a
+``RunPython`` operation by looking at the ``schema_editor.connection.alias``
+attribute::
+
+    from django.db import migrations
+
+    def forwards(apps, schema_editor):
+        if not schema_editor.connection.alias == 'default':
+            return
+        # Your migration code goes here
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            # Dependencies to other migrations
+        ]
+
+        operations = [
+            migrations.RunPython(forwards),
+        ]
+
+.. versionadded:: 1.8
+
+You can also provide hints that will be passed to the :meth:`allow_migrate()`
+method of database routers as ``**hints``:
+
+.. snippet::
+    :filename: myapp/dbrouters.py
+
+    class MyRouter(object):
+
+        def allow_migrate(self, db, model, **hints):
+            if 'target_db' in hints:
+                return db == hints['target_db']
+            return True
+
+Then, to leverage this in your migrations, do the following::
+
+    from django.db import migrations
+
+    def forwards(apps, schema_editor):
+        # Your migration code goes here
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            # Dependencies to other migrations
+        ]
+
+        operations = [
+            migrations.RunPython(forwards, hints={'target_db': 'default'}),
+        ]
