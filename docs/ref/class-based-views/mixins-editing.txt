@@ -21,6 +21,10 @@ FormMixin
 
     A mixin class that provides facilities for creating and displaying forms.
 
+    **Mixins**
+
+    * :class:`django.views.generic.base.ContextMixin`
+
     **Methods and Attributes**
 
     .. attribute:: initial
@@ -85,20 +89,6 @@ FormMixin
     .. method:: form_invalid(form)
 
         Renders a response, providing the invalid form as context.
-
-    .. method:: get_context_data(**kwargs)
-
-        Populates a context containing the contents of ``kwargs``.
-
-    **Context**
-
-    * ``form``: The form instance that was generated for the view.
-
-    .. note::
-
-        Views mixing ``FormMixin`` must provide an implementation of
-        :meth:`form_valid` and :meth:`form_invalid`.
-
 
 ModelFormMixin
 --------------
