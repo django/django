@@ -476,74 +476,13 @@ You can pass a second callable to
 want executed when migrating backwards. If this callable is omitted, migrating
 backwards will raise an exception.
 
-.. _data-migrations-and-multiple-databases:
-
-Data migrations and multiple databases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When using multiple databases, you may need to figure out whether or not to
-run a migration against a particular database. For example, you may want to
-**only** run a migration on a particular database.
-
-In order to do that you can check the database connection's alias inside a
-``RunPython`` operation by looking at the ``schema_editor.connection.alias``
-attribute::
-
-    from django.db import migrations
-
-    def forwards(apps, schema_editor):
-        if not schema_editor.connection.alias == 'default':
-            return
-        # Your migration code goes here
-
-    class Migration(migrations.Migration):
-
-        dependencies = [
-            # Dependencies to other migrations
-        ]
-
-        operations = [
-            migrations.RunPython(forwards),
-        ]
-
-.. versionadded:: 1.8
-
-You can also provide hints that will be passed to the :meth:`allow_migrate()`
-method of database routers as ``**hints``:
-
-.. snippet::
-    :filename: myapp/dbrouters.py
-
-    class MyRouter(object):
-
-        def allow_migrate(self, db, model, **hints):
-            if 'target_db' in hints:
-                return db == hints['target_db']
-            return True
-
-Then, to leverage this in your migrations, do the following::
-
-    from django.db import migrations
-
-    def forwards(apps, schema_editor):
-        # Your migration code goes here
-
-    class Migration(migrations.Migration):
-
-        dependencies = [
-            # Dependencies to other migrations
-        ]
-
-        operations = [
-            migrations.RunPython(forwards, hints={'target_db': 'default'}),
-        ]
-
 More advanced migrations
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you're interested in the more advanced migration operations, or want
 to be able to write your own, see the :doc:`migration operations reference
-</ref/migration-operations>`.
+</ref/migration-operations>` and the "how-to" on :doc:`writing migrations
+</howto/writing-migrations>`.
 
 .. _migration-squashing:
 
@@ -806,3 +745,7 @@ More information is available in the
     :doc:`The Migrations Operations Reference </ref/migration-operations>`
         Covers the schema operations API, special operations, and writing your
         own operations.
+
+    :doc:`The Writing Migrations "how-to" </howto/writing-migrations>`
+        Explains how to structure and write database migrations for different
+        scenarios you might encounter.
