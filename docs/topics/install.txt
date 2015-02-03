@@ -166,14 +166,6 @@ release, or fetching the latest development version.
 
 It's easy, no matter which way you choose.
 
-Installing a distribution-specific package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Check the :doc:`distribution specific notes </misc/distributions>` to see if
-your platform/distribution provides official Django packages/installers.
-Distribution-provided packages will typically allow for automatic installation
-of dependencies and easy upgrade paths.
-
 .. _installing-official-release:
 
 Installing an official release with ``pip``
@@ -237,6 +229,15 @@ Installing an official release manually
 .. _download page: https://www.djangoproject.com/download/
 .. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
 .. _7-zip: http://www.7-zip.org/
+
+Installing a distribution-specific package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check the :doc:`distribution specific notes </misc/distributions>` to see if
+your platform/distribution provides official Django packages/installers.
+Distribution-provided packages will typically allow for automatic installation
+of dependencies and easy upgrade paths; however, these packages will rarely
+contain the latest release of Django.
 
 .. _installing-development-version:
 
