@@ -648,7 +648,7 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
                                  day, self.get_day_format())
 
         # Use a custom queryset if provided
-        qs = queryset or self.get_queryset()
+        qs = self.get_queryset() if queryset is None else queryset
 
         if not self.get_allow_future() and date > datetime.date.today():
             raise Http404(_(
