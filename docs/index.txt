@@ -76,7 +76,8 @@ manipulating the data of your Web application. Learn more about it below:
 * **Migrations:**
   :doc:`Introduction to Migrations<topics/migrations>` |
   :doc:`Operations reference <ref/migration-operations>` |
-  :doc:`SchemaEditor <ref/schema-editor>`
+  :doc:`SchemaEditor <ref/schema-editor>` |
+  :doc:`Writing migrations <howto/writing-migrations>`
 
 * **Advanced:**
   :doc:`Managers <topics/db/managers>` |
