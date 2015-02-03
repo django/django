@@ -1349,12 +1349,10 @@ otherwise, they'll be tacked together without whitespace!
 
 .. admonition:: Mind your charset
 
-    When creating a PO file with your favorite text editor, first edit
-    the charset line (search for ``"CHARSET"``) and set it to the charset
-    you'll be using to edit the content. Due to the way the ``gettext`` tools
-    work internally and because we want to allow non-ASCII source strings in
-    Django's core and your applications, you **must** use UTF-8 as the encoding
-    for your PO file. This means that everybody will be using the same
+    Due to the way the ``gettext`` tools work internally and because we want to
+    allow non-ASCII source strings in Django's core and your applications, you
+    **must** use UTF-8 as the encoding for your PO files (the default when PO
+    files are created).  This means that everybody will be using the same
     encoding, which is important when Django processes the PO files.
 
 To reexamine all source code and templates for new translation strings and
