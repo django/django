@@ -118,3 +118,20 @@ class Relating(models.Model):
     # ManyToManyField to Person
     people = models.ManyToManyField(Person, related_name='relating_people')
     people_hidden = models.ManyToManyField(Person, related_name='+')
+
+
+# ParentListTests models
+class CommonAncestor(models.Model):
+    pass
+
+
+class FirstParent(CommonAncestor):
+    first_ancestor = models.OneToOneField(CommonAncestor, primary_key=True, parent_link=True)
+
+
+class SecondParent(CommonAncestor):
+    second_ancestor = models.OneToOneField(CommonAncestor, primary_key=True, parent_link=True)
+
+
+class Child(FirstParent, SecondParent):
+    pass
