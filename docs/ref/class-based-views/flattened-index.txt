@@ -163,7 +163,7 @@ FormView
 * :meth:`~django.views.generic.edit.FormMixin.form_invalid`
 * :meth:`~django.views.generic.edit.FormMixin.form_valid`
 * :meth:`~django.views.generic.edit.ProcessFormView.get`
-* :meth:`~django.views.generic.edit.FormMixin.get_context_data`
+* :meth:`~django.views.generic.base.ContextMixin.get_context_data`
 * :meth:`~django.views.generic.edit.FormMixin.get_form`
 * :meth:`~django.views.generic.edit.FormMixin.get_form_kwargs`
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
@@ -201,7 +201,7 @@ CreateView
 * :meth:`~django.views.generic.edit.FormMixin.form_invalid`
 * :meth:`~django.views.generic.edit.FormMixin.form_valid`
 * :meth:`~django.views.generic.edit.ProcessFormView.get`
-* :meth:`~django.views.generic.edit.FormMixin.get_context_data`
+* :meth:`~django.views.generic.base.ContextMixin.get_context_data`
 * :meth:`~django.views.generic.edit.FormMixin.get_form`
 * :meth:`~django.views.generic.edit.FormMixin.get_form_kwargs`
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
@@ -242,7 +242,7 @@ UpdateView
 * :meth:`~django.views.generic.edit.FormMixin.form_invalid`
 * :meth:`~django.views.generic.edit.FormMixin.form_valid`
 * :meth:`~django.views.generic.edit.ProcessFormView.get`
-* :meth:`~django.views.generic.edit.FormMixin.get_context_data`
+* :meth:`~django.views.generic.base.ContextMixin.get_context_data`
 * :meth:`~django.views.generic.edit.FormMixin.get_form`
 * :meth:`~django.views.generic.edit.FormMixin.get_form_kwargs`
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
