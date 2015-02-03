@@ -487,12 +487,6 @@ class Options(object):
 
     @cached_property
     def fields_map(self):
-        return self._get_fields_map()
-
-    def _get_fields_map(self):
-        # Helper method to provide a way to access this without caching it.
-        # For example, admin checks run before the app cache is ready and we
-        # need to be able to lookup fields before we cache the final result.
         res = {}
         fields = self._get_fields(forward=False, include_hidden=True)
         for field in fields:
@@ -537,26 +531,20 @@ class Options(object):
 
             return field
         except KeyError:
-            pass
-
-        if m2m_in_kwargs:
-            # Previous API does not allow searching reverse fields.
-            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
-
-        # If the app registry is not ready, reverse fields are probably
-        # unavailable, but try anyway.
-        if not self.apps.ready:
-            try:
-                # Don't cache results
-                return self._get_fields_map()[field_name]
-            except KeyError:
+            # If the app registry is not ready, reverse fields are
+            # unavailable, therefore we throw a FieldDoesNotExist exception.
+            if not self.apps.ready:
                 raise FieldDoesNotExist(
                     "%s has no field named %r. The app cache isn't ready yet, "
-                    "so if this is an auto-created related field, it might not "
+                    "so if this is an auto-created related field, it won't "
                     "be available yet." % (self.object_name, field_name)
                 )
 
         try:
+            if m2m_in_kwargs:
+                # Previous API does not allow searching reverse fields.
+                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+
             # Retrieve field instance by name from cached or just-computed
             # field map.
             return self.fields_map[field_name]
