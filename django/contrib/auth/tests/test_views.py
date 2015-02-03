@@ -34,13 +34,13 @@ from .utils import skipIfCustomUser
 
 
 @override_settings(
-    LANGUAGES=(
+    LANGUAGES=[
         ('en', 'English'),
-    ),
+    ],
     LANGUAGE_CODE='en',
     TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='django.contrib.auth.tests.urls',
 )
 class AuthViewsTestCase(TestCase):
@@ -444,7 +444,7 @@ class ChangePasswordTest(AuthViewsTestCase):
         self.assertURLEqual(response.url, '/password_reset/')
 
 
-@override_settings(MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+@override_settings(MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
 ])
 class SessionAuthenticationTests(AuthViewsTestCase):
@@ -819,10 +819,10 @@ class LogoutTest(AuthViewsTestCase):
 @override_settings(
     # Redirect in test_user_change_password will fail if session auth hash
     # isn't updated after password change (#21649)
-    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+    MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + [
         'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
     ],
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='django.contrib.auth.tests.urls_admin',
 )
 class ChangelistTests(AuthViewsTestCase):

@@ -28,7 +28,7 @@ MEDIA_ROOT = sys_tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
 UPLOAD_TO = os.path.join(MEDIA_ROOT, 'test_upload')
 
 
-@override_settings(MEDIA_ROOT=MEDIA_ROOT, ROOT_URLCONF='file_uploads.urls', MIDDLEWARE_CLASSES=())
+@override_settings(MEDIA_ROOT=MEDIA_ROOT, ROOT_URLCONF='file_uploads.urls', MIDDLEWARE_CLASSES=[])
 class FileUploadTests(TestCase):
 
     @classmethod

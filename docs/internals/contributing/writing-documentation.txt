@@ -312,14 +312,14 @@ example:
     ADMINS
     ------
 
-    Default: ``()`` (Empty tuple)
+    Default: ``[]`` (Empty list)
 
-    A tuple that lists people who get code error notifications. When
+    A list of all the people who get code error notifications. When
     ``DEBUG=False`` and a view raises an exception, Django will email these people
-    with the full exception information. Each member of the tuple should be a tuple
+    with the full exception information. Each member of the list should be a tuple
     of (Full name, email address). Example::
 
-        (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
+        [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
 
     Note that Django will email *all* of these people whenever an error happens.
     See :doc:`/howto/error-reporting` for more information.

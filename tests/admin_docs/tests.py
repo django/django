@@ -13,7 +13,7 @@ from .models import Person, Company
 
 
 @override_settings(
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_docs.urls')
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.admindocs'})
 class AdminDocsTestCase(TestCase):

@@ -380,7 +380,7 @@ class ProxyModelTests(TestCase):
         self.assertEqual(MyPerson(id=100), Person(id=100))
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='proxy_models.urls',)
 class ProxyModelAdminTests(TestCase):
     fixtures = ['myhorses']

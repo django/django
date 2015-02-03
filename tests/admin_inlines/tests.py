@@ -21,7 +21,7 @@ from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="admin_inlines.urls")
 class TestInline(TestCase):
     fixtures = ['admin-views-users.xml']
@@ -346,7 +346,7 @@ class TestInline(TestCase):
         self.assertNotContains(response, INLINE_CHANGELINK_HTML)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="admin_inlines.urls")
 class TestInlineMedia(TestCase):
     fixtures = ['admin-views-users.xml']
@@ -423,7 +423,7 @@ class TestInlineAdminForm(TestCase):
             self.assertEqual(iaf2.original_content_type_id, poll_ct.id)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF="admin_inlines.urls")
 class TestInlineProtectedOnDelete(TestCase):
     fixtures = ['admin-views-users.xml']
@@ -650,7 +650,7 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="admin_inlines.urls")
 class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 

@@ -14,7 +14,7 @@ from django.utils.http import urlsafe_base64_encode
 
 @skipIfCustomUser
 @override_settings(
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='django.contrib.auth.tests.urls',
 )
 class AuthTemplateTests(TestCase):

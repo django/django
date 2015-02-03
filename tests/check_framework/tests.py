@@ -113,7 +113,7 @@ class MessageTests(TestCase):
 
 class Django_1_7_0_CompatibilityChecks(TestCase):
 
-    @override_settings(MIDDLEWARE_CLASSES=('django.contrib.sessions.middleware.SessionMiddleware',))
+    @override_settings(MIDDLEWARE_CLASSES=['django.contrib.sessions.middleware.SessionMiddleware'])
     def test_middleware_classes_overridden(self):
         errors = check_1_7_compatibility()
         self.assertEqual(errors, [])

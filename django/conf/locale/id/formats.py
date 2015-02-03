@@ -16,19 +16,19 @@ FIRST_DAY_OF_WEEK = 1  # Monday
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
-DATE_INPUT_FORMATS = (
+DATE_INPUT_FORMATS = [
     '%d-%m-%y', '%d/%m/%y',             # '25-10-09', 25/10/09'
     '%d-%m-%Y', '%d/%m/%Y',             # '25-10-2009', 25/10/2009'
     '%d %b %Y',                         # '25 Oct 2006',
     '%d %B %Y',                         # '25 October 2006'
-)
+]
 
-TIME_INPUT_FORMATS = (
+TIME_INPUT_FORMATS = [
     '%H.%M.%S',                         # '14.30.59'
     '%H.%M',                            # '14.30'
-)
+]
 
-DATETIME_INPUT_FORMATS = (
+DATETIME_INPUT_FORMATS = [
     '%d-%m-%Y %H.%M.%S',                # '25-10-2009 14.30.59'
     '%d-%m-%Y %H.%M.%S.%f',             # '25-10-2009 14.30.59.000200'
     '%d-%m-%Y %H.%M',                   # '25-10-2009 14.30'
@@ -45,7 +45,7 @@ DATETIME_INPUT_FORMATS = (
     '%m/%d/%Y %H.%M.%S.%f',             # '25/10/2009 14.30.59.000200'
     '%m/%d/%Y %H.%M',                   # '25/10/2009 14.30'
     '%m/%d/%Y',                         # '10/25/2009'
-)
+]
 
 DECIMAL_SEPARATOR = ','
 THOUSAND_SEPARATOR = '.'
