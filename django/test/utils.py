@@ -22,9 +22,13 @@ from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
 
-try:
-    import jinja2
-except ImportError:
+# Jinja2 doesn't run on Python 3.2 because it uses u-prefixed unicode strings.
+if sys.version_info[:2] != (3, 2):
+    try:
+        import jinja2
+    except ImportError:
+        jinja2 = None
+else:
     jinja2 = None
 
 
