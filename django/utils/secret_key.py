@@ -16,7 +16,7 @@ def generate_secret_key():
     return get_random_string(50, chars)
 
 
-def create_secret_key_file(path):
+def create_secret_key_file(path, secret_key=generate_secret_key()):
     """
     Writes a secret key out to a file.
     """
@@ -33,7 +33,7 @@ def create_secret_key_file(path):
 
     try:
         with os.fdopen(fd, 'w') as file:
-            file.write(generate_secret_key())
+            file.write(secret_key)
     except:
         # An error occurred wrapping our FD in a file object
         os.close(fd)

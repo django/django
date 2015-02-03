@@ -18,9 +18,11 @@ class Command(BaseCommand):
         parser.add_argument('outfile', nargs='+')
 
     def handle(self, *args, **options):
+        secret_key = generate_secret_key()
+
         for outfile in options['outfile']:
             if outfile == '-':
-                self.stdout.write(generate_secret_key())
+                self.stdout.write(secret_key)
                 sys.exit(0)
 
-            create_secret_key_file(outfile)
+            create_secret_key_file(outfile, secret_key)
