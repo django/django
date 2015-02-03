@@ -14,7 +14,6 @@ from .base import Loader as BaseLoader
 
 
 class Loader(BaseLoader):
-    is_usable = True
 
     def get_template_sources(self, template_name, template_dirs=None):
         """

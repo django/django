@@ -121,18 +121,7 @@ class Engine(object):
                     "instead of django.template.loaders.base.Loader. " %
                     loader, RemovedInDjango20Warning, stacklevel=2)
 
-            loader_instance = loader_class(*args)
-
-            if not loader_instance.is_usable:
-                warnings.warn(
-                    "Your template loaders configuration includes %r, but "
-                    "your Python installation doesn't support that type of "
-                    "template loading. Consider removing that line from "
-                    "your settings." % loader)
-                return None
-            else:
-                return loader_instance
-
+            return loader_class(*args)
         else:
             raise ImproperlyConfigured(
                 "Invalid value in template loaders configuration: %r" % loader)

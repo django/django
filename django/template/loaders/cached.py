@@ -11,7 +11,6 @@ from .base import Loader as BaseLoader
 
 
 class Loader(BaseLoader):
-    is_usable = True
 
     def __init__(self, engine, loaders):
         self.template_cache = {}

@@ -2,7 +2,6 @@ from django.template.base import Template, TemplateDoesNotExist
 
 
 class Loader(object):
-    is_usable = False
     # Only used to raise a deprecation warning. Remove in Django 2.0.
     _accepts_engine_in_init = True
 
