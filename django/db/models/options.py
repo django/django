@@ -12,7 +12,7 @@ from django.db.models.fields.related import ManyToManyField
 from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
-from django.utils.datastructures import ImmutableList
+from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
@@ -634,14 +634,14 @@ class Options(object):
 
     def get_parent_list(self):
         """
-        Returns a list of all the ancestor of this model as a list. Useful for
-        determining if something is an ancestor, regardless of lineage.
+        Returns all the ancestors of this model as a list ordered by MRO.
+        Useful for determining if something is an ancestor, regardless of lineage.
         """
-        result = set()
+        result = OrderedSet(self.parents)
         for parent in self.parents:
-            result.add(parent)
-            result.update(parent._meta.get_parent_list())
-        return result
+            for ancestor in parent._meta.get_parent_list():
+                result.add(ancestor)
+        return list(result)
 
     def get_ancestor_link(self, ancestor):
         """

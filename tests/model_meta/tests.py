@@ -5,7 +5,10 @@ from django.db.models.fields import related, CharField, Field
 from django.db.models.options import IMMUTABLE_WARNING, EMPTY_RELATION_TREE
 from django.test import TestCase
 
-from .models import Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating
+from .models import (
+    Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating,
+    CommonAncestor, FirstParent, SecondParent, Child
+)
 from .results import TEST_RESULTS
 
 
@@ -245,3 +248,11 @@ class RelationTreeTests(TestCase):
             ])
         )
         self.assertEqual([field.related_query_name() for field in AbstractPerson._meta._relation_tree], [])
+
+
+class ParentListTests(TestCase):
+    def test_get_parent_list(self):
+        self.assertEqual(CommonAncestor._meta.get_parent_list(), [])
+        self.assertEqual(FirstParent._meta.get_parent_list(), [CommonAncestor])
+        self.assertEqual(SecondParent._meta.get_parent_list(), [CommonAncestor])
+        self.assertEqual(Child._meta.get_parent_list(), [FirstParent, SecondParent, CommonAncestor])
