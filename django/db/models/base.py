@@ -938,7 +938,7 @@ class Model(six.with_metaclass(ModelBase)):
         unique_checks = []
 
         unique_togethers = [(self.__class__, self._meta.unique_together)]
-        for parent_class in self._meta.parents.keys():
+        for parent_class in self._meta.get_parent_list():
             if parent_class._meta.unique_together:
                 unique_togethers.append((parent_class, parent_class._meta.unique_together))
 
@@ -958,7 +958,7 @@ class Model(six.with_metaclass(ModelBase)):
         # the list of checks.
 
         fields_with_class = [(self.__class__, self._meta.local_fields)]
-        for parent_class in self._meta.parents.keys():
+        for parent_class in self._meta.get_parent_list():
             fields_with_class.append((parent_class, parent_class._meta.local_fields))
 
         for model_class, fields in fields_with_class:
