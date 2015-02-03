@@ -35,6 +35,7 @@ os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
 SUBDIRS_TO_SKIP = [
     'data',
+    'import_error_package',
     'test_discovery_sample',
     'test_discovery_sample2',
     'test_runner_deprecation_app',

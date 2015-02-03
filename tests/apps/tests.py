@@ -172,7 +172,7 @@ class AppsTests(TestCase):
         App discovery should preserve stack traces. Regression test for #22920.
         """
         with six.assertRaisesRegex(self, ImportError, "Oops"):
-            with self.settings(INSTALLED_APPS=['apps.failing_app']):
+            with self.settings(INSTALLED_APPS=['import_error_package']):
                 pass
 
     def test_models_py(self):
