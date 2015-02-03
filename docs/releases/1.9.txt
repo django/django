@@ -182,6 +182,16 @@ Default settings that were tuples are now lists
 The default settings in ``django.conf.global_settings`` were a combination of
 lists and tuples. All settings that were formerly tuples are now lists.
 
+``is_usable`` attribute on template loaders is removed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django template loaders previously required an ``is_usable`` attribute to be
+defined. If a loader was configured in the template settings and this attribute
+was ``False``, the loader would be silently ignored. In practice, this was only
+used by the egg loader to detect if setuptools was installed. The ``is_usable``
+attribute is now removed and the egg loader instead fails at runtime if
+setuptools is not installed.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
