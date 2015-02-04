@@ -24,8 +24,8 @@ from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
         ORDER_PATTERN, INNER, LOUTER)
 from django.db.models.sql.datastructures import (
     EmptyResultSet, Empty, MultiJoin, Join, BaseTable)
-from django.db.models.sql.where import (WhereNode, EverythingNode,
-    ExtraWhere, AND, OR, NothingNode)
+from django.db.models.sql.where import (WhereNode, ExtraWhere, AND, OR,
+        NothingNode)
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -526,20 +526,8 @@ class Query(object):
 
         # Now relabel a copy of the rhs where-clause and add it to the current
         # one.
-        if rhs.where:
-            w = rhs.where.clone()
-            w.relabel_aliases(change_map)
-            if not self.where:
-                # Since 'self' matches everything, add an explicit "include
-                # everything" where-constraint so that connections between the
-                # where clauses won't exclude valid results.
-                self.where.add(EverythingNode(), AND)
-        elif self.where:
-            # rhs has an empty where clause.
-            w = self.where_class()
-            w.add(EverythingNode(), AND)
-        else:
-            w = self.where_class()
+        w = rhs.where.clone()
+        w.relabel_aliases(change_map)
         self.where.add(w, connector)
 
         # Selection columns and extra extensions are those provided by 'rhs'.
@@ -1207,8 +1195,9 @@ class Query(object):
         # So, demotion is OK.
         existing_inner = set(
             (a for a in self.alias_map if self.alias_map[a].join_type == INNER))
-        clause, require_inner = self._add_q(q_object, self.used_aliases)
-        self.where.add(clause, AND)
+        clause, _ = self._add_q(q_object, self.used_aliases)
+        if clause:
+            self.where.add(clause, AND)
         self.demote_joins(existing_inner)
 
     def _add_q(self, q_object, used_aliases, branch_negated=False,
@@ -1233,7 +1222,8 @@ class Query(object):
                     child, can_reuse=used_aliases, branch_negated=branch_negated,
                     current_negated=current_negated, connector=connector, allow_joins=allow_joins)
                 joinpromoter.add_votes(needed_inner)
-            target_clause.add(child_clause, connector)
+            if child_clause:
+                target_clause.add(child_clause, connector)
         needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
 
