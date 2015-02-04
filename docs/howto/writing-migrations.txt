@@ -67,3 +67,87 @@ Then, to leverage this in your migrations, do the following::
         operations = [
             migrations.RunPython(forwards, hints={'target_db': 'default'}),
         ]
+
+Creating migrations that add unique fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Applying a migration that adds unique fields to existing non-nullable rows will
+raise an error because the unique field will be generated with the same default
+value added to all rows, breaking the ``unique`` constraint, if a default value is
+given.
+
+Therefore, the following steps should be taken (in this example, we'll add a
+non-nullable UUID field with a default value. Modify the respective field according
+to your needs):
+
+* Add the field with ``default=uuid.uuid4`` and ``unique=True`` args.
+
+* Run the :djadmin:`makemigrations` command.
+
+* Edit the created migration file.
+
+* The migration class should look similar to this::
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('myapp', '0003_auto_20150129_1705'),
+        ]
+
+        operations = [
+            migrations.AddField(
+                model_name='mymodel',
+                name='uuid',
+                field=models.UUIDField(max_length=32, unique=True, default=uuid.uuid4),
+            ),
+        ]
+
+* You will need to make three changes:
+
+    * Change the :class:`~django.db.migrations.operations.AddField` operation to
+      create an intermediary null field.
+
+    * Add a :class:`~django.db.migrations.operations.RunPython` or
+      :class:`~django.db.migrations.operations.RunSQL` operation to generate a UUID
+      for each existing row.
+
+    * Add a second :class:`~django.db.migrations.operations.AlterField` operation to
+      change the field into ``unique=True`` and ``null=False`` one.
+
+* The resulting migration should look similar to this::
+
+    import uuid     # uuid module to create default field values
+
+    def gen_uuid(apps, schema_editor):
+        MyModel = apps.get_model("myapp", "MyModel")
+        for row in MyModel.objects.all():
+            row.uuid = uuid.uuid4()
+            row.save()
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('myapp', '0003_auto_20150129_1705'),
+        ]
+
+        operations = [
+            migrations.AddField(
+                model_name='mymodel',
+                name='uuid',
+                field=models.UUIDField(max_length=32, null=True),
+            ),
+
+
+            # Consider using `reverse_code=RunPython.noop` arg to make the
+            # migration reversible, see `RunPython.noop()`.
+            migrations.RunPython(gen_uuid),
+
+            migrations.AlterField(
+                model_name='mymodel',
+                name='uuid',
+                field=models.UUIDField(null=False, unique=True, default=uuid.uuid4),
+            ),
+
+        ]
+
+* At this point you can apply the migration as usual with the :djadmin:`migrate` command.
