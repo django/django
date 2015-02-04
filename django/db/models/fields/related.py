@@ -1767,6 +1767,7 @@ class ForeignObject(RelatedField):
             root_constraint.add(lookup_class(targets[0].get_col(alias, sources[0]), value), AND)
         elif lookup_type == 'in':
             values = [get_normalized_value(value) for value in raw_value]
+            root_constraint.connector = OR
             for value in values:
                 value_constraint = constraint_class()
                 for source, target, val in zip(sources, targets, value):
