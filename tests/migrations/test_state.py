@@ -403,6 +403,36 @@ class StateTests(TestCase):
         self.assertNotEqual(project_state, other_state)
         self.assertEqual(project_state == other_state, False)
 
+    def test_clone(self):
+        """
+        Tests that ProjectState clone method returns a deep copy
+        """
+
+        project_state = ProjectState()
+        project_state.add_model(ModelState(
+            "migrations",
+            "Tag",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=100)),
+                ("hidden", models.BooleanField()),
+            ],
+            {},
+            None,
+        ))
+        project_state.apps
+        other_state = project_state.clone()
+        self.assertIsNot(project_state, other_state)
+        self.assertIsNot(project_state.apps, other_state.apps)
+        self.assertIsNot(
+            project_state.apps.get_app_config("migrations"),
+            other_state.apps.get_app_config("migrations")
+        )
+        self.assertIsNot(
+            project_state.apps.get_model("migrations", "tag"),
+            other_state.apps.get_model("migrations", "tag")
+        )
+
     def test_dangling_references_throw_error(self):
         new_apps = Apps()
 

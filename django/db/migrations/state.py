@@ -189,8 +189,10 @@ class StateApps(Apps):
         Return a clone of this registry, mainly used by the migration framework.
         """
         clone = StateApps([], {})
-        clone.all_models = copy.deepcopy(self.all_models)
         clone.app_configs = copy.deepcopy(self.app_configs)
+        for app in self.all_models.values():
+            for model in app.values():
+                ModelState.from_model(model).render(clone)
         return clone
 
     def register_model(self, app_label, model):
