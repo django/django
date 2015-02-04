@@ -38,6 +38,86 @@ class SettingsReference(str):
         self.setting_name = setting_name
 
 
+class CleanWriter(object):
+#
+    def __init__(self, words_per_line=79):
+        self.words_per_line = words_per_line - 4
+        self._breakable = {'commas': None, 'parens': None}
+        self.indent_spaces = self._get_indent_spaces(line) * " "
+#
+    def _clean_line(self, line, space):
+        # break into chunks wherever it's possible to start a new line
+        chunks_commas = map(lambda x: x.strip(), line.strip().split(','))
+        chunks_paren  = map(lambda x: x.strip(), line.strip().split('('))
+#
+        possible_by_managing_commas = self._finder(chunks_commas, 'commas')
+        if possible_by_managing_commas[0]:
+            _ = possible_by_managing_commas
+            return ",\n    ".join([_[1], _[2]])
+#
+        possible_by_managing_parens = self._finder(chunks_paren, 'parens')
+        if possible_by_managing_parens[0]:
+            _ = possible_by_managing_parens
+            return "(\n    ".join([ _[1], _[2]])
+#
+        bp_comma = self._breakable['commas']
+        if bp_comma is not None:
+            dirty_line = self._fast_reconstruct(chunks_commas[bp_comma:])
+            trial = CleanWriter(self.words_per_line).clean(dirty_line, space+1)
+            if trial is not None:
+                old_clean_line = self._fast_reconstruct(chunks_commas[:bp_comma])
+                return (",\n    " + " " * space).join([old_clean_line, trial])
+#
+        bp_paren = self._breakable['parens']
+        if bp_paren is not None:
+            dirty_line = self._fast_reconstruct(chunks_paren[bp_paren:], '(')
+            trial = CleanWriter(self.words_per_line).clean(dirty_line, space+1)
+            if trial is not None:
+                old_clean_line = self._fast_reconstruct(chunks_paren[:bp_paren])
+                return ("(\n    " + " " * space).join([old_clean_line, trial])
+#
+        return None
+#
+    def _finder(self, chunks, chunk_name):
+        for i, blob in enumerate(reversed(chunks)):
+            break_point = len(chunks) - i
+            first_part  = chunks[:break_point]
+            last_part   = chunks[break_point:]
+            if len(last_part) == 0: continue
+#
+            try_first   = self._fast_reconstruct(first_part)
+            try_last    = self._fast_reconstruct(last_part)
+#
+            if self._is_line_dirty(try_first): continue
+            elif self._is_line_dirty(try_last):
+                _ = self._breakable[chunk_name]
+                self._breakable[chunk_name] = break_point if _ is None else _
+                break
+            else:
+                delimeter = "(" if chunk_name == "parens" else ","
+                return (True, try_first, try_last, delimeter)
+#
+        return (False, )
+#
+    def _get_indent_spaces(self, blob):
+        return len(blob) - len(blob.lstrip())
+#
+    def _is_line_dirty(self, blob):
+        return len(blob) > self.words_per_line
+#
+    def _fast_reconstruct(self, chunks, joiner = ", "):
+        return ''.join([self.indent_spaces, joiner.join(chunks)])
+#
+    def clean(self, line, space=0):
+        if self._is_line_dirty(line):
+            result = self._clean_line(line, space)
+            line   = line if result is None else result
+        return line
+
+a = CleanWriter()
+line =  "                ('id', models.AutoField(verbose_name='ID', serialize=False112512512512512523123123, auto_created=True, primary_key=True, serialize=False, auto_created=True, primary_key=True, seweghwoieughwoiueghwoieughwoeiugrializasdughoisudahgiaosudghisaue=False, auto_created=True, primary_key=True, serialize=False, auto_created=True, pasdhashshasdhjsfjdsfjdsfjsefjrimary_key=True)),"
+
+
 class OperationWriter(object):
     indentation = 2
 
