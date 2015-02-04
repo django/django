@@ -787,8 +787,8 @@ You can use ``select_related()`` with any queryset of objects::
 The order of ``filter()`` and ``select_related()`` chaining isn't important.
 These querysets are equivalent::
 
-    Entry.objects.filter(pub_date__gt=timezone.now()).selected_related('blog')
-    Entry.objects.selected_related('blog').filter(pub_date__gt=timezone.now())
+    Entry.objects.filter(pub_date__gt=timezone.now()).select_related('blog')
+    Entry.objects.select_related('blog').filter(pub_date__gt=timezone.now())
 
 You can follow foreign keys in a similar way to querying them. If you have the
 following models::
