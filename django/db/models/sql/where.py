@@ -1,22 +1,15 @@
 """
 Code to manage the creation and SQL rendering of 'where' constraints.
 """
+
 from django.db.models.sql.datastructures import EmptyResultSet
-from django.utils.functional import cached_property
 from django.utils import tree
+from django.utils.functional import cached_property
 
 
 # Connection types
 AND = 'AND'
 OR = 'OR'
-
-
-class EmptyShortCircuit(Exception):
-    """
-    Internal exception used to indicate that a "matches nothing" node should be
-    added to the where-clause.
-    """
-    pass
 
 
 class WhereNode(tree.Node):
@@ -27,15 +20,46 @@ class WhereNode(tree.Node):
     the correct SQL).
 
     A child is usually an expression producing boolean values. Most likely the
-    expression is a Lookup instance, but other types of objects fulfilling the
-    required API could be used too (for example, sql.where.EverythingNode).
+    expression is a Lookup instance.
 
     However, a child could also be any class with as_sql() and either
-    relabeled_clone() method or relabel_aliases() and clone() methods. The
-    second alternative should be used if the alias is not the only mutable
-    variable.
+    relabeled_clone() method or relabel_aliases() and clone() methods and
+    contains_aggregate attribute.
     """
     default = AND
+
+    def split_having(self, negated=False):
+        """
+        Returns two possibly None nodes, one for those parts of self that
+        should be included in the WHERE clause, and one for those parts of
+        self that must be included in the HAVING clause.
+        """
+        if not self.contains_aggregate:
+            return self, None
+        in_negated = negated ^ self.negated
+        # If the effective connector is OR, and this node contains an aggregate,
+        # then we need to push the whole branch to HAVING clause.
+        may_need_split = (
+            (in_negated and self.connector == AND) or
+            (not in_negated and self.connector == OR))
+        if may_need_split and self.contains_aggregate:
+            return None, self
+        where_parts = []
+        having_parts = []
+        for c in self.children:
+            if hasattr(c, 'split_having'):
+                where_part, having_part = c.split_having(in_negated)
+                if where_part is not None:
+                    where_parts.append(where_part)
+                if having_part is not None:
+                    having_parts.append(having_part)
+            elif c.contains_aggregate:
+                having_parts.append(c)
+            else:
+                where_parts.append(c)
+        having_node = self.__class__(having_parts, self.connector, self.negated) if having_parts else None
+        where_node = self.__class__(where_parts, self.connector, self.negated) if where_parts else None
+        return where_node, having_node
 
     def as_sql(self, compiler, connection):
         """
@@ -44,55 +68,39 @@ class WhereNode(tree.Node):
         None, [] if this node is empty, and raises EmptyResultSet if this
         node can't match anything.
         """
-        # Note that the logic here is made slightly more complex than
-        # necessary because there are two kind of empty nodes: Nodes
-        # containing 0 children, and nodes that are known to match everything.
-        # A match-everything node is different than empty node (which also
-        # technically matches everything) for backwards compatibility reasons.
-        # Refs #5261.
         result = []
         result_params = []
-        everything_childs, nothing_childs = 0, 0
-        non_empty_childs = len(self.children)
+        if self.connector == AND:
+            full_needed, empty_needed = len(self.children), 1
+        else:
+            full_needed, empty_needed = 1, len(self.children)
 
         for child in self.children:
             try:
                 sql, params = compiler.compile(child)
             except EmptyResultSet:
-                nothing_childs += 1
+                empty_needed -= 1
             else:
                 if sql:
                     result.append(sql)
                     result_params.extend(params)
                 else:
-                    if sql is None:
-                        # Skip empty childs totally.
-                        non_empty_childs -= 1
-                        continue
-                    everything_childs += 1
+                    full_needed -= 1
             # Check if this node matches nothing or everything.
             # First check the amount of full nodes and empty nodes
             # to make this node empty/full.
-            if self.connector == AND:
-                full_needed, empty_needed = non_empty_childs, 1
-            else:
-                full_needed, empty_needed = 1, non_empty_childs
             # Now, check if this node is full/empty using the
             # counts.
-            if empty_needed - nothing_childs <= 0:
+            if empty_needed == 0:
                 if self.negated:
                     return '', []
                 else:
                     raise EmptyResultSet
-            if full_needed - everything_childs <= 0:
+            if full_needed == 0:
                 if self.negated:
                     raise EmptyResultSet
                 else:
                     return '', []
-
-        if non_empty_childs == 0:
-            # All the child nodes were empty, so this one is empty, too.
-            return None, []
         conn = ' %s ' % self.connector
         sql_string = conn.join(result)
         if sql_string:
@@ -145,41 +153,29 @@ class WhereNode(tree.Node):
 
     @classmethod
     def _contains_aggregate(cls, obj):
-        if not isinstance(obj, tree.Node):
-            return getattr(obj.lhs, 'contains_aggregate', False) or getattr(obj.rhs, 'contains_aggregate', False)
-        return any(cls._contains_aggregate(c) for c in obj.children)
+        if isinstance(obj, tree.Node):
+            return any(cls._contains_aggregate(c) for c in obj.children)
+        return obj.contains_aggregate
 
     @cached_property
     def contains_aggregate(self):
         return self._contains_aggregate(self)
 
 
-class EmptyWhere(WhereNode):
-    def add(self, data, connector):
-        return
-
-    def as_sql(self, compiler=None, connection=None):
-        raise EmptyResultSet
-
-
-class EverythingNode(object):
-    """
-    A node that matches everything.
-    """
-
-    def as_sql(self, compiler=None, connection=None):
-        return '', []
-
-
 class NothingNode(object):
     """
     A node that matches nothing.
     """
+    contains_aggregate = False
+
     def as_sql(self, compiler=None, connection=None):
         raise EmptyResultSet
 
 
 class ExtraWhere(object):
+    # The contents are a black box - assume no aggregates are used.
+    contains_aggregate = False
+
     def __init__(self, sqls, params):
         self.sqls = sqls
         self.params = params
@@ -190,6 +186,10 @@ class ExtraWhere(object):
 
 
 class SubqueryConstraint(object):
+    # Even if aggregates would be used in a subquery, the outer query isn't
+    # interested about those.
+    contains_aggregate = False
+
     def __init__(self, alias, columns, targets, query_object):
         self.alias = alias
         self.columns = columns
