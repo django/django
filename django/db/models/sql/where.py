@@ -12,14 +12,6 @@ AND = 'AND'
 OR = 'OR'
 
 
-class EmptyShortCircuit(Exception):
-    """
-    Internal exception used to indicate that a "matches nothing" node should be
-    added to the where-clause.
-    """
-    pass
-
-
 class WhereNode(tree.Node):
     """
     Used to represent the SQL where-clause.
