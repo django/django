@@ -476,6 +476,33 @@ You can pass a second callable to
 want executed when migrating backwards. If this callable is omitted, migrating
 backwards will raise an exception.
 
+Accessing models from other apps
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When writing a ``RunPython`` function that uses models from apps other than the
+one in which the migration is located, the migration's ``dependencies``
+attribute should include the latest migration of each app that is involved,
+otherwise you may get an error similar to: ``LookupError: No installed app
+with label 'myappname'`` when you try to retrieve the model in the ``RunPython``
+function using ``apps.get_model()``.
+
+In the following example, we have a migration in ``app1`` which needs to use
+models in ``app2``. We aren't concerned with the details of ``move_m1`` other
+than the fact it will need to access models from both apps. Therefore we've
+added a dependency that specifies the last migration of ``app2``::
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('app1', '0001_initial'),
+            # added dependency to enable using models from app2 in move_m1
+            ('app2', '0004_foobar'),
+        ]
+
+        operations = [
+            migrations.RunPython(move_m1),
+        ]
+
 More advanced migrations
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
