@@ -16,6 +16,12 @@ We'll walk you through the entire process, so you can learn by example.
 Who's this tutorial for?
 ------------------------
 
+.. seealso::
+
+    If you are looking for a reference on how to submit patches, see the
+    :doc:`/internals/contributing/writing-code/submitting-patches`
+    documentation.
+
 For this tutorial, we expect that you have at least a basic understanding of
 how Django works. This means you should be comfortable going through the
 existing tutorials on :doc:`writing your first Django app</intro/tutorial01>`.
