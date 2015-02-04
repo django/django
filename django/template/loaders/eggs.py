@@ -14,7 +14,11 @@ from .base import Loader as BaseLoader
 
 
 class Loader(BaseLoader):
-    is_usable = resource_string is not None
+
+    def __init__(self, engine):
+        if resource_string is None:
+            raise RuntimeError("Setuptools must be installed to use the egg loader")
+        super(Loader, self).__init__(engine)
 
     def load_template_source(self, template_name, template_dirs=None):
         """
@@ -22,14 +26,13 @@ class Loader(BaseLoader):
 
         For every installed app, it tries to get the resource (app, template_name).
         """
-        if resource_string is not None:
-            pkg_name = 'templates/' + template_name
-            for app_config in apps.get_app_configs():
-                try:
-                    resource = resource_string(app_config.name, pkg_name)
-                except Exception:
-                    continue
-                if six.PY2:
-                    resource = resource.decode(self.engine.file_charset)
-                return (resource, 'egg:%s:%s' % (app_config.name, pkg_name))
+        pkg_name = 'templates/' + template_name
+        for app_config in apps.get_app_configs():
+            try:
+                resource = resource_string(app_config.name, pkg_name)
+            except Exception:
+                continue
+            if six.PY2:
+                resource = resource.decode(self.engine.file_charset)
+            return (resource, 'egg:%s:%s' % (app_config.name, pkg_name))
         raise TemplateDoesNotExist(template_name)
