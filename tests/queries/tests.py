@@ -3660,3 +3660,10 @@ class Ticket23605Tests(TestCase):
         self.assertQuerysetEqual(qs1, [a1], lambda x: x)
         qs2 = Ticket23605A.objects.exclude(complex_q)
         self.assertQuerysetEqual(qs2, [a2], lambda x: x)
+
+
+class TestTicket24279(TestCase):
+    def test_ticket_24278(self):
+        School.objects.create()
+        qs = School.objects.filter(Q(pk__in=()) | Q())
+        self.assertQuerysetEqual(qs, [])
