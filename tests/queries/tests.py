@@ -9,7 +9,7 @@ import unittest
 from django.core.exceptions import FieldError
 from django.db import connection, DEFAULT_DB_ALIAS
 from django.db.models import Count, F, Q
-from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
+from django.db.models.sql.where import WhereNode, NothingNode
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
@@ -2851,20 +2851,10 @@ class WhereNodeTest(TestCase):
 
     def test_empty_full_handling_conjunction(self):
         compiler = WhereNodeTest.MockCompiler()
-        w = WhereNode(children=[EverythingNode()])
-        self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w.negate()
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
         w = WhereNode(children=[NothingNode()])
         self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w = WhereNode(children=[EverythingNode(), EverythingNode()])
-        self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w.negate()
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
-        w = WhereNode(children=[EverythingNode(), self.DummyNode()])
-        self.assertEqual(w.as_sql(compiler, connection), ('dummy', []))
         w = WhereNode(children=[self.DummyNode(), self.DummyNode()])
         self.assertEqual(w.as_sql(compiler, connection), ('(dummy AND dummy)', []))
         w.negate()
@@ -2876,22 +2866,10 @@ class WhereNodeTest(TestCase):
 
     def test_empty_full_handling_disjunction(self):
         compiler = WhereNodeTest.MockCompiler()
-        w = WhereNode(children=[EverythingNode()], connector='OR')
-        self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w.negate()
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
         w = WhereNode(children=[NothingNode()], connector='OR')
         self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w = WhereNode(children=[EverythingNode(), EverythingNode()], connector='OR')
-        self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w.negate()
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
-        w = WhereNode(children=[EverythingNode(), self.DummyNode()], connector='OR')
-        self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w.negate()
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
         w = WhereNode(children=[self.DummyNode(), self.DummyNode()], connector='OR')
         self.assertEqual(w.as_sql(compiler, connection), ('(dummy OR dummy)', []))
         w.negate()
@@ -2905,15 +2883,20 @@ class WhereNodeTest(TestCase):
         compiler = WhereNodeTest.MockCompiler()
         empty_w = WhereNode()
         w = WhereNode(children=[empty_w, empty_w])
-        self.assertEqual(w.as_sql(compiler, connection), (None, []))
+        self.assertEqual(w.as_sql(compiler, connection), ('', []))
         w.negate()
-        self.assertEqual(w.as_sql(compiler, connection), (None, []))
+        with self.assertRaises(EmptyResultSet):
+            w.as_sql(compiler, connection)
         w.connector = 'OR'
-        self.assertEqual(w.as_sql(compiler, connection), (None, []))
+        with self.assertRaises(EmptyResultSet):
+            w.as_sql(compiler, connection)
         w.negate()
-        self.assertEqual(w.as_sql(compiler, connection), (None, []))
+        self.assertEqual(w.as_sql(compiler, connection), ('', []))
         w = WhereNode(children=[empty_w, NothingNode()], connector='OR')
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
+        self.assertEqual(w.as_sql(compiler, connection), ('', []))
+        w = WhereNode(children=[empty_w, NothingNode()], connector='AND')
+        with self.assertRaises(EmptyResultSet):
+            w.as_sql(compiler, connection)
 
 
 class IteratorExceptionsTest(TestCase):
