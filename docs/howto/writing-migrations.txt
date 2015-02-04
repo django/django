@@ -67,3 +67,92 @@ Then, to leverage this in your migrations, do the following::
         operations = [
             migrations.RunPython(forwards, hints={'target_db': 'default'}),
         ]
+
+Migrations that add unique fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Applying a "plain" migration that adds a unique non-nullable field to a table
+with existing rows will raise an error because the value used to populate
+existing rows is generated only once, thus breaking the unique constraint.
+
+Therefore, the following steps should be taken. In this example, we'll add a
+non-nullable :class:`~django.db.models.UUIDField` with a default value. Modify
+the respective field according to your needs.
+
+* Add the field on your model with ``default=...`` and ``unique=True``
+  arguments. In the example, we use ``uuid.uuid4`` for the default.
+
+* Run the :djadmin:`makemigrations` command.
+
+* Edit the created migration file.
+
+  The generated migration class should look similar to this::
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('myapp', '0003_auto_20150129_1705'),
+        ]
+
+        operations = [
+            migrations.AddField(
+                model_name='mymodel',
+                name='uuid',
+                field=models.UUIDField(max_length=32, unique=True, default=uuid.uuid4),
+            ),
+        ]
+
+  You will need to make three changes:
+
+  * Add a second :class:`~django.db.migrations.operations.AddField` operation
+    copied from the generated one and change it to
+    :class:`~django.db.migrations.operations.AlterField`.
+
+  * On the first operation (``AddField``), change ``unique=True`` to
+    ``null=True`` -- this will create the intermediary null field.
+
+  * Between the two operations, add a
+    :class:`~django.db.migrations.operations.RunPython` or
+    :class:`~django.db.migrations.operations.RunSQL` operation to generate a
+    unique value (UUID in the example) for each existing row.
+
+  The resulting migration should look similar to this::
+
+    # -*- coding: utf-8 -*-
+    from __future__ import unicode_literals
+
+    from django.db import migrations, models
+    import uuid
+
+    def gen_uuid(apps, schema_editor):
+        MyModel = apps.get_model('myapp', 'MyModel')
+        for row in MyModel.objects.all():
+            row.uuid = uuid.uuid4()
+            row.save()
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('myapp', '0003_auto_20150129_1705'),
+        ]
+
+        operations = [
+            migrations.AddField(
+                model_name='mymodel',
+                name='uuid',
+                field=models.UUIDField(default=uuid.uuid4, null=True),
+            ),
+            # omit reverse_code=... if you don't want the migration to be reversible.
+            migrations.RunPython(gen_uuid, reverse_code=migrations.RunPython.noop),
+            migrations.AlterField(
+                model_name='mymodel',
+                name='uuid',
+                field=models.UUIDField(default=uuid.uuid4, unique=True),
+            ),
+        ]
+
+* Now you can apply the migration as usual with the :djadmin:`migrate` command.
+
+  Note there is a race condition if you allow objects to be created while this
+  migration is running. Objects created after the ``AddField`` and before
+  ``RunPython`` will have their original ``uuid``’s overwritten.
