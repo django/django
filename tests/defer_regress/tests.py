@@ -219,7 +219,7 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(obj.item, item2)
         self.assertEqual(obj.item_id, item2.id)
 
-    def test_proxy_model_defer_with_selected_related(self):
+    def test_proxy_model_defer_with_select_related(self):
         # Regression for #22050
         item = Item.objects.create(name="first", value=47)
         RelatedItem.objects.create(item=item)
