@@ -43,7 +43,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
 
     ptr_type = GEOM_PTR
 
-    #### Python 'magic' routines ####
     def __init__(self, geo_input, srid=None):
         """
         The base constructor for GEOS geometry objects, and may take the
@@ -175,7 +174,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "The not equals operator."
         return not (self == other)
 
-    ### Geometry set-like operations ###
     # Thanks to Sean Gillies for inspiration:
     #  http://lists.gispython.org/pipermail/community/2007-July/001034.html
     # g = g1 | g2
@@ -198,7 +196,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Return the symmetric difference of this Geometry and the other."
         return self.sym_difference(other)
 
-    #### Coordinate Sequence Routines ####
     @property
     def has_cs(self):
         "Returns True if this Geometry has a coordinate sequence, False if not."
@@ -221,7 +218,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         if self.has_cs:
             return self._cs.clone()
 
-    #### Geometry Info ####
     @property
     def geom_type(self):
         "Returns a string representing the Geometry type, e.g. 'Polygon'"
@@ -256,7 +252,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Converts this Geometry to normal form (or canonical form)."
         return capi.geos_normalize(self.ptr)
 
-    #### Unary predicates ####
     @property
     def empty(self):
         """
@@ -292,7 +287,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         return capi.geos_isvalidreason(self.ptr).decode()
 
-    #### Binary predicates. ####
     def contains(self, other):
         "Returns true if other.within(this) returns true."
         return capi.geos_contains(self.ptr, other.ptr)
@@ -360,7 +354,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         return capi.geos_within(self.ptr, other.ptr)
 
-    #### SRID Routines ####
     def get_srid(self):
         "Gets the SRID for the geometry, returns None if no SRID is set."
         s = capi.geos_get_srid(self.ptr)
@@ -374,7 +367,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         capi.geos_set_srid(self.ptr, srid)
     srid = property(get_srid, set_srid)
 
-    #### Output Routines ####
     @property
     def ewkt(self):
         """
@@ -454,7 +446,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         return PreparedGeometry(self)
 
-    #### GDAL-specific output routines ####
     @property
     def ogr(self):
         "Returns the OGR Geometry for this Geometry."
@@ -525,7 +516,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         else:
             raise GEOSException('Transformed WKB was invalid.')
 
-    #### Topology Routines ####
     def _topology(self, gptr):
         "Helper routine to return Geometry from the given pointer."
         return GEOSGeometry(gptr, srid=self.srid)
@@ -639,7 +629,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Returns a Geometry representing all the points in this Geometry and other."
         return self._topology(capi.geos_union(self.ptr, other.ptr))
 
-    #### Other Routines ####
     @property
     def area(self):
         "Returns the area of the Geometry."

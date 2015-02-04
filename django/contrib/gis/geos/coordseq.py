@@ -16,7 +16,6 @@ class GEOSCoordSeq(GEOSBase):
 
     ptr_type = CS_PTR
 
-    #### Python 'magic' routines ####
     def __init__(self, ptr, z=False):
         "Initializes from a GEOS pointer."
         if not isinstance(ptr, CS_PTR):
@@ -68,7 +67,6 @@ class GEOSCoordSeq(GEOSBase):
         if set_3d:
             self.setZ(index, value[2])
 
-    #### Internal Routines ####
     def _checkindex(self, index):
         "Checks the given index."
         sz = self.size
@@ -80,7 +78,6 @@ class GEOSCoordSeq(GEOSBase):
         if dim < 0 or dim > 2:
             raise GEOSException('invalid ordinate dimension "%d"' % dim)
 
-    #### Ordinate getting and setting routines ####
     def getOrdinate(self, dimension, index):
         "Returns the value for the given dimension and index."
         self._checkindex(index)
@@ -117,7 +114,6 @@ class GEOSCoordSeq(GEOSBase):
         "Set Z with the value at the given index."
         self.setOrdinate(2, index, value)
 
-    ### Dimensions ###
     @property
     def size(self):
         "Returns the size of this coordinate sequence."
@@ -136,7 +132,6 @@ class GEOSCoordSeq(GEOSBase):
         """
         return self._z
 
-    ### Other Methods ###
     def clone(self):
         "Clones this coordinate sequence."
         return GEOSCoordSeq(capi.cs_clone(self.ptr), self.hasz)

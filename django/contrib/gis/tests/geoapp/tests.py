@@ -37,7 +37,7 @@ class GeoModelTest(TestCase):
 
     def test_proxy(self):
         "Testing Lazy-Geometry support (using the GeometryProxy)."
-        ## Testing on a Point
+        # Testing on a Point
         pnt = Point(0, 0)
         nullcity = City(name='NullCity', point=pnt)
         nullcity.save()
@@ -74,7 +74,7 @@ class GeoModelTest(TestCase):
         self.assertEqual(Point(23, 5), City.objects.get(name='NullCity').point)
         nullcity.delete()
 
-        ## Testing on a Polygon
+        # Testing on a Polygon
         shell = LinearRing((0, 0), (0, 100), (100, 100), (100, 0), (0, 0))
         inner = LinearRing((40, 40), (40, 60), (60, 60), (60, 40), (40, 40))
 

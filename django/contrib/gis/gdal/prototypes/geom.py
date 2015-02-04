@@ -6,7 +6,6 @@ from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
     double_output, geom_output, int_output, srs_output, string_output, void_output)
 
 
-### Generation routines specific to this module ###
 def env_func(f, argtypes):
     "For getting OGREnvelopes."
     f.argtypes = argtypes
@@ -26,7 +25,6 @@ def topology_func(f):
     f.errchck = bool
     return f
 
-### OGR_G ctypes function prototypes ###
 
 # GeoJSON routines.
 from_json = geom_output(lgdal.OGR_G_CreateGeometryFromJson, [c_char_p])

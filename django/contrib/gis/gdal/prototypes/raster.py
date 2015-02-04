@@ -18,14 +18,12 @@ void_output = partial(void_output, cpl=True)
 const_string_output = partial(const_string_output, cpl=True)
 double_output = partial(double_output, cpl=True)
 
-### Raster Driver Routines ###
 register_all = void_output(lgdal.GDALAllRegister, [])
 get_driver = voidptr_output(lgdal.GDALGetDriver, [c_int])
 get_driver_by_name = voidptr_output(lgdal.GDALGetDriverByName, [c_char_p], errcheck=False)
 get_driver_count = int_output(lgdal.GDALGetDriverCount, [])
 get_driver_description = const_string_output(lgdal.GDALGetDescription, [c_void_p])
 
-### Raster Data Source Routines ###
 create_ds = voidptr_output(lgdal.GDALCreate, [c_void_p, c_char_p, c_int, c_int, c_int, c_int])
 open_ds = voidptr_output(lgdal.GDALOpen, [c_char_p, c_int])
 close_ds = void_output(lgdal.GDALClose, [c_void_p])
@@ -43,7 +41,6 @@ set_ds_projection_ref = void_output(lgdal.GDALSetProjection, [c_void_p, c_char_p
 get_ds_geotransform = void_output(lgdal.GDALGetGeoTransform, [c_void_p, POINTER(c_double * 6)], errcheck=False)
 set_ds_geotransform = void_output(lgdal.GDALSetGeoTransform, [c_void_p, POINTER(c_double * 6)])
 
-### Raster Band Routines ###
 band_io = void_output(lgdal.GDALRasterIO, [c_void_p, c_int, c_int, c_int, c_int, c_int,
                                            c_void_p, c_int, c_int, c_int, c_int, c_int])
 get_band_xsize = int_output(lgdal.GDALGetRasterBandXSize, [c_void_p])
@@ -57,7 +54,6 @@ set_band_nodata_value = void_output(lgdal.GDALSetRasterNoDataValue, [c_void_p, c
 get_band_minimum = double_output(lgdal.GDALGetRasterMinimum, [c_void_p, POINTER(c_int)])
 get_band_maximum = double_output(lgdal.GDALGetRasterMaximum, [c_void_p, POINTER(c_int)])
 
-### Reprojection routine ###
 reproject_image = void_output(lgdal.GDALReprojectImage, [c_void_p, c_char_p, c_void_p, c_char_p,
                                                          c_int, c_double, c_double,
                                                          c_void_p, c_void_p, c_void_p])
