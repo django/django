@@ -1145,10 +1145,16 @@ class Query(object):
             # No support for transforms for relational fields
             assert len(lookups) == 1
             lookup_class = field.get_lookup(lookups[0])
-            if len(targets) == 1:
-                lhs = targets[0].get_col(alias, field)
+            # Undo the changes done in setup_joins() if hasattr(final_field, 'field') branch
+            # This hack is needed as long as the field.rel isn't like a real field.
+            if field.get_path_info()[-1].target_fields != sources:
+                target_field = field.rel
             else:
-                lhs = MultiColSource(alias, targets, sources, field)
+                target_field = field
+            if len(targets) == 1:
+                lhs = targets[0].get_col(alias, target_field)
+            else:
+                lhs = MultiColSource(alias, targets, sources, target_field)
             condition = lookup_class(lhs, value)
             lookup_type = lookup_class.lookup_name
         else:
@@ -1359,6 +1365,8 @@ class Query(object):
             reuse = can_reuse if join.m2m else None
             alias = self.join(connection, reuse=reuse)
             joins.append(alias)
+        if hasattr(final_field, 'field'):
+            final_field = final_field.field
         return final_field, targets, opts, joins, path
 
     def trim_joins(self, targets, joins, path):

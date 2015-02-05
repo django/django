@@ -26,6 +26,7 @@ from django.core.urlresolvers import reverse
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import BLANK_CHOICE_DASH
+from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
@@ -357,11 +358,14 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                     # This property or relation doesn't exist, but it's allowed
                     # since it's ignored in ChangeList.get_filters().
                     return True
-                model = field.rel.model
+                model = field.rel.to
                 if hasattr(field.rel, 'get_related_field'):
                     rel_name = field.rel.get_related_field().name
                 else:
-                    rel_name = model._meta.pk.name
+                    rel_name = None
+            elif isinstance(field, ForeignObjectRel):
+                model = field.related_model
+                rel_name = model._meta.pk.name
             else:
                 rel_name = None
         if rel_name and len(parts) > 1 and parts[-1] == rel_name:

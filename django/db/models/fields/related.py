@@ -1307,12 +1307,10 @@ class ForeignObjectRel(object):
     concrete = False
     editable = False
     is_relation = True
-    null = True
 
     def __init__(self, field, to, related_name=None, related_query_name=None,
             limit_choices_to=None, parent_link=False, on_delete=None):
         self.field = field
-        self.rel = field
         self.to = to
         self.related_name = related_name
         self.related_query_name = related_query_name
@@ -1380,18 +1378,6 @@ class ForeignObjectRel(object):
     def db_type(self):
         return self.field.db_type
 
-    @property
-    def foreign_related_fields(self):
-        return self.field.local_related_fields
-
-    @property
-    def local_related_fields(self):
-        return self.field.foreign_related_fields
-
-    @property
-    def related_fields(self):
-        return [(r[1], r[0]) for r in self.field.related_fields]
-
     def __repr__(self):
         return '<%s: %s.%s>' % (type(self).__name__, self.opts.app_label, self.opts.model_name)
 
@@ -1436,9 +1422,6 @@ class ForeignObjectRel(object):
         # By default foreign object doesn't relate to any remote field (for
         # example custom multicolumn joins currently have no remote field).
         self.field_name = None
-
-    def get_lookup(self, lookup_name):
-        return self.field.get_lookup(lookup_name)
 
     def get_accessor_name(self, model=None):
         # This method encapsulates the logic that decides what name to give an

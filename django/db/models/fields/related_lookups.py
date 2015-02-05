@@ -1,5 +1,6 @@
 from django.db.models.lookups import (
-    In, Exact, LessThan, LessThanOrEqual, GreaterThan, GreaterThanOrEqual)
+    Exact, GreaterThan, GreaterThanOrEqual, In, LessThan, LessThanOrEqual,
+)
 
 
 class MultiColSource(object):
