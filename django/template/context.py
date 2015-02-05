@@ -232,5 +232,6 @@ class RequestContext(Context):
         new_context = super(RequestContext, self).new(values)
         # This is for backwards-compatibility: RequestContexts created via
         # Context.new don't include values from context processors.
-        del new_context._processors_index
+        if hasattr(new_context, '_processors_index'):
+            del new_context._processors_index
         return new_context
