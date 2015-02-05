@@ -79,9 +79,8 @@ class NonConcreteField(models.IntegerField):
     def db_type(self, connection):
         return None
 
-    def get_attname_column(self):
-        attname, column = super(NonConcreteField, self).get_attname_column()
-        return attname, None
+    def get_column(self):
+        return None
 
 
 class NonConcreteModel(NamedModel):

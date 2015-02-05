@@ -25,7 +25,8 @@ class GenericRelationsTests(TestCase):
         self.bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         self.quartz = Mineral.objects.create(name="Quartz", hardness=7)
 
-        # Tagging stuff.
+        self.bacon
+        self.bacon.tags
         self.bacon.tags.create(tag="fatty")
         self.bacon.tags.create(tag="salty")
         self.lion.tags.create(tag="yellow")
@@ -107,6 +108,7 @@ class GenericRelationsTests(TestCase):
     def test_query_content_object(self):
         qs = TaggedItem.objects.filter(
             animal__isnull=False).order_by('animal__common_name', 'tag')
+        print(qs.query)
         self.assertQuerysetEqual(
             qs, ["<TaggedItem: hairy>", "<TaggedItem: yellow>"]
         )

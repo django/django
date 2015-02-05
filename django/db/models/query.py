@@ -1284,7 +1284,9 @@ class RawQuerySet(object):
             converter = connections[self.db].introspection.table_name_converter
             self._model_fields = {}
             for field in self.model._meta.fields:
-                name, column = field.get_attname_column()
+                if not field.concrete:
+                    continue
+                column = field.db_column
                 self._model_fields[converter(column)] = field
         return self._model_fields
 
@@ -1642,15 +1644,10 @@ class RelatedPopulator(object):
         self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
         self.related_populators = get_related_populators(klass_info, select, self.db)
         field = klass_info['field']
-        reverse = klass_info['reverse']
         self.reverse_cache_name = None
-        if reverse:
-            self.cache_name = field.rel.get_cache_name()
-            self.reverse_cache_name = field.get_cache_name()
-        else:
-            self.cache_name = field.get_cache_name()
-            if field.unique:
-                self.reverse_cache_name = field.rel.get_cache_name()
+        self.cache_name = field.get_cache_name()
+        if field.one_to_one:
+            self.reverse_cache_name = field.remote_field.get_cache_name()
 
     def get_deferred_cls(self, klass_info, init_list):
         model_cls = klass_info['model']

@@ -181,16 +181,14 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
      * load_fields - the set of fields to be loaded on this model
      * reverse - boolean, True if we are checking a reverse select related
     """
-    if not field.rel:
+    if not field.is_relation or field.many_to_many or field.many_to_one or not field.to:
         return False
-    if field.rel.parent_link and not reverse:
+    if field.parent_link:
         return False
-    if restricted:
-        if reverse and field.related_query_name() not in requested:
-            return False
-        if not reverse and field.name not in requested:
-            return False
-    if not restricted and field.null:
+    if restricted and field.name not in requested:
+        return False
+    if not restricted and not field.concrete:
+        # In automatic descent, do not descent back along one-to-one fields.
         return False
     if load_fields:
         if field.attname not in load_fields:

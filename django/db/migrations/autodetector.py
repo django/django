@@ -55,7 +55,7 @@ class MigrationAutodetector(object):
         if not hasattr(obj, 'deconstruct') or isinstance(obj, type):
             return obj
         deconstructed = obj.deconstruct()
-        if isinstance(obj, models.Field):
+        if isinstance(obj, models.fields.BaseField):
             # we have a field which also returns a name
             deconstructed = deconstructed[1:]
         path, args, kwargs = deconstructed

@@ -58,7 +58,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # If any of the new or altered fields is introducing a new PK,
         # remove the old one
         restore_pk_field = None
-        if any(f.primary_key for f in create_fields) or any(n.primary_key for o, n in alter_fields):
+        if any(f.concrete and f.primary_key for f in create_fields) or \
+                any(n.concrete and n.primary_key for o, n in alter_fields):
             for name, field in list(body.items()):
                 if field.primary_key:
                     field.primary_key = False

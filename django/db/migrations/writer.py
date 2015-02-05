@@ -351,7 +351,7 @@ class MigrationWriter(object):
         elif isinstance(value, decimal.Decimal):
             return repr(value), {"from decimal import Decimal"}
         # Django fields
-        elif isinstance(value, models.Field):
+        elif isinstance(value, models.fields.BaseField):
             attr_name, path, args, kwargs = value.deconstruct()
             return cls.serialize_deconstructed(path, args, kwargs)
         # Classes

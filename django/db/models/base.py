@@ -975,11 +975,11 @@ class Model(six.with_metaclass(ModelBase)):
                     continue
                 if f.unique:
                     unique_checks.append((model_class, (name,)))
-                if f.unique_for_date and f.unique_for_date not in exclude:
+                if getattr(f, 'unique_for_date', False) and f.unique_for_date not in exclude:
                     date_checks.append((model_class, 'date', name, f.unique_for_date))
-                if f.unique_for_year and f.unique_for_year not in exclude:
+                if getattr(f, 'unique_for_year', False) and f.unique_for_year not in exclude:
                     date_checks.append((model_class, 'year', name, f.unique_for_year))
-                if f.unique_for_month and f.unique_for_month not in exclude:
+                if getattr(f, 'unique_for_month', False) and f.unique_for_month not in exclude:
                     date_checks.append((model_class, 'month', name, f.unique_for_month))
         return unique_checks, date_checks
 
@@ -1369,7 +1369,7 @@ class Model(six.with_metaclass(ModelBase)):
         errors = []
 
         for f in cls._meta.local_fields:
-            _, column_name = f.get_attname_column()
+            column_name = f.get_column()
 
             # Ensure the column name is not already in use.
             if column_name and column_name in used_column_names:
@@ -1593,7 +1593,7 @@ class Model(six.with_metaclass(ModelBase)):
             return errors
 
         for f in cls._meta.local_fields:
-            _, column_name = f.get_attname_column()
+            column_name = f.get_column()
 
             # Check if auto-generated name for the field is too long
             # for the database.
@@ -1614,7 +1614,7 @@ class Model(six.with_metaclass(ModelBase)):
             # Check if auto-generated name for the M2M field is too long
             # for the database.
             for m2m in f.rel.through._meta.local_fields:
-                _, rel_name = m2m.get_attname_column()
+                rel_name = m2m.get_column()
                 if (m2m.db_column is None and rel_name is not None
                         and len(rel_name) > allowed_len):
                     errors.append(

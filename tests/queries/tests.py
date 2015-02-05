@@ -2904,7 +2904,7 @@ class WhereNodeTest(TestCase):
 class IteratorExceptionsTest(TestCase):
     def test_iter_exceptions(self):
         qs = ExtraInfo.objects.only('author')
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(FieldError):
             list(qs)
 
     def test_invalid_qs_list(self):

@@ -336,25 +336,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
-    def test_unique_m2m(self):
-        class Person(models.Model):
-            name = models.CharField(max_length=5)
-
-        class Group(models.Model):
-            members = models.ManyToManyField('Person', unique=True)
-
-        field = Group._meta.get_field('members')
-        errors = field.check(from_model=Group)
-        expected = [
-            Error(
-                'ManyToManyFields cannot be unique.',
-                hint=None,
-                obj=field,
-                id='fields.E330',
-            ),
-        ]
-        self.assertEqual(errors, expected)
-
     def test_foreign_key_to_non_unique_field(self):
         class Target(models.Model):
             bad = models.IntegerField()  # No unique=True

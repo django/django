@@ -305,17 +305,17 @@ class Options(object):
         # ideally, we'd just ask for field.related_model. However, related_model
         # is a cached property, and all the models haven't been loaded yet, so
         # we need to make sure we don't cache a string reference.
-        if field.is_relation and hasattr(field.rel, 'to') and field.rel.to:
+        if field.is_relation:
             try:
-                field.rel.to._meta._expire_cache(forward=False)
+                field.remote_field.model._meta._expire_cache()
             except AttributeError:
                 pass
             self._expire_cache()
         else:
-            self._expire_cache(reverse=False)
+            self._expire_cache()
 
     def setup_pk(self, field):
-        if not self.pk and field.primary_key:
+        if not self.pk and field.concrete and field.primary_key:
             self.pk = field
             field.serialize = False
 
@@ -473,8 +473,6 @@ class Options(object):
     @cached_property
     def _forward_fields_map(self):
         res = {}
-        # call get_fields() with export_ordered_set=True in order to have a
-        # field_instance -> names map
         fields = self._get_fields(reverse=False)
         for field in fields:
             res[field.name] = field
@@ -490,7 +488,7 @@ class Options(object):
     @cached_property
     def fields_map(self):
         res = {}
-        fields = self._get_fields(forward=False, include_hidden=True)
+        fields = self._get_fields(forward=True, include_hidden=True)
         for field in fields:
             res[field.name] = field
             # Due to the way Django's internals work, get_field() should also
@@ -589,7 +587,7 @@ class Options(object):
                                            for c in self.concrete_model._meta.proxied_children
                                            if c is not self)
             relations = (f.rel for f in children
-                         if include_hidden or not f.rel.field.rel.is_hidden())
+                         if include_hidden or not f.rel.field.rel.hidden)
             fields = chain(fields, relations)
         return list(fields)
 
@@ -686,11 +684,6 @@ class Options(object):
                     if not f.many_to_many
                 )
 
-            for f in fields_with_relations:
-                if not isinstance(f.rel.to, six.string_types):
-                    # Set options_instance -> field
-                    related_objects_graph[f.rel.to._meta].append(f)
-
         for model in all_models:
             # Set the relation_tree using the internal __dict__. In this way
             # we avoid calling the cached property. In attribute lookup,
@@ -746,29 +739,22 @@ class Options(object):
         """
         return self._get_fields(include_parents=include_parents, include_hidden=include_hidden)
 
-    def _get_fields(self, forward=True, reverse=True, include_parents=True, include_hidden=False,
-                    export_ordered_set=False):
+    def _get_fields(self, forward=True, reverse=True, include_parents=True, include_hidden=False):
         # This helper function is used to allow recursion in ``get_fields()``
         # implementation and to provide a fast way for Django's internals to
         # access specific subsets of fields.
 
         # Creates a cache key composed of all arguments
-        cache_key = (forward, reverse, include_parents, include_hidden, export_ordered_set)
+        cache_key = (forward, reverse, include_parents, include_hidden)
         try:
-            # In order to avoid list manipulation. Always return a shallow copy
-            # of the results.
             return self._get_fields_cache[cache_key]
         except KeyError:
             pass
 
-        # Using an OrderedDict preserves the order of insertion. This is
-        # important when displaying a ModelForm or the contrib.admin panel
-        # and no specific ordering is provided.
-        fields = OrderedDict()
+        fields = []
         options = {
             'include_parents': include_parents,
             'include_hidden': include_hidden,
-            'export_ordered_set': True,
         }
 
         # Abstract models cannot hold reverse fields.
@@ -778,59 +764,50 @@ class Options(object):
                 # Recursively call _get_fields() on each parent, with the same
                 # options provided in this call.
                 for parent in self.parents:
-                    for obj, _ in six.iteritems(parent._meta._get_fields(forward=False, **options)):
+                    for obj in parent._meta._get_fields(forward=False, **options):
                         if obj.many_to_many:
                             # In order for a reverse ManyToManyRel object to be
                             # valid, its creation counter must be > 0 and must
                             # be in the parent list.
                             if not (obj.field.creation_counter < 0 and obj.related_model not in parent_list):
-                                fields[obj] = True
+                                fields.append(obj)
 
                         elif not ((obj.field.creation_counter < 0 or obj.field.rel.parent_link)
                                   and obj.related_model not in parent_list):
-                            fields[obj] = True
+                            fields.append(obj)
 
             # Tree is computed once and cached until the app cache is expired.
             # It is composed of a list of fields pointing to the current model
             # from other models. If the model is a proxy model, then we also
             # add the concrete model.
-            all_fields = (
-                self._relation_tree if not self.proxy else
-                chain(self._relation_tree, self.concrete_model._meta._relation_tree)
-            )
+            # all_fields = (
+            #     self._relation_tree if not self.proxy else
+            #     chain(self._relation_tree, self.concrete_model._meta._relation_tree)
+            # )
 
             # Pull out all related objects from forward fields
-            for field in (f.rel for f in all_fields):
-                # If hidden fields should be included or the relation is not
-                # intentionally hidden, add to the fields dict.
-                if include_hidden or not field.hidden:
-                    fields[field] = True
+            # for field in (f.rel for f in all_fields):
+            # If hidden fields should be included or the relation is not
+            # intentionally hidden, add to the fields dict.
+            #    if include_hidden or not field.hidden:
+            #        fields[field] = True
         if forward:
             if include_parents:
                 for parent in self.parents:
                     # Add the forward fields of each parent.
-                    fields.update(parent._meta._get_fields(reverse=False, **options))
-            fields.update(
-                (field, True,)
-                for field in chain(self.local_fields, self.local_many_to_many)
+                    fields.extend(parent._meta._get_fields(reverse=False, **options))
+            fields.extend(
+                field for field in chain(self.local_fields, self.local_many_to_many)
             )
 
-        if not export_ordered_set:
-            # By default, fields contains field instances as keys and all
-            # possible names if the field instance as values. When
-            # _get_fields() is called, we only want to return field instances,
-            # so we just preserve the keys.
-            fields = list(fields.keys())
-
-            # Virtual fields are not inheritable, therefore they are inserted
-            # only when the recursive _get_fields() call comes to an end.
-            if forward:
-                fields.extend(self.virtual_fields)
-            fields = make_immutable_fields_list("get_fields()", fields)
-
-        # Store result into cache for later access
-        self._get_fields_cache[cache_key] = fields
-
+        # Virtual fields are not inheritable, therefore they are inserted
+        # only when the recursive _get_fields() call comes to an end.
+        if forward:
+            fields.extend(self.virtual_fields)
         # In order to avoid list manipulation. Always
-        # return a shallow copy of the results
+        # cache an immutable list of fields.
+        if not include_hidden:
+            fields = [f for f in fields if not f.hidden]
+        fields = make_immutable_fields_list("get_fields()", fields)
+        self._get_fields_cache[cache_key] = fields
         return fields

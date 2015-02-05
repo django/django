@@ -183,7 +183,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
     ignored = []
     opts = model._meta
     # Avoid circular import
-    from django.db.models.fields import Field as ModelField
+    from django.db.models.fields import BaseField as ModelField
     sortable_virtual_fields = [f for f in opts.virtual_fields
                                if isinstance(f, ModelField)]
     for f in sorted(chain(opts.concrete_fields, sortable_virtual_fields, opts.many_to_many)):

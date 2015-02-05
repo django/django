@@ -1,12 +1,13 @@
+from django.conf import settings
 from django.db.models.fields.related import (
     RECURSIVE_RELATIONSHIP_CONSTANT, ManyToManyField, ManyToManyRel,
-    RelatedField, ReverseManyRelatedObjectsDescriptor,
+    RelationField, ReverseManyRelatedObjectsDescriptor,
     create_many_to_many_intermediary_model,
 )
 from django.utils.functional import curry
 
 
-class CustomManyToManyField(RelatedField):
+class CustomManyToManyField(RelationField):
     """
     Ticket #24104 - Need to have a custom ManyToManyField,
     which is not an inheritor of ManyToManyField.
@@ -30,6 +31,7 @@ class CustomManyToManyField(RelatedField):
         )
         self.swappable = swappable
         self.db_table = kwargs.pop('db_table', None)
+        self.db_tablespace = kwargs.pop('db_tablespace', settings.DEFAULT_TABLESPACE)
         if kwargs['rel'].through is not None:
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
         super(CustomManyToManyField, self).__init__(**kwargs)
@@ -47,6 +49,8 @@ class CustomManyToManyField(RelatedField):
         return 'ManyToManyField'
 
     # Copy those methods from ManyToManyField because they don't call super() internally
+    db_type = ManyToManyField.__dict__['db_type']
+    db_parameters = ManyToManyField.__dict__['db_parameters']
     contribute_to_related_class = ManyToManyField.__dict__['contribute_to_related_class']
     _get_m2m_attr = ManyToManyField.__dict__['_get_m2m_attr']
     _get_m2m_reverse_attr = ManyToManyField.__dict__['_get_m2m_reverse_attr']

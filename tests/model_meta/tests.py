@@ -3,7 +3,7 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.core.exceptions import FieldDoesNotExist
-from django.db.models.fields import CharField, Field, related
+from django.db.models.fields import BaseField, CharField, related
 from django.db.models.options import EMPTY_RELATION_TREE, IMMUTABLE_WARNING
 from django.test import TestCase
 
@@ -27,7 +27,7 @@ class OptionsBaseTests(TestCase):
         return None if model == current_model else model
 
     def _details(self, current_model, relation):
-        direct = isinstance(relation, Field) or isinstance(relation, GenericForeignKey)
+        direct = isinstance(relation, BaseField) or isinstance(relation, GenericForeignKey)
         model = relation.model._meta.concrete_model
         if model == current_model:
             model = None
@@ -57,7 +57,7 @@ class DataTests(OptionsBaseTests):
             self.assertEqual([f.attname for f in fields], expected_result)
 
     def test_local_fields(self):
-        is_data_field = lambda f: isinstance(f, Field) and not isinstance(f, related.ManyToManyField)
+        is_data_field = lambda f: isinstance(f, BaseField) and not isinstance(f, related.ManyToManyField)
 
         for model, expected_result in TEST_RESULTS['local_fields'].items():
             fields = model._meta.local_fields

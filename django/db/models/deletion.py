@@ -14,7 +14,7 @@ class ProtectedError(IntegrityError):
 
 
 def CASCADE(collector, field, sub_objs, using):
-    collector.collect(sub_objs, source=field.rel.to,
+    collector.collect(sub_objs, source=field.model,
                       source_attr=field.name, nullable=field.null)
     if field.null and not connections[using].features.can_defer_constraint_checks:
         collector.add_field_update(field, None, sub_objs)
@@ -63,10 +63,10 @@ def get_candidate_relations_to_delete(opts):
     )
     # The candidate relations are the ones that come from N-1 and 1-1 relations.
     # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
-    return (
-        f for f in candidate_model_fields
-        if f.auto_created and not f.concrete and (f.one_to_one or f.many_to_one)
-    )
+    return [
+        f.remote_field for f in candidate_model_fields
+        if f.auto_created and not f.concrete and (f.many_to_one or f.one_to_many)
+    ]
 
 
 class Collector(object):
@@ -136,7 +136,7 @@ class Collector(object):
         skipping parent -> child -> parent chain preventing fast delete of
         the child.
         """
-        if from_field and from_field.rel.on_delete is not CASCADE:
+        if from_field and from_field.on_delete is not CASCADE:
             return False
         if not (hasattr(objs, 'model') and hasattr(objs, '_raw_delete')):
             return False
@@ -148,12 +148,12 @@ class Collector(object):
         # The use of from_field comes from the need to avoid cascade back to
         # parent when parent delete is cascading to child.
         opts = model._meta
-        if any(link != from_field for link in opts.concrete_model._meta.parents.values()):
+        if from_field and any(link != from_field.remote_field for link in opts.concrete_model._meta.parents.values()):
             return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
         for related in get_candidate_relations_to_delete(opts):
-            if related.field.rel.on_delete is not DO_NOTHING:
+            if related.on_delete is not DO_NOTHING:
                 return False
         for field in model._meta.virtual_fields:
             if hasattr(field, 'bulk_related_objects'):
@@ -216,17 +216,16 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-            for related in get_candidate_relations_to_delete(model._meta):
-                field = related.field
-                if field.rel.on_delete == DO_NOTHING:
+            for field in get_candidate_relations_to_delete(model._meta):
+                if field.on_delete == DO_NOTHING:
                     continue
                 batches = self.get_del_batches(new_objs, field)
                 for batch in batches:
-                    sub_objs = self.related_objects(related, batch)
+                    sub_objs = self.related_objects(field, batch)
                     if self.can_fast_delete(sub_objs, from_field=field):
                         self.fast_deletes.append(sub_objs)
                     elif sub_objs:
-                        field.rel.on_delete(self, field, sub_objs, self.using)
+                        field.on_delete(self, field, sub_objs, self.using)
             for field in model._meta.virtual_fields:
                 if hasattr(field, 'bulk_related_objects'):
                     # Its something like generic foreign key.
@@ -236,13 +235,13 @@ class Collector(object):
                                  source_attr=field.rel.related_name,
                                  nullable=True)
 
-    def related_objects(self, related, objs):
+    def related_objects(self, field, objs):
         """
         Gets a QuerySet of objects related to ``objs`` via the relation ``related``.
 
         """
-        return related.related_model._base_manager.using(self.using).filter(
-            **{"%s__in" % related.field.name: objs}
+        return field.model._base_manager.using(self.using).filter(
+            **{"%s__in" % field.name: objs}
         )
 
     def instances_with_model(self):

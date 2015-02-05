@@ -251,7 +251,9 @@ class ModelState(object):
         # Deconstruct the fields
         fields = []
         for field in model._meta.local_fields:
-            if getattr(field, "rel", None) and exclude_rels:
+            if getattr(field, 'auto_created', False):
+                continue
+            if getattr(field, "remote_field", None) and exclude_rels:
                 continue
             if isinstance(field, OrderWrt):
                 continue

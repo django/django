@@ -164,7 +164,7 @@ class BaseDatabaseSchemaEditor(object):
         elif field.unique:
             sql += " UNIQUE"
         # Optionally add the tablespace if it's an implicitly indexed column
-        tablespace = field.db_tablespace or model._meta.db_tablespace
+        tablespace = model._meta.db_tablespace
         if tablespace and self.connection.features.supports_tablespaces and field.unique:
             sql += " %s" % self.connection.ops.tablespace_sql(tablespace, inline=True)
         # Return the sql
@@ -229,9 +229,9 @@ class BaseDatabaseSchemaEditor(object):
         params = []
         for field in model._meta.local_fields:
             # SQL
-            definition, extra_params = self.column_sql(model, field)
-            if definition is None:
+            if field.concrete is False:
                 continue
+            definition, extra_params = self.column_sql(model, field)
             # Check constraints can go on the column SQL here
             db_params = field.db_parameters(connection=self.connection)
             if db_params['check']:
@@ -286,8 +286,8 @@ class BaseDatabaseSchemaEditor(object):
 
         # Make M2M tables
         for field in model._meta.local_many_to_many:
-            if field.rel.through._meta.auto_created:
-                self.create_model(field.rel.through)
+            if not field.auto_created and field.through._meta.auto_created:
+                self.create_model(field.through)
 
     def delete_model(self, model):
         """
@@ -847,7 +847,7 @@ class BaseDatabaseSchemaEditor(object):
             return []
         output = []
         for field in model._meta.local_fields:
-            if field.db_index and not field.unique:
+            if field.concrete and field.db_index and not field.unique:
                 output.append(self._create_index_sql(model, [field], suffix=""))
 
         for field_names in model._meta.index_together:

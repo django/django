@@ -1019,7 +1019,7 @@ class Query(object):
         """
         Checks the type of object passed to query relations.
         """
-        if field.rel:
+        if field.is_relation:
             # QuerySets implement is_compatible_query_object_type() to
             # determine compatibility with the given field.
             if hasattr(value, 'is_compatible_query_object_type'):
@@ -1141,7 +1141,7 @@ class Query(object):
         used_joins = set(used_joins).union(set(join_list))
         targets, alias, join_list = self.trim_joins(sources, join_list, path)
 
-        if field.rel:
+        if field.is_relation:
             # No support for transforms for relational fields
             assert len(lookups) == 1
             lookup_class = field.get_lookup(lookups[0])
@@ -1764,6 +1764,14 @@ class Query(object):
         """
         Callback used by get_deferred_field_names().
         """
+        non_supported_fields = [f for f in fields if f.many_to_many or f.many_to_one]
+        if non_supported_fields:
+            if len(non_supported_fields) == 1:
+                field_str = "Field"
+            else:
+                field_str = "Fields"
+            raise FieldError("%s %s doesn't support select_related()" %
+                             (field_str, ', '.join(f.name for f in non_supported_fields)))
         target[model] = {f.attname for f in fields}
 
     def set_aggregate_mask(self, names):
@@ -1872,8 +1880,7 @@ class Query(object):
                 contains_louter = True
             alias = lookup_tables[trimmed_paths]
             self.unref_alias(alias)
-        # The path.join_field is a Rel, lets get the other side's field
-        join_field = path.join_field.field
+        join_field = path.join_field
         # Build the filter prefix.
         paths_in_prefix = trimmed_paths
         trimmed_prefix = []
@@ -1883,24 +1890,25 @@ class Query(object):
             trimmed_prefix.append(name)
             paths_in_prefix -= len(path)
         trimmed_prefix.append(
-            join_field.foreign_related_fields[0].name)
+            join_field.local_related_fields[0].name)
         trimmed_prefix = LOOKUP_SEP.join(trimmed_prefix)
         # Lets still see if we can trim the first join from the inner query
         # (that is, self). We can't do this for LEFT JOINs because we would
         # miss those rows that have nothing on the outer side.
         if self.alias_map[lookup_tables[trimmed_paths + 1]].join_type != LOUTER:
-            select_fields = [r[0] for r in join_field.related_fields]
+            select_fields = join_field.foreign_related_fields
             select_alias = lookup_tables[trimmed_paths + 1]
             self.unref_alias(lookup_tables[trimmed_paths])
+            # TODO: this is likely wrong as is.
             extra_restriction = join_field.get_extra_restriction(
-                self.where_class, None, lookup_tables[trimmed_paths + 1])
+                self.where_class, lookup_tables[trimmed_paths + 1], None)
             if extra_restriction:
                 self.where.add(extra_restriction, AND)
         else:
             # TODO: It might be possible to trim more joins from the start of the
             # inner query if it happens to have a longer join chain containing the
             # values in select_fields. Lets punt this one for now.
-            select_fields = [r[1] for r in join_field.related_fields]
+            select_fields = join_field.local_related_fields
             select_alias = lookup_tables[trimmed_paths]
         # The found starting point is likely a Join instead of a BaseTable reference.
         # But the first entry in the query's FROM clause must not be a JOIN.

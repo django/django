@@ -132,7 +132,7 @@ class SelectRelatedTests(TestCase):
 
     def test_single_related_field(self):
         with self.assertNumQueries(1):
-            species = Species.objects.select_related('genus__name')
+            species = Species.objects.select_related('genus')
             names = [s.genus.name for s in species]
             self.assertEqual(sorted(names), ['Amanita', 'Drosophila', 'Homo', 'Pisum'])
 

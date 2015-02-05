@@ -7,12 +7,15 @@ class CurrentTranslation(models.ForeignObject):
     """
     # Avoid validation
     requires_unique_target = False
+    many_to_one = True
+    one_to_one = False
+    many_to_many = False
+    one_to_many = False
 
     def __init__(self, to, from_fields, to_fields, **kwargs):
         # Disable reverse relation
         kwargs['related_name'] = '+'
         # Set unique to enable model cache.
-        kwargs['unique'] = True
         super(CurrentTranslation, self).__init__(to, from_fields, to_fields, **kwargs)
 
 

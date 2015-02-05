@@ -1,6 +1,5 @@
 import re
 import warnings
-from itertools import chain
 
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
@@ -624,12 +623,17 @@ class SQLCompiler(object):
         connections to the root model).
         """
         def _get_field_choices():
-            direct_choices = (f.name for f in opts.fields if f.is_relation)
-            reverse_choices = (
-                f.field.related_query_name()
-                for f in opts.related_objects if f.field.unique
+            # We can only descend to relations which are one_to_many or one_to_one,
+            # we don't descent along parent link (as that is done automatically as
+            # a side effect of selecting the parent model), and we require the relation
+            # to be non-hidden. Finally, it must have a model (that is, GenericForeignKey
+            # for example can't be select_related, as it doesn't have a single target
+            # model).
+            return (
+                f.name for f in opts.get_fields()
+                if f.is_relation and (f.one_to_many or f.one_to_one) and
+                not f.parent_link and not f.hidden and f.related_model
             )
-            return chain(direct_choices, reverse_choices)
 
         related_klass_infos = []
         if not restricted and self.query.max_depth and cur_depth > self.query.max_depth:
@@ -654,9 +658,8 @@ class SQLCompiler(object):
         def get_related_klass_infos(klass_info, related_klass_infos):
             klass_info['related_klass_infos'] = related_klass_infos
 
-        for f in opts.fields:
+        for f in opts.get_fields():
             field_model = f.model._meta.concrete_model
-            fields_found.add(f.name)
 
             if restricted:
                 next = requested.get(f.name, {})
@@ -677,62 +680,30 @@ class SQLCompiler(object):
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):
                 continue
+            fields_found.add(f.name)
+            from_parent = f.remote_field and f.remote_field.parent_link and issubclass(f.to, opts.model)
             klass_info = {
-                'model': f.rel.to,
+                'model': f.to,
                 'field': f,
-                'reverse': False,
-                'from_parent': False,
+                'from_parent': from_parent,
             }
             related_klass_infos.append(klass_info)
             select_fields = []
             _, _, _, joins, _ = self.query.setup_joins(
                 [f.name], opts, root_alias)
             alias = joins[-1]
-            columns = self.get_default_columns(start_alias=alias, opts=f.rel.to._meta)
+            columns = self.get_default_columns(
+                start_alias=alias, opts=f.to._meta,
+                from_parent=opts.model if from_parent else None)
             for col in columns:
                 select_fields.append(len(select))
                 select.append((col, None))
             klass_info['select_fields'] = select_fields
             next_klass_infos = self.get_related_selections(
-                select, f.rel.to._meta, alias, cur_depth + 1, next, restricted)
+                select, f.to._meta, alias, cur_depth + 1, next, restricted)
             get_related_klass_infos(klass_info, next_klass_infos)
 
         if restricted:
-            related_fields = [
-                (o.field, o.related_model)
-                for o in opts.related_objects
-                if o.field.unique and not o.many_to_many
-            ]
-            for f, model in related_fields:
-                if not select_related_descend(f, restricted, requested,
-                                              only_load.get(model), reverse=True):
-                    continue
-
-                related_field_name = f.related_query_name()
-                fields_found.add(related_field_name)
-
-                _, _, _, joins, _ = self.query.setup_joins([related_field_name], opts, root_alias)
-                alias = joins[-1]
-                from_parent = issubclass(model, opts.model)
-                klass_info = {
-                    'model': model,
-                    'field': f,
-                    'reverse': True,
-                    'from_parent': from_parent,
-                }
-                related_klass_infos.append(klass_info)
-                select_fields = []
-                columns = self.get_default_columns(
-                    start_alias=alias, opts=model._meta, from_parent=opts.model)
-                for col in columns:
-                    select_fields.append(len(select))
-                    select.append((col, None))
-                klass_info['select_fields'] = select_fields
-                next = requested.get(f.related_query_name(), {})
-                next_klass_infos = self.get_related_selections(
-                    select, model._meta, alias, cur_depth + 1,
-                    next, restricted)
-                get_related_klass_infos(klass_info, next_klass_infos)
             fields_not_found = set(requested.keys()).difference(fields_found)
             if fields_not_found:
                 invalid_fields = ("'%s'" % s for s in fields_not_found)
