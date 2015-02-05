@@ -302,6 +302,11 @@ Forms
 * You can now :ref:`specify keyword arguments <custom-formset-form-kwargs>`
   that you want to pass to the constructor of forms in a formset.
 
+* :class:`~django.forms.CharField` now accepts a
+  :attr:`~django.forms.CharField.strip` argument to strip input data of leading
+  and trailing whitespace.  As this defaults to ``True`` this is different
+  behavior from previous releases.
+
 Generic Views
 ^^^^^^^^^^^^^
 
@@ -809,6 +814,9 @@ Miscellaneous
   framework) used to output any characters it received. Now if the content to
   be serialized contains any control characters not allowed in the XML 1.0
   standard, the serialization will fail with a :exc:`ValueError`.
+* :class:`~django.forms.CharField` now strips input of leading and trailing
+  whitespace by default. This can be disabled by setting the new ``strip``
+  argument to ``False``.
 
 .. _deprecated-features-1.9:
 
