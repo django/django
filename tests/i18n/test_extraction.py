@@ -17,6 +17,7 @@ from django.core.management.commands.makemessages import \
     Command as MakeMessagesCommand
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase, mock, override_settings
+from django.test.testcases import SerializeMixin
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import six
 from django.utils._os import upath
@@ -30,7 +31,13 @@ this_directory = os.path.dirname(upath(__file__))
 
 
 @skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
-class ExtractorTests(SimpleTestCase):
+class ExtractorTests(SerializeMixin, SimpleTestCase):
+
+    # makemessages scans the current working directory and writes in the
+    # locale subdirectory. There aren't any options to control this. As a
+    # consequence tests can't run in parallel. Since i18n tests run in less
+    # than 4 seconds, serializing them with SerializeMixin is acceptable.
+    lockfile = __file__
 
     test_dir = os.path.abspath(os.path.join(this_directory, 'commands'))
 
@@ -610,9 +617,6 @@ class KeepPotFileExtractorTests(ExtractorTests):
 
     POT_FILE = 'locale/django.pot'
 
-    def setUp(self):
-        super(KeepPotFileExtractorTests, self).setUp()
-
     def tearDown(self):
         super(KeepPotFileExtractorTests, self).tearDown()
         os.chdir(self.test_dir)
@@ -646,6 +650,7 @@ class MultipleLocaleExtractionTests(ExtractorTests):
     LOCALES = ['pt', 'de', 'ch']
 
     def tearDown(self):
+        super(MultipleLocaleExtractionTests, self).tearDown()
         os.chdir(self.test_dir)
         for locale in self.LOCALES:
             try:
@@ -677,7 +682,6 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
 
     def setUp(self):
         super(ExcludedLocaleExtractionTests, self).setUp()
-
         os.chdir(self.test_dir)  # ExtractorTests.tearDown() takes care of restoring.
         shutil.copytree('canned_locale', 'locale')
         self._set_times_for_all_po_files()
@@ -719,7 +723,7 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
 class CustomLayoutExtractionTests(ExtractorTests):
 
     def setUp(self):
-        self._cwd = os.getcwd()
+        super(CustomLayoutExtractionTests, self).setUp()
         self.test_dir = os.path.join(this_directory, 'project_dir')
 
     def test_no_locale_raises(self):
