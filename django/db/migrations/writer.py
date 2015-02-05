@@ -43,6 +43,7 @@ class CleanWriter(object):
     def __init__(self, words_per_line=79):
         self.words_per_line = words_per_line - 4
         self._breakable = {'commas': None, 'parens': None}
+        self._mapping = {'commas': ', ', 'parens': '( '}
 #
     def _clean_line(self, line, space):
         # break into chunks wherever it's possible to start a new line
@@ -89,8 +90,8 @@ class CleanWriter(object):
             last_part   = chunks[break_point:]
             if len(last_part) == 0 or len(first_part) == 0: continue
 #
-            try_first   = self._fast_reconstruct(first_part)
-            try_last    = self._fast_reconstruct(last_part)
+            try_first   = self._fast_reconstruct(first_part, self._mapping[chunk_name])
+            try_last    = self._fast_reconstruct(last_part, self._mapping[chunk_name])
 #
             if self._is_line_dirty(try_first): continue
             elif self._is_line_dirty(try_last):
