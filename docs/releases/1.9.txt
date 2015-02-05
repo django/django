@@ -1055,6 +1055,9 @@ Miscellaneous
   changed. They used to be ``(old_names, mirrors)`` tuples. Now they're just
   the first item, ``old_names``.
 
+* By default :class:`~django.test.LiveServerTestCase` attempts to find an
+  available port in the 8081-8179 range instead of just trying port 8081.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
