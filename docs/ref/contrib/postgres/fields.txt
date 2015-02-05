@@ -40,7 +40,7 @@ ArrayField
             class ChessBoard(models.Model):
                 board = ArrayField(
                     ArrayField(
-                        CharField(max_length=10, blank=True, null=True),
+                        CharField(max_length=10, blank=True),
                         size=8),
                     size=8)
 
