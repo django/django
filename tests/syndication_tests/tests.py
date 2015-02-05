@@ -93,7 +93,6 @@ class SyndicationFeedTest(FeedTestCase):
             'link': 'http://example.com/blog/',
             'language': 'en',
             'lastBuildDate': last_build_date,
-            #'atom:link': '',
             'ttl': '600',
             'copyright': 'Copyright (c) 2007, Sally Smith',
         })

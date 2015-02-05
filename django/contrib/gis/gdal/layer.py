@@ -25,7 +25,6 @@ from django.utils.six.moves import range
 class Layer(GDALBase):
     "A class that wraps an OGR Layer, needs to be instantiated from a DataSource object."
 
-    #### Python 'magic' routines ####
     def __init__(self, layer_ptr, ds):
         """
         Initializes on an OGR C pointer to the Layer and the `DataSource` object
@@ -94,7 +93,7 @@ class Layer(GDALBase):
         # Should have returned a Feature, raise an OGRIndexError.
         raise OGRIndexError('Invalid feature id: %s.' % feat_id)
 
-    #### Layer properties ####
+    # #### Layer properties ####
     @property
     def extent(self):
         "Returns the extent (an Envelope) of this layer."
@@ -188,7 +187,7 @@ class Layer(GDALBase):
 
     spatial_filter = property(_get_spatial_filter, _set_spatial_filter)
 
-    #### Layer Methods ####
+    # #### Layer Methods ####
     def get_fields(self, field_name):
         """
         Returns a list containing the given field name for every Feature

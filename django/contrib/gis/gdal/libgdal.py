@@ -66,7 +66,7 @@ def std_call(func):
     else:
         return lgdal[func]
 
-#### Version-information functions. ####
+# #### Version-information functions. ####
 
 # Returns GDAL library version information with the given key.
 _version_info = std_call('GDALVersionInfo')

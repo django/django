@@ -21,7 +21,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 class GeoQuerySet(QuerySet):
     "The Geographic QuerySet."
 
-    ### GeoQuerySet Methods ###
+    # ### GeoQuerySet Methods ###
     def area(self, tolerance=0.05, **kwargs):
         """
         Returns the area of the geographic field in an `area` attribute on
@@ -426,7 +426,7 @@ class GeoQuerySet(QuerySet):
         )
         return self._spatial_aggregate(aggregates.Union, **kwargs)
 
-    ### Private API -- Abstracted DRY routines. ###
+    # ### Private API -- Abstracted DRY routines. ###
     def _spatial_setup(self, att, desc=None, field_name=None, geo_field_type=None):
         """
         Performs set up for executing the spatial function.

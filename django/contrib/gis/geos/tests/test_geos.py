@@ -464,7 +464,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_memory_hijinks(self):
         "Testing Geometry __del__() on rings and polygons."
-        #### Memory issues with rings and polygons
+        # #### Memory issues with rings and poly
 
         # These tests are needed to ensure sanity with writable geometries.
 
@@ -659,7 +659,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_mutable_geometries(self):
         "Testing the mutability of Polygons and Geometry Collections."
-        ### Testing the mutability of Polygons ###
+        # ### Testing the mutability of Polygons ###
         for p in self.geometries.polygons:
             poly = fromstr(p.wkt)
 
@@ -679,7 +679,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(poly.exterior_ring, new_shell)
             self.assertEqual(poly[0], new_shell)
 
-        ### Testing the mutability of Geometry Collections
+        # ### Testing the mutability of Geometry Collections
         for tg in self.geometries.multipoints:
             mp = fromstr(tg.wkt)
             for i in range(len(mp)):
@@ -717,11 +717,11 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Extreme (!!) __setitem__ -- no longer works, have to detect
         # in the first object that __setitem__ is called in the subsequent
         # objects -- maybe mpoly[0, 0, 0] = (3.14, 2.71)?
-        #mpoly[0][0][0] = (3.14, 2.71)
-        #self.assertEqual((3.14, 2.71), mpoly[0][0][0])
+        # mpoly[0][0][0] = (3.14, 2.71)
+        # self.assertEqual((3.14, 2.71), mpoly[0][0][0])
         # Doing it more slowly..
-        #self.assertEqual((3.14, 2.71), mpoly[0].shell[0])
-        #del mpoly
+        # self.assertEqual((3.14, 2.71), mpoly[0].shell[0])
+        # del mpoly
 
     def test_threed(self):
         "Testing three-dimensional geometries."

@@ -23,7 +23,7 @@ def ptr_byref(args, offset=-1):
     return args[offset]._obj
 
 
-### String checking Routines ###
+# ### String checking Routines ###
 def check_const_string(result, func, cargs, offset=None, cpl=False):
     """
     Similar functionality to `check_string`, but does not free the pointer.
@@ -64,17 +64,17 @@ def check_string(result, func, cargs, offset=-1, str_result=False):
         lgdal.VSIFree(ptr)
     return s
 
-### DataSource, Layer error-checking ###
+# ### DataSource, Layer error-checking ###
 
 
-### Envelope checking ###
+# ### Envelope checking ###
 def check_envelope(result, func, cargs, offset=-1):
     "Checks a function that returns an OGR Envelope by reference."
     env = ptr_byref(cargs, offset)
     return env
 
 
-### Geometry error-checking routines ###
+# ### Geometry error-checking routines ###
 def check_geom(result, func, cargs):
     "Checks a function that returns a geometry."
     # OGR_G_Clone may return an integer, even though the
@@ -93,7 +93,7 @@ def check_geom_offset(result, func, cargs, offset=-1):
     return check_geom(geom, func, cargs)
 
 
-### Spatial Reference error-checking routines ###
+# ### Spatial Reference error-checking routines ###
 def check_srs(result, func, cargs):
     if isinstance(result, six.integer_types):
         result = c_void_p(result)
@@ -102,7 +102,7 @@ def check_srs(result, func, cargs):
     return result
 
 
-### Other error-checking routines ###
+# ### Other error-checking routines ###
 def check_arg_errcode(result, func, cargs, cpl=False):
     """
     The error code is returned in the last argument, by reference.

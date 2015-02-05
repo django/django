@@ -52,7 +52,6 @@ from django.utils.six.moves import range
 class DataSource(GDALBase):
     "Wraps an OGR Data Source object."
 
-    #### Python 'magic' routines ####
     def __init__(self, ds_input, ds_driver=False, write=False, encoding='utf-8'):
         # The write flag.
         if write:
