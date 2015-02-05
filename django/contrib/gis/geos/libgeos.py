@@ -87,7 +87,7 @@ def error_h(fmt, lst):
     logger.error('GEOS_ERROR: %s\n' % err_msg)
 error_h = ERRORFUNC(error_h)
 
-#### GEOS Geometry C data structures, and utility functions. ####
+# #### GEOS Geometry C data structures, and utility functions. ####
 
 
 # Opaque GEOS geometry structures, used for GEOM_PTR and CS_PTR

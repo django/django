@@ -67,7 +67,7 @@ class Polygon(GEOSGeometry):
                                     (x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
         return Polygon(((x0, y0), (x0, y1), (x1, y1), (x1, y0), (x0, y0)))
 
-    ### These routines are needed for list-like operation w/ListMixin ###
+    # ### These routines are needed for list-like operation w/ListMixin ###
     def _create_polygon(self, length, items):
         # Instantiate LinearRing objects if necessary, but don't clone them yet
         # _construct_ring will throw a TypeError if a parameter isn't a valid ring
@@ -144,7 +144,7 @@ class Polygon(GEOSGeometry):
     _set_single = GEOSGeometry._set_single_rebuild
     _assign_extended_slice = GEOSGeometry._assign_extended_slice_rebuild
 
-    #### Polygon Properties ####
+    # #### Polygon Properties ####
     @property
     def num_interior_rings(self):
         "Returns the number of interior rings."

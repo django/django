@@ -129,7 +129,7 @@ class Point(GEOSGeometry):
     y = property(get_y, set_y)
     z = property(get_z, set_z)
 
-    ### Tuple setting and retrieval routines. ###
+    # ### Tuple setting and retrieval routines. ###
     def get_coords(self):
         "Returns a tuple of the point."
         return self._cs.tuple

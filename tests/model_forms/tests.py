@@ -961,10 +961,10 @@ class ModelToDictTests(TestCase):
         with self.assertNumQueries(0):
             d = model_to_dict(art)
 
-        #Ensure all many-to-many categories appear in model_to_dict
+        # Ensure all many-to-many categories appear in model_to_dict
         for c in categories:
             self.assertIn(c.pk, d['categories'])
-        #Ensure many-to-many relation appears as a list
+        # Ensure many-to-many relation appears as a list
         self.assertIsInstance(d['categories'], list)
 
 

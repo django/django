@@ -13,7 +13,6 @@ free.argtypes = [c_void_p]
 free.restype = None
 
 
-### ctypes error checking routines ###
 def last_arg_byref(args):
     "Returns the last C argument's value by reference."
     return args[-1]._obj.value

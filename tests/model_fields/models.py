@@ -168,7 +168,7 @@ class VerboseNameField(models.Model):
     field10 = models.FilePathField("verbose field10")
     field11 = models.FloatField("verbose field11")
     # Don't want to depend on Pillow in this test
-    #field_image = models.ImageField("verbose field")
+    # field_image = models.ImageField("verbose field")
     field12 = models.IntegerField("verbose field12")
     field13 = models.GenericIPAddressField("verbose field13", protocol="ipv4")
     field14 = models.NullBooleanField("verbose field14")

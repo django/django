@@ -50,7 +50,7 @@ class GeometryCollection(GEOSGeometry):
         "Returns the number of geometries in this Collection."
         return self.num_geom
 
-    ### Methods for compatibility with ListMixin ###
+    # ### Methods for compatibility with ListMixin ###
     def _create_collection(self, length, items):
         # Creating the geometry pointer array.
         geoms = get_pointer_arr(length)

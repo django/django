@@ -11,7 +11,6 @@ class LineString(GEOSGeometry):
     _init_func = capi.create_linestring
     _minlength = 2
 
-    #### Python 'magic' routines ####
     def __init__(self, *args, **kwargs):
         """
         Initializes on the given sequence -- may take lists, tuples, NumPy arrays
@@ -116,7 +115,7 @@ class LineString(GEOSGeometry):
         if dim not in (2, 3):
             raise TypeError('Dimension mismatch.')
 
-    #### Sequence Properties ####
+    # #### Sequence Properties ####
     @property
     def tuple(self):
         "Returns a tuple version of the geometry from the coordinate sequence."

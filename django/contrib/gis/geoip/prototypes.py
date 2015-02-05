@@ -3,7 +3,7 @@ from ctypes import POINTER, Structure, c_char_p, c_float, c_int, string_at
 from django.contrib.gis.geoip.libgeoip import free, lgeoip
 
 
-#### GeoIP C Structure definitions ####
+# #### GeoIP C Structure definitions ####
 
 class GeoIPRecord(Structure):
     _fields_ = [('country_code', c_char_p),
@@ -37,7 +37,7 @@ class GeoIPTag(Structure):
 RECTYPE = POINTER(GeoIPRecord)
 DBTYPE = POINTER(GeoIPTag)
 
-#### ctypes function prototypes ####
+# #### ctypes function prototypes ####
 
 # GeoIP_lib_version appeared in version 1.4.7.
 if hasattr(lgeoip, 'GeoIP_lib_version'):
