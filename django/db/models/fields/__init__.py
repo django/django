@@ -2366,6 +2366,11 @@ class UUIDField(Field):
         kwargs['max_length'] = 32
         super(UUIDField, self).__init__(**kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(UUIDField, self).deconstruct()
+        del kwargs['max_length']
+        return name, path, args, kwargs
+
     def get_internal_type(self):
         return "UUIDField"
 

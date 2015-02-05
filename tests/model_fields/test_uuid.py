@@ -35,6 +35,14 @@ class TestSaveLoad(TestCase):
         self.assertEqual(loaded.field, None)
 
 
+class TestMigrations(TestCase):
+
+    def test_deconstruct(self):
+        field = models.UUIDField()
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(kwargs, {})
+
+
 class TestQuerying(TestCase):
     def setUp(self):
         self.objs = [
