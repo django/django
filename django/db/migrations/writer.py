@@ -41,7 +41,7 @@ class SettingsReference(str):
 class CleanWriter(object):
 
     def __init__(self, chars_per_line=79):
-        self.chars_per_line = chars_per_line - 2 # because the last char is one of the unaccounted-for  '(' or ',' token used when the line is shifted.
+        self.chars_per_line = chars_per_line - 2  # because the last char is one of the unaccounted-for  '(' or ',' token used when the line is shifted.
         self._breakable_chunks = {'commas': None, 'parens': None}
         self._joining_mapping = {'commas': ', ', 'parens': '( '}
 
@@ -58,7 +58,7 @@ class CleanWriter(object):
         possible_by_managing_parens = self._finder(chunks_paren, 'parens')
         if possible_by_managing_parens[0]:
             _ = possible_by_managing_parens
-            return "(\n ".join([ _[1], _[2]])
+            return "(\n ".join([_[1], _[2]])
 
         bp_comma = self._breakable_chunks['commas']
         if bp_comma is not None:
@@ -110,7 +110,7 @@ class CleanWriter(object):
     def _is_line_dirty(self, blob):
         return len(blob) > self.chars_per_line
 
-    def _fast_reconstruct(self, chunks, joiner = ", "):
+    def _fast_reconstruct(self, chunks, joiner=", "):
         return ''.join([self.indent_spaces, joiner.join(chunks)])
 
     def clean(self, line):
