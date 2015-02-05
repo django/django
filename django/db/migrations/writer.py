@@ -39,27 +39,27 @@ class SettingsReference(str):
 
 
 class CleanWriter(object):
-#
+
     def __init__(self, chars_per_line=79):
         self.chars_per_line = chars_per_line - 2 # because the last char is one of the unaccounted-for  '(' or ',' token used when the line is shifted.
         self._breakable_chunks = {'commas': None, 'parens': None}
         self._joining_mapping = {'commas': ', ', 'parens': '( '}
-#
+
     def _clean_line(self, line):
         # break into chunks wherever it's possible to start a new line
         chunks_commas = map(lambda x: x.strip(), line.strip().split(','))
         chunks_paren  = map(lambda x: x.strip(), line.strip().split('('))
-#
+
         possible_by_managing_commas = self._finder(chunks_commas, 'commas')
         if possible_by_managing_commas[0]:
             _ = possible_by_managing_commas
             return ",\n ".join([_[1], _[2]])
-#
+
         possible_by_managing_parens = self._finder(chunks_paren, 'parens')
         if possible_by_managing_parens[0]:
             _ = possible_by_managing_parens
             return "(\n ".join([ _[1], _[2]])
-#
+
         bp_comma = self._breakable_chunks['commas']
         if bp_comma is not None:
             dirty_line = self._fast_reconstruct(chunks_commas[bp_comma:])
@@ -67,7 +67,7 @@ class CleanWriter(object):
             if trial is not None:
                 old_clean_line = self._fast_reconstruct(chunks_commas[:bp_comma])
                 return ",\n ".join([old_clean_line, trial])
-#
+
         bp_paren = self._breakable_chunks['parens']
         if bp_paren is not None:
             dirty_line = self._fast_reconstruct(chunks_paren[bp_paren:], '( ')
@@ -75,14 +75,14 @@ class CleanWriter(object):
             if trial is not None:
                 old_clean_line = self._fast_reconstruct(chunks_paren[:bp_paren])
                 return "(\n ".join([old_clean_line, trial])
-#
+
         if len(chunks_commas[0]) <= len(chunks_paren[0]):
             return self.indent_spaces + chunks_commas[0] + ",  # NOQA\n " + CleanWriter(self.chars_per_line).clean(
                 self._fast_reconstruct(chunks_commas[1:]))
-#
+
         return self.indent_spaces + chunks_paren[0] + "(  # NOQA\n " + CleanWriter(self.chars_per_line).clean(
             self._fast_reconstruct(chunks_paren[1:], '( '))
-#
+
     def _finder(self, chunks, delimiter_name):
         delimeter =  self._joining_mapping[delimiter_name]
         for i, _ in enumerate(reversed(chunks)):
@@ -90,10 +90,10 @@ class CleanWriter(object):
             first_part  = chunks[:break_point]
             last_part   = chunks[break_point:]
             if len(last_part) == 0 or len(first_part) == 0: continue
-#
+
             try_first   = self._fast_reconstruct(first_part, delimeter)
             try_last    = self._fast_reconstruct(last_part, delimeter)
-#
+
             if self._is_line_dirty(try_first): continue
             elif self._is_line_dirty(try_last):
                 _ = self._breakable_chunks[delimiter_name]
@@ -101,26 +101,26 @@ class CleanWriter(object):
                 break
             else:
                 return (True, try_first, try_last)
-#
+
         return (False, )
-#
+
     def _get_indent_spaces(self, blob):
         return len(blob) - len(blob.lstrip())
-#
+
     def _is_line_dirty(self, blob):
         return len(blob) > self.chars_per_line
-#
+
     def _fast_reconstruct(self, chunks, joiner = ", "):
         return ''.join([self.indent_spaces, joiner.join(chunks)])
-#
+
     def clean(self, line):
         self.indent_spaces = self._get_indent_spaces(line) * " "
         if self._is_line_dirty(line):
             line = self._clean_line(line)
         return line.rstrip()
 
-a = CleanWriter()
-line =  "                ('id', models.AutoField(verbose_name='ID', serialize=False112512512512512523123123, auto_created=True, primary_key=True, serialize=False, auto_created=True, primary_key=True, seweghwoieughwoiueghwoieughwoeiugrializasdughoisudahgiaosudghisaue=False, auto_created=True, primary_key=True, serialize=False, auto_created=True, pasdhashshasdhjsfjdsfjdsfjsefjrimary_key=True)),"
+# a = CleanWriter()
+# line =  "                ('id', models.AutoField(verbose_name='ID', serialize=False112512512512512523123123, auto_created=True, primary_key=True, serialize=False, auto_created=True, primary_key=True, seweghwoieughwoiueghwoieughwoeiugrializasdughoisudahgiaosudghisaue=False, auto_created=True, primary_key=True, serialize=False, auto_created=True, pasdhashshasdhjsfjdsfjdsfjsefjrimary_key=True)),"
 
 
 class OperationWriter(object):
@@ -205,15 +205,16 @@ class OperationWriter(object):
         return '\n'.join(self.buff)
 
 
-class MigrationWriter(object):
+class MigrationWriter(CleanWriter):
     """
     Takes a Migration instance and is able to produce the contents
     of the migration file from it.
     """
 
-    def __init__(self, migration):
+    def __init__(self, migration, chars_per_line=79):
         self.migration = migration
         self.needs_manual_porting = False
+        super(MigrationWriter, self).__init__(chars_per_line)
 
     def as_string(self):
         """
@@ -230,7 +231,7 @@ class MigrationWriter(object):
         for operation in self.migration.operations:
             operation_string, operation_imports = OperationWriter(operation).serialize()
             imports.update(operation_imports)
-            operations.append(operation_string)
+            operations.append(self.clean(operation_string))
         items["operations"] = "\n".join(operations) + "\n" if operations else ""
 
         # Format dependencies and write out swappable dependencies right
@@ -542,4 +543,5 @@ class Migration(migrations.Migration):
     operations = [
 %(operations)s\
     ]
+
 """
