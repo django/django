@@ -48,7 +48,7 @@ class CleanWriter(object):
     def _clean_line(self, line):
         # break into chunks wherever it's possible to start a new line
         chunks_commas = map(lambda x: x.strip(), line.strip().split(','))
-        chunks_paren  = map(lambda x: x.strip(), line.strip().split('('))
+        chunks_paren = map(lambda x: x.strip(), line.strip().split('('))
 
         possible_by_managing_commas = self._finder(chunks_commas, 'commas')
         if possible_by_managing_commas[0]:
@@ -84,17 +84,19 @@ class CleanWriter(object):
             self._fast_reconstruct(chunks_paren[1:], '( '))
 
     def _finder(self, chunks, delimiter_name):
-        delimeter =  self._joining_mapping[delimiter_name]
+        delimeter = self._joining_mapping[delimiter_name]
         for i, _ in enumerate(reversed(chunks)):
             break_point = len(chunks) - i
-            first_part  = chunks[:break_point]
-            last_part   = chunks[break_point:]
-            if len(last_part) == 0 or len(first_part) == 0: continue
+            first_part = chunks[:break_point]
+            last_part = chunks[break_point:]
+            if len(last_part) == 0 or len(first_part) == 0:
+                continue
 
-            try_first   = self._fast_reconstruct(first_part, delimeter)
-            try_last    = self._fast_reconstruct(last_part, delimeter)
+            try_first = self._fast_reconstruct(first_part, delimeter)
+            try_last = self._fast_reconstruct(last_part, delimeter)
 
-            if self._is_line_dirty(try_first): continue
+            if self._is_line_dirty(try_first):
+                continue
             elif self._is_line_dirty(try_last):
                 _ = self._breakable_chunks[delimiter_name]
                 self._breakable_chunks[delimiter_name] = break_point if _ is None else _
