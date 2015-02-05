@@ -40,9 +40,11 @@ ArrayField
             class ChessBoard(models.Model):
                 board = ArrayField(
                     ArrayField(
-                        CharField(max_length=10, blank=True, null=True),
-                        size=8),
-                    size=8)
+                        models.CharField(max_length=10, blank=True),
+                        size=8,
+                    ),
+                    size=8,
+                )
 
         Transformation of values between the database and the model, validation
         of data and configuration, and serialization are all delegated to the
