@@ -12,10 +12,6 @@ from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
 
-# Imports kept for backwards-compatibility in Django 1.7.
-from logging import NullHandler  # NOQA
-from logging.config import dictConfig  # NOQA
-
 getLogger = logging.getLogger
 
 # Default logging for Django. This sends an email to the site admins on every
@@ -80,7 +76,7 @@ def configure_logging(logging_config, logging_settings):
         # First find the logging configuration function ...
         logging_config_func = import_string(logging_config)
 
-        dictConfig(DEFAULT_LOGGING)
+        logging.config.dictConfig(DEFAULT_LOGGING)
 
         # ... then invoke it with the logging settings
         if logging_settings:

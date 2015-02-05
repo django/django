@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 import socket
 import sys
 from wsgiref import simple_server
-from wsgiref.util import FileWrapper   # NOQA: for backwards compatibility
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8

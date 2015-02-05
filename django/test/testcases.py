@@ -14,7 +14,6 @@ import sys
 import threading
 import unittest
 import warnings
-from unittest import skipIf         # NOQA: Imported here for backward compatibility
 from unittest.util import safe_repr
 
 from django.apps import apps
