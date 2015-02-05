@@ -7,7 +7,6 @@ import sys
 import types
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import (HttpResponse, HttpResponseNotFound, HttpRequest,
     build_request_repr)
@@ -282,7 +281,11 @@ class ExceptionReporter(object):
         """Return a dictionary containing traceback information."""
         try:
             default_template_engine = Engine.get_default()
-        except ImproperlyConfigured:
+        except Exception:
+            # Since the debug view must never crash, catch all exceptions.
+            # If Django can't find a default template engine, get_default()
+            # raises ImproperlyConfigured. If some template engines fail to
+            # load, any exception may be raised.
             default_template_engine = None
 
         # TODO: add support for multiple template engines (#24120).
