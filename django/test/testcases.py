@@ -146,6 +146,7 @@ class SimpleTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(SimpleTestCase, cls).setUpClass()
         if cls._overridden_settings:
             cls._cls_overridden_context = override_settings(**cls._overridden_settings)
             cls._cls_overridden_context.enable()
@@ -161,6 +162,7 @@ class SimpleTestCase(unittest.TestCase):
         if hasattr(cls, '_cls_overridden_context'):
             cls._cls_overridden_context.disable()
             delattr(cls, '_cls_overridden_context')
+        super(SimpleTestCase, cls).tearDownClass()
 
     def __call__(self, result=None):
         """
