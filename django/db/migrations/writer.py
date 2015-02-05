@@ -43,7 +43,6 @@ class CleanWriter(object):
     def __init__(self, words_per_line=79):
         self.words_per_line = words_per_line - 4
         self._breakable = {'commas': None, 'parens': None}
-        self.indent_spaces = self._get_indent_spaces(line) * " "
 #
     def _clean_line(self, line, space):
         # break into chunks wherever it's possible to start a new line
@@ -63,27 +62,32 @@ class CleanWriter(object):
         bp_comma = self._breakable['commas']
         if bp_comma is not None:
             dirty_line = self._fast_reconstruct(chunks_commas[bp_comma:])
-            trial = CleanWriter(self.words_per_line).clean(dirty_line, space+1)
+            trial = CleanWriter(self.words_per_line).clean(dirty_line, space)
             if trial is not None:
                 old_clean_line = self._fast_reconstruct(chunks_commas[:bp_comma])
                 return (",\n    " + " " * space).join([old_clean_line, trial])
 #
         bp_paren = self._breakable['parens']
         if bp_paren is not None:
-            dirty_line = self._fast_reconstruct(chunks_paren[bp_paren:], '(')
-            trial = CleanWriter(self.words_per_line).clean(dirty_line, space+1)
+            dirty_line = self._fast_reconstruct(chunks_paren[bp_paren:], '( ')
+            trial = CleanWriter(self.words_per_line).clean(dirty_line, space)
             if trial is not None:
-                old_clean_line = self._fast_reconstruct(chunks_paren[:bp_paren])
-                return ("(\n    " + " " * space).join([old_clean_line, trial])
+               old_clean_line = self._fast_reconstruct(chunks_paren[:bp_paren])
+               return ("(\n    " + " " * space).join([old_clean_line, trial])
 #
-        return None
+        if len(chunks_commas[0]) <= len(chunks_paren[0]):
+            return self.indent_spaces + chunks_commas[0] + ",  # NOQA\n    " + CleanWriter(self.words_per_line).clean(
+                self._fast_reconstruct(chunks_commas[1:]), space=space)
+#
+        return self.indent_spaces + chunks_paren[0] + "(  # NOQA\n    " + CleanWriter(self.words_per_line).clean(
+            self._fast_reconstruct(chunks_paren[1:], '( '), space=space)
 #
     def _finder(self, chunks, chunk_name):
         for i, blob in enumerate(reversed(chunks)):
             break_point = len(chunks) - i
             first_part  = chunks[:break_point]
             last_part   = chunks[break_point:]
-            if len(last_part) == 0: continue
+            if len(last_part) == 0 or len(first_part) == 0: continue
 #
             try_first   = self._fast_reconstruct(first_part)
             try_last    = self._fast_reconstruct(last_part)
@@ -109,9 +113,9 @@ class CleanWriter(object):
         return ''.join([self.indent_spaces, joiner.join(chunks)])
 #
     def clean(self, line, space=0):
+        self.indent_spaces = self._get_indent_spaces(line) * " "
         if self._is_line_dirty(line):
-            result = self._clean_line(line, space)
-            line   = line if result is None else result
+            line = self._clean_line(line, space)
         return line
 
 a = CleanWriter()
