@@ -125,6 +125,12 @@ degradation.
 
 .. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support
 
+Running tests in parallel
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :djadmin:`test` command now supports a :djadminopt:`--parallel` option to
+run a project's tests in multiple processes in parallel.
+
 Minor features
 ~~~~~~~~~~~~~~
 

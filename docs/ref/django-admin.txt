@@ -1257,6 +1257,26 @@ The ``--debug-sql`` option can be used to enable :ref:`SQL logging
 <django-db-logger>` for failing tests. If :djadminopt:`--verbosity` is ``2``,
 then queries in passing tests are also output.
 
+.. django-admin-option:: --parallel
+
+.. versionadded:: 1.9
+
+The ``--parallel`` option can be used to run tests in parallel in separate
+processes. Since modern processors have multiple cores, this allows running
+tests significantly faster.
+
+By default ``--parallel`` runs one process per core according to
+:func:`multiprocessing.cpu_count()`. You can adjust the number of processes
+either by providing it as the option's value, e.g. ``--parallel=4``, or by
+setting the ``DJANGO_TEST_PROCESSES`` environment variable.
+
+This option requires the third-party ``tblib`` package to display tracebacks
+correctly:
+
+.. code-block:: console
+
+    $ pip install tblib
+
 testserver <fixture fixture ...>
 --------------------------------
 
