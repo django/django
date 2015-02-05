@@ -576,7 +576,8 @@ class HTMLEqualTests(TestCase):
         # when a root element is used for the needle but not the haystack
         dom1 = parse_html('<p>foo</p><p>bar</p>')
         dom2 = parse_html('<div><p>foo</p><p>bar</p></div>')
-        self.assertIn(dom1, dom2)
+        with self.assertRaises(ValueError):
+            self.assertIn(dom1, dom2)
 
     def test_count(self):
         # equal html contains each other one time

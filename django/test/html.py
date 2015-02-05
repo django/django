@@ -95,6 +95,9 @@ class Element(object):
         if not isinstance(element, six.string_types):
             if self == element:
                 return 1
+        if isinstance(element, RootElement):
+            raise ValueError('Needle HTML does not have a root element')
+
         i = 0
         for child in self.children:
             # child is text content and element is also text content, then
