@@ -22,7 +22,6 @@ class Feature(GDALBase):
     from a Layer object.
     """
 
-    #### Python 'magic' routines ####
     def __init__(self, feat, layer):
         """
         Initializes Feature from a pointer and its Layer object.
@@ -69,7 +68,6 @@ class Feature(GDALBase):
         "Does equivalence testing on the features."
         return bool(capi.feature_equal(self.ptr, other._ptr))
 
-    #### Feature Properties ####
     @property
     def encoding(self):
         return self._layer._ds.encoding
@@ -108,7 +106,6 @@ class Feature(GDALBase):
         "Returns the OGR Geometry Type for this Feture."
         return OGRGeomType(capi.get_fd_geom_type(self._layer._ldefn))
 
-    #### Feature Methods ####
     def get(self, field):
         """
         Returns the value of the field, instead of an instance of the Field

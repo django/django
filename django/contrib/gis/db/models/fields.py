@@ -163,7 +163,6 @@ class GeometryField(GeoSelectFormatMixin, Field):
             self._get_srid_info(connection)
         return self._units_name
 
-    ### Routines specific to GeometryField ###
     def geodetic(self, connection):
         """
         Returns true if this field's SRID corresponds with a coordinate
@@ -236,7 +235,6 @@ class GeometryField(GeoSelectFormatMixin, Field):
         else:
             return gsrid
 
-    ### Routines overloaded from Field ###
     def contribute_to_class(self, cls, name, **kwargs):
         super(GeometryField, self).contribute_to_class(cls, name, **kwargs)
 

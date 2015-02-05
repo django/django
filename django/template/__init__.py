@@ -39,7 +39,7 @@ Shared:
 
 """
 
-### Multiple Template Engines
+# Multiple Template Engines
 
 from .engine import Engine
 
@@ -51,7 +51,7 @@ engines = EngineHandler()
 __all__ = ('Engine', 'engines')
 
 
-### Django Template Language
+# Django Template Language
 
 # Public exceptions
 from .base import (TemplateDoesNotExist, TemplateSyntaxError,           # NOQA

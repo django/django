@@ -84,8 +84,6 @@ class BaseDatabaseWrapper(object):
                 "will be returned.".format(self.queries_log.maxlen))
         return list(self.queries_log)
 
-    ##### Backend-specific methods for creating connections and cursors #####
-
     def get_connection_params(self):
         """Returns a dict of parameters suitable for get_new_connection."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a get_connection_params() method')
@@ -101,8 +99,6 @@ class BaseDatabaseWrapper(object):
     def create_cursor(self):
         """Creates a cursor. Assumes that a connection is established."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a create_cursor() method')
-
-    ##### Backend-specific methods for creating connections #####
 
     def connect(self):
         """Connects to the database. Assumes that the connection is closed."""
@@ -130,8 +126,6 @@ class BaseDatabaseWrapper(object):
             with self.wrap_database_errors:
                 self.connect()
 
-    ##### Backend-specific wrappers for PEP-249 connection methods #####
-
     def _cursor(self):
         self.ensure_connection()
         with self.wrap_database_errors:
@@ -151,8 +145,6 @@ class BaseDatabaseWrapper(object):
         if self.connection is not None:
             with self.wrap_database_errors:
                 return self.connection.close()
-
-    ##### Generic wrappers for PEP-249 connection methods #####
 
     def cursor(self):
         """
@@ -204,8 +196,6 @@ class BaseDatabaseWrapper(object):
             else:
                 self.connection = None
 
-    ##### Backend-specific savepoint management methods #####
-
     def _savepoint(self, sid):
         with self.cursor() as cursor:
             cursor.execute(self.ops.savepoint_create_sql(sid))
@@ -221,8 +211,6 @@ class BaseDatabaseWrapper(object):
     def _savepoint_allowed(self):
         # Savepoints cannot be created outside a transaction
         return self.features.uses_savepoints and not self.get_autocommit()
-
-    ##### Generic savepoint management methods #####
 
     def savepoint(self):
         """
@@ -270,15 +258,11 @@ class BaseDatabaseWrapper(object):
         """
         self.savepoint_state = 0
 
-    ##### Backend-specific transaction management methods #####
-
     def _set_autocommit(self, autocommit):
         """
         Backend-specific implementation to enable or disable autocommit.
         """
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a _set_autocommit() method')
-
-    ##### Generic transaction management methods #####
 
     def get_autocommit(self):
         """
@@ -328,8 +312,6 @@ class BaseDatabaseWrapper(object):
                 "An error occurred in the current transaction. You can't "
                 "execute queries until the end of the 'atomic' block.")
 
-    ##### Foreign key constraints checks handling #####
-
     @contextmanager
     def constraint_checks_disabled(self):
         """
@@ -364,8 +346,6 @@ class BaseDatabaseWrapper(object):
         IntegrityError if any invalid foreign key references are encountered.
         """
         pass
-
-    ##### Connection termination handling #####
 
     def is_usable(self):
         """
@@ -404,8 +384,6 @@ class BaseDatabaseWrapper(object):
                 self.close()
                 return
 
-    ##### Thread safety handling #####
-
     def validate_thread_sharing(self):
         """
         Validates that the connection isn't accessed by another thread than the
@@ -420,8 +398,6 @@ class BaseDatabaseWrapper(object):
                 "with alias '%s' was created in thread id %s and this is "
                 "thread id %s."
                 % (self.alias, self._thread_ident, thread.get_ident()))
-
-    ##### Miscellaneous #####
 
     def prepare_database(self):
         """
