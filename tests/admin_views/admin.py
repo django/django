@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import tempfile
 import os
+from wsgiref.util import FileWrapper
 
 from django import forms
 from django.contrib import admin
@@ -10,7 +11,6 @@ from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
-from django.core.servers.basehttp import FileWrapper
 from django.conf.urls import url
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
