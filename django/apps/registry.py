@@ -344,7 +344,7 @@ class Apps(object):
             for model in self.get_models(include_auto_created=True):
                 model._meta._expire_cache()
 
-    ### DEPRECATED METHODS GO BELOW THIS LINE ###
+    # ### DEPRECATED METHODS GO BELOW THIS LINE ###
 
     def load_app(self, app_name):
         """
