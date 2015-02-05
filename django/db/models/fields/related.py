@@ -797,16 +797,16 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
             _clear.alters_data = True
 
         def set(self, objs, **kwargs):
+            # Force evaluation of `objs` in case it's a queryset whose value
+            # could be affected by `manager.clear()`. Refs #19816.
+            objs = tuple(objs)
+
             clear = kwargs.pop('clear', False)
 
             if rel_field.null:
                 db = router.db_for_write(self.model, instance=self.instance)
                 with transaction.atomic(using=db, savepoint=False):
                     if clear:
-                        # Force evaluation of `objs` in case it's a queryset whose value
-                        # could be affected by `manager.clear()`. Refs #19816.
-                        objs = tuple(objs)
-
                         self.clear()
                         self.add(*objs)
                     else:
@@ -1029,15 +1029,15 @@ def create_many_related_manager(superclass, rel):
                     (opts.app_label, opts.object_name)
                 )
 
+            # Force evaluation of `objs` in case it's a queryset whose value
+            # could be affected by `manager.clear()`. Refs #19816.
+            objs = tuple(objs)
+
             clear = kwargs.pop('clear', False)
 
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 if clear:
-                    # Force evaluation of `objs` in case it's a queryset whose value
-                    # could be affected by `manager.clear()`. Refs #19816.
-                    objs = tuple(objs)
-
                     self.clear()
                     self.add(*objs)
                 else:

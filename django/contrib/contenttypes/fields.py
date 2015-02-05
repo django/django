@@ -554,15 +554,15 @@ def create_generic_related_manager(superclass):
         _clear.alters_data = True
 
         def set(self, objs, **kwargs):
+            # Force evaluation of `objs` in case it's a queryset whose value
+            # could be affected by `manager.clear()`. Refs #19816.
+            objs = tuple(objs)
+
             clear = kwargs.pop('clear', False)
 
             db = router.db_for_write(self.model, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 if clear:
-                    # Force evaluation of `objs` in case it's a queryset whose value
-                    # could be affected by `manager.clear()`. Refs #19816.
-                    objs = tuple(objs)
-
                     self.clear()
                     self.add(*objs)
                 else:
