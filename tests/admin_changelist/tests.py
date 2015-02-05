@@ -3,11 +3,13 @@ from __future__ import unicode_literals
 import datetime
 
 from django.contrib import admin
+from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.templatetags.admin_list import pagination
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR, ChangeList
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.template import Context, Template
 from django.test import TestCase, override_settings
@@ -684,6 +686,24 @@ class AdminLogNodeTestCase(TestCase):
         # Rendering should be u'' since this templatetag just logs,
         # it doesn't render any string.
         self.assertEqual(template.render(context), '')
+
+    def test_get_admin_log_templatetag_no_user(self):
+        """
+        The {% get_admin_log %} tag should work without specifying a user.
+        """
+        user = User(username='jondoe', password='secret', email='super@example.com')
+        user.save()
+        ct = ContentType.objects.get_for_model(User)
+        LogEntry.objects.log_action(user.pk, ct.pk, user.pk, repr(user), 1)
+
+        t = Template(
+            '{% load log %}'
+            '{% get_admin_log 100 as admin_log %}'
+            '{% for entry in admin_log %}'
+            '{{ entry|safe }}'
+            '{% endfor %}'
+        )
+        self.assertEqual(t.render(Context({})), 'Added "<User: jondoe>".')
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
