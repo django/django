@@ -2,7 +2,8 @@
 
 from unittest import TestCase
 
-from django.template import Context, Variable, VariableDoesNotExist
+from django.http import HttpRequest
+from django.template import Context, RequestContext, Variable, VariableDoesNotExist
 from django.template.context import RenderContext
 
 
@@ -83,3 +84,7 @@ class ContextTests(TestCase):
         # make contexts equals again
         b.update({'a': 1})
         self.assertEqual(a, b)
+
+    def test_copy_request_context_twice(self):
+        # Regression test for #24273 - this doesn't raise an exception
+        RequestContext(HttpRequest()).new().new()
