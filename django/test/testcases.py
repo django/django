@@ -1278,7 +1278,7 @@ class LiveServerTestCase(TransactionTestCase):
 
         # Launch the live server's thread
         specified_address = os.environ.get(
-            'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081')
+            'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081-8119')
 
         # The specified ports may be of the form '8000-8010,8080,9200-9300'
         # i.e. a comma-separated list of ports or ranges of ports, so we break
