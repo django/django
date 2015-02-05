@@ -218,6 +218,7 @@ class SchemaTests(TransactionTestCase):
             name = CharField(max_length=255)
 
             class Meta:
+                app_label = 'schema'
                 apps = new_apps
 
         self.local_models = [LocalAuthorWithM2M]
@@ -652,6 +653,7 @@ class SchemaTests(TransactionTestCase):
             tags = M2MFieldClass("TagM2MTest", related_name="books")
 
             class Meta:
+                app_label = 'schema'
                 apps = new_apps
 
         self.local_models = [LocalBookWithM2M]
@@ -683,12 +685,14 @@ class SchemaTests(TransactionTestCase):
             tag = ForeignKey("schema.TagM2MTest")
 
             class Meta:
+                app_label = 'schema'
                 apps = new_apps
 
         class LocalBookWithM2MThrough(Model):
             tags = M2MFieldClass("TagM2MTest", related_name="books", through=LocalTagThrough)
 
             class Meta:
+                app_label = 'schema'
                 apps = new_apps
 
         self.local_models = [LocalTagThrough, LocalBookWithM2MThrough]
@@ -720,6 +724,7 @@ class SchemaTests(TransactionTestCase):
             name = CharField(max_length=255)
 
             class Meta:
+                app_label = 'schema'
                 apps = new_apps
 
         self.local_models = [LocalAuthorWithM2M]
@@ -768,6 +773,7 @@ class SchemaTests(TransactionTestCase):
             tag = ForeignKey("schema.TagM2MTest")
 
             class Meta:
+                app_label = 'schema'
                 apps = new_apps
 
         class LocalAuthorWithM2MThrough(Model):
@@ -775,6 +781,7 @@ class SchemaTests(TransactionTestCase):
             tags = M2MFieldClass("schema.TagM2MTest", related_name="authors", through=LocalAuthorTag)
 
             class Meta:
+                app_label = 'schema'
                 apps = new_apps
 
         self.local_models = [LocalAuthorTag, LocalAuthorWithM2MThrough]
@@ -815,6 +822,7 @@ class SchemaTests(TransactionTestCase):
             tags = M2MFieldClass("TagM2MTest", related_name="books")
 
             class Meta:
+                app_label = 'schema'
                 apps = new_apps
 
         self.local_models = [LocalBookWithM2M]
