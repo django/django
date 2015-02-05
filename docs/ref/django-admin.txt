@@ -1227,7 +1227,11 @@ provided by the :setting:`TEST_RUNNER` setting.
 
 The ``--liveserver`` option can be used to override the default address where
 the live server (used with :class:`~django.test.LiveServerTestCase`) is
-expected to run from. The default value is ``localhost:8081``.
+expected to run from. The default value is ``localhost:8081-8179``.
+
+.. versionchanged:: 1.9
+
+    In earlier versions, the default value was ``localhost:8081``.
 
 .. django-admin-option:: --keepdb
 

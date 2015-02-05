@@ -47,7 +47,7 @@ class Command(BaseCommand):
             action='store', dest='liveserver', default=None,
             help='Overrides the default address where the live server (used '
                  'with LiveServerTestCase) is expected to run from. The '
-                 'default value is localhost:8081.'),
+                 'default value is localhost:8081-8179.'),
 
         test_runner_class = get_runner(settings, self.test_runner)
         if hasattr(test_runner_class, 'option_list'):

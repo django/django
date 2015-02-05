@@ -388,7 +388,7 @@ if __name__ == "__main__":
     parser.add_argument('--liveserver',
         help='Overrides the default address where the live server (used with '
              'LiveServerTestCase) is expected to run from. The default value '
-             'is localhost:8081.')
+             'is localhost:8081-8179.')
     parser.add_argument(
         '--selenium', action='store_true', dest='selenium', default=False,
         help='Run the Selenium tests as well (if Selenium is installed).')
