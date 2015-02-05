@@ -27,6 +27,9 @@ from django.utils.functional import empty
 from .storage import DummyStorage
 
 TEST_ROOT = os.path.dirname(upath(__file__))
+
+TESTFILES_PATH = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test')
+
 TEST_SETTINGS = {
     'DEBUG': True,
     'MEDIA_URL': '/media/',
@@ -55,27 +58,6 @@ class BaseStaticFilesTestCase(object):
     """
     Test case with a couple utility assertions.
     """
-    def setUp(self):
-        self.testfiles_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test')
-        # To make sure SVN doesn't hangs itself with the non-ASCII characters
-        # during checkout, we actually create one file dynamically.
-        self._nonascii_filepath = os.path.join(self.testfiles_path, '\u2297.txt')
-        with codecs.open(self._nonascii_filepath, 'w', 'utf-8') as f:
-            f.write("\u2297 in the app dir")
-        # And also create the magic hidden file to trick the setup.py's
-        # package data handling.
-        self._hidden_filepath = os.path.join(self.testfiles_path, '.hidden')
-        with codecs.open(self._hidden_filepath, 'w', 'utf-8') as f:
-            f.write("should be ignored")
-        self._backup_filepath = os.path.join(
-            TEST_ROOT, 'project', 'documents', 'test', 'backup~')
-        with codecs.open(self._backup_filepath, 'w', 'utf-8') as f:
-            f.write("should be ignored")
-
-    def tearDown(self):
-        os.unlink(self._nonascii_filepath)
-        os.unlink(self._hidden_filepath)
-        os.unlink(self._backup_filepath)
 
     def assertFileContains(self, filepath, text):
         self.assertIn(text, self._get_file(force_text(filepath)),
@@ -656,7 +638,7 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
     def setUp(self):
         super(TestCollectionManifestStorage, self).setUp()
 
-        self._clear_filename = os.path.join(self.testfiles_path, 'cleared.txt')
+        self._clear_filename = os.path.join(TESTFILES_PATH, 'cleared.txt')
         with open(self._clear_filename, 'w') as f:
             f.write('to be deleted in one test')
 
