@@ -119,9 +119,6 @@ class CleanWriter(object):
             line = self._clean_line(line)
         return line.rstrip()
 
-# a = CleanWriter()
-# line =  "                ('id', models.AutoField(verbose_name='ID', serialize=False112512512512512523123123, auto_created=True, primary_key=True, serialize=False, auto_created=True, primary_key=True, seweghwoieughwoiueghwoieughwoeiugrializasdughoisudahgiaosudghisaue=False, auto_created=True, primary_key=True, serialize=False, auto_created=True, pasdhashshasdhjsfjdsfjdsfjsefjrimary_key=True)),"
-
 
 class OperationWriter(object):
     indentation = 2
