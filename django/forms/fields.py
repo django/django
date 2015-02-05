@@ -210,8 +210,10 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
 
 
 class CharField(Field):
-    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-        self.max_length, self.min_length = max_length, min_length
+    def __init__(self, max_length=None, min_length=None, strip=True, *args, **kwargs):
+        self.max_length = max_length
+        self.min_length = min_length
+        self.strip = strip
         super(CharField, self).__init__(*args, **kwargs)
         if min_length is not None:
             self.validators.append(validators.MinLengthValidator(int(min_length)))
@@ -222,7 +224,10 @@ class CharField(Field):
         "Returns a Unicode object."
         if value in self.empty_values:
             return ''
-        return smart_text(value)
+        value = force_text(value)
+        if self.strip:
+            value = value.strip()
+        return value
 
     def widget_attrs(self, widget):
         attrs = super(CharField, self).widget_attrs(widget)
@@ -539,6 +544,7 @@ class RegexField(CharField):
         error_message is an optional error message to use, if
         'Enter a valid value' is too generic for you.
         """
+        kwargs.setdefault('strip', False)
         # error_message is just kept for backwards compatibility:
         if error_message is not None:
             warnings.warn(
@@ -1230,10 +1236,6 @@ class GenericIPAddressField(CharField):
 
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
-
-    def clean(self, value):
-        value = self.to_python(value).strip()
-        return super(SlugField, self).clean(value)
 
 
 class UUIDField(CharField):

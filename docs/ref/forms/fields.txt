@@ -361,13 +361,20 @@ For each field, we describe the default widget used if you don't specify
       Otherwise, all inputs are valid.
     * Error message keys: ``required``, ``max_length``, ``min_length``
 
-    Has two optional arguments for validation:
+    Has three optional arguments for validation:
 
     .. attribute:: max_length
     .. attribute:: min_length
 
     If provided, these arguments ensure that the string is at most or at least
     the given length.
+
+    .. attribute:: strip
+
+       .. versionadded:: 1.9
+
+       If ``True`` (default), the value will be stripped of leading and
+       trailing whitespace.
 
 ``ChoiceField``
 ~~~~~~~~~~~~~~~
@@ -824,8 +831,15 @@ For each field, we describe the default widget used if you don't specify
         A regular expression specified either as a string or a compiled regular
         expression object.
 
-    Also takes ``max_length`` and ``min_length``, which work just as they do for
-    ``CharField``.
+    Also takes ``max_length``, ``min_length``, and ``strip``, which work just
+    as they do for ``CharField``.
+
+    .. attribute:: strip
+
+        .. versionadded:: 1.9
+
+        Defaults to ``False``. If enabled, stripping will be applied before the
+        regex validation.
 
     .. deprecated:: 1.8
 
