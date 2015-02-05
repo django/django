@@ -148,7 +148,7 @@ class OGRGeometry(GDALBase):
         return OGRGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' % (
             x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
 
-    ### Geometry set-like operations ###
+    # ### Geometry set-like operations ###
     # g = g1 | g2
     def __or__(self, other):
         "Returns the union of the two geometries."
@@ -184,7 +184,7 @@ class OGRGeometry(GDALBase):
         "WKT is used for the string representation."
         return self.wkt
 
-    #### Geometry Properties ####
+    # #### Geometry Properties ####
     @property
     def dimension(self):
         "Returns 0 for points, 1 for lines, and 2 for surfaces."
@@ -248,7 +248,7 @@ class OGRGeometry(GDALBase):
         "Returns the envelope as a 4-tuple, instead of as an Envelope object."
         return self.envelope.tuple
 
-    #### SpatialReference-related Properties ####
+    # #### SpatialReference-related Properties ####
 
     # The SRS property
     def _get_srs(self):
@@ -291,7 +291,7 @@ class OGRGeometry(GDALBase):
 
     srid = property(_get_srid, _set_srid)
 
-    #### Output Methods ####
+    # #### Output Methods ####
     @property
     def geos(self):
         "Returns a GEOSGeometry object from this OGRGeometry."
@@ -354,7 +354,7 @@ class OGRGeometry(GDALBase):
         else:
             return self.wkt
 
-    #### Geometry Methods ####
+    # #### Geometry Methods ####
     def clone(self):
         "Clones this OGR Geometry."
         return OGRGeometry(capi.clone_geom(self.ptr), self.srs)
@@ -399,7 +399,7 @@ class OGRGeometry(GDALBase):
         "For backwards-compatibility."
         self.transform(srs)
 
-    #### Topology Methods ####
+    # #### Topology Methods ####
     def _topology(self, func, other):
         """A generalized function for topology operations, takes a GDAL function and
         the other geometry to perform the operation on."""
@@ -442,7 +442,7 @@ class OGRGeometry(GDALBase):
         "Returns True if this geometry overlaps the other."
         return self._topology(capi.ogr_overlaps, other)
 
-    #### Geometry-generation Methods ####
+    # #### Geometry-generation Methods ####
     def _geomgen(self, gen_func, other=None):
         "A helper routine for the OGR routines that generate geometries."
         if isinstance(other, OGRGeometry):

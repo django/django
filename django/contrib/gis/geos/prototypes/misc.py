@@ -13,7 +13,7 @@ from django.utils.six.moves import range
 __all__ = ['geos_area', 'geos_distance', 'geos_length', 'geos_isvalidreason']
 
 
-### ctypes generator function ###
+# ### ctypes generator function ###
 def dbl_from_geom(func, num_geom=1):
     """
     Argument is a Geometry, return type is double that is passed
@@ -26,7 +26,7 @@ def dbl_from_geom(func, num_geom=1):
     func.errcheck = check_dbl
     return func
 
-### ctypes prototypes ###
+# ### ctypes prototypes ###
 
 # Area, distance, and length prototypes.
 geos_area = dbl_from_geom(GEOSFunc('GEOSArea'))

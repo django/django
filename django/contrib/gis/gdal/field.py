@@ -17,7 +17,6 @@ class Field(GDALBase):
     from a Feature object.
     """
 
-    #### Python 'magic' routines ####
     def __init__(self, feat, index):
         """
         Initializes on the feature object and the integer index of
@@ -45,7 +44,7 @@ class Field(GDALBase):
         "Returns the string representation of the Field."
         return str(self.value).strip()
 
-    #### Field Methods ####
+    # #### Field Methods ####
     def as_double(self):
         "Retrieves the Field's value as a double (float)."
         return capi.get_field_as_double(self._feat.ptr, self._index)
@@ -70,7 +69,7 @@ class Field(GDALBase):
         else:
             raise GDALException('Unable to retrieve date & time information from the field.')
 
-    #### Field Properties ####
+    # #### Field Properties ####
     @property
     def name(self):
         "Returns the name of this Field."
@@ -104,7 +103,7 @@ class Field(GDALBase):
         return capi.get_field_width(self.ptr)
 
 
-### The Field sub-classes for each OGR Field type. ###
+# ### The Field sub-classes for each OGR Field type. ###
 class OFTInteger(Field):
     _double = False
 

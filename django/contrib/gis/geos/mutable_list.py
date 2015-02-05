@@ -63,7 +63,7 @@ class ListMixin(object):
     _maxlength = None
     _IndexError = IndexError
 
-    ### Python initialization and special list interface methods ###
+    # ### Python initialization and special list interface methods ###
 
     def __init__(self, *args, **kwargs):
         if not hasattr(self, '_get_single_internal'):
@@ -117,7 +117,7 @@ class ListMixin(object):
         for i in range(len(self)):
             yield self[i]
 
-    ### Special methods for arithmetic operations ###
+    # ### Special methods for arithmetic operations ###
     def __add__(self, other):
         'add another list-like object'
         return self.__class__(list(self) + list(other))
@@ -175,8 +175,8 @@ class ListMixin(object):
                 return False
         return len(self) < olen
 
-    ### Public list interface Methods ###
-    ## Non-mutating ##
+    # ### Public list interface Methods ###
+    # ## Non-mutating ##
     def count(self, val):
         "Standard list count method"
         count = 0
@@ -192,7 +192,7 @@ class ListMixin(object):
                 return i
         raise ValueError('%s not found in object' % str(val))
 
-    ## Mutating ##
+    # ## Mutating ##
     def append(self, val):
         "Standard list append method"
         self[len(self):] = [val]
@@ -235,7 +235,7 @@ class ListMixin(object):
                 temp.sort(reverse=reverse)
             self[:] = temp
 
-    ### Private routines ###
+    # ### Private routines ###
     def _rebuild(self, newLen, newItems):
         if newLen < self._minlength:
             raise ValueError('Must have at least %d items' % self._minlength)

@@ -18,7 +18,6 @@ free_regex = re.compile(r'^GEO-\d{3}FREE')
 lite_regex = re.compile(r'^GEO-\d{3}LITE')
 
 
-#### GeoIP classes ####
 class GeoIPException(Exception):
     pass
 
@@ -201,7 +200,7 @@ class GeoIP(object):
                 'country_name': self.country_name(query),
                 }
 
-    #### Coordinate retrieval routines ####
+    # #### Coordinate retrieval routines ####
     def coords(self, query, ordering=('longitude', 'latitude')):
         cdict = self.city(query)
         if cdict is None:
@@ -226,7 +225,7 @@ class GeoIP(object):
         else:
             return None
 
-    #### GeoIP Database Information Routines ####
+    # #### GeoIP Database Information Routines ####
     @property
     def country_info(self):
         "Returns information about the GeoIP country database."
@@ -253,7 +252,7 @@ class GeoIP(object):
             info += 'GeoIP Library:\n\t%s\n' % GeoIP_lib_version()
         return info + 'Country:\n\t%s\nCity:\n\t%s' % (self.country_info, self.city_info)
 
-    #### Methods for compatibility w/the GeoIP-Python API. ####
+    # #### Methods for compatibility w/the GeoIP-Python API. ####
     @classmethod
     def open(cls, full_path, cache):
         return GeoIP(full_path, cache)

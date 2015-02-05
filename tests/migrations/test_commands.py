@@ -360,7 +360,7 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertIn('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d', content)  # title.default
 
     def test_failing_migration(self):
-        #21280 - If a migration fails to serialize, it shouldn't generate an empty file.
+        # If a migration fails to serialize, it shouldn't generate an empty file. #21280
         apps.register_model('migrations', UnserializableModel)
 
         with six.assertRaisesRegex(self, ValueError, r'Cannot serialize'):

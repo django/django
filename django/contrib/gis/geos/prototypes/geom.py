@@ -21,7 +21,7 @@ class geos_char_p(c_char_p):
     pass
 
 
-### ctypes generation functions ###
+# ### ctypes generation functions ###
 def bin_constructor(func):
     "Generates a prototype for binary construction (HEX, WKB) GEOS routines."
     func.argtypes = [c_char_p, c_size_t]
@@ -71,7 +71,7 @@ def string_from_geom(func):
     func.errcheck = check_string
     return func
 
-### ctypes prototypes ###
+# ### ctypes prototypes ###
 
 # Deprecated creation routines from WKB, HEX, WKT
 from_hex = bin_constructor(GEOSFunc('GEOSGeomFromHEX_buf'))

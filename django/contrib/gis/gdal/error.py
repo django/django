@@ -5,7 +5,7 @@
 """
 
 
-#### GDAL & SRS Exceptions ####
+# #### GDAL & SRS Exceptions ####
 class GDALException(Exception):
     pass
 
@@ -27,7 +27,7 @@ class OGRIndexError(GDALException, KeyError):
     """
     silent_variable_failure = True
 
-#### GDAL/OGR error checking codes and routine ####
+# #### GDAL/OGR error checking codes and routine ####
 
 # OGR Error Codes
 OGRERR_DICT = {

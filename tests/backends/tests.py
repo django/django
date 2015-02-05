@@ -467,7 +467,7 @@ class EscapingChecks(TestCase):
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "This is an sqlite-specific issue")
     def test_sqlite_parameter_escaping(self):
-        #13648: '%s' escaping support for sqlite3
+        # '%s' escaping support for sqlite3 #13648
         cursor = connection.cursor()
         cursor.execute("select strftime('%s', date('now'))")
         response = cursor.fetchall()[0][0]
@@ -505,7 +505,7 @@ class BackendTestCase(TransactionTestCase):
             cursor.execute(query, args)
 
     def test_cursor_executemany(self):
-        #4896: Test cursor.executemany
+        # Test cursor.executemany #4896
         args = [(i, i ** 2) for i in range(-5, 6)]
         self.create_squares_with_executemany(args)
         self.assertEqual(models.Square.objects.count(), 11)
@@ -514,13 +514,13 @@ class BackendTestCase(TransactionTestCase):
             self.assertEqual(square.square, i ** 2)
 
     def test_cursor_executemany_with_empty_params_list(self):
-        #4765: executemany with params=[] does nothing
+        # Test executemany with params=[] does nothing #4765
         args = []
         self.create_squares_with_executemany(args)
         self.assertEqual(models.Square.objects.count(), 0)
 
     def test_cursor_executemany_with_iterator(self):
-        #10320: executemany accepts iterators
+        # Test executemany accepts iterators #10320
         args = iter((i, i ** 2) for i in range(-3, 2))
         self.create_squares_with_executemany(args)
         self.assertEqual(models.Square.objects.count(), 5)
@@ -533,14 +533,14 @@ class BackendTestCase(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_execute_with_pyformat(self):
-        #10070: Support pyformat style passing of parameters
+        # Support pyformat style passing of parameters #10070
         args = {'root': 3, 'square': 9}
         self.create_squares(args, 'pyformat', multiple=False)
         self.assertEqual(models.Square.objects.count(), 1)
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_executemany_with_pyformat(self):
-        #10070: Support pyformat style passing of parameters
+        # Support pyformat style passing of parameters #10070
         args = [{'root': i, 'square': i ** 2} for i in range(-5, 6)]
         self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(models.Square.objects.count(), 11)
@@ -561,7 +561,7 @@ class BackendTestCase(TransactionTestCase):
         self.assertEqual(models.Square.objects.count(), 9)
 
     def test_unicode_fetches(self):
-        #6254: fetchone, fetchmany, fetchall return strings as unicode objects
+        # fetchone, fetchmany, fetchall return strings as unicode objects #6254
         qn = connection.ops.quote_name
         models.Person(first_name="John", last_name="Doe").save()
         models.Person(first_name="Jane", last_name="Doe").save()

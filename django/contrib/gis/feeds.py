@@ -81,7 +81,7 @@ class GeoFeedMixin(object):
                         raise ValueError('Geometry type "%s" not supported.' % geom.geom_type)
 
 
-### SyndicationFeed subclasses ###
+# ### SyndicationFeed subclasses ###
 class GeoRSSFeed(Rss201rev2Feed, GeoFeedMixin):
     def rss_attributes(self):
         attrs = super(GeoRSSFeed, self).rss_attributes()
@@ -127,7 +127,7 @@ class W3CGeoFeed(Rss201rev2Feed, GeoFeedMixin):
         self.add_georss_element(handler, self.feed, w3c_geo=True)
 
 
-### Feed subclass ###
+# ### Feed subclass ###
 class Feed(BaseFeed):
     """
     This is a subclass of the `Feed` from `django.contrib.syndication`.
