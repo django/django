@@ -244,21 +244,6 @@ class ContentTypesTests(TestCase):
         ct_fetched = ContentType.objects.get_for_id(ct.pk)
         self.assertIsNone(ct_fetched.model_class())
 
-    @skipUnlessDBFeature('can_rollback_ddl')
-    def test_unmigrating_first_migration_post_migrate_signal(self):
-        """
-        #24075 - When unmigrating an app before its first migration,
-        post_migrate signal handler must be aware of the missing tables.
-        """
-        try:
-            with override_settings(
-                INSTALLED_APPS=["django.contrib.contenttypes"],
-                MIGRATION_MODULES={'contenttypes': 'django.contrib.contenttypes.migrations'},
-            ):
-                call_command("migrate", "contenttypes", "zero", verbosity=0)
-        finally:
-            call_command("migrate", verbosity=0)
-
     def test_name_deprecation(self):
         """
         ContentType.name has been removed. Test that a warning is emitted when
@@ -277,3 +262,23 @@ class ContentTypesTests(TestCase):
             "ContentType.name field doesn't exist any longer. Please remove it from your code."
         )
         self.assertTrue(ContentType.objects.filter(model='OldModel').exists())
+
+
+class MigrateTests(TestCase):
+
+    available_apps = ['django.contrib.contenttypes']
+
+    @skipUnlessDBFeature('can_rollback_ddl')
+    def test_unmigrating_first_migration_post_migrate_signal(self):
+        """
+        #24075 - When unmigrating an app before its first migration,
+        post_migrate signal handler must be aware of the missing tables.
+        """
+        try:
+            with override_settings(
+                INSTALLED_APPS=["django.contrib.contenttypes"],
+                MIGRATION_MODULES={'contenttypes': 'django.contrib.contenttypes.migrations'},
+            ):
+                call_command("migrate", "contenttypes", "zero", verbosity=0)
+        finally:
+            call_command("migrate", verbosity=0)
