@@ -177,8 +177,14 @@ class AdminSite(object):
                 "setting in order to use the admin application.")
         try:
             default_template_engine = Engine.get_default()
-        except ImproperlyConfigured:
-            # Skip the check if the user has a non-trivial TEMPLATES setting
+        except Exception:
+            # Skip this non-critical check:
+            # 1. if the user has a non-trivial TEMPLATES setting and Django
+            #    can't find a default template engine
+            # 2. if anything goes wrong while loading template engines, in
+            #    order to avoid raising an exception from a confusing location
+            # Catching ImproperlyConfigured suffices for 1. but 2. requires
+            # catching all exceptions.
             pass
         else:
             if ('django.contrib.auth.context_processors.auth'
