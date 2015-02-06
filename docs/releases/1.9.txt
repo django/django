@@ -151,6 +151,10 @@ Models
   managers created by ``ForeignKey``, ``GenericForeignKey``, and
   ``ManyToManyField``.
 
+* Added the ``keep_parents`` parameter to :meth:`Model.delete()
+  <django.db.models.Model.delete>` to allow deleting only a child's data in a
+  model that uses multi-table inheritance.
+
 CSRF
 ^^^^
 
