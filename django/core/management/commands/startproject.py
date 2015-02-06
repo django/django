@@ -2,7 +2,6 @@ from importlib import import_module
 
 from django.core.management.base import CommandError
 from django.core.management.templates import TemplateCommand
-from django.utils.crypto import get_random_string
 
 
 class Command(TemplateCommand):
@@ -25,9 +24,5 @@ class Command(TemplateCommand):
                                "Python module and cannot be used as a "
                                "project name. Please try another name." %
                                project_name)
-
-        # Create a random SECRET_KEY to put it in the main settings.
-        chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-        options['secret_key'] = get_random_string(50, chars)
 
         super(Command, self).handle('project', project_name, target, **options)

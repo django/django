@@ -312,6 +312,17 @@ prompts.
 The :djadminopt:`--database` option may be used to specify the database
 to flush.
 
+generatesecret <outfile outfile ...>
+------------------------
+
+.. django-admin:: generatesecret
+
+Generates a secret key and writes it out to the :djadminopt:`--outfile`.  If
+`-` is provided as the outfile argument, the secret key will be written to
+stdout.
+
+.. django-admin-option:: --outfile
+
 inspectdb
 ---------
 

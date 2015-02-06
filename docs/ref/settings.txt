@@ -1838,9 +1838,6 @@ A secret key for a particular Django installation. This is used to provide
 :doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
 unpredictable value.
 
-:djadmin:`django-admin startproject <startproject>` automatically adds a
-randomly-generated ``SECRET_KEY`` to each new project.
-
 Django will refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. warning::
@@ -1873,6 +1870,30 @@ The secret key is used for:
 If you rotate your secret key, all of the above will be invalidated.
 Secret keys are not used for passwords of users and key rotation will not
 affect them.
+
+.. setting:: SECRET_KEY_FILE
+
+SECRET_KEY_FILE
+----------
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+As an alternative to specifying a :setting:`SECRET_KEY` in your settings file, Django can load your secret key from a file.
+
+:djadmin:`django-admin startproject <startproject>` automatically generates a
+secret key file named `.secret_key` in your project root.
+
+If both :setting:`SECRET_KEY` and :setting:`SECRET_KEY_FILE` are set, Django will use :setting:`SECRET_KEY`.
+
+.. warning::
+
+    **Do not commit your secret key file to your public repo.**
+
+    Running Django with a known secret key defeats many of Django's
+    security protections, and can lead to privilege escalation and remote code
+    execution vulnerabilities.
 
 .. setting:: SECURE_BROWSER_XSS_FILTER
 

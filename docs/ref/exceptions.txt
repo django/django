@@ -111,6 +111,14 @@ ImproperlyConfigured
     somehow improperly configured -- for example, if a value in ``settings.py``
     is incorrect or unparseable.
 
+InsecureFilePermissionError
+--------------------
+.. exception:: InsecureFilePermissionError
+
+    The :exc:`InsecureFilePermissionError` exception is raised when a file's
+    permissions are not configured correctly -- for example, if the
+    `SECRET_KEY_FILE` is world readable this exception is raised.
+
 FieldError
 ----------
 .. exception:: FieldError

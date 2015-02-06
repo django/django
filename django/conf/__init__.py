@@ -12,7 +12,7 @@ import time     # Needed for Windows
 import warnings
 
 from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, InsecureFilePermissionError
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import LazyObject, empty
 
@@ -107,6 +107,19 @@ class Settings(BaseSettings):
                             "Please fix your settings." % setting)
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
+
+        if self.SECRET_KEY_FILE and not self.SECRET_KEY:
+            try:
+                with open(self.SECRET_KEY_FILE, 'r') as file:
+                    self.SECRET_KEY = file.read().strip()
+            except IOError:
+                raise ImproperlyConfigured("Unable to read SECRET_KEY_FILE: %s" % self.SECRET_KEY_FILE)
+
+            # Verify that file permissions are not other readable/writable
+            import stat
+            mode = os.stat(self.SECRET_KEY_FILE).st_mode
+            if bool((stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH) & mode):
+                raise InsecureFilePermissionError("The SECRET_KEY_FILE permissions are not secure.  Set the file permissions to be only user readable and writable.")
 
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")

@@ -14,6 +14,7 @@ from os import path
 import django
 from django.template import Template, Context
 from django.utils import archive
+from django.utils.secret_key import create_secret_key_file
 from django.utils.six.moves.urllib.request import urlretrieve
 from django.utils._os import rmtree_errorhandler
 from django.utils.version import get_docs_version
@@ -166,6 +167,10 @@ class TemplateCommand(BaseCommand):
                         "Notice: Couldn't set permission bits on %s. You're "
                         "probably using an uncommon filesystem setup. No "
                         "problem." % new_path, self.style.NOTICE)
+
+        # If we are creating a project, generate the .secret_key file.
+        if app_or_project == 'project':
+            create_secret_key_file(os.path.join(top_dir, '.secret_key'))
 
         if self.paths_to_remove:
             if self.verbosity >= 2:
