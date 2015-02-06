@@ -107,11 +107,16 @@ class RemoveField(Operation):
         )
 
     def state_forwards(self, app_label, state):
-        new_fields = []
-        for name, instance in state.models[app_label, self.model_name_lower].fields:
-            if name != self.name:
-                new_fields.append((name, instance))
-        state.models[app_label, self.model_name_lower].fields = new_fields
+        model_state = state.models[app_label, self.model_name_lower]
+        old_field = model_state.get_field_by_name(self.name)
+        if old_field.is_relation:
+            # Reload the related model to create a new instance in state.apps,
+            # as it will be modified by side-effect of this field deletion
+            splitted = old_field.related_model.split('.')
+            app_label, model_name = (splitted if len(splitted) == 2 else (app_label, splitted[0]))
+            state._reload_one_model(app_label, model_name.lower())
+        model_state.fields = [(name, instance) for name, instance in model_state.fields
+                              if name != self.name]
         state.reload_model(app_label, self.model_name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
