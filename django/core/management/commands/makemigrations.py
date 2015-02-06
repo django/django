@@ -32,6 +32,8 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.')
         parser.add_argument('-n', '--name', action='store', dest='name', default=None,
             help="Use this name for migration file(s).")
+        parser.add_argument('--chars-per-line', type=int, dest='chars_per_line', default=79,
+            help="Specifies the maximum number of chars in a line before attempting to wrap the line")
         parser.add_argument('-e', '--exit', action='store_true', dest='exit_code', default=False,
             help='Exit with error code 1 if no changes needing migrations are found.')
 
@@ -43,6 +45,7 @@ class Command(BaseCommand):
         self.merge = options.get('merge', False)
         self.empty = options.get('empty', False)
         self.migration_name = options.get('name', None)
+        self.chars_per_line = options.get('chars_per_line', 79)
         self.exit_code = options.get('exit_code', False)
 
         # Make sure the app they asked for exists
@@ -152,7 +155,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label) + "\n")
             for migration in app_migrations:
                 # Describe the migration
-                writer = MigrationWriter(migration)
+                writer = MigrationWriter(migration, self.chars_per_line)
                 if self.verbosity >= 1:
                     self.stdout.write("  %s:\n" % (self.style.MIGRATE_LABEL(writer.filename),))
                     for operation in migration.operations:
@@ -233,7 +236,7 @@ class Command(BaseCommand):
                     "dependencies": [(app_label, migration.name) for migration in merge_migrations],
                 })
                 new_migration = subclass("%04i_merge" % (biggest_number + 1), app_label)
-                writer = MigrationWriter(new_migration)
+                writer = MigrationWriter(new_migration, self.chars_per_line)
                 with open(writer.path, "wb") as fh:
                     fh.write(writer.as_string())
                 if self.verbosity > 0:
