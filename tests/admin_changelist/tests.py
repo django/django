@@ -368,7 +368,7 @@ class ChangeListTests(TestCase):
             username='super', email='super@localhost', password='secret')
         self.client.login(username='super', password='secret')
         event = Event.objects.create(date=datetime.date.today())
-        response = self.client.get('/admin/admin_changelist/event/')
+        response = self.client.get(reverse('admin:admin_changelist_event_changelist'))
         self.assertContains(response, formats.localize(event.date))
         self.assertNotContains(response, six.text_type(event.date))
 
@@ -681,7 +681,7 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         """
         self.admin_login(username='super', password='secret')
         self.selenium.get('%s%s' % (self.live_server_url,
-                                    '/admin/auth/user/'))
+                                    reverse('admin:auth_user_changelist')))
 
         form_id = '#changelist-form'
 

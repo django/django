@@ -27,7 +27,7 @@ class Admin2(admin.AdminSite):
 
     def get_urls(self):
         return [
-            url(r'^my_view/$', self.admin_view(self.my_view)),
+            url(r'^my_view/$', self.admin_view(self.my_view), name='my_view'),
         ] + super(Admin2, self).get_urls()
 
     def my_view(self, request):

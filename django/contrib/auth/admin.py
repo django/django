@@ -79,7 +79,7 @@ class UserAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         return [
-            url(r'^(\d+)/password/$', self.admin_site.admin_view(self.user_change_password)),
+            url(r'^(\d+)/password/$', self.admin_site.admin_view(self.user_change_password), name='auth_user_password_change'),
         ] + super(UserAdmin, self).get_urls()
 
     def lookup_allowed(self, lookup, value):
