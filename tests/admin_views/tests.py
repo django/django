@@ -2125,6 +2125,15 @@ class SecureViewTests(TestCase):
         self.assertTemplateUsed(response, 'admin/login.html')
         self.assertEqual(response.context[REDIRECT_FIELD_NAME], secure_url)
 
+    def test_staff_member_required_decorator_works_with_argument(self):
+        """
+        Ensure that staff_member_required decorator works with an argument
+        (redirect_field_name).
+        """
+        secure_url = '/test_admin/admin/secure-view2/'
+        response = self.client.get(secure_url)
+        self.assertRedirects(response, '%s?myfield=%s' % (reverse('admin:login'), secure_url))
+
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF="admin_views.urls")
