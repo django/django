@@ -17,7 +17,7 @@ from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo
 from django.utils.encoding import force_text, smart_text
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango20Warning, RemovedInDjango19Warning
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
 from django.core import exceptions
@@ -26,74 +26,57 @@ from django import forms
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
 
-def add_lazy_relation(cls, field, relation, operation):
+def resolve_relation(scope_model, relation, always_text=False):
     """
-    Adds a lookup on ``cls`` when a related field is defined using a string,
-    i.e.::
+    Transform relation into a model or fully-qualified model string of the form
+    "app_label.ModelName", relative to scope_model.
+    
+    The relation argument can be:
+      * RECURSIVE_RELATIONSHIP_CONSTANT, i.e. the string "self", in which case
+        the model argument will be returned.
+      * A bare model name without an app_label, in which case scope_model's
+        app_label will be prepended.
+      * An "app_label.ModelName" string.
+      * A model class, which will be returned unchanged.
 
-        class MyModel(Model):
-            fk = ForeignKey("AnotherModel")
-
-    This string can be:
-
-        * RECURSIVE_RELATIONSHIP_CONSTANT (i.e. "self") to indicate a recursive
-          relation.
-
-        * The name of a model (i.e "AnotherModel") to indicate another model in
-          the same app.
-
-        * An app-label and model name (i.e. "someapp.AnotherModel") to indicate
-          another model in a different app.
-
-    If the other model hasn't yet been loaded -- almost a given if you're using
-    lazy relationships -- then the relation won't be set up until the
-    class_prepared signal fires at the end of model initialization.
-
-    operation is the work that must be performed once the relation can be resolved.
+    If always_text is True, an "app_label.ModelName" string will be returned
+    wherever a model class would otherwise have been returned.
     """
     # Check for recursive relations
     if relation == RECURSIVE_RELATIONSHIP_CONSTANT:
-        app_label = cls._meta.app_label
-        model_name = cls.__name__
+        relation = scope_model
 
-    else:
-        # Look for an "app.Model" relation
+    # Look for an "app.Model" relation
+    if isinstance(relation, six.string_types):
+        if "." not in relation:
+            relation = "%s.%s" % (scope_model._meta.app_label, relation)
+    elif always_text:
+        relation = "%s.%s" % (relation._meta.app_label, relation.__name__)
 
-        if isinstance(relation, six.string_types):
-            try:
-                app_label, model_name = relation.split(".")
-            except ValueError:
-                # If we can't split, assume a model in current app
-                app_label = cls._meta.app_label
-                model_name = relation
-        else:
-            # it's actually a model class
-            app_label = relation._meta.app_label
-            model_name = relation._meta.object_name
-
-    # Try to look up the related model, and if it's already loaded resolve the
-    # string right away. If get_registered_model raises a LookupError, it means
-    # that the related model isn't loaded yet, so we need to pend the relation
-    # until the class is prepared.
-    try:
-        model = cls._meta.apps.get_registered_model(app_label, model_name)
-    except LookupError:
-        key = (app_label, model_name)
-        value = (cls, field, operation)
-        cls._meta.apps._pending_lookups.setdefault(key, []).append(value)
-    else:
-        operation(field, model, cls)
+    return relation
 
 
-def do_pending_lookups(sender, **kwargs):
+def lazy_related_operation(function, model, related_model, **kwargs):
     """
-    Handle any pending relations to the sending model. Sent from class_prepared.
+    A wrapper for Apps.lazy_model_operation() restricted to two models
+      * Uses the apps object from the first model argument's _meta
+      * Accepts as its second argument the string "self" or a model name
+        without an app label, which will be resolved into a model class
+        or fully-qualified model name using resolve_relation().
     """
-    key = (sender._meta.app_label, sender.__name__)
-    for cls, field, operation in sender._meta.apps._pending_lookups.pop(key, []):
-        operation(field, sender, cls)
+    related_model = resolve_relation(model, related_model)
+    apps = model._meta.apps
+    return apps.lazy_model_operation(function, model, related_model, **kwargs)
 
-signals.class_prepared.connect(do_pending_lookups)
+
+def add_lazy_relation(cls, field, relation, operation):
+    warnings.warn(
+        "add_lazy_relation() has been replaced by lazy_related_operation() "
+        "and related methods on the Apps class, and will be no longer be "
+        "available in Django 1.9.", RemovedInDjango19Warning, stacklevel=2)
+    # Rearrange args for new Apps.lazy_model_operation
+    function = lambda local, related, field: operation(field, related, local)
+    lazy_related_operation(function, cls, relation, field=field)
 
 
 class RelatedField(Field):
@@ -298,10 +281,10 @@ class RelatedField(Field):
             self.rel.related_name = related_name
         other = self.rel.to
         if isinstance(other, six.string_types) or other._meta.pk is None:
-            def resolve_related_class(field, model, cls):
+            def resolve_related_class(cls, model, field):
                 field.rel.to = model
                 field.do_related_class(model, cls)
-            add_lazy_relation(cls, self, other, resolve_related_class)
+            lazy_related_operation(resolve_related_class, cls, other, field=self)
         else:
             self.do_related_class(other, cls)
 
@@ -2040,9 +2023,9 @@ def create_many_to_many_intermediary_model(field, klass):
         to_model = field.rel.to
         to = to_model.split('.')[-1]
 
-        def set_managed(field, model, cls):
+        def set_managed(cls, model, field):
             field.rel.through._meta.managed = model._meta.managed or cls._meta.managed
-        add_lazy_relation(klass, field, to_model, set_managed)
+        lazy_related_operation(set_managed, klass, to_model, field=field)
     elif isinstance(field.rel.to, six.string_types):
         to = klass._meta.object_name
         to_model = klass
@@ -2530,10 +2513,11 @@ class ManyToManyField(RelatedField):
 
         # Populate some necessary rel arguments so that cross-app relations
         # work correctly.
-        if isinstance(self.rel.through, six.string_types):
-            def resolve_through_model(field, model, cls):
+        if self.rel.through:
+            def resolve_through_model(_, model, field):
                 field.rel.through = model
-            add_lazy_relation(cls, self, self.rel.through, resolve_through_model)
+            lazy_related_operation(resolve_through_model,
+                                   cls, self.rel.through, field=self)
 
     def contribute_to_related_class(self, cls, related):
         # Internal M2Ms (i.e., those with a related name ending with '+')

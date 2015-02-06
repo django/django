@@ -19,7 +19,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
-    OneToOneField, add_lazy_relation)
+    OneToOneField, resolve_relation, lazy_related_operation)
 from django.db.models.manager import ensure_default_manager
 from django.db.models.options import Options
 from django.db.models.query import Q
@@ -219,7 +219,8 @@ class ModelBase(type):
             # Locate OneToOneField instances.
             for field in base._meta.local_fields:
                 if isinstance(field, OneToOneField):
-                    parent_links[field.rel.to] = field
+                    related = resolve_relation(new_class, field.rel.to, always_text=True)
+                    parent_links[related] = field
 
         # Do the appropriate setup for any model parents.
         for base in parents:
@@ -243,8 +244,9 @@ class ModelBase(type):
             if not base._meta.abstract:
                 # Concrete classes...
                 base = base._meta.concrete_model
-                if base in parent_links:
-                    field = parent_links[base]
+                base_label = "%s.%s" % (base._meta.app_label, base.__name__)
+                if base_label in parent_links:
+                    field = parent_links[base_label]
                 elif not is_proxy:
                     attr_name = '%s_ptr' % base._meta.model_name
                     field = OneToOneField(base, name=attr_name,
@@ -324,7 +326,7 @@ class ModelBase(type):
 
             # defer creating accessors on the foreign class until we are
             # certain it has been created
-            def make_foreign_order_accessors(field, model, cls):
+            def make_foreign_order_accessors(cls, model, field):
                 setattr(
                     field.rel.to,
                     'get_%s_order' % cls.__name__.lower(),
@@ -335,12 +337,9 @@ class ModelBase(type):
                     'set_%s_order' % cls.__name__.lower(),
                     curry(method_set_order, cls)
                 )
-            add_lazy_relation(
-                cls,
-                opts.order_with_respect_to,
-                opts.order_with_respect_to.rel.to,
-                make_foreign_order_accessors
-            )
+            lazy_related_operation(make_foreign_order_accessors,
+                                   cls, opts.order_with_respect_to.rel.to,
+                                   field=opts.order_with_respect_to)
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:

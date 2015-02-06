@@ -5,8 +5,9 @@ import threading
 import warnings
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
-from django.utils import lru_cache
+from django.utils import lru_cache, six
 from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.functional import curry
 from django.utils._os import upath
 
 from .config import AppConfig
@@ -50,6 +51,7 @@ class Apps(object):
 
         # Pending lookups for lazy relations.
         self._pending_lookups = {}
+        self._class_prepared_handler_registered = False
 
         # Populate apps and models, unless it's the master registry.
         if installed_apps is not None:
@@ -343,6 +345,76 @@ class Apps(object):
         if self.ready:
             for model in self.get_models(include_auto_created=True):
                 model._meta._expire_cache()
+
+    @staticmethod
+    def _model_key(model_or_name):
+        """
+        Returns an (app_label, model_name) tuple from a model or string.
+        """
+        if isinstance(model_or_name, six.string_types):
+            app_label, model_name = model_or_name.split(".")
+        else:
+            # It's actually a model class.
+            app_label = model_or_name._meta.app_label
+            model_name = model_or_name._meta.object_name
+        return app_label, model_name
+
+    def lazy_model_operation(self, function, *models_or_names, **kwargs):
+        """
+        Take a function and a number of models or model names, and when all
+        the corresponding models have been loaded, call the function with
+        the model classes and any optional as its arguments.
+
+        Each element of models_or names may be
+            * an actual model class
+            * a string of the form "app_label.ModelName"
+            * a tuple of strings of the form (app_label, model_name)
+
+        The function passed to this method must accept n positional arguments,
+        where n=len(models_or_names), plus whatever keyword arguments you pass
+        in kwargs.
+        """
+
+        if not self._class_prepared_handler_registered:
+            from django.db.models import signals
+            signals.class_prepared.connect(apps.do_pending_lookups, dispatch_uid=self)
+            self._class_prepared_handler_registered = True
+
+        # Eagerly parse all model strings so we can fail immediately
+        # if any are plainly invalid.
+        model_keys = [self._model_key(m) if not isinstance(m, tuple) else m
+                      for m in models_or_names]
+
+        # If this function depends on more than one model, recursively call add
+        # for each, partially applying the given function on each iteration.
+        model_key, more_models = model_keys[0], model_keys[1:]
+        if more_models:
+            inner_function = function
+            function = lambda model, **kwargs: (
+                self.lazy_model_operation(curry(inner_function, model),
+                                          *more_models, **kwargs)
+            )
+
+        # If the model is already loaded, pass it to the function immediately.
+        # Otherwise, delay execution until the class is prepared.
+        try:
+            model_class = self.get_registered_model(*model_key)
+        except LookupError:
+            self._pending_lookups.setdefault(model_key, []).append((function, kwargs))
+        else:
+            function(model_class, **kwargs)
+
+    @staticmethod
+    def do_pending_lookups(sender, **_):
+        """
+        Receive ``class_prepared``, and pass the freshly prepared
+        model to each function waiting for it.
+        """
+        key = (sender._meta.app_label, sender.__name__)
+        while key in sender._meta.apps._pending_lookups:
+            for function, kwargs in sender._meta.apps._pending_lookups.pop(key):
+                function(sender, **kwargs)
+
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 

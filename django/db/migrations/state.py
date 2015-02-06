@@ -6,7 +6,7 @@ from django.apps import AppConfig
 from django.apps.registry import Apps, apps as global_apps
 from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_together
-from django.db.models.fields.related import do_pending_lookups
+from django.db.models.fields.related import lazy_related_operation
 from django.db.models.fields.proxy import OrderWrt
 from django.conf import settings
 from django.utils import six
@@ -180,7 +180,7 @@ class StateApps(Apps):
                 # "ValueError: Lookup failed for model referenced by
                 # field migrations.Book.author: migrations.Author"
                 msg = "Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}"
-                raise ValueError(msg.format(field=operations[0][1], model=lookup_model))
+                raise ValueError(msg.format(field=operations[0][1]['field'], model=lookup_model))
             else:
                 do_pending_lookups(model)
 
