@@ -404,6 +404,13 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.clean('.01'), Decimal(".01"))
         self.assertRaisesMessage(ValidationError, "'Ensure that there are no more than 0 digits before the decimal point.'", f.clean, '1.1')
 
+    def test_decimalfield_scientific(self):
+        f = DecimalField(max_digits=2, decimal_places=2)
+        self.assertEqual(f.clean('1E+2'), Decimal('1E+2'))
+        self.assertEqual(f.clean('1e+2'), Decimal('1E+2'))
+        with self.assertRaisesMessage(ValidationError, "Ensure that there are no more"):
+            f.clean('0.546e+2')
+
     def test_decimalfield_widget_attrs(self):
         f = DecimalField(max_digits=6, decimal_places=2)
         self.assertEqual(f.widget_attrs(Widget()), {})
