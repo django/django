@@ -43,13 +43,14 @@ class GenericForeignKey(object):
 
     allow_unsaved_instance_assignment = False
 
-    def __init__(self, ct_field='content_type', fk_field='object_id', for_concrete_model=True):
+    def __init__(self, ct_field='content_type', fk_field='object_id', for_concrete_model=True, locked=False):
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
         self.editable = False
         self.rel = None
         self.column = None
+        self.locked = locked
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name

@@ -1326,15 +1326,31 @@ Or use a common ancestor to hold the :class:`~django.db.models.AutoField`::
     class BookReview(Book, Article):
         pass
 
-Field name "hiding" is not permitted
+Field name "hiding"
 -------------------------------------
 
 In normal Python class inheritance, it is permissible for a child class to
-override any attribute from the parent class. In Django, this is not permitted
-for attributes that are :class:`~django.db.models.Field` instances (at
-least, not at the moment). If a base class has a field called ``author``, you
-cannot create another model field called ``author`` in any class that inherits
-from that base class.
+override any attribute from the parent class. In Django, this is usually not
+permitted for attributes that are :class:`~django.db.models.Field` instances.
+If a base class has a field called ``author``, you cannot create another model
+field called ``author`` in any class that inherits from that base class.
+
+.. versionchanged:: 1.9
+
+If a field is directly inherited from an abstract base class, the usual issues
+don't apply, and the field can safely be overridden. The same is true for any
+fields where :attr:`~django.db.models.Field.concrete` is ``False``. Any abstract
+or virtual field can be completely replaced by a new :class:`~django.db.models.Field`
+instance, or it can be explicitly removed by overriding the field with the value
+`None`. In both cases, the inherited field will not be taken into account at all.
+
+.. note::
+
+    Some fields define extra attributes on the model, e.g. a
+    :class:`~django.db.models.ForeignKey` defines an extra attribute with ``_id``
+    appended to the field name. These extra attributes cannot be overridden, unless
+    the field that defines it is changed or removed so that it no longer defines
+    the extra attribute.
 
 Overriding fields in a parent model leads to difficulties in areas such as
 initializing new instances (specifying which field is being initialized in
