@@ -1,13 +1,15 @@
 from __future__ import unicode_literals
+
 from datetime import date
+import uuid
 
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.contrib.auth.tests.custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
+from django.contrib.auth.tests.custom_user import ExtensionUser, CustomPermissionsUser, CustomUser, CustomUserUUID
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.contrib.auth import authenticate, BACKEND_SESSION_KEY, get_user
+from django.contrib.auth import authenticate, BACKEND_SESSION_KEY, get_user, SESSION_KEY
 from django.http import HttpRequest
 from django.test import TestCase, modify_settings, override_settings
 from django.contrib.auth.hashers import MD5PasswordHasher
@@ -285,6 +287,24 @@ class CustomUserModelBackendAuthenticateTest(TestCase):
         )
         authenticated_user = authenticate(email='test@example.com', password='test')
         self.assertEqual(test_user, authenticated_user)
+
+
+@override_settings(AUTH_USER_MODEL='auth.CustomUserUUID')
+class CustomUserUUIDLoginTests(TestCase):
+    """
+    #24161 - Tests that a custom user with a UUID primary key can login.
+    """
+
+    def test_login(self):
+        user = CustomUserUUID.objects.create_user(
+            username='uuid',
+            password='test',
+            uuid=uuid.UUID('28b95ea6-9dc2-11e4-89d3-123b93f75cba'),
+        )
+        self.assertTrue(self.client.login(username='uuid', password='test'))
+        self.assertEqual(
+            CustomUserUUID.objects.get(pk=self.client.session[SESSION_KEY]), user
+        )
 
 
 class TestObj(object):
