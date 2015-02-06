@@ -11,7 +11,7 @@ from django.core.exceptions import (
 )
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import ValidationError
-from django.db import connection
+from django.db import connection, models
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import (
     ModelFormMetaclass, construct_instance, fields_for_model, model_to_dict,
@@ -545,6 +545,9 @@ class FieldOverridesByFormMetaForm(forms.ModelForm):
                 )
             }
         }
+        field_classes = {
+            'url': forms.URLField,
+        }
 
 
 class TestFieldOverridesByFormMeta(TestCase):
@@ -588,7 +591,7 @@ class TestFieldOverridesByFormMeta(TestCase):
     def test_error_messages_overrides(self):
         form = FieldOverridesByFormMetaForm(data={
             'name': 'Category',
-            'url': '/category/',
+            'url': 'http://www.example.com/category/',
             'slug': '!%#*@',
         })
         form.full_clean()
@@ -598,6 +601,11 @@ class TestFieldOverridesByFormMeta(TestCase):
             "We said letters, numbers, underscores and hyphens only!",
         ]
         self.assertEqual(form.errors, {'slug': error})
+
+    def test_field_type_overrides(self):
+        form = FieldOverridesByFormMetaForm()
+        self.assertIs(Category._meta.get_field('url').__class__, models.CharField)
+        self.assertIsInstance(form.fields['url'], forms.URLField)
 
 
 class IncompleteCategoryFormWithFields(forms.ModelForm):

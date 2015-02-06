@@ -106,7 +106,9 @@ File Uploads
 Forms
 ^^^^^
 
-* ...
+* :class:`~django.forms.ModelForm` accepts the new ``Meta`` option
+  ``field_classes`` to customize the type of the fields. See
+  :ref:`modelforms-overriding-default-fields` for details.
 
 Generic Views
 ^^^^^^^^^^^^^
