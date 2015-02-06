@@ -190,8 +190,10 @@ class MigrationWriter(object):
         except ImportError:
             pass
         else:
-            migration_statement = autopep8.fix_code(migration_statement,
-                                    options=autopep8.parse_args(['--aggressive', '']))
+            migration_statement = autopep8.fix_code(
+                migration_statement,
+                options=autopep8.parse_args(['--aggressive', ''])
+            )
         return migration_statement
 
     @staticmethod
