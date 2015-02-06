@@ -416,25 +416,28 @@ class ModelState(object):
             # instance
             managers[mgr.name] = (mgr.creation_counter, instance)
 
-        default_manager_name = model._default_manager.name
-        # Make sure the default manager is always the first
-        if model._default_manager.use_in_migrations:
-            reconstruct_manager(model._default_manager)
+        if hasattr(model, "_default_manager"):
+            default_manager_name = model._default_manager.name
+            # Make sure the default manager is always the first
+            if model._default_manager.use_in_migrations:
+                reconstruct_manager(model._default_manager)
+            else:
+                # Force this manager to be the first and thus default
+                managers[default_manager_name] = (0, models.Manager())
+            # Sort all managers by their creation counter
+            for _, manager, _ in sorted(model._meta.managers):
+                if manager.name == "_base_manager" or not manager.use_in_migrations:
+                    continue
+                reconstruct_manager(manager)
+            # Sort all managers by their creation counter but take only name and
+            # instance for further processing
+            managers = [
+                (name, instance) for name, (cc, instance) in
+                sorted(managers.items(), key=lambda v: v[1])
+            ]
+            if managers == [(default_manager_name, models.Manager())]:
+                managers = []
         else:
-            # Force this manager to be the first and thus default
-            managers[default_manager_name] = (0, models.Manager())
-        # Sort all managers by their creation counter
-        for _, manager, _ in sorted(model._meta.managers):
-            if manager.name == '_base_manager' or not manager.use_in_migrations:
-                continue
-            reconstruct_manager(manager)
-        # Sort all managers by their creation counter but take only name and
-        # instance for further processing
-        managers = [
-            (name, instance) for name, (cc, instance) in
-            sorted(managers.items(), key=lambda v: v[1])
-        ]
-        if managers == [(default_manager_name, models.Manager())]:
             managers = []
 
         # Construct the new ModelState
