@@ -135,6 +135,10 @@ class TemplateEncodingError(Exception):
     pass
 
 
+class TemplateCyclicDependencyError(Exception):
+    pass
+
+
 @python_2_unicode_compatible
 class VariableDoesNotExist(Exception):
 

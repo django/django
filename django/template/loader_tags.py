@@ -1,13 +1,16 @@
 from collections import defaultdict
 
-from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
-    token_kwargs, Variable
+from django.template.base import (
+    Library, Node, TemplateCyclicDependencyError, TemplateSyntaxError,
+    TextNode, Variable, token_kwargs,
+)
 from django.utils.safestring import mark_safe
 from django.utils import six
 
 register = Library()
 
 BLOCK_CONTEXT_KEY = 'block_context'
+EXTENDS_HISTORY_CONTEXT_KEY = 'extends_history'
 
 
 class ExtendsError(Exception):
@@ -105,6 +108,17 @@ class ExtendsNode(Node):
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
+        render_context = context.render_context
+
+        # keeps track of all extended templates to prevent circular extends.
+        extends_history = render_context.get(EXTENDS_HISTORY_CONTEXT_KEY, set())
+        if not extends_history:
+            render_context[EXTENDS_HISTORY_CONTEXT_KEY] = extends_history
+        if compiled_parent.name not in extends_history:
+            extends_history.add(compiled_parent.name)
+        else:
+            raise TemplateCyclicDependencyError(
+                'Circular template dependency error in %s' % extends_history)
 
         if BLOCK_CONTEXT_KEY not in context.render_context:
             context.render_context[BLOCK_CONTEXT_KEY] = BlockContext()
