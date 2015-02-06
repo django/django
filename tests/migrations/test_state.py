@@ -4,7 +4,7 @@ from django.db.migrations.operations import DeleteModel, RemoveField
 from django.db.migrations.state import (
     InvalidBasesError, ModelState, ProjectState, get_related_models_recursive,
 )
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 
 from .models import (
     FoodManager, FoodQuerySet, ModelWithCustomBase, NoMigrationFoodManager,
@@ -594,6 +594,60 @@ class StateTests(TestCase):
         self.assertIsNot(old_model.food_qs, new_model.food_qs)
         self.assertIsNot(old_model.food_mgr.model, new_model.food_mgr.model)
         self.assertIsNot(old_model.food_qs.model, new_model.food_qs.model)
+
+    @override_settings(TEST_SWAPPABLE_MODEL='migrations.SomeFakeModel')
+    def test_create_swappable(self):
+        """
+        Tests making a ProjectState from an Apps with a swappable model
+        """
+        new_apps = Apps(['migrations'])
+
+        class Author(models.Model):
+            name = models.CharField(max_length=255)
+            bio = models.TextField()
+            age = models.IntegerField(blank=True, null=True)
+
+            class Meta:
+                app_label = 'migrations'
+                apps = new_apps
+                swappable = 'TEST_SWAPPABLE_MODEL'
+
+        project_state = ProjectState.from_apps(new_apps)
+        author_state = project_state.models['migrations', 'author']
+        self.assertEqual(author_state.app_label, 'migrations')
+        self.assertEqual(author_state.name, 'Author')
+        self.assertEqual([x for x, y in author_state.fields], ['id', 'name', 'bio', 'age'])
+        self.assertEqual(author_state.fields[1][1].max_length, 255)
+        self.assertEqual(author_state.fields[2][1].null, False)
+        self.assertEqual(author_state.fields[3][1].null, True)
+        self.assertEqual(author_state.options, {'swappable': 'TEST_SWAPPABLE_MODEL'})
+        self.assertEqual(author_state.bases, (models.Model, ))
+        self.assertEqual(author_state.managers, [])
+
+    @override_settings(TEST_SWAPPABLE_MODEL='migrations.SomeFakeModel')
+    def test_custom_manager_swappable(self):
+        """
+        Tests making a ProjectState from unused models with custom managers
+        """
+        new_apps = Apps(['migrations'])
+
+        class Food(models.Model):
+
+            food_mgr = FoodManager('a', 'b')
+            food_qs = FoodQuerySet.as_manager()
+            food_no_mgr = NoMigrationFoodManager('x', 'y')
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+                swappable = 'TEST_SWAPPABLE_MODEL'
+
+        project_state = ProjectState.from_apps(new_apps)
+        food_state = project_state.models['migrations', 'food']
+
+        # The default manager is used in migrations
+        self.assertEqual([name for name, mgr in food_state.managers], ['food_mgr'])
+        self.assertEqual(food_state.managers[0][1].args, ('a', 'b', 1, 2))
 
 
 class ModelStateTests(TestCase):
