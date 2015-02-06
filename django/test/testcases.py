@@ -20,6 +20,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.files import locks
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
@@ -1332,3 +1333,31 @@ class LiveServerTestCase(TransactionTestCase):
     def tearDownClass(cls):
         cls._tearDownClassInternal()
         super(LiveServerTestCase, cls).tearDownClass()
+
+
+class SerializeMixin(object):
+    """
+    Mixin to enforce serialization of TestCases that share a common resource.
+
+    Define a common 'lockfile' for each set of TestCases to serialize. This
+    file must exist on the filesystem.
+
+    Place it early in the MRO in order to isolate setUpClass / tearDownClass.
+    """
+
+    lockfile = None
+
+    @classmethod
+    def setUpClass(cls):
+        if cls.lockfile is None:
+            raise ValueError(
+                "{}.lockfile isn't set. Set it to a unique value "
+                "in the base class.".format(cls.__name__))
+        cls._lockfile = open(cls.lockfile)
+        locks.lock(cls._lockfile, locks.LOCK_EX)
+        super(SerializeMixin, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(SerializeMixin, cls).tearDownClass()
+        cls._lockfile.close()
