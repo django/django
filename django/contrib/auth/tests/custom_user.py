@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager,
@@ -220,6 +222,11 @@ class CustomUserBadRequiredFields(AbstractBaseUser):
 
     class Meta:
         app_label = 'auth'
+
+
+class CustomUserUUIDasPK(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
 
 # Undo swap hack
 AbstractUser._meta.local_many_to_many = old_au_local_m2m

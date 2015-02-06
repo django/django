@@ -30,7 +30,7 @@ from django.middleware.csrf import CsrfViewMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 
 # Needed so model is installed when tests are run independently:
-from .custom_user import CustomUser  # NOQA
+from .custom_user import CustomUser, CustomUserUUIDasPK  # NOQA
 from .settings import AUTH_TEMPLATES
 from .utils import skipIfCustomUser
 
@@ -902,3 +902,28 @@ class ChangelistTests(AuthViewsTestCase):
         self.assertEqual(row.user_id, self.admin.pk)
         self.assertEqual(row.object_id, str(u.pk))
         self.assertEqual(row.change_message, 'Changed password.')
+
+
+@override_settings(
+    # Use pickle session serializer, because default json serializer
+    # can not encode UUID
+    AUTH_USER_MODEL='auth.CustomUserUUIDasPK',
+    SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer',
+    ROOT_URLCONF='django.contrib.auth.tests.urls_admin_custom_pk'
+)
+class CustomUserUUIDasPKPasswordChangeTest(AuthViewsTestCase):
+    fixtures = ['custom_user_uuid_as_pk.json']
+
+    def test_custom_user_uuid_as_pk_change_password(self):
+        self.login(username='uuid_as_pk')
+
+        u = CustomUserUUIDasPK.objects.get(username='uuid_as_pk')
+
+        response = self.client.get('/admin/auth/customuseruuidaspk/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/admin/auth/customuseruuidaspk/%s/' % u.pk)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/admin/auth/customuseruuidaspk/%s/password/' % u.pk)
+        self.assertEqual(response.status_code, 200)
