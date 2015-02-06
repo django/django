@@ -28,7 +28,7 @@ class Article(models.Model):
 
 
 class Movie(models.Model):
-    #5218: Test models with non-default primary keys / AutoFields
+    # Test models with non-default primary keys / AutoFields #5218
     movie_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=60)
 
@@ -72,7 +72,7 @@ class NonAutoPK(models.Model):
     name = models.CharField(max_length=10, primary_key=True)
 
 
-#18432: Chained foreign keys with to_field produce incorrect query
+# Chained foreign keys with to_field produce incorrect query #18432
 class Model1(models.Model):
     pkey = models.IntegerField(unique=True, db_index=True)
 

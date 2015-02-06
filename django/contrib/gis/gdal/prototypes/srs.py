@@ -7,7 +7,7 @@ from django.contrib.gis.gdal.prototypes.generation import (
 )
 
 
-## Shortcut generation for routines with known parameters.
+# Shortcut generation for routines with known parameters.
 def srs_double(f):
     """
     Creates a function prototype for the OSR routines that take

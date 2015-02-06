@@ -30,7 +30,7 @@ def topology(func, *args, **kwargs):
     func.errcheck = kwargs.get('errcheck', check_geom)
     return func
 
-### Topology Routines ###
+# Topology Routines
 geos_boundary = topology(GEOSFunc('GEOSBoundary'))
 geos_buffer = topology(GEOSFunc('GEOSBuffer'), c_double, c_int)
 geos_centroid = topology(GEOSFunc('GEOSGetCentroid'))
