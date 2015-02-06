@@ -174,7 +174,7 @@ class Collector(object):
             return [objs]
 
     def collect(self, objs, source=None, nullable=False, collect_related=True,
-            source_attr=None, reverse_dependency=False):
+            source_attr=None, reverse_dependency=False, keep_parents=False):
         """
         Adds 'objs' to the collection of objects to be deleted as well as all
         parent instances.  'objs' must be a homogeneous iterable collection of
@@ -189,6 +189,9 @@ class Collector(object):
         current model, rather than after. (Needed for cascading to parent
         models, the one case in which the cascade follows the forwards
         direction of an FK rather than the reverse direction.)
+
+        If 'keep_parents' is False, data of parent's models will be not
+        deleted.
         """
         if self.can_fast_delete(objs):
             self.fast_deletes.append(objs)
@@ -200,20 +203,21 @@ class Collector(object):
 
         model = new_objs[0].__class__
 
-        # Recursively collect concrete model's parent models, but not their
-        # related objects. These will be found by meta.get_fields()
-        concrete_model = model._meta.concrete_model
-        for ptr in six.itervalues(concrete_model._meta.parents):
-            if ptr:
-                # FIXME: This seems to be buggy and execute a query for each
-                # parent object fetch. We have the parent data in the obj,
-                # but we don't have a nice way to turn that data into parent
-                # object instance.
-                parent_objs = [getattr(obj, ptr.name) for obj in new_objs]
-                self.collect(parent_objs, source=model,
-                             source_attr=ptr.rel.related_name,
-                             collect_related=False,
-                             reverse_dependency=True)
+        if not keep_parents:
+            # Recursively collect concrete model's parent models, but not their
+            # related objects. These will be found by meta.get_fields()
+            concrete_model = model._meta.concrete_model
+            for ptr in six.itervalues(concrete_model._meta.parents):
+                if ptr:
+                    # FIXME: This seems to be buggy and execute a query for each
+                    # parent object fetch. We have the parent data in the obj,
+                    # but we don't have a nice way to turn that data into parent
+                    # object instance.
+                    parent_objs = [getattr(obj, ptr.name) for obj in new_objs]
+                    self.collect(parent_objs, source=model,
+                                 source_attr=ptr.rel.related_name,
+                                 collect_related=False,
+                                 reverse_dependency=True)
 
         if collect_related:
             for related in get_candidate_relations_to_delete(model._meta):
