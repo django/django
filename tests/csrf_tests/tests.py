@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import logging
+import re
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
-from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH
+from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH, check_token
 from django.template import RequestContext, Template
 from django.template.context_processors import csrf
 from django.test import TestCase, override_settings
@@ -81,7 +82,10 @@ class CsrfViewMiddlewareTest(TestCase):
         return req
 
     def _check_token_present(self, response, csrf_id=None):
-        self.assertContains(response, "name='csrfmiddlewaretoken' value='%s'" % (csrf_id or self._csrf_id))
+        m = re.search(br"name='csrfmiddlewaretoken' value='([^']*)'", response.content)
+        self.assert_(m)
+        token = m.group(1).decode('utf8')
+        self.assert_(check_token((csrf_id or self._csrf_id), token))
 
     def test_process_view_token_too_long(self):
         """
@@ -167,6 +171,17 @@ class CsrfViewMiddlewareTest(TestCase):
         req = self._get_POST_request_with_token()
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
+
+    def test_process_request_token_too_short(self):
+        """
+        Check that if the POSTed token is not equal to the cookie and
+        shorter than CSRF_KEY_LENGTH, the middleware rejects the request
+        gracefully.
+        """
+        req = self._get_POST_request_with_token()
+        req.POST['csrfmiddlewaretoken'] = 'a' * (CSRF_KEY_LENGTH / 2)
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(403, req2.status_code)
 
     def test_process_request_csrf_cookie_no_token_exempt_view(self):
         """
