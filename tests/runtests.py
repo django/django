@@ -89,7 +89,8 @@ def get_installed():
 
 
 def setup(verbosity, test_labels):
-    print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))
+    if verbosity >= 1:
+        print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
     def no_available_apps(self):
