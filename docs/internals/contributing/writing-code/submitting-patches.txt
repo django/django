@@ -119,7 +119,7 @@ to publish your work. If you use the Git workflow, then you should
 announce your branch in the ticket by including a link to your branch.
 When you think your work is ready to be merged in create a pull request.
 
-See the :doc:`working-with-git` documentation for mode details.
+See the :doc:`working-with-git` documentation for more details.
 
 You can also use patches in Trac. When using this style, follow these
 guidelines.
