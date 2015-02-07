@@ -6,7 +6,6 @@ from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
-from django.db import connection
 from django.db.migrations.graph import MigrationGraph, NodeNotFoundError
 from django.db.migrations.recorder import MigrationRecorder
 from django.utils import six
@@ -339,14 +338,3 @@ class AmbiguityError(Exception):
     Raised when more than one migration matches a name prefix
     """
     pass
-
-
-def is_latest_migration_applied(app_label):
-    # TODO: Remove when migration plan / state is passed (#24100).
-    loader = MigrationLoader(connection)
-    loader.load_disk()
-    leaf_nodes = loader.graph.leaf_nodes(app=app_label)
-    return (
-        leaf_nodes and leaf_nodes[0] in loader.applied_migrations or
-        app_label in loader.unmigrated_apps
-    )
