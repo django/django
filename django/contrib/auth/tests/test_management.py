@@ -590,6 +590,6 @@ class MigrateTests(TestCase):
                 INSTALLED_APPS=["django.contrib.auth", "django.contrib.contenttypes"],
                 MIGRATION_MODULES={'auth': 'django.contrib.auth.migrations'},
             ):
-                call_command("migrate", "auth", "zero", verbosity=0)
+                call_command("migrate", "auth", "zero", stdout=six.StringIO())
         finally:
-            call_command("migrate", verbosity=0)
+            call_command("migrate", stdout=six.StringIO())

@@ -258,9 +258,9 @@ class ContentTypesTests(TestCase):
                 INSTALLED_APPS=["django.contrib.contenttypes"],
                 MIGRATION_MODULES={'contenttypes': 'django.contrib.contenttypes.migrations'},
             ):
-                call_command("migrate", "contenttypes", "zero", verbosity=0)
+                call_command("migrate", "contenttypes", "zero", stdout=six.StringIO())
         finally:
-            call_command("migrate", verbosity=0)
+            call_command("migrate", stdout=six.StringIO())
 
     def test_name_deprecation(self):
         """
