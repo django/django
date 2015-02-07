@@ -61,11 +61,6 @@ class AdminCustomUrlsTest(TestCase):
         """
         # Should get the change_view for model instance with PK 'add', not show
         # the add_view
-        response = self.client.get('/admin/admin_custom_urls/action/add/')
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Change action')
-
-        # Ditto, but use reverse() to build the URL
         url = reverse('admin:%s_action_change' % Action._meta.app_label,
                 args=(quote('add'),))
         response = self.client.get(url)
