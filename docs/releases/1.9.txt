@@ -35,6 +35,14 @@ Minor features
 
 * Admin views now have ``model_admin`` or ``admin_site`` attributes.
 
+* The URL of the admin change view has been changed (was at
+  ``/admin/<app>/<model>/<pk>/`` by default and is now at
+  ``/admin/<app>/<model>/<pk>/change/``). This should not affect your
+  application unless you have hardcoded admin URLs. In that case, replace those
+  links by :ref:`reversing admin URLs <admin-reverse-urls>` instead. Note that
+  the old URL still redirects to the new one for backwards compatibility, but
+  it may be removed in a future version.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
