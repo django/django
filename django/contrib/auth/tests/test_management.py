@@ -579,6 +579,8 @@ class PermissionTestCase(TestCase):
 
 class MigrateTests(TestCase):
 
+    available_apps = ['django.contrib.auth', 'django.contrib.contenttypes']
+
     @skipUnlessDBFeature('can_rollback_ddl')
     def test_unmigrating_first_migration_post_migrate_signal(self):
         """
