@@ -3669,3 +3669,12 @@ class TestTicket24279(TestCase):
         School.objects.create()
         qs = School.objects.filter(Q(pk__in=()) | Q())
         self.assertQuerysetEqual(qs, [])
+
+
+class TestTicket24254(TestCase):
+    def test_ticket_24254(self):
+        # This tests that the following queryset compiles to valid SQL.
+        qs = Person.objects.filter(
+            pk__in=Person.objects.order_by('name').distinct()[:10]
+        )
+        self.assertQuerysetEqual(qs, [])

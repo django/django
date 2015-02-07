@@ -303,6 +303,10 @@ class SQLCompiler(object):
         return result
 
     def get_extra_select(self, order_by, select):
+        if self.subquery:
+            # For a subquery, we can't return more than one column, so we don't
+            # want any extra columns.
+            return []
         extra_select = []
         select_sql = [t[1] for t in select]
         if self.query.distinct and not self.query.distinct_fields:
