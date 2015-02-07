@@ -9,4 +9,7 @@ Django 1.7.5 fixes several bugs in 1.7.4.
 Bugfixes
 ========
 
-* ...
+* Reverted a fix that prevented a migration crash when unapplying
+  ``contrib.contenttypes``’s or ``contrib.auth``’s first migration
+  (:ticket:`24075`) due to severe impact on the test performance
+  (:ticket:`24251`) and problems in multi-database setups (:ticket:`24298`).
