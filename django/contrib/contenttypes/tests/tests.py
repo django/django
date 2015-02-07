@@ -5,9 +5,8 @@ import warnings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.management import call_command
 from django.http import Http404, HttpRequest
-from django.test import TestCase, override_settings, skipUnlessDBFeature
+from django.test import TestCase, override_settings
 from django.utils import six
 
 from .models import (
@@ -246,21 +245,6 @@ class ContentTypesTests(TestCase):
         # Instead, just return the ContentType object and let the app detect stale states.
         ct_fetched = ContentType.objects.get_for_id(ct.pk)
         self.assertIsNone(ct_fetched.model_class())
-
-    @skipUnlessDBFeature('can_rollback_ddl')
-    def test_unmigrating_first_migration_post_migrate_signal(self):
-        """
-        #24075 - When unmigrating an app before its first migration,
-        post_migrate signal handler must be aware of the missing tables.
-        """
-        try:
-            with override_settings(
-                INSTALLED_APPS=["django.contrib.contenttypes"],
-                MIGRATION_MODULES={'contenttypes': 'django.contrib.contenttypes.migrations'},
-            ):
-                call_command("migrate", "contenttypes", "zero", stdout=six.StringIO())
-        finally:
-            call_command("migrate", stdout=six.StringIO())
 
     def test_name_deprecation(self):
         """
