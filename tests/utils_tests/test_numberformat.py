@@ -26,6 +26,9 @@ class TestNumberFormat(TestCase):
         self.assertEqual(nformat('1234', '.', grouping=2, thousand_sep=',',
                                  force_grouping=True), '12,34')
         self.assertEqual(nformat('-1234.33', '.', decimal_pos=1), '-1234.3')
+        self.assertEqual(nformat('10000', '.', grouping=3,
+                                 thousand_sep='comma', force_grouping=True),
+                         '10comma000')
 
     def test_large_number(self):
         most_max = ('{}179769313486231570814527423731704356798070567525844996'
