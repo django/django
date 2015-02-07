@@ -693,7 +693,7 @@ class UnchangeableObjectAdmin(admin.ModelAdmin):
     def get_urls(self):
         # Disable change_view, but leave other urls untouched
         urlpatterns = super(UnchangeableObjectAdmin, self).get_urls()
-        return [p for p in urlpatterns if not p.name.endswith("_change")]
+        return [p for p in urlpatterns if p.name and not p.name.endswith("_change")]
 
 
 def callable_on_unknown(obj):
