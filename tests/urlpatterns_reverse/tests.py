@@ -10,6 +10,7 @@ import unittest
 from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
+from django.conf.urls import include
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.core.urlresolvers import (
@@ -399,7 +400,7 @@ class ReverseShortcutTests(TestCase):
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_reverse_by_path_nested(self):
         # Views that are added to urlpatterns using include() should be
-        # reversible by doted path.
+        # reversible by dotted path.
         self.assertEqual(reverse('urlpatterns_reverse.views.nested_view'), '/includes/nested_path/')
 
     def test_redirect_view_object(self):
@@ -749,3 +750,10 @@ class ViewLoadingTests(TestCase):
         # swallow it.
         self.assertRaises(AttributeError, get_callable,
                           'urlpatterns_reverse.views_broken.i_am_broken')
+
+
+class IncludeTests(SimpleTestCase):
+    def test_include_app_name_but_no_namespace(self):
+        msg = "Must specify a namespace if specifying app_name."
+        with self.assertRaisesMessage(ValueError, msg):
+            include('urls', app_name='bar')
