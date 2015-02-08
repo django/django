@@ -105,6 +105,24 @@ class Migration(migrations.Migration):
             options=None,
             bases=None,
         ),
+        migrations.CreateModel(
+            name='AggregateTestModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('boolean_field', models.NullBooleanField()),
+                ('char_field', models.CharField(max_length=30, blank=True)),
+                ('integer_field', models.IntegerField(null=True)),
+            ]
+        ),
+        migrations.CreateModel(
+            name='StatTestModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('int1', models.IntegerField()),
+                ('int2', models.IntegerField()),
+                ('related_field', models.ForeignKey('postgres_tests.AggregateTestModel', null=True)),
+            ]
+        ),
     ]
 
     pg_92_operations = [
