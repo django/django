@@ -69,6 +69,11 @@ Minor features
 
 * ...
 
+:mod:`django.contrib.postgres`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Added :doc:`/ref/contrib/postgres/aggregates`.
+
 :mod:`django.contrib.redirects`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

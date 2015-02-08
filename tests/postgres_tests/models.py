@@ -62,3 +62,21 @@ else:
 class ArrayFieldSubclass(ArrayField):
     def __init__(self, *args, **kwargs):
         super(ArrayFieldSubclass, self).__init__(models.IntegerField())
+
+
+class AggregateTestModel(models.Model):
+    """
+    To test postgres-specific general aggregation functions
+    """
+    char_field = models.CharField(max_length=30, blank=True)
+    integer_field = models.IntegerField(null=True)
+    boolean_field = models.NullBooleanField()
+
+
+class StatTestModel(models.Model):
+    """
+    To test postgres-specific aggregation functions for statistics
+    """
+    int1 = models.IntegerField()
+    int2 = models.IntegerField()
+    related_field = models.ForeignKey(AggregateTestModel, null=True)
