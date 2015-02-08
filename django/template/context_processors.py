@@ -11,9 +11,8 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.middleware.csrf import get_token
-from django.utils import six
 from django.utils.encoding import smart_text
-from django.utils.functional import lazy, SimpleLazyObject
+from django.utils.functional import SimpleLazyObject, lazy
 
 
 def csrf(request):
