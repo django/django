@@ -17,6 +17,9 @@ handler500 = 'django.views.defaults.server_error'
 
 
 def include(arg, namespace=None, app_name=None):
+    if app_name and not namespace:
+        raise ValueError('Must specify a namespace if specifying app_name.')
+
     if isinstance(arg, tuple):
         # callable returning a namespace hint
         if namespace:
