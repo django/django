@@ -715,7 +715,7 @@ SERIALIZE
 
 .. versionadded:: 1.7.1
 
-Boolean value to control whether or not the default test runnner serializes the
+Boolean value to control whether or not the default test runner serializes the
 database into an in-memory JSON string before running tests (used to restore
 the database state between tests if you don't have transactions). You can set
 this to ``False`` to speed up creation time if you don't have any test classes

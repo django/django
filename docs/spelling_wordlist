@@ -24,6 +24,7 @@ attr
 auth
 autoclobber
 autocommit
+autocompletion
 autoconf
 autodetect
 autodetectable
@@ -56,6 +57,7 @@ Biggs
 Bjørn
 blocktrans
 blog
+blogs
 Boersma
 boilerplatish
 Bokmål
@@ -67,6 +69,7 @@ Bronn
 bugfix
 bugfixes
 bugfixing
+buildbot
 builtin
 builtins
 Byteorder
@@ -132,6 +135,7 @@ datatype
 datetimes
 dbshell
 de
+Debian
 deconstruct
 deconstructing
 deduplicates
@@ -151,6 +155,7 @@ dictsortreversed
 diff
 diffsettings
 dirmod
+Disqus
 distro
 divisibleby
 django
@@ -171,6 +176,7 @@ Dreamhost
 Dreamweaver
 drilldown
 dropdown
+dropdowns
 drupal
 dumpdata
 Dunck
@@ -202,6 +208,7 @@ filesizeformat
 filesystem
 filesystems
 findstatic
+Firesheep
 firstof
 fk
 flatpage
@@ -225,8 +232,12 @@ geo
 geoip
 geolibs
 geolocalized
+geolocated
 geolocation
 geoquerysets
+georeference
+georeferenced
+georeferencing
 geospatial
 Geospatial
 Gettext
@@ -262,6 +273,7 @@ Honza
 hostname
 hostnames
 howto
+hstore
 html
 http
 https
@@ -285,6 +297,7 @@ init
 inline
 inlines
 inspectdb
+Instagram
 intcomma
 internet
 intranet
@@ -298,6 +311,7 @@ irc
 iregex
 iriencode
 ise
+isempty
 isnull
 iso
 istartswith
@@ -308,6 +322,7 @@ iTunes
 ize
 Jannis
 javascript
+Jinja
 jQuery
 JServ
 Julien
@@ -325,6 +340,7 @@ Kyngesburye
 latin
 lawrence
 Lawrence
+Leidel
 lexer
 lhs
 lifecycle
@@ -343,12 +359,16 @@ localflavors
 localhost
 localizable
 localtime
+Loïc
+loopback
 lorem
 lt
 lte
+Luhn
 Magee
 makemessages
 makemigrations
+Mako
 Mapnik
 MBR
 memcache
@@ -374,6 +394,7 @@ modelformset
 modwsgi
 monkeypatched
 Montréal
+mssql
 multijoins
 multiline
 multipart
@@ -385,6 +406,7 @@ myapp
 myproject
 mysite
 mysql
+mysqlclient
 naïve
 namespace
 namespaced
@@ -421,11 +443,13 @@ Palau
 params
 parens
 pdf
+PEM
 perl
 permalink
 pessimization
 Peucker
 pgAdmin
+phishing
 php
 pickleable
 picosecond
@@ -433,6 +457,7 @@ PIL
 pingback
 pingbacks
 Pinney
+Pinterest
 plaintext
 plugin
 plugins
@@ -458,6 +483,8 @@ prepopulate
 prepopulated
 prepopulates
 preprocess
+preprocesses
+Procida
 programmatically
 projectname
 proxied
@@ -478,6 +505,7 @@ queryset
 querysets
 Querysets
 querystring
+queueing
 Quickstart
 quoteless
 Radziej
@@ -491,10 +519,13 @@ refactored
 refactorings
 refactors
 referer
+reflow
 regex
 regexes
 reimplement
+reindent
 reindex
+releasers
 removetags
 repo
 reprojection
@@ -502,7 +533,7 @@ reraise
 reST
 reStructuredText
 reupload
-Reusability
+reusability
 revalidate
 rhs
 rjust
@@ -511,11 +542,13 @@ Roald
 rss
 runfcgi
 runserver
+SaaS
 safeseq
 Sandvik
 savepoint
 savepoints
 Schaub
+schemas
 screencast
 screencasts
 screenshot
@@ -527,6 +560,7 @@ serializability
 serializable
 serializer
 serializers
+servlet
 sessionid
 setuptools
 sha
@@ -534,6 +568,7 @@ Shai
 shapefile
 shapefiles
 sharding
+showmigrations
 sid
 simultaneously
 sitemap
@@ -561,7 +596,10 @@ sqlmigrate
 sqlsequencereset
 squashmigrations
 ssi
+SSL
 stacktrace
+startapp
+startproject
 startswith
 stateful
 staticfile
@@ -587,6 +625,7 @@ subpackages
 subqueries
 subquery
 subselect
+substr
 subtemplate
 subtemplates
 subviews
@@ -646,6 +685,7 @@ unapplying
 uncheck
 unclaim
 uncopyable
+unencoded
 unescape
 unescaped
 ungrouped
@@ -663,6 +703,7 @@ unmigrated
 unparseable
 unpickle
 unpickled
+unpickling
 unpythonic
 unregistration
 unrendered
@@ -731,6 +772,7 @@ www
 xe
 xgettext
 xref
+XSS
 xxxxx
 yesno
 Zope

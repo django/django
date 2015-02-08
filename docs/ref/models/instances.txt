@@ -608,7 +608,7 @@ URL, you should define ``get_absolute_url()``.
 
 .. warning::
 
-    You should avoid building the URL from un-validated user input, in order to
+    You should avoid building the URL from unvalidated user input, in order to
     reduce possibilities of link or redirect poisoning::
 
         def get_absolute_url(self):
