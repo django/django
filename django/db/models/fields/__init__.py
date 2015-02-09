@@ -1689,6 +1689,13 @@ class DurationField(Field):
         val = self._get_val_from_obj(obj)
         return '' if val is None else duration_string(val)
 
+    def formfield(self, **kwargs):
+        defaults = {
+            'form_class': forms.DurationField,
+        }
+        defaults.update(kwargs)
+        return super(DurationField, self).formfield(**defaults)
+
 
 class EmailField(CharField):
     default_validators = [validators.validate_email]
