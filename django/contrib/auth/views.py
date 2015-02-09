@@ -25,9 +25,6 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 
 
-# Avoid shadowing the login() and logout() views below.
-
-
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
