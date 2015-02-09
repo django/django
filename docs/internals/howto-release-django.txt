@@ -112,6 +112,17 @@ any time leading up to the actual release:
 #. Double-check that the release notes index has a link to the notes
    for the new release; this will be in ``docs/releases/index.txt``.
 
+#. If this is a major release, ensure translations from Transifex have been
+   integrated. This is typically done by a separate translation's manager
+   rather than the releaser, but here are the steps. Provided you have an
+   account on Transifex::
+
+        python scripts/manage_translations.py fetch
+
+   and then commit the changed/added files (both .po and .mo). Sometimes there
+   are validation errors which need to be debugged, so avoid doing this task
+   immediately before a release is needed.
+
 Preparing for release
 =====================
 
