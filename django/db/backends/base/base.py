@@ -494,6 +494,14 @@ class BaseDatabaseWrapper(object):
             '_start_transaction_under_autocommit() method'
         )
 
+    def clear_old_columns(self):
+        """
+        Handler for database feature `connection_persists_old_columns = True`
+        """
+        if self.connection is None:
+            return
+        self.connection.close()
+
     def schema_editor(self, *args, **kwargs):
         """
         Returns a new instance of this backend's SchemaEditor.
