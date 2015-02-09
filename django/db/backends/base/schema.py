@@ -415,7 +415,7 @@ class BaseDatabaseSchemaEditor(object):
             self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
-            self.connection.close()
+            self.connection.clear_old_columns()
 
     def remove_field(self, model, field):
         """
@@ -441,7 +441,7 @@ class BaseDatabaseSchemaEditor(object):
         self.execute(sql)
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
-            self.connection.close()
+            self.connection.clear_old_columns()
 
     def alter_field(self, model, old_field, new_field, strict=False):
         """
@@ -736,7 +736,7 @@ class BaseDatabaseSchemaEditor(object):
             self.execute(sql)
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
-            self.connection.close()
+            self.connection.clear_old_columns()
 
     def _alter_column_type_sql(self, table, column, type):
         """

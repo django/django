@@ -248,12 +248,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self.pattern_ops = self._standard_pattern_ops
             cursor.close()
 
-        try:
-            self.connection.stmtcachesize = 20
-        except AttributeError:
-            # Django docs specify cx_Oracle version 4.3.1 or higher, but
-            # stmtcachesize is available only in 4.3.2 and up.
-            pass
+        self.set_statement_cache_size(20)
         # Ensure all changes are preserved even when AUTOCOMMIT is False.
         if not self.get_autocommit():
             self.commit()
@@ -307,6 +302,23 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return False
         else:
             return True
+
+    def set_statement_cache_size(self, size):
+        try:
+            self.connection.stmtcachesize = size
+        except AttributeError:
+            # Django docs specify cx_Oracle version 4.3.1 or higher, but
+            # stmtcachesize is available only in 4.3.2 and up.
+            pass
+
+    def clear_old_columns(self):
+        """
+        Reset the statement cache to clear out old table definitions.
+        """
+        if self.connection is None:
+            return
+        self.set_statement_cache_size(0)
+        self.set_statement_cache_size(20)
 
     @cached_property
     def oracle_full_version(self):
