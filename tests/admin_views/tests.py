@@ -1114,8 +1114,9 @@ class AdminViewPermissionsTest(TestCase):
 
     fixtures = ['admin-views-users.xml']
 
-    def setUp(self):
-        """Test setup."""
+    @classmethod
+    def setUpTestData(cls):
+        super(AdminViewPermissionsTest, cls).setUpTestData()
         # Setup permissions, for our users who can add, change, and delete.
         # We can't put this into the fixture, because the content type id
         # and the permission id could be different on each run of the test.
@@ -1144,49 +1145,49 @@ class AdminViewPermissionsTest(TestCase):
             get_permission_codename('delete', Section._meta)))
 
         # login POST dicts
-        self.index_url = reverse('admin:index')
-        self.super_login = {
-            REDIRECT_FIELD_NAME: self.index_url,
+        cls.index_url = reverse('admin:index')
+        cls.super_login = {
+            REDIRECT_FIELD_NAME: cls.index_url,
             'username': 'super',
             'password': 'secret',
         }
-        self.super_email_login = {
-            REDIRECT_FIELD_NAME: self.index_url,
+        cls.super_email_login = {
+            REDIRECT_FIELD_NAME: cls.index_url,
             'username': 'super@example.com',
             'password': 'secret',
         }
-        self.super_email_bad_login = {
-            REDIRECT_FIELD_NAME: self.index_url,
+        cls.super_email_bad_login = {
+            REDIRECT_FIELD_NAME: cls.index_url,
             'username': 'super@example.com',
             'password': 'notsecret',
         }
-        self.adduser_login = {
-            REDIRECT_FIELD_NAME: self.index_url,
+        cls.adduser_login = {
+            REDIRECT_FIELD_NAME: cls.index_url,
             'username': 'adduser',
             'password': 'secret',
         }
-        self.changeuser_login = {
-            REDIRECT_FIELD_NAME: self.index_url,
+        cls.changeuser_login = {
+            REDIRECT_FIELD_NAME: cls.index_url,
             'username': 'changeuser',
             'password': 'secret',
         }
-        self.deleteuser_login = {
-            REDIRECT_FIELD_NAME: self.index_url,
+        cls.deleteuser_login = {
+            REDIRECT_FIELD_NAME: cls.index_url,
             'username': 'deleteuser',
             'password': 'secret',
         }
-        self.nostaff_login = {
+        cls.nostaff_login = {
             REDIRECT_FIELD_NAME: reverse('has_permission_admin:index'),
             'username': 'nostaff',
             'password': 'secret',
         }
-        self.joepublic_login = {
-            REDIRECT_FIELD_NAME: self.index_url,
+        cls.joepublic_login = {
+            REDIRECT_FIELD_NAME: cls.index_url,
             'username': 'joepublic',
             'password': 'secret',
         }
-        self.no_username_login = {
-            REDIRECT_FIELD_NAME: self.index_url,
+        cls.no_username_login = {
+            REDIRECT_FIELD_NAME: cls.index_url,
             'password': 'secret',
         }
 
@@ -1348,7 +1349,7 @@ class AdminViewPermissionsTest(TestCase):
         # Try POST just to make sure
         post = self.client.post(reverse('admin:admin_views_article_add'), add_dict)
         self.assertEqual(post.status_code, 403)
-        self.assertEqual(Article.objects.all().count(), 3)
+        self.assertEqual(Article.objects.count(), 3)
         self.client.get(reverse('admin:logout'))
 
         # Add user may login and POST to add view, then redirect to admin root
@@ -1360,7 +1361,7 @@ class AdminViewPermissionsTest(TestCase):
             msg_prefix='User restricted to add permission is given link to change list view in breadcrumbs.')
         post = self.client.post(reverse('admin:admin_views_article_add'), add_dict)
         self.assertRedirects(post, self.index_url)
-        self.assertEqual(Article.objects.all().count(), 4)
+        self.assertEqual(Article.objects.count(), 4)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a created object')
         self.client.get(reverse('admin:logout'))
@@ -1373,7 +1374,7 @@ class AdminViewPermissionsTest(TestCase):
             msg_prefix='Unrestricted user is not given link to change list view in breadcrumbs.')
         post = self.client.post(reverse('admin:admin_views_article_add'), add_dict)
         self.assertRedirects(post, reverse('admin:admin_views_article_changelist'))
-        self.assertEqual(Article.objects.all().count(), 5)
+        self.assertEqual(Article.objects.count(), 5)
         self.client.get(reverse('admin:logout'))
 
         # 8509 - if a normal user is already logged in, it is possible
@@ -1467,6 +1468,43 @@ class AdminViewPermissionsTest(TestCase):
             self.assertContains(response, 'login-form')
             self.client.get(reverse('admin:logout'))
 
+    def test_delete_view(self):
+        """Delete view should restrict access and actually delete items."""
+
+        delete_dict = {'post': 'yes'}
+        delete_url = reverse('admin:admin_views_article_delete', args=(1,))
+
+        # add user should not be able to delete articles
+        self.client.login(**self.adduser_login)
+        response = self.client.get(delete_url)
+        self.assertEqual(response.status_code, 403)
+        post = self.client.post(delete_url, delete_dict)
+        self.assertEqual(post.status_code, 403)
+        self.assertEqual(Article.objects.count(), 3)
+        self.client.logout()
+
+        # Delete user can delete
+        self.client.login(**self.deleteuser_login)
+        response = self.client.get(reverse('admin:admin_views_section_delete', args=(1,)))
+        self.assertContains(response, "<h2>Summary</h2>")
+        self.assertContains(response, "<li>Articles: 3</li>")
+        # test response contains link to related Article
+        self.assertContains(response, "admin_views/article/1/")
+
+        response = self.client.get(delete_url)
+        self.assertContains(response, "admin_views/article/1/")
+        self.assertContains(response, "<h2>Summary</h2>")
+        self.assertContains(response, "<li>Articles: 1</li>")
+        self.assertEqual(response.status_code, 200)
+        post = self.client.post(delete_url, delete_dict)
+        self.assertRedirects(post, self.index_url)
+        self.assertEqual(Article.objects.count(), 2)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Greetings from a deleted object')
+        article_ct = ContentType.objects.get_for_model(Article)
+        logged = LogEntry.objects.get(content_type=article_ct, action_flag=DELETION)
+        self.assertEqual(logged.object_id, '1')
+
     def test_history_view(self):
         """History view should restrict access."""
 
@@ -1518,17 +1556,13 @@ class AdminViewPermissionsTest(TestCase):
         The foreign key widget should only show the "add related" button if the
         user has permission to add that related item.
         """
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
-        # Set up and log in user.
+        self.client.login(**self.adduser_login)
+        # The user can't add sections yet, so they shouldn't see the "add section" link.
         url = reverse('admin:admin_views_article_add')
         add_link_text = 'add_id_section'
-        self.client.post(login_url, self.adduser_login)
-        # The user can't add sections yet, so they shouldn't see the "add
-        # section" link.
         response = self.client.get(url)
         self.assertNotContains(response, add_link_text)
-        # Allow the user to add sections too. Now they can see the "add
-        # section" link.
+        # Allow the user to add sections too. Now they can see the "add section" link.
         user = User.objects.get(username='adduser')
         perm = get_perm(Section, get_permission_codename('add', Section._meta))
         user.user_permissions.add(perm)
@@ -1543,18 +1577,14 @@ class AdminViewPermissionsTest(TestCase):
         def get_change_related(response):
             return response.context['adminform'].form.fields['section'].widget.can_change_related
 
-        login_url = reverse('admin:login')
-        # Set up and log in user.
+        self.client.login(**self.adduser_login)
+        # The user can't change sections yet, so they shouldn't see the "change section" link.
         url = reverse('admin:admin_views_article_add')
         change_link_text = 'change_id_section'
-        self.client.post(login_url, self.adduser_login)
-        # The user can't change sections yet, so they shouldn't see the "change
-        # section" link.
         response = self.client.get(url)
         self.assertFalse(get_change_related(response))
         self.assertNotContains(response, change_link_text)
-        # Allow the user to change sections too. Now they can see the "change
-        # section" link.
+        # Allow the user to change sections too. Now they can see the "change section" link.
         user = User.objects.get(username='adduser')
         perm = get_perm(Section, get_permission_codename('change', Section._meta))
         user.user_permissions.add(perm)
@@ -1570,66 +1600,20 @@ class AdminViewPermissionsTest(TestCase):
         def get_delete_related(response):
             return response.context['adminform'].form.fields['sub_section'].widget.can_delete_related
 
-        login_url = reverse('admin:login')
-        # Set up and log in user.
+        self.client.login(**self.adduser_login)
+        # The user can't delete sections yet, so they shouldn't see the "delete section" link.
         url = reverse('admin:admin_views_article_add')
         delete_link_text = 'delete_id_sub_section'
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.adduser_login)
-        # The user can't delete sections yet, so they shouldn't see the "delete
-        # section" link.
         response = self.client.get(url)
         self.assertFalse(get_delete_related(response))
         self.assertNotContains(response, delete_link_text)
-        # Allow the user to delete sections too. Now they can see the "delete
-        # section" link.
+        # Allow the user to delete sections too. Now they can see the "delete section" link.
         user = User.objects.get(username='adduser')
         perm = get_perm(Section, get_permission_codename('delete', Section._meta))
         user.user_permissions.add(perm)
         response = self.client.get(url)
         self.assertTrue(get_delete_related(response))
         self.assertContains(response, delete_link_text)
-
-    def test_delete_view(self):
-        """Delete view should restrict access and actually delete items."""
-
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
-        delete_dict = {'post': 'yes'}
-        delete_url = reverse('admin:admin_views_article_delete', args=(1,))
-
-        # add user should not be able to delete articles
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.adduser_login)
-        response = self.client.get(delete_url)
-        self.assertEqual(response.status_code, 403)
-        post = self.client.post(delete_url, delete_dict)
-        self.assertEqual(post.status_code, 403)
-        self.assertEqual(Article.objects.all().count(), 3)
-        self.client.get(reverse('admin:logout'))
-
-        # Delete user can delete
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.deleteuser_login)
-        response = self.client.get(reverse('admin:admin_views_section_delete', args=(1,)))
-        self.assertContains(response, "<h2>Summary</h2>")
-        self.assertContains(response, "<li>Articles: 3</li>")
-        # test response contains link to related Article
-        self.assertContains(response, "admin_views/article/1/")
-
-        response = self.client.get(delete_url)
-        self.assertContains(response, "admin_views/article/1/")
-        self.assertContains(response, "<h2>Summary</h2>")
-        self.assertContains(response, "<li>Articles: 1</li>")
-        self.assertEqual(response.status_code, 200)
-        post = self.client.post(delete_url, delete_dict)
-        self.assertRedirects(post, self.index_url)
-        self.assertEqual(Article.objects.all().count(), 2)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, 'Greetings from a deleted object')
-        article_ct = ContentType.objects.get_for_model(Article)
-        logged = LogEntry.objects.get(content_type=article_ct, action_flag=DELETION)
-        self.assertEqual(logged.object_id, '1')
-        self.client.get(reverse('admin:logout'))
 
     def test_disabled_permissions_when_logged_in(self):
         self.client.login(username='super', password='secret')
@@ -1662,12 +1646,11 @@ class AdminViewPermissionsTest(TestCase):
         If a user has no module perms, avoid iterating over all the modeladmins
         in the registry.
         """
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
         opts = Article._meta
         change_user = User.objects.get(username='changeuser')
         permission = get_perm(Article, get_permission_codename('change', opts))
 
-        self.client.post(login_url, self.changeuser_login)
+        self.client.login(**self.changeuser_login)
 
         # the user has no module permissions, because this module doesn't exist
         change_user.user_permissions.remove(permission)
@@ -1705,31 +1688,28 @@ class AdminViewPermissionsTest(TestCase):
         have any permission for that module (add, change, or delete), so that
         the module is displayed on the admin index page.
         """
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
-
-        self.client.post(login_url, self.super_login)
+        self.client.login(**self.super_login)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
-        self.client.get(reverse('admin:logout'))
+        self.client.logout()
 
-        self.client.post(login_url, self.adduser_login)
+        self.client.login(**self.adduser_login)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
-        self.client.get(reverse('admin:logout'))
+        self.client.logout()
 
-        self.client.post(login_url, self.changeuser_login)
+        self.client.login(**self.changeuser_login)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
-        self.client.get(reverse('admin:logout'))
+        self.client.logout()
 
-        self.client.post(login_url, self.deleteuser_login)
+        self.client.login(**self.deleteuser_login)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
-        self.client.get(reverse('admin:logout'))
 
     def test_overriding_has_module_permission(self):
         """
@@ -1737,32 +1717,30 @@ class AdminViewPermissionsTest(TestCase):
         In this case, it always returns False, so the module should not be
         displayed on the admin index page for any users.
         """
-        login_url = '%s?next=%s' % (reverse('admin7:login'), reverse('admin7:index'))
         index_url = reverse('admin7:index')
 
-        self.client.post(login_url, self.super_login)
+        self.client.login(**self.super_login)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
-        self.client.get(reverse('admin7:logout'))
+        self.client.logout()
 
-        self.client.post(login_url, self.adduser_login)
+        self.client.login(**self.adduser_login)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
-        self.client.get(reverse('admin7:logout'))
+        self.client.logout()
 
-        self.client.post(login_url, self.changeuser_login)
+        self.client.login(**self.changeuser_login)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
-        self.client.get(reverse('admin7:logout'))
+        self.client.logout()
 
-        self.client.post(login_url, self.deleteuser_login)
+        self.client.login(**self.deleteuser_login)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
-        self.client.get(reverse('admin7:logout'))
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
