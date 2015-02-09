@@ -1,3 +1,4 @@
+import ctypes
 import itertools
 import logging
 import multiprocessing
@@ -7,6 +8,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import connections
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.utils.datastructures import OrderedSet
@@ -87,6 +89,21 @@ class RemoteTextTestRunner(unittest.TextTestRunner):
         return errors, stats
 
 
+_worker_id = 0
+
+
+def _init_worker(counter):
+    global _worker_id
+    with counter.get_lock():
+        counter.value += 1
+        _worker_id = counter.value
+
+    for alias in connections:
+        connection = connections[alias]
+        connection.settings_dict["NAME"] += '_{}'.format(_worker_id)
+        connection.close()
+
+
 def _run_subsuite(subsuite):
     return RemoteTextTestRunner().run(subsuite)
 
@@ -99,7 +116,11 @@ class ParallelTestSuite(unittest.TestSuite):
         super(ParallelTestSuite, self).__init__()
 
     def run(self, result):
-        pool = multiprocessing.Pool(processes=self.processes)
+        counter = multiprocessing.Value(ctypes.c_int, 0)
+        pool = multiprocessing.Pool(
+            processes=self.processes,
+            initializer=_init_worker,
+            initargs=[counter])
         test_results = pool.imap_unordered(_run_subsuite, self.subsuites)
 
         errors = []
@@ -268,8 +289,7 @@ class DiscoverRunner(object):
     def setup_databases(self, **kwargs):
         return setup_databases(
             self.verbosity, self.interactive, self.keepdb, self.debug_sql,
-            **kwargs
-        )
+            self.parallel, **kwargs)
 
     def get_resultclass(self):
         return DebugSQLTextTestResult if self.debug_sql else None
@@ -289,6 +309,13 @@ class DiscoverRunner(object):
         old_names, mirrors = old_config
         for connection, old_name, destroy in old_names:
             if destroy:
+                if self.parallel > 1:
+                    for index in range(self.parallel):
+                        connection.creation.destroy_test_db(
+                            suffix=str(index + 1),
+                            verbosity=self.verbosity,
+                            keepdb=self.keepdb,
+                        )
                 connection.creation.destroy_test_db(old_name, self.verbosity, self.keepdb)
 
     def teardown_test_environment(self, **kwargs):
@@ -440,7 +467,7 @@ def partition_suite_by_case(suite):
     return groups
 
 
-def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwargs):
+def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs):
     from django.db import connections, DEFAULT_DB_ALIAS
 
     # First pass -- work out which databases actually need to be created,
@@ -484,11 +511,18 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwa
             connection = connections[alias]
             if test_db_name is None:
                 test_db_name = connection.creation.create_test_db(
-                    verbosity,
+                    verbosity=verbosity,
                     autoclobber=not interactive,
                     keepdb=keepdb,
                     serialize=connection.settings_dict.get("TEST", {}).get("SERIALIZE", True),
                 )
+                if parallel > 1:
+                    for index in range(parallel):
+                        connection.creation.clone_test_db(
+                            suffix=str(index + 1),
+                            verbosity=verbosity,
+                            keepdb=keepdb,
+                        )
                 destroy = True
             else:
                 connection.settings_dict['NAME'] = test_db_name
