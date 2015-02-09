@@ -24,9 +24,8 @@ Available ``Meta`` options
 
 .. attribute:: Options.app_label
 
-    If a model exists outside of an application in :setting:`INSTALLED_APPS` or
-    if it's imported before its application was loaded, it must define which
-    app it is part of::
+    If a model is defined outside of an application in
+    :setting:`INSTALLED_APPS`, it must declare which app it belongs to::
 
         app_label = 'myapp'
 
