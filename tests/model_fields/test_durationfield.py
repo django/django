@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from django import forms
 from django.core import exceptions, serializers
 from django.db import models
 from django.test import TestCase
@@ -70,3 +71,11 @@ class TestValidation(TestCase):
             "'not a datetime' value has an invalid format. "
             "It must be in [DD] [HH:[MM:]]ss[.uuuuuu] format."
         )
+
+
+class TestFormField(TestCase):
+    # Tests for forms.DurationField are in the forms_tests app.
+
+    def test_formfield(self):
+        field = models.DurationField()
+        self.assertIsInstance(field.formfield(), forms.DurationField)
