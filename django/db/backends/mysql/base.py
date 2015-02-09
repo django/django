@@ -15,7 +15,6 @@ from django.conf import settings
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.mysql.schema import DatabaseSchemaEditor
 from django.utils import six, timezone
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
@@ -36,6 +35,7 @@ from .creation import DatabaseCreation                      # isort:skip
 from .features import DatabaseFeatures                      # isort:skip
 from .introspection import DatabaseIntrospection            # isort:skip
 from .operations import DatabaseOperations                  # isort:skip
+from .schema import DatabaseSchemaEditor                    # isort:skip
 from .validation import DatabaseValidation                  # isort:skip
 
 # We want version (1, 2, 1, 'final', 2) or later. We can't just use
