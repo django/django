@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.utils.encoding import smart_text
-from django.utils.functional import SimpleLazyObject, lazy
+from django.utils.functional import SimpleLazyObject
 
 
 def csrf(request):
@@ -43,7 +43,8 @@ def debug(request):
         from django.db import connection
         # Return a lazy reference that computes connection.queries on access,
         # to ensure it contains queries triggered after this function runs.
-        context_extras['sql_queries'] = lazy(lambda: connection.queries, list)
+        sql_queries = SimpleLazyObject(lambda: connection.queries)
+        context_extras['sql_queries'] = sql_queries
     return context_extras
 
 
