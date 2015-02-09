@@ -1314,7 +1314,7 @@ class Model(six.with_metaclass(ModelBase)):
         used_fields = {}  # name or attname -> field
 
         # Check that multi-inheritance doesn't cause field name shadowing.
-        for parent in cls._meta.parents:
+        for parent in cls._meta.get_parent_list():
             for f in parent._meta.local_fields:
                 clash = used_fields.get(f.name) or used_fields.get(f.attname) or None
                 if clash:
