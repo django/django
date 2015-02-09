@@ -11,8 +11,8 @@ from django.apps.config import MODELS_MODULE_NAME
 from django.conf import settings
 from django.core import checks
 from django.core.exceptions import (
-    NON_FIELD_ERRORS, FieldDoesNotExist, FieldError, MultipleObjectsReturned,
-    ObjectDoesNotExist, ValidationError,
+    NON_FIELD_ERRORS, FieldDoesNotExist, FieldError, ImproperlyConfigured,
+    MultipleObjectsReturned, ObjectDoesNotExist, ValidationError,
 )
 from django.db import (
     DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, DatabaseError, connections,
@@ -121,8 +121,14 @@ class ModelBase(type):
                     app_label_index = package_components.index(MODELS_MODULE_NAME) + 1
                 except ValueError:
                     app_label_index = 1
-                kwargs = {"app_label": package_components[app_label_index]}
-
+                try:
+                    kwargs = {"app_label": package_components[app_label_index]}
+                except IndexError:
+                    raise ImproperlyConfigured(
+                        'Unable to detect the app label for model "%s." '
+                        'Ensure that its module, "%s", is located inside an installed '
+                        'app.' % (new_class.__name__, model_module.__name__)
+                    )
             else:
                 kwargs = {"app_label": app_config.label}
 
