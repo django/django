@@ -5,8 +5,8 @@ import threading
 
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
-from django.core.mail.utils import DNS_NAME
 from django.core.mail.message import sanitize_address
+from django.core.mail.utils import DNS_NAME
 
 
 class EmailBackend(BaseEmailBackend):

@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 """
 Base classes for writing management commands (named commands which can
 be executed through ``django-admin`` or ``manage.py``).
 """
 
+from __future__ import unicode_literals
+
 import os
 import sys
 import warnings
-
 from argparse import ArgumentParser
 from optparse import OptionParser
 
@@ -19,7 +17,9 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import connections
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango19Warning, RemovedInDjango20Warning,
+)
 from django.utils.encoding import force_str
 
 

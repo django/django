@@ -4,18 +4,16 @@ Code to manage the creation and SQL rendering of 'where' constraints.
 
 import collections
 import datetime
-from itertools import repeat
 import warnings
+from itertools import repeat
 
 from django.conf import settings
 from django.db.models.fields import DateTimeField, Field
-from django.db.models.sql.datastructures import EmptyResultSet, Empty
+from django.db.models.sql.datastructures import Empty, EmptyResultSet
+from django.utils import timezone, tree
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.functional import cached_property
 from django.utils.six.moves import range
-from django.utils import timezone
-from django.utils import tree
-
 
 # Connection types
 AND = 'AND'

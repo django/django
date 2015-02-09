@@ -4,10 +4,10 @@ import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
-from django.views.generic.base import View
 from django.utils.encoding import force_str
+from django.views.generic.base import View
 
-from .models import Author, Artist, Book
+from .models import Artist, Author, Book
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')

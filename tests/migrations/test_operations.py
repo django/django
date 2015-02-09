@@ -2,11 +2,6 @@ from __future__ import unicode_literals
 
 import unittest
 
-try:
-    import sqlparse
-except ImportError:
-    sqlparse = None
-
 from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
@@ -18,6 +13,11 @@ from django.utils import six
 
 from .models import FoodManager, FoodQuerySet
 from .test_base import MigrationTestBase
+
+try:
+    import sqlparse
+except ImportError:
+    sqlparse = None
 
 
 class OperationTestBase(MigrationTestBase):

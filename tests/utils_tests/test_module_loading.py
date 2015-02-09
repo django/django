@@ -1,19 +1,20 @@
 import imp
-from importlib import import_module
 import os
 import sys
 import unittest
 import warnings
+from importlib import import_module
 from zipimport import zipimporter
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, ignore_warnings, modify_settings
 from django.test.utils import extend_sys_path
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.module_loading import (autodiscover_modules, import_by_path, import_string,
-                                         module_has_submodule)
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.module_loading import (
+    autodiscover_modules, import_by_path, import_string, module_has_submodule,
+)
 
 
 class DefaultLoader(unittest.TestCase):

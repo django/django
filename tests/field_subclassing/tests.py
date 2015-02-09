@@ -6,7 +6,7 @@ from django.core import exceptions, serializers
 from django.db import connection
 from django.test import TestCase
 
-from .fields import Small, CustomTypedField
+from .fields import CustomTypedField, Small
 from .models import ChoicesModel, DataModel, MyModel, OtherModel
 
 

@@ -1,14 +1,16 @@
 import os
 import sys
-from types import ModuleType
 import unittest
 import warnings
+from types import ModuleType
 
 from django.conf import LazySettings, Settings, settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
-from django.test import (SimpleTestCase, TransactionTestCase, TestCase,
-    modify_settings, override_settings, signals)
+from django.test import (
+    SimpleTestCase, TestCase, TransactionTestCase, modify_settings,
+    override_settings, signals,
+)
 from django.utils import six
 from django.utils.encoding import force_text
 

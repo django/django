@@ -13,15 +13,13 @@ import unittest
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http.multipartparser import MultiPartParser, parse_header
-from django.test import TestCase, client
-from django.test import override_settings
+from django.test import TestCase, client, override_settings
 from django.utils.encoding import force_bytes
 from django.utils.http import urlquote
-from django.utils.six import BytesIO, PY2, StringIO
+from django.utils.six import PY2, BytesIO, StringIO
 
 from . import uploadhandler
 from .models import FileModel
-
 
 UNICODE_FILENAME = 'test-0123456789_中文_Orléans.jpg'
 MEDIA_ROOT = sys_tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])

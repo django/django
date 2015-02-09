@@ -1,6 +1,6 @@
 from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import TestCase, override_settings
 
 from .models import Simple

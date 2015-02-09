@@ -1,7 +1,7 @@
 from unittest import skipUnless
 
-from django.forms import ValidationError
 from django.contrib.gis.gdal import HAS_GDAL
+from django.forms import ValidationError
 from django.test import SimpleTestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils.html import escape

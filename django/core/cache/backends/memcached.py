@@ -1,11 +1,13 @@
 "Memcached cache backend"
 
-import time
 import pickle
+import time
 
-from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
+from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase, RemovedInDjango19Warning
+from django.utils.deprecation import (
+    RemovedInDjango19Warning, RenameMethodsBase,
+)
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 

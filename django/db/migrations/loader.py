@@ -1,15 +1,14 @@
 from __future__ import unicode_literals
 
-from importlib import import_module
 import os
 import sys
+from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
 from django.db.migrations.graph import MigrationGraph, NodeNotFoundError
 from django.db.migrations.recorder import MigrationRecorder
 from django.utils import six
-
 
 MIGRATIONS_MODULE_NAME = 'migrations'
 

@@ -1,20 +1,22 @@
 from __future__ import unicode_literals
 
+import warnings
 from bisect import bisect
 from collections import OrderedDict, defaultdict
 from itertools import chain
-import warnings
 
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
-from django.db.models.fields.related import ManyToManyField
 from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
+from django.db.models.fields.related import ManyToManyField
 from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
+from django.utils.encoding import (
+    force_text, python_2_unicode_compatible, smart_text,
+)
 from django.utils.functional import cached_property
 from django.utils.lru_cache import lru_cache
 from django.utils.text import camel_case_to_spaces

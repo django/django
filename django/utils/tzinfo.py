@@ -2,12 +2,14 @@
 
 from __future__ import unicode_literals
 
-from datetime import timedelta, tzinfo
 import time
 import warnings
+from datetime import timedelta, tzinfo
 
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.encoding import force_str, force_text, DEFAULT_LOCALE_ENCODING
+from django.utils.encoding import (
+    DEFAULT_LOCALE_ENCODING, force_str, force_text,
+)
 
 warnings.warn(
     "django.utils.tzinfo will be removed in Django 1.9. "

@@ -1,8 +1,9 @@
 import warnings
 
-from django.template import Library
-from django.template import defaulttags
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
+from django.template import Library, defaulttags
+from django.utils.deprecation import (
+    RemovedInDjango19Warning, RemovedInDjango20Warning,
+)
 
 register = Library()
 

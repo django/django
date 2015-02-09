@@ -1,16 +1,18 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+import time
 from datetime import datetime, timedelta
 from io import BytesIO
 from itertools import chain
-import time
 
 from django.core.exceptions import SuspiciousOperation
-from django.core.handlers.wsgi import WSGIRequest, LimitedStream
-from django.http import (HttpRequest, HttpResponse, parse_cookie,
-    build_request_repr, UnreadablePostError, RawPostDataException)
-from django.test import SimpleTestCase, RequestFactory, override_settings
+from django.core.handlers.wsgi import LimitedStream, WSGIRequest
+from django.http import (
+    HttpRequest, HttpResponse, RawPostDataException, UnreadablePostError,
+    build_request_repr, parse_cookie,
+)
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 from django.test.utils import str_prefix
 from django.utils import six

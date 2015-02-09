@@ -81,6 +81,5 @@ class SessionStore(DBStore):
         self.delete(self.session_key)
         self._session_key = ''
 
-
 # At bottom to avoid circular import
-from django.contrib.sessions.models import Session
+from django.contrib.sessions.models import Session  # isort:skip

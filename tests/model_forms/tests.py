@@ -6,25 +6,31 @@ from decimal import Decimal
 from unittest import skipUnless
 
 from django import forms
-from django.core.exceptions import FieldError, ImproperlyConfigured, NON_FIELD_ERRORS
+from django.core.exceptions import (
+    NON_FIELD_ERRORS, FieldError, ImproperlyConfigured,
+)
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import ValidationError
 from django.db import connection
 from django.db.models.query import EmptyQuerySet
-from django.forms.models import (construct_instance, fields_for_model,
-    model_to_dict, modelform_factory, ModelFormMetaclass)
-from django.template import Template, Context
+from django.forms.models import (
+    ModelFormMetaclass, construct_instance, fields_for_model, model_to_dict,
+    modelform_factory,
+)
+from django.template import Context, Template
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils._os import upath
 from django.utils import six
+from django.utils._os import upath
 
-from .models import (Article, ArticleStatus, Author, Author1, BetterWriter, BigInt, Book,
-    Category, CommaSeparatedInteger, CustomFF, CustomFieldForExclusionModel,
-    DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel, FlexibleDatePost, Homepage,
-    ImprovedArticle, ImprovedArticleWithParentLink, Inventory, Person, Photo, Post, Price,
-    Product, Publication, TextFile, Triple, Writer, WriterProfile,
-    Colour, ColourfulItem, DateTimePost, CustomErrorMessage,
-    test_images, StumpJoke, Character, Student)
+from .models import (
+    Article, ArticleStatus, Author, Author1, BetterWriter, BigInt, Book,
+    Category, Character, Colour, ColourfulItem, CommaSeparatedInteger,
+    CustomErrorMessage, CustomFF, CustomFieldForExclusionModel, DateTimePost,
+    DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel,
+    FlexibleDatePost, Homepage, ImprovedArticle, ImprovedArticleWithParentLink,
+    Inventory, Person, Photo, Post, Price, Product, Publication, Student,
+    StumpJoke, TextFile, Triple, Writer, WriterProfile, test_images,
+)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile

@@ -10,12 +10,12 @@ warnings.warn(
      'submodules of django.contrib.contenttypes.'), RemovedInDjango19Warning, stacklevel=2
 )
 
-from django.contrib.contenttypes.admin import (  # NOQA
-    GenericInlineModelAdmin, GenericStackedInline, GenericTabularInline
+from django.contrib.contenttypes.admin import (  # NOQA isort:skip
+    GenericInlineModelAdmin, GenericStackedInline, GenericTabularInline,
 )
-from django.contrib.contenttypes.fields import (  # NOQA
-    GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import (  # NOQA isort:skip
+    GenericForeignKey, GenericRelation,
 )
-from django.contrib.contenttypes.forms import (  # NOQA
-    BaseGenericInlineFormSet, generic_inlineformset_factory
+from django.contrib.contenttypes.forms import (  # NOQA isort:skip
+    BaseGenericInlineFormSet, generic_inlineformset_factory,
 )

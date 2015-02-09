@@ -1,10 +1,9 @@
 # Taken from Python 2.7 with permission from/by the original author.
-import warnings
 import sys
+import warnings
 
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
-
 
 warnings.warn("django.utils.importlib will be removed in Django 1.9.",
     RemovedInDjango19Warning, stacklevel=2)

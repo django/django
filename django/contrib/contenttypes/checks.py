@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.utils import six
 from django.apps import apps
+from django.utils import six
 
 
 def check_generic_foreign_keys(**kwargs):

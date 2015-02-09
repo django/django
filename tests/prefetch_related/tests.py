@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import Prefetch
 from django.db.models.query import get_prefetcher
@@ -9,10 +9,12 @@ from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils.encoding import force_text
 
-from .models import (Author, Bio, Book, Reader, Qualification, Teacher, Department,
-    TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,
-    BookWithYear, BookReview, Person, House, Room, Employee, Comment,
-    LessonEntry, WordEntry, Author2)
+from .models import (
+    Author, Author2, AuthorAddress, AuthorWithAge, Bio, Book, Bookmark,
+    BookReview, BookWithYear, Comment, Department, Employee, FavoriteAuthors,
+    House, LessonEntry, Person, Qualification, Reader, Room, TaggedItem,
+    Teacher, WordEntry,
+)
 
 
 class PrefetchRelatedTests(TestCase):

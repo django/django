@@ -5,7 +5,7 @@ import unittest
 
 from django.conf import settings
 from django.core.checks import Error
-from django.db import models, connections
+from django.db import connections, models
 from django.test.utils import override_settings
 
 from .base import IsolatedModelsTestCase

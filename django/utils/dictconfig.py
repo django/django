@@ -1,5 +1,10 @@
+import logging.handlers
+import re
+import sys
+import types
 import warnings
 
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 
 warnings.warn("django.utils.dictconfig will be removed in Django 1.9.",
@@ -25,12 +30,7 @@ warnings.warn("django.utils.dictconfig will be removed in Django 1.9.",
 # IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
 # OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-import logging.handlers
-import re
-import sys
-import types
 
-from django.utils import six
 
 IDENTIFIER = re.compile('^[a-z_][a-z0-9_]*$', re.I)
 

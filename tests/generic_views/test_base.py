@@ -6,11 +6,13 @@ import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
+from django.test import (
+    RequestFactory, TestCase, ignore_warnings, override_settings,
+)
+from django.test.utils import require_jinja2
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.test import TestCase, RequestFactory, ignore_warnings, override_settings
-from django.test.utils import require_jinja2
-from django.views.generic import View, TemplateView, RedirectView
+from django.views.generic import RedirectView, TemplateView, View
 
 from . import views
 

@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime, timedelta
 import gettext
-from importlib import import_module
 import os
+from datetime import datetime, timedelta
+from importlib import import_module
 from unittest import TestCase, skipIf
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 from django import forms
 from django.conf import settings
@@ -21,13 +16,16 @@ from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.db.models import CharField, DateField
-from django.test import TestCase as DjangoTestCase
-from django.test import override_settings
-from django.utils import six
-from django.utils import translation
+from django.test import TestCase as DjangoTestCase, override_settings
+from django.utils import six, translation
 
 from . import models
 from .widgetadmin import site as widget_admin_site
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 
 admin_static_prefix = lambda: {

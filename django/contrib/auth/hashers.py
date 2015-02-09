@@ -2,21 +2,21 @@ from __future__ import unicode_literals
 
 import base64
 import binascii
-from collections import OrderedDict
 import hashlib
 import importlib
+from collections import OrderedDict
 
-from django.dispatch import receiver
 from django.conf import settings
-from django.core.signals import setting_changed
-from django.utils.encoding import force_bytes, force_str, force_text
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.crypto import (
-    pbkdf2, constant_time_compare, get_random_string)
+from django.core.signals import setting_changed
+from django.dispatch import receiver
 from django.utils import lru_cache
+from django.utils.crypto import (
+    constant_time_compare, get_random_string, pbkdf2,
+)
+from django.utils.encoding import force_bytes, force_str, force_text
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_noop as _
-
 
 UNUSABLE_PASSWORD_PREFIX = '!'  # This will never be a valid encoded hash
 UNUSABLE_PASSWORD_SUFFIX_LENGTH = 40  # number of random chars to add after UNUSABLE_PASSWORD_PREFIX

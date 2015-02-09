@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime
 import os
+from datetime import datetime
 from unittest import TestCase
 
 from django.test import ignore_warnings

@@ -1,6 +1,6 @@
 from django import template
-from django.templatetags.static import StaticNode
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.templatetags.static import StaticNode
 
 register = template.Library()
 

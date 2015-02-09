@@ -1,4 +1,5 @@
 import os
+
 from django.conf.urls import url
 from django.utils._os import upath
 from django.views.static import serve

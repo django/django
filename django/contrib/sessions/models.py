@@ -58,6 +58,5 @@ class Session(models.Model):
     def get_decoded(self):
         return SessionStore().decode(self.session_data)
 
-
 # At bottom to avoid circular import
-from django.contrib.sessions.backends.db import SessionStore
+from django.contrib.sessions.backends.db import SessionStore  # isort:skip

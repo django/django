@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+
 from collections import deque
 
 from django.db.migrations.state import ProjectState

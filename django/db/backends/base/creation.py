@@ -13,7 +13,6 @@ from django.utils.encoding import force_bytes
 from django.utils.six import StringIO
 from django.utils.six.moves import input
 
-
 # The prefix to put on the default database name when creating
 # the test database.
 TEST_DATABASE_PREFIX = 'test_'

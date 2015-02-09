@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.utils.translation import ugettext_lazy as _
-
 # While this couples the geographic forms to the GEOS library,
 # it decouples from database (by not importing SpatialBackend).
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
+from django.utils.translation import ugettext_lazy as _
+
 from .widgets import OpenLayersWidget
 
 

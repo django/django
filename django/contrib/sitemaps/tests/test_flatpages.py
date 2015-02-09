@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from unittest import skipUnless
 import warnings
+from unittest import skipUnless
 
 from django.apps import apps
 from django.conf import settings

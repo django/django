@@ -8,17 +8,17 @@ import time
 from email.header import Header
 
 from django.conf import settings
-from django.core import signals
-from django.core import signing
+from django.core import signals, signing
 from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
-from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
+from django.utils.encoding import (
+    force_bytes, force_str, force_text, iri_to_uri,
+)
 from django.utils.http import cookie_date
 from django.utils.six.moves import map
 from django.utils.six.moves.urllib.parse import urlparse
-
 
 # See http://www.iana.org/assignments/http-status-codes
 REASON_PHRASES = {

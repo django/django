@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 
-from django.template import Template, Context
+from django.template import Context, Template
 from django.test import TestCase
-from django.utils.encoding import force_text, force_bytes
+from django.utils import html, six, text
+from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import lazy
-from django.utils.safestring import mark_safe, mark_for_escaping, SafeData, EscapeData
-from django.utils import six
-from django.utils import text
-from django.utils import html
+from django.utils.safestring import (
+    EscapeData, SafeData, mark_for_escaping, mark_safe,
+)
 
 lazystr = lazy(force_text, six.text_type)
 lazybytes = lazy(force_bytes, bytes)

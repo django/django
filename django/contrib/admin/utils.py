@@ -6,7 +6,7 @@ from collections import defaultdict
 
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import FieldDoesNotExist
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector

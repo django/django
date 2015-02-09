@@ -6,10 +6,12 @@ import copy
 import pickle
 
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.datastructures import (DictWrapper, ImmutableList,
-    MultiValueDict, MultiValueDictKeyError, MergeDict, OrderedSet, SortedDict)
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
+from django.utils.datastructures import (
+    DictWrapper, ImmutableList, MergeDict, MultiValueDict,
+    MultiValueDictKeyError, OrderedSet, SortedDict,
+)
+from django.utils.deprecation import RemovedInDjango19Warning
 
 
 @ignore_warnings(category=RemovedInDjango19Warning)

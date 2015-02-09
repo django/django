@@ -3,8 +3,9 @@
 from __future__ import absolute_import
 
 import sys
-
 from unittest import skipIf
+
+from .test_dummy import TemplateStringsTests
 
 # Jinja2 doesn't run on Python 3.2 because it uses u-prefixed unicode strings.
 if sys.version_info[:2] == (2, 7) or sys.version_info[:2] >= (3, 3):
@@ -18,8 +19,6 @@ if sys.version_info[:2] == (2, 7) or sys.version_info[:2] >= (3, 3):
 else:
     jinja2 = None
     Jinja2 = None
-
-from .test_dummy import TemplateStringsTests
 
 
 @skipIf(jinja2 is None, "this test requires jinja2")

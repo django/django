@@ -1,5 +1,6 @@
-from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
 from django.contrib.gis.gdal import OGRGeomType
+from django.db.backends.postgresql_psycopg2.introspection import \
+    DatabaseIntrospection
 
 
 class GeoIntrospectionError(Exception):

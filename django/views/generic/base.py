@@ -6,11 +6,11 @@ from functools import update_wrapper
 
 from django import http
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.template.response import TemplateResponse
+from django.utils import six
 from django.utils.decorators import classonlymethod
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils import six
 
 _sentinel = object()
 logger = logging.getLogger('django.request')

@@ -1,5 +1,5 @@
-from django.test import TransactionTestCase
 from django.core import management
+from django.test import TransactionTestCase
 
 from .models import Book
 

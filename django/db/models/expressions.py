@@ -6,7 +6,7 @@ from django.core.exceptions import FieldError
 from django.db.backends import utils as backend_utils
 from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import refs_aggregate, Q
+from django.db.models.query_utils import Q, refs_aggregate
 from django.utils import timezone
 from django.utils.functional import cached_property
 

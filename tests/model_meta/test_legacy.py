@@ -3,7 +3,7 @@ import warnings
 from django import test
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import FieldDoesNotExist
-from django.db.models.fields import related, CharField
+from django.db.models.fields import CharField, related
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import BasePerson, Person

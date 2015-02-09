@@ -7,4 +7,4 @@ warnings.warn(
     "Use django.contrib.gis.db.backends.utils instead.",
     RemovedInDjango19Warning, stacklevel=2)
 
-from django.contrib.gis.db.backends.utils import *  # NOQA
+from django.contrib.gis.db.backends.utils import *  # NOQA isort:skip

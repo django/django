@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.sessions.backends.base import SessionBase, CreateError
+from django.contrib.sessions.backends.base import CreateError, SessionBase
 from django.core.cache import caches
 from django.utils.six.moves import range
 

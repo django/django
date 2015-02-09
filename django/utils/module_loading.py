@@ -1,10 +1,11 @@
-from __future__ import absolute_import  # Avoid importing `importlib` from this package.
+# Avoid importing `importlib` from this package.
+from __future__ import absolute_import
 
 import copy
-from importlib import import_module
 import os
 import sys
 import warnings
+from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six

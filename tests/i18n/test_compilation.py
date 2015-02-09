@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 
+import gettext as gettext_module
 import os
 import shutil
 import stat
 import unittest
-import gettext as gettext_module
 
-from django.core.management import call_command, CommandError, execute_from_command_line
+from django.core.management import (
+    CommandError, call_command, execute_from_command_line,
+)
 from django.core.management.utils import find_command
-from django.test import SimpleTestCase
-from django.test import override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
-from django.utils.translation import ugettext
-from django.utils.encoding import force_text
 from django.utils._os import upath
+from django.utils.encoding import force_text
 from django.utils.six import StringIO
+from django.utils.translation import ugettext
 
 has_msgfmt = find_command('msgfmt')
 

@@ -2,7 +2,8 @@
 from __future__ import absolute_import
 
 from django.core.exceptions import (
-    ImproperlyConfigured, SuspiciousFileOperation)
+    ImproperlyConfigured, SuspiciousFileOperation,
+)
 from django.template.utils import get_app_template_dirs
 from django.utils._os import safe_join
 from django.utils.functional import cached_property

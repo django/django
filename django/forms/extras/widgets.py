@@ -6,14 +6,13 @@ from __future__ import unicode_literals
 import datetime
 import re
 
-from django.forms.widgets import Widget, Select
-from django.utils import datetime_safe
+from django.conf import settings
+from django.forms.widgets import Select, Widget
+from django.utils import datetime_safe, six
 from django.utils.dates import MONTHS
 from django.utils.encoding import force_str
-from django.utils.safestring import mark_safe
 from django.utils.formats import get_format
-from django.utils import six
-from django.conf import settings
+from django.utils.safestring import mark_safe
 
 __all__ = ('SelectDateWidget',)
 

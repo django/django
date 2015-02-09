@@ -24,13 +24,13 @@ http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/
 from __future__ import unicode_literals
 
 import datetime
-from django.utils.xmlutils import SimplerXMLGenerator
+
+from django.utils import datetime_safe, six
 from django.utils.encoding import force_text, iri_to_uri
-from django.utils import datetime_safe
-from django.utils import six
 from django.utils.six import StringIO
 from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.timezone import is_aware
+from django.utils.xmlutils import SimplerXMLGenerator
 
 
 def rfc2822_date(date):

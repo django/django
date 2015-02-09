@@ -1,14 +1,16 @@
-from copy import deepcopy
 import datetime
+from copy import deepcopy
 
-from django.core.exceptions import MultipleObjectsReturned, FieldError
+from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.test import TestCase
 from django.utils import six
 from django.utils.translation import ugettext_lazy
 
-from .models import (Article, Reporter, First, Third, Parent, Child,
-    ToFieldChild, Category, Record, Relation, School, Student)
+from .models import (
+    Article, Category, Child, First, Parent, Record, Relation, Reporter,
+    School, Student, Third, ToFieldChild,
+)
 
 
 class ManyToOneTests(TestCase):

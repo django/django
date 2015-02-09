@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-from django.core.urlresolvers import NoReverseMatch, reverse_lazy
 from django.contrib.auth.views import logout
+from django.core.urlresolvers import NoReverseMatch, reverse_lazy
 from django.shortcuts import resolve_url
 from django.test import TestCase, ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import UnimportantThing
 

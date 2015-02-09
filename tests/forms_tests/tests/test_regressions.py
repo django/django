@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from forms_tests.models import Cheese
+
 from django.forms import (
     CharField, ChoiceField, Form, HiddenInput, IntegerField, ModelForm,
     ModelMultipleChoiceField, MultipleChoiceField, RadioSelect, Select,
@@ -9,8 +11,6 @@ from django.forms import (
 from django.test import TestCase, ignore_warnings
 from django.utils import translation
 from django.utils.translation import gettext_lazy, ugettext_lazy
-
-from forms_tests.models import Cheese
 
 
 class FormsRegressionsTestCase(TestCase):

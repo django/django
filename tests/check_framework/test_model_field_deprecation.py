@@ -1,5 +1,5 @@
-from django.db import models
 from django.core import checks
+from django.db import models
 from django.test import SimpleTestCase
 
 from .tests import IsolateModelsMixin

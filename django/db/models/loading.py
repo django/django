@@ -3,7 +3,6 @@ import warnings
 from django.apps import apps
 from django.utils.deprecation import RemovedInDjango19Warning
 
-
 warnings.warn(
     "The utilities in django.db.models.loading are deprecated "
     "in favor of the new application loading system.",

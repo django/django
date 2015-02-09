@@ -1,16 +1,16 @@
 from __future__ import unicode_literals
+
 import datetime
 from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
-    Sum, Count,
-    F, Value, Func,
-    IntegerField, BooleanField, CharField)
+    F, BooleanField, CharField, Count, Func, IntegerField, Sum, Value,
+)
 from django.test import TestCase
 from django.utils import six
 
-from .models import Author, Book, Store, DepartmentStore, Company, Employee
+from .models import Author, Book, Company, DepartmentStore, Employee, Store
 
 
 def cxOracle_513_py3_bug(func):

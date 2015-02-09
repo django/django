@@ -1,7 +1,8 @@
 from ctypes import c_uint
+
+from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry
-from django.contrib.gis.geos import prototypes as capi
 from django.utils import six
 from django.utils.six.moves import range
 

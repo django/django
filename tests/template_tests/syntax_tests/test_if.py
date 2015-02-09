@@ -1,11 +1,11 @@
 import warnings
 
 from django.template import TemplateSyntaxError
-from django.test import ignore_warnings, SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import reset_warning_registry
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from ..utils import setup, TestObj
+from ..utils import TestObj, setup
 
 
 class IfTagTests(SimpleTestCase):

@@ -7,7 +7,7 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, ignore_warnings, override_settings
 
-from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
+from .models import Album, Book, City, Influence, Song, State, TwoAlbumFKAndAnE
 
 
 class SongForm(forms.ModelForm):

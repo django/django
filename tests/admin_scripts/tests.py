@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 """
 A series of tests to establish that the command-line management tools work as
 advertised - especially with regards to the handling of the DJANGO_SETTINGS_MODULE
 and default settings.py files.
 """
+from __future__ import unicode_literals
 
 import codecs
 import os
@@ -20,14 +19,17 @@ import django
 from django import conf, get_version
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management import BaseCommand, CommandError, call_command, color
+from django.core.management import (
+    BaseCommand, CommandError, call_command, color,
+)
+from django.test import (
+    LiveServerTestCase, TestCase, ignore_warnings, mock, override_settings,
+)
+from django.test.runner import DiscoverRunner
+from django.utils._os import npath, upath
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
-from django.utils._os import npath, upath
 from django.utils.six import StringIO
-from django.test import LiveServerTestCase, TestCase, ignore_warnings, mock, override_settings
-from django.test.runner import DiscoverRunner
-
 
 test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
 if not os.path.exists(test_dir):

@@ -4,21 +4,20 @@ from __future__ import unicode_literals
 import logging
 import warnings
 
+from admin_scripts.tests import AdminScriptTestCase
+
 from django.core import mail
 from django.core.files.temp import NamedTemporaryFile
-from django.test import TestCase, RequestFactory, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import patch_logger
-from django.utils.encoding import force_text
 from django.utils.deprecation import RemovedInNextVersionWarning
+from django.utils.encoding import force_text
 from django.utils.log import (
     AdminEmailHandler, CallbackFilter, RequireDebugFalse, RequireDebugTrue,
 )
 from django.utils.six import StringIO
 
-from admin_scripts.tests import AdminScriptTestCase
-
 from .logconfig import MyEmailBackend
-
 
 # logging config prior to using filter with mail_admins
 OLD_LOGGING = {

@@ -5,12 +5,14 @@ import unittest
 
 from django.apps import apps
 from django.core.management.color import no_style
-from django.core.management.sql import (sql_create, sql_delete, sql_indexes,
-    sql_destroy_indexes, sql_all)
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.core.management.sql import (
+    sql_all, sql_create, sql_delete, sql_destroy_indexes, sql_indexes,
+)
+from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import TestCase, ignore_warnings, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
+
 
 # See also initial_sql_regress for 'custom_sql_for_model' tests
 

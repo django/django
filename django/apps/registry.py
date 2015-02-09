@@ -1,13 +1,13 @@
-from collections import Counter, defaultdict, OrderedDict
 import os
 import sys
 import threading
 import warnings
+from collections import Counter, OrderedDict, defaultdict
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.utils import lru_cache
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango19Warning
 
 from .config import AppConfig
 

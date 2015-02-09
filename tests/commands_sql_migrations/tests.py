@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 from django.apps import apps
 from django.core.management import CommandError
 from django.core.management.color import no_style
-from django.core.management.sql import (sql_create, sql_delete, sql_indexes,
-                                        sql_destroy_indexes, sql_all)
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.core.management.sql import (
+    sql_all, sql_create, sql_delete, sql_destroy_indexes, sql_indexes,
+)
+from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import TestCase
 
 

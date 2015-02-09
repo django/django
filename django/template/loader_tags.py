@@ -1,9 +1,10 @@
 from collections import defaultdict
 
-from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
-    token_kwargs, Variable
-from django.utils.safestring import mark_safe
+from django.template.base import (
+    Library, Node, TemplateSyntaxError, TextNode, Variable, token_kwargs,
+)
 from django.utils import six
+from django.utils.safestring import mark_safe
 
 register = Library()
 

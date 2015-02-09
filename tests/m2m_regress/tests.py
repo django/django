@@ -4,8 +4,10 @@ from django.core.exceptions import FieldError
 from django.test import TestCase
 from django.utils import six
 
-from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
-    SelfReferChildSibling, Worksheet, RegressionModelSplit)
+from .models import (
+    Entry, RegressionModelSplit, SelfRefer, SelfReferChild,
+    SelfReferChildSibling, Tag, TagCollection, Worksheet,
+)
 
 
 class M2MRegressionTests(TestCase):

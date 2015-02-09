@@ -1,5 +1,6 @@
 from django.contrib.gis.db.backends.base.adapter import WKTAdapter
-from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
+from django.contrib.gis.db.backends.base.operations import \
+    BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
 from django.db.backends.mysql.operations import DatabaseOperations

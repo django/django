@@ -1,7 +1,7 @@
-from importlib import import_module
 import logging
 import os
 import unittest
+from importlib import import_module
 from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings

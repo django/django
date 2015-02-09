@@ -1,5 +1,4 @@
-from django.contrib.gis.geos.geometry import GEOSGeometry, wkt_regex, hex_regex
-
+from django.contrib.gis.geos.geometry import GEOSGeometry, hex_regex, wkt_regex
 from django.utils import six
 
 

@@ -1,15 +1,18 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.forms.formsets import BaseFormSet, DELETION_FIELD_NAME
+from django.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
+from django.forms.models import (
+    BaseModelFormSet, inlineformset_factory, modelform_factory,
+    modelformset_factory,
+)
 from django.forms.utils import ErrorDict, ErrorList
-from django.forms.models import modelform_factory, inlineformset_factory, modelformset_factory, BaseModelFormSet
 from django.test import TestCase
 from django.utils import six
 
 from .models import (
-    User, UserSite, UserProfile, ProfileNetwork, Restaurant, Manager, Network,
-    Host,
+    Host, Manager, Network, ProfileNetwork, Restaurant, User, UserProfile,
+    UserSite,
 )
 
 

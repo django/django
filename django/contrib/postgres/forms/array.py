@@ -1,10 +1,12 @@
 import copy
 
-from django.contrib.postgres.validators import ArrayMinLengthValidator, ArrayMaxLengthValidator
-from django.core.exceptions import ValidationError
 from django import forms
-from django.utils.safestring import mark_safe
+from django.contrib.postgres.validators import (
+    ArrayMaxLengthValidator, ArrayMinLengthValidator,
+)
+from django.core.exceptions import ValidationError
 from django.utils import six
+from django.utils.safestring import mark_safe
 from django.utils.translation import string_concat, ugettext_lazy as _
 
 

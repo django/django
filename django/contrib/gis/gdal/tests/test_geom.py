@@ -1,15 +1,17 @@
 import json
-from binascii import b2a_hex
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
 import unittest
+from binascii import b2a_hex
 from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import TestDataMixin
 from django.utils.six.moves import range
+
+try:
+    from django.utils.six.moves import cPickle as pickle
+except ImportError:
+    import pickle
+
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import (OGRGeometry, OGRGeomType,

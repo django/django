@@ -5,8 +5,9 @@ from django.conf import settings
 from django.db import connection
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from .models.tablespaces import (Article, ArticleRef, Authors, Reviewers,
-    Scientist, ScientistRef)
+from .models.tablespaces import (
+    Article, ArticleRef, Authors, Reviewers, Scientist, ScientistRef,
+)
 
 
 def sql_for_table(model):

@@ -5,9 +5,10 @@ import unittest
 from django.core.exceptions import FieldError
 from django.test import TestCase
 
-from .models import (User, UserProfile, UserStat, UserStatResult, StatDetails,
-    AdvancedUserStat, Image, Product, Parent1, Parent2, Child1, Child2, Child3,
-    Child4)
+from .models import (
+    AdvancedUserStat, Child1, Child2, Child3, Child4, Image, Parent1, Parent2,
+    Product, StatDetails, User, UserProfile, UserStat, UserStatResult,
+)
 
 
 class ReverseSelectRelatedTestCase(TestCase):

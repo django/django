@@ -1,8 +1,8 @@
 import copy
 import operator
-from functools import wraps
 import sys
 import warnings
+from functools import wraps
 
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning

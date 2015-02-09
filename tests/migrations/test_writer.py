@@ -8,20 +8,22 @@ import re
 import tokenize
 import unittest
 
-from django.core.validators import RegexValidator, EmailValidator
-from django.db import models, migrations
-from django.db.migrations.writer import MigrationWriter, OperationWriter, SettingsReference
-from django.test import SimpleTestCase, TestCase, ignore_warnings
+import custom_migration_operations.more_operations
+import custom_migration_operations.operations
+
 from django.conf import settings
+from django.core.validators import EmailValidator, RegexValidator
+from django.db import migrations, models
+from django.db.migrations.writer import (
+    MigrationWriter, OperationWriter, SettingsReference,
+)
+from django.test import SimpleTestCase, TestCase, ignore_warnings
 from django.utils import datetime_safe, six
 from django.utils.deconstruct import deconstructible
+from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import ugettext_lazy as _
-from django.utils.timezone import get_default_timezone, utc, FixedOffset
 
-import custom_migration_operations.operations
-import custom_migration_operations.more_operations
-
-from .models import FoodQuerySet, FoodManager
+from .models import FoodManager, FoodQuerySet
 
 
 class TestModel1(object):

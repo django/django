@@ -2,9 +2,9 @@ import warnings
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
-from django.db import DEFAULT_DB_ALIAS
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
+from django.db import DEFAULT_DB_ALIAS
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.six.moves import input
 

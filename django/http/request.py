@@ -14,12 +14,13 @@ from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils import six
-from django.utils.datastructures import MultiValueDict, ImmutableList
+from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.encoding import (
-    force_bytes, force_text, force_str, escape_uri_path, iri_to_uri,
+    escape_uri_path, force_bytes, force_str, force_text, iri_to_uri,
 )
-from django.utils.six.moves.urllib.parse import parse_qsl, urlencode, quote, urljoin, urlsplit
-
+from django.utils.six.moves.urllib.parse import (
+    parse_qsl, quote, urlencode, urljoin, urlsplit,
+)
 
 RAISE_ERROR = object()
 host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9:]+\])(:\d+)?$")

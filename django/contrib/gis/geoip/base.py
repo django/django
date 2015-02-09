@@ -2,14 +2,14 @@ import os
 import re
 from ctypes import c_char_p
 
-from django.core.validators import ipv4_re
 from django.contrib.gis.geoip.libgeoip import GEOIP_SETTINGS
 from django.contrib.gis.geoip.prototypes import (
-    GeoIP_open, GeoIP_delete, GeoIP_database_info,
-    GeoIP_lib_version, GeoIP_record_by_addr, GeoIP_record_by_name,
     GeoIP_country_code_by_addr, GeoIP_country_code_by_name,
-    GeoIP_country_name_by_addr, GeoIP_country_name_by_name)
-
+    GeoIP_country_name_by_addr, GeoIP_country_name_by_name,
+    GeoIP_database_info, GeoIP_delete, GeoIP_lib_version, GeoIP_open,
+    GeoIP_record_by_addr, GeoIP_record_by_name,
+)
+from django.core.validators import ipv4_re
 from django.utils import six
 from django.utils.encoding import force_bytes
 

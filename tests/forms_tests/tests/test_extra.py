@@ -12,11 +12,12 @@ from django.forms import (
 from django.forms.extras import SelectDateWidget
 from django.forms.utils import ErrorList
 from django.test import TestCase, ignore_warnings, override_settings
-from django.utils import six
-from django.utils import translation
+from django.utils import six, translation
 from django.utils.dates import MONTHS_AP
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
+from django.utils.encoding import (
+    force_text, python_2_unicode_compatible, smart_text,
+)
 
 from .test_error_messages import AssertFormErrorsMixin
 

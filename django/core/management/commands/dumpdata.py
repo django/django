@@ -1,11 +1,10 @@
 import warnings
-
 from collections import OrderedDict
 
 from django.apps import apps
-from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
-from django.db import router, DEFAULT_DB_ALIAS
+from django.core.management.base import BaseCommand, CommandError
+from django.db import DEFAULT_DB_ALIAS, router
 from django.utils.deprecation import RemovedInDjango19Warning
 
 

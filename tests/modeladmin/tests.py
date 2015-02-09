@@ -3,13 +3,13 @@ from __future__ import unicode_literals
 from datetime import date
 
 from django import forms
-from django.contrib.admin.options import (ModelAdmin, TabularInline,
-     HORIZONTAL, VERTICAL)
+from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
+from django.contrib.admin.options import (
+    HORIZONTAL, VERTICAL, ModelAdmin, TabularInline,
+)
 from django.contrib.admin.sites import AdminSite
-from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
 from django.contrib.admin.validation import ModelAdminValidator
-from django.contrib.admin import (SimpleListFilter,
-     BooleanFieldListFilter)
+from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
 from django.core.checks import Error
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
@@ -18,7 +18,9 @@ from django.test import TestCase, ignore_warnings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 
-from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
+from .models import (
+    Band, Concert, ValidationTestInlineModel, ValidationTestModel,
+)
 
 
 class MockRequest(object):

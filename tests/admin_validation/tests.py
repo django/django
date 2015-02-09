@@ -7,7 +7,7 @@ from django.test import TestCase, ignore_warnings
 from django.test.utils import str_prefix
 from django.utils.deprecation import RemovedInDjango19Warning
 
-from .models import Song, Book, Album, TwoAlbumFKAndAnE, City
+from .models import Album, Book, City, Song, TwoAlbumFKAndAnE
 
 
 class SongForm(forms.ModelForm):

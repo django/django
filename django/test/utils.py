@@ -1,22 +1,22 @@
-from contextlib import contextmanager
 import logging
 import re
 import sys
 import time
-from unittest import skipIf, skipUnless
 import warnings
+from contextlib import contextmanager
 from functools import wraps
-from xml.dom.minidom import parseString, Node
+from unittest import skipIf, skipUnless
+from xml.dom.minidom import Node, parseString
 
 from django.apps import apps
-from django.conf import settings, UserSettingsHolder
+from django.conf import UserSettingsHolder, settings
 from django.core import mail
 from django.core.signals import request_started
 from django.db import reset_queries
 from django.http import request
 from django.template import Template
 from django.template.loaders import locmem
-from django.test.signals import template_rendered, setting_changed
+from django.test.signals import setting_changed, template_rendered
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str

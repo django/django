@@ -6,7 +6,6 @@ from django.test import ignore_warnings
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy as _
 
-
 # test deprecated version of i18n_patterns() function (with prefix). Remove it
 # and convert to list of urls() in Django 2.0
 i18n_patterns = ignore_warnings(category=RemovedInDjango20Warning)(i18n_patterns)

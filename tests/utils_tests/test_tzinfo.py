@@ -9,7 +9,6 @@ import warnings
 from django.test import ignore_warnings
 from django.utils.deprecation import RemovedInDjango19Warning
 
-
 # Swallow the import-time warning to test the deprecated implementation.
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=RemovedInDjango19Warning)

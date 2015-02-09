@@ -15,12 +15,12 @@ from django.forms import (
     Textarea, TextInput, TimeInput,
 )
 from django.forms.widgets import RadioFieldRenderer
-from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.safestring import mark_safe, SafeData
-from django.utils import six
-from django.utils.translation import activate, deactivate, override
 from django.test import TestCase, ignore_warnings, override_settings
-from django.utils.encoding import python_2_unicode_compatible, force_text
+from django.utils import six
+from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.safestring import SafeData, mark_safe
+from django.utils.translation import activate, deactivate, override
 
 from ..models import Article
 

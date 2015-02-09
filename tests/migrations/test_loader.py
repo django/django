@@ -2,12 +2,11 @@ from __future__ import unicode_literals
 
 from unittest import skipIf
 
-from django.test import TestCase, override_settings
 from django.db import connection, connections
 from django.db.migrations.graph import NodeNotFoundError
-from django.db.migrations.loader import MigrationLoader, AmbiguityError
+from django.db.migrations.loader import AmbiguityError, MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import modify_settings
+from django.test import TestCase, modify_settings, override_settings
 from django.utils import six
 
 

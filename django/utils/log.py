@@ -3,6 +3,9 @@ from __future__ import unicode_literals
 import logging
 import sys
 import warnings
+# Imports kept for backwards-compatibility in Django 1.7.
+from logging import NullHandler  # NOQA
+from logging.config import dictConfig  # NOQA
 
 from django.conf import settings
 from django.core import mail
@@ -11,10 +14,6 @@ from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
-
-# Imports kept for backwards-compatibility in Django 1.7.
-from logging import NullHandler  # NOQA
-from logging.config import dictConfig  # NOQA
 
 getLogger = logging.getLogger
 
