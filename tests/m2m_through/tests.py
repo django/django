@@ -5,9 +5,11 @@ from operator import attrgetter
 
 from django.test import TestCase
 
-from .models import (Person, Group, Membership, CustomMembership,
-    PersonSelfRefM2M, Friendship, Event, Invitation, Employee, Relationship,
-    Ingredient, Recipe, RecipeIngredient)
+from .models import (
+    CustomMembership, Employee, Event, Friendship, Group, Ingredient,
+    Invitation, Membership, Person, PersonSelfRefM2M, Recipe, RecipeIngredient,
+    Relationship,
+)
 
 
 class M2mThroughTests(TestCase):

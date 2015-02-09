@@ -78,13 +78,6 @@ respectively. For example::
 Then set the :setting:`STATICFILES_STORAGE` setting to
 ``'path.to.MyStaticFilesStorage'``.
 
-.. versionadded:: 1.7
-
-    The ability to override ``file_permissions_mode`` and
-    ``directory_permissions_mode`` is new in Django 1.7.  Previously the file
-    permissions always used :setting:`FILE_UPLOAD_PERMISSIONS` and the directory
-    permissions always used :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
-
 .. highlight:: console
 
 Some commonly used options are:
@@ -174,10 +167,6 @@ get all the directories which were searched::
      /home/polls.com/core/static
      /some/other/path/static
 
-.. versionadded:: 1.7
-
-   The additional output of which directories were searched was added.
-
 .. _staticfiles-runserver:
 
 runserver
@@ -244,8 +233,6 @@ counterparts and update the cache appropriately.
 ManifestStaticFilesStorage
 --------------------------
 
-.. versionadded:: 1.7
-
 .. class:: storage.ManifestStaticFilesStorage
 
 A subclass of the :class:`~django.contrib.staticfiles.storage.StaticFilesStorage`
@@ -306,7 +293,7 @@ By default it calculates a MD5 hash from the content's chunks as
 mentioned above. Feel free to override this method to use your own
 hashing algorithm.
 
-.. _`far future Expires headers`: http://developer.yahoo.com/performance/rules.html#expires
+.. _`far future Expires headers`: https://developer.yahoo.com/performance/rules.html#expires
 .. _`@import`: http://www.w3.org/TR/CSS2/cascade.html#at-import
 .. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: http://www.w3.org/Style/CSS/
@@ -370,10 +357,6 @@ of directory paths in which the finders searched. Example usage::
     result = finders.find('css/base.css')
     searched_locations = finders.searched_locations
 
-.. versionadded:: 1.7
-
-The ``searched_locations`` attribute was added.
-
 Other Helpers
 =============
 
@@ -381,7 +364,7 @@ There are a few other helpers outside of the
 :mod:`staticfiles <django.contrib.staticfiles>` app to work with static
 files:
 
-- The :func:`django.core.context_processors.static` context processor
+- The :func:`django.template.context_processors.static` context processor
   which adds :setting:`STATIC_URL` to every template context rendered
   with :class:`~django.template.RequestContext` contexts.
 
@@ -422,12 +405,6 @@ This view function serves static files in development.
     That's because this view is **grossly inefficient** and probably
     **insecure**. This is only intended for local development, and should
     **never be used in production**.
-
-.. versionchanged:: 1.7
-
-    This view will now raise an :exc:`~django.http.Http404` exception instead
-    of :exc:`~django.core.exceptions.ImproperlyConfigured` when
-    :setting:`DEBUG` is ``False``.
 
 .. note::
 
@@ -502,8 +479,3 @@ But given the fact that it makes use of the
 transparently overlay at test execution-time the assets provided by the
 ``staticfiles`` finders. This means you don't need to run
 :djadmin:`collectstatic` before or as a part of your tests setup.
-
-.. versionadded:: 1.7
-
-    ``StaticLiveServerTestCase`` is new in Django 1.7. Previously its
-    functionality was provided by :class:`django.test.LiveServerTestCase`.

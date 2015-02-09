@@ -2,7 +2,9 @@ import re
 
 import cx_Oracle
 
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
+from django.db.backends.base.introspection import (
+    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+)
 from django.utils.encoding import force_text
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
@@ -78,12 +80,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Returns a dictionary of {field_index: (field_index_other_table, other_table)}
-        representing all relationships to the given table. Indexes are 0-based.
+        Returns a dictionary of {field_name: (field_name_other_table, other_table)}
+        representing all relationships to the given table.
         """
         table_name = table_name.upper()
         cursor.execute("""
-    SELECT ta.column_id - 1, tb.table_name, tb.column_id - 1
+    SELECT ta.column_name, tb.table_name, tb.column_name
     FROM   user_constraints, USER_CONS_COLUMNS ca, USER_CONS_COLUMNS cb,
            user_tab_cols ta, user_tab_cols tb
     WHERE  user_constraints.table_name = %s AND
@@ -98,7 +100,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
         relations = {}
         for row in cursor.fetchall():
-            relations[row[0]] = (row[2], row[1].lower())
+            relations[row[0].lower()] = (row[2].lower(), row[1].lower())
         return relations
 
     def get_key_columns(self, cursor, table_name):

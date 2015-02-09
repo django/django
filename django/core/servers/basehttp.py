@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 import socket
 import sys
 from wsgiref import simple_server
-from wsgiref.util import FileWrapper   # NOQA: for backwards compatibility
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8
@@ -33,13 +32,11 @@ def get_internal_wsgi_application():
     this will be the ``application`` object in ``projectname/wsgi.py``.
 
     This function, and the ``WSGI_APPLICATION`` setting itself, are only useful
-    for Django's internal servers (runserver, runfcgi); external WSGI servers
-    should just be configured to point to the correct application object
-    directly.
+    for Django's internal server (runserver); external WSGI servers should just
+    be configured to point to the correct application object directly.
 
     If settings.WSGI_APPLICATION is not set (is ``None``), we just return
     whatever ``django.core.wsgi.get_wsgi_application`` returns.
-
     """
     from django.conf import settings
     app_path = getattr(settings, 'WSGI_APPLICATION')
@@ -87,7 +84,8 @@ class WSGIServer(simple_server.WSGIServer, object):
             super(WSGIServer, self).handle_error(request, client_address)
 
 
-class ServerHandler(simple_server.ServerHandler):
+# Inheriting from object required on Python 2.
+class ServerHandler(simple_server.ServerHandler, object):
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
         if not is_broken_pipe_error():
@@ -138,6 +136,14 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         sys.stderr.write(msg)
 
     def get_environ(self):
+        # Strip all headers with underscores in the name before constructing
+        # the WSGI environ. This prevents header-spoofing based on ambiguity
+        # between underscores and dashes both normalized to underscores in WSGI
+        # env vars. Nginx and Apache 2.4+ both do this as well.
+        for k, v in self.headers.items():
+            if '_' in k:
+                del self.headers[k]
+
         env = super(WSGIRequestHandler, self).get_environ()
 
         path = self.path

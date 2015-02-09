@@ -4,29 +4,27 @@ Regression tests for the Test Client, especially the customized assertions.
 """
 from __future__ import unicode_literals
 
-import os
 import itertools
+import os
 
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template import TemplateSyntaxError, Context, Template
-from django.test import Client, TestCase, override_settings
+from django.contrib.auth.models import User
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.core.urlresolvers import NoReverseMatch, reverse
+from django.http import HttpResponse
+from django.template import Context, TemplateSyntaxError, engines
+from django.template.response import SimpleTemplateResponse
+from django.test import Client, TestCase, ignore_warnings, override_settings
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
-from django.template.response import SimpleTemplateResponse
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
-from django.http import HttpResponse
-from django.contrib.auth.signals import user_logged_out, user_logged_in
-from django.contrib.auth.models import User
 
 from .models import CustomUser
 from .views import CustomTestException
 
 
-@override_settings(
-    TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),),
-    ROOT_URLCONF='test_client_regress.urls',
-)
+@override_settings(ROOT_URLCONF='test_client_regress.urls')
 class AssertContainsTests(TestCase):
 
     def test_contains(self):
@@ -160,7 +158,8 @@ class AssertContainsTests(TestCase):
             without throwing an error.
             Refs #15826.
         """
-        response = SimpleTemplateResponse(Template('Hello'), status=200)
+        template = engines['django'].from_string('Hello')
+        response = SimpleTemplateResponse(template)
         self.assertContains(response, 'Hello')
 
     def test_assert_contains_using_non_template_response(self):
@@ -176,7 +175,8 @@ class AssertContainsTests(TestCase):
             without throwing an error.
             Refs #15826.
         """
-        response = SimpleTemplateResponse(Template('Hello'), status=200)
+        template = engines['django'].from_string('Hello')
+        response = SimpleTemplateResponse(template)
         self.assertNotContains(response, 'Bye')
 
     def test_assert_not_contains_using_non_template_response(self):
@@ -188,7 +188,7 @@ class AssertContainsTests(TestCase):
         self.assertNotContains(response, 'Bye')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
 class AssertTemplateUsedTests(TestCase):
     fixtures = ['testdata.json']
@@ -353,27 +353,27 @@ class AssertRedirectsTests(TestCase):
         "You can follow a redirect chain of multiple redirects"
         response = self.client.get('/redirects/further/more/', {}, follow=True)
         self.assertRedirects(response, '/no_template_view/',
-            status_code=301, target_status_code=200)
+            status_code=302, target_status_code=200)
 
         self.assertEqual(len(response.redirect_chain), 1)
-        self.assertEqual(response.redirect_chain[0], ('http://testserver/no_template_view/', 301))
+        self.assertEqual(response.redirect_chain[0], ('http://testserver/no_template_view/', 302))
 
     def test_multiple_redirect_chain(self):
         "You can follow a redirect chain of multiple redirects"
         response = self.client.get('/redirects/', {}, follow=True)
         self.assertRedirects(response, '/no_template_view/',
-            status_code=301, target_status_code=200)
+            status_code=302, target_status_code=200)
 
         self.assertEqual(len(response.redirect_chain), 3)
-        self.assertEqual(response.redirect_chain[0], ('http://testserver/redirects/further/', 301))
-        self.assertEqual(response.redirect_chain[1], ('http://testserver/redirects/further/more/', 301))
-        self.assertEqual(response.redirect_chain[2], ('http://testserver/no_template_view/', 301))
+        self.assertEqual(response.redirect_chain[0], ('http://testserver/redirects/further/', 302))
+        self.assertEqual(response.redirect_chain[1], ('http://testserver/redirects/further/more/', 302))
+        self.assertEqual(response.redirect_chain[2], ('http://testserver/no_template_view/', 302))
 
     def test_redirect_chain_to_non_existent(self):
         "You can follow a chain to a non-existent view"
         response = self.client.get('/redirect_to_non_existent_view2/', {}, follow=True)
         self.assertRedirects(response, '/non_existent_view/',
-            status_code=301, target_status_code=404)
+            status_code=302, target_status_code=404)
 
     def test_redirect_chain_to_self(self):
         "Redirections to self are caught and escaped"
@@ -382,7 +382,7 @@ class AssertRedirectsTests(TestCase):
         response = context.exception.last_response
         # The chain of redirects stops once the cycle is detected.
         self.assertRedirects(response, '/redirect_to_self/',
-            status_code=301, target_status_code=301)
+            status_code=302, target_status_code=302)
         self.assertEqual(len(response.redirect_chain), 2)
 
     def test_redirect_to_self_with_changing_query(self):
@@ -397,7 +397,7 @@ class AssertRedirectsTests(TestCase):
         response = context.exception.last_response
         # The chain of redirects will get back to the starting point, but stop there.
         self.assertRedirects(response, '/circular_redirect_2/',
-            status_code=301, target_status_code=301)
+            status_code=302, target_status_code=302)
         self.assertEqual(len(response.redirect_chain), 4)
 
     def test_redirect_chain_post(self):
@@ -405,7 +405,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.post('/redirects/',
             {'nothing': 'to_send'}, follow=True)
         self.assertRedirects(response,
-            '/no_template_view/', 301, 200)
+            '/no_template_view/', 302, 200)
         self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_head(self):
@@ -413,7 +413,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.head('/redirects/',
             {'nothing': 'to_send'}, follow=True)
         self.assertRedirects(response,
-            '/no_template_view/', 301, 200)
+            '/no_template_view/', 302, 200)
         self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_options(self):
@@ -421,7 +421,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.options('/redirects/',
             follow=True)
         self.assertRedirects(response,
-            '/no_template_view/', 301, 200)
+            '/no_template_view/', 302, 200)
         self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_put(self):
@@ -429,7 +429,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.put('/redirects/',
             follow=True)
         self.assertRedirects(response,
-            '/no_template_view/', 301, 200)
+            '/no_template_view/', 302, 200)
         self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_delete(self):
@@ -437,7 +437,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.delete('/redirects/',
             follow=True)
         self.assertRedirects(response,
-            '/no_template_view/', 301, 200)
+            '/no_template_view/', 302, 200)
         self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_to_different_host(self):
@@ -445,7 +445,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.get('/redirect_other_host/', follow=True)
         self.assertRedirects(response,
             'https://otherserver:8443/no_template_view/',
-            status_code=301, target_status_code=200)
+            status_code=302, target_status_code=200)
         # We can't use is_secure() or get_host()
         # because response.request is a dictionary, not an HttpRequest
         self.assertEqual(response.request.get('wsgi.url_scheme'), 'https')
@@ -492,11 +492,11 @@ class AssertRedirectsTests(TestCase):
             # always redirects to https
             response = self.client.get('/https_redirect_view/', follow=follow, secure=secure)
             # no scheme to compare too, always succeeds
-            self.assertRedirects(response, '/secure_view/', status_code=301)
+            self.assertRedirects(response, '/secure_view/', status_code=302)
             # the goal scheme is https
-            self.assertRedirects(response, 'https://testserver/secure_view/', status_code=301)
+            self.assertRedirects(response, 'https://testserver/secure_view/', status_code=302)
             with self.assertRaises(AssertionError):
-                self.assertRedirects(response, 'http://testserver/secure_view/', status_code=301)
+                self.assertRedirects(response, 'http://testserver/secure_view/', status_code=302)
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
@@ -810,7 +810,7 @@ class AssertFormsetErrorTests(TestCase):
                                     **kwargs)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
 class LoginTests(TestCase):
     fixtures = ['testdata']
@@ -833,7 +833,7 @@ class LoginTests(TestCase):
 
 
 @override_settings(
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     SESSION_ENGINE='test_client_regress.session',
     ROOT_URLCONF='test_client_regress.urls',
 )
@@ -879,7 +879,7 @@ class URLEscapingTests(TestCase):
         self.assertEqual(response.content, b'Hi, Arthur')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
 class ExceptionTests(TestCase):
     fixtures = ['testdata.json']
@@ -909,9 +909,10 @@ class ExceptionTests(TestCase):
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class TemplateExceptionTests(TestCase):
 
-    @override_settings(
-        TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'bad_templates'),)
-    )
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'bad_templates')],
+    }])
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"
         try:
@@ -947,7 +948,7 @@ class zzUrlconfSubstitutionTests(TestCase):
             reverse('arg_view', args=['somename'])
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
 class ContextTests(TestCase):
     fixtures = ['testdata']
@@ -958,7 +959,6 @@ class ContextTests(TestCase):
         self.assertEqual(response.context.__class__, Context)
         self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
-        self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'sausage')
 
         try:
@@ -974,7 +974,6 @@ class ContextTests(TestCase):
         self.assertEqual(len(response.context), 2)
         self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
-        self.assertEqual(response.context['request-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'bacon')
 
         try:
@@ -998,13 +997,20 @@ class ContextTests(TestCase):
                           'python', 'dolly'},
                          l.keys())
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_15368(self):
         # Need to insert a context processor that assumes certain things about
         # the request instance. This triggers a bug caused by some ways of
         # copying RequestContext.
-        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=(
-            'test_client_regress.context_processors.special',
-        )):
+        with self.settings(TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'test_client_regress.context_processors.special',
+                ],
+            },
+        }]):
             response = self.client.get("/request_context_view/")
             self.assertContains(response, 'Path: /request_context_view/')
 
@@ -1017,7 +1023,7 @@ class ContextTests(TestCase):
         self.assertEqual(response.context['nested'], 'yes')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
 class SessionTests(TestCase):
     fixtures = ['testdata.json']
@@ -1249,23 +1255,18 @@ class QueryStringTests(TestCase):
             method = getattr(self.client, method_name)
             response = method("/request_data/", data={'foo': 'whiz'})
             self.assertEqual(response.context['get-foo'], 'whiz')
-            self.assertEqual(response.context['request-foo'], 'whiz')
 
             # A GET-like request can pass a query string as part of the URL
             response = method("/request_data/?foo=whiz")
             self.assertEqual(response.context['get-foo'], 'whiz')
-            self.assertEqual(response.context['request-foo'], 'whiz')
 
             # Data provided in the URL to a GET-like request is overridden by actual form data
             response = method("/request_data/?foo=whiz", data={'foo': 'bang'})
             self.assertEqual(response.context['get-foo'], 'bang')
-            self.assertEqual(response.context['request-foo'], 'bang')
 
             response = method("/request_data/?foo=whiz", data={'bar': 'bang'})
             self.assertEqual(response.context['get-foo'], None)
             self.assertEqual(response.context['get-bar'], 'bang')
-            self.assertEqual(response.context['request-foo'], None)
-            self.assertEqual(response.context['request-bar'], 'bang')
 
     def test_post_like_requests(self):
         # A POST-like request can pass a query string as data
@@ -1277,21 +1278,17 @@ class QueryStringTests(TestCase):
         response = self.client.post("/request_data/?foo=whiz")
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['post-foo'], None)
-        self.assertEqual(response.context['request-foo'], 'whiz')
 
         # POST data provided in the URL augments actual form data
         response = self.client.post("/request_data/?foo=whiz", data={'foo': 'bang'})
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['post-foo'], 'bang')
-        self.assertEqual(response.context['request-foo'], 'bang')
 
         response = self.client.post("/request_data/?foo=whiz", data={'bar': 'bang'})
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['get-bar'], None)
         self.assertEqual(response.context['post-foo'], None)
         self.assertEqual(response.context['post-bar'], 'bang')
-        self.assertEqual(response.context['request-foo'], 'whiz')
-        self.assertEqual(response.context['request-bar'], 'bang')
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
@@ -1372,7 +1369,7 @@ class RequestHeadersTest(TestCase):
         response = self.client.get("/check_headers_redirect/", follow=True, HTTP_X_ARG_CHECK='Testing 123')
         self.assertEqual(response.content, b"HTTP_X_ARG_CHECK: Testing 123")
         self.assertRedirects(response, '/check_headers/',
-            status_code=301, target_status_code=200)
+            status_code=302, target_status_code=200)
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')

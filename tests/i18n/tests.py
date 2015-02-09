@@ -1,49 +1,45 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-from contextlib import contextmanager
 import datetime
 import decimal
 import gettext as gettext_module
-from importlib import import_module
 import os
 import pickle
+from contextlib import contextmanager
+from importlib import import_module
 from threading import local
 from unittest import skipUnless
 
+from django import forms
 from django.conf import settings
-from django.template import Template, Context
+from django.template import Context, Template
 from django.template.base import TemplateSyntaxError
-from django.test import TestCase, RequestFactory, override_settings
-from django.utils import translation
-from django.utils.formats import (get_format, date_format, time_format,
-    localize, localize_input, iter_format_modules, get_format_modules,
-    reset_format_cache, sanitize_separators)
-from django.utils.numberformat import format as nformat
+from django.test import RequestFactory, TestCase, override_settings
+from django.utils import six, translation
 from django.utils._os import upath
-from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
-from django.utils import six
+from django.utils.formats import (
+    date_format, get_format, get_format_modules, iter_format_modules, localize,
+    localize_input, reset_format_cache, sanitize_separators, time_format,
+)
+from django.utils.numberformat import format as nformat
+from django.utils.safestring import SafeBytes, SafeString, SafeText, mark_safe
 from django.utils.six import PY3
-from django.utils.translation import (activate, deactivate,
-    get_language, get_language_from_request, get_language_info,
-    to_locale, trans_real,
-    gettext, gettext_lazy,
-    ugettext, ugettext_lazy,
-    ngettext_lazy,
-    ungettext_lazy,
-    pgettext, pgettext_lazy,
-    npgettext, npgettext_lazy,
-    check_for_language,
-    string_concat, LANGUAGE_SESSION_KEY)
+from django.utils.translation import (
+    LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
+    get_language, get_language_from_request, get_language_info, gettext,
+    gettext_lazy, ngettext_lazy, npgettext, npgettext_lazy, pgettext,
+    pgettext_lazy, string_concat, to_locale, trans_real, ugettext,
+    ugettext_lazy, ungettext_lazy,
+)
 
-from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
+from .forms import CompanyForm, I18nForm, SelectDateForm
 from .models import Company, TestModel
 
-
 here = os.path.dirname(os.path.abspath(upath(__file__)))
-extended_locale_paths = settings.LOCALE_PATHS + (
+extended_locale_paths = settings.LOCALE_PATHS + [
     os.path.join(here, 'other', 'locale'),
-)
+]
 
 
 @contextmanager
@@ -68,7 +64,7 @@ class TranslationTests(TestCase):
                 self.assertEqual(get_language(), 'pl')
             self.assertEqual(get_language(), 'de')
             with translation.override(None):
-                self.assertEqual(get_language(), settings.LANGUAGE_CODE)
+                self.assertEqual(get_language(), None)
             self.assertEqual(get_language(), 'de')
         finally:
             deactivate()
@@ -81,7 +77,7 @@ class TranslationTests(TestCase):
 
         @translation.override(None)
         def func_none():
-            self.assertEqual(get_language(), settings.LANGUAGE_CODE)
+            self.assertEqual(get_language(), None)
 
         try:
             activate('de')
@@ -396,7 +392,7 @@ class TranslationTests(TestCase):
         self.assertEqual(trans_real.to_language('en_US'), 'en-us')
         self.assertEqual(trans_real.to_language('sr_Lat'), 'sr-lat')
 
-    @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),))
+    @override_settings(LOCALE_PATHS=[os.path.join(here, 'other', 'locale')])
     def test_bad_placeholder_1(self):
         """
         Error in translation file should not crash template rendering
@@ -408,7 +404,7 @@ class TranslationTests(TestCase):
             rendered = t.render(Context({'person': 'James'}))
             self.assertEqual(rendered, 'My name is James.')
 
-    @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),))
+    @override_settings(LOCALE_PATHS=[os.path.join(here, 'other', 'locale')])
     def test_bad_placeholder_2(self):
         """
         Error in translation file should not crash template rendering
@@ -549,7 +545,7 @@ class FormattingTests(TestCase):
             self.assertEqual(datetime.date(2009, 12, 31), form2.cleaned_data['date_field'])
             self.assertHTMLEqual(
                 '<select name="mydate_month" id="id_mydate_month">\n<option value="0">---</option>\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="0">---</option>\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="0">---</option>\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
-                SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
+                forms.SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
 
             # We shouldn't change the behavior of the floatformat filter re:
@@ -667,14 +663,14 @@ class FormattingTests(TestCase):
             self.assertEqual(datetime.date(2009, 12, 31), form5.cleaned_data['date_field'])
             self.assertHTMLEqual(
                 '<select name="mydate_day" id="id_mydate_day">\n<option value="0">---</option>\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_month" id="id_mydate_month">\n<option value="0">---</option>\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="0">---</option>\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
-                SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
+                forms.SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
 
         # Russian locale (with E as month)
         with translation.override('ru', deactivate=True):
             self.assertHTMLEqual(
                 '<select name="mydate_day" id="id_mydate_day">\n<option value="0">---</option>\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_month" id="id_mydate_month">\n<option value="0">---</option>\n<option value="1">\u042f\u043d\u0432\u0430\u0440\u044c</option>\n<option value="2">\u0424\u0435\u0432\u0440\u0430\u043b\u044c</option>\n<option value="3">\u041c\u0430\u0440\u0442</option>\n<option value="4">\u0410\u043f\u0440\u0435\u043b\u044c</option>\n<option value="5">\u041c\u0430\u0439</option>\n<option value="6">\u0418\u044e\u043d\u044c</option>\n<option value="7">\u0418\u044e\u043b\u044c</option>\n<option value="8">\u0410\u0432\u0433\u0443\u0441\u0442</option>\n<option value="9">\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c</option>\n<option value="10">\u041e\u043a\u0442\u044f\u0431\u0440\u044c</option>\n<option value="11">\u041d\u043e\u044f\u0431\u0440\u044c</option>\n<option value="12" selected="selected">\u0414\u0435\u043a\u0430\u0431\u0440\u044c</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="0">---</option>\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
-                SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
+                forms.SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
 
         # English locale
@@ -739,7 +735,7 @@ class FormattingTests(TestCase):
             self.assertEqual(datetime.date(2009, 12, 31), form6.cleaned_data['date_field'])
             self.assertHTMLEqual(
                 '<select name="mydate_month" id="id_mydate_month">\n<option value="0">---</option>\n<option value="1">January</option>\n<option value="2">February</option>\n<option value="3">March</option>\n<option value="4">April</option>\n<option value="5">May</option>\n<option value="6">June</option>\n<option value="7">July</option>\n<option value="8">August</option>\n<option value="9">September</option>\n<option value="10">October</option>\n<option value="11">November</option>\n<option value="12" selected="selected">December</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="0">---</option>\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="0">---</option>\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
-                SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
+                forms.SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
 
     def test_sub_locales(self):
@@ -972,11 +968,11 @@ class MiscTests(TestCase):
         self.assertEqual(g(r), 'es')
 
         # This tests the following scenario: there isn't a main language (zh)
-        # translation of Django but there is a translation to variation (zh_CN)
-        # the user sets zh-cn as the preferred language, it should be selected
+        # translation of Django but there is a translation to variation (zh-hans)
+        # the user sets zh-hans as the preferred language, it should be selected
         # by Django without falling back nor ignoring it.
-        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,de'}
-        self.assertEqual(g(r), 'zh-cn')
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-hans,de'}
+        self.assertEqual(g(r), 'zh-hans')
 
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'NL'}
         self.assertEqual('nl', g(r))
@@ -997,11 +993,11 @@ class MiscTests(TestCase):
         self.assertEqual('zh-hant', g(r))
 
     @override_settings(
-        LANGUAGES=(
+        LANGUAGES=[
             ('en', 'English'),
             ('zh-hans', 'Simplified Chinese'),
             ('zh-hant', 'Traditional Chinese'),
-        )
+        ]
     )
     def test_support_for_deprecated_chinese_language_codes(self):
         """
@@ -1021,32 +1017,6 @@ class MiscTests(TestCase):
 
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-tw,en'}
         self.assertEqual(g(r), 'zh-hant')
-
-    @override_settings(
-        LANGUAGES=(
-            ('en', 'English'),
-            ('zh-cn', 'Simplified Chinese'),
-            ('zh-hans', 'Simplified Chinese'),
-            ('zh-hant', 'Traditional Chinese'),
-            ('zh-tw', 'Traditional Chinese'),
-        )
-    )
-    def test_backwards_compatibility(self):
-        """
-        While the old chinese language codes are being deprecated, they should
-        still work as before the new language codes were introduced.
-
-        refs #18419 -- this is explicitly for backwards compatibility and
-        should be removed in Django 1.9
-        """
-        g = get_language_from_request
-        r = self.rf.get('/')
-        r.COOKIES = {}
-        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,en'}
-        self.assertEqual(g(r), 'zh-cn')
-
-        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-tw,en'}
-        self.assertEqual(g(r), 'zh-tw')
 
     def test_special_fallback_language(self):
         """
@@ -1085,12 +1055,12 @@ class MiscTests(TestCase):
         self.assertEqual(g(r), 'es')
 
         # This tests the following scenario: there isn't a main language (zh)
-        # translation of Django but there is a translation to variation (zh_CN)
-        # the user sets zh-cn as the preferred language, it should be selected
+        # translation of Django but there is a translation to variation (zh-hans)
+        # the user sets zh-hans as the preferred language, it should be selected
         # by Django without falling back nor ignoring it.
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'zh-cn'}
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'zh-hans'}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
-        self.assertEqual(g(r), 'zh-cn')
+        self.assertEqual(g(r), 'zh-hans')
 
     def test_get_language_from_path_real(self):
         g = trans_real.get_language_from_path
@@ -1137,7 +1107,7 @@ class MiscTests(TestCase):
         r.COOKIES = {}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-br'}
         self.assertEqual('pt-br', g(r))
-        with self.settings(LANGUAGES=(('en', 'English'),)):
+        with self.settings(LANGUAGES=[('en', 'English')]):
             self.assertNotEqual('pt-br', g(r))
 
 
@@ -1238,8 +1208,8 @@ class TestLanguageInfo(TestCase):
         """
         li = get_language_info('zh-my')
         self.assertEqual(li['code'], 'zh-hans')
-        li = get_language_info('zh-cn')
-        self.assertEqual(li['code'], 'zh-cn')
+        li = get_language_info('zh-hans')
+        self.assertEqual(li['code'], 'zh-hans')
 
 
 class MultipleLocaleActivationTests(TestCase):
@@ -1367,14 +1337,14 @@ class MultipleLocaleActivationTests(TestCase):
 
 @override_settings(
     USE_I18N=True,
-    LANGUAGES=(
+    LANGUAGES=[
         ('en', 'English'),
         ('fr', 'French'),
-    ),
-    MIDDLEWARE_CLASSES=(
+    ],
+    MIDDLEWARE_CLASSES=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
-    ),
+    ],
     ROOT_URLCONF='i18n.urls',
 )
 class LocaleMiddlewareTests(TestCase):
@@ -1387,11 +1357,11 @@ class LocaleMiddlewareTests(TestCase):
         self.assertContains(response, "Yes/No")
 
     @override_settings(
-        MIDDLEWARE_CLASSES=(
+        MIDDLEWARE_CLASSES=[
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.middleware.locale.LocaleMiddleware',
             'django.middleware.common.CommonMiddleware',
-        ),
+        ],
     )
     def test_language_not_saved_to_session(self):
         """Checks that current language is not automatically saved to
@@ -1403,15 +1373,15 @@ class LocaleMiddlewareTests(TestCase):
 
 @override_settings(
     USE_I18N=True,
-    LANGUAGES=(
+    LANGUAGES=[
         ('bg', 'Bulgarian'),
         ('en-us', 'English'),
         ('pt-br', 'Portugese (Brazil)'),
-    ),
-    MIDDLEWARE_CLASSES=(
+    ],
+    MIDDLEWARE_CLASSES=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
-    ),
+    ],
     ROOT_URLCONF='i18n.urls'
 )
 class CountrySpecificLanguageTests(TestCase):

@@ -59,7 +59,7 @@ The ``ContentType`` model
 .. class:: ContentType
 
     Each instance of :class:`~django.contrib.contenttypes.models.ContentType`
-    has three fields which, taken together, uniquely describe an installed
+    has two fields which, taken together, uniquely describe an installed
     model:
 
     .. attribute:: app_label
@@ -74,11 +74,18 @@ The ``ContentType`` model
 
         The name of the model class.
 
+    Additionally, the following property is available:
+
     .. attribute:: name
 
-        The human-readable name of the model. This is taken from the
+        The human-readable name of the content type. This is taken from the
         :attr:`verbose_name <django.db.models.Field.verbose_name>`
         attribute of the model.
+
+.. versionchanged:: 1.8
+
+    Before Django 1.8, the ``name`` property was a real field on the
+    ``ContentType`` model.
 
 Let's look at an example to see how this works. If you already have
 the :mod:`~django.contrib.contenttypes` application installed, and then add
@@ -94,9 +101,6 @@ created with the following values:
   path "django.contrib.sites").
 
 * :attr:`~django.contrib.contenttypes.models.ContentType.model`
-  will be set to ``'site'``.
-
-* :attr:`~django.contrib.contenttypes.models.ContentType.name`
   will be set to ``'site'``.
 
 .. _the verbose_name attribute: ../model-api/#verbose_name
@@ -295,11 +299,6 @@ model:
        is ``True``. This mirrors the ``for_concrete_model`` argument to
        :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`.
 
-    .. versionchanged:: 1.7
-
-        This class used to be defined in ``django.contrib.contenttypes.generic``.
-
-
 .. admonition:: Primary key type compatibility
 
    The "object_id" field doesn't have to be the same type as the
@@ -330,7 +329,8 @@ model:
    generic relations, you should probably be using a natural key to uniquely
    identify related :class:`~django.contrib.contenttypes.models.ContentType`
    objects. See :ref:`natural keys<topics-serialization-natural-keys>` and
-   :djadminopt:`dumpdata --natural <--natural>` for more information.
+   :djadminopt:`dumpdata --natural-foreign <--natural-foreign>` for more
+   information.
 
 This will enable an API similar to the one used for a normal
 :class:`~django.db.models.ForeignKey`;
@@ -364,13 +364,7 @@ Reverse generic relations
 
 .. class:: GenericRelation
 
-    .. versionchanged:: 1.7
-
-        This class used to be defined in ``django.contrib.contenttypes.generic``.
-
     .. attribute:: related_query_name
-
-        .. versionadded:: 1.7
 
         The relation on the related object back to this object doesn't exist by
         default. Setting ``related_query_name`` creates a relation from the
@@ -395,8 +389,6 @@ be used to retrieve their associated ``TaggedItems``::
     >>> t2.save()
     >>> b.tags.all()
     [<TaggedItem: django>, <TaggedItem: python>]
-
-.. versionadded:: 1.7
 
 Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 ``related_query_name`` set allows querying from the related object::
@@ -491,10 +483,6 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
 
 .. class:: BaseGenericInlineFormSet
 
-    .. versionchanged:: 1.7
-
-        This class used to be defined in ``django.contrib.contenttypes.generic``.
-
 .. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True, min_num=None, validate_min=False)
 
     Returns a ``GenericInlineFormSet`` using
@@ -510,19 +498,10 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
     :class:`~django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model`
     argument on ``GenericForeignKey``.
 
-    .. versionchanged:: 1.7
-
-        This function used to be defined in ``django.contrib.contenttypes.generic``.
-
-    .. versionchanged:: 1.7
-
-        ``min_num`` and ``validate_min`` were added.
-
-
 .. module:: django.contrib.contenttypes.admin
 
 Generic relations in admin
-------------------------------------
+--------------------------
 
 The :mod:`django.contrib.contenttypes.admin` module provides
 :class:`~django.contrib.contenttypes.admin.GenericTabularInline` and
@@ -552,16 +531,8 @@ information.
         The name of the integer field that represents the ID of the related
         object. Defaults to ``object_id``.
 
-    .. versionchanged:: 1.7
-
-        This class used to be defined in ``django.contrib.contenttypes.generic``.
-
 .. class:: GenericTabularInline
 .. class:: GenericStackedInline
 
     Subclasses of :class:`GenericInlineModelAdmin` with stacked and tabular
     layouts, respectively.
-
-    .. versionchanged:: 1.7
-
-        These classes used to be defined in ``django.contrib.contenttypes.generic``.

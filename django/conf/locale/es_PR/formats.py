@@ -12,18 +12,18 @@ SHORT_DATE_FORMAT = 'd/m/Y'
 SHORT_DATETIME_FORMAT = 'd/m/Y H:i'
 FIRST_DAY_OF_WEEK = 0  # Sunday
 
-DATE_INPUT_FORMATS = (
+DATE_INPUT_FORMATS = [
     # '31/12/2009', '31/12/09'
     '%d/%m/%Y', '%d/%m/%y'
-)
-DATETIME_INPUT_FORMATS = (
+]
+DATETIME_INPUT_FORMATS = [
     '%d/%m/%Y %H:%M:%S',
     '%d/%m/%Y %H:%M:%S.%f',
     '%d/%m/%Y %H:%M',
     '%d/%m/%y %H:%M:%S',
     '%d/%m/%y %H:%M:%S.%f',
     '%d/%m/%y %H:%M',
-)
+]
 
 DECIMAL_SEPARATOR = '.'
 THOUSAND_SEPARATOR = ','

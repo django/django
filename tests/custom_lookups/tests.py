@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 
-from datetime import date, datetime
 import time
 import unittest
+from datetime import date, datetime
 
 from django.core.exceptions import FieldError
-from django.db import models
-from django.db import connection
+from django.db import connection, models
 from django.test import TestCase, override_settings
+from django.utils import timezone
+
 from .models import Author, MySQLUnixTimestamp
 
 
@@ -376,7 +377,7 @@ class DateTimeLookupTests(TestCase):
         models.PositiveIntegerField.register_lookup(DateTimeTransform)
         try:
             ut = MySQLUnixTimestamp.objects.create(timestamp=time.time())
-            y2k = datetime(2000, 1, 1)
+            y2k = timezone.make_aware(datetime(2000, 1, 1))
             self.assertQuerysetEqual(
                 MySQLUnixTimestamp.objects.filter(timestamp__as_datetime__gt=y2k),
                 [ut], lambda x: x)

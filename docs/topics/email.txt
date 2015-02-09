@@ -74,10 +74,6 @@ are required.
 The return value will be the number of successfully delivered messages (which
 can be ``0`` or ``1`` since it can only send one message).
 
-.. versionadded:: 1.7
-
-    The ``html_message`` parameter was added.
-
 send_mass_mail()
 ================
 
@@ -333,17 +329,15 @@ The class has the following methods:
 
        message.attach('design.png', img_data, 'image/png')
 
-    .. versionchanged:: 1.7
+    If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
+    :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
 
-        If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
-        :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
+    In addition, ``message/rfc822`` attachments will no longer be
+    base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
+    issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
 
-        In addition, ``message/rfc822`` attachments will no longer be
-        base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
-        issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
-
-        __ https://bugzilla.gnome.org/show_bug.cgi?id=651197
-        __ https://bugzilla.mozilla.org/show_bug.cgi?id=333880
+    __ https://bugzilla.gnome.org/show_bug.cgi?id=651197
+    __ https://bugzilla.mozilla.org/show_bug.cgi?id=333880
 
 * ``attach_file()`` creates a new attachment using a file from your
   filesystem. Call it with the path of the file to attach and, optionally,
@@ -468,12 +462,8 @@ SMTP backend
 
         EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-    .. versionadded:: 1.7
-
-        The ``timeout`` parameter was added. If unspecified, the default
-        ``timeout`` will be the one provided by
-        :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no
-        timeout).
+    If unspecified, the default ``timeout`` will be the one provided by
+    :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
 
     .. versionchanged:: 1.8
 

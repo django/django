@@ -3,9 +3,11 @@ from __future__ import unicode_literals
 from django.test import TestCase
 from django.utils import six
 
-from .models import (Building, Child, Device, Port, Item, Country, Connection,
-    ClientStatus, State, Client, SpecialClient, TUser, Person, Student,
-    Organizer, Class, Enrollment, Hen, Chick, A, B, C)
+from .models import (
+    A, B, C, Building, Chick, Child, Class, Client, ClientStatus, Connection,
+    Country, Device, Enrollment, Hen, Item, Organizer, Person, Port,
+    SpecialClient, State, Student, TUser,
+)
 
 
 class SelectRelatedRegressTests(TestCase):

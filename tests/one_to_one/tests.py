@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
 
-from django.db import transaction, IntegrityError, connection
+from django.db import IntegrityError, connection, transaction
 from django.test import TestCase
 
-from .models import (Bar, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,
-    Place, RelatedModel, Restaurant, School, Director, Target, UndergroundBar, Waiter)
+from .models import (
+    Bar, Director, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,
+    Place, RelatedModel, Restaurant, School, Target, UndergroundBar, Waiter,
+)
 
 
 class OneToOneTests(TestCase):
@@ -383,7 +385,7 @@ class OneToOneTests(TestCase):
         be added to the related model.
         """
         self.assertFalse(
-            hasattr(Target, HiddenPointer._meta.get_field('target').related.get_accessor_name())
+            hasattr(Target, HiddenPointer._meta.get_field('target').rel.get_accessor_name())
         )
 
     def test_related_object(self):

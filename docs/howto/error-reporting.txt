@@ -73,14 +73,14 @@ those are usually just people typing in broken URLs or broken Web 'bots).
     Put it towards the top of your :setting:`MIDDLEWARE_CLASSES` setting.
 
 You can tell Django to stop reporting particular 404s by tweaking the
-:setting:`IGNORABLE_404_URLS` setting. It should be a tuple of compiled
+:setting:`IGNORABLE_404_URLS` setting. It should be a list of compiled
 regular expression objects. For example::
 
     import re
-    IGNORABLE_404_URLS = (
+    IGNORABLE_404_URLS = [
         re.compile(r'\.(php|cgi)$'),
         re.compile(r'^/phpmyadmin/'),
-    )
+    ]
 
 In this example, a 404 to any URL ending with ``.php`` or ``.cgi`` will *not* be
 reported. Neither will any URL starting with ``/phpmyadmin/``.
@@ -89,11 +89,11 @@ The following example shows how to exclude some conventional URLs that browsers 
 crawlers often request::
 
     import re
-    IGNORABLE_404_URLS = (
+    IGNORABLE_404_URLS = [
         re.compile(r'^/apple-touch-icon.*\.png$'),
         re.compile(r'^/favicon\.ico$'),
         re.compile(r'^/robots\.txt$'),
-    )
+    ]
 
 (Note that these are regular expressions, so we put a backslash in front of
 periods to escape them.)

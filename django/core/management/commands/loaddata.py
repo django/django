@@ -5,6 +5,7 @@ import gzip
 import os
 import warnings
 import zipfile
+from itertools import product
 
 from django.apps import apps
 from django.conf import settings
@@ -12,14 +13,14 @@ from django.core import serializers
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
-from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
-      IntegrityError, DatabaseError)
+from django.db import (
+    DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connections, router,
+    transaction,
+)
 from django.utils import lru_cache
+from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango19Warning
-from itertools import product
 
 try:
     import bz2
@@ -218,14 +219,9 @@ class Command(BaseCommand):
                     (fixture_name, humanize(fixture_dir)))
             fixture_files.extend(fixture_files_in_dir)
 
-        if fixture_name != 'initial_data' and not fixture_files:
+        if not fixture_files:
             # Warning kept for backwards-compatibility; why not an exception?
             warnings.warn("No fixture named '%s' found." % fixture_name)
-        elif fixture_name == 'initial_data' and fixture_files:
-            warnings.warn(
-                'initial_data fixtures are deprecated. Use data migrations instead.',
-                RemovedInDjango19Warning
-            )
 
         return fixture_files
 

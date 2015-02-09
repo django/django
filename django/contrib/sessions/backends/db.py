@@ -1,8 +1,8 @@
 import logging
 
-from django.contrib.sessions.backends.base import SessionBase, CreateError
+from django.contrib.sessions.backends.base import CreateError, SessionBase
 from django.core.exceptions import SuspiciousOperation
-from django.db import IntegrityError, transaction, router
+from django.db import IntegrityError, router, transaction
 from django.utils import timezone
 from django.utils.encoding import force_text
 
@@ -83,4 +83,4 @@ class SessionStore(SessionBase):
 
 
 # At bottom to avoid circular import
-from django.contrib.sessions.models import Session
+from django.contrib.sessions.models import Session  # isort:skip

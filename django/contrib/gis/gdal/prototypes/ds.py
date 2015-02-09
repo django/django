@@ -3,15 +3,18 @@
  related data structures. OGR_Dr_*, OGR_DS_*, OGR_L_*, OGR_F_*,
  OGR_Fld_* routines are relevant here.
 """
-from ctypes import c_char_p, c_double, c_int, c_long, c_void_p, POINTER
+from ctypes import POINTER, c_char_p, c_double, c_int, c_long, c_void_p
+
 from django.contrib.gis.gdal.envelope import OGREnvelope
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
-    double_output, geom_output, int_output, srs_output, void_output, voidptr_output)
+from django.contrib.gis.gdal.prototypes.generation import (
+    const_string_output, double_output, geom_output, int_output, srs_output,
+    void_output, voidptr_output,
+)
 
 c_int_p = POINTER(c_int)  # shortcut type
 
-### Driver Routines ###
+# Driver Routines
 register_all = void_output(lgdal.OGRRegisterAll, [], errcheck=False)
 cleanup_all = void_output(lgdal.OGRCleanupAll, [], errcheck=False)
 get_driver = voidptr_output(lgdal.OGRGetDriver, [c_int])
@@ -19,7 +22,7 @@ get_driver_by_name = voidptr_output(lgdal.OGRGetDriverByName, [c_char_p], errche
 get_driver_count = int_output(lgdal.OGRGetDriverCount, [])
 get_driver_name = const_string_output(lgdal.OGR_Dr_GetName, [c_void_p], decoding='ascii')
 
-### DataSource ###
+# DataSource
 open_ds = voidptr_output(lgdal.OGROpen, [c_char_p, c_int, POINTER(c_void_p)])
 destroy_ds = void_output(lgdal.OGR_DS_Destroy, [c_void_p], errcheck=False)
 release_ds = void_output(lgdal.OGRReleaseDataSource, [c_void_p])
@@ -28,7 +31,7 @@ get_layer = voidptr_output(lgdal.OGR_DS_GetLayer, [c_void_p, c_int])
 get_layer_by_name = voidptr_output(lgdal.OGR_DS_GetLayerByName, [c_void_p, c_char_p])
 get_layer_count = int_output(lgdal.OGR_DS_GetLayerCount, [c_void_p])
 
-### Layer Routines ###
+# Layer Routines
 get_extent = void_output(lgdal.OGR_L_GetExtent, [c_void_p, POINTER(OGREnvelope), c_int])
 get_feature = voidptr_output(lgdal.OGR_L_GetFeature, [c_void_p, c_long])
 get_feature_count = int_output(lgdal.OGR_L_GetFeatureCount, [c_void_p, c_int])
@@ -43,14 +46,14 @@ set_spatial_filter_rect = void_output(lgdal.OGR_L_SetSpatialFilterRect,
     [c_void_p, c_double, c_double, c_double, c_double], errcheck=False
 )
 
-### Feature Definition Routines ###
+# Feature Definition Routines
 get_fd_geom_type = int_output(lgdal.OGR_FD_GetGeomType, [c_void_p])
 get_fd_name = const_string_output(lgdal.OGR_FD_GetName, [c_void_p])
 get_feat_name = const_string_output(lgdal.OGR_FD_GetName, [c_void_p])
 get_field_count = int_output(lgdal.OGR_FD_GetFieldCount, [c_void_p])
 get_field_defn = voidptr_output(lgdal.OGR_FD_GetFieldDefn, [c_void_p, c_int])
 
-### Feature Routines ###
+# Feature Routines
 clone_feature = voidptr_output(lgdal.OGR_F_Clone, [c_void_p])
 destroy_feature = void_output(lgdal.OGR_F_Destroy, [c_void_p], errcheck=False)
 feature_equal = int_output(lgdal.OGR_F_Equal, [c_void_p, c_void_p])
@@ -66,7 +69,7 @@ get_field_as_integer = int_output(lgdal.OGR_F_GetFieldAsInteger, [c_void_p, c_in
 get_field_as_string = const_string_output(lgdal.OGR_F_GetFieldAsString, [c_void_p, c_int])
 get_field_index = int_output(lgdal.OGR_F_GetFieldIndex, [c_void_p, c_char_p])
 
-### Field Routines ###
+# Field Routines
 get_field_name = const_string_output(lgdal.OGR_Fld_GetNameRef, [c_void_p])
 get_field_precision = int_output(lgdal.OGR_Fld_GetPrecision, [c_void_p])
 get_field_type = int_output(lgdal.OGR_Fld_GetType, [c_void_p])

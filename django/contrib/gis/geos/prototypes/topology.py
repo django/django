@@ -11,8 +11,11 @@ __all__ = ['geos_boundary', 'geos_buffer', 'geos_cascaded_union',
            'geos_interpolate_normalized']
 
 from ctypes import c_double, c_int
+
 from django.contrib.gis.geos.libgeos import GEOM_PTR
-from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_minus_one, check_string
+from django.contrib.gis.geos.prototypes.errcheck import (
+    check_geom, check_minus_one, check_string,
+)
 from django.contrib.gis.geos.prototypes.geom import geos_char_p
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
@@ -27,7 +30,7 @@ def topology(func, *args, **kwargs):
     func.errcheck = kwargs.get('errcheck', check_geom)
     return func
 
-### Topology Routines ###
+# Topology Routines
 geos_boundary = topology(GEOSFunc('GEOSBoundary'))
 geos_buffer = topology(GEOSFunc('GEOSBuffer'), c_double, c_int)
 geos_centroid = topology(GEOSFunc('GEOSGetCentroid'))

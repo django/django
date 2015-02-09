@@ -3,10 +3,12 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.models import User
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory, TestCase
 
-from .models import (Band, Song, SongInlineDefaultOrdering,
-    SongInlineNewOrdering, DynOrderingBandAdmin)
+from .models import (
+    Band, DynOrderingBandAdmin, Song, SongInlineDefaultOrdering,
+    SongInlineNewOrdering,
+)
 
 
 class MockRequest(object):

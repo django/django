@@ -2,17 +2,15 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
+from django.contrib.contenttypes.models import ContentType
 from django.core import checks
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import connection
-from django.db import models, router, transaction, DEFAULT_DB_ALIAS
-from django.db.models import signals, FieldDoesNotExist, DO_NOTHING
+from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
+from django.db import DEFAULT_DB_ALIAS, connection, models, router, transaction
+from django.db.models import DO_NOTHING, signals
 from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
-from django.db.models.related import PathInfo
-from django.db.models.expressions import Col
-from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import smart_text, python_2_unicode_compatible
+from django.db.models.query_utils import PathInfo
+from django.utils.encoding import python_2_unicode_compatible, smart_text
 
 
 @python_2_unicode_compatible
@@ -21,18 +19,32 @@ class GenericForeignKey(object):
     Provides a generic relation to any object through content-type/object-id
     fields.
     """
+    # Field flags
+    auto_created = False
+    concrete = False
+    editable = False
+    hidden = False
 
-    def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
+    is_relation = True
+    many_to_many = False
+    many_to_one = False
+    one_to_many = True
+    one_to_one = False
+    related_model = None
+
+    def __init__(self, ct_field='content_type', fk_field='object_id', for_concrete_model=True):
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
         self.editable = False
+        self.rel = None
+        self.column = None
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
         self.model = cls
         self.cache_attr = "_%s_cache" % name
-        cls._meta.add_virtual_field(self)
+        cls._meta.add_field(self, virtual=True)
 
         # Only run pre-initialization field assignment on non-abstract models
         if not cls._meta.abstract:
@@ -240,33 +252,52 @@ class GenericForeignKey(object):
         setattr(instance, self.cache_attr, value)
 
 
+class GenericRel(ForeignObjectRel):
+    def __init__(self, field, to, related_name=None, related_query_name=None, limit_choices_to=None):
+        super(GenericRel, self).__init__(
+            field, to,
+            related_name=related_query_name or '+',
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            on_delete=DO_NOTHING,
+        )
+
+
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
+    # Field flags
+    auto_created = False
 
-    def __init__(self, to, **kwargs):
-        kwargs['verbose_name'] = kwargs.get('verbose_name', None)
-        kwargs['rel'] = GenericRel(
+    many_to_many = False
+    many_to_one = True
+    one_to_many = False
+    one_to_one = False
+
+    rel_class = GenericRel
+
+    def __init__(self, to, object_id_field='object_id', content_type_field='content_type',
+            for_concrete_model=True, related_query_name=None, limit_choices_to=None, **kwargs):
+        kwargs['rel'] = self.rel_class(
             self, to,
-            related_query_name=kwargs.pop('related_query_name', None),
-            limit_choices_to=kwargs.pop('limit_choices_to', None),
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
         )
-        # Override content-type/object-id field names on the related class
-        self.object_id_field_name = kwargs.pop("object_id_field", "object_id")
-        self.content_type_field_name = kwargs.pop("content_type_field", "content_type")
-
-        self.for_concrete_model = kwargs.pop("for_concrete_model", True)
 
         kwargs['blank'] = True
         kwargs['editable'] = False
         kwargs['serialize'] = False
+
         # This construct is somewhat of an abuse of ForeignObject. This field
         # represents a relation from pk to object_id field. But, this relation
         # isn't direct, the join is generated reverse along foreign key. So,
         # the from_field is object_id field, to_field is pk because of the
         # reverse join.
         super(GenericRelation, self).__init__(
-            to, to_fields=[],
-            from_fields=[self.object_id_field_name], **kwargs)
+            to, from_fields=[object_id_field], to_fields=[], **kwargs)
+
+        self.object_id_field_name = object_id_field
+        self.content_type_field_name = content_type_field
+        self.for_concrete_model = for_concrete_model
 
     def check(self, **kwargs):
         errors = super(GenericRelation, self).check(**kwargs)
@@ -302,12 +333,11 @@ class GenericRelation(ForeignObject):
 
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
-        return [(self.rel.to._meta.get_field_by_name(self.object_id_field_name)[0],
-                 self.model._meta.pk)]
+        return [(self.rel.to._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
 
     def get_path_info(self):
         opts = self.rel.to._meta
-        target = opts.get_field_by_name(self.object_id_field_name)[0]
+        target = opts.pk
         return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
 
     def get_reverse_path_info(self):
@@ -344,10 +374,10 @@ class GenericRelation(ForeignObject):
                                                  for_concrete_model=self.for_concrete_model)
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
-        field = self.rel.to._meta.get_field_by_name(self.content_type_field_name)[0]
+        field = self.rel.to._meta.get_field(self.content_type_field_name)
         contenttype_pk = self.get_content_type().pk
         cond = where_class()
-        lookup = field.get_lookup('exact')(Col(remote_alias, field, field), contenttype_pk)
+        lookup = field.get_lookup('exact')(field.get_col(remote_alias), contenttype_pk)
         cond.add(lookup, 'AND')
         return cond
 
@@ -405,16 +435,8 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         return manager
 
     def __set__(self, instance, value):
-        # Force evaluation of `value` in case it's a queryset whose
-        # value could be affected by `manager.clear()`. Refs #19816.
-        value = tuple(value)
-
         manager = self.__get__(instance)
-        db = router.db_for_write(manager.model, instance=manager.instance)
-        with transaction.atomic(using=db, savepoint=False):
-            manager.clear()
-            for obj in value:
-                manager.add(obj)
+        manager.set(value)
 
 
 def create_generic_related_manager(superclass):
@@ -530,6 +552,31 @@ def create_generic_related_manager(superclass):
                         obj.delete()
         _clear.alters_data = True
 
+        def set(self, objs, **kwargs):
+            # Force evaluation of `objs` in case it's a queryset whose value
+            # could be affected by `manager.clear()`. Refs #19816.
+            objs = tuple(objs)
+
+            clear = kwargs.pop('clear', False)
+
+            db = router.db_for_write(self.model, instance=self.instance)
+            with transaction.atomic(using=db, savepoint=False):
+                if clear:
+                    self.clear()
+                    self.add(*objs)
+                else:
+                    old_objs = set(self.using(db).all())
+                    new_objs = []
+                    for obj in objs:
+                        if obj in old_objs:
+                            old_objs.remove(obj)
+                        else:
+                            new_objs.append(obj)
+
+                    self.remove(*old_objs)
+                    self.add(*new_objs)
+        set.alters_data = True
+
         def create(self, **kwargs):
             kwargs[self.content_type_field_name] = self.content_type
             kwargs[self.object_id_field_name] = self.pk_val
@@ -552,10 +599,3 @@ def create_generic_related_manager(superclass):
         update_or_create.alters_data = True
 
     return GenericRelatedObjectManager
-
-
-class GenericRel(ForeignObjectRel):
-    def __init__(self, field, to, related_name=None, limit_choices_to=None, related_query_name=None):
-        super(GenericRel, self).__init__(field=field, to=to, related_name=related_query_name or '+',
-                                         limit_choices_to=limit_choices_to, on_delete=DO_NOTHING,
-                                         related_query_name=related_query_name)

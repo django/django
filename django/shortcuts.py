@@ -3,50 +3,92 @@ This module collects helper functions and classes that "span" multiple levels
 of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
-from django.template import loader, RequestContext
-from django.http import HttpResponse, Http404
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
+
+import warnings
+
+from django.core import urlresolvers
 from django.db.models.base import ModelBase
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
-from django.core import urlresolvers
+from django.http import (
+    Http404, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
+)
+from django.template import RequestContext, loader
+from django.template.context import _current_app_undefined
+from django.template.engine import (
+    _context_instance_undefined, _dictionary_undefined, _dirs_undefined,
+)
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_text
+from django.utils.functional import Promise
 
 
-def render_to_response(*args, **kwargs):
+def render_to_response(template_name, context=None,
+                       context_instance=_context_instance_undefined,
+                       content_type=None, status=None, dirs=_dirs_undefined,
+                       dictionary=_dictionary_undefined, using=None):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
-    httpresponse_kwargs = {'content_type': kwargs.pop('content_type', None)}
+    if (context_instance is _context_instance_undefined
+            and dirs is _dirs_undefined
+            and dictionary is _dictionary_undefined):
+        # No deprecated arguments were passed - use the new code path
+        content = loader.render_to_string(template_name, context, using=using)
 
-    return HttpResponse(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
+    else:
+        # Some deprecated arguments were passed - use the legacy code path
+        content = loader.render_to_string(
+            template_name, context, context_instance, dirs, dictionary,
+            using=using)
+
+    return HttpResponse(content, content_type, status)
 
 
-def render(request, *args, **kwargs):
+def render(request, template_name, context=None,
+           context_instance=_context_instance_undefined,
+           content_type=None, status=None, current_app=_current_app_undefined,
+           dirs=_dirs_undefined, dictionary=_dictionary_undefined,
+           using=None):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     Uses a RequestContext by default.
     """
-    httpresponse_kwargs = {
-        'content_type': kwargs.pop('content_type', None),
-        'status': kwargs.pop('status', None),
-    }
+    if (context_instance is _context_instance_undefined
+            and current_app is _current_app_undefined
+            and dirs is _dirs_undefined
+            and dictionary is _dictionary_undefined):
+        # No deprecated arguments were passed - use the new code path
+        # In Django 2.0, request should become a positional argument.
+        content = loader.render_to_string(
+            template_name, context, request=request, using=using)
 
-    if 'context_instance' in kwargs:
-        context_instance = kwargs.pop('context_instance')
-        if kwargs.get('current_app', None):
-            raise ValueError('If you provide a context_instance you must '
-                             'set its current_app before calling render()')
     else:
-        current_app = kwargs.pop('current_app', None)
-        context_instance = RequestContext(request, current_app=current_app)
+        # Some deprecated arguments were passed - use the legacy code path
+        if context_instance is not _context_instance_undefined:
+            if current_app is not _current_app_undefined:
+                raise ValueError('If you provide a context_instance you must '
+                                 'set its current_app before calling render()')
+        else:
+            context_instance = RequestContext(request)
+            if current_app is not _current_app_undefined:
+                warnings.warn(
+                    "The current_app argument of render is deprecated. "
+                    "Set the current_app attribute of request instead.",
+                    RemovedInDjango20Warning, stacklevel=2)
+                request.current_app = current_app
+                # Directly set the private attribute to avoid triggering the
+                # warning in RequestContext.__init__.
+                context_instance._current_app = current_app
 
-    kwargs['context_instance'] = context_instance
+        content = loader.render_to_string(
+            template_name, context, context_instance, dirs, dictionary,
+            using=using)
 
-    return HttpResponse(loader.render_to_string(*args, **kwargs),
-                        **httpresponse_kwargs)
+    return HttpResponse(content, content_type, status)
 
 
 def redirect(to, *args, **kwargs):
@@ -147,6 +189,11 @@ def resolve_url(to, *args, **kwargs):
     # If it's a model, use get_absolute_url()
     if hasattr(to, 'get_absolute_url'):
         return to.get_absolute_url()
+
+    if isinstance(to, Promise):
+        # Expand the lazy instance, as it can cause issues when it is passed
+        # further to some Python functions like urlparse.
+        to = force_text(to)
 
     if isinstance(to, six.string_types):
         # Handle relative URLs

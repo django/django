@@ -1,5 +1,5 @@
-from django.db.models.manager import Manager
 from django.contrib.gis.db.models.query import GeoQuerySet
+from django.db.models.manager import Manager
 
 
 class GeoManager(Manager.from_queryset(GeoQuerySet)):

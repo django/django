@@ -3,14 +3,13 @@ import datetime
 import pickle
 import unittest
 
+from django.test import override_settings
+from django.utils import timezone
+
 try:
     import pytz
 except ImportError:
     pytz = None
-
-from django.test import override_settings
-from django.utils import timezone
-
 
 if pytz is not None:
     CET = pytz.timezone("Europe/Paris")

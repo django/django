@@ -7,10 +7,10 @@ This document will get you up and running with Django.
 Install Python
 ==============
 
-Being a Python Web framework, Django requires Python. It works with Python 2.7,
-3.2 or 3.3.
+Being a Python Web framework, Django requires Python. It works with Python 2.7
+or 3.3+.
 
-Get the latest version of Python at http://www.python.org/download/ or with
+Get the latest version of Python at https://www.python.org/download/ or with
 your operating system's package manager.
 
 .. admonition:: Django on Jython
@@ -166,14 +166,6 @@ release, or fetching the latest development version.
 
 It's easy, no matter which way you choose.
 
-Installing a distribution-specific package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Check the :doc:`distribution specific notes </misc/distributions>` to see if
-your platform/distribution provides official Django packages/installers.
-Distribution-provided packages will typically allow for automatic installation
-of dependencies and easy upgrade paths.
-
 .. _installing-official-release:
 
 Installing an official release with ``pip``
@@ -238,6 +230,15 @@ Installing an official release manually
 .. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
 .. _7-zip: http://www.7-zip.org/
 
+Installing a distribution-specific package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check the :doc:`distribution specific notes </misc/distributions>` to see if
+your platform/distribution provides official Django packages/installers.
+Distribution-provided packages will typically allow for automatic installation
+of dependencies and easy upgrade paths; however, these packages will rarely
+contain the latest release of Django.
+
 .. _installing-development-version:
 
 Installing the development version
@@ -297,7 +298,7 @@ command ``git pull`` from within the ``django-trunk`` directory. When you do
 this, Git will automatically download any changes.
 
 .. _Git: http://git-scm.com/
-.. _`modify Python's search path`: http://docs.python.org/install/index.html#modifying-python-s-search-path
+.. _`modify Python's search path`: https://docs.python.org/install/index.html#modifying-python-s-search-path
 .. _installing-the-development-version-without-pip:
 
 Installing the development version without pip

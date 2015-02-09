@@ -1,22 +1,25 @@
-from importlib import import_module
 import inspect
 import os
 import re
+from importlib import import_module
 
-from django import template
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db import models
-from django.core.exceptions import ViewDoesNotExist
-from django.http import Http404
-from django.core import urlresolvers
 from django.contrib.admindocs import utils
+from django.core import urlresolvers
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.db import models
+from django.http import Http404
+from django.template.base import (
+    InvalidTemplateLibrary, builtins, get_library, get_templatetags_modules,
+    libraries,
+)
 from django.template.engine import Engine
-from django.utils.decorators import method_decorator
-from django.utils._os import upath
 from django.utils import six
+from django.utils._os import upath
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
 
@@ -29,16 +32,16 @@ class BaseAdminDocsView(TemplateView):
     Base view for admindocs views.
     """
     @method_decorator(staff_member_required)
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         if not utils.docutils_is_available:
             # Display an error message for people without docutils
             self.template_name = 'admin_doc/missing_docutils.html'
-            return self.render_to_response(admin.site.each_context())
-        return super(BaseAdminDocsView, self).dispatch(*args, **kwargs)
+            return self.render_to_response(admin.site.each_context(request))
+        return super(BaseAdminDocsView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs.update({'root_path': urlresolvers.reverse('admin:index')})
-        kwargs.update(admin.site.each_context())
+        kwargs.update(admin.site.each_context(self.request))
         return super(BaseAdminDocsView, self).get_context_data(**kwargs)
 
 
@@ -61,8 +64,8 @@ class TemplateTagIndexView(BaseAdminDocsView):
         load_all_installed_template_libraries()
 
         tags = []
-        app_libs = list(six.iteritems(template.libraries))
-        builtin_libs = [(None, lib) for lib in template.builtins]
+        app_libs = list(six.iteritems(libraries))
+        builtin_libs = [(None, lib) for lib in builtins]
         for module_name, library in builtin_libs + app_libs:
             for tag_name, tag_func in library.tags.items():
                 title, body, metadata = utils.parse_docstring(tag_func.__doc__)
@@ -72,7 +75,7 @@ class TemplateTagIndexView(BaseAdminDocsView):
                     body = utils.parse_rst(body, 'tag', _('tag:') + tag_name)
                 for key in metadata:
                     metadata[key] = utils.parse_rst(metadata[key], 'tag', _('tag:') + tag_name)
-                if library in template.builtins:
+                if library in builtins:
                     tag_library = ''
                 else:
                     tag_library = module_name.split('.')[-1]
@@ -94,8 +97,8 @@ class TemplateFilterIndexView(BaseAdminDocsView):
         load_all_installed_template_libraries()
 
         filters = []
-        app_libs = list(six.iteritems(template.libraries))
-        builtin_libs = [(None, lib) for lib in template.builtins]
+        app_libs = list(six.iteritems(libraries))
+        builtin_libs = [(None, lib) for lib in builtins]
         for module_name, library in builtin_libs + app_libs:
             for filter_name, filter_func in library.filters.items():
                 title, body, metadata = utils.parse_docstring(filter_func.__doc__)
@@ -105,7 +108,7 @@ class TemplateFilterIndexView(BaseAdminDocsView):
                     body = utils.parse_rst(body, 'filter', _('filter:') + filter_name)
                 for key in metadata:
                     metadata[key] = utils.parse_rst(metadata[key], 'filter', _('filter:') + filter_name)
-                if library in template.builtins:
+                if library in builtins:
                     tag_library = ''
                 else:
                     tag_library = module_name.split('.')[-1]
@@ -261,7 +264,7 @@ class ModelDetailView(BaseAdminDocsView):
                 })
 
         # Gather related objects
-        for rel in opts.get_all_related_objects() + opts.get_all_related_many_to_many_objects():
+        for rel in opts.related_objects:
             verbose = _("related `%(app_label)s.%(object_name)s` objects") % {
                 'app_label': rel.opts.app_label,
                 'object_name': rel.opts.object_name,
@@ -292,14 +295,21 @@ class TemplateDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         template = self.kwargs['template']
         templates = []
-        for dir in Engine.get_default().dirs:
-            template_file = os.path.join(dir, template)
-            templates.append({
-                'file': template_file,
-                'exists': os.path.exists(template_file),
-                'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
-                'order': list(Engine.get_default().dirs).index(dir),
-            })
+        try:
+            default_engine = Engine.get_default()
+        except ImproperlyConfigured:
+            # Non-trivial TEMPLATES settings aren't supported (#24125).
+            pass
+        else:
+            # This doesn't account for template loaders (#24128).
+            for index, directory in enumerate(default_engine.dirs):
+                template_file = os.path.join(directory, template)
+                templates.append({
+                    'file': template_file,
+                    'exists': os.path.exists(template_file),
+                    'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
+                    'order': index,
+                })
         kwargs.update({
             'name': template,
             'templates': templates,
@@ -313,8 +323,12 @@ class TemplateDetailView(BaseAdminDocsView):
 
 def load_all_installed_template_libraries():
     # Load/register all template tag libraries from installed apps.
-    for module_name in template.get_templatetags_modules():
+    for module_name in get_templatetags_modules():
         mod = import_module(module_name)
+        if not hasattr(mod, '__file__'):
+            # e.g. packages installed as eggs
+            continue
+
         try:
             libraries = [
                 os.path.splitext(p)[0]
@@ -322,12 +336,13 @@ def load_all_installed_template_libraries():
                 if p.endswith('.py') and p[0].isalpha()
             ]
         except OSError:
-            libraries = []
-        for library_name in libraries:
-            try:
-                template.get_library(library_name)
-            except template.InvalidTemplateLibrary:
-                pass
+            continue
+        else:
+            for library_name in libraries:
+                try:
+                    get_library(library_name)
+                except InvalidTemplateLibrary:
+                    pass
 
 
 def get_return_data_type(func_name):

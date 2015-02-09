@@ -3,7 +3,7 @@ Classes to represent the definitions of aggregate functions.
 """
 from django.core.exceptions import FieldError
 from django.db.models.expressions import Func, Value
-from django.db.models.fields import IntegerField, FloatField
+from django.db.models.fields import FloatField, IntegerField
 
 __all__ = [
     'Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',
@@ -14,8 +14,9 @@ class Aggregate(Func):
     contains_aggregate = True
     name = None
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         assert len(self.source_expressions) == 1
+        # Aggregates are not allowed in UPDATE queries, so ignore for_save
         c = super(Aggregate, self).resolve_expression(query, allow_joins, reuse, summarize)
         if c.source_expressions[0].contains_aggregate and not summarize:
             name = self.source_expressions[0].name
@@ -23,17 +24,6 @@ class Aggregate(Func):
                 c.name, name, name))
         c._patch_aggregate(query)  # backward-compatibility support
         return c
-
-    def refs_field(self, aggregate_types, field_types):
-        try:
-            return (isinstance(self, aggregate_types) and
-                    isinstance(self.input_field._output_field_or_none, field_types))
-        except FieldError:
-            # Sometimes we don't know the input_field's output type (for example,
-            # doing Sum(F('datetimefield') + F('datefield'), output_type=DateTimeField())
-            # is OK, but the Expression(F('datetimefield') + F('datefield')) doesn't
-            # have any output field.
-            return False
 
     @property
     def input_field(self):
@@ -87,7 +77,7 @@ class Avg(Aggregate):
     def __init__(self, expression, **extra):
         super(Avg, self).__init__(expression, output_field=FloatField(), **extra)
 
-    def convert_value(self, value, connection):
+    def convert_value(self, value, connection, context):
         if value is None:
             return value
         return float(value)
@@ -101,11 +91,17 @@ class Count(Aggregate):
     def __init__(self, expression, distinct=False, **extra):
         if expression == '*':
             expression = Value(expression)
-            expression._output_field = IntegerField()
         super(Count, self).__init__(
             expression, distinct='DISTINCT ' if distinct else '', output_field=IntegerField(), **extra)
 
-    def convert_value(self, value, connection):
+    def __repr__(self):
+        return "{}({}, distinct={})".format(
+            self.__class__.__name__,
+            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
+            'False' if self.extra['distinct'] == '' else 'True',
+        )
+
+    def convert_value(self, value, connection, context):
         if value is None:
             return 0
         return int(value)
@@ -128,7 +124,14 @@ class StdDev(Aggregate):
         self.function = 'STDDEV_SAMP' if sample else 'STDDEV_POP'
         super(StdDev, self).__init__(expression, output_field=FloatField(), **extra)
 
-    def convert_value(self, value, connection):
+    def __repr__(self):
+        return "{}({}, sample={})".format(
+            self.__class__.__name__,
+            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
+            'False' if self.function == 'STDDEV_POP' else 'True',
+        )
+
+    def convert_value(self, value, connection, context):
         if value is None:
             return value
         return float(value)
@@ -146,7 +149,14 @@ class Variance(Aggregate):
         self.function = 'VAR_SAMP' if sample else 'VAR_POP'
         super(Variance, self).__init__(expression, output_field=FloatField(), **extra)
 
-    def convert_value(self, value, connection):
+    def __repr__(self):
+        return "{}({}, sample={})".format(
+            self.__class__.__name__,
+            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
+            'False' if self.function == 'VAR_POP' else 'True',
+        )
+
+    def convert_value(self, value, connection, context):
         if value is None:
             return value
         return float(value)

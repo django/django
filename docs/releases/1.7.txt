@@ -51,8 +51,8 @@ but a few of the key features are:
 * A new ``makemigrations`` command provides an easy way to autodetect changes
   to your models and make migrations for them.
 
-  :data:`~django.db.models.signals.pre_syncdb` and
-  :data:`~django.db.models.signals.post_syncdb` have been deprecated,
+  ``django.db.models.signals.pre_syncdb`` and
+  ``django.db.models.signals.post_syncdb`` have been deprecated,
   to be replaced by :data:`~django.db.models.signals.pre_migrate` and
   :data:`~django.db.models.signals.post_migrate` respectively. These
   new signals have slightly different arguments. Check the
@@ -74,9 +74,8 @@ but a few of the key features are:
   <test-case-serialized-rollback>`.
 
 * It is not advised to have apps without migrations depend on (have a
-  :ref:`ForeignKey <ref-foreignkey>` or :ref:`ManyToManyField <ref-manytomany>` to) apps with migrations. Read the
-  :ref:`dependencies documentation <unmigrated-dependencies>` for more.
-
+  :ref:`ForeignKey <ref-foreignkey>` or :ref:`ManyToManyField <ref-manytomany>`
+  to) apps with migrations.
 
 * If you are upgrading from South, see our :ref:`upgrading-from-south`
   documentation, and third-party app authors should read the
@@ -222,7 +221,7 @@ resolving those problems. The framework is extensible so you can add your
 own checks for your own apps and libraries.
 
 To perform system checks, you use the :djadmin:`check` management command.
-This command replaces the older :djadmin:`validate` management command.
+This command replaces the older ``validate`` management command.
 
 New ``Prefetch`` object for advanced ``prefetch_related`` operations.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -544,7 +543,7 @@ Cache
 
 * Access to caches configured in :setting:`CACHES` is now available via
   :data:`django.core.cache.caches`. This dict-like object provides a different
-  instance per thread. It supersedes :func:`django.core.cache.get_cache` which
+  instance per thread. It supersedes ``django.core.cache.get_cache()`` which
   is now deprecated.
 
 * If you instantiate cache backends directly, be aware that they aren't
@@ -638,7 +637,7 @@ Forms
   value.
 
 * :attr:`SelectDateWidget.months
-  <django.forms.extras.widgets.SelectDateWidget.months>` can be used to
+  <django.forms.SelectDateWidget.months>` can be used to
   customize the wording of the months displayed in the select widget.
 
 * The ``min_num`` and ``validate_min`` parameters were added to
@@ -738,7 +737,7 @@ Management Commands
 * :djadmin:`collectstatic` command with symlink option is now supported on
   Windows NT 6 (Windows Vista and newer).
 
-* :ref:`initial-sql` now works better if the sqlparse_ Python library is
+* Initial SQL data now works better if the sqlparse_ Python library is
   installed.
 
   Note that it's deprecated in favor of the
@@ -853,7 +852,7 @@ Templates
   rendering of a template.
 
 * The following functions now accept a ``dirs`` parameter which is a list or
-  tuple to override :setting:`TEMPLATE_DIRS`:
+  tuple to override ``TEMPLATE_DIRS``:
 
   * :func:`django.template.loader.get_template()`
   * :func:`django.template.loader.select_template()`
@@ -953,8 +952,8 @@ Backwards incompatible changes in 1.7
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
-allow_syncdb/allow_migrate
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+``allow_syncdb`` / ``allow_migrate``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 While Django will still look at ``allow_syncdb`` methods even though they
 should be renamed to ``allow_migrate``, there is a subtle difference in which
@@ -1173,9 +1172,7 @@ errors are handled by different cache backends.
 ``django.core.cache.backends.locmem.LocMemCache`` used to fail silently when
 such an error occurs, which is inconsistent with other backends and leads to
 cache-specific errors. This has been fixed in Django 1.7, see
-`Ticket #21200`_ for more details.
-
-.. _Ticket #21200: https://code.djangoproject.com/ticket/21200
+:ticket:`21200` for more details.
 
 Cache keys are now generated from the request's absolute URL
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1199,10 +1196,8 @@ instance using default routing behavior, overriding any manually specified
 database routing. In Django 1.7, a value of ``None`` passed to db_manager will
 produce a router that *retains* any manually assigned database routing -- the
 manager will *not* be reset. This was necessary to resolve an inconsistency in
-the way routing information cascaded over joins. See `Ticket #13724`_ for more
+the way routing information cascaded over joins. See :ticket:`13724` for more
 details.
-
-.. _Ticket #13724: https://code.djangoproject.com/ticket/13724
 
 pytz may be required
 ~~~~~~~~~~~~~~~~~~~~
@@ -1383,7 +1378,7 @@ Miscellaneous
   the current class *and* on a parent ``Form``.
 
 * The ``required`` argument of
-  :class:`~django.forms.extras.widgets.SelectDateWidget` has been removed.
+  :class:`~django.forms.SelectDateWidget` has been removed.
   This widget now respects the form field's ``is_required`` attribute like
   other widgets.
 
@@ -1472,7 +1467,7 @@ Features deprecated in 1.7
 ``django.core.cache.get_cache``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:func:`django.core.cache.get_cache` has been supplanted by
+``django.core.cache.get_cache`` has been supplanted by
 :data:`django.core.cache.caches`.
 
 ``django.utils.dictconfig``/``django.utils.importlib``
@@ -1485,8 +1480,8 @@ versions prior to 2.7. They have been deprecated.
 ``django.utils.module_loading.import_by_path``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The current :meth:`~django.utils.module_loading.import_by_path` function
-catches ``AttributeError``, ``ImportError`` and ``ValueError`` exceptions,
+The current ``django.utils.module_loading.import_by_path`` function
+catches ``AttributeError``, ``ImportError``, and ``ValueError`` exceptions,
 and re-raises :exc:`~django.core.exceptions.ImproperlyConfigured`. Such
 exception masking makes it needlessly hard to diagnose circular import
 problems, because it makes it look like the problem comes from inside Django.
@@ -1515,20 +1510,18 @@ Python versions, this module isn't useful anymore. It has been deprecated. Use
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As :class:`~collections.OrderedDict` was added to the standard library in
-Python 2.7, :class:`~django.utils.datastructures.SortedDict` is no longer
-needed and has been deprecated.
+Python 2.7, ``SortedDict`` is no longer needed and has been deprecated.
 
 Custom SQL location for models package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Previously, if models were organized in a package (``myapp/models/``) rather
-than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
-<initial-sql>` in ``myapp/models/sql/``. This bug has been fixed so that Django
-will search ``myapp/sql/`` as documented. The old location will continue to
-work until Django 1.9. After this issue was fixed, migrations were added which
-deprecates initial SQL data. Thus, while this change still exists, the
-deprecation is somewhat irrelevant as the entire feature will be removed in
-Django 2.0 when migrations become compulsory for all applications.
+than simply ``myapp/models.py``, Django would look for initial SQL data in
+``myapp/models/sql/``. This bug has been fixed so that Django
+will search ``myapp/sql/`` as documented. After this issue was fixed, migrations
+were added which deprecates initial SQL data. Thus, while this change still
+exists, the deprecation is irrelevant as the entire feature will be removed in
+Django 1.9.
 
 Reorganization of ``django.contrib.sites``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1573,7 +1566,7 @@ submodules and the ``django.contrib.contenttypes.generic`` module is deprecated:
 ``syncdb``
 ~~~~~~~~~~
 
-The :djadmin:`syncdb` command has been deprecated in favor of the new :djadmin:`migrate`
+The ``syncdb`` command has been deprecated in favor of the new :djadmin:`migrate`
 command. ``migrate`` takes the same arguments as ``syncdb`` used to plus a few
 more, so it's safe to just change the name you're calling and nothing else.
 
@@ -1598,8 +1591,8 @@ better handle the case of selectively showing inlines on a ``ModelAdmin``.
 ``IPAddressField``
 ~~~~~~~~~~~~~~~~~~
 
-The :class:`django.db.models.IPAddressField` and
-:class:`django.forms.IPAddressField` fields have been deprecated in favor of
+The ``django.db.models.IPAddressField`` and ``django.forms.IPAddressField``
+fields have been deprecated in favor of
 :class:`django.db.models.GenericIPAddressField` and
 :class:`django.forms.GenericIPAddressField`.
 
@@ -1687,7 +1680,8 @@ deprecated, use ``SplitDateTimeWidget`` with
 ``validate``
 ~~~~~~~~~~~~
 
-:djadmin:`validate` command is deprecated in favor of :djadmin:`check` command.
+The ``validate`` management command is deprecated in favor of the
+:djadmin:`check` command.
 
 ``django.core.management.BaseCommand``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1699,10 +1693,16 @@ value of the former flag is used. Defining both ``requires_system_checks`` and
 
 The ``check()`` method has replaced the old ``validate()`` method.
 
-``ModelAdmin.validator``
-~~~~~~~~~~~~~~~~~~~~~~~~
+``ModelAdmin`` validators
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``ModelAdmin.validator`` is deprecated in favor of new ``checks`` attribute.
+The ``ModelAdmin.validator_class`` and ``default_validator_class`` attributes
+are deprecated in favor of the new ``checks_class`` attribute.
+
+The ``ModelAdmin.validate()`` method is deprecated in favor of
+``ModelAdmin.check()``.
+
+The ``django.contrib.admin.validation`` module is deprecated.
 
 ``django.db.backends.DatabaseValidation.validate_field``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1761,6 +1761,30 @@ FastCGI support
 
 FastCGI support via the ``runfcgi`` management command will be removed in
 Django 1.9. Please deploy your project using WSGI.
+
+Moved objects in ``contrib.sites``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Following the app-loading refactor, two objects in
+``django.contrib.sites.models`` needed to be moved because they must be
+available without importing ``django.contrib.sites.models`` when
+``django.contrib.sites`` isn't installed. Import ``RequestSite`` from
+``django.contrib.sites.requests`` and ``get_current_site()`` from
+``django.contrib.sites.shortcuts``. The old import locations will work until
+Django 1.9.
+
+``django.forms.forms.get_declared_fields()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django no longer uses this functional internally. Even though it's a private
+API, it'll go through the normal deprecation cycle.
+
+Private Query Lookup APIs
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Private APIs ``django.db.models.sql.where.WhereNode.make_atom()`` and
+``django.db.models.sql.where.Constraint`` are deprecated in favor of the new
+:doc:`custom lookups API </ref/models/lookups>`.
 
 .. removed-features-1.7:
 

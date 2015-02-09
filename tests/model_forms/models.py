@@ -17,9 +17,9 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils._os import upath
-
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils.six.moves import range
 
 temp_storage_dir = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
 temp_storage = FileSystemStorage(temp_storage_dir)
@@ -357,7 +357,7 @@ class Colour(models.Model):
     name = models.CharField(max_length=50)
 
     def __iter__(self):
-        for number in xrange(5):
+        for number in range(5):
             yield number
 
     def __str__(self):

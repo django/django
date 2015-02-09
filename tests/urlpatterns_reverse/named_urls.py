@@ -1,7 +1,6 @@
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 
 from .views import empty_view
-
 
 urlpatterns = [
     url(r'^$', empty_view, name="named-url1"),

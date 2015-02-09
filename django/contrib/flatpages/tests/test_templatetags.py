@@ -1,23 +1,22 @@
-import os
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.template import Template, Context, TemplateSyntaxError
+from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase, override_settings
+
+from .settings import FLATPAGES_TEMPLATES
 
 
 @override_settings(
-    MIDDLEWARE_CLASSES=(
+    MIDDLEWARE_CLASSES=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    ),
+    ],
     ROOT_URLCONF='django.contrib.flatpages.tests.urls',
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(__file__), 'templates'),
-    ),
+    TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )
 class FlatpageTemplateTagTests(TestCase):
@@ -125,10 +124,10 @@ class FlatpageTemplateTagTests(TestCase):
         self.assertRaises(TemplateSyntaxError, render,
                           "{% load flatpages %}{% get_flatpages cheesecake flatpages %}")
         self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages as flatpages asdf%}")
+                          "{% load flatpages %}{% get_flatpages as flatpages asdf %}")
         self.assertRaises(TemplateSyntaxError, render,
                           "{% load flatpages %}{% get_flatpages cheesecake user as flatpages %}")
         self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages for user as flatpages asdf%}")
+                          "{% load flatpages %}{% get_flatpages for user as flatpages asdf %}")
         self.assertRaises(TemplateSyntaxError, render,
-                          "{% load flatpages %}{% get_flatpages prefix for user as flatpages asdf%}")
+                          "{% load flatpages %}{% get_flatpages prefix for user as flatpages asdf %}")

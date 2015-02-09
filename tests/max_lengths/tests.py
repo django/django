@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-from .models import PersonWithDefaultMaxLengths, PersonWithCustomMaxLengths
+from .models import PersonWithCustomMaxLengths, PersonWithDefaultMaxLengths
 
 
 class MaxLengthArgumentsTests(unittest.TestCase):

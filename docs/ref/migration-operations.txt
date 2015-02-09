@@ -37,7 +37,7 @@ Schema Operations
 CreateModel
 -----------
 
-.. class:: CreateModel(name, fields, options=None, bases=None)
+.. class:: CreateModel(name, fields, options=None, bases=None, managers=None)
 
 Creates a new model in the project history and a corresponding table in the
 database to match it.
@@ -55,6 +55,14 @@ it can contain both class objects as well as strings in the format
 ``"appname.ModelName"`` if you want to depend on another model (so you inherit
 from the historical version). If it's not supplied, it defaults to just
 inheriting from the standard ``models.Model``.
+
+``managers`` takes a list of 2-tuples of ``(manager_name, manager_instance)``.
+The first manager in the list will be the default manager for this model during
+migrations.
+
+.. versionchanged:: 1.8
+
+    The ``managers`` argument was added.
 
 DeleteModel
 -----------
@@ -121,6 +129,15 @@ like ``permissions`` and ``verbose_name``. Does not affect the database, but
 persists these changes for :class:`RunPython` instances to use. ``options``
 should be a dictionary mapping option names to values.
 
+AlterModelManagers
+------------------
+
+.. versionadded:: 1.8
+
+.. class:: AlterModelManagers(name, managers)
+
+Alters the managers that are available during migrations.
+
 AddField
 --------
 
@@ -171,10 +188,6 @@ Note that not all changes are possible on all databases - for example, you
 cannot change a text-type field like ``models.TextField()`` into a number-type
 field like ``models.IntegerField()`` on most databases.
 
-.. versionchanged:: 1.7.1
-
-    The ``preserve_default`` argument was added.
-
 RenameField
 -----------
 
@@ -189,7 +202,7 @@ Special Operations
 RunSQL
 ------
 
-.. class:: RunSQL(sql, reverse_sql=None, state_operations=None)
+.. class:: RunSQL(sql, reverse_sql=None, state_operations=None, hints=None)
 
 Allows running of arbitrary SQL on the database - useful for more advanced
 features of database backends that Django doesn't support directly, like
@@ -218,29 +231,48 @@ operation here so that the autodetector still has an up-to-date state of the
 model (otherwise, when you next run ``makemigrations``, it won't see any
 operation that adds that field and so will try to run it again).
 
-.. versionchanged:: 1.7.1
-
-    If you want to include literal percent signs in a query without parameters
-    you don't need to double them anymore.
+The optional ``hints`` argument will be passed as ``**hints`` to the
+:meth:`allow_migrate` method of database routers to assist them in making
+routing decisions. See :ref:`topics-db-multi-db-hints` for more details on
+database hints.
 
 .. versionchanged:: 1.8
 
     The ability to pass parameters to the ``sql`` and ``reverse_sql`` queries
     was added.
 
+    The ``hints`` argument was added.
+
+.. attribute:: RunSQL.noop
+
+    .. versionadded:: 1.8
+
+    Pass the ``RunSQL.noop`` attribute to ``sql`` or ``reverse_sql`` when you
+    want the operation not to do anything in the given direction. This is
+    especially useful in making the operation reversible.
+
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
 RunPython
 ---------
 
-.. class:: RunPython(code, reverse_code=None, atomic=True)
+.. class:: RunPython(code, reverse_code=None, atomic=True, hints=None)
 
 Runs custom Python code in a historical context. ``code`` (and ``reverse_code``
 if supplied) should be callable objects that accept two arguments; the first is
 an instance of ``django.apps.registry.Apps`` containing historical models that
 match the operation's place in the project history, and the second is an
 instance of :class:`SchemaEditor
-<django.db.backends.schema.BaseDatabaseSchemaEditor>`.
+<django.db.backends.base.schema.BaseDatabaseSchemaEditor>`.
+
+The optional ``hints`` argument will be passed as ``**hints`` to the
+:meth:`allow_migrate` method of database routers to assist them in making a
+routing decision. See :ref:`topics-db-multi-db-hints` for more details on
+database hints.
+
+.. versionadded:: 1.8
+
+    The ``hints`` argument was added.
 
 You are advised to write the code as a separate function above the ``Migration``
 class in the migration file, and just pass it to ``RunPython``. Here's an
@@ -303,6 +335,14 @@ set ``atomic=False``.
     give them the current database alias (available from
     ``schema_editor.connection.alias``, where ``schema_editor`` is the second
     argument to your function).
+
+.. staticmethod:: RunPython.noop
+
+    .. versionadded:: 1.8
+
+    Pass the ``RunPython.noop`` method to ``code`` or ``reverse_code`` when
+    you want the operation not to do anything in the given direction. This is
+    especially useful in making the operation reversible.
 
 SeparateDatabaseAndState
 ------------------------
@@ -367,7 +407,7 @@ historical models.
 Some things to note:
 
 * You don't need to learn too much about ``ProjectState`` to just write simple
-  migrations; just know that it has a ``.render()`` method that turns it into
+  migrations; just know that it has an ``apps`` property that gives access to
   an app registry (which you can then call ``get_model`` on).
 
 * ``database_forwards`` and ``database_backwards`` both get two states passed

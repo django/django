@@ -1,36 +1,37 @@
 from __future__ import unicode_literals
 
-from collections import OrderedDict
 import datetime
-from operator import attrgetter
 import pickle
 import unittest
-import warnings
+from collections import OrderedDict
+from operator import attrgetter
 
 from django.core.exceptions import FieldError
-from django.db import connection, DEFAULT_DB_ALIAS
-from django.db.models import Count, F, Q
-from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
+from django.db import DEFAULT_DB_ALIAS, connection
+from django.db.models import F, Q, Count
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.datastructures import EmptyResultSet
+from django.db.models.sql.where import NothingNode, WhereNode
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
+from django.utils.six.moves import range
 
 from .models import (
-    Annotation, Article, Author, Celebrity, Child, Cover, Detail, DumbCategory,
-    ExtraInfo, Fan, Item, LeafA, Join, LeafB, LoopX, LoopZ, ManagedModel,
-    Member, NamedCategory, Note, Number, Plaything, PointerA, Ranking, Related,
-    Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten, Node, ObjectA,
-    ProxyObjectA, ChildObjectA, ObjectB, ProxyObjectB, ObjectC, CategoryItem,
-    SimpleCategory, SpecialCategory, OneToOneCategory, NullableName, ProxyCategory,
-    SingleObject, RelatedObject, ModelA, ModelB, ModelC, ModelD, Responsibility, Job,
-    JobResponsibilities, BaseA, FK1, Identifier, Program, Channel, Page, Paragraph,
-    Chapter, Book, MyObject, Order, OrderItem, SharedConnection, Task, Staff,
-    StaffUser, CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
-    Company, Employment, CustomPk, CustomPkTag, Classroom, School, Student,
-    Ticket23605A, Ticket23605B, Ticket23605C)
+    FK1, X, Annotation, Article, Author, BaseA, Book, CategoryItem,
+    CategoryRelationship, Celebrity, Channel, Chapter, Child, ChildObjectA,
+    Classroom, Company, Cover, CustomPk, CustomPkTag, Detail, DumbCategory,
+    Eaten, Employment, ExtraInfo, Fan, Food, Identifier, Item, Job,
+    JobResponsibilities, Join, LeafA, LeafB, LoopX, LoopZ, ManagedModel,
+    Member, ModelA, ModelB, ModelC, ModelD, MyObject, NamedCategory, Node,
+    Note, NullableName, Number, ObjectA, ObjectB, ObjectC, OneToOneCategory,
+    Order, OrderItem, Page, Paragraph, Person, Plaything, PointerA, Program,
+    ProxyCategory, ProxyObjectA, ProxyObjectB, Ranking, Related, RelatedObject,
+    Report, ReservedName, Responsibility, School, SharedConnection,
+    SimpleCategory, SingleObject, SpecialCategory, Staff, StaffUser, Student,
+    Tag, Task, Ticket21203Child, Ticket21203Parent, Ticket23605A, Ticket23605B,
+    Ticket23605C, TvChef, Valid,
+)
 
 
 class BaseQuerysetTest(TestCase):
@@ -381,6 +382,25 @@ class Queries1Tests(BaseQuerysetTest):
         self.assertQuerysetEqual(
             Item.objects.filter(tags__in=[t]),
             ['<Item: four>']
+        )
+
+    def test_avoid_infinite_loop_on_too_many_subqueries(self):
+        x = Tag.objects.filter(pk=1)
+        local_recursion_limit = 127
+        msg = 'Maximum recursion depth exceeded: too many subqueries.'
+        with self.assertRaisesMessage(RuntimeError, msg):
+            for i in six.moves.range(local_recursion_limit * 2):
+                x = Tag.objects.filter(pk__in=x)
+
+    def test_reasonable_number_of_subq_aliases(self):
+        x = Tag.objects.filter(pk=1)
+        for _ in range(20):
+            x = Tag.objects.filter(pk__in=x)
+        self.assertEqual(
+            x.query.subq_aliases, {
+                'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD',
+                'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN',
+            }
         )
 
     def test_heterogeneous_qs_combination(self):
@@ -735,12 +755,12 @@ class Queries1Tests(BaseQuerysetTest):
         # Multi-valued values() and values_list() querysets should raise errors.
         self.assertRaisesMessage(
             TypeError,
-            'Cannot use a multi-field ValuesQuerySet as a filter value.',
+            'Cannot use multi-field values as a filter value.',
             lambda: Tag.objects.filter(name__in=Tag.objects.filter(parent=self.t1).values('name', 'id'))
         )
         self.assertRaisesMessage(
             TypeError,
-            'Cannot use a multi-field ValuesListQuerySet as a filter value.',
+            'Cannot use multi-field values as a filter value.',
             lambda: Tag.objects.filter(name__in=Tag.objects.filter(parent=self.t1).values_list('name', 'id'))
         )
 
@@ -1144,17 +1164,6 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Author: a1>', '<Author: a2>', '<Author: a3>', '<Author: a4>']
         )
 
-    def test_callable_args(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            qs = Tag.objects.filter(name__startswith=lambda: 't')
-            self.assertQuerysetEqual(
-                qs,
-                ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>']
-            )
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, RemovedInDjango19Warning))
-
 
 class Queries2Tests(TestCase):
     @classmethod
@@ -1281,13 +1290,12 @@ class Queries3Tests(BaseQuerysetTest):
         )
 
     def test_ticket22023(self):
-        # only() and defer() are not applicable for ValuesQuerySet
-        with self.assertRaisesMessage(NotImplementedError,
-                "ValuesQuerySet does not implement only()"):
+        with self.assertRaisesMessage(TypeError,
+                "Cannot call only() after .values() or .values_list()"):
             Valid.objects.values().only()
 
-        with self.assertRaisesMessage(NotImplementedError,
-                "ValuesQuerySet does not implement defer()"):
+        with self.assertRaisesMessage(TypeError,
+                "Cannot call defer() after .values() or .values_list()"):
             Valid.objects.values().defer()
 
 
@@ -1751,7 +1759,7 @@ class DisjunctiveFilterTests(TestCase):
         # Another variation on the disjunctive filtering theme.
 
         # For the purposes of this regression test, it's important that there is no
-        # Join object releated to the LeafA we create.
+        # Join object related to the LeafA we create.
         LeafA.objects.create(data='first')
         self.assertQuerysetEqual(LeafA.objects.all(), ['<LeafA: first>'])
         self.assertQuerysetEqual(
@@ -2011,7 +2019,7 @@ class SubqueryTests(TestCase):
         Related objects constraints can safely contain sliced subqueries.
         refs #22434
         """
-        generic = NamedCategory.objects.create(name="Generic")
+        generic = NamedCategory.objects.create(id=5, name="Generic")
         t1 = Tag.objects.create(name='t1', category=generic)
         t2 = Tag.objects.create(name='t2', category=generic)
         ManagedModel.objects.create(data='mm1', tag=t1, public=True)
@@ -2073,7 +2081,7 @@ class CloneTests(TestCase):
         testing is impossible, this is a sanity check against invalid use of
         deepcopy. refs #16759.
         """
-        opts_class = type(Note._meta.get_field_by_name("misc")[0])
+        opts_class = type(Note._meta.get_field("misc"))
         note_deepcopy = getattr(opts_class, "__deepcopy__", None)
         opts_class.__deepcopy__ = lambda obj, memo: self.fail("Model fields shouldn't be cloned")
         try:
@@ -2484,7 +2492,7 @@ class ConditionalTests(BaseQuerysetTest):
         # Test that the "in" lookup works with lists of 1000 items or more.
         # The numbers amount is picked to force three different IN batches
         # for Oracle, yet to be less than 2100 parameter limit for MSSQL.
-        numbers = range(2050)
+        numbers = list(range(2050))
         Number.objects.all().delete()
         Number.objects.bulk_create(Number(num=num) for num in numbers)
         self.assertEqual(
@@ -2845,20 +2853,10 @@ class WhereNodeTest(TestCase):
 
     def test_empty_full_handling_conjunction(self):
         compiler = WhereNodeTest.MockCompiler()
-        w = WhereNode(children=[EverythingNode()])
-        self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w.negate()
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
         w = WhereNode(children=[NothingNode()])
         self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w = WhereNode(children=[EverythingNode(), EverythingNode()])
-        self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w.negate()
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
-        w = WhereNode(children=[EverythingNode(), self.DummyNode()])
-        self.assertEqual(w.as_sql(compiler, connection), ('dummy', []))
         w = WhereNode(children=[self.DummyNode(), self.DummyNode()])
         self.assertEqual(w.as_sql(compiler, connection), ('(dummy AND dummy)', []))
         w.negate()
@@ -2870,22 +2868,10 @@ class WhereNodeTest(TestCase):
 
     def test_empty_full_handling_disjunction(self):
         compiler = WhereNodeTest.MockCompiler()
-        w = WhereNode(children=[EverythingNode()], connector='OR')
-        self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w.negate()
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
         w = WhereNode(children=[NothingNode()], connector='OR')
         self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
         w.negate()
         self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w = WhereNode(children=[EverythingNode(), EverythingNode()], connector='OR')
-        self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w.negate()
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
-        w = WhereNode(children=[EverythingNode(), self.DummyNode()], connector='OR')
-        self.assertEqual(w.as_sql(compiler, connection), ('', []))
-        w.negate()
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
         w = WhereNode(children=[self.DummyNode(), self.DummyNode()], connector='OR')
         self.assertEqual(w.as_sql(compiler, connection), ('(dummy OR dummy)', []))
         w.negate()
@@ -2899,15 +2885,20 @@ class WhereNodeTest(TestCase):
         compiler = WhereNodeTest.MockCompiler()
         empty_w = WhereNode()
         w = WhereNode(children=[empty_w, empty_w])
-        self.assertEqual(w.as_sql(compiler, connection), (None, []))
+        self.assertEqual(w.as_sql(compiler, connection), ('', []))
         w.negate()
-        self.assertEqual(w.as_sql(compiler, connection), (None, []))
+        with self.assertRaises(EmptyResultSet):
+            w.as_sql(compiler, connection)
         w.connector = 'OR'
-        self.assertEqual(w.as_sql(compiler, connection), (None, []))
+        with self.assertRaises(EmptyResultSet):
+            w.as_sql(compiler, connection)
         w.negate()
-        self.assertEqual(w.as_sql(compiler, connection), (None, []))
+        self.assertEqual(w.as_sql(compiler, connection), ('', []))
         w = WhereNode(children=[empty_w, NothingNode()], connector='OR')
-        self.assertRaises(EmptyResultSet, w.as_sql, compiler, connection)
+        self.assertEqual(w.as_sql(compiler, connection), ('', []))
+        w = WhereNode(children=[empty_w, NothingNode()], connector='AND')
+        with self.assertRaises(EmptyResultSet):
+            w.as_sql(compiler, connection)
 
 
 class IteratorExceptionsTest(TestCase):
@@ -3543,8 +3534,10 @@ class Ticket20955Tests(TestCase):
         # version's queries.
         task_get.creator.staffuser.staff
         task_get.owner.staffuser.staff
-        task_select_related = Task.objects.select_related(
-            'creator__staffuser__staff', 'owner__staffuser__staff').get(pk=task.pk)
+        qs = Task.objects.select_related(
+            'creator__staffuser__staff', 'owner__staffuser__staff')
+        self.assertEqual(str(qs.query).count(' JOIN '), 6)
+        task_select_related = qs.get(pk=task.pk)
         with self.assertNumQueries(0):
             self.assertEqual(task_select_related.creator.staffuser.staff,
                              task_get.creator.staffuser.staff)
@@ -3669,3 +3662,10 @@ class Ticket23605Tests(TestCase):
         self.assertQuerysetEqual(qs1, [a1], lambda x: x)
         qs2 = Ticket23605A.objects.exclude(complex_q)
         self.assertQuerysetEqual(qs2, [a2], lambda x: x)
+
+
+class TestTicket24279(TestCase):
+    def test_ticket_24278(self):
+        School.objects.create()
+        qs = School.objects.filter(Q(pk__in=()) | Q())
+        self.assertQuerysetEqual(qs, [])

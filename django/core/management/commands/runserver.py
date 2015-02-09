@@ -1,20 +1,19 @@
 from __future__ import unicode_literals
 
-from datetime import datetime
 import errno
 import os
 import re
-import sys
 import socket
+import sys
+from datetime import datetime
 
-from django.core.management.base import BaseCommand, CommandError
-from django.core.servers.basehttp import run, get_internal_wsgi_application
-from django.db import connections, DEFAULT_DB_ALIAS
-from django.db.migrations.executor import MigrationExecutor
-from django.utils import autoreload
-from django.utils.encoding import force_text, get_system_encoding
-from django.utils import six
 from django.core.exceptions import ImproperlyConfigured
+from django.core.management.base import BaseCommand, CommandError
+from django.core.servers.basehttp import get_internal_wsgi_application, run
+from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.migrations.executor import MigrationExecutor
+from django.utils import autoreload, six
+from django.utils.encoding import force_text, get_system_encoding
 
 naiveip_re = re.compile(r"""^(?:
 (?P<addr>
@@ -108,7 +107,7 @@ class Command(BaseCommand):
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
         self.stdout.write("Performing system checks...\n\n")
-        self.validate(display_num_errors=True)
+        self.check(display_num_errors=True)
         try:
             self.check_migrations()
         except ImproperlyConfigured:

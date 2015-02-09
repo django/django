@@ -138,6 +138,7 @@ de
 Debian
 deconstruct
 deconstructing
+deduplicates
 deepcopy
 deserialization
 deserialize
@@ -175,6 +176,7 @@ Dreamhost
 Dreamweaver
 drilldown
 dropdown
+dropdowns
 drupal
 dumpdata
 Dunck
@@ -197,9 +199,7 @@ Facebook
 fallback
 fallbacks
 faq
-fastcgi
 FastCGI
-fcgid
 fieldset
 fieldsets
 filesizeformat
@@ -233,6 +233,9 @@ geolocalized
 geolocated
 geolocation
 geoquerysets
+georeference
+georeferenced
+georeferencing
 geospatial
 Geospatial
 Gettext
@@ -306,6 +309,7 @@ irc
 iregex
 iriencode
 ise
+isempty
 isnull
 iso
 istartswith
@@ -354,6 +358,7 @@ localhost
 localizable
 localtime
 Loïc
+loopback
 lorem
 lt
 lte
@@ -476,6 +481,7 @@ prepopulate
 prepopulated
 prepopulates
 preprocess
+preprocesses
 Procida
 programmatically
 projectname
@@ -497,6 +503,7 @@ queryset
 querysets
 Querysets
 querystring
+queueing
 Quickstart
 quoteless
 Radziej
@@ -510,9 +517,11 @@ refactored
 refactorings
 refactors
 referer
+reflow
 regex
 regexes
 reimplement
+reindent
 reindex
 releasers
 removetags
@@ -529,8 +538,8 @@ rjust
 roadmap
 Roald
 rss
-runfcgi
 runserver
+SaaS
 safeseq
 Sandvik
 savepoint
@@ -556,6 +565,7 @@ Shai
 shapefile
 shapefiles
 sharding
+showmigrations
 sid
 simultaneously
 sitemap
@@ -572,13 +582,8 @@ spam
 spammers
 spatialite
 Springmeyer
-sql
-sqlall
-sqlclear
-sqlcustom
-sqldropindexes
+SQL
 sqlflush
-sqlindexes
 sqlmigrate
 sqlsequencereset
 squashmigrations
@@ -612,6 +617,7 @@ subpackages
 subqueries
 subquery
 subselect
+substr
 subtemplate
 subtemplates
 subviews
@@ -619,7 +625,6 @@ subwidgets
 symlink
 symlinking
 symlinks
-syncdb
 sysadmin
 systemwide
 tablespace
@@ -663,6 +668,7 @@ ubuntu
 Ubuntuusers
 ul
 umask
+Unaccent
 unassigning
 unapplied
 unapply
@@ -688,6 +694,7 @@ unmigrated
 unparseable
 unpickle
 unpickled
+unpickling
 unpythonic
 unregistration
 unrendered

@@ -10,7 +10,7 @@ Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
 `WebAuth`_, `mod_auth_sspi`_, etc.
 
 .. _mod_authnz_ldap: http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
-.. _CAS: http://www.jasig.org/cas
+.. _CAS: https://www.apereo.org/cas
 .. _Cosign: http://weblogin.org
 .. _WebAuth: http://www.stanford.edu/services/webauth/
 .. _mod_auth_sspi: http://sourceforge.net/projects/mod-auth-sspi
@@ -31,20 +31,20 @@ First, you must add the
 :setting:`MIDDLEWARE_CLASSES` setting **after** the
 :class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE_CLASSES = [
         '...',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.RemoteUserMiddleware',
         '...',
-    )
+    ]
 
 Next, you must replace the :class:`~django.contrib.auth.backends.ModelBackend`
 with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
 :setting:`AUTHENTICATION_BACKENDS` setting::
 
-    AUTHENTICATION_BACKENDS = (
+    AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.RemoteUserBackend',
-    )
+    ]
 
 With this setup, ``RemoteUserMiddleware`` will detect the username in
 ``request.META['REMOTE_USER']`` and will authenticate and auto-login that user
@@ -63,6 +63,22 @@ If your authentication mechanism uses a custom HTTP header and not
 
     class CustomHeaderMiddleware(RemoteUserMiddleware):
         header = 'HTTP_AUTHUSER'
+
+.. warning::
+
+    Be very careful if using a ``RemoteUserMiddleware`` subclass with a custom
+    HTTP header. You must be sure that your front-end web server always sets or
+    strips that header based on the appropriate authentication checks, never
+    permitting an end-user to submit a fake (or "spoofed") header value. Since
+    the HTTP headers ``X-Auth-User`` and ``X-Auth_User`` (for example) both
+    normalize to the ``HTTP_X_AUTH_USER`` key in ``request.META``, you must
+    also check that your web server doesn't allow a spoofed header using
+    underscores in place of dashes.
+
+    This warning doesn't apply to ``RemoteUserMiddleware`` in its default
+    configuration with ``header = 'REMOTE_USER'``, since a key that doesn't
+    start with ``HTTP_`` in ``request.META`` can only be set by your WSGI
+    server, not directly from an HTTP request header.
 
 If you need more control, you can create your own authentication backend
 that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and

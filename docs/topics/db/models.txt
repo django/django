@@ -70,11 +70,11 @@ For example, if the models for your application live in the module
 application by the :djadmin:`manage.py startapp <startapp>` script),
 :setting:`INSTALLED_APPS` should read, in part::
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         #...
         'myapp',
         #...
-    )
+    ]
 
 When you add new apps to :setting:`INSTALLED_APPS`, be sure to run
 :djadmin:`manage.py migrate <migrate>`, optionally making migrations
@@ -212,6 +212,23 @@ ones:
     :attr:`primary_key=True <Field.primary_key>` on any of your fields
     unless you want to override the default primary-key behavior. For more,
     see :ref:`automatic-primary-key-fields`.
+
+    The primary key field is read-only. If you change the value of the primary
+    key on an existing object and then save it, a new object will be created
+    alongside the old one. For example::
+
+        from django.db import models
+
+        class Fruit(models.Model):
+            name = models.CharField(max_length=100, primary_key=True)
+
+    .. code-block:: pycon
+
+        >>> fruit = Fruit.objects.create(name='Apple')
+        >>> fruit.name = 'Pear'
+        >>> fruit.save()
+        >>> Fruit.objects.values_list('name', flat=True)
+        ['Apple', 'Pear']
 
 :attr:`~Field.unique`
     If ``True``, this field must be unique throughout the table.
@@ -459,12 +476,6 @@ There are a few restrictions on the intermediate model:
   itself, using an intermediary model, you *must* use
   :attr:`symmetrical=False <ManyToManyField.symmetrical>` (see
   :ref:`the model field reference <manytomany-arguments>`).
-
-.. versionchanged:: 1.7
-
-    In Django 1.6 and earlier, intermediate models containing more than one
-    foreign key to any of the models involved in the many-to-many relationship
-    used to be prohibited.
 
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
@@ -1286,41 +1297,9 @@ inheritance hierarchies as simple and straightforward as possible so that you
 won't have to struggle to work out where a particular piece of information is
 coming from.
 
-.. versionchanged:: 1.7
-
-Before Django 1.7, inheriting from multiple models that had an ``id`` primary
-key field did not raise an error, but could result in data loss. For example,
-consider these models (which no longer validate due to the clashing ``id``
-fields)::
-
-    class Article(models.Model):
-        headline = models.CharField(max_length=50)
-        body = models.TextField()
-
-    class Book(models.Model):
-        title = models.CharField(max_length=50)
-
-    class BookReview(Book, Article):
-        pass
-
-This snippet demonstrates how creating a child object overwrote the value of a
-previously created parent object::
-
-    >>> article = Article.objects.create(headline='Some piece of news.')
-    >>> review = BookReview.objects.create(
-    ...     headline='Review of Little Red Riding Hood.',
-    ...     title='Little Red Riding Hood')
-    >>>
-    >>> assert Article.objects.get(pk=article.pk).headline == article.headline
-    Traceback (most recent call last):
-      File "<console>", line 1, in <module>
-    AssertionError
-    >>> # the "Some piece of news." headline has been overwritten.
-    >>> Article.objects.get(pk=article.pk).headline
-    'Review of Little Red Riding Hood.'
-
-To properly use multiple inheritance, you can use an explicit
-:class:`~django.db.models.AutoField` in the base models::
+Note that inheriting from multiple models that have a common ``id`` primary
+key field will raise an error. To properly use multiple inheritance, you can
+use an explicit :class:`~django.db.models.AutoField` in the base models::
 
     class Article(models.Model):
         article_id = models.AutoField(primary_key=True)

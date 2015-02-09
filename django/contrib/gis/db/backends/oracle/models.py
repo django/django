@@ -8,7 +8,7 @@
  model and the `SDO_COORD_REF_SYS` is used for the SpatialRefSys model.
 """
 from django.contrib.gis.db import models
-from django.contrib.gis.db.backends.base import SpatialRefSysMixin
+from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.utils.encoding import python_2_unicode_compatible
 
 

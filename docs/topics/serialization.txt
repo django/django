@@ -262,7 +262,7 @@ In particular, :ref:`lazy translation objects <lazy-translations>` need a
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 
-.. _special encoder: http://docs.python.org/library/json.html#encoders-and-decoders
+.. _special encoder: https://docs.python.org/library/json.html#encoders-and-decoders
 .. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
 
 YAML
@@ -405,8 +405,6 @@ into the primary key of an actual ``Person`` object.
     fields will be effectively unique, you can still use those fields
     as a natural key.
 
-.. versionadded:: 1.7
-
 Deserialization of objects with no primary key will always check whether the
 model's manager has a ``get_by_natural_key()`` method and if so, use it to
 populate the deserialized object's primary key.
@@ -478,19 +476,6 @@ line flags to generate natural keys.
     Conversely, if (for some strange reason) you want Django to output
     natural keys during serialization, but *not* be able to load those
     key values, just don't define the ``get_by_natural_key()`` method.
-
-.. versionchanged:: 1.7
-
-    Previously there was only a ``use_natural_keys`` argument for
-    ``serializers.serialize()`` and the `-n` or `--natural` command line flags.
-    These have been deprecated in favor of the ``use_natural_foreign_keys`` and
-    ``use_natural_primary_keys`` arguments and the corresponding
-    :djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary` options
-    for :djadmin:`dumpdata`.
-
-The original argument and command line flags remain for backwards
-compatibility and map to the new ``use_natural_foreign_keys`` argument and
-`--natural-foreign` command line flag. They'll be removed in Django 1.9.
 
 Dependencies during serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

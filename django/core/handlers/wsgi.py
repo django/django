@@ -6,21 +6,15 @@ import logging
 import sys
 from io import BytesIO
 from threading import Lock
-import warnings
 
 from django import http
 from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
-from django.utils import datastructures
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils import six
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import cached_property
-from django.utils import six
-
-# For backwards compatibility -- lots of code uses this in the wild!
-from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT  # NOQA
 
 logger = logging.getLogger('django.request')
 
@@ -121,13 +115,6 @@ class WSGIRequest(http.HttpRequest):
     def _get_scheme(self):
         return self.environ.get('wsgi.url_scheme')
 
-    def _get_request(self):
-        warnings.warn('`request.REQUEST` is deprecated, use `request.GET` or '
-                      '`request.POST` instead.', RemovedInDjango19Warning, 2)
-        if not hasattr(self, '_request'):
-            self._request = datastructures.MergeDict(self.POST, self.GET)
-        return self._request
-
     @cached_property
     def GET(self):
         # The WSGI spec says 'QUERY_STRING' may be absent.
@@ -154,7 +141,6 @@ class WSGIRequest(http.HttpRequest):
 
     POST = property(_get_post, _set_post)
     FILES = property(_get_files)
-    REQUEST = property(_get_request)
 
 
 class WSGIHandler(base.BaseHandler):
@@ -197,6 +183,8 @@ class WSGIHandler(base.BaseHandler):
         for c in response.cookies.values():
             response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
         start_response(force_str(status), response_headers)
+        if getattr(response, 'file_to_stream', None) is not None and environ.get('wsgi.file_wrapper'):
+            response = environ['wsgi.file_wrapper'](response.file_to_stream)
         return response
 
 

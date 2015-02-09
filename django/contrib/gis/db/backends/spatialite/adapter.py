@@ -1,5 +1,5 @@
+from django.contrib.gis.db.backends.base.adapter import WKTAdapter
 from django.db.backends.sqlite3.base import Database
-from django.contrib.gis.db.backends.adapter import WKTAdapter
 
 
 class SpatiaLiteAdapter(WKTAdapter):

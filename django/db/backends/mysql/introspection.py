@@ -1,12 +1,16 @@
-from collections import namedtuple
 import re
-from .base import FIELD_TYPE
+from collections import namedtuple
+
+from MySQLdb.constants import FIELD_TYPE
+
+from django.db.backends.base.introspection import (
+    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+)
 from django.utils.datastructures import OrderedSet
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
 from django.utils.encoding import force_text
 
-FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra',))
-
+FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra', 'default'))
+InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default')
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
 
 
@@ -57,9 +61,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         #   not visible length (#5725)
         # - precision and scale (for decimal fields) (#5014)
         # - auto_increment is not available in cursor.description
-        InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra')
         cursor.execute("""
-            SELECT column_name, data_type, character_maximum_length, numeric_precision, numeric_scale, extra
+            SELECT column_name, data_type, character_maximum_length, numeric_precision,
+                   numeric_scale, extra, column_default
             FROM information_schema.columns
             WHERE table_name = %s AND table_schema = DATABASE()""", [table_name])
         field_info = {line[0]: InfoLine(*line) for line in cursor.fetchall()}
@@ -76,29 +80,20 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                                to_int(field_info[col_name].num_prec) or line[4],
                                to_int(field_info[col_name].num_scale) or line[5])
                             + (line[6],)
-                            + (field_info[col_name].extra,)))
+                            + (field_info[col_name].extra,)
+                            + (field_info[col_name].column_default,)))
             )
         return fields
 
-    def _name_to_index(self, cursor, table_name):
-        """
-        Returns a dictionary of {field_name: field_index} for the given table.
-        Indexes are 0-based.
-        """
-        return {d[0]: i for i, d in enumerate(self.get_table_description(cursor, table_name))}
-
     def get_relations(self, cursor, table_name):
         """
-        Returns a dictionary of {field_index: (field_index_other_table, other_table)}
-        representing all relationships to the given table. Indexes are 0-based.
+        Returns a dictionary of {field_name: (field_name_other_table, other_table)}
+        representing all relationships to the given table.
         """
-        my_field_dict = self._name_to_index(cursor, table_name)
         constraints = self.get_key_columns(cursor, table_name)
         relations = {}
         for my_fieldname, other_table, other_field in constraints:
-            other_field_index = self._name_to_index(cursor, other_table)[other_field]
-            my_field_index = my_field_dict[my_fieldname]
-            relations[my_field_index] = (other_field_index, other_table)
+            relations[my_fieldname] = (other_field, other_table)
         return relations
 
     def get_key_columns(self, cursor, table_name):
@@ -142,13 +137,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_storage_engine(self, cursor, table_name):
         """
-        Retrieves the storage engine for a given table.
+        Retrieves the storage engine for a given table. Returns the default
+        storage engine if the table doesn't exist.
         """
         cursor.execute(
             "SELECT engine "
             "FROM information_schema.tables "
             "WHERE table_name = %s", [table_name])
-        return cursor.fetchone()[0]
+        result = cursor.fetchone()
+        if not result:
+            return self.connection.features._mysql_storage_engine
+        return result[0]
 
     def get_constraints(self, cursor, table_name):
         """

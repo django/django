@@ -1,7 +1,7 @@
 """Adds xref targets to the top of files."""
 
-import sys
 import os
+import sys
 
 testing = False
 
@@ -34,7 +34,7 @@ def has_target(fn):
         print("Can't open or read %s. Not touching it." % fn)
         return (True, None)
 
-    #print fn, len(lines)
+    # print fn, len(lines)
     if len(lines) < 1:
         print("Not touching empty file %s." % fn)
         return (True, None)
@@ -56,7 +56,7 @@ def main(argv=None):
             files.extend((dirpath, f) for f in filenames)
     files.sort()
     files = [os.path.join(p, fn) for p, fn in files if fn.endswith('.txt')]
-    #print files
+    # print files
 
     for fn in files:
         if fn in DONT_TOUCH:

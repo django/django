@@ -1,11 +1,10 @@
 import warnings
 
-from django.conf.urls import patterns, url, include
+from django.conf.urls import include, patterns, url
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .namespace_urls import URLObject
 from .views import view_class_instance
-
 
 testobj3 = URLObject('testapp', 'test-ns3')
 

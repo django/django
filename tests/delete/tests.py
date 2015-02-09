@@ -2,14 +2,15 @@ from __future__ import unicode_literals
 
 from math import ceil
 
-from django.db import models, IntegrityError, connection
+from django.db import IntegrityError, connection, models
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
-from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
-from django.utils.six.moves import xrange
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.utils.six.moves import range
 
-from .models import (R, RChild, S, T, A, M, MR, MRNull,
-    create_a, get_default_r, User, Avatar, HiddenUser, HiddenUserProfile,
-    M2MTo, M2MFrom, Parent, Child, Base)
+from .models import (
+    A, M, MR, R, S, T, Avatar, Base, Child, HiddenUser, HiddenUserProfile,
+    M2MFrom, M2MTo, MRNull, Parent, RChild, User, create_a, get_default_r,
+)
 
 
 class OnDeleteTests(TestCase):
@@ -169,7 +170,7 @@ class DeletionTests(TestCase):
 
     def test_bulk(self):
         s = S.objects.create(r=R.objects.create())
-        for i in xrange(2 * GET_ITERATOR_CHUNK_SIZE):
+        for i in range(2 * GET_ITERATOR_CHUNK_SIZE):
             T.objects.create(s=s)
         #   1 (select related `T` instances)
         # + 1 (select related `U` instances)
@@ -324,7 +325,7 @@ class DeletionTests(TestCase):
         # One query for Avatar.objects.all() and then one related fast delete for
         # each batch.
         fetches_to_mem = 1 + batches
-        # The Avatar objecs are going to be deleted in batches of GET_ITERATOR_CHUNK_SIZE
+        # The Avatar objects are going to be deleted in batches of GET_ITERATOR_CHUNK_SIZE
         queries = fetches_to_mem + TEST_SIZE // GET_ITERATOR_CHUNK_SIZE
         self.assertNumQueries(queries, Avatar.objects.all().delete)
         self.assertFalse(Avatar.objects.exists())
@@ -332,10 +333,10 @@ class DeletionTests(TestCase):
     def test_large_delete_related(self):
         TEST_SIZE = 2000
         s = S.objects.create(r=R.objects.create())
-        for i in xrange(TEST_SIZE):
+        for i in range(TEST_SIZE):
             T.objects.create(s=s)
 
-        batch_size = max(connection.ops.bulk_batch_size(['pk'], xrange(TEST_SIZE)), 1)
+        batch_size = max(connection.ops.bulk_batch_size(['pk'], range(TEST_SIZE)), 1)
 
         # TEST_SIZE // batch_size (select related `T` instances)
         # + 1 (select related `U` instances)

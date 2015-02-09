@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import no_oracle
 from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango20Warning
 
 if HAS_GEOS:
     from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
@@ -64,7 +65,8 @@ class RelatedGeoModelTest(TestCase):
             check_pnt(GEOSGeometry(wkt, srid), qs[0].location.point)
 
     @skipUnlessDBFeature("supports_extent_aggr")
-    def test04a_related_extent_aggregate(self):
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_related_extent_aggregate(self):
         "Testing the `extent` GeoQuerySet aggregates on related geographic models."
         # This combines the Extent and Union aggregates into one query
         aggs = City.objects.aggregate(Extent('location__point'))
@@ -83,8 +85,22 @@ class RelatedGeoModelTest(TestCase):
             for ref_val, e_val in zip(ref, e):
                 self.assertAlmostEqual(ref_val, e_val, tol)
 
+    @skipUnlessDBFeature("supports_extent_aggr")
+    def test_related_extent_annotate(self):
+        """
+        Test annotation with Extent GeoAggregate.
+        """
+        cities = City.objects.annotate(points_extent=Extent('location__point')).order_by('name')
+        tol = 4
+        self.assertAlmostEqual(
+            cities[0].points_extent,
+            (-97.516111, 33.058333, -97.516111, 33.058333),
+            tol
+        )
+
     @skipUnlessDBFeature("has_unionagg_method")
-    def test04b_related_union_aggregate(self):
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_related_union_aggregate(self):
         "Testing the `unionagg` GeoQuerySet aggregates on related geographic models."
         # This combines the Extent and Union aggregates into one query
         aggs = City.objects.aggregate(Union('location__point'))
@@ -176,7 +192,6 @@ class RelatedGeoModelTest(TestCase):
 
     def test07_values(self):
         "Testing values() and values_list() and GeoQuerySets."
-        # GeoQuerySet and GeoValuesQuerySet, and GeoValuesListQuerySet respectively.
         gqs = Location.objects.all()
         gvqs = Location.objects.values()
         gvlqs = Location.objects.values_list()
@@ -231,15 +246,6 @@ class RelatedGeoModelTest(TestCase):
         self.assertIn('Aurora', names)
         self.assertIn('Kecksburg', names)
 
-    def test11_geoquery_pickle(self):
-        "Ensuring GeoQuery objects are unpickled correctly.  See #10839."
-        import pickle
-        from django.contrib.gis.db.models.sql import GeoQuery
-        qs = City.objects.all()
-        q_str = pickle.dumps(qs.query)
-        q = pickle.loads(q_str)
-        self.assertEqual(GeoQuery, q.__class__)
-
     # TODO: fix on Oracle -- get the following error because the SQL is ordered
     # by a geometry object, which Oracle apparently doesn't like:
     #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
@@ -257,7 +263,7 @@ class RelatedGeoModelTest(TestCase):
         "Testing `Count` aggregate use with the `GeoManager` on non geo-fields. See #11087."
         # Should only be one author (Trevor Paglen) returned by this query, and
         # the annotation should have 3 for the number of books, see #11087.
-        # Also testing with a `GeoValuesQuerySet`, see #11489.
+        # Also testing with a values(), see #11489.
         qs = Author.objects.annotate(num_books=Count('books')).filter(num_books__gt=1)
         vqs = Author.objects.values('name').annotate(num_books=Count('books')).filter(num_books__gt=1)
         self.assertEqual(1, len(qs))
@@ -286,8 +292,12 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(None, b.author)
 
     @skipUnlessDBFeature("supports_collect_aggr")
-    def test14_collect(self):
-        "Testing the `collect` GeoQuerySet method and `Collect` aggregate."
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_collect(self):
+        """
+        Testing the (deprecated) `collect` GeoQuerySet method and `Collect`
+        aggregate.
+        """
         # Reference query:
         # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN
         #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id")

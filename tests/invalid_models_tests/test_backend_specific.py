@@ -35,34 +35,3 @@ class BackendSpecificChecksTests(IsolatedModelsTestCase):
             v.check_field = old_check_field
 
         self.assertEqual(errors, [error])
-
-    def test_validate_field(self):
-        """ Errors raised by deprecated `validate_field` method should be
-        collected. """
-
-        def mock(self, errors, opts, field):
-            errors.add(opts, "An error!")
-
-        class Model(models.Model):
-            field = models.IntegerField()
-
-        field = Model._meta.get_field('field')
-        expected = [
-            Error(
-                "An error!",
-                hint=None,
-                obj=field,
-            )
-        ]
-
-        # Mock connection.validation.validate_field method.
-        v = connection.validation
-        old_validate_field = v.validate_field
-        v.validate_field = MethodType(mock, v)
-        try:
-            errors = field.check()
-        finally:
-            # Unmock connection.validation.validate_field method.
-            v.validate_field = old_validate_field
-
-        self.assertEqual(errors, expected)

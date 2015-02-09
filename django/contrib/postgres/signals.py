@@ -1,7 +1,7 @@
-from django.utils import six
-
 from psycopg2 import ProgrammingError
 from psycopg2.extras import register_hstore
+
+from django.utils import six
 
 
 def register_hstore_handler(connection, **kwargs):

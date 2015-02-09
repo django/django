@@ -12,7 +12,7 @@ from complete).
 from __future__ import unicode_literals
 
 from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
+    GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -29,7 +29,7 @@ class TaggedItem(models.Model):
     content_object = GenericForeignKey()
 
     class Meta:
-        ordering = ["tag", "content_type__name"]
+        ordering = ["tag", "content_type__model"]
 
     def __str__(self):
         return self.tag

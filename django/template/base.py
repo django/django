@@ -1,30 +1,85 @@
+"""
+This is the Django template system.
+
+How it works:
+
+The Lexer.tokenize() function converts a template string (i.e., a string containing
+markup with custom template tags) to tokens, which can be either plain text
+(TOKEN_TEXT), variables (TOKEN_VAR) or block statements (TOKEN_BLOCK).
+
+The Parser() class takes a list of tokens in its constructor, and its parse()
+method returns a compiled template -- which is, under the hood, a list of
+Node objects.
+
+Each Node is responsible for creating some sort of output -- e.g. simple text
+(TextNode), variable values in a given context (VariableNode), results of basic
+logic (IfNode), results of looping (ForNode), or anything else. The core Node
+types are TextNode, VariableNode, IfNode and ForNode, but plugin modules can
+define their own custom node types.
+
+Each Node has a render() method, which takes a Context and returns a string of
+the rendered node. For example, the render() method of a Variable Node returns
+the variable's value as a string. The render() method of a ForNode returns the
+rendered output of whatever was inside the loop, recursively.
+
+The Template class is a convenient wrapper that takes care of template
+compilation and rendering.
+
+Usage:
+
+The only thing you should ever use directly in this file is the Template class.
+Create a compiled template object with a template_string, then call render()
+with a context. In the compilation stage, the TemplateSyntaxError exception
+will be raised if the template doesn't have proper syntax.
+
+Sample code:
+
+>>> from django import template
+>>> s = u'<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>'
+>>> t = template.Template(s)
+
+(t is now a compiled template, and its render() method can be called multiple
+times with multiple contexts)
+
+>>> c = template.Context({'test':True, 'varvalue': 'Hello'})
+>>> t.render(c)
+u'<html><h1>Hello</h1></html>'
+>>> c = template.Context({'test':False, 'varvalue': 'Hello'})
+>>> t.render(c)
+u'<html></html>'
+"""
+
 from __future__ import unicode_literals
 
 import re
+import warnings
 from functools import partial
 from importlib import import_module
 from inspect import getargspec, getcallargs
-import warnings
 
 from django.apps import apps
-from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatibility
-    ContextPopException)
-from django.utils import lru_cache
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.itercompat import is_iterable
-from django.utils.text import (smart_split, unescape_string_literal,
-    get_text_list)
-from django.utils.encoding import force_str, force_text
-from django.utils.translation import ugettext_lazy, pgettext_lazy
-from django.utils.safestring import (SafeData, EscapeData, mark_safe,
-    mark_for_escaping)
+from django.template.context import (  # NOQA: imported for backwards compatibility
+    BaseContext, Context, ContextPopException, RequestContext,
+)
+from django.utils import lru_cache, six
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
+from django.utils.encoding import (
+    force_str, force_text, python_2_unicode_compatible,
+)
 from django.utils.formats import localize
-from django.utils.html import escape
+from django.utils.html import conditional_escape
+from django.utils.itercompat import is_iterable
 from django.utils.module_loading import module_has_submodule
-from django.utils import six
+from django.utils.safestring import (
+    EscapeData, SafeData, mark_for_escaping, mark_safe,
+)
+from django.utils.text import (
+    get_text_list, smart_split, unescape_string_literal,
+)
 from django.utils.timezone import template_localtime
-from django.utils.encoding import python_2_unicode_compatible
-
+from django.utils.translation import pgettext_lazy, ugettext_lazy
 
 TOKEN_TEXT = 0
 TOKEN_VAR = 1
@@ -125,6 +180,10 @@ class Template(object):
         except UnicodeDecodeError:
             raise TemplateEncodingError("Templates can only be constructed "
                                         "from unicode or UTF-8 strings.")
+        # If Template is instantiated directly rather than from an Engine and
+        # exactly one Django template engine is configured, use that engine.
+        # This is required to preserve backwards-compatibility for direct use
+        # e.g. Template('...').render(Context({...}))
         if engine is None:
             from .engine import Engine
             engine = Engine.get_default()
@@ -887,7 +946,7 @@ def render_value_in_context(value, context):
     value = force_text(value)
     if ((context.autoescape and not isinstance(value, SafeData)) or
             isinstance(value, EscapeData)):
-        return escape(value)
+        return conditional_escape(value)
     else:
         return value
 
@@ -966,9 +1025,9 @@ def token_kwargs(bits, parser, support_legacy=False):
 def parse_bits(parser, bits, params, varargs, varkw, defaults,
                takes_context, name):
     """
-    Parses bits for template tag helpers (simple_tag, include_tag and
-    assignment_tag), in particular by detecting syntax errors and by
-    extracting positional and keyword arguments.
+    Parses bits for template tag helpers simple_tag and inclusion_tag, in
+    particular by detecting syntax errors and by extracting positional and
+    keyword arguments.
     """
     if takes_context:
         if params[0] == 'context':
@@ -1044,9 +1103,9 @@ def generic_tag_compiler(parser, token, params, varargs, varkw, defaults,
 
 class TagHelperNode(Node):
     """
-    Base class for tag helper nodes such as SimpleNode, InclusionNode and
-    AssignmentNode. Manages the positional and keyword arguments to be passed
-    to the decorated function.
+    Base class for tag helper nodes such as SimpleNode and InclusionNode.
+    Manages the positional and keyword arguments to be passed to the decorated
+    function.
     """
 
     def __init__(self, takes_context, args, kwargs):
@@ -1136,17 +1195,31 @@ class Library(object):
             params, varargs, varkw, defaults = getargspec(func)
 
             class SimpleNode(TagHelperNode):
+                def __init__(self, takes_context, args, kwargs, target_var):
+                    super(SimpleNode, self).__init__(takes_context, args, kwargs)
+                    self.target_var = target_var
 
                 def render(self, context):
                     resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
-                    return func(*resolved_args, **resolved_kwargs)
+                    output = func(*resolved_args, **resolved_kwargs)
+                    if self.target_var is not None:
+                        context[self.target_var] = output
+                        return ''
+                    return output
 
             function_name = (name or
                 getattr(func, '_decorated_function', func).__name__)
-            compile_func = partial(generic_tag_compiler,
-                params=params, varargs=varargs, varkw=varkw,
-                defaults=defaults, name=function_name,
-                takes_context=takes_context, node_class=SimpleNode)
+
+            def compile_func(parser, token):
+                bits = token.split_contents()[1:]
+                target_var = None
+                if len(bits) >= 2 and bits[-2] == 'as':
+                    target_var = bits[-1]
+                    bits = bits[:-2]
+                args, kwargs = parse_bits(parser, bits, params,
+                    varargs, varkw, defaults, takes_context, function_name)
+                return SimpleNode(takes_context, args, kwargs, target_var)
+
             compile_func.__doc__ = func.__doc__
             self.tag(function_name, compile_func)
             return func
@@ -1161,48 +1234,14 @@ class Library(object):
             raise TemplateSyntaxError("Invalid arguments provided to simple_tag")
 
     def assignment_tag(self, func=None, takes_context=None, name=None):
-        def dec(func):
-            params, varargs, varkw, defaults = getargspec(func)
+        warnings.warn(
+            "assignment_tag() is deprecated. Use simple_tag() instead",
+            RemovedInDjango21Warning,
+            stacklevel=2,
+        )
+        return self.simple_tag(func, takes_context, name)
 
-            class AssignmentNode(TagHelperNode):
-                def __init__(self, takes_context, args, kwargs, target_var):
-                    super(AssignmentNode, self).__init__(takes_context, args, kwargs)
-                    self.target_var = target_var
-
-                def render(self, context):
-                    resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
-                    context[self.target_var] = func(*resolved_args, **resolved_kwargs)
-                    return ''
-
-            function_name = (name or
-                getattr(func, '_decorated_function', func).__name__)
-
-            def compile_func(parser, token):
-                bits = token.split_contents()[1:]
-                if len(bits) < 2 or bits[-2] != 'as':
-                    raise TemplateSyntaxError(
-                        "'%s' tag takes at least 2 arguments and the "
-                        "second last argument must be 'as'" % function_name)
-                target_var = bits[-1]
-                bits = bits[:-2]
-                args, kwargs = parse_bits(parser, bits, params,
-                    varargs, varkw, defaults, takes_context, function_name)
-                return AssignmentNode(takes_context, args, kwargs, target_var)
-
-            compile_func.__doc__ = func.__doc__
-            self.tag(function_name, compile_func)
-            return func
-
-        if func is None:
-            # @register.assignment_tag(...)
-            return dec
-        elif callable(func):
-            # @register.assignment_tag
-            return dec(func)
-        else:
-            raise TemplateSyntaxError("Invalid arguments provided to assignment_tag")
-
-    def inclusion_tag(self, file_name, context_class=Context, takes_context=False, name=None):
+    def inclusion_tag(self, file_name, takes_context=False, name=None):
         def dec(func):
             params, varargs, varkw, defaults = getargspec(func)
 
@@ -1213,21 +1252,16 @@ class Library(object):
                     _dict = func(*resolved_args, **resolved_kwargs)
 
                     if not getattr(self, 'nodelist', False):
-                        from django.template.loader import get_template, select_template
                         if isinstance(file_name, Template):
                             t = file_name
+                        elif isinstance(getattr(file_name, 'template', None), Template):
+                            t = file_name.template
                         elif not isinstance(file_name, six.string_types) and is_iterable(file_name):
-                            t = select_template(file_name)
+                            t = context.engine.select_template(file_name)
                         else:
-                            t = get_template(file_name)
+                            t = context.engine.get_template(file_name)
                         self.nodelist = t.nodelist
-                    new_context = context_class(_dict, **{
-                        'autoescape': context.autoescape,
-                        'current_app': context.current_app,
-                        'use_l10n': context.use_l10n,
-                        'use_tz': context.use_tz,
-                        'engine': context.engine,
-                    })
+                    new_context = context.new(_dict)
                     # Copy across the CSRF token, if present, because
                     # inclusion tags are often used for forms, and we need
                     # instructions for using CSRF protection to be as simple

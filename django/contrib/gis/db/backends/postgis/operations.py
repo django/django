@@ -1,13 +1,15 @@
 import re
 
 from django.conf import settings
-from django.contrib.gis.db.backends.base import BaseSpatialOperations
+from django.contrib.gis.db.backends.base.operations import \
+    BaseSpatialOperations
 from django.contrib.gis.db.backends.postgis.adapter import PostGISAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.postgresql_psycopg2.base import DatabaseOperations
+from django.db.backends.postgresql_psycopg2.operations import \
+    DatabaseOperations
 from django.db.utils import ProgrammingError
 from django.utils.functional import cached_property
 
@@ -43,14 +45,12 @@ class PostGISDistanceOperator(PostGISOperator):
         return super(PostGISDistanceOperator, self).as_sql(connection, lookup, template_params, sql_params)
 
 
-class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
-    compiler_module = 'django.contrib.gis.db.models.sql.compiler'
+class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     name = 'postgis'
     postgis = True
     geography = True
     geom_func_prefix = 'ST_'
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
-    valid_aggregates = {'Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union'}
 
     Adapter = PostGISAdapter
     Adaptor = Adapter  # Backwards-compatibility alias.
@@ -73,7 +73,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         'contains_properly': PostGISOperator(func='ST_ContainsProperly'),
         'coveredby': PostGISOperator(func='ST_CoveredBy', geography=True),
         'covers': PostGISOperator(func='ST_Covers', geography=True),
-        'crosses': PostGISOperator(func='ST_Crosses)'),
+        'crosses': PostGISOperator(func='ST_Crosses'),
         'disjoint': PostGISOperator(func='ST_Disjoint'),
         'equals': PostGISOperator(func='ST_Equals'),
         'intersects': PostGISOperator(func='ST_Intersects', geography=True),
@@ -180,31 +180,27 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             version = vtup[1:]
         return version
 
-    def check_aggregate_support(self, aggregate):
-        """
-        Checks if the given aggregate name is supported (that is, if it's
-        in `self.valid_aggregates`).
-        """
-        agg_name = aggregate.__class__.__name__
-        return agg_name in self.valid_aggregates
-
-    def convert_extent(self, box):
+    def convert_extent(self, box, srid):
         """
         Returns a 4-tuple extent for the `Extent` aggregate by converting
         the bounding box text returned by PostGIS (`box` argument), for
         example: "BOX(-90.0 30.0, -85.0 40.0)".
         """
+        if box is None:
+            return None
         ll, ur = box[4:-1].split(',')
         xmin, ymin = map(float, ll.split())
         xmax, ymax = map(float, ur.split())
         return (xmin, ymin, xmax, ymax)
 
-    def convert_extent3d(self, box3d):
+    def convert_extent3d(self, box3d, srid):
         """
         Returns a 6-tuple extent for the `Extent3D` aggregate by converting
         the 3d bounding-box text returned by PostGIS (`box3d` argument), for
         example: "BOX3D(-90.0 30.0 1, -85.0 40.0 2)".
         """
+        if box3d is None:
+            return None
         ll, ur = box3d[6:-1].split(',')
         xmin, ymin, zmin = map(float, ll.split())
         xmax, ymax, zmax = map(float, ur.split())
@@ -365,20 +361,11 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             raise Exception('Could not determine PROJ.4 version from PostGIS.')
 
-    def spatial_aggregate_sql(self, agg):
-        """
-        Returns the spatial aggregate SQL template and function for the
-        given Aggregate instance.
-        """
-        agg_name = agg.__class__.__name__
-        if not self.check_aggregate_support(agg):
-            raise NotImplementedError('%s spatial aggregate is not implemented for this backend.' % agg_name)
-        agg_name = agg_name.lower()
-        if agg_name == 'union':
-            agg_name += 'agg'
-        sql_template = '%(function)s(%(expressions)s)'
-        sql_function = getattr(self, agg_name)
-        return sql_template, sql_function
+    def spatial_aggregate_name(self, agg_name):
+        if agg_name == 'Extent3D':
+            return self.extent3d
+        else:
+            return self.geom_func_prefix + agg_name
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):

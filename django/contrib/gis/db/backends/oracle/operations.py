@@ -9,14 +9,16 @@
 """
 import re
 
-from django.db.backends.oracle.base import DatabaseOperations, Database
-from django.contrib.gis.db.backends.base import BaseSpatialOperations
+from django.contrib.gis.db.backends.base.operations import \
+    BaseSpatialOperations
 from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
+from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
+from django.db.backends.oracle.base import Database
+from django.db.backends.oracle.operations import DatabaseOperations
 from django.utils import six
-
 
 DEFAULT_TOLERANCE = '0.05'
 
@@ -51,12 +53,11 @@ class SDORelate(SpatialOperator):
         return super(SDORelate, self).as_sql(connection, lookup, template_params, sql_params)
 
 
-class OracleOperations(DatabaseOperations, BaseSpatialOperations):
-    compiler_module = "django.contrib.gis.db.backends.oracle.compiler"
+class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     name = 'oracle'
     oracle = True
-    valid_aggregates = {'Union', 'Extent'}
+    disallowed_aggregates = (aggregates.Collect, aggregates.Extent3D, aggregates.MakeLine)
 
     Adapter = OracleSpatialAdapter
     Adaptor = Adapter  # Backwards-compatibility alias.
@@ -111,8 +112,9 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     def geo_quote_name(self, name):
         return super(OracleOperations, self).geo_quote_name(name).upper()
 
-    def get_db_converters(self, internal_type):
-        converters = super(OracleOperations, self).get_db_converters(internal_type)
+    def get_db_converters(self, expression):
+        converters = super(OracleOperations, self).get_db_converters(expression)
+        internal_type = expression.output_field.get_internal_type()
         geometry_fields = (
             'PointField', 'GeometryField', 'LineStringField',
             'PolygonField', 'MultiPointField', 'MultiLineStringField',
@@ -121,14 +123,23 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         )
         if internal_type in geometry_fields:
             converters.append(self.convert_textfield_value)
+        if hasattr(expression.output_field, 'geom_type'):
+            converters.append(self.convert_geometry)
         return converters
 
-    def convert_extent(self, clob):
+    def convert_geometry(self, value, expression, context):
+        if value:
+            value = Geometry(value)
+            if 'transformed_srid' in context:
+                value.srid = context['transformed_srid']
+        return value
+
+    def convert_extent(self, clob, srid):
         if clob:
             # Generally, Oracle returns a polygon for the extent -- however,
             # it can return a single point if there's only one Point in the
             # table.
-            ext_geom = Geometry(clob.read())
+            ext_geom = Geometry(clob.read(), srid)
             gtype = str(ext_geom.geom_type)
             if gtype == 'Polygon':
                 # Construct the 4-tuple from the coordinates in the polygon.
@@ -213,20 +224,12 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
             else:
                 return 'SDO_GEOMETRY(%%s, %s)' % f.srid
 
-    def spatial_aggregate_sql(self, agg):
+    def spatial_aggregate_name(self, agg_name):
         """
-        Returns the spatial aggregate SQL template and function for the
-        given Aggregate instance.
+        Returns the spatial aggregate SQL name.
         """
-        agg_name = agg.__class__.__name__.lower()
-        if agg_name == 'union':
-            agg_name += 'agg'
-        if agg.is_extent:
-            sql_template = '%(function)s(%(expressions)s)'
-        else:
-            sql_template = '%(function)s(SDOAGGRTYPE(%(expressions)s,%(tolerance)s))'
-        sql_function = getattr(self, agg_name)
-        return self.select % sql_template, sql_function
+        agg_name = 'unionagg' if agg_name.lower() == 'union' else agg_name.lower()
+        return getattr(self, agg_name)
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):

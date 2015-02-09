@@ -1,32 +1,34 @@
 import base64
-from datetime import timedelta
 import os
 import shutil
 import string
 import tempfile
 import unittest
-import warnings
+from datetime import timedelta
 
 from django.conf import settings
-from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 from django.contrib.sessions.backends.cache import SessionStore as CacheSession
-from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
+from django.contrib.sessions.backends.cached_db import \
+    SessionStore as CacheDBSession
+from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 from django.contrib.sessions.backends.file import SessionStore as FileSession
-from django.contrib.sessions.backends.signed_cookies import SessionStore as CookieSession
-from django.contrib.sessions.models import Session
+from django.contrib.sessions.backends.signed_cookies import \
+    SessionStore as CookieSession
+from django.contrib.sessions.exceptions import InvalidSessionKey
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.contrib.sessions.models import Session
+from django.core import management
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
-from django.core import management
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory, override_settings
+from django.test import (
+    RequestFactory, TestCase, ignore_warnings, override_settings,
+)
 from django.test.utils import patch_logger
-from django.utils import six
-from django.utils import timezone
+from django.utils import six, timezone
 from django.utils.encoding import force_text
-
-from django.contrib.sessions.exceptions import InvalidSessionKey
+from django.utils.six.moves import http_cookies
 
 
 class SessionTestsMixin(object):
@@ -393,12 +395,11 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
         with self.assertNumQueries(0):
             self.assertTrue(self.session.exists(self.session.session_key))
 
+    # Some backends might issue a warning
+    @ignore_warnings(module="django.core.cache.backends.base")
     def test_load_overlong_key(self):
-        # Some backends might issue a warning
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self.session._session_key = (string.ascii_letters + string.digits) * 20
-            self.assertEqual(self.session.load(), {})
+        self.session._session_key = (string.ascii_letters + string.digits) * 20
+        self.assertEqual(self.session.load(), {})
 
     @override_settings(SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
@@ -486,12 +487,11 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
     backend = CacheSession
 
+    # Some backends might issue a warning
+    @ignore_warnings(module="django.core.cache.backends.base")
     def test_load_overlong_key(self):
-        # Some backends might issue a warning
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self.session._session_key = (string.ascii_letters + string.digits) * 20
-            self.assertEqual(self.session.load(), {})
+        self.session._session_key = (string.ascii_letters + string.digits) * 20
+        self.assertEqual(self.session.load(), {})
 
     def test_default_cache(self):
         self.session.save()
@@ -515,7 +515,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertNotEqual(caches['sessions'].get(self.session.cache_key), None)
 
 
-class SessionMiddlewareTests(unittest.TestCase):
+class SessionMiddlewareTests(TestCase):
 
     @override_settings(SESSION_COOKIE_SECURE=True)
     def test_secure_session_cookie(self):
@@ -546,7 +546,7 @@ class SessionMiddlewareTests(unittest.TestCase):
         response = middleware.process_response(request, response)
         self.assertTrue(
             response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
-        self.assertIn('httponly',
+        self.assertIn(http_cookies.Morsel._reserved['httponly'],
             str(response.cookies[settings.SESSION_COOKIE_NAME]))
 
     @override_settings(SESSION_COOKIE_HTTPONLY=False)
@@ -563,7 +563,7 @@ class SessionMiddlewareTests(unittest.TestCase):
         response = middleware.process_response(request, response)
         self.assertFalse(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
 
-        self.assertNotIn('httponly',
+        self.assertNotIn(http_cookies.Morsel._reserved['httponly'],
                          str(response.cookies[settings.SESSION_COOKIE_NAME]))
 
     def test_session_save_on_500(self):
@@ -607,7 +607,8 @@ class SessionMiddlewareTests(unittest.TestCase):
         )
 
 
-class CookieSessionTests(SessionTestsMixin, TestCase):
+# Don't need DB flushing for these tests, so can use unittest.TestCase as base class
+class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
 
     backend = CookieSession
 

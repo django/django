@@ -227,7 +227,7 @@ Logging is configured as part of the general Django ``setup()`` function.
 Therefore, you can be certain that loggers are always ready for use in your
 project code.
 
-.. _dictConfig format: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
+.. _dictConfig format: https://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
 Examples
 --------
@@ -375,7 +375,7 @@ This logging configuration does the following things:
     printed to the console; ``ERROR`` and ``CRITICAL``
     messages will also be output via email.
 
-.. _formatter documentation: http://docs.python.org/library/logging.html#formatter-objects
+.. _formatter documentation: https://docs.python.org/library/logging.html#formatter-objects
 
 Custom logging configuration
 ----------------------------
@@ -439,6 +439,8 @@ Messages to this logger have the following extra context:
 * ``request``: The request object that generated the logging
   message.
 
+.. _django-db-logger:
+
 ``django.db.backends``
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -495,8 +497,6 @@ specific logger following this example:
 
 ``django.db.backends.schema``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.7
 
 Logs the SQL queries that are executed during schema changes to the database by
 the :doc:`migrations framework </topics/migrations>`. Note that it won't log the

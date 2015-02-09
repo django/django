@@ -2,18 +2,18 @@
 from __future__ import unicode_literals
 
 from django.apps.registry import Apps, apps
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
-)
 from django.contrib.contenttypes import management
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.db import connections, models
 from django.test import TestCase, override_settings
 from django.test.utils import captured_stdout
-from django.utils.encoding import force_str
+from django.utils.encoding import force_str, force_text
 
-from .models import Author, Article, SchemeIncludedURL
+from .models import Article, Author, SchemeIncludedURL
 
 
 @override_settings(ROOT_URLCONF='contenttypes_tests.urls')
@@ -87,7 +87,7 @@ class ContentTypesViewsTests(TestCase):
         ct = ContentType.objects.get_for_model(ModelCreatedOnTheFly)
         self.assertEqual(ct.app_label, 'my_great_app')
         self.assertEqual(ct.model, 'modelcreatedonthefly')
-        self.assertEqual(ct.name, 'a model created on the fly')
+        self.assertEqual(force_text(ct), 'modelcreatedonthefly')
 
 
 class IsolatedModelsTestCase(TestCase):
@@ -364,7 +364,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
 class UpdateContentTypesTests(TestCase):
     def setUp(self):
         self.before_count = ContentType.objects.count()
-        ContentType.objects.create(name='fake', app_label='contenttypes_tests', model='Fake')
+        ContentType.objects.create(app_label='contenttypes_tests', model='Fake')
         self.app_config = apps.get_app_config('contenttypes_tests')
 
     def test_interactive_true(self):

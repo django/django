@@ -11,7 +11,7 @@ from django.test.utils import captured_stdout
 from . import models
 from .management import create_default_site
 from .middleware import CurrentSiteMiddleware
-from .models import clear_site_cache, Site
+from .models import Site, clear_site_cache
 from .requests import RequestSite
 from .shortcuts import get_current_site
 
@@ -151,8 +151,8 @@ class CreateDefaultSiteTests(TestCase):
         """
         #16353, #16828 - The default site creation should respect db routing.
         """
-        create_default_site(self.app_config, db='default', verbosity=0)
-        create_default_site(self.app_config, db='other', verbosity=0)
+        create_default_site(self.app_config, using='default', verbosity=0)
+        create_default_site(self.app_config, using='other', verbosity=0)
         self.assertFalse(Site.objects.using('default').exists())
         self.assertTrue(Site.objects.using('other').exists())
 

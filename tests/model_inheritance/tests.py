@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, ValidationError
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, TransactionTestCase
@@ -10,9 +10,10 @@ from django.test.utils import CaptureQueriesContext
 from django.utils import six
 
 from .models import (
-    Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place, Post,
-    Restaurant, Student, Supplier, Worker, MixinModel,
-    Title, Copy, Base, SubBase)
+    Base, Chef, CommonInfo, Copy, GrandChild, GrandParent, ItalianRestaurant,
+    MixinModel, ParkingLot, Place, Post, Restaurant, Student, SubBase,
+    Supplier, Title, Worker,
+)
 
 
 class ModelInheritanceTests(TestCase):
@@ -404,7 +405,7 @@ class InheritanceSameModelNameTests(TransactionTestCase):
     def test_inheritance_with_same_model_name(self):
         with self.modify_settings(
                 INSTALLED_APPS={'append': ['model_inheritance.same_model_name']}):
-            call_command('migrate', verbosity=0)
+            call_command('migrate', verbosity=0, run_syncdb=True)
             from .same_model_name.models import Copy
             copy = self.title.attached_same_model_name_copy_set.create(
                 content='The Web framework for perfectionists with deadlines.',
@@ -423,3 +424,33 @@ class InheritanceSameModelNameTests(TransactionTestCase):
     def test_related_name_attribute_exists(self):
         # The Post model doesn't have an attribute called 'attached_%(app_label)s_%(class)s_set'.
         self.assertFalse(hasattr(self.title, 'attached_%(app_label)s_%(class)s_set'))
+
+
+class InheritanceUniqueTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.grand_parent = GrandParent.objects.create(
+            email='grand_parent@example.com',
+            first_name='grand',
+            last_name='parent',
+        )
+
+    def test_unique(self):
+        grand_child = GrandChild(
+            email=self.grand_parent.email,
+            first_name='grand',
+            last_name='child',
+        )
+        msg = 'Grand parent with this Email already exists.'
+        with self.assertRaisesMessage(ValidationError, msg):
+            grand_child.validate_unique()
+
+    def test_unique_together(self):
+        grand_child = GrandChild(
+            email='grand_child@example.com',
+            first_name=self.grand_parent.first_name,
+            last_name=self.grand_parent.last_name,
+        )
+        msg = 'Grand parent with this First name and Last name already exists.'
+        with self.assertRaisesMessage(ValidationError, msg):
+            grand_child.validate_unique()

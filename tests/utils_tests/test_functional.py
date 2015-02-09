@@ -1,6 +1,6 @@
 import unittest
 
-from django.utils.functional import lazy, lazy_property, cached_property
+from django.utils.functional import cached_property, lazy, lazy_property
 
 
 class FunctionalTestCase(unittest.TestCase):
@@ -21,6 +21,20 @@ class FunctionalTestCase(unittest.TestCase):
 
         t = lazy(lambda: Klazz(), Klazz)()
         self.assertIn('base_method', dir(t))
+
+    def test_lazy_base_class_override(self):
+        """Test that lazy finds the correct (overridden) method implementation"""
+
+        class Base(object):
+            def method(self):
+                return 'Base'
+
+        class Klazz(Base):
+            def method(self):
+                return 'Klazz'
+
+        t = lazy(lambda: Klazz(), Base)()
+        self.assertEqual(t.method(), 'Klazz')
 
     def test_lazy_property(self):
 

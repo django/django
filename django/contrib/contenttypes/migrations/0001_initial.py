@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+import django.contrib.contenttypes.models
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -25,6 +26,9 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'content types',
             },
             bases=(models.Model,),
+            managers=[
+                ('objects', django.contrib.contenttypes.models.ContentTypeManager()),
+            ],
         ),
         migrations.AlterUniqueTogether(
             name='contenttype',

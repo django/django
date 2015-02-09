@@ -9,23 +9,22 @@ a string) and returns a tuple in this format:
 from __future__ import unicode_literals
 
 import functools
-from importlib import import_module
 import re
-from threading import local
 import warnings
+from importlib import import_module
+from threading import local
 
-from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.http import Http404
+from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str, force_text, iri_to_uri
-from django.utils.functional import lazy
+from django.utils.functional import cached_property, lazy
 from django.utils.http import RFC3986_SUBDELIMS, urlquote
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
-from django.utils import six, lru_cache
 from django.utils.translation import get_language
-
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
 # the current thread (which is the only one we ever access), it is assumed to
@@ -252,10 +251,10 @@ class RegexURLPattern(LocaleRegexProvider):
 class RegexURLResolver(LocaleRegexProvider):
     def __init__(self, regex, urlconf_name, default_kwargs=None, app_name=None, namespace=None):
         LocaleRegexProvider.__init__(self, regex)
-        # urlconf_name is a string representing the module containing URLconfs.
+        # urlconf_name is the dotted Python path to the module defining
+        # urlpatterns. It may also be an object with an urlpatterns attribute
+        # or urlpatterns itself.
         self.urlconf_name = urlconf_name
-        if not isinstance(urlconf_name, six.string_types):
-            self._urlconf_module = self.urlconf_name
         self.callback = None
         self.default_kwargs = default_kwargs or {}
         self.namespace = namespace
@@ -389,15 +388,14 @@ class RegexURLResolver(LocaleRegexProvider):
             raise Resolver404({'tried': tried, 'path': new_path})
         raise Resolver404({'path': path})
 
-    @property
+    @cached_property
     def urlconf_module(self):
-        try:
-            return self._urlconf_module
-        except AttributeError:
-            self._urlconf_module = import_module(self.urlconf_name)
-            return self._urlconf_module
+        if isinstance(self.urlconf_name, six.string_types):
+            return import_module(self.urlconf_name)
+        else:
+            return self.urlconf_name
 
-    @property
+    @cached_property
     def url_patterns(self):
         # urlconf_module might be a valid set of patterns, so we default to it
         patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)

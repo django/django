@@ -1,6 +1,6 @@
 from django.db import (
-    connections, DEFAULT_DB_ALIAS,
-    DatabaseError, Error, ProgrammingError)
+    DEFAULT_DB_ALIAS, DatabaseError, Error, ProgrammingError, connections,
+)
 from django.utils.decorators import ContextDecorator
 
 

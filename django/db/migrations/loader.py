@@ -1,15 +1,14 @@
 from __future__ import unicode_literals
 
-from importlib import import_module
 import os
 import sys
+from importlib import import_module
 
 from django.apps import apps
-from django.db.migrations.recorder import MigrationRecorder
-from django.db.migrations.graph import MigrationGraph, NodeNotFoundError
-from django.utils import six
 from django.conf import settings
-
+from django.db.migrations.graph import MigrationGraph, NodeNotFoundError
+from django.db.migrations.recorder import MigrationRecorder
+from django.utils import six
 
 MIGRATIONS_MODULE_NAME = 'migrations'
 
@@ -194,7 +193,7 @@ class MigrationLoader(object):
         for key, migration in normal.items():
             for parent in migration.dependencies:
                 reverse_dependencies.setdefault(parent, set()).add(key)
-        # Remeber the possible replacements to generate more meaningful error
+        # Remember the possible replacements to generate more meaningful error
         # messages
         reverse_replacements = {}
         for key, migration in replacing.items():

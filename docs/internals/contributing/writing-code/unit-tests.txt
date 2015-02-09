@@ -39,17 +39,6 @@ sample settings module that uses the SQLite database. To run the tests:
    $ cd django-repo/tests
    $ PYTHONPATH=..:$PYTHONPATH ./runtests.py
 
-.. versionchanged:: 1.7
-
-    Older versions of Django required specifying a settings file:
-
-    .. code-block:: bash
-
-        $ PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
-
-    ``runtests.py`` now uses ``test_sqlite`` by default if settings aren't
-    provided through either ``--settings`` or :envvar:`DJANGO_SETTINGS_MODULE`.
-
 You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
 checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
 See :ref:`installing-development-version`.
@@ -94,12 +83,6 @@ details for each database:
 Test databases get their names by prepending ``test_`` to the value of the
 :setting:`NAME` settings for the databases defined in :setting:`DATABASES`.
 These test databases are deleted when the tests are finished.
-
-.. versionchanged:: 1.7
-
-    Before Django 1.7, the :setting:`NAME` setting was mandatory and had to
-    be the name of an existing database to which the given user had permission
-    to connect.
 
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
@@ -286,7 +269,7 @@ For example, suppose that the failing test that works on its own is
 
 .. code-block:: bash
 
-   $ ./runtests.py --bisect basic.tests.ModelTest.test_eq
+    $ ./runtests.py --bisect basic.tests.ModelTest.test_eq
 
 will try to determine a test that interferes with the given one. First, the
 test is run with the first half of the test suite. If a failure occurs, the
@@ -302,7 +285,7 @@ failure. So:
 
 .. code-block:: bash
 
-   $ ./runtests.py --pair basic.tests.ModelTest.test_eq
+    $ ./runtests.py --pair basic.tests.ModelTest.test_eq
 
 will pair ``test_eq`` with every test label.
 
@@ -313,7 +296,7 @@ the first one:
 
 .. code-block:: bash
 
-   $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
+    $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
 
 You can also try running any set of tests in reverse using the ``--reverse``
 option in order to verify that executing tests in a different order does not
@@ -321,8 +304,16 @@ cause any trouble:
 
 .. code-block:: bash
 
-   $ ./runtests.py basic --reverse
+    $ ./runtests.py basic --reverse
+
+If you wish to examine the SQL being run in failing tests, you can turn on
+:ref:`SQL logging <django-db-logger>` using the ``--debug-sql`` option. If you
+combine this with ``--verbosity=2``, all SQL queries will be output.
+
+.. code-block:: bash
+
+    $ ./runtests.py basic --debug-sql
 
 .. versionadded:: 1.8
 
-    The ``--reverse`` option was added.
+    The ``--reverse`` and ``--debug-sql`` options were added.

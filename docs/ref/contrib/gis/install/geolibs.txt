@@ -51,7 +51,7 @@ totally fine with GeoDjango. Your mileage may vary.
     required -- just import them as normal from :mod:`django.contrib.gis`.
 
 .. _PROJ.4: http://trac.osgeo.org/proj/
-__ http://postgis.refractions.net/
+__ http://postgis.net/
 __ http://www.gaia-gis.it/gaia-sins/
 
 
@@ -107,7 +107,7 @@ internal geometry representation used by GeoDjango (it's behind the "lazy"
 geometries).  Specifically, the C API library is called (e.g., ``libgeos_c.so``)
 directly from Python using ctypes.
 
-First, download GEOS 3.3.8 from the refractions Web site and untar the source
+First, download GEOS 3.3.8 from the GEOS Web site and untar the source
 archive::
 
     $ wget http://download.osgeo.org/geos/geos-3.3.8.tar.bz2

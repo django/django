@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
+
 from collections import namedtuple
 
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
+from django.db.backends.base.introspection import (
+    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+)
 from django.utils.encoding import force_text
-
 
 FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 
@@ -69,20 +71,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Returns a dictionary of {field_index: (field_index_other_table, other_table)}
-        representing all relationships to the given table. Indexes are 0-based.
+        Returns a dictionary of {field_name: (field_name_other_table, other_table)}
+        representing all relationships to the given table.
         """
         cursor.execute("""
-            SELECT con.conkey, con.confkey, c2.relname
-            FROM pg_constraint con, pg_class c1, pg_class c2
-            WHERE c1.oid = con.conrelid
-                AND c2.oid = con.confrelid
-                AND c1.relname = %s
+            SELECT c2.relname, a1.attname, a2.attname
+            FROM pg_constraint con
+            LEFT JOIN pg_class c1 ON con.conrelid = c1.oid
+            LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
+            LEFT JOIN pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
+            LEFT JOIN pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
+            WHERE c1.relname = %s
                 AND con.contype = 'f'""", [table_name])
         relations = {}
         for row in cursor.fetchall():
-            # row[0] and row[1] are single-item lists, so grab the single item.
-            relations[row[0][0] - 1] = (row[1][0] - 1, row[2])
+            relations[row[1]] = (row[2], row[0])
         return relations
 
     def get_key_columns(self, cursor, table_name):

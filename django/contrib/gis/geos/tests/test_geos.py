@@ -4,17 +4,15 @@ import ctypes
 import json
 import random
 import unittest
-from unittest import skipUnless
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
+from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
-
 from django.contrib.gis.geometry.test_data import TestDataMixin
-
-from django.utils.encoding import force_bytes
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.encoding import force_bytes
+from django.utils.six.moves import range
 
 from .. import HAS_GEOS
 
@@ -63,7 +61,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         # Anything that is either not None or the acceptable pointer type will
         # result in a TypeError when trying to assign it to the `ptr` property.
-        # Thus, memmory addresses (integers) and pointers of the incorrect type
+        # Thus, memory addresses (integers) and pointers of the incorrect type
         # (in `bad_ptrs`) will not be allowed.
         bad_ptrs = (5, ctypes.c_char_p(b'foobar'))
         for bad_ptr in bad_ptrs:
@@ -466,7 +464,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_memory_hijinks(self):
         "Testing Geometry __del__() on rings and polygons."
-        #### Memory issues with rings and polygons
+        # #### Memory issues with rings and poly
 
         # These tests are needed to ensure sanity with writable geometries.
 
@@ -500,7 +498,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(len(p.ext_ring_cs), len(cs))  # Making sure __len__ works
 
                 # Checks __getitem__ and __setitem__
-                for i in xrange(len(p.ext_ring_cs)):
+                for i in range(len(p.ext_ring_cs)):
                     c1 = p.ext_ring_cs[i]  # Expected value
                     c2 = cs[i]  # Value from coordseq
                     self.assertEqual(c1, c2)
@@ -529,7 +527,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_intersection(self):
         "Testing intersects() and intersection()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             i1 = fromstr(self.geometries.intersect_geoms[i].wkt)
@@ -542,7 +540,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_union(self):
         "Testing union()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             u1 = fromstr(self.geometries.union_geoms[i].wkt)
@@ -554,7 +552,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_difference(self):
         "Testing difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             d1 = fromstr(self.geometries.diff_geoms[i].wkt)
@@ -566,7 +564,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_symdifference(self):
         "Testing sym_difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
             d1 = fromstr(self.geometries.sdiff_geoms[i].wkt)
@@ -595,11 +593,11 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(len(exp_buf), len(buf))
 
             # Now assuring that each point in the buffer is almost equal
-            for j in xrange(len(exp_buf)):
+            for j in range(len(exp_buf)):
                 exp_ring = exp_buf[j]
                 buf_ring = buf[j]
                 self.assertEqual(len(exp_ring), len(buf_ring))
-                for k in xrange(len(exp_ring)):
+                for k in range(len(exp_ring)):
                     # Asserting the X, Y of each point are almost equal (due to floating point imprecision)
                     self.assertAlmostEqual(exp_ring[k][0], buf_ring[k][0], 9)
                     self.assertAlmostEqual(exp_ring[k][1], buf_ring[k][1], 9)
@@ -661,7 +659,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_mutable_geometries(self):
         "Testing the mutability of Polygons and Geometry Collections."
-        ### Testing the mutability of Polygons ###
+        # ### Testing the mutability of Polygons ###
         for p in self.geometries.polygons:
             poly = fromstr(p.wkt)
 
@@ -681,7 +679,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(poly.exterior_ring, new_shell)
             self.assertEqual(poly[0], new_shell)
 
-        ### Testing the mutability of Geometry Collections
+        # ### Testing the mutability of Geometry Collections
         for tg in self.geometries.multipoints:
             mp = fromstr(tg.wkt)
             for i in range(len(mp)):
@@ -699,13 +697,13 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Polygon w/in the collection has its own rings.
         for tg in self.geometries.multipolygons:
             mpoly = fromstr(tg.wkt)
-            for i in xrange(len(mpoly)):
+            for i in range(len(mpoly)):
                 poly = mpoly[i]
                 old_poly = mpoly[i]
                 # Offsetting the each ring in the polygon by 500.
-                for j in xrange(len(poly)):
+                for j in range(len(poly)):
                     r = poly[j]
-                    for k in xrange(len(r)):
+                    for k in range(len(r)):
                         r[k] = (r[k][0] + 500., r[k][1] + 500.)
                     poly[j] = r
 
@@ -719,11 +717,11 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Extreme (!!) __setitem__ -- no longer works, have to detect
         # in the first object that __setitem__ is called in the subsequent
         # objects -- maybe mpoly[0, 0, 0] = (3.14, 2.71)?
-        #mpoly[0][0][0] = (3.14, 2.71)
-        #self.assertEqual((3.14, 2.71), mpoly[0][0][0])
+        # mpoly[0][0][0] = (3.14, 2.71)
+        # self.assertEqual((3.14, 2.71), mpoly[0][0][0])
         # Doing it more slowly..
-        #self.assertEqual((3.14, 2.71), mpoly[0].shell[0])
-        #del mpoly
+        # self.assertEqual((3.14, 2.71), mpoly[0].shell[0])
+        # del mpoly
 
     def test_threed(self):
         "Testing three-dimensional geometries."

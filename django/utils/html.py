@@ -3,20 +3,20 @@
 from __future__ import unicode_literals
 
 import re
-import sys
 import warnings
 
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, force_str
+from django.utils.encoding import force_str, force_text
 from django.utils.functional import allow_lazy
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
-from django.utils import six
-from django.utils.six.moves.urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
+from django.utils.six.moves.urllib.parse import (
+    parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
+)
 from django.utils.text import normalize_newlines
 
-from .html_parser import HTMLParser, HTMLParseError
-
+from .html_parser import HTMLParseError, HTMLParser
 
 # Configuration for urlize() function.
 TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)', '"', '\'', '!']
@@ -44,6 +44,10 @@ def escape(text):
     """
     Returns the given text with ampersands, quotes and angle brackets encoded
     for use in HTML.
+
+    This function always escapes its input, even if it's already escaped and
+    marked as such. This may result in double-escaping. If this is a concern,
+    use conditional_escape() instead.
     """
     return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;')
         .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
@@ -76,6 +80,9 @@ escapejs = allow_lazy(escapejs, six.text_type, SafeText)
 def conditional_escape(text):
     """
     Similar to escape(), except that it doesn't operate on pre-escaped strings.
+
+    This function relies on the __html__ convention used both by Django's
+    SafeData class and by third-party libraries like markupsafe.
     """
     if hasattr(text, '__html__'):
         return text.__html__()
@@ -128,12 +135,7 @@ linebreaks = allow_lazy(linebreaks, six.text_type)
 
 class MLStripper(HTMLParser):
     def __init__(self):
-        # The strict parameter was added in Python 3.2 with a default of True.
-        # The default changed to False in Python 3.3 and was deprecated.
-        if sys.version_info[:2] == (3, 2):
-            HTMLParser.__init__(self, strict=False)
-        else:
-            HTMLParser.__init__(self)
+        HTMLParser.__init__(self)
         self.reset()
         self.fed = []
 
@@ -161,9 +163,7 @@ def _strip_once(value):
         return value
     try:
         s.close()
-    except (HTMLParseError, UnboundLocalError):
-        # UnboundLocalError because of http://bugs.python.org/issue17802
-        # on Python 3.2, triggered by strict=False mode of HTMLParser
+    except HTMLParseError:
         return s.get_data() + s.rawdata
     else:
         return s.get_data()

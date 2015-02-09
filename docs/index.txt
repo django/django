@@ -41,12 +41,12 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Installation <intro/install>`
 
 * **Tutorial:**
-  :doc:`Part 1 <intro/tutorial01>` |
-  :doc:`Part 2 <intro/tutorial02>` |
-  :doc:`Part 3 <intro/tutorial03>` |
-  :doc:`Part 4 <intro/tutorial04>` |
-  :doc:`Part 5 <intro/tutorial05>` |
-  :doc:`Part 6 <intro/tutorial06>`
+  :doc:`Part 1: Models <intro/tutorial01>` |
+  :doc:`Part 2: The admin site <intro/tutorial02>` |
+  :doc:`Part 3: Views and templates <intro/tutorial03>` |
+  :doc:`Part 4: Forms and generic views <intro/tutorial04>` |
+  :doc:`Part 5: Testing <intro/tutorial05>` |
+  :doc:`Part 6: Static files <intro/tutorial06>`
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
@@ -67,7 +67,6 @@ manipulating the data of your Web application. Learn more about it below:
 * **QuerySets:**
   :doc:`Executing queries <topics/db/queries>` |
   :doc:`QuerySet method reference <ref/models/querysets>` |
-  :doc:`Query-related classes <ref/models/queries>` |
   :doc:`Lookup expressions <ref/models/lookups>`
 
 * **Model instances:**
@@ -77,7 +76,8 @@ manipulating the data of your Web application. Learn more about it below:
 * **Migrations:**
   :doc:`Introduction to Migrations<topics/migrations>` |
   :doc:`Operations reference <ref/migration-operations>` |
-  :doc:`SchemaEditor <ref/schema-editor>`
+  :doc:`SchemaEditor <ref/schema-editor>` |
+  :doc:`Writing migrations <howto/writing-migrations>`
 
 * **Advanced:**
   :doc:`Managers <topics/db/managers>` |
@@ -87,7 +87,9 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Custom fields <howto/custom-model-fields>` |
   :doc:`Multiple databases <topics/db/multi-db>` |
   :doc:`Custom lookups <howto/custom-lookups>` |
-  :doc:`Query Expressions <ref/models/expressions>`
+  :doc:`Query Expressions <ref/models/expressions>` |
+  :doc:`Conditional Expressions <ref/models/conditional-expressions>` |
+  :doc:`Database Functions <ref/models/database-functions>`
 
 * **Other:**
   :doc:`Supported databases <ref/databases>` |
@@ -144,8 +146,11 @@ The template layer provides a designer-friendly syntax for rendering the
 information to be presented to the user. Learn how this syntax can be used by
 designers and how it can be extended by programmers:
 
+* **The basics:**
+  :doc:`Overview <topics/templates>`
+
 * **For designers:**
-  :doc:`Syntax overview <topics/templates>` |
+  :doc:`Language overview <ref/templates/language>` |
   :doc:`Built-in tags and filters <ref/templates/builtins>` |
   :doc:`Web design helpers <ref/contrib/webdesign>` |
   :doc:`Humanization <ref/contrib/humanize>`
@@ -201,7 +206,6 @@ testing of Django applications:
 * **Deployment:**
   :doc:`Overview <howto/deployment/index>` |
   :doc:`WSGI servers <howto/deployment/wsgi/index>` |
-  :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` (deprecated) |
   :doc:`Deploying static files <howto/static-files/deployment>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`
 

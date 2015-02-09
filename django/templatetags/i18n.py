@@ -1,15 +1,15 @@
 from __future__ import unicode_literals
+
 import re
 import sys
 
 from django.conf import settings
-from django.template import (Node, Variable, TemplateSyntaxError,
-    TokenParser, Library, TOKEN_TEXT, TOKEN_VAR)
-from django.template.base import render_value_in_context
+from django.template import Library, Node, TemplateSyntaxError, Variable
+from django.template.base import (
+    TOKEN_TEXT, TOKEN_VAR, TokenParser, render_value_in_context,
+)
 from django.template.defaulttags import token_kwargs
-from django.utils import six
-from django.utils import translation
-
+from django.utils import six, translation
 
 register = Library()
 
@@ -232,7 +232,7 @@ def do_get_language_info_list(parser, token):
     """
     This will store a list of language information dictionaries for the given
     language codes in a context variable. The language codes can be specified
-    either as a list of strings or a settings.LANGUAGES style tuple (or any
+    either as a list of strings or a settings.LANGUAGES style list (or any
     sequence of sequences whose first items are language codes).
 
     Usage::

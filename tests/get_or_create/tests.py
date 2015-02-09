@@ -1,15 +1,16 @@
 from __future__ import unicode_literals
 
-from datetime import date
 import traceback
-import warnings
+from datetime import date
 
-from django.db import IntegrityError, DatabaseError
+from django.db import DatabaseError, IntegrityError
+from django.test import TestCase, TransactionTestCase, ignore_warnings
 from django.utils.encoding import DjangoUnicodeDecodeError
-from django.test import TestCase, TransactionTestCase
 
-from .models import (DefaultPerson, Person, ManualPrimaryKeyTest, Profile,
-    Tag, Thing, Publisher, Author, Book)
+from .models import (
+    Author, Book, DefaultPerson, ManualPrimaryKeyTest, Person, Profile,
+    Publisher, Tag, Thing,
+)
 
 
 class GetOrCreateTests(TestCase):
@@ -155,18 +156,17 @@ class GetOrCreateTestsWithManualPKs(TestCase):
             formatted_traceback = traceback.format_exc()
             self.assertIn(str('obj.save'), formatted_traceback)
 
+    # MySQL emits a warning when broken data is saved
+    @ignore_warnings(module='django.db.backends.mysql.base')
     def test_savepoint_rollback(self):
         """
         Regression test for #20463: the database connection should still be
         usable after a DataError or ProgrammingError in .get_or_create().
         """
         try:
-            # Hide warnings when broken data is saved with a warning (MySQL).
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore')
-                Person.objects.get_or_create(
-                    birthday=date(1970, 1, 1),
-                    defaults={'first_name': b"\xff", 'last_name': b"\xff"})
+            Person.objects.get_or_create(
+                birthday=date(1970, 1, 1),
+                defaults={'first_name': b"\xff", 'last_name': b"\xff"})
         except (DatabaseError, DjangoUnicodeDecodeError):
             Person.objects.create(
                 first_name="Bob", last_name="Ross", birthday=date(1950, 1, 1))

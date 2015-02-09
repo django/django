@@ -28,8 +28,6 @@ bit of i18n-related overhead in certain places of the framework. If you don't
 use internationalization, you should take the two seconds to set
 :setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
 make some optimizations so as not to load the internationalization machinery.
-You'll probably also want to remove ``'django.core.context_processors.i18n'``
-from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
 
 .. note::
 
@@ -529,7 +527,7 @@ Internationalization: in template code
 
 .. highlightlang:: html+django
 
-Translations in :doc:`Django templates </topics/templates>` uses two template
+Translations in :doc:`Django templates </ref/templates/language>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
 access to these tags, put ``{% load i18n %}`` toward the top of your template.
 As with all template tags, this tag needs to be loaded in all templates which
@@ -701,11 +699,6 @@ will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
 compared to ``"\n  First sentence.\n  Second sentence.\n"``, if the ``trimmed``
 option had not been specified.
 
-.. versionchanged:: 1.7
-
-    The ``trimmed`` option was added.
-
-
 String literals passed to tags and filters
 ------------------------------------------
 
@@ -812,27 +805,28 @@ the second will always be in English.
 Other tags
 ----------
 
-Each ``RequestContext`` has access to three translation-specific variables:
-
-* ``LANGUAGES`` is a list of tuples in which the first element is the
-  :term:`language code` and the second is the language name (translated into
-  the currently active locale).
-
-* ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
-  Example: ``en-us``. (See :ref:`how-django-discovers-language-preference`.)
-
-* ``LANGUAGE_BIDI`` is the current locale's direction. If True, it's a
-  right-to-left language, e.g.: Hebrew, Arabic. If False it's a
-  left-to-right language, e.g.: English, French, German etc.
-
-If you don't use the ``RequestContext`` extension, you can get those values with
-three tags::
-
-    {% get_current_language as LANGUAGE_CODE %}
-    {% get_available_languages as LANGUAGES %}
-    {% get_current_language_bidi as LANGUAGE_BIDI %}
-
 These tags also require a ``{% load i18n %}``.
+
+* ``{% get_available_languages as LANGUAGES %}`` returns a list of tuples in
+  which the first element is the :term:`language code` and the second is the
+  language name (translated into the currently active locale).
+
+* ``{% get_current_language as LANGUAGE_CODE %}`` returns the current user's
+  preferred language, as a string.  Example: ``en-us``. (See
+  :ref:`how-django-discovers-language-preference`.)
+
+* ``{% get_current_language_bidi as LANGUAGE_BIDI %}`` returns the current
+  locale's direction. If True, it's a right-to-left language, e.g.: Hebrew,
+  Arabic. If False it's a left-to-right language, e.g.: English, French, German
+  etc.
+
+If you enable the ``django.template.context_processors.i18n`` context processor
+then each ``RequestContext`` will have access to ``LANGUAGES``,
+``LANGUAGE_CODE``, and ``LANGUAGE_BIDI`` as defined above.
+
+.. versionchanged:: 1.8
+
+    The ``i18n`` context processor is not enabled by default for new projects.
 
 You can also retrieve information about any of the available languages using
 provided template tags and filters. To get information about a single language,
@@ -854,7 +848,7 @@ information for a list of languages (e.g. active languages as specified in
 view <set_language-redirect-view>` for an example of how to display a language
 selector using ``{% get_language_info_list %}``.
 
-In addition to :setting:`LANGUAGES` style nested tuples,
+In addition to :setting:`LANGUAGES` style list of tuples,
 ``{% get_language_info_list %}`` supports simple lists of language codes.
 If you do this in your view:
 
@@ -872,7 +866,7 @@ There are also simple filters available for convenience:
 
 * ``{{ LANGUAGE_CODE|language_name }}`` ("German")
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
-* ``{{ LANGUAGE_CODE|bidi }}`` (False)
+* ``{{ LANGUAGE_CODE|language_bidi }}`` (False)
 
 .. _Django templates: ../templates_python/
 
@@ -1276,16 +1270,13 @@ is configured correctly). It creates (or updates) a message file in the
 directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the file will be
 ``locale/de/LC_MESSAGES/django.po``.
 
-.. versionchanged:: 1.7
-
-    When you run ``makemessages`` from the root directory of your project, the
-    extracted strings will be automatically distributed to the proper message
-    files. That is, a string extracted from a file of an app containing a
-    ``locale`` directory will go in a message file under that directory.
-    A string extracted from a file of an app without any ``locale`` directory
-    will either go in a message file under the directory listed first in
-    :setting:`LOCALE_PATHS` or will generate an error if :setting:`LOCALE_PATHS`
-    is empty.
+When you run ``makemessages`` from the root directory of your project, the
+extracted strings will be automatically distributed to the proper message files.
+That is, a string extracted from a file of an app containing a ``locale``
+directory will go in a message file under that directory. A string extracted
+from a file of an app without any ``locale`` directory will either go in a
+message file under the directory listed first in :setting:`LOCALE_PATHS` or
+will generate an error if :setting:`LOCALE_PATHS` is empty.
 
 By default :djadmin:`django-admin makemessages <makemessages>` examines every
 file that has the ``.html`` or ``.txt`` file extension. In case you want to
@@ -1358,12 +1349,10 @@ otherwise, they'll be tacked together without whitespace!
 
 .. admonition:: Mind your charset
 
-    When creating a PO file with your favorite text editor, first edit
-    the charset line (search for ``"CHARSET"``) and set it to the charset
-    you'll be using to edit the content. Due to the way the ``gettext`` tools
-    work internally and because we want to allow non-ASCII source strings in
-    Django's core and your applications, you **must** use UTF-8 as the encoding
-    for your PO file. This means that everybody will be using the same
+    Due to the way the ``gettext`` tools work internally and because we want to
+    allow non-ASCII source strings in Django's core and your applications, you
+    **must** use UTF-8 as the encoding for your PO files (the default when PO
+    files are created).  This means that everybody will be using the same
     encoding, which is important when Django processes the PO files.
 
 To reexamine all source code and templates for new translation strings and
@@ -1428,8 +1417,7 @@ files of this type, but if you want to create your own message files, or want to
 test or compile a changed message file, you will need the ``gettext`` utilities:
 
 * Download the following zip files from the GNOME servers
-  http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/ or from one
-  of its mirrors_
+  https://download.gnome.org/binaries/win32/dependencies/
 
   * ``gettext-runtime-X.zip``
   * ``gettext-tools-X.zip``
@@ -1445,8 +1433,6 @@ test or compile a changed message file, you will need the ``gettext`` utilities:
   * In the ``System variables`` list, click ``Path``, click ``Edit``.
   * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
     ``Variable value`` field.
-
-.. _mirrors: http://ftp.gnome.org/pub/GNOME/MIRRORS
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
@@ -1509,11 +1495,6 @@ As a convenience, Django comes with a view, :func:`django.views.i18n.set_languag
 that sets a user's language preference and redirects to a given URL or, by default,
 back to the previous page.
 
-Make sure that the following item is in your
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` list in your settings file::
-
-    'django.core.context_processors.i18n'
-
 Activate this view by adding the following line to your URLconf::
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
@@ -1545,10 +1526,13 @@ Here's example HTML template code:
 
 .. code-block:: html+django
 
+    {% load i18n %}
     <form action="{% url 'set_language' %}" method="post">
     {% csrf_token %}
     <input name="next" type="hidden" value="{{ redirect_to }}" />
     <select name="language">
+    {% get_current_language as LANGUAGE_CODE %}
+    {% get_available_languages as LANGUAGES %}
     {% get_language_info_list for LANGUAGES as languages %}
     {% for language in languages %}
     <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}>
@@ -1633,13 +1617,9 @@ Language cookie
 A number of settings can be used to adjust language cookie options:
 
 * :setting:`LANGUAGE_COOKIE_NAME`
-
-.. versionadded:: 1.7
-
 * :setting:`LANGUAGE_COOKIE_AGE`
 * :setting:`LANGUAGE_COOKIE_DOMAIN`
 * :setting:`LANGUAGE_COOKIE_PATH`
-
 
 Implementation notes
 ====================
@@ -1702,11 +1682,11 @@ matters, you should follow these guidelines:
 
 For example, your :setting:`MIDDLEWARE_CLASSES` might look like this::
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE_CLASSES = [
        'django.contrib.sessions.middleware.SessionMiddleware',
        'django.middleware.locale.LocaleMiddleware',
        'django.middleware.common.CommonMiddleware',
-    )
+    ]
 
 (For more on middleware, see the :doc:`middleware documentation
 </topics/http/middleware>`.)
@@ -1721,11 +1701,6 @@ following this algorithm:
 
 * Failing that, it looks for the :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
   key in the current user's session.
-
-  .. versionchanged:: 1.7
-
-      In previous versions, the key was named ``django_language``, and the
-      ``LANGUAGE_SESSION_KEY`` constant did not exist.
 
 * Failing that, it looks for a cookie.
 
@@ -1757,10 +1732,10 @@ Notes:
   languages (because your application doesn't provide all those languages),
   set :setting:`LANGUAGES` to a list of languages. For example::
 
-      LANGUAGES = (
+      LANGUAGES = [
         ('de', _('German')),
         ('en', _('English')),
-      )
+      ]
 
   This example restricts languages that are available for automatic
   selection to German and English (and any sublanguage, like de-ch or
@@ -1775,10 +1750,10 @@ Notes:
 
       from django.utils.translation import ugettext_lazy as _
 
-      LANGUAGES = (
+      LANGUAGES = [
           ('de', _('German')),
           ('en', _('English')),
-      )
+      ]
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each

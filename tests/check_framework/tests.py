@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.utils.six import StringIO
 import sys
 
 from django.apps import apps
 from django.conf import settings
 from django.core import checks
 from django.core.checks import Error, Warning
+from django.core.checks.compatibility.django_1_7_0 import \
+    check_1_7_compatibility
 from django.core.checks.registry import CheckRegistry
-from django.core.checks.compatibility.django_1_7_0 import check_1_7_compatibility
-from django.core.management.base import CommandError
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.db import models
 from django.test import TestCase
 from django.test.utils import override_settings, override_system_checks
 from django.utils.encoding import force_text
+from django.utils.six import StringIO
 
 from .models import SimpleModel
 
@@ -113,7 +114,7 @@ class MessageTests(TestCase):
 
 class Django_1_7_0_CompatibilityChecks(TestCase):
 
-    @override_settings(MIDDLEWARE_CLASSES=('django.contrib.sessions.middleware.SessionMiddleware',))
+    @override_settings(MIDDLEWARE_CLASSES=['django.contrib.sessions.middleware.SessionMiddleware'])
     def test_middleware_classes_overridden(self):
         errors = check_1_7_compatibility()
         self.assertEqual(errors, [])
@@ -291,8 +292,7 @@ class SilencingCheckTests(TestCase):
         self.assertEqual(err.getvalue(), '')
 
 
-class CheckFrameworkReservedNamesTests(TestCase):
-
+class IsolateModelsMixin(object):
     def setUp(self):
         self.current_models = apps.all_models[__package__]
         self.saved_models = set(self.current_models)
@@ -302,6 +302,8 @@ class CheckFrameworkReservedNamesTests(TestCase):
             del self.current_models[model]
         apps.clear_cache()
 
+
+class CheckFrameworkReservedNamesTests(IsolateModelsMixin, TestCase):
     @override_settings(
         SILENCED_SYSTEM_CHECKS=['models.E20', 'fields.W342'],  # ForeignKey(unique=True)
         INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'check_framework']

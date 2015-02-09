@@ -1,20 +1,23 @@
 from __future__ import unicode_literals
 
-from datetime import date
 import locale
 import sys
+from datetime import date
 
 from django.apps import apps
-from django.contrib.auth import models, management
+from django.contrib.auth import management, models
 from django.contrib.auth.checks import check_user_model
 from django.contrib.auth.management import create_permissions
-from django.contrib.auth.management.commands import changepassword, createsuperuser
-from django.contrib.auth.models import User, Group
-from django.contrib.auth.tests.custom_user import CustomUser, CustomUserWithFK, Email
+from django.contrib.auth.management.commands import (
+    changepassword, createsuperuser,
+)
+from django.contrib.auth.models import Group, User
+from django.contrib.auth.tests.custom_user import (
+    CustomUser, CustomUserWithFK, Email,
+)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
-from django.core import checks
-from django.core import exceptions
+from django.core import checks, exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase, override_settings, override_system_checks
@@ -334,6 +337,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         command.execute(
             stdin=sentinel,
             stdout=six.StringIO(),
+            stderr=six.StringIO(),
             interactive=False,
             verbosity=0,
             username='janet',
@@ -344,6 +348,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         command = createsuperuser.Command()
         command.execute(
             stdout=six.StringIO(),
+            stderr=six.StringIO(),
             interactive=False,
             verbosity=0,
             username='joe',
@@ -566,5 +571,5 @@ class PermissionTestCase(TestCase):
         models.Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control" * 5
 
         six.assertRaisesRegex(self, exceptions.ValidationError,
-            "The verbose_name of permission is longer than 244 characters",
+            "The verbose_name of auth.permission is longer than 244 characters",
             create_permissions, auth_app_config, verbosity=0)

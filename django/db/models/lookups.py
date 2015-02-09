@@ -1,10 +1,10 @@
-from copy import copy
 import inspect
+from copy import copy
 
 from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 from .query_utils import QueryWrapper
 
@@ -86,6 +86,10 @@ class Transform(RegisterLookupMixin):
         if self.bilateral:
             bilateral_transforms.append((self.__class__, self.init_lookups))
         return bilateral_transforms
+
+    @cached_property
+    def contains_aggregate(self):
+        return self.lhs.contains_aggregate
 
 
 class Lookup(RegisterLookupMixin):
@@ -189,6 +193,10 @@ class Lookup(RegisterLookupMixin):
     def as_sql(self, compiler, connection):
         raise NotImplementedError
 
+    @cached_property
+    def contains_aggregate(self):
+        return self.lhs.contains_aggregate or getattr(self.rhs, 'contains_aggregate', False)
+
 
 class BuiltinLookup(Lookup):
     def process_lhs(self, compiler, connection, lhs=None):
@@ -198,7 +206,7 @@ class BuiltinLookup(Lookup):
         db_type = self.lhs.output_field.db_type(connection=connection)
         lhs_sql = connection.ops.field_cast_sql(
             db_type, field_internal_type) % lhs_sql
-        lhs_sql = connection.ops.lookup_cast(self.lookup_name) % lhs_sql
+        lhs_sql = connection.ops.lookup_cast(self.lookup_name, field_internal_type) % lhs_sql
         return lhs_sql, params
 
     def as_sql(self, compiler, connection):
@@ -222,6 +230,14 @@ default_lookups['exact'] = Exact
 
 class IExact(BuiltinLookup):
     lookup_name = 'iexact'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(IExact, self).process_rhs(qn, connection)
+        if params:
+            params[0] = connection.ops.prep_for_iexact_query(params[0])
+        return rhs, params
+
+
 default_lookups['iexact'] = IExact
 
 
@@ -275,7 +291,7 @@ class In(BuiltinLookup):
             rhs, rhs_params = self.batch_process_rhs(compiler, connection)
             in_clause_elements = ['(']
             params = []
-            for offset in xrange(0, len(rhs_params), max_in_list_size):
+            for offset in range(0, len(rhs_params), max_in_list_size):
                 if offset > 0:
                     in_clause_elements.append(' OR ')
                 in_clause_elements.append('%s IN (' % lhs)
@@ -317,31 +333,73 @@ class PatternLookup(BuiltinLookup):
 
 class Contains(PatternLookup):
     lookup_name = 'contains'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(Contains, self).process_rhs(qn, connection)
+        if params and not self.bilateral_transforms:
+            params[0] = "%%%s%%" % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
+
 default_lookups['contains'] = Contains
 
 
-class IContains(PatternLookup):
+class IContains(Contains):
     lookup_name = 'icontains'
+
+
 default_lookups['icontains'] = IContains
 
 
 class StartsWith(PatternLookup):
     lookup_name = 'startswith'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(StartsWith, self).process_rhs(qn, connection)
+        if params and not self.bilateral_transforms:
+            params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
+
 default_lookups['startswith'] = StartsWith
 
 
 class IStartsWith(PatternLookup):
     lookup_name = 'istartswith'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(IStartsWith, self).process_rhs(qn, connection)
+        if params and not self.bilateral_transforms:
+            params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
+
 default_lookups['istartswith'] = IStartsWith
 
 
 class EndsWith(PatternLookup):
     lookup_name = 'endswith'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(EndsWith, self).process_rhs(qn, connection)
+        if params and not self.bilateral_transforms:
+            params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
+
 default_lookups['endswith'] = EndsWith
 
 
 class IEndsWith(PatternLookup):
     lookup_name = 'iendswith'
+
+    def process_rhs(self, qn, connection):
+        rhs, params = super(IEndsWith, self).process_rhs(qn, connection)
+        if params and not self.bilateral_transforms:
+            params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
+
 default_lookups['iendswith'] = IEndsWith
 
 

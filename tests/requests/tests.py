@@ -1,21 +1,24 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+import time
 from datetime import datetime, timedelta
 from io import BytesIO
 from itertools import chain
-import time
 
 from django.core.exceptions import SuspiciousOperation
-from django.core.handlers.wsgi import WSGIRequest, LimitedStream
-from django.http import (HttpRequest, HttpResponse, parse_cookie,
-    build_request_repr, UnreadablePostError, RawPostDataException)
-from django.test import SimpleTestCase, RequestFactory, override_settings
+from django.core.handlers.wsgi import LimitedStream, WSGIRequest
+from django.http import (
+    HttpRequest, HttpResponse, RawPostDataException, UnreadablePostError,
+    build_request_repr, parse_cookie,
+)
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.http import cookie_date, urlencode
+from django.utils.six.moves import http_cookies
 from django.utils.six.moves.urllib.parse import urlencode as original_urlencode
 from django.utils.timezone import utc
 
@@ -201,7 +204,11 @@ class RequestsTests(SimpleTestCase):
         response = HttpResponse()
         response.set_cookie('datetime', expires=datetime(2028, 1, 1, 4, 5, 6))
         datetime_cookie = response.cookies['datetime']
-        self.assertEqual(datetime_cookie['expires'], 'Sat, 01-Jan-2028 04:05:06 GMT')
+        self.assertIn(
+            datetime_cookie['expires'],
+            # Slight time dependency; refs #23450
+            ('Sat, 01-Jan-2028 04:05:06 GMT', 'Sat, 01-Jan-2028 04:05:07 GMT')
+        )
 
     def test_max_age_expiration(self):
         "Cookie will expire if max_age is provided"
@@ -217,7 +224,7 @@ class RequestsTests(SimpleTestCase):
         example_cookie = response.cookies['example']
         # A compat cookie may be in use -- check that it has worked
         # both as an output string, and using the cookie attributes
-        self.assertIn('; httponly', str(example_cookie))
+        self.assertIn('; %s' % http_cookies.Morsel._reserved['httponly'], str(example_cookie))
         self.assertTrue(example_cookie['httponly'])
 
     def test_unicode_cookie(self):
@@ -347,7 +354,7 @@ class RequestsTests(SimpleTestCase):
         """
         Reading body after parsing multipart/form-data is not allowed
         """
-        # Because multipart is used for large amounts fo data i.e. file uploads,
+        # Because multipart is used for large amounts of data i.e. file uploads,
         # we don't want the data held in memory twice, and we don't want to
         # silence the error by setting body = '' either.
         payload = FakePayload("\r\n".join([

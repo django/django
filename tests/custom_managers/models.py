@@ -11,7 +11,9 @@ returns.
 
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -60,7 +62,14 @@ class BaseCustomManager(models.Manager):
     def manager_only(self):
         return self.all()
 
+
 CustomManager = BaseCustomManager.from_queryset(CustomQuerySet)
+
+
+class DeconstructibleCustomManager(BaseCustomManager.from_queryset(CustomQuerySet)):
+
+    def __init__(self, a, b, c=1, d=2):
+        super(DeconstructibleCustomManager, self).__init__(a)
 
 
 class FunPeopleManager(models.Manager):

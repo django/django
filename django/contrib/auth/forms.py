@@ -3,6 +3,13 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 
 from django import forms
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.hashers import (
+    UNUSABLE_PASSWORD_PREFIX, identify_hasher,
+)
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
 from django.forms.utils import flatatt
 from django.template import loader
@@ -12,21 +19,6 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext, ugettext_lazy as _
-
-from django.contrib.auth import authenticate, get_user_model
-from django.contrib.auth.models import User
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, identify_hasher
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.shortcuts import get_current_site
-
-
-UNMASKED_DIGITS_TO_SHOW = 6
-
-
-def mask_password(password):
-    shown = password[:UNMASKED_DIGITS_TO_SHOW]
-    masked = "*" * max(len(password) - UNMASKED_DIGITS_TO_SHOW, 0)
-    return shown + masked
 
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
@@ -337,10 +329,15 @@ class AdminPasswordChangeForm(forms.Form):
         'password_mismatch': _("The two password fields didn't match."),
     }
     required_css_class = 'required'
-    password1 = forms.CharField(label=_("Password"),
-                                widget=forms.PasswordInput)
-    password2 = forms.CharField(label=_("Password (again)"),
-                                widget=forms.PasswordInput)
+    password1 = forms.CharField(
+        label=_("Password"),
+        widget=forms.PasswordInput,
+    )
+    password2 = forms.CharField(
+        label=_("Password (again)"),
+        widget=forms.PasswordInput,
+        help_text=_("Enter the same password as above, for verification."),
+    )
 
     def __init__(self, user, *args, **kwargs):
         self.user = user

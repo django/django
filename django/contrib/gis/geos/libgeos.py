@@ -9,7 +9,7 @@
 import logging
 import os
 import re
-from ctypes import c_char_p, Structure, CDLL, CFUNCTYPE, POINTER
+from ctypes import CDLL, CFUNCTYPE, POINTER, Structure, c_char_p
 from ctypes.util import find_library
 
 from django.contrib.gis.geos.error import GEOSException
@@ -87,7 +87,7 @@ def error_h(fmt, lst):
     logger.error('GEOS_ERROR: %s\n' % err_msg)
 error_h = ERRORFUNC(error_h)
 
-#### GEOS Geometry C data structures, and utility functions. ####
+# #### GEOS Geometry C data structures, and utility functions. ####
 
 
 # Opaque GEOS geometry structures, used for GEOM_PTR and CS_PTR

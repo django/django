@@ -4,7 +4,6 @@
 
 from django.conf import settings
 from django.utils.encoding import force_text
-from django.utils.safestring import mark_safe, SafeData
 
 
 def ngettext(singular, plural, number):
@@ -33,8 +32,6 @@ check_for_language = lambda x: True
 
 
 def gettext(message):
-    if isinstance(message, SafeData):
-        return mark_safe(message)
     return message
 
 

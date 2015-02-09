@@ -6,14 +6,15 @@ import types
 
 from django import http
 from django.conf import settings
-from django.core import urlresolvers
-from django.core import signals
-from django.core.exceptions import MiddlewareNotUsed, PermissionDenied, SuspiciousOperation
+from django.core import signals, urlresolvers
+from django.core.exceptions import (
+    MiddlewareNotUsed, PermissionDenied, SuspiciousOperation,
+)
 from django.db import connections, transaction
 from django.http.multipartparser import MultiPartParserError
+from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
-from django.utils import six
 from django.views import debug
 
 logger = logging.getLogger('django.request')

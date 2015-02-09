@@ -1,13 +1,13 @@
-from django.db.backends.mysql.base import DatabaseOperations
-
-from django.contrib.gis.db.backends.adapter import WKTAdapter
-from django.contrib.gis.db.backends.base import BaseSpatialOperations
+from django.contrib.gis.db.backends.base.adapter import WKTAdapter
+from django.contrib.gis.db.backends.base.operations import \
+    BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
+from django.contrib.gis.db.models import aggregates
+from django.db.backends.mysql.operations import DatabaseOperations
 
 
-class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
+class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
-    compiler_module = 'django.contrib.gis.db.models.sql.compiler'
     mysql = True
     name = 'mysql'
     select = 'AsText(%s)'
@@ -31,6 +31,8 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
         'touches': SpatialOperator(func='MBRTouches'),
         'within': SpatialOperator(func='MBRWithin'),
     }
+
+    disallowed_aggregates = (aggregates.Collect, aggregates.Extent, aggregates.Extent3D, aggregates.MakeLine, aggregates.Union)
 
     def geo_db_type(self, f):
         return f.geom_type

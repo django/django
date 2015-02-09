@@ -1,18 +1,15 @@
 from __future__ import unicode_literals
 
 import logging
-import warnings
 from functools import update_wrapper
 
 from django import http
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.template.response import TemplateResponse
-from django.utils.decorators import classonlymethod
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
+from django.utils.decorators import classonlymethod
 
-_sentinel = object()
 logger = logging.getLogger('django.request')
 
 
@@ -69,6 +66,8 @@ class View(object):
             self.args = args
             self.kwargs = kwargs
             return self.dispatch(request, *args, **kwargs)
+        view.view_class = cls
+        view.view_initkwargs = initkwargs
 
         # take name and docstring from class
         update_wrapper(view, cls, updated=())
@@ -115,6 +114,7 @@ class TemplateResponseMixin(object):
     A mixin that can be used to render a template.
     """
     template_name = None
+    template_engine = None
     response_class = TemplateResponse
     content_type = None
 
@@ -131,6 +131,7 @@ class TemplateResponseMixin(object):
             request=self.request,
             template=self.get_template_names(),
             context=context,
+            using=self.template_engine,
             **response_kwargs
         )
 
@@ -161,35 +162,10 @@ class RedirectView(View):
     """
     A view that provides a redirect on any GET request.
     """
-    permanent = _sentinel
+    permanent = False
     url = None
     pattern_name = None
     query_string = False
-
-    def __init__(self, *args, **kwargs):
-        if 'permanent' not in kwargs and self.permanent is _sentinel:
-            warnings.warn(
-                "Default value of 'RedirectView.permanent' will change "
-                "from True to False in Django 1.9. Set an explicit value "
-                "to silence this warning.",
-                RemovedInDjango19Warning,
-                stacklevel=2
-            )
-            self.permanent = True
-        super(RedirectView, self).__init__(*args, **kwargs)
-
-    @classonlymethod
-    def as_view(cls, **initkwargs):
-        if 'permanent' not in initkwargs and cls.permanent is _sentinel:
-            warnings.warn(
-                "Default value of 'RedirectView.permanent' will change "
-                "from True to False in Django 1.9. Set an explicit value "
-                "to silence this warning.",
-                RemovedInDjango19Warning,
-                stacklevel=2
-            )
-            initkwargs['permanent'] = True
-        return super(RedirectView, cls).as_view(**initkwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         """

@@ -55,10 +55,10 @@ particular app. In addition to using a ``static/`` directory inside your apps,
 you can define a list of directories (:setting:`STATICFILES_DIRS`) in your
 settings file where Django will also look for static files. For example::
 
-    STATICFILES_DIRS = (
+    STATICFILES_DIRS = [
         os.path.join(BASE_DIR, "static"),
         '/var/www/static/',
-    )
+    ]
 
 See the documentation for the :setting:`STATICFILES_FINDERS` setting for
 details on how ``staticfiles`` finds your files.
@@ -157,12 +157,6 @@ of the built-in one that has the ability to transparently serve all the assets
 during execution of these tests in a way very similar to what we get at
 development time with ``DEBUG = True``, i.e. without having to collect them
 using :djadmin:`collectstatic` first.
-
-.. versionadded:: 1.7
-
-    :class:`django.contrib.staticfiles.testing.StaticLiveServerTestCase` is new
-    in Django 1.7. Previously its functionality was provided by
-    :class:`django.test.LiveServerTestCase`.
 
 Deployment
 ==========

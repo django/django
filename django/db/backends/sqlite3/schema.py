@@ -1,10 +1,12 @@
 import codecs
 import copy
 from decimal import Decimal
-from django.utils import six
+
+import _sqlite3
+
 from django.apps.registry import Apps
-from django.db.backends.schema import BaseDatabaseSchemaEditor
-from django.db.models.fields.related import ManyToManyField
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.utils import six
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -13,8 +15,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s)"
 
     def quote_value(self, value):
-        # Inner import to allow nice failure for backend if not present
-        import _sqlite3
         try:
             value = _sqlite3.adapt(value)
         except _sqlite3.ProgrammingError:
@@ -69,8 +69,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Add in any created fields
         for field in create_fields:
             body[field.name] = field
-            # If there's a default, insert it into the copy map
-            if field.has_default():
+            # Choose a default and insert it into the copy map
+            if not field.many_to_many:
                 mapping[field.column] = self.quote_value(
                     self.effective_default(field)
                 )
@@ -93,7 +93,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             del body[field.name]
             del mapping[field.column]
             # Remove any implicit M2M tables
-            if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
+            if field.many_to_many and field.rel.through._meta.auto_created:
                 return self.delete_model(field.rel.through)
         # Work inside a new app registry
         apps = Apps()
@@ -172,7 +172,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         table instead (for M2M fields)
         """
         # Special-case implicit M2M tables
-        if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
+        if field.many_to_many and field.rel.through._meta.auto_created:
             return self.create_model(field.rel.through)
         self._remake_table(model, create_fields=[field])
 
@@ -182,7 +182,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         but for M2Ms may involve deleting a table.
         """
         # M2M fields are a special case
-        if isinstance(field, ManyToManyField):
+        if field.many_to_many:
             # For implicit M2M tables, delete the auto-created table
             if field.rel.through._meta.auto_created:
                 self.delete_model(field.rel.through)
@@ -227,8 +227,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 alter_fields=[(
                     # We need the field that points to the target model, so we can tell alter_field to change it -
                     # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
-                    old_field.rel.through._meta.get_field_by_name(old_field.m2m_reverse_field_name())[0],
-                    new_field.rel.through._meta.get_field_by_name(new_field.m2m_reverse_field_name())[0],
+                    old_field.rel.through._meta.get_field(old_field.m2m_reverse_field_name()),
+                    new_field.rel.through._meta.get_field(new_field.m2m_reverse_field_name()),
                 )],
                 override_uniques=(new_field.m2m_field_name(), new_field.m2m_reverse_field_name()),
             )

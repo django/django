@@ -20,21 +20,21 @@ Activating middleware
 =====================
 
 To activate a middleware component, add it to the
-:setting:`MIDDLEWARE_CLASSES` tuple in your Django settings.
+:setting:`MIDDLEWARE_CLASSES` list in your Django settings.
 
 In :setting:`MIDDLEWARE_CLASSES`, each middleware component is represented by
 a string: the full Python path to the middleware's class name. For example,
 here's the default value created by :djadmin:`django-admin startproject
 <startproject>`::
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE_CLASSES = [
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    )
+    ]
 
 A Django installation doesn't require any middleware —
 :setting:`MIDDLEWARE_CLASSES` can be empty, if you'd like — but it's strongly
@@ -130,12 +130,11 @@ view; it'll apply response middleware to that
 
 .. note::
 
-    Accessing :attr:`request.POST <django.http.HttpRequest.POST>` or
-    :attr:`request.REQUEST <django.http.HttpRequest.REQUEST>` inside middleware
-    from ``process_request`` or ``process_view`` will prevent any view running
-    after the middleware from being able to :ref:`modify the upload handlers
-    for the request <modifying_upload_handlers_on_the_fly>`, and should
-    normally be avoided.
+    Accessing :attr:`request.POST <django.http.HttpRequest.POST>` inside
+    middleware from ``process_request`` or ``process_view`` will prevent any
+    view running after the middleware from being able to :ref:`modify the
+    upload handlers for the request <modifying_upload_handlers_on_the_fly>`,
+    and should normally be avoided.
 
     The :class:`~django.middleware.csrf.CsrfViewMiddleware` class can be
     considered an exception, as it provides the

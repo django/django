@@ -150,7 +150,7 @@ A database Router is a class that provides up to four methods:
     used by foreign key and many to many operations to determine if a
     relation should be allowed between two objects.
 
-.. method:: allow_migrate(db, model)
+.. method:: allow_migrate(db, model, **hints)
 
     Determine if the ``model`` should have tables/indexes created in the
     database with alias ``db``. Return True if the model should be
@@ -293,7 +293,7 @@ send queries for the ``auth`` app to ``auth_db``::
                return True
             return None
 
-        def allow_migrate(self, db, model):
+        def allow_migrate(self, db, model, **hints):
             """
             Make sure the auth app only appears in the 'auth_db'
             database.
@@ -333,7 +333,7 @@ from::
                 return True
             return None
 
-        def allow_migrate(self, db, model):
+        def allow_migrate(self, db, model, **hints):
             """
             All non-auth models end up in this pool.
             """

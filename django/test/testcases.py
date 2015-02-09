@@ -1,10 +1,7 @@
 from __future__ import unicode_literals
 
-from collections import Counter
-from copy import copy
 import difflib
 import errno
-from functools import wraps
 import json
 import os
 import posixpath
@@ -14,34 +11,39 @@ import sys
 import threading
 import unittest
 import warnings
-from unittest import skipIf         # NOQA: Imported here for backward compatibility
+from collections import Counter
+from copy import copy
+from functools import wraps
 from unittest.util import safe_repr
 
 from django.apps import apps
 from django.conf import settings
 from django.core import mail
-from django.core.exceptions import ValidationError, ImproperlyConfigured
-from django.core.handlers.wsgi import get_path_info, WSGIHandler
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.commands import flush
 from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.core.urlresolvers import clear_url_caches, set_urlconf
-from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
+from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import setting_changed, template_rendered
-from django.test.utils import (CaptureQueriesContext, ContextList,
-    override_settings, modify_settings, compare_xml)
+from django.test.utils import (
+    CaptureQueriesContext, ContextList, compare_xml, modify_settings,
+    override_settings,
+)
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
-from django.utils import six
-from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit, urlparse, unquote
+from django.utils.six.moves.urllib.parse import (
+    unquote, urlparse, urlsplit, urlunsplit,
+)
 from django.utils.six.moves.urllib.request import url2pathname
 from django.views.static import serve
-
 
 __all__ = ('TestCase', 'TransactionTestCase',
            'SimpleTestCase', 'skipIfDBFeature', 'skipUnlessDBFeature')
@@ -146,6 +148,7 @@ class SimpleTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(SimpleTestCase, cls).setUpClass()
         if cls._overridden_settings:
             cls._cls_overridden_context = override_settings(**cls._overridden_settings)
             cls._cls_overridden_context.enable()
@@ -161,6 +164,7 @@ class SimpleTestCase(unittest.TestCase):
         if hasattr(cls, '_cls_overridden_context'):
             cls._cls_overridden_context.disable()
             delattr(cls, '_cls_overridden_context')
+        super(SimpleTestCase, cls).tearDownClass()
 
     def __call__(self, result=None):
         """
@@ -915,24 +919,46 @@ class TestCase(TransactionTestCase):
     On database backends with no transaction support, TestCase behaves as
     TransactionTestCase.
     """
+    @classmethod
+    def _enter_atomics(cls):
+        """Helper method to open atomic blocks for multiple databases"""
+        atomics = {}
+        for db_name in cls._databases_names():
+            atomics[db_name] = transaction.atomic(using=db_name)
+            atomics[db_name].__enter__()
+        return atomics
+
+    @classmethod
+    def _rollback_atomics(cls, atomics):
+        """Rollback atomic blocks opened through the previous method"""
+        for db_name in reversed(cls._databases_names()):
+            transaction.set_rollback(True, using=db_name)
+            atomics[db_name].__exit__(None, None, None)
 
     @classmethod
     def setUpClass(cls):
         super(TestCase, cls).setUpClass()
         if not connections_support_transactions():
             return
-        cls.cls_atomics = {}
-        for db_name in cls._databases_names():
-            cls.cls_atomics[db_name] = transaction.atomic(using=db_name)
-            cls.cls_atomics[db_name].__enter__()
+        cls.cls_atomics = cls._enter_atomics()
+
+        if cls.fixtures:
+            for db_name in cls._databases_names(include_mirrors=False):
+                    try:
+                        call_command('loaddata', *cls.fixtures, **{
+                            'verbosity': 0,
+                            'commit': False,
+                            'database': db_name,
+                        })
+                    except Exception:
+                        cls._rollback_atomics(cls.cls_atomics)
+                        raise
         cls.setUpTestData()
 
     @classmethod
     def tearDownClass(cls):
         if connections_support_transactions():
-            for db_name in reversed(cls._databases_names()):
-                transaction.set_rollback(True, using=db_name)
-                cls.cls_atomics[db_name].__exit__(None, None, None)
+            cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all():
                 conn.close()
         super(TestCase, cls).tearDownClass()
@@ -955,32 +981,12 @@ class TestCase(TransactionTestCase):
             return super(TestCase, self)._fixture_setup()
 
         assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
-
-        self.atomics = {}
-        for db_name in self._databases_names():
-            self.atomics[db_name] = transaction.atomic(using=db_name)
-            self.atomics[db_name].__enter__()
-
-        for db_name in self._databases_names(include_mirrors=False):
-            if self.fixtures:
-                try:
-                    call_command('loaddata', *self.fixtures,
-                                 **{
-                                     'verbosity': 0,
-                                     'commit': False,
-                                     'database': db_name,
-                                 })
-                except Exception:
-                    self._fixture_teardown()
-                    raise
+        self.atomics = self._enter_atomics()
 
     def _fixture_teardown(self):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_teardown()
-
-        for db_name in reversed(self._databases_names()):
-            transaction.set_rollback(True, using=db_name)
-            self.atomics[db_name].__exit__(None, None, None)
+        self._rollback_atomics(self.atomics)
 
 
 class CheckCondition(object):
@@ -1210,8 +1216,7 @@ class LiveServerTestCase(TransactionTestCase):
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to
             # the server thread.
-            if (conn.vendor == 'sqlite'
-                    and conn.settings_dict['NAME'] == ':memory:'):
+            if conn.vendor == 'sqlite' and conn.is_in_memory_db(conn.settings_dict['NAME']):
                 # Explicitly enable thread-shareability for this connection
                 conn.allow_thread_sharing = True
                 connections_override[conn.alias] = conn
@@ -1254,8 +1259,6 @@ class LiveServerTestCase(TransactionTestCase):
             cls._tearDownClassInternal()
             raise cls.server_thread.error
 
-        super(LiveServerTestCase, cls).setUpClass()
-
     @classmethod
     def _tearDownClassInternal(cls):
         # There may not be a 'server_thread' attribute if setUpClass() for some
@@ -1265,10 +1268,9 @@ class LiveServerTestCase(TransactionTestCase):
             cls.server_thread.terminate()
             cls.server_thread.join()
 
-        # Restore sqlite connections' non-shareability
+        # Restore sqlite in-memory database connections' non-shareability
         for conn in connections.all():
-            if (conn.vendor == 'sqlite'
-                    and conn.settings_dict['NAME'] == ':memory:'):
+            if conn.vendor == 'sqlite' and conn.is_in_memory_db(conn.settings_dict['NAME']):
                 conn.allow_thread_sharing = False
 
     @classmethod

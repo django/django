@@ -1,19 +1,21 @@
 import json
-from binascii import b2a_hex
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
 import unittest
+from binascii import b2a_hex
 from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import TestDataMixin
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
+
+try:
+    from django.utils.six.moves import cPickle as pickle
+except ImportError:
+    import pickle
+
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import (OGRGeometry, OGRGeomType,
-        OGRException, OGRIndexError, SpatialReference, CoordTransform,
+        GDALException, OGRIndexError, SpatialReference, CoordTransform,
         GDAL_VERSION)
 
 
@@ -33,9 +35,9 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         OGRGeomType('Unknown')
 
         # Should throw TypeError on this input
-        self.assertRaises(OGRException, OGRGeomType, 23)
-        self.assertRaises(OGRException, OGRGeomType, 'fooD')
-        self.assertRaises(OGRException, OGRGeomType, 9)
+        self.assertRaises(GDALException, OGRGeomType, 23)
+        self.assertRaises(GDALException, OGRGeomType, 'fooD')
+        self.assertRaises(GDALException, OGRGeomType, 9)
 
         # Equivalence can take strings, ints, and other OGRGeomTypes
         self.assertEqual(OGRGeomType(1), OGRGeomType(1))
@@ -196,7 +198,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         prev = OGRGeometry('POINT(0 0)')
         for rr in self.geometries.linearrings:
             lr = OGRGeometry(rr.wkt)
-            #self.assertEqual(101, lr.geom_type.num)
+            # self.assertEqual(101, lr.geom_type.num)
             self.assertEqual('LINEARRING', lr.geom_name)
             self.assertEqual(rr.n_p, len(lr))
             self.assertEqual(lr, OGRGeometry(rr.wkt))
@@ -243,7 +245,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         # Both rings in this geometry are not closed.
         poly = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5), (1 1, 2 1, 2 2, 2 1))')
         self.assertEqual(8, poly.point_count)
-        with self.assertRaises(OGRException):
+        with self.assertRaises(GDALException):
             poly.centroid
 
         poly.close_rings()
@@ -355,7 +357,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test10_difference(self):
         "Testing difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             d1 = OGRGeometry(self.geometries.diff_geoms[i].wkt)
@@ -367,7 +369,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test11_intersection(self):
         "Testing intersects() and intersection()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             i1 = OGRGeometry(self.geometries.intersect_geoms[i].wkt)
@@ -380,7 +382,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test12_symdifference(self):
         "Testing sym_difference()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             d1 = OGRGeometry(self.geometries.sdiff_geoms[i].wkt)
@@ -392,7 +394,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test13_union(self):
         "Testing union()."
-        for i in xrange(len(self.geometries.topology_geoms)):
+        for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
             u1 = OGRGeometry(self.geometries.union_geoms[i].wkt)
@@ -407,7 +409,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         # Can't insert a Point into a MultiPolygon.
         mp = OGRGeometry('MultiPolygon')
         pnt = OGRGeometry('POINT(5 23)')
-        self.assertRaises(OGRException, mp.add, pnt)
+        self.assertRaises(GDALException, mp.add, pnt)
 
         # GeometryCollection.add may take an OGRGeometry (if another collection
         # of the same type all child geoms will be added individually) or WKT.

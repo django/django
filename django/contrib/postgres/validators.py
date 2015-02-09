@@ -1,9 +1,12 @@
 import copy
 
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxLengthValidator, MinLengthValidator
+from django.core.validators import (
+    MaxLengthValidator, MaxValueValidator, MinLengthValidator,
+    MinValueValidator,
+)
 from django.utils.deconstruct import deconstructible
-from django.utils.translation import ungettext_lazy, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 
 class ArrayMaxLengthValidator(MaxLengthValidator):
@@ -63,3 +66,13 @@ class KeysValidator(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+
+class RangeMaxValueValidator(MaxValueValidator):
+    compare = lambda self, a, b: a.upper > b
+    message = _('Ensure that this range is completely less than or equal to %(limit_value)s.')
+
+
+class RangeMinValueValidator(MinValueValidator):
+    compare = lambda self, a, b: a.lower < b
+    message = _('Ensure that this range is completely greater than or equal to %(limit_value)s.')

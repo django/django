@@ -1,47 +1,49 @@
-from importlib import import_module
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import itertools
-import os
 import re
-import warnings
+from importlib import import_module
 
 from django.apps import apps
-from django.conf import global_settings, settings
-from django.contrib.sites.requests import RequestSite
+from django.conf import settings
 from django.contrib.admin.models import LogEntry
+from django.contrib.auth import REDIRECT_FIELD_NAME, SESSION_KEY
+from django.contrib.auth.forms import (
+    AuthenticationForm, PasswordChangeForm, SetPasswordForm,
+)
 from django.contrib.auth.models import User
+from django.contrib.auth.views import login as login_view, redirect_to_login
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.contrib.sites.requests import RequestSite
 from django.core import mail
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.http import QueryDict, HttpRequest
+from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
+from django.http import HttpRequest, QueryDict
+from django.middleware.csrf import CsrfViewMiddleware
+from django.test import (
+    TestCase, ignore_warnings, modify_settings, override_settings,
+)
+from django.test.utils import patch_logger
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
-from django.utils.six.moves.urllib.parse import urlparse, ParseResult
+from django.utils.six.moves.urllib.parse import ParseResult, urlparse
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.utils._os import upath
-from django.test import TestCase, override_settings
-from django.test.utils import patch_logger
-from django.middleware.csrf import CsrfViewMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
 
-from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
-from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
-                SetPasswordForm)
 # Needed so model is installed when tests are run independently:
-from django.contrib.auth.tests.custom_user import CustomUser  # NOQA
-from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.contrib.auth.views import login as login_view
+from .custom_user import CustomUser  # NOQA
+from .settings import AUTH_TEMPLATES
+from .utils import skipIfCustomUser
 
 
 @override_settings(
-    LANGUAGES=(
+    LANGUAGES=[
         ('en', 'English'),
-    ),
+    ],
     LANGUAGE_CODE='en',
-    TEMPLATE_LOADERS=global_settings.TEMPLATE_LOADERS,
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-    ),
+    TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='django.contrib.auth.tests.urls',
 )
 class AuthViewsTestCase(TestCase):
@@ -158,15 +160,14 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual("staffmember@example.com", mail.outbox[0].from_email)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(ALLOWED_HOSTS=['adminsite.com'])
     def test_admin_reset(self):
         "If the reset view is marked as being for admin, the HTTP_HOST header is used for a domain override."
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            response = self.client.post('/admin_password_reset/',
-                {'email': 'staffmember@example.com'},
-                HTTP_HOST='adminsite.com'
-            )
+        response = self.client.post('/admin_password_reset/',
+            {'email': 'staffmember@example.com'},
+            HTTP_HOST='adminsite.com'
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("http://adminsite.com", mail.outbox[0].body)
@@ -446,9 +447,9 @@ class ChangePasswordTest(AuthViewsTestCase):
         self.assertURLEqual(response.url, '/password_reset/')
 
 
-@override_settings(MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
-])
+@modify_settings(MIDDLEWARE_CLASSES={
+    'append': 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+})
 class SessionAuthenticationTests(AuthViewsTestCase):
     def test_user_password_change_updates_session(self):
         """
@@ -653,6 +654,10 @@ class LoginURLSettings(AuthViewsTestCase):
         expected = 'http://remote.example.com/login/?next=%s' % quoted_next
         self.assertLoginURLEquals(expected)
 
+    @override_settings(LOGIN_URL=reverse_lazy('login'))
+    def test_lazy_login_url(self):
+        self.assertLoginURLEquals('/login/?next=/login_required/')
+
 
 @skipIfCustomUser
 class LoginRedirectUrlTest(AuthViewsTestCase):
@@ -676,6 +681,21 @@ class LoginRedirectUrlTest(AuthViewsTestCase):
     @override_settings(LOGIN_REDIRECT_URL='http://remote.example.com/welcome/')
     def test_remote(self):
         self.assertLoginRedirectURLEqual('http://remote.example.com/welcome/')
+
+
+class RedirectToLoginTests(AuthViewsTestCase):
+    """Tests for the redirect_to_login view"""
+    @override_settings(LOGIN_URL=reverse_lazy('login'))
+    def test_redirect_to_login_with_lazy(self):
+        login_redirect_response = redirect_to_login(next='/else/where/')
+        expected = '/login/?next=/else/where/'
+        self.assertEqual(expected, login_redirect_response.url)
+
+    @override_settings(LOGIN_URL=reverse_lazy('login'))
+    def test_redirect_to_login_with_lazy_and_unicode(self):
+        login_redirect_response = redirect_to_login(next='/else/where/झ/')
+        expected = '/login/?next=/else/where/%E0%A4%9D/'
+        self.assertEqual(expected, login_redirect_response.url)
 
 
 @skipIfCustomUser
@@ -798,14 +818,14 @@ class LogoutTest(AuthViewsTestCase):
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'pl')
 
 
+# Redirect in test_user_change_password will fail if session auth hash
+# isn't updated after password change (#21649)
 @skipIfCustomUser
+@modify_settings(MIDDLEWARE_CLASSES={
+    'append': 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+})
 @override_settings(
-    # Redirect in test_user_change_password will fail if session auth hash
-    # isn't updated after password change (#21649)
-    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
-        'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
-    ],
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='django.contrib.auth.tests.urls_admin',
 )
 class ChangelistTests(AuthViewsTestCase):

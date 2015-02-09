@@ -1,5 +1,5 @@
-from django.db.utils import DatabaseError
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
+from django.db.utils import DatabaseError
 
 
 class SpatialiteSchemaEditor(DatabaseSchemaEditor):

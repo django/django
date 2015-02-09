@@ -1,18 +1,20 @@
+import gettext as gettext_module
 import importlib
 import json
 import os
-import gettext as gettext_module
 
 from django import http
 from django.apps import apps
 from django.conf import settings
 from django.template import Context, Template
-from django.utils.translation import check_for_language, to_locale, get_language, LANGUAGE_SESSION_KEY
-from django.utils.encoding import smart_text
-from django.utils.formats import get_format_modules, get_format
-from django.utils._os import upath
-from django.utils.http import is_safe_url
 from django.utils import six
+from django.utils._os import upath
+from django.utils.encoding import smart_text
+from django.utils.formats import get_format, get_format_modules
+from django.utils.http import is_safe_url
+from django.utils.translation import (
+    LANGUAGE_SESSION_KEY, check_for_language, get_language, to_locale,
+)
 
 
 def set_language(request):
@@ -205,7 +207,7 @@ def get_javascript_catalog(locale, domain, packages):
         path = os.path.join(os.path.dirname(upath(p.__file__)), 'locale')
         paths.append(path)
     # add the filesystem paths listed in the LOCALE_PATHS setting
-    paths.extend(list(reversed(settings.LOCALE_PATHS)))
+    paths.extend(reversed(settings.LOCALE_PATHS))
     # first load all english languages files for defaults
     for path in paths:
         try:

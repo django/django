@@ -5,9 +5,9 @@ requiring an %(app_label)s format string. This app tests this feature by
 redefining the Copy model from model_inheritance/models.py.
 """
 
-from django.db import models
-
 from model_inheritance.models import NamedURL
+
+from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 

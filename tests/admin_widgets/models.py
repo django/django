@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -108,7 +108,8 @@ class Individual(models.Model):
     related instances (rendering will be called programmatically in this case).
     """
     name = models.CharField(max_length=20)
-    parent = models.ForeignKey('self', null=True)
+    parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
+    soulmate = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name='soulmates')
 
 
 class Company(models.Model):

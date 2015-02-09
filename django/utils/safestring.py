@@ -4,8 +4,8 @@ without further escaping in HTML. Marking something as a "safe string" means
 that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
-from django.utils.functional import curry, Promise
 from django.utils import six
+from django.utils.functional import Promise, curry
 
 
 class EscapeData(object):
@@ -36,9 +36,9 @@ else:
 class SafeData(object):
     def __html__(self):
         """
-        Returns the html representation of a string.
+        Returns the html representation of a string for interoperability.
 
-        Allows interoperability with other template engines.
+        This allows other template engines to understand Django's SafeData.
         """
         return self
 
@@ -121,7 +121,7 @@ def mark_safe(s):
 
     Can be called multiple times on a single string.
     """
-    if isinstance(s, SafeData):
+    if hasattr(s, '__html__'):
         return s
     if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
         return SafeBytes(s)
@@ -138,10 +138,10 @@ def mark_for_escaping(s):
     Can be called multiple times on a single string (the resulting escaping is
     only applied once).
     """
-    if isinstance(s, (SafeData, EscapeData)):
+    if hasattr(s, '__html__') or isinstance(s, EscapeData):
         return s
     if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
         return EscapeBytes(s)
     if isinstance(s, (six.text_type, Promise)):
         return EscapeText(s)
-    return EscapeBytes(bytes(s))
+    return EscapeString(str(s))

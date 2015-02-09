@@ -1,14 +1,17 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django.apps import apps
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_text, force_text
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class ContentTypeManager(models.Manager):
+    use_in_migrations = True
 
     # Cache to avoid re-looking up ContentType objects all over the place.
     # This cache is shared by all the get_for_* methods.
@@ -32,6 +35,14 @@ class ContentTypeManager(models.Manager):
     def _get_from_cache(self, opts):
         key = (opts.app_label, opts.model_name)
         return self.__class__._cache[self.db][key]
+
+    def create(self, **kwargs):
+        if 'name' in kwargs:
+            del kwargs['name']
+            warnings.warn(
+                "ContentType.name field doesn't exist any longer. Please remove it from your code.",
+                RemovedInDjango20Warning, stacklevel=2)
+        return super(ContentTypeManager, self).create(**kwargs)
 
     def get_for_model(self, model, for_concrete_model=True):
         """
@@ -62,12 +73,9 @@ class ContentTypeManager(models.Manager):
         except self.model.DoesNotExist:
             # Not found in the database; we proceed to create it.  This time we
             # use get_or_create to take care of any race conditions.
-            # The smart_text() is needed around opts.verbose_name_raw because
-            # name_raw might be a django.utils.functional.__proxy__ object.
             ct, created = self.get_or_create(
                 app_label=opts.app_label,
                 model=opts.model_name,
-                defaults={'name': smart_text(opts.verbose_name_raw)},
             )
         self._add_to_cache(self.db, ct)
         return ct
@@ -109,7 +117,6 @@ class ContentTypeManager(models.Manager):
             ct = self.create(
                 app_label=opts.app_label,
                 model=opts.model_name,
-                name=smart_text(opts.verbose_name_raw),
             )
             self._add_to_cache(self.db, ct)
             results[ct.model_class()] = ct
@@ -149,7 +156,6 @@ class ContentTypeManager(models.Manager):
 
 @python_2_unicode_compatible
 class ContentType(models.Model):
-    name = models.CharField(max_length=100)
     app_label = models.CharField(max_length=100)
     model = models.CharField(_('python model class name'), max_length=100)
     objects = ContentTypeManager()
@@ -158,22 +164,17 @@ class ContentType(models.Model):
         verbose_name = _('content type')
         verbose_name_plural = _('content types')
         db_table = 'django_content_type'
-        ordering = ('name',)
         unique_together = (('app_label', 'model'),)
 
     def __str__(self):
-        # self.name is deprecated in favor of using model's verbose_name, which
-        # can be translated. Formal deprecation is delayed until we have DB
-        # migration to be able to remove the field from the database along with
-        # the attribute.
-        #
-        # We return self.name only when users have changed its value from the
-        # initial verbose_name_raw and might rely on it.
+        return self.name
+
+    @property
+    def name(self):
         model = self.model_class()
-        if not model or self.name != model._meta.verbose_name_raw:
-            return self.name
-        else:
-            return force_text(model._meta.verbose_name)
+        if not model:
+            return self.model
+        return force_text(model._meta.verbose_name)
 
     def model_class(self):
         "Returns the Python model class for this type of content."

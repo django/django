@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
 
+from unittest import skipUnless
+
 from django.db import connection
 from django.db.utils import DatabaseError
-from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.test import TransactionTestCase, mock, skipUnlessDBFeature
 
-from .models import Reporter, Article
+from .models import Article, Reporter
 
 
 class IntrospectionTests(TransactionTestCase):
@@ -28,7 +30,7 @@ class IntrospectionTests(TransactionTestCase):
                              "django_table_names() returned a non-Django table")
 
     def test_django_table_names_retval_type(self):
-        #15216 - Table name is a list
+        # Table name is a list #15216
         tl = connection.introspection.django_table_names(only_existing=True)
         self.assertIs(type(tl), list)
         tl = connection.introspection.django_table_names(only_existing=False)
@@ -110,17 +112,37 @@ class IntrospectionTests(TransactionTestCase):
             cursor.execute('DROP TABLE django_ixn_real_test_table;')
         self.assertEqual(datatype(desc[0][1], desc[0]), 'FloatField')
 
+    @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_relations(self):
         with connection.cursor() as cursor:
             relations = connection.introspection.get_relations(cursor, Article._meta.db_table)
 
-        # Older versions of MySQL don't have the chops to report on this stuff,
-        # so just skip it if no relations come back. If they do, though, we
-        # should test that the response is correct.
-        if relations:
-            # That's {field_index: (field_index_other_table, other_table)}
-            self.assertEqual(relations, {3: (0, Reporter._meta.db_table),
-                                         4: (0, Article._meta.db_table)})
+        # That's {field_name: (field_name_other_table, other_table)}
+        expected_relations = {
+            'reporter_id': ('id', Reporter._meta.db_table),
+            'response_to_id': ('id', Article._meta.db_table),
+        }
+        self.assertEqual(relations, expected_relations)
+
+        # Removing a field shouldn't disturb get_relations (#17785)
+        body = Article._meta.get_field('body')
+        with connection.schema_editor() as editor:
+            editor.remove_field(Article, body)
+        with connection.cursor() as cursor:
+            relations = connection.introspection.get_relations(cursor, Article._meta.db_table)
+        with connection.schema_editor() as editor:
+            editor.add_field(Article, body)
+        self.assertEqual(relations, expected_relations)
+
+    @skipUnless(connection.vendor == 'sqlite', "This is an sqlite-specific issue")
+    def test_get_relations_alt_format(self):
+        """With SQLite, foreign keys can be added with different syntaxes."""
+        with connection.cursor() as cursor:
+            cursor.fetchone = mock.Mock(return_value=[
+                "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES %s(id));" % Article._meta.db_table
+            ])
+            relations = connection.introspection.get_relations(cursor, 'mocked_table')
+        self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_key_columns(self):

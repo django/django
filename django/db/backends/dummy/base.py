@@ -8,10 +8,13 @@ ImproperlyConfigured.
 """
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends import (BaseDatabaseOperations, BaseDatabaseClient,
-    BaseDatabaseIntrospection, BaseDatabaseWrapper, BaseDatabaseFeatures,
-    BaseDatabaseValidation)
-from django.db.backends.creation import BaseDatabaseCreation
+from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.base.client import BaseDatabaseClient
+from django.db.backends.base.creation import BaseDatabaseCreation
+from django.db.backends.base.features import BaseDatabaseFeatures
+from django.db.backends.base.introspection import BaseDatabaseIntrospection
+from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.backends.base.validation import BaseDatabaseValidation
 
 
 def complain(*args, **kwargs):
@@ -60,6 +63,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # do something raises complain; anything that tries
     # to rollback or undo something raises ignore.
     _cursor = complain
+    ensure_connection = complain
     _commit = complain
     _rollback = ignore
     _close = ignore

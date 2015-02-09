@@ -5,7 +5,7 @@ from django.core import exceptions, serializers
 from django.db import models
 from django.test import TestCase
 
-from .models import UUIDModel, NullableUUIDModel, PrimaryKeyUUIDModel
+from .models import NullableUUIDModel, PrimaryKeyUUIDModel, UUIDModel
 
 
 class TestSaveLoad(TestCase):
@@ -33,6 +33,14 @@ class TestSaveLoad(TestCase):
         NullableUUIDModel.objects.create(field=None)
         loaded = NullableUUIDModel.objects.get()
         self.assertEqual(loaded.field, None)
+
+
+class TestMigrations(TestCase):
+
+    def test_deconstruct(self):
+        field = models.UUIDField()
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(kwargs, {})
 
 
 class TestQuerying(TestCase):
@@ -87,3 +95,20 @@ class TestAsPrimaryKey(TestCase):
         PrimaryKeyUUIDModel.objects.create()
         loaded = PrimaryKeyUUIDModel.objects.get()
         self.assertIsInstance(loaded.pk, uuid.UUID)
+
+    def test_uuid_pk_on_save(self):
+        saved = PrimaryKeyUUIDModel.objects.create(id=None)
+        loaded = PrimaryKeyUUIDModel.objects.get()
+        self.assertIsNotNone(loaded.id, None)
+        self.assertEqual(loaded.id, saved.id)
+
+    def test_uuid_pk_on_bulk_create(self):
+        u1 = PrimaryKeyUUIDModel()
+        u2 = PrimaryKeyUUIDModel(id=None)
+        PrimaryKeyUUIDModel.objects.bulk_create([u1, u2])
+        # Check that the two objects were correctly created.
+        u1_found = PrimaryKeyUUIDModel.objects.filter(id=u1.id).exists()
+        u2_found = PrimaryKeyUUIDModel.objects.exclude(id=u1.id).exists()
+        self.assertTrue(u1_found)
+        self.assertTrue(u2_found)
+        self.assertEqual(PrimaryKeyUUIDModel.objects.count(), 2)

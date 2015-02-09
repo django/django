@@ -2,11 +2,10 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
+from django.db import models
 from django.test import TestCase
 
-from django.db import models
-
-from .models import Post, Question, Answer
+from .models import Answer, Post, Question
 
 
 class OrderWithRespectToTests(TestCase):
