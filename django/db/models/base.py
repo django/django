@@ -1206,7 +1206,8 @@ class Model(six.with_metaclass(ModelBase)):
                 app_label, model_name = cls._meta.swapped.split('.')
                 errors.append(
                     checks.Error(
-                        ("'%s' references '%s.%s', which has not been installed, or is abstract.") % (
+                        "'%s' references '%s.%s', which has not been "
+                        "installed, or is abstract." % (
                             cls._meta.swappable, app_label, model_name
                         ),
                         hint=None,
@@ -1272,8 +1273,8 @@ class Model(six.with_metaclass(ModelBase)):
             if signature in seen_intermediary_signatures:
                 errors.append(
                     checks.Error(
-                        ("The model has two many-to-many relations through "
-                         "the intermediate model '%s.%s'.") % (
+                        "The model has two many-to-many relations through "
+                        "the intermediate model '%s.%s'." % (
                             f.rel.through._meta.app_label,
                             f.rel.through._meta.object_name
                         ),
@@ -1296,8 +1297,8 @@ class Model(six.with_metaclass(ModelBase)):
         if fields and not fields[0].primary_key and cls._meta.pk.name == 'id':
             return [
                 checks.Error(
-                    ("'id' can only be used as a field name if the field also "
-                     "sets 'primary_key=True'."),
+                    "'id' can only be used as a field name if the field also "
+                    "sets 'primary_key=True'.",
                     hint=None,
                     obj=cls,
                     id='models.E004',
@@ -1320,9 +1321,9 @@ class Model(six.with_metaclass(ModelBase)):
                 if clash:
                     errors.append(
                         checks.Error(
-                            ("The field '%s' from parent model "
-                             "'%s' clashes with the field '%s' "
-                             "from parent model '%s'.") % (
+                            "The field '%s' from parent model "
+                            "'%s' clashes with the field '%s' "
+                            "from parent model '%s'." % (
                                 clash.name, clash.model._meta,
                                 f.name, f.model._meta
                             ),
@@ -1347,8 +1348,8 @@ class Model(six.with_metaclass(ModelBase)):
             if clash and not id_conflict:
                 errors.append(
                     checks.Error(
-                        ("The field '%s' clashes with the field '%s' "
-                         "from model '%s'.") % (
+                        "The field '%s' clashes with the field '%s' "
+                        "from model '%s'." % (
                             f.name, clash.name, clash.model._meta
                         ),
                         hint=None,
@@ -1374,7 +1375,8 @@ class Model(six.with_metaclass(ModelBase)):
             if column_name and column_name in used_column_names:
                 errors.append(
                     checks.Error(
-                        "Field '%s' has column name '%s' that is used by another field." % (f.name, column_name),
+                        "Field '%s' has column name '%s' that is used by "
+                        "another field." % (f.name, column_name),
                         hint="Specify a 'db_column' for the field.",
                         obj=cls,
                         id='models.E007'
@@ -1462,7 +1464,9 @@ class Model(six.with_metaclass(ModelBase)):
             except KeyError:
                 errors.append(
                     checks.Error(
-                        "'%s' refers to the non-existent field '%s'." % (option, field_name),
+                        "'%s' refers to the non-existent field '%s'." % (
+                            option, field_name,
+                        ),
                         hint=None,
                         obj=cls,
                         id='models.E012',
@@ -1472,9 +1476,9 @@ class Model(six.with_metaclass(ModelBase)):
                 if isinstance(field.rel, models.ManyToManyRel):
                     errors.append(
                         checks.Error(
-                            ("'%s' refers to a ManyToManyField '%s', but "
-                             "ManyToManyFields are not permitted in '%s'.") % (
-                                option, field_name, option
+                            "'%s' refers to a ManyToManyField '%s', but "
+                            "ManyToManyFields are not permitted in '%s'." % (
+                                option, field_name, option,
                             ),
                             hint=None,
                             obj=cls,
@@ -1486,7 +1490,7 @@ class Model(six.with_metaclass(ModelBase)):
                         checks.Error(
                             ("'%s' refers to field '%s' which is not local "
                              "to model '%s'.") % (
-                                option, field_name, cls._meta.object_name
+                                option, field_name, cls._meta.object_name,
                             ),
                             hint=("This issue may be caused by multi-table "
                                   "inheritance."),
