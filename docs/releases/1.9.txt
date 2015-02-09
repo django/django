@@ -131,6 +131,10 @@ Running tests in parallel
 The :djadmin:`test` command now supports a :djadminopt:`--parallel` option to
 run a project's tests in multiple processes in parallel.
 
+Each process gets its own database. You must ensure that different test cases
+don't access the same resources. For instance, test cases that touch the
+filesystem should create a temporary directory for their own use.
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -680,6 +684,10 @@ Database backend API
   has been removed. This method served to format dates on Oracle long
   before 1.0, but hasn't been overridden by any core backend in years
   and hasn't been called anywhere in Django's code or tests.
+
+* In order to support test parallelization, you must implement the
+  ``DatabaseCreation._clone_test_db()`` method. You may have to adjust
+  ``DatabaseCreation.get_test_db_clone_settings()``.
 
 Default settings that were tuples are now lists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

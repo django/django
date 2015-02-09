@@ -319,7 +319,7 @@ class SetupDatabasesTests(unittest.TestCase):
             with mock.patch('django.test.runner.connections', new=tested_connections):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
-            0, autoclobber=False, serialize=True, keepdb=False
+            verbosity=0, autoclobber=False, serialize=True, keepdb=False
         )
 
     def test_serialized_off(self):
@@ -333,7 +333,7 @@ class SetupDatabasesTests(unittest.TestCase):
             with mock.patch('django.test.runner.connections', new=tested_connections):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
-            0, autoclobber=False, serialize=False, keepdb=False
+            verbosity=0, autoclobber=False, serialize=False, keepdb=False
         )
 
 

@@ -1,4 +1,5 @@
 import collections
+import ctypes
 import itertools
 import logging
 import multiprocessing
@@ -158,12 +159,36 @@ def default_test_processes():
         return multiprocessing.cpu_count()
 
 
+_worker_id = 0
+
+
+def _init_worker(counter):
+    """
+    Switch to databases dedicated to this worker.
+
+    This helper lives at module-level because of the multiprocessing module's
+    requirements.
+    """
+
+    global _worker_id
+
+    with counter.get_lock():
+        counter.value += 1
+        _worker_id = counter.value
+
+    for alias in connections:
+        connection = connections[alias]
+        settings_dict = connection.creation.get_test_db_clone_settings(_worker_id)
+        connection.settings_dict = settings_dict
+        connection.close()
+
+
 def _run_subsuite(args):
     """
     Run a suite of tests with a RemoteTestRunner and return a RemoteTestResult.
 
     This helper lives at module-level and its arguments are wrapped in a tuple
-    because of idiosyncrasies of Python's multiprocessing module.
+    because of the multiprocessing module's requirements.
     """
     subsuite_index, subsuite, failfast = args
     runner = RemoteTestRunner(failfast=failfast)
@@ -211,7 +236,11 @@ class ParallelTestSuite(unittest.TestSuite):
         if tblib is not None:
             tblib.pickling_support.install()
 
-        pool = multiprocessing.Pool(processes=self.processes)
+        counter = multiprocessing.Value(ctypes.c_int, 0)
+        pool = multiprocessing.Pool(
+            processes=self.processes,
+            initializer=_init_worker,
+            initargs=[counter])
         args = [
             (index, subsuite, self.failfast)
             for index, subsuite in enumerate(self.subsuites)
@@ -368,7 +397,7 @@ class DiscoverRunner(object):
     def setup_databases(self, **kwargs):
         return setup_databases(
             self.verbosity, self.interactive, self.keepdb, self.debug_sql,
-            **kwargs
+            self.parallel, **kwargs
         )
 
     def get_resultclass(self):
@@ -388,6 +417,13 @@ class DiscoverRunner(object):
         """
         for connection, old_name, destroy in old_config:
             if destroy:
+                if self.parallel > 1:
+                    for index in range(self.parallel):
+                        connection.creation.destroy_test_db(
+                            number=index + 1,
+                            verbosity=self.verbosity,
+                            keepdb=self.keepdb,
+                        )
                 connection.creation.destroy_test_db(old_name, self.verbosity, self.keepdb)
 
     def teardown_test_environment(self, **kwargs):
@@ -581,7 +617,7 @@ def get_unique_databases():
     return test_databases
 
 
-def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwargs):
+def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs):
     """
     Creates the test databases.
     """
@@ -599,11 +635,18 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwa
             if first_alias is None:
                 first_alias = alias
                 connection.creation.create_test_db(
-                    verbosity,
+                    verbosity=verbosity,
                     autoclobber=not interactive,
                     keepdb=keepdb,
                     serialize=connection.settings_dict.get("TEST", {}).get("SERIALIZE", True),
                 )
+                if parallel > 1:
+                    for index in range(parallel):
+                        connection.creation.clone_test_db(
+                            number=index + 1,
+                            verbosity=verbosity,
+                            keepdb=keepdb,
+                        )
             # Configure all other connections as mirrors of the first one
             else:
                 connections[alias].creation.set_as_test_mirror(
