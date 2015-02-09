@@ -2,28 +2,29 @@
 from __future__ import unicode_literals
 
 import os
-import sys
 import re
-from datetime import datetime
-from itertools import groupby, cycle as itertools_cycle
+import sys
 import warnings
+from datetime import datetime
+from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
-from django.template.base import (Node, NodeList, Template, Context, Library,
-    TemplateSyntaxError, VariableDoesNotExist, InvalidTemplateLibrary,
-    BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END,
-    SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END,
-    VARIABLE_ATTRIBUTE_SEPARATOR, get_library, token_kwargs, kwarg_re,
-    render_value_in_context)
-from django.template.smartif import IfParser, Literal
+from django.template.base import (
+    BLOCK_TAG_END, BLOCK_TAG_START, COMMENT_TAG_END, COMMENT_TAG_START,
+    SINGLE_BRACE_END, SINGLE_BRACE_START, VARIABLE_ATTRIBUTE_SEPARATOR,
+    VARIABLE_TAG_END, VARIABLE_TAG_START, Context, InvalidTemplateLibrary,
+    Library, Node, NodeList, Template, TemplateSyntaxError,
+    VariableDoesNotExist, get_library, kwarg_re, render_value_in_context,
+    token_kwargs,
+)
 from django.template.defaultfilters import date
+from django.template.smartif import IfParser, Literal
+from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
-from django.utils.lorem_ipsum import words, paragraphs
-from django.utils.safestring import mark_safe
 from django.utils.html import format_html
-from django.utils import six
-from django.utils import timezone
+from django.utils.lorem_ipsum import paragraphs, words
+from django.utils.safestring import mark_safe
 
 register = Library()
 
@@ -403,7 +404,7 @@ class SsiNode(Node):
             output = ''
         if self.parsed:
             try:
-                t = Template(output, name=filepath)
+                t = Template(output, name=filepath, engine=context.engine)
                 return t.render(context)
             except TemplateSyntaxError as e:
                 if settings.DEBUG:
@@ -476,13 +477,20 @@ class URLNode(Node):
 
         view_name = self.view_name.resolve(context)
 
+        try:
+            current_app = context.request.current_app
+        except AttributeError:
+            # Change the fallback value to None when the deprecation path for
+            # Context.current_app completes in Django 2.0.
+            current_app = context.current_app
+
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,
         # re-raise the NoReverseMatch unless we're using the
         # {% url ... as var %} construct in which case return nothing.
         url = ''
         try:
-            url = reverse(view_name, args=args, kwargs=kwargs, current_app=context.current_app)
+            url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
         except NoReverseMatch:
             exc_info = sys.exc_info()
             if settings.SETTINGS_MODULE:
@@ -490,7 +498,7 @@ class URLNode(Node):
                 try:
                     url = reverse(project_name + '.' + view_name,
                               args=args, kwargs=kwargs,
-                              current_app=context.current_app)
+                              current_app=current_app)
                 except NoReverseMatch:
                     if self.asvar is None:
                         # Re-raise the original exception, not the one with
@@ -992,7 +1000,7 @@ def do_if(parser, token):
     ``{% if 1>2 %}`` is not a valid if tag.
 
     All supported operators are: ``or``, ``and``, ``in``, ``not in``
-    ``==`` (or ``=``), ``!=``, ``>``, ``>=``, ``<`` and ``<=``.
+    ``==``, ``!=``, ``>``, ``>=``, ``<`` and ``<=``.
 
     Operator precedence follows Python.
     """
@@ -1081,6 +1089,11 @@ def ssi(parser, token):
 
         {% ssi "/home/html/ljworld.com/includes/right_generic.html" parsed %}
     """
+    warnings.warn(
+        "The {% ssi %} tag is deprecated. Use the {% include %} tag instead.",
+        RemovedInDjango20Warning,
+    )
+
     bits = token.split_contents()
     parsed = False
     if len(bits) not in (2, 3):

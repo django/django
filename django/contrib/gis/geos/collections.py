@@ -2,14 +2,15 @@
  This module houses the Geometry Collection objects:
  GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
-from ctypes import c_int, c_uint, byref
+from ctypes import byref, c_int, c_uint
+
+from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.libgeos import get_pointer_arr
-from django.contrib.gis.geos.linestring import LineString, LinearRing
+from django.contrib.gis.geos.linestring import LinearRing, LineString
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
-from django.contrib.gis.geos import prototypes as capi
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 class GeometryCollection(GEOSGeometry):
@@ -42,14 +43,14 @@ class GeometryCollection(GEOSGeometry):
 
     def __iter__(self):
         "Iterates over each Geometry in the Collection."
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             yield self[i]
 
     def __len__(self):
         "Returns the number of geometries in this Collection."
         return self.num_geom
 
-    ### Methods for compatibility with ListMixin ###
+    # ### Methods for compatibility with ListMixin ###
     def _create_collection(self, length, items):
         # Creating the geometry pointer array.
         geoms = get_pointer_arr(length)

@@ -5,19 +5,11 @@ Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
 from django.conf import settings
-from django.db.backends import (BaseDatabaseFeatures, BaseDatabaseWrapper,
-    BaseDatabaseValidation)
-from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
-from django.db.backends.postgresql_psycopg2.client import DatabaseClient
-from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
-from django.db.backends.postgresql_psycopg2.version import get_version
-from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
-from django.db.backends.postgresql_psycopg2.schema import DatabaseSchemaEditor
-from django.db.utils import InterfaceError
+from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.base.validation import BaseDatabaseValidation
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeText, SafeBytes
-from django.utils.timezone import utc
+from django.utils.safestring import SafeBytes, SafeText
 
 try:
     import psycopg2 as Database
@@ -26,6 +18,16 @@ try:
 except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
+
+# Some of these import psycopg2, so import them after checking if it's installed.
+from .client import DatabaseClient                          # isort:skip
+from .creation import DatabaseCreation                      # isort:skip
+from .features import DatabaseFeatures                      # isort:skip
+from .introspection import DatabaseIntrospection            # isort:skip
+from .operations import DatabaseOperations                  # isort:skip
+from .schema import DatabaseSchemaEditor                    # isort:skip
+from .utils import utc_tzinfo_factory                       # isort:skip
+from .version import get_version                            # isort:skip
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
@@ -36,39 +38,54 @@ psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
 
-
-def utc_tzinfo_factory(offset):
-    if offset != 0:
-        raise AssertionError("database connection isn't set to UTC")
-    return utc
-
-
-class DatabaseFeatures(BaseDatabaseFeatures):
-    needs_datetime_string_cast = False
-    can_return_id_from_insert = True
-    has_real_datatype = True
-    can_defer_constraint_checks = True
-    has_select_for_update = True
-    has_select_for_update_nowait = True
-    has_bulk_insert = True
-    uses_savepoints = True
-    can_release_savepoints = True
-    supports_tablespaces = True
-    supports_transactions = True
-    can_introspect_autofield = True
-    can_introspect_ip_address_field = True
-    can_introspect_small_integer_field = True
-    can_distinct_on_fields = True
-    can_rollback_ddl = True
-    supports_combined_alters = True
-    nulls_order_largest = True
-    closed_cursor_error_class = InterfaceError
-    has_case_insensitive_like = False
-    requires_sqlparse_for_splitting = False
+# Register support for inet[] manually so we don't have to handle the Inet()
+# object on load all the time.
+INETARRAY_OID = 1041
+INETARRAY = psycopg2.extensions.new_array_type(
+    (INETARRAY_OID,),
+    'INETARRAY',
+    psycopg2.extensions.UNICODE,
+)
+psycopg2.extensions.register_type(INETARRAY)
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'postgresql'
+    # This dictionary maps Field objects to their associated PostgreSQL column
+    # types, as strings. Column-type strings can contain format strings; they'll
+    # be interpolated against the values of Field.__dict__ before being output.
+    # If a column type is set to None, it won't be included in the output.
+    data_types = {
+        'AutoField': 'serial',
+        'BinaryField': 'bytea',
+        'BooleanField': 'boolean',
+        'CharField': 'varchar(%(max_length)s)',
+        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
+        'DateField': 'date',
+        'DateTimeField': 'timestamp with time zone',
+        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'DurationField': 'interval',
+        'FileField': 'varchar(%(max_length)s)',
+        'FilePathField': 'varchar(%(max_length)s)',
+        'FloatField': 'double precision',
+        'IntegerField': 'integer',
+        'BigIntegerField': 'bigint',
+        'IPAddressField': 'inet',
+        'GenericIPAddressField': 'inet',
+        'NullBooleanField': 'boolean',
+        'OneToOneField': 'integer',
+        'PositiveIntegerField': 'integer',
+        'PositiveSmallIntegerField': 'smallint',
+        'SlugField': 'varchar(%(max_length)s)',
+        'SmallIntegerField': 'smallint',
+        'TextField': 'text',
+        'TimeField': 'time',
+        'UUIDField': 'uuid',
+    }
+    data_type_check_constraints = {
+        'PositiveIntegerField': '"%(column)s" >= 0',
+        'PositiveSmallIntegerField': '"%(column)s" >= 0',
+    }
     operators = {
         'exact': '= %s',
         'iexact': '= UPPER(%s)',
@@ -177,13 +194,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
-
-    def _set_isolation_level(self, isolation_level):
-        assert isolation_level in range(1, 5)     # Use set_autocommit for level = 0
-        if self.psycopg2_version >= (2, 4, 2):
-            self.connection.set_session(isolation_level=isolation_level)
-        else:
-            self.connection.set_isolation_level(isolation_level)
 
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:

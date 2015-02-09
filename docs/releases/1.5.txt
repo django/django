@@ -627,16 +627,16 @@ with the :meth:`~django.forms.Form.is_valid()` method and not with the
 presence or absence of the :attr:`~django.forms.Form.cleaned_data` attribute
 on the form.
 
-Behavior of :djadmin:`syncdb` with multiple databases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Behavior of ``syncdb`` with multiple databases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:djadmin:`syncdb` now queries the database routers to determine if content
+``syncdb`` now queries the database routers to determine if content
 types (when :mod:`~django.contrib.contenttypes` is enabled) and permissions
 (when :mod:`~django.contrib.auth` is enabled) should be created in the target
 database. Previously, it created them in the default database, even when
 another database was specified with the :djadminopt:`--database` option.
 
-If you use :djadmin:`syncdb` on multiple databases, you should ensure that
+If you use ``syncdb`` on multiple databases, you should ensure that
 your routers allow synchronizing content types and permissions to only one of
 them. See the docs on the :ref:`behavior of contrib apps with multiple
 databases <contrib_app_multiple_databases>` for more information.

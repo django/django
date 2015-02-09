@@ -217,9 +217,9 @@ The ``Field.__init__()`` method takes the following parameters:
 * :attr:`~django.db.models.Field.db_tablespace`: Only for index creation, if the
   backend supports :doc:`tablespaces </topics/db/tablespaces>`. You can usually
   ignore this option.
-* ``auto_created``: ``True`` if the field was automatically created, as for the
-  :class:`~django.db.models.OneToOneField` used by model inheritance. For
-  advanced use only.
+* :attr:`~django.db.models.Field.auto_created`: ``True`` if the field was
+  automatically created, as for the :class:`~django.db.models.OneToOneField`
+  used by model inheritance. For advanced use only.
 
 All of the options without an explanation in the above list have the same
 meaning they do for normal Django fields. See the :doc:`field documentation
@@ -229,12 +229,6 @@ meaning they do for normal Django fields. See the :doc:`field documentation
 
 Field deconstruction
 --------------------
-
-.. versionadded:: 1.7
-
-    ``deconstruct()`` is part of the migrations framework in Django 1.7 and
-    above. If you have custom fields from previous versions they will
-    need this method added before you can use them with migrations.
 
 The counterpoint to writing your ``__init__()`` method is writing the
 ``deconstruct()`` method. This method tells Django how to take an instance
@@ -483,7 +477,7 @@ instances::
     class HandField(models.Field):
         # ...
 
-        def from_db_value(self, value, connection):
+        def from_db_value(self, value, connection, context):
             if value is None:
                 return value
             return parse_hand(value)
@@ -590,11 +584,8 @@ valid Django filter lookups: ``exact``, ``iexact``, ``contains``, ``icontains``,
 ``endswith``, ``iendswith``, ``range``, ``year``, ``month``, ``day``,
 ``isnull``, ``search``, ``regex``, and ``iregex``.
 
-.. versionadded:: 1.7
-
-    If you are using :doc:`Custom lookups </howto/custom-lookups>` the
-    ``lookup_type`` can be any ``lookup_name`` used by the project's custom
-    lookups.
+If you are using :doc:`custom lookups </howto/custom-lookups>`, the
+``lookup_type`` can be any ``lookup_name`` used by the project's custom lookups.
 
 Your method must be prepared to handle all of these ``lookup_type`` values and
 should raise either a ``ValueError`` if the ``value`` is of the wrong sort (a

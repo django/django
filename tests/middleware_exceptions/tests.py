@@ -4,8 +4,8 @@ from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.core.signals import got_request_exception
 from django.http import HttpResponse
+from django.template import engines
 from django.template.response import TemplateResponse
-from django.template import Template
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import patch_logger
 
@@ -63,7 +63,8 @@ class ResponseMiddleware(TestMiddleware):
 class TemplateResponseMiddleware(TestMiddleware):
     def process_template_response(self, request, response):
         super(TemplateResponseMiddleware, self).process_template_response(request, response)
-        return TemplateResponse(request, Template('Template Response Middleware'))
+        template = engines['django'].from_string('Template Response Middleware')
+        return TemplateResponse(request, template)
 
 
 class ExceptionMiddleware(TestMiddleware):
@@ -867,9 +868,9 @@ class MiddlewareNotUsedTests(TestCase):
         with self.assertRaises(MiddlewareNotUsed):
             MyMiddleware().process_request(request)
 
-    @override_settings(MIDDLEWARE_CLASSES=(
+    @override_settings(MIDDLEWARE_CLASSES=[
         'middleware_exceptions.tests.MyMiddleware',
-    ))
+    ])
     def test_log(self):
         with patch_logger('django.request', 'debug') as calls:
             self.client.get('/middleware_exceptions/view/')
@@ -879,9 +880,9 @@ class MiddlewareNotUsedTests(TestCase):
             "MiddlewareNotUsed: 'middleware_exceptions.tests.MyMiddleware'"
         )
 
-    @override_settings(MIDDLEWARE_CLASSES=(
+    @override_settings(MIDDLEWARE_CLASSES=[
         'middleware_exceptions.tests.MyMiddlewareWithExceptionMessage',
-    ))
+    ])
     def test_log_custom_message(self):
         with patch_logger('django.request', 'debug') as calls:
             self.client.get('/middleware_exceptions/view/')

@@ -6,7 +6,7 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.test import TestCase, override_settings
+from django.test import TestCase, modify_settings, override_settings
 from django.utils import timezone
 
 
@@ -23,10 +23,14 @@ class RemoteUserTest(TestCase):
     known_user2 = 'knownuser2'
 
     def setUp(self):
-        self.curr_middleware = settings.MIDDLEWARE_CLASSES
-        self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.MIDDLEWARE_CLASSES += (self.middleware,)
-        settings.AUTHENTICATION_BACKENDS += (self.backend,)
+        self.patched_settings = modify_settings(
+            AUTHENTICATION_BACKENDS={'append': self.backend},
+            MIDDLEWARE_CLASSES={'append': self.middleware},
+        )
+        self.patched_settings.enable()
+
+    def tearDown(self):
+        self.patched_settings.disable()
 
     def test_no_remote_user(self):
         """
@@ -142,11 +146,6 @@ class RemoteUserTest(TestCase):
         # In backends that create a new user, username is "newnewuser"
         # In backends that do not create new users, it is '' (anonymous user)
         self.assertNotEqual(response.context['user'].username, 'knownuser')
-
-    def tearDown(self):
-        """Restores settings to avoid breaking other tests."""
-        settings.MIDDLEWARE_CLASSES = self.curr_middleware
-        settings.AUTHENTICATION_BACKENDS = self.curr_auth
 
 
 class RemoteUserNoCreateBackend(RemoteUserBackend):

@@ -27,33 +27,32 @@ __init__(). For example, CharField has a max_length option.
 from __future__ import unicode_literals
 
 import datetime
+import os
 import pickle
 import re
-import os
 import uuid
 from decimal import Decimal
 from unittest import skipIf
-import warnings
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.forms import (
+    BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
+    DecimalField, DurationField, EmailField, Field, FileField, FilePathField,
+    FloatField, Form, GenericIPAddressField, HiddenInput, ImageField,
+    IntegerField, MultipleChoiceField, NullBooleanField, NumberInput,
+    PasswordInput, RadioSelect, RegexField, SlugField, SplitDateTimeField,
+    Textarea, TextInput, TimeField, TypedChoiceField, TypedMultipleChoiceField,
+    URLField, UUIDField, ValidationError, Widget, forms,
+)
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils import formats, six, translation
+from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 
 try:
     from PIL import Image
 except ImportError:
     Image = None
-
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import (
-    BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
-    DecimalField, EmailField, Field, FileField, FilePathField, FloatField,
-    Form, forms, HiddenInput, ImageField, IntegerField, MultipleChoiceField,
-    NullBooleanField, NumberInput, PasswordInput, RadioSelect, RegexField,
-    SplitDateTimeField, TextInput, Textarea, TimeField, TypedChoiceField,
-    TypedMultipleChoiceField, URLField, UUIDField, ValidationError, Widget,
-)
-from django.test import SimpleTestCase
-from django.utils import formats
-from django.utils import six
-from django.utils import translation
-from django.utils._os import upath
 
 
 def fix_os_paths(x):
@@ -405,6 +404,13 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.clean('.01'), Decimal(".01"))
         self.assertRaisesMessage(ValidationError, "'Ensure that there are no more than 0 digits before the decimal point.'", f.clean, '1.1')
 
+    def test_decimalfield_scientific(self):
+        f = DecimalField(max_digits=2, decimal_places=2)
+        self.assertEqual(f.clean('1E+2'), Decimal('1E+2'))
+        self.assertEqual(f.clean('1e+2'), Decimal('1E+2'))
+        with self.assertRaisesMessage(ValidationError, "Ensure that there are no more"):
+            f.clean('0.546e+2')
+
     def test_decimalfield_widget_attrs(self):
         f = DecimalField(max_digits=6, decimal_places=2)
         self.assertEqual(f.widget_attrs(Widget()), {})
@@ -490,15 +496,14 @@ class FieldsTests(SimpleTestCase):
         f = DateField()
         self.assertRaisesMessage(ValidationError, "'Enter a valid date.'", f.clean, 'a\x00b')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)  # for _has_changed
     def test_datefield_changed(self):
         format = '%d/%m/%Y'
         f = DateField(input_formats=[format])
         d = datetime.date(2007, 9, 17)
         self.assertFalse(f.has_changed(d, '17/09/2007'))
         # Test for deprecated behavior _has_changed
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(f._has_changed(d, '17/09/2007'))
+        self.assertFalse(f._has_changed(d, '17/09/2007'))
 
     def test_datefield_strptime(self):
         """Test that field.strptime doesn't raise an UnicodeEncodeError (#16123)"""
@@ -611,6 +616,32 @@ class FieldsTests(SimpleTestCase):
 
     # RegexField ##################################################################
 
+    def test_durationfield_1(self):
+        f = DurationField()
+        self.assertEqual(datetime.timedelta(seconds=30), f.clean('30'))
+        self.assertEqual(
+            datetime.timedelta(minutes=15, seconds=30),
+            f.clean('15:30')
+        )
+        self.assertEqual(
+            datetime.timedelta(hours=1, minutes=15, seconds=30),
+            f.clean('1:15:30')
+        )
+        self.assertEqual(
+            datetime.timedelta(
+                days=1, hours=1, minutes=15, seconds=30, milliseconds=300),
+            f.clean('1 1:15:30.3')
+        )
+
+    def test_durationfield_2(self):
+        class DurationForm(Form):
+            duration = DurationField(initial=datetime.timedelta(hours=1))
+        f = DurationForm()
+        self.assertHTMLEqual(
+            '<input id="id_duration" type="text" name="duration" value="01:00:00">',
+            str(f['duration'])
+        )
+
     def test_regexfield_1(self):
         f = RegexField('^[0-9][A-F][0-9]$')
         self.assertEqual('2A2', f.clean('2A2'))
@@ -635,11 +666,9 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, ' 2A2')
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '2A2 ')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)  # error_message deprecation
     def test_regexfield_4(self):
-        # deprecated error_message argument; remove in Django 2.0
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
+        f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
         self.assertEqual('1234', f.clean('1234'))
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, '123')
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, 'abcd')
@@ -872,9 +901,7 @@ class FieldsTests(SimpleTestCase):
         """Test URLField correctly validates IPv6 (#18779)."""
         f = URLField()
         urls = (
-            'http://::/',
-            'http://6:21b4:92/',
-            'http://[12:34:3a53]/',
+            'http://[12:34::3a53]/',
             'http://[a34:9238::]:8080/',
         )
         for url in urls:
@@ -883,6 +910,10 @@ class FieldsTests(SimpleTestCase):
     def test_urlfield_not_string(self):
         f = URLField(required=False)
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 23)
+
+    def test_urlfield_normalization(self):
+        f = URLField()
+        self.assertEqual(f.clean('http://example.com/     '), 'http://example.com/')
 
     # BooleanField ################################################################
 
@@ -1004,7 +1035,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_typedchoicefield_4(self):
         # Even more weirdness: if you have a valid choice but your coercion function
-        # can't coerce, yo'll still get a validation error. Don't do this!
+        # can't coerce, you'll still get a validation error. Don't do this!
         f = TypedChoiceField(choices=[('A', 'A'), ('B', 'B')], coerce=int)
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. B is not one of the available choices.'", f.clean, 'B')
         # Required fields require values
@@ -1252,7 +1283,6 @@ class FieldsTests(SimpleTestCase):
             ('/django/forms/forms.py', 'forms.py'),
             ('/django/forms/formsets.py', 'formsets.py'),
             ('/django/forms/models.py', 'models.py'),
-            ('/django/forms/util.py', 'util.py'),
             ('/django/forms/utils.py', 'utils.py'),
             ('/django/forms/widgets.py', 'widgets.py')
         ]
@@ -1273,7 +1303,6 @@ class FieldsTests(SimpleTestCase):
             ('/django/forms/forms.py', 'forms.py'),
             ('/django/forms/formsets.py', 'formsets.py'),
             ('/django/forms/models.py', 'models.py'),
-            ('/django/forms/util.py', 'util.py'),
             ('/django/forms/utils.py', 'utils.py'),
             ('/django/forms/widgets.py', 'widgets.py')
         ]
@@ -1294,7 +1323,6 @@ class FieldsTests(SimpleTestCase):
             ('/django/forms/forms.py', 'forms.py'),
             ('/django/forms/formsets.py', 'formsets.py'),
             ('/django/forms/models.py', 'models.py'),
-            ('/django/forms/util.py', 'util.py'),
             ('/django/forms/utils.py', 'utils.py'),
             ('/django/forms/widgets.py', 'widgets.py')
         ]
@@ -1365,6 +1393,96 @@ class FieldsTests(SimpleTestCase):
         self.assertTrue(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['2008-05-06', '12:40:00']))
         self.assertFalse(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:40']))
         self.assertTrue(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:41']))
+
+    # GenericIPAddressField #######################################################
+
+    def test_generic_ipaddress_invalid_arguments(self):
+        self.assertRaises(ValueError, GenericIPAddressField, protocol="hamster")
+        self.assertRaises(ValueError, GenericIPAddressField, protocol="ipv4", unpack_ipv4=True)
+
+    def test_generic_ipaddress_as_generic(self):
+        # The edge cases of the IPv6 validation code are not deeply tested
+        # here, they are covered in the tests for django.utils.ipv6
+        f = GenericIPAddressField()
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
+        self.assertEqual(f.clean(' 127.0.0.1 '), '127.0.0.1')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, 'foo')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '127.0.0.')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '1.2.3.4.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '256.125.1.5')
+        self.assertEqual(f.clean(' fe80::223:6cff:fe8a:2e8a '), 'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean(' 2a02::223:6cff:fe8a:2e8a '), '2a02::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '12345:2:3:4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3::4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3:4:5:6:7:8')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1:2')
+
+    def test_generic_ipaddress_as_ipv4_only(self):
+        f = GenericIPAddressField(protocol="IPv4")
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
+        self.assertEqual(f.clean(' 127.0.0.1 '), '127.0.0.1')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, 'foo')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, '127.0.0.')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, '1.2.3.4.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, '256.125.1.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, 'fe80::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 address.'", f.clean, '2a02::223:6cff:fe8a:2e8a')
+
+    def test_generic_ipaddress_as_ipv6_only(self):
+        f = GenericIPAddressField(protocol="IPv6")
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv6 address.'", f.clean, '127.0.0.1')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv6 address.'", f.clean, 'foo')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv6 address.'", f.clean, '127.0.0.')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv6 address.'", f.clean, '1.2.3.4.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv6 address.'", f.clean, '256.125.1.5')
+        self.assertEqual(f.clean(' fe80::223:6cff:fe8a:2e8a '), 'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean(' 2a02::223:6cff:fe8a:2e8a '), '2a02::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '12345:2:3:4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3::4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3:4:5:6:7:8')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1:2')
+
+    def test_generic_ipaddress_as_generic_not_required(self):
+        f = GenericIPAddressField(required=False)
+        self.assertEqual(f.clean(''), '')
+        self.assertEqual(f.clean(None), '')
+        self.assertEqual(f.clean('127.0.0.1'), '127.0.0.1')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, 'foo')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '127.0.0.')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '1.2.3.4.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a valid IPv4 or IPv6 address.'", f.clean, '256.125.1.5')
+        self.assertEqual(f.clean(' fe80::223:6cff:fe8a:2e8a '), 'fe80::223:6cff:fe8a:2e8a')
+        self.assertEqual(f.clean(' 2a02::223:6cff:fe8a:2e8a '), '2a02::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '12345:2:3:4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3::4')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, 'foo::223:6cff:fe8a:2e8a')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1::2:3:4:5:6:7:8')
+        self.assertRaisesMessage(ValidationError, "'This is not a valid IPv6 address.'", f.clean, '1:2')
+
+    def test_generic_ipaddress_normalization(self):
+        # Test the normalizing code
+        f = GenericIPAddressField()
+        self.assertEqual(f.clean(' ::ffff:0a0a:0a0a  '), '::ffff:10.10.10.10')
+        self.assertEqual(f.clean(' ::ffff:10.10.10.10  '), '::ffff:10.10.10.10')
+        self.assertEqual(f.clean(' 2001:000:a:0000:0:fe:fe:beef  '), '2001:0:a::fe:fe:beef')
+        self.assertEqual(f.clean(' 2001::a:0000:0:fe:fe:beef  '), '2001:0:a::fe:fe:beef')
+
+        f = GenericIPAddressField(unpack_ipv4=True)
+        self.assertEqual(f.clean(' ::ffff:0a0a:0a0a'), '10.10.10.10')
+
+    # SlugField ###################################################################
+
+    def test_slugfield_normalization(self):
+        f = SlugField()
+        self.assertEqual(f.clean('    aa-bb-cc    '), 'aa-bb-cc')
+
+    # UUIDField ###################################################################
 
     def test_uuidfield_1(self):
         field = UUIDField()

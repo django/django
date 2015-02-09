@@ -1,24 +1,21 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 """
 Base classes for writing management commands (named commands which can
 be executed through ``django-admin`` or ``manage.py``).
 """
+from __future__ import unicode_literals
 
 import os
 import sys
 import warnings
-
 from argparse import ArgumentParser
 from optparse import OptionParser
 
 import django
 from django.core import checks
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
+from django.db import connections
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str
 
 
@@ -190,35 +187,22 @@ class BaseCommand(object):
         is the list of application's configuration provided by the
         app registry.
 
-    ``requires_model_validation``
-        DEPRECATED - This value will only be used if requires_system_checks
-        has not been provided. Defining both ``requires_system_checks`` and
-        ``requires_model_validation`` will result in an error.
-
-        A boolean; if ``True``, validation of installed models will be
-        performed prior to executing the command. Default value is
-        ``True``. To validate an individual application's models
-        rather than all applications' models, call
-        ``self.validate(app_config)`` from ``handle()``, where ``app_config``
-        is the application's configuration provided by the app registry.
-
     ``leave_locale_alone``
         A boolean indicating whether the locale set in settings should be
-        preserved during the execution of the command instead of being
-        forcibly set to 'en-us'.
+        preserved during the execution of the command instead of translations
+        being deactivated.
 
         Default value is ``False``.
 
         Make sure you know what you are doing if you decide to change the value
         of this option in your custom command if it creates database content
         that is locale-sensitive and such content shouldn't contain any
-        translations (like it happens e.g. with django.contrim.auth
-        permissions) as making the locale differ from the de facto default
-        'en-us' might cause unintended effects.
+        translations (like it happens e.g. with django.contrib.auth
+        permissions) as activating any locale might cause unintended effects.
 
         This option can't be False when the can_import_settings option is set
-        to False too because attempting to set the locale needs access to
-        settings. This condition will generate a CommandError.
+        to False too because attempting to deactivate translations needs access
+        to settings. This condition will generate a CommandError.
     """
     # Metadata about this command.
     option_list = ()
@@ -230,11 +214,7 @@ class BaseCommand(object):
     can_import_settings = True
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     leave_locale_alone = False
-
-    # Uncomment the following line of code after deprecation plan for
-    # requires_model_validation comes to completion:
-    #
-    # requires_system_checks = True
+    requires_system_checks = True
 
     def __init__(self, stdout=None, stderr=None, no_color=False):
         self.stdout = OutputWrapper(stdout or sys.stdout)
@@ -244,29 +224,6 @@ class BaseCommand(object):
         else:
             self.style = color_style()
             self.stderr.style_func = self.style.ERROR
-
-        # `requires_model_validation` is deprecated in favor of
-        # `requires_system_checks`. If both options are present, an error is
-        # raised. Otherwise the present option is used. If none of them is
-        # defined, the default value (True) is used.
-        has_old_option = hasattr(self, 'requires_model_validation')
-        has_new_option = hasattr(self, 'requires_system_checks')
-
-        if has_old_option:
-            warnings.warn(
-                '"requires_model_validation" is deprecated '
-                'in favor of "requires_system_checks".',
-                RemovedInDjango19Warning)
-        if has_old_option and has_new_option:
-            raise ImproperlyConfigured(
-                'Command %s defines both "requires_model_validation" '
-                'and "requires_system_checks", which is illegal. Use only '
-                '"requires_system_checks".' % self.__class__.__name__)
-
-        self.requires_system_checks = (
-            self.requires_system_checks if has_new_option else
-            self.requires_model_validation if has_old_option else
-            True)
 
     @property
     def use_argparse(self):
@@ -398,12 +355,14 @@ class BaseCommand(object):
             else:
                 self.stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
+        finally:
+            connections.close_all()
 
     def execute(self, *args, **options):
         """
         Try to execute this command, performing system checks if needed (as
-        controlled by attributes ``self.requires_system_checks`` and
-        ``self.requires_model_validation``, except if force-skipped).
+        controlled by the ``requires_system_checks`` attribute, except if
+        force-skipped).
         """
         if options.get('no_color'):
             self.style = no_style()
@@ -412,9 +371,6 @@ class BaseCommand(object):
             self.stdout = OutputWrapper(options['stdout'])
         if options.get('stderr'):
             self.stderr = OutputWrapper(options.get('stderr'), self.stderr.style_func)
-
-        if self.can_import_settings:
-            from django.conf import settings  # NOQA
 
         saved_locale = None
         if not self.leave_locale_alone:
@@ -427,12 +383,12 @@ class BaseCommand(object):
                                    "(%s) and 'can_import_settings' (%s) command "
                                    "options." % (self.leave_locale_alone,
                                                  self.can_import_settings))
-            # Switch to US English, because django-admin creates database
+            # Deactivate translations, because django-admin creates database
             # content like permissions, and those shouldn't contain any
             # translations.
             from django.utils import translation
             saved_locale = translation.get_language()
-            translation.activate('en-us')
+            translation.deactivate_all()
 
         try:
             if (self.requires_system_checks and
@@ -454,16 +410,6 @@ class BaseCommand(object):
         finally:
             if saved_locale is not None:
                 translation.activate(saved_locale)
-
-    def validate(self, app_config=None, display_num_errors=False):
-        """ Deprecated. Delegates to ``check``."""
-
-        if app_config is None:
-            app_configs = None
-        else:
-            app_configs = [app_config]
-
-        return self.check(app_configs=app_configs, display_num_errors=display_num_errors)
 
     def check(self, app_configs=None, tags=None, display_num_errors=False,
               include_deployment_checks=False):
@@ -573,26 +519,9 @@ class AppCommand(BaseCommand):
         Perform the command's actions for app_config, an AppConfig instance
         corresponding to an application label given on the command line.
         """
-        try:
-            # During the deprecation path, keep delegating to handle_app if
-            # handle_app_config isn't implemented in a subclass.
-            handle_app = self.handle_app
-        except AttributeError:
-            # Keep only this exception when the deprecation completes.
-            raise NotImplementedError(
-                "Subclasses of AppCommand must provide"
-                "a handle_app_config() method.")
-        else:
-            warnings.warn(
-                "AppCommand.handle_app() is superseded by "
-                "AppCommand.handle_app_config().",
-                RemovedInDjango19Warning, stacklevel=2)
-            if app_config.models_module is None:
-                raise CommandError(
-                    "AppCommand cannot handle app '%s' in legacy mode "
-                    "because it doesn't have a models module."
-                    % app_config.label)
-            return handle_app(app_config.models_module, **options)
+        raise NotImplementedError(
+            "Subclasses of AppCommand must provide"
+            "a handle_app_config() method.")
 
 
 class LabelCommand(BaseCommand):

@@ -3,10 +3,11 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from django.db import connection
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test import override_settings
+from django.test import (
+    TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
+)
 
-from .models import Country, Restaurant, Pizzeria, State, TwoFields
+from .models import Country, Pizzeria, Restaurant, State, TwoFields
 
 
 class BulkCreateTests(TestCase):

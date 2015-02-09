@@ -7,6 +7,21 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-2.1:
+
+2.1
+---
+
+See the :ref:`Django 1.9 release notes<deprecated-features-1.9>` for more
+details on these changes.
+
+* The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` will
+  be removed.
+
+* The ``django.forms.extras`` package will be removed.
+
+* The ``assignment_tag`` helper will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0
@@ -31,9 +46,6 @@ details on these changes.
 * Using an incorrect count of unpacked values in the ``for`` template tag
   will raise an exception rather than fail silently.
 
-* The ``DatabaseCreation`` class on each database backend will be removed,
-  and all table/schema editing will be moved to be via ``SchemaEditor`` instead.
-
 * The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
   Python path will be removed.
 
@@ -43,6 +55,8 @@ details on these changes.
 * The class :class:`~django.core.management.NoArgsCommand` will be removed. Use
   :class:`~django.core.management.BaseCommand` instead, which takes no arguments
   by default.
+
+* ``django.core.context_processors`` module will be removed.
 
 * ``django.db.models.sql.aggregates`` module will be removed.
 
@@ -56,6 +70,19 @@ details on these changes.
     ``append_aggregate_mask``.
 
 * ``django.template.resolve_variable`` will be removed.
+
+* The following private APIs will be removed from
+  :class:`django.db.models.options.Options` (``Model._meta``):
+
+  * ``get_field_by_name()``
+  * ``get_all_field_names()``
+  * ``get_fields_with_model()``
+  * ``get_concrete_fields_with_model()``
+  * ``get_m2m_with_model()``
+  * ``get_all_related_objects()``
+  * ``get_all_related_objects_with_model()``
+  * ``get_all_related_many_to_many_objects()``
+  * ``get_all_related_m2m_objects_with_model()``
 
 * The ``error_message`` argument of ``django.forms.RegexField`` will be removed.
 
@@ -85,8 +112,42 @@ details on these changes.
 * The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
   defined with no default value for its ``form_class`` argument will be removed.
 
+* The following settings will be removed:
+
+  * ``ALLOWED_INCLUDE_ROOTS``
+  * ``TEMPLATE_CONTEXT_PROCESSORS``
+  * ``TEMPLATE_DIRS``
+  * ``TEMPLATE_LOADERS``
+  * ``TEMPLATE_STRING_IF_INVALID``
+
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` will
   be removed.
+
+* Django template objects returned by
+  :func:`~django.template.loader.get_template` and
+  :func:`~django.template.loader.select_template` won't accept a
+  :class:`~django.template.Context` in their
+  :meth:`~django.template.backends.base.Template.render()` method anymore.
+
+* :doc:`Template response APIs </ref/template-response>` will enforce the use
+  of :class:`dict` and backend-dependent template objects instead of
+  :class:`~django.template.Context` and :class:`~django.template.Template`
+  respectively.
+
+* The ``current_app`` parameter for the following function and classes will be
+  removed:
+
+  * ``django.shortcuts.render()``
+  * ``django.template.Context()``
+  * ``django.template.RequestContext()``
+  * ``django.template.response.TemplateResponse()``
+
+* The ``dictionary`` and ``context_instance`` parameters for the following
+  functions will be removed:
+
+  * ``django.shortcuts.render()``
+  * ``django.shortcuts.render_to_response()``
+  * ``django.template.loader.render_to_string()``
 
 * The ``dirs`` parameter for the following functions will be removed:
 
@@ -98,6 +159,28 @@ details on these changes.
 * Session verification will be enabled regardless of whether or not
   ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` is in
   ``MIDDLEWARE_CLASSES``.
+
+* Private attribute ``django.db.models.Field.related`` will be removed.
+
+* The ``--list`` option of the ``migrate`` management command will be removed.
+
+* The ``ssi`` template tag will be removed.
+
+* Support for the ``=`` comparison operator in the ``if`` template tag will be
+  removed.
+
+* The backwards compatibility shims to allow ``Storage.get_available_name()``
+  and ``Storage.save()`` to be defined without a ``max_length`` argument will
+  be removed.
+
+* Support for the legacy ``%(<foo>)s`` syntax in ``ModelFormMixin.success_url``
+  will be removed.
+
+* ``GeoQuerySet`` aggregate methods ``collect()``, ``extent()``, ``extent3d()``,
+  ``makeline()``, and ``union()`` will be removed.
+
+* Ability to specify ``ContentType.name`` when creating a content type instance
+  will be removed.
 
 .. _deprecation-removed-in-1.9:
 
@@ -133,16 +216,13 @@ details on these changes.
   is loaded. In particular, it won't be possible to import models inside
   the root package of their application.
 
-* If models are organized in a package, Django will no longer look for
-  :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
-  custom SQL files to ``myapp/sql/``.
-
-* The model and form ``IPAddressField`` will be removed.
+* The model and form ``IPAddressField`` will be removed. A stub field will
+  remain for compatibility with historical migrations.
 
 * ``AppCommand.handle_app()`` will no longer be supported.
 
-* ``RequestSite`` will be located in ``django.contrib.sites.requests`` and
-  ``get_current_site`` in ``django.contrib.sites.shortcuts``.
+* ``RequestSite`` and ``get_current_site()`` will no longer be importable from
+  ``django.contrib.sites.models``.
 
 * FastCGI support via the ``runfcgi`` management command will be
   removed. Please deploy your project using WSGI.
@@ -163,9 +243,9 @@ details on these changes.
 
 * ``ModelAdmin.get_formsets`` will be removed.
 
-* Remove the backward compatible shims introduced to rename the
+* The backward compatibility shim introduced to rename the
   ``BaseMemcachedCache._get_memcache_timeout()`` method to
-  ``get_backend_timeout()``.
+  ``get_backend_timeout()`` will be removed.
 
 * The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` will be removed.
   Use :djadminopt:`--natural-foreign` instead.
@@ -173,7 +253,7 @@ details on these changes.
 * The ``use_natural_keys`` argument for ``serializers.serialize()`` will be
   removed. Use ``use_natural_foreign_keys`` instead.
 
-* ``django.forms.get_declared_fields`` will be removed.
+* Private API ``django.forms.forms.get_declared_fields()`` will be removed.
 
 * The ability to use a ``SplitDateTimeWidget`` with ``DateTimeField`` will be
   removed.
@@ -198,11 +278,15 @@ details on these changes.
   ``requires_system_checks``. Admin validators will be replaced by admin
   checks.
 
-* ``ModelAdmin.validator`` will be removed in favor of the new ``checks``
-  attribute.
+* The ``ModelAdmin.validator_class`` and ``default_validator_class`` attributes
+  will be removed.
+
+* ``ModelAdmin.validate()`` will be removed.
 
 * ``django.db.backends.DatabaseValidation.validate_field`` will be removed in
   favor of the ``check_field`` method.
+
+* The ``check`` management command will be removed.
 
 * ``django.utils.module_loading.import_by_path`` will be removed in favor of
   ``django.utils.module_loading.import_string``.
@@ -221,6 +305,16 @@ details on these changes.
 * The default value of the
   :attr:`RedirectView.permanent <django.views.generic.base.RedirectView.permanent>`
   attribute will change from ``True`` to ``False``.
+
+* ``django.contrib.sitemaps.FlatPageSitemap`` will be removed in favor of
+  ``django.contrib.flatpages.sitemaps.FlatPageSitemap``.
+
+* Private API ``django.test.utils.TestTemplateLoader`` will be removed.
+
+* The ``django.contrib.contenttypes.generic`` module will be removed.
+
+* Private APIs ``django.db.models.sql.where.WhereNode.make_atom()`` and
+  ``django.db.models.sql.where.Constraint`` will be removed.
 
 .. _deprecation-removed-in-1.8:
 

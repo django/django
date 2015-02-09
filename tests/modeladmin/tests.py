@@ -1,25 +1,23 @@
 from __future__ import unicode_literals
 
 from datetime import date
-import warnings
 
 from django import forms
-from django.contrib.admin.options import (ModelAdmin, TabularInline,
-     HORIZONTAL, VERTICAL)
+from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
+from django.contrib.admin.options import (
+    HORIZONTAL, VERTICAL, ModelAdmin, TabularInline,
+)
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
-from django.contrib.admin.validation import ModelAdminValidator
-from django.contrib.admin import (SimpleListFilter,
-     BooleanFieldListFilter)
 from django.core.checks import Error
-from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 
-from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
+from .models import (
+    Band, Concert, ValidationTestInlineModel, ValidationTestModel,
+)
 
 
 class MockRequest(object):
@@ -356,30 +354,30 @@ class ModelAdminTests(TestCase):
         form = ma.get_form(request)()
 
         self.assertHTMLEqual(str(form["main_band"]),
-            '<select name="main_band" id="id_main_band">\n'
-            '<option value="" selected="selected">---------</option>\n'
-            '<option value="%d">The Beatles</option>\n'
-            '<option value="%d">The Doors</option>\n'
-            '</select>' % (band2.id, self.band.id))
+            '<div class="related-widget-wrapper">'
+            '<select name="main_band" id="id_main_band">'
+            '<option value="" selected="selected">---------</option>'
+            '<option value="%d">The Beatles</option>'
+            '<option value="%d">The Doors</option>'
+            '</select></div>' % (band2.id, self.band.id))
 
         class AdminConcertForm(forms.ModelForm):
-            pass
-
             def __init__(self, *args, **kwargs):
                 super(AdminConcertForm, self).__init__(*args, **kwargs)
                 self.fields["main_band"].queryset = Band.objects.filter(name='The Doors')
 
-        class ConcertAdmin(ModelAdmin):
+        class ConcertAdminWithForm(ModelAdmin):
             form = AdminConcertForm
 
-        ma = ConcertAdmin(Concert, self.site)
+        ma = ConcertAdminWithForm(Concert, self.site)
         form = ma.get_form(request)()
 
         self.assertHTMLEqual(str(form["main_band"]),
-            '<select name="main_band" id="id_main_band">\n'
-            '<option value="" selected="selected">---------</option>\n'
-            '<option value="%d">The Doors</option>\n'
-            '</select>' % self.band.id)
+            '<div class="related-widget-wrapper">'
+            '<select name="main_band" id="id_main_band">'
+            '<option value="" selected="selected">---------</option>'
+            '<option value="%d">The Doors</option>'
+            '</select></div>' % self.band.id)
 
     def test_regression_for_ticket_15820(self):
         """
@@ -1502,22 +1500,6 @@ class FormsetCheckTests(CheckTestCase):
             inlines = [ValidationTestInline]
 
         self.assertIsValid(ValidationTestModelAdmin, ValidationTestModel)
-
-
-class CustomModelAdminTests(CheckTestCase):
-    def test_deprecation(self):
-        "Deprecated Custom Validator definitions still work with the check framework."
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RemovedInDjango19Warning)
-
-            class CustomValidator(ModelAdminValidator):
-                def validate_me(self, model_admin, model):
-                    raise ImproperlyConfigured('error!')
-
-            class CustomModelAdmin(ModelAdmin):
-                validator_class = CustomValidator
-
-            self.assertIsInvalid(CustomModelAdmin, ValidationTestModel, 'error!')
 
 
 class ListDisplayEditableTests(CheckTestCase):

@@ -1,19 +1,17 @@
 import imp
-from importlib import import_module
 import os
 import sys
 import unittest
-import warnings
+from importlib import import_module
 from zipimport import zipimporter
 
-from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, modify_settings
-from django.test.utils import IgnoreDeprecationWarningsMixin, extend_sys_path
+from django.test.utils import extend_sys_path
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.module_loading import (autodiscover_modules, import_by_path, import_string,
-                                         module_has_submodule)
 from django.utils._os import upath
+from django.utils.module_loading import (
+    autodiscover_modules, import_string, module_has_submodule,
+)
 
 
 class DefaultLoader(unittest.TestCase):
@@ -110,38 +108,7 @@ class EggLoader(unittest.TestCase):
             self.assertRaises(ImportError, import_module, 'egg_module.sub1.sub2.no_such_module')
 
 
-class ModuleImportTestCase(IgnoreDeprecationWarningsMixin, unittest.TestCase):
-    def test_import_by_path(self):
-        cls = import_by_path('django.utils.module_loading.import_by_path')
-        self.assertEqual(cls, import_by_path)
-
-        # Test exceptions raised
-        for path in ('no_dots_in_path', 'unexistent.path', 'utils_tests.unexistent'):
-            self.assertRaises(ImproperlyConfigured, import_by_path, path)
-
-        with self.assertRaises(ImproperlyConfigured) as cm:
-            import_by_path('unexistent.module.path', error_prefix="Foo")
-        self.assertTrue(str(cm.exception).startswith('Foo'))
-
-    def test_import_error_traceback(self):
-        """Test preserving the original traceback on an ImportError."""
-        try:
-            import_by_path('test_module.bad_module.content')
-        except ImproperlyConfigured:
-            traceback = sys.exc_info()[2]
-
-        self.assertIsNotNone(traceback.tb_next.tb_next,
-            'Should have more than the calling frame in the traceback.')
-
-    def test_import_by_path_pending_deprecation_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always', category=RemovedInDjango19Warning)
-            cls = import_by_path('django.utils.module_loading.import_by_path')
-            self.assertEqual(cls, import_by_path)
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[-1].category, RemovedInDjango19Warning))
-            self.assertIn('deprecated', str(w[-1].message))
-
+class ModuleImportTestCase(unittest.TestCase):
     def test_import_string(self):
         cls = import_string('django.utils.module_loading.import_string')
         self.assertEqual(cls, import_string)
@@ -149,7 +116,6 @@ class ModuleImportTestCase(IgnoreDeprecationWarningsMixin, unittest.TestCase):
         # Test exceptions raised
         self.assertRaises(ImportError, import_string, 'no_dots_in_path')
         self.assertRaises(ImportError, import_string, 'utils_tests.unexistent')
-        self.assertRaises(ImportError, import_string, 'unexistent.path')
 
 
 @modify_settings(INSTALLED_APPS={'append': 'utils_tests.test_module'})

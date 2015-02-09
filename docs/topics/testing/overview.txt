@@ -20,20 +20,6 @@ Writing tests
 Django's unit tests use a Python standard library module: :mod:`unittest`. This
 module defines tests using a class-based approach.
 
-.. admonition:: unittest2
-
-    .. deprecated:: 1.7
-
-    Python 2.7 introduced some major changes to the ``unittest`` library,
-    adding some extremely useful features. To ensure that every Django project
-    could benefit from these new features, Django used to ship with a copy of
-    Python 2.7's ``unittest`` backported for Python 2.6 compatibility.
-
-    Since Django no longer supports Python versions older than 2.7,
-    ``django.utils.unittest`` is deprecated. Simply use ``unittest``.
-
-.. _unittest2: https://pypi.python.org/pypi/unittest2
-
 Here is an example which subclasses from :class:`django.test.TestCase`,
 which is a subclass of :class:`unittest.TestCase` that runs each test inside a
 transaction to provide isolation::
@@ -166,10 +152,8 @@ entirely!). If you want to use a different database name, specify
 :setting:`NAME <TEST_NAME>` in the :setting:`TEST <DATABASE-TEST>`
 dictionary for any given database in :setting:`DATABASES`.
 
-.. versionchanged:: 1.7
-
-    On PostgreSQL, :setting:`USER` will also need read access to the built-in
-    ``postgres`` database.
+On PostgreSQL, :setting:`USER` will also need read access to the built-in
+``postgres`` database.
 
 Aside from using a separate database, the test runner will otherwise
 use all of the same database settings you have in your settings file:
@@ -185,11 +169,13 @@ control the particular collation used by the test database. See the
 :doc:`settings documentation </ref/settings>` for details of these
 and other advanced settings.
 
-.. versionchanged:: 1.7
+If using a SQLite in-memory database with Python 3.4+ and SQLite 3.7.13+,
+`shared cache <https://www.sqlite.org/sharedcache.html>`_ will be enabled, so
+you can write tests with ability to share the database between threads.
 
-   The different options in the :setting:`TEST <DATABASE-TEST>` database
-   setting used to be separate options in the database settings dictionary,
-   prefixed with ``TEST_``.
+.. versionadded:: 1.8
+
+    The ability to use SQLite with a shared cache as described above was added.
 
 .. admonition:: Finding data from your production database when running tests?
 
@@ -200,10 +186,8 @@ and other advanced settings.
     your tests. *It is a bad idea to have such import-time database queries in
     your code* anyway - rewrite your code so that it doesn't do this.
 
-    .. versionadded:: 1.7
-
-        This also applies to customized implementations of
-        :meth:`~django.apps.AppConfig.ready()`.
+    This also applies to customized implementations of
+    :meth:`~django.apps.AppConfig.ready()`.
 
 .. seealso::
 
@@ -266,9 +250,6 @@ The initial serialization is usually very quick, but if you wish to exclude
 some apps from this process (and speed up test runs slightly), you may add
 those apps to :setting:`TEST_NON_SERIALIZED_APPS`.
 
-Apps without migrations are not affected; ``initial_data`` fixtures are
-reloaded as usual.
-
 Other test conditions
 ---------------------
 
@@ -294,8 +275,6 @@ prepares itself. You can control the level of detail of these messages with the
     Creating test database...
     Creating table myapp_animal
     Creating table myapp_mineral
-    Loading 'initial_data' fixtures...
-    No fixtures found.
 
 This tells you that the test runner is creating a test database, as described
 in the previous section.
@@ -341,9 +320,9 @@ design. If during your tests you are authenticating many users, you may want
 to use a custom settings file and set the :setting:`PASSWORD_HASHERS` setting
 to a faster hashing algorithm::
 
-    PASSWORD_HASHERS = (
+    PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.MD5PasswordHasher',
-    )
+    ]
 
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
 algorithm used in fixtures, if any.

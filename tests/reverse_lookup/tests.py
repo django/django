@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.core.exceptions import FieldError
 from django.test import TestCase
 
-from .models import User, Poll, Choice
+from .models import Choice, Poll, User
 
 
 class ReverseLookupTests(TestCase):

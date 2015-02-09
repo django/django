@@ -12,7 +12,6 @@ from .base import Loader as BaseLoader
 
 
 class Loader(BaseLoader):
-    is_usable = True
 
     def get_template_sources(self, template_name, template_dirs=None):
         """
@@ -44,4 +43,3 @@ class Loader(BaseLoader):
             error_msg = ("Your template directories configuration is empty. "
                          "Change it to point to at least one template directory.")
         raise TemplateDoesNotExist(error_msg)
-    load_template_source.is_usable = True

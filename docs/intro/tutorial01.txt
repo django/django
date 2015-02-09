@@ -22,7 +22,7 @@ tell Django is installed and which version by running the following command:
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
-This tutorial is written for Django |version| and Python 3.2 or later. If the
+This tutorial is written for Django |version| and Python 3.3 or later. If the
 Django version doesn't match, you can refer to the tutorial for your version
 of Django by using the version switcher at the bottom right corner of this
 page, or update Django to the newest version. If you are still using Python
@@ -116,7 +116,7 @@ These files are:
 * :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
 
-.. _more about packages: http://docs.python.org/tutorial/modules.html#packages
+.. _more about packages: https://docs.python.org/tutorial/modules.html#packages
 
 Database setup
 --------------
@@ -327,7 +327,7 @@ The first step in writing a database Web app in Django is to define your models
 
 .. admonition:: Philosophy
 
-   A model is the single, definitive source of data about your data. It contains
+   A model is the single, definitive source of truth about your data. It contains
    the essential fields and behaviors of the data you're storing. Django follows
    the :ref:`DRY Principle <dry>`. The goal is to define your data model in one
    place and automatically derive things from it.
@@ -396,7 +396,7 @@ Finally, note a relationship is defined, using
 to a single ``Question``. Django supports all the common database relationships:
 many-to-one, many-to-many and one-to-one.
 
-.. _`Python path`: http://docs.python.org/tutorial/modules.html#the-module-search-path
+.. _`Python path`: https://docs.python.org/tutorial/modules.html#the-module-search-path
 
 Activating models
 =================
@@ -422,7 +422,7 @@ look like this:
 .. snippet::
     :filename: mysite/settings.py
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -430,7 +430,7 @@ look like this:
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'polls',
-    )
+    ]
 
 Now Django knows to include the ``polls`` app. Let's run another command:
 
@@ -537,18 +537,13 @@ Now, run :djadmin:`migrate` again to create those model tables in your database:
 .. code-block:: bash
 
     $ python manage.py migrate
-
     Operations to perform:
-      Synchronize unmigrated apps: sessions, admin, messages, auth, staticfiles, contenttypes
-      Apply all migrations: polls
-    Synchronizing apps without migrations:
-      Creating tables...
-      Installing custom SQL...
-      Installing indexes...
-    Installed 0 object(s) from 0 fixture(s)
+      Apply all migrations: admin, contenttypes, polls, auth, sessions
     Running migrations:
+      Rendering model states... DONE
+      ...
       Applying polls.0001_initial... OK
-
+      ...
 
 The :djadmin:`migrate` command takes all the migrations that haven't been
 applied (Django tracks which ones are applied using a special table in your

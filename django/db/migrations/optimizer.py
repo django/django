@@ -15,65 +15,18 @@ class MigrationOptimizer(object):
     nothing.
     """
 
-    def optimize(self, operations, app_label=None):
-        """
-        Main optimization entry point. Pass in a list of Operation instances,
-        get out a new list of Operation instances.
-
-        Unfortunately, due to the scope of the optimization (two combinable
-        operations might be separated by several hundred others), this can't be
-        done as a peephole optimization with checks/output implemented on
-        the Operations themselves; instead, the optimizer looks at each
-        individual operation and scans forwards in the list to see if there
-        are any matches, stopping at boundaries - operations which can't
-        be optimized over (RunSQL, operations on the same field/model, etc.)
-
-        The inner loop is run until the starting list is the same as the result
-        list, and then the result is returned. This means that operation
-        optimization must be stable and always return an equal or shorter list.
-
-        The app_label argument is optional, but if you pass it you'll get more
-        efficient optimization.
-        """
-        # Internal tracking variable for test assertions about # of loops
-        self._iterations = 0
-        while True:
-            result = self.optimize_inner(operations, app_label)
-            self._iterations += 1
-            if result == operations:
-                return result
-            operations = result
-
-    def optimize_inner(self, operations, app_label=None):
-        """
-        Inner optimization loop.
-        """
-        new_operations = []
-        for i, operation in enumerate(operations):
-            # Compare it to each operation after it
-            for j, other in enumerate(operations[i + 1:]):
-                result = self.reduce(operation, other, operations[i + 1:i + j + 1])
-                if result is not None:
-                    # Optimize! Add result, then remaining others, then return
-                    new_operations.extend(result)
-                    new_operations.extend(operations[i + 1:i + 1 + j])
-                    new_operations.extend(operations[i + j + 2:])
-                    return new_operations
-                if not self.can_optimize_through(operation, other, app_label):
-                    new_operations.append(operation)
-                    break
-            else:
-                new_operations.append(operation)
-        return new_operations
-
-    #### REDUCTION ####
-
-    def reduce(self, operation, other, in_between=None):
-        """
-        Either returns a list of zero, one or two operations,
-        or None, meaning this pair cannot be optimized.
-        """
-        submethods = [
+    def __init__(self):
+        self.model_level_operations = (
+            migrations.CreateModel,
+            migrations.AlterModelTable,
+            migrations.AlterUniqueTogether,
+            migrations.AlterIndexTogether,
+        )
+        self.field_level_operations = (
+            migrations.AddField,
+            migrations.AlterField,
+        )
+        self.reduce_methods = [
             (
                 migrations.CreateModel,
                 migrations.DeleteModel,
@@ -155,7 +108,66 @@ class MigrationOptimizer(object):
                 self.reduce_rename_field_self,
             ),
         ]
-        for ia, ib, om in submethods:
+
+    def optimize(self, operations, app_label=None):
+        """
+        Main optimization entry point. Pass in a list of Operation instances,
+        get out a new list of Operation instances.
+
+        Unfortunately, due to the scope of the optimization (two combinable
+        operations might be separated by several hundred others), this can't be
+        done as a peephole optimization with checks/output implemented on
+        the Operations themselves; instead, the optimizer looks at each
+        individual operation and scans forwards in the list to see if there
+        are any matches, stopping at boundaries - operations which can't
+        be optimized over (RunSQL, operations on the same field/model, etc.)
+
+        The inner loop is run until the starting list is the same as the result
+        list, and then the result is returned. This means that operation
+        optimization must be stable and always return an equal or shorter list.
+
+        The app_label argument is optional, but if you pass it you'll get more
+        efficient optimization.
+        """
+        # Internal tracking variable for test assertions about # of loops
+        self._iterations = 0
+        while True:
+            result = self.optimize_inner(operations, app_label)
+            self._iterations += 1
+            if result == operations:
+                return result
+            operations = result
+
+    def optimize_inner(self, operations, app_label=None):
+        """
+        Inner optimization loop.
+        """
+        new_operations = []
+        for i, operation in enumerate(operations):
+            # Compare it to each operation after it
+            for j, other in enumerate(operations[i + 1:]):
+                result = self.reduce(operation, other, operations[i + 1:i + j + 1])
+                if result is not None:
+                    # Optimize! Add result, then remaining others, then return
+                    new_operations.extend(result)
+                    new_operations.extend(operations[i + 1:i + 1 + j])
+                    new_operations.extend(operations[i + j + 2:])
+                    return new_operations
+                if not self.can_optimize_through(operation, other, app_label):
+                    new_operations.append(operation)
+                    break
+            else:
+                new_operations.append(operation)
+        return new_operations
+
+    # REDUCTION
+
+    def reduce(self, operation, other, in_between=None):
+        """
+        Either returns a list of zero, one or two operations,
+        or None, meaning this pair cannot be optimized.
+        """
+        for ia, ib, om in self.reduce_methods:
             if isinstance(operation, ia) and isinstance(other, ib):
                 return om(operation, other, in_between or [])
         return None
@@ -177,7 +189,7 @@ class MigrationOptimizer(object):
         """
         Folds a CreateModel and a DeleteModel into nothing.
         """
-        if (operation.name.lower() == other.name.lower() and
+        if (operation.name_lower == other.name_lower and
                 not operation.options.get("proxy", False)):
             return []
 
@@ -185,20 +197,21 @@ class MigrationOptimizer(object):
         """
         Folds an AlterModelSomething and a DeleteModel into just delete.
         """
-        if operation.name.lower() == other.name.lower():
+        if operation.name_lower == other.name_lower:
             return [other]
 
     def reduce_model_create_rename(self, operation, other, in_between):
         """
         Folds a model rename into its create
         """
-        if operation.name.lower() == other.old_name.lower():
+        if operation.name_lower == other.old_name_lower:
             return [
                 migrations.CreateModel(
                     other.new_name,
                     fields=operation.fields,
                     options=operation.options,
                     bases=operation.bases,
+                    managers=operation.managers,
                 )
             ]
 
@@ -206,7 +219,7 @@ class MigrationOptimizer(object):
         """
         Folds a model rename into another one
         """
-        if operation.new_name.lower() == other.old_name.lower():
+        if operation.new_name_lower == other.old_name_lower:
             return [
                 migrations.RenameModel(
                     operation.old_name,
@@ -215,8 +228,8 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_create_model_add_field(self, operation, other, in_between):
-        if operation.name.lower() == other.model_name.lower():
-            # Don't allow optimisations of FKs through models they reference
+        if operation.name_lower == other.model_name_lower:
+            # Don't allow optimizations of FKs through models they reference
             if hasattr(other.field, "rel") and other.field.rel:
                 for between in in_between:
                     # Check that it doesn't point to the model
@@ -235,11 +248,12 @@ class MigrationOptimizer(object):
                     fields=operation.fields + [(other.name, other.field)],
                     options=operation.options,
                     bases=operation.bases,
+                    managers=operation.managers,
                 )
             ]
 
     def reduce_create_model_alter_field(self, operation, other, in_between):
-        if operation.name.lower() == other.model_name.lower():
+        if operation.name_lower == other.model_name_lower:
             return [
                 migrations.CreateModel(
                     operation.name,
@@ -249,11 +263,12 @@ class MigrationOptimizer(object):
                     ],
                     options=operation.options,
                     bases=operation.bases,
+                    managers=operation.managers,
                 )
             ]
 
     def reduce_create_model_rename_field(self, operation, other, in_between):
-        if operation.name.lower() == other.model_name.lower():
+        if operation.name_lower == other.model_name_lower:
             return [
                 migrations.CreateModel(
                     operation.name,
@@ -263,26 +278,29 @@ class MigrationOptimizer(object):
                     ],
                     options=operation.options,
                     bases=operation.bases,
+                    managers=operation.managers,
                 )
             ]
 
     def reduce_create_model_remove_field(self, operation, other, in_between):
-        if operation.name.lower() == other.model_name.lower():
+        if operation.name_lower == other.model_name_lower:
             return [
                 migrations.CreateModel(
                     operation.name,
                     fields=[
                         (n, v)
                         for n, v in operation.fields
-                        if n.lower() != other.name.lower()
+                        if n.lower() != other.name_lower
                     ],
                     options=operation.options,
                     bases=operation.bases,
+                    managers=operation.managers,
                 )
             ]
 
     def reduce_add_field_alter_field(self, operation, other, in_between):
-        if operation.model_name.lower() == other.model_name.lower() and operation.name.lower() == other.name.lower():
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.name_lower == other.name_lower):
             return [
                 migrations.AddField(
                     model_name=operation.model_name,
@@ -292,16 +310,18 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_add_field_delete_field(self, operation, other, in_between):
-        if operation.model_name.lower() == other.model_name.lower() and operation.name.lower() == other.name.lower():
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.name_lower == other.name_lower):
             return []
 
     def reduce_alter_field_delete_field(self, operation, other, in_between):
-        if operation.model_name.lower() == other.model_name.lower() and operation.name.lower() == other.name.lower():
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.name_lower == other.name_lower):
             return [other]
 
     def reduce_add_field_rename_field(self, operation, other, in_between):
-        if (operation.model_name.lower() == other.model_name.lower() and
-                operation.name.lower() == other.old_name.lower()):
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.name_lower == other.old_name_lower):
             return [
                 migrations.AddField(
                     model_name=operation.model_name,
@@ -311,8 +331,8 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_alter_field_rename_field(self, operation, other, in_between):
-        if (operation.model_name.lower() == other.model_name.lower() and
-                operation.name.lower() == other.old_name.lower()):
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.name_lower == other.old_name_lower):
             return [
                 other,
                 migrations.AlterField(
@@ -323,8 +343,8 @@ class MigrationOptimizer(object):
             ]
 
     def reduce_rename_field_self(self, operation, other, in_between):
-        if (operation.model_name.lower() == other.model_name.lower() and
-                operation.new_name.lower() == other.old_name.lower()):
+        if (operation.model_name_lower == other.model_name_lower and
+                operation.new_name_lower == other.old_name_lower):
             return [
                 migrations.RenameField(
                     operation.model_name,
@@ -333,7 +353,7 @@ class MigrationOptimizer(object):
                 ),
             ]
 
-    #### THROUGH CHECKS ####
+    # THROUGH CHECKS
 
     def can_optimize_through(self, operation, other, app_label=None):
         """
@@ -341,24 +361,14 @@ class MigrationOptimizer(object):
         the other side of 'other'. This is possible if, for example, they
         affect different models.
         """
-        MODEL_LEVEL_OPERATIONS = (
-            migrations.CreateModel,
-            migrations.AlterModelTable,
-            migrations.AlterUniqueTogether,
-            migrations.AlterIndexTogether,
-        )
-        FIELD_LEVEL_OPERATIONS = (
-            migrations.AddField,
-            migrations.AlterField,
-        )
         # If it's a model level operation, let it through if there's
         # nothing that looks like a reference to us in 'other'.
-        if isinstance(operation, MODEL_LEVEL_OPERATIONS):
+        if isinstance(operation, self.model_level_operations):
             if not other.references_model(operation.name, app_label):
                 return True
         # If it's field level, only let it through things that don't reference
         # the field (which includes not referencing the model)
-        if isinstance(operation, FIELD_LEVEL_OPERATIONS):
+        if isinstance(operation, self.field_level_operations):
             if not other.references_field(operation.model_name, operation.name, app_label):
                 return True
         return False

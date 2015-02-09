@@ -1,9 +1,8 @@
 from django.apps import apps
 from django.core import management
 from django.db.models import signals
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import six
-
 
 APP_CONFIG = apps.get_app_config('migrate_signals')
 PRE_MIGRATE_ARGS = ['app_config', 'verbosity', 'interactive', 'using']
@@ -66,8 +65,27 @@ class MigrateSignalTests(TestCase):
         signals.pre_migrate.connect(r, sender=APP_CONFIG)
         management.call_command('migrate', database=MIGRATE_DATABASE,
             verbosity=MIGRATE_VERBOSITY, interactive=MIGRATE_INTERACTIVE,
-            load_initial_data=False, stdout=six.StringIO())
+            stdout=six.StringIO())
 
+        args = r.call_args
+        self.assertEqual(r.call_counter, 1)
+        self.assertEqual(set(args), set(PRE_MIGRATE_ARGS))
+        self.assertEqual(args['app_config'], APP_CONFIG)
+        self.assertEqual(args['verbosity'], MIGRATE_VERBOSITY)
+        self.assertEqual(args['interactive'], MIGRATE_INTERACTIVE)
+        self.assertEqual(args['using'], 'default')
+
+    @override_settings(MIGRATION_MODULES={'migrate_signals': 'migrate_signals.custom_migrations'})
+    def test_pre_migrate_migrations_only(self):
+        """
+        If all apps have migrations, pre_migrate should be sent.
+        """
+        r = PreMigrateReceiver()
+        signals.pre_migrate.connect(r, sender=APP_CONFIG)
+        stdout = six.StringIO()
+        management.call_command('migrate', database=MIGRATE_DATABASE,
+            verbosity=MIGRATE_VERBOSITY, interactive=MIGRATE_INTERACTIVE,
+            stdout=stdout)
         args = r.call_args
         self.assertEqual(r.call_counter, 1)
         self.assertEqual(set(args), set(PRE_MIGRATE_ARGS))

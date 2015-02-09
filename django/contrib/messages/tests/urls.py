@@ -1,13 +1,14 @@
+from django import forms
 from django.conf.urls import url
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.urlresolvers import reverse
-from django import forms
-from django.http import HttpResponseRedirect, HttpResponse
-from django.template import RequestContext, Template
+from django.http import HttpResponse, HttpResponseRedirect
+from django.template import engines
 from django.template.response import TemplateResponse
 from django.views.decorators.cache import never_cache
-from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import FormView
+
 
 TEMPLATE = """{% if messages %}
 <ul class="messages">
@@ -48,13 +49,14 @@ def add_template_response(request, message_type):
 
 @never_cache
 def show(request):
-    t = Template(TEMPLATE)
-    return HttpResponse(t.render(RequestContext(request)))
+    template = engines['django'].from_string(TEMPLATE)
+    return HttpResponse(template.render(request=request))
 
 
 @never_cache
 def show_template_response(request):
-    return TemplateResponse(request, Template(TEMPLATE))
+    template = engines['django'].from_string(TEMPLATE)
+    return TemplateResponse(request, template)
 
 
 class ContactForm(forms.Form):

@@ -19,6 +19,16 @@ class DefaultsTests(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.locmem.Loader', {
+                    '404.html': '{{ csrf_token }}',
+                }),
+            ],
+        },
+    }])
     def test_csrf_token_in_404(self):
         """
         The 404 page should have the csrf_token available in the context
@@ -26,30 +36,34 @@ class DefaultsTests(TestCase):
         # See ticket #14565
         for url in self.non_existing_urls:
             response = self.client.get(url)
-            csrf_token = response.context['csrf_token']
-            self.assertNotEqual(str(csrf_token), 'NOTPROVIDED')
-            self.assertNotEqual(str(csrf_token), '')
+            self.assertNotEqual(response.content, 'NOTPROVIDED')
+            self.assertNotEqual(response.content, '')
 
     def test_server_error(self):
         "The server_error view raises a 500 status"
         response = self.client.get('/server_error/')
         self.assertEqual(response.status_code, 500)
 
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.locmem.Loader', {
+                    '404.html': 'This is a test template for a 404 error.',
+                    '500.html': 'This is a test template for a 500 error.',
+                }),
+            ],
+        },
+    }])
     def test_custom_templates(self):
         """
         Test that 404.html and 500.html templates are picked by their respective
         handler.
         """
-        with override_settings(TEMPLATE_LOADERS=[
-            ('django.template.loaders.locmem.Loader', {
-                '404.html': 'This is a test template for a 404 error.',
-                '500.html': 'This is a test template for a 500 error.',
-            }),
-        ]):
-            for code, url in ((404, '/non_existing_url/'), (500, '/server_error/')):
-                response = self.client.get(url)
-                self.assertContains(response, "test template for a %d error" % code,
-                    status_code=code)
+        for code, url in ((404, '/non_existing_url/'), (500, '/server_error/')):
+            response = self.client.get(url)
+            self.assertContains(response, "test template for a %d error" % code,
+                status_code=code)
 
     def test_get_absolute_url_attributes(self):
         "A model can set attributes on the get_absolute_url method"

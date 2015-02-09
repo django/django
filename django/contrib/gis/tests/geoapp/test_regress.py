@@ -10,6 +10,7 @@ from django.db.models import Count, Min
 from django.test import TestCase, skipUnlessDBFeature
 
 if HAS_GEOS:
+    from django.contrib.gis.db.models import Extent
     from .models import City, PennsylvaniaCity, State, Truth
 
 
@@ -44,7 +45,7 @@ class GeoRegressionTests(TestCase):
         "Testing `extent` on a table with a single point. See #11827."
         pnt = City.objects.get(name='Pueblo').point
         ref_ext = (pnt.x, pnt.y, pnt.x, pnt.y)
-        extent = City.objects.filter(name='Pueblo').extent()
+        extent = City.objects.filter(name='Pueblo').aggregate(Extent('point'))['point__extent']
         for ref_val, val in zip(ref_ext, extent):
             self.assertAlmostEqual(ref_val, val, 4)
 
@@ -82,7 +83,7 @@ class GeoRegressionTests(TestCase):
 
         val1 = Truth.objects.get(pk=t1.pk).val
         val2 = Truth.objects.get(pk=t2.pk).val
-        # verify types -- should't be 0/1
+        # verify types -- shouldn't be 0/1
         self.assertIsInstance(val1, bool)
         self.assertIsInstance(val2, bool)
         # verify values

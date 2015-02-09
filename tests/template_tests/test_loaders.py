@@ -4,31 +4,28 @@ Test cases for the template loaders
 Note: This test requires setuptools!
 """
 
-from django.conf import settings
-
-if __name__ == '__main__':
-    settings.configure()
-
 import os.path
 import sys
 import types
 import unittest
+
+from django.template import Context, TemplateDoesNotExist, loader
+from django.template.engine import Engine
+from django.template.loaders import cached, eggs
+from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.utils import six
+from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.six import StringIO
 
 try:
     import pkg_resources
 except ImportError:
     pkg_resources = None
 
+TEMPLATES_DIR = os.path.join(os.path.dirname(upath(__file__)), 'templates')
 
-from django.template import TemplateDoesNotExist, Context
-from django.template.loaders.eggs import Loader as EggLoader
-from django.template.engine import Engine
-from django.template import loader
-from django.test import SimpleTestCase, override_settings
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
-from django.utils import six
-from django.utils._os import upath
-from django.utils.six import StringIO
+GLOBAL_TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.dirname(upath(__file__))), 'templates')
 
 
 # Mock classes and objects for pkg_resources functions.
@@ -53,7 +50,10 @@ def create_egg(name, resources):
 
 @unittest.skipUnless(pkg_resources, 'setuptools is not installed')
 class EggLoaderTest(SimpleTestCase):
+
     def setUp(self):
+        self.loader = eggs.Loader(Engine.get_default())
+
         # Defined here b/c at module scope we may not have pkg_resources
         class MockProvider(pkg_resources.NullProvider):
             def __init__(self, module):
@@ -86,68 +86,64 @@ class EggLoaderTest(SimpleTestCase):
     @override_settings(INSTALLED_APPS=['egg_empty'])
     def test_empty(self):
         "Loading any template on an empty egg should fail"
-        egg_loader = EggLoader(Engine.get_default())
-        self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
+        with self.assertRaises(TemplateDoesNotExist):
+            self.loader.load_template_source("not-existing.html")
 
     @override_settings(INSTALLED_APPS=['egg_1'])
     def test_non_existing(self):
         "Template loading fails if the template is not in the egg"
-        egg_loader = EggLoader(Engine.get_default())
-        self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
+        with self.assertRaises(TemplateDoesNotExist):
+            self.loader.load_template_source("not-existing.html")
 
     @override_settings(INSTALLED_APPS=['egg_1'])
     def test_existing(self):
         "A template can be loaded from an egg"
-        egg_loader = EggLoader(Engine.get_default())
-        contents, template_name = egg_loader.load_template_source("y.html")
+        contents, template_name = self.loader.load_template_source("y.html")
         self.assertEqual(contents, "y")
         self.assertEqual(template_name, "egg:egg_1:templates/y.html")
 
     def test_not_installed(self):
         "Loading an existent template from an egg not included in any app should fail"
-        egg_loader = EggLoader(Engine.get_default())
-        self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "y.html")
+        with self.assertRaises(TemplateDoesNotExist):
+            self.loader.load_template_source("y.html")
 
 
-@override_settings(
-    TEMPLATE_LOADERS=(
-        ('django.template.loaders.cached.Loader', (
-            'django.template.loaders.filesystem.Loader',
-        )),
-    )
-)
 class CachedLoader(SimpleTestCase):
+
+    def setUp(self):
+        self.loader = cached.Loader(Engine.get_default(), [
+            'django.template.loaders.filesystem.Loader',
+        ])
+
     def test_templatedir_caching(self):
         "Check that the template directories form part of the template cache key. Refs #13573"
         # Retrieve a template specifying a template directory to check
-        t1, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'first'),))
+        t1, name = self.loader.find_template('test.html', (os.path.join(TEMPLATES_DIR, 'first'),))
         # Now retrieve the same template name, but from a different directory
-        t2, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'second'),))
+        t2, name = self.loader.find_template('test.html', (os.path.join(TEMPLATES_DIR, 'second'),))
 
         # The two templates should not have the same content
         self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
 
     def test_missing_template_is_cached(self):
         "#19949 -- Check that the missing template is cached."
-        template_loader = Engine.get_default().template_loaders[0]
-        # Empty cache, which may be filled from previous tests.
-        template_loader.reset()
         # Check that 'missing.html' isn't already in cache before 'missing.html' is loaded
-        self.assertRaises(KeyError, lambda: template_loader.template_cache["missing.html"])
+        with self.assertRaises(KeyError):
+            self.loader.template_cache["missing.html"]
         # Try to load it, it should fail
-        self.assertRaises(TemplateDoesNotExist, template_loader.load_template, "missing.html")
+        with self.assertRaises(TemplateDoesNotExist):
+            self.loader.load_template("missing.html")
         # Verify that the fact that the missing template, which hasn't been found, has actually
         # been cached:
-        self.assertEqual(template_loader.template_cache.get("missing.html"),
-                         TemplateDoesNotExist,
+        cached_miss = self.loader.template_cache["missing.html"]
+        self.assertEqual(cached_miss, TemplateDoesNotExist,
                          "Cached template loader doesn't cache file lookup misses. It should.")
 
 
-@override_settings(
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-    )
-)
+@override_settings(TEMPLATES=[{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [TEMPLATES_DIR],
+}])
 class RenderToStringTest(SimpleTestCase):
     def test_basic(self):
         self.assertEqual(loader.render_to_string('test_context.html'), 'obj:\n')
@@ -155,13 +151,6 @@ class RenderToStringTest(SimpleTestCase):
     def test_basic_context(self):
         self.assertEqual(loader.render_to_string('test_context.html',
                                                  {'obj': 'test'}), 'obj:test\n')
-
-    def test_existing_context_kept_clean(self):
-        context = Context({'obj': 'before'})
-        output = loader.render_to_string('test_context.html', {'obj': 'after'},
-                                         context_instance=context)
-        self.assertEqual(output, 'obj:after\n')
-        self.assertEqual(context['obj'], 'before')
 
     def test_empty_list(self):
         six.assertRaisesRegex(self, TemplateDoesNotExist,
@@ -172,6 +161,21 @@ class RenderToStringTest(SimpleTestCase):
         six.assertRaisesRegex(self, TemplateDoesNotExist,
             'No template names provided$',
             loader.select_template, [])
+
+
+@ignore_warnings(category=RemovedInDjango20Warning)
+@override_settings(TEMPLATES=[{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [TEMPLATES_DIR],
+}])
+class DeprecatedRenderToStringTest(SimpleTestCase):
+
+    def test_existing_context_kept_clean(self):
+        context = Context({'obj': 'before'})
+        output = loader.render_to_string('test_context.html', {'obj': 'after'},
+                                         context_instance=context)
+        self.assertEqual(output, 'obj:after\n')
+        self.assertEqual(context['obj'], 'before')
 
     def test_no_empty_dict_pushed_to_stack(self):
         """
@@ -186,7 +190,11 @@ class RenderToStringTest(SimpleTestCase):
             loader.render_to_string('test_context_stack.html', context_instance=Context()).strip())
 
 
-class TemplateDirsOverrideTest(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
+@ignore_warnings(category=RemovedInDjango20Warning)
+@override_settings(TEMPLATES=[{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+}])
+class TemplateDirsOverrideTest(SimpleTestCase):
 
     dirs_tuple = (os.path.join(os.path.dirname(upath(__file__)), 'other_templates'),)
     dirs_list = list(dirs_tuple)
@@ -199,39 +207,49 @@ class TemplateDirsOverrideTest(IgnorePendingDeprecationWarningsMixin, unittest.T
     def test_get_template(self):
         for dirs in self.dirs_iter:
             template = loader.get_template('test_dirs.html', dirs=dirs)
-            self.assertEqual(template.render(Context({})), 'spam eggs\n')
+            self.assertEqual(template.render(), 'spam eggs\n')
 
     def test_select_template(self):
         for dirs in self.dirs_iter:
             template = loader.select_template(['test_dirs.html'], dirs=dirs)
-            self.assertEqual(template.render(Context({})), 'spam eggs\n')
+            self.assertEqual(template.render(), 'spam eggs\n')
 
 
-@override_settings(
-    TEMPLATE_LOADERS=(
-        ('django.template.loaders.cached.Loader', (
-            'django.template.loaders.filesystem.Loader',
-            'django.template.loaders.app_directories.Loader',
-        )),
-    )
-)
+@override_settings(TEMPLATES=[{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [GLOBAL_TEMPLATES_DIR],
+    'OPTIONS': {
+        'loaders': [
+            ('django.template.loaders.cached.Loader', [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ]),
+        ],
+    },
+}])
 class PriorityCacheLoader(SimpleTestCase):
     def test_basic(self):
         """
         Check that the order of template loader works. Refs #21460.
         """
-        t1, name = loader.find_template('priority/foo.html')
-        self.assertEqual(t1.render(Context({})), 'priority\n')
+        t1 = loader.get_template('priority/foo.html')
+        self.assertEqual(t1.render(), 'priority\n')
 
 
-@override_settings(
-    TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',
-                      'django.template.loaders.app_directories.Loader',),
-)
+@override_settings(TEMPLATES=[{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [GLOBAL_TEMPLATES_DIR],
+    'OPTIONS': {
+        'loaders': [
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        ],
+    },
+}])
 class PriorityLoader(SimpleTestCase):
     def test_basic(self):
         """
         Check that the order of template loader works. Refs #21460.
         """
-        t1, name = loader.find_template('priority/foo.html')
-        self.assertEqual(t1.render(Context({})), 'priority\n')
+        t1 = loader.get_template('priority/foo.html')
+        self.assertEqual(t1.render(), 'priority\n')

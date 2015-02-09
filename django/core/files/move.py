@@ -6,21 +6,9 @@ Move a file in the safest way possible::
 """
 
 import os
+from shutil import copystat
+
 from django.core.files import locks
-
-try:
-    from shutil import copystat
-except ImportError:
-    import stat
-
-    def copystat(src, dst):
-        """Copy all stat info (mode bits, atime and mtime) from src to dst"""
-        st = os.stat(src)
-        mode = stat.S_IMODE(st.st_mode)
-        if hasattr(os, 'utime'):
-            os.utime(dst, (st.st_atime, st.st_mtime))
-        if hasattr(os, 'chmod'):
-            os.chmod(dst, mode)
 
 __all__ = ['file_move_safe']
 

@@ -1,4 +1,5 @@
 import inspect
+import re
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
@@ -7,9 +8,12 @@ from django.http import HttpResponseRedirect
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
-from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
-from django.views.generic.detail import (SingleObjectMixin,
-                        SingleObjectTemplateResponseMixin, BaseDetailView)
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from django.views.generic.detail import (
+    BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,
+)
+
+PERCENT_PLACEHOLDER_REGEX = re.compile(r'%\([^\)]+\)')  # RemovedInDjango20Warning
 
 
 class FormMixinBase(type):
@@ -162,7 +166,17 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         Returns the supplied URL.
         """
         if self.success_url:
-            url = self.success_url % self.object.__dict__
+            # force_text can be removed with deprecation warning
+            self.success_url = force_text(self.success_url)
+            if PERCENT_PLACEHOLDER_REGEX.search(self.success_url):
+                warnings.warn(
+                    "%()s placeholder style in success_url is deprecated. "
+                    "Please replace them by the {} Python format syntax.",
+                    RemovedInDjango20Warning, stacklevel=2
+                )
+                url = self.success_url % self.object.__dict__
+            else:
+                url = self.success_url.format(**self.object.__dict__)
         else:
             try:
                 url = self.object.get_absolute_url()
@@ -288,7 +302,17 @@ class DeletionMixin(object):
 
     def get_success_url(self):
         if self.success_url:
-            return self.success_url % self.object.__dict__
+            # force_text can be removed with deprecation warning
+            self.success_url = force_text(self.success_url)
+            if PERCENT_PLACEHOLDER_REGEX.search(self.success_url):
+                warnings.warn(
+                    "%()s placeholder style in success_url is deprecated. "
+                    "Please replace them by the {} Python format syntax.",
+                    RemovedInDjango20Warning, stacklevel=2
+                )
+                return self.success_url % self.object.__dict__
+            else:
+                return self.success_url.format(**self.object.__dict__)
         else:
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")

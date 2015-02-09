@@ -36,10 +36,10 @@ It's used both by Django's development server and in production WSGI
 deployments.
 
 WSGI servers obtain the path to the ``application`` callable from their
-configuration. Django's built-in servers, namely the :djadmin:`runserver` and
-:djadmin:`runfcgi` commands, read it from the :setting:`WSGI_APPLICATION`
-setting. By default, it's set to ``<project_name>.wsgi.application``, which
-points to the ``application`` callable in :file:`<project_name>/wsgi.py`.
+configuration. Django's built-in server, namely the :djadmin:`runserver`
+command, read it from the :setting:`WSGI_APPLICATION` setting. By default, it's
+set to ``<project_name>.wsgi.application``, which points to the ``application``
+callable in :file:`<project_name>/wsgi.py`.
 
 Configuring the settings module
 -------------------------------
@@ -80,7 +80,7 @@ You could also replace the Django WSGI application with a custom WSGI
 application that later delegates to the Django WSGI application, if you want
 to combine a Django application with a WSGI application of another framework.
 
-.. _`WSGI middleware`: http://www.python.org/dev/peps/pep-3333/#middleware-components-that-play-both-sides
+.. _`WSGI middleware`: https://www.python.org/dev/peps/pep-3333/#middleware-components-that-play-both-sides
 
 .. note::
 

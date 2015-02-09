@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-from collections import OrderedDict
 import keyword
 import re
+from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, connections
 
 
 class Command(BaseCommand):
@@ -45,9 +45,6 @@ class Command(BaseCommand):
                 "Django to create, modify, and delete the table"
             )
             yield "# Feel free to rename the models, but don't rename db_table values or field names."
-            yield "#"
-            yield "# Also note: You'll have to insert the output of 'django-admin sqlcustom [app_label]'"
-            yield "# into your database."
             yield "from __future__ import unicode_literals"
             yield ''
             yield 'from %s import models' % self.db_module
@@ -73,11 +70,11 @@ class Command(BaseCommand):
                 except NotImplementedError:
                     constraints = {}
                 used_column_names = []  # Holds column names used in the table so far
-                for i, row in enumerate(connection.introspection.get_table_description(cursor, table_name)):
+                for row in connection.introspection.get_table_description(cursor, table_name):
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
                     extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
                     column_name = row[0]
-                    is_relation = i in relations
+                    is_relation = column_name in relations
 
                     att_name, params, notes = self.normalize_col_name(
                         column_name, used_column_names, is_relation)
@@ -94,7 +91,7 @@ class Command(BaseCommand):
                             extra_params['unique'] = True
 
                     if is_relation:
-                        rel_to = "self" if relations[i][1] == table_name else table2model(relations[i][1])
+                        rel_to = "self" if relations[column_name][1] == table_name else table2model(relations[column_name][1])
                         if rel_to in known_models:
                             field_type = 'ForeignKey(%s' % rel_to
                         else:

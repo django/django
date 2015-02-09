@@ -1,21 +1,20 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import PermissionDenied
-from django.core.mail import send_mail
-from django.core import validators
-from django.db import models
-from django.db.models.manager import EmptyManager
-from django.utils.crypto import get_random_string, salted_hmac
-from django.utils import six
-from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
-
 from django.contrib import auth
 from django.contrib.auth.hashers import (
-    check_password, make_password, is_password_usable)
+    check_password, is_password_usable, make_password,
+)
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
+from django.core import validators
+from django.core.exceptions import PermissionDenied
+from django.core.mail import send_mail
+from django.db import models
+from django.db.models.manager import EmptyManager
+from django.utils import six, timezone
+from django.utils.crypto import get_random_string, salted_hmac
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 
 def update_last_login(sender, user, **kwargs):
@@ -29,6 +28,8 @@ user_logged_in.connect(update_last_login)
 
 
 class PermissionManager(models.Manager):
+    use_in_migrations = True
+
     def get_by_natural_key(self, codename, app_label, model):
         return self.get(
             codename=codename,
@@ -87,6 +88,8 @@ class GroupManager(models.Manager):
     """
     The manager for the auth's Group model.
     """
+    use_in_migrations = True
+
     def get_by_natural_key(self, name):
         return self.get(name=name)
 
@@ -160,6 +163,7 @@ class BaseUserManager(models.Manager):
 
 
 class UserManager(BaseUserManager):
+    use_in_migrations = True
 
     def _create_user(self, username, email, password,
                      is_staff, is_superuser, **extra_fields):

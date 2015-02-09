@@ -1,9 +1,9 @@
 from django.core import management
-from django.core.checks import run_checks, Error
+from django.core.checks import Error, run_checks
 from django.db.models.signals import post_init
 from django.test import TestCase
-from django.utils import six
 from django.test.utils import override_settings
+from django.utils import six
 
 
 class OnPostInit(object):

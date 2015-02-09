@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
 
-from django.contrib.gis.geos import fromstr, Point, LineString, LinearRing, Polygon
-from django.utils.functional import total_ordering
-from django.utils.safestring import mark_safe
+from django.contrib.gis.geos import (
+    LinearRing, LineString, Point, Polygon, fromstr,
+)
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import total_ordering
+from django.utils.safestring import mark_safe
 
 
 @python_2_unicode_compatible

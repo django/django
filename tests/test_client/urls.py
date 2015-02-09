@@ -4,7 +4,6 @@ from django.views.generic import RedirectView
 
 from . import views
 
-
 urlpatterns = [
     url(r'^get_view/$', views.get_view, name='get_view'),
     url(r'^post_view/$', views.post_view),
@@ -15,8 +14,8 @@ urlpatterns = [
     url(r'^secure_view/$', views.view_with_secure),
     url(r'^permanent_redirect_view/$', RedirectView.as_view(url='/get_view/', permanent=True)),
     url(r'^temporary_redirect_view/$', RedirectView.as_view(url='/get_view/', permanent=False)),
-    url(r'^http_redirect_view/$', RedirectView.as_view(url='/secure_view/', permanent=True)),
-    url(r'^https_redirect_view/$', RedirectView.as_view(url='https://testserver/secure_view/', permanent=True)),
+    url(r'^http_redirect_view/$', RedirectView.as_view(url='/secure_view/')),
+    url(r'^https_redirect_view/$', RedirectView.as_view(url='https://testserver/secure_view/')),
     url(r'^double_redirect_view/$', views.double_redirect_view),
     url(r'^bad_view/$', views.bad_view),
     url(r'^form_view/$', views.form_view),

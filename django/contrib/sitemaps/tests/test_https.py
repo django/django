@@ -1,9 +1,8 @@
 from __future__ import unicode_literals
 
 from datetime import date
-import warnings
 
-from django.test import override_settings
+from django.test import ignore_warnings, override_settings
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .base import SitemapTestsBase
@@ -13,17 +12,16 @@ from .base import SitemapTestsBase
 class HTTPSSitemapTests(SitemapTestsBase):
     protocol = 'https'
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_secure_sitemap_index(self):
         "A secure sitemap index can be rendered"
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
-            # The URL for views.sitemap in tests/urls/https.py has been updated
-            # with a name but since reversing by Python path is tried first
-            # before reversing by name and works since we're giving
-            # name='django.contrib.sitemaps.views.sitemap', we need to silence
-            # the erroneous warning until reversing by dotted path is removed.
-            # The test will work without modification when it's removed.
-            response = self.client.get('/secure/index.xml')
+        # The URL for views.sitemap in tests/urls/https.py has been updated
+        # with a name but since reversing by Python path is tried first
+        # before reversing by name and works since we're giving
+        # name='django.contrib.sitemaps.views.sitemap', we need to silence
+        # the erroneous warning until reversing by dotted path is removed.
+        # The test will work without modification when it's removed.
+        response = self.client.get('/secure/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap><loc>%s/secure/sitemap-simple.xml</loc></sitemap>
@@ -46,17 +44,16 @@ class HTTPSSitemapTests(SitemapTestsBase):
 class HTTPSDetectionSitemapTests(SitemapTestsBase):
     extra = {'wsgi.url_scheme': 'https'}
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_sitemap_index_with_https_request(self):
         "A sitemap index requested in HTTPS is rendered with HTTPS links"
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
-            # The URL for views.sitemap in tests/urls/https.py has been updated
-            # with a name but since reversing by Python path is tried first
-            # before reversing by name and works since we're giving
-            # name='django.contrib.sitemaps.views.sitemap', we need to silence
-            # the erroneous warning until reversing by dotted path is removed.
-            # The test will work without modification when it's removed.
-            response = self.client.get('/simple/index.xml', **self.extra)
+        # The URL for views.sitemap in tests/urls/https.py has been updated
+        # with a name but since reversing by Python path is tried first
+        # before reversing by name and works since we're giving
+        # name='django.contrib.sitemaps.views.sitemap', we need to silence
+        # the erroneous warning until reversing by dotted path is removed.
+        # The test will work without modification when it's removed.
+        response = self.client.get('/simple/index.xml', **self.extra)
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>

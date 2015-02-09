@@ -1,16 +1,20 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 
-from . import models
-from . import views
-
+from . import models, views
 
 urlpatterns = [
     # TemplateView
     url(r'^template/no_template/$',
         TemplateView.as_view()),
+    url(r'^template/login_required/$',
+        login_required(TemplateView.as_view())),
     url(r'^template/simple/(?P<foo>\w+)/$',
         TemplateView.as_view(template_name='generic_views/about.html')),
     url(r'^template/custom/(?P<foo>\w+)/$',
@@ -74,9 +78,11 @@ urlpatterns = [
         views.NaiveAuthorCreate.as_view(success_url='/edit/authors/create/')),
     url(r'^edit/authors/create/interpolate_redirect/$',
         views.NaiveAuthorCreate.as_view(success_url='/edit/author/%(id)d/update/')),
+    url(r'^edit/authors/create/interpolate_redirect_nonascii/$',
+        views.NaiveAuthorCreate.as_view(success_url='/%C3%A9dit/author/{id}/update/')),
     url(r'^edit/authors/create/restricted/$',
         views.AuthorCreateRestricted.as_view()),
-    url(r'^edit/authors/create/$',
+    url(r'^[eé]dit/authors/create/$',
         views.AuthorCreate.as_view()),
     url(r'^edit/authors/create/special/$',
         views.SpecializedAuthorCreate.as_view()),
@@ -87,7 +93,9 @@ urlpatterns = [
         views.NaiveAuthorUpdate.as_view(success_url='/edit/authors/create/')),
     url(r'^edit/author/(?P<pk>[0-9]+)/update/interpolate_redirect/$',
         views.NaiveAuthorUpdate.as_view(success_url='/edit/author/%(id)d/update/')),
-    url(r'^edit/author/(?P<pk>[0-9]+)/update/$',
+    url(r'^edit/author/(?P<pk>[0-9]+)/update/interpolate_redirect_nonascii/$',
+        views.NaiveAuthorUpdate.as_view(success_url='/%C3%A9dit/author/{id}/update/')),
+    url(r'^[eé]dit/author/(?P<pk>[0-9]+)/update/$',
         views.AuthorUpdate.as_view()),
     url(r'^edit/author/update/$',
         views.OneAuthorUpdate.as_view()),
@@ -99,6 +107,8 @@ urlpatterns = [
         views.NaiveAuthorDelete.as_view(success_url='/edit/authors/create/')),
     url(r'^edit/author/(?P<pk>[0-9]+)/delete/interpolate_redirect/$',
         views.NaiveAuthorDelete.as_view(success_url='/edit/authors/create/?deleted=%(id)s')),
+    url(r'^edit/author/(?P<pk>[0-9]+)/delete/interpolate_redirect_nonascii/$',
+        views.NaiveAuthorDelete.as_view(success_url='/%C3%A9dit/authors/create/?deleted={id}')),
     url(r'^edit/author/(?P<pk>[0-9]+)/delete/$',
         views.AuthorDelete.as_view()),
     url(r'^edit/author/(?P<pk>[0-9]+)/delete/special/$',

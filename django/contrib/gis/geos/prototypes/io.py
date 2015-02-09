@@ -1,16 +1,18 @@
 import threading
-from ctypes import byref, c_char_p, c_int, c_char, c_size_t, Structure, POINTER
+from ctypes import POINTER, Structure, byref, c_char, c_char_p, c_int, c_size_t
+
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.libgeos import GEOM_PTR
-from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_string, check_sized_string
+from django.contrib.gis.geos.prototypes.errcheck import (
+    check_geom, check_sized_string, check_string,
+)
 from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
-
 from django.utils import six
 from django.utils.encoding import force_bytes
 
 
-### The WKB/WKT Reader/Writer structures and pointers ###
+# ### The WKB/WKT Reader/Writer structures and pointers ###
 class WKTReader_st(Structure):
     pass
 
@@ -31,7 +33,7 @@ WKT_WRITE_PTR = POINTER(WKTWriter_st)
 WKB_READ_PTR = POINTER(WKBReader_st)
 WKB_WRITE_PTR = POINTER(WKBReader_st)
 
-### WKTReader routines ###
+# WKTReader routines
 wkt_reader_create = GEOSFunc('GEOSWKTReader_create')
 wkt_reader_create.restype = WKT_READ_PTR
 
@@ -43,7 +45,7 @@ wkt_reader_read.argtypes = [WKT_READ_PTR, c_char_p]
 wkt_reader_read.restype = GEOM_PTR
 wkt_reader_read.errcheck = check_geom
 
-### WKTWriter routines ###
+# WKTWriter routines
 wkt_writer_create = GEOSFunc('GEOSWKTWriter_create')
 wkt_writer_create.restype = WKT_WRITE_PTR
 
@@ -67,7 +69,7 @@ except AttributeError:
     wkt_writer_get_outdim = lambda ptr: 2
     wkt_writer_set_outdim = lambda ptr, dim: None
 
-### WKBReader routines ###
+# WKBReader routines
 wkb_reader_create = GEOSFunc('GEOSWKBReader_create')
 wkb_reader_create.restype = WKB_READ_PTR
 
@@ -89,7 +91,7 @@ def wkb_read_func(func):
 wkb_reader_read = wkb_read_func(GEOSFunc('GEOSWKBReader_read'))
 wkb_reader_read_hex = wkb_read_func(GEOSFunc('GEOSWKBReader_readHEX'))
 
-### WKBWriter routines ###
+# WKBWriter routines
 wkb_writer_create = GEOSFunc('GEOSWKBWriter_create')
 wkb_writer_create.restype = WKB_WRITE_PTR
 
@@ -127,7 +129,7 @@ wkb_writer_get_include_srid = wkb_writer_get(GEOSFunc('GEOSWKBWriter_getIncludeS
 wkb_writer_set_include_srid = wkb_writer_set(GEOSFunc('GEOSWKBWriter_setIncludeSRID'), argtype=c_char)
 
 
-### Base I/O Class ###
+# ### Base I/O Class ###
 class IOBase(GEOSBase):
     "Base class for GEOS I/O objects."
     def __init__(self):
@@ -139,7 +141,7 @@ class IOBase(GEOSBase):
         if self._ptr:
             self._destructor(self._ptr)
 
-### Base WKB/WKT Reading and Writing objects ###
+# ### Base WKB/WKT Reading and Writing objects ###
 
 
 # Non-public WKB/WKT reader classes for internal use because
@@ -172,7 +174,7 @@ class _WKBReader(IOBase):
             raise TypeError
 
 
-### WKB/WKT Writer Classes ###
+# ### WKB/WKT Writer Classes ###
 class WKTWriter(IOBase):
     _constructor = wkt_writer_create
     _destructor = wkt_writer_destroy
@@ -206,7 +208,7 @@ class WKBWriter(IOBase):
         "Returns the HEXEWKB representation of the given geometry."
         return wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
 
-    ### WKBWriter Properties ###
+    # ### WKBWriter Properties ###
 
     # Property for getting/setting the byteorder.
     def _get_byteorder(self):

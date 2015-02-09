@@ -4,13 +4,12 @@ A test spanning all the capabilities of all the serializers.
 This class sets up a model for each model field type
 (except for image types, because of the Pillow dependency).
 """
-import warnings
-
-from django.db import models
 from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
+    GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
+
 
 # The following classes are for testing basic data
 # marshalling, including NULL values, where allowed.
@@ -65,12 +64,6 @@ class BigIntegerData(models.Model):
 
 # class ImageData(models.Model):
 #    data = models.ImageField(null=True)
-
-
-class IPAddressData(models.Model):
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        data = models.IPAddressField(null=True)
 
 
 class GenericIPAddressData(models.Model):
@@ -247,12 +240,6 @@ class IntegerPKData(models.Model):
 
 # class ImagePKData(models.Model):
 #    data = models.ImageField(primary_key=True)
-
-
-class IPAddressPKData(models.Model):
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        data = models.IPAddressField(primary_key=True)
 
 
 class GenericIPAddressPKData(models.Model):

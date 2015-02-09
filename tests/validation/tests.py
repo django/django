@@ -5,8 +5,10 @@ from django.core.exceptions import NON_FIELD_ERRORS
 from django.test import TestCase
 
 from . import ValidationTestCase
-from .models import (Author, Article, ModelToValidate,
-    GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest)
+from .models import (
+    Article, Author, GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest,
+    ModelToValidate,
+)
 
 
 class BaseModelValidationTests(ValidationTestCase):

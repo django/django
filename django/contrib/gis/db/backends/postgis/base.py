@@ -1,20 +1,14 @@
 from django.conf import settings
-from django.db.backends.creation import NO_DB_ALIAS
-from django.db.backends.postgresql_psycopg2.base import (
-    DatabaseWrapper as Psycopg2DatabaseWrapper,
-    DatabaseFeatures as Psycopg2DatabaseFeatures
-)
-from django.contrib.gis.db.backends.base import BaseSpatialFeatures
-from django.contrib.gis.db.backends.postgis.creation import PostGISCreation
-from django.contrib.gis.db.backends.postgis.introspection import PostGISIntrospection
-from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
-from django.contrib.gis.db.backends.postgis.schema import PostGISSchemaEditor
+from django.db.backends.base.base import NO_DB_ALIAS
+from django.db.backends.postgresql_psycopg2.base import \
+    DatabaseWrapper as Psycopg2DatabaseWrapper
 from django.utils.functional import cached_property
 
-
-class DatabaseFeatures(BaseSpatialFeatures, Psycopg2DatabaseFeatures):
-    supports_3d_functions = True
-    supports_left_right_lookups = True
+from .creation import PostGISCreation
+from .features import DatabaseFeatures
+from .introspection import PostGISIntrospection
+from .operations import PostGISOperations
+from .schema import PostGISSchemaEditor
 
 
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
@@ -31,7 +25,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
     @cached_property
     def template_postgis(self):
         template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
-        with self.cursor() as cursor:
+        with self._nodb_connection.cursor() as cursor:
             cursor.execute('SELECT 1 FROM pg_database WHERE datname = %s LIMIT 1;', (template_postgis,))
             if cursor.fetchone():
                 return template_postgis
@@ -43,4 +37,3 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
             # Check that postgis extension is installed on PostGIS >= 2
             with self.cursor() as cursor:
                 cursor.execute("CREATE EXTENSION IF NOT EXISTS postgis")
-                cursor.connection.commit()

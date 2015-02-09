@@ -2,16 +2,15 @@ from __future__ import unicode_literals
 
 from django.core.exceptions import ValidationError
 from django.forms import Form
-from django.forms.fields import IntegerField, BooleanField
+from django.forms.fields import BooleanField, IntegerField
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
+from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
-from django.utils import six
-from django.utils.six.moves import xrange
-from django.utils.translation import ungettext, ugettext as _
-
+from django.utils.six.moves import range
+from django.utils.translation import ugettext as _, ungettext
 
 __all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
 
@@ -138,7 +137,7 @@ class BaseFormSet(object):
         Instantiate forms at first property access.
         """
         # DoS protection is included in total_form_count()
-        forms = [self._construct_form(i) for i in xrange(self.total_form_count())]
+        forms = [self._construct_form(i) for i in range(self.total_form_count())]
         return forms
 
     def _construct_form(self, i, **kwargs):

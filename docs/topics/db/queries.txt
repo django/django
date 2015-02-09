@@ -405,7 +405,7 @@ translates (roughly) into the following SQL:
    arguments whose names and values are evaluated at runtime. For more
    information, see `Keyword Arguments`_ in the official Python tutorial.
 
-   .. _`Keyword Arguments`: http://docs.python.org/tutorial/controlflow.html#keyword-arguments
+   .. _`Keyword Arguments`: https://docs.python.org/tutorial/controlflow.html#keyword-arguments
 
 The field specified in a lookup has to be the name of a model field. There's
 one exception though, in case of a :class:`~django.db.models.ForeignKey` you
@@ -617,10 +617,6 @@ and with other ``F()`` objects. To find all the blog entries with more than
 *twice* as many comments as pingbacks, we modify the query::
 
     >>> Entry.objects.filter(n_comments__gt=F('n_pingbacks') * 2)
-
-.. versionadded:: 1.7
-
-    The power operator ``**`` was added.
 
 To find all the entries where the rating of the entry is less than the
 sum of the pingback count and comment count, we would issue the
@@ -1149,8 +1145,6 @@ above example code would look like this::
 Using a custom reverse manager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.7
-
 By default the :class:`~django.db.models.fields.related.RelatedManager` used
 for reverse relations is a subclass of the :ref:`default manager <manager-names>`
 for that model. If you would like to specify a different manager for a given
@@ -1195,6 +1189,9 @@ be found in the :doc:`related objects reference </ref/models/relations>`.
 
 ``clear()``
     Removes all objects from the related object set.
+
+``set(objs)``
+    Replace the set of related objects.
 
 To assign the members of a related set in one fell swoop, just assign to it
 from any iterable object. The iterable can contain object instances, or just

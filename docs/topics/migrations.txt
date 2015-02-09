@@ -5,23 +5,10 @@ Migrations
 .. module:: django.db.migrations
    :synopsis: Schema migration support for Django models
 
-.. versionadded:: 1.7
-
 Migrations are Django's way of propagating changes you make to your models
 (adding a field, deleting a model, etc.) into your database schema. They're
 designed to be mostly automatic, but you'll need to know when to make
 migrations, when to run them, and the common problems you might run into.
-
-A Brief History
----------------
-
-Prior to version 1.7, Django only supported adding new models to the
-database; it was not possible to alter or remove existing models via the
-``syncdb`` command (the predecessor to :djadmin:`migrate`).
-
-Third-party tools, most notably `South <http://south.aeracode.org>`_,
-provided support for these additional types of change, but it was considered
-important enough that support was brought into core Django.
 
 The Commands
 ------------
@@ -147,18 +134,12 @@ database to make sure they work as expected::
 
     $ python manage.py migrate
     Operations to perform:
-      Synchronize unmigrated apps: sessions, admin, messages, auth, staticfiles, contenttypes
       Apply all migrations: books
-    Synchronizing apps without migrations:
-      Creating tables...
-      Installing custom SQL...
-      Installing indexes...
-    Installed 0 object(s) from 0 fixture(s)
     Running migrations:
+      Rendering model states... DONE
       Applying books.0003_auto... OK
 
-The command runs in two stages; first, it synchronizes unmigrated apps
-(performing the same functionality that ``syncdb`` used to provide), and
+The command runs in two stages; first, it synchronizes unmigrated apps, and
 then it runs any migrations that have not yet been applied.
 
 Once the migration is applied, commit the migration and the models change
@@ -208,26 +189,6 @@ restrict to a single app. Restricting to a single app (either in
 ``makemigrations`` or ``migrate``) is a best-efforts promise, and not
 a guarantee; any other apps that need to be used to get dependencies correct
 will be.
-
-.. _unmigrated-dependencies:
-
-Be aware, however, that unmigrated apps cannot depend on migrated apps, by the
-very nature of not having migrations. This means that it is not generally
-possible to have an unmigrated app have a ``ForeignKey`` or ``ManyToManyField``
-to a migrated app; some cases may work, but it will eventually fail.
-
-.. warning::
-
-    Even if things appear to work with unmigrated apps depending on migrated
-    apps, Django may not generate all the necessary foreign key constraints!
-
-This is particularly apparent if you use swappable models (e.g.
-``AUTH_USER_MODEL``), as every app that uses swappable models will need
-to have migrations if you're unlucky. As time goes on, more and more
-third-party apps will get migrations, but in the meantime you can either
-give them migrations yourself (using :setting:`MIGRATION_MODULES` to
-store those modules outside of the app's own module if you wish), or
-keep the app with your user model unmigrated.
 
 .. _migration-files:
 
@@ -284,7 +245,37 @@ You can't modify the number of positional arguments in an already migrated
 custom field without raising a ``TypeError``. The old migration will call the
 modified ``__init__`` method with the old signature. So if you need a new
 argument, please create a keyword argument and add something like
-``assert kwargs.get('argument_name') is not None`` in the constructor.
+``assert 'argument_name' in kwargs`` in the constructor.
+
+.. _using-managers-in-migrations:
+
+Model managers
+~~~~~~~~~~~~~~
+
+.. versionadded:: 1.8
+
+You can optionally serialize managers into migrations and have them available
+in :class:`~django.db.migrations.operations.RunPython` operations. This is done
+by defining a ``use_in_migrations`` attribute on the manager class::
+
+    class MyManager(models.Manager):
+        use_in_migrations = True
+
+    class MyModel(models.Model):
+        objects = MyManager()
+
+If you are using the :meth:`~django.db.models.from_queryset` function to
+dynamically generate a manager class, you need to inherit from the generated
+class to make it importable::
+
+    class MyManager(MyBaseManager.from_queryset(CustomQuerySet)):
+        use_in_migrations = True
+
+    class MyModel(models.Model):
+        objects = MyManager()
+
+Please refer to the notes about :ref:`historical-models` in migrations to see
+the implications that come along.
 
 Adding migrations to apps
 -------------------------
@@ -326,16 +317,17 @@ you can use the :djadminopt:`--name` option::
 Historical models
 -----------------
 
-When you run migrations, Django is working from historical versions of
-your models stored in the migration files. If you write Python code
-using the :class:`~django.db.migrations.operations.RunPython` operation, or if
-you have ``allow_migrate`` methods on your database routers, you will be
-exposed to these versions of your models.
+When you run migrations, Django is working from historical versions of your
+models stored in the migration files. If you write Python code using the
+:class:`~django.db.migrations.operations.RunPython` operation, or if you have
+``allow_migrate`` methods on your database routers, you will be exposed to
+these versions of your models.
 
 Because it's impossible to serialize arbitrary Python code, these historical
-models will not have any custom methods or managers that you have defined.
-They will, however, have the same fields, relationships and ``Meta`` options
-(also versioned, so they may be different from your current ones).
+models will not have any custom methods that you have defined. They will,
+however, have the same fields, relationships, managers (limited to those with
+``use_in_migrations = True``) and ``Meta`` options (also versioned, so they may
+be different from your current ones).
 
 .. warning::
 
@@ -344,16 +336,65 @@ They will, however, have the same fields, relationships and ``Meta`` options
   constructors or instance methods. Plan appropriately!
 
 References to functions in field options such as ``upload_to`` and
-``limit_choices_to`` are serialized in migrations, so the functions will need
-to be kept around for as long as there is a migration referencing them. Any
-:doc:`custom model fields </howto/custom-model-fields>` will also need to be
-kept, since these are imported directly by migrations.
+``limit_choices_to`` and model manager declarations with managers having
+``use_in_migrations = True`` are serialized in migrations, so the functions and
+classes will need to be kept around for as long as there is a migration
+referencing them. Any :doc:`custom model fields </howto/custom-model-fields>`
+will also need to be kept, since these are imported directly by migrations.
 
-In addition, the base classes of the model are just stored as pointers,
-so you must always keep base classes around for as long as there is a migration
-that contains a reference to them. On the plus side, methods and managers
-from these base classes inherit normally, so if you absolutely need access
-to these you can opt to move them into a superclass.
+In addition, the base classes of the model are just stored as pointers, so you
+must always keep base classes around for as long as there is a migration that
+contains a reference to them. On the plus side, methods and managers from these
+base classes inherit normally, so if you absolutely need access to these you
+can opt to move them into a superclass.
+
+.. _migrations-removing-model-fields:
+
+Considerations when removing model fields
+-----------------------------------------
+
+.. versionadded:: 1.8
+
+Similar to the "references to historical functions" considerations described in
+the previous section, removing custom model fields from your project or
+third-party app will cause a problem if they are referenced in old migrations.
+
+To help with this situation, Django provides some model field attributes to
+assist with model field deprecation using the :doc:`system checks framework
+</topics/checks>`.
+
+Add the ``system_check_deprecated_details`` attribute to your model field
+similar to the following::
+
+    class IPAddressField(Field):
+        system_check_deprecated_details = {
+            'msg': (
+                'IPAddressField has been deprecated. Support for it (except '
+                'in historical migrations) will be removed in Django 1.9.'
+            ),
+            'hint': 'Use GenericIPAddressField instead.',  # optional
+            'id': 'fields.W900',  # pick a unique ID for your field.
+        }
+
+After a deprecation period of your choosing (two major releases for fields in
+Django itself), change the ``system_check_deprecated_details`` attribute to
+``system_check_removed_details`` and update the dictionary similar to::
+
+    class IPAddressField(Field):
+        system_check_removed_details = {
+            'msg': (
+                'IPAddressField has been removed except for support in '
+                'historical migrations.'
+            ),
+            'hint': 'Use GenericIPAddressField instead.',
+            'id': 'fields.E900',  # pick a unique ID for your field.
+        }
+
+You should keep the field's methods that are required for it to operate in
+database migrations such as ``__init__()``, ``deconstruct()``, and
+``get_internal_type()``. Keep this stub field for as long as any migrations
+which reference the field exist. For example, after squashing migrations and
+removing the old ones, you should be able to remove the field completely.
 
 .. _data-migrations:
 
@@ -435,9 +476,13 @@ You can pass a second callable to
 want executed when migrating backwards. If this callable is omitted, migrating
 backwards will raise an exception.
 
+More advanced migrations
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 If you're interested in the more advanced migration operations, or want
 to be able to write your own, see the :doc:`migration operations reference
-</ref/migration-operations>`.
+</ref/migration-operations>` and the "how-to" on :doc:`writing migrations
+</howto/writing-migrations>`.
 
 .. _migration-squashing:
 
@@ -555,10 +600,6 @@ Django can serialize the following:
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
-.. versionchanged:: 1.7.1
-
-    Support for serializing timezone-aware datetimes was added.
-
 Django can serialize the following on Python 3 only:
 
 - Unbound methods used from within the class body (see below)
@@ -638,6 +679,26 @@ The decorator adds logic to capture and preserve the arguments on their
 way into your constructor, and then returns those arguments exactly when
 deconstruct() is called.
 
+Supporting Python 2 and 3
+-------------------------
+
+In order to generate migrations that support both Python 2 and 3, all string
+literals used in your models and fields (e.g. ``verbose_name``,
+``related_name``, etc.), must be consistently either bytestrings or text
+(unicode) strings in both Python 2 and 3 (rather than bytes in Python 2 and
+text in Python 3, the default situation for unmarked string literals.)
+Otherwise running :djadmin:`makemigrations` under Python 3 will generate
+spurious new migrations to convert all these string attributes to text.
+
+The easiest way to achieve this is to follow the advice in Django's
+:doc:`Python 3 porting guide </topics/python3>` and make sure that all your
+modules begin with ``from __future__ import unicode_literals``, so that all
+unmarked string literals are always unicode, regardless of Python version. When
+you add this to an app with existing migrations generated on Python 2, your
+next run of :djadmin:`makemigrations` on Python 3 will likely generate many
+changes as it converts all the bytestring attributes to text strings; this is
+normal and should only happen once.
+
 .. _upgrading-from-south:
 
 Upgrading from South
@@ -684,3 +745,7 @@ More information is available in the
     :doc:`The Migrations Operations Reference </ref/migration-operations>`
         Covers the schema operations API, special operations, and writing your
         own operations.
+
+    :doc:`The Writing Migrations "how-to" </howto/writing-migrations>`
+        Explains how to structure and write database migrations for different
+        scenarios you might encounter.

@@ -52,13 +52,13 @@ all of its authentication backends. If the first authentication method fails,
 Django tries the second one, and so on, until all backends have been attempted.
 
 The list of authentication backends to use is specified in the
-:setting:`AUTHENTICATION_BACKENDS` setting. This should be a tuple of Python
+:setting:`AUTHENTICATION_BACKENDS` setting. This should be a list of Python
 path names that point to Python classes that know how to authenticate. These
 classes can be anywhere on your Python path.
 
 By default, :setting:`AUTHENTICATION_BACKENDS` is set to::
 
-    ('django.contrib.auth.backends.ModelBackend',)
+    ['django.contrib.auth.backends.ModelBackend']
 
 That's the basic authentication backend that checks the Django users database
 and queries the built-in permissions. It does not provide protection against
@@ -436,18 +436,16 @@ different User model.
         class Article(models.Model):
             author = models.ForeignKey(settings.AUTH_USER_MODEL)
 
-    .. versionadded:: 1.7
+    When connecting to signals sent by the ``User`` model, you should specify
+    the custom model using the :setting:`AUTH_USER_MODEL` setting. For example::
 
-        When connecting to signals sent by the User model, you should specify the
-        custom model using the :setting:`AUTH_USER_MODEL` setting. For example::
+        from django.conf import settings
+        from django.db.models.signals import post_save
 
-            from django.conf import settings
-            from django.db.models.signals import post_save
+        def post_save_receiver(signal, sender, instance, **kwargs):
+            pass
 
-            def post_save_receiver(signal, sender, instance, **kwargs):
-                pass
-
-            post_save.connect(post_save_receiver, sender=settings.AUTH_USER_MODEL)
+        post_save.connect(post_save_receiver, sender=settings.AUTH_USER_MODEL)
 
     Generally speaking, you should reference the User model with the
     :setting:`AUTH_USER_MODEL` setting in code that is executed at import
@@ -637,8 +635,6 @@ The following methods are available on any subclass of
 
     .. method:: models.AbstractBaseUser.get_session_auth_hash()
 
-        .. versionadded:: 1.7
-
         Returns an HMAC of the password field. Used for
         :ref:`session-invalidation-on-password-change`.
 
@@ -746,9 +742,9 @@ auth views.
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm`
 
-  Assumes that the user model has an integer primary key, has a field named
-  ``email`` that can be used to identify the user, and a boolean field
-  named ``is_active`` to prevent password resets for inactive users.
+  Assumes that the user model has a field named ``email`` that can be used to
+  identify the user and a boolean field named ``is_active`` to prevent
+  password resets for inactive users.
 
 * :class:`~django.contrib.auth.forms.SetPasswordForm`
 

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+import django.contrib.admin.models
 from django.conf import settings
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -32,5 +33,8 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'log entries',
             },
             bases=(models.Model,),
+            managers=[
+                ('objects', django.contrib.admin.models.LogEntryManager()),
+            ],
         ),
     ]

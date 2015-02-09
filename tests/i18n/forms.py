@@ -1,5 +1,4 @@
 from django import forms
-from django.forms.extras import SelectDateWidget
 
 from .models import Company
 
@@ -14,7 +13,7 @@ class I18nForm(forms.Form):
 
 
 class SelectDateForm(forms.Form):
-    date_field = forms.DateField(widget=SelectDateWidget)
+    date_field = forms.DateField(widget=forms.SelectDateWidget)
 
 
 class CompanyForm(forms.ModelForm):

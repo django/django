@@ -5,10 +5,9 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.query_utils import Q
-from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS, SelectInfo
+from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS
 from django.db.models.sql.query import Query
 from django.utils import six
-
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
 
@@ -54,10 +53,8 @@ class DeleteQuery(Query):
         self.get_initial_alias()
         innerq_used_tables = [t for t in innerq.tables
                               if innerq.alias_refcount[t]]
-        if ((not innerq_used_tables or innerq_used_tables == self.tables)
-                and not len(innerq.having)):
-            # There is only the base table in use in the query, and there is
-            # no aggregate filtering going on.
+        if not innerq_used_tables or innerq_used_tables == self.tables:
+            # There is only the base table in use in the query.
             self.where = innerq.where
         else:
             pk = query.model._meta.pk
@@ -71,7 +68,7 @@ class DeleteQuery(Query):
             else:
                 innerq.clear_select_clause()
                 innerq.select = [
-                    SelectInfo((self.get_initial_alias(), pk.column), None)
+                    pk.get_col(self.get_initial_alias())
                 ]
                 values = innerq
             self.where = self.where_class()
@@ -120,13 +117,15 @@ class UpdateQuery(Query):
         """
         values_seq = []
         for name, val in six.iteritems(values):
-            field, model, direct, m2m = self.get_meta().get_field_by_name(name)
-            if not direct or m2m:
+            field = self.get_meta().get_field(name)
+            direct = not (field.auto_created and not field.concrete) or not field.concrete
+            model = field.model._meta.concrete_model
+            if not direct or (field.is_relation and field.many_to_many):
                 raise FieldError(
                     'Cannot update model field %r (only non-relations and '
                     'foreign keys permitted).' % field
                 )
-            if model:
+            if model is not self.get_meta().model:
                 self.add_related_update(model, field, val)
                 continue
             values_seq.append((field, model, val))
@@ -207,4 +206,7 @@ class AggregateQuery(Query):
     compiler = 'SQLAggregateCompiler'
 
     def add_subquery(self, query, using):
-        self.subquery, self.sub_params = query.get_compiler(using).as_sql(with_col_aliases=True)
+        self.subquery, self.sub_params = query.get_compiler(using).as_sql(
+            with_col_aliases=True,
+            subquery=True,
+        )

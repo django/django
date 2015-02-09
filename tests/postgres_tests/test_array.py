@@ -1,16 +1,21 @@
+import decimal
 import json
 import unittest
+import uuid
 
+from django import forms
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
 from django.core import exceptions, serializers
 from django.core.management import call_command
-from django.db import models, IntegrityError, connection
-from django import forms
+from django.db import IntegrityError, connection, models
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from .models import IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel, DateTimeArrayModel, NestedIntegerArrayModel
+from .models import (
+    ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
+    NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
+)
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
@@ -29,10 +34,16 @@ class TestSaveLoad(TestCase):
         self.assertEqual(instance.field, loaded.field)
 
     def test_dates(self):
-        instance = DateTimeArrayModel(field=[timezone.now()])
+        instance = DateTimeArrayModel(
+            datetimes=[timezone.now()],
+            dates=[timezone.now().date()],
+            times=[timezone.now().time()],
+        )
         instance.save()
         loaded = DateTimeArrayModel.objects.get()
-        self.assertEqual(instance.field, loaded.field)
+        self.assertEqual(instance.datetimes, loaded.datetimes)
+        self.assertEqual(instance.dates, loaded.dates)
+        self.assertEqual(instance.times, loaded.times)
 
     def test_tuples(self):
         instance = IntegerArrayModel(field=(1,))
@@ -69,6 +80,18 @@ class TestSaveLoad(TestCase):
         instance.save()
         loaded = NestedIntegerArrayModel.objects.get()
         self.assertEqual(instance.field, loaded.field)
+
+    def test_other_array_types(self):
+        instance = OtherTypesArrayModel(
+            ips=['192.168.0.1', '::1'],
+            uuids=[uuid.uuid4()],
+            decimals=[decimal.Decimal(1.25), 1.75],
+        )
+        instance.save()
+        loaded = OtherTypesArrayModel.objects.get()
+        self.assertEqual(instance.ips, loaded.ips)
+        self.assertEqual(instance.uuids, loaded.uuids)
+        self.assertEqual(instance.decimals, loaded.decimals)
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
@@ -129,6 +152,18 @@ class TestQuerying(TestCase):
         # Regression for #22907
         self.assertSequenceEqual(
             CharArrayModel.objects.filter(field__contains=['text']),
+            []
+        )
+
+    def test_contained_by_charfield(self):
+        self.assertSequenceEqual(
+            CharArrayModel.objects.filter(field__contained_by=['text']),
+            []
+        )
+
+    def test_overlap_charfield(self):
+        self.assertSequenceEqual(
+            CharArrayModel.objects.filter(field__overlap=['text']),
             []
         )
 
@@ -228,6 +263,16 @@ class TestMigrations(TestCase):
         new = ArrayField(*args, **kwargs)
         self.assertEqual(new.base_field.max_length, field.base_field.max_length)
 
+    def test_subclass_deconstruct(self):
+        field = ArrayField(models.IntegerField())
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, 'django.contrib.postgres.fields.ArrayField')
+
+        field = ArrayFieldSubclass()
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, 'postgres_tests.models.ArrayFieldSubclass')
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
     @override_settings(MIGRATION_MODULES={
         "postgres_tests": "postgres_tests.array_default_migrations",
     })

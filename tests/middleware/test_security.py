@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 
 

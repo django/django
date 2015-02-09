@@ -4,7 +4,7 @@ from datetime import datetime
 
 from django.test import TestCase
 
-from .models import Article, Person, IndexErrorArticle
+from .models import Article, IndexErrorArticle, Person
 
 
 class EarliestOrLatestTests(TestCase):

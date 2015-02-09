@@ -13,12 +13,14 @@ import sys
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousMultipartForm
+from django.core.files.uploadhandler import (
+    SkipFile, StopFutureHandlers, StopUpload,
+)
+from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
-from django.utils import six
 from django.utils.six.moves.urllib.parse import unquote
 from django.utils.text import unescape_entities
-from django.core.files.uploadhandler import StopUpload, SkipFile, StopFutureHandlers
 
 __all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
 
@@ -643,7 +645,8 @@ def parse_header(line):
                 # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
                 # http://tools.ietf.org/html/rfc2231#section-4
                 name = name[:-1]
-                has_encoding = True
+                if p.count(b"'") == 2:
+                    has_encoding = True
             value = p[i + 1:].strip()
             if has_encoding:
                 encoding, lang, value = value.split(b"'")

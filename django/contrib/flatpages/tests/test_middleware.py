@@ -1,25 +1,24 @@
-import os
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.flatpages.models import FlatPage
 from django.test import TestCase, override_settings
 
+from .settings import FLATPAGES_TEMPLATES
+
 
 @override_settings(
     LOGIN_URL='/accounts/login/',
-    MIDDLEWARE_CLASSES=(
+    MIDDLEWARE_CLASSES=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    ),
+    ],
     ROOT_URLCONF='django.contrib.flatpages.tests.urls',
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(__file__), 'templates'),
-    ),
+    TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )
 class FlatpageMiddlewareTests(TestCase):
@@ -88,18 +87,16 @@ class FlatpageMiddlewareTests(TestCase):
 @override_settings(
     APPEND_SLASH=True,
     LOGIN_URL='/accounts/login/',
-    MIDDLEWARE_CLASSES=(
+    MIDDLEWARE_CLASSES=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    ),
+    ],
     ROOT_URLCONF='django.contrib.flatpages.tests.urls',
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(__file__), 'templates'),
-    ),
+    TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )
 class FlatpageMiddlewareAppendSlashTests(TestCase):

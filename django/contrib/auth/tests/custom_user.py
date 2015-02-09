@@ -1,13 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import (
-    BaseUserManager,
-    AbstractBaseUser,
-    AbstractUser,
-    UserManager,
-    PermissionsMixin,
-    Group,
-    Permission,
+    AbstractBaseUser, AbstractUser, BaseUserManager, Group, Permission,
+    PermissionsMixin, UserManager,
 )
+from django.db import models
 
 
 # The custom User uses email as the unique identifier, and requires
@@ -211,7 +206,7 @@ class CustomUserNonListRequiredFields(AbstractBaseUser):
 
 
 class CustomUserBadRequiredFields(AbstractBaseUser):
-    "A user with a non-unique username"
+    "A user with a USERNAME_FIELD that appears in REQUIRED_FIELDS (invalid)"
     username = models.CharField(max_length=30, unique=True)
     date_of_birth = models.DateField()
 

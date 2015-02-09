@@ -11,16 +11,17 @@ from django.core.exceptions import SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import request_finished
 from django.db import close_old_connections
-from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
-                         HttpResponsePermanentRedirect, HttpResponseNotAllowed,
-                         HttpResponseNotModified, StreamingHttpResponse,
-                         SimpleCookie, BadHeaderError, JsonResponse,
-                         parse_cookie)
+from django.http import (
+    BadHeaderError, HttpResponse, HttpResponseNotAllowed,
+    HttpResponseNotModified, HttpResponsePermanentRedirect,
+    HttpResponseRedirect, JsonResponse, QueryDict, SimpleCookie,
+    StreamingHttpResponse, parse_cookie,
+)
 from django.test import TestCase
-from django.utils.encoding import smart_str, force_text
-from django.utils.functional import lazy
-from django.utils._os import upath
 from django.utils import six
+from django.utils._os import upath
+from django.utils.encoding import force_text, smart_str
+from django.utils.functional import lazy
 
 lazystr = lazy(force_text, six.text_type)
 
@@ -345,16 +346,8 @@ class HttpResponseTests(unittest.TestCase):
         # test odd inputs
         r = HttpResponse()
         r.content = ['1', '2', 3, '\u079e']
-        #'\xde\x9e' == unichr(1950).encode('utf-8')
+        # '\xde\x9e' == unichr(1950).encode('utf-8')
         self.assertEqual(r.content, b'123\xde\x9e')
-
-        # with Content-Encoding header
-        r = HttpResponse()
-        r['Content-Encoding'] = 'winning'
-        r.content = [b'abc', b'def']
-        self.assertEqual(r.content, b'abcdef')
-        self.assertRaises(TypeError if six.PY3 else UnicodeEncodeError,
-                          setattr, r, 'content', ['\u079e'])
 
         # .content can safely be accessed multiple times.
         r = HttpResponse(iter(['hello', 'world']))
@@ -511,6 +504,14 @@ class StreamingHttpResponseTests(TestCase):
         r = StreamingHttpResponse(['abc', 'def'])
         self.assertEqual(list(r), [b'abc', b'def'])
         self.assertEqual(list(r), [])
+
+        # iterating over Unicode strings still yields bytestring chunks.
+        r.streaming_content = iter(['hello', 'café'])
+        chunks = list(r)
+        # '\xc3\xa9' == unichr(233).encode('utf-8')
+        self.assertEqual(chunks, [b'hello', b'caf\xc3\xa9'])
+        for chunk in chunks:
+            self.assertIsInstance(chunk, six.binary_type)
 
         # streaming responses don't have a `content` attribute.
         self.assertFalse(hasattr(r, 'content'))

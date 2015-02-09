@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+import django.contrib.sites.models
 from django.contrib.sites.models import _simple_domain_name_validator
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -24,5 +25,8 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'sites',
             },
             bases=(models.Model,),
+            managers=[
+                ('objects', django.contrib.sites.models.SiteManager()),
+            ],
         ),
     ]

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import django.contrib.auth.models
 from django.core import validators
-from django.db import models, migrations
+from django.db import migrations, models
 from django.utils import timezone
 
 
@@ -27,6 +28,9 @@ class Migration(migrations.Migration):
                 'verbose_name': 'permission',
                 'verbose_name_plural': 'permissions',
             },
+            managers=[
+                ('objects', django.contrib.auth.models.PermissionManager()),
+            ],
         ),
         migrations.CreateModel(
             name='Group',
@@ -39,6 +43,9 @@ class Migration(migrations.Migration):
                 'verbose_name': 'group',
                 'verbose_name_plural': 'groups',
             },
+            managers=[
+                ('objects', django.contrib.auth.models.GroupManager()),
+            ],
         ),
         migrations.CreateModel(
             name='User',
@@ -62,5 +69,8 @@ class Migration(migrations.Migration):
                 'verbose_name': 'user',
                 'verbose_name_plural': 'users',
             },
+            managers=[
+                ('objects', django.contrib.auth.models.UserManager()),
+            ],
         ),
     ]

@@ -1,8 +1,10 @@
 """
  The GeometryColumns and SpatialRefSys models for the SpatiaLite backend.
 """
+from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
+from django.contrib.gis.db.backends.spatialite.base import DatabaseWrapper
 from django.db import connection, models
-from django.contrib.gis.db.backends.base import SpatialRefSysMixin
+from django.db.backends.signals import connection_created
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -13,10 +15,6 @@ class SpatialiteGeometryColumns(models.Model):
     """
     f_table_name = models.CharField(max_length=256)
     f_geometry_column = models.CharField(max_length=256)
-    if connection.ops.spatial_version[0] >= 4:
-        type = models.IntegerField(db_column='geometry_type')
-    else:
-        type = models.CharField(max_length=30)
     coord_dimension = models.IntegerField()
     srid = models.IntegerField(primary_key=True)
     spatial_index_enabled = models.IntegerField()
@@ -57,8 +55,6 @@ class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
     auth_srid = models.IntegerField()
     ref_sys_name = models.CharField(max_length=256)
     proj4text = models.CharField(max_length=2048)
-    if connection.ops.spatial_version[0] >= 4:
-        srtext = models.CharField(max_length=2048)
 
     @property
     def wkt(self):
@@ -71,3 +67,18 @@ class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
         app_label = 'gis'
         db_table = 'spatial_ref_sys'
         managed = False
+
+
+def add_spatial_version_related_fields(sender, **kwargs):
+    """
+    Adds fields after establishing a database connection to prevent database
+    operations at compile time.
+    """
+    if connection_created.disconnect(add_spatial_version_related_fields, sender=DatabaseWrapper):
+        spatial_version = connection.ops.spatial_version[0]
+        if spatial_version >= 4:
+            SpatialiteSpatialRefSys.add_to_class('srtext', models.CharField(max_length=2048))
+            SpatialiteGeometryColumns.add_to_class('type', models.IntegerField(db_column='geometry_type'))
+        else:
+            SpatialiteGeometryColumns.add_to_class('type', models.CharField(max_length=30))
+connection_created.connect(add_spatial_version_related_fields, sender=DatabaseWrapper)

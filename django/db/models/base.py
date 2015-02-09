@@ -4,31 +4,38 @@ import copy
 import inspect
 import sys
 import warnings
+from itertools import chain
 
 from django.apps import apps
 from django.apps.config import MODELS_MODULE_NAME
 from django.conf import settings
 from django.core import checks
-from django.core.exceptions import (ObjectDoesNotExist,
-    MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
-from django.db import (router, connections, transaction, DatabaseError,
-    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY)
+from django.core.exceptions import (
+    NON_FIELD_ERRORS, FieldDoesNotExist, FieldError, MultipleObjectsReturned,
+    ObjectDoesNotExist, ValidationError,
+)
+from django.db import (
+    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, DatabaseError, connections,
+    router, transaction,
+)
 from django.db.models import signals
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.fields import AutoField, FieldDoesNotExist
-from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
-    OneToOneField, add_lazy_relation)
+from django.db.models.fields import AutoField
+from django.db.models.fields.related import (
+    ForeignObjectRel, ManyToOneRel, OneToOneField, add_lazy_relation,
+)
 from django.db.models.manager import ensure_default_manager
 from django.db.models.options import Options
 from django.db.models.query import Q
-from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
+from django.db.models.query_utils import (
+    DeferredAttribute, deferred_class_factory,
+)
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import curry
 from django.utils.six.moves import zip
-from django.utils.text import get_text_list, capfirst
+from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_version
 
@@ -105,7 +112,7 @@ class ModelBase(type):
                     "This will no longer be supported in Django 1.9." %
                     (module, name))
                 if not abstract:
-                    warnings.warn(msg, RemovedInDjango19Warning, stacklevel=2)
+                    warnings.warn(msg, DeprecationWarning, stacklevel=2)
 
                 model_module = sys.modules[new_class.__module__]
                 package_components = model_module.__name__.split('.')
@@ -175,12 +182,12 @@ class ModelBase(type):
             new_class.add_to_class(obj_name, obj)
 
         # All the fields of any type declared on this model
-        new_fields = (
-            new_class._meta.local_fields +
-            new_class._meta.local_many_to_many +
+        new_fields = chain(
+            new_class._meta.local_fields,
+            new_class._meta.local_many_to_many,
             new_class._meta.virtual_fields
         )
-        field_names = set(f.name for f in new_fields)
+        field_names = {f.name for f in new_fields}
 
         # Basic setup for proxy models.
         if is_proxy:
@@ -202,6 +209,7 @@ class ModelBase(type):
                 raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
             new_class._meta.setup_proxy(base)
             new_class._meta.concrete_model = base._meta.concrete_model
+            base._meta.concrete_model._meta.proxied_children.append(new_class._meta)
         else:
             new_class._meta.concrete_model = new_class
 
@@ -342,7 +350,7 @@ class ModelBase(type):
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
-            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join(f.attname for f in opts.fields))
+            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join(f.name for f in opts.fields))
 
         get_absolute_url_override = settings.ABSOLUTE_URL_OVERRIDES.get(
             '%s.%s' % (opts.app_label, opts.model_name)
@@ -630,7 +638,7 @@ class Model(six.with_metaclass(ModelBase)):
         and not use this method.
         """
         try:
-            field = self._meta.get_field_by_name(field_name)[0]
+            field = self._meta.get_field(field_name)
         except FieldDoesNotExist:
             return getattr(self, field_name)
         return getattr(self, field.attname)
@@ -770,6 +778,9 @@ class Model(six.with_metaclass(ModelBase)):
                        if f.name in update_fields or f.attname in update_fields]
 
         pk_val = self._get_pk_val(meta)
+        if pk_val is None:
+            pk_val = meta.pk.get_pk_value_on_save(self)
+            setattr(self, meta.pk.attname, pk_val)
         pk_set = pk_val is not None
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")
@@ -934,7 +945,7 @@ class Model(six.with_metaclass(ModelBase)):
         unique_checks = []
 
         unique_togethers = [(self.__class__, self._meta.unique_together)]
-        for parent_class in self._meta.parents.keys():
+        for parent_class in self._meta.get_parent_list():
             if parent_class._meta.unique_together:
                 unique_togethers.append((parent_class, parent_class._meta.unique_together))
 
@@ -954,7 +965,7 @@ class Model(six.with_metaclass(ModelBase)):
         # the list of checks.
 
         fields_with_class = [(self.__class__, self._meta.local_fields)]
-        for parent_class in self._meta.parents.keys():
+        for parent_class in self._meta.get_parent_list():
             fields_with_class.append((parent_class, parent_class._meta.local_fields))
 
         for model_class, fields in fields_with_class:
@@ -1225,8 +1236,7 @@ class Model(six.with_metaclass(ModelBase)):
         """ Perform all manager checks. """
 
         errors = []
-        managers = cls._meta.concrete_managers + cls._meta.abstract_managers
-        for __, __, manager in managers:
+        for __, manager, __ in cls._meta.managers:
             errors.extend(manager.check(**kwargs))
         return errors
 
@@ -1439,12 +1449,17 @@ class Model(six.with_metaclass(ModelBase)):
     def _check_local_fields(cls, fields, option):
         from django.db import models
 
+        # In order to avoid hitting the relation tree prematurely, we use our
+        # own fields_map instead of using get_field()
+        forward_fields_map = {
+            field.name: field for field in cls._meta._get_fields(reverse=False)
+        }
+
         errors = []
         for field_name in fields:
             try:
-                field = cls._meta.get_field(field_name,
-                    many_to_many=True)
-            except models.FieldDoesNotExist:
+                field = forward_fields_map[field_name]
+            except KeyError:
                 errors.append(
                     checks.Error(
                         "'%s' refers to the non-existent field '%s'." % (option, field_name),
@@ -1485,9 +1500,6 @@ class Model(six.with_metaclass(ModelBase)):
     def _check_ordering(cls):
         """ Check "ordering" option -- is it a list of strings and do all fields
         exist? """
-
-        from django.db.models import FieldDoesNotExist
-
         if not cls._meta.ordering:
             return []
 
@@ -1503,7 +1515,6 @@ class Model(six.with_metaclass(ModelBase)):
             ]
 
         errors = []
-
         fields = cls._meta.ordering
 
         # Skip '?' fields.
@@ -1521,28 +1532,30 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Skip ordering on pk. This is always a valid order_by field
         # but is an alias and therefore won't be found by opts.get_field.
-        fields = (f for f in fields if f != 'pk')
+        fields = {f for f in fields if f != 'pk'}
 
-        for field_name in fields:
-            try:
-                cls._meta.get_field(field_name, many_to_many=False)
-            except FieldDoesNotExist:
-                if field_name.endswith('_id'):
-                    try:
-                        field = cls._meta.get_field(field_name[:-3], many_to_many=False)
-                    except FieldDoesNotExist:
-                        pass
-                    else:
-                        if field.attname == field_name:
-                            continue
-                errors.append(
-                    checks.Error(
-                        "'ordering' refers to the non-existent field '%s'." % field_name,
-                        hint=None,
-                        obj=cls,
-                        id='models.E015',
-                    )
+        # Check for invalid or non-existent fields in ordering.
+        invalid_fields = []
+
+        # Any field name that is not present in field_names does not exist.
+        # Also, ordering by m2m fields is not allowed.
+        opts = cls._meta
+        valid_fields = set(chain.from_iterable(
+            (f.name, f.attname) if not (f.auto_created and not f.concrete) else (f.field.related_query_name(),)
+            for f in chain(opts.fields, opts.related_objects)
+        ))
+
+        invalid_fields.extend(fields - valid_fields)
+
+        for invalid_field in invalid_fields:
+            errors.append(
+                checks.Error(
+                    "'ordering' refers to the non-existent field '%s'." % invalid_field,
+                    hint=None,
+                    obj=cls,
+                    id='models.E015',
                 )
+            )
         return errors
 
     @classmethod
@@ -1659,6 +1672,8 @@ def model_unpickle(model_id, attrs, factory):
     Used to unpickle Model subclasses with deferred fields.
     """
     if isinstance(model_id, tuple):
+        if not apps.ready:
+            apps.populate(settings.INSTALLED_APPS)
         model = apps.get_model(*model_id)
     else:
         # Backwards compat - the model was cached directly in earlier versions.

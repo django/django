@@ -2,17 +2,20 @@ from __future__ import unicode_literals
 
 import re
 from tempfile import NamedTemporaryFile
-import unittest
 
-from django.db import connection
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import no_oracle, oracle, postgis, spatialite
+from django.contrib.gis.tests.utils import (
+    no_oracle, oracle, postgis, spatialite,
+)
 from django.core.management import call_command
-from django.test import TestCase, skipUnlessDBFeature
+from django.db import connection
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 if HAS_GEOS:
+    from django.contrib.gis.db.models import Extent, MakeLine, Union
     from django.contrib.gis.geos import (fromstr, GEOSGeometry,
         Point, LineString, LinearRing, Polygon, GeometryCollection)
     from .models import Country, City, PennsylvaniaCity, State, Track, NonConcreteModel, Feature, MinusOneSRID
@@ -36,7 +39,7 @@ class GeoModelTest(TestCase):
 
     def test_proxy(self):
         "Testing Lazy-Geometry support (using the GeometryProxy)."
-        ## Testing on a Point
+        # Testing on a Point
         pnt = Point(0, 0)
         nullcity = City(name='NullCity', point=pnt)
         nullcity.save()
@@ -73,7 +76,7 @@ class GeoModelTest(TestCase):
         self.assertEqual(Point(23, 5), City.objects.get(name='NullCity').point)
         nullcity.delete()
 
-        ## Testing on a Polygon
+        # Testing on a Polygon
         shell = LinearRing((0, 0), (0, 100), (100, 100), (100, 0), (0, 0))
         inner = LinearRing((40, 40), (40, 60), (60, 60), (60, 40), (40, 40))
 
@@ -285,12 +288,32 @@ class GeoLookupTest(TestCase):
             self.assertEqual(1, len(qs))
             self.assertEqual('Texas', qs[0].name)
 
+    @skipUnlessDBFeature("supports_crosses_lookup")
+    def test_crosses_lookup(self):
+        Track.objects.create(
+            name='Line1',
+            line=LineString([(-95, 29), (-60, 0)])
+        )
+        self.assertEqual(
+            Track.objects.filter(line__crosses=LineString([(-95, 0), (-60, 29)])).count(),
+            1
+        )
+        self.assertEqual(
+            Track.objects.filter(line__crosses=LineString([(-95, 30), (0, 30)])).count(),
+            0
+        )
+
     @skipUnlessDBFeature("supports_left_right_lookups")
     def test_left_right_lookups(self):
         "Testing the 'left' and 'right' lookup types."
         # Left: A << B => true if xmax(A) < xmin(B)
         # Right: A >> B => true if xmin(A) > xmax(B)
         # See: BOX2D_left() and BOX2D_right() in lwgeom_box2dfloat4.c in PostGIS source.
+
+        # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
+        # http://trac.osgeo.org/postgis/ticket/2035
+        if postgis_bug_version():
+            self.skipTest("PostGIS 2.0/2.0.1 left and right lookups are known to be buggy.")
 
         # Getting the borders for Colorado & Kansas
         co_border = State.objects.get(name='Colorado').poly
@@ -324,11 +347,6 @@ class GeoLookupTest(TestCase):
         self.assertEqual(2, len(qs))
         for c in qs:
             self.assertIn(c.name, cities)
-
-    # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
-    # http://trac.osgeo.org/postgis/ticket/2035
-    if postgis_bug_version():
-        test_left_right_lookups = unittest.expectedFailure(test_left_right_lookups)
 
     def test_equals_lookups(self):
         "Testing the 'same_as' and 'equals' lookup types."
@@ -440,7 +458,7 @@ class GeoQuerySetTest(TestCase):
         geom = Point(5, 23)
         qs = Country.objects.all().difference(geom).sym_difference(geom).union(geom)
 
-        # XXX For some reason SpatiaLite does something screwey with the Texas geometry here.  Also,
+        # XXX For some reason SpatiaLite does something screwy with the Texas geometry here.  Also,
         # XXX it doesn't like the null intersection.
         if spatialite:
             qs = qs.exclude(name='Texas')
@@ -471,18 +489,35 @@ class GeoQuerySetTest(TestCase):
             self.assertIsInstance(country.envelope, Polygon)
 
     @skipUnlessDBFeature("supports_extent_aggr")
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_extent(self):
-        "Testing the `extent` GeoQuerySet method."
+        """
+        Testing the (deprecated) `extent` GeoQuerySet method and the Extent
+        aggregate.
+        """
         # Reference query:
         # `SELECT ST_extent(point) FROM geoapp_city WHERE (name='Houston' or name='Dallas');`
         #   =>  BOX(-96.8016128540039 29.7633724212646,-95.3631439208984 32.7820587158203)
         expected = (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
         qs = City.objects.filter(name__in=('Houston', 'Dallas'))
-        extent = qs.extent()
+        extent1 = qs.extent()
+        extent2 = qs.aggregate(Extent('point'))['point__extent']
 
-        for val, exp in zip(extent, expected):
-            self.assertAlmostEqual(exp, val, 4)
+        for extent in (extent1, extent2):
+            for val, exp in zip(extent, expected):
+                self.assertAlmostEqual(exp, val, 4)
+        self.assertIsNone(City.objects.filter(name=('Smalltown')).extent())
+        self.assertIsNone(City.objects.filter(name=('Smalltown')).aggregate(Extent('point'))['point__extent'])
+
+    @skipUnlessDBFeature("supports_extent_aggr")
+    def test_extent_with_limit(self):
+        """
+        Testing if extent supports limit.
+        """
+        extent1 = City.objects.all().aggregate(Extent('point'))['point__extent']
+        extent2 = City.objects.all()[:3].aggregate(Extent('point'))['point__extent']
+        self.assertNotEqual(extent1, extent2)
 
     @skipUnlessDBFeature("has_force_rhr_method")
     def test_force_rhr(self):
@@ -566,7 +601,7 @@ class GeoQuerySetTest(TestCase):
     @skipUnlessDBFeature("has_gml_method")
     def test_gml(self):
         "Testing GML output from the database using GeoQuerySet.gml()."
-        # Should throw a TypeError when tyring to obtain GML from a
+        # Should throw a TypeError when trying to obtain GML from a
         # non-geometry field.
         qs = City.objects.all()
         self.assertRaises(TypeError, qs.gml, field_name='name')
@@ -612,13 +647,26 @@ class GeoQuerySetTest(TestCase):
         for ptown in [ptown1, ptown2]:
             self.assertEqual('<Point><coordinates>-104.609252,38.255001</coordinates></Point>', ptown.kml)
 
-    # Only PostGIS has support for the MakeLine aggregate.
-    @skipUnlessDBFeature("supports_make_line_aggr")
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_make_line(self):
-        "Testing the `make_line` GeoQuerySet method."
+        """
+        Testing the (deprecated) `make_line` GeoQuerySet method and the MakeLine
+        aggregate.
+        """
+        if not connection.features.supports_make_line_aggr:
+            # Only PostGIS has support for the MakeLine aggregate. For other
+            # backends, test that NotImplementedError is raised
+            self.assertRaises(
+                NotImplementedError,
+                City.objects.all().aggregate, MakeLine('point')
+            )
+            return
+
         # Ensuring that a `TypeError` is raised on models without PointFields.
         self.assertRaises(TypeError, State.objects.make_line)
         self.assertRaises(TypeError, Country.objects.make_line)
+        # MakeLine on an inappropriate field returns simply None
+        self.assertIsNone(State.objects.aggregate(MakeLine('poly'))['poly__makeline'])
         # Reference query:
         # SELECT AsText(ST_MakeLine(geoapp_city.point)) FROM geoapp_city;
         ref_line = GEOSGeometry(
@@ -629,9 +677,11 @@ class GeoQuerySetTest(TestCase):
         )
         # We check for equality with a tolerance of 10e-5 which is a lower bound
         # of the precisions of ref_line coordinates
-        line = City.objects.make_line()
-        self.assertTrue(ref_line.equals_exact(line, tolerance=10e-5),
-            "%s != %s" % (ref_line, line))
+        line1 = City.objects.make_line()
+        line2 = City.objects.aggregate(MakeLine('point'))['point__makeline']
+        for line in (line1, line2):
+            self.assertTrue(ref_line.equals_exact(line, tolerance=10e-5),
+                "%s != %s" % (ref_line, line))
 
     @skipUnlessDBFeature("has_num_geom_method")
     def test_num_geom(self):
@@ -813,24 +863,49 @@ class GeoQuerySetTest(TestCase):
     # but this seems unexpected and should be investigated to determine the cause.
     @skipUnlessDBFeature("has_unionagg_method")
     @no_oracle
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_unionagg(self):
-        "Testing the `unionagg` (aggregate union) GeoQuerySet method."
+        """
+        Testing the (deprecated) `unionagg` (aggregate union) GeoQuerySet method
+        and the Union aggregate.
+        """
         tx = Country.objects.get(name='Texas').mpoly
         # Houston, Dallas -- Ordering may differ depending on backend or GEOS version.
         union1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
         union2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)')
         qs = City.objects.filter(point__within=tx)
         self.assertRaises(TypeError, qs.unionagg, 'name')
+        self.assertRaises(ValueError, qs.aggregate, Union('name'))
         # Using `field_name` keyword argument in one query and specifying an
         # order in the other (which should not be used because this is
         # an aggregate method on a spatial column)
         u1 = qs.unionagg(field_name='point')
         u2 = qs.order_by('name').unionagg()
+        u3 = qs.aggregate(Union('point'))['point__union']
+        u4 = qs.order_by('name').aggregate(Union('point'))['point__union']
         tol = 0.00001
         self.assertTrue(union1.equals_exact(u1, tol) or union2.equals_exact(u1, tol))
         self.assertTrue(union1.equals_exact(u2, tol) or union2.equals_exact(u2, tol))
+        self.assertTrue(union1.equals_exact(u3, tol) or union2.equals_exact(u3, tol))
+        self.assertTrue(union1.equals_exact(u4, tol) or union2.equals_exact(u4, tol))
         qs = City.objects.filter(name='NotACity')
         self.assertIsNone(qs.unionagg(field_name='point'))
+        self.assertIsNone(qs.aggregate(Union('point'))['point__union'])
+
+    def test_within_subquery(self):
+        """
+        Test that using a queryset inside a geo lookup is working (using a subquery)
+        (#14483).
+        """
+        tex_cities = City.objects.filter(
+            point__within=Country.objects.filter(name='Texas').values('mpoly')).order_by('name')
+        expected = ['Dallas', 'Houston']
+        if not connection.features.supports_real_shape_operations:
+            expected.append('Oklahoma City')
+        self.assertEqual(
+            list(tex_cities.values_list('name', flat=True)),
+            expected
+        )
 
     def test_non_concrete_field(self):
         NonConcreteModel.objects.create(point=Point(0, 0), name='name')

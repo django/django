@@ -5,7 +5,7 @@ Query Expressions
 .. currentmodule:: django.db.models
 
 Query expressions describe a value or a computation that can be used as part of
-a filter, an annotation, or an aggregation. There are a number of built-in
+a filter, order by, annotation, or aggregate. There are a number of built-in
 expressions (documented below) that can be used to help you write queries.
 Expressions can be combined, or in some cases nested, to form more complex
 computations.
@@ -16,10 +16,6 @@ Supported arithmetic
 Django supports addition, subtraction, multiplication, division, modulo
 arithmetic, and the power operator on query expressions, using Python constants,
 variables, and even other expressions.
-
-.. versionadded:: 1.7
-
-    Support for the power operator ``**`` was added.
 
 Some examples
 =============
@@ -57,6 +53,10 @@ Some examples
 
     # Aggregates can contain complex computations also
     Company.objects.annotate(num_offerings=Count(F('products') + F('services')))
+
+    # Expressions can also be used in order_by()
+    Company.objects.order_by(Length('name').asc())
+    Company.objects.order_by(Length('name').desc())
 
 
 Built-in Expressions
@@ -189,6 +189,8 @@ extra attribute ``field_lower`` produced, roughly, from the following SQL::
         ...
         LOWER("app_label"."field") as "field_lower"
 
+See :doc:`database-functions` for a list of built-in database functions.
+
 The ``Func`` API is as follows:
 
 .. class:: Func(*expressions, **extra)
@@ -257,7 +259,10 @@ placeholder within the ``template``.
 
 The ``output_field`` argument requires a model field instance, like
 ``IntegerField()`` or ``BooleanField()``, into which Django will load the value
-after it's retrieved from the database.
+after it's retrieved from the database. Usually no arguments are needed when
+instantiating the model field as any arguments relating to data validation
+(``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
+output value.
 
 Note that ``output_field`` is only required when Django is unable to determine
 what field type the result should be. Complex expressions that mix field types
@@ -318,8 +323,19 @@ values into their corresponding database type.
 
 The ``output_field`` argument should be a model field instance, like
 ``IntegerField()`` or ``BooleanField()``, into which Django will load the value
-after it's retrieved from the database.
+after it's retrieved from the database. Usually no arguments are needed when
+instantiating the model field as any arguments relating to data validation
+(``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
+output value.
 
+Conditional expressions
+-----------------------
+
+.. versionadded:: 1.8
+
+Conditional expressions allow you to use :keyword:`if` ... :keyword:`elif` ...
+:keyword:`else` logic in queries. Django natively supports SQL ``CASE``
+expressions. For more details see :doc:`conditional-expressions`.
 
 Technical Information
 =====================
@@ -392,7 +408,7 @@ calling the appropriate methods on the wrapped expression.
               clone.expression = self.expression.relabeled_clone(change_map)
               return clone
 
-    .. method:: convert_value(self, value, connection)
+    .. method:: convert_value(self, value, connection, context)
 
         A hook allowing the expression to coerce ``value`` into a more
         appropriate type.
@@ -420,6 +436,24 @@ calling the appropriate methods on the wrapped expression.
         this expression. ``get_group_by_cols()`` should be called on any
         nested expressions. ``F()`` objects, in particular, hold a reference
         to a column.
+
+    .. method:: asc()
+
+        Returns the expression ready to be sorted in ascending order.
+
+    .. method:: desc()
+
+        Returns the expression ready to be sorted in descending order.
+
+    .. method:: reverse_ordering()
+
+        Returns ``self`` with any modifications required to reverse the sort
+        order within an ``order_by`` call. As an example, an expression
+        implementing ``NULLS LAST`` would change its value to be
+        ``NULLS FIRST``. Modifications are only required for expressions that
+        implement sort order like ``OrderBy``. This method is called when
+        :meth:`~django.db.models.query.QuerySet.reverse()` is called on a
+        queryset.
 
 Writing your own Query Expressions
 ----------------------------------

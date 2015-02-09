@@ -1,15 +1,24 @@
 import os.path
 
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render, render_to_response
 from django.template import Context, RequestContext
 from django.utils._os import upath
-
 
 dirs = (os.path.join(os.path.dirname(upath(__file__)), 'other_templates'),)
 
 
 def render_to_response_view(request):
     return render_to_response('shortcuts/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    })
+
+
+def render_to_response_view_with_multiple_templates(request):
+    return render_to_response([
+        'shortcuts/no_such_template.html',
+        'shortcuts/render_test.html',
+    ], {
         'foo': 'FOO',
         'bar': 'BAR',
     })
@@ -33,6 +42,18 @@ def render_to_response_view_with_dirs(request):
     return render_to_response('render_dirs_test.html', dirs=dirs)
 
 
+def render_to_response_view_with_status(request):
+    return render_to_response('shortcuts/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    }, status=403)
+
+
+def render_to_response_view_with_using(request):
+    using = request.GET.get('using')
+    return render_to_response('shortcuts/using.html', using=using)
+
+
 def context_processor(request):
     return {'bar': 'context processor output'}
 
@@ -45,6 +66,16 @@ def render_to_response_with_context_instance_misuse(request):
 
 def render_view(request):
     return render(request, 'shortcuts/render_test.html', {
+        'foo': 'FOO',
+        'bar': 'BAR',
+    })
+
+
+def render_view_with_multiple_templates(request):
+    return render(request, [
+        'shortcuts/no_such_template.html',
+        'shortcuts/render_test.html',
+    ], {
         'foo': 'FOO',
         'bar': 'BAR',
     })
@@ -73,6 +104,11 @@ def render_view_with_status(request):
         'foo': 'FOO',
         'bar': 'BAR',
     }, status=403)
+
+
+def render_view_with_using(request):
+    using = request.GET.get('using')
+    return render(request, 'shortcuts/using.html', using=using)
 
 
 def render_view_with_current_app(request):

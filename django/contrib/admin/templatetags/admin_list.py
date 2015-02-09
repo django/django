@@ -2,24 +2,25 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.admin.utils import (lookup_field, display_for_field,
-    display_for_value, label_for_field)
-from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
-    ORDER_VAR, PAGE_VAR, SEARCH_VAR)
 from django.contrib.admin.templatetags.admin_static import static
+from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from django.contrib.admin.utils import (
+    display_for_field, display_for_value, label_for_field, lookup_field,
+)
+from django.contrib.admin.views.main import (
+    ALL_VAR, EMPTY_CHANGELIST_VALUE, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
+)
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import NoReverseMatch
 from django.db import models
+from django.template import Library
+from django.template.loader import get_template
 from django.utils import formats
+from django.utils.encoding import force_text
 from django.utils.html import escapejs, format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
-from django.utils.encoding import force_text
-from django.template import Library
-from django.template.loader import get_template
-from django.template.context import Context
 
 register = Library()
 
@@ -326,7 +327,7 @@ def date_hierarchy(cl):
     """
     if cl.date_hierarchy:
         field_name = cl.date_hierarchy
-        field = cl.opts.get_field_by_name(field_name)[0]
+        field = cl.opts.get_field(field_name)
         dates_or_datetimes = 'datetimes' if isinstance(field, models.DateTimeField) else 'dates'
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name
@@ -412,11 +413,11 @@ def search_form(cl):
 @register.simple_tag
 def admin_list_filter(cl, spec):
     tpl = get_template(spec.template)
-    return tpl.render(Context({
+    return tpl.render({
         'title': spec.title,
         'choices': list(spec.choices(cl)),
         'spec': spec,
-    }))
+    })
 
 
 @register.inclusion_tag('admin/actions.html', takes_context=True)

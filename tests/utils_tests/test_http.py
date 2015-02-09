@@ -1,12 +1,11 @@
 from __future__ import unicode_literals
 
-from datetime import datetime
 import sys
 import unittest
+from datetime import datetime
 
+from django.utils import http, six
 from django.utils.datastructures import MultiValueDict
-from django.utils import http
-from django.utils import six
 
 
 class TestUtilsHttp(unittest.TestCase):
@@ -109,7 +108,8 @@ class TestUtilsHttp(unittest.TestCase):
                         'http:/\//example.com',
                         'http:\/example.com',
                         'http:/\example.com',
-                        'javascript:alert("XSS")'):
+                        'javascript:alert("XSS")',
+                        '\njavascript:alert(x)'):
             self.assertFalse(http.is_safe_url(bad_url, host='testserver'), "%s should be blocked" % bad_url)
         for good_url in ('/view/?param=http://example.com',
                      '/view/?param=https://example.com',

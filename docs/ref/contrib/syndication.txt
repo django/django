@@ -118,7 +118,7 @@ into those elements.
   both.
 
   If you want to do any special formatting for either the title or
-  description, :doc:`Django templates </topics/templates>` can be used
+  description, :doc:`Django templates </ref/templates/language>` can be used
   instead. Their paths can be specified with the ``title_template`` and
   ``description_template`` attributes on the
   :class:`~django.contrib.syndication.views.Feed` class. The templates are
@@ -953,10 +953,6 @@ They share this interface:
     * ``enclosure`` should be an instance of
       :class:`django.utils.feedgenerator.Enclosure`.
     * ``categories`` should be a sequence of Unicode objects.
-
-    .. versionadded:: 1.7
-
-        The optional ``updateddate`` argument was added.
 
 :meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.

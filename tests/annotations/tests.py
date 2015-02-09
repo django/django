@@ -1,17 +1,16 @@
 from __future__ import unicode_literals
+
 import datetime
 from decimal import Decimal
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
-    Sum, Count,
-    F, Value, Func,
-    IntegerField, BooleanField, CharField)
-from django.db.models.fields import FieldDoesNotExist
+    F, BooleanField, CharField, Count, Func, IntegerField, Sum, Value,
+)
 from django.test import TestCase
 from django.utils import six
 
-from .models import Author, Book, Store, DepartmentStore, Company, Employee
+from .models import Author, Book, Company, DepartmentStore, Employee, Store
 
 
 def cxOracle_513_py3_bug(func):
@@ -181,7 +180,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             other_chain=F('chain'),
             is_open=Value(True, BooleanField()),
             book_isbn=F('books__isbn')
-        ).select_related('store').order_by('book_isbn').filter(chain='Westfield')
+        ).order_by('book_isbn').filter(chain='Westfield')
 
         self.assertQuerysetEqual(
             qs, [
@@ -190,6 +189,13 @@ class NonAggregateAnnotationTestCase(TestCase):
             ],
             lambda d: (d.other_name, d.other_chain, d.is_open, d.book_isbn)
         )
+
+    def test_null_annotation(self):
+        """
+        Test that annotating None onto a model round-trips
+        """
+        book = Book.objects.annotate(no_value=Value(None, output_field=IntegerField())).first()
+        self.assertIsNone(book.no_value)
 
     def test_column_field_ordering(self):
         """

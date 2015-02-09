@@ -2,15 +2,17 @@
 from __future__ import unicode_literals
 
 import codecs
+import importlib
 import os
 import shutil
 
 from django.apps import apps
+from django.core.management import CommandError, call_command
 from django.db import connection, models
-from django.core.management import call_command, CommandError
 from django.db.migrations import questioner
-from django.test import override_settings
+from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 
 from .models import UnicodeModel, UnserializableModel
@@ -50,35 +52,183 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_migrate_conflict_exit(self):
+        """
+        Makes sure that migrate exits if it detects a conflict.
+        """
+        with self.assertRaisesMessage(CommandError, "Conflicting migrations detected"):
+            call_command("migrate", "migrations")
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate_list(self):
         """
         Tests --list output of migrate command
         """
         out = six.StringIO()
-        call_command("migrate", list=True, stdout=out, verbosity=0)
-        self.assertIn("migrations", out.getvalue().lower())
-        self.assertIn("[ ] 0001_initial", out.getvalue().lower())
-        self.assertIn("[ ] 0002_second", out.getvalue().lower())
+        with mock.patch('django.core.management.color.supports_color', lambda *args: True):
+            call_command("migrate", list=True, stdout=out, verbosity=0, no_color=False)
+        self.assertEqual(
+            '\x1b[1mmigrations\n\x1b[0m'
+            ' [ ] 0001_initial\n'
+            ' [ ] 0002_second\n',
+            out.getvalue().lower()
+        )
 
         call_command("migrate", "migrations", "0001", verbosity=0)
 
         out = six.StringIO()
         # Giving the explicit app_label tests for selective `show_migration_list` in the command
-        call_command("migrate", "migrations", list=True, stdout=out, verbosity=0)
-        self.assertIn("migrations", out.getvalue().lower())
-        self.assertIn("[x] 0001_initial", out.getvalue().lower())
-        self.assertIn("[ ] 0002_second", out.getvalue().lower())
+        call_command("migrate", "migrations", list=True, stdout=out, verbosity=0, no_color=True)
+        self.assertEqual(
+            'migrations\n'
+            ' [x] 0001_initial\n'
+            ' [ ] 0002_second\n',
+            out.getvalue().lower()
+        )
+
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
 
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
-    def test_migrate_conflict_exit(self):
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_showmigrations_list(self):
         """
-        Makes sure that migrate exits if it detects a conflict.
+        Tests --list output of showmigrations command
         """
-        with self.assertRaises(CommandError):
-            call_command("migrate", "migrations")
+        out = six.StringIO()
+        with mock.patch('django.core.management.color.supports_color', lambda *args: True):
+            call_command("showmigrations", format='list', stdout=out, verbosity=0, no_color=False)
+        self.assertEqual(
+            '\x1b[1mmigrations\n\x1b[0m'
+            ' [ ] 0001_initial\n'
+            ' [ ] 0002_second\n',
+            out.getvalue().lower()
+        )
+
+        call_command("migrate", "migrations", "0001", verbosity=0)
+
+        out = six.StringIO()
+        # Giving the explicit app_label tests for selective `show_list` in the command
+        call_command("showmigrations", "migrations", format='list', stdout=out, verbosity=0, no_color=True)
+        self.assertEqual(
+            'migrations\n'
+            ' [x] 0001_initial\n'
+            ' [ ] 0002_second\n',
+            out.getvalue().lower()
+        )
+        # Cleanup by unmigrating everything
+        call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_run_before"})
+    def test_showmigrations_plan(self):
+        """
+        Tests --plan output of showmigrations command
+        """
+        out = six.StringIO()
+        call_command("showmigrations", format='plan', stdout=out)
+        self.assertIn(
+            "[ ]  migrations.0001_initial\n"
+            "[ ]  migrations.0003_third\n"
+            "[ ]  migrations.0002_second",
+            out.getvalue().lower()
+        )
+
+        out = six.StringIO()
+        call_command("showmigrations", format='plan', stdout=out, verbosity=2)
+        self.assertIn(
+            "[ ]  migrations.0001_initial\n"
+            "[ ]  migrations.0003_third ... (migrations.0001_initial)\n"
+            "[ ]  migrations.0002_second ... (migrations.0001_initial)",
+            out.getvalue().lower()
+        )
+
+        call_command("migrate", "migrations", "0003", verbosity=0)
+
+        out = six.StringIO()
+        call_command("showmigrations", format='plan', stdout=out)
+        self.assertIn(
+            "[x]  migrations.0001_initial\n"
+            "[x]  migrations.0003_third\n"
+            "[ ]  migrations.0002_second",
+            out.getvalue().lower()
+        )
+
+        out = six.StringIO()
+        call_command("showmigrations", format='plan', stdout=out, verbosity=2)
+        self.assertIn(
+            "[x]  migrations.0001_initial\n"
+            "[x]  migrations.0003_third ... (migrations.0001_initial)\n"
+            "[ ]  migrations.0002_second ... (migrations.0001_initial)",
+            out.getvalue().lower()
+        )
+
+        # Cleanup by unmigrating everything
+        call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_empty"})
+    def test_showmigrations_plan_no_migrations(self):
+        """
+        Tests --plan output of showmigrations command without migrations
+        """
+        out = six.StringIO()
+        call_command("showmigrations", format='plan', stdout=out)
+        self.assertEqual("", out.getvalue().lower())
+
+        out = six.StringIO()
+        call_command("showmigrations", format='plan', stdout=out, verbosity=2)
+        self.assertEqual("", out.getvalue().lower())
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_complex"})
+    def test_showmigrations_plan_squashed(self):
+        """
+        Tests --plan output of showmigrations command with squashed migrations.
+        """
+        out = six.StringIO()
+        call_command("showmigrations", format='plan', stdout=out)
+        self.assertEqual(
+            "[ ]  migrations.1_auto\n"
+            "[ ]  migrations.2_auto\n"
+            "[ ]  migrations.3_squashed_5\n"
+            "[ ]  migrations.6_auto\n"
+            "[ ]  migrations.7_auto\n",
+            out.getvalue().lower()
+        )
+
+        out = six.StringIO()
+        call_command("showmigrations", format='plan', stdout=out, verbosity=2)
+        self.assertEqual(
+            "[ ]  migrations.1_auto\n"
+            "[ ]  migrations.2_auto ... (migrations.1_auto)\n"
+            "[ ]  migrations.3_squashed_5 ... (migrations.2_auto)\n"
+            "[ ]  migrations.6_auto ... (migrations.3_squashed_5)\n"
+            "[ ]  migrations.7_auto ... (migrations.6_auto)\n",
+            out.getvalue().lower()
+        )
+
+        call_command("migrate", "migrations", "3_squashed_5", verbosity=0)
+
+        out = six.StringIO()
+        call_command("showmigrations", format='plan', stdout=out)
+        self.assertEqual(
+            "[x]  migrations.1_auto\n"
+            "[x]  migrations.2_auto\n"
+            "[x]  migrations.3_squashed_5\n"
+            "[ ]  migrations.6_auto\n"
+            "[ ]  migrations.7_auto\n",
+            out.getvalue().lower()
+        )
+
+        out = six.StringIO()
+        call_command("showmigrations", format='plan', stdout=out, verbosity=2)
+        self.assertEqual(
+            "[x]  migrations.1_auto\n"
+            "[x]  migrations.2_auto ... (migrations.1_auto)\n"
+            "[x]  migrations.3_squashed_5 ... (migrations.2_auto)\n"
+            "[ ]  migrations.6_auto ... (migrations.3_squashed_5)\n"
+            "[ ]  migrations.7_auto ... (migrations.6_auto)\n",
+            out.getvalue().lower()
+        )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate(self):
@@ -210,7 +360,7 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertIn('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d', content)  # title.default
 
     def test_failing_migration(self):
-        #21280 - If a migration fails to serialize, it shouldn't generate an empty file.
+        # If a migration fails to serialize, it shouldn't generate an empty file. #21280
         apps.register_model('migrations', UnserializableModel)
 
         with six.assertRaisesRegex(self, ValueError, r'Cannot serialize'):
@@ -536,6 +686,11 @@ class MakeMigrationsTests(MigrationTestBase):
         migration_name_0001 = "my_initial_migration"
         content = cmd("0001", migration_name_0001)
         self.assertIn("dependencies=[\n]", content)
+
+        # Python 3.3+ importlib caches os.listdir() on some platforms like
+        # Mac OS X (#23850).
+        if hasattr(importlib, 'invalidate_caches'):
+            importlib.invalidate_caches()
 
         # generate an empty migration
         migration_name_0002 = "my_custom_migration"

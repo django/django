@@ -28,7 +28,8 @@ For reference, here are the requirements:
    in your :setting:`INSTALLED_APPS` list, add them.
 
 3. Add ``django.contrib.messages.context_processors.messages`` to
-   :setting:`TEMPLATE_CONTEXT_PROCESSORS` as well as
+   the ``'context_processors'`` option of the ``DjangoTemplates`` backend
+   defined in your :setting:`TEMPLATES` as well as
    :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
    :class:`django.contrib.messages.middleware.MessageMiddleware` to
    :setting:`MIDDLEWARE_CLASSES`. (These are all active by default, so
@@ -101,8 +102,6 @@ The register decorator
 
 .. function:: register(*models, [site=django.admin.sites.site])
 
-    .. versionadded:: 1.7
-
     There is also a decorator for registering your ``ModelAdmin`` classes::
 
         from django.contrib import admin
@@ -133,14 +132,10 @@ application and imports it.
 
 .. class:: apps.AdminConfig
 
-    .. versionadded:: 1.7
-
     This is the default :class:`~django.apps.AppConfig` class for the admin.
     It calls :func:`~django.contrib.admin.autodiscover()` when Django starts.
 
 .. class:: apps.SimpleAdminConfig
-
-    .. versionadded:: 1.7
 
     This class works like :class:`~django.contrib.admin.apps.AdminConfig`,
     except it doesn't call :func:`~django.contrib.admin.autodiscover()`.
@@ -150,26 +145,14 @@ application and imports it.
     This function attempts to import an ``admin`` module in each installed
     application. Such modules are expected to register models with the admin.
 
-    .. versionchanged:: 1.7
-
-        Previous versions of Django recommended calling this function directly
-        in the URLconf. As of Django 1.7 this isn't needed anymore.
-        :class:`~django.contrib.admin.apps.AdminConfig` takes care of running
-        the auto-discovery automatically.
+    Typically you won't need to call this function directly as
+    :class:`~django.contrib.admin.apps.AdminConfig` calls it when Django starts.
 
 If you are using a custom ``AdminSite``, it is common to import all of the
 ``ModelAdmin`` subclasses into your code and register them to the custom
 ``AdminSite``. In that case, in order to disable auto-discovery, you should
 put ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
 ``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS` setting.
-
-.. versionchanged:: 1.7
-
-    In previous versions, the admin needed to be instructed to look for
-    ``admin.py`` files with :func:`~django.contrib.admin.autodiscover()`.
-    As of Django 1.7, auto-discovery is enabled by default and must be
-    explicitly disabled when it's undesirable.
-
 
 ``ModelAdmin`` options
 ----------------------
@@ -660,9 +643,7 @@ subclass::
       The above will tell Django to order by the ``first_name`` field when
       trying to sort by ``colored_first_name`` in the admin.
 
-      .. versionadded:: 1.7
-
-      To indicate descending order with ``admin_model_field`` you can use a
+      To indicate descending order with ``admin_order_field`` you can use a
       hyphen prefix on the field name. Using the above example, this would
       look like::
 
@@ -675,7 +656,7 @@ subclass::
 
       For example::
 
-          class Person(object):
+          class Person(models.Model):
               first_name = models.CharField(max_length=50)
               last_name = models.CharField(max_length=50)
 
@@ -735,10 +716,6 @@ subclass::
         class AuditEntryAdmin(admin.ModelAdmin):
             list_display = ('timestamp', 'message')
             list_display_links = None
-
-    .. versionchanged:: 1.7
-
-        ``None`` was added as a valid ``list_display_links`` value.
 
 .. _admin-list-editable:
 
@@ -1175,8 +1152,6 @@ subclass::
 
 .. attribute:: ModelAdmin.view_on_site
 
-    .. versionadded:: 1.7
-
     Set ``view_on_site`` to control whether or not to display the "View on site" link.
     This link should bring you to a URL where you can display the saved object.
 
@@ -1372,13 +1347,7 @@ templates used by the :class:`ModelAdmin` views:
     names on the changelist that will be linked to the change view, as described
     in the :attr:`ModelAdmin.list_display_links` section.
 
-    .. versionchanged:: 1.7
-
-        ``None`` was added as a valid ``get_list_display_links()`` return value.
-
 .. method:: ModelAdmin.get_fields(request, obj=None)
-
-    .. versionadded:: 1.7
 
     The ``get_fields`` method is given the ``HttpRequest`` and the ``obj``
     being edited (or ``None`` on an add form) and is expected to return a list
@@ -1398,8 +1367,6 @@ templates used by the :class:`ModelAdmin` views:
     :attr:`~ModelAdmin.list_filter` attribute.
 
 .. method:: ModelAdmin.get_search_fields(request)
-
-    .. versionadded:: 1.7
 
     The ``get_search_fields`` method is given the ``HttpRequest`` and is expected
     to return the same kind of sequence type as for the
@@ -1489,6 +1456,11 @@ templates used by the :class:`ModelAdmin` views:
 
         url(r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
 
+    .. versionadded:: 1.9
+
+    ``ModelAdmin`` views have ``model_admin`` attributes. Other
+    ``AdminSite`` views have ``admin_site`` attributes.
+
 .. method:: ModelAdmin.get_form(request, obj=None, **kwargs)
 
     Returns a :class:`~django.forms.ModelForm` class for use in the admin add
@@ -1507,26 +1479,6 @@ templates used by the :class:`ModelAdmin` views:
 
     You may also simply return a custom :class:`~django.forms.ModelForm` class
     directly.
-
-.. method:: ModelAdmin.get_formsets(request, obj=None)
-
-    .. deprecated:: 1.7
-        Use :meth:`get_formsets_with_inlines()` instead.
-
-    Yields  :class:`InlineModelAdmin`\s for use in admin add and change views.
-
-    For example if you wanted to display a particular inline only in the change
-    view, you could override ``get_formsets`` as follows::
-
-        class MyModelAdmin(admin.ModelAdmin):
-            inlines = [MyInline, SomeOtherInline]
-
-            def get_formsets(self, request, obj=None):
-                for inline in self.get_inline_instances(request, obj):
-                    # hide MyInline in the add view
-                    if isinstance(inline, MyInline) and obj is None:
-                        continue
-                    yield inline.get_formset(request, obj)
 
 .. method:: ModelAdmin.get_formsets_with_inlines(request, obj=None)
 
@@ -1735,9 +1687,7 @@ templates used by the :class:`ModelAdmin` views:
     been saved. You can override it to change the default
     behavior after the object has been changed.
 
-.. method:: ModelAdmin.response_delete(request, obj_display)
-
-    .. versionadded:: 1.7
+.. method:: ModelAdmin.response_delete(request, obj_display, obj_id)
 
     Determines the :class:`~django.http.HttpResponse` for the
     :meth:`delete_view` stage.
@@ -1749,9 +1699,14 @@ templates used by the :class:`ModelAdmin` views:
     ``obj_display`` is a string with the name of the deleted
     object.
 
-.. method:: ModelAdmin.get_changeform_initial_data(request)
+    ``obj_id`` is the serialized identifier used to retrieve the object to be
+    deleted.
 
-    .. versionadded:: 1.7
+    .. versionadded:: 1.8
+
+        The ``obj_id`` parameter was added.
+
+.. method:: ModelAdmin.get_changeform_initial_data(request)
 
     A hook for the initial data on admin change forms. By default, fields are
     given initial values from ``GET`` parameters. For instance,
@@ -1848,13 +1803,13 @@ jQuery
 Django admin Javascript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
-(version 1.11.1) is namespaced as ``django.jQuery``. If you want to use jQuery
+(version 1.11.2) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
 .. versionchanged:: 1.8
 
-    The embedded jQuery has been upgraded from 1.9.1 to 1.11.1.
+    The embedded jQuery has been upgraded from 1.9.1 to 1.11.2.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2028,8 +1983,6 @@ The ``InlineModelAdmin`` class adds:
 
 .. attribute:: InlineModelAdmin.min_num
 
-    .. versionadded:: 1.7
-
     This controls the minimum number of forms to show in the inline.
     See :func:`~django.forms.models.modelformset_factory` for more information.
 
@@ -2121,8 +2074,6 @@ The ``InlineModelAdmin`` class adds:
 
 .. method:: InlineModelAdmin.get_min_num(request, obj=None, **kwargs)
 
-    .. versionadded:: 1.7
-
     Returns the minimum number of inline forms to use. By default,
     returns the :attr:`InlineModelAdmin.min_num` attribute.
 
@@ -2212,6 +2163,11 @@ defines the relation (in this case, ``Group``). If you want to use an inline
 model to represent the many-to-many relationship, you must tell Django's admin
 to *not* display this widget - otherwise you will end up with two widgets on
 your admin page for managing the relation.
+
+Note that when using this technique the
+:data:`~django.db.models.signals.m2m_changed` signals aren't triggered. This
+is because as far as the admin is concerned, ``through`` is just a model with
+two foreign key fields rather than a many-to-many relation.
 
 In all other respects, the ``InlineModelAdmin`` is exactly the same as any
 other. You can customize the appearance using any of the normal
@@ -2337,8 +2293,9 @@ directory.
 
 In order to override one or more of them, first create an ``admin`` directory
 in your project's ``templates`` directory. This can be any of the directories
-you specified in :setting:`TEMPLATE_DIRS`. If you have customized the
-:setting:`TEMPLATE_LOADERS` setting, be sure
+you specified in the :setting:`DIRS <TEMPLATES-DIRS>` option of the
+``DjangoTemplates`` backend in the :setting:`TEMPLATES` setting. If you have
+customized the ``'loaders'`` option, be sure
 ``'django.template.loaders.filesystem.Loader'`` appears before
 ``'django.template.loaders.app_directories.Loader'`` so that your custom
 templates will be found by the template loading system before those that are
@@ -2391,7 +2348,7 @@ Therefore here is our new ``change_form.html`` :
             <li>
                 <a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% trans "View on site" %}</a>
             </li>
-        {% endif%}
+        {% endif %}
     {% endblock %}
 
 And that's it! If we placed this file in the ``templates/admin/my_app``
@@ -2457,14 +2414,10 @@ Templates can override or extend base admin templates as described in
 
 .. attribute:: AdminSite.site_header
 
-    .. versionadded:: 1.7
-
     The text to put at the top of each admin page, as an ``<h1>`` (a string).
     By default, this is "Django administration".
 
 .. attribute:: AdminSite.site_title
-
-    .. versionadded:: 1.7
 
     The text to put at the end of each admin page's ``<title>`` (a string). By
     default, this is "Django site admin".
@@ -2477,8 +2430,6 @@ Templates can override or extend base admin templates as described in
     ``site_url`` is ``/``. Set it to ``None`` to remove the link.
 
 .. attribute:: AdminSite.index_title
-
-    .. versionadded:: 1.7
 
     The text to put at the top of the admin index page (a string). By default,
     this is "Site administration".
@@ -2514,6 +2465,33 @@ Templates can override or extend base admin templates as described in
 
     Path to a custom template that will be used by the admin site password
     change done view.
+
+``AdminSite`` methods
+---------------------
+
+.. method:: AdminSite.each_context(request)
+
+    Returns a dictionary of variables to put in the template context for
+    every page in the admin site.
+
+    Includes the following variables and values by default:
+
+    * ``site_header``: :attr:`AdminSite.site_header`
+    * ``site_title``: :attr:`AdminSite.site_title`
+    * ``site_url``: :attr:`AdminSite.site_url`
+    * ``has_permission``: :meth:`AdminSite.has_permission`
+
+    .. versionchanged:: 1.8
+
+        The ``request`` argument and the ``has_permission`` variable were added.
+
+.. method:: AdminSite.has_permission(request)
+
+    Returns ``True`` if the user for the given ``HttpRequest`` has permission
+    to view at least one page in the admin site. Defaults to requiring both
+    :attr:`User.is_active <django.contrib.auth.models.User.is_active>` and
+    :attr:`User.is_staff <django.contrib.auth.models.User.is_staff>` to be
+    ``True``.
 
 Hooking ``AdminSite`` instances into your URLconf
 -------------------------------------------------
@@ -2617,11 +2595,16 @@ a pattern for your new view.
 .. note::
 
     Any view you render that uses the admin templates, or extends the base
-    admin template, should provide the ``current_app`` argument to
-    :class:`~django.template.RequestContext` or
-    :class:`~django.template.Context` when rendering the template.  It should
-    be set to either ``self.name`` if your view is on an ``AdminSite`` or
-    ``self.admin_site.name`` if your view is on a ``ModelAdmin``.
+    admin template, should set ``request.current_app`` before rendering the
+    template. It should be set to either ``self.name`` if your view is on an
+    ``AdminSite`` or ``self.admin_site.name`` if your view is on a
+    ``ModelAdmin``.
+
+    .. versionchanged:: 1.8
+
+       In previous versions of Django, you had to provide the ``current_app``
+       argument to :class:`~django.template.RequestContext` or
+       :class:`~django.template.Context` when rendering the template.
 
 .. _auth_password_reset:
 

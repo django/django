@@ -2,14 +2,13 @@ import hashlib
 import logging
 import re
 
-from django.conf import settings
-from django.core.mail import mail_managers
-from django.core import urlresolvers
 from django import http
+from django.conf import settings
+from django.core import urlresolvers
+from django.core.mail import mail_managers
+from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
-from django.utils import six
-
 
 logger = logging.getLogger('django.request')
 
@@ -75,14 +74,14 @@ class CommonMiddleware(object):
             if (not urlresolvers.is_valid_path(request.path_info, urlconf) and
                     urlresolvers.is_valid_path("%s/" % request.path_info, urlconf)):
                 new_url[1] = new_url[1] + '/'
-                if settings.DEBUG and request.method == 'POST':
+                if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
                     raise RuntimeError((""
-                    "You called this URL via POST, but the URL doesn't end "
+                    "You called this URL via %(method)s, but the URL doesn't end "
                     "in a slash and you have APPEND_SLASH set. Django can't "
-                    "redirect to the slash URL while maintaining POST data. "
-                    "Change your form to point to %s%s (note the trailing "
+                    "redirect to the slash URL while maintaining %(method)s data. "
+                    "Change your form to point to %(url)s (note the trailing "
                     "slash), or set APPEND_SLASH=False in your Django "
-                    "settings.") % (new_url[0], new_url[1]))
+                    "settings.") % {'method': request.method, 'url': ''.join(new_url)})
 
         if new_url == old_url:
             # No redirects required.

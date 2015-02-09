@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser, Group, Permission, User, UserManager
+from django.contrib.auth.models import (
+    AbstractUser, Group, Permission, User, UserManager,
+)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -52,24 +54,20 @@ class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
         default_objects = [
             ContentType.objects.db_manager('default').create(
                 model='examplemodela',
-                name='example model a',
                 app_label='app_a',
             ),
             ContentType.objects.db_manager('default').create(
                 model='examplemodelb',
-                name='example model b',
                 app_label='app_b',
             ),
         ]
         other_objects = [
             ContentType.objects.db_manager('other').create(
                 model='examplemodelb',
-                name='example model b',
                 app_label='app_b',
             ),
             ContentType.objects.db_manager('other').create(
                 model='examplemodela',
-                name='example model a',
                 app_label='app_a',
             ),
         ]

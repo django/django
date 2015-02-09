@@ -4,12 +4,11 @@ import os
 import unittest
 import warnings
 
-from django.test import SimpleTestCase, RequestFactory, override_settings
+from django.test import SimpleTestCase
 from django.test.utils import reset_warning_registry
-from django.utils import six, translation
+from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import force_text
-from django.utils.functional import memoize
 
 
 class RenameManagerMethods(RenameMethodsBase):
@@ -174,57 +173,6 @@ class RenameMethodsTests(SimpleTestCase):
                 '`DeprecatedMixin.old` is deprecated, use `new` instead.',
                 '`RenamedMixin.old` is deprecated, use `new` instead.',
             ])
-
-
-class DeprecatingRequestMergeDictTest(SimpleTestCase):
-    def test_deprecated_request(self):
-        """
-        Ensure the correct warning is raised when WSGIRequest.REQUEST is
-        accessed.
-        """
-        with warnings.catch_warnings(record=True) as recorded:
-            warnings.simplefilter('always')
-            request = RequestFactory().get('/')
-            request.REQUEST  # evaluate
-
-            msgs = [str(warning.message) for warning in recorded]
-            self.assertEqual(msgs, [
-                '`request.REQUEST` is deprecated, use `request.GET` or '
-                '`request.POST` instead.',
-                '`MergeDict` is deprecated, use `dict.update()` instead.',
-            ])
-
-
-@override_settings(USE_I18N=True)
-class DeprecatedChineseLanguageCodes(SimpleTestCase):
-    def test_deprecation_warning(self):
-        with warnings.catch_warnings(record=True) as recorded:
-            warnings.simplefilter('always')
-            with translation.override('zh-cn'):
-                pass
-            with translation.override('zh-tw'):
-                pass
-            msgs = [str(warning.message) for warning in recorded]
-            self.assertEqual(msgs, [
-                "The use of the language code 'zh-cn' is deprecated. "
-                "Please use the 'zh-hans' translation instead.",
-                "The use of the language code 'zh-tw' is deprecated. "
-                "Please use the 'zh-hant' translation instead.",
-            ])
-
-
-class DeprecatingMemoizeTest(SimpleTestCase):
-    def test_deprecated_memoize(self):
-        """
-        Ensure the correct warning is raised when memoize is used.
-        """
-        with warnings.catch_warnings(record=True) as recorded:
-            warnings.simplefilter('always')
-            memoize(lambda x: x, {}, 1)
-            msg = str(recorded.pop().message)
-            self.assertEqual(msg,
-                'memoize wrapper is deprecated and will be removed in Django '
-                '1.9. Use django.utils.lru_cache instead.')
 
 
 class DeprecatingSimpleTestCaseUrls(unittest.TestCase):

@@ -1,13 +1,18 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.shortcuts import get_current_site
-from django.http import HttpRequest, Http404
+from django.http import Http404, HttpRequest
 from django.test import TestCase, override_settings
 from django.utils import six
 
-from .models import ConcreteModel, ProxyModel, FooWithoutUrl, FooWithUrl, FooWithBrokenAbsoluteUrl
+from .models import (
+    ConcreteModel, FooWithBrokenAbsoluteUrl, FooWithoutUrl, FooWithUrl,
+    ProxyModel,
+)
 
 
 class ContentTypesTests(TestCase):
@@ -229,11 +234,10 @@ class ContentTypesTests(TestCase):
         is defined anymore.
         """
         ct = ContentType.objects.create(
-            name='Old model',
             app_label='contenttypes',
             model='OldModel',
         )
-        self.assertEqual(six.text_type(ct), 'Old model')
+        self.assertEqual(six.text_type(ct), 'OldModel')
         self.assertIsNone(ct.model_class())
 
         # Make sure stale ContentTypes can be fetched like any other object.
@@ -241,3 +245,22 @@ class ContentTypesTests(TestCase):
         # Instead, just return the ContentType object and let the app detect stale states.
         ct_fetched = ContentType.objects.get_for_id(ct.pk)
         self.assertIsNone(ct_fetched.model_class())
+
+    def test_name_deprecation(self):
+        """
+        ContentType.name has been removed. Test that a warning is emitted when
+        creating a ContentType with a `name`, but the creation should not fail.
+        """
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            ContentType.objects.create(
+                name='Name',
+                app_label='contenttypes',
+                model='OldModel',
+            )
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            str(warns[0].message),
+            "ContentType.name field doesn't exist any longer. Please remove it from your code."
+        )
+        self.assertTrue(ContentType.objects.filter(model='OldModel').exists())

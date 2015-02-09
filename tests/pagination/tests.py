@@ -1,15 +1,16 @@
 from __future__ import unicode_literals
 
-from datetime import datetime
 import unittest
+from datetime import datetime
 
-from django.core.paginator import (Paginator, EmptyPage, InvalidPage,
-    PageNotAnInteger)
+from django.core.paginator import (
+    EmptyPage, InvalidPage, PageNotAnInteger, Paginator,
+)
 from django.test import TestCase
 from django.utils import six
 
-from .models import Article
 from .custom import ValidAdjacentNumsPaginator
+from .models import Article
 
 
 class PaginationTests(unittest.TestCase):

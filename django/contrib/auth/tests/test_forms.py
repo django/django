@@ -1,27 +1,29 @@
 from __future__ import unicode_literals
 
-import os
 import re
 
 from django import forms
+from django.contrib.auth.forms import (
+    AuthenticationForm, PasswordChangeForm, PasswordResetForm,
+    ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget, SetPasswordForm,
+    UserChangeForm, UserCreationForm,
+)
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
-    PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm,
-    ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget)
-from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
-from django.forms.fields import Field, CharField
+from django.forms.fields import CharField, Field
 from django.test import TestCase, override_settings
-from django.utils.encoding import force_text
-from django.utils._os import upath
 from django.utils import translation
+from django.utils.encoding import force_text
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
+from .settings import AUTH_TEMPLATES
+from .utils import skipIfCustomUser
+
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class UserCreationFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -89,7 +91,7 @@ class UserCreationFormTest(TestCase):
 
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class AuthenticationFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -202,7 +204,7 @@ class AuthenticationFormTest(TestCase):
 
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class SetPasswordFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -230,7 +232,7 @@ class SetPasswordFormTest(TestCase):
 
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class PasswordChangeFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -279,7 +281,7 @@ class PasswordChangeFormTest(TestCase):
 
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class UserChangeFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -359,11 +361,8 @@ class UserChangeFormTest(TestCase):
 
 @skipIfCustomUser
 @override_settings(
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
-    TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-    ),
+    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
+    TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,
 )
 class PasswordResetFormTest(TestCase):
@@ -416,33 +415,31 @@ class PasswordResetFormTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, 'Custom password reset on example.com')
 
     def test_custom_email_constructor(self):
-        template_path = os.path.join(os.path.dirname(__file__), 'templates')
-        with self.settings(TEMPLATE_DIRS=(template_path,)):
-            data = {'email': 'testclient@example.com'}
+        data = {'email': 'testclient@example.com'}
 
-            class CustomEmailPasswordResetForm(PasswordResetForm):
-                def send_mail(self, subject_template_name, email_template_name,
-                              context, from_email, to_email,
-                              html_email_template_name=None):
-                    EmailMultiAlternatives(
-                        "Forgot your password?",
-                        "Sorry to hear you forgot your password.",
-                        None, [to_email],
-                        ['site_monitor@example.com'],
-                        headers={'Reply-To': 'webmaster@example.com'},
-                        alternatives=[("Really sorry to hear you forgot your password.",
-                                       "text/html")]).send()
+        class CustomEmailPasswordResetForm(PasswordResetForm):
+            def send_mail(self, subject_template_name, email_template_name,
+                          context, from_email, to_email,
+                          html_email_template_name=None):
+                EmailMultiAlternatives(
+                    "Forgot your password?",
+                    "Sorry to hear you forgot your password.",
+                    None, [to_email],
+                    ['site_monitor@example.com'],
+                    headers={'Reply-To': 'webmaster@example.com'},
+                    alternatives=[("Really sorry to hear you forgot your password.",
+                                   "text/html")]).send()
 
-            form = CustomEmailPasswordResetForm(data)
-            self.assertTrue(form.is_valid())
-            # Since we're not providing a request object, we must provide a
-            # domain_override to prevent the save operation from failing in the
-            # potential case where contrib.sites is not installed. Refs #16412.
-            form.save(domain_override='example.com')
-            self.assertEqual(len(mail.outbox), 1)
-            self.assertEqual(mail.outbox[0].subject, 'Forgot your password?')
-            self.assertEqual(mail.outbox[0].bcc, ['site_monitor@example.com'])
-            self.assertEqual(mail.outbox[0].content_subtype, "plain")
+        form = CustomEmailPasswordResetForm(data)
+        self.assertTrue(form.is_valid())
+        # Since we're not providing a request object, we must provide a
+        # domain_override to prevent the save operation from failing in the
+        # potential case where contrib.sites is not installed. Refs #16412.
+        form.save(domain_override='example.com')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Forgot your password?')
+        self.assertEqual(mail.outbox[0].bcc, ['site_monitor@example.com'])
+        self.assertEqual(mail.outbox[0].content_subtype, "plain")
 
     def test_preserve_username_case(self):
         """

@@ -220,7 +220,7 @@ with the same WSGI configuration that is used for deployment. The new
 :setting:`WSGI_APPLICATION` setting lets you configure which WSGI callable
 :djadmin:`runserver` uses.
 
-(The :djadmin:`runfcgi` management command also internally wraps the WSGI
+(The ``runfcgi`` management command also internally wraps the WSGI
 callable configured via :setting:`WSGI_APPLICATION`.)
 
 ``SELECT FOR UPDATE`` support
@@ -1313,7 +1313,7 @@ This behavior was never documented. Since it is unpythonic and not obviously
 useful, it was removed in Django 1.4. If you relied on it, you must edit your
 settings file to list all your applications explicitly.
 
-.. _this can't be done reliably: http://docs.python.org/tutorial/modules.html#importing-from-a-package
+.. _this can't be done reliably: https://docs.python.org/tutorial/modules.html#importing-from-a-package
 
 ``HttpRequest.raw_post_data`` renamed to ``HttpRequest.body``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

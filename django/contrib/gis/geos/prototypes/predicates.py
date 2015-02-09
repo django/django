@@ -3,12 +3,13 @@
  unary and binary predicate operations on geometries.
 """
 from ctypes import c_char, c_char_p, c_double
+
 from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import check_predicate
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
 
-## Binary & unary predicate functions ##
+# ## Binary & unary predicate functions ##
 def binary_predicate(func, *args):
     "For GEOS binary predicate functions."
     argtypes = [GEOM_PTR, GEOM_PTR]
@@ -27,14 +28,14 @@ def unary_predicate(func):
     func.errcheck = check_predicate
     return func
 
-## Unary Predicates ##
+# ## Unary Predicates ##
 geos_hasz = unary_predicate(GEOSFunc('GEOSHasZ'))
 geos_isempty = unary_predicate(GEOSFunc('GEOSisEmpty'))
 geos_isring = unary_predicate(GEOSFunc('GEOSisRing'))
 geos_issimple = unary_predicate(GEOSFunc('GEOSisSimple'))
 geos_isvalid = unary_predicate(GEOSFunc('GEOSisValid'))
 
-## Binary Predicates ##
+# ## Binary Predicates ##
 geos_contains = binary_predicate(GEOSFunc('GEOSContains'))
 geos_crosses = binary_predicate(GEOSFunc('GEOSCrosses'))
 geos_disjoint = binary_predicate(GEOSFunc('GEOSDisjoint'))

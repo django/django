@@ -1,14 +1,16 @@
-from copy import deepcopy
 import datetime
+from copy import deepcopy
 
-from django.core.exceptions import MultipleObjectsReturned, FieldError
+from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.test import TestCase
 from django.utils import six
 from django.utils.translation import ugettext_lazy
 
-from .models import (Article, Reporter, First, Third, Parent, Child,
-    ToFieldChild, Category, Record, Relation, School, Student)
+from .models import (
+    Article, Category, Child, First, Parent, Record, Relation, Reporter,
+    School, Student, Third, ToFieldChild,
+)
 
 
 class ManyToOneTests(TestCase):
@@ -80,11 +82,49 @@ class ManyToOneTests(TestCase):
                 "<Article: This is a test>",
             ])
 
+    def test_set(self):
+        new_article = self.r.article_set.create(headline="John's second story",
+                                                pub_date=datetime.date(2005, 7, 29))
+        new_article2 = self.r2.article_set.create(headline="Paul's story",
+                                                  pub_date=datetime.date(2006, 1, 17))
+
+        # Assign the article to the reporter.
+        new_article2.reporter = self.r
+        new_article2.save()
+        self.assertEqual(repr(new_article2.reporter), "<Reporter: John Smith>")
+        self.assertEqual(new_article2.reporter.id, self.r.id)
+        self.assertQuerysetEqual(self.r.article_set.all(), [
+            "<Article: John's second story>",
+            "<Article: Paul's story>",
+            "<Article: This is a test>",
+        ])
+        self.assertQuerysetEqual(self.r2.article_set.all(), [])
+
+        # Set the article back again.
+        self.r2.article_set.set([new_article, new_article2])
+        self.assertQuerysetEqual(self.r.article_set.all(), ["<Article: This is a test>"])
+        self.assertQuerysetEqual(self.r2.article_set.all(),
+            [
+                "<Article: John's second story>",
+                "<Article: Paul's story>",
+            ])
+
+        # Funny case - because the ForeignKey cannot be null,
+        # existing members of the set must remain.
+        self.r.article_set.set([new_article])
+        self.assertQuerysetEqual(self.r.article_set.all(),
+            [
+                "<Article: John's second story>",
+                "<Article: This is a test>",
+            ])
+        self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
+
     def test_assign(self):
         new_article = self.r.article_set.create(headline="John's second story",
                                                 pub_date=datetime.date(2005, 7, 29))
         new_article2 = self.r2.article_set.create(headline="Paul's story",
                                                   pub_date=datetime.date(2006, 1, 17))
+
         # Assign the article to the reporter directly using the descriptor.
         new_article2.reporter = self.r
         new_article2.save()
@@ -96,6 +136,7 @@ class ManyToOneTests(TestCase):
             "<Article: This is a test>",
         ])
         self.assertQuerysetEqual(self.r2.article_set.all(), [])
+
         # Set the article back again using set descriptor.
         self.r2.article_set = [new_article, new_article2]
         self.assertQuerysetEqual(self.r.article_set.all(), ["<Article: This is a test>"])
@@ -437,11 +478,11 @@ class ManyToOneTests(TestCase):
         expected_message = "Cannot resolve keyword 'notafield' into field. Choices are: %s"
 
         self.assertRaisesMessage(FieldError,
-                                 expected_message % ', '.join(Reporter._meta.get_all_field_names()),
+                                 expected_message % ', '.join(sorted(f.name for f in Reporter._meta.get_fields())),
                                  Article.objects.values_list,
                                  'reporter__notafield')
         self.assertRaisesMessage(FieldError,
-                                 expected_message % ', '.join(['EXTRA'] + Article._meta.get_all_field_names()),
+                                 expected_message % ', '.join(['EXTRA'] + sorted(f.name for f in Article._meta.get_fields())),
                                  Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
                                  'notafield')
 

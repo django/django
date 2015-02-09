@@ -4,15 +4,16 @@ XML serializer.
 
 from __future__ import unicode_literals
 
-from django.apps import apps
-from django.conf import settings
-from django.core.serializers import base
-from django.db import models, DEFAULT_DB_ALIAS
-from django.utils.xmlutils import SimplerXMLGenerator
-from django.utils.encoding import smart_text
 from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
+
+from django.apps import apps
+from django.conf import settings
+from django.core.serializers import base
+from django.db import DEFAULT_DB_ALIAS, models
+from django.utils.encoding import smart_text
+from django.utils.xmlutils import SimplerXMLGenerator
 
 
 class Serializer(base.Serializer):
@@ -186,7 +187,7 @@ class Deserializer(base.Deserializer):
         # {m2m_accessor_attribute : [list_of_related_objects]})
         m2m_data = {}
 
-        model_fields = Model._meta.get_all_field_names()
+        field_names = {f.name for f in Model._meta.get_fields()}
         # Deserialize each field.
         for field_node in node.getElementsByTagName("field"):
             # If the field is missing the name attribute, bail (are you
@@ -198,7 +199,7 @@ class Deserializer(base.Deserializer):
             # Get the field from the Model. This will raise a
             # FieldDoesNotExist if, well, the field doesn't exist, which will
             # be propagated correctly unless ignorenonexistent=True is used.
-            if self.ignore and field_name not in model_fields:
+            if self.ignore and field_name not in field_names:
                 continue
             field = Model._meta.get_field(field_name)
 

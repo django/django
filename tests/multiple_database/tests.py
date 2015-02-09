@@ -7,14 +7,14 @@ from operator import attrgetter
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
-from django.db import connections, router, DEFAULT_DB_ALIAS, transaction
+from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import TestCase, override_settings
 from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
-from .routers import TestRouter, AuthRouter, WriteRouter
+from .routers import AuthRouter, TestRouter, WriteRouter
 
 
 class QueryTestCase(TestCase):
@@ -1778,8 +1778,7 @@ class MigrateTestCase(TestCase):
         self.assertGreater(count, 0)
 
         cts.delete()
-        management.call_command('migrate', verbosity=0, interactive=False,
-            load_initial_data=False, database='other')
+        management.call_command('migrate', verbosity=0, interactive=False, database='other')
         self.assertEqual(cts.count(), count)
 
     def test_migrate_to_other_database_with_router(self):
@@ -1788,8 +1787,7 @@ class MigrateTestCase(TestCase):
 
         cts.delete()
         with override_settings(DATABASE_ROUTERS=[SyncOnlyDefaultDatabaseRouter()]):
-            management.call_command('migrate', verbosity=0, interactive=False,
-                load_initial_data=False, database='other')
+            management.call_command('migrate', verbosity=0, interactive=False, database='other')
 
         self.assertEqual(cts.count(), 0)
 

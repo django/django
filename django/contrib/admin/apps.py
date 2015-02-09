@@ -1,6 +1,6 @@
 from django.apps import AppConfig
-from django.core import checks
 from django.contrib.admin.checks import check_admin_app
+from django.core import checks
 from django.utils.translation import ugettext_lazy as _
 
 

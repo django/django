@@ -34,8 +34,6 @@ All attributes should be considered read-only, unless stated otherwise below.
 
 .. attribute:: HttpRequest.scheme
 
-    .. versionadded:: 1.7
-
     A string representing the scheme of the request (``http`` or ``https``
     usually).
 
@@ -107,21 +105,6 @@ All attributes should be considered read-only, unless stated otherwise below.
     "POST"`` (see above).
 
     Note: ``POST`` does *not* include file-upload information. See ``FILES``.
-
-.. attribute:: HttpRequest.REQUEST
-
-    .. deprecated:: 1.7
-        Use the more explicit ``GET`` and ``POST`` instead.
-
-    For convenience, a dictionary-like object that searches ``POST`` first,
-    then ``GET``. Inspired by PHP's ``$_REQUEST``.
-
-    For example, if ``GET = {"name": "john"}`` and ``POST = {"age": '34'}``,
-    ``REQUEST["name"]`` would be ``"john"``, and ``REQUEST["age"]`` would be
-    ``"34"``.
-
-    It's strongly suggested that you use ``GET`` and ``POST`` instead of
-    ``REQUEST``, because the former are more explicit.
 
 .. attribute:: HttpRequest.COOKIES
 
@@ -644,6 +627,13 @@ Attributes
 
     The HTTP reason phrase for the response.
 
+    .. versionchanged:: 1.9
+
+        ``reason_phrase`` no longer defaults to all capital letters. It now
+        uses the `HTTP standard's`_ default reason phrases.
+
+        .. _`HTTP standard's`: https://www.ietf.org/rfc/rfc2616.txt
+
 .. attribute:: HttpResponse.streaming
 
     This is always ``False``.
@@ -707,6 +697,12 @@ Methods
 
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
+
+.. method:: HttpResponse.setdefault(header, value)
+
+    .. versionadded:: 1.8
+
+    Sets a header unless it has already been set.
 
 .. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
 
@@ -867,8 +863,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 JsonResponse objects
 ====================
 
-.. versionadded:: 1.7
-
 .. class:: JsonResponse
 
 .. method:: JsonResponse.__init__(data, encoder=DjangoJSONEncoder, safe=True, **kwargs)
@@ -989,6 +983,31 @@ Attributes
 
     The HTTP reason phrase for the response.
 
+    .. versionchanged:: 1.9
+
+        ``reason_phrase`` no longer defaults to all capital letters. It now
+        uses the `HTTP standard's`_ default reason phrases.
+
+        .. _`HTTP standard's`: https://www.ietf.org/rfc/rfc2616.txt
+
 .. attribute:: StreamingHttpResponse.streaming
 
     This is always ``True``.
+
+FileResponse objects
+====================
+
+.. versionadded:: 1.8
+
+.. class:: FileResponse
+
+:class:`FileResponse` is a subclass of :class:`StreamingHttpResponse` optimized
+for binary files. It uses `wsgi.file_wrapper`_ if provided by the wsgi server,
+otherwise it streams the file out in small chunks.
+
+.. _wsgi.file_wrapper: https://www.python.org/dev/peps/pep-3333/#optional-platform-specific-file-handling
+
+``FileResponse`` expects a file open in binary mode like so::
+
+    >>> from django.http import FileResponse
+    >>> response = FileResponse(open('myfile.png', 'rb'))

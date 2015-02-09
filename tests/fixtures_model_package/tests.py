@@ -3,11 +3,9 @@ from __future__ import unicode_literals
 import warnings
 
 from django.core import management
-from django.db import transaction
-from django.test import TestCase, TransactionTestCase
-from django.utils.six import StringIO
+from django.test import TestCase
 
-from .models import Article, Book
+from .models import Article
 
 
 class SampleTestCase(TestCase):
@@ -26,51 +24,7 @@ class SampleTestCase(TestCase):
         )
 
 
-class TestNoInitialDataLoading(TransactionTestCase):
-
-    available_apps = ['fixtures_model_package']
-
-    def test_migrate(self):
-        with transaction.atomic():
-            Book.objects.all().delete()
-
-            management.call_command(
-                'migrate',
-                verbosity=0,
-                load_initial_data=False
-            )
-            self.assertQuerysetEqual(Book.objects.all(), [])
-
-    def test_flush(self):
-        # Test presence of fixture (flush called by TransactionTestCase)
-        self.assertQuerysetEqual(
-            Book.objects.all(), [
-                'Achieving self-awareness of Python programs'
-            ],
-            lambda a: a.name
-        )
-
-        with transaction.atomic():
-            management.call_command(
-                'flush',
-                verbosity=0,
-                interactive=False,
-                load_initial_data=False
-            )
-            self.assertQuerysetEqual(Book.objects.all(), [])
-
-
 class FixtureTestCase(TestCase):
-    def test_initial_data(self):
-        "Fixtures can load initial data into models defined in packages"
-        # migrate introduces 1 initial data object from initial_data.json
-        # this behavior is deprecated and will be removed in Django 1.9
-        self.assertQuerysetEqual(
-            Book.objects.all(), [
-                'Achieving self-awareness of Python programs'
-            ],
-            lambda a: a.name
-        )
 
     def test_loaddata(self):
         "Fixtures can load data into models defined in packages"
@@ -111,18 +65,3 @@ class FixtureTestCase(TestCase):
             ],
             lambda a: a.headline,
         )
-
-
-class InitialSQLTests(TestCase):
-
-    def test_custom_sql(self):
-        """
-        #14300 -- Verify that custom_sql_for_model searches `app/sql` and not
-        `app/models/sql` (the old location will work until Django 1.9)
-        """
-        out = StringIO()
-        management.call_command("sqlcustom", "fixtures_model_package", stdout=out)
-        output = out.getvalue()
-        self.assertIn("INSERT INTO fixtures_model_package_book (name) VALUES ('My Book')", output)
-        # value from deprecated search path models/sql (remove in Django 1.9)
-        self.assertIn("Deprecated Book", output)

@@ -3,18 +3,18 @@ from __future__ import unicode_literals
 from django.apps import apps
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
-from django.core import management
-from django.core import checks
-from django.db import models, DEFAULT_DB_ALIAS
+from django.core import checks, management
+from django.db import DEFAULT_DB_ALIAS, models
 from django.db.models import signals
 from django.test import TestCase, override_settings
 
-
-from .models import (MyPerson, Person, StatusPerson, LowerStatusPerson,
-    MyPersonProxy, Abstract, OtherPerson, User, UserProxy, UserProxyProxy,
-    Country, State, StateProxy, TrackerUser, BaseUser, Bug, ProxyTrackerUser,
-    Improvement, ProxyProxyBug, ProxyBug, ProxyImprovement, Issue)
 from .admin import admin as force_admin_model_registration  # NOQA
+from .models import (
+    Abstract, BaseUser, Bug, Country, Improvement, Issue, LowerStatusPerson,
+    MyPerson, MyPersonProxy, OtherPerson, Person, ProxyBug, ProxyImprovement,
+    ProxyProxyBug, ProxyTrackerUser, State, StateProxy, StatusPerson,
+    TrackerUser, User, UserProxy, UserProxyProxy,
+)
 
 
 class ProxyModelTests(TestCase):
@@ -380,7 +380,7 @@ class ProxyModelTests(TestCase):
         self.assertEqual(MyPerson(id=100), Person(id=100))
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='proxy_models.urls',)
 class ProxyModelAdminTests(TestCase):
     fixtures = ['myhorses']

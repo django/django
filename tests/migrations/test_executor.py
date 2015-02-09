@@ -1,8 +1,8 @@
+from django.apps.registry import apps as global_apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
-from django.test import modify_settings, override_settings, TestCase
-from django.apps.registry import apps as global_apps
+from django.test import TestCase, modify_settings, override_settings
 
 from .test_base import MigrationTestBase
 
@@ -150,7 +150,7 @@ class ExecutorTests(MigrationTestBase):
         """
         state = {"faked": None}
 
-        def fake_storer(phase, migration, fake):
+        def fake_storer(phase, migration=None, fake=None):
             state["faked"] = fake
         executor = MigrationExecutor(connection, progress_callback=fake_storer)
         # Were the tables there before?
@@ -219,11 +219,11 @@ class ExecutorTests(MigrationTestBase):
         # exists in the global app registry temporarily.
         old_table_names = connection.introspection.table_names
         connection.introspection.table_names = lambda c: [x for x in old_table_names(c) if x != "auth_user"]
-        migrations_apps = executor.loader.project_state(("migrations", "0001_initial")).render()
+        migrations_apps = executor.loader.project_state(("migrations", "0001_initial")).apps
         global_apps.get_app_config("migrations").models["author"] = migrations_apps.get_model("migrations", "author")
         try:
             migration = executor.loader.get_migration("auth", "0001_initial")
-            self.assertEqual(executor.detect_soft_applied(migration), True)
+            self.assertEqual(executor.detect_soft_applied(None, migration)[0], True)
         finally:
             connection.introspection.table_names = old_table_names
             del global_apps.get_app_config("migrations").models["author"]
@@ -232,6 +232,141 @@ class ExecutorTests(MigrationTestBase):
         executor.migrate([("migrations", None)])
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.lookuperror_a",
+            "migrations.migrations_test_apps.lookuperror_b",
+            "migrations.migrations_test_apps.lookuperror_c"
+        ]
+    )
+    def test_unrelated_model_lookups_forwards(self):
+        """
+        #24123 - Tests that all models of apps already applied which are
+        unrelated to the first app being applied are part of the initial model
+        state.
+        """
+        try:
+            executor = MigrationExecutor(connection)
+            self.assertTableNotExists("lookuperror_a_a1")
+            self.assertTableNotExists("lookuperror_b_b1")
+            self.assertTableNotExists("lookuperror_c_c1")
+            executor.migrate([("lookuperror_b", "0003_b3")])
+            self.assertTableExists("lookuperror_b_b3")
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+
+            # Migrate forwards -- This led to a lookup LookupErrors because
+            # lookuperror_b.B2 is already applied
+            executor.migrate([
+                ("lookuperror_a", "0004_a4"),
+                ("lookuperror_c", "0003_c3"),
+            ])
+            self.assertTableExists("lookuperror_a_a4")
+            self.assertTableExists("lookuperror_c_c3")
+
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+        finally:
+            # Cleanup
+            executor.migrate([
+                ("lookuperror_a", None),
+                ("lookuperror_b", None),
+                ("lookuperror_c", None),
+            ])
+            self.assertTableNotExists("lookuperror_a_a1")
+            self.assertTableNotExists("lookuperror_b_b1")
+            self.assertTableNotExists("lookuperror_c_c1")
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.lookuperror_a",
+            "migrations.migrations_test_apps.lookuperror_b",
+            "migrations.migrations_test_apps.lookuperror_c"
+        ]
+    )
+    def test_unrelated_model_lookups_backwards(self):
+        """
+        #24123 - Tests that all models of apps being unapplied which are
+        unrelated to the first app being unapplied are part of the initial
+        model state.
+        """
+        try:
+            executor = MigrationExecutor(connection)
+            self.assertTableNotExists("lookuperror_a_a1")
+            self.assertTableNotExists("lookuperror_b_b1")
+            self.assertTableNotExists("lookuperror_c_c1")
+            executor.migrate([
+                ("lookuperror_a", "0004_a4"),
+                ("lookuperror_b", "0003_b3"),
+                ("lookuperror_c", "0003_c3"),
+            ])
+            self.assertTableExists("lookuperror_b_b3")
+            self.assertTableExists("lookuperror_a_a4")
+            self.assertTableExists("lookuperror_c_c3")
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+
+            # Migrate backwards -- This led to a lookup LookupErrors because
+            # lookuperror_b.B2 is not in the initial state (unrelated to app c)
+            executor.migrate([("lookuperror_a", None)])
+
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+        finally:
+            # Cleanup
+            executor.migrate([
+                ("lookuperror_b", None),
+                ("lookuperror_c", None)
+            ])
+            self.assertTableNotExists("lookuperror_a_a1")
+            self.assertTableNotExists("lookuperror_b_b1")
+            self.assertTableNotExists("lookuperror_c_c1")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_process_callback(self):
+        """
+        #24129 - Tests callback process
+        """
+        call_args_list = []
+
+        def callback(*args):
+            call_args_list.append(args)
+
+        executor = MigrationExecutor(connection, progress_callback=callback)
+        # Were the tables there before?
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
+        executor.migrate([
+            ("migrations", "0001_initial"),
+            ("migrations", "0002_second"),
+        ])
+        # Rebuild the graph to reflect the new DB state
+        executor.loader.build_graph()
+
+        executor.migrate([
+            ("migrations", None),
+            ("migrations", None),
+        ])
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
+
+        migrations = executor.loader.graph.nodes
+        expected = [
+            ("render_start", ),
+            ("render_success", ),
+            ("apply_start", migrations['migrations', '0001_initial'], False),
+            ("apply_success", migrations['migrations', '0001_initial'], False),
+            ("apply_start", migrations['migrations', '0002_second'], False),
+            ("apply_success", migrations['migrations', '0002_second'], False),
+            ("render_start", ),
+            ("render_success", ),
+            ("unapply_start", migrations['migrations', '0002_second'], False),
+            ("unapply_success", migrations['migrations', '0002_second'], False),
+            ("unapply_start", migrations['migrations', '0001_initial'], False),
+            ("unapply_success", migrations['migrations', '0001_initial'], False),
+        ]
+        self.assertEqual(call_args_list, expected)
 
 
 class FakeLoader(object):

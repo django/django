@@ -47,6 +47,7 @@ class Experiment(models.Model):
     name = models.CharField(max_length=24)
     assigned = models.DateField()
     completed = models.DateField()
+    estimated_time = models.DurationField()
     start = models.DateTimeField()
     end = models.DateTimeField()
 
@@ -55,3 +56,19 @@ class Experiment(models.Model):
 
     def duration(self):
         return self.end - self.start
+
+
+@python_2_unicode_compatible
+class Time(models.Model):
+    time = models.TimeField(null=True)
+
+    def __str__(self):
+        return "%s" % self.time
+
+
+@python_2_unicode_compatible
+class UUID(models.Model):
+    uuid = models.UUIDField(null=True)
+
+    def __str__(self):
+        return "%s" % self.uuid
