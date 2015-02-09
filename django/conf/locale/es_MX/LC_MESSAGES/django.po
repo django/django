@@ -1240,7 +1240,7 @@ msgstr "o"
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:264 utils/timesince.py:57
 msgid ", "
-msgstr ","
+msgstr ", "
 
 #: utils/timesince.py:25
 #, python-format
