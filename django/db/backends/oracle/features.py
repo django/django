@@ -35,7 +35,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_combined_alters = False
     nulls_order_largest = True
     requires_literal_defaults = True
-    connection_persists_old_columns = True
     closed_cursor_error_class = InterfaceError
     bare_select_suffix = " FROM DUAL"
     uppercases_column_names = True
