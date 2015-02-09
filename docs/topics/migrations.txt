@@ -24,11 +24,6 @@ and Django's handling of database schema:
 
 * :djadmin:`sqlmigrate`, which displays the SQL statements for a migration.
 
-It's worth noting that migrations are created and run on a per-app basis.
-In particular, it's possible to have apps that *do not use migrations* (these
-are referred to as "unmigrated" apps) - these apps will instead mimic the
-legacy behavior of just adding new models.
-
 You should think of migrations as a version control system for your database
 schema. ``makemigrations`` is responsible for packaging up your model changes
 into individual migration files - analogous to commits - and ``migrate`` is
@@ -138,9 +133,6 @@ database to make sure they work as expected::
     Running migrations:
       Rendering model states... DONE
       Applying books.0003_auto... OK
-
-The command runs in two stages; first, it synchronizes unmigrated apps, and
-then it runs any migrations that have not yet been applied.
 
 Once the migration is applied, commit the migration and the models change
 to your version control system as a single commit - that way, when other
