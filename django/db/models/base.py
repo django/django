@@ -2,12 +2,10 @@ from __future__ import unicode_literals
 
 import copy
 import inspect
-import sys
 import warnings
 from itertools import chain
 
 from django.apps import apps
-from django.apps.config import MODELS_MODULE_NAME
 from django.conf import settings
 from django.core import checks
 from django.core.exceptions import (
@@ -88,48 +86,24 @@ class ModelBase(type):
             meta = attr_meta
         base_meta = getattr(new_class, '_meta', None)
 
+        app_label = None
+
         # Look for an application configuration to attach the model to.
         app_config = apps.get_containing_app_config(module)
 
         if getattr(meta, 'app_label', None) is None:
-
             if app_config is None:
-                # If the model is imported before the configuration for its
-                # application is created (#21719), or isn't in an installed
-                # application (#21680), use the legacy logic to figure out the
-                # app_label by looking one level up from the package or module
-                # named 'models'. If no such package or module exists, fall
-                # back to looking one level up from the module this model is
-                # defined in.
-
-                # For 'django.contrib.sites.models', this would be 'sites'.
-                # For 'geo.models.places' this would be 'geo'.
-
-                msg = (
-                    "Model class %s.%s doesn't declare an explicit app_label "
-                    "and either isn't in an application in INSTALLED_APPS or "
-                    "else was imported before its application was loaded. "
-                    "This will no longer be supported in Django 1.9." %
-                    (module, name))
                 if not abstract:
-                    warnings.warn(msg, DeprecationWarning, stacklevel=2)
-
-                model_module = sys.modules[new_class.__module__]
-                package_components = model_module.__name__.split('.')
-                package_components.reverse()  # find the last occurrence of 'models'
-                try:
-                    app_label_index = package_components.index(MODELS_MODULE_NAME) + 1
-                except ValueError:
-                    app_label_index = 1
-                kwargs = {"app_label": package_components[app_label_index]}
+                    raise RuntimeError(
+                        "Model class %s.%s doesn't declare an explicit "
+                        "app_label and either isn't in an application in "
+                        "INSTALLED_APPS or else was imported before its "
+                        "application was loaded. " % (module, name))
 
             else:
-                kwargs = {"app_label": app_config.label}
+                app_label = app_config.label
 
-        else:
-            kwargs = {}
-
-        new_class.add_to_class('_meta', Options(meta, **kwargs))
+        new_class.add_to_class('_meta', Options(meta, app_label))
         if not abstract:
             new_class.add_to_class(
                 'DoesNotExist',
