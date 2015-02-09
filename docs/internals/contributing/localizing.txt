@@ -45,6 +45,13 @@ translating or add a language that isn't yet translated, here's what to do:
      For more information about how to use Transifex, read the
      `Transifex User Guide`_.
 
+Translations from Transifex are only integrated into the Django repository at
+the time of a new major release. We try to update them a second time during one
+of the following minor releases, but that depends on the translation manager's
+availability. So don't miss the string freeze period (between the release
+candidate and the major release) to take the opportunity to complete and fix
+the translations for your language!
+
 Formats
 -------
 
