@@ -8,6 +8,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -133,7 +134,9 @@ class UserAdmin(admin.ModelAdmin):
                 msg = ugettext('Password changed successfully.')
                 messages.success(request, msg)
                 update_session_auth_hash(request, form.user)
-                return HttpResponseRedirect('..')
+                return HttpResponseRedirect(
+                    reverse('%s:auth_user_change' % self.admin_site.name, args=(user.pk,))
+                )
         else:
             form = self.change_password_form(user)
 

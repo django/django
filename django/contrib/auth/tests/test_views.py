@@ -861,32 +861,39 @@ class ChangelistTests(AuthViewsTestCase):
     def test_changelist_disallows_password_lookups(self):
         # A lookup that tries to filter on password isn't OK
         with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as logger_calls:
-            response = self.client.get('/admin/auth/user/?password__startswith=sha1$')
+            response = self.client.get(reverse('auth_test_admin:auth_user_changelist') + '?password__startswith=sha1$')
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(logger_calls), 1)
 
     def test_user_change_email(self):
         data = self.get_user_data(self.admin)
         data['email'] = 'new_' + data['email']
-        response = self.client.post('/admin/auth/user/%s/' % self.admin.pk, data)
-        self.assertRedirects(response, '/admin/auth/user/')
+        response = self.client.post(
+            reverse('auth_test_admin:auth_user_change', args=(self.admin.pk,)),
+            data
+        )
+        self.assertRedirects(response, reverse('auth_test_admin:auth_user_changelist'))
         row = LogEntry.objects.latest('id')
         self.assertEqual(row.change_message, 'Changed email.')
 
     def test_user_not_change(self):
-        response = self.client.post('/admin/auth/user/%s/' % self.admin.pk,
+        response = self.client.post(
+            reverse('auth_test_admin:auth_user_change', args=(self.admin.pk,)),
             self.get_user_data(self.admin)
         )
-        self.assertRedirects(response, '/admin/auth/user/')
+        self.assertRedirects(response, reverse('auth_test_admin:auth_user_changelist'))
         row = LogEntry.objects.latest('id')
         self.assertEqual(row.change_message, 'No fields changed.')
 
     def test_user_change_password(self):
-        response = self.client.post('/admin/auth/user/%s/password/' % self.admin.pk, {
-            'password1': 'password1',
-            'password2': 'password1',
-        })
-        self.assertRedirects(response, '/admin/auth/user/%s/' % self.admin.pk)
+        response = self.client.post(
+            reverse('auth_test_admin:auth_user_password_change', args=(self.admin.pk,)),
+            {
+                'password1': 'password1',
+                'password2': 'password1',
+            }
+        )
+        self.assertRedirects(response, reverse('auth_test_admin:auth_user_change', args=(self.admin.pk,)))
         row = LogEntry.objects.latest('id')
         self.assertEqual(row.change_message, 'Changed password.')
         self.logout()
@@ -894,11 +901,14 @@ class ChangelistTests(AuthViewsTestCase):
 
     def test_user_change_different_user_password(self):
         u = User.objects.get(email='staffmember@example.com')
-        response = self.client.post('/admin/auth/user/%s/password/' % u.pk, {
-            'password1': 'password1',
-            'password2': 'password1',
-        })
-        self.assertRedirects(response, '/admin/auth/user/%s/' % u.pk)
+        response = self.client.post(
+            reverse('auth_test_admin:auth_user_password_change', args=(u.pk,)),
+            {
+                'password1': 'password1',
+                'password2': 'password1',
+            }
+        )
+        self.assertRedirects(response, reverse('auth_test_admin:auth_user_change', args=(u.pk,)))
         row = LogEntry.objects.latest('id')
         self.assertEqual(row.user_id, self.admin.pk)
         self.assertEqual(row.object_id, str(u.pk))
