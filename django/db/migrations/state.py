@@ -8,7 +8,9 @@ from django.apps.registry import Apps, apps as global_apps
 from django.conf import settings
 from django.db import models
 from django.db.models.fields.proxy import OrderWrt
-from django.db.models.fields.related import do_pending_lookups
+from django.db.models.fields.related import (
+    RECURSIVE_RELATIONSHIP_CONSTANT, do_pending_lookups,
+)
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.utils import six
 from django.utils.encoding import force_text, smart_text
@@ -19,6 +21,39 @@ from django.utils.version import get_docs_version
 
 class InvalidBasesError(ValueError):
     pass
+
+
+def _get_app_label_and_model_name(model, app_label=''):
+    if isinstance(model, six.string_types):
+        split = model.split('.', 1)
+        return (tuple(split) if len(split) == 2 else (app_label, split[0]))
+    else:
+        return model._meta.app_label, model._meta.model_name
+
+
+def get_related_models_recursive(model):
+    """
+    Returns all models that have a direct or indirect relationship
+    to the given model.
+    """
+    def _related_models(m):
+        return [
+            f.related_model for f in m._meta.get_fields(include_parents=True, include_hidden=True)
+            if f.is_relation and not isinstance(f.related_model, six.string_types)
+        ] + [
+            subclass for subclass in m.__subclasses__()
+            if issubclass(subclass, models.Model)
+        ]
+
+    seen = set()
+    queue = _related_models(model)
+    for rel_mod in queue:
+        rel_app_label, rel_model_name = rel_mod._meta.app_label, rel_mod._meta.model_name
+        if (rel_app_label, rel_model_name) in seen:
+            continue
+        seen.add((rel_app_label, rel_model_name))
+        queue.extend(_related_models(rel_mod))
+    return seen - {(model._meta.app_label, model._meta.model_name)}
 
 
 class ProjectState(object):
@@ -46,27 +81,57 @@ class ProjectState(object):
 
     def reload_model(self, app_label, model_name):
         if 'apps' in self.__dict__:  # hasattr would cache the property
-            # Get relations before reloading the models, as _meta.apps may change
             try:
-                related_old = {
-                    f.related_model for f in
-                    self.apps.get_model(app_label, model_name)._meta.related_objects
-                }
+                old_model = self.apps.get_model(app_label, model_name)
             except LookupError:
-                related_old = set()
-            self._reload_one_model(app_label, model_name)
-            # Reload models if there are relations
-            model = self.apps.get_model(app_label, model_name)
-            related_m2m = {f.related_model for f in model._meta.many_to_many}
-            for rel_model in related_old.union(related_m2m):
-                self._reload_one_model(rel_model._meta.app_label, rel_model._meta.model_name)
-            if related_m2m:
-                # Re-render this model after related models have been reloaded
-                self._reload_one_model(app_label, model_name)
+                related_models = set()
+            else:
+                # Get all relations to and from the old model before reloading,
+                # as _meta.apps may change
+                related_models = get_related_models_recursive(old_model)
 
-    def _reload_one_model(self, app_label, model_name):
-        self.apps.unregister_model(app_label, model_name)
-        self.models[app_label, model_name].render(self.apps)
+            # Get all outgoing references from the model to be rendered
+            model_state = self.models[(app_label, model_name)]
+            for name, field in model_state.fields:
+                if field.is_relation:
+                    if field.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT:
+                        continue
+                    rel_app_label, rel_model_name = _get_app_label_and_model_name(field.rel.to, app_label)
+                    related_models.add((rel_app_label, rel_model_name.lower()))
+
+            # Unregister all related models
+            for rel_app_label, rel_model_name in related_models:
+                self.apps.unregister_model(rel_app_label, rel_model_name)
+
+            # Unregister the current model
+            self.apps.unregister_model(app_label, model_name)
+
+            # Gather all models states of those models that will be rerendered.
+            # This includes:
+            # 1. The current model
+            try:
+                model_state = self.models[app_label, model_name]
+            except KeyError:
+                states_to_be_rendered = []
+            else:
+                states_to_be_rendered = [model_state]
+
+            # 2. All related models of unmigrated apps
+            for model_state in self.apps.real_models:
+                if (model_state.app_label, model_state.name_lower) in related_models:
+                    states_to_be_rendered.append(model_state)
+
+            # 3. All related models of migrated apps
+            for rel_app_label, rel_model_name in related_models:
+                try:
+                    model_state = self.models[rel_app_label, rel_model_name]
+                except KeyError:
+                    pass
+                else:
+                    states_to_be_rendered.append(model_state)
+
+            # Render all models
+            self.apps.render_multiple(states_to_be_rendered)
 
     def clone(self):
         "Returns an exact copy of this ProjectState"
@@ -136,36 +201,17 @@ class StateApps(Apps):
         # are some variables that refer to the Apps object.
         # FKs/M2Ms from real apps are also not included as they just
         # mess things up with partial states (due to lack of dependencies)
-        real_models = []
+        self.real_models = []
         for app_label in real_apps:
             app = global_apps.get_app_config(app_label)
             for model in app.get_models():
-                real_models.append(ModelState.from_model(model, exclude_rels=True))
+                self.real_models.append(ModelState.from_model(model, exclude_rels=True))
         # Populate the app registry with a stub for each application.
         app_labels = {model_state.app_label for model_state in models.values()}
         app_configs = [AppConfigStub(label) for label in sorted(real_apps + list(app_labels))]
         super(StateApps, self).__init__(app_configs)
 
-        # We keep trying to render the models in a loop, ignoring invalid
-        # base errors, until the size of the unrendered models doesn't
-        # decrease by at least one, meaning there's a base dependency loop/
-        # missing base.
-        unrendered_models = list(models.values()) + real_models
-        while unrendered_models:
-            new_unrendered_models = []
-            for model in unrendered_models:
-                try:
-                    model.render(self)
-                except InvalidBasesError:
-                    new_unrendered_models.append(model)
-            if len(new_unrendered_models) == len(unrendered_models):
-                raise InvalidBasesError(
-                    "Cannot resolve bases for %r\nThis can happen if you are inheriting models from an "
-                    "app with migrations (e.g. contrib.auth)\n in an app with no migrations; see "
-                    "https://docs.djangoproject.com/en/%s/topics/migrations/#dependencies "
-                    "for more" % (new_unrendered_models, get_docs_version())
-                )
-            unrendered_models = new_unrendered_models
+        self.render_multiple(list(models.values()) + self.real_models)
 
         # If there are some lookups left, see if we can first resolve them
         # ourselves - sometimes fields are added after class_prepared is sent
@@ -185,6 +231,28 @@ class StateApps(Apps):
             else:
                 do_pending_lookups(model)
 
+    def render_multiple(self, model_states):
+        # We keep trying to render the models in a loop, ignoring invalid
+        # base errors, until the size of the unrendered models doesn't
+        # decrease by at least one, meaning there's a base dependency loop/
+        # missing base.
+        unrendered_models = model_states
+        while unrendered_models:
+            new_unrendered_models = []
+            for model in unrendered_models:
+                try:
+                    model.render(self)
+                except InvalidBasesError:
+                    new_unrendered_models.append(model)
+            if len(new_unrendered_models) == len(unrendered_models):
+                raise InvalidBasesError(
+                    "Cannot resolve bases for %r\nThis can happen if you are inheriting models from an "
+                    "app with migrations (e.g. contrib.auth)\n in an app with no migrations; see "
+                    "https://docs.djangoproject.com/en/%s/topics/migrations/#dependencies "
+                    "for more" % (new_unrendered_models, get_docs_version())
+                )
+            unrendered_models = new_unrendered_models
+
     def clone(self):
         """
         Return a clone of this registry, mainly used by the migration framework.
@@ -192,6 +260,8 @@ class StateApps(Apps):
         clone = StateApps([], {})
         clone.all_models = copy.deepcopy(self.all_models)
         clone.app_configs = copy.deepcopy(self.app_configs)
+        # No need to actually clone them, they'll never change
+        clone.real_models = self.real_models
         return clone
 
     def register_model(self, app_label, model):
