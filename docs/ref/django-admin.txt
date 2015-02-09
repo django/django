@@ -696,8 +696,7 @@ Migrations, their relationship with apps and more are covered in depth in
 
 The behavior of this command changes depending on the arguments provided:
 
-* No arguments: All migrated apps have all of their migrations run,
-  and all unmigrated apps are synchronized with the database,
+* No arguments: All apps have all of their migrations run.
 * ``<app_label>``: The specified app has its migrations run, up to the most
   recent migration. This may involve running other apps' migrations too, due
   to dependencies.
