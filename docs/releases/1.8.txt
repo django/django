@@ -286,6 +286,10 @@ Database backends
 * The MySQL backend no longer creates explicit indexes for foreign keys when
   using the InnoDB storage engine, as MySQL already creates them automatically.
 
+* The Oracle backend no longer defines the ``connection_persists_old_columns``
+  feature as ``True``. Instead, Oracle will now include a cache busting clause
+  when getting the description of a table.
+
 Email
 ^^^^^
 
