@@ -87,9 +87,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.remove_field(model, old_field)
         # Rename the new field
         self.alter_field(model, new_temp_field, new_field)
-        # Close the connection to force cx_Oracle to get column types right
-        # on a new cursor
-        self.connection.close()
 
     def normalize_name(self, name):
         """
