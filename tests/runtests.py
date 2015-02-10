@@ -76,9 +76,10 @@ def get_test_modules():
         (None, RUNTESTS_DIR),
         (CONTRIB_MODULE_PATH, CONTRIB_DIR)
     ]
+    # GIS tests are in nested apps
     if connection.features.gis_enabled:
         discovery_paths.append(
-            ('django.contrib.gis.tests', os.path.join(CONTRIB_DIR, 'gis', 'tests'))
+            ('gis_tests', os.path.join(RUNTESTS_DIR, 'gis_tests'))
         )
 
     for modpath, dirpath in discovery_paths:
@@ -207,6 +208,14 @@ def setup(verbosity, test_labels):
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
             settings.INSTALLED_APPS.append(module_label)
+
+    # Add contrib.gis to INSTALLED_APPS if needed (rather than requiring
+    # @override_settings(INSTALLED_APPS=...) on all test cases.
+    gis = 'django.contrib.gis'
+    if connection.features.gis_enabled and gis not in settings.INSTALLED_APPS:
+        if verbosity >= 2:
+            print("Importing application %s" % gis)
+        settings.INSTALLED_APPS.append(gis)
 
     apps.set_installed_apps(settings.INSTALLED_APPS)
 
