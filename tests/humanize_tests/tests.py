@@ -6,7 +6,7 @@ from unittest import skipIf
 
 from django.contrib.humanize.templatetags import humanize
 from django.template import Context, Template, defaultfilters
-from django.test import TestCase, override_settings
+from django.test import TestCase, modify_settings, override_settings
 from django.utils import translation
 from django.utils.html import escape
 from django.utils.timezone import get_fixed_timezone, utc
@@ -35,6 +35,7 @@ class MockDateTime(datetime.datetime):
             return now.replace(tzinfo=tz) + tz.utcoffset(now)
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.humanize'})
 class HumanizeTests(TestCase):
 
     def humanize_tester(self, test_list, result_list, method, normalize_result_func=escape):
