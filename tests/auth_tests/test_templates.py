@@ -1,6 +1,5 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.views import (
     password_change, password_change_done, password_reset,
@@ -11,10 +10,9 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode
 
 
-@skipIfCustomUser
 @override_settings(
     PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='django.contrib.auth.tests.urls',
+    ROOT_URLCONF='auth_tests.urls',
 )
 class AuthTemplateTests(TestCase):
 

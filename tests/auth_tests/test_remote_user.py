@@ -5,13 +5,11 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
-from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase, modify_settings, override_settings
 from django.utils import timezone
 
 
-@skipIfCustomUser
-@override_settings(ROOT_URLCONF='django.contrib.auth.tests.urls')
+@override_settings(ROOT_URLCONF='auth_tests.urls')
 class RemoteUserTest(TestCase):
 
     middleware = 'django.contrib.auth.middleware.RemoteUserMiddleware'
@@ -153,14 +151,13 @@ class RemoteUserNoCreateBackend(RemoteUserBackend):
     create_unknown_user = False
 
 
-@skipIfCustomUser
 class RemoteUserNoCreateTest(RemoteUserTest):
     """
     Contains the same tests as RemoteUserTest, but using a custom auth backend
     class that doesn't create unknown users.
     """
 
-    backend = 'django.contrib.auth.tests.test_remote_user.RemoteUserNoCreateBackend'
+    backend = 'auth_tests.test_remote_user.RemoteUserNoCreateBackend'
 
     def test_unknown_user(self):
         num_users = User.objects.count()
@@ -189,14 +186,13 @@ class CustomRemoteUserBackend(RemoteUserBackend):
         return user
 
 
-@skipIfCustomUser
 class RemoteUserCustomTest(RemoteUserTest):
     """
     Tests a custom RemoteUserBackend subclass that overrides the clean_username
     and configure_user methods.
     """
 
-    backend = 'django.contrib.auth.tests.test_remote_user.CustomRemoteUserBackend'
+    backend = 'auth_tests.test_remote_user.CustomRemoteUserBackend'
     # REMOTE_USER strings with email addresses for the custom backend to
     # clean.
     known_user = 'knownuser@example.com'
@@ -227,13 +223,12 @@ class CustomHeaderMiddleware(RemoteUserMiddleware):
     header = 'HTTP_AUTHUSER'
 
 
-@skipIfCustomUser
 class CustomHeaderRemoteUserTest(RemoteUserTest):
     """
     Tests a custom RemoteUserMiddleware subclass with custom HTTP auth user
     header.
     """
     middleware = (
-        'django.contrib.auth.tests.test_remote_user.CustomHeaderMiddleware'
+        'auth_tests.test_remote_user.CustomHeaderMiddleware'
     )
     header = 'HTTP_AUTHUSER'
