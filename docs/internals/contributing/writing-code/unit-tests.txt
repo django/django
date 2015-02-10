@@ -5,11 +5,6 @@ Unit tests
 Django comes with a test suite of its own, in the ``tests`` directory of the
 code base. It's our policy to make sure all tests pass at all times.
 
-The tests cover:
-
-* Models, the database API and everything else in core Django core (``tests/``),
-* :ref:`contrib-apps` (``django/contrib/<app>/tests`` or ``tests/<app>_...``).
-
 We appreciate any and all contributions to the test suite!
 
 The Django tests all use the testing infrastructure that ships with Django for
@@ -108,8 +103,7 @@ internationalization, type:
    $ ./runtests.py --settings=path.to.settings generic_relations i18n
 
 How do you find out the names of individual tests? Look in ``tests/`` — each
-directory name there is the name of a test. Contrib app names are also valid
-test names.
+directory name there is the name of a test.
 
 If you just want to run a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
@@ -221,18 +215,9 @@ and also excludes several directories not relevant to the results
 Contrib apps
 ------------
 
-Tests for contrib apps go in their respective directories under
-``django/contrib``, in a ``tests.py`` file. You can split the tests over
-multiple modules by using a ``tests`` directory in the normal Python way.
-
-If you have URLs that need to be mapped, put them in ``tests/urls.py``.
-
-To run tests for just one contrib app (e.g. ``auth``), use the same
-method as above:
-
-.. code-block:: bash
-
-   $ ./runtests.py --settings=settings django.contrib.auth
+Tests for contrib apps can be found in the ``tests/`` directory, typically
+under ``<app_name>_tests``. For example, tests for ``contrib.auth`` are located
+in ``tests/auth_tests``.
 
 .. _troubleshooting-unit-tests:
 

@@ -9,7 +9,6 @@ import warnings
 from argparse import ArgumentParser
 
 import django
-from django import contrib
 from django.apps import apps
 from django.conf import settings
 from django.db import connection
@@ -24,9 +23,6 @@ from django.utils.deprecation import (
 warnings.simplefilter("error", RemovedInDjango20Warning)
 warnings.simplefilter("error", RemovedInDjango21Warning)
 
-CONTRIB_MODULE_PATH = 'django.contrib'
-
-CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 
 TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, 'templates')
@@ -74,7 +70,6 @@ def get_test_modules():
     modules = []
     discovery_paths = [
         (None, RUNTESTS_DIR),
-        (CONTRIB_MODULE_PATH, CONTRIB_DIR)
     ]
     # GIS tests are in nested apps
     if connection.features.gis_enabled:
@@ -177,11 +172,7 @@ def setup(verbosity, test_labels):
     # Reduce given test labels to just the app module path
     test_labels_set = set()
     for label in test_labels:
-        bits = label.split('.')
-        if bits[:2] == ['django', 'contrib']:
-            bits = bits[:3]
-        else:
-            bits = bits[:1]
+        bits = label.split('.')[:1]
         test_labels_set.add('.'.join(bits))
 
     installed_app_names = set(get_installed())
