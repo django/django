@@ -234,3 +234,19 @@ class RequestContext(Context):
         if hasattr(new_context, '_processors_index'):
             del new_context._processors_index
         return new_context
+
+
+def make_context(context, request=None):
+    """
+    Create a suitable Context from a plain dict and optionally an HttpRequest.
+    """
+    if request is None:
+        context = Context(context)
+    else:
+        # The following pattern is required to ensure values from
+        # context override those from template context processors.
+        original_context = context
+        context = RequestContext(request)
+        if original_context:
+            context.push(original_context)
+    return context
