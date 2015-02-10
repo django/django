@@ -18,9 +18,7 @@ recursive-include django/contrib/*/locale *
 recursive-include django/contrib/admin/templates *
 recursive-include django/contrib/admin/static *
 recursive-include django/contrib/admindocs/templates *
-recursive-include django/contrib/auth/fixtures *
 recursive-include django/contrib/auth/templates *
-recursive-include django/contrib/auth/tests/templates *
 recursive-include django/contrib/gis/gdal/tests/data *
 recursive-include django/contrib/gis/static *
 recursive-include django/contrib/gis/templates *
