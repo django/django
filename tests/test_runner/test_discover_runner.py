@@ -121,9 +121,9 @@ class DiscoverRunnerTest(TestCase):
         """
         Tests shouldn't be discovered twice when discovering on overlapping paths.
         """
-        single = DiscoverRunner().build_suite(["django.contrib.gis"]).countTestCases()
+        single = DiscoverRunner().build_suite(["gis_tests"]).countTestCases()
         dups = DiscoverRunner().build_suite(
-            ["django.contrib.gis", "django.contrib.gis.tests.geo3d"]).countTestCases()
+            ["gis_tests", "gis_tests.geo3d"]).countTestCases()
         self.assertEqual(single, dups)
 
     def test_reverse(self):
