@@ -178,7 +178,7 @@ class GetFieldByNameTests(OptionsBaseTests):
         opts = Person._meta
         # If apps registry is not ready, get_field() searches over only
         # forward fields.
-        opts.apps.ready = False
+        opts.apps.models_ready = False
         try:
             # 'data_abstract' is a forward field, and therefore will be found
             self.assertTrue(opts.get_field('data_abstract'))
@@ -191,7 +191,7 @@ class GetFieldByNameTests(OptionsBaseTests):
             with self.assertRaisesMessage(FieldDoesNotExist, msg):
                 opts.get_field('relating_baseperson')
         finally:
-            opts.apps.ready = True
+            opts.apps.models_ready = True
 
 
 class RelationTreeTests(TestCase):
