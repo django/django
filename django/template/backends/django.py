@@ -4,7 +4,7 @@ from __future__ import absolute_import
 import warnings
 
 from django.conf import settings
-from django.template.context import Context, RequestContext
+from django.template.context import Context, RequestContext, make_context
 from django.template.engine import Engine, _dirs_undefined
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -69,14 +69,6 @@ class Template(object):
                 RemovedInDjango20Warning, stacklevel=2)
 
         else:
-            if request is None:
-                context = Context(context)
-            else:
-                # The following pattern is required to ensure values from
-                # context override those from template context processors.
-                original_context = context
-                context = RequestContext(request)
-                if original_context:
-                    context.push(original_context)
+            context = make_context(context, request)
 
         return self.template.render(context)
