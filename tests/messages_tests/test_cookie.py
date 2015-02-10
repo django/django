@@ -5,9 +5,10 @@ from django.contrib.messages.storage.base import Message
 from django.contrib.messages.storage.cookie import (
     CookieStorage, MessageDecoder, MessageEncoder,
 )
-from django.contrib.messages.tests.base import BaseTests
 from django.test import TestCase, override_settings
 from django.utils.safestring import SafeData, mark_safe
+
+from .base import BaseTests
 
 
 def set_cookie_data(storage, messages, invalid=False, encode_empty=False):

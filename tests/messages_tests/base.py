@@ -1,7 +1,4 @@
-from unittest import skipUnless
-
 from django import http
-from django.apps import apps
 from django.contrib.messages import constants, get_level, set_level, utils
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
@@ -10,12 +7,6 @@ from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
 from django.test import modify_settings, override_settings
 from django.utils.translation import ugettext_lazy
-
-
-def skipUnlessAuthIsInstalled(func):
-    return skipUnless(
-        apps.is_installed('django.contrib.auth'),
-        "django.contrib.auth isn't installed")(func)
 
 
 def add_level_messages(storage):
@@ -68,7 +59,7 @@ class BaseTests(object):
                     ),
                 },
             }],
-            ROOT_URLCONF='django.contrib.messages.tests.urls',
+            ROOT_URLCONF='messages_tests.urls',
             MESSAGE_TAGS='',
             MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__,
                                        self.storage_class.__name__),
