@@ -2023,22 +2023,19 @@ class OneToOneField(ForeignKey):
 
 def create_many_to_many_intermediary_model(field, klass):
     from django.db import models
-    managed = True
-    if isinstance(field.rel.to, six.string_types) and field.rel.to != RECURSIVE_RELATIONSHIP_CONSTANT:
-        to_model = field.rel.to
-        to = to_model.split('.')[-1]
 
+    to_model = resolve_relation(klass, field.rel.to)
+    to_label = resolve_relation(klass, field.rel.to, always_text=True)
+    to = to_label.split('.')[-1]
+
+    try:
+        managed = klass._meta.managed or to_model._meta.managed
+    except AttributeError:
         def set_managed(cls, model, field):
             field.rel.through._meta.managed = model._meta.managed or cls._meta.managed
         lazy_related_operation(set_managed, klass, to_model, field=field)
-    elif isinstance(field.rel.to, six.string_types):
-        to = klass._meta.object_name
-        to_model = klass
-        managed = klass._meta.managed
-    else:
-        to = field.rel.to._meta.object_name
-        to_model = field.rel.to
-        managed = klass._meta.managed or to_model._meta.managed
+        managed = True
+
     name = '%s_%s' % (klass._meta.object_name, field.name)
     if field.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT or to == klass._meta.object_name:
         from_ = 'from_%s' % to.lower()
@@ -2190,7 +2187,7 @@ class ManyToManyField(RelatedField):
                 "where the field is attached to."
 
             # Set some useful local variables
-            to_model = self.rel.to
+            to_model = resolve_relation(from_model, self.rel.to)
             from_model_name = from_model._meta.object_name
             if isinstance(to_model, six.string_types):
                 to_model_name = to_model
