@@ -1,5 +1,4 @@
 from django import template
-from django.template.base import Node
 from django.utils.encoding import iri_to_uri
 from django.utils.six.moves.urllib.parse import urljoin
 
@@ -90,7 +89,7 @@ def get_media_prefix(parser, token):
     return PrefixNode.handle_token(parser, token, "MEDIA_URL")
 
 
-class StaticNode(Node):
+class StaticNode(template.Node):
     def __init__(self, varname=None, path=None):
         if path is None:
             raise template.TemplateSyntaxError(
