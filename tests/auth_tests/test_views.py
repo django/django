@@ -13,6 +13,8 @@ from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
 )
 from django.contrib.auth.models import User
+# Needed so model is installed when tests are run independently:
+from django.contrib.auth.tests.custom_user import CustomUser  # NOQA
 from django.contrib.auth.views import login as login_view, redirect_to_login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
@@ -30,10 +32,7 @@ from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import ParseResult, urlparse
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
-# Needed so model is installed when tests are run independently:
-from .custom_user import CustomUser  # NOQA
 from .settings import AUTH_TEMPLATES
-from .utils import skipIfCustomUser
 
 
 @override_settings(
@@ -44,7 +43,7 @@ from .utils import skipIfCustomUser
     TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,
     PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='django.contrib.auth.tests.urls',
+    ROOT_URLCONF='auth_tests.urls',
 )
 class AuthViewsTestCase(TestCase):
     """
@@ -88,7 +87,6 @@ class AuthViewsTestCase(TestCase):
                 self.fail("%r != %r (%s doesn't match)" % (url, expected, attr))
 
 
-@skipIfCustomUser
 @override_settings(ROOT_URLCONF='django.contrib.auth.urls')
 class AuthViewNamedURLTests(AuthViewsTestCase):
 
@@ -114,7 +112,6 @@ class AuthViewNamedURLTests(AuthViewsTestCase):
                 self.fail("Reversal of url named '%s' failed with NoReverseMatch" % name)
 
 
-@skipIfCustomUser
 class PasswordResetTest(AuthViewsTestCase):
 
     def test_email_not_found(self):
@@ -357,7 +354,6 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
         self.assertContains(response, "Please enter your new password")
 
 
-@skipIfCustomUser
 class ChangePasswordTest(AuthViewsTestCase):
 
     def fail_login(self, password='password'):
@@ -466,7 +462,6 @@ class SessionAuthenticationTests(AuthViewsTestCase):
         self.assertRedirects(response, '/password_change/done/')
 
 
-@skipIfCustomUser
 class LoginTest(AuthViewsTestCase):
 
     def test_current_site_in_context_after_login(self):
@@ -616,7 +611,6 @@ class LoginTest(AuthViewsTestCase):
         self.assertNotEqual(original_session_key, self.client.session.session_key)
 
 
-@skipIfCustomUser
 class LoginURLSettings(AuthViewsTestCase):
     """Tests for settings.LOGIN_URL."""
     def assertLoginURLEquals(self, url, parse_qs=False):
@@ -659,7 +653,6 @@ class LoginURLSettings(AuthViewsTestCase):
         self.assertLoginURLEquals('/login/?next=/login_required/')
 
 
-@skipIfCustomUser
 class LoginRedirectUrlTest(AuthViewsTestCase):
     """Tests for settings.LOGIN_REDIRECT_URL."""
     def assertLoginRedirectURLEqual(self, url):
@@ -698,7 +691,6 @@ class RedirectToLoginTests(AuthViewsTestCase):
         self.assertEqual(expected, login_redirect_response.url)
 
 
-@skipIfCustomUser
 class LogoutTest(AuthViewsTestCase):
 
     def confirm_logged_out(self):
@@ -820,13 +812,12 @@ class LogoutTest(AuthViewsTestCase):
 
 # Redirect in test_user_change_password will fail if session auth hash
 # isn't updated after password change (#21649)
-@skipIfCustomUser
 @modify_settings(MIDDLEWARE_CLASSES={
     'append': 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 })
 @override_settings(
     PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='django.contrib.auth.tests.urls_admin',
+    ROOT_URLCONF='auth_tests.urls_admin',
 )
 class ChangelistTests(AuthViewsTestCase):
 

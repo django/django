@@ -9,7 +9,6 @@ from django.contrib.auth.models import AnonymousUser, Group, Permission, User
 from django.contrib.auth.tests.custom_user import (
     CustomPermissionsUser, CustomUser, ExtensionUser,
 )
-from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
@@ -176,7 +175,7 @@ class BaseModelBackendTest(object):
         user = self.UserModel._default_manager.get(pk=self.superuser.pk)
         self.assertEqual(len(user.get_all_permissions()), len(Permission.objects.all()))
 
-    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.tests.test_auth_backends.CountingMD5PasswordHasher'])
+    @override_settings(PASSWORD_HASHERS=['auth_tests.test_auth_backends.CountingMD5PasswordHasher'])
     def test_authentication_timing(self):
         """Hasher is run once regardless of whether the user exists. Refs #20760."""
         # Re-set the password, because this tests overrides PASSWORD_HASHERS
@@ -193,7 +192,6 @@ class BaseModelBackendTest(object):
         self.assertEqual(CountingMD5PasswordHasher.calls, 1)
 
 
-@skipIfCustomUser
 class ModelBackendTest(BaseModelBackendTest, TestCase):
     """
     Tests for the ModelBackend using the default User model.
@@ -340,9 +338,8 @@ class SimpleRowlevelBackend(object):
             return ['none']
 
 
-@skipIfCustomUser
 @modify_settings(AUTHENTICATION_BACKENDS={
-    'append': 'django.contrib.auth.tests.test_auth_backends.SimpleRowlevelBackend',
+    'append': 'auth_tests.test_auth_backends.SimpleRowlevelBackend',
 })
 class RowlevelBackendTest(TestCase):
     """
@@ -381,7 +378,7 @@ class RowlevelBackendTest(TestCase):
 
 
 @override_settings(
-    AUTHENTICATION_BACKENDS=['django.contrib.auth.tests.test_auth_backends.SimpleRowlevelBackend'],
+    AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.SimpleRowlevelBackend'],
 )
 class AnonymousUserBackendTest(TestCase):
     """
@@ -407,7 +404,6 @@ class AnonymousUserBackendTest(TestCase):
         self.assertEqual(self.user1.get_all_permissions(TestObj()), {'anon'})
 
 
-@skipIfCustomUser
 @override_settings(AUTHENTICATION_BACKENDS=[])
 class NoBackendsTest(TestCase):
     """
@@ -420,8 +416,7 @@ class NoBackendsTest(TestCase):
         self.assertRaises(ImproperlyConfigured, self.user.has_perm, ('perm', TestObj(),))
 
 
-@skipIfCustomUser
-@override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.tests.test_auth_backends.SimpleRowlevelBackend'])
+@override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.SimpleRowlevelBackend'])
 class InActiveUserBackendTest(TestCase):
     """
     Tests for an inactive user
@@ -459,12 +454,11 @@ class PermissionDeniedBackend(object):
         raise PermissionDenied
 
 
-@skipIfCustomUser
 class PermissionDeniedBackendTest(TestCase):
     """
     Tests that other backends are not checked once a backend raises PermissionDenied
     """
-    backend = 'django.contrib.auth.tests.test_auth_backends.PermissionDeniedBackend'
+    backend = 'auth_tests.test_auth_backends.PermissionDeniedBackend'
 
     def setUp(self):
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
@@ -502,12 +496,11 @@ class NewModelBackend(ModelBackend):
     pass
 
 
-@skipIfCustomUser
 class ChangedBackendSettingsTest(TestCase):
     """
     Tests for changes in the settings.AUTHENTICATION_BACKENDS
     """
-    backend = 'django.contrib.auth.tests.test_auth_backends.NewModelBackend'
+    backend = 'auth_tests.test_auth_backends.NewModelBackend'
 
     TEST_USERNAME = 'test_user'
     TEST_PASSWORD = 'test_password'
@@ -559,14 +552,13 @@ class TypeErrorBackend(object):
         raise TypeError
 
 
-@skipIfCustomUser
 class TypeErrorBackendTest(TestCase):
     """
     Tests that a TypeError within a backend is propagated properly.
 
     Regression test for ticket #18171
     """
-    backend = 'django.contrib.auth.tests.test_auth_backends.TypeErrorBackend'
+    backend = 'auth_tests.test_auth_backends.TypeErrorBackend'
 
     def setUp(self):
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
@@ -576,7 +568,6 @@ class TypeErrorBackendTest(TestCase):
         self.assertRaises(TypeError, authenticate, username='test', password='test')
 
 
-@skipIfCustomUser
 class ImproperlyConfiguredUserModelTest(TestCase):
     """
     Tests that an exception from within get_user_model is propagated and doesn't
@@ -610,7 +601,7 @@ class ImportedBackendTests(TestCase):
     as the one defined in AUTHENTICATION_BACKENDS setting.
     """
 
-    backend = 'django.contrib.auth.tests.backend_alias.ImportedModelBackend'
+    backend = 'auth_tests.backend_alias.ImportedModelBackend'
 
     @override_settings(AUTHENTICATION_BACKENDS=[backend])
     def test_backend_path(self):

@@ -6,7 +6,6 @@ from django.db.models import Q
 from django.test import TestCase, override_settings
 
 from .settings import AUTH_MIDDLEWARE_CLASSES, AUTH_TEMPLATES
-from .utils import skipIfCustomUser
 
 
 class MockUser(object):
@@ -58,10 +57,9 @@ class PermWrapperTests(TestCase):
             self.EQLimiterObject() in pldict
 
 
-@skipIfCustomUser
 @override_settings(
     PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='django.contrib.auth.tests.urls',
+    ROOT_URLCONF='auth_tests.urls',
     TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,                           # required for loading the fixture
 )

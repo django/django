@@ -2,14 +2,14 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import (
     AbstractUser, Group, Permission, User, UserManager,
 )
-from django.contrib.auth.tests.utils import skipIfCustomUser
+# Needed so model is installed when tests are run independently:
+from django.contrib.auth.tests.custom_user import IsActiveTestUser1  # NOQA
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db.models.signals import post_save
 from django.test import TestCase, override_settings
 
 
-@skipIfCustomUser
 @override_settings(USE_TZ=False)
 class NaturalKeysTestCase(TestCase):
     fixtures = ['authtestdata.json']
@@ -24,7 +24,6 @@ class NaturalKeysTestCase(TestCase):
         self.assertEqual(Group.objects.get_by_natural_key('users'), users_group)
 
 
-@skipIfCustomUser
 @override_settings(USE_TZ=False)
 class LoadDataWithoutNaturalKeysTestCase(TestCase):
     fixtures = ['regular.json']
@@ -35,7 +34,6 @@ class LoadDataWithoutNaturalKeysTestCase(TestCase):
         self.assertEqual(group, user.groups.get())
 
 
-@skipIfCustomUser
 @override_settings(USE_TZ=False)
 class LoadDataWithNaturalKeysTestCase(TestCase):
     fixtures = ['natural.json']
@@ -100,7 +98,6 @@ class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
         self.assertEqual(perm_other.content_type_id, other_objects[0].id)
 
 
-@skipIfCustomUser
 class UserManagerTestCase(TestCase):
 
     def test_create_user(self):
@@ -167,7 +164,6 @@ class IsActiveTestCase(TestCase):
     Tests the behavior of the guaranteed is_active attribute
     """
 
-    @skipIfCustomUser
     def test_builtin_user_isactive(self):
         user = User.objects.create(username='foo', email='foo@bar.com')
         # is_active is true by default
@@ -195,7 +191,6 @@ class IsActiveTestCase(TestCase):
         self.assertEqual(user_fetched.is_active, True)
 
 
-@skipIfCustomUser
 class TestCreateSuperUserSignals(TestCase):
     """
     Simple test case for ticket #20541

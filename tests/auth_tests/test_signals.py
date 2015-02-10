@@ -1,14 +1,12 @@
 from django.contrib.auth import signals
 from django.contrib.auth.models import User
-from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 
 
-@skipIfCustomUser
 @override_settings(USE_TZ=False,
     PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF='django.contrib.auth.tests.urls')
+    ROOT_URLCONF='auth_tests.urls')
 class SignalTestCase(TestCase):
     fixtures = ['authtestdata.json']
 
