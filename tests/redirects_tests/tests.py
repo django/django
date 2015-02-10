@@ -1,12 +1,11 @@
 from django import http
 from django.conf import settings
+from django.contrib.redirects.middleware import RedirectFallbackMiddleware
+from django.contrib.redirects.models import Redirect
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, modify_settings, override_settings
 from django.utils import six
-
-from .middleware import RedirectFallbackMiddleware
-from .models import Redirect
 
 
 @modify_settings(MIDDLEWARE_CLASSES={'append':
@@ -65,7 +64,7 @@ class OverriddenRedirectFallbackMiddleware(RedirectFallbackMiddleware):
 
 
 @modify_settings(MIDDLEWARE_CLASSES={'append':
-    'django.contrib.redirects.tests.OverriddenRedirectFallbackMiddleware'})
+    'redirects_tests.tests.OverriddenRedirectFallbackMiddleware'})
 @override_settings(SITE_ID=1)
 class OverriddenRedirectMiddlewareTests(TestCase):
 
