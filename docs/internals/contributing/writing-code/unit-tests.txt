@@ -128,15 +128,14 @@ Going beyond that, you can specify an individual test method like this:
 Running the Selenium tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some admin tests require Selenium 2, Firefox and Python >= 2.6 to work via a
-real Web browser. To allow those tests to run and not be skipped, you must
-install the selenium_ package (version > 2.13) into your Python path and run
-the tests with the ``--selenium`` option:
+Some tests require Selenium and a Web browser (Firefox, Google Chrome, or
+Internet Explorer). To allow those tests to be run rather than skipped, you must
+install the selenium_ package into your Python path and run the tests with the
+``--selenium`` option:
 
 .. code-block:: bash
 
    $ ./runtests.py --settings=test_sqlite --selenium admin_inlines
-
 
 .. _running-unit-tests-dependencies:
 
