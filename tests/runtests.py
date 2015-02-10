@@ -60,6 +60,14 @@ ALWAYS_MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
+# Need to add the associated contrib app to INSTALLED_APPS in some cases to
+# avoid "RuntimeError: Model class X doesn't declare an explicit app_label
+# and either isn't in an application in INSTALLED_APPS or else was imported
+# before its application was loaded."
+CONTRIB_TESTS_TO_APPS = {
+    'flatpages_tests': 'django.contrib.flatpages',
+}
+
 
 def get_test_modules():
     modules = []
@@ -140,6 +148,7 @@ def setup(verbosity, test_labels):
         # us skip creating migrations for the test models.
         'auth': 'django.contrib.auth.tests.migrations',
         'contenttypes': 'django.contrib.contenttypes.tests.migrations',
+        'flatpages_tests': 'django.contrib.flatpages.migrations',
     }
 
     if verbosity > 0:
@@ -188,6 +197,9 @@ def setup(verbosity, test_labels):
                 # exact match or ancestor match
                 module_label == label or module_label.startswith(label + '.')
                 for label in test_labels_set)
+
+        if module_name in CONTRIB_TESTS_TO_APPS and module_found_in_labels:
+            settings.INSTALLED_APPS.append(CONTRIB_TESTS_TO_APPS[module_name])
 
         if module_found_in_labels and module_label not in installed_app_names:
             if verbosity >= 2:

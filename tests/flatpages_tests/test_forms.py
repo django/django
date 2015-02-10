@@ -3,15 +3,20 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.contrib.flatpages.forms import FlatpageForm
 from django.contrib.flatpages.models import FlatPage
-from django.test import TestCase, override_settings
+from django.contrib.sites.models import Site
+from django.test import TestCase, modify_settings, override_settings
 from django.utils import translation
 
 
+@modify_settings(INSTALLED_APPS={'append': ['django.contrib.flatpages', ]})
 @override_settings(SITE_ID=1)
 class FlatpageAdminFormTests(TestCase):
     fixtures = ['example_site']
 
     def setUp(self):
+        # Site fields cache needs to be cleared after flatpages is added to
+        # INSTALLED_APPS
+        Site._meta._expire_cache()
         self.form_data = {
             'title': "A test page",
             'content': "This is a test",
