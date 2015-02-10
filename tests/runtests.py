@@ -66,6 +66,7 @@ ALWAYS_MIDDLEWARE_CLASSES = (
 # before its application was loaded."
 CONTRIB_TESTS_TO_APPS = {
     'flatpages_tests': 'django.contrib.flatpages',
+    'redirects_tests': 'django.contrib.redirects',
 }
 
 
@@ -151,6 +152,7 @@ def setup(verbosity, test_labels):
         'auth': 'django.contrib.auth.tests.migrations',
         'contenttypes': 'django.contrib.contenttypes.tests.migrations',
         'flatpages_tests': 'django.contrib.flatpages.migrations',
+        'redirects_tests': 'django.contrib.redirects.migrations',
     }
 
     if verbosity > 0:
