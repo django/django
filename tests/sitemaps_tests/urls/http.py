@@ -5,10 +5,11 @@ from django.conf.urls.i18n import i18n_patterns
 from django.contrib.sitemaps import (
     FlatPageSitemap, GenericSitemap, Sitemap, views,
 )
-from django.contrib.sitemaps.tests.base import I18nTestModel, TestModel
 from django.http import HttpResponse
 from django.utils import timezone
 from django.views.decorators.cache import cache_page
+
+from ..models import I18nTestModel, TestModel
 
 
 class SimpleSitemap(Sitemap):
