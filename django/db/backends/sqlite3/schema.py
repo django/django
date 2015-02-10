@@ -1,8 +1,7 @@
+import _sqlite3  # isort:skip
 import codecs
 import copy
 from decimal import Decimal
-
-import _sqlite3
 
 from django.apps.registry import Apps
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
