@@ -135,8 +135,6 @@ def setup(verbosity, test_labels):
     settings.LANGUAGE_CODE = 'en'
     settings.SITE_ID = 1
     settings.MIDDLEWARE_CLASSES = ALWAYS_MIDDLEWARE_CLASSES
-    # Ensure the middleware classes are seen as overridden otherwise we get a compatibility warning.
-    settings._explicit_settings.add('MIDDLEWARE_CLASSES')
     settings.MIGRATION_MODULES = {
         # these 'tests.migrations' modules don't actually exist, but this lets
         # us skip creating migrations for the test models.

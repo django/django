@@ -4,11 +4,8 @@ from __future__ import unicode_literals
 import sys
 
 from django.apps import apps
-from django.conf import settings
 from django.core import checks
 from django.core.checks import Error, Warning
-from django.core.checks.compatibility.django_1_7_0 import \
-    check_1_7_compatibility
 from django.core.checks.registry import CheckRegistry
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -110,40 +107,6 @@ class MessageTests(TestCase):
         e = Error("Error", hint=None, obj=manager)
         expected = "check_framework.SimpleModel.manager: Error"
         self.assertEqual(force_text(e), expected)
-
-
-class Django_1_7_0_CompatibilityChecks(TestCase):
-
-    @override_settings(MIDDLEWARE_CLASSES=['django.contrib.sessions.middleware.SessionMiddleware'])
-    def test_middleware_classes_overridden(self):
-        errors = check_1_7_compatibility()
-        self.assertEqual(errors, [])
-
-    def test_middleware_classes_not_set_explicitly(self):
-        # If MIDDLEWARE_CLASSES was set explicitly, temporarily pretend it wasn't
-        middleware_classes_overridden = False
-        if 'MIDDLEWARE_CLASSES' in settings._wrapped._explicit_settings:
-            middleware_classes_overridden = True
-            settings._wrapped._explicit_settings.remove('MIDDLEWARE_CLASSES')
-        try:
-            errors = check_1_7_compatibility()
-            expected = [
-                checks.Warning(
-                    "MIDDLEWARE_CLASSES is not set.",
-                    hint=("Django 1.7 changed the global defaults for the MIDDLEWARE_CLASSES. "
-                          "django.contrib.sessions.middleware.SessionMiddleware, "
-                          "django.contrib.auth.middleware.AuthenticationMiddleware, and "
-                          "django.contrib.messages.middleware.MessageMiddleware were removed from the defaults. "
-                          "If your project needs these middleware then you should configure this setting."),
-                    obj=None,
-                    id='1_7.W001',
-                )
-            ]
-            self.assertEqual(errors, expected)
-        finally:
-            # Restore settings value
-            if middleware_classes_overridden:
-                settings._wrapped._explicit_settings.add('MIDDLEWARE_CLASSES')
 
 
 def simple_system_check(**kwargs):
