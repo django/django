@@ -1,11 +1,11 @@
 from django.contrib.auth.models import AnonymousUser, User
-from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.template import Context, Template, TemplateSyntaxError
-from django.test import TestCase, override_settings
+from django.test import TestCase, modify_settings, override_settings
 
 from .settings import FLATPAGES_TEMPLATES
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.flatpages'})
 @override_settings(
     MIDDLEWARE_CLASSES=[
         'django.middleware.common.CommonMiddleware',
@@ -15,7 +15,7 @@ from .settings import FLATPAGES_TEMPLATES
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     ],
-    ROOT_URLCONF='django.contrib.flatpages.tests.urls',
+    ROOT_URLCONF='flatpages_tests.urls',
     TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )
@@ -46,7 +46,6 @@ class FlatpageTemplateTagTests(TestCase):
         }))
         self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
-    @skipIfCustomUser
     def test_get_flatpages_tag_for_user(self):
         "The flatpage template tag retrives all flatpages for an authenticated user"
         me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
@@ -85,7 +84,6 @@ class FlatpageTemplateTagTests(TestCase):
         }))
         self.assertEqual(out, "A Nested Flatpage,")
 
-    @skipIfCustomUser
     def test_get_flatpages_with_prefix_for_user(self):
         "The flatpage template tag retrieve prefixed flatpages for an authenticated user"
         me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
