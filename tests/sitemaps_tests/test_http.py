@@ -15,7 +15,8 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.formats import localize
 from django.utils.translation import activate, deactivate
 
-from .base import SitemapTestsBase, TestModel
+from .base import SitemapTestsBase
+from .models import TestModel
 
 
 class HTTPSitemapTests(SitemapTestsBase):
