@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import datetime
 import os
 import re
 import sys
@@ -13,7 +12,7 @@ from django.http import (
 )
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
-from django.utils import lru_cache, six
+from django.utils import lru_cache, six, timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, smart_text
 from django.utils.html import escape
@@ -362,7 +361,7 @@ class ExceptionReporter(object):
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
-            'server_time': datetime.datetime.now(),
+            'server_time': timezone.now(),
             'django_version_info': get_version(),
             'sys_path': sys.path,
             'template_info': self.template_info,
