@@ -334,6 +334,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         """
         sentinel = object()
         command = createsuperuser.Command()
+        command.check = lambda: []
         command.execute(
             stdin=sentinel,
             stdout=six.StringIO(),
@@ -346,6 +347,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertIs(command.stdin, sentinel)
 
         command = createsuperuser.Command()
+        command.check = lambda: []
         command.execute(
             stdout=six.StringIO(),
             stderr=six.StringIO(),

@@ -1577,6 +1577,7 @@ class CommandTypes(AdminScriptTestCase):
         being executed (#21255).
         """
         command = BaseCommand(stderr=StringIO())
+        command.check = lambda: []
         command.handle = lambda *args, **kwargs: args
         with mock.patch('django.core.management.base.connections') as mock_connections:
             command.run_from_argv(['', ''])
