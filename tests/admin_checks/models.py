@@ -49,6 +49,7 @@ class Book(models.Model):
 class AuthorsBooks(models.Model):
     author = models.ForeignKey(Author)
     book = models.ForeignKey(Book)
+    featured = models.BooleanField()
 
 
 class State(models.Model):

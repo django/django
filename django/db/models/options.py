@@ -535,7 +535,7 @@ class Options(object):
         except KeyError:
             # If the app registry is not ready, reverse fields are
             # unavailable, therefore we throw a FieldDoesNotExist exception.
-            if not self.apps.ready:
+            if not self.apps.models_ready:
                 raise FieldDoesNotExist(
                     "%s has no field named %r. The app cache isn't ready yet, "
                     "so if this is an auto-created related field, it won't "
