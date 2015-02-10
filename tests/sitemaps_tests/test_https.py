@@ -8,7 +8,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from .base import SitemapTestsBase
 
 
-@override_settings(ROOT_URLCONF='django.contrib.sitemaps.tests.urls.https')
+@override_settings(ROOT_URLCONF='sitemaps_tests.urls.https')
 class HTTPSSitemapTests(SitemapTestsBase):
     protocol = 'https'
 
