@@ -21,8 +21,6 @@ recursive-include django/contrib/admindocs/templates *
 recursive-include django/contrib/auth/fixtures *
 recursive-include django/contrib/auth/templates *
 recursive-include django/contrib/auth/tests/templates *
-recursive-include django/contrib/flatpages/fixtures *
-recursive-include django/contrib/flatpages/tests/templates *
 recursive-include django/contrib/gis/gdal/tests/data *
 recursive-include django/contrib/gis/static *
 recursive-include django/contrib/gis/templates *
