@@ -5,7 +5,6 @@ from django.contrib.auth.handlers.modwsgi import (
 )
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.tests.custom_user import CustomUser
-from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TransactionTestCase, override_settings
 
 
@@ -21,7 +20,6 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         'django.contrib.contenttypes',
     ]
 
-    @skipIfCustomUser
     def test_check_password(self):
         """
         Verify that check_password returns the correct values as per
@@ -62,7 +60,6 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
         # Valid user with incorrect password
         self.assertFalse(check_password({}, 'test@example.com', 'incorrect'))
 
-    @skipIfCustomUser
     def test_groups_for_user(self):
         """
         Check that groups_for_user returns correct values as per

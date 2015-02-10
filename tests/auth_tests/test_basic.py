@@ -4,7 +4,6 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.tests.custom_user import CustomUser
-from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.exceptions import ImproperlyConfigured
 from django.dispatch import receiver
 from django.test import TestCase, override_settings
@@ -22,7 +21,6 @@ def user_model_swapped(**kwargs):
         apps.clear_cache()
 
 
-@skipIfCustomUser
 class BasicTestCase(TestCase):
     def test_user(self):
         "Check that users can be created and can set their password"
@@ -108,7 +106,6 @@ class BasicTestCase(TestCase):
         with self.assertRaises(ImproperlyConfigured):
             get_user_model()
 
-    @skipIfCustomUser
     def test_user_verbose_names_translatable(self):
         "Default User model verbose names are translatable (#19945)"
         with translation.override('en'):

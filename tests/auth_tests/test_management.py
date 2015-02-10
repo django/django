@@ -13,9 +13,9 @@ from django.contrib.auth.management.commands import (
 )
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.tests.custom_user import (
-    CustomUser, CustomUserWithFK, Email,
+    CustomUser, CustomUserBadRequiredFields, CustomUserNonListRequiredFields,
+    CustomUserNonUniqueUsername, CustomUserWithFK, Email,
 )
-from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks, exceptions
 from django.core.management import call_command
@@ -23,6 +23,7 @@ from django.core.management.base import CommandError
 from django.test import TestCase, override_settings, override_system_checks
 from django.utils import six
 from django.utils.encoding import force_str
+from django.utils.translation import ugettext_lazy as _
 
 
 def mock_inputs(inputs):
@@ -74,7 +75,6 @@ class MockTTY(object):
         return True
 
 
-@skipIfCustomUser
 class GetDefaultUsernameTestCase(TestCase):
 
     def setUp(self):
@@ -103,7 +103,6 @@ class GetDefaultUsernameTestCase(TestCase):
         self.assertEqual(management.get_default_username(), 'julia')
 
 
-@skipIfCustomUser
 class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
@@ -155,7 +154,6 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         command.execute(username="J\xfalia", stdout=self.stdout)
 
 
-@skipIfCustomUser
 @override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)
 class CreatesuperuserManagementCommandTestCase(TestCase):
 
@@ -216,11 +214,9 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         'u\u017eivatel': 'foo',  # username (cz)
         'email': 'nolocale@somewhere.org'})
     def test_non_ascii_verbose_name(self):
-        # Aliased so the string doesn't get extracted
-        from django.utils.translation import ugettext_lazy as ulazy
         username_field = User._meta.get_field('username')
         old_verbose_name = username_field.verbose_name
-        username_field.verbose_name = ulazy('u\u017eivatel')
+        username_field.verbose_name = _('u\u017eivatel')
         new_io = six.StringIO()
         try:
             call_command(
@@ -422,8 +418,6 @@ class CustomUserModelValidationTestCase(TestCase):
     @override_system_checks([check_user_model])
     def test_required_fields_is_list(self):
         "REQUIRED_FIELDS should be a list."
-
-        from .custom_user import CustomUserNonListRequiredFields
         errors = checks.run_checks()
         expected = [
             checks.Error(
@@ -439,8 +433,6 @@ class CustomUserModelValidationTestCase(TestCase):
     @override_system_checks([check_user_model])
     def test_username_not_in_required_fields(self):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
-
-        from .custom_user import CustomUserBadRequiredFields
         errors = checks.run_checks()
         expected = [
             checks.Error(
@@ -457,8 +449,6 @@ class CustomUserModelValidationTestCase(TestCase):
     @override_system_checks([check_user_model])
     def test_username_non_unique(self):
         "A non-unique USERNAME_FIELD should raise a model validation error."
-
-        from .custom_user import CustomUserNonUniqueUsername
         errors = checks.run_checks()
         expected = [
             checks.Error(
@@ -480,8 +470,6 @@ class CustomUserModelValidationTestCase(TestCase):
         """ A non-unique USERNAME_FIELD should raise an error only if we use the
         default authentication backend. Otherwise, an warning should be raised.
         """
-
-        from .custom_user import CustomUserNonUniqueUsername
         errors = checks.run_checks()
         expected = [
             checks.Warning(

@@ -19,10 +19,8 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
 from .settings import AUTH_TEMPLATES
-from .utils import skipIfCustomUser
 
 
-@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class UserCreationFormTest(TestCase):
 
@@ -90,7 +88,6 @@ class UserCreationFormTest(TestCase):
         self.assertEqual(repr(u), '<User: jsmith@example.com>')
 
 
-@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class AuthenticationFormTest(TestCase):
 
@@ -203,7 +200,6 @@ class AuthenticationFormTest(TestCase):
         self.assertEqual(form.fields['username'].label, "")
 
 
-@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class SetPasswordFormTest(TestCase):
 
@@ -231,7 +227,6 @@ class SetPasswordFormTest(TestCase):
         self.assertTrue(form.is_valid())
 
 
-@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class PasswordChangeFormTest(TestCase):
 
@@ -280,7 +275,6 @@ class PasswordChangeFormTest(TestCase):
                          ['old_password', 'new_password1', 'new_password2'])
 
 
-@skipIfCustomUser
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
 class UserChangeFormTest(TestCase):
 
@@ -359,7 +353,6 @@ class UserChangeFormTest(TestCase):
         self.assertEqual(form.initial['password'], form['password'].value())
 
 
-@skipIfCustomUser
 @override_settings(
     PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     TEMPLATES=AUTH_TEMPLATES,

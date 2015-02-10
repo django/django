@@ -295,7 +295,7 @@ class TestUtilsHashPass(SimpleTestCase):
             state['upgraded'] = True
 
         with self.settings(PASSWORD_HASHERS=[
-                'django.contrib.auth.tests.test_hashers.PBKDF2SingleIterationHasher']):
+                'auth_tests.test_hashers.PBKDF2SingleIterationHasher']):
             encoded = make_password('letmein')
             algo, iterations, salt, hash = encoded.split('$', 3)
             self.assertEqual(iterations, '1')
@@ -308,7 +308,7 @@ class TestUtilsHashPass(SimpleTestCase):
         # updated to the new iteration count.
         with self.settings(PASSWORD_HASHERS=[
                 'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-                'django.contrib.auth.tests.test_hashers.PBKDF2SingleIterationHasher']):
+                'auth_tests.test_hashers.PBKDF2SingleIterationHasher']):
             self.assertTrue(check_password('letmein', encoded, setter))
             self.assertTrue(state['upgraded'])
 
