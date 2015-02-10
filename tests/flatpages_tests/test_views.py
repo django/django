@@ -1,12 +1,12 @@
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.flatpages.models import FlatPage
-from django.test import TestCase, override_settings
+from django.test import TestCase, modify_settings, override_settings
 
 from .settings import FLATPAGES_TEMPLATES
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.flatpages'})
 @override_settings(
     LOGIN_URL='/accounts/login/',
     MIDDLEWARE_CLASSES=(
@@ -17,7 +17,7 @@ from .settings import FLATPAGES_TEMPLATES
         'django.contrib.messages.middleware.MessageMiddleware',
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ),
-    ROOT_URLCONF='django.contrib.flatpages.tests.urls',
+    ROOT_URLCONF='flatpages_tests.urls',
     TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )
@@ -35,7 +35,6 @@ class FlatpageViewTests(TestCase):
         response = self.client.get('/flatpage_root/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
-    @skipIfCustomUser
     def test_view_authenticated_flatpage(self):
         "A flatpage served through a view can require authentication"
         response = self.client.get('/flatpage_root/sekrit/')
@@ -72,6 +71,7 @@ class FlatpageViewTests(TestCase):
         self.assertContains(response, "<p>Isn't it special!</p>")
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.flatpages'})
 @override_settings(
     APPEND_SLASH=True,
     LOGIN_URL='/accounts/login/',
@@ -83,7 +83,7 @@ class FlatpageViewTests(TestCase):
         'django.contrib.messages.middleware.MessageMiddleware',
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ),
-    ROOT_URLCONF='django.contrib.flatpages.tests.urls',
+    ROOT_URLCONF='flatpages_tests.urls',
     TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )
