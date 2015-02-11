@@ -36,7 +36,6 @@ RFC3986_SUBDELIMS = str("!$&'()*+,;=")
 PROTOCOL_TO_PORT = {
     'http': 80,
     'https': 443,
-    'ftp': 21,
 }
 
 
@@ -259,13 +258,10 @@ def same_origin(url1, url2):
     """
     p1, p2 = urlparse(url1), urlparse(url2)
     try:
-        return (
-            p1.scheme, p1.hostname, p1.port or PROTOCOL_TO_PORT[p1.scheme]
-            ) == (
-            p2.scheme, p2.hostname, p2.port or PROTOCOL_TO_PORT[p2.scheme])
-    except ValueError:
-        return False
-    except KeyError:
+        o1 = (p1.scheme, p1.hostname, p1.port or PROTOCOL_TO_PORT[p1.scheme])
+        o2 = (p2.scheme, p2.hostname, p2.port or PROTOCOL_TO_PORT[p2.scheme])
+        return o1 == o2
+    except (ValueError, KeyError):
         return False
 
 
