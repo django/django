@@ -6,13 +6,13 @@ from django.contrib.auth import BACKEND_SESSION_KEY, authenticate, get_user
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import MD5PasswordHasher
 from django.contrib.auth.models import AnonymousUser, Group, Permission, User
-from django.contrib.auth.tests.custom_user import (
-    CustomPermissionsUser, CustomUser, ExtensionUser,
-)
+from django.contrib.auth.tests.custom_user import CustomUser, ExtensionUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
 from django.test import TestCase, modify_settings, override_settings
+
+from .models import CustomPermissionsUser
 
 
 class CountingMD5PasswordHasher(MD5PasswordHasher):

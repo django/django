@@ -13,8 +13,6 @@ from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
 )
 from django.contrib.auth.models import User
-# Needed so model is installed when tests are run independently:
-from django.contrib.auth.tests.custom_user import CustomUser  # NOQA
 from django.contrib.auth.views import login as login_view, redirect_to_login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
