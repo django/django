@@ -18,6 +18,9 @@ class TestUtilsHttp(unittest.TestCase):
         self.assertTrue(http.same_origin('http://foo.com/', 'http://foo.com'))
         # With port
         self.assertTrue(http.same_origin('https://foo.com:8000', 'https://foo.com:8000/'))
+        # No port given but according to RFC6454 still the same origin
+        self.assertTrue(http.same_origin('http://foo.com', 'http://foo.com:80/'))
+        self.assertTrue(http.same_origin('https://foo.com', 'https://foo.com:443/'))
 
     def test_same_origin_false(self):
         # Different scheme
@@ -28,6 +31,9 @@ class TestUtilsHttp(unittest.TestCase):
         self.assertFalse(http.same_origin('http://foo.com', 'http://foo.com.evil.com'))
         # Different port
         self.assertFalse(http.same_origin('http://foo.com:8000', 'http://foo.com:8001'))
+        # No port given
+        self.assertFalse(http.same_origin('http://foo.com', 'http://foo.com:8000/'))
+        self.assertFalse(http.same_origin('https://foo.com', 'https://foo.com:8000/'))
 
     def test_urlencode(self):
         # 2-tuples (the norm)
