@@ -12,10 +12,7 @@ from django.contrib.auth.management.commands import (
     changepassword, createsuperuser,
 )
 from django.contrib.auth.models import Group, User
-from django.contrib.auth.tests.custom_user import (
-    CustomUser, CustomUserBadRequiredFields, CustomUserNonListRequiredFields,
-    CustomUserNonUniqueUsername, CustomUserWithFK, Email,
-)
+from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks, exceptions
 from django.core.management import call_command
@@ -24,6 +21,11 @@ from django.test import TestCase, override_settings, override_system_checks
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.translation import ugettext_lazy as _
+
+from .models import (
+    CustomUserBadRequiredFields, CustomUserNonListRequiredFields,
+    CustomUserNonUniqueUsername, CustomUserWithFK, Email,
+)
 
 
 def mock_inputs(inputs):

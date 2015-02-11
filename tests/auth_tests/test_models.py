@@ -2,8 +2,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import (
     AbstractUser, Group, Permission, User, UserManager,
 )
-# Needed so model is installed when tests are run independently:
-from django.contrib.auth.tests.custom_user import IsActiveTestUser1  # NOQA
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db.models.signals import post_save
