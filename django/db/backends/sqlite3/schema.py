@@ -1,5 +1,6 @@
 import _sqlite3  # isort:skip
 import codecs
+import contextlib
 import copy
 from decimal import Decimal
 
@@ -46,6 +47,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                       override_indexes=None):
         """
         Shortcut to transform a model from old_model into new_model
+
+        The essential steps are:
+          1. rename the model's existing table, e.g. "app_model" to "app_model__old"
+          2. create a table with the updated definition called "app_model"
+          3. copy the data from the old renamed table to the new table
+          4. delete the "app_model__old" table
         """
         # Work out the new fields dict / mapping
         body = {f.name: f for f in model._meta.local_fields}
@@ -97,9 +104,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Work inside a new app registry
         apps = Apps()
 
-        # Provide isolated instances of the fields to the new model body
-        # Instantiating the new model with an alternate db_table will alter
-        # the internal references of some of the provided fields.
+        # Provide isolated instances of the fields to the new model body so
+        # that the existing model's internals aren't interfered with when
+        # the dummy model is constructed.
         body = copy.deepcopy(body)
 
         # Work out the new value of unique_together, taking renames into
@@ -121,7 +128,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
-            'db_table': model._meta.db_table + "__new",
+            'db_table': model._meta.db_table,
             'unique_together': override_uniques,
             'index_together': override_indexes,
             'apps': apps,
@@ -131,25 +138,43 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         body['__module__'] = model.__module__
 
         temp_model = type(model._meta.object_name, model.__bases__, body)
+
+        # We need to modify model._meta.db_table, but everything explodes
+        # if the change isn't reversed before the end of this method. This
+        # context manager helps us avoid that situation.
+        @contextlib.contextmanager
+        def altered_table_name(model, temporary_table_name):
+            original_table_name = model._meta.db_table
+            model._meta.db_table = temporary_table_name
+            yield
+            model._meta.db_table = original_table_name
+
+        # Rename the old table to something temporary
+        old_table_name = model._meta.db_table + "__old"
+        with altered_table_name(model, old_table_name):
+            self.alter_db_table(model, temp_model._meta.db_table, model._meta.db_table)
+
         # Create a new table with that format. We remove things from the
         # deferred SQL that match our table name, too
-        self.deferred_sql = [x for x in self.deferred_sql if model._meta.db_table not in x]
+        self.deferred_sql = [x for x in self.deferred_sql if temp_model._meta.db_table not in x]
         self.create_model(temp_model)
+
         # Copy data from the old table
         field_maps = list(mapping.items())
         self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
             self.quote_name(temp_model._meta.db_table),
             ', '.join(self.quote_name(x) for x, y in field_maps),
             ', '.join(y for x, y in field_maps),
-            self.quote_name(model._meta.db_table),
+            self.quote_name(old_table_name),
         ))
+
         # Delete the old table
-        self.delete_model(model, handle_autom2m=False)
-        # Rename the new to the old
-        self.alter_db_table(temp_model, temp_model._meta.db_table, model._meta.db_table)
+        with altered_table_name(model, old_table_name):
+            self.delete_model(model, handle_autom2m=False)
+
         # Run deferred SQL on correct table
         for sql in self.deferred_sql:
-            self.execute(sql.replace(temp_model._meta.db_table, model._meta.db_table))
+            self.execute(sql)
         self.deferred_sql = []
         # Fix any PK-removed field
         if restore_pk_field:
