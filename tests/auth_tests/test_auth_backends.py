@@ -2,7 +2,9 @@ from __future__ import unicode_literals
 
 from datetime import date
 
-from django.contrib.auth import BACKEND_SESSION_KEY, authenticate, get_user
+from django.contrib.auth import (
+    BACKEND_SESSION_KEY, SESSION_KEY, authenticate, get_user,
+)
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import MD5PasswordHasher
 from django.contrib.auth.models import AnonymousUser, Group, Permission, User
@@ -12,7 +14,7 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
 from django.test import TestCase, modify_settings, override_settings
 
-from .models import CustomPermissionsUser
+from .models import CustomPermissionsUser, UUIDUser
 
 
 class CountingMD5PasswordHasher(MD5PasswordHasher):
@@ -286,6 +288,18 @@ class CustomUserModelBackendAuthenticateTest(TestCase):
         )
         authenticated_user = authenticate(email='test@example.com', password='test')
         self.assertEqual(test_user, authenticated_user)
+
+
+@override_settings(AUTH_USER_MODEL='auth.UUIDUser')
+class UUIDUserTests(TestCase):
+
+    def test_login(self):
+        """
+        A custom user with a UUID primary key should be able to login.
+        """
+        user = UUIDUser.objects.create_user(username='uuid', password='test')
+        self.assertTrue(self.client.login(username='uuid', password='test'))
+        self.assertEqual(UUIDUser.objects.get(pk=self.client.session[SESSION_KEY]), user)
 
 
 class TestObj(object):

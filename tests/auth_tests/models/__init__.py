@@ -5,9 +5,10 @@ from .invalid_models import (
     CustomUserBadRequiredFields,
 )
 from .with_foreign_key import CustomUserWithFK, Email
+from .uuid_pk import UUIDUser
 
 __all__ = (
     'CustomPermissionsUser', 'CustomUserNonUniqueUsername',
     'CustomUserNonListRequiredFields', 'CustomUserBadRequiredFields',
-    'CustomUserWithFK', 'Email', 'IsActiveTestUser1',
+    'CustomUserWithFK', 'Email', 'IsActiveTestUser1', 'UUIDUser',
 )
