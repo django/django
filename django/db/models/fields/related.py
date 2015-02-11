@@ -2025,28 +2025,22 @@ class OneToOneField(ForeignKey):
 def create_many_to_many_intermediary_model(field, klass):
     from django.db import models
 
+    def set_managed(model, related, through):
+        through._meta.managed = model._meta.managed or related._meta.managed
+
     to_model = resolve_relation(klass, field.rel.to)
-    to_label = resolve_relation(klass, field.rel.to, always_text=True)
-    to = to_label.split('.')[-1]
-
-    try:
-        managed = klass._meta.managed or to_model._meta.managed
-    except AttributeError:
-        def set_managed(cls, model, field):
-            field.rel.through._meta.managed = model._meta.managed or cls._meta.managed
-        lazy_related_operation(set_managed, klass, to_model, field=field)
-        managed = True
-
     name = '%s_%s' % (klass._meta.object_name, field.name)
-    if field.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT or to == klass._meta.object_name:
-        from_ = 'from_%s' % to.lower()
-        to = 'to_%s' % to.lower()
-    else:
-        from_ = klass._meta.model_name
-        to = to.lower()
+    lazy_related_operation(set_managed, klass, to_model, name)
+
+    to_label = resolve_relation(klass, field.rel.to, always_text=True)
+    to = to_label.split('.')[-1].lower()
+    from_ = klass._meta.model_name
+    if to == from_:
+        to = 'to_%s' % to
+        from_ = 'from_%s' % from_
+
     meta = type(str('Meta'), (object,), {
         'db_table': field._get_m2m_db_table(klass._meta),
-        'managed': managed,
         'auto_created': klass,
         'app_label': klass._meta.app_label,
         'db_tablespace': klass._meta.db_tablespace,
