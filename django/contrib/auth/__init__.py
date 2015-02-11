@@ -53,6 +53,12 @@ def _clean_credentials(credentials):
     return credentials
 
 
+def _get_user_session_key(request):
+    # This value in the session is always serialized to a string, so we need
+    # to convert it back to Python whenever we access it.
+    return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
+
+
 def authenticate(**credentials):
     """
     If the given credentials are valid, return a User object.
@@ -93,7 +99,7 @@ def login(request, user):
         session_auth_hash = user.get_session_auth_hash()
 
     if SESSION_KEY in request.session:
-        if request.session[SESSION_KEY] != user.pk or (
+        if _get_user_session_key(request) != user.pk or (
                 session_auth_hash and
                 request.session.get(HASH_SESSION_KEY) != session_auth_hash):
             # To avoid reusing another user's session, create a new, empty
@@ -102,7 +108,7 @@ def login(request, user):
             request.session.flush()
     else:
         request.session.cycle_key()
-    request.session[SESSION_KEY] = user.pk
+    request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
     request.session[BACKEND_SESSION_KEY] = user.backend
     request.session[HASH_SESSION_KEY] = session_auth_hash
     if hasattr(request, 'user'):
@@ -158,7 +164,7 @@ def get_user(request):
     from .models import AnonymousUser
     user = None
     try:
-        user_id = request.session[SESSION_KEY]
+        user_id = _get_user_session_key(request)
         backend_path = request.session[BACKEND_SESSION_KEY]
     except KeyError:
         pass
