@@ -280,14 +280,11 @@ class RelatedField(Field):
                 'app_label': cls._meta.app_label.lower()
             }
             self.rel.related_name = related_name
-        other = self.rel.to
-        if isinstance(other, six.string_types) or other._meta.pk is None:
-            def resolve_related_class(cls, model, field):
-                field.rel.to = model
-                field.do_related_class(model, cls)
-            lazy_related_operation(resolve_related_class, cls, other, field=self)
-        else:
-            self.do_related_class(other, cls)
+
+        def resolve_related_class(model, related, field):
+            field.rel.to = related
+            field.do_related_class(related, model)
+        lazy_related_operation(resolve_related_class, cls, self.rel.to, field=self)
 
     @property
     def swappable_setting(self):
