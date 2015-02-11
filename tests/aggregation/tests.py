@@ -8,7 +8,7 @@ from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
     F, Aggregate, Avg, Count, DecimalField, FloatField, Func, IntegerField,
-    Max, Min, Sum, Value,
+    Max, Min, Sum,
 )
 from django.test import TestCase, ignore_warnings
 from django.test.utils import Approximate, CaptureQueriesContext
@@ -706,14 +706,14 @@ class ComplexAggregateTestCase(TestCase):
             Book.objects.aggregate(fail=F('price'))
 
     def test_nonfield_annotation(self):
-        book = Book.objects.annotate(val=Max(Value(2, output_field=IntegerField())))[0]
+        book = Book.objects.annotate(val=Max(2, output_field=IntegerField()))[0]
         self.assertEqual(book.val, 2)
-        book = Book.objects.annotate(val=Max(Value(2), output_field=IntegerField()))[0]
+        book = Book.objects.annotate(val=Max(2, output_field=IntegerField()))[0]
         self.assertEqual(book.val, 2)
 
     def test_missing_output_field_raises_error(self):
         with six.assertRaisesRegex(self, FieldError, 'Cannot resolve expression type, unknown output_field'):
-            Book.objects.annotate(val=Max(Value(2)))[0]
+            Book.objects.annotate(val=Max(2))[0]
 
     def test_annotation_expressions(self):
         authors = Author.objects.annotate(combined_ages=Sum(F('age') + F('friends__age'))).order_by('name')
@@ -772,7 +772,7 @@ class ComplexAggregateTestCase(TestCase):
         with six.assertRaisesRegex(self, TypeError, 'Complex aggregates require an alias'):
             Author.objects.aggregate(Sum('age') / Count('age'))
         with six.assertRaisesRegex(self, TypeError, 'Complex aggregates require an alias'):
-            Author.objects.aggregate(Sum(Value(1)))
+            Author.objects.aggregate(Sum(1))
 
     def test_aggregate_over_complex_annotation(self):
         qs = Author.objects.annotate(
