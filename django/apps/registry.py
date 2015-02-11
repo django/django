@@ -377,7 +377,7 @@ class Apps(object):
 
         if not self._class_prepared_handler_registered:
             from django.db.models import signals
-            signals.class_prepared.connect(apps.do_pending_lookups, dispatch_uid=self)
+            signals.class_prepared.connect(self.do_pending_lookups)
             self._class_prepared_handler_registered = True
 
         # Eagerly parse all model strings so we can fail immediately
@@ -404,15 +404,18 @@ class Apps(object):
         else:
             function(model_class, **kwargs)
 
-    @staticmethod
-    def do_pending_lookups(sender, **_):
+    def do_pending_lookups(self, sender, **_):
         """
-        Receive ``class_prepared``, and pass the freshly prepared
-        model to each function waiting for it.
+        Receive ``class_prepared``, and pass the freshly prepared model to
+        each function waiting for it. This is an instance method to allow
+        weak refs in the signal system to do their thing.
         """
+        if sender._meta.apps is not self:
+            return  # Only execute the operation once.
+
         key = (sender._meta.app_label, sender.__name__)
-        while key in sender._meta.apps._pending_lookups:
-            for function, kwargs in sender._meta.apps._pending_lookups.pop(key):
+        while key in self._pending_lookups:
+            for function, kwargs in self._pending_lookups.pop(key):
                 function(sender, **kwargs)
 
 
