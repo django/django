@@ -396,6 +396,12 @@ class AdminFileWidgetTests(DjangoTestCase):
             '<input type="file" name="cover_art" id="id_cover_art" />',
             html=True,
         )
+        response = self.client.get(reverse('admin:admin_widgets_album_add'))
+        self.assertContains(
+            response,
+            '<p></p>',
+            html=True,
+        )
 
 
 @override_settings(ROOT_URLCONF='admin_widgets.urls')

@@ -388,7 +388,7 @@ def display_for_field(value, field):
         return formats.number_format(value, field.decimal_places)
     elif isinstance(field, models.FloatField):
         return formats.number_format(value)
-    elif isinstance(field, models.FileField):
+    elif isinstance(field, models.FileField) and value:
         return mark_safe('<a href="%s">%s</a>' % (
             conditional_escape(value.url),
             conditional_escape(value),
