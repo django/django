@@ -56,17 +56,18 @@ def resolve_relation(scope_model, relation, always_text=False):
     return relation
 
 
-def lazy_related_operation(function, model, related_model, **kwargs):
+def lazy_related_operation(function, model, *related_models, **kwargs):
     """
-    A wrapper for Apps.lazy_model_operation() restricted to two models
+    A wrapper for Apps.lazy_model_operation() where the first model has some
+    special significance:
       * Uses the apps object from the first model argument's _meta
-      * Accepts as its second argument the string "self" or a model name
-        without an app label, which will be resolved into a model class
-        or fully-qualified model name using resolve_relation().
+      * Accepts as its positional arguments the string "self" or model names
+        without an app label, which will be resolved into a fully-qualified
+        model name relative to the first model using resolve_relation().
     """
-    related_model = resolve_relation(model, related_model)
     apps = model._meta.apps
-    return apps.lazy_model_operation(function, model, related_model, **kwargs)
+    related_models = [resolve_relation(model, rel) for rel in related_models]
+    return apps.lazy_model_operation(function, model, *related_models, **kwargs)
 
 
 def add_lazy_relation(cls, field, relation, operation):
