@@ -39,7 +39,7 @@ We'll be using the following model in the subsequent examples::
 When
 ----
 
-.. class:: When(condition=None, then=Value(None), **lookups)
+.. class:: When(condition=None, then=None, **lookups)
 
 A ``When()`` object is used to encapsulate a condition and its result for use
 in the conditional expression. Using a ``When()`` object is similar to using
@@ -73,8 +73,8 @@ Keep in mind that each of these values can be an expression.
     resolved in two ways::
 
         >>> from django.db.models import Value
-        >>> When(then__exact=0, then=Value(1))
-        >>> When(Q(then=0), then=Value(1))
+        >>> When(then__exact=0, then=1)
+        >>> When(Q(then=0), then=1)
 
 Case
 ----
@@ -197,15 +197,15 @@ What if we want to find out how many clients there are for each
     >>> from django.db.models import IntegerField, Sum
     >>> Client.objects.aggregate(
     ...     regular=Sum(
-    ...         Case(When(account_type=Client.REGULAR, then=Value(1)),
+    ...         Case(When(account_type=Client.REGULAR, then=1),
     ...              output_field=IntegerField())
     ...     ),
     ...     gold=Sum(
-    ...         Case(When(account_type=Client.GOLD, then=Value(1)),
+    ...         Case(When(account_type=Client.GOLD, then=1),
     ...              output_field=IntegerField())
     ...     ),
     ...     platinum=Sum(
-    ...         Case(When(account_type=Client.PLATINUM, then=Value(1)),
+    ...         Case(When(account_type=Client.PLATINUM, then=1),
     ...              output_field=IntegerField())
     ...     )
     ... )
