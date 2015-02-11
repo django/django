@@ -365,14 +365,14 @@ Each cache backend can be given additional arguments to control caching
 behavior. These arguments are provided as additional keys in the
 :setting:`CACHES` setting. Valid arguments are as follows:
 
-
 * :setting:`TIMEOUT <CACHES-TIMEOUT>`: The default timeout, in
   seconds, to use for the cache. This argument defaults to ``300`` seconds (5 minutes).
 
   .. versionadded:: 1.7
 
   You can set ``TIMEOUT`` to ``None`` so that, by default, cache keys never
-  expire.
+  expire. A value of ``0`` causes keys to immediately expire (effectively
+  "don't cache").
 
 * :setting:`OPTIONS <CACHES-OPTIONS>`: Any options that should be
   passed to the cache backend. The list of valid options will vary
@@ -773,7 +773,8 @@ The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
 The ``timeout`` argument is optional and defaults to the ``timeout`` argument
 of the appropriate backend in the :setting:`CACHES` setting (explained above).
 It's the number of seconds the value should be stored in the cache. Passing in
-``None`` for ``timeout`` will cache the value forever.
+``None`` for ``timeout`` will cache the value forever. A ``timeout`` of ``0``
+won't cache the value.
 
 .. versionchanged:: 1.6
 
