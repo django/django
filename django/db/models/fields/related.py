@@ -274,17 +274,18 @@ class RelatedField(Field):
         if hasattr(sup, 'contribute_to_class'):
             sup.contribute_to_class(cls, name, virtual_only=virtual_only)
 
-        if not cls._meta.abstract and self.rel.related_name:
-            related_name = force_text(self.rel.related_name) % {
-                'class': cls.__name__.lower(),
-                'app_label': cls._meta.app_label.lower()
-            }
-            self.rel.related_name = related_name
+        if not cls._meta.abstract:
+            if self.rel.related_name:
+                related_name = force_text(self.rel.related_name) % {
+                    'class': cls.__name__.lower(),
+                    'app_label': cls._meta.app_label.lower()
+                }
+                self.rel.related_name = related_name
 
-        def resolve_related_class(model, related, field):
-            field.rel.to = related
-            field.do_related_class(related, model)
-        lazy_related_operation(resolve_related_class, cls, self.rel.to, field=self)
+            def resolve_related_class(model, related, field):
+                field.rel.to = related
+                field.do_related_class(related, model)
+            lazy_related_operation(resolve_related_class, cls, self.rel.to, field=self)
 
     @property
     def swappable_setting(self):
@@ -325,8 +326,7 @@ class RelatedField(Field):
 
     def do_related_class(self, other, cls):
         self.set_attributes_from_rel()
-        if not cls._meta.abstract:
-            self.contribute_to_related_class(other, self.rel)
+        self.contribute_to_related_class(other, self.rel)
 
     def get_limit_choices_to(self):
         """Returns 'limit_choices_to' for this model field.
@@ -2496,22 +2496,19 @@ class ManyToManyField(RelatedField):
         #  1) There is a manually specified intermediate, or
         #  2) The class owning the m2m field is abstract.
         #  3) The class owning the m2m field has been swapped out.
-        if not self.rel.through and not cls._meta.abstract and not cls._meta.swapped:
-            self.rel.through = create_many_to_many_intermediary_model(self, cls)
+        if not cls._meta.abstract:
+            if self.rel.through:
+                def resolve_through_model(_, model, field):
+                    field.rel.through = model
+                lazy_related_operation(resolve_through_model, cls, self.rel.through, field=self)
+            elif not cls._meta.swapped:
+                self.rel.through = create_many_to_many_intermediary_model(self, cls)
 
         # Add the descriptor for the m2m relation
         setattr(cls, self.name, ReverseManyRelatedObjectsDescriptor(self))
 
         # Set up the accessor for the m2m table name for the relation
         self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
-
-        # Populate some necessary rel arguments so that cross-app relations
-        # work correctly.
-        if self.rel.through:
-            def resolve_through_model(_, model, field):
-                field.rel.through = model
-            lazy_related_operation(resolve_through_model,
-                                   cls, self.rel.through, field=self)
 
     def contribute_to_related_class(self, cls, related):
         # Internal M2Ms (i.e., those with a related name ending with '+')
