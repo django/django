@@ -18,6 +18,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
 from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
+from django.db import connection
 from django.http import HttpRequest, QueryDict
 from django.middleware.csrf import CsrfViewMiddleware
 from django.test import (
@@ -30,6 +31,7 @@ from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import ParseResult, urlparse
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
+from .models import UUIDUser
 from .settings import AUTH_TEMPLATES
 
 
@@ -900,5 +902,40 @@ class ChangelistTests(AuthViewsTestCase):
         self.assertRedirects(response, reverse('auth_test_admin:auth_user_change', args=(u.pk,)))
         row = LogEntry.objects.latest('id')
         self.assertEqual(row.user_id, self.admin.pk)
+        self.assertEqual(row.object_id, str(u.pk))
+        self.assertEqual(row.change_message, 'Changed password.')
+
+    def test_password_change_bad_url(self):
+        response = self.client.get(reverse('auth_test_admin:auth_user_password_change', args=('foobar',)))
+        self.assertEqual(response.status_code, 404)
+
+
+@override_settings(
+    AUTH_USER_MODEL='auth.UUIDUser',
+    ROOT_URLCONF='auth_tests.urls_custom_user_admin',
+)
+class UUIDUserTests(TestCase):
+
+    def test_admin_password_change(self):
+        u = UUIDUser.objects.create_superuser(username='uuid', email='foo@bar.com', password='test')
+        self.assertTrue(self.client.login(username='uuid', password='test'))
+
+        user_change_url = reverse('custom_user_admin:auth_uuiduser_change', args=(u.pk,))
+        response = self.client.get(user_change_url)
+        self.assertEqual(response.status_code, 200)
+
+        password_change_url = reverse('custom_user_admin:auth_user_password_change', args=(u.pk,))
+        response = self.client.get(password_change_url)
+        self.assertEqual(response.status_code, 200)
+
+        # A LogEntry is created with pk=1 which breaks a FK constraint on MySQL
+        with connection.constraint_checks_disabled():
+            response = self.client.post(password_change_url, {
+                'password1': 'password1',
+                'password2': 'password1',
+            })
+        self.assertRedirects(response, user_change_url)
+        row = LogEntry.objects.latest('id')
+        self.assertEqual(row.user_id, 1)  # harcoded in CustomUserAdmin.log_change()
         self.assertEqual(row.object_id, str(u.pk))
         self.assertEqual(row.change_message, 'Changed password.')
