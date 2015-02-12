@@ -17,6 +17,7 @@ from django.test.utils import captured_stdout
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
 class SitesFrameworkTests(TestCase):
+    multi_db = True
 
     def setUp(self):
         self.site = Site(
@@ -112,7 +113,26 @@ class SitesFrameworkTests(TestCase):
         expected_cache.update({self.site.domain: self.site})
         self.assertEqual(models.SITE_CACHE, expected_cache)
 
-        clear_site_cache(Site, instance=self.site)
+        clear_site_cache(Site, instance=self.site, using='default')
+        self.assertEqual(models.SITE_CACHE, {})
+
+    @override_settings(SITE_ID='')
+    def test_clear_site_cache_domain(self):
+        site = Site.objects.create(name='example2.com', domain='example2.com')
+        request = HttpRequest()
+        request.META = {
+            "SERVER_NAME": "example2.com",
+            "SERVER_PORT": "80",
+        }
+        get_current_site(request)  # prime the models.SITE_CACHE
+        expected_cache = {site.domain: site}
+        self.assertEqual(models.SITE_CACHE, expected_cache)
+
+        # Site exists in 'default' database so using='other' shouldn't clear.
+        clear_site_cache(Site, instance=site, using='other')
+        self.assertEqual(models.SITE_CACHE, expected_cache)
+        # using='default' should clear.
+        clear_site_cache(Site, instance=site, using='default')
         self.assertEqual(models.SITE_CACHE, {})
 
 
@@ -146,13 +166,19 @@ class CreateDefaultSiteTests(TestCase):
         self.assertEqual("", stdout.getvalue())
 
     @override_settings(DATABASE_ROUTERS=[JustOtherRouter()])
-    def test_multi_db(self):
+    def test_multi_db_with_router(self):
         """
         #16353, #16828 - The default site creation should respect db routing.
         """
         create_default_site(self.app_config, using='default', verbosity=0)
         create_default_site(self.app_config, using='other', verbosity=0)
         self.assertFalse(Site.objects.using('default').exists())
+        self.assertTrue(Site.objects.using('other').exists())
+
+    def test_multi_db(self):
+        create_default_site(self.app_config, using='default', verbosity=0)
+        create_default_site(self.app_config, using='other', verbosity=0)
+        self.assertTrue(Site.objects.using('default').exists())
         self.assertTrue(Site.objects.using('other').exists())
 
     def test_save_another(self):
