@@ -21,7 +21,9 @@ from django.http import (
     HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
 from django.shortcuts import redirect
-from django.test import TestCase, ignore_warnings, override_settings
+from django.test import (
+    SimpleTestCase, TestCase, ignore_warnings, override_settings,
+)
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
