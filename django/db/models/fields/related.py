@@ -291,20 +291,21 @@ class RelatedField(Field):
         if hasattr(sup, 'contribute_to_class'):
             sup.contribute_to_class(cls, name, virtual_only=virtual_only)
 
-        if not cls._meta.abstract and self.rel.related_name:
-            related_name = force_text(self.rel.related_name) % {
-                'class': cls.__name__.lower(),
-                'app_label': cls._meta.app_label.lower()
-            }
-            self.rel.related_name = related_name
-        other = self.rel.to
-        if isinstance(other, six.string_types) or other._meta.pk is None:
-            def resolve_related_class(field, model, cls):
-                field.rel.to = model
-                field.do_related_class(model, cls)
-            add_lazy_relation(cls, self, other, resolve_related_class)
-        else:
-            self.do_related_class(other, cls)
+        if not cls._meta.abstract:
+            if self.rel.related_name:
+                related_name = force_text(self.rel.related_name) % {
+                    'class': cls.__name__.lower(),
+                    'app_label': cls._meta.app_label.lower()
+                }
+                self.rel.related_name = related_name
+            other = self.rel.to
+            if isinstance(other, six.string_types) or other._meta.pk is None:
+                def resolve_related_class(field, model, cls):
+                    field.rel.to = model
+                    field.do_related_class(model, cls)
+                add_lazy_relation(cls, self, other, resolve_related_class)
+            else:
+                self.do_related_class(other, cls)
 
     @property
     def swappable_setting(self):
@@ -2605,7 +2606,7 @@ class ManyToManyField(RelatedField):
 
         # Populate some necessary rel arguments so that cross-app relations
         # work correctly.
-        if isinstance(self.rel.through, six.string_types):
+        if not cls._meta.abstract and isinstance(self.rel.through, six.string_types):
             def resolve_through_model(field, model, cls):
                 field.rel.through = model
             add_lazy_relation(cls, self, self.rel.through, resolve_through_model)

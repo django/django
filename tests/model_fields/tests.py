@@ -21,11 +21,12 @@ from django.utils import six
 from django.utils.functional import lazy
 
 from .models import (
-    Bar, BigD, BigIntegerModel, BigS, BooleanModel, DataModel, DateTimeModel,
-    Document, FksToBooleans, FkToChar, FloatModel, Foo, GenericIPAddress,
-    IntegerModel, NullBooleanModel, PositiveIntegerModel,
-    PositiveSmallIntegerModel, Post, PrimaryKeyCharModel, RenamedField,
-    SmallIntegerModel, VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
+    AbstractForeignFieldsModel, Bar, BigD, BigIntegerModel, BigS, BooleanModel,
+    DataModel, DateTimeModel, Document, FksToBooleans, FkToChar, FloatModel,
+    Foo, GenericIPAddress, IntegerModel, NullBooleanModel,
+    PositiveIntegerModel, PositiveSmallIntegerModel, Post, PrimaryKeyCharModel,
+    RenamedField, SmallIntegerModel, VerboseNameField, Whiz, WhizIter,
+    WhizIterEmpty,
 )
 
 
@@ -200,6 +201,39 @@ class ForeignKeyTests(test.TestCase):
     def test_related_name_converted_to_text(self):
         rel_name = Bar._meta.get_field('a').rel.related_name
         self.assertIsInstance(rel_name, six.text_type)
+
+    def test_abstract_model_pending_lookups(self):
+        """
+        Foreign key fields declared on abstract models should not add lazy relations to
+        resolve relationship declared as string. refs #24215
+        """
+        opts = AbstractForeignFieldsModel._meta
+        to_key = ('missing', 'FK')
+        fk_lookup = (AbstractForeignFieldsModel, opts.get_field('fk'))
+        self.assertFalse(
+            any(lookup[0:2] == fk_lookup for lookup in opts.apps._pending_lookups.get(to_key, [])),
+            'Pending lookup added for the abstract model foreign key `to` parameter'
+        )
+
+
+class ManyToManyFieldTests(test.TestCase):
+    def test_abstract_model_pending_lookups(self):
+        """
+        Many-to-many fields declared on abstract models should not add lazy relations to
+        resolve relationship declared as string. refs #24215
+        """
+        opts = AbstractForeignFieldsModel._meta
+        to_key = ('missing', 'M2M')
+        fk_lookup = (AbstractForeignFieldsModel, opts.get_field('m2m'))
+        self.assertFalse(
+            any(lookup[0:2] == fk_lookup for lookup in opts.apps._pending_lookups.get(to_key, [])),
+            'Pending lookup added for the abstract model many-to-many `to` parameter.'
+        )
+        through_key = ('missing', 'Through')
+        self.assertFalse(
+            any(lookup[0:2] == fk_lookup for lookup in opts.apps._pending_lookups.get(through_key, [])),
+            'Pending lookup added for the abstract model many-to-many `through` parameter.'
+        )
 
 
 class DateTimeFieldTests(unittest.TestCase):
