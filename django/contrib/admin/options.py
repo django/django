@@ -36,7 +36,6 @@ from django.forms.models import (
 from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
 from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
-from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils import six
 from django.utils.decorators import method_decorator
@@ -1646,7 +1645,12 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import LogEntry
         # First check if the user can see this history.
         model = self.model
-        obj = get_object_or_404(self.get_queryset(request), pk=unquote(object_id))
+        obj = self.get_object(request, unquote(object_id))
+        if obj is None:
+            raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
+                'name': force_text(model._meta.verbose_name),
+                'key': escape(object_id),
+            })
 
         if not self.has_change_permission(request, obj):
             raise PermissionDenied

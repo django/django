@@ -1551,6 +1551,11 @@ class AdminViewPermissionsTest(TestCase):
 
             self.client.get(reverse('admin:logout'))
 
+    def test_history_view_bad_url(self):
+        self.client.post(reverse('admin:login'), self.changeuser_login)
+        response = self.client.get(reverse('admin:admin_views_article_history', args=('foo',)))
+        self.assertEqual(response.status_code, 404)
+
     def test_conditionally_show_add_section_link(self):
         """
         The foreign key widget should only show the "add related" button if the
