@@ -107,7 +107,7 @@ class CreateDefaultSiteTests(TestCase):
         self.assertEqual(Site.objects.count(), 1)
 
     @unittest.skipIf('other' not in connections, "Requires 'other' database connection.")
-    def test_multi_db(self):
+    def test_multi_db_with_router(self):
         """
         #16353, #16828 - The default site creation should respect db routing.
         """
@@ -120,6 +120,13 @@ class CreateDefaultSiteTests(TestCase):
             self.assertTrue(Site.objects.using('other').exists())
         finally:
             router.routers = old_routers
+
+    @unittest.skipIf('other' not in connections, "Requires 'other' database connection.")
+    def test_multi_db(self):
+        create_default_site(self.app_config, using='default', verbosity=0)
+        create_default_site(self.app_config, using='other', verbosity=0)
+        self.assertTrue(Site.objects.using('default').exists())
+        self.assertTrue(Site.objects.using('other').exists())
 
     def test_save_another(self):
         """
