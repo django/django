@@ -8,7 +8,7 @@ from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
     F, Aggregate, Avg, Count, DecimalField, FloatField, Func, IntegerField,
-    Max, Min, Sum,
+    Max, Min, Sum, Value,
 )
 from django.test import TestCase, ignore_warnings
 from django.test.utils import Approximate, CaptureQueriesContext
@@ -706,7 +706,9 @@ class ComplexAggregateTestCase(TestCase):
             Book.objects.aggregate(fail=F('price'))
 
     def test_nonfield_annotation(self):
-        book = Book.objects.annotate(val=Max(2, output_field=IntegerField()))[0]
+        book = Book.objects.annotate(val=Max(Value(2, output_field=IntegerField())))[0]
+        self.assertEqual(book.val, 2)
+        book = Book.objects.annotate(val=Max(Value(2), output_field=IntegerField()))[0]
         self.assertEqual(book.val, 2)
         book = Book.objects.annotate(val=Max(2, output_field=IntegerField()))[0]
         self.assertEqual(book.val, 2)
