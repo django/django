@@ -16,3 +16,6 @@ Bugfixes
 
 * Fixed a regression that prevented custom fields inheriting from
   ``ManyToManyField`` from being recognized in migrations (:ticket:`24236`).
+
+* Fixed crash in ``contrib.sites`` migrations when a default database isn't
+  used (:ticket:`24332`).
