@@ -367,3 +367,14 @@ class NullableUUIDModel(models.Model):
 
 class PrimaryKeyUUIDModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+
+###############################################################################
+
+# See ticket #24215.
+class AbstractForeignFieldsModel(models.Model):
+    fk = models.ForeignKey('missing.FK')
+    m2m = models.ManyToManyField('missing.M2M', through='missing.Through')
+
+    class Meta:
+        abstract = True
