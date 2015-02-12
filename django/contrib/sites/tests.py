@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 
+import unittest
+
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import router
+from django.db import connections, router
 from django.http import HttpRequest
 from django.test import TestCase, modify_settings, override_settings
 
@@ -104,6 +106,7 @@ class CreateDefaultSiteTests(TestCase):
         create_default_site(self.app_config, verbosity=0)
         self.assertEqual(Site.objects.count(), 1)
 
+    @unittest.skipIf('other' not in connections, "Requires 'other' database connection.")
     def test_multi_db(self):
         """
         #16353, #16828 - The default site creation should respect db routing.
