@@ -266,13 +266,11 @@ class RelatedField(Field):
         return None
 
     def contribute_to_class(self, cls, name, virtual_only=False):
-        sup = super(RelatedField, self)
 
         # Store the opts for related_query_name()
         self.opts = cls._meta
 
-        if hasattr(sup, 'contribute_to_class'):
-            sup.contribute_to_class(cls, name, virtual_only=virtual_only)
+        super(RelatedField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
 
         if not cls._meta.abstract:
             if self.rel.related_name:
