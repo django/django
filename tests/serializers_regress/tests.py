@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import uuid
 from unittest import skipUnless
 
 from django.core import serializers
@@ -35,6 +36,7 @@ from .models import (
     PositiveIntegerData, PositiveIntegerPKData, PositiveSmallIntegerData,
     PositiveSmallIntegerPKData, ProxyBaseModel, ProxyProxyBaseModel, SlugData,
     SlugPKData, SmallData, SmallPKData, Tag, TextData, TimeData, UniqueAnchor,
+    UUIDData,
 )
 
 try:
@@ -354,6 +356,7 @@ The end."""),
     # The end."""),
     # (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
     # (pk_obj, 790, XMLPKData, "<foo></foo>"),
+    (pk_obj, 791, UUIDData, uuid.uuid4()),
 
     (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (data_obj, 810, ModifyingSaveData, 42),
