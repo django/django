@@ -2382,12 +2382,12 @@ class UUIDField(Field):
         return "UUIDField"
 
     def get_db_prep_value(self, value, connection, prepared=False):
+        if isinstance(value, six.string_types):
+            value = uuid.UUID(value.replace('-', ''))
         if isinstance(value, uuid.UUID):
             if connection.features.has_native_uuid_field:
                 return value
             return value.hex
-        if isinstance(value, six.string_types):
-            return value.replace('-', '')
         return value
 
     def to_python(self, value):
