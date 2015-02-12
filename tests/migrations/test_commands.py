@@ -8,7 +8,7 @@ import shutil
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
-from django.db import connection, models
+from django.db import DatabaseError, connection, models
 from django.db.migrations import questioner
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
@@ -45,6 +45,65 @@ class MigrateTests(MigrationTestBase):
         self.assertTableExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
         self.assertTableExists("migrations_book")
+        # Unmigrate everything
+        call_command("migrate", "migrations", "zero", verbosity=0)
+        # Make sure it's all gone
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
+        self.assertTableNotExists("migrations_book")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_migrate_fake_initial(self):
+        """
+        #24184 - Tests that --fake-initial only works if all tables created in
+        the initial migration of an app exists
+        """
+        # Make sure no tables are created
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
+        # Run the migrations to 0001 only
+        call_command("migrate", "migrations", "0001", verbosity=0)
+        # Make sure the right tables exist
+        self.assertTableExists("migrations_author")
+        self.assertTableExists("migrations_tribble")
+        # Fake a roll-back
+        call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
+        # Make sure the tables still exist
+        self.assertTableExists("migrations_author")
+        self.assertTableExists("migrations_tribble")
+        # Try to run initial migration
+        with self.assertRaises(DatabaseError):
+            call_command("migrate", "migrations", "0001", verbosity=0)
+        # Run initial migration with an explicit --fake-initial
+        out = six.StringIO()
+        with mock.patch('django.core.management.color.supports_color', lambda *args: False):
+            call_command("migrate", "migrations", "0001", fake_initial=True, stdout=out, verbosity=1)
+        self.assertIn(
+            "migrations.0001_initial... faked",
+            out.getvalue().lower()
+        )
+        # Run migrations all the way
+        call_command("migrate", verbosity=0)
+        # Make sure the right tables exist
+        self.assertTableExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
+        self.assertTableExists("migrations_book")
+        # Fake a roll-back
+        call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
+        # Make sure the tables still exist
+        self.assertTableExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
+        self.assertTableExists("migrations_book")
+        # Try to run initial migration
+        with self.assertRaises(DatabaseError):
+            call_command("migrate", "migrations", verbosity=0)
+        # Run initial migration with an explicit --fake-initial
+        with self.assertRaises(DatabaseError):
+            # Fails because "migrations_tribble" does not exist but needs to in
+            # order to make --fake-initial work.
+            call_command("migrate", "migrations", fake_initial=True, verbosity=0)
+        # Fake a apply
+        call_command("migrate", "migrations", fake=True, verbosity=0)
         # Unmigrate everything
         call_command("migrate", "migrations", "zero", verbosity=0)
         # Make sure it's all gone

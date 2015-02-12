@@ -62,7 +62,7 @@ class MigrationExecutor(object):
                         applied.add(migration)
         return plan
 
-    def migrate(self, targets, plan=None, fake=False):
+    def migrate(self, targets, plan=None, fake=False, fake_initial=False):
         """
         Migrates the database up to the given targets.
 
@@ -91,7 +91,7 @@ class MigrationExecutor(object):
         # Phase 2 -- Run the migrations
         for migration, backwards in plan:
             if not backwards:
-                self.apply_migration(states[migration], migration, fake=fake)
+                self.apply_migration(states[migration], migration, fake=fake, fake_initial=fake_initial)
             else:
                 self.unapply_migration(states[migration], migration, fake=fake)
 
@@ -113,18 +113,19 @@ class MigrationExecutor(object):
             statements.extend(schema_editor.collected_sql)
         return statements
 
-    def apply_migration(self, state, migration, fake=False):
+    def apply_migration(self, state, migration, fake=False, fake_initial=False):
         """
         Runs a migration forwards.
         """
         if self.progress_callback:
             self.progress_callback("apply_start", migration, fake)
         if not fake:
-            # Test to see if this is an already-applied initial migration
-            applied, state = self.detect_soft_applied(state, migration)
-            if applied:
-                fake = True
-            else:
+            if fake_initial:
+                # Test to see if this is an already-applied initial migration
+                applied, state = self.detect_soft_applied(state, migration)
+                if applied:
+                    fake = True
+            if not fake:
                 # Alright, do it normally
                 with self.connection.schema_editor() as schema_editor:
                     state = migration.apply(state, schema_editor)
