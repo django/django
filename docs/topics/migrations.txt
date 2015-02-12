@@ -140,6 +140,13 @@ developers (or your production servers) check out the code, they'll
 get both the changes to your models and the accompanying migration at the
 same time.
 
+.. versionadded:: 1.8
+
+If you want to give the migration(s) a meaningful name instead of a generated
+one, you can use the :djadminopt:`--name` option::
+
+    $ python manage.py makemigrations --name changed_my_model your_app_label
+
 Version control
 ~~~~~~~~~~~~~~~
 
@@ -282,10 +289,12 @@ need to convert it to use migrations; this is a simple process::
 
     $ python manage.py makemigrations your_app_label
 
-This will make a new initial migration for your app. Now, when you run
-:djadmin:`migrate`, Django will detect that you have an initial migration
-*and* that the tables it wants to create already exist, and will mark the
-migration as already applied.
+This will make a new initial migration for your app. Now, run ``python
+manage.py migrate --fake-initial``, and Django will detect that you have an
+initial migration *and* that the tables it wants to create already exist, and
+will mark the migration as already applied. (Without the
+:djadminopt:`--fake-initial` flag, the :djadmin:`migrate` command would error
+out because the tables it wants to create already exist.)
 
 Note that this only works given two things:
 
@@ -297,12 +306,11 @@ Note that this only works given two things:
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
 
-.. versionadded:: 1.8
+.. versionchanged: 1.8
 
-If you want to give the migration(s) a meaningful name instead of a generated one,
-you can use the :djadminopt:`--name` option::
-
-    $ python manage.py makemigrations --name changed_my_model your_app_label
+    The ``--fake-initial`` flag to :djadmin:`migrate` was added. Previously,
+    Django would always automatically fake-apply initial migrations if it
+    detected that the tables exist.
 
 .. _historical-models:
 
@@ -706,15 +714,22 @@ If you already have pre-existing migrations created with
   ``__init__.py`` - make sure you remove the ``.pyc`` files too.
 * Run ``python manage.py makemigrations``. Django should see the empty
   migration directories and make new initial migrations in the new format.
-* Run ``python manage.py migrate``. Django will see that the tables for the
-  initial migrations already exist and mark them as applied without running
-  them.
+* Run ``python manage.py migrate --fake-initial``. Django will see that the
+  tables for the initial migrations already exist and mark them as applied
+  without running them. (Django won't check that the table schema match your
+  models, just that the right table names exist).
 
 That's it! The only complication is if you have a circular dependency loop
 of foreign keys; in this case, ``makemigrations`` might make more than one
 initial migration, and you'll need to mark them all as applied using::
 
     python manage.py migrate --fake yourappnamehere
+
+.. versionchanged:: 1.8
+
+    The :djadminopt:`--fake-initial` flag was added to :djadmin:`migrate`;
+    previously, initial migrations were always automatically fake-applied if
+    existing tables were detected.
 
 Libraries/Third-party Apps
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

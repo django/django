@@ -1135,6 +1135,11 @@ Miscellaneous
   has been removed by a migration and replaced by a property. That means it's
   not possible to query or filter a ``ContentType`` by this field any longer.
 
+* :djadmin:`migrate` now accepts the :djadminopt:`--fake-initial` option to
+  allow faking initial migrations. In 1.7 initial migrations were always
+  automatically faked if all tables created in an initial migration already
+  existed.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8

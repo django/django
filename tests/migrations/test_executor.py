@@ -2,6 +2,7 @@ from django.apps.registry import apps as global_apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
+from django.db.utils import DatabaseError
 from django.test import TestCase, modify_settings, override_settings
 
 from .test_base import MigrationTestBase
@@ -186,7 +187,14 @@ class ExecutorTests(MigrationTestBase):
                 (executor.loader.graph.nodes["migrations", "0001_initial"], False),
             ],
         )
-        executor.migrate([("migrations", "0001_initial")])
+        # Applying the migration should raise a database level error
+        # because we haven't given the --fake-initial option
+        with self.assertRaises(DatabaseError):
+            executor.migrate([("migrations", "0001_initial")])
+        # Reset the faked state
+        state = {"faked": None}
+        # Allow faking of initial CreateModel operations
+        executor.migrate([("migrations", "0001_initial")], fake_initial=True)
         self.assertEqual(state["faked"], True)
         # And migrate back to clean up the database
         executor.loader.build_graph()
