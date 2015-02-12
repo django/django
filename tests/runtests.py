@@ -145,8 +145,6 @@ def setup(verbosity, test_labels):
         # us skip creating migrations for the test models.
         'auth': 'django.contrib.auth.tests.migrations',
         'contenttypes': 'django.contrib.contenttypes.tests.migrations',
-        'flatpages_tests': 'django.contrib.flatpages.migrations',
-        'redirects_tests': 'django.contrib.redirects.migrations',
     }
 
     if verbosity > 0:
