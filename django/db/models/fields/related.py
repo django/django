@@ -1475,8 +1475,8 @@ class ManyToManyRel(ForeignObjectRel):
 class ForeignObject(RelatedField):
     # Field flags
     many_to_many = False
-    many_to_one = False
-    one_to_many = True
+    many_to_one = True
+    one_to_many = False
     one_to_one = False
 
     requires_unique_target = True
@@ -1785,8 +1785,8 @@ class ForeignObject(RelatedField):
 class ForeignKey(ForeignObject):
     # Field flags
     many_to_many = False
-    many_to_one = False
-    one_to_many = True
+    many_to_one = True
+    one_to_many = False
     one_to_one = False
 
     empty_strings_allowed = False
