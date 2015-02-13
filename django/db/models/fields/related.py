@@ -40,9 +40,6 @@ def resolve_relation(scope_model, relation):
         app_label will be prepended.
       * An "app_label.ModelName" string.
       * A model class, which will be returned unchanged.
-
-    If always_text is True, an "app_label.ModelName" string will be returned
-    wherever a model class would otherwise have been returned.
     """
     # Check for recursive relations
     if relation == RECURSIVE_RELATIONSHIP_CONSTANT:
