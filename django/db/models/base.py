@@ -338,9 +338,8 @@ class ModelBase(type):
                     'set_%s_order' % cls.__name__.lower(),
                     curry(method_set_order, cls)
                 )
-            lazy_related_operation(make_foreign_order_accessors,
-                                   cls, opts.order_with_respect_to.rel.to,
-                                   field=opts.order_with_respect_to)
+            wrt = opts.order_with_respect_to
+            lazy_related_operation(make_foreign_order_accessors, cls, wrt.rel.to, field=wrt)
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
