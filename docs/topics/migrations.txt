@@ -742,7 +742,8 @@ If you already have pre-existing migrations created with
   migration directories and make new initial migrations in the new format.
 * Run ``python manage.py migrate``. Django will see that the tables for the
   initial migrations already exist and mark them as applied without running
-  them.
+  them. (Only matching table names are checked; not their full schema - it's up
+  to you to make sure the existing schema is up to date with your models!)
 
 That's it! The only complication is if you have a circular dependency loop
 of foreign keys; in this case, ``makemigrations`` might make more than one
