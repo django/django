@@ -65,7 +65,7 @@ def get_candidate_relations_to_delete(opts):
     # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
     return (
         f for f in candidate_model_fields
-        if f.auto_created and not f.concrete and (f.one_to_one or f.many_to_one)
+        if f.auto_created and not f.concrete and (f.one_to_one or f.one_to_many)
     )
 
 

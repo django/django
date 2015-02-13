@@ -388,9 +388,9 @@ class Options(object):
         # and all the models may not have been loaded yet; we don't want to cache
         # the string reference to the related_model.
         is_not_an_m2m_field = lambda f: not (f.is_relation and f.many_to_many)
-        is_not_a_generic_relation = lambda f: not (f.is_relation and f.many_to_one)
+        is_not_a_generic_relation = lambda f: not (f.is_relation and f.one_to_many)
         is_not_a_generic_foreign_key = lambda f: not (
-            f.is_relation and f.one_to_many and not (hasattr(f.rel, 'to') and f.rel.to)
+            f.is_relation and f.many_to_one and not (hasattr(f.rel, 'to') and f.rel.to)
         )
         return make_immutable_fields_list(
             "fields",
@@ -564,7 +564,7 @@ class Options(object):
         for field in fields:
             # For backwards compatibility GenericForeignKey should not be
             # included in the results.
-            if field.is_relation and field.one_to_many and field.related_model is None:
+            if field.is_relation and field.many_to_one and field.related_model is None:
                 continue
 
             names.add(field.name)

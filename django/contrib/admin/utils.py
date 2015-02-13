@@ -296,7 +296,7 @@ def _get_non_gfk_field(opts, name):
     "not found" by get_field(). This could likely be cleaned up.
     """
     field = opts.get_field(name)
-    if field.is_relation and field.one_to_many and not field.related_model:
+    if field.is_relation and field.many_to_one and not field.related_model:
         raise FieldDoesNotExist()
     return field
 

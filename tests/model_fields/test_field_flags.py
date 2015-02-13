@@ -31,20 +31,20 @@ RELATION_FIELDS = (
     GenericRelation,
 )
 
-ONE_TO_MANY_CLASSES = {
+MANY_TO_MANY_CLASSES = {
+    ManyToManyField,
+}
+
+MANY_TO_ONE_CLASSES = {
     ForeignObject,
     ForeignKey,
     GenericForeignKey,
 }
 
-MANY_TO_ONE_CLASSES = {
+ONE_TO_MANY_CLASSES = {
     ForeignObjectRel,
     ManyToOneRel,
     GenericRelation,
-}
-
-MANY_TO_MANY_CLASSES = {
-    ManyToManyField,
 }
 
 ONE_TO_ONE_CLASSES = {

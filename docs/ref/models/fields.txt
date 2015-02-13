@@ -1810,16 +1810,6 @@ relation. These attribute are present on all fields; however, they will only
 have meaningful values if the field is a relation type
 (:attr:`Field.is_relation=True <Field.is_relation>`).
 
-.. attribute:: Field.one_to_many
-
-    Boolean flag that is ``True`` if the field has a one-to-many relation, such
-    as a ``ForeignKey``; ``False`` otherwise.
-
-.. attribute:: Field.one_to_one
-
-    Boolean flag that is ``True`` if the field has a one-to-one relation, such
-    as a ``OneToOneField``; ``False`` otherwise.
-
 .. attribute:: Field.many_to_many
 
     Boolean flag that is ``True`` if the field has a many-to-many relation;
@@ -1829,8 +1819,18 @@ have meaningful values if the field is a relation type
 .. attribute:: Field.many_to_one
 
     Boolean flag that is ``True`` if the field has a many-to-one relation, such
+    as a ``ForeignKey``; ``False`` otherwise.
+
+.. attribute:: Field.one_to_many
+
+    Boolean flag that is ``True`` if the field has a one-to-many relation, such
     as a ``GenericRelation`` or the reverse of a ``ForeignKey``; ``False``
     otherwise.
+
+.. attribute:: Field.one_to_one
+
+    Boolean flag that is ``True`` if the field has a one-to-one relation, such
+    as a ``OneToOneField``; ``False`` otherwise.
 
 .. attribute:: Field.related_model
 
