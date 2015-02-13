@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from functools import partial
 from operator import attrgetter
 import warnings
 
@@ -66,7 +67,7 @@ def lazy_related_operation(function, model, *related_models, **kwargs):
     """
     apps = model._meta.apps
     related_models = [resolve_relation(model, rel) for rel in related_models]
-    return apps.lazy_model_operation(function, model, *related_models, **kwargs)
+    return apps.lazy_model_operation(partial(function, **kwargs), model, *related_models)
 
 
 def add_lazy_relation(cls, field, relation, operation):

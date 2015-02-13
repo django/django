@@ -179,8 +179,8 @@ class StateApps(Apps):
                 # (only for the first issue). Error message should look like:
                 # "ValueError: Lookup failed for model referenced by
                 # field migrations.Book.author: migrations.Author"
-                msg = "Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}"
-                raise ValueError(msg.format(field=operations[0][1]['field'], model=lookup_model))
+                msg = "Lookup failed for model: {model[0]}.{model[1]}"
+                raise ValueError(msg.format(model=lookup_model))
             else:
                 do_pending_lookups(model)
 

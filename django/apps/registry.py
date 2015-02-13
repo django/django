@@ -346,11 +346,11 @@ class Apps(object):
             for model in self.get_models(include_auto_created=True):
                 model._meta._expire_cache()
 
-    def lazy_model_operation(self, function, *models_or_names, **kwargs):
+    def lazy_model_operation(self, function, *models_or_names):
         """
         Take a function and a number of models or model names, and when all
         the corresponding models have been loaded, call the function with
-        the model classes and any optional as its arguments.
+        the model classes as its arguments.
 
         Each element of models_or names may be
             * an actual model class
@@ -358,8 +358,7 @@ class Apps(object):
             * a tuple of strings of the form (app_label, model_name)
 
         The function passed to this method must accept n positional arguments,
-        where n=len(models_or_names), plus whatever keyword arguments you pass
-        in kwargs.
+        where n=len(models_or_names).
         """
 
         # Avoid a circular import by putting this here
@@ -374,14 +373,14 @@ class Apps(object):
         # if any are plainly invalid.
         model_keys = [make_model_tuple(m) for m in models_or_names]
 
-        # If this function depends on more than one model, recursively call add
-        # for each, partially applying the given function on each iteration.
+        # If this function depends on more than one model, we recursively turn
+        # it into a chain of functions that accept a single model argument and
+        # pass each in turn to lazy_model_operation.
         model_key, more_models = model_keys[0], model_keys[1:]
         if more_models:
-            inner_function = function
-            function = lambda model, **kwargs: (
-                self.lazy_model_operation(partial(inner_function, model),
-                                          *more_models, **kwargs)
+            inner_fn = function
+            function = lambda model: (
+                self.lazy_model_operation(partial(inner_fn, model), *more_models)
             )
 
         # If the model is already loaded, pass it to the function immediately.
@@ -389,9 +388,9 @@ class Apps(object):
         try:
             model_class = self.get_registered_model(*model_key)
         except LookupError:
-            self._pending_lookups.setdefault(model_key, []).append((function, kwargs))
+            self._pending_lookups.setdefault(model_key, []).append(function)
         else:
-            function(model_class, **kwargs)
+            function(model_class)
 
     def do_pending_lookups(self, sender, **_):
         """
@@ -404,8 +403,8 @@ class Apps(object):
 
         key = (sender._meta.app_label, sender.__name__)
         while key in self._pending_lookups:
-            for function, kwargs in self._pending_lookups.pop(key):
-                function(sender, **kwargs)
+            for function in self._pending_lookups.pop(key):
+                function(sender)
 
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
