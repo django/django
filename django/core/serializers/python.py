@@ -63,6 +63,8 @@ class Serializer(base.Serializer):
                 value = None
         else:
             value = getattr(obj, field.get_attname())
+            if not is_protected_type(value):
+                value = field.value_to_string(obj)
         self._current[field.name] = value
 
     def handle_m2m_field(self, obj, field):
