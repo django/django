@@ -401,7 +401,8 @@ class Apps(object):
         if sender._meta.apps is not self:
             return  # Only execute the operation once.
 
-        key = (sender._meta.app_label, sender.__name__)
+        from django.db.models.utils import make_model_tuple
+        key = make_model_tuple(sender)
         while key in self._pending_lookups:
             for function in self._pending_lookups.pop(key):
                 function(sender)
