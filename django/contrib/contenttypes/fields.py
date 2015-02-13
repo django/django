@@ -27,8 +27,8 @@ class GenericForeignKey(object):
 
     is_relation = True
     many_to_many = False
-    many_to_one = False
-    one_to_many = True
+    many_to_one = True
+    one_to_many = False
     one_to_one = False
     related_model = None
 
@@ -269,8 +269,8 @@ class GenericRelation(ForeignObject):
     auto_created = False
 
     many_to_many = False
-    many_to_one = True
-    one_to_many = False
+    many_to_one = False
+    one_to_many = True
     one_to_one = False
 
     rel_class = GenericRel
