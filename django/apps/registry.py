@@ -51,7 +51,6 @@ class Apps(object):
 
         # Pending lookups for lazy relations.
         self._pending_lookups = {}
-        self._class_prepared_handler_registered = False
 
         # Populate apps and models, unless it's the master registry.
         if installed_apps is not None:
