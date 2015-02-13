@@ -390,9 +390,8 @@ class Apps(object):
 
     def do_pending_lookups(self, model):
         """
-        Receive ``class_prepared``, and pass the freshly prepared model to
-        each function waiting for it. This is an instance method to allow
-        weak refs in the signal system to do their thing.
+        Take a newly-prepared model and pass it to each function waiting for
+        it. This is called at the very end of ``Apps.register_model()``.
         """
         from django.db.models.utils import make_model_tuple
         key = make_model_tuple(model)
