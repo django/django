@@ -1409,7 +1409,7 @@ templates used by the :class:`ModelAdmin` views:
                 # ...
                 context = dict(
                    # Include common variables for rendering the admin template.
-                   self.each_context(),
+                   self.each_context(request),
                    # Anything else you want in the context...
                    key=value,
                 )
