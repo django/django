@@ -28,15 +28,15 @@ from .models import (
     BooleanData, BooleanPKData, CharData, CharPKData, ComplexModel, DateData,
     DateTimeData, DecimalData, DecimalPKData, EmailData, EmailPKData,
     ExplicitInheritBaseModel, FileData, FilePathData, FilePathPKData, FKData,
-    FKDataNaturalKey, FKDataToField, FKDataToO2O, FKSelfData, FloatData,
-    FloatPKData, GenericData, GenericIPAddressData, GenericIPAddressPKData,
-    InheritAbstractModel, InheritBaseModel, IntegerData, IntegerPKData,
-    Intermediate, LengthModel, M2MData, M2MIntermediateData, M2MSelfData,
-    ModifyingSaveData, NaturalKeyAnchor, NullBooleanData, O2OData,
-    PositiveIntegerData, PositiveIntegerPKData, PositiveSmallIntegerData,
-    PositiveSmallIntegerPKData, ProxyBaseModel, ProxyProxyBaseModel, SlugData,
-    SlugPKData, SmallData, SmallPKData, Tag, TextData, TimeData, UniqueAnchor,
-    UUIDData,
+    FKDataNaturalKey, FKDataToField, FKDataToO2O, FKSelfData, FKToUUID,
+    FloatData, FloatPKData, GenericData, GenericIPAddressData,
+    GenericIPAddressPKData, InheritAbstractModel, InheritBaseModel,
+    IntegerData, IntegerPKData, Intermediate, LengthModel, M2MData,
+    M2MIntermediateData, M2MSelfData, ModifyingSaveData, NaturalKeyAnchor,
+    NullBooleanData, O2OData, PositiveIntegerData, PositiveIntegerPKData,
+    PositiveSmallIntegerData, PositiveSmallIntegerPKData, ProxyBaseModel,
+    ProxyProxyBaseModel, SlugData, SlugPKData, SmallData, SmallPKData, Tag,
+    TextData, TimeData, UniqueAnchor, UUIDData,
 )
 
 try:
@@ -201,6 +201,7 @@ im_obj = (im_create, im_compare)
 o2o_obj = (o2o_create, o2o_compare)
 pk_obj = (pk_create, pk_compare)
 inherited_obj = (inherited_create, inherited_compare)
+uuid_obj = uuid.uuid4()
 
 test_data = [
     # Format: (data type, PK value, Model Class, data)
@@ -356,7 +357,8 @@ The end."""),
     # The end."""),
     # (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
     # (pk_obj, 790, XMLPKData, "<foo></foo>"),
-    (pk_obj, 791, UUIDData, uuid.uuid4()),
+    (pk_obj, 791, UUIDData, uuid_obj),
+    (fk_obj, 792, FKToUUID, uuid_obj),
 
     (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (data_obj, 810, ModifyingSaveData, 42),
