@@ -361,11 +361,9 @@ class Apps(object):
         where n=len(models_or_names).
         """
 
-        # Avoid a circular import by putting this here
-        from django.db.models.utils import make_model_tuple
-
         # Eagerly parse all model strings so we can fail immediately
         # if any are plainly invalid.
+        from django.db.models.utils import make_model_tuple
         model_keys = [make_model_tuple(m) for m in models_or_names]
 
         # If this function depends on more than one model, we recursively turn
@@ -373,10 +371,10 @@ class Apps(object):
         # pass each in turn to lazy_model_operation.
         model_key, more_models = model_keys[0], model_keys[1:]
         if more_models:
-            inner_fn = function
-            function = lambda model: (
-                self.lazy_model_operation(partial(inner_fn, model), *more_models)
-            )
+            supplied_fn = function
+            def function(model):
+                next_function = partial(supplied_fn, model)
+                self.lazy_model_operation(next_function, *more_models)
 
         # If the model is already loaded, pass it to the function immediately.
         # Otherwise, delay execution until the class is prepared.
