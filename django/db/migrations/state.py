@@ -200,6 +200,7 @@ class StateApps(Apps):
             self.app_configs[app_label].models = OrderedDict()
         self.app_configs[app_label].models[model._meta.model_name] = model
         self.clear_cache()
+        self.do_pending_lookups(model)
 
     def unregister_model(self, app_label, model_name):
         try:

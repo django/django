@@ -223,6 +223,7 @@ class Apps(object):
                     (model_name, app_label, app_models[model_name], model))
         app_models[model_name] = model
         self.clear_cache()
+        self.do_pending_lookups(model)
 
     def is_installed(self, app_name):
         """
@@ -364,11 +365,6 @@ class Apps(object):
         # Avoid a circular import by putting this here
         from django.db.models.utils import make_model_tuple
 
-        if not self._class_prepared_handler_registered:
-            from django.db.models import signals
-            signals.class_prepared.connect(self.do_pending_lookups)
-            self._class_prepared_handler_registered = True
-
         # Eagerly parse all model strings so we can fail immediately
         # if any are plainly invalid.
         model_keys = [make_model_tuple(m) for m in models_or_names]
@@ -392,20 +388,16 @@ class Apps(object):
         else:
             function(model_class)
 
-    def do_pending_lookups(self, sender, **_):
+    def do_pending_lookups(self, model):
         """
         Receive ``class_prepared``, and pass the freshly prepared model to
         each function waiting for it. This is an instance method to allow
         weak refs in the signal system to do their thing.
         """
-        if sender._meta.apps is not self:
-            return  # Only execute the operation once.
-
         from django.db.models.utils import make_model_tuple
-        key = make_model_tuple(sender)
-        while key in self._pending_lookups:
-            for function in self._pending_lookups.pop(key):
-                function(sender)
+        key = make_model_tuple(model)
+        for function in self._pending_lookups.pop(key, []):
+            function(model)
 
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
