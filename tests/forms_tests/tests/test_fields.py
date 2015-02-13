@@ -48,6 +48,7 @@ from django.test import SimpleTestCase, ignore_warnings
 from django.utils import formats, six, translation
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.duration import duration_string
 
 try:
     from PIL import Image
@@ -614,7 +615,7 @@ class FieldsTests(SimpleTestCase):
         d = datetime.datetime(2006, 9, 17, 14, 30, 0)
         self.assertFalse(f.has_changed(d, '2006 09 17 2:30 PM'))
 
-    # RegexField ##################################################################
+    # DurationField ###########################################################
 
     def test_durationfield_1(self):
         f = DurationField()
@@ -641,6 +642,14 @@ class FieldsTests(SimpleTestCase):
             '<input id="id_duration" type="text" name="duration" value="01:00:00">',
             str(f['duration'])
         )
+
+    def test_durationfield_prepare_value(self):
+        field = DurationField()
+        td = datetime.timedelta(minutes=15, seconds=30)
+        self.assertEqual(field.prepare_value(td), duration_string(td))
+        self.assertIsNone(field.prepare_value(None))
+
+    # RegexField ##################################################################
 
     def test_regexfield_1(self):
         f = RegexField('^[0-9][A-F][0-9]$')
