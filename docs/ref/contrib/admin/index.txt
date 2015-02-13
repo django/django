@@ -1406,8 +1406,22 @@ templates used by the :class:`ModelAdmin` views:
                 return my_urls + urls
 
             def my_view(self, request):
-                # custom view which should return an HttpResponse
-                pass
+                # Admin specific rendering
+                # This ensures all of the admin variables are included if you are using the Django
+                # Admin template
+                context = dict(
+                   self.each_context(),
+                   # Anything else you want in the context
+                )
+                context.update(extra_context or {})
+                return TemplateResponse(request, "sometemplate.html", context)
+
+    If you want to use the Django Admin template you should extend from ``admin/base_site.html``, like so::
+    
+       {% extends "admin/base_site.html" %}
+       {% block content %}
+       <!-- content -->
+       {% endblock %}
 
     .. note::
 
