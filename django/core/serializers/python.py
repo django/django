@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils import six
-from django.utils.encoding import force_text, is_protected_type
+from django.utils.encoding import force_text, is_protected_type, smart_text
 
 
 class Serializer(base.Serializer):
@@ -62,7 +62,11 @@ class Serializer(base.Serializer):
             else:
                 value = None
         else:
-            value = getattr(obj, field.get_attname())
+            gotten_value = getattr(obj, field.get_attname())
+            if gotten_value is not None:
+                value = smart_text(gotten_value)
+            else:
+                value = gotten_value
         self._current[field.name] = value
 
     def handle_m2m_field(self, obj, field):
