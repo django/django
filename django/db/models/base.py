@@ -24,6 +24,7 @@ from django.db.models.manager import ensure_default_manager
 from django.db.models.options import Options
 from django.db.models.query import Q
 from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
+from django.db.models.utils import make_model_label
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str, force_text
@@ -219,8 +220,8 @@ class ModelBase(type):
             # Locate OneToOneField instances.
             for field in base._meta.local_fields:
                 if isinstance(field, OneToOneField):
-                    related = resolve_relation(new_class, field.rel.to, always_text=True)
-                    parent_links[related] = field
+                    related = resolve_relation(new_class, field.rel.to)
+                    parent_links[make_model_label(related)] = field
 
         # Do the appropriate setup for any model parents.
         for base in parents:

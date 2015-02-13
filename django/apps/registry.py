@@ -6,7 +6,7 @@ import threading
 import warnings
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
-from django.utils import lru_cache, six
+from django.utils import lru_cache
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils._os import upath
 
@@ -346,19 +346,6 @@ class Apps(object):
             for model in self.get_models(include_auto_created=True):
                 model._meta._expire_cache()
 
-    @staticmethod
-    def _model_key(model_or_name):
-        """
-        Returns an (app_label, model_name) tuple from a model or string.
-        """
-        if isinstance(model_or_name, six.string_types):
-            app_label, model_name = model_or_name.split(".")
-        else:
-            # It's actually a model class.
-            app_label = model_or_name._meta.app_label
-            model_name = model_or_name._meta.object_name
-        return app_label, model_name
-
     def lazy_model_operation(self, function, *models_or_names, **kwargs):
         """
         Take a function and a number of models or model names, and when all
@@ -375,6 +362,9 @@ class Apps(object):
         in kwargs.
         """
 
+        # Avoid a circular import by putting this here
+        from django.db.models.utils import make_model_tuple
+
         if not self._class_prepared_handler_registered:
             from django.db.models import signals
             signals.class_prepared.connect(self.do_pending_lookups)
@@ -382,8 +372,7 @@ class Apps(object):
 
         # Eagerly parse all model strings so we can fail immediately
         # if any are plainly invalid.
-        model_keys = [self._model_key(m) if not isinstance(m, tuple) else m
-                      for m in models_or_names]
+        model_keys = [make_model_tuple(m) for m in models_or_names]
 
         # If this function depends on more than one model, recursively call add
         # for each, partially applying the given function on each iteration.

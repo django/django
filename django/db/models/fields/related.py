@@ -15,6 +15,7 @@ from django.db.models.fields import (AutoField, Field, IntegerField,
 from django.db.models.lookups import IsNull
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo
+from django.db.models.utils import make_model_label
 from django.utils.encoding import force_text, smart_text
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning, RemovedInDjango19Warning
@@ -26,7 +27,7 @@ from django import forms
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
 
-def resolve_relation(scope_model, relation, always_text=False):
+def resolve_relation(scope_model, relation):
     """
     Transform relation into a model or fully-qualified model string of the form
     "app_label.ModelName", relative to scope_model.
@@ -50,8 +51,6 @@ def resolve_relation(scope_model, relation, always_text=False):
     if isinstance(relation, six.string_types):
         if "." not in relation:
             relation = "%s.%s" % (scope_model._meta.app_label, relation)
-    elif always_text:
-        relation = "%s.%s" % (relation._meta.app_label, relation.__name__)
 
     return relation
 
@@ -2027,7 +2026,7 @@ def create_many_to_many_intermediary_model(field, klass):
     name = '%s_%s' % (klass._meta.object_name, field.name)
     lazy_related_operation(set_managed, klass, to_model, name)
 
-    to_label = resolve_relation(klass, field.rel.to, always_text=True)
+    to_label = make_model_label(to_model)
     to = to_label.split('.')[-1].lower()
     from_ = klass._meta.model_name
     if to == from_:
