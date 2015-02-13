@@ -334,10 +334,11 @@ class PasswordResetTest(AuthViewsTestCase):
 @override_settings(AUTH_USER_MODEL='auth.CustomUser')
 class CustomUserPasswordResetTest(AuthViewsTestCase):
     fixtures = ['custom_user.json']
+    user_email = 'staffmember@example.com'
 
     def _test_confirm_start(self):
         # Start by creating the email
-        response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
+        response = self.client.post('/password_reset/', {'email': self.user_email})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
         return self._read_signup_email(mail.outbox[0])
@@ -352,6 +353,26 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
         response = self.client.get(path)
         # redirect to a 'complete' page:
         self.assertContains(response, "Please enter your new password")
+        # then submit a new password
+        response = self.client.post(path, {
+            'new_password1': 'anewpassword',
+            'new_password2': 'anewpassword',
+        })
+        self.assertRedirects(response, '/reset/done/')
+
+
+@override_settings(AUTH_USER_MODEL='auth.UUIDUser')
+class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
+    fixtures = None
+
+    def _test_confirm_start(self):
+        # instead of fixture
+        UUIDUser.objects.create_user(
+            email=self.user_email,
+            username='foo',
+            password='foo',
+        )
+        return super(UUIDUserPasswordResetTest, self)._test_confirm_start()
 
 
 class ChangePasswordTest(AuthViewsTestCase):
