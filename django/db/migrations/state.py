@@ -167,7 +167,7 @@ class StateApps(Apps):
             unrendered_models = new_unrendered_models
 
         # If there are some lookups left, see if we can first resolve them
-        # ourselves - sometimes fields are added after class_prepared is sent
+        # ourselves - sometimes fields are added after a model is registered
         for lookup_model, operations in self._pending_lookups.items():
             try:
                 model = self.get_model(lookup_model[0], lookup_model[1])
