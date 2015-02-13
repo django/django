@@ -1,4 +1,5 @@
 from collections import Counter, defaultdict, OrderedDict
+from functools import partial
 import os
 import sys
 import threading
@@ -7,7 +8,6 @@ import warnings
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.utils import lru_cache, six
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.functional import curry
 from django.utils._os import upath
 
 from .config import AppConfig
@@ -391,7 +391,7 @@ class Apps(object):
         if more_models:
             inner_function = function
             function = lambda model, **kwargs: (
-                self.lazy_model_operation(curry(inner_function, model),
+                self.lazy_model_operation(partial(inner_function, model),
                                           *more_models, **kwargs)
             )
 
