@@ -369,6 +369,10 @@ class PrimaryKeyUUIDModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
 
+class RelatedToUUIDModel(models.Model):
+    uuid_fk = models.ForeignKey('PrimaryKeyUUIDModel')
+
+
 ###############################################################################
 
 # See ticket #24215.
