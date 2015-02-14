@@ -93,10 +93,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
-        opts = self.settings_dict["OPTIONS"]
-        RC = psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED
-        self.isolation_level = opts.get('isolation_level', RC)
-
         self.features = DatabaseFeatures(self)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
@@ -131,7 +127,29 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn_params
 
     def get_new_connection(self, conn_params):
-        return Database.connect(**conn_params)
+        connection = Database.connect(**conn_params)
+
+        # self.isolation_level must be set:
+        # - after connecting to the database in order to obtain the database's
+        #   default when no value is explicitly specified in options.
+        # - before calling _set_autocommit() because if autocommit is on, that
+        #   will set connection.isolation_level to ISOLATION_LEVEL_AUTOCOMMIT;
+        #   and if autocommit is off, on psycopg2 < 2.4.2, _set_autocommit()
+        #   needs self.isolation_level.
+        options = self.settings_dict['OPTIONS']
+        try:
+            self.isolation_level = options['isolation_level']
+        except KeyError:
+            self.isolation_level = connection.isolation_level
+        else:
+            # Set the isolation level to the value from OPTIONS. This isn't
+            # needed on psycopg2 < 2.4.2 because it happens as a side-effect
+            # of _set_autocommit(False).
+            if (self.isolation_level != connection.isolation_level and
+                    self.psycopg2_version >= (2, 4, 2)):
+                connection.set_session(isolation_level=self.isolation_level)
+
+        return connection
 
     def init_connection_state(self):
         settings_dict = self.settings_dict

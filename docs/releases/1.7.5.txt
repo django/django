@@ -19,3 +19,7 @@ Bugfixes
 
 * Fixed crash in ``contrib.sites`` migrations when a default database isn't
   used (:ticket:`24332`).
+
+* Added the ability to set the isolation level on PostgreSQL with psycopg2 ≥
+  2.4.2 (:ticket:`24318`). It was advertised as a new feature in Django 1.6
+  but it didn't work in practice.
