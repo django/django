@@ -146,10 +146,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             'database': settings_dict['NAME'] or 'postgres',
         }
         conn_params.update(settings_dict['OPTIONS'])
-        if 'autocommit' in conn_params:
-            del conn_params['autocommit']
-        if 'isolation_level' in conn_params:
-            del conn_params['isolation_level']
+        conn_params.pop('isolation_level', None)
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
         if settings_dict['PASSWORD']:
