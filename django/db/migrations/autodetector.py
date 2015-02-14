@@ -52,21 +52,35 @@ class MigrationAutodetector(object):
         Used for full comparison for rename/alter; sometimes a single-level
         deconstruction will not compare correctly.
         """
-        if not hasattr(obj, 'deconstruct') or isinstance(obj, type):
-            return obj
-        deconstructed = obj.deconstruct()
-        if isinstance(obj, models.Field):
-            # we have a field which also returns a name
-            deconstructed = deconstructed[1:]
-        path, args, kwargs = deconstructed
-        return (
-            path,
-            [self.deep_deconstruct(value) for value in args],
-            {
+        if isinstance(obj, list):
+            return [self.deep_deconstruct(value) for value in obj]
+        elif isinstance(obj, tuple):
+            return tuple(self.deep_deconstruct(value) for value in obj)
+        elif isinstance(obj, dict):
+            return {
                 key: self.deep_deconstruct(value)
-                for key, value in kwargs.items()
-            },
-        )
+                for key, value in obj.items()
+            }
+        elif isinstance(obj, type):
+            # If this is a type that implements 'deconstruct' as an instance method,
+            # avoid treating this as being deconstructible itself - see #22951
+            return obj
+        elif hasattr(obj, 'deconstruct'):
+            deconstructed = obj.deconstruct()
+            if isinstance(obj, models.Field):
+                # we have a field which also returns a name
+                deconstructed = deconstructed[1:]
+            path, args, kwargs = deconstructed
+            return (
+                path,
+                [self.deep_deconstruct(value) for value in args],
+                {
+                    key: self.deep_deconstruct(value)
+                    for key, value in kwargs.items()
+                },
+            )
+        else:
+            return obj
 
     def only_relation_agnostic_fields(self, fields):
         """
