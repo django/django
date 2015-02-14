@@ -2054,9 +2054,15 @@ class ForeignKey(ForeignObject):
 
     def get_db_converters(self, connection):
         backend_converters = connection.ops.get_db_converters(Col(self.attname, self.related_field))
+        backend_converters = [self._convert_backend_converter(func) for func in backend_converters]
         field_converters = self.related_field.get_db_converters(connection)
         self_converters = super(ForeignKey, self).get_db_converters(connection)
         return backend_converters + field_converters + self_converters
+
+    def _convert_backend_converter(self, converter):
+        def new_converter(value, connection, context):
+            return converter(value, self, context)
+        return new_converter
 
 
 class OneToOneField(ForeignKey):
