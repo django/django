@@ -15,6 +15,7 @@ from django.db.models.fields import (
     BLANK_CHOICE_DASH, AutoField, Field, IntegerField, PositiveIntegerField,
     PositiveSmallIntegerField,
 )
+from django.db.models.expressions import Col
 from django.db.models.lookups import IsNull
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo
@@ -2050,6 +2051,12 @@ class ForeignKey(ForeignObject):
 
     def db_parameters(self, connection):
         return {"type": self.db_type(connection), "check": []}
+
+    def get_db_converters(self, connection):
+        backend_converters = connection.ops.get_db_converters(Col(self.attname, self.related_field))
+        field_converters = self.related_field.get_db_converters(connection)
+        self_converters = super(ForeignKey, self).get_db_converters(connection)
+        return backend_converters + field_converters + self_converters
 
 
 class OneToOneField(ForeignKey):
