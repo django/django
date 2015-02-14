@@ -12,9 +12,9 @@ from django.core.exceptions import ValidationError
 from django.core.validators import (
     BaseValidator, EmailValidator, MaxLengthValidator, MaxValueValidator,
     MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
-    validate_comma_separated_integer_list, validate_email, validate_integer,
-    validate_ipv4_address, validate_ipv6_address, validate_ipv46_address,
-    validate_slug,
+    int_list_validator, validate_comma_separated_integer_list, validate_email,
+    validate_integer, validate_ipv4_address, validate_ipv6_address,
+    validate_ipv46_address, validate_slug,
 )
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
@@ -120,12 +120,23 @@ TEST_DATA = [
     (validate_ipv46_address, '12345::', ValidationError),
 
     (validate_comma_separated_integer_list, '1', None),
+    (validate_comma_separated_integer_list, '12', None),
+    (validate_comma_separated_integer_list, '1,2', None),
     (validate_comma_separated_integer_list, '1,2,3', None),
-    (validate_comma_separated_integer_list, '1,2,3,', None),
+    (validate_comma_separated_integer_list, '10,32', None),
 
     (validate_comma_separated_integer_list, '', ValidationError),
+    (validate_comma_separated_integer_list, 'a', ValidationError),
     (validate_comma_separated_integer_list, 'a,b,c', ValidationError),
     (validate_comma_separated_integer_list, '1, 2, 3', ValidationError),
+    (validate_comma_separated_integer_list, ',', ValidationError),
+    (validate_comma_separated_integer_list, '1,2,3,', ValidationError),
+    (validate_comma_separated_integer_list, '1,2,', ValidationError),
+    (validate_comma_separated_integer_list, ',1', ValidationError),
+    (validate_comma_separated_integer_list, '1,,2', ValidationError),
+
+    (int_list_validator(sep='.'), '1.2.3', None),
+    (int_list_validator(sep='.'), '1,2,3', ValidationError),
 
     (MaxValueValidator(10), 10, None),
     (MaxValueValidator(10), -10, None),
