@@ -186,27 +186,26 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return connection
 
     def init_connection_state(self):
-        settings_dict = self.settings_dict
         self.connection.set_client_encoding('UTF8')
-        tz = 'UTC' if settings.USE_TZ else settings_dict.get('TIME_ZONE')
-        if tz:
-            try:
-                get_parameter_status = self.connection.get_parameter_status
-            except AttributeError:
-                # psycopg2 < 2.0.12 doesn't have get_parameter_status
-                conn_tz = None
-            else:
-                conn_tz = get_parameter_status('TimeZone')
 
-            if conn_tz != tz:
-                cursor = self.connection.cursor()
-                try:
-                    cursor.execute(self.ops.set_time_zone_sql(), [tz])
-                finally:
-                    cursor.close()
-                # Commit after setting the time zone (see #17062)
-                if not self.get_autocommit():
-                    self.connection.commit()
+        tz = self.settings_dict['TIME_ZONE']
+        try:
+            get_parameter_status = self.connection.get_parameter_status
+        except AttributeError:
+            # psycopg2 < 2.0.12 doesn't have get_parameter_status
+            conn_tz = None
+        else:
+            conn_tz = get_parameter_status('TimeZone')
+
+        if conn_tz != tz:
+            cursor = self.connection.cursor()
+            try:
+                cursor.execute(self.ops.set_time_zone_sql(), [tz])
+            finally:
+                cursor.close()
+            # Commit after setting the time zone (see #17062)
+            if not self.get_autocommit():
+                self.connection.commit()
 
     def create_cursor(self):
         cursor = self.connection.cursor()
