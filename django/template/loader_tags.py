@@ -1,7 +1,8 @@
 from collections import defaultdict
 
 from django.template.base import (
-    Library, Node, TemplateSyntaxError, TextNode, Variable, token_kwargs,
+    Library, Node, Template, TemplateSyntaxError, TextNode, Variable,
+    token_kwargs,
 )
 from django.utils import six
 from django.utils.safestring import mark_safe
@@ -100,8 +101,12 @@ class ExtendsNode(Node):
                 error_msg += " Got this from the '%s' variable." %\
                     self.parent_name.token
             raise TemplateSyntaxError(error_msg)
-        if hasattr(parent, 'render'):
-            return parent  # parent is a Template object
+        if isinstance(parent, Template):
+            # parent is a django.template.Template
+            return parent
+        if isinstance(getattr(parent, 'template', None), Template):
+            # parent is a django.template.backends.django.Template
+            return parent.template
         return context.engine.get_template(parent)
 
     def render(self, context):
