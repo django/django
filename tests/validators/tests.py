@@ -14,8 +14,7 @@ from django.core.validators import (
     MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
     validate_comma_separated_integer_list, validate_email, validate_integer,
     validate_ipv4_address, validate_ipv6_address, validate_ipv46_address,
-    validate_slug,
-    int_list_validator)
+    validate_slug, int_list_validator)
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
 from django.utils._os import upath
