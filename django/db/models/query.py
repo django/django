@@ -57,7 +57,7 @@ class ModelIterator(BaseIterator):
         model_cls = klass_info['model']
         select_fields = klass_info['select_fields']
         model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
-        init_list = [f[0].output_field.attname
+        init_list = [f[0].target.attname
                      for f in select[model_fields_start:model_fields_end]]
         if len(init_list) != len(model_cls._meta.concrete_fields):
             init_set = set(init_list)
@@ -1618,7 +1618,7 @@ class RelatedPopulator(object):
             self.cols_start = select_fields[0]
             self.cols_end = select_fields[-1] + 1
             self.init_list = [
-                f[0].output_field.attname for f in select[self.cols_start:self.cols_end]
+                f[0].target.attname for f in select[self.cols_start:self.cols_end]
             ]
             self.reorder_for_init = None
         else:
@@ -1627,7 +1627,7 @@ class RelatedPopulator(object):
             ]
             reorder_map = []
             for idx in select_fields:
-                field = select[idx][0].output_field
+                field = select[idx][0].target
                 init_pos = model_init_attnames.index(field.attname)
                 reorder_map.append((init_pos, field.attname, idx))
             reorder_map.sort()
