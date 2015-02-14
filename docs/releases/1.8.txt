@@ -711,6 +711,28 @@ Now, an error will be raised to prevent data loss::
     ...
     ValueError: Cannot assign "<Author: John>": "Author" instance isn't saved in the database.
 
+Accessing foreign keys in ``ModelForm.save()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In older versions, you could access unsaved foreign key objects in
+``ModelForm.save()`` when adding new objects. For example, given ``Book`` with
+a ``ForeignKey`` to ``Author``::
+
+    class BookForm(forms.ModelForm):
+        def save(self, *args, **kwargs):
+            book = super(BookForm, self).save(*args, **kwargs)
+            book.title = "%s by %s" % (book.title, book.author.name)
+            return book
+
+Now if the related instance hasn't been saved (for example, when adding an
+author and some inlined books in the admin), accessing the foreign key
+``book.author`` in the example) will raise ``RelatedObjectDoesNotExist``. This
+change was necessary to avoid assigning unsaved objects to relations (as
+described in the previous section).
+
+To adapt the example above, you could replace ``book.author.name`` with
+``self.cleaned_data['author'].name``.
+
 Management commands that only accept positional arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
