@@ -10,7 +10,7 @@ from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import (
     Context, RequestContext, Template, TemplateSyntaxError,
-    base as template_base, loader,
+    base as template_base, engines, loader,
 )
 from django.template.engine import Engine
 from django.template.loaders import app_directories, filesystem
@@ -413,6 +413,16 @@ class TemplateRegressionTests(SimpleTestCase):
         c1 = Context({"objs": Group.objects.all()})
         t1 = Template('{% debug %}')
         self.assertIn("清風", t1.render(c1))
+
+    def test_extends_generic_template(self):
+        """
+        {% extends %} accepts django.template.backends.django.Template (#24338).
+        """
+        parent = engines['django'].from_string(
+            '{% block content %}parent{% endblock %}')
+        child = engines['django'].from_string(
+            '{% extends parent %}{% block content %}child{% endblock %}')
+        self.assertEqual(child.render({'parent': parent}), 'child')
 
 
 class TemplateTagLoading(SimpleTestCase):
