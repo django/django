@@ -482,7 +482,8 @@ the geometry.
 .. attribute:: GEOSGeometry.envelope
 
 Returns a :class:`Polygon` that represents the bounding envelope of
-this geometry.
+this geometry. Note that it can also return a :class:`Point` if the input
+geometry is a point.
 
 .. attribute:: GEOSGeometry.point_on_surface
 
