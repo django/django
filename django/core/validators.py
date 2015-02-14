@@ -254,11 +254,14 @@ def ip_address_validators(protocol, unpack_ipv4):
         raise ValueError("The protocol '%s' is unknown. Supported: %s"
                          % (protocol, list(ip_address_validator_map)))
 
-comma_separated_int_list_re = re.compile('^[\d,]+$')
-validate_comma_separated_integer_list = RegexValidator(
-    comma_separated_int_list_re,
-    _('Enter only digits separated by commas.'),
-    'invalid'
+
+def int_list_validator(sep=',', message=None, code='invalid'):
+    regexp = re.compile('^\d+(?:%s\d+)*$' % re.escape(sep))
+    return RegexValidator(regexp, message=message, code=code)
+
+
+validate_comma_separated_integer_list = int_list_validator(
+    message=_('Enter only digits separated by commas.'),
 )
 
 
