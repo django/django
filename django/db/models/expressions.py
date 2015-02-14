@@ -585,10 +585,10 @@ class Random(ExpressionNode):
 
 
 class Col(ExpressionNode):
-    def __init__(self, alias, target, source=None):
-        if source is None:
-            source = target
-        super(Col, self).__init__(output_field=source)
+    def __init__(self, alias, target, output_field=None):
+        if output_field is None:
+            output_field = target
+        super(Col, self).__init__(output_field=output_field)
         self.alias, self.target = alias, target
 
     def __repr__(self):
@@ -606,7 +606,10 @@ class Col(ExpressionNode):
         return [self]
 
     def get_db_converters(self, connection):
-        return self.output_field.get_db_converters(connection)
+        if self.target == self.output_field:
+            return self.output_field.get_db_converters(connection)
+        return (self.output_field.get_db_converters(connection) +
+                self.target.get_db_converters(connection))
 
 
 class Ref(ExpressionNode):

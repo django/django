@@ -5,7 +5,9 @@ from django.core import exceptions, serializers
 from django.db import models
 from django.test import TestCase
 
-from .models import NullableUUIDModel, PrimaryKeyUUIDModel, UUIDModel
+from .models import (
+    NullableUUIDModel, PrimaryKeyUUIDModel, RelatedToUUIDModel, UUIDModel,
+)
 
 
 class TestSaveLoad(TestCase):
@@ -121,3 +123,9 @@ class TestAsPrimaryKey(TestCase):
         self.assertTrue(u1_found)
         self.assertTrue(u2_found)
         self.assertEqual(PrimaryKeyUUIDModel.objects.count(), 2)
+
+    def test_underlying_field(self):
+        pk_model = PrimaryKeyUUIDModel.objects.create()
+        RelatedToUUIDModel.objects.create(uuid_fk=pk_model)
+        related = RelatedToUUIDModel.objects.get()
+        self.assertEqual(related.uuid_fk.pk, related.uuid_fk_id)
