@@ -516,6 +516,7 @@ class DurationField(Field):
     def prepare_value(self, value):
         if isinstance(value, datetime.timedelta):
             return duration_string(value)
+        return value
 
     def to_python(self, value):
         if value in self.empty_values:
