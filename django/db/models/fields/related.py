@@ -11,11 +11,11 @@ from django.db import connection, connections, router, transaction
 from django.db.backends import utils
 from django.db.models import Q, signals
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
+from django.db.models.expressions import Col
 from django.db.models.fields import (
     BLANK_CHOICE_DASH, AutoField, Field, IntegerField, PositiveIntegerField,
     PositiveSmallIntegerField,
 )
-from django.db.models.expressions import Col
 from django.db.models.lookups import IsNull
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo
