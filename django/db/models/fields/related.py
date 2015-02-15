@@ -2061,7 +2061,7 @@ class ForeignKey(ForeignObject):
 
     def _convert_backend_converter(self, converter):
         def new_converter(value, connection, context):
-            return converter(value, self, context)
+            return converter(value, Col(self.attname, self.related_field), context)
         return new_converter
 
 
