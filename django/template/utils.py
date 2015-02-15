@@ -1,12 +1,12 @@
 import os
-import sys
 import warnings
 from collections import Counter, OrderedDict
 
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache, six
+from django.utils import lru_cache
+from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
@@ -116,16 +116,12 @@ def get_app_template_dirs(dirname):
     dirname is the name of the subdirectory containing templates inside
     installed applications.
     """
-    if six.PY2:
-        fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
     template_dirs = []
     for app_config in apps.get_app_configs():
         if not app_config.path:
             continue
         template_dir = os.path.join(app_config.path, dirname)
         if os.path.isdir(template_dir):
-            if six.PY2:
-                template_dir = template_dir.decode(fs_encoding)
-            template_dirs.append(template_dir)
+            template_dirs.append(upath(template_dir))
     # Immutable return value because it will be cached and shared by callers.
     return tuple(template_dirs)
