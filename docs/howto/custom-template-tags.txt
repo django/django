@@ -756,10 +756,9 @@ Notes:
 * The ``render()`` method is where the work actually happens.
 
 * ``render()`` should generally fail silently, particularly in a production
-  environment where :setting:`DEBUG` and :setting:`TEMPLATE_DEBUG` are
-  ``False``. In some cases however, particularly if :setting:`TEMPLATE_DEBUG` is
-  ``True``, this method may raise an exception to make debugging easier. For
-  example, several core tags raise ``django.template.TemplateSyntaxError``
+  environment. In some cases however, particularly if ``context.engine.debug``
+  is ``True``, this method may raise an exception to make debugging easier.
+  For example, several core tags raise ``django.template.TemplateSyntaxError``
   if they receive the wrong number or type of arguments.
 
 Ultimately, this decoupling of compilation and rendering results in an

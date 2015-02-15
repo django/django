@@ -42,6 +42,7 @@ class EngineHandler(object):
                     'OPTIONS': {
                         'allowed_include_roots': settings.ALLOWED_INCLUDE_ROOTS,
                         'context_processors': settings.TEMPLATE_CONTEXT_PROCESSORS,
+                        'debug': settings.TEMPLATE_DEBUG,
                         'loaders': settings.TEMPLATE_LOADERS,
                         'string_if_invalid': settings.TEMPLATE_STRING_IF_INVALID,
                     },

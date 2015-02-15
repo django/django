@@ -356,9 +356,7 @@ applications. This generic name was kept for backwards-compatibility.
   exception raised during template rendering. This report contains the
   relevant snippet of the template with the appropriate line highlighted.
 
-  It defaults to the value of the :setting:`TEMPLATE_DEBUG` setting. The
-  setting is convenient for toggling template debug mode globally rather than
-  on a per-engine basis.
+  It defaults to the value of the :setting:`DEBUG` setting.
 
 * ``'loaders'``: a list of dotted Python paths to template loader classes.
   Each ``Loader`` class knows how to import templates from a particular

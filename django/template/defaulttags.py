@@ -209,8 +209,8 @@ class ForNode(Node):
                         context.update(unpacked_vars)
                 else:
                     context[self.loopvars[0]] = item
-                # In TEMPLATE_DEBUG mode provide source of the node which
-                # actually raised the exception
+                # In debug mode provide the source of the node which raised
+                # the exception
                 if context.engine.debug:
                     for node in self.nodelist_loop:
                         try:
