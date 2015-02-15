@@ -15,6 +15,7 @@ from django.apps import apps
 from django.db import migrations, models
 from django.db.migrations.loader import MigrationLoader
 from django.utils import datetime_safe, six
+from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 from django.utils.timezone import utc
@@ -215,7 +216,7 @@ class MigrationWriter(object):
             if not hasattr(migrations_module, '__file__'):
                 raise ImportError
 
-            basedir = os.path.dirname(migrations_module.__file__)
+            basedir = os.path.dirname(upath(migrations_module.__file__))
         except ImportError:
             app_config = apps.get_app_config(self.migration.app_label)
             migrations_package_basename = migrations_package_name.split(".")[-1]
