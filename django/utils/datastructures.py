@@ -25,6 +25,10 @@ class OrderedSet(object):
         except KeyError:
             pass
 
+    def update(self, items):
+        for item in items:
+            self.add(item)
+
     def __iter__(self):
         return iter(self.dict.keys())
 

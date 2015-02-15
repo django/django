@@ -761,10 +761,10 @@ class Options(object):
         except KeyError:
             pass
 
-        # Using an OrderedDict preserves the order of insertion. This is
+        # Using an OrderedSet preserves the order of insertion. This is
         # important when displaying a ModelForm or the contrib.admin panel
-        # and no specific ordering is provided.
-        fields = OrderedDict()
+        # when no specific ordering is provided.
+        fields = OrderedSet()
         options = {
             'include_parents': include_parents,
             'include_hidden': include_hidden,
@@ -778,17 +778,17 @@ class Options(object):
                 # Recursively call _get_fields() on each parent, with the same
                 # options provided in this call.
                 for parent in self.parents:
-                    for obj, _ in six.iteritems(parent._meta._get_fields(forward=False, **options)):
+                    for obj in parent._meta._get_fields(forward=False, **options):
                         if obj.many_to_many:
                             # In order for a reverse ManyToManyRel object to be
                             # valid, its creation counter must be > 0 and must
                             # be in the parent list.
                             if not (obj.field.creation_counter < 0 and obj.related_model not in parent_list):
-                                fields[obj] = True
+                                fields.add(obj)
 
                         elif not ((obj.field.creation_counter < 0 or obj.field.rel.parent_link)
                                   and obj.related_model not in parent_list):
-                            fields[obj] = True
+                            fields.add(obj)
 
             # Tree is computed once and cached until the app cache is expired.
             # It is composed of a list of fields pointing to the current model
@@ -804,28 +804,21 @@ class Options(object):
                 # If hidden fields should be included or the relation is not
                 # intentionally hidden, add to the fields dict.
                 if include_hidden or not field.hidden:
-                    fields[field] = True
+                    fields.add(field)
         if forward:
             if include_parents:
                 for parent in self.parents:
                     # Add the forward fields of each parent.
                     fields.update(parent._meta._get_fields(reverse=False, **options))
             fields.update(
-                (field, True,)
-                for field in chain(self.local_fields, self.local_many_to_many)
+                field for field in chain(self.local_fields, self.local_many_to_many)
             )
 
         if not export_ordered_set:
-            # By default, fields contains field instances as keys and all
-            # possible names if the field instance as values. When
-            # _get_fields() is called, we only want to return field instances,
-            # so we just preserve the keys.
-            fields = list(fields.keys())
-
             # Virtual fields are not inheritable, therefore they are inserted
             # only when the recursive _get_fields() call comes to an end.
             if forward:
-                fields.extend(self.virtual_fields)
+                fields.update(self.virtual_fields)
             fields = make_immutable_fields_list("get_fields()", fields)
 
         # Store result into cache for later access
