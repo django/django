@@ -35,7 +35,7 @@ SOME_INSTALLED_APPS_NAMES = [
     'django.contrib.auth',
 ] + SOME_INSTALLED_APPS[2:]
 
-HERE = os.path.dirname(__file__)
+HERE = os.path.dirname(upath(__file__))
 
 
 class AppsTests(TestCase):

@@ -18,6 +18,7 @@ from django.test import (
 from django.test.runner import DiscoverRunner, dependency_ordered
 from django.test.testcases import connections_support_transactions
 from django.utils import six
+from django.utils.encoding import force_text
 
 from .models import Person
 
@@ -372,7 +373,7 @@ class DeprecationDisplayTest(AdminScriptTestCase):
     def test_runner_deprecation_verbosity_default(self):
         args = ['test', '--settings=test_project.settings', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
-        self.assertIn("Ran 1 test", err)
+        self.assertIn("Ran 1 test", force_text(err))
         six.assertRegex(self, err, r"RemovedInDjango\d\dWarning: warning from test")
         six.assertRegex(self, err, r"RemovedInDjango\d\dWarning: module-level warning from deprecation_app")
 

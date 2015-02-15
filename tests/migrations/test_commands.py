@@ -563,7 +563,7 @@ class MakeMigrationsTests(MigrationTestBase):
             self.fail("Makemigrations failed while running interactive questioner")
         finally:
             questioner.input = old_input
-        self.assertIn("Created new merge migration", out.getvalue())
+        self.assertIn("Created new merge migration", force_text(out.getvalue()))
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_makemigrations_handle_merge(self):
@@ -572,14 +572,15 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         out = six.StringIO()
         call_command("makemigrations", "migrations", merge=True, interactive=False, stdout=out)
-        self.assertIn("Merging migrations", out.getvalue())
-        self.assertIn("Branch 0002_second", out.getvalue())
-        self.assertIn("Branch 0002_conflicting_second", out.getvalue())
+        output = force_text(out.getvalue())
+        self.assertIn("Merging migrations", output)
+        self.assertIn("Branch 0002_second", output)
+        self.assertIn("Branch 0002_conflicting_second", output)
         merge_file = os.path.join(self.test_dir, 'test_migrations_conflict', '0003_merge.py')
         self.assertTrue(os.path.exists(merge_file))
         os.remove(merge_file)
         self.assertFalse(os.path.exists(merge_file))
-        self.assertIn("Created new merge migration", out.getvalue())
+        self.assertIn("Created new merge migration", output)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_default"})
     def test_makemigrations_dry_run(self):
@@ -797,7 +798,7 @@ class SquashMigrationsTest(MigrationTestBase):
         """
         out = six.StringIO()
         call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=1, stdout=out)
-        self.assertIn("Optimized from 7 operations to 5 operations.", out.getvalue())
+        self.assertIn("Optimized from 7 operations to 5 operations.", force_text(out.getvalue()))
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_ticket_23799_squashmigrations_no_optimize(self):
@@ -807,4 +808,4 @@ class SquashMigrationsTest(MigrationTestBase):
         out = six.StringIO()
         call_command("squashmigrations", "migrations", "0002",
                      interactive=False, verbosity=1, no_optimize=True, stdout=out)
-        self.assertIn("Skipping optimization", out.getvalue())
+        self.assertIn("Skipping optimization", force_text(out.getvalue()))
