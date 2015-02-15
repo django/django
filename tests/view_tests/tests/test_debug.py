@@ -44,8 +44,7 @@ class CallableSettingWrapperTests(TestCase):
         self.assertEqual(actual, "repr from the wrapped callable")
 
 
-@override_settings(DEBUG=True, TEMPLATE_DEBUG=True,
-                   ROOT_URLCONF="view_tests.urls")
+@override_settings(DEBUG=True, ROOT_URLCONF="view_tests.urls")
 class DebugViewTests(TestCase):
 
     def test_files(self):

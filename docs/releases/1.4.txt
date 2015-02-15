@@ -437,7 +437,7 @@ For example:
 No wrapping of exceptions in ``TEMPLATE_DEBUG`` mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In previous versions of Django, whenever the :setting:`TEMPLATE_DEBUG` setting
+In previous versions of Django, whenever the ``TEMPLATE_DEBUG`` setting
 was ``True``, any exception raised during template rendering (even exceptions
 unrelated to template syntax) were wrapped in ``TemplateSyntaxError`` and
 re-raised. This was done in order to provide detailed template source location
@@ -446,7 +446,7 @@ information in the debug 500 page.
 In Django 1.4, exceptions are no longer wrapped. Instead, the original
 exception is annotated with the source information. This means that catching
 exceptions from template rendering is now consistent regardless of the value of
-:setting:`TEMPLATE_DEBUG`, and there's no need to catch and unwrap
+``TEMPLATE_DEBUG``, and there's no need to catch and unwrap
 ``TemplateSyntaxError`` in order to catch other errors.
 
 ``truncatechars`` template filter

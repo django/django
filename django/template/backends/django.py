@@ -18,7 +18,7 @@ class DjangoTemplates(BaseEngine):
     def __init__(self, params):
         params = params.copy()
         options = params.pop('OPTIONS').copy()
-        options.setdefault('debug', settings.TEMPLATE_DEBUG)
+        options.setdefault('debug', settings.DEBUG)
         options.setdefault('file_charset', settings.FILE_CHARSET)
         super(DjangoTemplates, self).__init__(params)
         self.engine = Engine(self.dirs, self.app_dirs, **options)

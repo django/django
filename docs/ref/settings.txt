@@ -2250,6 +2250,11 @@ TEMPLATE_DEBUG
 
 Default: ``False``
 
+.. deprecated:: 1.8
+
+    Set the ``'debug'`` option in the :setting:`OPTIONS <TEMPLATES-OPTIONS>`
+    of a ``DjangoTemplates`` backend instead.
+
 A boolean that turns on/off template debug mode. If this is ``True``, the fancy
 error page will display a detailed report for any exception raised during
 template rendering. This report contains the relevant snippet of the template,

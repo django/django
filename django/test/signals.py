@@ -93,6 +93,7 @@ def reset_template_engines(**kwargs):
         'TEMPLATE_DEBUG',
         'TEMPLATE_LOADERS',
         'TEMPLATE_STRING_IF_INVALID',
+        'DEBUG',
         'FILE_CHARSET',
         'INSTALLED_APPS',
     }:

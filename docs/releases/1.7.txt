@@ -845,7 +845,7 @@ Templates
 * It is now possible to :ttag:`include` templates recursively.
 
 * Template objects now have an origin attribute set when
-  :setting:`TEMPLATE_DEBUG` is ``True``. This allows template origins to be
+  ``TEMPLATE_DEBUG`` is ``True``. This allows template origins to be
   inspected and logged outside of the ``django.template`` infrastructure.
 
 * ``TypeError`` exceptions are no longer silenced when raised during the
