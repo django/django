@@ -13,8 +13,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import (BaseCommand, CommandError,
     CommandParser, handle_default_options)
 from django.core.management.color import color_style
-from django.utils import lru_cache
-from django.utils import six
+from django.utils import lru_cache, six
+from django.utils._os import npath, upath
 
 
 def find_commands(management_dir):
@@ -27,7 +27,7 @@ def find_commands(management_dir):
     command_dir = os.path.join(management_dir, 'commands')
     # Workaround for a Python 3.2 bug with pkgutil.iter_modules
     sys.path_importer_cache.pop(command_dir, None)
-    return [name for _, name, is_pkg in pkgutil.iter_modules([command_dir])
+    return [name for _, name, is_pkg in pkgutil.iter_modules([npath(command_dir)])
             if not is_pkg and not name.startswith('_')]
 
 
@@ -64,7 +64,7 @@ def get_commands():
     The dictionary is cached on the first call and reused on subsequent
     calls.
     """
-    commands = {name: 'django.core' for name in find_commands(__path__[0])}
+    commands = {name: 'django.core' for name in find_commands(upath(__path__[0]))}
 
     if not settings.configured:
         return commands
