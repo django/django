@@ -299,7 +299,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.cursor().execute("BEGIN")
 
     def is_in_memory_db(self, name):
-        return name == ":memory:" or "mode=memory" in name
+        return name == ":memory:" or "mode=memory" in force_text(name)
 
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
