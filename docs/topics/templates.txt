@@ -404,6 +404,45 @@ adds defaults that differ from Jinja2's for a few options:
 * ``'auto_reload'``: ``settings.DEBUG``
 * ``'undefined'``: ``DebugUndefined if settings.DEBUG else Undefined``
 
+The default configuration is purposefully kept to a minimum. The ``Jinja2``
+backend doesn't create a Django-flavored environment. It doesn't know about
+Django context processors, filters, and tags. In order to use Django-specific
+APIs, you must configure them into the environment.
+
+For example, you can create ``myproject/jinja2.py`` with this content::
+
+    from django.contrib.staticfiles.storage import staticfiles_storage
+    from django.core.urlresolvers import reverse
+
+    from jinja2 import Environment
+
+
+    def environment(**options):
+        env = Environment(**options)
+        env.globals.update({
+            'static': staticfiles_storage.url,
+            'url': reverse,
+        })
+        return env
+
+and set the ``'environment'`` option to ``'myproject.jinja2.environment'``.
+
+Then you could use the following constructs in Jinja2 templates:
+
+.. code-block:: html+jinja
+
+    <img src="{{ static('path/to/company-logo.png') }}" alt="Company Logo">
+
+    <a href="{{ url('admin:index') }}">Administration</a>
+
+The concepts of tags and filters exist both in the Django template language
+and in Jinja2 but they're used differently. Since Jinja2 supports passing
+arguments to callables in templates, many features that require a template tag
+or filter in Django templates can be achieved simply by calling a function in
+Jinja2 templates, as shown in the example above. Jinja2's global namespace
+removes the need for template context processors. The Django template language
+doesn't have an equivalent of Jinja2 tests.
+
 Custom backends
 ---------------
 
