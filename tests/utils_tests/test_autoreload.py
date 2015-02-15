@@ -5,7 +5,7 @@ from importlib import import_module
 from django import conf
 from django.contrib import admin
 from django.test import TestCase, override_settings
-from django.utils._os import upath
+from django.utils._os import npath, upath
 from django.utils.autoreload import gen_filenames
 
 LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')
@@ -58,9 +58,10 @@ class TestFilenameGenerator(TestCase):
         Test that gen_filenames also yields from locale dirs in installed apps.
         """
         filenames = list(gen_filenames())
-        self.assertIn(os.path.join(os.path.dirname(admin.__file__), 'locale',
-                                   'nl', 'LC_MESSAGES', 'django.mo'),
-                      filenames)
+        self.assertIn(
+            os.path.join(os.path.dirname(upath(admin.__file__)), 'locale', 'nl', 'LC_MESSAGES', 'django.mo'),
+            filenames
+        )
 
     @override_settings(USE_I18N=False)
     def test_no_i18n(self):
@@ -70,9 +71,9 @@ class TestFilenameGenerator(TestCase):
         """
         filenames = list(gen_filenames())
         self.assertNotIn(
-            os.path.join(os.path.dirname(conf.__file__), 'locale', 'nl',
-                         'LC_MESSAGES', 'django.mo'),
-            filenames)
+            os.path.join(os.path.dirname(upath(conf.__file__)), 'locale', 'nl', 'LC_MESSAGES', 'django.mo'),
+            filenames
+        )
 
     def test_only_new_files(self):
         """
@@ -91,7 +92,7 @@ class TestFilenameGenerator(TestCase):
         try:
             _, filename = os.path.split(filepath)
             import_module('.%s' % filename.replace('.py', ''), package='utils_tests')
-            self.assertIn(filepath, gen_filenames())
+            self.assertIn(npath(filepath), gen_filenames())
         finally:
             os.close(fd)
             os.remove(filepath)
