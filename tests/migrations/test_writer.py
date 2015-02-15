@@ -19,6 +19,7 @@ from django.db.migrations.writer import (
 )
 from django.test import SimpleTestCase, TestCase, ignore_warnings
 from django.utils import datetime_safe, six
+from django.utils._os import upath
 from django.utils.deconstruct import deconstructible
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import ugettext_lazy as _
@@ -401,7 +402,7 @@ class WriterTests(TestCase):
             'migrations.migrations_test_apps.without_init_file',
         ]
 
-        base_dir = os.path.dirname(os.path.dirname(__file__))
+        base_dir = os.path.dirname(os.path.dirname(upath(__file__)))
 
         for app in test_apps:
             with self.modify_settings(INSTALLED_APPS={'append': app}):
