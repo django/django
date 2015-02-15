@@ -699,6 +699,20 @@ next run of :djadmin:`makemigrations` on Python 3 will likely generate many
 changes as it converts all the bytestring attributes to text strings; this is
 normal and should only happen once.
 
+Supporting multiple Django versions
+-----------------------------------
+
+If you are the maintainer of a third-party app with models, you may need to
+ship migrations that support multiple Django versions. In this case, you should
+always run :djadmin:`makemigrations` **with the lowest Django version you wish
+to support**.
+
+The migrations system will maintain backwards-compatibility according to the
+same policy as the rest of Django, so migration files generated on Django X.Y
+should run unchanged on Django X.Y+1. The migrations system does not promise
+forwards-compatibility, however. New features may be added, and migration files
+generated with newer versions of Django may not work on older versions.
+
 .. _upgrading-from-south:
 
 Upgrading from South
