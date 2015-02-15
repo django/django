@@ -936,7 +936,7 @@ Template origin
 When an :class:`~django.template.Engine` is initialized with ``debug=True``,
 its templates have an ``origin`` attribute depending on the source they are
 loaded from. For engines initialized by Django, ``debug`` defaults to the
-value of :setting:`TEMPLATE_DEBUG`.
+value of :setting:`DEBUG`.
 
 .. class:: loader.LoaderOrigin
 

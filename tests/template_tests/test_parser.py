@@ -89,7 +89,7 @@ class ParserTests(TestCase):
         with six.assertRaisesRegex(self, TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):
             Variable({})
 
-    @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
+    @override_settings(DEBUG=True)
     def test_compile_filter_error(self):
         # regression test for #19819
         msg = "Could not parse the remainder: '@bar' from 'foo@bar'"
