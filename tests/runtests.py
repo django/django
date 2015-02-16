@@ -84,7 +84,7 @@ def get_test_modules():
                     os.path.isfile(f) or
                     not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
                 continue
-            if not connection.vendor == 'postgresql' and f == 'postgres_tests' or f == 'postgres':
+            if connection.vendor != 'postgresql' and f == 'postgres_tests':
                 continue
             modules.append((modpath, f))
     return modules
@@ -229,6 +229,11 @@ def teardown(state):
 def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels, debug_sql):
     state = setup(verbosity, test_labels)
     extra_tests = []
+
+    if test_labels and 'postgres_tests' in test_labels and connection.vendor != 'postgres':
+        if verbosity >= 2:
+            print("Removed postgres_tests from tests as we're not running with PostgreSQL.")
+        test_labels.remove('postgres_tests')
 
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
