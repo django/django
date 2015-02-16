@@ -420,6 +420,14 @@ All of the range fields translate to :ref:`psycopg2 Range objects
 information is necessary. The default is lower bound included, upper bound
 excluded.
 
+.. note::
+    The :class:`~psycopg2:psycopg2.extras.Range` was added to
+    psycopg2__ in version 2.5. These fields are unavailable for import if
+    using an earlier version of the package.
+
+__ http://initd.org/psycopg/
+
+
 IntegerRangeField
 ^^^^^^^^^^^^^^^^^
 

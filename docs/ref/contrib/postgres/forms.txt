@@ -164,6 +164,14 @@ omitted value as an unbounded range. They also validate that the lower bound is
 not greater than the upper bound. All of these fields use
 :class:`~django.contrib.postgres.forms.RangeWidget`.
 
+.. note::
+    The :class:`~psycopg2:psycopg2.extras.Range` was added to
+    psycopg2__ in version 2.5. The following fields are unavailable for import if
+    using an earlier version of the package.
+
+__ http://initd.org/psycopg/
+
+
 IntegerRangeField
 ~~~~~~~~~~~~~~~~~
 
