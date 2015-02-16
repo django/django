@@ -9,9 +9,6 @@ from django.utils.timezone import template_localtime
 
 
 class DebugLexer(Lexer):
-    def __init__(self, template_string, origin):
-        super(DebugLexer, self).__init__(template_string, origin)
-
     def tokenize(self):
         "Return a list of tokens from a given template_string"
         result, upto = [], 0
