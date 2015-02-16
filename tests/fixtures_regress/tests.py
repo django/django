@@ -5,8 +5,10 @@ from __future__ import unicode_literals
 import json
 import os
 import re
+import unittest
 import warnings
 
+import django
 from django.core import management, serializers
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import CommandError
@@ -32,6 +34,16 @@ from .models import (
 )
 
 _cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
+
+
+def is_ascii(s):
+    return all(ord(c) < 128 for c in s)
+
+
+skipIfNonASCIIPath = unittest.skipIf(
+    not is_ascii(django.__file__) and six.PY2,
+    'Python 2 crashes when checking non-ASCII exception messages.'
+)
 
 
 class TestFixtures(TestCase):
@@ -198,6 +210,7 @@ class TestFixtures(TestCase):
                 verbosity=0,
             )
 
+    @skipIfNonASCIIPath
     @override_settings(SERIALIZATION_MODULES={'unkn': 'unexistent.path'})
     def test_unimportable_serializer(self):
         """
@@ -514,6 +527,7 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
 
+    @skipIfNonASCIIPath
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures')])
     def test_fixture_dirs_with_default_fixture_path(self):
         """
