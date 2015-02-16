@@ -95,6 +95,11 @@ PostgreSQL notes
 Django supports PostgreSQL 9.0 and higher. It requires the use of Psycopg2
 2.0.9 or higher.
 
+If you're on Windows, check out the unofficial `compiled Windows version`_
+of psycopg2.
+
+.. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
+
 PostgreSQL connection settings
 -------------------------------
 
