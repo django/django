@@ -239,7 +239,8 @@ class ModelBase(type):
             else:
                 # .. and abstract ones.
                 for field in parent_fields:
-                    new_class.add_to_class(field.name, copy.deepcopy(field))
+                    new_field = copy.deepcopy(field)
+                    new_class.add_to_class(field.name, new_field)
 
                 # Pass any non-abstract parent classes onto child.
                 new_class._meta.parents.update(base._meta.parents)
