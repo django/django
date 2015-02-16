@@ -94,7 +94,7 @@ class DebugNode(Node):
         from pprint import pformat
         output = [force_text(pformat(val)) for val in context]
         output.append('\n\n')
-        output.append(pformat(sys.modules))
+        output.append(force_text(pformat(sys.modules)))
         return ''.join(output)
 
 
