@@ -447,6 +447,30 @@ Arguments sent with this signal:
     The database alias used for synchronization. Defaults to the ``default``
     database.
 
+``plan``
+    The migration plan that was used for the migration run. While the API for
+    the plan is not public API, this allows for the rare cases when it is
+    critical to know the plan. A plan is a list of two-tuples with the first
+    item being the instance of a migration class and the second item showing if
+    the migration was rolled back (``True``) or applied (``False``).
+
+``project_state``
+    The project state provides information about which models / database tables
+    are available in the database at this moment, including their fields, etc.
+    While the API for the project state is not public API, this allows for the
+    rare cases when it is critical to know the concrete database state. The
+    project state has an attribute ``models`` which provides an abstraction to
+    the database models, as well as an attribute ``apps`` which is an instance
+    of an :data:`AppRegistry <django.apps.apps>`.
+
+``loader``
+    The loader provides access to all migrations in all installed apps. While
+    the API for the migration loader is not public API, this allows for the
+    rare cases when it is critical to know if an exact migration is applied or
+    unapplied. The loader has the attributes ``disk_migrations`` is a dict of
+    ``(app_label, migration_name) --> migration instance``. The attribute
+    ``applied_migrations`` is a set of ``(app_label, migration_name)``.
+
 For example, you could register a callback in an
 :class:`~django.apps.AppConfig` like this::
 

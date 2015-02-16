@@ -35,7 +35,7 @@ def emit_pre_migrate_signal(verbosity, interactive, db):
             using=db)
 
 
-def emit_post_migrate_signal(verbosity, interactive, db):
+def emit_post_migrate_signal(verbosity, interactive, db, plan=None, project_state=None, loader=None):
     # Emit the post_migrate signal for every application.
     for app_config in apps.get_app_configs():
         if app_config.models_module is None:
@@ -47,4 +47,8 @@ def emit_post_migrate_signal(verbosity, interactive, db):
             app_config=app_config,
             verbosity=verbosity,
             interactive=interactive,
-            using=db)
+            using=db,
+            plan=plan,
+            project_state=project_state,
+            loader=loader,
+        )
