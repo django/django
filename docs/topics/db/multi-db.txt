@@ -293,11 +293,15 @@ send queries for the ``auth`` app to ``auth_db``::
                return True
             return None
 
-        def allow_migrate(self, db, model, **hints):
+        def allow_migrate(self, db, model=None, **hints):
             """
             Make sure the auth app only appears in the 'auth_db'
             database.
             """
+            if model is None:
+                # Handle RunPython or RunSQL
+                return db == 'auth_db'
+
             if db == 'auth_db':
                 return model._meta.app_label == 'auth'
             elif model._meta.app_label == 'auth':
