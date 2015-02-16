@@ -19,9 +19,14 @@ from django.utils.functional import cached_property
 @python_2_unicode_compatible
 class GenericForeignKey(object):
     """
-    Provides a generic relation to any object through content-type/object-id
-    fields.
+    Provide a generic many-to-one relation through the ``content_type`` and
+    ``object_id`` fields.
+
+    This class also doubles as an accessor to the related object (similar to
+    ReverseSingleRelatedObjectDescriptor) by adding itself as a model
+    attribute.
     """
+
     # Field flags
     auto_created = False
     concrete = False
@@ -96,9 +101,10 @@ class GenericForeignKey(object):
             return []
 
     def _check_content_type_field(self):
-        """ Check if field named `field_name` in model `model` exists and is
-        valid content_type field (is a ForeignKey to ContentType). """
-
+        """
+        Check if field named `field_name` in model `model` exists and is a
+        valid content_type field (is a ForeignKey to ContentType).
+        """
         try:
             field = self.model._meta.get_field(self.ct_field)
         except FieldDoesNotExist:
@@ -146,8 +152,8 @@ class GenericForeignKey(object):
 
     def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
         """
-        Handles initializing an object with the generic FK instead of
-        content-type/object-id fields.
+        Handle initializing an object with the generic FK instead of
+        content_type and object_id fields.
         """
         if self.name in kwargs:
             value = kwargs.pop(self.name)
@@ -256,6 +262,10 @@ class GenericForeignKey(object):
 
 
 class GenericRel(ForeignObjectRel):
+    """
+    Used by GenericRelation to store information about the relation.
+    """
+
     def __init__(self, field, to, related_name=None, related_query_name=None, limit_choices_to=None):
         super(GenericRel, self).__init__(
             field, to,
@@ -267,7 +277,10 @@ class GenericRel(ForeignObjectRel):
 
 
 class GenericRelation(ForeignObject):
-    """Provides an accessor to generic related objects (e.g. comments)"""
+    """
+    Provide a reverse to a relation created by a GenericForeignKey.
+    """
+
     # Field flags
     auto_created = False
 
@@ -310,9 +323,6 @@ class GenericRelation(ForeignObject):
     def _check_generic_foreign_key_existence(self):
         target = self.rel.to
         if isinstance(target, ModelBase):
-            # Using `vars` is very ugly approach, but there is no better one,
-            # because GenericForeignKeys are not considered as fields and,
-            # therefore, are not included in `target._meta.local_fields`.
             fields = target._meta.virtual_fields
             if any(isinstance(field, GenericForeignKey) and
                     field.ct_field == self.content_type_field_name and
@@ -358,9 +368,7 @@ class GenericRelation(ForeignObject):
     def contribute_to_class(self, cls, name, **kwargs):
         kwargs['virtual_only'] = True
         super(GenericRelation, self).contribute_to_class(cls, name, **kwargs)
-        # Save a reference to which model this class is on for future use
         self.model = cls
-        # Add the descriptor for the relation
         setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self.rel))
 
     def set_attributes_from_rel(self):
@@ -371,7 +379,7 @@ class GenericRelation(ForeignObject):
 
     def get_content_type(self):
         """
-        Returns the content type associated with this field's model.
+        Return the content type associated with this field's model.
         """
         return ContentType.objects.get_for_model(self.model,
                                                  for_concrete_model=self.for_concrete_model)
@@ -387,7 +395,6 @@ class GenericRelation(ForeignObject):
     def bulk_related_objects(self, objs, using=DEFAULT_DB_ALIAS):
         """
         Return all objects related to ``objs`` via this ``GenericRelation``.
-
         """
         return self.rel.to._base_manager.db_manager(using).filter(**{
             "%s__pk" % self.content_type_field_name: ContentType.objects.db_manager(using).get_for_model(
@@ -398,16 +405,16 @@ class GenericRelation(ForeignObject):
 
 class ReverseGenericRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
     """
-    This class provides the functionality that makes the related-object
-    managers available as attributes on a model class, for fields that have
-    multiple "remote" values and have a GenericRelation defined in their model
-    (rather than having another model pointed *at* them). In the example
-    "article.publications", the publications attribute is a
-    ReverseGenericRelatedObjectsDescriptor instance.
+    Accessor to the related objects manager on the one-to-many relation created
+    by GenericRelation.
+
+    In the example::
+
+        class Post(Model):
+            comments = GenericRelation(Comment)
+
+    ``post.comments`` is a ReverseGenericRelatedObjectsDescriptor instance.
     """
-
-
-
 
     @cached_property
     def related_manager_cls(self):
@@ -419,8 +426,9 @@ class ReverseGenericRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
 
 def create_generic_related_manager(superclass, rel):
     """
-    Factory function for a manager that subclasses 'superclass' (which is a
-    Manager) and adds behavior for generic related objects.
+    Factory function to create a manager that subclasses another manager
+    (generally the default manager of a given model) and adds behaviors
+    specific to generic relations.
     """
 
     class GenericRelatedObjectManager(superclass):
