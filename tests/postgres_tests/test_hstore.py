@@ -1,17 +1,14 @@
 import json
-import unittest
 
 from django.contrib.postgres import forms
 from django.contrib.postgres.fields import HStoreField
 from django.contrib.postgres.validators import KeysValidator
 from django.core import exceptions, serializers
-from django.db import connection
 from django.test import TestCase
 
 from .models import HStoreModel
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class SimpleTests(TestCase):
     apps = ['django.contrib.postgres']
 
@@ -36,7 +33,6 @@ class SimpleTests(TestCase):
         self.assertEqual(reloaded.field, value)
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class TestQuerying(TestCase):
 
     def setUp(self):
@@ -115,7 +111,6 @@ class TestQuerying(TestCase):
         )
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class TestSerialization(TestCase):
     test_data = '[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, "model": "postgres_tests.hstoremodel", "pk": null}]'
 

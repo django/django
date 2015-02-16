@@ -18,7 +18,6 @@ from .models import (
 )
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class TestSaveLoad(TestCase):
 
     def test_integer(self):
@@ -94,7 +93,6 @@ class TestSaveLoad(TestCase):
         self.assertEqual(instance.decimals, loaded.decimals)
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class TestQuerying(TestCase):
 
     def setUp(self):
@@ -274,7 +272,6 @@ class TestMigrations(TransactionTestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, 'postgres_tests.models.ArrayFieldSubclass')
 
-    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
     @override_settings(MIGRATION_MODULES={
         "postgres_tests": "postgres_tests.array_default_migrations",
     })
@@ -291,7 +288,6 @@ class TestMigrations(TransactionTestCase):
             self.assertNotIn(table_name, connection.introspection.table_names(cursor))
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class TestSerialization(TestCase):
     test_data = '[{"fields": {"field": "[\\"1\\", \\"2\\"]"}, "model": "postgres_tests.integerarraymodel", "pk": null}]'
 

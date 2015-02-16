@@ -18,8 +18,6 @@ from .models import RangesModel
 
 
 def skipUnlessPG92(test):
-    if not connection.vendor == 'postgresql':
-        return unittest.skip('PostgreSQL required')(test)
     PG_VERSION = connection.pg_version
     if PG_VERSION < 90200:
         return unittest.skip('PostgreSQL >= 9.2 required')(test)
