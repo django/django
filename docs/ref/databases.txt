@@ -92,8 +92,10 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 9.0 and higher. It requires the use of Psycopg2
-2.0.9 or higher.
+Django supports PostgreSQL 9.0 and higher. It requires the use of `psycopg2`_
+2.4.5 or higher (or 2.5+ if you want to use :mod:`django.contrib.postgres`).
+
+.. _psycopg2: http://initd.org/psycopg/
 
 If you're on Windows, check out the unofficial `compiled Windows version`_
 of psycopg2.
