@@ -8,9 +8,12 @@ from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, connection, models, router, transaction
 from django.db.models import DO_NOTHING, signals
 from django.db.models.base import ModelBase
-from django.db.models.fields.related import ForeignObject, ForeignObjectRel
+from django.db.models.fields.related import (
+    ForeignObject, ForeignObjectRel, ForeignRelatedObjectsDescriptor,
+)
 from django.db.models.query_utils import PathInfo
 from django.utils.encoding import python_2_unicode_compatible, smart_text
+from django.utils.functional import cached_property
 
 
 @python_2_unicode_compatible
@@ -358,7 +361,7 @@ class GenericRelation(ForeignObject):
         # Save a reference to which model this class is on for future use
         self.model = cls
         # Add the descriptor for the relation
-        setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self, self.for_concrete_model))
+        setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self.rel))
 
     def set_attributes_from_rel(self):
         pass
@@ -393,7 +396,7 @@ class GenericRelation(ForeignObject):
         })
 
 
-class ReverseGenericRelatedObjectsDescriptor(object):
+class ReverseGenericRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
     """
     This class provides the functionality that makes the related-object
     managers available as attributes on a model class, for fields that have
@@ -402,87 +405,57 @@ class ReverseGenericRelatedObjectsDescriptor(object):
     "article.publications", the publications attribute is a
     ReverseGenericRelatedObjectsDescriptor instance.
     """
-    def __init__(self, field, for_concrete_model=True):
-        self.field = field
-        self.for_concrete_model = for_concrete_model
 
-    def __get__(self, instance, instance_type=None):
-        if instance is None:
-            return self
 
-        # Dynamically create a class that subclasses the related model's
-        # default manager.
-        rel_model = self.field.rel.to
-        superclass = rel_model._default_manager.__class__
-        RelatedManager = create_generic_related_manager(superclass)
 
-        qn = connection.ops.quote_name
-        content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(
-            instance, for_concrete_model=self.for_concrete_model)
 
-        join_cols = self.field.get_joining_columns(reverse_join=True)[0]
-        manager = RelatedManager(
-            model=rel_model,
-            instance=instance,
-            source_col_name=qn(join_cols[0]),
-            target_col_name=qn(join_cols[1]),
-            content_type=content_type,
-            content_type_field_name=self.field.content_type_field_name,
-            object_id_field_name=self.field.object_id_field_name,
-            prefetch_cache_name=self.field.attname,
+    @cached_property
+    def related_manager_cls(self):
+        return create_generic_related_manager(
+            self.rel.to._default_manager.__class__,
+            self.rel,
         )
 
-        return manager
 
-    def __set__(self, instance, value):
-        manager = self.__get__(instance)
-        manager.set(value)
-
-
-def create_generic_related_manager(superclass):
+def create_generic_related_manager(superclass, rel):
     """
     Factory function for a manager that subclasses 'superclass' (which is a
     Manager) and adds behavior for generic related objects.
     """
 
     class GenericRelatedObjectManager(superclass):
-        def __init__(self, model=None, instance=None, symmetrical=None,
-                     source_col_name=None, target_col_name=None, content_type=None,
-                     content_type_field_name=None, object_id_field_name=None,
-                     prefetch_cache_name=None):
-
+        def __init__(self, instance=None):
             super(GenericRelatedObjectManager, self).__init__()
-            self.model = model
-            self.content_type = content_type
-            self.symmetrical = symmetrical
+
             self.instance = instance
-            self.source_col_name = source_col_name
-            self.target_col_name = target_col_name
-            self.content_type_field_name = content_type_field_name
-            self.object_id_field_name = object_id_field_name
-            self.prefetch_cache_name = prefetch_cache_name
-            self.pk_val = self.instance._get_pk_val()
+
+            self.model = rel.to
+
+            content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(
+                instance, for_concrete_model=rel.field.for_concrete_model)
+            self.content_type = content_type
+
+            qn = connection.ops.quote_name
+            join_cols = rel.field.get_joining_columns(reverse_join=True)[0]
+            self.source_col_name = qn(join_cols[0])
+            self.target_col_name = qn(join_cols[1])
+
+            self.content_type_field_name = rel.field.content_type_field_name
+            self.object_id_field_name = rel.field.object_id_field_name
+            self.prefetch_cache_name = rel.field.attname
+            self.pk_val = instance._get_pk_val()
+
             self.core_filters = {
-                '%s__pk' % content_type_field_name: content_type.id,
-                '%s' % object_id_field_name: instance._get_pk_val(),
+                '%s__pk' % self.content_type_field_name: content_type.id,
+                self.object_id_field_name: self.pk_val,
             }
 
         def __call__(self, **kwargs):
             # We use **kwargs rather than a kwarg argument to enforce the
             # `manager='manager_name'` syntax.
             manager = getattr(self.model, kwargs.pop('manager'))
-            manager_class = create_generic_related_manager(manager.__class__)
-            return manager_class(
-                model=self.model,
-                instance=self.instance,
-                symmetrical=self.symmetrical,
-                source_col_name=self.source_col_name,
-                target_col_name=self.target_col_name,
-                content_type=self.content_type,
-                content_type_field_name=self.content_type_field_name,
-                object_id_field_name=self.object_id_field_name,
-                prefetch_cache_name=self.prefetch_cache_name,
-            )
+            manager_class = create_generic_related_manager(manager.__class__, rel)
+            return manager_class(instance=self.instance)
         do_not_call_in_templates = True
 
         def __str__(self):
