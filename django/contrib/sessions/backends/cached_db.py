@@ -18,6 +18,7 @@ class SessionStore(DBStore):
     """
     Implements cached, database backed sessions.
     """
+    cache_key_prefix = KEY_PREFIX
 
     def __init__(self, session_key=None):
         self._cache = caches[settings.SESSION_CACHE_ALIAS]
@@ -25,7 +26,7 @@ class SessionStore(DBStore):
 
     @property
     def cache_key(self):
-        return KEY_PREFIX + self._get_or_create_session_key()
+        return self.cache_key_prefix + self._get_or_create_session_key()
 
     def load(self):
         try:
@@ -39,14 +40,14 @@ class SessionStore(DBStore):
             # Duplicate DBStore.load, because we need to keep track
             # of the expiry date to set it properly in the cache.
             try:
-                s = Session.objects.get(
+                s = self.get_session_class().objects.get(
                     session_key=self.session_key,
                     expire_date__gt=timezone.now()
                 )
                 data = self.decode(s.session_data)
                 self._cache.set(self.cache_key, data,
                     self.get_expiry_age(expiry=s.expire_date))
-            except (Session.DoesNotExist, SuspiciousOperation) as e:
+            except (self.get_session_class().DoesNotExist, SuspiciousOperation) as e:
                 if isinstance(e, SuspiciousOperation):
                     logger = logging.getLogger('django.security.%s' %
                             e.__class__.__name__)
@@ -56,7 +57,7 @@ class SessionStore(DBStore):
         return data
 
     def exists(self, session_key):
-        if (KEY_PREFIX + session_key) in self._cache:
+        if (self.cache_key_prefix + session_key) in self._cache:
             return True
         return super(SessionStore, self).exists(session_key)
 
@@ -70,7 +71,7 @@ class SessionStore(DBStore):
             if self.session_key is None:
                 return
             session_key = self.session_key
-        self._cache.delete(KEY_PREFIX + session_key)
+        self._cache.delete(self.cache_key_prefix + session_key)
 
     def flush(self):
         """

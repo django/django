@@ -14,14 +14,18 @@ class SessionStore(SessionBase):
     def __init__(self, session_key=None):
         super(SessionStore, self).__init__(session_key)
 
+    @classmethod
+    def get_session_class(cls):
+        return Session
+
     def load(self):
         try:
-            s = Session.objects.get(
+            s = self.get_session_class().objects.get(
                 session_key=self.session_key,
                 expire_date__gt=timezone.now()
             )
             return self.decode(s.session_data)
-        except (Session.DoesNotExist, SuspiciousOperation) as e:
+        except (self.get_session_class().DoesNotExist, SuspiciousOperation) as e:
             if isinstance(e, SuspiciousOperation):
                 logger = logging.getLogger('django.security.%s' %
                         e.__class__.__name__)
@@ -30,7 +34,7 @@ class SessionStore(SessionBase):
             return {}
 
     def exists(self, session_key):
-        return Session.objects.filter(session_key=session_key).exists()
+        return self.get_session_class().objects.filter(session_key=session_key).exists()
 
     def create(self):
         while True:
@@ -46,6 +50,18 @@ class SessionStore(SessionBase):
             self._session_cache = {}
             return
 
+    def create_session_instance(self, data):
+        """
+        Returns a new instance of the session model object, which represents
+        the current session state. Intended to be used for saving the session
+        data to the database.
+        """
+        return self.get_session_class()(
+            session_key=self._get_or_create_session_key(),
+            session_data=self.encode(data),
+            expire_date=self.get_expiry_date()
+        )
+
     def save(self, must_create=False):
         """
         Saves the current session data to the database. If 'must_create' is
@@ -53,12 +69,9 @@ class SessionStore(SessionBase):
         create a *new* entry (as opposed to possibly updating an existing
         entry).
         """
-        obj = Session(
-            session_key=self._get_or_create_session_key(),
-            session_data=self.encode(self._get_session(no_load=must_create)),
-            expire_date=self.get_expiry_date()
-        )
-        using = router.db_for_write(Session, instance=obj)
+        data = self._get_session(no_load=must_create)
+        obj = self.create_session_instance(data)
+        using = router.db_for_write(self.get_session_class(), instance=obj)
         try:
             with transaction.atomic(using=using):
                 obj.save(force_insert=must_create, using=using)
@@ -73,13 +86,13 @@ class SessionStore(SessionBase):
                 return
             session_key = self.session_key
         try:
-            Session.objects.get(session_key=session_key).delete()
-        except Session.DoesNotExist:
+            self.get_session_class().objects.get(session_key=session_key).delete()
+        except self.get_session_class().DoesNotExist:
             pass
 
     @classmethod
     def clear_expired(cls):
-        Session.objects.filter(expire_date__lt=timezone.now()).delete()
+        cls.get_session_class().objects.filter(expire_date__lt=timezone.now()).delete()
 
 
 # At bottom to avoid circular import
