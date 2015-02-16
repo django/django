@@ -289,14 +289,14 @@ class PostgreSQLTests(TestCase):
             self.assertIn('::text', do.lookup_cast(lookup))
 
     def test_correct_extraction_psycopg2_version(self):
-        from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper
+        from django.db.backends.postgresql_psycopg2.base import psycopg2_version
         version_path = 'django.db.backends.postgresql_psycopg2.base.Database.__version__'
 
         with mock.patch(version_path, '2.6.9'):
-            self.assertEqual(DatabaseWrapper.psycopg2_version.__get__(self), (2, 6, 9))
+            self.assertEqual(psycopg2_version(), (2, 6, 9))
 
         with mock.patch(version_path, '2.5.dev0'):
-            self.assertEqual(DatabaseWrapper.psycopg2_version.__get__(self), (2, 5))
+            self.assertEqual(psycopg2_version(), (2, 5))
 
 
 class DateQuotingTest(TestCase):

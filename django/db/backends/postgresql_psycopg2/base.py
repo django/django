@@ -5,6 +5,7 @@ Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.utils.encoding import force_str
@@ -16,8 +17,18 @@ try:
     import psycopg2.extensions
     import psycopg2.extras
 except ImportError as e:
-    from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
+
+
+def psycopg2_version():
+    version = psycopg2.__version__.split(' ', 1)[0]
+    return tuple(int(v) for v in version.split('.') if v.isdigit())
+
+PSYCOPG2_VERSION = psycopg2_version()
+
+if PSYCOPG2_VERSION < (2, 4, 5):
+    raise ImproperlyConfigured("psycopg2_version 2.4.5 or newer is required; you have %s" % psycopg2.__version__)
+
 
 # Some of these import psycopg2, so import them after checking if it's installed.
 from .client import DatabaseClient                          # isort:skip
@@ -164,20 +175,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # - after connecting to the database in order to obtain the database's
         #   default when no value is explicitly specified in options.
         # - before calling _set_autocommit() because if autocommit is on, that
-        #   will set connection.isolation_level to ISOLATION_LEVEL_AUTOCOMMIT;
-        #   and if autocommit is off, on psycopg2 < 2.4.2, _set_autocommit()
-        #   needs self.isolation_level.
+        #   will set connection.isolation_level to ISOLATION_LEVEL_AUTOCOMMIT.
         options = self.settings_dict['OPTIONS']
         try:
             self.isolation_level = options['isolation_level']
         except KeyError:
             self.isolation_level = connection.isolation_level
         else:
-            # Set the isolation level to the value from OPTIONS. This isn't
-            # needed on psycopg2 < 2.4.2 because it happens as a side-effect
-            # of _set_autocommit(False).
-            if (self.isolation_level != connection.isolation_level and
-                    self.psycopg2_version >= (2, 4, 2)):
+            # Set the isolation level to the value from OPTIONS.
+            if self.isolation_level != connection.isolation_level:
                 connection.set_session(isolation_level=self.isolation_level)
 
         return connection
@@ -186,13 +192,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.connection.set_client_encoding('UTF8')
 
         tz = self.settings_dict['TIME_ZONE']
-        try:
-            get_parameter_status = self.connection.get_parameter_status
-        except AttributeError:
-            # psycopg2 < 2.0.12 doesn't have get_parameter_status
-            conn_tz = None
-        else:
-            conn_tz = get_parameter_status('TimeZone')
+        conn_tz = self.connection.get_parameter_status('TimeZone')
 
         if conn_tz != tz:
             cursor = self.connection.cursor()
@@ -211,14 +211,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:
-            if self.psycopg2_version >= (2, 4, 2):
-                self.connection.autocommit = autocommit
-            else:
-                if autocommit:
-                    level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
-                else:
-                    level = self.isolation_level
-                self.connection.set_isolation_level(level)
+            self.connection.autocommit = autocommit
 
     def check_constraints(self, table_names=None):
         """
@@ -239,8 +232,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def psycopg2_version(self):
-        version = psycopg2.__version__.split(' ', 1)[0]
-        return tuple(int(v) for v in version.split('.') if v.isdigit())
+        return PSYCOPG2_VERSION
 
     @cached_property
     def pg_version(self):
