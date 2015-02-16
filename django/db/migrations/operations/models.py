@@ -162,6 +162,7 @@ class RenameModel(Operation):
         all_related_objects = (
             f for f in model._meta.get_fields(include_hidden=True)
             if f.auto_created and not f.concrete and not (f.hidden or f.many_to_many)
+            and f.model is model
         )
         # Rename the model
         state.models[app_label, self.new_name_lower] = state.models[app_label, self.old_name_lower]
