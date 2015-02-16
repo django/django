@@ -9,4 +9,6 @@ Django 1.7.7 fixes several bugs in 1.7.6.
 Bugfixes
 ========
 
-* ...
+* Fixed renaming of classes in migrations where renaming a subclass would
+  cause incorrect state to be recorded for objects that referenced the
+  superclass (:ticket:`24354`).
