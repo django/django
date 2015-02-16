@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.test import TestCase, modify_settings, override_settings
 
@@ -18,3 +19,10 @@ class SitemapTestsBase(TestCase):
         # Create an object for sitemap content.
         TestModel.objects.create(name='Test Object')
         self.i18n_model = I18nTestModel.objects.create(name='Test Object')
+
+    @classmethod
+    def setUpClass(cls):
+        super(SitemapTestsBase, cls).setUpClass()
+        # This cleanup is necessary because contrib.sites cache
+        # makes tests interfere with each other, see #11505
+        Site.objects.clear_cache()
