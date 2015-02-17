@@ -756,10 +756,11 @@ Notes:
 * The ``render()`` method is where the work actually happens.
 
 * ``render()`` should generally fail silently, particularly in a production
-  environment. In some cases however, particularly if ``context.engine.debug``
-  is ``True``, this method may raise an exception to make debugging easier.
-  For example, several core tags raise ``django.template.TemplateSyntaxError``
-  if they receive the wrong number or type of arguments.
+  environment. In some cases however, particularly if
+  ``context.template.engine.debug`` is ``True``, this method may raise an
+  exception to make debugging easier. For example, several core tags raise
+  ``django.template.TemplateSyntaxError`` if they receive the wrong number or
+  type of arguments.
 
 Ultimately, this decoupling of compilation and rendering results in an
 efficient template system, because a template can render multiple contexts
@@ -795,16 +796,17 @@ This is not a very common situation, but it's useful if you're rendering a
 template yourself. For example::
 
     def render(self, context):
-        t = context.engine.get_template('small_fragment.html')
+        t = context.template.engine.get_template('small_fragment.html')
         return t.render(Context({'var': obj}, autoescape=context.autoescape))
 
 .. versionchanged:: 1.8
 
-    The ``engine`` attribute of ``Context`` objects was added in Django 1.8.
-    :meth:`context.engine.get_template <django.template.Engine.get_template>`
-    must be used instead of :func:`django.template.loader.get_template`
-    because the latter now returns a wrapper whose ``render`` method doesn't
-    accept a :class:`~django.template.Context`.
+    The ``template`` attribute of ``Context`` objects was added in Django 1.8.
+    :meth:`context.template.engine.get_template
+    <django.template.Engine.get_template>` must be used instead of
+    :func:`django.template.loader.get_template` because the latter now returns
+    a wrapper whose ``render`` method doesn't accept a
+    :class:`~django.template.Context`.
 
 If we had neglected to pass in the current ``context.autoescape`` value to our
 new ``Context`` in this example, the results would have *always* been

@@ -516,9 +516,6 @@ class RequestContextTests(unittest.TestCase):
         self.assertEqual(len(ctx.dicts), 3)
 
     def test_context_comparable(self):
-        # Create an engine without any context processors.
-        engine = Engine()
-
         test_data = {'x': 'y', 'v': 'z', 'd': {'o': object, 'a': 'b'}}
 
         # test comparing RequestContext to prevent problems if somebody
@@ -526,8 +523,8 @@ class RequestContextTests(unittest.TestCase):
         request = RequestFactory().get('/')
 
         self.assertEqual(
-            RequestContext(request, dict_=test_data, engine=engine),
-            RequestContext(request, dict_=test_data, engine=engine))
+            RequestContext(request, dict_=test_data),
+            RequestContext(request, dict_=test_data))
 
 
 @ignore_warnings(category=RemovedInDjango20Warning)

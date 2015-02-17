@@ -123,7 +123,7 @@ class Context(BaseContext):
     "A stack container for variable context"
     def __init__(self, dict_=None, autoescape=True,
             current_app=_current_app_undefined,
-            use_l10n=None, use_tz=None, engine=None):
+            use_l10n=None, use_tz=None):
         if current_app is not _current_app_undefined:
             warnings.warn(
                 "The current_app argument of Context is deprecated. Use "
@@ -133,8 +133,10 @@ class Context(BaseContext):
         self._current_app = current_app
         self.use_l10n = use_l10n
         self.use_tz = use_tz
-        self.engine = engine
         self.render_context = RenderContext()
+        # Set to the original template during rendering -- as opposed to
+        # extended or included templates
+        self.template = None
         super(Context, self).__init__(dict_)
 
     @property
@@ -192,11 +194,11 @@ class RequestContext(Context):
     """
     def __init__(self, request, dict_=None, processors=None,
             current_app=_current_app_undefined,
-            use_l10n=None, use_tz=None, engine=None):
+            use_l10n=None, use_tz=None):
         # current_app isn't passed here to avoid triggering the deprecation
         # warning in Context.__init__.
         super(RequestContext, self).__init__(
-            dict_, use_l10n=use_l10n, use_tz=use_tz, engine=engine)
+            dict_, use_l10n=use_l10n, use_tz=use_tz)
         if current_app is not _current_app_undefined:
             warnings.warn(
                 "The current_app argument of RequestContext is deprecated. "
@@ -207,23 +209,27 @@ class RequestContext(Context):
         self._processors = () if processors is None else tuple(processors)
         self._processors_index = len(self.dicts)
         self.update({})         # placeholder for context processors output
-        self.engine = engine    # re-run the setter in case engine is not None
 
     @property
-    def engine(self):
-        return self._engine
+    def template(self):
+        return self._template
 
-    @engine.setter
-    def engine(self, engine):
-        self._engine = engine
+    @template.setter
+    def template(self, template):
+        # Execute context processors when Template.render(self, context) sets
+        # context.template = self. Until then, since the context isn't tied to
+        # an engine, it has no way to know which context processors to apply.
+        self._template = template
         if hasattr(self, '_processors_index'):
-            if engine is None:
+            if template is None:
                 # Unset context processors.
                 self.dicts[self._processors_index] = {}
             else:
                 # Set context processors for this engine.
+                processors = (template.engine.template_context_processors +
+                              self._processors)
                 updates = {}
-                for processor in engine.template_context_processors + self._processors:
+                for processor in processors:
                     updates.update(processor(self.request))
                 self.dicts[self._processors_index] = updates
 
