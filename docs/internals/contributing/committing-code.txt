@@ -12,7 +12,7 @@ who wants to contribute code to Django, have a look at
 Handling pull requests
 ----------------------
 
-Since Django is now hosted at GitHub, many patches are provided in the form of
+Since Django is now hosted at GitHub, most patches are provided in the form of
 pull requests.
 
 When committing a pull request, make sure each individual commit matches the
@@ -29,58 +29,57 @@ to standard themselves.
 
 .. _Jenkins wiki page: https://code.djangoproject.com/wiki/Jenkins
 
-Here is one way to commit a pull request::
+An easy way to checkout a pull request locally is to add an alias to your
+``~/.gitconfig`` (``upstream`` is assumed to be ``django/django``)::
 
-    # Create a new branch tracking upstream/master -- upstream is assumed
-    # to be django/django.
-    git checkout -b pull_xxxxx upstream/master
+    [alias]
+        pr = !sh -c \"git fetch upstream pull/${1}/head:pr/${1} && git checkout pr/${1}\"
 
-    # Download the patches from github and apply them.
-    curl https://github.com/django/django/pull/xxxxx.patch | git am
+Now you can simply run ``git pr ####`` to checkout the corresponding pull
+request.
 
 At this point, you can work on the code. Use ``git rebase -i`` and ``git
 commit --amend`` to make sure the commits have the expected level of quality.
-Once you're ready::
+Once you're ready:
 
-    # Make sure master is ready to receive changes.
-    git checkout master
-    git pull upstream master
-    # Merge the work as "fast-forward" to master, to avoid a merge commit.
-    git merge --ff-only pull_xxxxx
-    # Check that only the changes you expect will be pushed to upstream.
-    git push --dry-run upstream master
-    # Push!
-    git push upstream master
+.. code-block:: console
 
-    # Get rid of the pull_xxxxx branch.
-    git branch -d pull_xxxxx
+    $ # Pull in the latest changes from master.
+    $ git checkout master
+    $ git pull upstream master
+    $ # Rebase the pull request on master.
+    $ git checkout pr/####
+    $ git rebase master
+    $ git checkout master
+    $ # Merge the work as "fast-forward" to master to avoid a merge commit.
+    $ # (in practice, you can omit "--ff-only" since you just rebased)
+    $ git merge --ff-only pr/XXXX
+    $ # If you're not sure if you did things correctly, check that only the
+    $ # changes you expect will be pushed to upstream.
+    $ git push --dry-run upstream master
+    $ # Push!
+    $ git push upstream master
+    $ # Delete the pull request branch.
+    $ git branch -d pr/xxxx
 
-An alternative is to add the contributor's repository as a new remote,
-checkout the branch and work from there::
+For changes on your own branches, force push to your fork after rebasing on
+master but before merging and pushing to upstream. This allows the commit
+hashes on master and your branch to match which automatically closes the pull
+request. Since you can't push to other contributors' branches, comment on the
+pull request "Merged in XXXXXXX" (replacing with the commit hash) after you
+merge it. Trac checks for this message format to indicate on the ticket page
+whether or not a pull request is merged.
 
-    git remote add <contributor> https://github.com/<contributor>/django.git
-    git checkout pull_xxxxx <contributor> <contributor's pull request branch>
-
-Yet another alternative is to fetch the branch without adding the
-contributor's repository as a remote::
-
-    git fetch https://github.com/<contributor>/django.git <contributor's pull request branch>
-    git checkout -b pull_xxxxx FETCH_HEAD
-
-At this point, you can work on the code and continue as above.
-
-GitHub provides a one-click merge functionality for pull requests. This should
-only be used if the pull request is 100% ready, and you have checked it for
-errors (or trust the request maker enough to skip checks). Currently, it isn't
-possible to check that the tests pass and that the docs build without
-downloading the changes to your development environment.
+Avoid using GitHub's "Merge pull request" button on the Web site as its creates
+an ugly "merge commit" and makes navigating history more difficult.
 
 When rewriting the commit history of a pull request, the goal is to make
 Django's commit history as usable as possible:
 
 * If a patch contains back-and-forth commits, then rewrite those into one.
-  Typically, a commit can add some code, and a second commit can fix
-  stylistic issues introduced in the first commit.
+  For example, if a commit adds some code and a second commit fixes stylistic
+  issues introduced in the first commit, those commits should be squashed
+  before merging.
 
 * Separate changes to different commits by logical grouping: if you do a
   stylistic cleanup at the same time as you do other changes to a file,
@@ -93,7 +92,7 @@ Django's commit history as usable as possible:
   tests nor the docs should emit warnings.
 
 * Trivial and small patches usually are best done in one commit. Medium to
-  large work should be split into multiple commits if possible.
+  large work may be split into multiple commits if it makes sense.
 
 Practicality beats purity, so it is up to each committer to decide how much
 history mangling to do for a pull request. The main points are engaging the
@@ -195,6 +194,10 @@ Django's Git repository:
     [1.3.x] Fixed #17028 -- Changed diveintopython.org -> diveintopython.net.
 
     Backport of 80c0cbf1c97047daed2c5b41b296bbc56fe1d7e3 from master.
+
+  There's a `script on the wiki
+  <https://code.djangoproject.com/wiki/CommitterTips#AutomatingBackports>`_
+  to automate this.
 
 Reverting commits
 -----------------
