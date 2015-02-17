@@ -14,6 +14,23 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_table = "DROP TABLE %(table)s"
     sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s)"
 
+    def __enter__(self):
+        with self.connection.cursor() as c:
+            # Some SQLite schema alterations need foreign key constraints to be
+            # disabled. This is the default in SQLite but can be changed with a
+            # build flag and might change in future, so can't be relied upon.
+            # We enforce it here for the duration of the transaction.
+            c.execute('PRAGMA foreign_keys')
+            self._initial_pragma_fk = c.fetchone()[0]
+            c.execute('PRAGMA foreign_keys = 0')
+        return super(DatabaseSchemaEditor, self).__enter__()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        super(DatabaseSchemaEditor, self).__exit__(exc_type, exc_value, traceback)
+        with self.connection.cursor() as c:
+            # Restore initial FK setting - PRAGMA values can't be parametrized
+            c.execute('PRAGMA foreign_keys = %s' % int(self._initial_pragma_fk))
+
     def quote_value(self, value):
         try:
             value = _sqlite3.adapt(value)
