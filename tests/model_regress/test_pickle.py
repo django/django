@@ -88,7 +88,7 @@ print(article.headline)"""
                 str('PYTHONPATH'): os.pathsep.join(sys.path),
                 # Needed on Windows because http://bugs.python.org/issue8557
                 str('PATH'): os.environ['PATH'],
-                str('LANG'): os.environ.get('LANG'),
+                str('LANG'): os.environ.get('LANG', ''),
             }
             if 'SYSTEMROOT' in os.environ:  # Windows http://bugs.python.org/issue20614
                 env[str('SYSTEMROOT')] = os.environ['SYSTEMROOT']
