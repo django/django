@@ -204,19 +204,19 @@ class Template(object):
 
     def render(self, context):
         "Display stage -- can be called many times"
-        # Set engine attribute here to avoid changing the signature of either
-        # Context.__init__ or Node.render. The engine is set only on the first
-        # call to render. Further calls e.g. for includes don't override it.
-        toplevel_render = context.engine is None
+        # Set context.template to the original template -- as opposed to
+        # extended or included templates -- during rendering. This may be
+        # used for accessing context.template.engine.
+        toplevel_render = context.template is None
         if toplevel_render:
-            context.engine = self.engine
+            context.template = self
         context.render_context.push()
         try:
             return self._render(context)
         finally:
             context.render_context.pop()
             if toplevel_render:
-                context.engine = None
+                context.template = None
 
 
 class Token(object):
@@ -655,7 +655,7 @@ class FilterExpression(object):
                 if ignore_failures:
                     obj = None
                 else:
-                    string_if_invalid = context.engine.string_if_invalid
+                    string_if_invalid = context.template.engine.string_if_invalid
                     if string_if_invalid:
                         if '%s' in string_if_invalid:
                             return string_if_invalid % self.var
@@ -847,7 +847,7 @@ class Variable(object):
                     if getattr(current, 'do_not_call_in_templates', False):
                         pass
                     elif getattr(current, 'alters_data', False):
-                        current = context.engine.string_if_invalid
+                        current = context.template.engine.string_if_invalid
                     else:
                         try:  # method call (assuming no args required)
                             current = current()
@@ -855,12 +855,12 @@ class Variable(object):
                             try:
                                 getcallargs(current)
                             except TypeError:  # arguments *were* required
-                                current = context.engine.string_if_invalid  # invalid method call
+                                current = context.template.engine.string_if_invalid  # invalid method call
                             else:
                                 raise
         except Exception as e:
             if getattr(e, 'silent_variable_failure', False):
-                current = context.engine.string_if_invalid
+                current = context.template.engine.string_if_invalid
             else:
                 raise
 
@@ -1257,9 +1257,9 @@ class Library(object):
                         elif isinstance(getattr(file_name, 'template', None), Template):
                             t = file_name.template
                         elif not isinstance(file_name, six.string_types) and is_iterable(file_name):
-                            t = context.engine.select_template(file_name)
+                            t = context.template.engine.select_template(file_name)
                         else:
-                            t = context.engine.get_template(file_name)
+                            t = context.template.engine.get_template(file_name)
                         self.nodelist = t.nodelist
                     new_context = context.new(_dict)
                     # Copy across the CSRF token, if present, because

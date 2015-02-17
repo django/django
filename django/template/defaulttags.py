@@ -211,7 +211,7 @@ class ForNode(Node):
                     context[self.loopvars[0]] = item
                 # In debug mode provide the source of the node which raised
                 # the exception
-                if context.engine.debug:
+                if context.template.engine.debug:
                     for node in self.nodelist_loop:
                         try:
                             nodelist.append(node.render(context))
@@ -392,7 +392,7 @@ class SsiNode(Node):
     def render(self, context):
         filepath = self.filepath.resolve(context)
 
-        if not include_is_allowed(filepath, context.engine.allowed_include_roots):
+        if not include_is_allowed(filepath, context.template.engine.allowed_include_roots):
             if settings.DEBUG:
                 return "[Didn't have permission to include file]"
             else:
@@ -404,7 +404,7 @@ class SsiNode(Node):
             output = ''
         if self.parsed:
             try:
-                t = Template(output, name=filepath, engine=context.engine)
+                t = Template(output, name=filepath, engine=context.template.engine)
                 return t.render(context)
             except TemplateSyntaxError as e:
                 if settings.DEBUG:
