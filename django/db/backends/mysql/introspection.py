@@ -1,4 +1,3 @@
-import re
 from collections import namedtuple
 
 from MySQLdb.constants import FIELD_TYPE
@@ -10,8 +9,6 @@ from django.utils.datastructures import OrderedSet
 from django.utils.encoding import force_text
 
 FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra',))
-
-foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
