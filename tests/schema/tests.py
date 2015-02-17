@@ -1,6 +1,7 @@
 import datetime
 import itertools
 import unittest
+from copy import copy
 
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
@@ -411,7 +412,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
-        self.assertEqual(bool(columns['name'][1][6]), False)
+        self.assertEqual(bool(columns['name'][1][6]), bool(connection.features.interprets_empty_strings_as_nulls))
 
     def test_alter_text_field(self):
         # Regression for "BLOB/TEXT column 'info' can't have a default value")
@@ -453,6 +454,36 @@ class SchemaTests(TransactionTestCase):
         # Verify default value
         self.assertEqual(Author.objects.get(name='Not null author').height, 12)
         self.assertEqual(Author.objects.get(name='Null author').height, 42)
+
+    def test_alter_charfield_to_null(self):
+        """
+        #24307 - Should skip an alter statement on databases with
+        interprets_empty_strings_as_null when changing a CharField to null.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Change the CharField to null
+        old_field = Author._meta.get_field('name')
+        new_field = copy(old_field)
+        new_field.null = True
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field)
+
+    def test_alter_textfield_to_null(self):
+        """
+        #24307 - Should skip an alter statement on databases with
+        interprets_empty_strings_as_null when changing a TextField to null.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Note)
+        # Change the TextField to null
+        old_field = Note._meta.get_field('info')
+        new_field = copy(old_field)
+        new_field.null = True
+        with connection.schema_editor() as editor:
+            editor.alter_field(Note, old_field, new_field)
 
     @unittest.skipUnless(connection.features.supports_combined_alters, "No combined ALTER support")
     def test_alter_null_to_not_null_keeping_default(self):
