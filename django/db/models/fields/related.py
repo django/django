@@ -11,6 +11,7 @@ from django.db import connection, connections, router, transaction
 from django.db.backends import utils
 from django.db.models import Q, signals
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
+from django.db.models.expressions import Col
 from django.db.models.fields import (
     BLANK_CHOICE_DASH, AutoField, Field, IntegerField, PositiveIntegerField,
     PositiveSmallIntegerField,
@@ -2063,6 +2064,18 @@ class ForeignKey(ForeignObject):
 
     def db_parameters(self, connection):
         return {"type": self.db_type(connection), "check": []}
+
+    def get_db_converters(self, connection):
+        backend_converters = connection.ops.get_db_converters(Col(self.attname, self.related_field))
+        backend_converters = [self._convert_backend_converter(func) for func in backend_converters]
+        field_converters = self.related_field.get_db_converters(connection)
+        self_converters = super(ForeignKey, self).get_db_converters(connection)
+        return backend_converters + field_converters + self_converters
+
+    def _convert_backend_converter(self, converter):
+        def new_converter(value, connection, context):
+            return converter(value, Col(self.attname, self.related_field), context)
+        return new_converter
 
 
 class OneToOneField(ForeignKey):
