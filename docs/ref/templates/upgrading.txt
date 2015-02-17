@@ -162,7 +162,7 @@ instance in the ``render()`` method of a template tag, you can use the current
 
 You can write::
 
-    template = context.engine.get_template('included.html')
+    template = context.template.engine.get_template('included.html')
 
 This will load the template with the current engine without triggering the
 multiple template engines machinery, which is usually the desired behavior.
@@ -201,7 +201,7 @@ APIs. The multiple template engines machinery isn't involved here.
 Finally, if you have access to the current context, you can use the same trick
 as above::
 
-    template = context.engine.from_string(template_code)
+    template = context.template.engine.from_string(template_code)
 
 ``Template()``
 ==============
