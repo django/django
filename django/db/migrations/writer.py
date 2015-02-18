@@ -228,11 +228,11 @@ class MigrationWriter(object):
                 # In case of using MIGRATION_MODULES setting and the custom
                 # package doesn't exist, create one.
                 package_dirs = migrations_package_name.split(".")
-                create_path = os.path.join(sys.path[0], *package_dirs)
+                create_path = os.path.join(upath(sys.path[0]), *package_dirs)
                 if not os.path.isdir(create_path):
                     os.makedirs(create_path)
                 for i in range(1, len(package_dirs) + 1):
-                    init_dir = os.path.join(sys.path[0], *package_dirs[:i])
+                    init_dir = os.path.join(upath(sys.path[0]), *package_dirs[:i])
                     init_path = os.path.join(init_dir, "__init__.py")
                     if not os.path.isfile(init_path):
                         open(init_path, "w").close()

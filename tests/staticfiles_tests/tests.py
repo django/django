@@ -241,7 +241,7 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         self.assertIn('project', force_text(lines[1]))
         self.assertIn('apps', force_text(lines[2]))
         self.assertIn("Looking in the following locations:", force_text(lines[3]))
-        searched_locations = ', '.join(lines[4:])
+        searched_locations = ', '.join(force_text(x) for x in lines[4:])
         # AppDirectoriesFinder searched locations
         self.assertIn(os.path.join('staticfiles_tests', 'apps', 'test', 'static'),
                       searched_locations)

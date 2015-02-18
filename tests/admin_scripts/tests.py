@@ -32,7 +32,7 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
     open(os.path.join(test_dir, '__init__.py'), 'w').close()
 
-custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
+custom_templates_dir = os.path.join(os.path.dirname(upath(__file__)), 'custom_templates')
 SYSTEM_CHECK_MSG = 'System check identified no issues'
 
 
@@ -113,7 +113,7 @@ class AdminScriptTestCase(unittest.TestCase):
     def run_test(self, script, args, settings_file=None, apps=None):
         base_dir = os.path.dirname(test_dir)
         # The base dir for Django's tests is one level up.
-        tests_dir = os.path.dirname(os.path.dirname(__file__))
+        tests_dir = os.path.dirname(os.path.dirname(upath(__file__)))
         # The base dir for Django is one level above the test dir. We don't use
         # `import django` to figure that out, so we don't pick up a Django
         # from site-packages or similar.
