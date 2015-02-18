@@ -102,6 +102,9 @@ class HttpResponseBase(six.Iterator):
         """
         if not isinstance(value, (bytes, six.text_type)):
             value = str(value)
+        if ((isinstance(value, bytes) and (b'\n' in value or b'\r' in value)) or
+                isinstance(value, six.text_type) and ('\n' in value or '\r' in value)):
+            raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
         try:
             if six.PY3:
                 if isinstance(value, str):
@@ -124,8 +127,6 @@ class HttpResponseBase(six.Iterator):
             else:
                 e.reason += ', HTTP response headers must be in %s format' % charset
                 raise
-        if str('\n') in value or str('\r') in value:
-            raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
         return value
 
     def __setitem__(self, header, value):
