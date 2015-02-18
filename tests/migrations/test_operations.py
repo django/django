@@ -1708,6 +1708,7 @@ class OperationTests(OperationTestBase):
             new_state = new_state.clone()
             add_hometown.state_forwards("test_authors", new_state)
             add_hometown.database_forwards("test_authors", editor, project_state, new_state)
+        with connection.schema_editor() as editor:
             project_state = new_state
             new_state = new_state.clone()
             create_old_man.state_forwards("test_books", new_state)
