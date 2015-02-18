@@ -1700,16 +1700,19 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             create_author.state_forwards("test_authors", new_state)
             create_author.database_forwards("test_authors", editor, project_state, new_state)
-            project_state = new_state
-            new_state = new_state.clone()
+        project_state = new_state
+        new_state = new_state.clone()
+        with connection.schema_editor() as editor:
             create_book.state_forwards("test_books", new_state)
             create_book.database_forwards("test_books", editor, project_state, new_state)
-            project_state = new_state
-            new_state = new_state.clone()
+        project_state = new_state
+        new_state = new_state.clone()
+        with connection.schema_editor() as editor:
             add_hometown.state_forwards("test_authors", new_state)
             add_hometown.database_forwards("test_authors", editor, project_state, new_state)
-            project_state = new_state
-            new_state = new_state.clone()
+        project_state = new_state
+        new_state = new_state.clone()
+        with connection.schema_editor() as editor:
             create_old_man.state_forwards("test_books", new_state)
             create_old_man.database_forwards("test_books", editor, project_state, new_state)
 
