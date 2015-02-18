@@ -126,7 +126,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         elif args[1][0] == '4':
             # 0x16 = Handshake, 0x03 = SSL 3.0 or TLS 1.x
             if args[0].startswith(str('\x16\x03')):
-                msg = ("You're accessing the developement server over HTTPS, "
+                msg = ("You're accessing the development server over HTTPS, "
                     "but it only supports HTTP.\n")
             msg = self.style.HTTP_BAD_REQUEST(msg)
         else:
