@@ -1,13 +1,10 @@
 from __future__ import unicode_literals
 
-import re
 import sys
 
 from django.conf import settings
 from django.template import Library, Node, TemplateSyntaxError, Variable
-from django.template.base import (
-    TOKEN_TEXT, TOKEN_VAR, TokenParser, render_value_in_context,
-)
+from django.template.base import TOKEN_TEXT, TOKEN_VAR, render_value_in_context
 from django.template.defaulttags import token_kwargs
 from django.utils import six, translation
 
@@ -348,42 +345,54 @@ def do_translate(parser, token):
 
     This is equivalent to calling pgettext instead of (u)gettext.
     """
-    class TranslateParser(TokenParser):
-        def top(self):
-            value = self.value()
+    bits = token.split_contents()
+    if len(bits) < 2:
+        raise TemplateSyntaxError("'%s' takes at least one argument" % bits[0])
+    message_string = parser.compile_filter(bits[1])
+    remaining = bits[2:]
 
-            # Backwards Compatibility fix:
-            # FilterExpression does not support single-quoted strings,
-            # so we make a cheap localized fix in order to maintain
-            # backwards compatibility with existing uses of ``trans``
-            # where single quote use is supported.
-            if value[0] == "'":
-                m = re.match("^'([^']+)'(\|.*$)", value)
-                if m:
-                    value = '"%s"%s' % (m.group(1).replace('"', '\\"'), m.group(2))
-                elif value[-1] == "'":
-                    value = '"%s"' % value[1:-1].replace('"', '\\"')
+    noop = False
+    asvar = None
+    message_context = None
+    seen = set()
+    invalid_context = {'as', 'noop'}
 
-            noop = False
-            asvar = None
-            message_context = None
+    while remaining:
+        option = remaining.pop(0)
+        if option in seen:
+            raise TemplateSyntaxError(
+                "The '%s' option was specified more than once." % option,
+            )
+        elif option == 'noop':
+            noop = True
+        elif option == 'context':
+            try:
+                value = remaining.pop(0)
+            except IndexError:
+                msg = "No argument provided to the '%s' tag for the context option." % bits[0]
+                six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
+            if value in invalid_context:
+                raise TemplateSyntaxError(
+                    "Invalid argument '%s' provided to the '%s' tag for the context option" % (value, bits[0]),
+                )
+            message_context = parser.compile_filter(value)
+        elif option == 'as':
+            try:
+                value = remaining.pop(0)
+            except IndexError:
+                msg = "No argument provided to the '%s' tag for the as option." % bits[0]
+                six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
+            asvar = value
+        else:
+            raise TemplateSyntaxError(
+                "Unknown argument for '%s' tag: '%s'. The only options "
+                "available are 'noop', 'context' \"xxx\", and 'as VAR'." % (
+                    bits[0], option,
+                )
+            )
+        seen.add(option)
 
-            while self.more():
-                tag = self.tag()
-                if tag == 'noop':
-                    noop = True
-                elif tag == 'context':
-                    message_context = parser.compile_filter(self.value())
-                elif tag == 'as':
-                    asvar = self.tag()
-                else:
-                    raise TemplateSyntaxError(
-                        "Only options for 'trans' are 'noop', "
-                        "'context \"xxx\"', and 'as VAR'.")
-            return value, noop, asvar, message_context
-    value, noop, asvar, message_context = TranslateParser(token.contents).top()
-    return TranslateNode(parser.compile_filter(value), noop, asvar,
-                         message_context)
+    return TranslateNode(message_string, noop, asvar, message_context)
 
 
 @register.tag("blocktrans")

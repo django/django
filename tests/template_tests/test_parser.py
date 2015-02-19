@@ -7,7 +7,7 @@ from unittest import TestCase
 
 from django.template import Library, Template, TemplateSyntaxError
 from django.template.base import (
-    TOKEN_BLOCK, FilterExpression, Parser, Token, TokenParser, Variable,
+    TOKEN_BLOCK, FilterExpression, Parser, Token, Variable,
 )
 from django.test import override_settings
 from django.utils import six
@@ -22,31 +22,6 @@ class ParserTests(TestCase):
         token = Token(TOKEN_BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
         split = token.split_contents()
         self.assertEqual(split, ["sometag", '_("Page not found")', 'value|yesno:_("yes,no")'])
-
-    def test_token_parsing(self):
-        # Tests for TokenParser behavior in the face of quoted strings with
-        # spaces.
-
-        p = TokenParser("tag thevar|filter sometag")
-        self.assertEqual(p.tagname, "tag")
-        self.assertEqual(p.value(), "thevar|filter")
-        self.assertTrue(p.more())
-        self.assertEqual(p.tag(), "sometag")
-        self.assertFalse(p.more())
-
-        p = TokenParser('tag "a value"|filter sometag')
-        self.assertEqual(p.tagname, "tag")
-        self.assertEqual(p.value(), '"a value"|filter')
-        self.assertTrue(p.more())
-        self.assertEqual(p.tag(), "sometag")
-        self.assertFalse(p.more())
-
-        p = TokenParser("tag 'a value'|filter sometag")
-        self.assertEqual(p.tagname, "tag")
-        self.assertEqual(p.value(), "'a value'|filter")
-        self.assertTrue(p.more())
-        self.assertEqual(p.tag(), "sometag")
-        self.assertFalse(p.more())
 
     def test_filter_parsing(self):
         c = {"article": {"section": "News"}}
