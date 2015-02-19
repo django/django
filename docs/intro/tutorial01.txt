@@ -15,7 +15,7 @@ It'll consist of two parts:
 We'll assume you have :doc:`Django installed </intro/install>` already. You can
 tell Django is installed and which version by running the following command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python -c "import django; print(django.get_version())"
 
@@ -51,7 +51,7 @@ application-specific settings.
 From the command line, ``cd`` into a directory where you'd like to store your
 code, then run the following command:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ django-admin startproject mysite
 
@@ -190,7 +190,7 @@ Some of these applications makes use of at least one database table, though,
 so we need to create the tables in the database before we can use them. To do
 that, run the following command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py migrate
 
@@ -217,7 +217,7 @@ The development server
 Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
 you haven't already, and run the following commands:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ python manage.py runserver
 
@@ -255,7 +255,7 @@ It worked!
     it as a command-line argument. For instance, this command starts the server
     on port 8080:
 
-    .. code-block:: bash
+    .. code-block:: console
 
         $ python manage.py runserver 8080
 
@@ -263,7 +263,7 @@ It worked!
     listen on all public IPs (useful if you want to show off your work on other
     computers), use:
 
-    .. code-block:: bash
+    .. code-block:: console
 
         $ python manage.py runserver 0.0.0.0:8000
 
@@ -305,7 +305,7 @@ imported as its own top-level module, rather than a submodule of ``mysite``.
 To create your app, make sure you're in the same directory as :file:`manage.py`
 and type this command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py startapp polls
 
@@ -434,7 +434,7 @@ look like this:
 
 Now Django knows to include the ``polls`` app. Let's run another command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py makemigrations polls
 
@@ -464,7 +464,7 @@ schema automatically - that's called :djadmin:`migrate`, and we'll come to it in
 moment - but first, let's see what SQL that migration would run. The
 :djadmin:`sqlmigrate` command takes migration names and returns their SQL:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py sqlmigrate polls 0001
 
@@ -534,7 +534,7 @@ your project without making migrations or touching the database.
 
 Now, run :djadmin:`migrate` again to create those model tables in your database:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py migrate
     Operations to perform:
@@ -577,7 +577,7 @@ Playing with the API
 Now, let's hop into the interactive Python shell and play around with the free
 API Django gives you. To invoke the Python shell, use this command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py shell
 

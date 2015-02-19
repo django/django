@@ -52,7 +52,7 @@ might want to set up a new environment with all the dependencies first.
 Exactly which steps you will need to take depends on your installation process.
 The most convenient way is to use pip_ with the ``--upgrade`` or ``-U`` flag:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ pip install -U Django
 
@@ -74,7 +74,7 @@ warnings are silenced by default. It is useful to turn the warnings on so they
 are shown in the test output (you can also use the flag if you test your app
 manually using ``manage.py runserver``):
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python -Wall manage.py test
 

@@ -760,9 +760,9 @@ to change the default address (in the case, for example, where the 8081 port is
 already taken) then you may pass a different one to the :djadmin:`test` command
 via the :djadminopt:`--liveserver` option, for example:
 
-.. code-block:: bash
+.. code-block:: console
 
-    ./manage.py test --liveserver=localhost:8082
+    $ ./manage.py test --liveserver=localhost:8082
 
 Another way of changing the default server address is by setting the
 `DJANGO_LIVE_TEST_SERVER_ADDRESS` environment variable somewhere in your
@@ -778,9 +778,9 @@ tests might randomly fail with an "Address already in use" error. To avoid this
 problem, you can pass a comma-separated list of ports or ranges of ports (at
 least as many as the number of potential parallel processes). For example:
 
-.. code-block:: bash
+.. code-block:: console
 
-    ./manage.py test --liveserver=localhost:8082,8090-8100,9000-9200,7041
+    $ ./manage.py test --liveserver=localhost:8082,8090-8100,9000-9200,7041
 
 Then, during test execution, each new live test server will try every specified
 port until it finds one that is free and takes it.
@@ -791,9 +791,9 @@ To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
 test. First of all, you need to install the `selenium package`_ into your
 Python path:
 
-.. code-block:: bash
+.. code-block:: console
 
-   pip install selenium
+    $ pip install selenium
 
 Then, add a ``LiveServerTestCase``-based test to your app's tests module
 (for example: ``myapp/tests.py``). The code for this test may look as follows::
@@ -824,9 +824,9 @@ Then, add a ``LiveServerTestCase``-based test to your app's tests module
 
 Finally, you may run the test as follows:
 
-.. code-block:: bash
+.. code-block:: console
 
-    ./manage.py test myapp.tests.MySeleniumTests.test_login
+    $ ./manage.py test myapp.tests.MySeleniumTests.test_login
 
 This example will automatically open Firefox then go to the login page, enter
 the credentials and press the "Log in" button. Selenium offers other drivers in
