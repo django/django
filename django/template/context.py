@@ -1,4 +1,5 @@
 import warnings
+from contextlib import contextmanager
 from copy import copy
 
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -134,14 +135,24 @@ class Context(BaseContext):
         self.use_l10n = use_l10n
         self.use_tz = use_tz
         self.render_context = RenderContext()
-        # Set to the original template during rendering -- as opposed to
-        # extended or included templates
+        # Set to the original template -- as opposed to extended or included
+        # templates -- during rendering, see bind_template.
         self.template = None
         super(Context, self).__init__(dict_)
 
     @property
     def current_app(self):
         return None if self._current_app is _current_app_undefined else self._current_app
+
+    @contextmanager
+    def bind_template(self, template):
+        if self.template is not None:
+            raise RuntimeError("Context is already bound to a template")
+        self.template = template
+        try:
+            yield
+        finally:
+            self.template = None
 
     def __copy__(self):
         duplicate = super(Context, self).__copy__()
@@ -210,28 +221,26 @@ class RequestContext(Context):
         self._processors_index = len(self.dicts)
         self.update({})         # placeholder for context processors output
 
-    @property
-    def template(self):
-        return self._template
+    @contextmanager
+    def bind_template(self, template):
+        if self.template is not None:
+            raise RuntimeError("Context is already bound to a template")
 
-    @template.setter
-    def template(self, template):
-        # Execute context processors when Template.render(self, context) sets
-        # context.template = self. Until then, since the context isn't tied to
-        # an engine, it has no way to know which context processors to apply.
-        self._template = template
-        if hasattr(self, '_processors_index'):
-            if template is None:
-                # Unset context processors.
-                self.dicts[self._processors_index] = {}
-            else:
-                # Set context processors for this engine.
-                processors = (template.engine.template_context_processors +
-                              self._processors)
-                updates = {}
-                for processor in processors:
-                    updates.update(processor(self.request))
-                self.dicts[self._processors_index] = updates
+        self.template = template
+        # Set context processors according to the template engine's settings.
+        processors = (template.engine.template_context_processors +
+                      self._processors)
+        updates = {}
+        for processor in processors:
+            updates.update(processor(self.request))
+        self.dicts[self._processors_index] = updates
+
+        try:
+            yield
+        finally:
+            self.template = None
+            # Unset context processors.
+            self.dicts[self._processors_index] = {}
 
     def new(self, values=None):
         new_context = super(RequestContext, self).new(values)
