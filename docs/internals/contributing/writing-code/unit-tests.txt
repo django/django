@@ -28,7 +28,7 @@ Running the tests requires a Django settings module that defines the
 databases to use. To make it easy to get started, Django provides and uses a
 sample settings module that uses the SQLite database. To run the tests:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ git clone https://github.com/django/django.git django-repo
    $ cd django-repo/tests
@@ -98,7 +98,7 @@ command line.
 For example, if you'd like to run tests only for generic relations and
 internationalization, type:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ ./runtests.py --settings=path.to.settings generic_relations i18n
 
@@ -109,13 +109,13 @@ If you just want to run a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
 of the ``i18n`` module, type:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests
 
 Going beyond that, you can specify an individual test method like this:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
 
@@ -127,7 +127,7 @@ Internet Explorer). To allow those tests to be run rather than skipped, you must
 install the selenium_ package into your Python path and run the tests with the
 ``--selenium`` option:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ ./runtests.py --settings=test_sqlite --selenium admin_inlines
 
@@ -156,7 +156,7 @@ You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
 like so:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
 
@@ -195,13 +195,13 @@ in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
 To run coverage on the Django test suite using the standard test settings:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ coverage run ./runtests.py --settings=test_sqlite
 
 After running coverage, generate the html report by running:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ coverage html
 
@@ -232,7 +232,7 @@ If the ``locales`` package is not installed, some tests will fail with a
 
 You can resolve this on Debian-based systems, for example, by running:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ apt-get install locales
     $ dpkg-reconfigure locales
@@ -251,7 +251,7 @@ failure.
 For example, suppose that the failing test that works on its own is
 ``ModelTest.test_eq``, then using:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ./runtests.py --bisect basic.tests.ModelTest.test_eq
 
@@ -267,7 +267,7 @@ The ``--pair`` option runs the given test alongside every other test from the
 suite, letting you check if another test has side-effects that cause the
 failure. So:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ./runtests.py --pair basic.tests.ModelTest.test_eq
 
@@ -278,7 +278,7 @@ might be responsible for the failure, you may limit tests to be cross-analyzed
 by :ref:`specifying further test labels <runtests-specifying-labels>` after
 the first one:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
 
@@ -286,7 +286,7 @@ You can also try running any set of tests in reverse using the ``--reverse``
 option in order to verify that executing tests in a different order does not
 cause any trouble:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ./runtests.py basic --reverse
 
@@ -294,7 +294,7 @@ If you wish to examine the SQL being run in failing tests, you can turn on
 :ref:`SQL logging <django-db-logger>` using the ``--debug-sql`` option. If you
 combine this with ``--verbosity=2``, all SQL queries will be output.
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ./runtests.py basic --debug-sql
 

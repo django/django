@@ -24,7 +24,7 @@ The ReportLab library is `available on PyPI`_. A `user guide`_ (not
 coincidentally, a PDF file) is also available for download.
 You can install ReportLab with ``pip``:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ pip install reportlab
 
