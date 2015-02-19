@@ -556,7 +556,7 @@ need to reload your data. Do this after you have made the change to using
 To upgrade each application to use a ``DecimalField``, you can do the
 following, replacing ``<app>`` in the code below with each app's name:
 
-.. code-block:: bash
+.. code-block:: console
 
       $ ./manage.py dumpdata --format=xml <app> > data-dump.xml
       $ ./manage.py reset <app>
@@ -685,13 +685,13 @@ Subcommands must now precede options
 ``django-admin.py`` and ``manage.py`` now require subcommands to precede
 options. So:
 
-.. code-block:: bash
+.. code-block:: console
 
       $ django-admin.py --settings=foo.bar runserver
 
 ...no longer works and should be changed to:
 
-.. code-block:: bash
+.. code-block:: console
 
       $ django-admin.py runserver --settings=foo.bar
 
