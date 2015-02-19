@@ -140,9 +140,9 @@ uninstalling is as simple as deleting the ``django`` directory from your Python
 ``site-packages``. To find the directory you need to remove, you can run the
 following at your shell prompt (not the interactive Python prompt):
 
-.. code-block:: bash
+.. code-block:: console
 
-    python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"
+    $ python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"
 
 
 .. _install-django-code:
@@ -256,18 +256,18 @@ latest bug fixes and improvements, follow these instructions:
 2. Check out Django's main development branch (the 'trunk' or 'master') like
    so:
 
-   .. code-block:: bash
+   .. code-block:: console
 
-       git clone git://github.com/django/django.git django-trunk
+        $ git clone git://github.com/django/django.git django-trunk
 
    This will create a directory ``django-trunk`` in your current directory.
 
 3. Make sure that the Python interpreter can load Django's code. The most
    convenient way to do this is via pip_. Run the following command:
 
-   .. code-block:: bash
+   .. code-block:: console
 
-       sudo pip install -e django-trunk/
+        $ sudo pip install -e django-trunk/
 
    (If using a virtualenv_ you can omit ``sudo``.)
 
@@ -302,9 +302,9 @@ with a checkout of Django's latest code in it. Then add a ``.pth`` file
 containing the full path to the ``django-trunk`` directory to your system's
 ``site-packages`` directory. For example, on a Unix-like system:
 
-.. code-block:: bash
+.. code-block:: console
 
-    echo WORKING-DIR/django-trunk > SITE-PACKAGES-DIR/django.pth
+    $ echo WORKING-DIR/django-trunk > SITE-PACKAGES-DIR/django.pth
 
 In the above line, change ``WORKING-DIR/django-trunk`` to match the full path
 to your new ``django-trunk`` directory, and change ``SITE-PACKAGES-DIR`` to
@@ -314,9 +314,9 @@ The location of the ``site-packages`` directory depends on the operating
 system, and the location in which Python was installed. To find your system's
 ``site-packages`` location, execute the following:
 
-.. code-block:: bash
+.. code-block:: console
 
-    python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
+    $ python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
 
 (Note that this should be run from a shell prompt, not a Python interactive
 prompt.)
@@ -334,9 +334,9 @@ On Unix-like systems, create a symbolic link to the file
 ``django-trunk/django/bin/django-admin`` in a directory on your system
 path, such as ``/usr/local/bin``. For example:
 
-.. code-block:: bash
+.. code-block:: console
 
-    ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin/
+    $ ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin/
 
 (In the above line, change WORKING-DIR to match the full path to your new
 ``django-trunk`` directory.)
