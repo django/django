@@ -26,6 +26,7 @@ class GenericForeignKey(object):
     hidden = False
 
     is_relation = True
+    is_reverse_relation = False
     many_to_many = False
     many_to_one = False
     one_to_many = True

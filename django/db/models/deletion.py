@@ -15,7 +15,7 @@ class ProtectedError(IntegrityError):
 
 def CASCADE(collector, field, sub_objs, using):
     collector.collect(sub_objs, source=field.to,
-                      source_attr=field.name, nullable=field.null)
+                      source_attr=field.get_accessor_name(), nullable=field.null)
     if field.null and not connections[using].features.can_defer_constraint_checks:
         collector.add_field_update(field, None, sub_objs)
 
@@ -214,7 +214,7 @@ class Collector(object):
                 # object instance.
                 parent_objs = [getattr(obj, ptr.name) for obj in new_objs]
                 self.collect(parent_objs, source=model,
-                             source_attr=ptr.rel.related_name,
+                             source_attr=ptr.remote_field.get_accessor_name(),
                              collect_related=False,
                              reverse_dependency=True)
 
@@ -235,7 +235,7 @@ class Collector(object):
                     sub_objs = field.bulk_related_objects(new_objs, self.using)
                     self.collect(sub_objs,
                                  source=model,
-                                 source_attr=field.rel.related_name,
+                                 source_attr=field.remote_field.get_accessor_name(),
                                  nullable=True)
 
     def related_objects(self, field, objs):

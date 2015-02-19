@@ -102,6 +102,7 @@ class BaseField(RegisterLookupMixin):
     hidden = False
 
     is_relation = False
+    is_reverse_relation = False
 
     many_to_many = None
     many_to_one = None

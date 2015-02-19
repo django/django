@@ -613,7 +613,9 @@ class Query(object):
             # models.
             workset = {}
             for model, values in six.iteritems(seen):
-                for field in model._meta.fields:
+                for field in model._meta.get_fields():
+                    if field.many_to_one or field.many_to_many:
+                        continue
                     if field in values:
                         continue
                     m = field.model._meta.concrete_model
