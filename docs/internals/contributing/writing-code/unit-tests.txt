@@ -2,6 +2,8 @@
 Unit tests
 ==========
 
+.. highlight:: console
+
 Django comes with a test suite of its own, in the ``tests`` directory of the
 code base. It's our policy to make sure all tests pass at all times.
 
@@ -26,9 +28,7 @@ the other optional test dependencies.
 
 Running the tests requires a Django settings module that defines the
 databases to use. To make it easy to get started, Django provides and uses a
-sample settings module that uses the SQLite database. To run the tests:
-
-.. code-block:: bash
+sample settings module that uses the SQLite database. To run the tests::
 
    $ git clone https://github.com/django/django.git django-repo
    $ cd django-repo/tests
@@ -96,9 +96,7 @@ tests by appending the names of the test modules to ``runtests.py`` on the
 command line.
 
 For example, if you'd like to run tests only for generic relations and
-internationalization, type:
-
-.. code-block:: bash
+internationalization, type::
 
    $ ./runtests.py --settings=path.to.settings generic_relations i18n
 
@@ -107,15 +105,11 @@ directory name there is the name of a test.
 
 If you just want to run a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
-of the ``i18n`` module, type:
-
-.. code-block:: bash
+of the ``i18n`` module, type::
 
    $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests
 
-Going beyond that, you can specify an individual test method like this:
-
-.. code-block:: bash
+Going beyond that, you can specify an individual test method like this::
 
    $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
 
@@ -125,9 +119,7 @@ Running the Selenium tests
 Some tests require Selenium and a Web browser (Firefox, Google Chrome, or
 Internet Explorer). To allow those tests to be run rather than skipped, you must
 install the selenium_ package into your Python path and run the tests with the
-``--selenium`` option:
-
-.. code-block:: bash
+``--selenium`` option::
 
    $ ./runtests.py --settings=test_sqlite --selenium admin_inlines
 
@@ -154,9 +146,7 @@ dependencies:
 
 You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
-like so:
-
-.. code-block:: bash
+like so::
 
    $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
 
@@ -193,15 +183,11 @@ Contributors are encouraged to run coverage on the test suite to identify areas
 that need additional tests. The coverage tool installation and use is described
 in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
-To run coverage on the Django test suite using the standard test settings:
-
-.. code-block:: bash
+To run coverage on the Django test suite using the standard test settings::
 
    $ coverage run ./runtests.py --settings=test_sqlite
 
-After running coverage, generate the html report by running:
-
-.. code-block:: bash
+After running coverage, generate the html report by running::
 
    $ coverage html
 
@@ -230,9 +216,7 @@ Many test failures with ``UnicodeEncodeError``
 If the ``locales`` package is not installed, some tests will fail with a
 ``UnicodeEncodeError``.
 
-You can resolve this on Debian-based systems, for example, by running:
-
-.. code-block:: bash
+You can resolve this on Debian-based systems, for example, by running::
 
     $ apt-get install locales
     $ dpkg-reconfigure locales
@@ -249,9 +233,7 @@ it possible to identify a small number of tests that may be related to the
 failure.
 
 For example, suppose that the failing test that works on its own is
-``ModelTest.test_eq``, then using:
-
-.. code-block:: bash
+``ModelTest.test_eq``, then using::
 
     $ ./runtests.py --bisect basic.tests.ModelTest.test_eq
 
@@ -265,9 +247,7 @@ failing tests is minimized.
 
 The ``--pair`` option runs the given test alongside every other test from the
 suite, letting you check if another test has side-effects that cause the
-failure. So:
-
-.. code-block:: bash
+failure. So::
 
     $ ./runtests.py --pair basic.tests.ModelTest.test_eq
 
@@ -276,25 +256,19 @@ will pair ``test_eq`` with every test label.
 With both ``--bisect`` and ``--pair``, if you already suspect which cases
 might be responsible for the failure, you may limit tests to be cross-analyzed
 by :ref:`specifying further test labels <runtests-specifying-labels>` after
-the first one:
-
-.. code-block:: bash
+the first one::
 
     $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
 
 You can also try running any set of tests in reverse using the ``--reverse``
 option in order to verify that executing tests in a different order does not
-cause any trouble:
-
-.. code-block:: bash
+cause any trouble::
 
     $ ./runtests.py basic --reverse
 
 If you wish to examine the SQL being run in failing tests, you can turn on
 :ref:`SQL logging <django-db-logger>` using the ``--debug-sql`` option. If you
-combine this with ``--verbosity=2``, all SQL queries will be output.
-
-.. code-block:: bash
+combine this with ``--verbosity=2``, all SQL queries will be output::
 
     $ ./runtests.py basic --debug-sql
 

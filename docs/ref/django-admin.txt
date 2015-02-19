@@ -38,7 +38,7 @@ be consistent, but any example can use ``manage.py`` just as well.
 Usage
 =====
 
-.. code-block:: bash
+.. code-block:: console
 
     $ django-admin <command> [options]
     $ manage.py <command> [options]

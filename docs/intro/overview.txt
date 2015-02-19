@@ -51,7 +51,7 @@ Install it
 Next, run the Django command-line utility to create the database tables
 automatically:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py migrate
 

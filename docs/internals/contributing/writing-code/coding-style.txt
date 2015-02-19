@@ -48,7 +48,7 @@ Imports
 
   Quick start:
 
-  .. code-block:: bash
+  .. code-block:: console
 
       $ pip install isort
       $ isort -rc .
