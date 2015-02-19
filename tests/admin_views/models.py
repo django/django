@@ -355,7 +355,7 @@ class Recommender(Title):
 
 
 class Recommendation(Title):
-    recommender = models.ForeignKey(Recommender)
+    recommender_fk = models.ForeignKey(Recommender)
 
 
 class Collector(models.Model):

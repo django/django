@@ -1876,7 +1876,6 @@ class ForeignKey(ConcreteFieldMixin, ForeignObject):
     def __init__(self, to, to_field=None, related_name=None, related_query_name=None,
             limit_choices_to=None, parent_link=False, on_delete=CASCADE,
             db_constraint=True, **kwargs):
-        self.on_delete = on_delete
         try:
             to._meta.model_name
         except AttributeError:
@@ -1906,7 +1905,8 @@ class ForeignKey(ConcreteFieldMixin, ForeignObject):
         self.field_kwargs = {}
         super(ForeignKey, self).__init__(
             to=to, from_fields=['self'],
-            to_fields=[to_field], **kwargs)
+            to_fields=[to_field], on_delete=on_delete, parent_link=parent_link,
+            **kwargs)
         self.remote_field_kwargs = {
             'related_name': related_name,
             'related_query_name': related_query_name
@@ -1914,7 +1914,6 @@ class ForeignKey(ConcreteFieldMixin, ForeignObject):
         self.db_constraint = db_constraint
         self.related_name = self.name
         self.related_query_name = self.name
-        self.parent_link = parent_link
 
     def resolve_remote_field(self):
         return self.remote_field_class(

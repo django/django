@@ -14,7 +14,7 @@ class ProtectedError(IntegrityError):
 
 
 def CASCADE(collector, field, sub_objs, using):
-    collector.collect(sub_objs, source=field.model,
+    collector.collect(sub_objs, source=field.to,
                       source_attr=field.name, nullable=field.null)
     if field.null and not connections[using].features.can_defer_constraint_checks:
         collector.add_field_update(field, None, sub_objs)
@@ -58,14 +58,17 @@ def get_candidate_relations_to_delete(opts):
     candidate_models = {opts}
     candidate_models = candidate_models.union(opts.concrete_model._meta.proxied_children)
     # For each model, get all candidate fields.
-    candidate_model_fields = chain.from_iterable(
-        opts.get_fields(include_hidden=True) for opts in candidate_models
+    candidate_model_fields = list(
+        chain.from_iterable(
+            opts.get_fields(include_hidden=True) for opts in candidate_models
+        )
     )
     # The candidate relations are the ones that come from N-1 and 1-1 relations.
     # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
     return [
         f.remote_field for f in candidate_model_fields
-        if f.auto_created and not f.concrete and (f.many_to_one or f.one_to_many)
+        if f.auto_created and not f.concrete and (f.many_to_one or f.one_to_one) and
+        not (f.remote_field.parent_link and f.to._meta.concrete_model == opts.concrete_model)
     ]
 
 
@@ -148,7 +151,7 @@ class Collector(object):
         # The use of from_field comes from the need to avoid cascade back to
         # parent when parent delete is cascading to child.
         opts = model._meta
-        if from_field and any(link != from_field.remote_field for link in opts.concrete_model._meta.parents.values()):
+        if from_field and any(link != from_field for link in opts.concrete_model._meta.parents.values()):
             return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
