@@ -480,11 +480,13 @@ Migrations
   method/attribute were added to ease in making ``RunPython`` and ``RunSQL``
   operations reversible.
 
-* The :class:`~django.db.migrations.operations.RunPython` and
-  :class:`~django.db.migrations.operations.RunSQL` operations now accept a
-  ``hints`` parameter that will be passed to :meth:`allow_migrate`. To take
-  advantage of this feature you must ensure that the ``allow_migrate()`` method
-  of all your routers accept ``**hints``.
+* The migration operations :class:`~django.db.migrations.operations.RunPython`
+  and :class:`~django.db.migrations.operations.RunSQL` now call the
+  :meth:`allow_migrate` method of database routers. The router can use the
+  newly introduced ``app_label`` and ``hints`` arguments to make a routing
+  decision. To take advantage of this feature you need to update the router to
+  the new ``allow_migrate`` signature, see the :ref:`deprecation section
+  <deprecated-signature-of-allow-migrate>` for more details.
 
 Models
 ^^^^^^
@@ -1146,14 +1148,6 @@ Miscellaneous
 * :func:`django.utils.translation.get_language()` now returns ``None`` instead
   of :setting:`LANGUAGE_CODE` when translations are temporarily deactivated.
 
-* The migration operations :class:`~django.db.migrations.operations.RunPython`
-  and :class:`~django.db.migrations.operations.RunSQL` now call the
-  :meth:`allow_migrate` method of database routers. In these cases the
-  ``model`` argument of ``allow_migrate()`` is set to ``None``, so the router
-  must properly handle this value. This is most useful when used together with
-  the newly introduced ``hints`` parameter for these operations, but it can
-  also be used to disable migrations from running on a particular database.
-
 * The ``name`` field of :class:`django.contrib.contenttypes.models.ContentType`
   has been removed by a migration and replaced by a property. That means it's
   not possible to query or filter a ``ContentType`` by this field any longer.
@@ -1650,6 +1644,23 @@ The ``collect()``, ``extent()``, ``extent3d()``, ``makeline()``, and ``union()``
 aggregate methods are deprecated and should be replaced by their function-based
 aggregate equivalents (``Collect``, ``Extent``, ``Extent3D``, ``MakeLine``, and
 ``Union``).
+
+.. _deprecated-signature-of-allow-migrate:
+
+Signature of the ``allow_migrate`` router method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The signature of the :meth:`allow_migrate` method of database routers has
+changed from ``allow_migrate(db, model)`` to
+``allow_migrate(db, app_label, model_name=None, **hints)``.
+
+When ``model_name`` is set, the value that was previously given through the
+``model`` positional argument may now be found inside the ``hints`` dictionary
+under the key ``'model'``.
+
+After switching to the new signature the router will also be called by the
+:class:`~django.db.migrations.operations.RunPython` and
+:class:`~django.db.migrations.operations.RunSQL` operations.
 
 .. removed-features-1.8:
 

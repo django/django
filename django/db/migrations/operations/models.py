@@ -55,12 +55,12 @@ class CreateModel(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = to_state.apps.get_model(app_label, self.name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, model):
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, model):
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.delete_model(model)
 
     def describe(self):
@@ -111,12 +111,12 @@ class DeleteModel(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, model):
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.delete_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         model = to_state.apps.get_model(app_label, self.name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, model):
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
 
     def references_model(self, name, app_label=None):
@@ -189,7 +189,7 @@ class RenameModel(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.new_name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
             old_model = from_state.apps.get_model(app_label, self.old_name)
             # Move the main table
             schema_editor.alter_db_table(
@@ -287,7 +287,7 @@ class AlterModelTable(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
             old_model = from_state.apps.get_model(app_label, self.name)
             schema_editor.alter_db_table(
                 new_model,
@@ -347,7 +347,7 @@ class AlterUniqueTogether(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
             old_model = from_state.apps.get_model(app_label, self.name)
             schema_editor.alter_unique_together(
                 new_model,
@@ -399,7 +399,7 @@ class AlterIndexTogether(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         new_model = to_state.apps.get_model(app_label, self.name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
             old_model = from_state.apps.get_model(app_label, self.name)
             schema_editor.alter_index_together(
                 new_model,
@@ -448,7 +448,7 @@ class AlterOrderWithRespectTo(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, to_model):
             from_model = from_state.apps.get_model(app_label, self.name)
             # Remove a field if we need to
             if from_model._meta.order_with_respect_to and not to_model._meta.order_with_respect_to:

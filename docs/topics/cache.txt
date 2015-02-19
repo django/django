@@ -226,19 +226,19 @@ operations to ``cache_replica``, and all write operations to
 
         def db_for_read(self, model, **hints):
             "All cache read operations go to the replica"
-            if model._meta.app_label in ('django_cache',):
+            if model._meta.app_label == 'django_cache':
                 return 'cache_replica'
             return None
 
         def db_for_write(self, model, **hints):
             "All cache write operations go to primary"
-            if model._meta.app_label in ('django_cache',):
+            if model._meta.app_label == 'django_cache':
                 return 'cache_primary'
             return None
 
-        def allow_migrate(self, db, model):
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
             "Only install the cache model on primary"
-            if model._meta.app_label in ('django_cache',):
+            if app_label == 'django_cache':
                 return db == 'cache_primary'
             return None
 

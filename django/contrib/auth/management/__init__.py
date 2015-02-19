@@ -66,7 +66,7 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     except LookupError:
         return
 
-    if not router.allow_migrate(using, Permission):
+    if not router.allow_migrate_model(using, Permission):
         return
 
     from django.contrib.contenttypes.models import ContentType

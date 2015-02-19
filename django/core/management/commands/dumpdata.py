@@ -132,7 +132,7 @@ class Command(BaseCommand):
             for model in serializers.sort_dependencies(app_list.items()):
                 if model in excluded_models:
                     continue
-                if not model._meta.proxy and router.allow_migrate(using, model):
+                if not model._meta.proxy and router.allow_migrate_model(using, model):
                     if use_base_manager:
                         objects = model._base_manager
                     else:

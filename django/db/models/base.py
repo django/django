@@ -1549,7 +1549,7 @@ class Model(six.with_metaclass(ModelBase)):
         # Find the minimum max allowed length among all specified db_aliases.
         for db in settings.DATABASES.keys():
             # skip databases where the model won't be created
-            if not router.allow_migrate(db, cls):
+            if not router.allow_migrate_model(db, cls):
                 continue
             connection = connections[db]
             max_name_length = connection.ops.max_name_length()

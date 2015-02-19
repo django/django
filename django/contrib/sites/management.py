@@ -14,7 +14,7 @@ def create_default_site(app_config, verbosity=2, interactive=True, using=DEFAULT
     except LookupError:
         return
 
-    if not router.allow_migrate(using, Site):
+    if not router.allow_migrate_model(using, Site):
         return
 
     if not Site.objects.using(using).exists():

@@ -137,7 +137,7 @@ class SitesFrameworkTests(TestCase):
 
 
 class JustOtherRouter(object):
-    def allow_migrate(self, db, model):
+    def allow_migrate(self, db, app_label, **hints):
         return db == 'other'
 
 

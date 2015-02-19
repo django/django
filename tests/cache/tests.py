@@ -956,14 +956,17 @@ class DBCacheRouter(object):
     def db_for_read(self, model, **hints):
         if model._meta.app_label == 'django_cache':
             return 'other'
+        return None
 
     def db_for_write(self, model, **hints):
         if model._meta.app_label == 'django_cache':
             return 'other'
+        return None
 
-    def allow_migrate(self, db, model):
-        if model._meta.app_label == 'django_cache':
+    def allow_migrate(self, db, app_label, **hints):
+        if app_label == 'django_cache':
             return db == 'other'
+        return None
 
 
 @override_settings(

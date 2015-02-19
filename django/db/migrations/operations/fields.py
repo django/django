@@ -52,7 +52,7 @@ class AddField(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, to_model):
             from_model = from_state.apps.get_model(app_label, self.model_name)
             field = to_model._meta.get_field(self.name)
             if not self.preserve_default:
@@ -66,7 +66,7 @@ class AddField(Operation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.apps.get_model(app_label, self.model_name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, from_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, from_model):
             schema_editor.remove_field(from_model, from_model._meta.get_field(self.name))
 
     def describe(self):
@@ -117,12 +117,12 @@ class RemoveField(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.apps.get_model(app_label, self.model_name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, from_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, from_model):
             schema_editor.remove_field(from_model, from_model._meta.get_field(self.name))
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, to_model):
             from_model = from_state.apps.get_model(app_label, self.model_name)
             schema_editor.add_field(from_model, to_model._meta.get_field(self.name))
 
@@ -184,7 +184,7 @@ class AlterField(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, to_model):
             from_model = from_state.apps.get_model(app_label, self.model_name)
             from_field = from_model._meta.get_field(self.name)
             to_field = to_model._meta.get_field(self.name)
@@ -267,7 +267,7 @@ class RenameField(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, to_model):
             from_model = from_state.apps.get_model(app_label, self.model_name)
             schema_editor.alter_field(
                 from_model,
@@ -277,7 +277,7 @@ class RenameField(Operation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
+        if self.allow_migrate_model(schema_editor.connection.alias, to_model):
             from_model = from_state.apps.get_model(app_label, self.model_name)
             schema_editor.alter_field(
                 from_model,
