@@ -311,44 +311,161 @@ class TestFormField(TestCase):
         </tr>
         ''')
 
-    def test_lower_bound_higher(self):
+    def test_integer_lower_bound_higher(self):
         field = pg_forms.IntegerRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['10', '2'])
         self.assertEqual(cm.exception.messages[0], 'The start of the range must not exceed the end of the range.')
         self.assertEqual(cm.exception.code, 'bound_ordering')
 
-    def test_open(self):
+    def test_integer_open(self):
         field = pg_forms.IntegerRangeField()
         value = field.clean(['', '0'])
         self.assertEqual(value, NumericRange(None, 0))
 
-    def test_incorrect_data_type(self):
+    def test_integer_incorrect_data_type(self):
         field = pg_forms.IntegerRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('1')
-        self.assertEqual(cm.exception.messages[0], 'Enter two valid values.')
+        self.assertEqual(cm.exception.messages[0], 'Enter two whole numbers.')
         self.assertEqual(cm.exception.code, 'invalid')
 
-    def test_invalid_lower(self):
+    def test_integer_invalid_lower(self):
         field = pg_forms.IntegerRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['a', '2'])
         self.assertEqual(cm.exception.messages[0], 'Enter a whole number.')
 
-    def test_invalid_upper(self):
+    def test_integer_invalid_upper(self):
         field = pg_forms.IntegerRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['1', 'b'])
         self.assertEqual(cm.exception.messages[0], 'Enter a whole number.')
 
-    def test_required(self):
+    def test_integer_required(self):
         field = pg_forms.IntegerRangeField(required=True)
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['', ''])
         self.assertEqual(cm.exception.messages[0], 'This field is required.')
         value = field.clean([1, ''])
         self.assertEqual(value, NumericRange(1, None))
+
+    def test_float_lower_bound_higher(self):
+        field = pg_forms.FloatRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['1.8', '1.6'])
+        self.assertEqual(cm.exception.messages[0], 'The start of the range must not exceed the end of the range.')
+        self.assertEqual(cm.exception.code, 'bound_ordering')
+
+    def test_float_open(self):
+        field = pg_forms.FloatRangeField()
+        value = field.clean(['', '3.1415926'])
+        self.assertEqual(value, NumericRange(None, 3.1415926))
+
+    def test_float_incorrect_data_type(self):
+        field = pg_forms.FloatRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean('1.6')
+        self.assertEqual(cm.exception.messages[0], 'Enter two numbers.')
+        self.assertEqual(cm.exception.code, 'invalid')
+
+    def test_float_invalid_lower(self):
+        field = pg_forms.FloatRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['a', '3.1415926'])
+        self.assertEqual(cm.exception.messages[0], 'Enter a number.')
+
+    def test_float_invalid_upper(self):
+        field = pg_forms.FloatRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['1.61803399', 'b'])
+        self.assertEqual(cm.exception.messages[0], 'Enter a number.')
+
+    def test_float_required(self):
+        field = pg_forms.FloatRangeField(required=True)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['', ''])
+        self.assertEqual(cm.exception.messages[0], 'This field is required.')
+        value = field.clean(['1.61803399', ''])
+        self.assertEqual(value, NumericRange(1.61803399, None))
+
+    def test_date_lower_bound_higher(self):
+        field = pg_forms.DateRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['2013-04-09', '1976-04-16'])
+        self.assertEqual(cm.exception.messages[0], 'The start of the range must not exceed the end of the range.')
+        self.assertEqual(cm.exception.code, 'bound_ordering')
+
+    def test_date_open(self):
+        field = pg_forms.DateRangeField()
+        value = field.clean(['', '2013-04-09'])
+        self.assertEqual(value, DateRange(None, datetime.date(2013, 4, 9)))
+
+    def test_date_incorrect_data_type(self):
+        field = pg_forms.DateRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean('1')
+        self.assertEqual(cm.exception.messages[0], 'Enter two valid dates.')
+        self.assertEqual(cm.exception.code, 'invalid')
+
+    def test_date_invalid_lower(self):
+        field = pg_forms.DateRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['a', '2013-04-09'])
+        self.assertEqual(cm.exception.messages[0], 'Enter a valid date.')
+
+    def test_date_invalid_upper(self):
+        field = pg_forms.DateRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['2013-04-09', 'b'])
+        self.assertEqual(cm.exception.messages[0], 'Enter a valid date.')
+
+    def test_date_required(self):
+        field = pg_forms.DateRangeField(required=True)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['', ''])
+        self.assertEqual(cm.exception.messages[0], 'This field is required.')
+        value = field.clean(['1976-04-16', ''])
+        self.assertEqual(value, DateRange(datetime.date(1976, 4, 16), None))
+
+    def test_datetime_lower_bound_higher(self):
+        field = pg_forms.DateTimeRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['2006-10-25 14:59', '2006-10-25 14:58'])
+        self.assertEqual(cm.exception.messages[0], 'The start of the range must not exceed the end of the range.')
+        self.assertEqual(cm.exception.code, 'bound_ordering')
+
+    def test_datetime_open(self):
+        field = pg_forms.DateTimeRangeField()
+        value = field.clean(['', '2013-04-09 11:45'])
+        self.assertEqual(value, DateTimeTZRange(None, datetime.datetime(2013, 4, 9, 11, 45)))
+
+    def test_datetime_incorrect_data_type(self):
+        field = pg_forms.DateTimeRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean('2013-04-09 11:45')
+        self.assertEqual(cm.exception.messages[0], 'Enter two valid date/times.')
+        self.assertEqual(cm.exception.code, 'invalid')
+
+    def test_datetime_invalid_lower(self):
+        field = pg_forms.DateTimeRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['45', '2013-04-09 11:45'])
+        self.assertEqual(cm.exception.messages[0], 'Enter a valid date/time.')
+
+    def test_datetime_invalid_upper(self):
+        field = pg_forms.DateTimeRangeField()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['2013-04-09 11:45', 'sweet pickles'])
+        self.assertEqual(cm.exception.messages[0], 'Enter a valid date/time.')
+
+    def test_datetime_required(self):
+        field = pg_forms.DateTimeRangeField(required=True)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['', ''])
+        self.assertEqual(cm.exception.messages[0], 'This field is required.')
+        value = field.clean(['2013-04-09 11:45', ''])
+        self.assertEqual(value, DateTimeTZRange(datetime.datetime(2013, 4, 9, 11, 45), None))
 
     def test_model_field_formfield_integer(self):
         model_field = pg_fields.IntegerRangeField()
