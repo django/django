@@ -204,19 +204,15 @@ class Template(object):
 
     def render(self, context):
         "Display stage -- can be called many times"
-        # Set context.template to the original template -- as opposed to
-        # extended or included templates -- during rendering. This may be
-        # used for accessing context.template.engine.
-        toplevel_render = context.template is None
-        if toplevel_render:
-            context.template = self
         context.render_context.push()
         try:
-            return self._render(context)
+            if context.template is None:
+                with context.bind_template(self):
+                    return self._render(context)
+            else:
+                return self._render(context)
         finally:
             context.render_context.pop()
-            if toplevel_render:
-                context.template = None
 
 
 class Token(object):
