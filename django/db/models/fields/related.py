@@ -25,7 +25,7 @@ from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import smart_text
 from django.utils.functional import cached_property, curry
 from django.utils.translation import ugettext_lazy as _
 
@@ -1804,7 +1804,6 @@ class ForeignObject(RelationField):
         return tuple(field.get_default() for field in self.local_related_fields)
 
     def contribute_to_class(self, cls, name, virtual_only=False):
-        setattr(cls, name, ReverseSingleRelatedObjectDescriptor(self))
         super(ForeignObject, self).contribute_to_class(cls, name, virtual_only=virtual_only)
 
 
@@ -1925,8 +1924,7 @@ class ForeignKey(ConcreteFieldMixin, ForeignObject):
         )
 
     def post_relation_ready(self):
-        # We will likely need to do some setup here, don't know what yet...
-        pass
+        setattr(self.model, self.name, ReverseSingleRelatedObjectDescriptor(self))
 
     def check(self, **kwargs):
         errors = super(ForeignKey, self).check(**kwargs)

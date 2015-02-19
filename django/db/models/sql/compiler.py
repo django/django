@@ -204,7 +204,7 @@ class SQLCompiler(object):
             klass_info['related_klass_infos'] = related_klass_infos
 
             def get_select_from_parent(klass_info):
-                for ki in klass_info['related_klass_infos']:
+                for ki in klass_info.get('related_klass_infos', ()):
                     if ki['from_parent']:
                         ki['select_fields'] = (klass_info['select_fields'] +
                                                ki['select_fields'])
@@ -655,9 +655,6 @@ class SQLCompiler(object):
             else:
                 restricted = False
 
-        def get_related_klass_infos(klass_info, related_klass_infos):
-            klass_info['related_klass_infos'] = related_klass_infos
-
         for f in opts.get_fields():
             field_model = f.model._meta.concrete_model
 
@@ -677,8 +674,8 @@ class SQLCompiler(object):
             else:
                 next = False
 
-            if not select_related_descend(f, restricted, requested,
-                                          only_load.get(field_model)):
+            if not select_related_descend(
+                    f, restricted, requested, only_load.get(field_model)):
                 continue
             fields_found.add(f.name)
             from_parent = f.remote_field and f.remote_field.parent_link and issubclass(f.to, opts.model)
@@ -699,9 +696,10 @@ class SQLCompiler(object):
                 select_fields.append(len(select))
                 select.append((col, None))
             klass_info['select_fields'] = select_fields
-            next_klass_infos = self.get_related_selections(
-                select, f.to._meta, alias, cur_depth + 1, next, restricted)
-            get_related_klass_infos(klass_info, next_klass_infos)
+            if not restricted or next:
+                next_klass_infos = self.get_related_selections(
+                    select, f.to._meta, alias, cur_depth + 1, next, restricted)
+                klass_info['related_klass_infos'] = next_klass_infos
 
         if restricted:
             fields_not_found = set(requested.keys()).difference(fields_found)
