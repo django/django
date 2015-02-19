@@ -99,15 +99,17 @@ class Operation(object):
         """
         return self.references_model(model_name, app_label)
 
-    def allowed_to_migrate(self, connection_alias, model, hints=None):
+    def allow_migrate_model(self, connection_alias, model):
         """
         Returns if we're allowed to migrate the model.
+
+        This is a thin wrapper around router.allow_migrate_model() that
+        preemptively rejects any proxy, swapped out, or unmanaged model.
         """
-        # Always skip if proxy, swapped out, or unmanaged.
-        if model and (model._meta.proxy or model._meta.swapped or not model._meta.managed):
+        if model._meta.proxy or model._meta.swapped or not model._meta.managed:
             return False
 
-        return router.allow_migrate(connection_alias, model, **(hints or {}))
+        return router.allow_migrate_model(connection_alias, model)
 
     def __repr__(self):
         return "<%s %s%s>" % (

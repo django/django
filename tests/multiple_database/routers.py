@@ -4,8 +4,11 @@ from django.db import DEFAULT_DB_ALIAS
 
 
 class TestRouter(object):
-    # A test router. The behavior is vaguely primary/replica, but the
-    # databases aren't assumed to propagate changes.
+    """
+    Vaguely behave like primary/replica, but the databases aren't assumed to
+    propagate changes.
+    """
+
     def db_for_read(self, model, instance=None, **hints):
         if instance:
             return instance._state.db or 'other'
@@ -17,13 +20,14 @@ class TestRouter(object):
     def allow_relation(self, obj1, obj2, **hints):
         return obj1._state.db in ('default', 'other') and obj2._state.db in ('default', 'other')
 
-    def allow_migrate(self, db, model):
+    def allow_migrate(self, db, app_label, **hints):
         return True
 
 
 class AuthRouter(object):
-    """A router to control all database operations on models in
-    the contrib.auth application"""
+    """
+    Control all database operations on models in the contrib.auth application.
+    """
 
     def db_for_read(self, model, **hints):
         "Point all read operations on auth models to 'default'"
@@ -45,12 +49,10 @@ class AuthRouter(object):
             return True
         return None
 
-    def allow_migrate(self, db, model):
+    def allow_migrate(self, db, app_label, **hints):
         "Make sure the auth app only appears on the 'other' db"
-        if db == 'other':
-            return model._meta.app_label == 'auth'
-        elif model._meta.app_label == 'auth':
-            return False
+        if app_label == 'auth':
+            return db == 'other'
         return None
 
 
