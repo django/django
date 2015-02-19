@@ -762,9 +762,9 @@ class Options(object):
         # include the same field multiple times from different models.
         topmost_call = False
         if seen_models is None:
-            seen_models = []
+            seen_models = set()
             topmost_call = True
-        seen_models.append(self.model)
+        seen_models.add(self.model)
 
         # Creates a cache key composed of all arguments
         cache_key = (forward, reverse, include_parents, include_hidden, topmost_call)
