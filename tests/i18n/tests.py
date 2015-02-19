@@ -261,10 +261,6 @@ class TranslationTests(TestCase):
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Value: Kann')
 
-            # Mis-uses
-            self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% trans "May" context as var %}{{ var }}')
-            self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% trans "May" as var context %}{{ var }}')
-
             # {% blocktrans %} ------------------------------
 
             # Inexisting context...

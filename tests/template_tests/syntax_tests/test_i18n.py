@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase
 from django.utils import translation
 from django.utils.safestring import mark_safe
@@ -412,3 +413,45 @@ class I18nTagTests(SimpleTestCase):
     def test_i18n38_2(self):
         output = self.engine.render_to_string('i18n38_2', {'langcodes': ['it', 'no']})
         self.assertEqual(output, 'it: Italian/italiano bidi=False; no: Norwegian/norsk bidi=False; ')
+
+    @setup({'template': '{% load i18n %}{% trans %}A}'})
+    def test_syntax_error_no_arguments(self):
+        msg = "'trans' takes at least one argument"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% trans "Yes" badoption %}'})
+    def test_syntax_error_bad_option(self):
+        msg = "Unknown argument for 'trans' tag: 'badoption'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% trans "Yes" as %}'})
+    def test_syntax_error_missing_assignment(self):
+        msg = "No argument provided to the 'trans' tag for the as option."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% trans "Yes" as var context %}'})
+    def test_syntax_error_missing_context(self):
+        msg = "No argument provided to the 'trans' tag for the context option."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% trans "Yes" context as var %}'})
+    def test_syntax_error_context_as(self):
+        msg = "Invalid argument 'as' provided to the 'trans' tag for the context option"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% trans "Yes" context noop %}'})
+    def test_syntax_error_context_noop(self):
+        msg = "Invalid argument 'noop' provided to the 'trans' tag for the context option"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% trans "Yes" noop noop %}'})
+    def test_syntax_error_duplicate_option(self):
+        msg = "The 'noop' option was specified more than once."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
