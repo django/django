@@ -24,7 +24,7 @@ The uWSGI wiki describes several `installation procedures`_. Using pip, the
 Python package manager, you can install any uWSGI version with a single
 command. For example:
 
-.. code-block:: bash
+.. code-block:: console
 
     # Install current stable version.
     $ sudo pip install uwsgi

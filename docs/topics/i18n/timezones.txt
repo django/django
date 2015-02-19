@@ -34,7 +34,7 @@ but may not be mandatory depending on your particular database backend,
 operating system and time zone. If you encounter an exception querying dates
 or times, please try installing it before filing a bug. It's as simple as:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ sudo pip install pytz
 

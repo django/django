@@ -25,7 +25,7 @@ http://www.reportlab.com/software/opensource/rl-toolkit/download/.
 The `user guide`_ (not coincidentally, a PDF file) explains how to install it.
 Alternatively, you can also install it with ``pip``:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ sudo pip install reportlab
 

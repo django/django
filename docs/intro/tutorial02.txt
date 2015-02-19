@@ -27,7 +27,7 @@ Creating an admin user
 First we'll need to create a user who can login to the admin site. Run the
 following command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py createsuperuser
 
@@ -60,7 +60,7 @@ server and explore it.
 
 Recall from Tutorial 1 that you start the development server like so:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py runserver
 
@@ -508,7 +508,7 @@ template directory in the source code of Django itself
     If you have difficulty finding where the Django source files are located
     on your system, run the following command:
 
-    .. code-block:: bash
+    .. code-block:: console
 
         $ python -c "
         import sys

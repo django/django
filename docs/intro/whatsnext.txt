@@ -150,7 +150,7 @@ Unix ``grep`` utility to search for a phrase in all of the documentation. For
 example, this will show you each mention of the phrase "max_length" in any
 Django document:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ grep -r max_length /path/to/django/docs/
 
@@ -163,14 +163,14 @@ You can get a local copy of the HTML documentation following a few easy steps:
   plain text to HTML. You'll need to install Sphinx by either downloading
   and installing the package from the Sphinx Web site, or with ``pip``:
 
-  .. code-block:: bash
+  .. code-block:: console
 
         $ sudo pip install Sphinx
 
 * Then, just use the included ``Makefile`` to turn the documentation into
   HTML:
 
-  .. code-block:: bash
+  .. code-block:: console
 
         $ cd path/to/django/docs
         $ make html

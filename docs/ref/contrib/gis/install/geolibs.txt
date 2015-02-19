@@ -61,7 +61,7 @@ __ http://www.gaia-gis.it/gaia-sins/
 On Debian/Ubuntu, you are advised to install the following packages which will
 install, directly or by dependency, the required geospatial libraries:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ sudo apt-get install binutils libproj-dev gdal-bin
 
