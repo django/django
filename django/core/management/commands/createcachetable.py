@@ -38,7 +38,7 @@ class Command(BaseCommand):
 
     def create_table(self, database, tablename):
         cache = BaseDatabaseCache(tablename, {})
-        if not router.allow_migrate(database, cache.cache_model_class):
+        if not router.allow_migrate_model(database, cache.cache_model_class):
             return
         connection = connections[database]
 

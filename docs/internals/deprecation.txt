@@ -183,6 +183,10 @@ details on these changes.
 * Ability to specify ``ContentType.name`` when creating a content type instance
   will be removed.
 
+* Support for the old signature of ``allow_migrate`` will be removed. It changed
+  from ``allow_migrate(self, db, model)`` to
+  ``allow_migrate(self, db, app_label, model_name=None, **hints)``.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

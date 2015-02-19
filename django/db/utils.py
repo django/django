@@ -1,5 +1,7 @@
+import inspect
 import os
 import pkgutil
+import warnings
 from importlib import import_module
 from threading import local
 
@@ -7,6 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -276,22 +279,42 @@ class ConnectionRouter(object):
                     return allow
         return obj1._state.db == obj2._state.db
 
-    def allow_migrate(self, db, model, **hints):
+    def allow_migrate(self, db, app_label, **hints):
         for router in self.routers:
             try:
                 method = router.allow_migrate
             except AttributeError:
                 # If the router doesn't have a method, skip to the next one.
-                pass
+                continue
+
+            argspec = inspect.getargspec(router.allow_migrate)
+            if len(argspec.args) == 3 and not argspec.keywords:
+                warnings.warn(
+                    "The signature of allow_migrate has changed from "
+                    "allow_migrate(self, db, model) to "
+                    "allow_migrate(self, db, app_label, model_name=None, **hints). "
+                    "Support for the old signature will be removed in Django 2.0.",
+                    RemovedInDjango20Warning)
+                model = hints.get('model')
+                allow = None if model is None else method(db, model)
             else:
-                allow = method(db, model, **hints)
-                if allow is not None:
-                    return allow
+                allow = method(db, app_label, **hints)
+
+            if allow is not None:
+                return allow
         return True
+
+    def allow_migrate_model(self, db, model):
+        return self.allow_migrate(
+            db,
+            model._meta.app_label,
+            model_name=model._meta.model_name,
+            model=model,
+        )
 
     def get_migratable_models(self, app_config, db, include_auto_created=False):
         """
         Return app models allowed to be synchronized on provided db.
         """
         models = app_config.get_models(include_auto_created=include_auto_created)
-        return [model for model in models if self.allow_migrate(db, model)]
+        return [model for model in models if self.allow_migrate_model(db, model)]
