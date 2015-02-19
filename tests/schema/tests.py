@@ -1,7 +1,7 @@
-from copy import copy
 import datetime
 import itertools
 import unittest
+from copy import copy
 
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
