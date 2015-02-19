@@ -31,7 +31,6 @@ class GenericForeignKey(object):
     one_to_many = False
     one_to_one = False
     related_model = None
-    originating_model = None
 
     def __init__(self, ct_field='content_type', fk_field='object_id', for_concrete_model=True):
         self.ct_field = ct_field
@@ -44,8 +43,6 @@ class GenericForeignKey(object):
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
         self.model = cls
-        if self.originating_model is None and not cls._meta.abstract:
-            self.originating_model = cls
         self.cache_attr = "_%s_cache" % name
         cls._meta.add_field(self, virtual=True)
 

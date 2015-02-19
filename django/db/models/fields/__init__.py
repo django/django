@@ -126,14 +126,6 @@ class Field(RegisterLookupMixin):
     one_to_many = None
     one_to_one = None
     related_model = None
-    # The originating_model is the first non-abstract model that has this
-    # field. This can be different from field's model, as fields in
-    # _meta.virtual_fields overwrite the model attribute for each child
-    # model the field is copied to. For example, if Base defines a
-    # GenericRelation field with name gr, then Base's gr.originating_model
-    # is gr.model is Base, but for Child(Base) the originating_model is
-    # still Base, while gr.model is Child.
-    originating_model = None
 
     # Generic field type description, usually overridden by subclasses
     def _description(self):
@@ -660,8 +652,6 @@ class Field(RegisterLookupMixin):
     def contribute_to_class(self, cls, name, virtual_only=False):
         self.set_attributes_from_name(name)
         self.model = cls
-        if not self.originating_model and not cls._meta.abstract:
-            self.originating_model = cls
         if virtual_only:
             cls._meta.add_field(self, virtual=True)
         else:
