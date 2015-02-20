@@ -23,7 +23,7 @@ class AreaField(BaseField):
     def __init__(self, area_att):
         self.area_att = area_att
 
-    def from_db_value(self, value, connection, context):
+    def from_db_value(self, value, expression, connection, context):
         if value is not None:
             value = Area(**{self.area_att: value})
         return value
@@ -37,7 +37,7 @@ class DistanceField(BaseField):
     def __init__(self, distance_att):
         self.distance_att = distance_att
 
-    def from_db_value(self, value, connection, context):
+    def from_db_value(self, value, expression, connection, context):
         if value is not None:
             value = Distance(**{self.distance_att: value})
         return value
@@ -54,7 +54,7 @@ class GeomField(GeoSelectFormatMixin, BaseField):
     # Hacky marker for get_db_converters()
     geom_type = None
 
-    def from_db_value(self, value, connection, context):
+    def from_db_value(self, value, expression, connection, context):
         if value is not None:
             value = Geometry(value)
         return value
@@ -71,5 +71,5 @@ class GMLField(BaseField):
     def get_internal_type(self):
         return 'GMLField'
 
-    def from_db_value(self, value, connection, context):
+    def from_db_value(self, value, expression, connection, context):
         return value

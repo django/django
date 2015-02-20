@@ -252,7 +252,7 @@ class BaseExpression(object):
                         raise FieldError(
                             "Expression contains mixed types. You must set output_field")
 
-    def convert_value(self, value, connection, context):
+    def convert_value(self, value, expression, connection, context):
         """
         Expressions provide their own converters because users have the option
         of manually specifying the output_field which may be a different type
@@ -804,7 +804,7 @@ class Date(ExpressionNode):
         copy.lookup_type = self.lookup_type
         return copy
 
-    def convert_value(self, value, connection, context):
+    def convert_value(self, value, expression, connection, context):
         if isinstance(value, datetime.datetime):
             value = value.date()
         return value
@@ -856,7 +856,7 @@ class DateTime(ExpressionNode):
         copy.tzname = self.tzname
         return copy
 
-    def convert_value(self, value, connection, context):
+    def convert_value(self, value, expression, connection, context):
         if settings.USE_TZ:
             if value is None:
                 raise ValueError(
