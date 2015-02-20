@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from django.db.migrations.graph import (
     CircularDependencyError, MigrationGraph, NodeNotFoundError,
 )
@@ -151,7 +153,23 @@ class GraphTests(TestCase):
             graph.forwards_plan, ('C', '0001')
         )
 
-    def test_dfs(self):
+    def test_deep_graph(self):
+        graph = MigrationGraph()
+        root = ("app_a", "1")
+        graph.add_node(root, None)
+        expected = [root]
+        for i in range(2, 750):
+            parent = ("app_a", str(i - 1))
+            child = ("app_a", str(i))
+            graph.add_node(child, None)
+            graph.add_dependency(str(i), child, parent)
+            expected.append(child)
+
+        actual = graph.node_map[root].descendants()
+        self.assertEqual(expected[::-1], actual)
+
+    @expectedFailure
+    def test_recursion_depth(self):
         graph = MigrationGraph()
         root = ("app_a", "1")
         graph.add_node(root, None)
@@ -163,7 +181,7 @@ class GraphTests(TestCase):
             graph.add_dependency(str(i), child, parent)
             expected.append(child)
 
-        actual = graph.dfs(root, lambda x: graph.dependents.get(x, set()))
+        actual = graph.node_map[root].descendants()
         self.assertEqual(expected[::-1], actual)
 
     def test_plan_invalid_node(self):
