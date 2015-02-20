@@ -49,21 +49,25 @@ class BaseRangeField(forms.MultiValueField):
 
 
 class IntegerRangeField(BaseRangeField):
+    default_error_messages = {'invalid': _('Enter two whole numbers.')}
     base_field = forms.IntegerField
     range_type = NumericRange
 
 
 class FloatRangeField(BaseRangeField):
+    default_error_messages = {'invalid': _('Enter two numbers.')}
     base_field = forms.FloatField
     range_type = NumericRange
 
 
 class DateTimeRangeField(BaseRangeField):
+    default_error_messages = {'invalid': _('Enter two valid date/times.')}
     base_field = forms.DateTimeField
     range_type = DateTimeTZRange
 
 
 class DateRangeField(BaseRangeField):
+    default_error_messages = {'invalid': _('Enter two valid dates.')}
     base_field = forms.DateField
     range_type = DateRange
 
