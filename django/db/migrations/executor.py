@@ -47,7 +47,7 @@ class MigrationExecutor(object):
                 # child(ren) in the same app, and no further.
                 next_in_app = sorted(
                     n for n in
-                    self.loader.graph.dependents.get(target, set())
+                    self.loader.graph.node_map[target].children
                     if n[0] == target[0]
                 )
                 for node in next_in_app:
