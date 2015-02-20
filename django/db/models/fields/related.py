@@ -2064,6 +2064,15 @@ class ForeignKey(ForeignObject):
     def db_parameters(self, connection):
         return {"type": self.db_type(connection), "check": []}
 
+    def from_db_value(self, value, connection, context):
+        if ((not value) and isinstance(value, six.string_types) and
+                connection.features.interprets_empty_strings_as_nulls):
+            return None
+        return value
+
+    def get_col(self, alias, output_field=None):
+        return super(ForeignKey, self).get_col(alias, output_field or self.related_field)
+
 
 class OneToOneField(ForeignKey):
     """

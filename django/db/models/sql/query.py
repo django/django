@@ -1458,7 +1458,7 @@ class Query(object):
         # database from tripping over IN (...,NULL,...) selects and returning
         # nothing
         col = query.select[0]
-        select_field = col.field
+        select_field = col.target
         alias = col.alias
         if self.is_nullable(select_field):
             lookup_class = select_field.get_lookup('isnull')
