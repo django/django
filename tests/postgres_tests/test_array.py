@@ -6,7 +6,7 @@ import uuid
 from django import forms
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
-from django.core import exceptions, serializers
+from django.core import exceptions, serializers, validators
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
 from django.test import TestCase, TransactionTestCase, override_settings
@@ -329,6 +329,14 @@ class TestValidation(TestCase):
             field.clean([[1, 2], [3, 4, 5]], None)
         self.assertEqual(cm.exception.code, 'nested_array_mismatch')
         self.assertEqual(cm.exception.messages[0], 'Nested arrays must have the same length.')
+
+    def test_with_validators(self):
+        field = ArrayField(models.IntegerField(validators=[validators.MinValueValidator(1)]))
+        field.clean([1, 2], None)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean([0], None)
+        self.assertEqual(cm.exception.code, 'item_invalid')
+        self.assertEqual(cm.exception.messages[0], 'Item 0 in the array did not validate: Ensure this value is greater than or equal to 1.')
 
 
 class TestSimpleFormField(TestCase):
