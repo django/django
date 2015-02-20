@@ -203,7 +203,7 @@ class FileDescriptor(object):
             instance.__dict__[self.field.name] = attr
 
         # Other types of files may be assigned as well, but they need to have
-        # the FieldFile interface added to the. Thus, we wrap any other type of
+        # the FieldFile interface added to them. Thus, we wrap any other type of
         # File inside a FieldFile (well, the field's attr_class, which is
         # usually FieldFile).
         elif isinstance(file, File) and not isinstance(file, FieldFile):
