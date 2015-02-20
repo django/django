@@ -7,7 +7,6 @@ from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX, identify_hasher,
 )
-from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
@@ -20,8 +19,11 @@ from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext, ugettext_lazy as _
 
+User = get_user_model()
+
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
+
     def render(self, name, value, attrs):
         encoded = value
         final_attrs = self.build_attrs(attrs)
@@ -69,10 +71,10 @@ class UserCreationForm(forms.ModelForm):
         'password_mismatch': _("The two password fields didn't match."),
     }
     password1 = forms.CharField(label=_("Password"),
-        widget=forms.PasswordInput)
+                                widget=forms.PasswordInput)
     password2 = forms.CharField(label=_("Password confirmation"),
-        widget=forms.PasswordInput,
-        help_text=_("Enter the same password as above, for verification."))
+                                widget=forms.PasswordInput,
+                                help_text=_("Enter the same password as above, for verification."))
 
     class Meta:
         model = User
@@ -98,9 +100,9 @@ class UserCreationForm(forms.ModelForm):
 
 class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField(label=_("Password"),
-        help_text=_("Raw passwords are not stored, so there is no way to see "
-                    "this user's password, but you can change the password "
-                    "using <a href=\"password/\">this form</a>."))
+                                         help_text=_("Raw passwords are not stored, so there is no way to see "
+                                                     "this user's password, but you can change the password "
+                                                     "using <a href=\"password/\">this form</a>."))
 
     class Meta:
         model = User
