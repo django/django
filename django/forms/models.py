@@ -800,7 +800,10 @@ class BaseModelFormSet(BaseFormSet):
                 or (pk.rel and pk.rel.parent_link and pk_is_not_editable(pk.rel.to._meta.pk)))
         if pk_is_not_editable(pk) or pk.name not in form.fields:
             if form.is_bound:
-                pk_value = form.instance.pk
+                # If we're adding the related instance, ignore its primary key
+                # as it could be an auto-generated default which isn't actually
+                # in the database.
+                pk_value = None if form.instance._state.adding else form.instance.pk
             else:
                 try:
                     if index is not None:
@@ -927,6 +930,11 @@ class BaseInlineFormSet(BaseModelFormSet):
             }
             if self.fk.rel.field_name != self.fk.rel.to._meta.pk.name:
                 kwargs['to_field'] = self.fk.rel.field_name
+
+        # If we're adding a new object, ignore a parent's auto-generated pk
+        # as it will be regenerated on the save request.
+        if self.instance._state.adding and form._meta.model._meta.pk.has_default():
+            self.instance.pk = None
 
         form.fields[name] = InlineForeignKeyField(self.instance, **kwargs)
 
