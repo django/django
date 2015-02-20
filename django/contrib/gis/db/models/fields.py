@@ -219,7 +219,7 @@ class GeometryField(GeoSelectFormatMixin, Field):
         else:
             return geom
 
-    def from_db_value(self, value, connection, context):
+    def from_db_value(self, value, expression, connection, context):
         if value and not isinstance(value, Geometry):
             value = Geometry(value)
         return value

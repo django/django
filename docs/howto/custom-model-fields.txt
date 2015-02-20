@@ -477,7 +477,7 @@ instances::
     class HandField(models.Field):
         # ...
 
-        def from_db_value(self, value, connection, context):
+        def from_db_value(self, value, expression, connection, context):
             if value is None:
                 return value
             return parse_hand(value)
