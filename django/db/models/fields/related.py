@@ -2064,7 +2064,7 @@ class ForeignKey(ForeignObject):
     def db_parameters(self, connection):
         return {"type": self.db_type(connection), "check": []}
 
-    def convert_empty_strings(self, value, connection, context):
+    def convert_empty_strings(self, value, expression, connection, context):
         if (not value) and isinstance(value, six.string_types):
             return None
         return value

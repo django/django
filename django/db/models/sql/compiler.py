@@ -760,17 +760,15 @@ class SQLCompiler(object):
                 backend_converters = self.connection.ops.get_db_converters(expression)
                 field_converters = expression.get_db_converters(self.connection)
                 if backend_converters or field_converters:
-                    converters[i] = (backend_converters, field_converters, expression)
+                    converters[i] = (backend_converters + field_converters, expression)
         return converters
 
     def apply_converters(self, row, converters):
         row = list(row)
-        for pos, (backend_converters, field_converters, field) in converters.items():
+        for pos, (convs, expression) in converters.items():
             value = row[pos]
-            for converter in backend_converters:
-                value = converter(value, field, self.query.context)
-            for converter in field_converters:
-                value = converter(value, self.connection, self.query.context)
+            for converter in convs:
+                value = converter(value, expression, self.connection, self.query.context)
             row[pos] = value
         return tuple(row)
 
