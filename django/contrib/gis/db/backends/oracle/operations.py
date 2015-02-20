@@ -127,7 +127,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
             converters.append(self.convert_geometry)
         return converters
 
-    def convert_geometry(self, value, expression, context):
+    def convert_geometry(self, value, expression, connection, context):
         if value:
             value = Geometry(value)
             if 'transformed_srid' in context:
