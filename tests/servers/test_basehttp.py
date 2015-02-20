@@ -21,7 +21,7 @@ class WSGIRequestHandlerTestCase(TestCase):
         with captured_stderr() as stderr:
             handler.log_message("GET %s %s", str('\x16\x03'), "4")
             self.assertIn(
-                "You're accessing the developement server over HTTPS, "
+                "You're accessing the development server over HTTPS, "
                 "but it only supports HTTP.",
                 stderr.getvalue()
             )
