@@ -3,16 +3,14 @@ from __future__ import unicode_literals
 
 import os
 import sys
-import unittest
 
-from django import template
 from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import (
-    Context, RequestContext, Template, TemplateSyntaxError,
-    base as template_base, engines, loader,
+    Context, Template, TemplateSyntaxError, base as template_base, engines,
+    loader,
 )
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils._os import upath
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(upath(__file__)), 'templates')
@@ -180,54 +178,3 @@ class TemplateRegressionTests(SimpleTestCase):
         child = engines['django'].from_string(
             '{% extends parent %}{% block content %}child{% endblock %}')
         self.assertEqual(child.render({'parent': parent}), 'child')
-
-
-class RequestContextTests(unittest.TestCase):
-
-    def setUp(self):
-        self.fake_request = RequestFactory().get('/')
-
-    @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'OPTIONS': {
-            'loaders': [
-                ('django.template.loaders.locmem.Loader', {
-                    'child': '{{ var|default:"none" }}',
-                }),
-            ],
-        },
-    }])
-    def test_include_only(self):
-        """
-        Regression test for #15721, ``{% include %}`` and ``RequestContext``
-        not playing together nicely.
-        """
-        ctx = RequestContext(self.fake_request, {'var': 'parent'})
-        self.assertEqual(
-            template.Template('{% include "child" %}').render(ctx),
-            'parent'
-        )
-        self.assertEqual(
-            template.Template('{% include "child" only %}').render(ctx),
-            'none'
-        )
-
-    def test_stack_size(self):
-        """
-        Regression test for #7116, Optimize RequetsContext construction
-        """
-        ctx = RequestContext(self.fake_request, {})
-        # The stack should now contain 3 items:
-        # [builtins, supplied context, context processor]
-        self.assertEqual(len(ctx.dicts), 3)
-
-    def test_context_comparable(self):
-        test_data = {'x': 'y', 'v': 'z', 'd': {'o': object, 'a': 'b'}}
-
-        # test comparing RequestContext to prevent problems if somebody
-        # adds __eq__ in the future
-        request = RequestFactory().get('/')
-
-        self.assertEqual(
-            RequestContext(request, dict_=test_data),
-            RequestContext(request, dict_=test_data))
