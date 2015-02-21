@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 import datetime
 import itertools
-import os
 import tempfile
 
 from django.core.files.storage import FileSystemStorage
@@ -14,8 +13,7 @@ callable_default_counter = itertools.count()
 callable_default = lambda: next(callable_default_counter)
 
 
-temp_storage_location = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
-temp_storage = FileSystemStorage(location=temp_storage_location)
+temp_storage = FileSystemStorage(location=tempfile.mkdtemp())
 
 
 class BoundaryModel(models.Model):
