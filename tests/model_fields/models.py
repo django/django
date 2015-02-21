@@ -180,6 +180,8 @@ class VerboseNameField(models.Model):
     field20 = models.TextField("verbose field20")
     field21 = models.TimeField("verbose field21")
     field22 = models.URLField("verbose field22")
+    field23 = models.UUIDField("verbose field23")
+    field24 = models.DurationField("verbose field24")
 
 
 class GenericIPAddress(models.Model):
