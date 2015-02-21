@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 
+from django.template import Context, Engine
 from django.test import SimpleTestCase, ignore_warnings
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -78,3 +79,34 @@ class SsiTagTests(SimpleTestCase):
         output = self.engine.render_to_string('ssi09', {'test': 'Look ma! It parsed!'})
         self.assertEqual(output, 'This is for testing an ssi include '
                                  'with spaces in its name. Look ma! It parsed!\n')
+
+
+@ignore_warnings(category=RemovedInDjango20Warning)
+class SSISecurityTests(SimpleTestCase):
+
+    def setUp(self):
+        self.ssi_dir = os.path.join(ROOT, "templates", "first")
+        self.engine = Engine(allowed_include_roots=(self.ssi_dir,))
+
+    def render_ssi(self, path):
+        # the path must exist for the test to be reliable
+        self.assertTrue(os.path.exists(path))
+        return self.engine.from_string('{%% ssi "%s" %%}' % path).render(Context({}))
+
+    def test_allowed_paths(self):
+        acceptable_path = os.path.join(self.ssi_dir, "..", "first", "test.html")
+        self.assertEqual(self.render_ssi(acceptable_path), 'First template\n')
+
+    def test_relative_include_exploit(self):
+        """
+        May not bypass allowed_include_roots with relative paths
+
+        e.g. if allowed_include_roots = ("/var/www",), it should not be
+        possible to do {% ssi "/var/www/../../etc/passwd" %}
+        """
+        disallowed_paths = [
+            os.path.join(self.ssi_dir, "..", "ssi_include.html"),
+            os.path.join(self.ssi_dir, "..", "second", "test.html"),
+        ]
+        for disallowed_path in disallowed_paths:
+            self.assertEqual(self.render_ssi(disallowed_path), '')

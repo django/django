@@ -12,13 +12,9 @@ from django.template import (
     Context, RequestContext, Template, TemplateSyntaxError,
     base as template_base, engines, loader,
 )
-from django.template.engine import Engine
 from django.test import RequestFactory, SimpleTestCase
-from django.test.utils import (
-    extend_sys_path, ignore_warnings, override_settings,
-)
+from django.test.utils import extend_sys_path, override_settings
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(upath(__file__)), 'templates')
 
@@ -416,34 +412,3 @@ class RequestContextTests(unittest.TestCase):
         self.assertEqual(
             RequestContext(request, dict_=test_data),
             RequestContext(request, dict_=test_data))
-
-
-@ignore_warnings(category=RemovedInDjango20Warning)
-class SSITests(SimpleTestCase):
-    def setUp(self):
-        self.this_dir = os.path.dirname(os.path.abspath(upath(__file__)))
-        self.ssi_dir = os.path.join(self.this_dir, "templates", "first")
-        self.engine = Engine(allowed_include_roots=(self.ssi_dir,))
-
-    def render_ssi(self, path):
-        # the path must exist for the test to be reliable
-        self.assertTrue(os.path.exists(path))
-        return self.engine.from_string('{%% ssi "%s" %%}' % path).render(Context({}))
-
-    def test_allowed_paths(self):
-        acceptable_path = os.path.join(self.ssi_dir, "..", "first", "test.html")
-        self.assertEqual(self.render_ssi(acceptable_path), 'First template\n')
-
-    def test_relative_include_exploit(self):
-        """
-        May not bypass allowed_include_roots with relative paths
-
-        e.g. if allowed_include_roots = ("/var/www",), it should not be
-        possible to do {% ssi "/var/www/../../etc/passwd" %}
-        """
-        disallowed_paths = [
-            os.path.join(self.ssi_dir, "..", "ssi_include.html"),
-            os.path.join(self.ssi_dir, "..", "second", "test.html"),
-        ]
-        for disallowed_path in disallowed_paths:
-            self.assertEqual(self.render_ssi(disallowed_path), '')
