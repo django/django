@@ -76,7 +76,7 @@ class BasicFieldTests(test.TestCase):
 
     def test_field_verbose_name(self):
         m = VerboseNameField
-        for i in range(1, 22):
+        for i in range(1, 24):
             self.assertEqual(m._meta.get_field('field%d' % i).verbose_name,
                              'verbose field%d' % i)
 
