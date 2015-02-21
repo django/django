@@ -1524,7 +1524,7 @@ class AntiPetRouter(object):
     # A router that only expresses an opinion on migrate,
     # passing pets to the 'other' database
 
-    def allow_migrate(self, db, app_label, model_name, **hints):
+    def allow_migrate(self, db, app_label, model_name=None, **hints):
         if db == 'other':
             return model_name == 'pet'
         else:
