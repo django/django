@@ -92,14 +92,13 @@ class SQLCommandsTestCase(TestCase):
 
 
 class TestRouter(object):
-    def allow_migrate(self, db, model):
+    def allow_migrate(self, db, app_label, **hints):
         return False
 
 
 @override_settings(DATABASE_ROUTERS=[TestRouter()])
 class SQLCommandsRouterTestCase(TestCase):
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_router_honored(self):
         app_config = apps.get_app_config('commands_sql')
         for sql_command in (sql_all, sql_create, sql_delete, sql_indexes, sql_destroy_indexes):
