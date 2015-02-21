@@ -1,10 +1,14 @@
 from __future__ import unicode_literals
 
+import os
+
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import SimpleTestCase, ignore_warnings
+from django.test.utils import extend_sys_path
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .templatetags import custom, inclusion
+from .utils import ROOT
 
 
 class CustomFilterTests(SimpleTestCase):
@@ -276,3 +280,38 @@ class AssignmentTagTests(TagTestCase):
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             Template('{% load custom %}{% assignment_tag_without_context_parameter 123 as var %}')
+
+
+class TemplateTagLoadingTests(SimpleTestCase):
+
+    def setUp(self):
+        self.egg_dir = os.path.join(ROOT, 'eggs')
+
+    def test_load_error(self):
+        ttext = "{% load broken_tag %}"
+        with self.assertRaises(TemplateSyntaxError) as e:
+            Template(ttext)
+
+        self.assertIn('ImportError', e.exception.args[0])
+        self.assertIn('Xtemplate', e.exception.args[0])
+
+    def test_load_error_egg(self):
+        ttext = "{% load broken_egg %}"
+        egg_name = '%s/tagsegg.egg' % self.egg_dir
+        with extend_sys_path(egg_name):
+            with self.assertRaises(TemplateSyntaxError):
+                with self.settings(INSTALLED_APPS=['tagsegg']):
+                    Template(ttext)
+            try:
+                with self.settings(INSTALLED_APPS=['tagsegg']):
+                    Template(ttext)
+            except TemplateSyntaxError as e:
+                self.assertIn('ImportError', e.args[0])
+                self.assertIn('Xtemplate', e.args[0])
+
+    def test_load_working_egg(self):
+        ttext = "{% load working_egg %}"
+        egg_name = '%s/tagsegg.egg' % self.egg_dir
+        with extend_sys_path(egg_name):
+            with self.settings(INSTALLED_APPS=['tagsegg']):
+                Template(ttext)

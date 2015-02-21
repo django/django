@@ -12,8 +12,7 @@ from django.template import (
     Context, RequestContext, Template, TemplateSyntaxError,
     base as template_base, engines, loader,
 )
-from django.test import RequestFactory, SimpleTestCase
-from django.test.utils import extend_sys_path, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.utils._os import upath
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(upath(__file__)), 'templates')
@@ -181,42 +180,6 @@ class TemplateRegressionTests(SimpleTestCase):
         child = engines['django'].from_string(
             '{% extends parent %}{% block content %}child{% endblock %}')
         self.assertEqual(child.render({'parent': parent}), 'child')
-
-
-class TemplateTagLoading(SimpleTestCase):
-
-    def setUp(self):
-        self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
-
-    def test_load_error(self):
-        ttext = "{% load broken_tag %}"
-        self.assertRaises(template.TemplateSyntaxError, template.Template, ttext)
-        try:
-            template.Template(ttext)
-        except template.TemplateSyntaxError as e:
-            self.assertIn('ImportError', e.args[0])
-            self.assertIn('Xtemplate', e.args[0])
-
-    def test_load_error_egg(self):
-        ttext = "{% load broken_egg %}"
-        egg_name = '%s/tagsegg.egg' % self.egg_dir
-        with extend_sys_path(egg_name):
-            with self.assertRaises(template.TemplateSyntaxError):
-                with self.settings(INSTALLED_APPS=['tagsegg']):
-                    template.Template(ttext)
-            try:
-                with self.settings(INSTALLED_APPS=['tagsegg']):
-                    template.Template(ttext)
-            except template.TemplateSyntaxError as e:
-                self.assertIn('ImportError', e.args[0])
-                self.assertIn('Xtemplate', e.args[0])
-
-    def test_load_working_egg(self):
-        ttext = "{% load working_egg %}"
-        egg_name = '%s/tagsegg.egg' % self.egg_dir
-        with extend_sys_path(egg_name):
-            with self.settings(INSTALLED_APPS=['tagsegg']):
-                template.Template(ttext)
 
 
 class RequestContextTests(unittest.TestCase):
