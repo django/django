@@ -82,34 +82,6 @@ class TemplateRegressionTests(SimpleTestCase):
         except TemplateSyntaxError as e:
             self.assertEqual(e.args[0], "Invalid block tag: 'endblock', expected 'elif', 'else' or 'endif'")
 
-    def test_ifchanged_concurrency(self):
-        # Tests for #15849
-        template = Template('[0{% for x in foo %},{% with var=get_value %}{% ifchanged %}{{ var }}{% endifchanged %}{% endwith %}{% endfor %}]')
-
-        # Using generator to mimic concurrency.
-        # The generator is not passed to the 'for' loop, because it does a list(values)
-        # instead, call gen.next() in the template to control the generator.
-        def gen():
-            yield 1
-            yield 2
-            # Simulate that another thread is now rendering.
-            # When the IfChangeNode stores state at 'self' it stays at '3' and skip the last yielded value below.
-            iter2 = iter([1, 2, 3])
-            output2 = template.render(Context({'foo': range(3), 'get_value': lambda: next(iter2)}))
-            self.assertEqual(output2, '[0,1,2,3]', 'Expected [0,1,2,3] in second parallel template, got {}'.format(output2))
-            yield 3
-
-        gen1 = gen()
-        output1 = template.render(Context({'foo': range(3), 'get_value': lambda: next(gen1)}))
-        self.assertEqual(output1, '[0,1,2,3]', 'Expected [0,1,2,3] in first template, got {}'.format(output1))
-
-    def test_ifchanged_render_once(self):
-        """ Test for ticket #19890. The content of ifchanged template tag was
-        rendered twice."""
-        template = Template('{% ifchanged %}{% cycle "1st time" "2nd time" %}{% endifchanged %}')
-        output = template.render(Context({}))
-        self.assertEqual(output, '1st time')
-
     def test_super_errors(self):
         """
         Test behavior of the raise errors into included blocks.
