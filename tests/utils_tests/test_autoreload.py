@@ -5,6 +5,7 @@ from importlib import import_module
 from django import conf
 from django.contrib import admin
 from django.test import TestCase, override_settings
+from django.test.utils import extend_sys_path
 from django.utils._os import npath, upath
 from django.utils.autoreload import gen_filenames
 
@@ -88,12 +89,12 @@ class TestFilenameGenerator(TestCase):
         self.assertFalse(any(f.endswith('.pyc') for f in gen_filenames()))
 
     def test_deleted_removed(self):
-        fd, filepath = tempfile.mkstemp(dir=os.path.dirname(upath(__file__)), suffix='.py')
-        try:
-            _, filename = os.path.split(filepath)
-            import_module('.%s' % filename.replace('.py', ''), package='utils_tests')
-            self.assertIn(npath(filepath), gen_filenames())
-        finally:
-            os.close(fd)
-            os.remove(filepath)
-        self.assertNotIn(filepath, gen_filenames())
+        dirname = tempfile.mkdtemp()
+        filename = os.path.join(dirname, 'test_deleted_removed_module.py')
+        with open(filename, 'w'):
+            pass
+        with extend_sys_path(dirname):
+            import_module('test_deleted_removed_module')
+        self.assertIn(npath(filename), gen_filenames())
+        os.unlink(filename)
+        self.assertNotIn(filename, gen_filenames())

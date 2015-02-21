@@ -80,14 +80,16 @@ print(article.headline)"""
             article_text="This is an article",
         )
 
-        with NamedTemporaryFile(mode='w+', suffix=".py", dir='.') as script:
+        with NamedTemporaryFile(mode='w+', suffix=".py") as script:
             script.write(script_template % pickle.dumps(a))
             script.flush()
+            pythonpath = [os.path.dirname(script.name)] + sys.path
             env = {
                 # Needed to run test outside of tests directory
-                str('PYTHONPATH'): os.pathsep.join(sys.path),
+                str('PYTHONPATH'): os.pathsep.join(pythonpath),
                 # Needed on Windows because http://bugs.python.org/issue8557
                 str('PATH'): os.environ['PATH'],
+                str('TMPDIR'): os.environ['TMPDIR'],
                 str('LANG'): os.environ.get('LANG', ''),
             }
             if 'SYSTEMROOT' in os.environ:  # Windows http://bugs.python.org/issue20614
