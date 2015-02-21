@@ -409,6 +409,23 @@ where ``reason`` is a short message (intended for developers or logging, not for
 end users) indicating the reason the request was rejected.  See
 :doc:`/ref/csrf`.
 
+.. setting:: CSRF_HEADER_NAME
+
+CSRF_HEADER_NAME
+----------------
+
+.. versionadded:: 1.9
+
+Default: ``'HTTP_X_CSRFTOKEN'``
+
+The name of the request header used for CSRF authentication.
+
+As with other HTTP headers in ``request.META``, the header name received from
+the server is normalized by converting all characters to uppercase, replacing
+any hyphens with underscores, and adding an ``'HTTP_'`` prefix to the name.
+For example, if your client sends a ``'X-XSRF-TOKEN'`` header, the setting
+should be ``'HTTP_X_XSRF_TOKEN'``.
+
 .. setting:: DATABASES
 
 DATABASES
@@ -3261,6 +3278,7 @@ Security
   * :setting:`CSRF_COOKIE_PATH`
   * :setting:`CSRF_COOKIE_SECURE`
   * :setting:`CSRF_FAILURE_VIEW`
+  * :setting:`CSRF_HEADER_NAME`
 
 * :setting:`SECRET_KEY`
 * :setting:`X_FRAME_OPTIONS`

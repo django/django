@@ -92,6 +92,9 @@ protection for your views as outlined above.
     The CSRF token cookie is named ``csrftoken`` by default, but you can control
     the cookie name via the :setting:`CSRF_COOKIE_NAME` setting.
 
+    The CSRF header name is ``HTTP_X_CSRFTOKEN`` by default, but you can
+    customize it using the :setting:`CSRF_HEADER_NAME` setting.
+
 Acquiring the token is straightforward:
 
 .. code-block:: javascript
@@ -456,3 +459,4 @@ A number of settings can be used to control Django's CSRF behavior:
 * :setting:`CSRF_COOKIE_PATH`
 * :setting:`CSRF_COOKIE_SECURE`
 * :setting:`CSRF_FAILURE_VIEW`
+* :setting:`CSRF_HEADER_NAME`
