@@ -7,8 +7,7 @@ import sys
 from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import (
-    Context, Template, TemplateSyntaxError, base as template_base, engines,
-    loader,
+    Context, Template, TemplateSyntaxError, engines, loader,
 )
 from django.test import SimpleTestCase, override_settings
 from django.utils._os import upath
@@ -25,12 +24,6 @@ class TemplateTests(SimpleTestCase):
 
 
 class TemplateRegressionTests(SimpleTestCase):
-
-    def test_token_smart_split(self):
-        # Regression test for #7027
-        token = template_base.Token(template_base.TOKEN_BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
-        split = token.split_contents()
-        self.assertEqual(split, ["sometag", '_("Page not found")', 'value|yesno:_("yes,no")'])
 
     @override_settings(SETTINGS_MODULE=None, DEBUG=True)
     def test_url_reverse_no_settings_module(self):
