@@ -95,4 +95,4 @@ class StaticLiveServerView(LiveServerBase):
         to discover app's static assets without having to collectstatic first.
         """
         f = self.urlopen('/static/test/file.txt')
-        self.assertEqual(f.read().rstrip(b'\r\n'), b'In app media directory.')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'In static directory.')
