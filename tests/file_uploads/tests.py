@@ -50,10 +50,8 @@ class FileUploadTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_large_upload(self):
-        tdir = tempfile.gettempdir()
-
         file = tempfile.NamedTemporaryFile
-        with file(suffix=".file1", dir=tdir) as file1, file(suffix=".file2", dir=tdir) as file2:
+        with file(suffix=".file1") as file1, file(suffix=".file2") as file2:
             file1.write(b'a' * (2 ** 21))
             file1.seek(0)
 
@@ -262,11 +260,8 @@ class FileUploadTests(TestCase):
                             "Got a long file name (%s characters)." % len(got))
 
     def test_file_content(self):
-        tdir = tempfile.gettempdir()
-
         file = tempfile.NamedTemporaryFile
-        with file(suffix=".ctype_extra", dir=tdir) as no_content_type, \
-                file(suffix=".ctype_extra", dir=tdir) as simple_file:
+        with file(suffix=".ctype_extra") as no_content_type, file(suffix=".ctype_extra") as simple_file:
             no_content_type.write(b'no content')
             no_content_type.seek(0)
 
@@ -291,10 +286,8 @@ class FileUploadTests(TestCase):
 
     def test_content_type_extra(self):
         """Uploaded files may have content type parameters available."""
-        tdir = tempfile.gettempdir()
-
         file = tempfile.NamedTemporaryFile
-        with file(suffix=".ctype_extra", dir=tdir) as no_content_type, file(suffix=".ctype_extra", dir=tdir) as simple_file:
+        with file(suffix=".ctype_extra") as no_content_type, file(suffix=".ctype_extra") as simple_file:
             no_content_type.write(b'something')
             no_content_type.seek(0)
 

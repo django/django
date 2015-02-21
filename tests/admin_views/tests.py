@@ -3315,8 +3315,7 @@ class AdminInlineFileUploadTest(TestCase):
         # Set up test Picture and Gallery.
         # These must be set up here instead of in fixtures in order to allow Picture
         # to use a NamedTemporaryFile.
-        tdir = tempfile.gettempdir()
-        file1 = tempfile.NamedTemporaryFile(suffix=".file1", dir=tdir)
+        file1 = tempfile.NamedTemporaryFile(suffix=".file1")
         file1.write(b'a' * (2 ** 21))
         filename = file1.name
         file1.close()
