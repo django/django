@@ -2369,9 +2369,9 @@ class UUIDField(Field):
     description = 'Universally unique identifier'
     empty_strings_allowed = False
 
-    def __init__(self, **kwargs):
+    def __init__(self, verbose_name=None, **kwargs):
         kwargs['max_length'] = 32
-        super(UUIDField, self).__init__(**kwargs)
+        super(UUIDField, self).__init__(verbose_name, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(UUIDField, self).deconstruct()
