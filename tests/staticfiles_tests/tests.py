@@ -821,18 +821,6 @@ class TestServeStaticWithURLHelper(TestServeStatic, TestDefaults):
     """
 
 
-class TestServeAdminMedia(TestServeStatic):
-    """
-    Test serving media from django.contrib.admin.
-    """
-    def _response(self, filepath):
-        return self.client.get(
-            posixpath.join(settings.STATIC_URL, 'admin/', filepath))
-
-    def test_serve_admin_media(self):
-        self.assertFileContains('css/base.css', 'body')
-
-
 class FinderTestCase(object):
     """
     Base finder test mixin.
