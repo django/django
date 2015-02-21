@@ -22,7 +22,7 @@ from . import uploadhandler
 from .models import FileModel
 
 UNICODE_FILENAME = 'test-0123456789_中文_Orléans.jpg'
-MEDIA_ROOT = sys_tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
+MEDIA_ROOT = sys_tempfile.mkdtemp()
 UPLOAD_TO = os.path.join(MEDIA_ROOT, 'test_upload')
 
 

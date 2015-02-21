@@ -5,7 +5,6 @@ Storing files according to a custom storage system
 and where files should be stored.
 """
 
-import os
 import random
 import tempfile
 
@@ -26,7 +25,7 @@ class OldStyleFSStorage(FileSystemStorage):
         return super(OldStyleFSStorage, self).save(name, content)
 
 
-temp_storage_location = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
+temp_storage_location = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(location=temp_storage_location)
 
 

@@ -13,6 +13,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import tempfile
 import unittest
 
 import django
@@ -27,7 +28,7 @@ from django.utils._os import npath, upath
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
 
-test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
+test_dir = os.path.realpath(os.path.join(tempfile.gettempdir(), 'test_project'))
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
     open(os.path.join(test_dir, '__init__.py'), 'w').close()
