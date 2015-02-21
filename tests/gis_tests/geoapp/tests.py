@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import re
-from tempfile import NamedTemporaryFile
+import tempfile
 
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import HAS_GEOS
@@ -219,10 +219,10 @@ class GeoModelTest(TestCase):
         self.assertIn('"point": "%s"' % houston.point.ewkt, result)
 
         # Reload now dumped data
-        with NamedTemporaryFile(mode='w', suffix='.json') as tempfile:
-            tempfile.write(result)
-            tempfile.seek(0)
-            call_command('loaddata', tempfile.name, verbosity=0)
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.json') as tmp:
+            tmp.write(result)
+            tmp.seek(0)
+            call_command('loaddata', tmp.name, verbosity=0)
         self.assertListEqual(original_data, list(City.objects.all().order_by('name')))
 
 
