@@ -30,6 +30,6 @@ DATETIME_INPUT_FORMATS = [
     '%d.%m.%y %H:%M',        # '25.10.06 14:30'
     '%d.%m.%y',              # '25.10.06'
 ]
-DECIMAL_SEPARATOR = '.'
-THOUSAND_SEPARATOR = ','
+DECIMAL_SEPARATOR = ','
+THOUSAND_SEPARATOR = '\xa0'  # non-breaking space
 NUMBER_GROUPING = 3
