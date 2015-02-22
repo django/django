@@ -73,7 +73,7 @@ create a real version. Add the following to ``polls/views.py``:
     from django.http import HttpResponseRedirect, HttpResponse
     from django.core.urlresolvers import reverse
 
-    from polls.models import Choice, Question
+    from .models import Choice, Question
     # ...
     def vote(request, question_id):
         p = get_object_or_404(Question, pk=question_id)
@@ -225,7 +225,7 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 
     from django.conf.urls import url
 
-    from polls import views
+    from . import views
 
     urlpatterns = [
         url(r'^$', views.IndexView.as_view(), name='index'),
@@ -254,7 +254,7 @@ views and use Django's generic views instead. To do so, open the
     from django.core.urlresolvers import reverse
     from django.views import generic
 
-    from polls.models import Choice, Question
+    from .models import Choice, Question
 
 
     class IndexView(generic.ListView):
