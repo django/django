@@ -395,7 +395,13 @@ details on these changes.
 * The module ``django.test._doctest`` will be removed. Instead use the doctest
   module from the Python standard library.
 
-* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting will be removed.
+* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting will be removed. This change
+  applies to both ``django.middleware.cache.CacheMiddleware`` and
+  ``django.middleware.cache.UpdateCacheMiddleware`` despite the missing
+  deprecation warning in ``django.middleware.cache.UpdateCacheMiddleware`` in
+  version 1.7. Please read `#15201`_ for more information.
+
+  .. _`#15201`: https://code.djangoproject.com/ticket/15201
 
 * Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
   more than one.* string to override or append to user-provided ``help_text`` in
