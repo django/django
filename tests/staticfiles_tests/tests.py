@@ -20,7 +20,7 @@ from django.core.management import call_command
 from django.template import Context, Template
 from django.test import TestCase, override_settings
 from django.utils import six
-from django.utils._os import rmtree_errorhandler, symlinks_supported, upath
+from django.utils._os import symlinks_supported, upath
 from django.utils.encoding import force_text
 from django.utils.functional import empty
 
@@ -106,9 +106,7 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
         self.patched_settings = self.settings(STATIC_ROOT=temp_dir)
         self.patched_settings.enable()
         self.run_collectstatic()
-        # Use our own error handler that can handle .svn dirs on Windows
-        self.addCleanup(shutil.rmtree, temp_dir,
-                        ignore_errors=True, onerror=rmtree_errorhandler)
+        self.addCleanup(shutil.rmtree, temp_dir)
 
     def tearDown(self):
         self.patched_settings.disable()
