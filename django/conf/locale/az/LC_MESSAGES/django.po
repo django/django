@@ -2,7 +2,6 @@
 #
 # Translators:
 # Metin Amiroff <amiroff@gmail.com>, 2011
-# Emin Mastizada <emin@mastizada.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -20,7 +19,7 @@ msgstr ""
 
 #: conf/global_settings.py:51
 msgid "Afrikaans"
-msgstr "Afrikaans"
+msgstr "Afrikaansca"
 
 #: conf/global_settings.py:52
 msgid "Arabic"
@@ -28,7 +27,7 @@ msgstr "Ərəbcə"
 
 #: conf/global_settings.py:53
 msgid "Asturian"
-msgstr "Asturiyaca"
+msgstr ""
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -84,7 +83,7 @@ msgstr "İngiliscə"
 
 #: conf/global_settings.py:66
 msgid "Australian English"
-msgstr "Avstraliya İngiliscəsi"
+msgstr ""
 
 #: conf/global_settings.py:67
 msgid "British English"
@@ -172,7 +171,7 @@ msgstr "İndonezcə"
 
 #: conf/global_settings.py:88
 msgid "Ido"
-msgstr "İdoca"
+msgstr ""
 
 #: conf/global_settings.py:88
 msgid "Icelandic"
@@ -232,11 +231,11 @@ msgstr "Monqolca"
 
 #: conf/global_settings.py:102
 msgid "Marathi"
-msgstr "Marathicə"
+msgstr ""
 
 #: conf/global_settings.py:102
 msgid "Burmese"
-msgstr "Burmescə"
+msgstr ""
 
 #: conf/global_settings.py:103
 msgid "Norwegian Bokmal"
@@ -256,7 +255,7 @@ msgstr "Nynorsk Norveçcəsi"
 
 #: conf/global_settings.py:107
 msgid "Ossetic"
-msgstr "Osetincə"
+msgstr ""
 
 #: conf/global_settings.py:108
 msgid "Punjabi"
@@ -356,19 +355,19 @@ msgstr "Ənənəvi Çincə"
 
 #: contrib/sitemaps/apps.py:8
 msgid "Site Maps"
-msgstr "Sayt Xəritələri"
+msgstr ""
 
 #: contrib/staticfiles/apps.py:8
 msgid "Static Files"
-msgstr "Statik Fayllar"
+msgstr ""
 
 #: contrib/syndication/apps.py:8
 msgid "Syndication"
-msgstr "Sindikasiya"
+msgstr ""
 
 #: contrib/webdesign/apps.py:8
 msgid "Web Design"
-msgstr "Web Dizayn"
+msgstr ""
 
 #: core/validators.py:21
 msgid "Enter a valid value."
@@ -380,17 +379,17 @@ msgstr "Düzgün URL daxil edin."
 
 #: core/validators.py:115
 msgid "Enter a valid integer."
-msgstr "Düzgün rəqəm daxil edin."
+msgstr ""
 
 #: core/validators.py:120
 msgid "Enter a valid email address."
-msgstr "Düzgün e-poçt ünvanı daxil edin."
+msgstr "Düzgün e-poçt ünvanını daxil edin."
 
 #: core/validators.py:185
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Hərflərdən, rəqəmlərdən, alt-xətlərdən və ya defislərdən ibarət düzgün qısaltma "
+"Hərflərdən, rəqəmlərdən, alt-xətlərdən və ya defislərdən ibarət düzgün slaq "
 "daxil edin."
 
 #: core/validators.py:188 core/validators.py:207
@@ -482,7 +481,6 @@ msgstr "%(model_name)s bu %(field_label)s sahə ilə artıq mövcuddur."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
-"%(field_label)s dəyəri %(date_field_label)s %(lookup_type)s üçün unikal olmalıdır."
 
 #: db/models/fields/__init__.py:116
 #, python-format
@@ -887,14 +885,14 @@ msgstr "Yox"
 
 #: template/defaultfilters.py:855
 msgid "yes,no,maybe"
-msgstr "hə,yox,bəlkə"
+msgstr "hə, yox, bəlkə"
 
 #: template/defaultfilters.py:884 template/defaultfilters.py:896
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
-msgstr[0] "%(size)d bayt"
-msgstr[1] "%(size)d bayt"
+msgstr[0] ""
+msgstr[1] ""
 
 #: template/defaultfilters.py:898
 #, python-format
@@ -909,7 +907,7 @@ msgstr "%s MB"
 #: template/defaultfilters.py:902
 #, python-format
 msgid "%s GB"
-msgstr "%s QB"
+msgstr "%s GB"
 
 #: template/defaultfilters.py:904
 #, python-format
@@ -1219,7 +1217,7 @@ msgstr "Dekabr"
 
 #: utils/ipv6.py:10
 msgid "This is not a valid IPv6 address."
-msgstr "Bu doğru IPv6 ünvanı deyil."
+msgstr ""
 
 #: utils/text.py:76
 #, python-format
@@ -1240,51 +1238,51 @@ msgstr ", "
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] "%d il"
-msgstr[1] "%d il"
+msgstr[0] ""
+msgstr[1] ""
 
 #: utils/timesince.py:26
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "%d ay"
-msgstr[1] "%d ay"
+msgstr[0] ""
+msgstr[1] ""
 
 #: utils/timesince.py:27
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] "%d həftə"
-msgstr[1] "%d həftə"
+msgstr[0] ""
+msgstr[1] ""
 
 #: utils/timesince.py:28
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%d gün"
-msgstr[1] "%d gün"
+msgstr[0] ""
+msgstr[1] ""
 
 #: utils/timesince.py:29
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%d saat"
-msgstr[1] "%d saat"
+msgstr[0] ""
+msgstr[1] ""
 
 #: utils/timesince.py:30
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d dəqiqə"
-msgstr[1] "%d dəqiqə"
+msgstr[0] ""
+msgstr[1] ""
 
 #: utils/timesince.py:46
 msgid "0 minutes"
-msgstr "0 dəqiqə"
+msgstr ""
 
 #: views/csrf.py:105
 msgid "Forbidden"
-msgstr "Qadağan"
+msgstr ""
 
 #: views/csrf.py:106
 msgid "CSRF verification failed. Request aborted."
