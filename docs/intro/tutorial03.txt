@@ -94,7 +94,7 @@ In the ``polls/urls.py`` file include the following code:
 
     from django.conf.urls import url
 
-    from polls import views
+    from . import views
 
     urlpatterns = [
         url(r'^$', views.index, name='index'),
@@ -209,7 +209,7 @@ Wire these new views into the ``polls.urls`` module by adding the following
 
     from django.conf.urls import url
 
-    from polls import views
+    from . import views
 
     urlpatterns = [
         # ex: /polls/
@@ -296,7 +296,7 @@ commas, according to publication date:
 
     from django.http import HttpResponse
 
-    from polls.models import Question
+    from .models import Question
 
 
     def index(request):
@@ -374,7 +374,7 @@ Now let's update our ``index`` view in ``polls/views.py`` to use the template:
     from django.http import HttpResponse
     from django.template import RequestContext, loader
 
-    from polls.models import Question
+    from .models import Question
 
 
     def index(request):
@@ -406,7 +406,7 @@ rewritten:
 
     from django.shortcuts import render
 
-    from polls.models import Question
+    from .models import Question
 
 
     def index(request):
@@ -436,7 +436,7 @@ for a given poll. Here's the view:
     from django.http import Http404
     from django.shortcuts import render
 
-    from polls.models import Question
+    from .models import Question
     # ...
     def detail(request, question_id):
         try:
@@ -471,7 +471,7 @@ provides a shortcut. Here's the ``detail()`` view, rewritten:
 
     from django.shortcuts import get_object_or_404, render
 
-    from polls.models import Question
+    from .models import Question
     # ...
     def detail(request, question_id):
         question = get_object_or_404(Question, pk=question_id)
