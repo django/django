@@ -7,7 +7,6 @@ import inspect
 import math
 import os
 import re
-import sys
 import types
 from importlib import import_module
 
@@ -18,6 +17,7 @@ from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
+from django.utils.module_loading import module_dir
 from django.utils.timezone import utc
 from django.utils.version import get_docs_version
 
@@ -201,43 +201,66 @@ class MigrationWriter(object):
         return value_repr
 
     @property
+    def basedir(self):
+        migrations_package_name = MigrationLoader.migrations_module(self.migration.app_label)
+
+        # See if we can import the migrations module directly
+        try:
+            migrations_module = import_module(migrations_package_name)
+        except ImportError:
+            pass
+        else:
+            try:
+                return upath(module_dir(migrations_module))
+            except ValueError:
+                pass
+
+        # Alright, see if it's a direct submodule of the app
+        app_config = apps.get_app_config(self.migration.app_label)
+        maybe_app_name, _, migrations_package_basename = migrations_package_name.rpartition(".")
+        if app_config.name == maybe_app_name:
+            return os.path.join(app_config.path, migrations_package_basename)
+
+        # In case of using MIGRATION_MODULES setting and the custom package
+        # doesn't exist, create one, starting from an existing package
+        existing_dirs, missing_dirs = migrations_package_name.split("."), []
+        while existing_dirs:
+            missing_dirs.insert(0, existing_dirs.pop(-1))
+            try:
+                base_module = import_module(".".join(existing_dirs))
+            except ImportError:
+                continue
+            else:
+                try:
+                    base_dir = upath(module_dir(base_module))
+                except ValueError:
+                    continue
+                else:
+                    break
+        else:
+            raise ValueError(
+                "Could not locate an appropriate location to create "
+                "migrations package %s. Make sure the toplevel "
+                "package exists and can be imported." %
+                migrations_package_name)
+
+        final_dir = os.path.join(base_dir, *missing_dirs)
+        if not os.path.isdir(final_dir):
+            os.makedirs(final_dir)
+        for missing_dir in missing_dirs:
+            base_dir = os.path.join(base_dir, missing_dir)
+            with open(os.path.join(base_dir, "__init__.py"), "w"):
+                pass
+
+        return final_dir
+
+    @property
     def filename(self):
         return "%s.py" % self.migration.name
 
     @property
     def path(self):
-        migrations_package_name = MigrationLoader.migrations_module(self.migration.app_label)
-        # See if we can import the migrations module directly
-        try:
-            migrations_module = import_module(migrations_package_name)
-
-            # Python 3 fails when the migrations directory does not have a
-            # __init__.py file
-            if not hasattr(migrations_module, '__file__'):
-                raise ImportError
-
-            basedir = os.path.dirname(upath(migrations_module.__file__))
-        except ImportError:
-            app_config = apps.get_app_config(self.migration.app_label)
-            migrations_package_basename = migrations_package_name.split(".")[-1]
-
-            # Alright, see if it's a direct submodule of the app
-            if '%s.%s' % (app_config.name, migrations_package_basename) == migrations_package_name:
-                basedir = os.path.join(app_config.path, migrations_package_basename)
-            else:
-                # In case of using MIGRATION_MODULES setting and the custom
-                # package doesn't exist, create one.
-                package_dirs = migrations_package_name.split(".")
-                create_path = os.path.join(upath(sys.path[0]), *package_dirs)
-                if not os.path.isdir(create_path):
-                    os.makedirs(create_path)
-                for i in range(1, len(package_dirs) + 1):
-                    init_dir = os.path.join(upath(sys.path[0]), *package_dirs[:i])
-                    init_path = os.path.join(init_dir, "__init__.py")
-                    if not os.path.isfile(init_path):
-                        open(init_path, "w").close()
-                return os.path.join(create_path, self.filename)
-        return os.path.join(basedir, self.filename)
+        return os.path.join(self.basedir, self.filename)
 
     @classmethod
     def serialize_deconstructed(cls, path, args, kwargs):
