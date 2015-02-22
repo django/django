@@ -326,8 +326,11 @@ class Apps(object):
         # the relation tree and the fields cache.
         self.get_models.cache_clear()
         if self.ready:
-            for model in self.get_models(include_auto_created=True):
-                model._meta._expire_cache()
+            # Circumvent self.get_models() to prevent that the cache is refilled.
+            # This particularly prevents that an empty value is cached while cloning.
+            for app_config in self.app_configs.values():
+                for model in app_config.get_models(include_auto_created=True):
+                    model._meta._expire_cache()
 
 
 apps = Apps(installed_apps=None)

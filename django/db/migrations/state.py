@@ -236,6 +236,10 @@ class StateApps(Apps):
         # base errors, until the size of the unrendered models doesn't
         # decrease by at least one, meaning there's a base dependency loop/
         # missing base.
+        if not model_states:
+            return
+        # Prevent that all model caches are expired for each render.
+        self.ready = False
         unrendered_models = model_states
         while unrendered_models:
             new_unrendered_models = []
@@ -245,6 +249,7 @@ class StateApps(Apps):
                 except InvalidBasesError:
                     new_unrendered_models.append(model)
             if len(new_unrendered_models) == len(unrendered_models):
+                self.ready = True
                 raise InvalidBasesError(
                     "Cannot resolve bases for %r\nThis can happen if you are inheriting models from an "
                     "app with migrations (e.g. contrib.auth)\n in an app with no migrations; see "
@@ -252,6 +257,8 @@ class StateApps(Apps):
                     "for more" % (new_unrendered_models, get_docs_version())
                 )
             unrendered_models = new_unrendered_models
+        self.ready = True
+        self.clear_cache()
 
     def clone(self):
         """
