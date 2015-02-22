@@ -1723,7 +1723,10 @@ removed in Django 1.8 (please see the :ref:`deprecation timeline
 
 * The module ``django.test._doctest`` is removed.
 
-* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting is removed.
+* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting is removed. This change
+  affects both ``django.middleware.cache.CacheMiddleware`` and
+  ``django.middleware.cache.UpdateCacheMiddleware`` despite the lack of a
+  deprecation warning in the latter class.
 
 * Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
   more than one.* string to override or append to user-provided ``help_text`` in
