@@ -27,14 +27,16 @@ function windowname_to_id(text) {
     return text;
 }
 
-function showAdminPopup(triggeringLink, name_regexp) {
+function showAdminPopup(triggeringLink, name_regexp, add_popup) {
     var name = triggeringLink.id.replace(name_regexp, '');
     name = id_to_windowname(name);
     var href = triggeringLink.href;
-    if (href.indexOf('?') == -1) {
-        href += '?_popup=1';
-    } else {
-        href  += '&_popup=1';
+    if (add_popup) {
+        if (href.indexOf('?') == -1) {
+            href += '?_popup=1';
+        } else {
+            href += '&_popup=1';
+        }
     }
     var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
     win.focus();
@@ -42,7 +44,7 @@ function showAdminPopup(triggeringLink, name_regexp) {
 }
 
 function showRelatedObjectLookupPopup(triggeringLink) {
-    return showAdminPopup(triggeringLink, /^lookup_/);
+    return showAdminPopup(triggeringLink, /^lookup_/, true);
 }
 
 function dismissRelatedLookupPopup(win, chosenId) {
@@ -57,12 +59,22 @@ function dismissRelatedLookupPopup(win, chosenId) {
 }
 
 function showRelatedObjectPopup(triggeringLink) {
-    var name = triggeringLink.id.replace(/^(change|add|delete)_/, '');
-    name = id_to_windowname(name);
-    var href = triggeringLink.href;
-    var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
-    win.focus();
-    return false;
+    return showAdminPopup(triggeringLink, /^(change|add|delete)_/, false);
+}
+
+function updateRelatedObjectLinks(triggeringLink) {
+    var $this = django.jQuery(triggeringLink);
+    var siblings = $this.nextAll('.change-related, .delete-related');
+    if (!siblings.length) return;
+    var value = $this.val();
+    if (value) {
+        siblings.each(function() {
+            var elm = django.jQuery(this);
+            elm.attr('href', elm.attr('data-href-template').replace('__fk__', value));
+        });
+    } else {
+        siblings.removeAttr('href');
+    }
 }
 
 function dismissAddRelatedObjectPopup(win, newId, newRepr) {
@@ -72,13 +84,10 @@ function dismissAddRelatedObjectPopup(win, newId, newRepr) {
     newRepr = html_unescape(newRepr);
     var name = windowname_to_id(win.name);
     var elem = document.getElementById(name);
-    var o;
     if (elem) {
         var elemName = elem.nodeName.toUpperCase();
         if (elemName == 'SELECT') {
-            o = new Option(newRepr, newId);
-            elem.options[elem.options.length] = o;
-            o.selected = true;
+            elem.options[elem.options.length] = new Option(newRepr, newId, true, true);
         } else if (elemName == 'INPUT') {
             if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
                 elem.value += ',' + newId;
@@ -90,7 +99,7 @@ function dismissAddRelatedObjectPopup(win, newId, newRepr) {
         django.jQuery(elem).trigger('change');
     } else {
         var toId = name + "_to";
-        o = new Option(newRepr, newId);
+        var o = new Option(newRepr, newId);
         SelectBox.add_to_cache(toId, o);
         SelectBox.redisplay(toId);
     }

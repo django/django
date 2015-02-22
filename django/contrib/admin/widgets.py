@@ -10,7 +10,7 @@ from django.contrib.admin.templatetags.admin_static import static
 from django.core.urlresolvers import reverse
 from django.db.models.deletion import CASCADE
 from django.forms.utils import flatatt
-from django.forms.widgets import Media, RadioFieldRenderer
+from django.forms.widgets import RadioFieldRenderer
 from django.template.loader import render_to_string
 from django.utils import six
 from django.utils.encoding import force_text
@@ -272,8 +272,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     @property
     def media(self):
-        media = Media(js=['admin/js/related-widget-wrapper.js'])
-        return self.widget.media + media
+        return self.widget.media
 
     def get_related_url(self, info, action, *args):
         return reverse("admin:%s_%s_%s" % (info + (action,)),
