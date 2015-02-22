@@ -127,7 +127,9 @@ module-level variables representing Django settings.
 By default, the configuration uses SQLite. If you're new to databases, or
 you're just interested in trying Django, this is the easiest choice. SQLite is
 included in Python, so you won't need to install anything else to support your
-database.
+database. When starting your first real project, however, you may want to use a
+more robust database like PostgreSQL, to avoid database-switching headaches
+down the road.
 
 If you wish to use another database, install the appropriate :ref:`database
 bindings <database-installation>`, and change the following keys in the
