@@ -170,7 +170,8 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
     from django.utils import timezone
     from django.test import TestCase
 
-    from polls.models import Question
+    from .models import Question
+
 
     class QuestionMethodTests(TestCase):
 

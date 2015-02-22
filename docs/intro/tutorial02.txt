@@ -113,7 +113,8 @@ file, and edit it to look like this:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Question
+
+    from .models import Question
 
     admin.site.register(Question)
 
@@ -193,7 +194,8 @@ the ``admin.site.register(Question)`` line with:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Question
+
+    from .models import Question
 
 
     class QuestionAdmin(admin.ModelAdmin):
@@ -221,7 +223,8 @@ up into fieldsets:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Question
+
+    from .models import Question
 
 
     class QuestionAdmin(admin.ModelAdmin):
@@ -248,7 +251,8 @@ aren't commonly used:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Question
+
+    from .models import Question
 
 
     class QuestionAdmin(admin.ModelAdmin):
@@ -277,7 +281,8 @@ with the admin just as we did with ``Question``. That's easy:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Choice, Question
+
+    from .models import Choice, Question
     # ...
     admin.site.register(Choice)
 
@@ -310,7 +315,8 @@ registration code to read:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Choice, Question
+
+    from .models import Choice, Question
 
 
     class ChoiceInline(admin.StackedInline):
