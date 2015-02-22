@@ -1042,10 +1042,11 @@ If necessary, you can temporarily disable auto-escaping with
 ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``CacheMiddleware`` used to provide a way to cache requests only if they
-weren't made by a logged-in user. This mechanism was largely ineffective
-because the middleware correctly takes into account the ``Vary: Cookie`` HTTP
-header, and this header is being set on a variety of occasions, such as:
+``CacheMiddleware`` and ``UpdateCacheMiddleware`` used to provide a way to
+cache requests only if they weren't made by a logged-in user. This mechanism
+was largely ineffective because the middleware correctly takes into account the
+``Vary: Cookie`` HTTP header, and this header is being set on a variety of
+occasions, such as:
 
 * accessing the session, or
 * using CSRF protection, which is turned on by default, or
