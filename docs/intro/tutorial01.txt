@@ -470,35 +470,32 @@ moment - but first, let's see what SQL that migration would run. The
 
     $ python manage.py sqlmigrate polls 0001
 
-
 You should see something similar to the following (we've reformatted it for
 readability):
 
 .. code-block:: sql
 
     BEGIN;
-    CREATE TABLE polls_question (
+    CREATE TABLE "polls_choice" (
+        "id" serial NOT NULL PRIMARY KEY,
+        "choice_text" varchar(200) NOT NULL,
+        "votes" integer NOT NULL
+    );
+    CREATE TABLE "polls_question" (
         "id" serial NOT NULL PRIMARY KEY,
         "question_text" varchar(200) NOT NULL,
         "pub_date" timestamp with time zone NOT NULL
     );
-
-    CREATE TABLE polls_choice (
-        "id" serial NOT NULL PRIMARY KEY,
-        "question_id" integer NOT NULL,
-        "choice_text" varchar(200) NOT NULL,
-        "votes" integer NOT NULL
-    );
-
-    CREATE INDEX polls_choice_7aa0f6ee ON "polls_choice" ("question_id");
-
+    ALTER TABLE "polls_choice" ADD COLUMN "question_id" integer NOT NULL;
+    ALTER TABLE "polls_choice" ALTER COLUMN "question_id" DROP DEFAULT;
+    CREATE INDEX "polls_choice_7aa0f6ee" ON "polls_choice" ("question_id");
     ALTER TABLE "polls_choice"
-      ADD CONSTRAINT polls_choice_question_id_246c99a640fbbd72_fk_polls_question_id
+      ADD CONSTRAINT "polls_choice_question_id_246c99a640fbbd72_fk_polls_question_id"
         FOREIGN KEY ("question_id")
         REFERENCES "polls_question" ("id")
         DEFERRABLE INITIALLY DEFERRED;
-    COMMIT;
 
+    COMMIT;
 
 Note the following:
 
