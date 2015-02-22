@@ -6,7 +6,7 @@ import os
 from django import http
 from django.apps import apps
 from django.conf import settings
-from django.template import Context, Template
+from django.template import Context, Engine
 from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import smart_text
@@ -178,7 +178,7 @@ js_catalog_template = r"""
 
 
 def render_javascript_catalog(catalog=None, plural=None):
-    template = Template(js_catalog_template)
+    template = Engine().from_string(js_catalog_template)
     indent = lambda s: s.replace('\n', '\n  ')
     context = Context({
         'catalog_str': indent(json.dumps(

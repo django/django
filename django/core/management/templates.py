@@ -13,7 +13,7 @@ from os import path
 import django
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions
-from django.template import Context, Template
+from django.template import Context, Engine
 from django.utils import archive
 from django.utils.six.moves.urllib.request import urlretrieve
 from django.utils.version import get_docs_version
@@ -147,7 +147,7 @@ class TemplateCommand(BaseCommand):
                     content = template_file.read()
                 if filename.endswith(extensions) or filename in extra_files:
                     content = content.decode('utf-8')
-                    template = Template(content)
+                    template = Engine().from_string(content)
                     content = template.render(context)
                     content = content.encode('utf-8')
                 with open(new_path, 'wb') as new_file:
