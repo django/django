@@ -15,7 +15,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions
 from django.template import Context, Template
 from django.utils import archive
-from django.utils._os import rmtree_errorhandler
 from django.utils.six.moves.urllib.request import urlretrieve
 from django.utils.version import get_docs_version
 
@@ -172,8 +171,7 @@ class TemplateCommand(BaseCommand):
                 if path.isfile(path_to_remove):
                     os.remove(path_to_remove)
                 else:
-                    shutil.rmtree(path_to_remove,
-                                  onerror=rmtree_errorhandler)
+                    shutil.rmtree(path_to_remove)
 
     def handle_template(self, template, subdir):
         """
