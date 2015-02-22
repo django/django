@@ -19,7 +19,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
-from django.test.testcases import SerializeMixin
 from django.utils import six
 from django.utils._os import symlinks_supported, upath
 from django.utils.encoding import force_text
@@ -90,7 +89,7 @@ class StaticFilesTestCase(BaseStaticFilesTestCase, SimpleTestCase):
     pass
 
 
-class BaseCollectionTestCase(SerializeMixin, BaseStaticFilesTestCase):
+class BaseCollectionTestCase(BaseStaticFilesTestCase):
     """
     Tests shared by all file finding features (collectstatic,
     findstatic, and static serve view).
@@ -99,8 +98,6 @@ class BaseCollectionTestCase(SerializeMixin, BaseStaticFilesTestCase):
     is separated because some test cases need those asserts without
     all these tests.
     """
-
-    lockfile = __file__
 
     def setUp(self):
         super(BaseCollectionTestCase, self).setUp()
