@@ -21,7 +21,6 @@ class CsrfViewTests(TestCase):
         """
         Test that an invalid request is rejected with a localized error message.
         """
-
         response = self.client.post('/')
         self.assertContains(response, "Forbidden", status_code=403)
         self.assertContains(response,
@@ -63,3 +62,15 @@ class CsrfViewTests(TestCase):
                             "ensure that your browser is not being hijacked "
                             "by third parties.",
                             status_code=403)
+
+    # In Django 2.0, this can be changed to TEMPLATES=[] because the code path
+    # that reads the TEMPLATE_* settings in that case will have been removed.
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.dummy.TemplateStrings',
+    }])
+    def test_no_django_template_engine(self):
+        """
+        The CSRF view doesn't depend on the TEMPLATES configuration (#24388).
+        """
+        response = self.client.post('/')
+        self.assertContains(response, "Forbidden", status_code=403)
