@@ -500,7 +500,7 @@ class SingleRelatedObjectDescriptor(object):
                     value,
                     instance._meta.object_name,
                     self.related.get_accessor_name(),
-                    self.related.opts.object_name,
+                    self.related.related_model._meta.object_name,
                 )
             )
         elif value is not None:
@@ -1306,14 +1306,6 @@ class ForeignObjectRel(object):
         return self.to
 
     @cached_property
-    def opts(self):
-        return self.related_model._meta
-
-    @cached_property
-    def to_opts(self):
-        return self.to._meta
-
-    @cached_property
     def hidden(self):
         return self.is_hidden()
 
@@ -1345,7 +1337,11 @@ class ForeignObjectRel(object):
         return self.field.one_to_one
 
     def __repr__(self):
-        return '<%s: %s.%s>' % (type(self).__name__, self.opts.app_label, self.opts.model_name)
+        return '<%s: %s.%s>' % (
+            type(self).__name__,
+            self.related_model._meta.app_label,
+            self.related_model._meta.model_name,
+        )
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
                     limit_to_currently_related=False):
@@ -1396,7 +1392,7 @@ class ForeignObjectRel(object):
         # but this can be overridden with the "related_name" option.
         # Due to backwards compatibility ModelForms need to be able to provide
         # an alternate model. See BaseInlineFormSet.get_default_prefix().
-        opts = model._meta if model else self.opts
+        opts = model._meta if model else self.related_model._meta
         model = model or self.related_model
         if self.multiple:
             # If this is a symmetrical m2m relation on self, there is no reverse accessor.
@@ -1405,9 +1401,9 @@ class ForeignObjectRel(object):
         if self.related_name:
             return self.related_name
         if opts.default_related_name:
-            return self.opts.default_related_name % {
-                'model_name': self.opts.model_name.lower(),
-                'app_label': self.opts.app_label.lower(),
+            return opts.default_related_name % {
+                'model_name': opts.model_name.lower(),
+                'app_label': opts.app_label.lower(),
             }
         return opts.model_name + ('_set' if self.multiple else '')
 
