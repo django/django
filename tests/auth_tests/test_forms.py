@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import datetime
 import re
 
 from django import forms
@@ -22,10 +23,49 @@ from django.utils.translation import ugettext as _
 from .settings import AUTH_TEMPLATES
 
 
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
-class UserCreationFormTest(TestCase):
+class TestDataMixin(object):
 
-    fixtures = ['authtestdata.json']
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
+            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u2 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
+            first_name='Inactive', last_name='User', email='testclient2@example.com', is_staff=False, is_active=False,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u3 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
+            first_name='Staff', last_name='Member', email='staffmember@example.com', is_staff=True, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u4 = User.objects.create(
+            password='', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
+            username='empty_password', first_name='Empty', last_name='Password', email='empty_password@example.com',
+            is_staff=False, is_active=True, date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u5 = User.objects.create(
+            password='$', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
+            username='unmanageable_password', first_name='Unmanageable', last_name='Password',
+            email='unmanageable_password@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u6 = User.objects.create(
+            password='foo$bar', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
+            username='unknown_password', first_name='Unknown', last_name='Password',
+            email='unknown_password@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+
+
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
+class UserCreationFormTest(TestDataMixin, TestCase):
 
     def test_user_already_exists(self):
         data = {
@@ -90,9 +130,7 @@ class UserCreationFormTest(TestCase):
 
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
-class AuthenticationFormTest(TestCase):
-
-    fixtures = ['authtestdata.json']
+class AuthenticationFormTest(TestDataMixin, TestCase):
 
     def test_invalid_username(self):
         # The user submits an invalid username.
@@ -202,9 +240,7 @@ class AuthenticationFormTest(TestCase):
 
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
-class SetPasswordFormTest(TestCase):
-
-    fixtures = ['authtestdata.json']
+class SetPasswordFormTest(TestDataMixin, TestCase):
 
     def test_password_verification(self):
         # The two new passwords do not match.
@@ -229,9 +265,7 @@ class SetPasswordFormTest(TestCase):
 
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
-class PasswordChangeFormTest(TestCase):
-
-    fixtures = ['authtestdata.json']
+class PasswordChangeFormTest(TestDataMixin, TestCase):
 
     def test_incorrect_password(self):
         user = User.objects.get(username='testclient')
@@ -277,9 +311,7 @@ class PasswordChangeFormTest(TestCase):
 
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
-class UserChangeFormTest(TestCase):
-
-    fixtures = ['authtestdata.json']
+class UserChangeFormTest(TestDataMixin, TestCase):
 
     def test_username_validity(self):
         user = User.objects.get(username='testclient')
@@ -359,9 +391,7 @@ class UserChangeFormTest(TestCase):
     TEMPLATES=AUTH_TEMPLATES,
     USE_TZ=False,
 )
-class PasswordResetFormTest(TestCase):
-
-    fixtures = ['authtestdata.json']
+class PasswordResetFormTest(TestDataMixin, TestCase):
 
     @classmethod
     def setUpClass(cls):

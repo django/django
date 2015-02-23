@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
+
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
@@ -15,6 +17,19 @@ from .admin import MediaInline, MediaPermanentInline, site as admin_site
 from .models import Category, Episode, EpisodePermanent, Media
 
 
+class TestDataMixin(object):
+
+    @classmethod
+    def setUpTestData(cls):
+        # password = "secret"
+        User.objects.create(
+            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
+            is_staff=True, last_login=datetime.datetime(2007, 5, 30, 13, 20, 10),
+            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
+
+
 # Set DEBUG to True to ensure {% include %} will raise exceptions.
 # That is how inlines are rendered and #9498 will bubble up if it is an issue.
 @override_settings(
@@ -22,8 +37,7 @@ from .models import Category, Episode, EpisodePermanent, Media
     PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF="generic_inline_admin.urls",
 )
-class GenericAdminViewTest(TestCase):
-    fixtures = ['users.xml']
+class GenericAdminViewTest(TestDataMixin, TestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
@@ -129,8 +143,7 @@ class GenericAdminViewTest(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="generic_inline_admin.urls")
-class GenericInlineAdminParametersTest(TestCase):
-    fixtures = ['users.xml']
+class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
@@ -276,8 +289,7 @@ class GenericInlineAdminParametersTest(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="generic_inline_admin.urls")
-class GenericInlineAdminWithUniqueTogetherTest(TestCase):
-    fixtures = ['users.xml']
+class GenericInlineAdminWithUniqueTogetherTest(TestDataMixin, TestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')

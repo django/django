@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import datetime
 import warnings
 
 from django.contrib.admin import ModelAdmin, TabularInline
@@ -23,10 +24,22 @@ from .models import (
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
 
 
+class TestDataMixin(object):
+
+    @classmethod
+    def setUpTestData(cls):
+        # password = "secret"
+        User.objects.create(
+            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
+            is_staff=True, last_login=datetime.datetime(2007, 5, 30, 13, 20, 10),
+            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
+
+
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="admin_inlines.urls")
-class TestInline(TestCase):
-    fixtures = ['admin-views-users.xml']
+class TestInline(TestDataMixin, TestCase):
 
     def setUp(self):
         holder = Holder(dummy=13)
@@ -353,11 +366,9 @@ class TestInline(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="admin_inlines.urls")
-class TestInlineMedia(TestCase):
-    fixtures = ['admin-views-users.xml']
+class TestInlineMedia(TestDataMixin, TestCase):
 
     def setUp(self):
-
         result = self.client.login(username='super', password='secret')
         self.assertEqual(result, True)
 
@@ -430,8 +441,7 @@ class TestInlineAdminForm(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF="admin_inlines.urls")
-class TestInlineProtectedOnDelete(TestCase):
-    fixtures = ['admin-views-users.xml']
+class TestInlineProtectedOnDelete(TestDataMixin, TestCase):
 
     def setUp(self):
         result = self.client.login(username='super', password='secret')
@@ -657,10 +667,9 @@ class TestInlinePermissions(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="admin_inlines.urls")
-class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+class SeleniumFirefoxTests(TestDataMixin, AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_inlines'] + AdminSeleniumWebDriverTestCase.available_apps
-    fixtures = ['admin-views-users.xml']
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def test_add_stackeds(self):

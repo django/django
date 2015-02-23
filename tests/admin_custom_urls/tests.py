@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 
+import datetime
+
 from django.contrib.admin.utils import quote
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
@@ -17,7 +20,28 @@ class AdminCustomUrlsTest(TestCase):
     * The ModelAdmin for Action customizes the add_view URL, it's
       '<app name>/<model name>/!add/'
     """
-    fixtures = ['users.json', 'actions.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        # password = "secret"
+        User.objects.create(
+            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
+            is_staff=True, last_login=datetime.datetime(2007, 5, 30, 13, 20, 10),
+            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
+        Action.objects.create(name='delete', description='Remove things.')
+        Action.objects.create(name='rename', description='Gives things other names.')
+        Action.objects.create(name='add', description='Add things.')
+        Action.objects.create(name='path/to/file/', description="An action with '/' in its name.")
+        Action.objects.create(
+            name='path/to/html/document.html',
+            description='An action with a name similar to a HTML doc path.'
+        )
+        Action.objects.create(
+            name='javascript:alert(\'Hello world\');">Click here</a>',
+            description='An action with a name suspected of being a XSS attempt'
+        )
 
     def setUp(self):
         self.client.login(username='super', password='secret')
@@ -75,15 +99,6 @@ class AdminCustomUrlsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Change action')
         self.assertContains(response, 'value="path/to/html/document.html"')
-
-
-@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-                   ROOT_URLCONF='admin_custom_urls.urls',)
-class CustomRedirects(TestCase):
-    fixtures = ['users.json', 'actions.json']
-
-    def setUp(self):
-        self.client.login(username='super', password='secret')
 
     def test_post_save_add_redirect(self):
         """

@@ -11,7 +11,13 @@ from django.utils import translation
 @modify_settings(INSTALLED_APPS={'append': ['django.contrib.flatpages', ]})
 @override_settings(SITE_ID=1)
 class FlatpageAdminFormTests(TestCase):
-    fixtures = ['example_site']
+
+    @classmethod
+    def setUpTestData(cls):
+        # don't use the manager because we want to ensure the site exists
+        # with pk=1, regardless of whether or not it already exists.
+        cls.site1 = Site(pk=1, domain='example.com', name='example.com')
+        cls.site1.save()
 
     def setUp(self):
         # Site fields cache needs to be cleared after flatpages is added to
