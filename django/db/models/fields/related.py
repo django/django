@@ -1297,6 +1297,13 @@ class ForeignObjectRel(object):
         self.symmetrical = False
         self.multiple = True
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Avoid pickling the app cache.
+        for attr in ('opts', 'to_opts'):
+            state.pop(attr, None)
+        return state
+
     # Some of the following cached_properties can't be initialized in
     # __init__ as the field doesn't have its model yet. Calling these methods
     # before field.contribute_to_class() has been called will result in
