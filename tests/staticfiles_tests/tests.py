@@ -106,7 +106,8 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
         self.patched_settings = self.settings(STATIC_ROOT=temp_dir)
         self.patched_settings.enable()
         self.run_collectstatic()
-        self.addCleanup(shutil.rmtree, temp_dir)
+        # Same comment as in runtests.teardown.
+        self.addCleanup(shutil.rmtree, six.text_type(temp_dir))
 
     def tearDown(self):
         self.patched_settings.disable()
