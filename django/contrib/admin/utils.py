@@ -316,7 +316,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
             label = field.verbose_name
         except AttributeError:
             # field is likely a ForeignObjectRel
-            label = field.opts.verbose_name
+            label = field.related_model._meta.verbose_name
     except FieldDoesNotExist:
         if name == "__unicode__":
             label = force_text(model._meta.verbose_name)
