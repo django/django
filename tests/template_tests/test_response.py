@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import os
 import pickle
 import time
 from datetime import datetime
@@ -14,8 +13,9 @@ from django.test import (
     RequestFactory, SimpleTestCase, ignore_warnings, override_settings,
 )
 from django.test.utils import require_jinja2
-from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
+
+from .utils import TEMPLATE_DIR
 
 
 def test_processor(request):
@@ -224,7 +224,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
 
 @override_settings(TEMPLATES=[{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+    'DIRS': [TEMPLATE_DIR],
     'OPTIONS': {
         'context_processors': [test_processor_name],
     },

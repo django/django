@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import os
 import sys
 
 from django.contrib.auth.models import Group
@@ -10,9 +9,6 @@ from django.template import (
     Context, Template, TemplateSyntaxError, engines, loader,
 )
 from django.test import SimpleTestCase, override_settings
-from django.utils._os import upath
-
-TEMPLATES_DIR = os.path.join(os.path.dirname(upath(__file__)), 'templates')
 
 
 class TemplateTests(SimpleTestCase):
