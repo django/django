@@ -126,33 +126,35 @@ class MigrationGraph(object):
                 self.node_map[node].__dict__.pop('_descendants', None)
             self.cached = False
 
-    def forwards_plan(self, node):
+    def forwards_plan(self, target):
         """
         Given a node, returns a list of which previous nodes (dependencies)
         must be applied, ending with the node itself.
         This is the list you would follow if applying the migrations to
         a database.
         """
-        if node not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (node, ), node)
+        if target not in self.nodes:
+            raise NodeNotFoundError("Node %r not a valid node" % (target, ), target)
         # Use parent.key instead of parent to speed up the frequent hashing in ensure_not_cyclic
-        self.ensure_not_cyclic(node, lambda x: (parent.key for parent in self.node_map[x].parents))
+        self.ensure_not_cyclic(target, lambda x: (parent.key for parent in self.node_map[x].parents))
         self.cached = True
-        return self.node_map[node].ancestors()
+        node = self.node_map[target]
+        return node.ancestors()
 
-    def backwards_plan(self, node):
+    def backwards_plan(self, target):
         """
         Given a node, returns a list of which dependent nodes (dependencies)
         must be unapplied, ending with the node itself.
         This is the list you would follow if removing the migrations from
         a database.
         """
-        if node not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (node, ), node)
+        if target not in self.nodes:
+            raise NodeNotFoundError("Node %r not a valid node" % (target, ), target)
         # Use child.key instead of child to speed up the frequent hashing in ensure_not_cyclic
-        self.ensure_not_cyclic(node, lambda x: (child.key for child in self.node_map[x].children))
+        self.ensure_not_cyclic(target, lambda x: (child.key for child in self.node_map[x].children))
         self.cached = True
-        return self.node_map[node].descendants()
+        node = self.node_map[target]
+        return node.descendants()
 
     def root_nodes(self, app=None):
         """
