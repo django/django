@@ -7,6 +7,7 @@ import warnings
 from unittest import skipIf
 from xml.dom.minidom import parseString
 
+from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.db.models import Max, Min
@@ -1083,7 +1084,15 @@ class NewFormsTests(TestCase):
                   ROOT_URLCONF='timezones.urls')
 class AdminTests(TestCase):
 
-    fixtures = ['tz_users.xml']
+    @classmethod
+    def setUpTestData(cls):
+        # password = "secret"
+        cls.u1 = User.objects.create(
+            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
+            first_name='Super', last_name='User', email='super@example.com',
+            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
 
     def setUp(self):
         self.client.login(username='super', password='secret')

@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth import signals
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
@@ -8,7 +10,21 @@ from django.test.client import RequestFactory
     PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='auth_tests.urls')
 class SignalTestCase(TestCase):
-    fixtures = ['authtestdata.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
+            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u3 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
+            first_name='Staff', last_name='Member', email='staffmember@example.com', is_staff=True, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
 
     def listener_login(self, user, **kwargs):
         self.logged_in.append(user)
@@ -66,13 +82,13 @@ class SignalTestCase(TestCase):
 
     def test_update_last_login(self):
         """Ensure that only `last_login` is updated in `update_last_login`"""
-        user = User.objects.get(pk=3)
+        user = self.u3
         old_last_login = user.last_login
 
         user.username = "This username shouldn't get saved"
         request = RequestFactory().get('/login')
         signals.user_logged_in.send(sender=user.__class__, request=request,
             user=user)
-        user = User.objects.get(pk=3)
+        user = User.objects.get(pk=self.u3.pk)
         self.assertEqual(user.username, 'staff')
         self.assertNotEqual(user.last_login, old_last_login)

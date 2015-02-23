@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
 import itertools
 import re
 from importlib import import_module
@@ -13,6 +14,7 @@ from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
 )
 from django.contrib.auth.models import User
+from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.views import login as login_view, redirect_to_login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
@@ -49,7 +51,44 @@ class AuthViewsTestCase(TestCase):
     """
     Helper base class for all the follow test cases.
     """
-    fixtures = ['authtestdata.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
+            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u2 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
+            first_name='Inactive', last_name='User', email='testclient2@example.com', is_staff=False, is_active=False,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u3 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
+            first_name='Staff', last_name='Member', email='staffmember@example.com', is_staff=True, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u4 = User.objects.create(
+            password='', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
+            username='empty_password', first_name='Empty', last_name='Password', email='empty_password@example.com',
+            is_staff=False, is_active=True, date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u5 = User.objects.create(
+            password='$', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
+            username='unmanageable_password', first_name='Unmanageable', last_name='Password',
+            email='unmanageable_password@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u6 = User.objects.create(
+            password='foo$bar', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
+            username='unknown_password', first_name='Unknown', last_name='Password',
+            email='unknown_password@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
 
     def login(self, username='testclient', password='password'):
         response = self.client.post('/login/', {
@@ -333,8 +372,15 @@ class PasswordResetTest(AuthViewsTestCase):
 
 @override_settings(AUTH_USER_MODEL='auth.CustomUser')
 class CustomUserPasswordResetTest(AuthViewsTestCase):
-    fixtures = ['custom_user.json']
     user_email = 'staffmember@example.com'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = CustomUser.custom_objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), email='staffmember@example.com', is_active=True,
+            is_admin=False, date_of_birth=datetime.date(1976, 11, 8)
+        )
 
     def _test_confirm_start(self):
         # Start by creating the email
@@ -363,7 +409,6 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
 
 @override_settings(AUTH_USER_MODEL='auth.UUIDUser')
 class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
-    fixtures = None
 
     def _test_confirm_start(self):
         # instead of fixture
@@ -846,7 +891,7 @@ class ChangelistTests(AuthViewsTestCase):
         # Make me a superuser before logging in.
         User.objects.filter(username='testclient').update(is_staff=True, is_superuser=True)
         self.login()
-        self.admin = User.objects.get(pk=1)
+        self.admin = User.objects.get(pk=self.u1.pk)
 
     def get_user_data(self, user):
         return {

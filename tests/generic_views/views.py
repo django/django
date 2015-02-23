@@ -218,7 +218,7 @@ class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
 class BookDetailGetObjectCustomQueryset(BookDetail):
     def get_object(self, queryset=None):
         return super(BookDetailGetObjectCustomQueryset, self).get_object(
-            queryset=Book.objects.filter(pk=2))
+            queryset=Book.objects.filter(pk=self.kwargs['pk']))
 
 
 class CustomMultipleObjectMixinView(generic.list.MultipleObjectMixin, generic.View):

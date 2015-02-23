@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import (
     AbstractUser, Group, Permission, User, UserManager,
@@ -10,7 +12,44 @@ from django.test import TestCase, override_settings
 
 @override_settings(USE_TZ=False)
 class NaturalKeysTestCase(TestCase):
-    fixtures = ['authtestdata.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
+            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u2 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
+            first_name='Inactive', last_name='User', email='testclient2@example.com', is_staff=False, is_active=False,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u3 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
+            first_name='Staff', last_name='Member', email='staffmember@example.com', is_staff=True, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u4 = User.objects.create(
+            password='', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
+            username='empty_password', first_name='Empty', last_name='Password', email='empty_password@example.com',
+            is_staff=False, is_active=True, date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u5 = User.objects.create(
+            password='$', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
+            username='unmanageable_password', first_name='Unmanageable', last_name='Password',
+            email='unmanageable_password@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u6 = User.objects.create(
+            password='foo$bar', last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False,
+            username='unknown_password', first_name='Unknown', last_name='Password',
+            email='unknown_password@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
 
     def test_user_natural_key(self):
         staff_user = User.objects.get(username='staff')

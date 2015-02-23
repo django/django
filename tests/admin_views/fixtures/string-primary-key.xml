@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
-    <object pk="1" model="admin_views.modelwithstringprimarykey">
-        <field type="CharField" name="string_pk"><![CDATA[abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890 -_.!~*'() ;/?:@&=+$, <>#%" {}|\^[]`]]></field>
-    </object>
-</django-objects>
