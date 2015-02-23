@@ -76,7 +76,7 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_extract_sql() method')
 
-    def date_interval_sql(self, sql, connector, timedelta):
+    def date_interval_sql(self, timedelta):
         """
         Implements the date interval functionality for expressions
         """

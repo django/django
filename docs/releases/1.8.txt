@@ -1014,6 +1014,9 @@ those writing third-party backends in updating their code:
 * The ``SQLCompiler.as_sql()`` method now takes a ``subquery`` parameter
   (:ticket:`24164`).
 
+* The ``BaseDatabaseOperations.date_interval_sql()`` method now only takes a
+  ``timedelta`` parameter.
+
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
