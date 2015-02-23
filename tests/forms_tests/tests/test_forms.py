@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import copy
 import datetime
 import json
+import uuid
 
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -1368,6 +1369,20 @@ class FormsTestCase(TestCase):
         self.assertEqual(unbound['username'].value(), 'djangonaut')
         self.assertEqual(bound['password'].value(), 'foo')
         self.assertEqual(unbound['password'].value(), None)
+
+    def test_boundfield_initial_called_once(self):
+        """
+        Multiple calls to BoundField().value() in an unbound form should return
+        the same result each time (#24391).
+        """
+        class MyForm(Form):
+            name = CharField(max_length=10, initial=uuid.uuid4)
+
+        form = MyForm()
+        name = form['name']
+        self.assertEqual(name.value(), name.value())
+        # BoundField is also cached
+        self.assertIs(form['name'], name)
 
     def test_boundfield_rendering(self):
         """
