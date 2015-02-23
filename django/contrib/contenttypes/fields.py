@@ -272,6 +272,7 @@ class ReverseGenericRelation(ForeignObject):
     many_to_one = False
     auto_created = True
     generate_reverse = False
+    unique = False
 
     def __init__(self, to, object_id_field, content_type_field,
                  for_concrete_model, related_query_name, **kwargs):
@@ -298,6 +299,12 @@ class ReverseGenericRelation(ForeignObject):
         opts = self.to._meta
         from_opts = self.model._meta
         return [PathInfo(from_opts, opts, (opts.pk,), self, self.many_to_many or self.one_to_many, False)]
+
+    def get_query_name(self):
+        return self.related_name or (self.to._meta.model_name + '+')
+
+    def get_accessor_name(self):
+        return self.get_query_name()
 
 
 class GenericRelation(ForeignObject):

@@ -946,10 +946,11 @@ class SQLDeleteCompiler(SQLCompiler):
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
         """
-        assert len(self.query.tables) == 1, \
+        effective_tables = [t for t in self.query.tables if self.query.alias_refcount[t] > 0]
+        assert len(effective_tables) == 1, \
             "Can only delete from one table at a time."
         qn = self.quote_name_unless_alias
-        result = ['DELETE FROM %s' % qn(self.query.tables[0])]
+        result = ['DELETE FROM %s' % qn(effective_tables[0])]
         where, params = self.compile(self.query.where)
         if where:
             result.append('WHERE %s' % where)

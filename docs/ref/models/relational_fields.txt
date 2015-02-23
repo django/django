@@ -1,0 +1,70 @@
+Relational field API
+====================
+
+This documentation is very much WIP. I'm not even sure we want to document
+the API. Currently the main use case is that I have a single place where I
+can check that I don't define redundant APIs for related fields.
+
+Structure of a relational field
+-------------------------------
+
+A relational field consist of:
+
+  - The user created field
+  - Possibly of a remote field, which is auto-created by the user created field
+
+Both the created field and the remote field can possibly add a descriptor to
+the field's model.
+
+Both the remote field and the user created field have (mostly) matching API.
+The API consists of the following attributes and methods:
+
+.. attribute:: name
+
+The name of the field. This is the key of the field in _meta.get_field() calls, and
+thus this is also the name used in ORM queries.
+
+.. attribute:: attname
+
+ForeignKeys have the concrete value in field.attname, and the model instance in
+field.name. For example Author.book_id contains an integer, and Author.book contains
+a book instance. Attname is the book_id value.
+
+.. method:: get_query_name()
+
+A method that generates the field's name. Only needed for remote fields.
+
+.. method:: get_accessor_name()
+
+A method that generates the name the field's descriptor should be placed into.
+
+For remote fields, get_query_name() is essentially similar to related_query_name
+parameter, and get_accessor_name() is similar to related_name parameter.
+
+.. method:: get_path_info()
+
+Tells Django which relations to travel when this field is queried. Essentially
+returns one PathInfo structure for each join needed by this field.
+
+.. method:: get_extra_restriction()
+
+Tells Django which extra restrictions should be placed onto joins generated.
+
+.. attribute:: model
+
+The originating model of this field.
+
+.. attribute:: remote_field
+
+The remote field of this model.
+
+.. attribute:: remote_model
+
+Same as self.remote_field.model.
+
+
+******************************** RANDOM DESIGN DOCUMENTATION ***********************
+Abstract models and relational fields:
+ - If an abstract model defines a relation to non-abstract model, we must not add the remote
+   field.
+ - If an model defines a relation to abstract model, this should just fail (check this!)

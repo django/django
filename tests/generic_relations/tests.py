@@ -108,7 +108,6 @@ class GenericRelationsTests(TestCase):
     def test_query_content_object(self):
         qs = TaggedItem.objects.filter(
             animal__isnull=False).order_by('animal__common_name', 'tag')
-        print(qs.query)
         self.assertQuerysetEqual(
             qs, ["<TaggedItem: hairy>", "<TaggedItem: yellow>"]
         )

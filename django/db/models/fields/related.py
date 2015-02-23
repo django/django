@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 
+import keyword
+import re
 import warnings
+
 from operator import attrgetter
 
 from django import forms
@@ -177,9 +180,9 @@ class RelationField(BaseField):
         return errors
 
     def _check_related_name_is_valid(self):
-        import re
-        import keyword
-        related_name = self.rel.related_name
+        if not self.rel or not self.remote_field:
+            return []
+        related_name = self.remote_field.accessor_name
 
         is_valid_id = (related_name and re.match('^[a-zA-Z_][a-zA-Z0-9_]*$', related_name)
                        and not keyword.iskeyword(related_name))
@@ -201,6 +204,8 @@ class RelationField(BaseField):
         return self.name[-1] == '+'
 
     def _check_relation_model_exists(self):
+        if not self.rel:
+            return []
         rel_is_missing = self.rel.to not in apps.get_models()
         rel_is_string = isinstance(self.rel.to, six.string_types)
         model_name = self.rel.to if rel_is_string else self.rel.to._meta.object_name
@@ -217,6 +222,8 @@ class RelationField(BaseField):
         return []
 
     def _check_referencing_to_swapped_model(self):
+        if not self.rel:
+            return []
         if (self.rel.to not in apps.get_models() and
                 not isinstance(self.rel.to, six.string_types) and
                 self.rel.to._meta.swapped):
@@ -245,7 +252,7 @@ class RelationField(BaseField):
 
         # `f.rel.to` may be a string instead of a model. Skip if model name is
         # not resolved.
-        if not isinstance(self.rel.to, ModelBase):
+        if not self.rel or not isinstance(self.rel.to, ModelBase):
             return []
 
         # If the field doesn't install backward relation on the target model (so
@@ -309,11 +316,11 @@ class RelationField(BaseField):
         # Check clashes between accessors/reverse query names of `field` and
         # any other field accessor -- i. e. Model.foreign accessor clashes with
         # Model.m2m accessor.
-        potential_clashes = (r for r in rel_opts.related_objects if r.field is not self)
+        potential_clashes = (r for r in rel_opts.related_objects if r.remote_field is not self)
         for clash_field in potential_clashes:
             clash_name = "%s.%s" % (  # i. e. "Model.m2m"
                 clash_field.related_model._meta.object_name,
-                clash_field.field.name)
+                clash_field.remote_field.name)
             if clash_field.get_accessor_name() == rel_name:
                 errors.append(
                     checks.Error(
@@ -352,7 +359,7 @@ class RelationField(BaseField):
         super(RelationField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
         if not self.generate_reverse:
             return
-        if self.to == RECURSIVE_RELATIONSHIP_CONSTANT:
+        if self.to == RECURSIVE_RELATIONSHIP_CONSTANT and not cls._meta.abstract:
             self.to = cls
         other = self.to
 
@@ -360,10 +367,9 @@ class RelationField(BaseField):
             self.to = model
             if self.rel:
                 self.rel.to = model
-            if not model._meta.abstract:
-                self.remote_field = self.resolve_remote_field()
-                self.remote_field.contribute_to_class(
-                    model, self.remote_field.get_query_name())
+            self.remote_field = self.resolve_remote_field()
+            self.remote_field.contribute_to_class(
+                model, self.remote_field.get_query_name())
             self.set_attributes_from_rel()
             self.post_relation_ready()
             if self.remote_field:
@@ -1418,7 +1424,8 @@ class ForeignObjectRel(object):
     @cached_property
     def hidden(self):
         "Should the related object be hidden?"
-        return self.related_name is not None and self.related_name[-1] == '+'
+        related_name = self.field.remote_field.accessor_name
+        return related_name is not None and related_name[-1] == '+'
 
     def get_joining_columns(self):
         return self.field.get_reverse_joining_columns()
@@ -1594,6 +1601,8 @@ class ForeignObject(RelationField):
         return errors
 
     def _check_unique_target(self):
+        if not self.rel:
+            return []
         rel_is_string = isinstance(self.rel.to, six.string_types)
         if rel_is_string or not self.requires_unique_target:
             return []
@@ -1834,6 +1843,7 @@ class ManyToOneField(ForeignObject):
             to=to, from_fields=[], to_fields=[], **kwargs)
         self.accessor_name = related_name
         self._query_name = related_query_name
+        self.serialize = False
 
     def get_query_name(self):
         return self._query_name or self.accessor_name or self.to._meta.model_name
@@ -2287,15 +2297,17 @@ class ManyToManyBase(RelationField):
         return warnings
 
     def _check_relationship_model(self, from_model=None, **kwargs):
-        if hasattr(self.rel.through, '_meta'):
+        if not self.rel:
+            return []
+        if hasattr(self.through, '_meta'):
             qualified_model_name = "%s.%s" % (
-                self.rel.through._meta.app_label, self.rel.through.__name__)
+                self.through._meta.app_label, self.through.__name__)
         else:
-            qualified_model_name = self.rel.through
+            qualified_model_name = self.through
 
         errors = []
 
-        if self.rel.through not in apps.get_models(include_auto_created=True):
+        if self.through not in apps.get_models(include_auto_created=True):
             # The relationship model is not installed.
             errors.append(
                 checks.Error(
@@ -2323,12 +2335,12 @@ class ManyToManyBase(RelationField):
                 to_model_name = to_model
             else:
                 to_model_name = to_model._meta.object_name
-            relationship_model_name = self.rel.through._meta.object_name
+            relationship_model_name = self.through._meta.object_name
             self_referential = from_model == to_model
 
             # Check symmetrical attribute.
             if (self_referential and self.rel.symmetrical and
-                    not self.rel.through._meta.auto_created):
+                    not self.through._meta.auto_created):
                 errors.append(
                     checks.Error(
                         'Many-to-many fields with intermediate tables must not be symmetrical.',
@@ -2341,9 +2353,9 @@ class ManyToManyBase(RelationField):
             # Count foreign keys in intermediate model
             if self_referential:
                 seen_self = sum(from_model == getattr(field.rel, 'to', None)
-                    for field in self.rel.through._meta.fields)
+                    for field in self.through._meta.fields)
 
-                if seen_self > 2 and not self.rel.through_fields:
+                if seen_self > 2 and not self.through_fields:
                     errors.append(
                         checks.Error(
                             ("The model is used as an intermediate model by "
@@ -2353,7 +2365,7 @@ class ManyToManyBase(RelationField):
                              "through_fields keyword argument.") % (self, from_model_name),
                             hint=("Use through_fields to specify which two "
                                   "foreign keys Django should use."),
-                            obj=self.rel.through,
+                            obj=self.through,
                             id='fields.E333',
                         )
                     )
@@ -2361,11 +2373,11 @@ class ManyToManyBase(RelationField):
             else:
                 # Count foreign keys in relationship model
                 seen_from = sum(from_model == getattr(field.rel, 'to', None)
-                    for field in self.rel.through._meta.fields)
+                    for field in self.through._meta.fields)
                 seen_to = sum(to_model == getattr(field.rel, 'to', None)
-                    for field in self.rel.through._meta.fields)
+                    for field in self.through._meta.fields)
 
-                if seen_from > 1 and not self.rel.through_fields:
+                if seen_from > 1 and not self.through_fields:
                     errors.append(
                         checks.Error(
                             ("The model is used as an intermediate model by "
@@ -2381,7 +2393,7 @@ class ManyToManyBase(RelationField):
                         )
                     )
 
-                if seen_to > 1 and not self.rel.through_fields:
+                if seen_to > 1 and not self.through_fields:
                     errors.append(
                         checks.Error(
                             ("The model is used as an intermediate model by "
@@ -2405,17 +2417,17 @@ class ManyToManyBase(RelationField):
                                 self, from_model_name, to_model_name
                             ),
                             hint=None,
-                            obj=self.rel.through,
+                            obj=self.through,
                             id='fields.E336',
                         )
                     )
 
         # Validate `through_fields`
-        if self.rel.through_fields is not None:
+        if self.through_fields is not None:
             # Validate that we're given an iterable of at least two items
             # and that none of them is "falsy"
-            if not (len(self.rel.through_fields) >= 2 and
-                    self.rel.through_fields[0] and self.rel.through_fields[1]):
+            if not (len(self.through_fields) >= 2 and
+                    self.through_fields[0] and self.through_fields[1]):
                 errors.append(
                     checks.Error(
                         ("Field specifies 'through_fields' but does not "
@@ -2439,8 +2451,8 @@ class ManyToManyBase(RelationField):
                     "where the field is attached to."
                 )
 
-                source, through, target = from_model, self.rel.through, self.rel.to
-                source_field_name, target_field_name = self.rel.through_fields[:2]
+                source, through, target = from_model, self.through, self.rel.to
+                source_field_name, target_field_name = self.through_fields[:2]
 
                 for field_name, related_model in ((source_field_name, source),
                                                   (target_field_name, target)):
@@ -2491,20 +2503,20 @@ class ManyToManyBase(RelationField):
             kwargs['db_table'] = self.db_table
         if self.rel.db_constraint is not True:
             kwargs['db_constraint'] = self.rel.db_constraint
-        if self.remote_field.accessor_name is not None:
-            kwargs['related_name'] = self.remote_field.accessor_name
-        if self.remote_field.query_name is not None:
-            kwargs['related_query_name'] = self.remote_field.query_name
+        if self.remote_field_kwargs.get('accessor_name') is not None:
+            kwargs['related_name'] = self.remote_field_kwargs['accessor_name']
+        if self.remote_field_kwargs.get('query_name') is not None:
+            kwargs['related_query_name'] = self.remote_field_kwargs.get('query_name')
         # Rel needs more work.
         if isinstance(self.rel.to, six.string_types):
             kwargs['to'] = self.rel.to
         else:
             kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
         if getattr(self.rel, 'through', None) is not None:
-            if isinstance(self.rel.through, six.string_types):
-                kwargs['through'] = self.rel.through
-            elif not self.rel.through._meta.auto_created:
-                kwargs['through'] = "%s.%s" % (self.rel.through._meta.app_label, self.rel.through._meta.object_name)
+            if isinstance(self.through, six.string_types):
+                kwargs['through'] = self.through
+            elif not self.through._meta.auto_created:
+                kwargs['through'] = "%s.%s" % (self.through._meta.app_label, self.through._meta.object_name)
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
         swappable_setting = self.swappable_setting
@@ -2554,8 +2566,8 @@ class ManyToManyBase(RelationField):
         cache_attr = '_m2m_%s_cache' % attr
         if hasattr(self, cache_attr):
             return getattr(self, cache_attr)
-        if self.rel.through_fields is not None:
-            link_field_name = self.rel.through_fields[0]
+        if self.through_fields is not None:
+            link_field_name = self.through_fields[0]
         else:
             link_field_name = None
         for f in self.through._meta.fields:
@@ -2570,8 +2582,8 @@ class ManyToManyBase(RelationField):
         if hasattr(self, cache_attr):
             return getattr(self, cache_attr)
         found = False
-        if self.rel.through_fields is not None:
-            link_field_name = self.rel.through_fields[1]
+        if self.through_fields is not None:
+            link_field_name = self.through_fields[1]
         else:
             link_field_name = None
         for f in self.through._meta.fields:
@@ -2670,6 +2682,7 @@ class ReverseManyToManyField(ManyToManyBase):
             to=to, auto_created=auto_created, **kwargs)
         self.accessor_name = related_name
         self._query_name = related_query_name
+        self.serialize = False
 
     def get_query_name(self):
         return self._query_name or self.accessor_name or self.to._meta.model_name
@@ -2725,7 +2738,7 @@ class ManyToManyField(ManyToManyBase):
     rel_class = ManyToManyRel
 
     def __init__(self, to, related_name=None, related_query_name=None,
-                 through_fields=None, **kwargs):
+                 **kwargs):
         super(ManyToManyField, self).__init__(
             to, related_name=related_name, related_query_name=related_query_name,
             **kwargs)
@@ -2734,7 +2747,7 @@ class ManyToManyField(ManyToManyBase):
         self.remote_field_kwargs = {
             'related_query_name': related_query_name,
             'related_name': related_name,
-            'through_fields': through_fields
+            'through_fields': kwargs.get('through_fields', None)
         }
 
     def resolve_remote_field(self):
@@ -2742,7 +2755,8 @@ class ManyToManyField(ManyToManyBase):
             self.model, remote_field=self, **self.remote_field_kwargs)
 
     def post_relation_ready(self):
-        self.rel.related_name = self.remote_field.name
+        if self.remote_field:
+            self.rel.related_name = self.remote_field.name
         # The intermediate m2m model is not auto created if:
         #  1) There is a manually specified intermediate, or
         #  2) The class owning the m2m field is abstract.
@@ -2752,7 +2766,8 @@ class ManyToManyField(ManyToManyBase):
 
         def resolve_through_model(u1, model, u2):
             self.through = model
-            self.remote_field.through = model
+            if self.remote_field:
+                self.remote_field.through = model
             self.rel.through = model
         if isinstance(self.through, six.string_types):
             add_lazy_relation(self.model, self, self.through, resolve_through_model)

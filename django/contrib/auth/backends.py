@@ -27,7 +27,7 @@ class ModelBackend(object):
 
     def _get_group_permissions(self, user_obj):
         user_groups_field = get_user_model()._meta.get_field('groups')
-        user_groups_query = 'group__%s' % user_groups_field.related_query_name()
+        user_groups_query = 'group__%s' % user_groups_field.remote_field.name
         return Permission.objects.filter(**{user_groups_query: user_obj})
 
     def _get_permissions(self, user_obj, obj, from_name):

@@ -265,6 +265,8 @@ class ModelBase(type):
             else:
                 # .. and abstract ones.
                 for field in parent_fields:
+                    if field.is_reverse_relation:
+                        continue
                     new_class.add_to_class(field.name, copy.deepcopy(field))
 
                 # Pass any non-abstract parent classes onto child.
@@ -1260,7 +1262,7 @@ class Model(six.with_metaclass(ModelBase)):
         errors = []
         seen_intermediary_signatures = []
 
-        fields = cls._meta.local_many_to_many
+        fields = [f for f in cls._meta.local_many_to_many if not f.auto_created]
 
         # Skip when the target model wasn't found.
         fields = (f for f in fields if isinstance(f.rel.to, ModelBase))
@@ -1317,6 +1319,11 @@ class Model(six.with_metaclass(ModelBase)):
         # Check that multi-inheritance doesn't cause field name shadowing.
         for parent in cls._meta.get_parent_list():
             for f in parent._meta.local_fields:
+                # If this is a remote parent link, and not to this model's inheritance
+                # chain, it isn't actually included in local fields.
+                if (f.remote_field and f.remote_field.parent_link and
+                        not isinstance(f.remote_field.model, cls)):
+                    continue
                 clash = used_fields.get(f.name) or used_fields.get(f.attname) or None
                 if clash:
                     errors.append(
@@ -1343,6 +1350,8 @@ class Model(six.with_metaclass(ModelBase)):
             # field "id" and automatically added unique field "id", both
             # defined at the same model. This special case is considered in
             # _check_id_field and here we ignore it.
+            if f.hidden:
+                continue
             id_conflict = (f.name == "id" and
                 clash and clash.name == "id" and clash.model == cls)
             if clash and not id_conflict:
@@ -1454,7 +1463,7 @@ class Model(six.with_metaclass(ModelBase)):
         # In order to avoid hitting the relation tree prematurely, we use our
         # own fields_map instead of using get_field()
         forward_fields_map = {
-            field.name: field for field in cls._meta._get_fields(reverse=False)
+            field.name: field for field in cls._meta._get_fields()
         }
 
         errors = []
@@ -1545,7 +1554,7 @@ class Model(six.with_metaclass(ModelBase)):
         # Also, ordering by m2m fields is not allowed.
         opts = cls._meta
         valid_fields = set(chain.from_iterable(
-            (f.name, f.attname) if not (f.auto_created and not f.concrete) else (f.field.related_query_name(),)
+            (f.name, f.attname)
             for f in chain(opts.fields, opts.related_objects)
         ))
 

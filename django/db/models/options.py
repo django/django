@@ -469,7 +469,7 @@ class Options(object):
         return make_immutable_fields_list(
             "related_objects",
             (obj for obj in all_related_fields
-            if (not obj.hidden or obj.field.many_to_many) and obj.is_reverse_relation)
+            if obj.is_reverse_relation and not obj.hidden)
         )
 
     @raise_deprecation(suggested_alternative="get_fields()")
