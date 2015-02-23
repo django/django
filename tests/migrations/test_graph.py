@@ -153,7 +153,7 @@ class GraphTests(TestCase):
             graph.forwards_plan, ('C', '0001')
         )
 
-    def test_deep_graph(self):
+    def test_graph_recursive(self):
         graph = MigrationGraph()
         root = ("app_a", "1")
         graph.add_node(root, None)
@@ -169,7 +169,7 @@ class GraphTests(TestCase):
         self.assertEqual(expected[::-1], actual)
 
     @expectedFailure
-    def test_recursion_depth(self):
+    def test_graph_iterative(self):
         graph = MigrationGraph()
         root = ("app_a", "1")
         graph.add_node(root, None)
