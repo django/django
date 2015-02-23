@@ -22,9 +22,6 @@ class TemplateTests(SimpleTestCase):
         template = Template('string template')
         self.assertEqual(template.origin.source, 'string template')
 
-
-class TemplateRegressionTests(SimpleTestCase):
-
     @override_settings(SETTINGS_MODULE=None, DEBUG=True)
     def test_url_reverse_no_settings_module(self):
         # Regression test for #9005
@@ -58,8 +55,8 @@ class TemplateRegressionTests(SimpleTestCase):
     @override_settings(DEBUG=True)
     def test_no_wrapped_exception(self):
         """
-        The template system doesn't wrap exceptions, but annotates them.
-        Refs #16770
+        # 16770 -- The template system doesn't wrap exceptions, but annotates
+        them.
         """
         c = Context({"coconuts": lambda: 42 / 0})
         t = Template("{{ coconuts }}")
@@ -69,16 +66,20 @@ class TemplateRegressionTests(SimpleTestCase):
         self.assertEqual(cm.exception.django_template_source[1], (0, 14))
 
     def test_invalid_block_suggestion(self):
-        # See #7876
-        try:
+        """
+        #7876 -- Error messages should include the unexpected block name.
+        """
+        with self.assertRaises(TemplateSyntaxError) as e:
             Template("{% if 1 %}lala{% endblock %}{% endif %}")
-        except TemplateSyntaxError as e:
-            self.assertEqual(e.args[0], "Invalid block tag: 'endblock', expected 'elif', 'else' or 'endif'")
+
+        self.assertEqual(
+            e.exception.args[0],
+            "Invalid block tag: 'endblock', expected 'elif', 'else' or 'endif'",
+        )
 
     def test_super_errors(self):
         """
-        Test behavior of the raise errors into included blocks.
-        See #18169
+        #18169 -- NoReverseMatch should not be silence in block.super.
         """
         t = loader.get_template('included_content.html')
         with self.assertRaises(urlresolvers.NoReverseMatch):
@@ -86,7 +87,7 @@ class TemplateRegressionTests(SimpleTestCase):
 
     def test_debug_tag_non_ascii(self):
         """
-        Test non-ASCII model representation in debug output (#23060).
+        #23060 -- Test non-ASCII model representation in debug output.
         """
         Group.objects.create(name="清風")
         c1 = Context({"objs": Group.objects.all()})
@@ -95,7 +96,8 @@ class TemplateRegressionTests(SimpleTestCase):
 
     def test_extends_generic_template(self):
         """
-        {% extends %} accepts django.template.backends.django.Template (#24338).
+        #24338 -- Allow extending django.template.backends.django.Template
+        objects.
         """
         parent = engines['django'].from_string(
             '{% block content %}parent{% endblock %}')
