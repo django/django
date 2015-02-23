@@ -18,8 +18,89 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from .models import Author, Book, Publisher, Store
 
 
-class BaseAggregateTestCase(TestCase):
-    fixtures = ["aggregation.json"]
+class AggregateTestCase(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Author.objects.create(name='Adrian Holovaty', age=34)
+        cls.a2 = Author.objects.create(name='Jacob Kaplan-Moss', age=35)
+        cls.a3 = Author.objects.create(name='Brad Dayley', age=45)
+        cls.a4 = Author.objects.create(name='James Bennett', age=29)
+        cls.a5 = Author.objects.create(name='Jeffrey Forcier', age=37)
+        cls.a6 = Author.objects.create(name='Paul Bissex', age=29)
+        cls.a7 = Author.objects.create(name='Wesley J. Chun', age=25)
+        cls.a8 = Author.objects.create(name='Peter Norvig', age=57)
+        cls.a9 = Author.objects.create(name='Stuart Russell', age=46)
+        cls.a1.friends.add(cls.a2, cls.a4)
+        cls.a2.friends.add(cls.a1, cls.a7)
+        cls.a4.friends.add(cls.a1)
+        cls.a5.friends.add(cls.a6, cls.a7)
+        cls.a6.friends.add(cls.a5, cls.a7)
+        cls.a7.friends.add(cls.a2, cls.a5, cls.a6)
+        cls.a8.friends.add(cls.a9)
+        cls.a9.friends.add(cls.a8)
+
+        cls.p1 = Publisher.objects.create(name='Apress', num_awards=3)
+        cls.p2 = Publisher.objects.create(name='Sams', num_awards=1)
+        cls.p3 = Publisher.objects.create(name='Prentice Hall', num_awards=7)
+        cls.p4 = Publisher.objects.create(name='Morgan Kaufmann', num_awards=9)
+        cls.p5 = Publisher.objects.create(name="Jonno's House of Books", num_awards=0)
+
+        cls.b1 = Book.objects.create(
+            isbn='159059725', name='The Definitive Guide to Django: Web Development Done Right',
+            pages=447, rating=4.5, price=Decimal('30.00'), contact=cls.a1, publisher=cls.p1,
+            pubdate=datetime.date(2007, 12, 6)
+        )
+        cls.b2 = Book.objects.create(
+            isbn='067232959', name='Sams Teach Yourself Django in 24 Hours',
+            pages=528, rating=3.0, price=Decimal('23.09'), contact=cls.a3, publisher=cls.p2,
+            pubdate=datetime.date(2008, 3, 3)
+        )
+        cls.b3 = Book.objects.create(
+            isbn='159059996', name='Practical Django Projects',
+            pages=300, rating=4.0, price=Decimal('29.69'), contact=cls.a4, publisher=cls.p1,
+            pubdate=datetime.date(2008, 6, 23)
+        )
+        cls.b4 = Book.objects.create(
+            isbn='013235613', name='Python Web Development with Django',
+            pages=350, rating=4.0, price=Decimal('29.69'), contact=cls.a5, publisher=cls.p3,
+            pubdate=datetime.date(2008, 11, 3)
+        )
+        cls.b5 = Book.objects.create(
+            isbn='013790395', name='Artificial Intelligence: A Modern Approach',
+            pages=1132, rating=4.0, price=Decimal('82.80'), contact=cls.a8, publisher=cls.p3,
+            pubdate=datetime.date(1995, 1, 15)
+        )
+        cls.b6 = Book.objects.create(
+            isbn='155860191', name='Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp',
+            pages=946, rating=5.0, price=Decimal('75.00'), contact=cls.a8, publisher=cls.p4,
+            pubdate=datetime.date(1991, 10, 15)
+        )
+        cls.b1.authors.add(cls.a1, cls.a2)
+        cls.b2.authors.add(cls.a3)
+        cls.b3.authors.add(cls.a4)
+        cls.b4.authors.add(cls.a5, cls.a6, cls.a7)
+        cls.b5.authors.add(cls.a8, cls.a9)
+        cls.b6.authors.add(cls.a8)
+
+        s1 = Store.objects.create(
+            name='Amazon.com',
+            original_opening=datetime.datetime(1994, 4, 23, 9, 17, 42),
+            friday_night_closing=datetime.time(23, 59, 59)
+        )
+        s2 = Store.objects.create(
+            name='Books.com',
+            original_opening=datetime.datetime(2001, 3, 15, 11, 23, 37),
+            friday_night_closing=datetime.time(23, 59, 59)
+        )
+        s3 = Store.objects.create(
+            name="Mamma and Pappa's Books",
+            original_opening=datetime.datetime(1945, 4, 25, 16, 24, 14),
+            friday_night_closing=datetime.time(21, 30)
+        )
+        s1.books.add(cls.b1, cls.b2, cls.b3, cls.b4, cls.b5, cls.b6)
+        s2.books.add(cls.b1, cls.b3, cls.b5, cls.b6)
+        s3.books.add(cls.b3, cls.b4, cls.b6)
 
     def test_empty_aggregate(self):
         self.assertEqual(Author.objects.all().aggregate(), {})
@@ -86,7 +167,7 @@ class BaseAggregateTestCase(TestCase):
         )
 
         books = Book.objects.annotate(mean_age=Avg("authors__age"))
-        b = books.get(pk=1)
+        b = books.get(pk=self.b1.pk)
         self.assertEqual(
             b.name,
             'The Definitive Guide to Django: Web Development Done Right'
@@ -95,7 +176,7 @@ class BaseAggregateTestCase(TestCase):
 
     def test_annotate_defer(self):
         qs = Book.objects.annotate(
-            page_sum=Sum("pages")).defer('name').filter(pk=1)
+            page_sum=Sum("pages")).defer('name').filter(pk=self.b1.pk)
 
         rows = [
             (1, "159059725", 447, "The Definitive Guide to Django: Web Development Done Right")
@@ -107,7 +188,7 @@ class BaseAggregateTestCase(TestCase):
 
     def test_annotate_defer_select_related(self):
         qs = Book.objects.select_related('contact').annotate(
-            page_sum=Sum("pages")).defer('name').filter(pk=1)
+            page_sum=Sum("pages")).defer('name').filter(pk=self.b1.pk)
 
         rows = [
             (1, "159059725", 447, "Adrian Holovaty",
@@ -200,7 +281,7 @@ class BaseAggregateTestCase(TestCase):
         )
 
     def test_annotate_values(self):
-        books = list(Book.objects.filter(pk=1).annotate(mean_age=Avg("authors__age")).values())
+        books = list(Book.objects.filter(pk=self.b1.pk).annotate(mean_age=Avg("authors__age")).values())
         self.assertEqual(
             books, [
                 {
@@ -218,7 +299,7 @@ class BaseAggregateTestCase(TestCase):
             ]
         )
 
-        books = Book.objects.filter(pk=1).annotate(mean_age=Avg('authors__age')).values('pk', 'isbn', 'mean_age')
+        books = Book.objects.filter(pk=self.b1.pk).annotate(mean_age=Avg('authors__age')).values('pk', 'isbn', 'mean_age')
         self.assertEqual(
             list(books), [
                 {
@@ -229,7 +310,7 @@ class BaseAggregateTestCase(TestCase):
             ]
         )
 
-        books = Book.objects.filter(pk=1).annotate(mean_age=Avg("authors__age")).values("name")
+        books = Book.objects.filter(pk=self.b1.pk).annotate(mean_age=Avg("authors__age")).values("name")
         self.assertEqual(
             list(books), [
                 {
@@ -238,7 +319,7 @@ class BaseAggregateTestCase(TestCase):
             ]
         )
 
-        books = Book.objects.filter(pk=1).values().annotate(mean_age=Avg('authors__age'))
+        books = Book.objects.filter(pk=self.b1.pk).values().annotate(mean_age=Avg('authors__age'))
         self.assertEqual(
             list(books), [
                 {
@@ -470,7 +551,7 @@ class BaseAggregateTestCase(TestCase):
         self.assertEqual(len(publishers), 0)
 
     def test_annotation(self):
-        vals = Author.objects.filter(pk=1).aggregate(Count("friends__id"))
+        vals = Author.objects.filter(pk=self.a1.pk).aggregate(Count("friends__id"))
         self.assertEqual(vals, {"friends__id__count": 2})
 
         books = Book.objects.annotate(num_authors=Count("authors__name")).filter(num_authors__exact=2).order_by("pk")
@@ -565,28 +646,28 @@ class BaseAggregateTestCase(TestCase):
         )
 
     def test_annotate_values_list(self):
-        books = Book.objects.filter(pk=1).annotate(mean_age=Avg("authors__age")).values_list("pk", "isbn", "mean_age")
+        books = Book.objects.filter(pk=self.b1.pk).annotate(mean_age=Avg("authors__age")).values_list("pk", "isbn", "mean_age")
         self.assertEqual(
             list(books), [
                 (1, "159059725", 34.5),
             ]
         )
 
-        books = Book.objects.filter(pk=1).annotate(mean_age=Avg("authors__age")).values_list("isbn")
+        books = Book.objects.filter(pk=self.b1.pk).annotate(mean_age=Avg("authors__age")).values_list("isbn")
         self.assertEqual(
             list(books), [
                 ('159059725',)
             ]
         )
 
-        books = Book.objects.filter(pk=1).annotate(mean_age=Avg("authors__age")).values_list("mean_age")
+        books = Book.objects.filter(pk=self.b1.pk).annotate(mean_age=Avg("authors__age")).values_list("mean_age")
         self.assertEqual(
             list(books), [
                 (34.5,)
             ]
         )
 
-        books = Book.objects.filter(pk=1).annotate(mean_age=Avg("authors__age")).values_list("mean_age", flat=True)
+        books = Book.objects.filter(pk=self.b1.pk).annotate(mean_age=Avg("authors__age")).values_list("mean_age", flat=True)
         self.assertEqual(list(books), [34.5])
 
         books = Book.objects.values_list("price").annotate(count=Count("price")).order_by("-count", "price")
@@ -697,25 +778,21 @@ class BaseAggregateTestCase(TestCase):
         book = Book.objects.aggregate(price_sum=Sum('price'))
         self.assertEqual(book['price_sum'], Decimal("99999.80"))
 
-
-class ComplexAggregateTestCase(TestCase):
-    fixtures = ["aggregation.json"]
-
     def test_nonaggregate_aggregation_throws(self):
         with six.assertRaisesRegex(self, TypeError, 'fail is not an aggregate expression'):
             Book.objects.aggregate(fail=F('price'))
 
     def test_nonfield_annotation(self):
-        book = Book.objects.annotate(val=Max(Value(2, output_field=IntegerField())))[0]
+        book = Book.objects.annotate(val=Max(Value(2, output_field=IntegerField()))).first()
         self.assertEqual(book.val, 2)
-        book = Book.objects.annotate(val=Max(Value(2), output_field=IntegerField()))[0]
+        book = Book.objects.annotate(val=Max(Value(2), output_field=IntegerField())).first()
         self.assertEqual(book.val, 2)
-        book = Book.objects.annotate(val=Max(2, output_field=IntegerField()))[0]
+        book = Book.objects.annotate(val=Max(2, output_field=IntegerField())).first()
         self.assertEqual(book.val, 2)
 
     def test_missing_output_field_raises_error(self):
         with six.assertRaisesRegex(self, FieldError, 'Cannot resolve expression type, unknown output_field'):
-            Book.objects.annotate(val=Max(2))[0]
+            Book.objects.annotate(val=Max(2)).first()
 
     def test_annotation_expressions(self):
         authors = Author.objects.annotate(combined_ages=Sum(F('age') + F('friends__age'))).order_by('name')
@@ -754,18 +831,18 @@ class ComplexAggregateTestCase(TestCase):
 
     def test_combine_different_types(self):
         with six.assertRaisesRegex(self, FieldError, 'Expression contains mixed types. You must set output_field'):
-            Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price')).get(pk=4)
+            Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price')).get(pk=self.b4.pk)
 
         b1 = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
-                                   output_field=IntegerField())).get(pk=4)
+                                   output_field=IntegerField())).get(pk=self.b4.pk)
         self.assertEqual(b1.sums, 383)
 
         b2 = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
-                                   output_field=FloatField())).get(pk=4)
+                                   output_field=FloatField())).get(pk=self.b4.pk)
         self.assertEqual(b2.sums, 383.69)
 
         b3 = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
-                                   output_field=DecimalField())).get(pk=4)
+                                   output_field=DecimalField())).get(pk=self.b4.pk)
         self.assertEqual(b3.sums, Approximate(Decimal("383.69"), places=2))
 
     def test_complex_aggregations_require_kwarg(self):
@@ -805,14 +882,15 @@ class ComplexAggregateTestCase(TestCase):
     def test_values_annotation_with_expression(self):
         # ensure the F() is promoted to the group by clause
         qs = Author.objects.values('name').annotate(another_age=Sum('age') + F('age'))
-        a = qs.get(pk=1)
+        a = qs.get(name="Adrian Holovaty")
         self.assertEqual(a['another_age'], 68)
 
         qs = qs.annotate(friend_count=Count('friends'))
-        a = qs.get(pk=1)
+        a = qs.get(name="Adrian Holovaty")
         self.assertEqual(a['friend_count'], 2)
 
-        qs = qs.annotate(combined_age=Sum('age') + F('friends__age')).filter(pk=1).order_by('-combined_age')
+        qs = qs.annotate(combined_age=Sum('age') + F('friends__age')).filter(
+            name="Adrian Holovaty").order_by('-combined_age')
         self.assertEqual(
             list(qs), [
                 {
@@ -860,11 +938,11 @@ class ComplexAggregateTestCase(TestCase):
             age_alias=F('age')
         ).annotate(
             sum_age=Sum('age_alias')
-        ).get(pk=1)
+        ).get(name="Adrian Holovaty")
 
         other_author = Author.objects.annotate(
             sum_age=Sum('age')
-        ).get(pk=1)
+        ).get(name="Adrian Holovaty")
 
         self.assertEqual(author.sum_age, other_author.sum_age)
 
@@ -885,7 +963,7 @@ class ComplexAggregateTestCase(TestCase):
             qs = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
                                        output_field=IntegerField()))
             self.assertEqual(str(qs.query).count('sum('), 1)
-            b1 = qs.get(pk=4)
+            b1 = qs.get(pk=self.b4.pk)
             self.assertEqual(b1.sums, 383)
 
             # test changing the dict and delegating
@@ -897,7 +975,7 @@ class ComplexAggregateTestCase(TestCase):
             qs = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
                                        output_field=IntegerField()))
             self.assertEqual(str(qs.query).count('sum('), 1)
-            b1 = qs.get(pk=4)
+            b1 = qs.get(pk=self.b4.pk)
             self.assertEqual(b1.sums, 383)
 
             # test overriding all parts of the template
@@ -910,7 +988,7 @@ class ComplexAggregateTestCase(TestCase):
             qs = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
                                        output_field=IntegerField()))
             self.assertEqual(str(qs.query).count('MAX('), 1)
-            b1 = qs.get(pk=4)
+            b1 = qs.get(pk=self.b4.pk)
             self.assertEqual(b1.sums, 2)
         finally:
             delattr(Sum, 'as_' + connection.vendor)
@@ -938,16 +1016,16 @@ class ComplexAggregateTestCase(TestCase):
 
         qs = Publisher.objects.annotate(
             price_or_median=Greatest(Avg('book__rating'), Avg('book__price'))
-        ).filter(price_or_median__gte=F('num_awards')).order_by('pk')
+        ).filter(price_or_median__gte=F('num_awards')).order_by('num_awards')
         self.assertQuerysetEqual(
-            qs, [1, 2, 3, 4], lambda v: v.pk)
+            qs, [1, 3, 7, 9], lambda v: v.num_awards)
 
         qs2 = Publisher.objects.annotate(
             rating_or_num_awards=Greatest(Avg('book__rating'), F('num_awards'),
                                           output_field=FloatField())
-        ).filter(rating_or_num_awards__gt=F('num_awards')).order_by('pk')
+        ).filter(rating_or_num_awards__gt=F('num_awards')).order_by('num_awards')
         self.assertQuerysetEqual(
-            qs2, [1, 2], lambda v: v.pk)
+            qs2, [1, 3], lambda v: v.num_awards)
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_backwards_compatibility(self):
@@ -966,5 +1044,5 @@ class ComplexAggregateTestCase(TestCase):
                 query.annotations[alias] = aggregate
 
         qs = Author.objects.values('name').annotate(another_age=NewSum('age') + F('age'))
-        a = qs.get(pk=1)
+        a = qs.get(name="Adrian Holovaty")
         self.assertEqual(a['another_age'], 68)

@@ -1,9 +1,40 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
+from django.contrib.sites.models import Site
 from django.test import TestCase, modify_settings, override_settings
 
 from .settings import FLATPAGES_TEMPLATES
+
+
+class TestDataMixin(object):
+
+    @classmethod
+    def setUpTestData(cls):
+        # don't use the manager because we want to ensure the site exists
+        # with pk=1, regardless of whether or not it already exists.
+        cls.site1 = Site(pk=1, domain='example.com', name='example.com')
+        cls.site1.save()
+        cls.fp1 = FlatPage.objects.create(
+            url='/flatpage/', title='A Flatpage', content="Isn't it flat!",
+            enable_comments=False, template_name='', registration_required=False
+        )
+        cls.fp2 = FlatPage.objects.create(
+            url='/location/flatpage/', title='A Nested Flatpage', content="Isn't it flat and deep!",
+            enable_comments=False, template_name='', registration_required=False
+        )
+        cls.fp3 = FlatPage.objects.create(
+            url='/sekrit/', title='Sekrit Flatpage', content="Isn't it sekrit!",
+            enable_comments=False, template_name='', registration_required=True
+        )
+        cls.fp4 = FlatPage.objects.create(
+            url='/location/sekrit/', title='Sekrit Nested Flatpage', content="Isn't it sekrit and deep!",
+            enable_comments=False, template_name='', registration_required=True
+        )
+        cls.fp1.sites.add(cls.site1)
+        cls.fp2.sites.add(cls.site1)
+        cls.fp3.sites.add(cls.site1)
+        cls.fp4.sites.add(cls.site1)
 
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.flatpages'})
@@ -21,8 +52,7 @@ from .settings import FLATPAGES_TEMPLATES
     TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )
-class FlatpageMiddlewareTests(TestCase):
-    fixtures = ['sample_flatpages', 'example_site']
+class FlatpageMiddlewareTests(TestDataMixin, TestCase):
 
     def test_view_flatpage(self):
         "A flatpage can be served through a view, even when the middleware is in use"
@@ -98,8 +128,7 @@ class FlatpageMiddlewareTests(TestCase):
     TEMPLATES=FLATPAGES_TEMPLATES,
     SITE_ID=1,
 )
-class FlatpageMiddlewareAppendSlashTests(TestCase):
-    fixtures = ['sample_flatpages', 'example_site']
+class FlatpageMiddlewareAppendSlashTests(TestDataMixin, TestCase):
 
     def test_redirect_view_flatpage(self):
         "A flatpage can be served through a view and should add a slash"

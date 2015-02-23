@@ -22,6 +22,9 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
+import datetime
+
+from django.contrib.auth.models import User
 from django.core import mail
 from django.http import HttpResponse
 from django.test import Client, RequestFactory, TestCase, override_settings
@@ -32,7 +35,27 @@ from .views import get_view, post_view, trace_view
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client.urls',)
 class ClientTest(TestCase):
-    fixtures = ['testdata.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
+            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u2 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
+            first_name='Inactive', last_name='User', email='testclient@example.com', is_staff=False, is_active=False,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u3 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
+            first_name='Staff', last_name='Member', email='testclient@example.com', is_staff=True, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
 
     def test_get_view(self):
         "GET a view"
