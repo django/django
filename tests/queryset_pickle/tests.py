@@ -43,6 +43,9 @@ class PickleabilityTestCase(TestCase):
     def test_membermethod_as_default(self):
         self.assert_pickles(Happening.objects.filter(number4=1))
 
+    def test_filter_reverse_fk(self):
+        self.assert_pickles(Group.objects.filter(event=1))
+
     def test_doesnotexist_exception(self):
         # Ticket #17776
         original = Event.DoesNotExist("Doesn't exist")
