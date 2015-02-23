@@ -319,6 +319,38 @@ class CommonMiddlewareTest(SimpleTestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, "http://www.testserver/customurlconf/slash/")
 
+    @override_settings(APPEND_SLASH=True)
+    def test_empty_path_info_not_found_with_append_slash(self):
+        req = HttpRequest()
+        req.urlconf = "middleware.urls"
+        res = HttpResponseNotFound()
+        middleware_res = CommonMiddleware(get_response_empty).process_response(req, res)
+        self.assertEqual(middleware_res.status_code, 301)
+
+    @override_settings(APPEND_SLASH=False)
+    def test_empty_path_info_not_found_without_append_slash(self):
+        req = HttpRequest()
+        req.urlconf = "middleware.urls"
+        res = HttpResponseNotFound()
+        middleware_res = CommonMiddleware(get_response_empty).process_response(req, res)
+        self.assertEqual(middleware_res.status_code, 404)
+
+    @override_settings(APPEND_SLASH=True)
+    def test_empty_path_info_200_with_append_slash(self):
+        req = HttpRequest()
+        req.urlconf = "middleware.urls"
+        res = HttpResponse("content")
+        middleware_res = CommonMiddleware(get_response_empty).process_response(req, res)
+        self.assertEqual(middleware_res.status_code, 200)
+
+    @override_settings(APPEND_SLASH=False)
+    def test_empty_path_info_200_without_append_slash(self):
+        req = HttpRequest()
+        req.urlconf = "middleware.urls"
+        res = HttpResponse("content")
+        middleware_res = CommonMiddleware(get_response_empty).process_response(req, res)
+        self.assertEqual(middleware_res.status_code, 200)
+
     # Tests for the Content-Length header
 
     def test_content_length_header_added(self):

@@ -46,28 +46,35 @@ class CommonMiddleware(MiddlewareMixin):
 
         # Check for a redirect based on settings.PREPEND_WWW
         host = request.get_host()
+        must_prepend = settings.PREPEND_WWW and host and not host.startswith("www.")
+        redirect_url = ("%s://www.%s" % (request.scheme, host)) if must_prepend else ""
 
-        if settings.PREPEND_WWW and host and not host.startswith("www."):
-            # Check if we also need to append a slash so we can do it all
-            # with a single redirect. (This check may be somewhat expensive,
-            # so we only do it if we already know we're sending a redirect,
-            # or in process_response if we get a 404.)
-            if self.should_redirect_with_slash(request):
-                path = self.get_full_path_with_slash(request)
-            else:
-                path = request.get_full_path()
+        # Check if a slash should be appended to the URL
+        should_redirect_with_slash = self.should_redirect_with_slash(request)
 
-            return self.response_redirect_class(f"{request.scheme}://www.{host}{path}")
+        # If a slash should be appended, use the full path with a slash.
+        # Otherwise, just get the full path without forcing a slash.
+        if should_redirect_with_slash:
+            path = self.get_full_path_with_slash(request)
+        else:
+            path = request.get_full_path()
+
+        # If it's needed to redirect either based on settings.PREPEND_WWW
+        # or to append a slash, do so.
+        if redirect_url or should_redirect_with_slash:
+            redirect_url += path
+            return self.response_redirect_class(redirect_url)
 
     def should_redirect_with_slash(self, request):
         """
         Return True if settings.APPEND_SLASH is True and appending a slash to
         the request path turns an invalid path into a valid one.
         """
-        if settings.APPEND_SLASH and not request.path_info.endswith("/"):
+        path_info = "" if request.path_info_is_empty else request.path_info
+        if settings.APPEND_SLASH and not path_info.endswith("/"):
             urlconf = getattr(request, "urlconf", None)
-            if not is_valid_path(request.path_info, urlconf):
-                match = is_valid_path("%s/" % request.path_info, urlconf)
+            if not is_valid_path(path_info, urlconf):
+                match = is_valid_path("%s/" % path_info, urlconf)
                 if match:
                     view = match.func
                     return getattr(view, "should_append_slash", True)

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
@@ -18,4 +18,5 @@ urlpatterns = [
     path("malformed_post/", views.malformed_post),
     path("httpstatus_enum/", views.httpstatus_enum),
     path("unawaited/", views.async_unawaited),
+    re_path("^$", views.index),
 ]

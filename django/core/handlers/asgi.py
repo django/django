@@ -57,6 +57,7 @@ class ASGIRequest(HttpRequest):
             self.path_info = scope["path"].removeprefix(self.script_name)
         else:
             self.path_info = scope["path"]
+        self.path_info_is_empty = not bool(self.path_info)
         # HTTP basics.
         self.method = self.scope["method"].upper()
         # Ensure query string is encoded correctly.

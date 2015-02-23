@@ -24,4 +24,5 @@ urlpatterns = [
     path("csp-override-enforced/", views.csp_override_enforced),
     path("csp-override-report-only/", views.csp_override_report_only),
     path("csp-500/", views.csp_500),
+    re_path(r"^$", views.empty_view),
 ]
