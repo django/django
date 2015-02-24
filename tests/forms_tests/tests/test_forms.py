@@ -19,7 +19,7 @@ from django.forms import (
 from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
-from django.test import TestCase
+from django.test import TestCase, mock
 from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.datastructures import MultiValueDict
@@ -1368,6 +1368,22 @@ class FormsTestCase(TestCase):
         self.assertEqual(unbound['username'].value(), 'djangonaut')
         self.assertEqual(bound['password'].value(), 'foo')
         self.assertEqual(unbound['password'].value(), None)
+
+    def test_boundfield_initial_called_once(self):
+        # Ensures multiple calls to BoundField().value() in an unbound form
+        # only results in a single call to a provided initial callable (#24391)
+        initial = mock.Mock(return_value='dynamic')
+
+        class Element(Form):
+            name = CharField(max_length=10, initial=initial)
+
+        # Make an instance, and get its "name" value multiple times
+        unbound = Element()
+        name = unbound['name']
+        name.value()
+        name.value()
+
+        self.assertEqual(initial.call_count, 1)
 
     def test_boundfield_rendering(self):
         """

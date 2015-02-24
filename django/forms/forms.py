@@ -580,7 +580,13 @@ class BoundField(object):
         if not self.form.is_bound:
             data = self.form.initial.get(self.name, self.field.initial)
             if callable(data):
-                data = data()
+                # Get/set the result of a prior call from/to an attribute, to
+                # avoid having to call the initial callable twice (#24391);
+                # default to the result of calling it
+                if hasattr(self, '_initial_result'):
+                    data = self._initial_result
+                else:
+                    self._initial_result = data = data()
                 # If this is an auto-generated default date, nix the
                 # microseconds for standardized handling. See #22502.
                 if (isinstance(data, (datetime.datetime, datetime.time)) and
