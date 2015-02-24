@@ -521,22 +521,22 @@ Atom1Feed
 
     For example::
 
+        from django.utils import six
         from django.utils.functional import keep_lazy, keep_lazy_text
 
         def fancy_utility_function(s, ...):
             # Do some conversion on string 's'
             ...
-        # Replace unicode by str on Python 3
-        fancy_utility_function = keep_lazy(unicode)(fancy_utility_function)
+        fancy_utility_function = keep_lazy(six.text_type)(fancy_utility_function)
         # Or more succintly:
-        @keep_lazy(unicode)
+        @keep_lazy(six.text_type)
         def fancy_utility_function(s, ...):
             ...
 
     The ``keep_lazy()`` decorator takes a number of extra arguments
     (``*args``) specifying the type(s) that the original function can return.
     A common use-case is to have functions that return text. For these, you can
-    just pass the ``unicode`` type to ``keep_lazy`` (or even simpler, use the
+    just pass the ``six.text_type`` type to ``keep_lazy`` (or even simpler, use the
     ``keep_lazy_text`` decorator described in the next section).
 
     Using this decorator means you can write your function and assume that the
@@ -545,15 +545,16 @@ Atom1Feed
 
 .. function:: keep_lazy_text(func)
 
-    A shortcut for ``keep_lazy(unicode)``.
+    A shortcut for ``keep_lazy(six.text_type)(func)``.
 
     If you have a function that returns text and you want to be able to take
     lazy arguments while delaying their evaluation, simply use this decorator::
 
+        from django.utils import six
         from django.utils.functional import keep_lazy, keep_lazy_text
 
         # Our previous example was:
-        @keep_lazy(unicode)
+        @keep_lazy(six.text_type)
         def fancy_utility_function(s, ...):
             ...
 
