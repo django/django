@@ -916,6 +916,17 @@ class BaseInlineFormSet(BaseModelFormSet):
             form.save_m2m()
         return obj
 
+    def save(self, commit=True):
+        # The instance may not exists in the db at formset instanciation time.
+        if self.instance.pk:
+            self.set_forms_fk_instances(self.instance)
+        return super(BaseInlineFormSet, self).save(commit)
+
+    def set_forms_fk_instances(self, obj):
+        rel_name = self.fk.name
+        for form in self.forms:
+            setattr(form.instance, rel_name, obj)
+
     def add_fields(self, form, index):
         super(BaseInlineFormSet, self).add_fields(form, index)
         if self._pk_field == self.fk:

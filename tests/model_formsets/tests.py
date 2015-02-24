@@ -819,6 +819,38 @@ class ModelFormsetTest(TestCase):
         formset = AuthorBooksFormSet(data, instance=author, queryset=custom_qs)
         self.assertTrue(formset.is_valid())
 
+        # The save() method should access the related object if it exists
+        # in the database (#24395).
+
+        class PoemForm2(forms.ModelForm):
+            def save(self, commit=True):
+                poem = super(PoemForm2, self).save(commit=False)
+                poem.name = "%s by %s" % (poem.name, poem.poet.name)
+                if commit:
+                    poem.save()
+                return poem
+
+        PoemFormSet2 = inlineformset_factory(Poet, Poem, form=PoemForm2, fields="__all__")
+        data = {
+            'poem_set-TOTAL_FORMS': '1',
+            'poem_set-INITIAL_FORMS': '0',
+            'poem_set-MAX_NUM_FORMS': '',
+            'poem_set-0-name': 'Le Lac',
+        }
+
+        poet2 = Poet()
+        formset = PoemFormSet2(data=data, instance=poet2)
+        self.assertTrue(formset.is_valid())
+
+        # The Poet instance is saved after the formset instanciation. this happens
+        # in admin's changeform_view() when adding a new object and some inlines
+        #in the same request.
+        poet2.name = 'Lamartine'
+        poet2.save()
+        saved = formset.save()
+        poem, = saved
+        self.assertEqual(poem.name, 'Le Lac by Lamartine')
+
     def test_inline_formsets_with_wrong_fk_name(self):
         """ Regression for #23451 """
         message = "fk_name 'title' is not a ForeignKey to 'model_formsets.Author'."
