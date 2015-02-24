@@ -59,8 +59,8 @@ window.SelectFilter = {
 
         selector_available.appendChild(from_box);
         var choose_all = quickElement('a', selector_available, gettext('Choose all'), 'title', interpolate(gettext('Click to choose all %s at once.'), [field_name]), 'href', 'javascript:void(0);', 'id', field_id + '_add_all_link');
-        choose_all.addEventListener("click", function() {
-            SelectBox.move_all(field_id + "_from", field_id + "_to");
+        choose_all.addEventListener('click', function() {
+            SelectBox.move_all(field_id + '_from', field_id + '_to');
             SelectFilter.refresh_icons(field_id);
         });
         choose_all.className = 'selector-chooseall';
@@ -69,14 +69,14 @@ window.SelectFilter = {
         var selector_chooser = quickElement('ul', selector_div);
         selector_chooser.className = 'selector-chooser';
         var add_link = quickElement('a', quickElement('li', selector_chooser), gettext('Choose'), 'title', gettext('Choose'), 'href', 'javascript:void(0);', 'id', field_id + '_add_link');
-        add_link.addEventListener("click", function() {
-            SelectBox.move(field_id + "_from", field_id + "_to");
+        add_link.addEventListener('click', function() {
+            SelectBox.move(field_id + '_from', field_id + '_to');
             SelectFilter.refresh_icons(field_id);
         });
         add_link.className = 'selector-add';
         var remove_link = quickElement('a', quickElement('li', selector_chooser), gettext('Remove'), 'title', gettext('Remove'), 'href', 'javascript:void(0);', 'id', field_id + '_remove_link');
-        remove_link.addEventListener("click", function() {
-            SelectBox.move(field_id + "_to", field_id + "_from");
+        remove_link.addEventListener('click', function() {
+            SelectBox.move(field_id + '_to', field_id + '_from');
             SelectFilter.refresh_icons(field_id);
         });
         remove_link.className = 'selector-remove';
@@ -90,8 +90,8 @@ window.SelectFilter = {
         var to_box = quickElement('select', selector_chosen, '', 'id', field_id + '_to', 'multiple', 'multiple', 'size', from_box.size, 'name', from_box.getAttribute('name'));
         to_box.className = 'filtered';
         var clear_all = quickElement('a', selector_chosen, gettext('Remove all'), 'title', interpolate(gettext('Click to remove all chosen %s at once.'), [field_name]), 'href', 'javascript:void(0);', 'id', field_id + '_remove_all_link');
-        clear_all.addEventListener("click", function() {
-            SelectBox.move_all(field_id + "_to", field_id + "_from");
+        clear_all.addEventListener('click', function() {
+            SelectBox.move_all(field_id + '_to', field_id + '_from');
             SelectFilter.refresh_icons(field_id);
         });
         clear_all.className = 'selector-clearall';
