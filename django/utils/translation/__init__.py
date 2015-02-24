@@ -89,7 +89,7 @@ ugettext_lazy = lazy(ugettext, six.text_type)
 pgettext_lazy = lazy(pgettext, six.text_type)
 
 def lazy_number(func, resultclass, number=None, **kwargs):
-    if isinstance(number, int):
+    if isinstance(number, (int, long)):
         kwargs['number'] = number
         proxy = lazy(func, resultclass)(**kwargs)
     else:
