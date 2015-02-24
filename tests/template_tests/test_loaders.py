@@ -185,11 +185,16 @@ class FileSystemLoaderTests(SimpleTestCase):
         def check_sources(path, expected_sources):
             expected_sources = [os.path.abspath(s) for s in expected_sources]
             self.assertEqual(
-                list(loader.get_template_sources(path, dirs)),
+                list(loader.get_template_sources(path)),
                 expected_sources,
             )
 
-        yield check_sources
+        original_dirs = self.engine.dirs
+        self.engine.dirs = dirs
+        try:
+            yield check_sources
+        finally:
+            self.engine.dirs = original_dirs
 
     def test_directory_security(self):
         with self.source_checker(['/dir1', '/dir2']) as check_sources:
@@ -234,9 +239,18 @@ class FileSystemLoaderTests(SimpleTestCase):
             check_sources('/DIR1/index.HTML', ['/DIR1/index.HTML'])
 
 
-class AppDirectoriesLoaderTest(FileSystemLoaderTests):
+class AppDirectoriesLoaderTest(SimpleTestCase):
 
     def setUp(self):
         self.engine = Engine(
             loaders=['django.template.loaders.app_directories.Loader'],
         )
+
+    @override_settings(INSTALLED_APPS=['template_tests'])
+    def test_load_template(self):
+        self.engine.get_template('index.html')
+
+    @override_settings(INSTALLED_APPS=[])
+    def test_not_installed(self):
+        with self.assertRaises(TemplateDoesNotExist):
+            self.engine.get_template('index.html')
