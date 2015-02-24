@@ -13,7 +13,6 @@ from django.template import (
     base as template_base, engines, loader,
 )
 from django.template.engine import Engine
-from django.template.loaders import app_directories, filesystem
 from django.test import RequestFactory, SimpleTestCase
 from django.test.utils import (
     extend_sys_path, ignore_warnings, override_settings,
@@ -21,126 +20,18 @@ from django.test.utils import (
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 
-TESTS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(upath(__file__))))
-
-TEMPLATES_DIR = os.path.join(TESTS_DIR, 'templates')
+TEMPLATES_DIR = os.path.join(os.path.dirname(upath(__file__)), 'templates')
 
 
-class TemplateLoaderTests(SimpleTestCase):
-
-    def test_loaders_security(self):
-        ad_loader = app_directories.Loader(Engine.get_default())
-        fs_loader = filesystem.Loader(Engine.get_default())
-
-        def test_template_sources(path, template_dirs, expected_sources):
-            if isinstance(expected_sources, list):
-                # Fix expected sources so they are abspathed
-                expected_sources = [os.path.abspath(s) for s in expected_sources]
-            # Test the two loaders (app_directores and filesystem).
-            func1 = lambda p, t: list(ad_loader.get_template_sources(p, t))
-            func2 = lambda p, t: list(fs_loader.get_template_sources(p, t))
-            for func in (func1, func2):
-                if isinstance(expected_sources, list):
-                    self.assertEqual(func(path, template_dirs), expected_sources)
-                else:
-                    self.assertRaises(expected_sources, func, path, template_dirs)
-
-        template_dirs = ['/dir1', '/dir2']
-        test_template_sources('index.html', template_dirs,
-                              ['/dir1/index.html', '/dir2/index.html'])
-        test_template_sources('/etc/passwd', template_dirs, [])
-        test_template_sources('etc/passwd', template_dirs,
-                              ['/dir1/etc/passwd', '/dir2/etc/passwd'])
-        test_template_sources('../etc/passwd', template_dirs, [])
-        test_template_sources('../../../etc/passwd', template_dirs, [])
-        test_template_sources('/dir1/index.html', template_dirs,
-                              ['/dir1/index.html'])
-        test_template_sources('../dir2/index.html', template_dirs,
-                              ['/dir2/index.html'])
-        test_template_sources('/dir1blah', template_dirs, [])
-        test_template_sources('../dir1blah', template_dirs, [])
-
-        # UTF-8 bytestrings are permitted.
-        test_template_sources(b'\xc3\x85ngstr\xc3\xb6m', template_dirs,
-                              ['/dir1/Ångström', '/dir2/Ångström'])
-        # Unicode strings are permitted.
-        test_template_sources('Ångström', template_dirs,
-                              ['/dir1/Ångström', '/dir2/Ångström'])
-        test_template_sources('Ångström', [b'/Stra\xc3\x9fe'], ['/Straße/Ångström'])
-        test_template_sources(b'\xc3\x85ngstr\xc3\xb6m', [b'/Stra\xc3\x9fe'],
-                              ['/Straße/Ångström'])
-        # Invalid UTF-8 encoding in bytestrings is not. Should raise a
-        # semi-useful error message.
-        test_template_sources(b'\xc3\xc3', template_dirs, UnicodeDecodeError)
-
-        # Case insensitive tests (for win32). Not run unless we're on
-        # a case insensitive operating system.
-        if os.path.normcase('/TEST') == os.path.normpath('/test'):
-            template_dirs = ['/dir1', '/DIR2']
-            test_template_sources('index.html', template_dirs,
-                                  ['/dir1/index.html', '/DIR2/index.html'])
-            test_template_sources('/DIR1/index.HTML', template_dirs,
-                                  ['/DIR1/index.HTML'])
-
-    @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATES_DIR],
-        'OPTIONS': {
-            # Turn DEBUG on, so that the origin file name will be kept with
-            # the compiled templates.
-            'debug': True,
-        }
-    }])
-    def test_loader_debug_origin(self):
-        load_name = 'login.html'
-
-        # We rely on the fact the file system and app directories loaders both
-        # inherit the load_template method from the base Loader class, so we
-        # only need to test one of them.
-        template = loader.get_template(load_name).template
-        template_name = template.nodelist[0].source[0].name
-        self.assertTrue(template_name.endswith(load_name),
-            'Template loaded by filesystem loader has incorrect name for debug page: %s' % template_name)
-
-    @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATES_DIR],
-        'OPTIONS': {
-            'debug': True,
-            'loaders': [
-                ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.filesystem.Loader',
-                ]),
-            ],
-        },
-    }])
-    def test_cached_loader_debug_origin(self):
-        load_name = 'login.html'
-
-        # Test the cached loader separately since it overrides load_template.
-        template = loader.get_template(load_name).template
-        template_name = template.nodelist[0].source[0].name
-        self.assertTrue(template_name.endswith(load_name),
-            'Template loaded through cached loader has incorrect name for debug page: %s' % template_name)
-
-        template = loader.get_template(load_name).template
-        template_name = template.nodelist[0].source[0].name
-        self.assertTrue(template_name.endswith(load_name),
-            'Cached template loaded through cached loader has incorrect name for debug page: %s' % template_name)
-
-    @override_settings(DEBUG=True)
-    def test_loader_origin(self):
-        template = loader.get_template('login.html')
-        self.assertEqual(template.origin.loadname, 'login.html')
+class TemplateTests(SimpleTestCase):
 
     @override_settings(DEBUG=True)
     def test_string_origin(self):
         template = Template('string template')
         self.assertEqual(template.origin.source, 'string template')
 
-    def test_debug_false_origin(self):
-        template = loader.get_template('login.html')
-        self.assertEqual(template.origin, None)
+
+class IncludeTests(SimpleTestCase):
 
     # Test the base loader class via the app loader. load_template
     # from base is used by all shipped loaders excepting cached,
