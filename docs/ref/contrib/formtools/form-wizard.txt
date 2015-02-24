@@ -319,7 +319,7 @@ The ``urls.py`` file would contain something like::
 
 .. versionchanged:: 1.6
 
-The ``condition_dict`` can be passed as attribute for the ``as_view()`
+The ``condition_dict`` can be passed as attribute for the ``as_view()``
 method or as a class attribute named ``condition_dict``::
 
     class OrderWizard(WizardView):
