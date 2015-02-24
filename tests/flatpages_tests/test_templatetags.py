@@ -23,7 +23,7 @@ class FlatpageTemplateTagTests(TestCase):
     fixtures = ['sample_flatpages']
 
     def test_get_flatpages_tag(self):
-        "The flatpage template tag retrives unregistered prefixed flatpages by default"
+        "The flatpage template tag retrieves unregistered prefixed flatpages by default"
         out = Template(
             "{% load flatpages %}"
             "{% get_flatpages as flatpages %}"
@@ -34,7 +34,7 @@ class FlatpageTemplateTagTests(TestCase):
         self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
     def test_get_flatpages_tag_for_anon_user(self):
-        "The flatpage template tag retrives unregistered flatpages for an anonymous user"
+        "The flatpage template tag retrieves unregistered flatpages for an anonymous user"
         out = Template(
             "{% load flatpages %}"
             "{% get_flatpages for anonuser as flatpages %}"
@@ -47,7 +47,7 @@ class FlatpageTemplateTagTests(TestCase):
         self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
     def test_get_flatpages_tag_for_user(self):
-        "The flatpage template tag retrives all flatpages for an authenticated user"
+        "The flatpage template tag retrieves all flatpages for an authenticated user"
         me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
         out = Template(
             "{% load flatpages %}"
@@ -61,7 +61,7 @@ class FlatpageTemplateTagTests(TestCase):
         self.assertEqual(out, "A Flatpage,A Nested Flatpage,Sekrit Nested Flatpage,Sekrit Flatpage,")
 
     def test_get_flatpages_with_prefix(self):
-        "The flatpage template tag retrives unregistered prefixed flatpages by default"
+        "The flatpage template tag retrieves unregistered prefixed flatpages by default"
         out = Template(
             "{% load flatpages %}"
             "{% get_flatpages '/location/' as location_flatpages %}"
@@ -72,7 +72,7 @@ class FlatpageTemplateTagTests(TestCase):
         self.assertEqual(out, "A Nested Flatpage,")
 
     def test_get_flatpages_with_prefix_for_anon_user(self):
-        "The flatpage template tag retrives unregistered prefixed flatpages for an anonymous user"
+        "The flatpage template tag retrieves unregistered prefixed flatpages for an anonymous user"
         out = Template(
             "{% load flatpages %}"
             "{% get_flatpages '/location/' for anonuser as location_flatpages %}"
