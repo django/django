@@ -1,0 +1,12 @@
+==========================
+Django 1.7.6 release notes
+==========================
+
+*Under Development*
+
+Django 1.7.6 fixes several bugs in 1.7.5.
+
+Bugfixes
+========
+
+* ...
