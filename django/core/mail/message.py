@@ -101,7 +101,7 @@ def forbid_multi_line_headers(name, val, encoding):
 
 
 def sanitize_address(addr, encoding):
-    if isinstance(addr, six.string_types):
+    if not isinstance(addr, tuple):
         addr = parseaddr(force_text(addr))
     nm, addr = addr
     nm = Header(nm, encoding).encode()
@@ -262,11 +262,11 @@ class EmailMessage(object):
         msg = self._create_message(msg)
         msg['Subject'] = self.subject
         msg['From'] = self.extra_headers.get('From', self.from_email)
-        msg['To'] = self.extra_headers.get('To', ', '.join(self.to))
+        msg['To'] = self.extra_headers.get('To', ', '.join(map(force_text, self.to)))
         if self.cc:
-            msg['Cc'] = ', '.join(self.cc)
+            msg['Cc'] = ', '.join(map(force_text, self.cc))
         if self.reply_to:
-            msg['Reply-To'] = self.extra_headers.get('Reply-To', ', '.join(self.reply_to))
+            msg['Reply-To'] = self.extra_headers.get('Reply-To', ', '.join(map(force_text, self.reply_to)))
 
         # Email header names are case-insensitive (RFC 2045), so we have to
         # accommodate that when doing comparisons.
