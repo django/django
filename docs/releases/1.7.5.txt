@@ -2,7 +2,7 @@
 Django 1.7.5 release notes
 ==========================
 
-*Under development*
+*February 25, 2015*
 
 Django 1.7.5 fixes several bugs in 1.7.4.
 
