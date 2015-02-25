@@ -29,6 +29,8 @@ def pretty_name(name):
         return ''
     return name.replace('_', ' ').capitalize()
 
+UNSET = object()
+
 
 class DeclarativeFieldsMetaclass(MediaDefiningClass):
     """
@@ -93,6 +95,7 @@ class BaseForm(object):
         # Instances should always modify self.fields; they should not modify
         # self.base_fields.
         self.fields = copy.deepcopy(self.base_fields)
+        self._bound_fields_cache = {}
 
     def __str__(self):
         return self.as_table()
@@ -120,7 +123,9 @@ class BaseForm(object):
         except KeyError:
             raise KeyError(
                 "Key %r not found in '%s'" % (name, self.__class__.__name__))
-        return BoundField(self, field, name)
+        if name not in self._bound_fields_cache:
+            self._bound_fields_cache[name] = BoundField(self, field, name)
+        return self._bound_fields_cache[name]
 
     @property
     def errors(self):
@@ -486,6 +491,7 @@ class BoundField(object):
         else:
             self.label = self.field.label
         self.help_text = field.help_text or ''
+        self._initial_value = UNSET
 
     def __str__(self):
         """Renders this field as an HTML widget."""
@@ -580,12 +586,16 @@ class BoundField(object):
         if not self.form.is_bound:
             data = self.form.initial.get(self.name, self.field.initial)
             if callable(data):
-                data = data()
-                # If this is an auto-generated default date, nix the
-                # microseconds for standardized handling. See #22502.
-                if (isinstance(data, (datetime.datetime, datetime.time)) and
-                        not getattr(self.field.widget, 'supports_microseconds', True)):
-                    data = data.replace(microsecond=0)
+                if self._initial_value is not UNSET:
+                    data = self._initial_value
+                else:
+                    data = data()
+                    # If this is an auto-generated default date, nix the
+                    # microseconds for standardized handling. See #22502.
+                    if (isinstance(data, (datetime.datetime, datetime.time)) and
+                            not getattr(self.field.widget, 'supports_microseconds', True)):
+                        data = data.replace(microsecond=0)
+                    self._initial_value = data
         else:
             data = self.field.bound_data(
                 self.data, self.form.initial.get(self.name, self.field.initial)
