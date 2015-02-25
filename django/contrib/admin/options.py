@@ -1631,7 +1631,7 @@ class ModelAdmin(BaseModelAdmin):
             object_name=object_name,
             object=obj,
             deleted_objects=deleted_objects,
-            model_count=dict(model_count),
+            model_count=dict(model_count).items(),
             perms_lacking=perms_needed,
             protected=protected,
             opts=opts,
