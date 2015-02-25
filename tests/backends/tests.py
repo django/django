@@ -13,10 +13,8 @@ from decimal import Decimal, Rounded
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
-from django.db import (
-    DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connection, connections,
-    reset_queries, transaction,
-)
+from django.db import (connection, connections, DatabaseError, DEFAULT_DB_ALIAS,
+                       IntegrityError, reset_queries, transaction)
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.backends.signals import connection_created
@@ -24,10 +22,8 @@ from django.db.backends.utils import CursorWrapper, format_number
 from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
-from django.test import (
-    TestCase, TransactionTestCase, mock, override_settings, skipIfDBFeature,
-    skipUnlessDBFeature,
-)
+from django.test import (mock, override_settings, skipIfDBFeature,
+                         skipUnlessDBFeature, TestCase, TransactionTestCase)
 from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.six.moves import range
@@ -44,7 +40,7 @@ class DummyBackendTest(TestCase):
         DATABASES = {}
         conns = ConnectionHandler(DATABASES)
         self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'],
-            'django.db.backends.dummy')
+                         'django.db.backends.dummy')
         with self.assertRaises(ImproperlyConfigured):
             conns[DEFAULT_DB_ALIAS].ensure_connection()
 
@@ -123,8 +119,8 @@ class SQLiteTests(TestCase):
         match = re.search('"id" ([^,]+),', statements[0])
         self.assertIsNotNone(match)
         self.assertEqual('integer NOT NULL PRIMARY KEY AUTOINCREMENT',
-            match.group(1), "Wrong SQL used to create an auto-increment "
-            "column on SQLite")
+                         match.group(1), "Wrong SQL used to create an auto-increment "
+                         "column on SQLite")
 
     def test_aggregation(self):
         """
@@ -159,14 +155,17 @@ class PostgreSQLTests(TestCase):
         self.assert_parses("EnterpriseDB 9.3", 90300)
         self.assert_parses("PostgreSQL 9.3.6", 90306)
         self.assert_parses("PostgreSQL 9.4beta1", 90400)
-        self.assert_parses("PostgreSQL 9.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)", 90301)
+        self.assert_parses(
+            "PostgreSQL 9.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)", 90301)
 
     def test_version_detection(self):
         """Test PostgreSQL version detection"""
 
         # Helper mocks
         class CursorMock(object):
+
             "Very simple mock of DB-API cursor"
+
             def execute(self, arg):
                 pass
 
@@ -180,7 +179,9 @@ class PostgreSQLTests(TestCase):
                 pass
 
         class OlderConnectionMock(object):
+
             "Mock of psycopg2 (< 2.0.12) connection"
+
             def cursor(self):
                 return CursorMock()
 
@@ -367,7 +368,7 @@ class LastExecutedQueryTest(TestCase):
         query = "SELECT strftime('%Y', 'now');"
         connection.cursor().execute(query)
         self.assertEqual(connection.queries[-1]['sql'],
-            str_prefix("QUERY = %(_)s\"SELECT strftime('%%Y', 'now');\" - PARAMS = ()"))
+                         str_prefix("QUERY = %(_)s\"SELECT strftime('%%Y', 'now');\" - PARAMS = ()"))
 
 
 class ParameterHandlingTest(TestCase):
@@ -388,6 +389,7 @@ class ParameterHandlingTest(TestCase):
 # backends, but it breaks MySQL hard. Until #13711 is fixed, it can't be run
 # everywhere (although it would be an effective test of #13711).
 class LongNameTest(TransactionTestCase):
+
     """Long primary keys and model names can result in a sequence name
     that exceeds the database limits, which will result in truncation
     on certain databases (e.g., Postgres). The backend needs to use
@@ -475,6 +477,7 @@ class ConnectionCreatedSignalTest(TransactionTestCase):
 
 
 class EscapingChecks(TestCase):
+
     """
     All tests in this test case are also run with settings.DEBUG=True in
     EscapingChecksDebug test case, to also test CursorDebugWrapper.
@@ -599,8 +602,8 @@ class BackendTestCase(TransactionTestCase):
         opts2 = models.Person._meta
         f3, f4 = opts2.get_field('first_name'), opts2.get_field('last_name')
         query2 = ('SELECT %s, %s FROM %s ORDER BY %s'
-          % (qn(f3.column), qn(f4.column), connection.introspection.table_name_converter(opts2.db_table),
-             qn(f3.column)))
+                  % (qn(f3.column), qn(f4.column), connection.introspection.table_name_converter(opts2.db_table),
+                     qn(f3.column)))
         cursor = connection.cursor()
         cursor.execute(query2)
         self.assertEqual(cursor.fetchone(), ('Clark', 'Kent'))
@@ -746,7 +749,7 @@ class BackendTestCase(TransactionTestCase):
                 self.assertEqual(3, len(new_connection.queries))
                 self.assertEqual(1, len(w))
                 self.assertEqual(str(w[0].message), "Limit for query logging "
-                    "exceeded, only the last 3 queries will be returned.")
+                                 "exceeded, only the last 3 queries will be returned.")
 
         finally:
             BaseDatabaseWrapper.queries_limit = old_queries_limit
@@ -821,7 +824,8 @@ class FkConstraintsTests(TransactionTestCase):
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            models.Article.objects.create(
+                headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
@@ -839,7 +843,8 @@ class FkConstraintsTests(TransactionTestCase):
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            models.Article.objects.create(
+                headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
@@ -856,7 +861,8 @@ class FkConstraintsTests(TransactionTestCase):
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            models.Article.objects.create(
+                headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
@@ -1023,6 +1029,7 @@ class ThreadTests(TransactionTestCase):
 
 
 class MySQLPKZeroTests(TestCase):
+
     """
     Zero as id for AutoField should raise exception in MySQL, because MySQL
     does not allow zero for autoincrement primary key.
@@ -1062,6 +1069,22 @@ class DBConstraintTestCase(TestCase):
         intermediary_model.objects.create(from_object_id=obj.id, to_object_id=12345)
         self.assertEqual(obj.related_objects.count(), 1)
         self.assertEqual(intermediary_model.objects.count(), 2)
+
+
+class SchemaEditorTestCase(TestCase):
+
+    """BaseDatabaseSchemaEditor tests"""
+
+    def test_index_name_hash_is_same(self):
+        """
+        Test for https://code.djangoproject.com/ticket/24390
+        """
+        with connection.schema_editor() as editor:
+            index_name = editor._create_index_name(
+                model=models.Person,
+                column_names=("column1", "column2", "column3"),
+                suffix="123")
+            self.assertEqual(index_name, "backends_person_column1_dd10a602db123")
 
 
 class BackendUtilTests(TestCase):
