@@ -13,8 +13,10 @@ from decimal import Decimal, Rounded
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
-from django.db import (connection, connections, DatabaseError, DEFAULT_DB_ALIAS,
-                       IntegrityError, reset_queries, transaction)
+from django.db import (
+    DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connection, connections,
+    reset_queries, transaction,
+)
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.backends.signals import connection_created
@@ -22,8 +24,10 @@ from django.db.backends.utils import CursorWrapper, format_number
 from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
-from django.test import (mock, override_settings, skipIfDBFeature,
-                         skipUnlessDBFeature, TestCase, TransactionTestCase)
+from django.test import (
+    TestCase, TransactionTestCase, mock, override_settings, skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.six.moves import range
@@ -1069,22 +1073,6 @@ class DBConstraintTestCase(TestCase):
         intermediary_model.objects.create(from_object_id=obj.id, to_object_id=12345)
         self.assertEqual(obj.related_objects.count(), 1)
         self.assertEqual(intermediary_model.objects.count(), 2)
-
-
-class SchemaEditorTestCase(TestCase):
-
-    """BaseDatabaseSchemaEditor tests"""
-
-    def test_index_name_hash_is_same(self):
-        """
-        Test for https://code.djangoproject.com/ticket/24390
-        """
-        with connection.schema_editor() as editor:
-            index_name = editor._create_index_name(
-                model=models.Person,
-                column_names=("column1", "column2", "column3"),
-                suffix="123")
-            self.assertEqual(index_name, "backends_person_column1_dd10a602db123")
 
 
 class BackendUtilTests(TestCase):
