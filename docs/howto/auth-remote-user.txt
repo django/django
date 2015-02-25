@@ -50,6 +50,18 @@ With this setup, ``RemoteUserMiddleware`` will detect the username in
 ``request.META['REMOTE_USER']`` and will authenticate and auto-login that user
 using the :class:`~django.contrib.auth.backends.RemoteUserBackend`.
 
+Be aware that this particular setup disables authentication with the default
+``ModelBackend``. This means that if the ``REMOTE_USER`` value is not set
+then the user is unable to log in, even using Django's admin interface.
+Adding ``'django.contrib.auth.backends.ModelBackend'`` to the
+``AUTHENTICATION_BACKENDS`` list will use ``ModelBackend`` as a fallback
+if ``REMOTE_USER`` is absent, which will solve these issues.
+
+Django's user management, such as the views in ``contrib.admin`` and
+the :djadmin:`createsuperuser` management command, doesn't integrate with
+remote users. These interfaces work with users stored in the database
+regardless of ``AUTHENTICATION_BACKENDS``.
+
 .. note::
    Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
    still have all of the same permissions checking that is implemented in
