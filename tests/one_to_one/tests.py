@@ -136,7 +136,7 @@ class OneToOneTests(TestCase):
         place = Place(name='User', address='London')
         with self.assertRaisesMessage(ValueError,
                             'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                            % (place, Restaurant.place.field.rel.to._meta.object_name)):
+                            % (place, Restaurant.place.field.remote_field.model._meta.object_name)):
             Restaurant.objects.create(place=place, serves_hot_dogs=True, serves_pizza=False)
         bar = UndergroundBar()
         p = Place(name='User', address='London')
@@ -410,7 +410,7 @@ class OneToOneTests(TestCase):
         be added to the related model.
         """
         self.assertFalse(
-            hasattr(Target, HiddenPointer._meta.get_field('target').rel.get_accessor_name())
+            hasattr(Target, HiddenPointer._meta.get_field('target').remote_field.get_accessor_name())
         )
 
     def test_related_object(self):

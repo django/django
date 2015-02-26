@@ -383,7 +383,7 @@ class ChangeList(object):
             except FieldDoesNotExist:
                 pass
             else:
-                if isinstance(field.rel, models.ManyToOneRel):
+                if isinstance(field.remote_field, models.ManyToOneRel):
                     return True
         return False
 

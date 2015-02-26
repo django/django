@@ -172,7 +172,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                     )
                     break  # Only one AutoField is allowed per model, so don't bother continuing.
             for f in model._meta.many_to_many:
-                if not f.rel.through:
+                if not f.remote_field.through:
                     output.append(
                         "%s setval(pg_get_serial_sequence('%s','%s'), "
                         "coalesce(max(%s), 1), max(%s) %s null) %s %s;" % (

@@ -437,7 +437,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         band.album_set.create(
             name='Hybrid Theory', cover_art=r'albums\hybrid_theory.jpg'
         )
-        rel = models.Album._meta.get_field('band').rel
+        rel = models.Album._meta.get_field('band').remote_field
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
@@ -456,7 +456,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         core = models.Inventory.objects.create(
             barcode=87, name='Core', parent=apple
         )
-        rel = models.Inventory._meta.get_field('parent').rel
+        rel = models.Inventory._meta.get_field('parent').remote_field
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', core.parent_id, attrs={}), (
@@ -471,7 +471,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         # have no magnifying glass link. See #16542
         big_honeycomb = models.Honeycomb.objects.create(location='Old tree')
         big_honeycomb.bee_set.create()
-        rel = models.Bee._meta.get_field('honeycomb').rel
+        rel = models.Bee._meta.get_field('honeycomb').remote_field
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
@@ -484,7 +484,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         # no magnifying glass link. See #16542
         subject1 = models.Individual.objects.create(name='Subject #1')
         models.Individual.objects.create(name='Child', parent=subject1)
-        rel = models.Individual._meta.get_field('parent').rel
+        rel = models.Individual._meta.get_field('parent').remote_field
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
@@ -494,7 +494,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
 
     def test_proper_manager_for_label_lookup(self):
         # see #9258
-        rel = models.Inventory._meta.get_field('parent').rel
+        rel = models.Inventory._meta.get_field('parent').remote_field
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
 
         hidden = models.Inventory.objects.create(
@@ -521,7 +521,7 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
         m1 = models.Member.objects.create(name='Chester')
         m2 = models.Member.objects.create(name='Mike')
         band.members.add(m1, m2)
-        rel = models.Band._meta.get_field('members').rel
+        rel = models.Band._meta.get_field('members').remote_field
 
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
@@ -546,7 +546,7 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
         c1 = models.Company.objects.create(name='Doodle')
         c2 = models.Company.objects.create(name='Pear')
         consultor1.companies.add(c1, c2)
-        rel = models.Advisor._meta.get_field('companies').rel
+        rel = models.Advisor._meta.get_field('companies').remote_field
 
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
@@ -562,14 +562,14 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
 
 class RelatedFieldWidgetWrapperTests(DjangoTestCase):
     def test_no_can_add_related(self):
-        rel = models.Individual._meta.get_field('parent').rel
+        rel = models.Individual._meta.get_field('parent').remote_field
         w = widgets.AdminRadioSelect()
         # Used to fail with a name error.
         w = widgets.RelatedFieldWidgetWrapper(w, rel, widget_admin_site)
         self.assertFalse(w.can_add_related)
 
     def test_select_multiple_widget_cant_change_delete_related(self):
-        rel = models.Individual._meta.get_field('parent').rel
+        rel = models.Individual._meta.get_field('parent').remote_field
         widget = forms.SelectMultiple()
         wrapper = widgets.RelatedFieldWidgetWrapper(
             widget, rel, widget_admin_site,
@@ -582,7 +582,7 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
         self.assertFalse(wrapper.can_delete_related)
 
     def test_on_delete_cascade_rel_cant_delete_related(self):
-        rel = models.Individual._meta.get_field('soulmate').rel
+        rel = models.Individual._meta.get_field('soulmate').remote_field
         widget = forms.Select()
         wrapper = widgets.RelatedFieldWidgetWrapper(
             widget, rel, widget_admin_site,

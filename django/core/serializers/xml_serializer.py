@@ -91,7 +91,7 @@ class Serializer(base.Serializer):
         self._start_relational_field(field)
         related_att = getattr(obj, field.get_attname())
         if related_att is not None:
-            if self.use_natural_foreign_keys and hasattr(field.rel.to, 'natural_key'):
+            if self.use_natural_foreign_keys and hasattr(field.remote_field.model, 'natural_key'):
                 related = getattr(obj, field.name)
                 # If related object has a natural key, use it
                 related = related.natural_key()
@@ -112,9 +112,9 @@ class Serializer(base.Serializer):
         serialized as references to the object's PK (i.e. the related *data*
         is not dumped, just the relation).
         """
-        if field.rel.through._meta.auto_created:
+        if field.remote_field.through._meta.auto_created:
             self._start_relational_field(field)
-            if self.use_natural_foreign_keys and hasattr(field.rel.to, 'natural_key'):
+            if self.use_natural_foreign_keys and hasattr(field.remote_field.model, 'natural_key'):
                 # If the objects in the m2m have a natural key, use it
                 def handle_m2m(value):
                     natural = value.natural_key()
@@ -142,8 +142,8 @@ class Serializer(base.Serializer):
         self.indent(2)
         self.xml.startElement("field", {
             "name": field.name,
-            "rel": field.rel.__class__.__name__,
-            "to": smart_text(field.rel.to._meta),
+            "rel": field.remote_field.__class__.__name__,
+            "to": smart_text(field.remote_field.model._meta),
         })
 
 
@@ -204,9 +204,9 @@ class Deserializer(base.Deserializer):
             field = Model._meta.get_field(field_name)
 
             # As is usually the case, relation fields get the special treatment.
-            if field.rel and isinstance(field.rel, models.ManyToManyRel):
+            if field.remote_field and isinstance(field.remote_field, models.ManyToManyRel):
                 m2m_data[field.name] = self._handle_m2m_field_node(field_node, field)
-            elif field.rel and isinstance(field.rel, models.ManyToOneRel):
+            elif field.remote_field and isinstance(field.remote_field, models.ManyToOneRel):
                 data[field.attname] = self._handle_fk_field_node(field_node, field)
             else:
                 if field_node.getElementsByTagName('None'):
@@ -228,43 +228,43 @@ class Deserializer(base.Deserializer):
         if node.getElementsByTagName('None'):
             return None
         else:
-            if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
+            if hasattr(field.remote_field.model._default_manager, 'get_by_natural_key'):
                 keys = node.getElementsByTagName('natural')
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj = field.rel.to._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
-                    obj_pk = getattr(obj, field.rel.field_name)
+                    obj = field.remote_field.model._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
+                    obj_pk = getattr(obj, field.remote_field.field_name)
                     # If this is a natural foreign key to an object that
                     # has a FK/O2O as the foreign key, use the FK value
-                    if field.rel.to._meta.pk.rel:
+                    if field.remote_field.model._meta.pk.remote_field:
                         obj_pk = obj_pk.pk
                 else:
                     # Otherwise, treat like a normal PK
                     field_value = getInnerText(node).strip()
-                    obj_pk = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                    obj_pk = field.remote_field.model._meta.get_field(field.remote_field.field_name).to_python(field_value)
                 return obj_pk
             else:
                 field_value = getInnerText(node).strip()
-                return field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                return field.remote_field.model._meta.get_field(field.remote_field.field_name).to_python(field_value)
 
     def _handle_m2m_field_node(self, node, field):
         """
         Handle a <field> node for a ManyToManyField.
         """
-        if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
+        if hasattr(field.remote_field.model._default_manager, 'get_by_natural_key'):
             def m2m_convert(n):
                 keys = n.getElementsByTagName('natural')
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj_pk = field.rel.to._default_manager.db_manager(self.db).get_by_natural_key(*field_value).pk
+                    obj_pk = field.remote_field.model._default_manager.db_manager(self.db).get_by_natural_key(*field_value).pk
                 else:
                     # Otherwise, treat like a normal PK value.
-                    obj_pk = field.rel.to._meta.pk.to_python(n.getAttribute('pk'))
+                    obj_pk = field.remote_field.model._meta.pk.to_python(n.getAttribute('pk'))
                 return obj_pk
         else:
-            m2m_convert = lambda n: field.rel.to._meta.pk.to_python(n.getAttribute('pk'))
+            m2m_convert = lambda n: field.remote_field.model._meta.pk.to_python(n.getAttribute('pk'))
         return [m2m_convert(c) for c in node.getElementsByTagName("object")]
 
     def _get_model_from_node(self, node, attr):

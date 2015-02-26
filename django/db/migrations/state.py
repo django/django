@@ -94,9 +94,9 @@ class ProjectState(object):
             model_state = self.models[(app_label, model_name)]
             for name, field in model_state.fields:
                 if field.is_relation:
-                    if field.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT:
+                    if field.remote_field.model == RECURSIVE_RELATIONSHIP_CONSTANT:
                         continue
-                    rel_app_label, rel_model_name = _get_app_label_and_model_name(field.rel.to, app_label)
+                    rel_app_label, rel_model_name = _get_app_label_and_model_name(field.remote_field.model, app_label)
                     related_models.add((rel_app_label, rel_model_name.lower()))
 
             # Unregister all related models
@@ -328,7 +328,7 @@ class ModelState(object):
         # Deconstruct the fields
         fields = []
         for field in model._meta.local_fields:
-            if getattr(field, "rel", None) and exclude_rels:
+            if getattr(field, "remote_field", None) and exclude_rels:
                 continue
             if isinstance(field, OrderWrt):
                 continue

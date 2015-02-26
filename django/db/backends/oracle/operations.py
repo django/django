@@ -346,7 +346,7 @@ WHEN (new.%(col_name)s IS NULL)
                     # continue to loop
                     break
             for f in model._meta.many_to_many:
-                if not f.rel.through:
+                if not f.remote_field.through:
                     table_name = self.quote_name(f.m2m_db_table())
                     sequence_name = self._get_sequence_name(f.m2m_db_table())
                     column_name = self.quote_name('id')

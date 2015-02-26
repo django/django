@@ -178,8 +178,8 @@ class FieldDeconstructionTests(TestCase):
         # Test basic pointing
         from django.contrib.auth.models import Permission
         field = models.ForeignKey("auth.Permission")
-        field.rel.to = Permission
-        field.rel.field_name = "id"
+        field.remote_field.model = Permission
+        field.remote_field.field_name = "id"
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])

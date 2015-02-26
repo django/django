@@ -207,8 +207,8 @@ class ModelDetailView(BaseAdminDocsView):
             # ForeignKey is a special case since the field will actually be a
             # descriptor that returns the other object
             if isinstance(field, models.ForeignKey):
-                data_type = field.rel.to.__name__
-                app_label = field.rel.to._meta.app_label
+                data_type = field.remote_field.model.__name__
+                app_label = field.remote_field.model._meta.app_label
                 verbose = utils.parse_rst(
                     (_("the related `%(app_label)s.%(data_type)s` object") % {
                         'app_label': app_label, 'data_type': data_type,
@@ -228,8 +228,8 @@ class ModelDetailView(BaseAdminDocsView):
 
         # Gather many-to-many fields.
         for field in opts.many_to_many:
-            data_type = field.rel.to.__name__
-            app_label = field.rel.to._meta.app_label
+            data_type = field.remote_field.model.__name__
+            app_label = field.remote_field.model._meta.app_label
             verbose = _("related `%(app_label)s.%(object_name)s` objects") % {
                 'app_label': app_label,
                 'object_name': data_type,

@@ -68,7 +68,7 @@ class SchemaTests(TransactionTestCase):
                 # Remove any M2M tables first
                 for field in model._meta.local_many_to_many:
                     with atomic():
-                        tbl = field.rel.through._meta.db_table
+                        tbl = field.remote_field.through._meta.db_table
                         if tbl in table_names:
                             cursor.execute(connection.schema_editor().sql_delete_table % {
                                 "table": connection.ops.quote_name(tbl),
@@ -244,7 +244,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.add_field(LocalAuthorWithM2M, new_field)
         # Make sure no FK constraint is present
-        constraints = self.get_constraints(new_field.rel.through._meta.db_table)
+        constraints = self.get_constraints(new_field.remote_field.through._meta.db_table)
         for name, details in constraints.items():
             if details['columns'] == ["tag_id"] and details['foreign_key']:
                 self.fail("FK constraint for tag_id found")
@@ -740,7 +740,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(TagM2MTest)
             editor.create_model(LocalBookWithM2M)
         # Ensure there is now an m2m table there
-        columns = self.column_classes(LocalBookWithM2M._meta.get_field("tags").rel.through)
+        columns = self.column_classes(LocalBookWithM2M._meta.get_field("tags").remote_field.through)
         self.assertEqual(columns['tagm2mtest_id'][0], "IntegerField")
 
     def test_m2m_create(self):
@@ -813,12 +813,12 @@ class SchemaTests(TransactionTestCase):
         new_field = M2MFieldClass("schema.TagM2MTest", related_name="authors")
         new_field.contribute_to_class(LocalAuthorWithM2M, "tags")
         # Ensure there's no m2m table there
-        self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
+        self.assertRaises(DatabaseError, self.column_classes, new_field.remote_field.through)
         # Add the field
         with connection.schema_editor() as editor:
             editor.add_field(LocalAuthorWithM2M, new_field)
         # Ensure there is now an m2m table there
-        columns = self.column_classes(new_field.rel.through)
+        columns = self.column_classes(new_field.remote_field.through)
         self.assertEqual(columns['tagm2mtest_id'][0], "IntegerField")
 
         # "Alter" the field. This should not rename the DB table to itself.
@@ -829,7 +829,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.remove_field(LocalAuthorWithM2M, new_field)
         # Ensure there's no m2m table there
-        self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
+        self.assertRaises(DatabaseError, self.column_classes, new_field.remote_field.through)
 
     def test_m2m(self):
         self._test_m2m(ManyToManyField)
@@ -910,7 +910,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(TagM2MTest)
             editor.create_model(UniqueTest)
         # Ensure the M2M exists and points to TagM2MTest
-        constraints = self.get_constraints(LocalBookWithM2M._meta.get_field("tags").rel.through._meta.db_table)
+        constraints = self.get_constraints(LocalBookWithM2M._meta.get_field("tags").remote_field.through._meta.db_table)
         if connection.features.supports_foreign_keys:
             for name, details in constraints.items():
                 if details['columns'] == ["tagm2mtest_id"] and details['foreign_key']:
@@ -925,9 +925,9 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(LocalBookWithM2M, old_field, new_field)
         # Ensure old M2M is gone
-        self.assertRaises(DatabaseError, self.column_classes, LocalBookWithM2M._meta.get_field("tags").rel.through)
+        self.assertRaises(DatabaseError, self.column_classes, LocalBookWithM2M._meta.get_field("tags").remote_field.through)
         # Ensure the new M2M exists and points to UniqueTest
-        constraints = self.get_constraints(new_field.rel.through._meta.db_table)
+        constraints = self.get_constraints(new_field.remote_field.through._meta.db_table)
         if connection.features.supports_foreign_keys:
             for name, details in constraints.items():
                 if details['columns'] == ["uniquetest_id"] and details['foreign_key']:

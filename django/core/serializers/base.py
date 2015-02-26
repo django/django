@@ -49,7 +49,7 @@ class Serializer(object):
             concrete_model = obj._meta.concrete_model
             for field in concrete_model._meta.local_fields:
                 if field.serialize:
-                    if field.rel is None:
+                    if field.remote_field is None:
                         if self.selected_fields is None or field.attname in self.selected_fields:
                             self.handle_field(obj, field)
                     else:

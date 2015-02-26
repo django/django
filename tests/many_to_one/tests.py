@@ -565,12 +565,12 @@ class ManyToOneTests(TestCase):
         p = Parent()
         with self.assertRaisesMessage(ValueError,
                 'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                % (p, Child.parent.field.rel.to._meta.object_name)):
+                % (p, Child.parent.field.remote_field.model._meta.object_name)):
             Child(parent=p)
 
         with self.assertRaisesMessage(ValueError,
                 'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                % (p, Child.parent.field.rel.to._meta.object_name)):
+                % (p, Child.parent.field.remote_field.model._meta.object_name)):
             ToFieldChild(parent=p)
 
         # Creation using attname keyword argument and an id will cause the
@@ -610,7 +610,7 @@ class ManyToOneTests(TestCase):
         # Regression for #12190 -- Should be able to instantiate a FK outside
         # of a model, and interrogate its related field.
         cat = models.ForeignKey(Category)
-        self.assertEqual('id', cat.rel.get_related_field().name)
+        self.assertEqual('id', cat.remote_field.get_related_field().name)
 
     def test_relation_unsaved(self):
         # Test that the <field>_set manager does not join on Null value fields (#17541)

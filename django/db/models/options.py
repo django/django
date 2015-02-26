@@ -308,9 +308,9 @@ class Options(object):
         # ideally, we'd just ask for field.related_model. However, related_model
         # is a cached property, and all the models haven't been loaded yet, so
         # we need to make sure we don't cache a string reference.
-        if field.is_relation and hasattr(field.rel, 'to') and field.rel.to:
+        if field.is_relation and hasattr(field.remote_field, 'model') and field.remote_field.model:
             try:
-                field.rel.to._meta._expire_cache(forward=False)
+                field.remote_field.model._meta._expire_cache(forward=False)
             except AttributeError:
                 pass
             self._expire_cache()
@@ -393,7 +393,7 @@ class Options(object):
         is_not_an_m2m_field = lambda f: not (f.is_relation and f.many_to_many)
         is_not_a_generic_relation = lambda f: not (f.is_relation and f.one_to_many)
         is_not_a_generic_foreign_key = lambda f: not (
-            f.is_relation and f.many_to_one and not (hasattr(f.rel, 'to') and f.rel.to)
+            f.is_relation and f.many_to_one and not (hasattr(f.remote_field, 'model') and f.remote_field.model)
         )
         return make_immutable_fields_list(
             "fields",
@@ -592,8 +592,8 @@ class Options(object):
             children = chain.from_iterable(c._relation_tree
                                            for c in self.concrete_model._meta.proxied_children
                                            if c is not self)
-            relations = (f.rel for f in children
-                         if include_hidden or not f.rel.field.rel.is_hidden())
+            relations = (f.remote_field for f in children
+                         if include_hidden or not f.remote_field.field.remote_field.is_hidden())
             fields = chain(fields, relations)
         return list(fields)
 
@@ -690,8 +690,8 @@ class Options(object):
                 if f.is_relation and f.related_model is not None
             )
             for f in fields_with_relations:
-                if not isinstance(f.rel.to, six.string_types):
-                    related_objects_graph[f.rel.to._meta].append(f)
+                if not isinstance(f.remote_field.model, six.string_types):
+                    related_objects_graph[f.remote_field.model._meta].append(f)
 
         for model in all_models:
             # Set the relation_tree using the internal __dict__. In this way
@@ -804,8 +804,8 @@ class Options(object):
             for field in all_fields:
                 # If hidden fields should be included or the relation is not
                 # intentionally hidden, add to the fields dict.
-                if include_hidden or not field.rel.hidden:
-                    fields.append(field.rel)
+                if include_hidden or not field.remote_field.hidden:
+                    fields.append(field.remote_field)
 
         if forward:
             fields.extend(

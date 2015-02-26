@@ -180,7 +180,7 @@ class BaseModelAdminChecks(object):
                 return []
             else:
                 if (isinstance(field, models.ManyToManyField) and
-                        not field.rel.through._meta.auto_created):
+                        not field.remote_field.through._meta.auto_created):
                     return [
                         checks.Error(
                             ("The value of '%s' cannot include the ManyToManyField '%s', "

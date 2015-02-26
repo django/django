@@ -33,7 +33,7 @@ class ArrayField(Field):
 
     def check(self, **kwargs):
         errors = super(ArrayField, self).check(**kwargs)
-        if self.base_field.rel:
+        if self.base_field.remote_field:
             errors.append(
                 checks.Error(
                     'Base field for array cannot be a related field.',

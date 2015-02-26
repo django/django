@@ -1645,12 +1645,12 @@ class RelatedPopulator(object):
         reverse = klass_info['reverse']
         self.reverse_cache_name = None
         if reverse:
-            self.cache_name = field.rel.get_cache_name()
+            self.cache_name = field.remote_field.get_cache_name()
             self.reverse_cache_name = field.get_cache_name()
         else:
             self.cache_name = field.get_cache_name()
             if field.unique:
-                self.reverse_cache_name = field.rel.get_cache_name()
+                self.reverse_cache_name = field.remote_field.get_cache_name()
 
     def get_deferred_cls(self, klass_info, init_list):
         model_cls = klass_info['model']

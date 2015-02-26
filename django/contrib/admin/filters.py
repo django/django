@@ -9,12 +9,10 @@ import datetime
 
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.utils import (
-    get_limit_choices_to_from_path, get_model_from_relation,
-    prepare_lookup_value, reverse_field_path,
+    get_model_from_relation, prepare_lookup_value, reverse_field_path,
 )
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
-from django.db.models.fields.related import ForeignObjectRel, ManyToManyField
 from django.utils import timezone
 from django.utils.encoding import force_text, smart_text
 from django.utils.translation import ugettext_lazy as _
@@ -164,11 +162,7 @@ class FieldListFilter(ListFilter):
 class RelatedFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         other_model = get_model_from_relation(field)
-        if hasattr(field, 'rel'):
-            rel_name = field.rel.get_related_field().name
-        else:
-            rel_name = other_model._meta.pk.name
-        self.lookup_kwarg = '%s__%s__exact' % (field_path, rel_name)
+        self.lookup_kwarg = '%s__%s__exact' % (field_path, field.target_field.name)
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg)
         self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
@@ -182,9 +176,7 @@ class RelatedFieldListFilter(FieldListFilter):
         self.title = self.lookup_title
 
     def has_output(self):
-        if (isinstance(self.field, ForeignObjectRel) and
-                self.field.field.null or hasattr(self.field, 'rel') and
-                self.field.null):
+        if self.field.null:
             extra = 1
         else:
             extra = 0
@@ -212,9 +204,7 @@ class RelatedFieldListFilter(FieldListFilter):
                 }, [self.lookup_kwarg_isnull]),
                 'display': val,
             }
-        if (isinstance(self.field, ForeignObjectRel) and
-                (self.field.field.null or isinstance(self.field.field, ManyToManyField)) or
-                hasattr(self.field, 'rel') and (self.field.null or isinstance(self.field, ManyToManyField))):
+        if self.field.null:
             yield {
                 'selected': bool(self.lookup_val_isnull),
                 'query_string': cl.get_query_string({
@@ -223,9 +213,7 @@ class RelatedFieldListFilter(FieldListFilter):
                 'display': EMPTY_CHANGELIST_VALUE,
             }
 
-FieldListFilter.register(lambda f: (
-    bool(f.rel) if hasattr(f, 'rel') else
-    isinstance(f, ForeignObjectRel)), RelatedFieldListFilter)
+FieldListFilter.register(lambda f: f.remote_field, RelatedFieldListFilter)
 
 
 class BooleanFieldListFilter(FieldListFilter):
@@ -371,13 +359,6 @@ class AllValuesFieldListFilter(FieldListFilter):
             queryset = model_admin.get_queryset(request)
         else:
             queryset = parent_model._default_manager.all()
-
-        # optional feature: limit choices base on existing relationships
-        # queryset = queryset.complex_filter(
-        #    {'%s__isnull' % reverse_path: False})
-        limit_choices_to = get_limit_choices_to_from_path(model, field_path)
-        queryset = queryset.filter(limit_choices_to)
-
         self.lookup_choices = (queryset
                                .distinct()
                                .order_by(field.name)

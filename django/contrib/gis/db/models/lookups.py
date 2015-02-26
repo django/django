@@ -45,7 +45,7 @@ class GISLookup(Lookup):
             # model field associated with the next field in the list
             # until there's no more left.
             while len(field_list):
-                opts = geo_fld.rel.to._meta
+                opts = geo_fld.remote_field.model._meta
                 geo_fld = opts.get_field(field_list.pop())
         except (FieldDoesNotExist, AttributeError):
             return False

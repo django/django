@@ -446,7 +446,7 @@ def reverse_field_path(model, path):
         # Field should point to another model
         if field.is_relation and not (field.auto_created and not field.concrete):
             related_name = field.related_query_name()
-            parent = field.rel.to
+            parent = field.remote_field.model
         else:
             related_name = field.field.name
             parent = field.related_model
@@ -481,23 +481,3 @@ def remove_trailing_data_field(fields):
     except NotRelationField:
         fields = fields[:-1]
     return fields
-
-
-def get_limit_choices_to_from_path(model, path):
-    """ Return Q object for limiting choices if applicable.
-
-    If final model in path is linked via a ForeignKey or ManyToManyField which
-    has a ``limit_choices_to`` attribute, return it as a Q object.
-    """
-    fields = get_fields_from_path(model, path)
-    fields = remove_trailing_data_field(fields)
-    get_limit_choices_to = (
-        fields and hasattr(fields[-1], 'rel') and
-        getattr(fields[-1].rel, 'get_limit_choices_to', None))
-    if not get_limit_choices_to:
-        return models.Q()  # empty Q
-    limit_choices_to = get_limit_choices_to()
-    if isinstance(limit_choices_to, models.Q):
-        return limit_choices_to  # already a Q
-    else:
-        return models.Q(**limit_choices_to)  # convert dict to Q

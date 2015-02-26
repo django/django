@@ -118,8 +118,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             del body[field.name]
             del mapping[field.column]
             # Remove any implicit M2M tables
-            if field.many_to_many and field.rel.through._meta.auto_created:
-                return self.delete_model(field.rel.through)
+            if field.many_to_many and field.remote_field.through._meta.auto_created:
+                return self.delete_model(field.remote_field.through)
         # Work inside a new app registry
         apps = Apps()
 
@@ -215,8 +215,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         table instead (for M2M fields)
         """
         # Special-case implicit M2M tables
-        if field.many_to_many and field.rel.through._meta.auto_created:
-            return self.create_model(field.rel.through)
+        if field.many_to_many and field.remote_field.through._meta.auto_created:
+            return self.create_model(field.remote_field.through)
         self._remake_table(model, create_fields=[field])
 
     def remove_field(self, model, field):
@@ -227,8 +227,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # M2M fields are a special case
         if field.many_to_many:
             # For implicit M2M tables, delete the auto-created table
-            if field.rel.through._meta.auto_created:
-                self.delete_model(field.rel.through)
+            if field.remote_field.through._meta.auto_created:
+                self.delete_model(field.remote_field.through)
             # For explicit "through" M2M fields, do nothing
         # For everything else, remake.
         else:
@@ -263,25 +263,25 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         Alters M2Ms to repoint their to= endpoints.
         """
-        if old_field.rel.through._meta.db_table == new_field.rel.through._meta.db_table:
+        if old_field.remote_field.through._meta.db_table == new_field.remote_field.through._meta.db_table:
             # The field name didn't change, but some options did; we have to propagate this altering.
             self._remake_table(
-                old_field.rel.through,
+                old_field.remote_field.through,
                 alter_fields=[(
                     # We need the field that points to the target model, so we can tell alter_field to change it -
                     # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
-                    old_field.rel.through._meta.get_field(old_field.m2m_reverse_field_name()),
-                    new_field.rel.through._meta.get_field(new_field.m2m_reverse_field_name()),
+                    old_field.remote_field.through._meta.get_field(old_field.m2m_reverse_field_name()),
+                    new_field.remote_field.through._meta.get_field(new_field.m2m_reverse_field_name()),
                 )],
                 override_uniques=(new_field.m2m_field_name(), new_field.m2m_reverse_field_name()),
             )
             return
 
         # Make a new through table
-        self.create_model(new_field.rel.through)
+        self.create_model(new_field.remote_field.through)
         # Copy the data across
         self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
-            self.quote_name(new_field.rel.through._meta.db_table),
+            self.quote_name(new_field.remote_field.through._meta.db_table),
             ', '.join([
                 "id",
                 new_field.m2m_column_name(),
@@ -292,7 +292,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 old_field.m2m_column_name(),
                 old_field.m2m_reverse_name(),
             ]),
-            self.quote_name(old_field.rel.through._meta.db_table),
+            self.quote_name(old_field.remote_field.through._meta.db_table),
         ))
         # Delete the old through table
-        self.delete_model(old_field.rel.through)
+        self.delete_model(old_field.remote_field.through)

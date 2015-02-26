@@ -1068,7 +1068,7 @@ class AutodetectorTests(TestCase):
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # The field name the FK on the book model points to
-        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'id')
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].remote_field.field_name, 'id')
 
         # Now, we test the custom pk field name
         before = self.make_project_state([])
@@ -1076,7 +1076,7 @@ class AutodetectorTests(TestCase):
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # The field name the FK on the book model points to
-        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'pk_field')
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].remote_field.field_name, 'pk_field')
 
     def test_unmanaged_create(self):
         """Tests that the autodetector correctly deals with managed models."""
@@ -1126,7 +1126,7 @@ class AutodetectorTests(TestCase):
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # The field name the FK on the book model points to
-        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'id')
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].remote_field.field_name, 'id')
 
         # Now, we test the custom pk field name
         before = self.make_project_state([])
@@ -1134,7 +1134,7 @@ class AutodetectorTests(TestCase):
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # The field name the FK on the book model points to
-        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'pk_field')
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].remote_field.field_name, 'pk_field')
 
     @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
     def test_swappable(self):
@@ -1159,7 +1159,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name="author", name='user')
         fk_field = changes['testapp'][0].operations[0].field
-        to_model = '%s.%s' % (fk_field.rel.to._meta.app_label, fk_field.rel.to._meta.object_name)
+        to_model = '%s.%s' % (fk_field.remote_field.model._meta.app_label, fk_field.remote_field.model._meta.object_name)
         self.assertEqual(to_model, 'thirdapp.CustomUser')
 
     def test_add_field_with_default(self):

@@ -199,7 +199,7 @@ class ModelBase(type):
             # Locate OneToOneField instances.
             for field in base._meta.local_fields:
                 if isinstance(field, OneToOneField):
-                    parent_links[field.rel.to] = field
+                    parent_links[field.remote_field.model] = field
 
         # Do the appropriate setup for any model parents.
         for base in parents:
@@ -307,19 +307,19 @@ class ModelBase(type):
             # certain it has been created
             def make_foreign_order_accessors(field, model, cls):
                 setattr(
-                    field.rel.to,
+                    field.remote_field.model,
                     'get_%s_order' % cls.__name__.lower(),
                     curry(method_get_order, cls)
                 )
                 setattr(
-                    field.rel.to,
+                    field.remote_field.model,
                     'set_%s_order' % cls.__name__.lower(),
                     curry(method_set_order, cls)
                 )
             add_lazy_relation(
                 cls,
                 opts.order_with_respect_to,
-                opts.order_with_respect_to.rel.to,
+                opts.order_with_respect_to.remote_field.model,
                 make_foreign_order_accessors
             )
 
@@ -382,7 +382,7 @@ class Model(six.with_metaclass(ModelBase)):
                 setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
                 # Maintain compatibility with existing calls.
-                if isinstance(field.rel, ManyToOneRel):
+                if isinstance(field.remote_field, ManyToOneRel):
                     kwargs.pop(field.attname, None)
 
         # Now we're left with the unprocessed fields that *must* come from
@@ -399,7 +399,7 @@ class Model(six.with_metaclass(ModelBase)):
                 # This field will be populated on request.
                 continue
             if kwargs:
-                if isinstance(field.rel, ForeignObjectRel):
+                if isinstance(field.remote_field, ForeignObjectRel):
                     try:
                         # Assume object instance was passed in.
                         rel_obj = kwargs.pop(field.name)
@@ -879,7 +879,7 @@ class Model(six.with_metaclass(ModelBase)):
     def prepare_database_save(self, field):
         if self.pk is None:
             raise ValueError("Unsaved model instance %r cannot be used in an ORM query." % self)
-        return getattr(self, field.rel.field_name)
+        return getattr(self, field.remote_field.field_name)
 
     def clean(self):
         """
@@ -1238,20 +1238,20 @@ class Model(six.with_metaclass(ModelBase)):
         fields = cls._meta.local_many_to_many
 
         # Skip when the target model wasn't found.
-        fields = (f for f in fields if isinstance(f.rel.to, ModelBase))
+        fields = (f for f in fields if isinstance(f.remote_field.model, ModelBase))
 
         # Skip when the relationship model wasn't found.
-        fields = (f for f in fields if isinstance(f.rel.through, ModelBase))
+        fields = (f for f in fields if isinstance(f.remote_field.through, ModelBase))
 
         for f in fields:
-            signature = (f.rel.to, cls, f.rel.through)
+            signature = (f.remote_field.model, cls, f.remote_field.through)
             if signature in seen_intermediary_signatures:
                 errors.append(
                     checks.Error(
                         "The model has two many-to-many relations through "
                         "the intermediate model '%s.%s'." % (
-                            f.rel.through._meta.app_label,
-                            f.rel.through._meta.object_name
+                            f.remote_field.through._meta.app_label,
+                            f.remote_field.through._meta.object_name
                         ),
                         hint=None,
                         obj=cls,
@@ -1448,7 +1448,7 @@ class Model(six.with_metaclass(ModelBase)):
                     )
                 )
             else:
-                if isinstance(field.rel, models.ManyToManyRel):
+                if isinstance(field.remote_field, models.ManyToManyRel):
                     errors.append(
                         checks.Error(
                             "'%s' refers to a ManyToManyField '%s', but "
@@ -1595,7 +1595,7 @@ class Model(six.with_metaclass(ModelBase)):
         for f in cls._meta.local_many_to_many:
             # Check if auto-generated name for the M2M field is too long
             # for the database.
-            for m2m in f.rel.through._meta.local_fields:
+            for m2m in f.remote_field.through._meta.local_fields:
                 _, rel_name = m2m.get_attname_column()
                 if (m2m.db_column is None and rel_name is not None
                         and len(rel_name) > allowed_len):
@@ -1624,7 +1624,7 @@ class Model(six.with_metaclass(ModelBase)):
 def method_set_order(ordered_obj, self, id_list, using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
-    rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
+    rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.remote_field.field_name)
     order_name = ordered_obj._meta.order_with_respect_to.name
     # FIXME: It would be nice if there was an "update many" version of update
     # for situations like this.
@@ -1634,7 +1634,7 @@ def method_set_order(ordered_obj, self, id_list, using=None):
 
 
 def method_get_order(ordered_obj, self):
-    rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
+    rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.remote_field.field_name)
     order_name = ordered_obj._meta.order_with_respect_to.name
     pk_name = ordered_obj._meta.pk.name
     return [r[pk_name] for r in

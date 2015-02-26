@@ -23,6 +23,7 @@ from django.utils.duration import duration_string
 from django.utils.functional import cached_property, curry, total_ordering, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import (smart_text, force_text, force_bytes,
     python_2_unicode_compatible)
@@ -146,8 +147,8 @@ class Field(RegisterLookupMixin):
         self.primary_key = primary_key
         self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
-        self.rel = rel
-        self.is_relation = self.rel is not None
+        self.remote_field = rel
+        self.is_relation = self.remote_field is not None
         self.default = default
         self.editable = editable
         self.serialize = serialize
@@ -239,6 +240,13 @@ class Field(RegisterLookupMixin):
             ]
         else:
             return []
+
+    @property
+    def rel(self):
+        warnings.warn(
+            "Usage of field.rel has been deprecated. Use field.remote_field instead.",
+            RemovedInDjango21Warning, 2)
+        return self.remote_field
 
     def _check_choices(self):
         if self.choices:
@@ -468,10 +476,10 @@ class Field(RegisterLookupMixin):
         # We don't have to deepcopy very much here, since most things are not
         # intended to be altered after initial creation.
         obj = copy.copy(self)
-        if self.rel:
-            obj.rel = copy.copy(self.rel)
-            if hasattr(self.rel, 'field') and self.rel.field is self:
-                obj.rel.field = obj
+        if self.remote_field:
+            obj.remote_field = copy.copy(self.remote_field)
+            if hasattr(self.remote_field, 'field') and self.remote_field.field is self:
+                obj.remote_field.field = obj
         memodict[id(self)] = obj
         return obj
 
@@ -811,10 +819,10 @@ class Field(RegisterLookupMixin):
                         not blank_defined else [])
         if self.choices:
             return first_choice + choices
-        rel_model = self.rel.to
+        rel_model = self.remote_field.model
         limit_choices_to = limit_choices_to or self.get_limit_choices_to()
-        if hasattr(self.rel, 'get_related_field'):
-            lst = [(getattr(x, self.rel.get_related_field().attname),
+        if hasattr(self.remote_field, 'get_related_field'):
+            lst = [(getattr(x, self.remote_field.get_related_field().attname),
                    smart_text(x))
                    for x in rel_model._default_manager.complex_filter(
                        limit_choices_to)]

@@ -153,7 +153,7 @@ class DeletionTests(TestCase):
         r = R.objects.create()
         m.m2m.add(r)
         r.delete()
-        through = M._meta.get_field('m2m').rel.through
+        through = M._meta.get_field('m2m').remote_field.through
         self.assertFalse(through.objects.exists())
 
         r = R.objects.create()
