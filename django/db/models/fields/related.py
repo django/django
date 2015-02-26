@@ -1082,7 +1082,7 @@ def create_many_related_manager(superclass, rel, reverse):
                     self.clear()
                     self.add(*objs)
                 else:
-                    old_ids = set(self.using(db).values_list(self.target_field.related_field.attname, flat=True))
+                    old_ids = set(self.using(db).values_list(self.target_field.target_field.attname, flat=True))
 
                     new_objs = []
                     for obj in objs:
@@ -1224,7 +1224,7 @@ def create_many_related_manager(superclass, rel, reverse):
                 target_model_qs = super(ManyRelatedManager, self).get_queryset()
                 if target_model_qs._has_filters():
                     old_vals = target_model_qs.using(db).filter(**{
-                        '%s__in' % self.target_field.related_field.attname: old_ids})
+                        '%s__in' % self.target_field.target_field.attname: old_ids})
                 else:
                     old_vals = old_ids
                 filters = self._build_remove_filters(old_vals)
@@ -1941,7 +1941,7 @@ class ForeignKey(ForeignObject):
         return name, path, args, kwargs
 
     @property
-    def related_field(self):
+    def target_field(self):
         return self.foreign_related_fields[0]
 
     def get_reverse_path_info(self):
@@ -1987,19 +1987,19 @@ class ForeignKey(ForeignObject):
         "Here we check if the default value is an object and return the to_field if so."
         field_default = super(ForeignKey, self).get_default()
         if isinstance(field_default, self.rel.to):
-            return getattr(field_default, self.related_field.attname)
+            return getattr(field_default, self.target_field.attname)
         return field_default
 
     def get_db_prep_save(self, value, connection):
         if value is None or (value == '' and
-                             (not self.related_field.empty_strings_allowed or
+                             (not self.target_field.empty_strings_allowed or
                               connection.features.interprets_empty_strings_as_nulls)):
             return None
         else:
-            return self.related_field.get_db_prep_save(value, connection=connection)
+            return self.target_field.get_db_prep_save(value, connection=connection)
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        return self.related_field.get_db_prep_value(value, connection, prepared)
+        return self.target_field.get_db_prep_value(value, connection, prepared)
 
     def value_to_string(self, obj):
         if not obj:
@@ -2039,7 +2039,7 @@ class ForeignKey(ForeignObject):
         # in which case the column type is simply that of an IntegerField.
         # If the database needs similar types for key fields however, the only
         # thing we can do is making AutoField an IntegerField.
-        rel_field = self.related_field
+        rel_field = self.target_field
         if (isinstance(rel_field, AutoField) or
                 (not connection.features.related_fields_match_type and
                 isinstance(rel_field, (PositiveIntegerField,
@@ -2062,7 +2062,7 @@ class ForeignKey(ForeignObject):
         return converters
 
     def get_col(self, alias, output_field=None):
-        return super(ForeignKey, self).get_col(alias, output_field or self.related_field)
+        return super(ForeignKey, self).get_col(alias, output_field or self.target_field)
 
 
 class OneToOneField(ForeignKey):
