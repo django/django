@@ -337,6 +337,10 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
             (_('checksum'), mask_hash(checksum)),
         ])
 
+    def must_update(self, encoded):
+        algorithm, empty, algostr, rounds, data = encoded.split('$', 4)
+        return int(rounds) != self.rounds
+
 
 class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
     """
