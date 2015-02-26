@@ -109,3 +109,7 @@ class M2MRegressionTests(TestCase):
         worksheet.lines = hi
         self.assertEqual(1, worksheet.lines.count())
         self.assertEqual(1, hi.count())
+
+    def test_many_related_manager_str(self):
+        worksheet = Worksheet.objects.create(id=1)
+        self.assertIn('ManyRelatedManager', str(worksheet.lines))
