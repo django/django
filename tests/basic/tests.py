@@ -766,5 +766,5 @@ class TestRelatedObjectDeprecation(TestCase):
             self.assertEqual(len(warns), 1)
             self.assertEqual(
                 str(warns.pop().message),
-                'Usage of field.related has been deprecated. Use field.rel instead.'
+                'Usage of field.related has been deprecated. Use field.remote_field instead.'
             )

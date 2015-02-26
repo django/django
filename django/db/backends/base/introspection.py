@@ -125,7 +125,7 @@ class BaseDatabaseIntrospection(object):
                 for f in model._meta.local_many_to_many:
                     # If this is an m2m using an intermediate table,
                     # we don't need to reset the sequence.
-                    if f.rel.through is None:
+                    if f.remote_field.through is None:
                         sequence_list.append({'table': f.m2m_db_table(), 'column': None})
 
         return sequence_list

@@ -78,7 +78,7 @@ class MigrationAutodetector(object):
         fields_def = []
         for name, field in fields:
             deconstruction = self.deep_deconstruct(field)
-            if field.rel and field.rel.to:
+            if field.remote_field and field.remote_field.model:
                 del deconstruction[2]['to']
             fields_def.append(deconstruction)
         return fields_def
@@ -163,11 +163,11 @@ class MigrationAutodetector(object):
             old_model_state = self.from_state.models[app_label, old_model_name]
             for field_name, field in old_model_state.fields:
                 old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(field_name)
-                if (hasattr(old_field, "rel") and getattr(old_field.rel, "through", None)
-                        and not old_field.rel.through._meta.auto_created):
+                if (hasattr(old_field, "remote_field") and getattr(old_field.remote_field, "through", None)
+                        and not old_field.remote_field.through._meta.auto_created):
                     through_key = (
-                        old_field.rel.through._meta.app_label,
-                        old_field.rel.through._meta.model_name,
+                        old_field.remote_field.through._meta.app_label,
+                        old_field.remote_field.through._meta.model_name,
                     )
                     self.through_users[through_key] = (app_label, old_model_name, field_name)
 
@@ -460,20 +460,20 @@ class MigrationAutodetector(object):
             related_fields = {}
             primary_key_rel = None
             for field in model_opts.local_fields:
-                if field.rel:
-                    if field.rel.to:
+                if field.remote_field:
+                    if field.remote_field.model:
                         if field.primary_key:
-                            primary_key_rel = field.rel.to
-                        elif not field.rel.parent_link:
+                            primary_key_rel = field.remote_field.model
+                        elif not field.remote_field.parent_link:
                             related_fields[field.name] = field
                     # through will be none on M2Ms on swapped-out models;
                     # we can treat lack of through as auto_created=True, though.
-                    if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                    if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
                         related_fields[field.name] = field
             for field in model_opts.local_many_to_many:
-                if field.rel.to:
+                if field.remote_field.model:
                     related_fields[field.name] = field
-                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
                     related_fields[field.name] = field
             # Are there unique/index_together to defer?
             unique_together = model_state.options.pop('unique_together', None)
@@ -522,13 +522,13 @@ class MigrationAutodetector(object):
                     dep_app_label = "__setting__"
                     dep_object_name = swappable_setting
                 else:
-                    dep_app_label = field.rel.to._meta.app_label
-                    dep_object_name = field.rel.to._meta.object_name
+                    dep_app_label = field.remote_field.model._meta.app_label
+                    dep_object_name = field.remote_field.model._meta.object_name
                 dependencies = [(dep_app_label, dep_object_name, None, True)]
-                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
                     dependencies.append((
-                        field.rel.through._meta.app_label,
-                        field.rel.through._meta.object_name,
+                        field.remote_field.through._meta.app_label,
+                        field.remote_field.through._meta.object_name,
                         None,
                         True
                     ))
@@ -639,17 +639,17 @@ class MigrationAutodetector(object):
             # Gather related fields
             related_fields = {}
             for field in model._meta.local_fields:
-                if field.rel:
-                    if field.rel.to:
+                if field.remote_field:
+                    if field.remote_field.model:
                         related_fields[field.name] = field
                     # through will be none on M2Ms on swapped-out models;
                     # we can treat lack of through as auto_created=True, though.
-                    if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                    if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
                         related_fields[field.name] = field
             for field in model._meta.local_many_to_many:
-                if field.rel.to:
+                if field.remote_field.model:
                     related_fields[field.name] = field
-                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
                     related_fields[field.name] = field
             # Generate option removal first
             unique_together = model_state.options.pop('unique_together', None)
@@ -736,7 +736,7 @@ class MigrationAutodetector(object):
             for rem_app_label, rem_model_name, rem_field_name in sorted(self.old_field_keys - self.new_field_keys):
                 if rem_app_label == app_label and rem_model_name == model_name:
                     old_field_dec = self.deep_deconstruct(old_model_state.get_field_by_name(rem_field_name))
-                    if field.rel and field.rel.to and 'to' in old_field_dec[2]:
+                    if field.remote_field and field.remote_field.model and 'to' in old_field_dec[2]:
                         old_rel_to = old_field_dec[2]['to']
                         if old_rel_to in self.renamed_models_rel:
                             old_field_dec[2]['to'] = self.renamed_models_rel[old_rel_to]
@@ -766,20 +766,20 @@ class MigrationAutodetector(object):
         field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
         # Fields that are foreignkeys/m2ms depend on stuff
         dependencies = []
-        if field.rel and field.rel.to:
+        if field.remote_field and field.remote_field.model:
             # Account for FKs to swappable models
             swappable_setting = getattr(field, 'swappable_setting', None)
             if swappable_setting is not None:
                 dep_app_label = "__setting__"
                 dep_object_name = swappable_setting
             else:
-                dep_app_label = field.rel.to._meta.app_label
-                dep_object_name = field.rel.to._meta.object_name
+                dep_app_label = field.remote_field.model._meta.app_label
+                dep_object_name = field.remote_field.model._meta.object_name
             dependencies = [(dep_app_label, dep_object_name, None, True)]
-            if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+            if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
                 dependencies.append((
-                    field.rel.through._meta.app_label,
-                    field.rel.through._meta.object_name,
+                    field.remote_field.through._meta.app_label,
+                    field.remote_field.through._meta.object_name,
                     None,
                     True,
                 ))
@@ -838,13 +838,13 @@ class MigrationAutodetector(object):
             new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
             # Implement any model renames on relations; these are handled by RenameModel
             # so we need to exclude them from the comparison
-            if hasattr(new_field, "rel") and getattr(new_field.rel, "to", None):
+            if hasattr(new_field, "remote_field") and getattr(new_field.remote_field, "model", None):
                 rename_key = (
-                    new_field.rel.to._meta.app_label,
-                    new_field.rel.to._meta.model_name,
+                    new_field.remote_field.model._meta.app_label,
+                    new_field.remote_field.model._meta.model_name,
                 )
                 if rename_key in self.renamed_models:
-                    new_field.rel.to = old_field.rel.to
+                    new_field.remote_field.model = old_field.remote_field.model
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
             if old_field_dec != new_field_dec:

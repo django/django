@@ -39,6 +39,7 @@ class GenericForeignKey(object):
     one_to_many = False
     one_to_one = False
     related_model = None
+    remote_field = None
 
     allow_unsaved_instance_assignment = False
 
@@ -135,7 +136,7 @@ class GenericForeignKey(object):
                         id='contenttypes.E003',
                     )
                 ]
-            elif field.rel.to != ContentType:
+            elif field.remote_field.model != ContentType:
                 return [
                     checks.Error(
                         "'%s.%s' is not a ForeignKey to 'contenttypes.ContentType'." % (
@@ -323,7 +324,7 @@ class GenericRelation(ForeignObject):
         return errors
 
     def _check_generic_foreign_key_existence(self):
-        target = self.rel.to
+        target = self.remote_field.model
         if isinstance(target, ModelBase):
             fields = target._meta.virtual_fields
             if any(isinstance(field, GenericForeignKey) and
@@ -348,16 +349,16 @@ class GenericRelation(ForeignObject):
 
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
-        return [(self.rel.to._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
+        return [(self.remote_field.model._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
 
     def get_path_info(self):
-        opts = self.rel.to._meta
+        opts = self.remote_field.model._meta
         target = opts.pk
-        return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
+        return [PathInfo(self.model._meta, opts, (target,), self.remote_field, True, False)]
 
     def get_reverse_path_info(self):
         opts = self.model._meta
-        from_opts = self.rel.to._meta
+        from_opts = self.remote_field.model._meta
         return [PathInfo(from_opts, opts, (opts.pk,), self, not self.unique, False)]
 
     def get_choices_default(self):
@@ -371,7 +372,7 @@ class GenericRelation(ForeignObject):
         kwargs['virtual_only'] = True
         super(GenericRelation, self).contribute_to_class(cls, name, **kwargs)
         self.model = cls
-        setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self.rel))
+        setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self.remote_field))
 
     def set_attributes_from_rel(self):
         pass
@@ -387,7 +388,7 @@ class GenericRelation(ForeignObject):
                                                  for_concrete_model=self.for_concrete_model)
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
-        field = self.rel.to._meta.get_field(self.content_type_field_name)
+        field = self.remote_field.model._meta.get_field(self.content_type_field_name)
         contenttype_pk = self.get_content_type().pk
         cond = where_class()
         lookup = field.get_lookup('exact')(field.get_col(remote_alias), contenttype_pk)
@@ -398,7 +399,7 @@ class GenericRelation(ForeignObject):
         """
         Return all objects related to ``objs`` via this ``GenericRelation``.
         """
-        return self.rel.to._base_manager.db_manager(using).filter(**{
+        return self.remote_field.model._base_manager.db_manager(using).filter(**{
             "%s__pk" % self.content_type_field_name: ContentType.objects.db_manager(using).get_for_model(
                 self.model, for_concrete_model=self.for_concrete_model).pk,
             "%s__in" % self.object_id_field_name: [obj.pk for obj in objs]
@@ -421,7 +422,7 @@ class ReverseGenericRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
     @cached_property
     def related_manager_cls(self):
         return create_generic_related_manager(
-            self.rel.to._default_manager.__class__,
+            self.rel.model._default_manager.__class__,
             self.rel,
         )
 
@@ -439,7 +440,7 @@ def create_generic_related_manager(superclass, rel):
 
             self.instance = instance
 
-            self.model = rel.to
+            self.model = rel.model
 
             content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(
                 instance, for_concrete_model=rel.field.for_concrete_model)

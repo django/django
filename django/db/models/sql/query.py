@@ -608,7 +608,7 @@ class Query(object):
                 if is_reverse_o2o(source):
                     cur_model = source.related_model
                 else:
-                    cur_model = source.rel.to
+                    cur_model = source.remote_field.model
                 opts = cur_model._meta
                 # Even if we're "just passing through" this model, we must add
                 # both the current model's pk and the related reference field
@@ -1303,7 +1303,7 @@ class Query(object):
                         opts = int_model._meta
                     else:
                         final_field = opts.parents[int_model]
-                        targets = (final_field.rel.get_related_field(),)
+                        targets = (final_field.remote_field.get_related_field(),)
                         opts = int_model._meta
                         path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
                         cur_names_with_path[1].append(

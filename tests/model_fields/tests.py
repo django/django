@@ -199,7 +199,7 @@ class ForeignKeyTests(test.TestCase):
         self.assertEqual(warnings, expected_warnings)
 
     def test_related_name_converted_to_text(self):
-        rel_name = Bar._meta.get_field('a').rel.related_name
+        rel_name = Bar._meta.get_field('a').remote_field.related_name
         self.assertIsInstance(rel_name, six.text_type)
 
     def test_abstract_model_pending_lookups(self):

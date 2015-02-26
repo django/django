@@ -26,6 +26,11 @@ details on these changes.
   compatibility layer which allows absolute URLs to be considered equal to
   relative ones when the path is identical will also be removed.
 
+* ``Field.rel`` will be removed. Use ``Field.remote_field`` instead.
+
+* ``Field.remote_field.to`` attribute will be removed. Use the
+  ``model`` attribute instead.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

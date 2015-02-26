@@ -65,7 +65,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             name = models.CharField(max_length=20)
 
         class ModelM2M(models.Model):
-            m2m = models.ManyToManyField(Model, null=True, validators=[''])
+            m2m = models.ManyToManyField(Model, null=False, validators=[''])
 
         errors = ModelM2M.check()
         field = ModelM2M._meta.get_field('m2m')

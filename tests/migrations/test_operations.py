@@ -479,7 +479,7 @@ class OperationTests(OperationTestBase):
         self.assertNotIn(("test_rnmo", "pony"), new_state.models)
         self.assertIn(("test_rnmo", "horse"), new_state.models)
         # RenameModel also repoints all incoming FKs and M2Ms
-        self.assertEqual("test_rnmo.Horse", new_state.models["test_rnmo", "rider"].fields[1][1].rel.to)
+        self.assertEqual("test_rnmo.Horse", new_state.models["test_rnmo", "rider"].fields[1][1].remote_field.model)
         self.assertTableNotExists("test_rnmo_pony")
         self.assertTableExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
@@ -490,7 +490,7 @@ class OperationTests(OperationTestBase):
         # Test original state and database
         self.assertIn(("test_rnmo", "pony"), original_state.models)
         self.assertNotIn(("test_rnmo", "horse"), original_state.models)
-        self.assertEqual("Pony", original_state.models["test_rnmo", "rider"].fields[1][1].rel.to)
+        self.assertEqual("Pony", original_state.models["test_rnmo", "rider"].fields[1][1].remote_field.model)
         self.assertTableExists("test_rnmo_pony")
         self.assertTableNotExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
@@ -515,7 +515,7 @@ class OperationTests(OperationTestBase):
         self.assertNotIn(("test_rmwsrf", "rider"), new_state.models)
         self.assertIn(("test_rmwsrf", "horserider"), new_state.models)
         # Remember, RenameModel also repoints all incoming FKs and M2Ms
-        self.assertEqual("test_rmwsrf.HorseRider", new_state.models["test_rmwsrf", "horserider"].fields[2][1].rel.to)
+        self.assertEqual("test_rmwsrf.HorseRider", new_state.models["test_rmwsrf", "horserider"].fields[2][1].remote_field.model)
         # Test the database alteration
         self.assertTableExists("test_rmwsrf_rider")
         self.assertTableNotExists("test_rmwsrf_horserider")
@@ -553,8 +553,8 @@ class OperationTests(OperationTestBase):
         self.assertIn(("test_rmwsc", "littlehorse"), new_state.models)
         # RenameModel shouldn't repoint the superclass's relations, only local ones
         self.assertEqual(
-            project_state.models["test_rmwsc", "rider"].fields[1][1].rel.to,
-            new_state.models["test_rmwsc", "rider"].fields[1][1].rel.to
+            project_state.models["test_rmwsc", "rider"].fields[1][1].remote_field.model,
+            new_state.models["test_rmwsc", "rider"].fields[1][1].remote_field.model
         )
         # Before running the migration we have a table for Shetland Pony, not Little Horse
         self.assertTableExists("test_rmwsc_shetlandpony")
@@ -612,7 +612,7 @@ class OperationTests(OperationTestBase):
         pony.riders.add(rider)
         self.assertEqual(Pony.objects.count(), 2)
         self.assertEqual(Rider.objects.count(), 2)
-        self.assertEqual(Pony._meta.get_field('riders').rel.through.objects.count(), 2)
+        self.assertEqual(Pony._meta.get_field('riders').remote_field.through.objects.count(), 2)
 
     def test_add_field(self):
         """
