@@ -1343,6 +1343,16 @@ class ForeignObjectRel(object):
     def get_prep_lookup(self, lookup_name, value):
         return self.field.get_prep_lookup(lookup_name, value)
 
+    @cached_property
+    def target_field(self):
+        target_fields = self.get_path_info().target_fields
+        if len(target_fields) > 1:
+            raise RuntimeError("Multicolumn relations do not have a single target_field")
+        return target_fields[0]
+
+    def get_lookup(self, lookup_name):
+        return self.field.get_lookup(lookup_name)
+
     def get_internal_type(self):
         return self.field.get_internal_type()
 
