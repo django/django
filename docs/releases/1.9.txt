@@ -56,6 +56,9 @@ Minor features
   subclassed ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
   default value.
 
+* The ``BCryptSHA256PasswordHasher`` will now update passwords if its
+  ``rounds`` attribute is changed.
+
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
