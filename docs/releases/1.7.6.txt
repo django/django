@@ -9,4 +9,6 @@ Django 1.7.6 fixes several bugs in 1.7.5.
 Bugfixes
 ========
 
-* ...
+* Fixed a ``StopIteration`` exception when using ``ManyRelatedManager``
+  with strings (:ticket:`24352`).
+
