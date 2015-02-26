@@ -593,10 +593,10 @@ class Model(six.with_metaclass(ModelBase)):
                 continue
             setattr(self, field.attname, getattr(db_instance, field.attname))
             # Throw away stale foreign key references.
-            if field.rel and field.get_cache_name() in self.__dict__:
+            if field.is_relation and field.get_cache_name() in self.__dict__:
                 rel_instance = getattr(self, field.get_cache_name())
                 local_val = getattr(db_instance, field.attname)
-                related_val = None if rel_instance is None else getattr(rel_instance, field.related_field.attname)
+                related_val = None if rel_instance is None else getattr(rel_instance, field.target_field.attname)
                 if local_val != related_val:
                     del self.__dict__[field.get_cache_name()]
         self._state.db = db_instance._state.db
