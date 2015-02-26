@@ -35,12 +35,13 @@ class CustomManyToManyField(RelatedField):
         super(CustomManyToManyField, self).__init__(**kwargs)
 
     def contribute_to_class(self, cls, name, **kwargs):
-        if self.rel.symmetrical and (self.rel.to == "self" or self.rel.to == cls._meta.object_name):
-            self.rel.related_name = "%s_rel_+" % name
+        if self.remote_field.symmetrical and (
+                self.remote_field.model == "self" or self.remote_field.model == cls._meta.object_name):
+            self.remote_field.related_name = "%s_rel_+" % name
         super(CustomManyToManyField, self).contribute_to_class(cls, name, **kwargs)
-        if not self.rel.through and not cls._meta.abstract and not cls._meta.swapped:
-            self.rel.through = create_many_to_many_intermediary_model(self, cls)
-        setattr(cls, self.name, ManyRelatedObjectsDescriptor(self.rel))
+        if not self.remote_field.through and not cls._meta.abstract and not cls._meta.swapped:
+            self.remote_field.through = create_many_to_many_intermediary_model(self, cls)
+        setattr(cls, self.name, ManyRelatedObjectsDescriptor(self.remote_field))
         self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
 
     def get_internal_type(self):

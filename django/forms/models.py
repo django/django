@@ -589,8 +589,8 @@ class BaseModelFormSet(BaseFormSet):
         If the field is a related field, fetch the concrete field's (that
         is, the ultimate pointed-to field's) to_python.
         """
-        while field.rel is not None:
-            field = field.rel.get_related_field()
+        while field.remote_field is not None:
+            field = field.remote_field.get_related_field()
         return field.to_python
 
     def _construct_form(self, i, **kwargs):
@@ -797,7 +797,7 @@ class BaseModelFormSet(BaseFormSet):
 
         def pk_is_not_editable(pk):
             return ((not pk.editable) or (pk.auto_created or isinstance(pk, AutoField))
-                or (pk.rel and pk.rel.parent_link and pk_is_not_editable(pk.rel.to._meta.pk)))
+                or (pk.remote_field and pk.remote_field.parent_link and pk_is_not_editable(pk.remote_field.model._meta.pk)))
         if pk_is_not_editable(pk) or pk.name not in form.fields:
             if form.is_bound:
                 # If we're adding the related instance, ignore its primary key
@@ -813,7 +813,7 @@ class BaseModelFormSet(BaseFormSet):
                 except IndexError:
                     pk_value = None
             if isinstance(pk, OneToOneField) or isinstance(pk, ForeignKey):
-                qs = pk.rel.to._default_manager.get_queryset()
+                qs = pk.remote_field.model._default_manager.get_queryset()
             else:
                 qs = self.model._default_manager.get_queryset()
             qs = qs.using(form.instance._state.db)
@@ -863,7 +863,7 @@ class BaseInlineFormSet(BaseModelFormSet):
     def __init__(self, data=None, files=None, instance=None,
                  save_as_new=False, prefix=None, queryset=None, **kwargs):
         if instance is None:
-            self.instance = self.fk.rel.to()
+            self.instance = self.fk.remote_field.model()
         else:
             self.instance = instance
         self.save_as_new = save_as_new
@@ -893,15 +893,15 @@ class BaseInlineFormSet(BaseModelFormSet):
 
         # Set the fk value here so that the form can do its validation.
         fk_value = self.instance.pk
-        if self.fk.rel.field_name != self.fk.rel.to._meta.pk.name:
-            fk_value = getattr(self.instance, self.fk.rel.field_name)
+        if self.fk.remote_field.field_name != self.fk.remote_field.model._meta.pk.name:
+            fk_value = getattr(self.instance, self.fk.remote_field.field_name)
             fk_value = getattr(fk_value, 'pk', fk_value)
         setattr(form.instance, self.fk.get_attname(), fk_value)
         return form
 
     @classmethod
     def get_default_prefix(cls):
-        return cls.fk.rel.get_accessor_name(model=cls.model).replace('+', '')
+        return cls.fk.remote_field.get_accessor_name(model=cls.model).replace('+', '')
 
     def save_new(self, form, commit=True):
         # Ensure the latest copy of the related instance is present on each
@@ -911,7 +911,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         # Use commit=False so we can assign the parent key afterwards, then
         # save the object.
         obj = form.save(commit=False)
-        pk_value = getattr(self.instance, self.fk.rel.field_name)
+        pk_value = getattr(self.instance, self.fk.remote_field.field_name)
         setattr(obj, self.fk.get_attname(), getattr(pk_value, 'pk', pk_value))
         if commit:
             obj.save()
@@ -932,8 +932,8 @@ class BaseInlineFormSet(BaseModelFormSet):
             kwargs = {
                 'label': getattr(form.fields.get(name), 'label', capfirst(self.fk.verbose_name))
             }
-            if self.fk.rel.field_name != self.fk.rel.to._meta.pk.name:
-                kwargs['to_field'] = self.fk.rel.field_name
+            if self.fk.remote_field.field_name != self.fk.remote_field.model._meta.pk.name:
+                kwargs['to_field'] = self.fk.remote_field.field_name
 
         # If we're adding a new object, ignore a parent's auto-generated pk
         # as it will be regenerated on the save request.
@@ -970,8 +970,8 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
             if not isinstance(fk, ForeignKey) or \
-                    (fk.rel.to != parent_model and
-                     fk.rel.to not in parent_model._meta.get_parent_list()):
+                    (fk.remote_field.model != parent_model and
+                     fk.remote_field.model not in parent_model._meta.get_parent_list()):
                 raise ValueError(
                     "fk_name '%s' is not a ForeignKey to '%s.%s'."
                     % (fk_name, parent_model._meta.app_label, parent_model._meta.object_name))
@@ -984,8 +984,8 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         fks_to_parent = [
             f for f in opts.fields
             if isinstance(f, ForeignKey)
-            and (f.rel.to == parent_model
-                or f.rel.to in parent_model._meta.get_parent_list())
+            and (f.remote_field.model == parent_model
+                or f.remote_field.model in parent_model._meta.get_parent_list())
         ]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]

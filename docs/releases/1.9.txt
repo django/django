@@ -348,6 +348,15 @@ versions:
 Its parsing caused bugs with the current syntax, so support for the old syntax
 will be removed in Django 2.0 following an accelerated deprecation.
 
+``Field.rel`` changes
+~~~~~~~~~~~~~~~~~~~~~
+
+``Field.rel`` and its methods and attributes have changed to match the related
+fields API. The ``Field.rel`` attribute is renamed to ``remote_field`` and many
+of its methods and attributes are either changed or renamed.
+
+The aim of these changes is to provide a documented API for relation fields.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

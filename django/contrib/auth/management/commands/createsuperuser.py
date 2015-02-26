@@ -90,11 +90,11 @@ class Command(BaseCommand):
                     input_msg = capfirst(verbose_field_name)
                     if default_username:
                         input_msg += " (leave blank to use '%s')" % default_username
-                    username_rel = self.username_field.rel
+                    username_rel = self.username_field.remote_field
                     input_msg = force_str('%s%s: ' % (
                         input_msg,
                         ' (%s.%s)' % (
-                            username_rel.to._meta.object_name,
+                            username_rel.model._meta.object_name,
                             username_rel.field_name
                         ) if username_rel else '')
                     )
@@ -114,8 +114,13 @@ class Command(BaseCommand):
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = options.get(field_name)
                     while user_data[field_name] is None:
-                        message = force_str('%s%s: ' % (capfirst(field.verbose_name),
-                            ' (%s.%s)' % (field.rel.to._meta.object_name, field.rel.field_name) if field.rel else ''))
+                        message = force_str('%s%s: ' % (
+                            capfirst(field.verbose_name),
+                            ' (%s.%s)' % (
+                                field.remote_field.model._meta.object_name,
+                                field.remote_field.field_name,
+                            ) if field.remote_field else '',
+                        ))
                         user_data[field_name] = self.get_input_data(field, message)
 
                 # Get a password

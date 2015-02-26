@@ -151,7 +151,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         super(ForeignKeyRawIdWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
-        rel_to = self.rel.to
+        rel_to = self.rel.model
         if attrs is None:
             attrs = {}
         extra = []
@@ -196,9 +196,9 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     def label_for_value(self, value):
         key = self.rel.get_related_field().name
         try:
-            obj = self.rel.to._default_manager.using(self.db).get(**{key: value})
+            obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
             return '&nbsp;<strong>%s</strong>' % escape(Truncator(obj).words(14, truncate='...'))
-        except (ValueError, self.rel.to.DoesNotExist):
+        except (ValueError, self.rel.model.DoesNotExist):
             return ''
 
 
@@ -210,7 +210,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     def render(self, name, value, attrs=None):
         if attrs is None:
             attrs = {}
-        if self.rel.to in self.admin_site._registry:
+        if self.rel.model in self.admin_site._registry:
             # The related object is registered with the same AdminSite
             attrs['class'] = 'vManyToManyRawIdAdminField'
         if value:
@@ -248,7 +248,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         # Backwards compatible check for whether a user can add related
         # objects.
         if can_add_related is None:
-            can_add_related = rel.to in admin_site._registry
+            can_add_related = rel.model in admin_site._registry
         self.can_add_related = can_add_related
         # XXX: The UX does not support multiple selected values.
         multiple = getattr(widget, 'allow_multiple_selected', False)
@@ -280,7 +280,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     def render(self, name, value, *args, **kwargs):
         from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
-        rel_opts = self.rel.to._meta
+        rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
         self.widget.choices = self.choices
         url_params = '&'.join("%s=%s" % param for param in [
