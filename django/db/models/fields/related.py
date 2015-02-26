@@ -855,6 +855,9 @@ def create_many_related_manager(superclass, rel):
             )
         do_not_call_in_templates = True
 
+        def __str__(self):
+            return repr(self)
+
         def _build_remove_filters(self, removed_vals):
             filters = Q(**{self.source_field_name: self.related_val})
             # No need to add a subquery condition if removed_vals is a QuerySet without

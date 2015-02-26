@@ -9,4 +9,5 @@ Django 1.7.6 fixes several bugs in 1.7.5.
 Bugfixes
 ========
 
-* ...
+* Fixed crash when coercing ``ManyRelatedManager`` to a string
+  (:ticket:`24352`).
