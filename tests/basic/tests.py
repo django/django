@@ -735,6 +735,13 @@ class ModelRefreshTests(TestCase):
             self.assertFalse(hasattr(s3_copy.selfref, 'touched'))
             self.assertEqual(s3_copy.selfref, s2)
 
+    def test_refresh_null_fk(self):
+        s1 = SelfRef.objects.create()
+        s2 = SelfRef.objects.create(selfref=s1)
+        s2.selfref = None
+        s2.refresh_from_db()
+        self.assertEqual(s2.selfref, s1)
+
     def test_refresh_unsaved(self):
         pub_date = self._truncate_ms(datetime.now())
         a = Article.objects.create(pub_date=pub_date)
