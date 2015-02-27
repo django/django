@@ -141,7 +141,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if field_maps != []:
             insert_fields = "(" + ', '.join(self.quote_name(x) for x, y in field_maps) + ")"
             select_fields = ', '.join(y for x, y in field_maps)
-        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
+        self.execute("INSERT INTO %s %s SELECT %s FROM %s" % (
             self.quote_name(temp_model._meta.db_table),
             insert_fields,
             select_fields,
