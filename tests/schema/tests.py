@@ -120,7 +120,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_index_name_hash_is_same(self):
         """
-        Test for https://code.djangoproject.com/ticket/24390
+        Index names should be deterministic, #24390.
         """
         with connection.schema_editor() as editor:
             index_name = editor._create_index_name(
