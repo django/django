@@ -33,8 +33,8 @@ To get more help:
 
 To contribute to Django:
 
-* Check out https://www.djangoproject.com/community/ for information about
-  getting involved.
+* Check out https://docs.djangoproject.com/en/dev/internals/contributing/ for
+  information about getting involved.
 
 To run Django's test suite:
 
