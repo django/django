@@ -15,7 +15,6 @@ def _related_non_m2m_objects(opts):
 
 
 class BaseDatabaseSchemaEditor(object):
-
     """
     This class (and its subclasses) are responsible for emitting schema-changing
     statements to the databases - model creation/removal/alteration, field
