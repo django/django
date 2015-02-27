@@ -668,8 +668,8 @@ of this object. Let's fix that by editing the ``Question`` model (in the
             return self.choice_text
 
 It's important to add :meth:`~django.db.models.Model.__str__` methods to your
-models, not only for your own sanity when dealing with the interactive prompt,
-but also because objects' representations are used throughout Django's
+models, not only for your own convenience when dealing with the interactive
+prompt, but also because objects' representations are used throughout Django's
 automatically-generated admin.
 
 .. admonition:: ``__str__`` or ``__unicode__``?
