@@ -251,7 +251,6 @@ class FieldsTests(SimpleTestCase):
         f = IntegerField()
         self.assertEqual(1, f.clean(1.0))
         self.assertEqual(1, f.clean('1.0'))
-        self.assertEqual(1, f.clean(b'1.0'))
         self.assertEqual(1, f.clean(' 1.0 '))
         self.assertEqual(1, f.clean('1.'))
         self.assertEqual(1, f.clean(' 1. '))
