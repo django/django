@@ -232,7 +232,7 @@ Overriding the clean() method
 You can override the ``clean()`` method on a model form to provide additional
 validation in the same way you can on a normal form.
 
-A model form instance bound to a model object will contain an ``instance``
+A model form instance attached to a model object will contain an ``instance``
 attribute that gives its methods access to that specific model instance.
 
 .. warning::
@@ -674,6 +674,21 @@ There are a couple of things to note, however.
   a default field. To opt-out from default fields, see
   :ref:`modelforms-selecting-fields`.
 
+Providing initial values
+------------------------
+
+As with regular forms, it's possible to specify initial data for forms by
+specifying an ``initial`` parameter when instantiating the form. Initial
+values provided this way will override both initial values from the form field
+and values from an attached model instance. For example::
+
+    >>> article = Article.objects.get(pk1=)
+    >>> article.headline
+    'My headline'
+    >>> form = ArticleForm(initial={'headline': 'Initial headline'), instance=article)
+    >>> form['pub_date'].value()
+    'Initial headline'
+
 .. _modelforms-factory:
 
 ModelForm factory function
@@ -840,8 +855,8 @@ As with regular formsets, it's possible to :ref:`specify initial data
 <formsets-initial-data>` for forms in the formset by specifying an ``initial``
 parameter when instantiating the model formset class returned by
 :func:`~django.forms.models.modelformset_factory`. However, with model
-formsets, the initial values only apply to extra forms, those that aren't bound
-to an existing object instance.
+formsets, the initial values only apply to extra forms, those that aren't
+attached to an existing model instance.
 
 .. _saving-objects-in-the-formset:
 
