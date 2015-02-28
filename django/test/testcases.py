@@ -23,7 +23,7 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
-from django.core.management.commands import flush
+from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
@@ -777,7 +777,7 @@ class TransactionTestCase(SimpleTestCase):
                                  value=self.available_apps,
                                  enter=True)
             for db_name in self._databases_names(include_mirrors=False):
-                flush.Command.emit_post_migrate(verbosity=0, interactive=False, database=db_name)
+                emit_post_migrate_signal(verbosity=0, interactive=False, db=db_name)
         try:
             self._fixture_setup()
         except Exception:
