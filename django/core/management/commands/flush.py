@@ -75,7 +75,8 @@ Are you sure you want to do this?
                     "The full error: %s") % (connection.settings_dict['NAME'], e)
                 six.reraise(CommandError, CommandError(new_msg), sys.exc_info()[2])
 
-            if not inhibit_post_migrate:
+            # Empty sql_list may signify an empty database and post_migrate would then crash
+            if sql_list and not inhibit_post_migrate:
                 # Emit the post migrate signal. This allows individual applications to
                 # respond as if the database had been migrated from scratch.
                 emit_post_migrate_signal(verbosity, interactive, database)
