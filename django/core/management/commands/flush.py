@@ -46,10 +46,6 @@ class Command(BaseCommand):
         sql_list = sql_flush(self.style, connection, only_django=True,
                              reset_sequences=reset_sequences,
                              allow_cascade=allow_cascade)
-        if not sql_list:
-            raise CommandError(
-                "No commands to proceed with, maybe the database is still empty?"
-            )
 
         if interactive:
             confirm = input("""You have requested a flush of the database.
