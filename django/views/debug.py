@@ -269,10 +269,6 @@ class ExceptionReporter(object):
     def format_path_status(self, path):
         if not os.path.exists(path):
             return "File does not exist"
-        if not os.path.isfile(path):
-            return "Not a file"
-        if not os.access(path, os.R_OK):
-            return "File is not readable"
         return "File exists"
 
     def get_traceback_data(self):
