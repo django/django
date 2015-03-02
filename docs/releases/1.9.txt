@@ -224,6 +224,19 @@ the keyword argument ``clear=True``.
 assignment for many-to-many relations and as a consequence now use the new
 behavior.
 
+Filesystem-based template loaders catch more specific exceptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using the :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`
+or :class:`app_directories.Loader <django.template.loaders.app_directories.Loader>`
+template loaders, earlier versions of Django raised a
+:exc:`~django.template.TemplateDoesNotExist` error if a template source existed
+but was unreadable. This could happen under many circumstances, such as if
+Django didn't have permissions to open the file, or if the template source was
+a directory. Now, Django only silences the exception if the template source
+does not exist. All other situations result in the original ``IOError`` being
+raised.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
