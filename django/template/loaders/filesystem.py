@@ -13,6 +13,9 @@ from .base import Loader as BaseLoader
 
 class Loader(BaseLoader):
 
+    def get_dirs(self):
+        return self.engine.dirs
+
     def get_template_sources(self, template_name, template_dirs=None):
         """
         Returns the absolute paths to "template_name", when appended to each
@@ -20,7 +23,7 @@ class Loader(BaseLoader):
         template dirs are excluded from the result set, for security reasons.
         """
         if not template_dirs:
-            template_dirs = self.engine.dirs
+            template_dirs = self.get_dirs()
         for template_dir in template_dirs:
             try:
                 yield safe_join(template_dir, template_name)
@@ -30,16 +33,10 @@ class Loader(BaseLoader):
                 pass
 
     def load_template_source(self, template_name, template_dirs=None):
-        tried = []
         for filepath in self.get_template_sources(template_name, template_dirs):
             try:
                 with io.open(filepath, encoding=self.engine.file_charset) as fp:
                     return fp.read(), filepath
             except IOError:
-                tried.append(filepath)
-        if tried:
-            error_msg = "Tried %s" % tried
-        else:
-            error_msg = ("Your template directories configuration is empty. "
-                         "Change it to point to at least one template directory.")
-        raise TemplateDoesNotExist(error_msg)
+                pass
+        raise TemplateDoesNotExist(template_name)
