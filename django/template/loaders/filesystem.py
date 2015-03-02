@@ -2,6 +2,7 @@
 Wrapper for loading templates from the filesystem.
 """
 
+import errno
 import io
 
 from django.core.exceptions import SuspiciousFileOperation
@@ -37,6 +38,7 @@ class Loader(BaseLoader):
             try:
                 with io.open(filepath, encoding=self.engine.file_charset) as fp:
                     return fp.read(), filepath
-            except IOError:
-                pass
+            except IOError as e:
+                if e.errno != errno.ENOENT:
+                    raise
         raise TemplateDoesNotExist(template_name)

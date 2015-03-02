@@ -7,7 +7,6 @@ import importlib
 import inspect
 import os
 import re
-import shutil
 import sys
 import tempfile
 from unittest import skipIf
@@ -151,36 +150,6 @@ class DebugViewTests(TestCase):
             }]):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
             self.assertContains(response, "%s (File does not exist)" % template_path, status_code=500, count=1)
-
-    @skipIf(sys.platform == "win32", "Python on Windows doesn't have working os.chmod() and os.access().")
-    def test_template_loader_postmortem_notreadable(self):
-        """Tests for not readable file"""
-        with tempfile.NamedTemporaryFile() as tmpfile:
-            template_name = tmpfile.name
-            tempdir = os.path.dirname(tmpfile.name)
-            template_path = os.path.join(tempdir, template_name)
-            os.chmod(template_path, 0o0222)
-            with override_settings(TEMPLATES=[{
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                'DIRS': [tempdir],
-            }]):
-                response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
-            self.assertContains(response, "%s (File is not readable)" % template_path, status_code=500, count=1)
-
-    def test_template_loader_postmortem_notafile(self):
-        """Tests for not being a file"""
-        try:
-            template_path = tempfile.mkdtemp()
-            template_name = os.path.basename(template_path)
-            tempdir = os.path.dirname(template_path)
-            with override_settings(TEMPLATES=[{
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                'DIRS': [tempdir],
-            }]):
-                response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
-            self.assertContains(response, "%s (Not a file)" % template_path, status_code=500, count=1)
-        finally:
-            shutil.rmtree(template_path)
 
     def test_no_template_source_loaders(self):
         """
