@@ -620,6 +620,49 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertIn("Branch 0002_conflicting_second", output)
         self.assertIn("Created new merge migration", output)
 
+    def test_makemigration_merge_dry_run(self):
+        """
+        Makes sure that makemigrations respects --dry-run option when fixing
+        migration conflicts (#24427).
+        """
+        out = six.StringIO()
+        with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+            call_command("makemigrations", "migrations", dry_run=True, merge=True, interactive=False, stdout=out)
+            merge_file = os.path.join(migration_dir, '0003_merge.py')
+            self.assertFalse(os.path.exists(merge_file))
+        output = force_text(out.getvalue())
+        self.assertIn("Merging migrations", output)
+        self.assertIn("Branch 0002_second", output)
+        self.assertIn("Branch 0002_conflicting_second", output)
+        self.assertNotIn("Created new merge migration", output)
+
+    def test_makemigration_merge_dry_run_verbosity_3(self):
+        """
+        Makes sure that `makemigrations --merge --dry-run` writes the merge
+        migration file to stdout with `verbosity == 3` (#24427).
+        """
+        out = six.StringIO()
+        with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+            call_command("makemigrations", "migrations", dry_run=True, merge=True, interactive=False,
+                         stdout=out, verbosity=3)
+            merge_file = os.path.join(migration_dir, '0003_merge.py')
+            self.assertFalse(os.path.exists(merge_file))
+        output = force_text(out.getvalue())
+        self.assertIn("Merging migrations", output)
+        self.assertIn("Branch 0002_second", output)
+        self.assertIn("Branch 0002_conflicting_second", output)
+        self.assertNotIn("Created new merge migration", output)
+
+        # Additional output caused by verbosity 3
+        # The complete merge migration file that would be written
+        self.assertIn("# -*- coding: utf-8 -*-", output)
+        self.assertIn("class Migration(migrations.Migration):", output)
+        self.assertIn("dependencies = [", output)
+        self.assertIn("('migrations', '0002_second')", output)
+        self.assertIn("('migrations', '0002_conflicting_second')", output)
+        self.assertIn("operations = [", output)
+        self.assertIn("]", output)
+
     def test_makemigrations_dry_run(self):
         """
         Ticket #22676 -- `makemigrations --dry-run` should not ask for defaults.
