@@ -219,7 +219,18 @@ class Command(BaseCommand):
                 })
                 new_migration = subclass("%04i_merge" % (biggest_number + 1), app_label)
                 writer = MigrationWriter(new_migration)
-                with open(writer.path, "wb") as fh:
-                    fh.write(writer.as_string())
-                if self.verbosity > 0:
-                    self.stdout.write("\nCreated new merge migration %s" % writer.path)
+
+                if not self.dry_run:
+                    # Write the merge migrations file to the disk
+                    with open(writer.path, "wb") as fh:
+                        fh.write(writer.as_string())
+                    if self.verbosity > 0:
+                        self.stdout.write("\nCreated new merge migration %s" % writer.path)
+                elif self.verbosity == 3:
+                    # Alternatively, makemigrations --merge --dry-run --verbosity 3
+                    # will output the merge migrations to stdout rather than saving
+                    # the file to the disk.
+                    self.stdout.write(self.style.MIGRATE_HEADING(
+                        "Full merge migrations file '%s':" % writer.filename) + "\n"
+                    )
+                    self.stdout.write("%s\n" % writer.as_string())

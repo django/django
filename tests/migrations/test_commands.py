@@ -400,6 +400,51 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertIn("Created new merge migration", stdout.getvalue())
 
     @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigration_merge_dry_run(self):
+        """
+        Makes sure that makemigrations respects --dry-run option when fixing
+        migration conflicts (#24427).
+        """
+        out = six.StringIO()
+        call_command("makemigrations", "migrations", dry_run=True, merge=True, interactive=False, stdout=out)
+        merge_file = os.path.join(self.test_dir, '0003_merge.py')
+        self.assertFalse(os.path.exists(merge_file))
+        output = force_text(out.getvalue())
+        self.assertIn("Merging migrations", output)
+        self.assertIn("Branch 0002_second", output)
+        self.assertIn("Branch 0002_conflicting_second", output)
+        self.assertNotIn("Created new merge migration", output)
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigration_merge_dry_run_verbosity_3(self):
+        """
+        Makes sure that `makemigrations --merge --dry-run` writes the merge
+        migration file to stdout with `verbosity == 3` (#24427).
+        """
+        out = six.StringIO()
+        call_command("makemigrations", "migrations", dry_run=True, merge=True, interactive=False,
+                     stdout=out, verbosity=3)
+        merge_file = os.path.join(self.test_dir, '0003_merge.py')
+        self.assertFalse(os.path.exists(merge_file))
+        output = force_text(out.getvalue())
+        self.assertIn("Merging migrations", output)
+        self.assertIn("Branch 0002_second", output)
+        self.assertIn("Branch 0002_conflicting_second", output)
+        self.assertNotIn("Created new merge migration", output)
+
+        # Additional output caused by verbosity 3
+        # The complete merge migration file that would be written
+        self.assertIn("# -*- coding: utf-8 -*-", output)
+        self.assertIn("class Migration(migrations.Migration):", output)
+        self.assertIn("dependencies = [", output)
+        self.assertIn("('migrations', '0002_second')", output)
+        self.assertIn("('migrations', '0002_conflicting_second')", output)
+        self.assertIn("operations = [", output)
+        self.assertIn("]", output)
+
+    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_default"})
     def test_makemigrations_dry_run(self):
         """
