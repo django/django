@@ -21,7 +21,7 @@ class SchemaIndexesTests(TestCase):
                 column_names=("column1", "column2", "column3"),
                 suffix="123",
             )
-        self.assertEqual(index_name, "indexes_article_column1_856fe518123")
+        self.assertEqual(index_name, "indexes_article_column1_6bd61f85123")
 
     def test_index_together(self):
         editor = connection.schema_editor()

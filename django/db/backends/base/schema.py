@@ -798,7 +798,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Else generate the name for the index using a different algorithm
         table_name = model._meta.db_table.replace('"', '').replace('.', '_')
-        index_unique_name = '_%s' % self._digest(*column_names)
+        index_unique_name = '_%s' % self._digest(table_name, *column_names)
         max_length = self.connection.ops.max_name_length() or 200
         # If the index name is too long, truncate it
         index_name = ('%s_%s%s%s' % (
