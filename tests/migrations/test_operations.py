@@ -1848,7 +1848,7 @@ class SwappableOperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adfligsw", editor, new_state, project_state)
         self.assertTableNotExists("test_adfligsw_pony")
-    
+
     def test_remove_abstract_model_pointer(self):
         """
         Test in which a model has a 1-1 link to an abstract model which is
@@ -1884,11 +1884,10 @@ class SwappableOperationTests(OperationTestBase):
                 name='abstractequine_ptr',
             )
         ]
-        
+
         with connection.schema_editor() as editor:
             for operation in operations:
                 operation.state_forwards("ramptr", new_state)
                 operation.database_forwards("ramptr", editor, project_state, new_state)
                 project_state, new_state = new_state, new_state.clone()
-            
 
