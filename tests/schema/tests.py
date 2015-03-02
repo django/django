@@ -118,6 +118,17 @@ class SchemaTests(TransactionTestCase):
 
     # Tests
 
+    def test_index_name_hash_is_same(self):
+        """
+        Index names should be deterministic, #24390.
+        """
+        with connection.schema_editor() as editor:
+            index_name = editor._create_index_name(
+                model=Book,
+                column_names=("column1", "column2", "column3"),
+                suffix="123")
+            self.assertEqual(index_name, "schema_book_column1_494c09d2b4123")
+
     def test_creation_deletion(self):
         """
         Tries creating a model's table, and then deleting it.
