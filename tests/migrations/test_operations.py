@@ -1890,4 +1890,3 @@ class SwappableOperationTests(OperationTestBase):
                 operation.state_forwards("ramptr", new_state)
                 operation.database_forwards("ramptr", editor, project_state, new_state)
                 project_state, new_state = new_state, new_state.clone()
-
