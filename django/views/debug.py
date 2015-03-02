@@ -621,9 +621,9 @@ TECHNICAL_500_TEMPLATE = ("""
     ul.traceback li.user { background-color:#e0e0e0; color:#000 }
     div.context { padding:10px 0; overflow:hidden; }
     div.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
-    div.context ol li { font-family:monospace; white-space:pre; color:#777; cursor:pointer; }
+    div.context ol li { font-family:monospace; white-space:pre; color:#777; cursor:pointer; padding-left: 2px; }
     div.context ol li pre { display:inline; }
-    div.context ol.context-line li { color:#505050; background-color:#dfdfdf; }
+    div.context ol.context-line li { color:#505050; background-color:#dfdfdf; padding: 3px 2px; }
     div.context ol.context-line li span { position:absolute; right:32px; }
     .user div.context ol.context-line li { background-color:#bbb; color:#000; }
     .user div.context ol li { color:#666; }
