@@ -18,10 +18,10 @@ class SchemaIndexesTests(TestCase):
         with connection.schema_editor() as editor:
             index_name = editor._create_index_name(
                 model=Article,
-                column_names=("column1", "column2", "column3"),
+                column_names=("c1", "c2", "c3"),
                 suffix="123",
             )
-        self.assertEqual(index_name, "indexes_article_column1_6bd61f85123")
+        self.assertEqual(index_name, "indexes_article_c1_7ce4cc86123")
 
     def test_index_together(self):
         editor = connection.schema_editor()
