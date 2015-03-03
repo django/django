@@ -74,7 +74,6 @@ class LogEntry(models.Model):
     def get_admin_url(self):
         """
         Returns the admin URL to edit the object represented by this log entry.
-        This is relative to the Django admin index page.
         """
         if self.content_type and self.object_id:
             url_name = 'admin:%s_%s_change' % (self.content_type.app_label, self.content_type.model)
