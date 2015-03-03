@@ -59,8 +59,8 @@ from .base import (TemplateDoesNotExist, TemplateSyntaxError,           # NOQA
 from .context import ContextPopException                                # NOQA
 
 # Template parts
-from .base import (Context, Node, NodeList, RequestContext,             # NOQA
-                   StringOrigin, Template, Variable)
+from .base import (Context, Node, NodeList, Origin, RequestContext,     # NOQA
+                   Template, Variable)
 
 # Deprecated in Django 1.8, will be removed in Django 2.0.
 from .base import resolve_variable                                      # NOQA

@@ -55,7 +55,7 @@ class LoaderTests(SimpleTestCase):
     def test_origin(self):
         engine = Engine(dirs=[TEMPLATE_DIR], debug=True)
         template = engine.get_template('index.html')
-        self.assertEqual(template.origin.loadname, 'index.html')
+        self.assertEqual(template.origin.template_name, 'index.html')
 
     def test_loader_priority(self):
         """

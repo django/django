@@ -124,15 +124,25 @@ class Engine(object):
             raise ImproperlyConfigured(
                 "Invalid value in template loaders configuration: %r" % loader)
 
-    def find_template(self, name, dirs=None):
+    def find_template(self, name, dirs=None, skip=None):
+        tried = []
         for loader in self.template_loaders:
-            try:
-                source, display_name = loader(name, dirs)
-                origin = self.make_origin(display_name, loader, name, dirs)
-                return source, origin
-            except TemplateDoesNotExist:
-                pass
-        raise TemplateDoesNotExist(name)
+            if loader.supports_recursion:
+                try:
+                    template = loader.get_template(
+                        name, template_dirs=dirs, skip=skip,
+                    )
+                    return template, template.origin
+                except TemplateDoesNotExist as e:
+                    tried.extend(e.tried)
+            else:
+                # RemovedInDjango21Warning: Use old api for non-recursive
+                # loaders.
+                try:
+                    return loader(name, dirs)
+                except TemplateDoesNotExist:
+                    pass
+        raise TemplateDoesNotExist(name, tried=tried)
 
     def from_string(self, template_code):
         """
@@ -234,11 +244,3 @@ class Engine(object):
                 continue
         # If we get here, none of the templates could be loaded
         raise TemplateDoesNotExist(', '.join(not_found))
-
-    def make_origin(self, display_name, loader, name, dirs):
-        if self.debug and display_name:
-            # Inner import to avoid circular dependency
-            from .loader import LoaderOrigin
-            return LoaderOrigin(display_name, loader, name, dirs)
-        else:
-            return None
