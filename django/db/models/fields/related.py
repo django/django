@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import warnings
+from functools import partial
 from operator import attrgetter
 
 from django import forms
@@ -21,6 +22,7 @@ from django.db.models.fields.related_lookups import (
 )
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import PathInfo
+from django.db.models.utils import make_model_tuple
 from django.utils import six
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango21Warning,
@@ -32,75 +34,60 @@ from django.utils.translation import ugettext_lazy as _
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
 
-def add_lazy_relation(cls, field, relation, operation):
+def resolve_relation(scope_model, relation):
     """
-    Adds a lookup on ``cls`` when a related field is defined using a string,
-    i.e.::
+    Transform relation into a model or fully-qualified model string of the form
+    "app_label.ModelName", relative to scope_model.
 
-        class MyModel(Model):
-            fk = ForeignKey("AnotherModel")
-
-    This string can be:
-
-        * RECURSIVE_RELATIONSHIP_CONSTANT (i.e. "self") to indicate a recursive
-          relation.
-
-        * The name of a model (i.e "AnotherModel") to indicate another model in
-          the same app.
-
-        * An app-label and model name (i.e. "someapp.AnotherModel") to indicate
-          another model in a different app.
-
-    If the other model hasn't yet been loaded -- almost a given if you're using
-    lazy relationships -- then the relation won't be set up until the
-    class_prepared signal fires at the end of model initialization.
-
-    ``operation`` is the work that must be performed once the relation can be
-    resolved.
+    The relation argument can be:
+      * RECURSIVE_RELATIONSHIP_CONSTANT, i.e. the string "self", in which case
+        the model argument will be returned.
+      * A bare model name without an app_label, in which case scope_model's
+        app_label will be prepended.
+      * An "app_label.ModelName" string.
+      * A model class, which will be returned unchanged.
     """
     # Check for recursive relations
     if relation == RECURSIVE_RELATIONSHIP_CONSTANT:
-        app_label = cls._meta.app_label
-        model_name = cls.__name__
+        relation = scope_model
 
-    else:
-        # Look for an "app.Model" relation.
+    # Look for an "app.Model" relation
+    if isinstance(relation, six.string_types):
+        if "." not in relation:
+            relation = "%s.%s" % (scope_model._meta.app_label, relation)
 
-        if isinstance(relation, six.string_types):
-            try:
-                app_label, model_name = relation.split(".")
-            except ValueError:
-                # If we can't split, assume a model in current app.
-                app_label = cls._meta.app_label
-                model_name = relation
-        else:
-            # It's actually a model class.
-            app_label = relation._meta.app_label
-            model_name = relation._meta.object_name
-
-    # Try to look up the related model, and if it's already loaded resolve the
-    # string right away. If get_registered_model raises a LookupError, it means
-    # that the related model isn't loaded yet, so we need to pend the relation
-    # until the class is prepared.
-    try:
-        model = cls._meta.apps.get_registered_model(app_label, model_name)
-    except LookupError:
-        key = (app_label, model_name)
-        value = (cls, field, operation)
-        cls._meta.apps._pending_lookups.setdefault(key, []).append(value)
-    else:
-        operation(field, model, cls)
+    return relation
 
 
-def do_pending_lookups(sender, **kwargs):
+def lazy_related_operation(function, model, *related_models, **kwargs):
     """
-    Sent from class_prepared to handle pending relations to the sending model.
-    """
-    key = (sender._meta.app_label, sender.__name__)
-    for cls, field, operation in sender._meta.apps._pending_lookups.pop(key, []):
-        operation(field, sender, cls)
+    Schedule `function` to be called once `model` and all `related_models`
+    have been imported and registered with the app registry. `function` will
+    be called with the newly-loaded model classes as its positional arguments,
+    plus any optional keyword arguments.
 
-signals.class_prepared.connect(do_pending_lookups)
+    The `model` argument must be a model class. Each subsequent positional
+    argument is another model, or a reference to another model - see
+    `resolve_relation()` for the various forms these may take. Any relative
+    references will be resolved relative to `model`.
+
+    This is a convenience wrapper for `Apps.lazy_model_operation` - the app
+    registry model used is the one found in `model._meta.apps`.
+    """
+    models = [model] + [resolve_relation(model, rel) for rel in related_models]
+    model_keys = (make_model_tuple(m) for m in models)
+    apps = model._meta.apps
+    return apps.lazy_model_operation(partial(function, **kwargs), *model_keys)
+
+
+def add_lazy_relation(cls, field, relation, operation):
+    warnings.warn(
+        "add_lazy_relation() has been superseded by lazy_related_operation() "
+        "and related methods on the Apps class.",
+        RemovedInDjango21Warning, stacklevel=2)
+    # Rearrange args for new Apps.lazy_model_operation
+    function = lambda local, related, field: operation(field, related, local)
+    lazy_related_operation(function, cls, relation, field=field)
 
 
 class RelatedField(Field):
@@ -289,12 +276,10 @@ class RelatedField(Field):
         return None
 
     def contribute_to_class(self, cls, name, virtual_only=False):
-        sup = super(RelatedField, self)
+
+        super(RelatedField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
 
         self.opts = cls._meta
-
-        if hasattr(sup, 'contribute_to_class'):
-            sup.contribute_to_class(cls, name, virtual_only=virtual_only)
 
         if not cls._meta.abstract:
             if self.remote_field.related_name:
@@ -303,14 +288,11 @@ class RelatedField(Field):
                     'app_label': cls._meta.app_label.lower()
                 }
                 self.remote_field.related_name = related_name
-            other = self.remote_field.model
-            if isinstance(other, six.string_types) or other._meta.pk is None:
-                def resolve_related_class(field, model, cls):
-                    field.remote_field.model = model
-                    field.do_related_class(model, cls)
-                add_lazy_relation(cls, self, other, resolve_related_class)
-            else:
-                self.do_related_class(other, cls)
+
+            def resolve_related_class(model, related, field):
+                field.remote_field.model = related
+                field.do_related_class(related, model)
+            lazy_related_operation(resolve_related_class, cls, self.remote_field.model, field=self)
 
     @property
     def swappable_setting(self):
@@ -351,8 +333,7 @@ class RelatedField(Field):
 
     def do_related_class(self, other, cls):
         self.set_attributes_from_rel()
-        if not cls._meta.abstract:
-            self.contribute_to_related_class(other, self.remote_field)
+        self.contribute_to_related_class(other, self.remote_field)
 
     def get_limit_choices_to(self):
         """
@@ -2132,32 +2113,22 @@ class OneToOneField(ForeignKey):
 
 def create_many_to_many_intermediary_model(field, klass):
     from django.db import models
-    managed = True
-    if isinstance(field.remote_field.model, six.string_types) and field.remote_field.model != RECURSIVE_RELATIONSHIP_CONSTANT:
-        to_model = field.remote_field.model
-        to = to_model.split('.')[-1]
 
-        def set_managed(field, model, cls):
-            field.remote_field.through._meta.managed = model._meta.managed or cls._meta.managed
-        add_lazy_relation(klass, field, to_model, set_managed)
-    elif isinstance(field.remote_field.model, six.string_types):
-        to = klass._meta.object_name
-        to_model = klass
-        managed = klass._meta.managed
-    else:
-        to = field.remote_field.model._meta.object_name
-        to_model = field.remote_field.model
-        managed = klass._meta.managed or to_model._meta.managed
+    def set_managed(model, related, through):
+        through._meta.managed = model._meta.managed or related._meta.managed
+
+    to_model = resolve_relation(klass, field.remote_field.model)
     name = '%s_%s' % (klass._meta.object_name, field.name)
-    if field.remote_field.model == RECURSIVE_RELATIONSHIP_CONSTANT or to == klass._meta.object_name:
-        from_ = 'from_%s' % to.lower()
-        to = 'to_%s' % to.lower()
-    else:
-        from_ = klass._meta.model_name
-        to = to.lower()
+    lazy_related_operation(set_managed, klass, to_model, name)
+
+    to = make_model_tuple(to_model)[1]
+    from_ = klass._meta.model_name
+    if to == from_:
+        to = 'to_%s' % to
+        from_ = 'from_%s' % from_
+
     meta = type(str('Meta'), (object,), {
         'db_table': field._get_m2m_db_table(klass._meta),
-        'managed': managed,
         'auto_created': klass,
         'app_label': klass._meta.app_label,
         'db_tablespace': klass._meta.db_tablespace,
@@ -2323,7 +2294,7 @@ class ManyToManyField(RelatedField):
             )
 
             # Set some useful local variables
-            to_model = self.remote_field.model
+            to_model = resolve_relation(from_model, self.remote_field.model)
             from_model_name = from_model._meta.object_name
             if isinstance(to_model, six.string_types):
                 to_model_name = to_model
@@ -2657,21 +2628,19 @@ class ManyToManyField(RelatedField):
         #  1) There is a manually specified intermediate, or
         #  2) The class owning the m2m field is abstract.
         #  3) The class owning the m2m field has been swapped out.
-        if not self.remote_field.through and not cls._meta.abstract and not cls._meta.swapped:
-            self.remote_field.through = create_many_to_many_intermediary_model(self, cls)
+        if not cls._meta.abstract:
+            if self.remote_field.through:
+                def resolve_through_model(_, model, field):
+                    field.remote_field.through = model
+                lazy_related_operation(resolve_through_model, cls, self.remote_field.through, field=self)
+            elif not cls._meta.swapped:
+                self.remote_field.through = create_many_to_many_intermediary_model(self, cls)
 
         # Add the descriptor for the m2m relation.
         setattr(cls, self.name, ManyRelatedObjectsDescriptor(self.remote_field, reverse=False))
 
         # Set up the accessor for the m2m table name for the relation.
         self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
-
-        # Populate some necessary rel arguments so that cross-app relations
-        # work correctly.
-        if not cls._meta.abstract and isinstance(self.remote_field.through, six.string_types):
-            def resolve_through_model(field, model, cls):
-                field.remote_field.through = model
-            add_lazy_relation(cls, self, self.remote_field.through, resolve_through_model)
 
     def contribute_to_related_class(self, cls, related):
         # Internal M2Ms (i.e., those with a related name ending with '+')
