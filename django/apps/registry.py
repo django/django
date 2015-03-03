@@ -2,6 +2,7 @@ import sys
 import threading
 import warnings
 from collections import Counter, OrderedDict, defaultdict
+from functools import partial
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.utils import lru_cache
@@ -45,8 +46,10 @@ class Apps(object):
         # Lock for thread-safe population.
         self._lock = threading.Lock()
 
-        # Pending lookups for lazy relations.
-        self._pending_lookups = {}
+        # Maps ("app_label", "modelname") tuples to lists of functions to be
+        # called when the corresponding model is ready. Used by this class's
+        # `lazy_model_operation()` and `do_pending_operations()` methods.
+        self._pending_operations = defaultdict(list)
 
         # Populate apps and models, unless it's the master registry.
         if installed_apps is not None:
@@ -207,6 +210,7 @@ class Apps(object):
                     "Conflicting '%s' models in application '%s': %s and %s." %
                     (model_name, app_label, app_models[model_name], model))
         app_models[model_name] = model
+        self.do_pending_operations(model)
         self.clear_cache()
 
     def is_installed(self, app_name):
@@ -332,5 +336,42 @@ class Apps(object):
                 for model in app_config.get_models(include_auto_created=True):
                     model._meta._expire_cache()
 
+    def lazy_model_operation(self, function, *model_keys):
+        """
+        Take a function and a number of ("app_label", "modelname") tuples, and
+        when all the corresponding models have been imported and registered,
+        call the function with the model classes as its arguments.
+
+        The function passed to this method must accept exactly n models as
+        arguments, where n=len(model_keys).
+        """
+        # If this function depends on more than one model, we recursively turn
+        # it into a chain of functions that accept a single model argument and
+        # pass each in turn to lazy_model_operation.
+        model_key, more_models = model_keys[0], model_keys[1:]
+        if more_models:
+            supplied_fn = function
+
+            def function(model):
+                next_function = partial(supplied_fn, model)
+                self.lazy_model_operation(next_function, *more_models)
+
+        # If the model is already loaded, pass it to the function immediately.
+        # Otherwise, delay execution until the class is prepared.
+        try:
+            model_class = self.get_registered_model(*model_key)
+        except LookupError:
+            self._pending_operations[model_key].append(function)
+        else:
+            function(model_class)
+
+    def do_pending_operations(self, model):
+        """
+        Take a newly-prepared model and pass it to each function waiting for
+        it. This is called at the very end of `Apps.register_model()`.
+        """
+        key = model._meta.app_label, model._meta.model_name
+        for function in self._pending_operations.pop(key, []):
+            function(model)
 
 apps = Apps(installed_apps=None)

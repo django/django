@@ -21,7 +21,8 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField
 from django.db.models.fields.related import (
-    ForeignObjectRel, ManyToOneRel, OneToOneField, add_lazy_relation,
+    ForeignObjectRel, ManyToOneRel, OneToOneField, lazy_related_operation,
+    resolve_relation,
 )
 from django.db.models.manager import ensure_default_manager
 from django.db.models.options import Options
@@ -29,6 +30,7 @@ from django.db.models.query import Q
 from django.db.models.query_utils import (
     DeferredAttribute, deferred_class_factory,
 )
+from django.db.models.utils import make_model_tuple
 from django.utils import six
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import curry
@@ -199,8 +201,8 @@ class ModelBase(type):
             # Locate OneToOneField instances.
             for field in base._meta.local_fields:
                 if isinstance(field, OneToOneField):
-                    parent_links[field.remote_field.model] = field
-
+                    related = resolve_relation(new_class, field.remote_field.model)
+                    parent_links[make_model_tuple(related)] = field
         # Do the appropriate setup for any model parents.
         for base in parents:
             original_base = base
@@ -223,8 +225,9 @@ class ModelBase(type):
             if not base._meta.abstract:
                 # Concrete classes...
                 base = base._meta.concrete_model
-                if base in parent_links:
-                    field = parent_links[base]
+                base_key = make_model_tuple(base)
+                if base_key in parent_links:
+                    field = parent_links[base_key]
                 elif not is_proxy:
                     attr_name = '%s_ptr' % base._meta.model_name
                     field = OneToOneField(base, name=attr_name,
@@ -305,7 +308,7 @@ class ModelBase(type):
 
             # defer creating accessors on the foreign class until we are
             # certain it has been created
-            def make_foreign_order_accessors(field, model, cls):
+            def make_foreign_order_accessors(cls, model, field):
                 setattr(
                     field.remote_field.model,
                     'get_%s_order' % cls.__name__.lower(),
@@ -316,12 +319,8 @@ class ModelBase(type):
                     'set_%s_order' % cls.__name__.lower(),
                     curry(method_set_order, cls)
                 )
-            add_lazy_relation(
-                cls,
-                opts.order_with_respect_to,
-                opts.order_with_respect_to.remote_field.model,
-                make_foreign_order_accessors
-            )
+            wrt = opts.order_with_respect_to
+            lazy_related_operation(make_foreign_order_accessors, cls, wrt.remote_field.model, field=wrt)
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
