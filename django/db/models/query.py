@@ -1797,7 +1797,7 @@ def prefetch_related_objects(result_cache, related_lookups):
                     done_queries[prefetch_to] = obj_list
                     new_lookups = normalize_prefetch_lookups(additional_lookups, prefetch_to)
                     auto_lookups.update(new_lookups)
-                    all_lookups.extendleft(new_lookups)
+                    all_lookups.extendleft(reversed(new_lookups))
                 followed_descriptors.add(descriptor)
             else:
                 # Either a singly related object that has already been fetched
