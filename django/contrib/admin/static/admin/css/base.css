@@ -2,24 +2,26 @@
     DJANGO Admin styles
 */
 
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,300,500,700&subset=latin,latin-ext);
+
 body {
     margin: 0;
     padding: 0;
-    font-size: 12px;
-    font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
-    color: #333;
+    font-size: 14px;
+    font-family: "Roboto", Corbel, Avenir, "Lucida Grande", "Lucida Sans", sans-serif;
+    color: #0c3c26;
     background: #fff;
 }
 
 /* LINKS */
 
 a:link, a:visited {
-    color: #5b80b2;
+    color: #156641;
     text-decoration: none;
 }
 
 a:hover {
-    color: #036;
+    color: #1d915c;
 }
 
 a img {
@@ -47,10 +49,10 @@ h1,h2,h3,h4,h5 {
 }
 
 h1 {
-    font-size: 18px;
+    margin: 0 0 20px;
+    font-weight: 300;
+    font-size: 20px;
     color: #666;
-    padding: 0 6px 0 0;
-    margin: 0 0 .2em 0;
 }
 
 h2 {
@@ -102,8 +104,8 @@ li ul {
 }
 
 li, dt, dd {
-    font-size: 11px;
-    line-height: 14px;
+    font-size: 13px;
+    line-height: 20px;
 }
 
 dt {
@@ -123,6 +125,8 @@ form {
 fieldset {
     margin: 0;
     padding: 0;
+    border: none;
+    border-top: 1px solid #eee;
 }
 
 blockquote {
@@ -134,9 +138,9 @@ blockquote {
 }
 
 code, pre {
-    font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+    font-family: "Ubuntu Mono", "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
     color: #666;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 pre.literal-block {
@@ -243,33 +247,30 @@ table {
 }
 
 td, th {
-    font-size: 11px;
-    line-height: 13px;
+    font-size: 13px;
+    line-height: 15px;
     border-bottom: 1px solid #eee;
     vertical-align: top;
-    padding: 5px;
-    font-family: "Lucida Grande", Verdana, Arial, sans-serif;
+    padding: 10px;
 }
 
 th {
+    font-weight: 600;
     text-align: left;
-    font-size: 12px;
-    font-weight: bold;
 }
 
 thead th,
 tfoot td {
     color: #666;
-    padding: 2px 5px;
+    padding: 5px 10px;
     font-size: 11px;
-    background: #e1e1e1 url(../img/nav-bg.gif) top left repeat-x;
-    border-left: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
+    background: #fff;
+    border-bottom: 1px solid #eee;
 }
 
 tfoot td {
     border-bottom: none;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #eee;
 }
 
 thead th:first-child,
@@ -279,10 +280,6 @@ tfoot td:first-child {
 
 thead th.optional {
     font-weight: normal !important;
-}
-
-fieldset table {
-    border-right: 1px solid #eee;
 }
 
 tr.row-label td {
@@ -299,7 +296,7 @@ tr.alt {
 }
 
 .row1 {
-    background: #EDF3FE;
+    background: #fff;
 }
 
 .row2 {
@@ -309,8 +306,10 @@ tr.alt {
 /* SORTABLE TABLES */
 
 thead th {
-    padding: 2px 5px;
+    text-transform: uppercase;
+    padding: 5px 10px;
     line-height: normal;
+    background: #f6f6f6;
 }
 
 thead th a:link, thead th a:visited {
@@ -318,7 +317,7 @@ thead th a:link, thead th a:visited {
 }
 
 thead th.sorted {
-    background: #c5c5c5 url(../img/nav-bg-selected.gif) top left repeat-x;
+    background: #eee;
 }
 
 thead th.sorted .text {
@@ -326,18 +325,18 @@ thead th.sorted .text {
 }
 
 table thead th .text span {
-    padding: 2px 5px;
-    display:block;
+    display: block;
+    padding: 10px;
 }
 
 table thead th .text a {
     display: block;
     cursor: pointer;
-    padding: 2px 5px;
+    padding: 10px;
 }
 
 table thead th.sortable:hover {
-    background: #fff url(../img/nav-bg-reverse.gif) 0 -5px repeat-x;
+    background: #eee;
 }
 
 thead th.sorted a.sortremove {
@@ -350,7 +349,7 @@ table thead th.sorted:hover a.sortremove {
 
 table thead th.sorted .sortoptions {
     display: block;
-    padding: 4px 5px 0 5px;
+    padding: 10px 5px 0 5px;
     float: right;
     text-align: right;
 }
@@ -414,9 +413,9 @@ input, textarea, select, .form-row p, form .button {
     margin: 2px 0;
     padding: 2px 3px;
     vertical-align: middle;
-    font-family: "Lucida Grande", Verdana, Arial, sans-serif;
+    font-family: "Roboto", Corbel, Avenir, "Lucida Grande", "Lucida Sans", sans-serif;
     font-weight: normal;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 textarea {
@@ -425,50 +424,54 @@ textarea {
 
 input[type=text], input[type=password], input[type=email], input[type=url], input[type=number],
 textarea, select, .vTextField {
-    border: 1px solid #ccc;
+    min-width: 200px;
+    border: 1px solid #cfe3dc;
+    border-radius: 4px;
+    padding: 6px;
+    outline: none;
+}
+
+input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, input[type=url]:focus, input[type=number]:focus,
+textarea:focus, select:focus, .vTextField:focus {
+    border-color: #20aa76;
 }
 
 /* FORM BUTTONS */
 
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
-    background: #fff url(../img/nav-bg.gif) bottom repeat-x;
-    padding: 3px 5px;
-    color: black;
-    border: 1px solid #bbb;
-    border-color: #ddd #aaa #aaa #ddd;
+    background: #44b78b;
+    padding: 10px 15px;
+    border: none;
+    outline: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
 }
 
 a.button {
     padding: 4px 5px;
 }
 
-.button:active, input[type=submit]:active, input[type=button]:active {
-    background-image: url(../img/nav-bg-reverse.gif);
-    background-position: top;
+.button:active, input[type=submit]:active, input[type=button]:active,
+.button:hover, input[type=submit]:hover, input[type=button]:hover {
+    background: #35a57a;
 }
 
 .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
-    background-image: url(../img/nav-bg.gif);
-    background-position: bottom;
     opacity: 0.4;
 }
 
 .button.default, input[type=submit].default, .submit-row input.default {
-    border: 2px solid #5b80b2;
-    background: #7CA0C7 url(../img/default-bg.gif) bottom repeat-x;
-    font-weight: bold;
-    color: #fff;
     float: right;
+    background: #0c4b33;
 }
 
-.button.default:active, input[type=submit].default:active {
-    background-image: url(../img/default-bg-reverse.gif);
-    background-position: top;
+.button.default:active, input[type=submit].default:active,
+.button.default:hover, input[type=submit].default:hover {
+    background: #063422;
 }
 
 .button[disabled].default, input[type=submit][disabled].default, input[type=button][disabled].default {
-    background-image: url(../img/default-bg.gif);
-    background-position: bottom;
     opacity: 0.4;
 }
 
@@ -476,8 +479,7 @@ a.button {
 /* MODULES */
 
 .module {
-    border: 1px solid #ccc;
-    margin-bottom: 5px;
+    margin-bottom: 30px;
     background: #fff;
 }
 
@@ -500,11 +502,11 @@ a.button {
 
 .module h2, .module caption, .inline-group h2 {
     margin: 0;
-    padding: 2px 5px 3px 5px;
-    font-size: 11px;
+    padding: 10px;
+    font-weight: 400;
+    font-size: 13px;
     text-align: left;
-    font-weight: bold;
-    background: #7CA0C7 url(../img/default-bg.gif) top left repeat-x;
+    background: #44b78b;
     color: #fff;
 }
 
@@ -520,51 +522,46 @@ ul.messagelist {
 }
 
 ul.messagelist li {
-    font-size: 12px;
-    font-weight: bold;
     display: block;
-    padding: 5px 5px 4px 25px;
-    margin: 0 0 3px 0;
-    border-bottom: 1px solid #ddd;
-    color: #666;
-    background: #dfd url(../img/icon_success.gif) 5px .3em no-repeat;
+    font-weight: 400;
+    font-size: 13px;
+    padding: 10px 10px 8px 65px;
+    margin: 0 0 10px 0;
+    border-bottom: 1px solid #eee;
+    background: #dfd url(../img/icon_success.gif) 40px 12px no-repeat;
+    color: #333;
 }
 
 ul.messagelist li.warning {
-    background: #ffc url(../img/icon_alert.gif) 5px .3em no-repeat;
+    background: #ffc url(../img/icon_alert.gif) 40px 10px no-repeat;
 }
 
 ul.messagelist li.error {
-    background: #ffefef url(../img/icon_error.gif) 5px .3em no-repeat;
+    background: #ffefef url(../img/icon_error.gif) 40px 11px no-repeat;
 }
 
 .errornote {
-    font-size: 12px !important;
-    font-weight: bold;
+    font-size: 14px !important;
+    font-weight: 500;
     display: block;
-    padding: 5px 5px 4px 25px;
-    margin: 0 0 3px 0;
-    border: 1px solid #c22;
-    color: #c11;
-    background: #ffefef url(../img/icon_error.gif) 5px .38em no-repeat;
-}
-
-.errornote, ul.errorlist {
-    border-radius: 1px;
+    padding: 10px 12px;
+    margin: 0 0 10px 0;
+    color: #ba2121;
+    border: 1px solid #ba2121;
+    border-radius: 4px;
 }
 
 ul.errorlist {
     margin: 0 0 4px !important;
     padding: 0 !important;
-    color: #fff;
-    background: #c11;
+    color: #ba2121;
+    background: #fff;
 }
 
 ul.errorlist li {
-    font-size: 12px !important;
+    font-size: 13px !important;
     display: block;
-    padding: 5px 5px 4px 7px;
-    margin: 3px 0 0 0;
+    margin-bottom: 4px;
 }
 
 ul.errorlist li:first-child {
@@ -585,17 +582,8 @@ td ul.errorlist li {
     margin: 0 !important;
 }
 
-.errors, .form-row.errors {
-    background: #ffefef;
-}
-
-.form-row.errors {
-    border: 1px solid #c22;
-    margin: -1px;
-}
-
 .errors input, .errors select, .errors textarea {
-    border: 1px solid #c11;
+    border: 1px solid #ba2121;
 }
 
 div.system-message {
@@ -620,13 +608,19 @@ div.system-message p.system-message-title {
 /* BREADCRUMBS */
 
 div.breadcrumbs {
-    background: #fff url(../img/nav-bg-reverse.gif) 0 -10px repeat-x;
-    padding: 2px 8px 3px 8px;
-    font-size: 11px;
-    color: #999;
-    border-top: 1px solid #fff;
-    border-bottom: 1px solid #ddd;
+    background: #44b78b;
+    padding: 10px 40px;
+    font-size: 14px;
+    color: #c9f0dd;
     text-align: left;
+}
+
+div.breadcrumbs a {
+    color: #fff;
+}
+
+div.breadcrumbs a:hover {
+    color: #c9f0dd;
 }
 
 /* ACTION ICONS */
@@ -659,12 +653,10 @@ a.deletelink:hover {
 .object-tools {
     font-size: 10px;
     font-weight: bold;
-    font-family: Arial,Helvetica,sans-serif;
     padding-left: 0;
     float: right;
     position: relative;
-    margin-top: -2.4em;
-    margin-bottom: -2em;
+    margin-top: -40px;
 }
 
 .form-row .object-tools {
@@ -689,13 +681,18 @@ a.deletelink:hover {
 .object-tools a:link, .object-tools a:visited {
     display: block;
     float: left;
-    color: #fff;
-    padding: .2em 10px;
+    padding: 4px 10px 3px;
     background: #999;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #fff;
 }
 
 .object-tools a:hover, .object-tools li:hover a {
-    background-color: #5b80b2;
+    background-color: #0c4b33;
 }
 
 .object-tools a.viewsitelink, .object-tools a.golink {
@@ -723,12 +720,16 @@ table#change-history tbody th {
 #container {
     position: relative;
     width: 100%;
-    min-width: 760px;
+    min-width: 960px;
     padding: 0;
 }
 
 #content {
-    margin: 10px 15px;
+    padding: 40px;
+}
+
+.dashboard #content {
+    width: 640px;
 }
 
 #content-main {
@@ -738,9 +739,9 @@ table#change-history tbody th {
 
 #content-related {
     float: right;
-    width: 18em;
+    width: 320px;
     position: relative;
-    margin-right: -19em;
+    margin-right: -360px;
 }
 
 #footer {
@@ -778,16 +779,16 @@ table#change-history tbody th {
     margin-right: 15px;
 }
 
-.dashboard #content {
-    width: 500px;
-}
 
 /* HEADER */
 
 #header {
-    width: 100%;
-    background: #417690;
-    color: #ffc;
+    min-width: 960px;
+    height: 40px;
+    padding: 15px 40px;
+    background: #0c4b33;
+    line-height: 40px;
+    color: #fff;
     overflow: hidden;
 }
 
@@ -802,15 +803,17 @@ table#change-history tbody th {
 #branding {
     float: left;
 }
+
 #branding h1 {
-    padding: 0 10px;
-    font-size: 18px;
-    margin: 8px 0;
-    font-weight: normal;
+    padding: 0;
+    margin: 0 20px 0 0;
+    font-weight: 300;
+    font-size: 28px;
+    color: #44b78b;
 }
 
 #branding h1, #branding h1 a:link, #branding h1 a:visited {
-    color: #f4f379;
+    color: #44b78b;
 }
 
 #branding h2 {
@@ -827,24 +830,96 @@ table#change-history tbody th {
 
 #user-tools {
     float: right;
-    padding: 1.2em 10px;
-    font-size: 11px;
+    padding: 0;
+    margin: 0 0 0 20px;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
     text-align: right;
+}
+
+#user-tools a {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+#user-tools a:hover {
+    text-decoration: none;
+    border-bottom-color: #44b78b;
+    color: #44b78b;
 }
 
 /* SIDEBAR */
 
+#content-related {
+    background: #f8f8f8;
+}
+
+#content-related .module {
+    background: none;
+}
+
 #content-related h3 {
-    font-size: 12px;
+    font-size: 14px;
     color: #666;
-    margin-bottom: 3px;
+    padding: 0 16px;
+    margin: 0 0 16px;
 }
 
 #content-related h4 {
-    font-size: 11px;
+    font-size: 13px;
+}
+
+#content-related p {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+#content-related .actionlist {
+    padding: 0;
+    margin: 16px;
+}
+
+#content-related .actionlist li {
+    line-height: 1;
+    margin-bottom: 10px;
+    padding-left: 18px;
 }
 
 #content-related .module h2 {
-    background: #eee url(../img/nav-bg.gif) bottom left repeat-x;
-    color: #666;
+    background: none;
+    padding: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #cfe3dc;
+    font-size: 18px;
+    color: #0c3c26;
+}
+
+.delete-confirmation form input[type="submit"] {
+    background: #ba2121;
+    border-radius: 4px;
+    padding: 10px 15px;
+    color: #fff;
+}
+
+.delete-confirmation form input[type="submit"]:active,
+.delete-confirmation form input[type="submit"]:hover {
+    background: #a41515;
+}
+
+.delete-confirmation form .cancel-link {
+    display: inline-block;
+    vertical-align: middle;
+    height: 15px;
+    line-height: 15px;
+    background: #ddd;
+    border-radius: 4px;
+    padding: 10px 15px;
+    color: #333;
+    margin: 0 0 0 10px;
+}
+
+.delete-confirmation form .cancel-link:active,
+.delete-confirmation form .cancel-link:hover {
+    background: #ccc;
 }

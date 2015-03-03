@@ -4,8 +4,8 @@
 
 .form-row {
     overflow: hidden;
-    padding: 8px 12px;
-    font-size: 11px;
+    padding: 15px;
+    font-size: 13px;
     border-bottom: 1px solid #eee;
 }
 
@@ -15,7 +15,7 @@
 
 form .form-row p {
     padding-left: 0;
-    font-size: 11px;
+    font-size: 11px !important;
 }
 
 .hidden {
@@ -33,7 +33,7 @@ form h4 {
 label {
     font-weight: normal !important;
     color: #666;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .required label, label.required {
@@ -52,6 +52,12 @@ form ul.radiolist label {
     display: inline;
 }
 
+form ul.radiolist input[type="radio"] {
+    margin: -2px 4px 0 0;
+    padding: 0;
+    outline: none;
+}
+
 form ul.inline {
     margin-left: 0;
     padding: 0;
@@ -66,9 +72,9 @@ form ul.inline li {
 
 .aligned label {
     display: block;
-    padding: 3px 10px 0 0;
+    padding: 6px 10px 0 0;
     float: left;
-    width: 8em;
+    width: 140px;
     word-wrap: break-word;
 }
 
@@ -83,8 +89,12 @@ form ul.inline li {
 }
 
 form .aligned p, form .aligned ul {
-    margin-left: 7em;
-    padding-left: 30px;
+    margin-left: 140px;
+    padding-left: 10px;
+}
+
+form .aligned ul li {
+    list-style: none;
 }
 
 form .aligned table p {
@@ -92,14 +102,12 @@ form .aligned table p {
     padding-left: 0;
 }
 
-form .aligned p.help {
-    padding-left: 38px;
-}
-
 .aligned .vCheckboxLabel {
     float: none !important;
     display: inline;
-    padding-left: 4px;
+    vertical-align: middle;
+    padding-left: 6px;
+    padding-top: 0;
 }
 
 .colM .aligned .vLargeTextField, .colM .aligned .vXMLLargeTextField {
@@ -144,10 +152,15 @@ fieldset.collapsed h2, fieldset.collapsed {
     display: block !important;
 }
 
+fieldset.collapsed {
+    border: 1px solid #c9f0dd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
 fieldset.collapsed h2 {
-    background-image: url(../img/nav-bg.gif);
-    background-position: bottom left;
-    color: #999;
+    background: #f1fff7;
+    color: #666;
 }
 
 fieldset.collapsed .collapse-toggle {
@@ -158,17 +171,22 @@ fieldset.collapsed .collapse-toggle {
 /* MONOSPACE TEXTAREAS */
 
 fieldset.monospace textarea {
-    font-family: "Bitstream Vera Sans Mono",Monaco,"Courier New",Courier,monospace;
+    font-family: "Roboto", Corbel, Avenir, "Lucida Grande", "Lucida Sans", sans-serif;
+}
+
+textarea {
+    resize: vertical;
 }
 
 /* SUBMIT ROW */
 
 .submit-row {
-    padding: 5px 7px;
+    padding: 20px;
+    margin: 40px 0 0;
+    background: #f8f8f8;
+    border: 1px solid #eee;
+    border-radius: 4px;
     text-align: right;
-    background: white url(../img/nav-bg.gif) 0 100% repeat-x;
-    border: 1px solid #ccc;
-    margin: 5px 0;
     overflow: hidden;
 }
 
@@ -177,7 +195,14 @@ body.popup .submit-row {
 }
 
 .submit-row input {
+    height: 35px;
+    line-height: 15px;
     margin: 0 0 0 5px;
+}
+
+.submit-row input.default {
+    margin: 0 0 0 8px;
+    text-transform: uppercase;
 }
 
 .submit-row p {
@@ -186,11 +211,22 @@ body.popup .submit-row {
 
 .submit-row p.deletelink-box {
     float: left;
+    margin: 0;
 }
 
-.submit-row .deletelink {
-    background: url(../img/icon_deletelink.gif) 0 50% no-repeat;
-    padding-left: 14px;
+.submit-row a.deletelink {
+    display: block;
+    background: #ba2121;
+    border-radius: 4px;
+    padding: 10px 15px;
+    height: 15px;
+    line-height: 15px;
+    color: #fff;
+}
+
+.submit-row a.deletelink:hover,
+.submit-row a.deletelink:active {
+    background: #a41515;
 }
 
 /* CUSTOM FORM FIELDS */
@@ -251,12 +287,15 @@ body.popup .submit-row {
 
 .inline-group {
     padding: 0;
-    border: 1px solid #ccc;
     margin: 10px 0;
 }
 
+.inline-group thead th {
+    padding: 8px 10px;
+}
+
 .inline-group .aligned label {
-    width: 8em;
+    width: 140px;
 }
 
 .inline-related {
@@ -300,7 +339,6 @@ body.popup .submit-row {
 
 .inline-group .tabular fieldset.module {
     border: none;
-    border-bottom: 1px solid #ddd;
 }
 
 .inline-related.tabular fieldset.module table {
@@ -352,14 +390,12 @@ body.popup .submit-row {
 .inline-group div.add-row,
 .inline-group .tabular tr.add-row td {
     color: #666;
-    padding: 3px 5px;
-    border-bottom: 1px solid #ddd;
-    background: #e1e1e1 url(../img/nav-bg.gif) top left repeat-x;
+    background: #f1fff7;
 }
 
 .inline-group .tabular tr.add-row td {
-    padding: 4px 5px 3px;
-    border-bottom: none;
+    padding: 8px 10px;
+    border-bottom: 1px solid #c9f0dd;
 }
 
 .inline-group ul.tools a.add,
@@ -392,4 +428,10 @@ body.popup .submit-row {
     width: 16px;
     height: 16px;
     background-image: url(../img/selector-search.gif);
+}
+
+form .related-widget-wrapper ul {
+    display: inline-block;
+    margin-left: 0;
+    padding-left: 0;
 }
