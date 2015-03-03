@@ -37,6 +37,26 @@ details on these changes.
 
 * The ``GeoManager`` and ``GeoQuerySet`` classes will be removed.
 
+* The ``supports_recursion`` check for template loaders will be removed from:
+
+  * ``django.template.engine.Engine.find_template()``
+  * ``django.template.loader_tags.ExtendsNode.find_template()``
+  * ``django.template.loaders.base.Loader.supports_recursion()``
+  * ``django.template.loaders.cached.Loader.supports_recursion()``
+
+* The ``load_template and ``load_template_sources`` template loader methods
+  will be removed.
+
+* The ``template_dirs`` argument for template loaders will be removed:
+
+  * ``django.template.loaders.base.Loader.get_template()``
+  * ``django.template.loaders.cached.Loader.cache_key()``
+  * ``django.template.loaders.cached.Loader.get_template()``
+  * ``django.template.loaders.cached.Loader.get_template_sources()``
+  * ``django.template.loaders.filesystem.Loader.get_template_sources()``
+
+* The ``django.template.loaders.base.Loader.__call__`` method will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

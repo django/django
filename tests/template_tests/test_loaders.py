@@ -10,8 +10,9 @@ from contextlib import contextmanager
 
 from django.template import Context, TemplateDoesNotExist
 from django.template.engine import Engine
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango21Warning
 
 from .utils import TEMPLATE_DIR
 
@@ -23,8 +24,9 @@ except ImportError:
 
 class CachedLoaderTests(SimpleTestCase):
 
-    def create_engine(self, **kwargs):
-        return Engine(
+    def setUp(self):
+        self.engine = Engine(
+            dirs=[TEMPLATE_DIR],
             loaders=[
                 ('django.template.loaders.cached.Loader', [
                     'django.template.loaders.filesystem.Loader',
@@ -32,26 +34,47 @@ class CachedLoaderTests(SimpleTestCase):
             ],
         )
 
-    def test_templatedir_caching(self):
-        """
-        #13573 -- Template directories should be part of the cache key.
-        """
-        engine = self.create_engine()
+    def test_get_template(self):
+        template = self.engine.get_template('index.html')
+        self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, 'index.html'))
+        self.assertEqual(template.origin.template_name, 'index.html')
+        self.assertEqual(template.origin.loader, self.engine.template_loaders[0].loaders[0])
 
-        # Retrieve a template specifying a template directory to check
-        t1, name = engine.find_template('test.html', (os.path.join(TEMPLATE_DIR, 'first'),))
-        # Now retrieve the same template name, but from a different directory
-        t2, name = engine.find_template('test.html', (os.path.join(TEMPLATE_DIR, 'second'),))
+        cache = self.engine.template_loaders[0].get_template_cache
+        self.assertEqual(cache['index.html'], template)
 
-        # The two templates should not have the same content
-        self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
+        # Run a second time from cache
+        template = self.engine.get_template('index.html')
+        self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, 'index.html'))
+        self.assertEqual(template.origin.template_name, 'index.html')
+        self.assertEqual(template.origin.loader, self.engine.template_loaders[0].loaders[0])
 
-    def test_missing_template_is_cached(self):
+    def test_get_template_missing(self):
+        with self.assertRaises(TemplateDoesNotExist):
+            self.engine.get_template('doesnotexist.html')
+        e = self.engine.template_loaders[0].get_template_cache['doesnotexist.html']
+        self.assertEqual(e.args[0], 'doesnotexist.html')
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_load_template(self):
+        loader = self.engine.template_loaders[0]
+        template, origin = loader.load_template('index.html')
+        self.assertEqual(template.origin.template_name, 'index.html')
+
+        cache = self.engine.template_loaders[0].template_cache
+        self.assertEqual(cache['index.html'][0], template)
+
+        # Run a second time from cache
+        loader = self.engine.template_loaders[0]
+        source, name = loader.load_template('index.html')
+        self.assertEqual(template.origin.template_name, 'index.html')
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_load_template_missing(self):
         """
         #19949 -- TemplateDoesNotExist exceptions should be cached.
         """
-        engine = self.create_engine()
-        loader = engine.template_loaders[0]
+        loader = self.engine.template_loaders[0]
 
         self.assertFalse('missing.html' in loader.template_cache)
 
@@ -63,6 +86,18 @@ class CachedLoaderTests(SimpleTestCase):
             TemplateDoesNotExist,
             "Cached loader failed to cache the TemplateDoesNotExist exception",
         )
+
+    def test_templatedir_caching(self):
+        """
+        #13573 -- Template directories should be part of the cache key.
+        """
+        # Retrieve a template specifying a template directory to check
+        t1, name = self.engine.find_template('test.html', (os.path.join(TEMPLATE_DIR, 'first'),))
+        # Now retrieve the same template name, but from a different directory
+        t2, name = self.engine.find_template('test.html', (os.path.join(TEMPLATE_DIR, 'second'),))
+
+        # The two templates should not have the same content
+        self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
 
 
 @unittest.skipUnless(pkg_resources, 'setuptools is not installed')
@@ -117,22 +152,43 @@ class EggLoaderTests(SimpleTestCase):
             del sys.modules[name]
             del pkg_resources._provider_factories[MockLoader]
 
-    def setUp(self):
-        engine = Engine(loaders=[
+    @classmethod
+    def setUpClass(cls):
+        cls.engine = Engine(loaders=[
             'django.template.loaders.eggs.Loader',
         ])
-        self.loader = engine.template_loaders[0]
+        cls.loader = cls.engine.template_loaders[0]
+        super(EggLoaderTests, cls).setUpClass()
 
-    def test_existing(self):
+    def test_get_template(self):
         templates = {
             os.path.normcase('templates/y.html'): six.StringIO("y"),
         }
 
         with self.create_egg('egg', templates):
             with override_settings(INSTALLED_APPS=['egg']):
-                contents, template_name = self.loader.load_template_source("y.html")
-                self.assertEqual(contents, "y")
-                self.assertEqual(template_name, "egg:egg:templates/y.html")
+                template = self.engine.get_template("y.html")
+
+        self.assertEqual(template.origin.name, 'egg:egg:templates/y.html')
+        self.assertEqual(template.origin.template_name, 'y.html')
+        self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
+
+        output = template.render(Context({}))
+        self.assertEqual(output, "y")
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_load_template_source(self):
+        loader = self.engine.template_loaders[0]
+        templates = {
+            os.path.normcase('templates/y.html'): six.StringIO("y"),
+        }
+
+        with self.create_egg('egg', templates):
+            with override_settings(INSTALLED_APPS=['egg']):
+                source, name = loader.load_template_source('y.html')
+
+        self.assertEqual(source.strip(), 'y')
+        self.assertEqual(name, 'egg:egg:templates/y.html')
 
     def test_non_existing(self):
         """
@@ -141,7 +197,7 @@ class EggLoaderTests(SimpleTestCase):
         with self.create_egg('egg', {}):
             with override_settings(INSTALLED_APPS=['egg']):
                 with self.assertRaises(TemplateDoesNotExist):
-                    self.loader.load_template_source("not-existing.html")
+                    self.engine.get_template('not-existing.html')
 
     def test_not_installed(self):
         """
@@ -153,13 +209,15 @@ class EggLoaderTests(SimpleTestCase):
 
         with self.create_egg('egg', templates):
             with self.assertRaises(TemplateDoesNotExist):
-                self.loader.load_template_source("y.html")
+                self.engine.get_template('y.html')
 
 
 class FileSystemLoaderTests(SimpleTestCase):
 
-    def setUp(self):
-        self.engine = Engine(dirs=[TEMPLATE_DIR])
+    @classmethod
+    def setUpClass(cls):
+        cls.engine = Engine(dirs=[TEMPLATE_DIR])
+        super(FileSystemLoaderTests, cls).setUpClass()
 
     @contextmanager
     def set_dirs(self, dirs):
@@ -177,12 +235,26 @@ class FileSystemLoaderTests(SimpleTestCase):
         def check_sources(path, expected_sources):
             expected_sources = [os.path.abspath(s) for s in expected_sources]
             self.assertEqual(
-                list(loader.get_template_sources(path)),
+                [origin.name for origin in loader.get_template_sources(path)],
                 expected_sources,
             )
 
         with self.set_dirs(dirs):
             yield check_sources
+
+    def test_get_template(self):
+        template = self.engine.get_template('index.html')
+        self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, 'index.html'))
+        self.assertEqual(template.origin.template_name, 'index.html')
+        self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
+        self.assertEqual(template.origin.loader_name, 'django.template.loaders.filesystem.Loader')
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_load_template_source(self):
+        loader = self.engine.template_loaders[0]
+        source, name = loader.load_template_source('index.html')
+        self.assertEqual(source.strip(), 'index')
+        self.assertEqual(name, os.path.join(TEMPLATE_DIR, 'index.html'))
 
     def test_directory_security(self):
         with self.source_checker(['/dir1', '/dir2']) as check_sources:
@@ -248,18 +320,56 @@ class FileSystemLoaderTests(SimpleTestCase):
             self.engine.get_template('first')
 
 
-class AppDirectoriesLoaderTest(SimpleTestCase):
+class AppDirectoriesLoaderTests(SimpleTestCase):
 
-    def setUp(self):
-        self.engine = Engine(
+    @classmethod
+    def setUpClass(cls):
+        cls.engine = Engine(
             loaders=['django.template.loaders.app_directories.Loader'],
         )
+        super(AppDirectoriesLoaderTests, cls).setUpClass()
 
     @override_settings(INSTALLED_APPS=['template_tests'])
-    def test_load_template(self):
-        self.engine.get_template('index.html')
+    def test_get_template(self):
+        template = self.engine.get_template('index.html')
+        self.assertEqual(template.origin.name, os.path.join(TEMPLATE_DIR, 'index.html'))
+        self.assertEqual(template.origin.template_name, 'index.html')
+        self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    @override_settings(INSTALLED_APPS=['template_tests'])
+    def test_load_template_source(self):
+        loader = self.engine.template_loaders[0]
+        source, name = loader.load_template_source('index.html')
+        self.assertEqual(source.strip(), 'index')
+        self.assertEqual(name, os.path.join(TEMPLATE_DIR, 'index.html'))
 
     @override_settings(INSTALLED_APPS=[])
     def test_not_installed(self):
         with self.assertRaises(TemplateDoesNotExist):
             self.engine.get_template('index.html')
+
+
+class LocmemLoaderTests(SimpleTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.engine = Engine(
+            loaders=[('django.template.loaders.locmem.Loader', {
+                'index.html': 'index',
+            })],
+        )
+        super(LocmemLoaderTests, cls).setUpClass()
+
+    def test_get_template(self):
+        template = self.engine.get_template('index.html')
+        self.assertEqual(template.origin.name, 'index.html')
+        self.assertEqual(template.origin.template_name, 'index.html')
+        self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_load_template_source(self):
+        loader = self.engine.template_loaders[0]
+        source, name = loader.load_template_source('index.html')
+        self.assertEqual(source.strip(), 'index')
+        self.assertEqual(name, 'index.html')

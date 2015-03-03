@@ -6,6 +6,7 @@ import sys
 from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import Context, Engine, TemplateSyntaxError
+from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings
 
 
@@ -13,7 +14,9 @@ class TemplateTests(SimpleTestCase):
 
     def test_string_origin(self):
         template = Engine().from_string('string template')
-        self.assertEqual(template.origin.source, 'string template')
+        self.assertEqual(template.origin.name, UNKNOWN_SOURCE)
+        self.assertEqual(template.origin.loader_name, None)
+        self.assertEqual(template.source, 'string template')
 
     @override_settings(SETTINGS_MODULE=None)
     def test_url_reverse_no_settings_module(self):

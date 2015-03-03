@@ -134,7 +134,15 @@ class TemplateSyntaxError(Exception):
 
 
 class TemplateDoesNotExist(Exception):
-    pass
+    """
+    This exception is used when template loaders are unable to find a
+    template. The tried argument is an optional list of tuples containing
+    (origin, status), where origin is an Origin object and status is a string
+    with the reason the template wasn't found.
+    """
+    def __init__(self, msg, tried=None):
+        self.tried = tried or []
+        super(TemplateDoesNotExist, self).__init__(msg)
 
 
 class TemplateEncodingError(Exception):
@@ -157,23 +165,29 @@ class InvalidTemplateLibrary(Exception):
 
 
 class Origin(object):
-    def __init__(self, name):
+    def __init__(self, name, template_name=None, loader=None):
         self.name = name
-
-    def reload(self):
-        raise NotImplementedError('subclasses of Origin must provide a reload() method')
+        self.template_name = template_name
+        self.loader = loader
 
     def __str__(self):
         return self.name
 
+    def __eq__(self, other):
+        if not isinstance(other, Origin):
+            return False
 
-class StringOrigin(Origin):
-    def __init__(self, source):
-        super(StringOrigin, self).__init__(UNKNOWN_SOURCE)
-        self.source = source
+        return (
+            self.name == other.name and
+            self.loader == other.loader
+        )
 
-    def reload(self):
-        return self.source
+    @property
+    def loader_name(self):
+        if self.loader:
+            return '%s.%s' % (
+                self.loader.__module__, self.loader.__class__.__name__,
+            )
 
 
 class Template(object):
@@ -191,7 +205,7 @@ class Template(object):
             from .engine import Engine
             engine = Engine.get_default()
         if origin is None:
-            origin = StringOrigin(template_string)
+            origin = Origin(UNKNOWN_SOURCE)
         self.name = name
         self.origin = origin
         self.engine = engine

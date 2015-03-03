@@ -82,6 +82,7 @@ class BlockNode(Node):
 
 class ExtendsNode(Node):
     must_be_first = True
+    context_key = 'extends_context'
 
     def __init__(self, nodelist, parent_name, template_dirs=None):
         self.nodelist = nodelist
@@ -91,6 +92,39 @@ class ExtendsNode(Node):
 
     def __repr__(self):
         return '<ExtendsNode: extends %s>' % self.parent_name.token
+
+    def find_template(self, template_name, context):
+        """
+        This is a wrapper around engine.find_template(). A history is kept in
+        the render_context attribute between successive extends calls and
+        passed as the skip argument. This enables extends to work recursively
+        without extending the same template twice.
+        """
+        # RemovedInDjango21Warning: If any non-recursive loaders are installed
+        # do a direct template lookup. If the same template name appears twice,
+        # raise an exception to avoid system recursion.
+        for loader in context.template.engine.template_loaders:
+            if not loader.supports_recursion:
+                history = context.render_context.setdefault(
+                    self.context_key, [context.template.origin.template_name],
+                )
+                if template_name in history:
+                    raise ExtendsError(
+                        "Cannot extend templates recursively when using "
+                        "non-recursive template loaders",
+                    )
+                template = context.template.engine.get_template(template_name)
+                history.append(template_name)
+                return template
+
+        history = context.render_context.setdefault(
+            self.context_key, [context.template.origin],
+        )
+        template, origin = context.template.engine.find_template(
+            template_name, skip=history,
+        )
+        history.append(origin)
+        return template
 
     def get_parent(self, context):
         parent = self.parent_name.resolve(context)
@@ -107,7 +141,7 @@ class ExtendsNode(Node):
         if isinstance(getattr(parent, 'template', None), Template):
             # parent is a django.template.backends.django.Template
             return parent.template
-        return context.template.engine.get_template(parent)
+        return self.find_template(parent, context)
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
