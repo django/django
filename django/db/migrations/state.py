@@ -212,22 +212,14 @@ class StateApps(Apps):
 
         self.render_multiple(list(models.values()) + self.real_models)
 
-        # If there are some lookups left, see if we can first resolve them
-        # ourselves - sometimes fields are added after a model is registered
-        for lookup_model in self._pending_operations:
-            try:
-                model = self.get_model(*lookup_model)
-            except LookupError:
-                if lookup_model == make_model_tuple(settings.AUTH_USER_MODEL) and ignore_swappable:
-                    continue
-                # Raise an error with a best-effort helpful message
-                # (only for the first issue). Error message should look like:
-                # "ValueError: Lookup failed for model referenced by
-                # field migrations.Book.author: migrations.Author"
-                msg = "Lookup failed for model: {model[0]}.{model[1]}"
-                raise ValueError(msg.format(model=lookup_model))
-            else:
-                self.do_pending_operations(model)
+        # There shouldn't be any operations pending at this point.
+        pending_models = set(self._pending_operations)
+        if ignore_swappable:
+            pending_models -= {make_model_tuple(settings.AUTH_USER_MODEL)}
+        if pending_models:
+            msg = "Unhandled pending operations for models: %s"
+            labels = (".".join(model_key) for model_key in self._pending_operations)
+            raise ValueError(msg % ", ".join(labels))
 
     def render_multiple(self, model_states):
         # We keep trying to render the models in a loop, ignoring invalid
