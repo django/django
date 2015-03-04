@@ -11,7 +11,7 @@ from django.utils import six
 from django.utils.six.moves import zip
 
 
-def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
+def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=True):
     """
     Given a DataSource, generates a dictionary that may be used
     for invoking the LayerMapping utility.
@@ -43,7 +43,7 @@ def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
             mfield += 'field'
         _mapping[mfield] = field
     gtype = data_source[layer_key].geom_type
-    if multi_geom and gtype.num in (1, 2, 3):
+    if multi_geom:
         prefix = 'MULTI'
     else:
         prefix = ''
@@ -92,7 +92,10 @@ def ogrinspect(*args, **kwargs):
      `srid` => The SRID to use for the Geometry Field.  If it can be determined,
        the SRID of the datasource is used.
 
-     `multi_geom` => Boolean (default: False) - specify as multigeometry.
+     `multi_geom` => Boolean (default: True) - specify as multigeometry because,
+       we never can really know if a Shapefile is Linestring or Multilinestring
+       for example.  Using mulit as True will force all imports as mulit and 
+       will work the other way around does not and import will crash.
 
      `name_field` => String - specifies a field name to return for the
        `__unicode__`/`__str__` function (which will be generated if specified).
@@ -123,7 +126,7 @@ def ogrinspect(*args, **kwargs):
 
 
 def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=None,
-                multi_geom=False, name_field=None, imports=True,
+                multi_geom=True, name_field=None, imports=True,
                 decimal=False, blank=False, null=False):
     """
     Helper routine for `ogrinspect` that generates GeoDjango models corresponding
@@ -209,8 +212,9 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
             raise TypeError('Unknown field type %s in %s' % (field_type, mfield))
 
     # TODO: Autodetection of multigeometry types (see #7218).
+    # TODO: build a real multi-auto detector valid for shapefiles
     gtype = layer.geom_type
-    if multi_geom and gtype.num in (1, 2, 3):
+    if multi_geom:
         geom_field = 'Multi%s' % gtype.django
     else:
         geom_field = gtype.django
