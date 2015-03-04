@@ -252,6 +252,11 @@ Miscellaneous
 
 * ``ValuesQuerySet`` and ``ValuesListQuerySet`` have been removed.
 
+* The ``admin/base.html`` template no longer sets
+  ``window.__admin_media_prefix__``. Image references in JavaScript that used
+  that value to construct absolute URLs have been moved to CSS for easier
+  customization.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9

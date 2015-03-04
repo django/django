@@ -28,10 +28,6 @@ try:
 except ImportError:
     pytz = None
 
-admin_static_prefix = lambda: {
-    'ADMIN_STATIC_PREFIX': "%sadmin/" % settings.STATIC_URL,
-}
-
 
 class TestDataMixin(object):
 
@@ -261,14 +257,14 @@ class FilteredSelectMultipleWidgetTest(DjangoTestCase):
         w = widgets.FilteredSelectMultiple('test', False)
         self.assertHTMLEqual(
             w.render('test', 'test'),
-            '<select multiple="multiple" name="test" class="selectfilter">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 0, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
+            '<select multiple="multiple" name="test" class="selectfilter">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 0); });</script>\n'
         )
 
     def test_stacked_render(self):
         w = widgets.FilteredSelectMultiple('test', True)
         self.assertHTMLEqual(
             w.render('test', 'test'),
-            '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
+            '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1); });</script>\n'
         )
 
 

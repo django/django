@@ -161,11 +161,11 @@
       if (typeof SelectFilter != 'undefined'){
         $('.selectfilter').each(function(index, value){
           var namearr = value.name.split('-');
-          SelectFilter.init(value.id, namearr[namearr.length-1], false, options.adminStaticPrefix );
+          SelectFilter.init(value.id, namearr[namearr.length-1], false);
         });
         $('.selectfilterstacked').each(function(index, value){
           var namearr = value.name.split('-');
-          SelectFilter.init(value.id, namearr[namearr.length-1], true, options.adminStaticPrefix );
+          SelectFilter.init(value.id, namearr[namearr.length-1], true);
         });
       }
     };
@@ -227,11 +227,11 @@
       if (typeof SelectFilter != "undefined"){
         $(".selectfilter").each(function(index, value){
           var namearr = value.name.split('-');
-          SelectFilter.init(value.id, namearr[namearr.length-1], false, options.adminStaticPrefix);
+          SelectFilter.init(value.id, namearr[namearr.length-1], false);
         });
         $(".selectfilterstacked").each(function(index, value){
           var namearr = value.name.split('-');
-          SelectFilter.init(value.id, namearr[namearr.length-1], true, options.adminStaticPrefix);
+          SelectFilter.init(value.id, namearr[namearr.length-1], true);
         });
       }
     };
