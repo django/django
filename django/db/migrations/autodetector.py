@@ -848,8 +848,16 @@ class MigrationAutodetector(object):
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
             if old_field_dec != new_field_dec:
-                if (not isinstance(old_field, models.ManyToManyField) and
-                        not isinstance(new_field, models.ManyToManyField)):
+                both_m2m = (
+                    isinstance(old_field, models.ManyToManyField) and
+                    isinstance(new_field, models.ManyToManyField)
+                )
+                neither_m2m = (
+                    not isinstance(old_field, models.ManyToManyField) and
+                    not isinstance(new_field, models.ManyToManyField)
+                )
+                if both_m2m or neither_m2m:
+                    # Either both fields are m2m or neither is
                     preserve_default = True
                     if (old_field.null and not new_field.null and not new_field.has_default() and
                             not isinstance(new_field, models.ManyToManyField)):
@@ -870,6 +878,7 @@ class MigrationAutodetector(object):
                         )
                     )
                 else:
+                    # We cannot alter between m2m and concrete fields
                     self._generate_removed_field(app_label, model_name, field_name)
                     self._generate_added_field(app_label, model_name, field_name)
 
