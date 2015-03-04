@@ -106,6 +106,23 @@ class Publication(models.Model):
         return self.title
 
 
+def default_mode():
+    return 'di'
+
+
+def default_category():
+    return 3
+
+
+class PublicationDefaults(models.Model):
+    MODE_CHOICES = (('di', 'direct'), ('de', 'delayed'))
+    CATEGORY_CHOICES = ((1, 'Games'), (2, 'Comics'), (3, 'Novel'))
+    title = models.CharField(max_length=30)
+    date_published = models.DateField(default=datetime.date.today)
+    mode = models.CharField(max_length=2, choices=MODE_CHOICES, default=default_mode)
+    category = models.IntegerField(choices=CATEGORY_CHOICES, default=default_category)
+
+
 class Author(models.Model):
     publication = models.OneToOneField(Publication, null=True, blank=True)
     full_name = models.CharField(max_length=255)
