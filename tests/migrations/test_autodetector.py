@@ -127,6 +127,10 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher")),
     ])
+    author_with_m2m_blank = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("publishers", models.ManyToManyField("testapp.Publisher", blank=True)),
+    ])
     author_with_m2m_through = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher", through="testapp.Contract")),
@@ -1261,6 +1265,16 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="publishers")
+
+    def test_alter_many_to_many(self):
+        before = self.make_project_state([self.author_with_m2m, self.publisher])
+        after = self.make_project_state([self.author_with_m2m_blank, self.publisher])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="publishers")
 
     def test_create_with_through_model(self):
