@@ -2657,6 +2657,7 @@ class AdminSearchTest(TestCase):
         self.assertContains(response,
             """<span class="small quiet">1 result (<a href="?">Show all</a>)</span>""",
             html=True)
+        self.assertTrue(response.context['cl'].show_admin_actions)
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
