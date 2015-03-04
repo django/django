@@ -2,9 +2,9 @@
 Django 1.7.7 release notes
 ==========================
 
-*Under development*
+*March 18, 2015*
 
-Django 1.7.7 fixes several bugs in 1.7.6.
+Django 1.7.7 fixes several bugs and security issues in 1.7.6.
 
 Bugfixes
 ========
