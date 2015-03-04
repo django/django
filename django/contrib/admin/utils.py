@@ -13,8 +13,7 @@ from django.db.models.deletion import Collector
 from django.forms.forms import pretty_name
 from django.utils import formats, six, timezone
 from django.utils.encoding import force_str, force_text, smart_text
-from django.utils.html import conditional_escape, format_html
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils.translation import ungettext
 
@@ -389,10 +388,7 @@ def display_for_field(value, field):
     elif isinstance(field, models.FloatField):
         return formats.number_format(value)
     elif isinstance(field, models.FileField) and value:
-        return mark_safe('<a href="%s">%s</a>' % (
-            conditional_escape(value.url),
-            conditional_escape(value),
-        ))
+        return format_html('<a href="{}">{}</a>', value.url, value)
     else:
         return smart_text(value)
 
