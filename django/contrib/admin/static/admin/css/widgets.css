@@ -22,19 +22,25 @@
 }
 
 .selector-available h2, .selector-chosen h2 {
-    border: 1px solid #ccc;
+    border: 1px solid #cfe3dc;
+    border-radius: 4px 4px 0 0;
+}
+
+.selector-chosen h2 {
+    background: #f1fff7;
+    color: #666;
 }
 
 .selector .selector-available h2 {
-    background: white url(../img/nav-bg.gif) bottom left repeat-x;
+    background: #f8f8f8;
     color: #666;
 }
 
 .selector .selector-filter {
     background: white;
-    border: 1px solid #ccc;
+    border: 1px solid #cfe3dc;
     border-width: 0 1px;
-    padding: 3px;
+    padding: 8px;
     color: #999;
     font-size: 10px;
     margin: 0;
@@ -43,12 +49,15 @@
 
 .selector .selector-filter label,
 .inline-group .aligned .selector .selector-filter label {
+    float: left;
+    margin: 5px 0 0;
     width: 16px;
     padding: 2px;
 }
 
 .selector .selector-available input {
-    width: 360px;
+    width: 340px;
+    margin-left: 8px;
 }
 
 .selector ul.selector-chooser {
@@ -67,8 +76,9 @@
 }
 
 .selector select {
-    margin-bottom: 10px;
-    margin-top: 0;
+    padding: 10px;
+    margin: 0 0 10px;
+    border-radius: 0 0 4px 4px;
 }
 
 .selector-add, .selector-remove {
@@ -118,7 +128,7 @@ a.selector-clearall {
 }
 
 a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
-    color: #036;
+    color: #1d915c;
 }
 
 a.selector-chooseall {
@@ -209,15 +219,24 @@ p.datetime {
     margin: 0;
     padding: 0;
     color: #666;
-    font-size: 11px;
+    font-size: 13px !important;
     font-weight: bold;
 }
 
+form .form-row p.datetime {
+    font-size: 13px !important;
+}
+
 .datetime span {
+    white-space: nowrap;
+    font-weight: normal;
     font-size: 11px;
     color: #ccc;
-    font-weight: normal;
-    white-space: nowrap;
+}
+
+.datetime input {
+    min-width: 0;
+    margin-left: 5px;
 }
 
 table p.datetime {
@@ -271,10 +290,14 @@ span.clearable-file-input label {
 
 .calendarbox, .clockbox {
     margin: 5px auto;
-    font-size: 11px;
-    width: 16em;
+    font-size: 12px;
+    width: 19em;
     text-align: center;
     background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
     position: relative;
 }
 
@@ -297,22 +320,27 @@ span.clearable-file-input label {
 
 .calendar caption, .calendarbox h2 {
     margin: 0;
-    font-size: 11px;
     text-align: center;
     border-top: none;
+    background: #f5dd5d;
+    font-weight: 500;
+    font-size: 13px;
+    color: #333;
 }
 
 .calendar th {
-    font-size: 10px;
-    color: #666;
-    padding: 2px 3px;
-    text-align: center;
-    background: #e1e1e1 url(../img/nav-bg.gif) 0 50% repeat-x;
+    padding: 8px 5px;
+    background: #f8f8f8;
     border-bottom: 1px solid #ddd;
+    font-weight: 400;
+    font-size: 12px;
+    text-align: center;
+    color: #666;
 }
 
 .calendar td {
-    font-size: 11px;
+    font-weight: 400;
+    font-size: 12px;
     text-align: center;
     padding: 0;
     border-top: 1px solid #eee;
@@ -320,32 +348,33 @@ span.clearable-file-input label {
 }
 
 .calendar td.selected a {
-    background: #C9DBED;
+    background: #44b78b;
+    color: #fff;
 }
 
 .calendar td.nonday {
-    background: #efefef;
+    background: #f8f8f8;
 }
 
 .calendar td.today a {
-    background: #ffc;
+    font-weight: 700;
 }
 
 .calendar td a, .timelist a {
     display: block;
-    font-weight: bold;
-    padding: 4px;
+    font-weight: 400;
+    padding: 8px;
     text-decoration: none;
     color: #444;
 }
 
 .calendar td a:hover, .timelist a:hover {
-    background: #5b80b2;
+    background: #44b78b;
     color: white;
 }
 
 .calendar td a:active, .timelist a:active {
-    background: #036;
+    background: #0c4b33;
     color: white;
 }
 
@@ -363,47 +392,50 @@ span.clearable-file-input label {
 
 .calendar-shortcuts {
     background: white;
-    font-size: 10px;
+    font-size: 11px;
     line-height: 11px;
     border-top: 1px solid #eee;
-    padding: 3px 0 4px;
+    padding: 8px 0;
     color: #ccc;
 }
 
 .calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
     display: block;
     position: absolute;
-    font-weight: bold;
+    top: 7px;
+    border: 1px solid #333;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    line-height: 16px;
     font-size: 12px;
-    background: #C9DBED url(../img/default-bg.gif) bottom left repeat-x;
-    padding: 1px 4px 2px 4px;
-    color: white;
+    color: #333;
 }
 
 .calendarnav-previous:hover, .calendarnav-next:hover {
-    background: #036;
+    background: #333;
+    color: #fff;
 }
 
 .calendarnav-previous {
-    top: 0;
-    left: 0;
+    left: 10px;
 }
 
 .calendarnav-next {
-    top: 0;
-    right: 0;
+    right: 10px;
 }
 
 .calendar-cancel {
     margin: 0 !important;
-    padding: 0 !important;
-    font-size: 10px;
-    background: #e1e1e1 url(../img/nav-bg.gif) 0 50% repeat-x;
+    padding: 4px 0 !important;
+    font-size: 12px;
+    background: #eee;
     border-top: 1px solid #ddd;
+    color: #333;
 }
 
 .calendar-cancel:hover {
-    background: #e1e1e1 url(../img/nav-bg-reverse.gif) 0 50% repeat-x;
+    background: #ddd;
 }
 
 .calendar-cancel a {
@@ -505,13 +537,13 @@ ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
 
 .editinline button.addlink {
     border: 0px none;
-    color: #5b80b2;
+    color: #156641;
     font-size: 100%;
     cursor: pointer;
 }
 
 .editinline button.addlink:hover {
-    color: #036;
+    color: #1d915c;
     cursor: pointer;
 }
 
