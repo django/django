@@ -1,0 +1,7 @@
+===========================
+Django 1.4.20 release notes
+===========================
+
+*March 18, 2015*
+
+Django 1.4.20 fixes one security issue in 1.4.19.
