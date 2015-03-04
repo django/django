@@ -329,7 +329,7 @@ span.clearable-file-input label {
 }
 
 .calendar th {
-    padding: 8px 5px 6px;
+    padding: 8px 5px;
     background: #f8f8f8;
     border-bottom: 1px solid #ddd;
     font-weight: 400;
@@ -395,7 +395,7 @@ span.clearable-file-input label {
     font-size: 11px;
     line-height: 11px;
     border-top: 1px solid #eee;
-    padding: 8px 0 6px;
+    padding: 8px 0;
     color: #ccc;
 }
 
@@ -407,7 +407,7 @@ span.clearable-file-input label {
     border-radius: 50%;
     width: 18px;
     height: 18px;
-    line-height: 18px;
+    line-height: 16px;
     font-size: 12px;
     color: #333;
 }

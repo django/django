@@ -525,9 +525,8 @@ ul.messagelist li {
     display: block;
     font-weight: 400;
     font-size: 13px;
-    padding: 10px 10px 8px 65px;
+    padding: 10px 10px 10px 65px;
     margin: 0 0 10px 0;
-    border-bottom: 1px solid #eee;
     background: #dfd url(../img/icon_success.gif) 40px 12px no-repeat;
     color: #333;
 }
@@ -656,7 +655,7 @@ a.deletelink:hover {
     padding-left: 0;
     float: right;
     position: relative;
-    margin-top: -40px;
+    margin-top: -48px;
 }
 
 .form-row .object-tools {
@@ -681,11 +680,10 @@ a.deletelink:hover {
 .object-tools a:link, .object-tools a:visited {
     display: block;
     float: left;
-    padding: 4px 10px 3px;
+    padding: 3px 10px;
     background: #999;
     font-weight: 400;
     font-size: 12px;
-    line-height: 18px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: #fff;
