@@ -156,8 +156,10 @@ def strip_tags(value):
         if not ('<' in value or '>' in value):
             return value
         new_value = _strip_once(value)
-        if new_value == value:
-            # _strip_once was not able to detect more tags
+        if len(new_value) >= len(value):
+            # _strip_once was not able to detect more tags or length increased
+            # due to http://bugs.python.org/issue20288
+            # (affects Python 2 < 2.7.7 and Python 3 < 3.3.5)
             return value
         else:
             value = new_value
