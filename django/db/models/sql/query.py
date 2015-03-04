@@ -351,7 +351,7 @@ class Query(object):
                 # is selected.
                 col_cnt += 1
                 col_alias = '__col%d' % col_cnt
-                self.annotation_select[col_alias] = expr
+                self.annotations[col_alias] = expr
                 self.append_annotation_mask([col_alias])
                 new_exprs.append(Ref(col_alias, expr))
             else:
@@ -390,10 +390,22 @@ class Query(object):
             from django.db.models.sql.subqueries import AggregateQuery
             outer_query = AggregateQuery(self.model)
             inner_query = self.clone()
-            if not has_limit and not self.distinct_fields:
-                inner_query.clear_ordering(True)
             inner_query.select_for_update = False
             inner_query.select_related = False
+            if not has_limit and not self.distinct_fields:
+                # Queries with distinct_fields need ordering and when a limit
+                # is applied we must take the slice from the ordered query.
+                # Otherwise no need for ordering.
+                inner_query.clear_ordering(True)
+            if not inner_query.distinct:
+                # If the inner query uses default select and it has some
+                # aggregate annotations, then we must make sure the inner
+                # query is grouped by the main model's primary key. However,
+                # clearing the select clause can alter results if distinct is
+                # used.
+                if inner_query.default_cols and has_existing_annotations:
+                    inner_query.group_by = [self.model._meta.pk.get_col(inner_query.get_initial_alias())]
+                inner_query.default_cols = False
 
             relabels = {t: 'subquery' for t in inner_query.tables}
             relabels[None] = 'subquery'
@@ -404,7 +416,14 @@ class Query(object):
                 if expression.is_summary:
                     expression, col_cnt = inner_query.rewrite_cols(expression, col_cnt)
                     outer_query.annotations[alias] = expression.relabeled_clone(relabels)
-                    del inner_query.annotation_select[alias]
+                    del inner_query.annotations[alias]
+                # Make sure the annotation_select wont use cached results.
+                inner_query.set_annotation_mask(inner_query.annotation_select_mask)
+            if inner_query.select == [] and not inner_query.default_cols and not inner_query.annotation_select_mask:
+                # In case of Model.objects[0:3].count(), there would be no
+                # field selected in the inner query, yet we must use a subquery.
+                # So, make sure at least one field is selected.
+                inner_query.select = [self.model._meta.pk.get_col(inner_query.get_initial_alias())]
             try:
                 outer_query.add_subquery(inner_query, using)
             except EmptyResultSet:
