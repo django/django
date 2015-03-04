@@ -5,7 +5,7 @@ import uuid
 from copy import deepcopy
 
 from django.core.exceptions import FieldError
-from django.db import DatabaseError, connection, transaction
+from django.db import DatabaseError, connection, models, transaction
 from django.db.models import TimeField, UUIDField
 from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
@@ -30,15 +30,15 @@ class BasicExpressionsTests(TestCase):
     def setUpTestData(cls):
         Company.objects.create(
             name="Example Inc.", num_employees=2300, num_chairs=5,
-            ceo=Employee.objects.create(firstname="Joe", lastname="Smith")
+            ceo=Employee.objects.create(firstname="Joe", lastname="Smith", salary=10)
         )
         Company.objects.create(
             name="Foobar Ltd.", num_employees=3, num_chairs=4,
-            ceo=Employee.objects.create(firstname="Frank", lastname="Meyer")
+            ceo=Employee.objects.create(firstname="Frank", lastname="Meyer", salary=20)
         )
         Company.objects.create(
             name="Test GmbH", num_employees=32, num_chairs=1,
-            ceo=Employee.objects.create(firstname="Max", lastname="Mustermann")
+            ceo=Employee.objects.create(firstname="Max", lastname="Mustermann", salary=30)
         )
 
     def setUp(self):
@@ -47,6 +47,15 @@ class BasicExpressionsTests(TestCase):
         ).order_by(
             "name", "num_employees", "num_chairs"
         )
+
+    def test_annotate_values_aggregate(self):
+        companies = Company.objects.annotate(
+            salaries=F('ceo__salary'),
+        ).values('num_employees', 'salaries').aggregate(
+            result=Sum(F('salaries') + F('num_employees'),
+            output_field=models.IntegerField()),
+        )
+        self.assertEqual(companies['result'], 2395)
 
     def test_filter_inter_attribute(self):
         # We can filter on attribute relationships on same model obj, e.g.

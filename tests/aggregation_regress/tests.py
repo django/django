@@ -7,7 +7,9 @@ from operator import attrgetter
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
-from django.db.models import F, Q, Avg, Count, Max, StdDev, Sum, Variance
+from django.db.models import (
+    F, Q, Avg, Count, Max, StdDev, Sum, Value, Variance,
+)
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
@@ -1231,6 +1233,14 @@ class AggregationTests(TestCase):
             publisher_awards=Sum('publisher__num_awards')
         )
         self.assertEqual(qs['publisher_awards'], 30)
+
+    def test_annotate_distinct_aggregate(self):
+        # There are three books with rating of 4.0 and two of the books have
+        # the same price. Hence, the distinct removes one rating of 4.0
+        # from the results.
+        vals1 = Book.objects.values('rating', 'price').distinct().aggregate(result=Sum('rating'))
+        vals2 = Book.objects.aggregate(result=Sum('rating') - Value(4.0))
+        self.assertEqual(vals1, vals2)
 
 
 class JoinPromotionTests(TestCase):
