@@ -195,6 +195,7 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
             data = self.to_python(data)
             if hasattr(self, '_coerce'):
                 data = self._coerce(data)
+                initial_value = self._coerce(initial_value)
         except ValidationError:
             return True
         data_value = data if data is not None else ''
