@@ -1,0 +1,7 @@
+===========================
+Django 1.6.11 release notes
+===========================
+
+*March 18, 2015*
+
+Django 1.6.11 fixes two security issues in 1.6.10.
