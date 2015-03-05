@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import os
 import re
 import sys
 import types
@@ -10,7 +9,7 @@ from django.core.urlresolvers import Resolver404, resolve
 from django.http import (
     HttpRequest, HttpResponse, HttpResponseNotFound, build_request_repr,
 )
-from django.template import Context, Engine, TemplateDoesNotExist
+from django.template import Context, Engine, TemplateDoesNotExist, engines
 from django.template.defaultfilters import force_escape, pprint
 from django.utils import lru_cache, six, timezone
 from django.utils.datastructures import MultiValueDict
@@ -266,61 +265,36 @@ class ExceptionReporter(object):
 
         self.template_info = getattr(self.exc_value, 'template_debug', None)
         self.template_does_not_exist = False
-        self.loader_debug_info = None
+        self.postmortem = None
 
         # Handle deprecated string exceptions
         if isinstance(self.exc_type, six.string_types):
             self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
             self.exc_type = type(self.exc_value)
 
-    def format_path_status(self, path):
-        if not os.path.exists(path):
-            return "File does not exist"
-        return "File exists"
-
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
-        try:
-            default_template_engine = Engine.get_default()
-        except Exception:
-            # Since the debug view must never crash, catch all exceptions.
-            # If Django can't find a default template engine, get_default()
-            # raises ImproperlyConfigured. If some template engines fail to
-            # load, any exception may be raised.
-            default_template_engine = None
-
-        # TODO: add support for multiple template engines (#24120).
-        # TemplateDoesNotExist should carry all the information.
-        # Replaying the search process isn't a good design.
         if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
-            if default_template_engine is None:
-                template_loaders = []
-            else:
-                self.template_does_not_exist = True
-                self.loader_debug_info = []
-                # If Django fails in get_template_loaders, provide an empty list
-                # for the following loop to not fail.
-                try:
-                    template_loaders = default_template_engine.template_loaders
-                except Exception:
-                    template_loaders = []
+            self.template_does_not_exist = True
+            postmortem = []
 
-            for loader in template_loaders:
-                try:
-                    source_list_func = loader.get_template_sources
-                    # NOTE: This assumes exc_value is the name of the template that
-                    # the loader attempted to load.
-                    template_list = [{
-                        'name': t,
-                        'status': self.format_path_status(t),
-                    } for t in source_list_func(str(self.exc_value))]
-                except AttributeError:
-                    template_list = []
-                loader_name = loader.__module__ + '.' + loader.__class__.__name__
-                self.loader_debug_info.append({
-                    'loader': loader_name,
-                    'templates': template_list,
-                })
+            # TODO: add support for multiple template engines (#24120).
+            # TemplateDoesNotExist should carry all the information, including
+            # the backend, rather than looping through engines.all.
+            for engine in engines.all():
+                if hasattr(engine, 'engine'):
+                    e = engine.engine
+                else:
+                    e = engine
+
+                postmortem.append(dict(
+                    engine=engine,
+                    tried=[
+                        entry for entry in self.exc_value.tried if
+                        entry[0].loader.engine == e
+                    ],
+                ))
+            self.postmortem = postmortem
 
         frames = self.get_traceback_frames()
         for i, frame in enumerate(frames):
@@ -363,7 +337,7 @@ class ExceptionReporter(object):
             'sys_path': sys.path,
             'template_info': self.template_info,
             'template_does_not_exist': self.template_does_not_exist,
-            'loader_debug_info': self.loader_debug_info,
+            'postmortem': self.postmortem,
         }
         # Check whether exception info is available
         if self.exc_type:
@@ -634,7 +608,8 @@ TECHNICAL_500_TEMPLATE = ("""
     #summary h2 { font-weight: normal; color: #666; }
     #explanation { background:#eee; }
     #template, #template-not-exist { background:#f6f6f6; }
-    #template-not-exist ul { margin: 0 0 0 20px; }
+    #template-not-exist ul { margin: 0 0 10px 20px; }
+    #template-not-exist .postmortem-section { margin-bottom: 3px; }
     #unicode-hint { background:#eee; }
     #traceback { background:#eee; }
     #requestinfo { background:#f6f6f6; padding-left:120px; }
@@ -646,6 +621,7 @@ TECHNICAL_500_TEMPLATE = ("""
     h2 span.commands { font-size:.7em;}
     span.commands a:link {color:#5E5694;}
     pre.exception_value { font-family: sans-serif; color: #666; font-size: 1.5em; margin: 10px 0 10px 0; }
+    .append-bottom { margin-bottom: 10px; }
   </style>
   {% if not is_email %}
   <script type="text/javascript">
@@ -772,19 +748,23 @@ TECHNICAL_500_TEMPLATE = ("""
 {% if template_does_not_exist %}
 <div id="template-not-exist">
     <h2>Template-loader postmortem</h2>
-    {% if loader_debug_info %}
-        <p>Django tried loading these templates, in this order:</p>
-        <ul>
-        {% for loader in loader_debug_info %}
-            <li>Using loader <code>{{ loader.loader }}</code>:
-                <ul>
-                {% for t in loader.templates %}<li><code>{{ t.name }}</code> ({{ t.status }})</li>{% endfor %}
-                </ul>
-            </li>
+    {% if postmortem %}
+        <p class="append-bottom">Django tried loading these templates, in this order:</p>
+        {% for entry in postmortem %}
+            <p class="postmortem-section">Using engine <code>{{ entry.engine.name }}</code>:</p>
+            <ul>
+                {% if entry.tried %}
+                    {% for attempt in entry.tried %}
+                        <li><code>{{ attempt.0.loader_name }}</code>: {{ attempt.0.name }} ({{ attempt.1 }})</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <li>This engine did not provide a list of tried templates.</li>
+                {% endif %}
+            </ul>
         {% endfor %}
-        </ul>
     {% else %}
-        <p>Django couldn't find any templates because your <code>'loaders'</code> option is empty!</p>
+        <p>No templates were found because your 'TEMPLATES' setting is not configured.</p>
     {% endif %}
 </div>
 {% endif %}
@@ -907,12 +887,14 @@ Installed Applications:
 Installed Middleware:
 {{ settings.MIDDLEWARE_CLASSES|pprint }}
 
-{% if template_does_not_exist %}Template Loader Error:
-{% if loader_debug_info %}Django tried loading these templates, in this order:
-{% for loader in loader_debug_info %}Using loader {{ loader.loader }}:
-{% for t in loader.templates %}{{ t.name }} ({{ t.status }})
-{% endfor %}{% endfor %}
-{% else %}Django couldn't find any templates because your 'loaders' option is empty!
+{% if template_does_not_exist %}Template loader postmortem
+{% if postmortem %}Django tried loading these templates, in this order:
+{% for entry in postmortem %}
+Using engine {{ entry.engine.name }}:
+{% if entry.tried %}{% for attempt in entry.tried %}    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
+{% endfor %}{% else %}    This engine did not provide a list of tried templates.
+{% endif %}{% endfor %}
+{% else %}No templates were found because your 'TEMPLATES' setting is not configured.
 {% endif %}
 {% endif %}{% if template_info %}
 Template error:
@@ -1098,12 +1080,14 @@ Installed Applications:
 {{ settings.INSTALLED_APPS|pprint }}
 Installed Middleware:
 {{ settings.MIDDLEWARE_CLASSES|pprint }}
-{% if template_does_not_exist %}Template loader Error:
-{% if loader_debug_info %}Django tried loading these templates, in this order:
-{% for loader in loader_debug_info %}Using loader {{ loader.loader }}:
-{% for t in loader.templates %}{{ t.name }} ({{ t.status }})
-{% endfor %}{% endfor %}
-{% else %}Django couldn't find any templates because your 'loaders' option is empty!
+{% if template_does_not_exist %}Template loader postmortem
+{% if postmortem %}Django tried loading these templates, in this order:
+{% for entry in postmortem %}
+Using engine {{ entry.engine.name }}:
+{% if entry.tried %}{% for attempt in entry.tried %}    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
+{% endfor %}{% else %}    This engine did not provide a list of tried templates.
+{% endif %}{% endfor %}
+{% else %}No templates were found because your 'TEMPLATES' setting is not configured.
 {% endif %}
 {% endif %}{% if template_info %}
 Template error:
