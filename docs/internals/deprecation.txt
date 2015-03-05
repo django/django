@@ -187,6 +187,9 @@ details on these changes.
   from ``allow_migrate(self, db, model)`` to
   ``allow_migrate(self, db, app_label, model_name=None, **hints)``.
 
+* Support for the syntax of ``{% cycle %}`` that uses comma-separated arguments
+  will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
