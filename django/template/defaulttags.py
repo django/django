@@ -654,6 +654,10 @@ def cycle(parser, token):
         raise TemplateSyntaxError("'cycle' tag requires at least two arguments")
 
     if ',' in args[1]:
+        warnings.warn(
+            "The old {% cycle %} syntax with comma-separated arguments is deprecated.",
+            RemovedInDjango20Warning,
+        )
         # Backwards compatibility: {% cycle a,b %} or {% cycle a,b as foo %}
         # case.
         args[1:2] = ['"%s"' % arg for arg in args[1].split(",")]
