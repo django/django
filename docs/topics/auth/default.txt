@@ -352,8 +352,8 @@ If you have an authenticated user you want to attach to the current session
 
 .. admonition:: Calling ``authenticate()`` first
 
-    When you're manually logging a user in, you *must* call
-    :func:`~django.contrib.auth.authenticate()` before you call
+    When you're manually logging a user in, you *must* successfully authenticate
+    the user with :func:`~django.contrib.auth.authenticate()` before you call
     :func:`~django.contrib.auth.login()`.
     :func:`~django.contrib.auth.authenticate()`
     sets an attribute on the :class:`~django.contrib.auth.models.User` noting
