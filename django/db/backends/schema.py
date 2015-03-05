@@ -675,9 +675,9 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Does it have a foreign key?
-        if new_field.rel and \
-           (fks_dropped or (old_field.rel and not old_field.db_constraint)) and \
-           new_field.db_constraint:
+        if (new_field.rel and
+                (fks_dropped or not old_field.rel or not old_field.db_constraint) and
+                new_field.db_constraint):
             self.execute(self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s"))
         # Rebuild FKs that pointed to us if we previously had to drop them
         if old_field.primary_key and new_field.primary_key and old_type != new_type:

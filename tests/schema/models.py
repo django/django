@@ -87,6 +87,15 @@ class BookWithM2M(models.Model):
         apps = new_apps
 
 
+class BookWithoutFK(models.Model):
+    author = models.IntegerField()
+    title = models.CharField(max_length=100, db_index=True)
+    pub_date = models.DateTimeField()
+
+    class Meta:
+        apps = new_apps
+
+
 class TagThrough(models.Model):
     book = models.ForeignKey("schema.BookWithM2MThrough")
     tag = models.ForeignKey("schema.TagM2MTest")
