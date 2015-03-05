@@ -667,10 +667,19 @@ class TestInlinePermissions(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF="admin_inlines.urls")
-class SeleniumFirefoxTests(TestDataMixin, AdminSeleniumWebDriverTestCase):
+class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_inlines'] + AdminSeleniumWebDriverTestCase.available_apps
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    def setUp(self):
+        # password = "secret"
+        User.objects.create(
+            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
+            is_staff=True, last_login=datetime.datetime(2007, 5, 30, 13, 20, 10),
+            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
 
     def test_add_stackeds(self):
         """

@@ -674,8 +674,7 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_changelist'] + AdminSeleniumWebDriverTestCase.available_apps
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
-    @classmethod
-    def setUpTestData(cls):
+    def setUp(self):
         # password = "secret"
         User.objects.create(
             pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
