@@ -280,6 +280,24 @@ class NonAggregateAnnotationTestCase(TestCase):
         book = Book.objects.annotate(no_value=Value(None, output_field=IntegerField())).first()
         self.assertIsNone(book.no_value)
 
+    def test_order_by_annotation(self):
+        authors = Author.objects.annotate(other_age=F('age')).order_by('other_age')
+        self.assertQuerysetEqual(
+            authors, [
+                25, 29, 29, 34, 35, 37, 45, 46, 57,
+            ],
+            lambda a: a.other_age
+        )
+
+    def test_order_by_aggregate(self):
+        authors = Author.objects.values('age').annotate(age_count=Count('age')).order_by('age_count', 'age')
+        self.assertQuerysetEqual(
+            authors, [
+                (25, 1), (34, 1), (35, 1), (37, 1), (45, 1), (46, 1), (57, 1), (29, 2),
+            ],
+            lambda a: (a['age'], a['age_count'])
+        )
+
     def test_column_field_ordering(self):
         """
         Test that columns are aligned in the correct order for
