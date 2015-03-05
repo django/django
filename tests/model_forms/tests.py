@@ -2289,13 +2289,15 @@ class OtherModelFormTests(TestCase):
                 model = PublicationDefaults
                 fields = '__all__'
 
+        self.maxDiff = 2000
         form = PublicationDefaultsForm()
+        today_str = str(datetime.date.today())
         self.assertHTMLEqual(
             form.as_p(),
             """<p><label for="id_title">Title:</label> <input id="id_title" maxlength="30" name="title" type="text" /></p>
                <p><label for="id_date_published">Date published:</label>
-                    <input id="id_date_published" name="date_published" type="text" value="2015-03-04" />
-                    <input id="initial-id_date_published" name="initial-date_published" type="hidden" value="2015-03-04" /></p>
+                    <input id="id_date_published" name="date_published" type="text" value="{0}" />
+                    <input id="initial-id_date_published" name="initial-date_published" type="hidden" value="{0}" /></p>
                <p><label for="id_mode">Mode:</label> <select id="id_mode" name="mode">
                     <option value="di" selected="selected">direct</option>
                     <option value="de">delayed</option></select>
@@ -2304,12 +2306,13 @@ class OtherModelFormTests(TestCase):
                     <option value="1">Games</option>
                     <option value="2">Comics</option>
                     <option value="3" selected="selected">Novel</option></select>
-                    <input id="initial-id_category" name="initial-category" type="hidden" value="3" />"""
+                    <input id="initial-id_category" name="initial-category" type="hidden" value="3" />
+            """.format(today_str)
         )
         empty_data = {
             'title': '',
-            'date_published': '2015-03-04',
-            'initial-date_published': '2015-03-04',
+            'date_published': today_str,
+            'initial-date_published': today_str,
             'mode': 'di',
             'initial-mode': 'di',
             'category': '3',
