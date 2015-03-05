@@ -153,7 +153,7 @@ class DebugViewTests(TestCase):
                 'DIRS': [tempdir],
             }]):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
-            self.assertContains(response, "%s (File does not exist)" % template_path, status_code=500, count=1)
+            self.assertContains(response, "%s (Source does not exist)" % template_path, status_code=500, count=2)
 
     def test_no_template_source_loaders(self):
         """
