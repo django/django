@@ -262,7 +262,7 @@ class FileSystemLoaderTests(SimpleTestCase):
                     self.engine.get_template(tmpfile.name)
 
     def test_notafile_error(self):
-        with self.assertRaisesMessage(IOError, 'Is a directory'):
+        with self.assertRaises(IOError):
             self.engine.get_template('first')
 
 
