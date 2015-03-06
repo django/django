@@ -1371,3 +1371,35 @@ class SchemaTests(TransactionTestCase):
             )
             if connection.features.can_introspect_default:
                 self.assertIsNone(field.default)
+
+    def test_remove_last_field(self):
+        class TestModel(Model):
+            test_field = IntegerField(primary_key=True)
+
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
+
+        self.local_models = [TestModel]
+    
+        # Create model with schema editor
+        with connection.schema_editor() as editor:
+            editor.create_model(TestModel)
+        
+        test_field = TestModel._meta.get_field("test_field")
+        
+        # Verify columns: connection.cursor().introspection.get_table_description() (see get_indexes())
+        # Ensure the table is there and has the right index
+        self.assertIn(
+            "test_field",
+            self.get_indexes(TestModel._meta.db_table),
+        )
+        # Remove field with schema editor
+        with connection.schema_editor() as editor:
+            editor.remove_field(TestModel, test_field)
+        
+        # Verify columns: connection.cursor().introspection.get_table_description() (see get_indexes())
+        self.assertNotIn(
+            "test_field",
+            self.get_indexes(TestModel._meta.db_table),
+        )
