@@ -1388,7 +1388,6 @@ class SchemaTests(TransactionTestCase):
         
         test_field = TestModel._meta.get_field("test_field")
         
-        # Verify columns: connection.cursor().introspection.get_table_description() (see get_indexes())
         # Ensure the table is there and has the right index
         self.assertIn(
             "test_field",
@@ -1398,7 +1397,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.remove_field(TestModel, test_field)
         
-        # Verify columns: connection.cursor().introspection.get_table_description() (see get_indexes())
+        # Verify columns
         self.assertNotIn(
             "test_field",
             self.get_indexes(TestModel._meta.db_table),
