@@ -1420,13 +1420,13 @@ class SchemaTests(TransactionTestCase):
                 apps = new_apps
 
         self.local_models = [TestModel]
-    
+
         # Create model with schema editor
         with connection.schema_editor() as editor:
             editor.create_model(TestModel)
-        
+
         test_field = TestModel._meta.get_field("test_field")
-        
+
         # Ensure the table is there and has the right index
         self.assertIn(
             "test_field",
@@ -1435,7 +1435,7 @@ class SchemaTests(TransactionTestCase):
         # Remove field with schema editor
         with connection.schema_editor() as editor:
             editor.remove_field(TestModel, test_field)
-        
+
         # Verify columns
         self.assertNotIn(
             "test_field",
