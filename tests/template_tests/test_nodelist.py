@@ -51,6 +51,5 @@ class ErrorIndexTest(TestCase):
             try:
                 template.render(context)
             except (RuntimeError, TypeError) as e:
-                error_source_index = e.django_template_source[1]
-                self.assertEqual(error_source_index,
-                                 expected_error_source_index)
+                debug = e.template_debug
+                self.assertEqual((debug['start'], debug['end']), expected_error_source_index)

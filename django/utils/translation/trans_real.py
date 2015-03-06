@@ -556,7 +556,7 @@ def templatize(src, origin=None):
             message = trim_whitespace(message)
         return message
 
-    for t in Lexer(src, origin).tokenize():
+    for t in Lexer(src).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
                 content = ''.join(comment)

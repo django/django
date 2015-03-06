@@ -209,19 +209,10 @@ class ForNode(Node):
                         context.update(unpacked_vars)
                 else:
                     context[self.loopvars[0]] = item
-                # In debug mode provide the source of the node which raised
-                # the exception
-                if context.template.engine.debug:
-                    for node in self.nodelist_loop:
-                        try:
-                            nodelist.append(node.render(context))
-                        except Exception as e:
-                            if not hasattr(e, 'django_template_source'):
-                                e.django_template_source = node.source
-                            raise
-                else:
-                    for node in self.nodelist_loop:
-                        nodelist.append(node.render(context))
+
+                for node in self.nodelist_loop:
+                    nodelist.append(node.render_annotated(context))
+
                 if pop_context:
                     # The loop variables were pushed on to the context so pop them
                     # off again. This is necessary because the tag lets the length

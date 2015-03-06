@@ -6,7 +6,7 @@ import sys
 from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import (
-    Context, Template, TemplateSyntaxError, engines, loader,
+    Context, Engine, Template, TemplateSyntaxError, engines, loader,
 )
 from django.test import SimpleTestCase, override_settings
 
@@ -48,30 +48,60 @@ class TemplateTests(SimpleTestCase):
             self.assertGreater(depth, 5,
                 "The traceback context was lost when reraising the traceback. See #19827")
 
-    @override_settings(DEBUG=True)
     def test_no_wrapped_exception(self):
         """
         # 16770 -- The template system doesn't wrap exceptions, but annotates
         them.
         """
+        engine = Engine(debug=True)
         c = Context({"coconuts": lambda: 42 / 0})
-        t = Template("{{ coconuts }}")
-        with self.assertRaises(ZeroDivisionError) as cm:
+        t = engine.from_string("{{ coconuts }}")
+
+        with self.assertRaises(ZeroDivisionError) as e:
             t.render(c)
 
-        self.assertEqual(cm.exception.django_template_source[1], (0, 14))
+        debug = e.exception.template_debug
+        self.assertEqual(debug['start'], 0)
+        self.assertEqual(debug['end'], 14)
 
     def test_invalid_block_suggestion(self):
         """
         #7876 -- Error messages should include the unexpected block name.
         """
+        engine = Engine()
+
         with self.assertRaises(TemplateSyntaxError) as e:
-            Template("{% if 1 %}lala{% endblock %}{% endif %}")
+            engine.from_string("{% if 1 %}lala{% endblock %}{% endif %}")
 
         self.assertEqual(
             e.exception.args[0],
             "Invalid block tag: 'endblock', expected 'elif', 'else' or 'endif'",
         )
+
+    def test_compile_filter_expression_error(self):
+        """
+        19819 -- Make sure the correct token is highlighted for
+        FilterExpression errors.
+        """
+        engine = Engine(debug=True)
+        msg = "Could not parse the remainder: '@bar' from 'foo@bar'"
+
+        with self.assertRaisesMessage(TemplateSyntaxError, msg) as e:
+            engine.from_string("{% if 1 %}{{ foo@bar }}{% endif %}")
+
+        debug = e.exception.template_debug
+        self.assertEqual((debug['start'], debug['end']), (10, 23))
+        self.assertEqual((debug['during']), '{{ foo@bar }}')
+
+    def test_compile_tag_error(self):
+        """
+        Errors raised while compiling nodes should include the token
+        information.
+        """
+        engine = Engine(debug=True)
+        with self.assertRaises(RuntimeError) as e:
+            engine.from_string("{% load bad_tag %}{% badtag %}")
+        self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
 
     def test_super_errors(self):
         """

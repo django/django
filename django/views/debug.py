@@ -15,7 +15,6 @@ from django.template.defaultfilters import force_escape, pprint
 from django.utils import lru_cache, six, timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, smart_text
-from django.utils.html import escape
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
@@ -265,7 +264,7 @@ class ExceptionReporter(object):
         self.tb = tb
         self.is_email = is_email
 
-        self.template_info = None
+        self.template_info = getattr(self.exc_value, 'template_debug', None)
         self.template_does_not_exist = False
         self.loader_debug_info = None
 
@@ -322,12 +321,6 @@ class ExceptionReporter(object):
                     'loader': loader_name,
                     'templates': template_list,
                 })
-
-        # TODO: add support for multiple template engines (#24119).
-        if (default_template_engine is not None
-                and default_template_engine.debug
-                and hasattr(self.exc_value, 'django_template_source')):
-            self.get_template_exception_info()
 
         frames = self.get_traceback_frames()
         for i, frame in enumerate(frames):
@@ -392,46 +385,6 @@ class ExceptionReporter(object):
         t = DEBUG_ENGINE.from_string(TECHNICAL_500_TEXT_TEMPLATE)
         c = Context(self.get_traceback_data(), autoescape=False, use_l10n=False)
         return t.render(c)
-
-    def get_template_exception_info(self):
-        origin, (start, end) = self.exc_value.django_template_source
-        template_source = origin.reload()
-        context_lines = 10
-        line = 0
-        upto = 0
-        source_lines = []
-        before = during = after = ""
-        for num, next in enumerate(linebreak_iter(template_source)):
-            if start >= upto and end <= next:
-                line = num
-                before = escape(template_source[upto:start])
-                during = escape(template_source[start:end])
-                after = escape(template_source[end:next])
-            source_lines.append((num, escape(template_source[upto:next])))
-            upto = next
-        total = len(source_lines)
-
-        top = max(1, line - context_lines)
-        bottom = min(total, line + 1 + context_lines)
-
-        # In some rare cases, exc_value.args might be empty.
-        try:
-            message = self.exc_value.args[0]
-        except IndexError:
-            message = '(Could not get exception message)'
-
-        self.template_info = {
-            'message': message,
-            'source_lines': source_lines[top:bottom],
-            'before': before,
-            'during': during,
-            'after': after,
-            'top': top,
-            'bottom': bottom,
-            'total': total,
-            'line': line,
-            'name': origin.name,
-        }
 
     def _get_lines_from_file(self, filename, lineno, context_lines, loader=None, module_name=None):
         """

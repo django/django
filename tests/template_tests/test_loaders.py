@@ -64,24 +64,6 @@ class CachedLoaderTests(SimpleTestCase):
             "Cached loader failed to cache the TemplateDoesNotExist exception",
         )
 
-    def test_debug_nodelist_name(self):
-        template_name = 'index.html'
-        engine = Engine(dirs=[TEMPLATE_DIR], debug=True)
-
-        template = engine.get_template(template_name)
-        name = template.nodelist[0].source[0].name
-        self.assertTrue(
-            name.endswith(template_name),
-            'Template loaded through cached loader has incorrect name for debug page: %s' % template_name,
-        )
-
-        template = engine.get_template(template_name)
-        name = template.nodelist[0].source[0].name
-        self.assertTrue(
-            name.endswith(template_name),
-            'Cached template loaded through cached loader has incorrect name for debug page: %s' % template_name,
-        )
-
 
 @unittest.skipUnless(pkg_resources, 'setuptools is not installed')
 class EggLoaderTests(SimpleTestCase):

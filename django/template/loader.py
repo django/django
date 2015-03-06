@@ -16,9 +16,6 @@ class LoaderOrigin(Origin):
         super(LoaderOrigin, self).__init__(display_name)
         self.loader, self.loadname, self.dirs = loader, name, dirs
 
-    def reload(self):
-        return self.loader(self.loadname, self.dirs)[0]
-
 
 def get_template(template_name, dirs=_dirs_undefined, using=None):
     """

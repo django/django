@@ -5,11 +5,10 @@ from __future__ import unicode_literals
 
 from unittest import TestCase
 
-from django.template import Library, Template, TemplateSyntaxError
+from django.template import Library, TemplateSyntaxError
 from django.template.base import (
     TOKEN_BLOCK, FilterExpression, Parser, Token, Variable,
 )
-from django.test import override_settings
 from django.utils import six
 
 
@@ -72,14 +71,6 @@ class ParserTests(TestCase):
         # Variables should raise on non string type
         with six.assertRaisesRegex(self, TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):
             Variable({})
-
-    @override_settings(DEBUG=True)
-    def test_compile_filter_error(self):
-        # regression test for #19819
-        msg = "Could not parse the remainder: '@bar' from 'foo@bar'"
-        with six.assertRaisesRegex(self, TemplateSyntaxError, msg) as cm:
-            Template("{% if 1 %}{{ foo@bar }}{% endif %}")
-        self.assertEqual(cm.exception.django_template_source[1], (10, 23))
 
     def test_filter_args_count(self):
         p = Parser("")

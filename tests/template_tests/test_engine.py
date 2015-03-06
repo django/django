@@ -52,22 +52,10 @@ class DeprecatedRenderToStringTest(SimpleTestCase):
 
 class LoaderTests(SimpleTestCase):
 
-    def test_debug_nodelist_name(self):
-        engine = Engine(dirs=[TEMPLATE_DIR], debug=True)
-        template_name = 'index.html'
-        template = engine.get_template(template_name)
-        name = template.nodelist[0].source[0].name
-        self.assertTrue(name.endswith(template_name))
-
     def test_origin(self):
         engine = Engine(dirs=[TEMPLATE_DIR], debug=True)
         template = engine.get_template('index.html')
         self.assertEqual(template.origin.loadname, 'index.html')
-
-    def test_origin_debug_false(self):
-        engine = Engine(dirs=[TEMPLATE_DIR], debug=False)
-        template = engine.get_template('index.html')
-        self.assertEqual(template.origin, None)
 
     def test_loader_priority(self):
         """
