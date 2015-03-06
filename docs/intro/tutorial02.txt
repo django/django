@@ -530,11 +530,7 @@ template directory in the source code of Django itself
 
     .. code-block:: console
 
-        $ python -c "
-        import sys
-        sys.path = sys.path[1:]
-        import django
-        print(django.__path__)"
+        $ python -c "import django; print(django.__path__)"
 
 Then, just edit the file and replace
 ``{{ site_header|default:_('Django administration') }}`` (including the curly

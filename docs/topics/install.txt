@@ -142,7 +142,7 @@ following at your shell prompt (not the interactive Python prompt):
 
 .. code-block:: console
 
-    $ python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"
+    $ python -c "import django; print(django.__path__)"
 
 
 .. _install-django-code:
