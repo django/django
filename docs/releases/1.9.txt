@@ -195,6 +195,20 @@ Database backend API
   doesn't implement this. You may want to review the implementation on the
   backends that Django includes for reference (:ticket:`24245`).
 
+:attr:`AbstractUser.username <django.contrib.auth.models.User.username>` max_length increased to 254
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A migration for :attr:`django.contrib.auth.models.User.username` is included.
+If you have a custom user model inheriting from ``AbstractUser``, you will need
+to generate and apply a database migration for your user model.
+
+To preserve the 30 character limit for usernames, use a custom form when
+creating a user or changing usernames::
+
+    class MyUserCreationForm(UserCreationForm):
+        username = forms.CharField(max_length=30, help_text='Required. '
+            '30 characters or fewer. Letters, digits and @/./+/-/_ only.')
+
 Default settings that were tuples are now lists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
