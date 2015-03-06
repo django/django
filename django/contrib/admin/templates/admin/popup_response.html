@@ -4,11 +4,11 @@
   <body>
     <script type="text/javascript">
       {% if action == 'change' %}
-        opener.dismissChangeRelatedObjectPopup(window, "{{ value }}", "{{ obj }}", "{{ new_value }}");
+        opener.dismissChangeRelatedObjectPopup(window, "{{ value|escapejs }}", "{{ obj|escapejs }}", "{{ new_value|escapejs }}");
       {% elif action == 'delete' %}
-        opener.dismissDeleteRelatedObjectPopup(window, "{{ value }}");
+        opener.dismissDeleteRelatedObjectPopup(window, "{{ value|escapejs }}");
       {% else %}
-        opener.dismissAddRelatedObjectPopup(window, "{{ value }}", "{{ obj }}");
+        opener.dismissAddRelatedObjectPopup(window, "{{ value|escapejs }}", "{{ obj|escapejs }}");
       {% endif %}
     </script>
   </body>
