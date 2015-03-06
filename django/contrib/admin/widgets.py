@@ -15,7 +15,7 @@ from django.template.loader import render_to_string
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.html import (
-    escape, format_html, format_html_join, smart_urlquote,
+    escape, escapejs, format_html, format_html_join, smart_urlquote,
 )
 from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
@@ -50,7 +50,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
         output.append('SelectFilter.init("id_%s", "%s", %s); });</script>\n'
-            % (name, self.verbose_name.replace('"', '\\"'), int(self.is_stacked)))
+            % (name, escapejs(self.verbose_name), int(self.is_stacked)))
         return mark_safe(''.join(output))
 
 

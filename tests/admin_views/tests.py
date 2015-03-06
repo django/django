@@ -24,6 +24,7 @@ from django.core.checks import Error
 from django.core.files import temp as tempfile
 from django.core.urlresolvers import NoReverseMatch, resolve, reverse
 from django.forms.utils import ErrorList
+from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.test import (
     TestCase, modify_settings, override_settings, skipUnlessDBFeature,
@@ -3489,6 +3490,30 @@ action)</option>
             {'name': 'Troy McClure', 'age': '55', IS_POPUP_VAR: '1'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template_name, 'admin/popup_response.html')
+
+    def test_popup_template_escaping(self):
+        context = {
+            'new_value': 'new_value\\',
+            'obj': 'obj\\',
+            'value': 'value\\',
+        }
+        output = render_to_string('admin/popup_response.html', context)
+        self.assertIn(
+            'opener.dismissAddRelatedObjectPopup(window, "value\\u005C", "obj\\u005C");', output
+        )
+
+        context['action'] = 'change'
+        output = render_to_string('admin/popup_response.html', context)
+        self.assertIn(
+            'opener.dismissChangeRelatedObjectPopup(window, '
+            '"value\\u005C", "obj\\u005C", "new_value\\u005C");', output
+        )
+
+        context['action'] = 'delete'
+        output = render_to_string('admin/popup_response.html', context)
+        self.assertIn(
+            'opener.dismissDeleteRelatedObjectPopup(window, "value\\u005C");', output
+        )
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
