@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+import tempfile
 import warnings
 
 from django.apps import apps
@@ -46,6 +47,8 @@ class DumpDataAssertMixin(object):
                          natural_foreign_keys=False, natural_primary_keys=False,
                          use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = six.StringIO()
+        if filename:
+            filename = os.path.join(tempfile.gettempdir(), filename)
         management.call_command('dumpdata', *args, **{'format': format,
                                                       'stdout': new_io,
                                                       'stderr': new_io,
