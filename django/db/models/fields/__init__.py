@@ -1463,6 +1463,22 @@ class DateTimeField(DateField):
         return super(DateTimeField, self).formfield(**defaults)
 
 
+@DateTimeField.register_lookup
+class DateTimeDateTransform(Transform):
+    lookup_name = 'date'
+
+    @cached_property
+    def output_field(self):
+        return DateField()
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = compiler.compile(self.lhs)
+        tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
+        sql, tz_params = connection.ops.datetime_cast_date_sql(lhs, tzname)
+        lhs_params.extend(tz_params)
+        return sql, lhs_params
+
+
 class DecimalField(Field):
     empty_strings_allowed = False
     default_error_messages = {
