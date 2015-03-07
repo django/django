@@ -9,5 +9,8 @@ Django 1.7.6 fixes several bugs in 1.7.5.
 Bugfixes
 ========
 
+* Fixed crash when coercing ``ManyRelatedManager`` to a string
+  (:ticket:`24352`).
+
 * Fixed a bug that prevented migrations from adding a FK constraint
   for an existing column. (:ticket:`24447`).
