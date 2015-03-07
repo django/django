@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views import generic
 
 from .models import Artist, Author, Book, BookSigning, Page
-from .test_forms import AuthorForm, ContactForm
+from .test_forms import AuthorForm, ContactDeleteForm, ContactForm
 
 
 class CustomTemplateView(generic.TemplateView):
@@ -173,6 +173,14 @@ class SpecializedAuthorDelete(generic.DeleteView):
     template_name = 'generic_views/confirm_delete.html'
     context_object_name = 'thingy'
     success_url = reverse_lazy('authors_list')
+
+
+class AuthorDeleteFormView(generic.DeleteView):
+    model = Author
+    form_class = ConfirmDeleteForm
+
+    def get_success_url(self):
+        return reverse('authors_list')
 
 
 class BookConfig(object):
