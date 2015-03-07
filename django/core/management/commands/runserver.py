@@ -7,6 +7,7 @@ import socket
 import sys
 from datetime import datetime
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import get_internal_wsgi_application, run
@@ -14,6 +15,7 @@ from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.executor import MigrationExecutor
 from django.utils import autoreload, six
 from django.utils.encoding import force_text, get_system_encoding
+from django.utils.translation import ugettext as _
 
 naiveip_re = re.compile(r"""^(?:
 (?P<addr>
@@ -29,6 +31,7 @@ class Command(BaseCommand):
 
     # Validation is called explicitly each time the server is reloaded.
     requires_system_checks = False
+    leave_locale_alone = True
 
     def add_arguments(self, parser):
         parser.add_argument('addrport', nargs='?',
@@ -55,14 +58,12 @@ class Command(BaseCommand):
         return get_internal_wsgi_application()
 
     def handle(self, *args, **options):
-        from django.conf import settings
-
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
-            raise CommandError('You must set settings.ALLOWED_HOSTS if DEBUG is False.')
+            raise CommandError(_('You must set settings.ALLOWED_HOSTS if DEBUG is False.'))
 
         self.use_ipv6 = options.get('use_ipv6')
         if self.use_ipv6 and not socket.has_ipv6:
-            raise CommandError('Your Python does not support IPv6.')
+            raise CommandError(_('Your Python does not support IPv6.'))
         self._raw_ipv6 = False
         if not options.get('addrport'):
             self.addr = ''
@@ -70,18 +71,18 @@ class Command(BaseCommand):
         else:
             m = re.match(naiveip_re, options['addrport'])
             if m is None:
-                raise CommandError('"%s" is not a valid port number '
-                                   'or address:port pair.' % options['addrport'])
+                raise CommandError(_('"%s" is not a valid port number '
+                                   'or address:port pair.') % options['addrport'])
             self.addr, _ipv4, _ipv6, _fqdn, self.port = m.groups()
             if not self.port.isdigit():
-                raise CommandError("%r is not a valid port number." % self.port)
+                raise CommandError(_("%r is not a valid port number.") % self.port)
             if self.addr:
                 if _ipv6:
                     self.addr = self.addr[1:-1]
                     self.use_ipv6 = True
                     self._raw_ipv6 = True
                 elif self.use_ipv6 and not _fqdn:
-                    raise CommandError('"%s" is not a valid IPv6 address.' % self.addr)
+                    raise CommandError(_('"%s" is not a valid IPv6 address.') % self.addr)
         if not self.addr:
             self.addr = '::1' if self.use_ipv6 else '127.0.0.1'
             self._raw_ipv6 = bool(self.use_ipv6)
@@ -99,14 +100,11 @@ class Command(BaseCommand):
             self.inner_run(None, **options)
 
     def inner_run(self, *args, **options):
-        from django.conf import settings
-        from django.utils import translation
-
         threading = options.get('use_threading')
         shutdown_message = options.get('shutdown_message', '')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
-        self.stdout.write("Performing system checks...\n\n")
+        self.stdout.write(_("Performing system checks...") + "\n\n")
         self.check(display_num_errors=True)
         try:
             self.check_migrations()
@@ -115,23 +113,18 @@ class Command(BaseCommand):
         now = datetime.now().strftime('%B %d, %Y - %X')
         if six.PY2:
             now = now.decode(get_system_encoding())
-        self.stdout.write((
-            "%(started_at)s\n"
+        self.stdout.write(now)
+        self.stdout.write(_(
             "Django version %(version)s, using settings %(settings)r\n"
             "Starting development server at http://%(addr)s:%(port)s/\n"
-            "Quit the server with %(quit_command)s.\n"
+            "Quit the server with %(quit_command)s."
         ) % {
-            "started_at": now,
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
             "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
             "quit_command": quit_command,
         })
-        # django.core.management.base forces the locale to en-us. We should
-        # set it up correctly for the first request (particularly important
-        # in the "--noreload" case).
-        translation.activate(settings.LANGUAGE_CODE)
 
         try:
             handler = self.get_handler(*args, **options)
@@ -140,15 +133,15 @@ class Command(BaseCommand):
         except socket.error as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
-                errno.EACCES: "You don't have permission to access that port.",
-                errno.EADDRINUSE: "That port is already in use.",
-                errno.EADDRNOTAVAIL: "That IP address can't be assigned-to.",
+                errno.EACCES: _("You don't have permission to access that port."),
+                errno.EADDRINUSE: _("That port is already in use."),
+                errno.EADDRNOTAVAIL: _("That IP address can't be assigned-to."),
             }
             try:
                 error_text = ERRORS[e.errno]
             except KeyError:
                 error_text = force_text(e)
-            self.stderr.write("Error: %s" % error_text)
+            self.stderr.write(_("Error: %s") % error_text)
             # Need to use an OS exit because sys.exit doesn't work in a thread
             os._exit(1)
         except KeyboardInterrupt:
@@ -165,9 +158,9 @@ class Command(BaseCommand):
         plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
         if plan:
             self.stdout.write(self.style.NOTICE(
-                "\nYou have unapplied migrations; your app may not work properly until they are applied."
+                "\n" + _("You have unapplied migrations; your app may not work properly until they are applied.")
             ))
-            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
+            self.stdout.write(self.style.NOTICE(_("Run 'python manage.py migrate' to apply them.")))
 
 # Kept for backward compatibility
 BaseRunserverCommand = Command
