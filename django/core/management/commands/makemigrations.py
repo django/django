@@ -9,6 +9,7 @@ from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import (
     InteractiveMigrationQuestioner, MigrationQuestioner,
+    NonInteractiveMigrationQuestioner,
 )
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
@@ -93,11 +94,15 @@ class Command(BaseCommand):
         if self.merge and conflicts:
             return self.handle_merge(loader, conflicts)
 
+        if self.interactive:
+            questioner = InteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run)
+        else:
+            questioner = NonInteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run)
         # Set up autodetector
         autodetector = MigrationAutodetector(
             loader.project_state(),
             ProjectState.from_apps(apps),
-            InteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run),
+            questioner,
         )
 
         # If they want to make an empty migration, make one for each app
