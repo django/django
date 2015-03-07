@@ -56,7 +56,7 @@ options that make it very powerful.
 
 .. admonition:: Model table names
 
-    Where'd the name of the ``Person`` table come from in that example?
+    Where did the name of the ``Person`` table come from in that example?
 
     By default, Django figures out a database table name by joining the
     model's "app label" -- the name you used in ``manage.py startapp`` -- to

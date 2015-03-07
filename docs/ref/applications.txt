@@ -243,7 +243,7 @@ Methods
         In the usual initialization process, the ``ready`` method is only called
         once by Django. But in some corner cases, particularly in tests which
         are fiddling with installed applications, ``ready`` might be called more
-        than once. In that case, either write idempotents methods, or put a flag
+        than once. In that case, either write idempotent methods, or put a flag
         on your ``AppConfig`` classes to prevent re-running code which should
         be executed exactly one time.
 
