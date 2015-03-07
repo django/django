@@ -360,8 +360,12 @@ class TestCollectionFilesOverride(CollectionTestCase):
         # anyway it should be taken to STATIC_ROOT because 'test' app is before
         # 'no_label' app in installed apps
         self.testfile_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'file2.txt')
-        with open(self.testfile_path, 'w+') as f:
-            f.write('duplicate of file2.txt')
+        try:
+            with open(self.testfile_path, 'w+') as f:
+                f.write('duplicate of file2.txt')
+        except IOError:
+            raise unittest.SkipTest("Failed to write required file")
+
         os.utime(self.testfile_path, (self.orig_atime - 1, self.orig_mtime - 1))
         super(TestCollectionFilesOverride, self).setUp()
 
@@ -633,19 +637,6 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
     """
     Tests for the Cache busting storage
     """
-
-    def setUp(self):
-        super(TestCollectionManifestStorage, self).setUp()
-
-        self._clear_filename = os.path.join(TESTFILES_PATH, 'cleared.txt')
-        with open(self._clear_filename, 'w') as f:
-            f.write('to be deleted in one test')
-
-    def tearDown(self):
-        super(TestCollectionManifestStorage, self).tearDown()
-        if os.path.exists(self._clear_filename):
-            os.unlink(self._clear_filename)
-
     def test_manifest_exists(self):
         filename = storage.staticfiles_storage.manifest_name
         path = storage.staticfiles_storage.path(filename)
@@ -664,7 +655,15 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
         self.assertEqual(hashed_files, manifest)
 
     def test_clear_empties_manifest(self):
+        cleared_file_path = os.path.join(TESTFILES_PATH, 'cleared.txt')
+        try:
+            with open(cleared_file_path, 'w') as f:
+                f.write('to be deleted\n')
+        except IOError:
+            raise unittest.SkipTest("Failed to write required file")
+
         cleared_file_name = os.path.join('test', 'cleared.txt')
+
         # collect the additional file
         self.run_collectstatic()
 
@@ -678,7 +677,7 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
         self.assertTrue(os.path.exists(original_path))
 
         # delete the original file form the app, collect with clear
-        os.unlink(self._clear_filename)
+        os.unlink(cleared_file_path)
         self.run_collectstatic(clear=True)
 
         self.assertFileNotFound(original_path)
