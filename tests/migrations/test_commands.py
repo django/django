@@ -531,6 +531,80 @@ class MakeMigrationsTests(MigrationTestBase):
             questioner.input = old_input
         self.assertIn("Created new merge migration", force_text(out.getvalue()))
 
+    def test_makemigrations_non_interactive_not_null_addition(self):
+        """
+        Tests that non-interactive makemigrations fails when a default is missing on a new not-null field.
+        """
+        class SillyModel(models.Model):
+            silly_field = models.BooleanField(default=False)
+            silly_int = models.IntegerField()
+
+            class Meta:
+                app_label = "migrations"
+
+        out = six.StringIO()
+        with self.assertRaises(SystemExit):
+            with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
+                call_command("makemigrations", "migrations", interactive=False, stdout=out)
+
+    def test_makemigrations_non_interactive_not_null_alteration(self):
+        """
+        Tests that non-interactive makemigrations fails when a default is missing on a field changed to not-null.
+        """
+        class Author(models.Model):
+            name = models.CharField(max_length=255)
+            slug = models.SlugField()
+            age = models.IntegerField(default=0)
+
+            class Meta:
+                app_label = "migrations"
+
+        out = six.StringIO()
+        try:
+            with self.temporary_migration_module(module="migrations.test_migrations"):
+                call_command("makemigrations", "migrations", interactive=False, stdout=out)
+        except CommandError:
+            self.fail("Makemigrations failed while running non-interactive questioner.")
+        self.assertIn("Alter field slug on author", force_text(out.getvalue()))
+
+    def test_makemigrations_non_interactive_no_model_rename(self):
+        """
+        Makes sure that makemigrations adds and removes a possible model rename in non-interactive mode.
+        """
+        class RenamedModel(models.Model):
+            silly_field = models.BooleanField(default=False)
+
+            class Meta:
+                app_label = "migrations"
+
+        out = six.StringIO()
+        try:
+            with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
+                call_command("makemigrations", "migrations", interactive=False, stdout=out)
+        except CommandError:
+            self.fail("Makemigrations failed while running non-interactive questioner")
+        self.assertIn("Delete model SillyModel", force_text(out.getvalue()))
+        self.assertIn("Create model RenamedModel", force_text(out.getvalue()))
+
+    def test_makemigrations_non_interactive_no_field_rename(self):
+        """
+        Makes sure that makemigrations adds and removes a possible field rename in non-interactive mode.
+        """
+        class SillyModel(models.Model):
+            silly_rename = models.BooleanField(default=False)
+
+            class Meta:
+                app_label = "migrations"
+
+        out = six.StringIO()
+        try:
+            with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
+                call_command("makemigrations", "migrations", interactive=False, stdout=out)
+        except CommandError:
+            self.fail("Makemigrations failed while running non-interactive questioner")
+        self.assertIn("Remove field silly_field from sillymodel", force_text(out.getvalue()))
+        self.assertIn("Add field silly_rename to sillymodel", force_text(out.getvalue()))
+
     def test_makemigrations_handle_merge(self):
         """
         Makes sure that makemigrations properly merges the conflicting migrations with --noinput.
