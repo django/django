@@ -1182,6 +1182,7 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
         self.assertIsInstance(login, TemplateResponse)
         self.assertEqual(login.status_code, 200)
         self.assertContains(login, 'custom form error')
+        self.assertContains(login, 'path/to/media.css')
 
     def test_custom_admin_site_login_template(self):
         self.client.logout()
