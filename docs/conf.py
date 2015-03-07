@@ -273,7 +273,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('contents', 'django', 'Django Documentation', ['Django Software Foundation'], 1)
+    ('ref/django-admin', 'django-admin', 'Utility script for the Django Web framework', ['Django Software Foundation'], 1),
 ]
 
 
