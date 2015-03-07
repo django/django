@@ -132,7 +132,7 @@ Internationalization
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
-* ...
+* :djadmin:`sendtestemail` lets you send a test email to the recipient specified.
 
 Models
 ^^^^^^
