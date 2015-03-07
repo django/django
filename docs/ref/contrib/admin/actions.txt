@@ -70,7 +70,7 @@ Writing action functions
 ------------------------
 
 First, we'll need to write a function that gets called when the action is
-trigged from the admin. Action functions are just regular functions that take
+triggered from the admin. Action functions are just regular functions that take
 three arguments:
 
 * The current :class:`ModelAdmin`
