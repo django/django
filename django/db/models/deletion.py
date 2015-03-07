@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from itertools import chain
 from operator import attrgetter
 
@@ -280,6 +280,8 @@ class Collector(object):
         # don't support transactions or cannot defer constraint checks until the
         # end of a transaction.
         self.sort()
+        # number of objects deleted for each model label
+        deleted_counter = Counter()
 
         with transaction.atomic(using=self.using, savepoint=False):
             # send pre_delete signals
@@ -291,7 +293,8 @@ class Collector(object):
 
             # fast deletes
             for qs in self.fast_deletes:
-                qs._raw_delete(using=self.using)
+                count = qs._raw_delete(using=self.using)
+                deleted_counter[qs.model._meta.label] += count
 
             # update fields
             for model, instances_for_fieldvalues in six.iteritems(self.field_updates):
@@ -308,7 +311,8 @@ class Collector(object):
             for model, instances in six.iteritems(self.data):
                 query = sql.DeleteQuery(model)
                 pk_list = [obj.pk for obj in instances]
-                query.delete_batch(pk_list, self.using)
+                count = query.delete_batch(pk_list, self.using)
+                deleted_counter[model._meta.label] += count
 
                 if not model._meta.auto_created:
                     for obj in instances:
@@ -324,3 +328,4 @@ class Collector(object):
         for model, instances in six.iteritems(self.data):
             for instance in instances:
                 setattr(instance, model._meta.pk.attname, None)
+        return sum(deleted_counter.values()), dict(deleted_counter)

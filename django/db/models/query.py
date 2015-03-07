@@ -590,10 +590,12 @@ class QuerySet(object):
 
         collector = Collector(using=del_query.db)
         collector.collect(del_query)
-        collector.delete()
+        deleted, _rows_count = collector.delete()
 
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
+        return deleted, _rows_count
+
     delete.alters_data = True
     delete.queryset_only = True
 
@@ -602,7 +604,7 @@ class QuerySet(object):
         Deletes objects found from the given queryset in single direct SQL
         query. No signals are sent, and there is no protection for cascades.
         """
-        sql.DeleteQuery(self.model).delete_qs(self, using)
+        return sql.DeleteQuery(self.model).delete_qs(self, using)
     _raw_delete.alters_data = True
 
     def update(self, **kwargs):

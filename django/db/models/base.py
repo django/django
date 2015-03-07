@@ -833,7 +833,7 @@ class Model(six.with_metaclass(ModelBase)):
 
         collector = Collector(using=using)
         collector.collect([self], keep_parents=keep_parents)
-        collector.delete()
+        return collector.delete()
 
     delete.alters_data = True
 
