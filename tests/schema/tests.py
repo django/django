@@ -546,6 +546,45 @@ class SchemaTests(TransactionTestCase):
             self.fail("No FK constraint for author_id found")
 
     @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_alter_to_fk(self):
+        """
+        #24447 - Tests adding a FK constraint for an existing column
+        """
+        class LocalBook(Model):
+            author = IntegerField()
+            title = CharField(max_length=100, db_index=True)
+            pub_date = DateTimeField()
+
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
+
+        self.local_models = [LocalBook]
+
+        # Create the tables
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(LocalBook)
+        # Ensure no FK constraint exists
+        constraints = self.get_constraints(LocalBook._meta.db_table)
+        for name, details in constraints.items():
+            if details['foreign_key']:
+                self.fail('Found an unexpected FK constraint to %s' % details['columns'])
+        old_field = LocalBook._meta.get_field("author")
+        new_field = ForeignKey(Author)
+        new_field.set_attributes_from_name("author")
+        with connection.schema_editor() as editor:
+            editor.alter_field(LocalBook, old_field, new_field, strict=True)
+        constraints = self.get_constraints(LocalBook._meta.db_table)
+        # Ensure FK constraint exists
+        for name, details in constraints.items():
+            if details['foreign_key'] and details['columns'] == ["author_id"]:
+                self.assertEqual(details['foreign_key'], ('schema_author', 'id'))
+                break
+        else:
+            self.fail("No FK constraint for author_id found")
+
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
     def test_alter_o2o_to_fk(self):
         """
         #24163 - Tests altering of OneToOneField to ForeignKey
