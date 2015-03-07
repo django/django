@@ -146,7 +146,8 @@ Internationalization
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The new :djadmin:`sendtestemail` command lets you send a test email to
+  easily confirm that email sending through Django is working.
 
 Models
 ^^^^^^
