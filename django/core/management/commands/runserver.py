@@ -7,6 +7,7 @@ import socket
 import sys
 from datetime import datetime
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import get_internal_wsgi_application, run
@@ -29,6 +30,7 @@ class Command(BaseCommand):
 
     # Validation is called explicitly each time the server is reloaded.
     requires_system_checks = False
+    leave_locale_alone = True
 
     def add_arguments(self, parser):
         parser.add_argument('addrport', nargs='?',
@@ -99,9 +101,6 @@ class Command(BaseCommand):
             self.inner_run(None, **options)
 
     def inner_run(self, *args, **options):
-        from django.conf import settings
-        from django.utils import translation
-
         threading = options.get('use_threading')
         shutdown_message = options.get('shutdown_message', '')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
@@ -115,23 +114,18 @@ class Command(BaseCommand):
         now = datetime.now().strftime('%B %d, %Y - %X')
         if six.PY2:
             now = now.decode(get_system_encoding())
+        self.stdout.write(now)
         self.stdout.write((
-            "%(started_at)s\n"
             "Django version %(version)s, using settings %(settings)r\n"
             "Starting development server at http://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
-            "started_at": now,
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
             "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
             "quit_command": quit_command,
         })
-        # django.core.management.base forces the locale to en-us. We should
-        # set it up correctly for the first request (particularly important
-        # in the "--noreload" case).
-        translation.activate(settings.LANGUAGE_CODE)
 
         try:
             handler = self.get_handler(*args, **options)
@@ -142,7 +136,7 @@ class Command(BaseCommand):
             ERRORS = {
                 errno.EACCES: "You don't have permission to access that port.",
                 errno.EADDRINUSE: "That port is already in use.",
-                errno.EADDRNOTAVAIL: "That IP address can't be assigned-to.",
+                errno.EADDRNOTAVAIL: "That IP address can't be assigned to.",
             }
             try:
                 error_text = ERRORS[e.errno]
