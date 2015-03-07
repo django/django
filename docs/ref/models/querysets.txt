@@ -2463,6 +2463,27 @@ numbers and even characters.
 
     Generally speaking, you can't mix dates and datetimes.
 
+.. fieldlookup:: date
+
+date
+~~~~
+
+.. versionadded:: 1.9
+
+For datetime fields, casts the value as date. Allows chaining additional field
+lookups. Takes a date value.
+
+Example::
+
+    Entry.objects.filter(pub_date__date=datetime.date(2005, 1, 1))
+    Entry.objects.filter(pub_date__date__gt=datetime.date(2005, 1, 1))
+
+(No equivalent SQL code fragment is included for this lookup because
+implementation of the relevant query varies among different database engines.)
+
+When :setting:`USE_TZ` is ``True``, fields are converted to the current time
+zone before filtering.
+
 .. fieldlookup:: year
 
 year

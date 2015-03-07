@@ -207,6 +207,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn = Database.connect(**conn_params)
         conn.create_function("django_date_extract", 2, _sqlite_date_extract)
         conn.create_function("django_date_trunc", 2, _sqlite_date_trunc)
+        conn.create_function("django_datetime_cast_date", 2, _sqlite_datetime_cast_date)
         conn.create_function("django_datetime_extract", 3, _sqlite_datetime_extract)
         conn.create_function("django_datetime_trunc", 3, _sqlite_datetime_trunc)
         conn.create_function("regexp", 2, _sqlite_regexp)
@@ -354,7 +355,7 @@ def _sqlite_date_trunc(lookup_type, dt):
         return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
 
 
-def _sqlite_datetime_extract(lookup_type, dt, tzname):
+def _sqlite_datetime_parse(dt, tzname):
     if dt is None:
         return None
     try:
@@ -363,6 +364,20 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
         return None
     if tzname is not None:
         dt = timezone.localtime(dt, pytz.timezone(tzname))
+    return dt
+
+
+def _sqlite_datetime_cast_date(dt, tzname):
+    dt = _sqlite_datetime_parse(dt, tzname)
+    if dt is None:
+        return None
+    return dt.date().isoformat()
+
+
+def _sqlite_datetime_extract(lookup_type, dt, tzname):
+    dt = _sqlite_datetime_parse(dt, tzname)
+    if dt is None:
+        return None
     if lookup_type == 'week_day':
         return (dt.isoweekday() % 7) + 1
     else:
@@ -370,12 +385,9 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
 
 
 def _sqlite_datetime_trunc(lookup_type, dt, tzname):
-    try:
-        dt = backend_utils.typecast_timestamp(dt)
-    except (ValueError, TypeError):
+    dt = _sqlite_datetime_parse(dt, tzname)
+    if dt is None:
         return None
-    if tzname is not None:
-        dt = timezone.localtime(dt, pytz.timezone(tzname))
     if lookup_type == 'year':
         return "%i-01-01 00:00:00" % dt.year
     elif lookup_type == 'month':

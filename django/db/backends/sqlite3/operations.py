@@ -68,21 +68,23 @@ class DatabaseOperations(BaseDatabaseOperations):
         # cause a collision with a field name).
         return "django_date_trunc('%s', %s)" % (lookup_type.lower(), field_name)
 
+    def _require_pytz(self):
+        if settings.USE_TZ and pytz is None:
+            raise ImproperlyConfigured("This query requires pytz, but it isn't installed.")
+
+    def datetime_cast_date_sql(self, field_name, tzname):
+        self._require_pytz()
+        return "django_datetime_cast_date(%s, %%s)" % field_name, [tzname]
+
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_extract_sql.
-        if settings.USE_TZ:
-            if pytz is None:
-                raise ImproperlyConfigured("This query requires pytz, "
-                                           "but it isn't installed.")
+        self._require_pytz()
         return "django_datetime_extract('%s', %s, %%s)" % (
             lookup_type.lower(), field_name), [tzname]
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_trunc_sql.
-        if settings.USE_TZ:
-            if pytz is None:
-                raise ImproperlyConfigured("This query requires pytz, "
-                                           "but it isn't installed.")
+        self._require_pytz()
         return "django_datetime_trunc('%s', %s, %%s)" % (
             lookup_type.lower(), field_name), [tzname]
 

@@ -114,6 +114,8 @@ WHEN (new.%(col_name)s IS NULL)
     _tzname_re = re.compile(r'^[\w/:+-]+$')
 
     def _convert_field_to_tz(self, field_name, tzname):
+        if not settings.USE_TZ:
+            return field_name
         if not self._tzname_re.match(tzname):
             raise ValueError("Invalid time zone name: %s" % tzname)
         # Convert from UTC to local time, returning TIMESTAMP WITH TIME ZONE.
@@ -127,20 +129,18 @@ WHEN (new.%(col_name)s IS NULL)
         # on DATE values, even though they actually store the time part.
         return "CAST(%s AS TIMESTAMP)" % result
 
+    def datetime_cast_date_sql(self, field_name, tzname):
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        sql = 'TRUNC(%s)' % field_name
+        return sql, []
+
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        if settings.USE_TZ:
-            field_name = self._convert_field_to_tz(field_name, tzname)
-        if lookup_type == 'week_day':
-            # TO_CHAR(field, 'D') returns an integer from 1-7, where 1=Sunday.
-            sql = "TO_CHAR(%s, 'D')" % field_name
-        else:
-            # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions050.htm
-            sql = "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        sql = self.date_extract_sql(lookup_type, field_name)
         return sql, []
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        if settings.USE_TZ:
-            field_name = self._convert_field_to_tz(field_name, tzname)
+        field_name = self._convert_field_to_tz(field_name, tzname)
         # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
         if lookup_type in ('year', 'month'):
             sql = "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())

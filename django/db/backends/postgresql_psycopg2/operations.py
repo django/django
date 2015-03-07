@@ -32,26 +32,26 @@ class DatabaseOperations(BaseDatabaseOperations):
         # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
-    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+    def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
             field_name = "%s AT TIME ZONE %%s" % field_name
             params = [tzname]
         else:
             params = []
-        # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
-        if lookup_type == 'week_day':
-            # For consistency across backends, we return Sunday=1, Saturday=7.
-            sql = "EXTRACT('dow' FROM %s) + 1" % field_name
-        else:
-            sql = "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
+        return field_name, params
+
+    def datetime_cast_date_sql(self, field_name, tzname):
+        field_name, params = self._convert_field_to_tz(field_name, tzname)
+        sql = '(%s)::date' % field_name
+        return sql, params
+
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+        field_name, params = self._convert_field_to_tz(field_name, tzname)
+        sql = self.date_extract_sql(lookup_type, field_name)
         return sql, params
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        if settings.USE_TZ:
-            field_name = "%s AT TIME ZONE %%s" % field_name
-            params = [tzname]
-        else:
-            params = []
+        field_name, params = self._convert_field_to_tz(field_name, tzname)
         # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         sql = "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
         return sql, params
