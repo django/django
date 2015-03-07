@@ -106,8 +106,8 @@ Subclasses of ``UploadedFile`` include:
     A file uploaded into memory (i.e. stream-to-memory). This class is used
     by the :class:`~django.core.files.uploadhandler.MemoryFileUploadHandler`.
 
-Built-in upload handers
-=======================
+Built-in upload handlers
+========================
 
 .. module:: django.core.files.uploadhandler
    :synopsis: Django's handlers for file uploads.
