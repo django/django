@@ -1350,9 +1350,10 @@ class ModelAdmin(BaseModelAdmin):
                     'name': force_text(opts.verbose_name), 'key': escape(object_id)})
 
             if request.method == 'POST' and "_saveasnew" in request.POST:
-                return self.add_view(request, form_url=reverse('admin:%s_%s_add' % (
-                    opts.app_label, opts.model_name),
-                    current_app=self.admin_site.name))
+                # With obj and object_id set to None, the following is executed
+                # as `self.add_view` would do.
+                object_id = None
+                obj = None
 
         ModelForm = self.get_form(request, obj)
         if request.method == 'POST':
@@ -1374,6 +1375,8 @@ class ModelAdmin(BaseModelAdmin):
                     change_message = self.construct_change_message(request, form, formsets)
                     self.log_change(request, new_object, change_message)
                     return self.response_change(request, new_object)
+            else:
+                form_validated = False
         else:
             if add:
                 initial = self.get_changeform_initial_data(request)
@@ -1408,9 +1411,14 @@ class ModelAdmin(BaseModelAdmin):
             errors=helpers.AdminErrorList(form, formsets),
             preserved_filters=self.get_preserved_filters(request),
         )
-
+        # Hide "Save" and "Save and continue" buttons since "Save as New" was
+        # previously chosen and the interface gets confusing otherwise.
+        # Also, the "normal" save functionality is broken after a "Save as New"
+        # call with invalid data *and* inlines. See #23387.
+        if request.method == 'POST' and not form_validated and "_saveasnew" in request.POST:
+            context['show_save'] = False
+            context['show_save_and_continue'] = False
         context.update(extra_context or {})
-
         return self.render_change_form(request, context, add=add, change=not add, obj=obj, form_url=form_url)
 
     def add_view(self, request, form_url='', extra_context=None):

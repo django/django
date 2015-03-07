@@ -288,6 +288,7 @@ class ChildInline(admin.StackedInline):
 class ParentAdmin(admin.ModelAdmin):
     model = Parent
     inlines = [ChildInline]
+    save_as = True
 
     list_editable = ('name',)
 
