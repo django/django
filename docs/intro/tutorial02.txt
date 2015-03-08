@@ -100,6 +100,14 @@ You should see a few types of editable content: groups and users. They are
 provided by :mod:`django.contrib.auth`, the authentication framework shipped
 by Django.
 
+.. admonition:: Warning
+
+    You will see that you can modify the permissions of your users. Generally,
+    only superusers have the ability to do this, but you can give other users
+    permission to change the User model. This is ultimately the same as giving
+    them superuser status, because they will be able to elevate permissions of
+    users including themselves!
+
 Make the poll app modifiable in the admin
 =========================================
 
