@@ -1012,6 +1012,26 @@ those writing third-party backends in updating their code:
   now takes a second argument named ``obj_id`` which is the serialized
   identifier used to retrieve the object before deletion.
 
+Default autoescaping of functions in ``django.template.defaultfilters``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to make built-in template filters that output HTML "safe by default"
+when calling them in Python code, the following functions in
+``django.template.defaultfilters`` have been changed to automatically escape
+their input value:
+
+* ``join``
+* ``linebreaksbr``
+* ``linebreaks_filter``
+* ``linenumbers``
+* ``unordered_list``
+* ``urlize``
+* ``urlizetrunc``
+
+You can revert to the old behavior by specifying ``autoescape=False`` if you
+are passing trusted content. This change doesn't have any effect when using
+the corresponding filters in templates.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

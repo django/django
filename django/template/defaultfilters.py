@@ -191,7 +191,7 @@ def iriencode(value):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def linenumbers(value, autoescape=None):
+def linenumbers(value, autoescape=True):
     """Displays text with line numbers."""
     lines = value.split('\n')
     # Find the maximum width of the line count, for use with zero padding
@@ -353,14 +353,14 @@ def urlencode(value, safe=None):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def urlize(value, autoescape=None):
+def urlize(value, autoescape=True):
     """Converts URLs in plain text into clickable links."""
     return mark_safe(_urlize(value, nofollow=True, autoescape=autoescape))
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def urlizetrunc(value, limit, autoescape=None):
+def urlizetrunc(value, limit, autoescape=True):
     """
     Converts URLs into clickable links, truncating URLs to the given character
     limit, and adding 'rel=nofollow' attribute to discourage spamming.
@@ -457,7 +457,7 @@ def force_escape(value):
 
 @register.filter("linebreaks", is_safe=True, needs_autoescape=True)
 @stringfilter
-def linebreaks_filter(value, autoescape=None):
+def linebreaks_filter(value, autoescape=True):
     """
     Replaces line breaks in plain text with appropriate HTML; a single
     newline becomes an HTML line break (``<br />``) and a new line
@@ -469,7 +469,7 @@ def linebreaks_filter(value, autoescape=None):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def linebreaksbr(value, autoescape=None):
+def linebreaksbr(value, autoescape=True):
     """
     Converts all newlines in a piece of plain text to HTML line breaks
     (``<br />``).
@@ -552,7 +552,7 @@ def first(value):
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
-def join(value, arg, autoescape=None):
+def join(value, arg, autoescape=True):
     """
     Joins a list with a string, like Python's ``str.join(list)``.
     """
@@ -622,7 +622,7 @@ def slice_filter(value, arg):
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
-def unordered_list(value, autoescape=None):
+def unordered_list(value, autoescape=True):
     """
     Recursively takes a self-nested list and returns an HTML unordered list --
     WITHOUT opening and closing <ul> tags.
