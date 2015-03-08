@@ -78,3 +78,15 @@ class FunctionTests(SimpleTestCase):
 
     def test_non_string_input(self):
         self.assertEqual(urlizetrunc(123, 1), '123')
+
+    def test_autoescape(self):
+        self.assertEqual(
+            urlizetrunc('foo<a href=" google.com ">bar</a>buz', 10),
+            'foo&lt;a href=&quot; <a href="http://google.com" rel="nofollow">google.com</a> &quot;&gt;bar&lt;/a&gt;buz',
+        )
+
+    def test_autoescape_off(self):
+        self.assertEqual(
+            urlizetrunc('foo<a href=" google.com ">bar</a>buz', 9, autoescape=False),
+            'foo<a href=" <a href="http://google.com" rel="nofollow">google...</a> ">bar</a>buz',
+        )

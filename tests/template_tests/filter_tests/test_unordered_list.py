@@ -99,6 +99,18 @@ class FunctionTests(SimpleTestCase):
             '\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>',
         )
 
+    def test_autoescape(self):
+        self.assertEqual(
+            unordered_list(['<a>item 1</a>', 'item 2']),
+            '\t<li>&lt;a&gt;item 1&lt;/a&gt;</li>\n\t<li>item 2</li>',
+        )
+
+    def test_autoescape_off(self):
+        self.assertEqual(
+            unordered_list(['<a>item 1</a>', 'item 2'], autoescape=False),
+            '\t<li><a>item 1</a></li>\n\t<li>item 2</li>',
+        )
+
     def test_ulitem(self):
         @python_2_unicode_compatible
         class ULItem(object):
@@ -110,13 +122,48 @@ class FunctionTests(SimpleTestCase):
 
         a = ULItem('a')
         b = ULItem('b')
-        self.assertEqual(unordered_list([a, b]), '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
+        c = ULItem('<a>c</a>')
+        self.assertEqual(
+            unordered_list([a, b, c]),
+            '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>\n\t<li>ulitem-&lt;a&gt;c&lt;/a&gt;</li>',
+        )
 
         def item_generator():
             yield a
             yield b
+            yield c
 
-        self.assertEqual(unordered_list(item_generator()), '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
+        self.assertEqual(
+            unordered_list(item_generator()),
+            '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>\n\t<li>ulitem-&lt;a&gt;c&lt;/a&gt;</li>',
+        )
+
+    def test_ulitem_autoescape_off(self):
+        @python_2_unicode_compatible
+        class ULItem(object):
+            def __init__(self, title):
+                self.title = title
+
+            def __str__(self):
+                return 'ulitem-%s' % str(self.title)
+
+        a = ULItem('a')
+        b = ULItem('b')
+        c = ULItem('<a>c</a>')
+        self.assertEqual(
+            unordered_list([a, b, c], autoescape=False),
+            '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>\n\t<li>ulitem-<a>c</a></li>',
+        )
+
+        def item_generator():
+            yield a
+            yield b
+            yield c
+
+        self.assertEqual(
+            unordered_list(item_generator(), autoescape=False),
+            '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>\n\t<li>ulitem-<a>c</a></li>',
+        )
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_legacy(self):

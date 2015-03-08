@@ -259,27 +259,27 @@ class FunctionTests(SimpleTestCase):
         #20364 - Check urlize correctly include quotation marks in links
         """
         self.assertEqual(
-            urlize('before "hi@example.com" afterwards'),
+            urlize('before "hi@example.com" afterwards', autoescape=False),
             'before "<a href="mailto:hi@example.com">hi@example.com</a>" afterwards',
         )
         self.assertEqual(
-            urlize('before hi@example.com" afterwards'),
+            urlize('before hi@example.com" afterwards', autoescape=False),
             'before <a href="mailto:hi@example.com">hi@example.com</a>" afterwards',
         )
         self.assertEqual(
-            urlize('before "hi@example.com afterwards'),
+            urlize('before "hi@example.com afterwards', autoescape=False),
             'before "<a href="mailto:hi@example.com">hi@example.com</a> afterwards',
         )
         self.assertEqual(
-            urlize('before \'hi@example.com\' afterwards'),
+            urlize('before \'hi@example.com\' afterwards', autoescape=False),
             'before \'<a href="mailto:hi@example.com">hi@example.com</a>\' afterwards',
         )
         self.assertEqual(
-            urlize('before hi@example.com\' afterwards'),
+            urlize('before hi@example.com\' afterwards', autoescape=False),
             'before <a href="mailto:hi@example.com">hi@example.com</a>\' afterwards',
         )
         self.assertEqual(
-            urlize('before \'hi@example.com afterwards'),
+            urlize('before \'hi@example.com afterwards', autoescape=False),
             'before \'<a href="mailto:hi@example.com">hi@example.com</a> afterwards',
         )
 
@@ -288,7 +288,7 @@ class FunctionTests(SimpleTestCase):
         #20364 - Check urlize copes with commas following URLs in quotes
         """
         self.assertEqual(
-            urlize('Email us at "hi@example.com", or phone us at +xx.yy'),
+            urlize('Email us at "hi@example.com", or phone us at +xx.yy', autoescape=False),
             'Email us at "<a href="mailto:hi@example.com">hi@example.com</a>", or phone us at +xx.yy',
         )
 
@@ -316,3 +316,15 @@ class FunctionTests(SimpleTestCase):
 
     def test_non_string_input(self):
         self.assertEqual(urlize(123), '123')
+
+    def test_autoescape(self):
+        self.assertEqual(
+            urlize('foo<a href=" google.com ">bar</a>buz'),
+            'foo&lt;a href=&quot; <a href="http://google.com" rel="nofollow">google.com</a> &quot;&gt;bar&lt;/a&gt;buz',
+        )
+
+    def test_autoescape_off(self):
+        self.assertEqual(
+            urlize('foo<a href=" google.com ">bar</a>buz', autoescape=False),
+            'foo<a href=" <a href="http://google.com" rel="nofollow">google.com</a> ">bar</a>buz',
+        )
