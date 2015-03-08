@@ -565,3 +565,21 @@ class PermissionTestCase(TestCase):
         six.assertRaisesRegex(self, exceptions.ValidationError,
             "The verbose_name of auth.permission is longer than 244 characters",
             create_permissions, auth_app_config, verbosity=0)
+
+    def test_custom_permission_name_length(self):
+        auth_app_config = apps.get_app_config('auth')
+
+        ContentType.objects.get_by_natural_key('auth', 'permission')
+        custom_perm_name = 'a' * 256
+        models.Permission._meta.permissions = [
+            ('my_custom_permission', custom_perm_name),
+        ]
+        try:
+            msg = (
+                "The permission name %s of auth.permission is longer than "
+                "255 characters" % custom_perm_name
+            )
+            with self.assertRaisesMessage(exceptions.ValidationError, msg):
+                create_permissions(auth_app_config, verbosity=0)
+        finally:
+            models.Permission._meta.permissions = []
