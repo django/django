@@ -374,11 +374,19 @@ class RegexURLResolver(LocaleRegexProvider):
                         tried.append([pattern])
                 else:
                     if sub_match:
+                        # Merge captured arguments in match with submatch
                         sub_match_dict = dict(match.groupdict(), **self.default_kwargs)
                         sub_match_dict.update(sub_match.kwargs)
+
+                        # If there are *any* named groups, ignore all non-named groups.
+                        # Otherwise, pass all non-named arguments as positional arguments.
+                        sub_match_args = sub_match.args
+                        if not sub_match_dict:
+                            sub_match_args = match.groups() + sub_match.args
+
                         return ResolverMatch(
                             sub_match.func,
-                            sub_match.args,
+                            sub_match_args,
                             sub_match_dict,
                             sub_match.url_name,
                             self.app_name or sub_match.app_name,
