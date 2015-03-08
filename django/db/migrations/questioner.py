@@ -180,3 +180,14 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             "Do you want to merge these migration branches? [y/N]",
             False,
         )
+
+
+class NonInteractiveMigrationQuestioner(MigrationQuestioner):
+
+    def ask_not_null_addition(self, field_name, model_name):
+        # We can't ask the user, so act like the user aborted.
+        sys.exit(3)
+
+    def ask_not_null_alteration(self, field_name, model_name):
+        # We can't ask the user, so set as not provided.
+        return NOT_PROVIDED
