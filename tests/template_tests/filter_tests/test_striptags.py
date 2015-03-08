@@ -1,5 +1,7 @@
 from django.template.defaultfilters import striptags
 from django.test import SimpleTestCase
+from django.utils import six
+from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -40,3 +42,10 @@ class FunctionTests(SimpleTestCase):
 
     def test_non_string_input(self):
         self.assertEqual(striptags(123), '123')
+
+    def test_strip_lazy_string(self):
+        lazystr = lazy(lambda string: string, six.text_type)
+        self.assertEqual(
+            striptags(lazystr('some <b>html</b> with <script>alert("Hello")</script> disallowed <img /> tags')),
+            'some html with alert("Hello") disallowed  tags',
+        )

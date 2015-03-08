@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import (
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.utils.decorators import method_decorator
-from django.utils.functional import allow_lazy, lazy
+from django.utils.functional import keep_lazy, lazy
 from django.views.decorators.cache import (
     cache_control, cache_page, never_cache,
 )
@@ -66,7 +66,7 @@ full_decorator = compose(
     staff_member_required,
 
     # django.utils.functional
-    allow_lazy,
+    keep_lazy(HttpResponse),
     lazy,
 )
 

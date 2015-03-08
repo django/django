@@ -1,5 +1,8 @@
 from django.template.defaultfilters import wordwrap
 from django.test import SimpleTestCase
+from django.utils import six
+from django.utils.encoding import force_text
+from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -24,6 +27,15 @@ class FunctionTests(SimpleTestCase):
     def test_wrap(self):
         self.assertEqual(
             wordwrap('this is a long paragraph of text that really needs to be wrapped I\'m afraid', 14),
+            'this is a long\nparagraph of\ntext that\nreally needs\nto be wrapped\nI\'m afraid',
+        )
+
+    def test_wrap_lazy_string(self):
+        lazystr = lazy(force_text, six.text_type)
+        self.assertEqual(
+            wordwrap(lazystr(
+                'this is a long paragraph of text that really needs to be wrapped I\'m afraid'
+            ), 14),
             'this is a long\nparagraph of\ntext that\nreally needs\nto be wrapped\nI\'m afraid',
         )
 

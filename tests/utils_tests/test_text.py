@@ -94,6 +94,10 @@ class TestUtilsText(SimpleTestCase):
         # a length shorter than the ellipsis shouldn't break
         self.assertEqual('...', text.Truncator('asdf').chars(1))
 
+        # Ensure that lazy strings are handled correctly
+        self.assertEqual(text.Truncator(lazystr('The quick brown fox')).chars(12),
+                         'The quick...')
+
     def test_truncate_words(self):
         truncator = text.Truncator('The quick brown fox jumped over the lazy '
             'dog.')
@@ -102,6 +106,9 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual('The quick brown fox...', truncator.words(4))
         self.assertEqual('The quick brown fox[snip]',
             truncator.words(4, '[snip]'))
+        truncator = text.Truncator(lazystr('The quick brown fox jumped '
+            'over the lazy dog.'))
+        self.assertEqual('The quick brown fox...', truncator.words(4))
 
     def test_truncate_html_words(self):
         truncator = text.Truncator('<p id="par"><strong><em>The quick brown fox'
@@ -156,6 +163,7 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.wrap(long_word, 20), long_word)
         self.assertEqual(text.wrap('a %s word' % long_word, 10),
                          'a\n%s\nword' % long_word)
+        self.assertEqual(text.wrap(lazystr(digits), 100), '1234 67 9')
 
     def test_normalize_newlines(self):
         self.assertEqual(text.normalize_newlines("abc\ndef\rghi\r\n"),
@@ -163,12 +171,20 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.normalize_newlines("\n\r\r\n\r"), "\n\n\n\n")
         self.assertEqual(text.normalize_newlines("abcdefghi"), "abcdefghi")
         self.assertEqual(text.normalize_newlines(""), "")
+        self.assertEqual(text.normalize_newlines(lazystr("abc\ndef\rghi\r\n")),
+                         "abc\ndef\nghi\n")
 
     def test_normalize_newlines_bytes(self):
         """normalize_newlines should be able to handle bytes too"""
         normalized = text.normalize_newlines(b"abc\ndef\rghi\r\n")
         self.assertEqual(normalized, "abc\ndef\nghi\n")
         self.assertIsInstance(normalized, six.text_type)
+
+    def test_phone2numeric(self):
+        numeric = text.phone2numeric('0800 flowers')
+        self.assertEqual(numeric, '0800 3569377')
+        lazy_numeric = lazystr(text.phone2numeric('0800 flowers'))
+        self.assertEqual(lazy_numeric, '0800 3569377')
 
     def test_slugify(self):
         items = (
@@ -177,6 +193,7 @@ class TestUtilsText(SimpleTestCase):
         )
         for value, output in items:
             self.assertEqual(text.slugify(value), output)
+            self.assertEqual(text.slugify(lazystr(value)), output)
 
     def test_unescape_entities(self):
         items = [
@@ -190,10 +207,23 @@ class TestUtilsText(SimpleTestCase):
         ]
         for value, output in items:
             self.assertEqual(text.unescape_entities(value), output)
+            self.assertEqual(text.unescape_entities(lazystr(value)), output)
+
+    def test_unescape_string_literal(self):
+        items = [
+            ('"abc"', 'abc'),
+            ("'abc'", 'abc'),
+            ('"a \"bc\""', 'a "bc"'),
+            ("'\'ab\' c'", "'ab' c")
+        ]
+        for value, output in items:
+            self.assertEqual(text.unescape_string_literal(value), output)
+            self.assertEqual(text.unescape_string_literal(lazystr(value)), output)
 
     def test_get_valid_filename(self):
         filename = "^&'@{}[],$=!-#()%+~_123.txt"
         self.assertEqual(text.get_valid_filename(filename), "-_123.txt")
+        self.assertEqual(text.get_valid_filename(lazystr(filename)), "-_123.txt")
 
     def test_compress_sequence(self):
         data = [{'key': i} for i in range(10)]
