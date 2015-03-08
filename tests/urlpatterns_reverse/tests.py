@@ -41,6 +41,7 @@ resolve_test_data = (
     # Unnamed args are dropped if you have *any* kwargs in a pattern
     ('/mixed_args/42/37/', 'mixed-args', None, '', 'mixed-args', views.empty_view, tuple(), {'arg2': '37'}),
     ('/included/mixed_args/42/37/', 'inc-mixed-args', None, '', 'inc-mixed-args', views.empty_view, tuple(), {'arg2': '37'}),
+    ('/included/12/mixed_args/42/37/', 'inc-mixed-args', None, '', 'inc-mixed-args', views.empty_view, tuple(), {'arg2': '37'}),
 
     # Unnamed views should have None as the url_name. Regression data for #21157.
     ('/unnamed/normal/42/37/', None, None, '', 'urlpatterns_reverse.views.empty_view', views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}),
@@ -49,6 +50,7 @@ resolve_test_data = (
     # If you have no kwargs, you get an args list.
     ('/no_kwargs/42/37/', 'no-kwargs', None, '', 'no-kwargs', views.empty_view, ('42', '37'), {}),
     ('/included/no_kwargs/42/37/', 'inc-no-kwargs', None, '', 'inc-no-kwargs', views.empty_view, ('42', '37'), {}),
+    ('/included/12/no_kwargs/42/37/', 'inc-no-kwargs', None, '', 'inc-no-kwargs', views.empty_view, ('12', '42', '37'), {}),
 
     # Namespaces
     ('/test1/inner/42/37/', 'urlobject-view', 'testapp', 'test-ns1', 'test-ns1:urlobject-view', views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}),
