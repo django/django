@@ -144,7 +144,9 @@ class EmailValidator(object):
     domain_regex = re.compile(
         # max length of the domain is 249: 254 (max email length) minus one
         # period, two characters for the TLD, @ sign, & one character before @.
-        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,247}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,}(?<!-))$',
+        # max length of the gTDs is 63
+        # Ref: http://en.wikipedia.org/wiki/Domain_Name_System#cite_ref-rfc1034_1-2
+        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,247}[A-Z0-9])?\.)+(?:[A-Z0-9-]{2,63}(?<!-))$',
         re.IGNORECASE)
     literal_regex = re.compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
