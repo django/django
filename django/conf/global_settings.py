@@ -534,6 +534,8 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.CryptPasswordHasher',
 ]
 
+AUTH_PASSWORD_VALIDATORS = []
+
 ###########
 # SIGNING #
 ###########

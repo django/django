@@ -2767,6 +2767,19 @@ Default::
      'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
      'django.contrib.auth.hashers.CryptPasswordHasher']
 
+.. setting:: AUTH_PASSWORD_VALIDATORS
+
+AUTH_PASSWORD_VALIDATORS
+------------------------
+
+.. versionadded:: 1.9
+
+Default: ``[]``
+
+Sets the validators that are used to check the strength of user's passwords.
+See :ref:`password-validation` for more details.
+By default, no validation is performed and all passwords are accepted.
+
 .. _settings-messages:
 
 Messages
