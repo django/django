@@ -200,17 +200,21 @@ class URLPatternReverse(TestCase):
                reverse('non_path_include', prefix='/{{invalid}}/'))
 
     def test_prefix_parenthesis(self):
-        self.assertEqual('/bogus%29/includes/non_path_include/',
+        # Parentheses are allowed and should not cause errors or be escaped
+        self.assertEqual('/bogus)/includes/non_path_include/',
                reverse('non_path_include', prefix='/bogus)/'))
+        self.assertEqual('/(bogus)/includes/non_path_include/',
+                         reverse('non_path_include', prefix='/(bogus)/'))
 
     def test_prefix_format_char(self):
         self.assertEqual('/bump%2520map/includes/non_path_include/',
                reverse('non_path_include', prefix='/bump%20map/'))
 
     def test_non_urlsafe_prefix_with_args(self):
-        # Regression for #20022
-        self.assertEqual('/%7Eme/places/1/',
-                reverse('places', args=[1], prefix='/~me/'))
+        # Regression for #20022, adjusted for #24013 because ~ is an unreserved
+        # character. Tests whether % is escaped.
+        self.assertEqual('/%257Eme/places/1/',
+                reverse('places', args=[1], prefix='/%7Eme/'))
 
     def test_patterns_reported(self):
         # Regression for #17076
@@ -224,6 +228,12 @@ class URLPatternReverse(TestCase):
             # we can't use .assertRaises, since we want to inspect the
             # exception
             self.fail("Expected a NoReverseMatch, but none occurred.")
+
+    def test_script_name_escaping(self):
+        self.assertEqual(
+            reverse('optional', args=['foo:bar'], prefix='/script:name/'),
+            '/script:name/optional/foo:bar/',
+        )
 
     def test_reverse_returns_unicode(self):
         name, expected, args, kwargs = test_data[0]
