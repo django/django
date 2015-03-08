@@ -860,7 +860,7 @@ class GetFormsetsArgumentCheckingAdmin(admin.ModelAdmin):
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
-site.register(Section, save_as=True, inlines=[ArticleInline])
+site.register(Section, save_as=True, inlines=[ArticleInline], readonly_fields=['name_property'])
 site.register(ModelWithStringPrimaryKey)
 site.register(Color)
 site.register(Thing, ThingAdmin)

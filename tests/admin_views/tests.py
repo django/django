@@ -3862,6 +3862,15 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, '<label for="id_public">Overridden public label:</label>', html=True)
         self.assertNotContains(response, "Some help text for the date (with unicode ŠĐĆŽćžšđ)")
 
+    def test_correct_autoescaping(self):
+        """
+        Make sure that non-field readonly elements are properly autoescaped (#24461)
+        """
+        section = Section.objects.create(name='<a>evil</a>')
+        response = self.client.get(reverse('admin:admin_views_section_change', args=(section.pk,)))
+        self.assertNotContains(response, "<a>evil</a>", status_code=200)
+        self.assertContains(response, "&lt;a&gt;evil&lt;/a&gt;", status_code=200)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class LimitChoicesToInAdminTest(TestCase):

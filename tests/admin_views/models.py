@@ -22,6 +22,13 @@ class Section(models.Model):
     """
     name = models.CharField(max_length=100)
 
+    @property
+    def name_property(self):
+        """
+        A property that simply returns the name. Used to test #24461
+        """
+        return self.name
+
 
 @python_2_unicode_compatible
 class Article(models.Model):

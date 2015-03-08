@@ -193,7 +193,7 @@ class AdminReadonlyField(object):
                     if getattr(attr, "allow_tags", False):
                         result_repr = mark_safe(result_repr)
                     else:
-                        result_repr = linebreaksbr(result_repr)
+                        result_repr = linebreaksbr(result_repr, autoescape=True)
             else:
                 if isinstance(f.rel, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(six.text_type, value.all()))
