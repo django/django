@@ -58,9 +58,8 @@ class BaseLoader(object):
             return source, display_name
         except TemplateSyntaxError:
             excp_class, excp_inst, stack_trace = sys.exc_info()
-            error = "Error in file: %s\n%s"%(display_name, excp_inst.message)
+            error = "Error in file: %s\n%s" % (display_name, excp_inst.message)
             six.reraise(excp_class, excp_class(error), stack_trace)
-
 
     def load_template_source(self, template_name, template_dirs=None):
         """
