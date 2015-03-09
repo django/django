@@ -12,5 +12,5 @@ Bugfixes
 * Fixed crash when coercing ``ManyRelatedManager`` to a string
   (:ticket:`24352`).
 
-* Fixed a bug that prevented migrations from adding a FK constraint
-  for an existing column. (:ticket:`24447`).
+* Fixed a bug that prevented migrations from adding a foreign key constraint
+  when converting an existing field to a foreign key (:ticket:`24447`).
