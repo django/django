@@ -485,7 +485,15 @@ The login_required decorator
 
 .. note::
 
-    The login_required decorator does NOT check the is_active flag on a user.
+    The ``login_required`` decorator does NOT check the ``is_active`` flag on a
+    user.
+
+.. seealso::
+
+    If you are writing custom views for Django's admin (or need the same
+    authorization check that the built-in views use), you may find the
+    :func:`django.contrib.admin.views.decorators.staff_member_required`
+    decorator a useful alternative to ``login_required()``.
 
 Limiting access to logged-in users that pass a test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
