@@ -2717,3 +2717,29 @@ The action in the examples above match the last part of the URL names for
 :class:`ModelAdmin` instances described above. The ``opts`` variable can be any
 object which has an ``app_label`` and ``model_name`` attributes and is usually
 supplied by the admin views for the current model.
+
+.. currentmodule:: django.contrib.admin.views.decorators
+
+The ``staff_member_required`` decorator
+=======================================
+
+.. function:: staff_member_required([redirect_field_name=REDIRECT_FIELD_NAME, login_url='admin:login'])
+
+    This decorator is used on the admin views that require authorization. A
+    view decorated with this function will having the following behavior:
+
+    * If the user is logged in, is a staff member (``User.is_staff=True``), and
+      is active (``User.is_active=True``), execute the view normally.
+
+    * Otherwise, the request will be redirected to the URL specified by the
+      ``login_url`` parameter, with the originally requested path in a query
+      string variable specified by ``redirect_field_name``. For example:
+      ``/admin/login/?next=/admin/polls/question/3/``.
+
+    Example usage::
+
+        from django.contrib.admin.views.decorators import staff_member_required
+
+        @staff_member_required
+        def my_view(request):
+            ...
