@@ -290,7 +290,7 @@ Template filter code falls into one of two situations:
 
    Be careful, though. You need to do more than just mark the output as
    safe. You need to ensure it really *is* safe, and what you do depends on
-   whether auto-escaping is in effect. The idea is to write filters than
+   whether auto-escaping is in effect. The idea is to write filters that
    can operate in templates where auto-escaping is either on or off in
    order to make things easier for your template authors.
 
