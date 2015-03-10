@@ -56,14 +56,14 @@ Model field                         Form field
 =================================== ==================================================
 :class:`AutoField`                  Not represented in the form
 
-:class:`BigIntegerField`            :class:`IntegerField` with ``min_value``
-                                    set to -9223372036854775808 and
-                                    ``max_value`` set to 9223372036854775807.
+:class:`BigIntegerField`            :class:`~django.forms.IntegerField` with
+                                    ``min_value`` set to -9223372036854775808
+                                    and ``max_value`` set to 9223372036854775807.
 
 :class:`BooleanField`               :class:`~django.forms.BooleanField`
 
-:class:`CharField`                  :class:`~django.forms.CharField` with 
-                                    ``max_length`` set to the model field's 
+:class:`CharField`                  :class:`~django.forms.CharField` with
+                                    ``max_length`` set to the model field's
                                     ``max_length``
 
 :class:`CommaSeparatedIntegerField` :class:`~django.forms.CharField`
@@ -82,7 +82,7 @@ Model field                         Form field
 
 :class:`FloatField`                 :class:`~django.forms.FloatField`
 
-:class:`ForeignKey`                 :class:`~django.forms.ModelChoiceField` 
+:class:`ForeignKey`                 :class:`~django.forms.ModelChoiceField`
                                     (see below)
 
 ``ImageField``                      :class:`~django.forms.ImageField`
@@ -93,7 +93,7 @@ Model field                         Form field
 
 :class:`GenericIPAddressField`      :class:`~django.forms.GenericIPAddressField`
 
-:class:`ManyToManyField`            :class:`~django.forms.ModelMultipleChoiceField` 
+:class:`ManyToManyField`            :class:`~django.forms.ModelMultipleChoiceField`
                                     (see below)
 
 :class:`NullBooleanField`           :class:`~django.forms.CharField`
