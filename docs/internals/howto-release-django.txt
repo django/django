@@ -123,6 +123,15 @@ any time leading up to the actual release:
    are validation errors which need to be debugged, so avoid doing this task
    immediately before a release is needed.
 
+#. :ref:`Update the django-admin manual page <django-admin-manpage>`::
+
+        $ cd docs
+        $ make man
+        $ man _build/man/django-admin.1  # do a quick sanity check
+        $ cp _build/man/django-admin.1 man/django-admin.1
+
+   and then commit the changed man page.
+
 Preparing for release
 =====================
 

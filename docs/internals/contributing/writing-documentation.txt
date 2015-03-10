@@ -420,3 +420,22 @@ Translating documentation
 
 See :ref:`Localizing the Django documentation <translating-documentation>` if
 you'd like to help translate the documentation into another language.
+
+.. _django-admin-manpage:
+
+django-admin man page
+---------------------
+
+Sphinx can generate a manual page for the
+:doc:`django-admin </ref/django-admin>` command. This is configured in
+``conf.py``. Unlike other documentation output, this man page should be
+included in the Django repository and the releases in
+``docs/man/django-admin.1``. There isn't a need to update this file when
+updating the documentation, however, as it's updated once as part of the
+release process.
+
+To generate an updated version of the man page, run ``make man`` in the
+``docs`` directory. The new man page will be written in
+``_build/man/django-admin.1``. Note that Sphinx will also generate another
+man page named ``django.1`` which contains the entire documentation. That
+file should not be included in the repository or any release.
