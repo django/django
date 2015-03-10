@@ -33,14 +33,10 @@ Sample Data
 The GDAL/OGR tools described here are designed to help you read in
 your geospatial data, in order for most of them to be useful you have
 to have some data to work with.  If you're starting out and don't yet
-have any data of your own to use, GeoDjango comes with a number of
-simple data sets that you can use for testing.  This snippet will
-determine where these sample files are installed on your computer::
+have any data of your own to use, GeoDjango tests contain a number of
+simple data sets that you can use for testing. You can download them here:
 
-    >>> import os
-    >>> import django.contrib.gis
-    >>> GIS_PATH = os.path.dirname(django.contrib.gis.__file__)
-    >>> CITIES_PATH = os.path.join(GIS_PATH, 'tests/data/cities/cities.shp')
+https://github.com/django/django/raw/master/tests/gis_tests/data/cities/cities.shp
 
 Vector Data Source Objects
 ==========================
@@ -77,8 +73,8 @@ each feature in that layer.
 
        >>> from django.contrib.gis.gdal import DataSource
        >>> ds = DataSource(CITIES_PATH)
-       >>> ds.name                         # The exact filename may be different on your computer
-       '/usr/local/lib/python3.4/site-packages/django/contrib/gis/tests/data/cities/cities.shp'
+       >>> ds.name
+       '/path/to/your/cities.shp'
        >>> ds.layer_count                  # This file only contains one layer
        1
 
