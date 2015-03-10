@@ -637,7 +637,7 @@ If you're getting this error, you can solve it by:
   transactions are short-lived.
 
 * Increase the default timeout value by setting the ``timeout`` database
-  option option::
+  option::
 
       'OPTIONS': {
           # ...
