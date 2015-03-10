@@ -18,8 +18,8 @@ class UrlizeTests(SimpleTestCase):
         )
         self.assertEqual(
             output,
-            '<a href="http://example.com/?x=&y=" rel="nofollow">http://example.com/?x=&y=</a> '
-            '<a href="http://example.com?x=&y=%3C2%3E" rel="nofollow">http://example.com?x=&amp;y=&lt;2&gt;</a>'
+            '<a href="http://example.com/?x=&amp;y=" rel="nofollow">http://example.com/?x=&y=</a> '
+            '<a href="http://example.com?x=&amp;y=%3C2%3E" rel="nofollow">http://example.com?x=&amp;y=&lt;2&gt;</a>'
         )
 
     @setup({'urlize02': '{{ a|urlize }} {{ b|urlize }}'})
@@ -30,8 +30,8 @@ class UrlizeTests(SimpleTestCase):
         )
         self.assertEqual(
             output,
-            '<a href="http://example.com/?x=&y=" rel="nofollow">http://example.com/?x=&amp;y=</a> '
-            '<a href="http://example.com?x=&y=" rel="nofollow">http://example.com?x=&amp;y=</a>'
+            '<a href="http://example.com/?x=&amp;y=" rel="nofollow">http://example.com/?x=&amp;y=</a> '
+            '<a href="http://example.com?x=&amp;y=" rel="nofollow">http://example.com?x=&amp;y=</a>'
         )
 
     @setup({'urlize03': '{% autoescape off %}{{ a|urlize }}{% endautoescape %}'})
@@ -78,7 +78,7 @@ class UrlizeTests(SimpleTestCase):
         output = self.engine.render_to_string('urlize09', {'a': "http://example.com/?x=&amp;y=&lt;2&gt;"})
         self.assertEqual(
             output,
-            '<a href="http://example.com/?x=&y=%3C2%3E" rel="nofollow">http://example.com/?x=&amp;y=&lt;2&gt;</a>',
+            '<a href="http://example.com/?x=&amp;y=%3C2%3E" rel="nofollow">http://example.com/?x=&amp;y=&lt;2&gt;</a>',
         )
 
 
