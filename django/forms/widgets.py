@@ -44,6 +44,9 @@ class Media(object):
         for name in MEDIA_TYPES:
             getattr(self, 'add_' + name)(media_attrs.get(name, None))
 
+    def __html__(self):
+        return force_text(self)
+
     def __str__(self):
         return self.render()
 

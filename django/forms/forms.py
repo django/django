@@ -138,6 +138,9 @@ class BaseForm(object):
         self.fields = copy.deepcopy(self.base_fields)
         self._bound_fields_cache = {}
 
+    def __html__(self):
+        return force_text(self)
+
     def __str__(self):
         return self.as_table()
 
@@ -533,6 +536,9 @@ class BoundField(object):
             self.label = self.field.label
         self.help_text = field.help_text or ''
         self._initial_value = UNSET
+
+    def __html__(self):
+        return force_text(self)
 
     def __str__(self):
         """Renders this field as an HTML widget."""
