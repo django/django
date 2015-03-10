@@ -1254,7 +1254,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         # Since this overrides the inherited ModelChoiceField.clean
         # we run custom validators here
         self.run_validators(value)
-        return qs
+        return value
 
     def _check_values(self, value):
         """
