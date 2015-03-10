@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+from django.forms import CharField, Form, Media
 from django.http import HttpRequest
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
@@ -43,7 +44,7 @@ class TemplateStringsTests(SimpleTestCase):
         # There's no way to trigger a syntax error with the dummy backend.
         # The test still lives here to factor it between other backends.
         if self.backend_name == 'dummy':
-            return
+            self.skipTest("test doesn't apply to dummy backend")
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template('template_backends/syntax_error.html')
 
@@ -54,6 +55,22 @@ class TemplateStringsTests(SimpleTestCase):
 
         self.assertIn('&lt;script&gt;', content)
         self.assertNotIn('<script>', content)
+
+    def test_django_html_escaping(self):
+        if self.backend_name == 'dummy':
+            self.skipTest("test doesn't apply to dummy backend")
+
+        class TestForm(Form):
+            test_field = CharField()
+
+        media = Media(js=['my-script.js'])
+        form = TestForm()
+        template = self.engine.get_template('template_backends/django_escaping.html')
+        content = template.render({'media': media, 'test_form': form})
+
+        expected = '{}\n\n{}\n\n{}'.format(media, form, form['test_field'])
+
+        self.assertHTMLEqual(content, expected)
 
     def test_csrf_token(self):
         request = HttpRequest()

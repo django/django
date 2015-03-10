@@ -122,6 +122,9 @@ class BaseForm(object):
         fields.update(self.fields)  # add remaining fields in original order
         self.fields = fields
 
+    def __html__(self):
+        return force_text(self)
+
     def __str__(self):
         return self.as_table()
 
@@ -517,6 +520,9 @@ class BoundField(object):
             self.label = self.field.label
         self.help_text = field.help_text or ''
         self._initial_value = UNSET
+
+    def __html__(self):
+        return force_text(self)
 
     def __str__(self):
         """Renders this field as an HTML widget."""
