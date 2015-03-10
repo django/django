@@ -19,8 +19,8 @@ class UrlizetruncTests(SimpleTestCase):
         )
         self.assertEqual(
             output,
-            '"Unsafe" <a href="http://example.com/x=&y=" rel="nofollow">http:...</a> '
-            '&quot;Safe&quot; <a href="http://example.com?x=&y=" rel="nofollow">http:...</a>'
+            '"Unsafe" <a href="http://example.com/x=&amp;y=" rel="nofollow">http:...</a> '
+            '&quot;Safe&quot; <a href="http://example.com?x=&amp;y=" rel="nofollow">http:...</a>'
         )
 
     @setup({'urlizetrunc02': '{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}'})
@@ -34,8 +34,8 @@ class UrlizetruncTests(SimpleTestCase):
         )
         self.assertEqual(
             output,
-            '&quot;Unsafe&quot; <a href="http://example.com/x=&y=" rel="nofollow">http:...</a> '
-            '&quot;Safe&quot; <a href="http://example.com?x=&y=" rel="nofollow">http:...</a>'
+            '&quot;Unsafe&quot; <a href="http://example.com/x=&amp;y=" rel="nofollow">http:...</a> '
+            '&quot;Safe&quot; <a href="http://example.com?x=&amp;y=" rel="nofollow">http:...</a>'
         )
 
 
@@ -72,7 +72,7 @@ class FunctionTests(SimpleTestCase):
     def test_query_string(self):
         self.assertEqual(
             urlizetrunc('http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=', 20),
-            '<a href="http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&'
+            '<a href="http://www.google.co.uk/search?hl=en&amp;q=some+long+url&amp;btnG=Search&amp;'
             'meta=" rel="nofollow">http://www.google...</a>',
         )
 
