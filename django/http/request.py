@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import copy
-import os
 import re
 import sys
 from io import BytesIO
@@ -157,11 +156,14 @@ class HttpRequest(object):
         return iri_to_uri(location)
 
     def _get_scheme(self):
-        return 'https' if os.environ.get("HTTPS") == "on" else 'http'
+        """
+        Hook for subclasses like WSGIRequest to implement. Returns 'http' by
+        default.
+        """
+        return 'http'
 
     @property
     def scheme(self):
-        # First, check the SECURE_PROXY_SSL_HEADER setting.
         if settings.SECURE_PROXY_SSL_HEADER:
             try:
                 header, value = settings.SECURE_PROXY_SSL_HEADER
@@ -171,8 +173,6 @@ class HttpRequest(object):
                 )
             if self.META.get(header, None) == value:
                 return 'https'
-        # Failing that, fall back to _get_scheme(), which is a hook for
-        # subclasses to implement.
         return self._get_scheme()
 
     def is_secure(self):
