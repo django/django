@@ -17,6 +17,9 @@ from django.contrib.sessions.backends.signed_cookies import \
 from django.contrib.sessions.exceptions import InvalidSessionKey
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sessions.models import Session
+from django.contrib.sessions.serializers import (
+    JSONSerializer, PickleSerializer,
+)
 from django.core import management
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
@@ -632,3 +635,12 @@ class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
     def test_actual_expiry(self):
         # The cookie backend doesn't handle non-default expiry dates, see #19201
         super(CookieSessionTests, self).test_actual_expiry()
+
+    def test_unpickling_exception(self):
+        # signed_cookies backend should handle unpickle exceptions gracefully
+        # by creating a new session
+        self.assertEqual(self.session.serializer, JSONSerializer)
+        self.session.save()
+
+        self.session.serializer = PickleSerializer
+        self.session.load()
