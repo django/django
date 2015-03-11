@@ -575,11 +575,10 @@ class ModelAdmin(BaseModelAdmin):
             'admin/RelatedObjectLookups.js',
             'jquery%s.js' % extra,
             'jquery.init.js',
+            'actions%s.js' % extra,
             'urlify.js',
             'prepopulate%s.js' % extra
         ]
-        if self.actions is not None:
-            js.append('actions%s.js' % extra)
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])
 
     def get_model_perms(self, request):
