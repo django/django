@@ -698,7 +698,7 @@ and values from an attached model instance. For example::
     >>> article.headline
     'My headline'
     >>> form = ArticleForm(initial={'headline': 'Initial headline'), instance=article)
-    >>> form['pub_date'].value()
+    >>> form['headline'].value()
     'Initial headline'
 
 .. _modelforms-factory:
