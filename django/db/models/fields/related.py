@@ -1953,6 +1953,9 @@ class ForeignKey(ForeignObject):
             kwargs['to_field'] = self.rel.field_name
         return name, path, args, kwargs
 
+    def get_internal_type(self):
+        return "ForeignKey"
+
     @property
     def related_field(self):
         return self.foreign_related_fields[0]
@@ -2104,6 +2107,9 @@ class OneToOneField(ForeignKey):
             del kwargs['unique']
         return name, path, args, kwargs
 
+    def get_internal_type(self):
+        return "OneToOneField"
+
     def formfield(self, **kwargs):
         if self.rel.parent_link:
             return None
@@ -2234,6 +2240,9 @@ class ManyToManyField(RelatedField):
 
         self.db_table = db_table
         self.swappable = swappable
+
+    def get_internal_type(self):
+        return "ManyToManyField"
 
     def check(self, **kwargs):
         errors = super(ManyToManyField, self).check(**kwargs)
