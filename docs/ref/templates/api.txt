@@ -420,6 +420,13 @@ dictionary syntax::
     Returns the value for ``key`` if ``key`` is in the context, else returns
     ``otherwise``.
 
+.. method:: Context.setdefault(key, default=None)
+
+    .. versionadded:: 1.9
+
+    If ``key`` is in the context, returns its value. Otherwise inserts ``key``
+    with a value of ``default`` and returns ``default``.
+
 .. method:: Context.pop()
 .. method:: Context.push()
 .. exception:: ContextPopException
