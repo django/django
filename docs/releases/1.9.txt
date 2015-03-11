@@ -166,6 +166,9 @@ Templates
   helper can now store results in a template variable by using the ``as``
   argument.
 
+* Added a :meth:`Context.setdefault() <django.template.Context.setdefault>`
+  method.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 

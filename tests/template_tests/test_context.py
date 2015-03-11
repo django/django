@@ -30,6 +30,17 @@ class ContextTests(SimpleTestCase):
             self.assertEqual(c['a'], 3)
         self.assertEqual(c['a'], 1)
 
+    def test_setdefault(self):
+        c = Context()
+
+        x = c.setdefault('x', 42)
+        self.assertEqual(x, 42)
+        self.assertEqual(c['x'], 42)
+
+        x = c.setdefault('x', 100)
+        self.assertEqual(x, 42)
+        self.assertEqual(c['x'], 42)
+
     def test_resolve_on_context_method(self):
         """
         #17778 -- Variable shouldn't resolve RequestContext methods

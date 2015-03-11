@@ -89,6 +89,13 @@ class BaseContext(object):
                 return d[key]
         return otherwise
 
+    def setdefault(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            self[key] = default
+        return default
+
     def new(self, values=None):
         """
         Returns a new context with the same properties, but with only the
