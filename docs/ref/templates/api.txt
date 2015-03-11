@@ -187,7 +187,7 @@ different contexts.
 
       .. deprecated:: 1.8
 
-          The ``curent_app`` argument is deprecated. If you need it, you must
+          The ``current_app`` argument is deprecated. If you need it, you must
           now use a :class:`RequestContext` instead of a :class:`Context`.
 
     For details, see :ref:`playing-with-context` below.
