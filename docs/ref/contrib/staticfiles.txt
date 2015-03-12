@@ -298,6 +298,12 @@ hashed names for all processed files in a file called ``staticfiles.json``.
 This happens once when you run the :djadmin:`collectstatic` management
 command.
 
+Due to the requirement of running :djadmin:`collectstatic`, this storage
+typically shouldn't be used when running tests as ``collectstatic`` isn't run
+as part of the normal test setup. During testing, ensure that the
+:setting:`STATICFILES_STORAGE` setting is set to something else like
+``'django.contrib.staticfiles.storage.StaticFilesStorage'`` (the default).
+
 .. method:: storage.ManifestStaticFilesStorage.file_hash(name, content=None)
 
 The method that is used when creating the hashed name of a file.
