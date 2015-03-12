@@ -13,7 +13,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.db.backends.dummy.base import DatabaseCreation
 from django.test import (
-    TestCase, TransactionTestCase, mock, skipUnlessDBFeature,
+    TestCase, TransactionTestCase, mock, skipUnlessDBFeature, testcases,
 )
 from django.test.runner import DiscoverRunner, dependency_ordered
 from django.test.testcases import connections_support_transactions
@@ -404,3 +404,18 @@ class AutoIncrementResetTest(TransactionTestCase):
     def test_autoincrement_reset2(self):
         p = Person.objects.create(first_name='Jack', last_name='Smith')
         self.assertEqual(p.pk, 1)
+
+
+class EmptyDefaultDatabaseTest(unittest.TestCase):
+    def test_empty_default_database(self):
+        """
+        Test that an empty default database in settings does not raise an ImproperlyConfigured
+        error when running a unit test that does not use a database.
+        """
+        testcases.connections = db.ConnectionHandler({'default': {}})
+        connection = testcases.connections[db.utils.DEFAULT_DB_ALIAS]
+        self.assertEqual(connection.settings_dict['ENGINE'], 'django.db.backends.dummy')
+        try:
+            connections_support_transactions()
+        except Exception as e:
+            self.fail("connections_support_transactions() unexpectedly raised an error: %s" % e)
