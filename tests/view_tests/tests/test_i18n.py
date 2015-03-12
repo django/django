@@ -67,6 +67,23 @@ class I18NTests(TestCase):
             self.assertEqual(language_cookie['path'], '/test/')
             self.assertEqual(language_cookie['max-age'], 3600 * 7 * 2)
 
+    @modify_settings(MIDDLEWARE_CLASSES={
+        'append': 'django.middleware.locale.LocaleMiddleware',
+    })
+    def test_lang_from_translated_i18n_pattern(self):
+        response = self.client.post(
+            '/i18n/setlang/', data={'language': 'nl'},
+            follow=True, HTTP_REFERER='/en/translated/'
+        )
+        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'nl')
+        self.assertRedirects(response, 'http://testserver/nl/vertaald/')
+        # And reverse
+        response = self.client.post(
+            '/i18n/setlang/', data={'language': 'en'},
+            follow=True, HTTP_REFERER='/nl/vertaald/'
+        )
+        self.assertRedirects(response, 'http://testserver/en/translated/')
+
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""
         for lang_code in ['es', 'fr', 'ru']:
