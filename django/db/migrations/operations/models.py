@@ -52,6 +52,12 @@ class CreateModel(Operation):
             tuple(self.bases),
             list(self.managers),
         ))
+        for field_name, field in self.fields:
+            if field.many_to_many and not field.remote_field.through:
+                model = state.apps.get_model(app_label, self.name_lower)
+                through = model._meta.get_field(field_name).remote_field.through
+                if through and through._meta.auto_created:
+                    state.add_model(ModelState.from_model(through))
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = to_state.apps.get_model(app_label, self.name)
@@ -107,6 +113,13 @@ class DeleteModel(Operation):
         )
 
     def state_forwards(self, app_label, state):
+        m2m_fields = [(fname, f) for fname, f in state.models[app_label, self.name_lower].fields if f.many_to_many]
+        for field_name, field in m2m_fields:
+            if not field.remote_field.through:
+                model = state.apps.get_model(app_label, self.name_lower)
+                through = model._meta.get_field(field_name).remote_field.through
+                if through and through._meta.auto_created:
+                    state.remove_model(app_label, through._meta.model_name)
         state.remove_model(app_label, self.name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -487,6 +500,7 @@ class AlterModelOptions(Operation):
 
     # Model options we want to compare and preserve in an AlterModelOptions op
     ALTER_OPTION_KEYS = [
+        "auto_created",
         "get_latest_by",
         "managed",
         "ordering",
