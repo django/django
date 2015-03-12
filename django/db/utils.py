@@ -153,6 +153,9 @@ class ConnectionHandler(object):
                     'ENGINE': 'django.db.backends.dummy',
                 },
             }
+        if self._databases[DEFAULT_DB_ALIAS] == {}:
+            self._databases[DEFAULT_DB_ALIAS]['ENGINE'] = 'django.db.backends.dummy'
+
         if DEFAULT_DB_ALIAS not in self._databases:
             raise ImproperlyConfigured("You must define a '%s' database" % DEFAULT_DB_ALIAS)
         return self._databases
