@@ -232,8 +232,8 @@ lies outside the valid UTF-8 range.
 Both ``iri_to_uri()`` and ``uri_to_iri()`` functions are idempotent, which means the
 following is always true::
 
-    iri_to_uri(iri_to_uri(some_string)) = iri_to_uri(some_string)
-    uri_to_iri(uri_to_iri(some_string)) = uri_to_iri(some_string)
+    iri_to_uri(iri_to_uri(some_string)) == iri_to_uri(some_string)
+    uri_to_iri(uri_to_iri(some_string)) == uri_to_iri(some_string)
 
 So you can safely call it multiple times on the same URI/IRI without risking
 double-quoting problems.
