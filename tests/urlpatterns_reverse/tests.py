@@ -173,11 +173,13 @@ class NoURLPatternsTests(TestCase):
         """
         resolver = RegexURLResolver(r'^$', settings.ROOT_URLCONF)
 
-        self.assertRaisesMessage(ImproperlyConfigured,
+        self.assertRaisesMessage(
+            ImproperlyConfigured,
             "The included urlconf 'urlpatterns_reverse.no_urls' does not "
             "appear to have any patterns in it. If you see valid patterns in "
             "the file then the issue is probably caused by a circular import.",
-            getattr, resolver, 'url_patterns')
+            getattr, resolver, 'url_patterns'
+        )
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
@@ -198,21 +200,33 @@ class URLPatternReverse(TestCase):
         self.assertRaises(NoReverseMatch, reverse, None)
 
     def test_prefix_braces(self):
-        self.assertEqual('/%7B%7Binvalid%7D%7D/includes/non_path_include/',
-               reverse('non_path_include', prefix='/{{invalid}}/'))
+        self.assertEqual(
+            '/%7B%7Binvalid%7D%7D/includes/non_path_include/',
+            reverse('non_path_include', prefix='/{{invalid}}/')
+        )
 
     def test_prefix_parenthesis(self):
-        self.assertEqual('/bogus%29/includes/non_path_include/',
-               reverse('non_path_include', prefix='/bogus)/'))
+        # Parentheses are allowed and should not cause errors or be escaped
+        self.assertEqual(
+            '/bogus)/includes/non_path_include/',
+            reverse('non_path_include', prefix='/bogus)/')
+        )
+        self.assertEqual('/(bogus)/includes/non_path_include/',
+                         reverse('non_path_include', prefix='/(bogus)/'))
 
     def test_prefix_format_char(self):
-        self.assertEqual('/bump%2520map/includes/non_path_include/',
-               reverse('non_path_include', prefix='/bump%20map/'))
+        self.assertEqual(
+            '/bump%2520map/includes/non_path_include/',
+            reverse('non_path_include', prefix='/bump%20map/')
+        )
 
     def test_non_urlsafe_prefix_with_args(self):
-        # Regression for #20022
-        self.assertEqual('/%7Eme/places/1/',
-                reverse('places', args=[1], prefix='/~me/'))
+        # Regression for #20022, adjusted for #24013 because ~ is an unreserved
+        # character. Tests whether % is escaped.
+        self.assertEqual(
+            '/%257Eme/places/1/',
+            reverse('places', args=[1], prefix='/%7Eme/')
+        )
 
     def test_patterns_reported(self):
         # Regression for #17076
@@ -226,6 +240,12 @@ class URLPatternReverse(TestCase):
             # we can't use .assertRaises, since we want to inspect the
             # exception
             self.fail("Expected a NoReverseMatch, but none occurred.")
+
+    def test_script_name_escaping(self):
+        self.assertEqual(
+            reverse('optional', args=['foo:bar'], prefix='/script:name/'),
+            '/script:name/optional/foo:bar/',
+        )
 
     def test_reverse_returns_unicode(self):
         name, expected, args, kwargs = test_data[0]
@@ -537,8 +557,10 @@ class RequestURLconfTests(TestCase):
     def test_urlconf(self):
         response = self.client.get('/test/me/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, b'outer:/test/me/,'
-                                           b'inner:/inner_urlconf/second_test/')
+        self.assertEqual(
+            response.content, b'outer:/test/me/,'
+            b'inner:/inner_urlconf/second_test/'
+        )
         response = self.client.get('/inner_urlconf/second_test/')
         self.assertEqual(response.status_code, 200)
         response = self.client.get('/second_test/')
@@ -737,8 +759,10 @@ class ErroneousViewTests(TestCase):
 
 class ViewLoadingTests(TestCase):
     def test_view_loading(self):
-        self.assertEqual(get_callable('urlpatterns_reverse.views.empty_view'),
-                         empty_view)
+        self.assertEqual(
+            get_callable('urlpatterns_reverse.views.empty_view'),
+            empty_view
+        )
 
         # passing a callable should return the callable
         self.assertEqual(get_callable(empty_view), empty_view)
@@ -746,14 +770,17 @@ class ViewLoadingTests(TestCase):
     def test_exceptions(self):
         # A missing view (identified by an AttributeError) should raise
         # ViewDoesNotExist, ...
-        six.assertRaisesRegex(self, ViewDoesNotExist,
-                              ".*View does not exist in.*",
-                              get_callable,
-                              'urlpatterns_reverse.views.i_should_not_exist')
+        six.assertRaisesRegex(
+            self, ViewDoesNotExist,
+            ".*View does not exist in.*", get_callable,
+            'urlpatterns_reverse.views.i_should_not_exist'
+        )
         # ... but if the AttributeError is caused by something else don't
         # swallow it.
-        self.assertRaises(AttributeError, get_callable,
-                          'urlpatterns_reverse.views_broken.i_am_broken')
+        self.assertRaises(
+            AttributeError, get_callable,
+            'urlpatterns_reverse.views_broken.i_am_broken'
+        )
 
 
 class IncludeTests(SimpleTestCase):
