@@ -61,16 +61,21 @@ points, polygons, etc.), as well as the names and types of any
 additional fields (:class:`Field`) of data that may be associated with
 each feature in that layer.
 
-.. class:: DataSource(ds_input)
+.. class:: DataSource(ds_input, [encoding='utf-8'])
 
-   The constructor for ``DataSource`` just a single parameter: the path of
-   the file you want to read.  However, OGR
+   The constructor for ``DataSource`` only requires one parameter: the path of
+   the file you want to read. However, OGR
    also supports a variety of more complex data sources, including
    databases, that may be accessed by passing a special name string instead
    of a path.  For more information, see the `OGR Vector Formats`__
    documentation.  The :attr:`name` property of a ``DataSource``
    instance gives the OGR name of the underlying data source that it is
    using.
+
+   The optional ``encoding`` parameter allows you to
+   specify a non-standard encoding of the strings in the source. This is
+   typically useful when you obtain ``DjangoUnicodeDecodeError`` exceptions
+   while reading field values.
 
    Once you've created your ``DataSource``, you can find out how many
    layers of data it contains by accessing the :attr:`layer_count` property,
