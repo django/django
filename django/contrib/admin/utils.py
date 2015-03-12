@@ -4,6 +4,7 @@ import datetime
 import decimal
 from collections import defaultdict
 
+from django.conf import settings
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import FieldDoesNotExist
 from django.core.urlresolvers import NoReverseMatch, reverse
@@ -14,8 +15,9 @@ from django.forms.forms import pretty_name
 from django.utils import formats, six, timezone
 from django.utils.encoding import force_str, force_text, smart_text
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
-from django.utils.translation import ungettext
+from django.utils.translation import ungettext, ugettext_lazy
 
 
 def lookup_needs_distinct(opts, lookup_path):
@@ -367,18 +369,21 @@ def help_text_for_field(name, model):
     return smart_text(help_text)
 
 
+def display_empty_value():
+    return mark_safe(ugettext_lazy(getattr(settings, 'ADMIN_EMPTY_CHANGELIST_VALUE', '-')))
+
+
 def display_for_field(value, field):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
-    from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 
     if field.flatchoices:
-        return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
+        return dict(field.flatchoices).get(value, display_empty_value())
     # NullBooleanField needs special-case null-handling, so it comes
     # before the general null test.
     elif isinstance(field, models.BooleanField) or isinstance(field, models.NullBooleanField):
         return _boolean_icon(value)
     elif value is None:
-        return EMPTY_CHANGELIST_VALUE
+        return display_empty_value()
     elif isinstance(field, models.DateTimeField):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(field, (models.DateField, models.TimeField)):
@@ -395,12 +400,11 @@ def display_for_field(value, field):
 
 def display_for_value(value, boolean=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
-    from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 
     if boolean:
         return _boolean_icon(value)
     elif value is None:
-        return EMPTY_CHANGELIST_VALUE
+        return display_empty_value()
     elif isinstance(value, datetime.datetime):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(value, (datetime.date, datetime.time)):
