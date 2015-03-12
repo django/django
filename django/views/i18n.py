@@ -6,6 +6,7 @@ import os
 from django import http
 from django.apps import apps
 from django.conf import settings
+from django.core.urlresolvers import translate_url
 from django.template import Context, Engine
 from django.utils import six
 from django.utils._os import upath
@@ -37,6 +38,9 @@ def set_language(request):
     if request.method == 'POST':
         lang_code = request.POST.get('language', None)
         if lang_code and check_for_language(lang_code):
+            next_trans = translate_url(next, lang_code)
+            if next_trans != next:
+                response = http.HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
             else:

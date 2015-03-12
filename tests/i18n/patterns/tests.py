@@ -4,7 +4,7 @@ import os
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import (
-    clear_url_caches, reverse, set_script_prefix,
+    clear_url_caches, reverse, set_script_prefix, translate_url,
 )
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
@@ -134,6 +134,18 @@ class URLTranslationTests(URLTestCaseBase):
 
         with translation.override('pt-br'):
             self.assertEqual(reverse('users'), '/pt-br/usuarios/')
+
+    def test_translate_url_utility(self):
+        with translation.override('en'):
+            self.assertEqual(translate_url('/en/non-existent/', 'nl'), '/en/non-existent/')
+            self.assertEqual(translate_url('/en/users/', 'nl'), '/nl/gebruikers/')
+            # Namespaced URL
+            self.assertEqual(translate_url('/en/account/register/', 'nl'), '/nl/profiel/registeren/')
+            self.assertEqual(translation.get_language(), 'en')
+
+        with translation.override('nl'):
+            self.assertEqual(translate_url('/nl/gebruikers/', 'en'), '/en/users/')
+            self.assertEqual(translation.get_language(), 'nl')
 
 
 class URLNamespaceTests(URLTestCaseBase):

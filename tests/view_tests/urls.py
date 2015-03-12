@@ -2,7 +2,9 @@
 from os import path
 
 from django.conf.urls import include, url
+from django.conf.urls.i18n import i18n_patterns
 from django.utils._os import upath
+from django.utils.translation import ugettext_lazy as _
 from django.views import defaults, i18n, static
 
 from . import views
@@ -72,6 +74,10 @@ urlpatterns = [
     # Static views
     url(r'^site_media/(?P<path>.*)$', static.serve, {'document_root': media_dir}),
 ]
+
+urlpatterns += i18n_patterns(
+    url(_(r'^translated/$'), views.index_page, name='i18n_prefixed'),
+)
 
 urlpatterns += [
     url(r'view_exception/(?P<n>[0-9]+)/$', views.view_exception, name='view_exception'),

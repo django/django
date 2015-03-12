@@ -24,7 +24,8 @@ from django.utils.functional import cached_property, lazy
 from django.utils.http import RFC3986_SUBDELIMS, urlquote
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
-from django.utils.translation import get_language
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
+from django.utils.translation import get_language, override
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
 # the current thread (which is the only one we ever access), it is assumed to
@@ -652,3 +653,26 @@ def is_valid_path(path, urlconf=None):
         return True
     except Resolver404:
         return False
+
+
+def translate_url(url, lang_code):
+    """
+    Given a URL (absolute or relative), try to get its translated version in
+    the `lang_code` language (either by i18n_patterns or by translated regex).
+    Return the original URL if no translated version is found.
+    """
+    parsed = urlsplit(url)
+    try:
+        match = resolve(parsed.path)
+    except Resolver404:
+        pass
+    else:
+        to_be_reversed = "%s:%s" % (match.namespace, match.url_name) if match.namespace else match.url_name
+        with override(lang_code):
+            try:
+                url = reverse(to_be_reversed, args=match.args, kwargs=match.kwargs)
+            except NoReverseMatch:
+                pass
+            else:
+                url = urlunsplit((parsed.scheme, parsed.netloc, url, parsed.query, parsed.fragment))
+    return url
