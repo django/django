@@ -249,6 +249,9 @@ Miscellaneous
 * CSS and images in ``contrib.admin`` to support Internet Explorer 6 & 7 have
   been removed as these browsers have reached end-of-life.
 
+* The text displayed for null columns in the admin changelist ``list_display``
+  cells has changed from ``(None)`` (or its translated equivalent) to ``-``.
+
 * ``django.http.responses.REASON_PHRASES`` and
   ``django.core.handlers.wsgi.STATUS_CODE_TEXT`` have been removed. Use
   Python's stdlib instead: :data:`http.client.responses` for Python 3 and
