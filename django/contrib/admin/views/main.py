@@ -20,7 +20,7 @@ from django.db import models
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
-from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.translation import ugettext
 
 # Changelist settings
 ALL_VAR = 'all'
@@ -34,7 +34,7 @@ IGNORED_PARAMS = (
     ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
 
 # Text to display within change-list table cells if the value is blank.
-EMPTY_CHANGELIST_VALUE = ugettext_lazy('(None)')
+EMPTY_CHANGELIST_VALUE = '-'
 
 
 class ChangeList(object):
