@@ -23,28 +23,29 @@ class ImageFile(File):
 
     def _get_image_dimensions(self):
         if not hasattr(self, '_dimensions_cache'):
-            close = self.closed
             self.open()
-            self._dimensions_cache = get_image_dimensions(self, close=close)
+            self._dimensions_cache = get_image_dimensions(self)
         return self._dimensions_cache
 
 
-def get_image_dimensions(file_or_path, close=False):
+def get_image_dimensions(file_or_path):
     """
-    Returns the (width, height) of an image, given an open file or a path.  Set
-    'close' to True to close the file at the end if it is initially in an open
-    state.
+    Returns the (width, height) of an image, given an open file or a path. If a
+    file is opened it is closed at the end of the function.
     """
     from PIL import ImageFile as PillowImageFile
 
     p = PillowImageFile.Parser()
+
     if hasattr(file_or_path, 'read'):
         file = file_or_path
         file_pos = file.tell()
         file.seek(0)
+        close = False
     else:
         file = open(file_or_path, 'rb')
         close = True
+
     try:
         # Most of the time Pillow only needs a small chunk to parse the image
         # and get the dimensions, but with some TIFF files Pillow needs to
