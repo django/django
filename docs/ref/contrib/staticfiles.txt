@@ -320,7 +320,6 @@ hashing algorithm.
     make sure that the :setting:`STATICFILES_STORAGE` setting does not refer to
     ``ManifestStaticFilesStorage``.
 
-
 CachedStaticFilesStorage
 ------------------------
 
