@@ -99,6 +99,28 @@ class ChangeListTests(TestCase):
         self.assertNotEqual(table_output.find(row_html), -1,
             'Failed to find expected row element: %s' % table_output)
 
+    @override_settings(ADMIN_EMPTY_CHANGELIST_VALUE='&empty;')
+    def test_result_list_empty_changelist_value_config_setting(self):
+        """
+        Test that empty value can be set through configuration settings.
+        """
+        new_child = Child.objects.create(name='name', parent=None)
+        request = self.factory.get('/child/')
+        m = ChildAdmin(Child, admin.site)
+        list_display = m.get_list_display(request)
+        list_display_links = m.get_list_display_links(request, list_display)
+        cl = ChangeList(request, Child, list_display, list_display_links,
+                m.list_filter, m.date_hierarchy, m.search_fields,
+                m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
+        cl.formset = None
+        template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
+        context = Context({'cl': cl})
+        table_output = template.render(context)
+        link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
+        row_html = '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th><td class="field-parent nowrap">&empty;</td></tr></tbody>' % link
+        self.assertNotEqual(table_output.find(row_html), -1,
+                            'Failed to find expected row element: %s' % table_output)
+
     def test_result_list_html(self):
         """
         Verifies that inclusion tag result_list generates a table when with

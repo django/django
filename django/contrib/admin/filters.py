@@ -197,7 +197,7 @@ class RelatedFieldListFilter(FieldListFilter):
         return field.get_choices(include_blank=False)
 
     def choices(self, cl):
-        from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
+        from django.contrib.admin.utils import display_empty_value
         yield {
             'selected': self.lookup_val is None and not self.lookup_val_isnull,
             'query_string': cl.get_query_string({},
@@ -220,7 +220,7 @@ class RelatedFieldListFilter(FieldListFilter):
                 'query_string': cl.get_query_string({
                     self.lookup_kwarg_isnull: 'True',
                 }, [self.lookup_kwarg]),
-                'display': EMPTY_CHANGELIST_VALUE,
+                'display': display_empty_value(),
             }
 
 FieldListFilter.register(lambda f: (
@@ -389,7 +389,7 @@ class AllValuesFieldListFilter(FieldListFilter):
         return [self.lookup_kwarg, self.lookup_kwarg_isnull]
 
     def choices(self, cl):
-        from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
+        from django.contrib.admin.utils import display_empty_value
         yield {
             'selected': (self.lookup_val is None
                 and self.lookup_val_isnull is None),
@@ -416,7 +416,7 @@ class AllValuesFieldListFilter(FieldListFilter):
                 'query_string': cl.get_query_string({
                     self.lookup_kwarg_isnull: 'True',
                 }, [self.lookup_kwarg]),
-                'display': EMPTY_CHANGELIST_VALUE,
+                'display': display_empty_value(),
             }
 
 FieldListFilter.register(lambda f: True, AllValuesFieldListFilter)

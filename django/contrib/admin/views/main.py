@@ -33,9 +33,6 @@ ERROR_FLAG = 'e'
 IGNORED_PARAMS = (
     ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
 
-# Text to display within change-list table cells if the value is blank.
-EMPTY_CHANGELIST_VALUE = '-'
-
 
 class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links,
