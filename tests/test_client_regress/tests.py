@@ -342,12 +342,12 @@ class AssertRedirectsTests(TestCase):
         try:
             self.assertRedirects(response, '/get_view/')
         except AssertionError as e:
-            self.assertIn("Response redirected to 'http://testserver/get_view/?var=value', expected 'http://testserver/get_view/'", str(e))
+            self.assertIn("Response redirected to '/get_view/?var=value', expected '/get_view/'", str(e))
 
         try:
             self.assertRedirects(response, '/get_view/', msg_prefix='abc')
         except AssertionError as e:
-            self.assertIn("abc: Response redirected to 'http://testserver/get_view/?var=value', expected 'http://testserver/get_view/'", str(e))
+            self.assertIn("abc: Response redirected to '/get_view/?var=value', expected '/get_view/'", str(e))
 
     def test_incorrect_target(self):
         "An assertion is raised if the response redirects to another target"
@@ -380,7 +380,7 @@ class AssertRedirectsTests(TestCase):
             status_code=302, target_status_code=200)
 
         self.assertEqual(len(response.redirect_chain), 1)
-        self.assertEqual(response.redirect_chain[0], ('http://testserver/no_template_view/', 302))
+        self.assertEqual(response.redirect_chain[0], ('/no_template_view/', 302))
 
     def test_multiple_redirect_chain(self):
         "You can follow a redirect chain of multiple redirects"
@@ -389,9 +389,9 @@ class AssertRedirectsTests(TestCase):
             status_code=302, target_status_code=200)
 
         self.assertEqual(len(response.redirect_chain), 3)
-        self.assertEqual(response.redirect_chain[0], ('http://testserver/redirects/further/', 302))
-        self.assertEqual(response.redirect_chain[1], ('http://testserver/redirects/further/more/', 302))
-        self.assertEqual(response.redirect_chain[2], ('http://testserver/no_template_view/', 302))
+        self.assertEqual(response.redirect_chain[0], ('/redirects/further/', 302))
+        self.assertEqual(response.redirect_chain[1], ('/redirects/further/more/', 302))
+        self.assertEqual(response.redirect_chain[2], ('/no_template_view/', 302))
 
     def test_redirect_chain_to_non_existent(self):
         "You can follow a chain to a non-existent view"
@@ -515,8 +515,6 @@ class AssertRedirectsTests(TestCase):
         for follow, secure in itertools.product([True, False], repeat=2):
             # always redirects to https
             response = self.client.get('/https_redirect_view/', follow=follow, secure=secure)
-            # no scheme to compare too, always succeeds
-            self.assertRedirects(response, '/secure_view/', status_code=302)
             # the goal scheme is https
             self.assertRedirects(response, 'https://testserver/secure_view/', status_code=302)
             with self.assertRaises(AssertionError):
