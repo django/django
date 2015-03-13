@@ -18,7 +18,9 @@ from django.test import Client, TestCase, ignore_warnings, override_settings
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 from django.utils.translation import ugettext_lazy
 
 from .models import CustomUser
@@ -342,12 +344,12 @@ class AssertRedirectsTests(TestCase):
         try:
             self.assertRedirects(response, '/get_view/')
         except AssertionError as e:
-            self.assertIn("Response redirected to 'http://testserver/get_view/?var=value', expected 'http://testserver/get_view/'", str(e))
+            self.assertIn("Response redirected to '/get_view/?var=value', expected '/get_view/'", str(e))
 
         try:
             self.assertRedirects(response, '/get_view/', msg_prefix='abc')
         except AssertionError as e:
-            self.assertIn("abc: Response redirected to 'http://testserver/get_view/?var=value', expected 'http://testserver/get_view/'", str(e))
+            self.assertIn("abc: Response redirected to '/get_view/?var=value', expected '/get_view/'", str(e))
 
     def test_incorrect_target(self):
         "An assertion is raised if the response redirects to another target"
@@ -380,7 +382,7 @@ class AssertRedirectsTests(TestCase):
             status_code=302, target_status_code=200)
 
         self.assertEqual(len(response.redirect_chain), 1)
-        self.assertEqual(response.redirect_chain[0], ('http://testserver/no_template_view/', 302))
+        self.assertEqual(response.redirect_chain[0], ('/no_template_view/', 302))
 
     def test_multiple_redirect_chain(self):
         "You can follow a redirect chain of multiple redirects"
@@ -389,9 +391,9 @@ class AssertRedirectsTests(TestCase):
             status_code=302, target_status_code=200)
 
         self.assertEqual(len(response.redirect_chain), 3)
-        self.assertEqual(response.redirect_chain[0], ('http://testserver/redirects/further/', 302))
-        self.assertEqual(response.redirect_chain[1], ('http://testserver/redirects/further/more/', 302))
-        self.assertEqual(response.redirect_chain[2], ('http://testserver/no_template_view/', 302))
+        self.assertEqual(response.redirect_chain[0], ('/redirects/further/', 302))
+        self.assertEqual(response.redirect_chain[1], ('/redirects/further/more/', 302))
+        self.assertEqual(response.redirect_chain[2], ('/no_template_view/', 302))
 
     def test_redirect_chain_to_non_existent(self):
         "You can follow a chain to a non-existent view"
@@ -507,20 +509,23 @@ class AssertRedirectsTests(TestCase):
     def test_redirect_scheme(self):
         "An assertion is raised if the response doesn't have the scheme specified in expected_url"
 
-        # Assure that original request scheme is preserved if no scheme specified in the redirect location
-        response = self.client.get('/redirect_view/', secure=True)
-        self.assertRedirects(response, 'https://testserver/get_view/')
-
         # For all possible True/False combinations of follow and secure
         for follow, secure in itertools.product([True, False], repeat=2):
             # always redirects to https
             response = self.client.get('/https_redirect_view/', follow=follow, secure=secure)
-            # no scheme to compare too, always succeeds
-            self.assertRedirects(response, '/secure_view/', status_code=302)
             # the goal scheme is https
             self.assertRedirects(response, 'https://testserver/secure_view/', status_code=302)
             with self.assertRaises(AssertionError):
                 self.assertRedirects(response, 'http://testserver/secure_view/', status_code=302)
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_full_path_in_expected_urls(self):
+        """
+        Test that specifying a full URL as assertRedirects expected_url still
+        work as backwards compatible behavior until Django 2.1.
+        """
+        response = self.client.get('/redirect_view/')
+        self.assertRedirects(response, 'http://testserver/get_view/')
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
@@ -852,7 +857,7 @@ class LoginTests(TestDataMixin, TestCase):
         # At this points, the self.client isn't logged in.
         # Check that assertRedirects uses the original client, not the
         # default client.
-        self.assertRedirects(response, "http://testserver/get_view/")
+        self.assertRedirects(response, "/get_view/")
 
 
 @override_settings(

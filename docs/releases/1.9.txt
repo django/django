@@ -266,6 +266,21 @@ a directory. Now, Django only silences the exception if the template source
 does not exist. All other situations result in the original ``IOError`` being
 raised.
 
+HTTP redirects no longer forced to absolute URIs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Relative redirects are no longer converted to absolute URIs. :rfc:`2616`
+required the ``Location`` header in redirect responses to be an absolute URI,
+but it has been superseded by :rfc:`7231` which allows relative URIs in
+``Location``, recognizing the actual practice of user agents, almost all of
+which support them.
+
+Consequently, the expected URLs passed to ``assertRedirects`` should generally
+no longer include the scheme and domain part of the URLs. For example,
+``self.assertRedirects(response, 'http://testserver/some-url/')`` should be
+replaced by ``self.assertRedirects(response, '/some-url/')`` (unless the
+redirection specifically contained an absolute URL, of course).
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

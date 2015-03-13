@@ -40,16 +40,12 @@ class LocaleMiddleware(object):
 
             if path_valid:
                 script_prefix = get_script_prefix()
-                language_url = "%s://%s%s" % (
-                    request.scheme,
-                    request.get_host(),
-                    # insert language after the script prefix and before the
-                    # rest of the URL
-                    request.get_full_path().replace(
-                        script_prefix,
-                        '%s%s/' % (script_prefix, language),
-                        1
-                    )
+                # Insert language after the script prefix and before the
+                # rest of the URL
+                language_url = request.get_full_path().replace(
+                    script_prefix,
+                    '%s%s/' % (script_prefix, language),
+                    1
                 )
                 return self.response_redirect_class(language_url)
 
