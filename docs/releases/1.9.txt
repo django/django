@@ -52,6 +52,12 @@ Minor features
   applications for the current user, has been added to the
   :meth:`AdminSite.each_context() <django.contrib.admin.AdminSite.each_context>`
   method.
+* :attr:`AdminSite.empty_value_display
+  <django.contrib.admin.AdminSite.empty_value_display>` and
+  :attr:`ModelAdmin.empty_value_display
+  <django.contrib.admin.ModelAdmin.empty_value_display>` were added to override
+  the display of empty values in admin change list. You can also customize the
+  value for each field.
 
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

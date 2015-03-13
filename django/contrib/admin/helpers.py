@@ -174,6 +174,7 @@ class AdminReadonlyField(object):
         self.is_first = is_first
         self.is_checkbox = False
         self.is_readonly = True
+        self.empty_value_display = model_admin.get_empty_value_display()
 
     def label_tag(self):
         attrs = {}
@@ -186,12 +187,11 @@ class AdminReadonlyField(object):
 
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
-        from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
         field, obj, model_admin = self.field['field'], self.form.instance, self.model_admin
         try:
             f, attr, value = lookup_field(field, obj, model_admin)
         except (AttributeError, ValueError, ObjectDoesNotExist):
-            result_repr = EMPTY_CHANGELIST_VALUE
+            result_repr = self.empty_value_display
         else:
             if f is None:
                 boolean = getattr(attr, "boolean", False)
@@ -207,7 +207,7 @@ class AdminReadonlyField(object):
                 if isinstance(f.remote_field, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(six.text_type, value.all()))
                 else:
-                    result_repr = display_for_field(value, f)
+                    result_repr = display_for_field(value, f, self.empty_value_display)
         return conditional_escape(result_repr)
 
 
