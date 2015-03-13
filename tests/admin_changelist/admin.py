@@ -125,3 +125,12 @@ class DynamicSearchFieldsChildAdmin(admin.ModelAdmin):
         search_fields = super(DynamicSearchFieldsChildAdmin, self).get_search_fields(request)
         search_fields += ('age',)
         return search_fields
+
+
+class EmptyValueChildAdmin(admin.ModelAdmin):
+    empty_value_display = '-empty-'
+    list_display = ('name', 'age_display', 'age')
+
+    def age_display(self, obj):
+        return obj.age
+    age_display.empty_value_display = '&dagger;'
