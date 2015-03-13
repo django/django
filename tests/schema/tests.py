@@ -1410,7 +1410,8 @@ class SchemaTests(TransactionTestCase):
             )
             if connection.features.can_introspect_default:
                 self.assertIsNone(field.default)
-
+    
+    @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite specific test.')
     def test_remove_last_field(self):
         class TestModel(Model):
             test_field = IntegerField(primary_key=True)
