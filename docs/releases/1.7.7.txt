@@ -9,4 +9,5 @@ Django 1.7.7 fixes several bugs in 1.7.6.
 Bugfixes
 ========
 
-* Sqlite schema editor causes SQL syntax error (:ticket:`24424`).
+* Fixed a migration crash when removing the last database table column with
+  SQLite (:ticket:`24424`).
