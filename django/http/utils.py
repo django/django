@@ -9,19 +9,6 @@ Functions that modify an HTTP request or response in some way.
 # universally applicable.
 
 
-def fix_location_header(request, response):
-    """
-    Ensures that we always use an absolute URI in any location header in the
-    response. This is required by RFC 2616, section 14.30.
-
-    Code constructing response objects is free to insert relative paths, as
-    this function converts them to absolute paths.
-    """
-    if 'Location' in response:
-        response['Location'] = request.build_absolute_uri(response['Location'])
-    return response
-
-
 def conditional_content_removal(request, response):
     """
     Removes the content of responses for HEAD requests, 1xx, 204 and 304

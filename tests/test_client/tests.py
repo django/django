@@ -176,40 +176,27 @@ class ClientTest(TestCase):
     def test_redirect(self):
         "GET a URL that redirects elsewhere"
         response = self.client.get('/redirect_view/')
-        # Check that the response was a 302 (redirect) and that
-        # assertRedirect() understands to put an implicit http://testserver/ in
-        # front of non-absolute URLs.
+        # Check that the response was a 302 (redirect)
         self.assertRedirects(response, '/get_view/')
-
-        host = 'django.testserver'
-        client_providing_host = Client(HTTP_HOST=host)
-        response = client_providing_host.get('/redirect_view/')
-        # Check that the response was a 302 (redirect) with absolute URI
-        self.assertRedirects(response, '/get_view/', host=host)
 
     def test_redirect_with_query(self):
         "GET a URL that redirects with given GET parameters"
         response = self.client.get('/redirect_view/', {'var': 'value'})
 
         # Check if parameters are intact
-        self.assertRedirects(response, 'http://testserver/get_view/?var=value')
+        self.assertRedirects(response, '/get_view/?var=value')
 
     def test_permanent_redirect(self):
         "GET a URL that redirects permanently elsewhere"
         response = self.client.get('/permanent_redirect_view/')
         # Check that the response was a 301 (permanent redirect)
-        self.assertRedirects(response, 'http://testserver/get_view/', status_code=301)
-
-        client_providing_host = Client(HTTP_HOST='django.testserver')
-        response = client_providing_host.get('/permanent_redirect_view/')
-        # Check that the response was a 301 (permanent redirect) with absolute URI
-        self.assertRedirects(response, 'http://django.testserver/get_view/', status_code=301)
+        self.assertRedirects(response, '/get_view/', status_code=301)
 
     def test_temporary_redirect(self):
         "GET a URL that does a non-permanent redirect"
         response = self.client.get('/temporary_redirect_view/')
         # Check that the response was a 302 (non-permanent redirect)
-        self.assertRedirects(response, 'http://testserver/get_view/', status_code=302)
+        self.assertRedirects(response, '/get_view/', status_code=302)
 
     def test_redirect_to_strange_location(self):
         "GET a URL that redirects to a non-200 page"
@@ -217,12 +204,12 @@ class ClientTest(TestCase):
 
         # Check that the response was a 302, and that
         # the attempt to get the redirection location returned 301 when retrieved
-        self.assertRedirects(response, 'http://testserver/permanent_redirect_view/', target_status_code=301)
+        self.assertRedirects(response, '/permanent_redirect_view/', target_status_code=301)
 
     def test_follow_redirect(self):
         "A URL that redirects can be followed to termination."
         response = self.client.get('/double_redirect_view/', follow=True)
-        self.assertRedirects(response, 'http://testserver/get_view/', status_code=302, target_status_code=200)
+        self.assertRedirects(response, '/get_view/', status_code=302, target_status_code=200)
         self.assertEqual(len(response.redirect_chain), 2)
 
     def test_redirect_http(self):
@@ -364,7 +351,7 @@ class ClientTest(TestCase):
 
         # Get the page without logging in. Should result in 302.
         response = self.client.get('/login_protected_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/login_protected_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/login_protected_view/')
 
         # Log in
         login = self.client.login(username='testclient', password='password')
@@ -380,7 +367,7 @@ class ClientTest(TestCase):
 
         # Get the page without logging in. Should result in 302.
         response = self.client.get('/login_protected_method_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/login_protected_method_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/login_protected_method_view/')
 
         # Log in
         login = self.client.login(username='testclient', password='password')
@@ -396,7 +383,7 @@ class ClientTest(TestCase):
 
         # Get the page without logging in. Should result in 302.
         response = self.client.get('/login_protected_view_custom_redirect/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?redirect_to=/login_protected_view_custom_redirect/')
+        self.assertRedirects(response, '/accounts/login/?redirect_to=/login_protected_view_custom_redirect/')
 
         # Log in
         login = self.client.login(username='testclient', password='password')
@@ -434,7 +421,7 @@ class ClientTest(TestCase):
 
         # Request a page that requires a login
         response = self.client.get('/login_protected_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/login_protected_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/login_protected_view/')
 
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
     def test_logout_cookie_sessions(self):
@@ -445,7 +432,7 @@ class ClientTest(TestCase):
 
         # Get the page without logging in. Should result in 302.
         response = self.client.get('/permission_protected_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/permission_protected_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/permission_protected_view/')
 
         # Log in
         login = self.client.login(username='testclient', password='password')
@@ -453,7 +440,7 @@ class ClientTest(TestCase):
 
         # Log in with wrong permissions. Should result in 302.
         response = self.client.get('/permission_protected_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/permission_protected_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/permission_protected_view/')
 
         # TODO: Log in with right permissions and request the page again
 
@@ -477,7 +464,7 @@ class ClientTest(TestCase):
 
         # Get the page without logging in. Should result in 302.
         response = self.client.get('/permission_protected_method_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/permission_protected_method_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/permission_protected_method_view/')
 
         # Log in
         login = self.client.login(username='testclient', password='password')
@@ -485,7 +472,7 @@ class ClientTest(TestCase):
 
         # Log in with wrong permissions. Should result in 302.
         response = self.client.get('/permission_protected_method_view/')
-        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/permission_protected_method_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/permission_protected_method_view/')
 
         # TODO: Log in with right permissions and request the page again
 

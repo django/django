@@ -22,6 +22,10 @@ details on these changes.
 
 * The ``assignment_tag`` helper will be removed.
 
+* The ``host`` argument to ``assertsRedirects`` will be removed. The
+  compatibility layer which allows absolute URLs to be considered equal to
+  relative ones when the path is identical will also be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

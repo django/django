@@ -64,7 +64,7 @@ class CommonMiddlewareTest(TestCase):
         request = self.rf.get('/slash')
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, 'http://testserver/slash/')
+        self.assertEqual(r.url, '/slash/')
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG(self):
@@ -106,7 +106,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,
-            'http://testserver/needsquoting%23/')
+            '/needsquoting%23/')
 
     @override_settings(APPEND_SLASH=False, PREPEND_WWW=True)
     def test_prepend_www(self):
@@ -174,7 +174,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertIsNotNone(r,
             "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, 'http://testserver/customurlconf/slash/')
+        self.assertEqual(r.url, '/customurlconf/slash/')
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG_custom_urlconf(self):
@@ -212,7 +212,7 @@ class CommonMiddlewareTest(TestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,
-            'http://testserver/customurlconf/needsquoting%23/')
+            '/customurlconf/needsquoting%23/')
 
     @override_settings(APPEND_SLASH=False, PREPEND_WWW=True)
     def test_prepend_www_custom_urlconf(self):
@@ -264,7 +264,7 @@ class CommonMiddlewareTest(TestCase):
         request = self.rf.get('/slash')
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
-        self.assertEqual(r.url, 'http://testserver/slash/')
+        self.assertEqual(r.url, '/slash/')
         self.assertIsInstance(r, HttpResponsePermanentRedirect)
 
     def test_response_redirect_class_subclass(self):
@@ -274,7 +274,7 @@ class CommonMiddlewareTest(TestCase):
         request = self.rf.get('/slash')
         r = MyCommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 302)
-        self.assertEqual(r.url, 'http://testserver/slash/')
+        self.assertEqual(r.url, '/slash/')
         self.assertIsInstance(r, HttpResponseRedirect)
 
 

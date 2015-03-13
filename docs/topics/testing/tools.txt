@@ -1398,7 +1398,7 @@ your test suite.
     You can use this as a context manager in the same way as
     :meth:`~SimpleTestCase.assertTemplateUsed`.
 
-.. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, host=None, msg_prefix='', fetch_redirect_response=True)
+.. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)
 
     Asserts that the response returned a ``status_code`` redirect status,
     redirected to ``expected_url`` (including any ``GET`` data), and that the
@@ -1408,14 +1408,6 @@ your test suite.
     ``target_status_code`` will be the url and status code for the final
     point of the redirect chain.
 
-    The ``host`` argument sets a default host if ``expected_url`` doesn't
-    include one (e.g. ``"/bar/"``).  If ``expected_url`` is an absolute URL that
-    includes a host (e.g. ``"http://testhost/bar/"``), the ``host`` parameter
-    will be ignored. Note that the test client doesn't support fetching external
-    URLs, but the parameter may be useful if you are testing with a custom HTTP
-    host (for example, initializing the test client with
-    ``Client(HTTP_HOST="testhost")``.
-
     If ``fetch_redirect_response`` is ``False``, the final page won't be
     loaded. Since the test client can't fetch externals URLs, this is
     particularly useful if ``expected_url`` isn't part of your Django app.
@@ -1424,6 +1416,11 @@ your test suite.
     there isn't any scheme specified in the location where we are redirected to,
     the original request's scheme is used. If present, the scheme in
     ``expected_url`` is the one used to make the comparisons to.
+
+    .. deprecated:: 1.9
+
+        The ``host`` argument is deprecated, as redirections are no longer
+        forced to be absolute URLs.
 
 .. method:: SimpleTestCase.assertHTMLEqual(html1, html2, msg=None)
 

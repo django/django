@@ -6,9 +6,7 @@ import sys
 
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import get_resolver
-from django.http import (
-    Http404, HttpResponse, HttpResponseRedirect, JsonResponse,
-)
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response
 from django.template import TemplateDoesNotExist
 from django.utils.log import getLogger
@@ -69,13 +67,6 @@ def technical404(request):
 class Http404View(View):
     def get(self, request):
         raise Http404("Testing class-based technical 404.")
-
-
-def redirect(request):
-    """
-    Forces an HTTP redirect.
-    """
-    return HttpResponseRedirect("target/")
 
 
 def view_exception(request, n):
