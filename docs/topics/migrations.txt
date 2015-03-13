@@ -476,6 +476,30 @@ You can pass a second callable to
 want executed when migrating backwards. If this callable is omitted, migrating
 backwards will raise an exception.
 
+.. note::
+
+    When migrating data across models spanning more than one app, ``dependencies``
+    should include the latest migration of each app that is involved, otherwise you
+    may get an error: "LookupError: No installed app with label '``myappname``'".
+
+    In the following example, we have the ``app1`` app with the ``0002_m1_f1`` migration that
+    necessitates a data migration implemented in the ``move_m1`` function. We are
+    not concerned with the details of ``move_m1`` but with the fact that it will
+    need to access both apps to do its work. For this reason we've added the
+    second dependency that specifies the initial migration of ``app2``::
+
+        class Migration(migrations.Migration):
+
+            dependencies = [
+                ('app1', '0002_m1_f1'),
+                # added dependency to enable the data migration to proceed
+                ('app2', '0001_initial'),
+            ]
+
+            operations = [
+                migrations.RunPython(move_m1),
+            ]
+
 More advanced migrations
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
