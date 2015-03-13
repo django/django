@@ -112,6 +112,18 @@ use ``WSGIPythonPath``; instead you should use the ``python-path`` option to
     WSGIDaemonProcess example.com python-path=/path/to/mysite.com:/path/to/venv/lib/python2.7/site-packages
     WSGIProcessGroup example.com
 
+Additionally, daemon mode can be used to specify a non root subdirectory of
+the Apache webserver, when combined with the ``WSGIScriptAlias`` directive.
+
+.. code-block:: apache
+
+    WSGIDaemonProcess example.com python-path=/path/to/mysite.com:/path/to/venv/lib/python2.7/site-packages
+    WSGIProcessGroup example.com
+    WSGIScriptAlias /mysite /path/to/mysite.com/mysite/wsgi.py process-group=example.com
+
+This configuration (when combined with the basic configuration from above) will
+allow access to a server such as ``http://example.com/mysite``.
+
 See the official mod_wsgi documentation for `details on setting up daemon
 mode`_.
 
