@@ -232,7 +232,7 @@ class Token(object):
         bits = iter(smart_split(self.contents))
         for bit in bits:
             # Handle translation-marked template pieces
-            if bit.startswith('_("') or bit.startswith("_('"):
+            if bit.startswith(('_("', "_('")):
                 sentinal = bit[2] + ')'
                 trans_bit = [bit]
                 while not bit.endswith(sentinal):
