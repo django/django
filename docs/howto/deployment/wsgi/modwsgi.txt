@@ -83,7 +83,9 @@ your Python path as well. To do this, add an additional path to your
 ``WSGIPythonPath`` directive, with multiple paths separated by a colon (``:``)
 if using a UNIX-like system, or a semicolon (``;``) if using Windows. If any
 part of a directory path contains a space character, the complete argument
-string to ``WSGIPythonPath`` must be quoted::
+string to ``WSGIPythonPath`` must be quoted:
+
+.. code-block:: apache
 
     WSGIPythonPath /path/to/mysite.com:/path/to/your/venv/lib/python3.X/site-packages
 
@@ -103,10 +105,20 @@ Django instance to run in it, you will need to add appropriate
 ``WSGIDaemonProcess`` and ``WSGIProcessGroup`` directives. A further change
 required to the above configuration if you use daemon mode is that you can't
 use ``WSGIPythonPath``; instead you should use the ``python-path`` option to
-``WSGIDaemonProcess``, for example::
+``WSGIDaemonProcess``, for example:
+
+.. code-block:: apache
 
     WSGIDaemonProcess example.com python-path=/path/to/mysite.com:/path/to/venv/lib/python2.7/site-packages
     WSGIProcessGroup example.com
+
+If you want to serve your project in a subdirectory
+(``http://example.com/mysite`` in this example), you can add ``WSGIScriptAlias``
+to the configuration above:
+
+.. code-block:: apache
+
+    WSGIScriptAlias /mysite /path/to/mysite.com/mysite/wsgi.py process-group=example.com
 
 See the official mod_wsgi documentation for `details on setting up daemon
 mode`_.
@@ -134,7 +146,9 @@ static media, and others using the mod_wsgi interface to Django.
 This example sets up Django at the site root, but explicitly serves
 ``robots.txt``, ``favicon.ico``, any CSS file, and anything in the
 ``/static/`` and ``/media/`` URL space as a static file. All other URLs
-will be served using mod_wsgi::
+will be served using mod_wsgi:
+
+.. code-block:: apache
 
     Alias /robots.txt /path/to/mysite.com/static/robots.txt
     Alias /favicon.ico /path/to/mysite.com/static/favicon.ico

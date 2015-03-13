@@ -272,7 +272,7 @@ Template filter code falls into one of two situations:
 
    Be careful, though. You need to do more than just mark the output as
    safe. You need to ensure it really *is* safe, and what you do depends on
-   whether auto-escaping is in effect. The idea is to write filters than
+   whether auto-escaping is in effect. The idea is to write filters that
    can operate in templates where auto-escaping is either on or off in
    order to make things easier for your template authors.
 
@@ -281,7 +281,9 @@ Template filter code falls into one of two situations:
    (If you don't specify this flag, it defaults to ``False``). This flag tells
    Django that your filter function wants to be passed an extra keyword
    argument, called ``autoescape``, that is ``True`` if auto-escaping is in
-   effect and ``False`` otherwise.
+   effect and ``False`` otherwise. It is recommended to set the default of the
+   ``autoescape`` parameter to ``True``, so that if you call the function
+   from Python code it will have escaping enabled by default.
 
    For example, let's write a filter that emphasizes the first character of
    a string::
@@ -293,7 +295,7 @@ Template filter code falls into one of two situations:
       register = template.Library()
 
       @register.filter(needs_autoescape=True)
-      def initial_letter_filter(text, autoescape=None):
+      def initial_letter_filter(text, autoescape=True):
           first, other = text[0], text[1:]
           if autoescape:
               esc = conditional_escape
@@ -323,9 +325,15 @@ Template filter code falls into one of two situations:
 
 .. warning:: Avoiding XSS vulnerabilities when reusing built-in filters
 
-    Be careful when reusing Django's built-in filters. You'll need to pass
-    ``autoescape=True`` to the filter in order to get the proper autoescaping
-    behavior and avoid a cross-site script vulnerability.
+    .. versionchanged:: 1.8
+
+    Django's built-in filters have ``autoescape=True`` by default in order to
+    get the proper autoescaping behavior and avoid a cross-site script
+    vulnerability.
+
+    In older versions of Django, be careful when reusing Django's built-in
+    filters as ``autoescape`` defaults to ``None``. You'll need to pass
+    ``autoescape=True`` to get autoescaping.
 
     For example, if you wanted to write a custom filter called
     ``urlize_and_linebreaks`` that combined the :tfilter:`urlize` and
@@ -333,9 +341,12 @@ Template filter code falls into one of two situations:
 
         from django.template.defaultfilters import linebreaksbr, urlize
 
-        @register.filter
-        def urlize_and_linebreaks(text):
-            return linebreaksbr(urlize(text, autoescape=True), autoescape=True)
+        @register.filter(needs_autoescape=True)
+        def urlize_and_linebreaks(text, autoescape=True):
+            return linebreaksbr(
+                urlize(text, autoescape=autoescape),
+                autoescape=autoescape
+            )
 
     Then:
 
@@ -836,7 +847,7 @@ it's rendered:
 .. code-block:: html+django
 
     {% for o in some_list %}
-        <tr class="{% cycle 'row1' 'row2' %}>
+        <tr class="{% cycle 'row1' 'row2' %}">
             ...
         </tr>
     {% endfor %}
@@ -906,7 +917,8 @@ Registering the tag
 ~~~~~~~~~~~~~~~~~~~
 
 Finally, register the tag with your module's ``Library`` instance, as explained
-in "Writing custom template filters" above. Example::
+in :ref:`writing custom template filters<howto-writing-custom-template-tags>`
+above. Example::
 
     register.tag('current_time', do_current_time)
 

@@ -357,20 +357,20 @@ Versions affected
 * Django 1.3 `(patch) <https://github.com/django/django/commit/d7094bbce8cb838f3b40f504f198c098ff1cf727>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/0cc350a896f70ace18280410eb616a9197d862b0>`__
 
-August 13, 2013 - Awaiting CVE 1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+August 13, 2013 - CVE-2013-4249
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-(CVE not yet issued): XSS via admin trusting ``URLField`` values. `Full description <https://www.djangoproject.com/weblog/2013/aug/13/security-releases-issued/>`__
+`CVE-2013-4249 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-4249&cid=2>`_: XSS via admin trusting ``URLField`` values. `Full description <https://www.djangoproject.com/weblog/2013/aug/13/security-releases-issued/>`__
 
 Versions affected
 -----------------
 
 * Django 1.5 `(patch) <https://github.com/django/django/commit/90363e388c61874add3f3557ee654a996ec75d78>`__
 
-August 13, 2013 - Awaiting CVE 2
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+August 13, 2013 - CVE-2013-6044
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-(CVE not yet issued): Possible XSS via unvalidated URL redirect schemes. `Full description <https://www.djangoproject.com/weblog/2013/aug/13/security-releases-issued/>`__
+`CVE-2013-6044 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-6044&cid=2>`_: Possible XSS via unvalidated URL redirect schemes. `Full description <https://www.djangoproject.com/weblog/2013/aug/13/security-releases-issued/>`__
 
 Versions affected
 -----------------
@@ -569,3 +569,16 @@ Versions affected
 
 * Django 1.6 `(patch) <https://github.com/django/django/commit/d7a06ee7e571b6dad07c0f5b519b1db02e2a476c>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/bcfb47780ce7caecb409a9e9c1c314266e41d392>`__
+
+March 9, 2015 - CVE-2015-2241
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-2241 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-2241&cid=2>`_:
+XSS attack via properties in ``ModelAdmin.readonly_fields``.
+`Full description <https://www.djangoproject.com/weblog/2015/mar/09/security-releases/>`__
+
+Versions affected
+-----------------
+
+* Django 1.7 `(patch) <https://github.com/django/django/commit/d16e4e1d6f95e6f46bff53cc4fd0ab398b8e5059>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/2654e1b93923bac55f12b4e66c5e39b16695ace5>`_

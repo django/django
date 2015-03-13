@@ -472,8 +472,10 @@ class URLNode(Node):
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = dict((smart_text(k, 'ascii'), v.resolve(context))
-                      for k, v in self.kwargs.items())
+        kwargs = {
+            smart_text(k, 'ascii'): v.resolve(context)
+            for k, v in self.kwargs.items()
+        }
 
         view_name = self.view_name.resolve(context)
 
@@ -652,6 +654,10 @@ def cycle(parser, token):
         raise TemplateSyntaxError("'cycle' tag requires at least two arguments")
 
     if ',' in args[1]:
+        warnings.warn(
+            "The old {% cycle %} syntax with comma-separated arguments is deprecated.",
+            RemovedInDjango20Warning,
+        )
         # Backwards compatibility: {% cycle a,b %} or {% cycle a,b as foo %}
         # case.
         args[1:2] = ['"%s"' % arg for arg in args[1].split(",")]

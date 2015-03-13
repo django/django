@@ -261,10 +261,6 @@ class TranslationTests(TestCase):
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Value: Kann')
 
-            # Mis-uses
-            self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% trans "May" context as var %}{{ var }}')
-            self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% trans "May" as var context %}{{ var }}')
-
             # {% blocktrans %} ------------------------------
 
             # Inexisting context...
@@ -901,6 +897,21 @@ class MiscTests(TestCase):
     def setUp(self):
         super(MiscTests, self).setUp()
         self.rf = RequestFactory()
+
+    @override_settings(LANGUAGE_CODE='de')
+    def test_english_fallback(self):
+        """
+        With a non-English LANGUAGE_CODE and if the active language is English
+        or one of its variants, the untranslated string should be returned
+        (instead of falling back to LANGUAGE_CODE) (See #24413).
+        """
+        self.assertEqual(ugettext("Image"), "Bild")
+        with translation.override('en'):
+            self.assertEqual(ugettext("Image"), "Image")
+        with translation.override('en-us'):
+            self.assertEqual(ugettext("Image"), "Image")
+        with translation.override('en-ca'):
+            self.assertEqual(ugettext("Image"), "Image")
 
     def test_parse_spec_http_header(self):
         """

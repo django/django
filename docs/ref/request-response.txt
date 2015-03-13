@@ -249,6 +249,14 @@ Methods
 
     Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
 
+    .. note::
+
+        Mixing HTTP and HTTPS on the same site is discouraged, therefore
+        :meth:`~HttpRequest.build_absolute_uri()` will always generate an
+        absolute URI with the same scheme the current request has. If you need
+        to redirect users to HTTPS, it's best to let your webserver redirect
+        all HTTP traffic to HTTPS.
+
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
 
     Returns a cookie value for a signed cookie, or raises a
@@ -623,6 +631,12 @@ Attributes
 
     The `HTTP status code`_ for the response.
 
+    .. versionchanged:: 1.9
+
+        Unless :attr:`reason_phrase` is explicitly set, modifying the value of
+        ``status_code`` outside the constructor will also modify the value of
+        ``reason_phrase``.
+
 .. attribute:: HttpResponse.reason_phrase
 
     The HTTP reason phrase for the response.
@@ -633,6 +647,9 @@ Attributes
         uses the `HTTP standard's`_ default reason phrases.
 
         .. _`HTTP standard's`: https://www.ietf.org/rfc/rfc2616.txt
+
+        Unless explicitly set, ``reason_phrase`` is determined by the current
+        value of :attr:`status_code`.
 
 .. attribute:: HttpResponse.streaming
 
@@ -979,6 +996,12 @@ Attributes
 
     The `HTTP status code`_ for the response.
 
+    .. versionchanged:: 1.9
+
+        Unless :attr:`reason_phrase` is explicitly set, modifying the value of
+        ``status_code`` outside the constructor will also modify the value of
+        ``reason_phrase``.
+
 .. attribute:: StreamingHttpResponse.reason_phrase
 
     The HTTP reason phrase for the response.
@@ -989,6 +1012,9 @@ Attributes
         uses the `HTTP standard's`_ default reason phrases.
 
         .. _`HTTP standard's`: https://www.ietf.org/rfc/rfc2616.txt
+
+        Unless explicitly set, ``reason_phrase`` is determined by the current
+        value of :attr:`status_code`.
 
 .. attribute:: StreamingHttpResponse.streaming
 

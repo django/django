@@ -649,6 +649,11 @@ Providing one or more app names as arguments will limit the migrations created
 to the app(s) specified and any dependencies needed (the table at the other end
 of a ``ForeignKey``, for example).
 
+.. versionchanged:: 1.9
+
+The ``--noinput`` option may be provided to suppress all user prompts. If a suppressed
+prompt cannot be resolved automatically, the command will exit with error code 3.
+
 .. django-admin-option:: --empty
 
 The ``--empty`` option will cause ``makemigrations`` to output an empty
@@ -666,9 +671,7 @@ written.
 
 .. django-admin-option:: --merge
 
-The ``--merge`` option enables fixing of migration conflicts. The
-:djadminopt:`--noinput` option may be provided to suppress user prompts during
-a merge.
+The ``--merge`` option enables fixing of migration conflicts.
 
 .. django-admin-option:: --name, -n
 

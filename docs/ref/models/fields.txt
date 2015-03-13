@@ -1377,13 +1377,25 @@ that control how the relationship functions.
 
     If you don't specify an explicit ``through`` model, there is still an
     implicit ``through`` model class you can use to directly access the table
-    created to hold the association. It has three fields:
+    created to hold the association. It has three fields to link the models.
+
+    If the source and target models differ, the following fields are
+    generated:
 
     * ``id``: the primary key of the relation.
     * ``<containing_model>_id``: the ``id`` of the model that declares the
       ``ManyToManyField``.
     * ``<other_model>_id``: the ``id`` of the model that the
       ``ManyToManyField`` points to.
+
+    If the ``ManyToManyField`` points from and to the same model, the following 
+    fields are generated:
+
+    * ``id``: the primary key of the relation.
+    * ``from_<model>_id``: the ``id`` of the instance which points at the
+      model (i.e. the source instance).
+    * ``to_<model>_id``: the ``id`` of the instance to which the relationship
+      points (i.e. the target model instance).
 
     This class can be used to query associated records for a given model
     instance like a normal model.
@@ -1572,7 +1584,7 @@ Field API reference
 
     All of Django's built-in fields, such as :class:`CharField`, are particular
     implementations of ``Field``. If you need a custom field, you can either
-    subclass any of the built-in fields or write a ``Field``` from scratch. In
+    subclass any of the built-in fields or write a ``Field`` from scratch. In
     either case, see :doc:`/howto/custom-model-fields`.
 
     .. attribute:: description

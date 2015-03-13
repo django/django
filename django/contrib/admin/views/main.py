@@ -20,7 +20,7 @@ from django.db import models
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
-from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.translation import ugettext
 
 # Changelist settings
 ALL_VAR = 'all'
@@ -34,7 +34,7 @@ IGNORED_PARAMS = (
     ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
 
 # Text to display within change-list table cells if the value is blank.
-EMPTY_CHANGELIST_VALUE = ugettext_lazy('(None)')
+EMPTY_CHANGELIST_VALUE = '-'
 
 
 class ChangeList(object):
@@ -203,7 +203,7 @@ class ChangeList(object):
         self.show_full_result_count = self.model_admin.show_full_result_count
         # Admin actions are shown if there is at least one entry
         # or if entries are not counted because show_full_result_count is disabled
-        self.show_admin_actions = self.show_full_result_count or bool(full_result_count)
+        self.show_admin_actions = not self.show_full_result_count or bool(full_result_count)
         self.full_result_count = full_result_count
         self.result_list = result_list
         self.can_show_all = can_show_all

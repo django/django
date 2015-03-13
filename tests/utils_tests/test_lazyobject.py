@@ -165,11 +165,22 @@ class LazyObjectTestCase(TestCase):
             del obj_dict['f']
 
     def test_iter(self):
-        # LazyObjects don't actually implements __iter__ but you can still
-        # iterate over them because they implement __getitem__
-        obj = self.lazy_wrap([1, 2, 3])
-        for expected, actual in zip([1, 2, 3], obj):
-            self.assertEqual(expected, actual)
+        # Tests whether an object's custom `__iter__` method is being
+        # used when iterating over it.
+
+        class IterObject(object):
+
+            def __init__(self, values):
+                self.values = values
+
+            def __iter__(self):
+                return iter(self.values)
+
+        original_list = ['test', '123']
+        self.assertEqual(
+            list(self.lazy_wrap(IterObject(original_list))),
+            original_list
+        )
 
     def test_pickle(self):
         # See ticket #16563

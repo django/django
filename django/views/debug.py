@@ -186,7 +186,15 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 return request.POST
 
     def cleanse_special_types(self, request, value):
-        if isinstance(value, HttpRequest):
+        try:
+            # If value is lazy or a complex object of another kind, this check
+            # might raise an exception. isinstance checks that lazy HttpRequests
+            # or MultiValueDicts will have a return value.
+            is_request = isinstance(value, HttpRequest)
+        except Exception as e:
+            return '{!r} while evaluating {!r}'.format(e, value)
+
+        if is_request:
             # Cleanse the request's POST parameters.
             value = self.get_request_repr(value)
         elif isinstance(value, MultiValueDict):
@@ -269,10 +277,6 @@ class ExceptionReporter(object):
     def format_path_status(self, path):
         if not os.path.exists(path):
             return "File does not exist"
-        if not os.path.isfile(path):
-            return "Not a file"
-        if not os.access(path, os.R_OK):
-            return "File is not readable"
         return "File exists"
 
     def get_traceback_data(self):

@@ -142,6 +142,12 @@ Models
   managers created by ``ForeignKey``, ``GenericForeignKey``, and
   ``ManyToManyField``.
 
+CSRF
+^^^^
+
+* The request header's name used for CSRF authentication can be customized
+  with :setting:`CSRF_HEADER_NAME`.
+
 Signals
 ^^^^^^^
 
@@ -157,7 +163,12 @@ Templates
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Unless :attr:`HttpResponse.reason_phrase
+  <django.http.HttpResponse.reason_phrase>` is explicitly set, it now is
+  determined by the current value of :attr:`HttpResponse.status_code
+  <django.http.HttpResponse.status_code>`. Modifying the value of
+  ``status_code`` outside of the constructor will also modify the value of
+  ``reason_phrase``.
 
 Tests
 ^^^^^
@@ -224,11 +235,27 @@ the keyword argument ``clear=True``.
 assignment for many-to-many relations and as a consequence now use the new
 behavior.
 
+Filesystem-based template loaders catch more specific exceptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using the :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`
+or :class:`app_directories.Loader <django.template.loaders.app_directories.Loader>`
+template loaders, earlier versions of Django raised a
+:exc:`~django.template.TemplateDoesNotExist` error if a template source existed
+but was unreadable. This could happen under many circumstances, such as if
+Django didn't have permissions to open the file, or if the template source was
+a directory. Now, Django only silences the exception if the template source
+does not exist. All other situations result in the original ``IOError`` being
+raised.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
 * CSS and images in ``contrib.admin`` to support Internet Explorer 6 & 7 have
   been removed as these browsers have reached end-of-life.
+
+* The text displayed for null columns in the admin changelist ``list_display``
+  cells has changed from ``(None)`` (or its translated equivalent) to ``-``.
 
 * ``django.http.responses.REASON_PHRASES`` and
   ``django.core.handlers.wsgi.STATUS_CODE_TEXT`` have been removed. Use
@@ -238,6 +265,11 @@ Miscellaneous
   .. _`httplib.responses`: https://docs.python.org/2/library/httplib.html#httplib.responses
 
 * ``ValuesQuerySet`` and ``ValuesListQuerySet`` have been removed.
+
+* The ``admin/base.html`` template no longer sets
+  ``window.__admin_media_prefix__``. Image references in JavaScript that used
+  that value to construct absolute URLs have been moved to CSS for easier
+  customization.
 
 .. _deprecated-features-1.9:
 
@@ -252,6 +284,19 @@ template tags that store results in a template variable. The
 :meth:`~django.template.Library.simple_tag` helper has gained this same
 ability, making the ``assignment_tag`` obsolete. Tags that use
 ``assignment_tag`` should be updated to use ``simple_tag``.
+
+``{% cycle %}`` syntax with comma-separated arguments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :ttag:`cycle` tag supports an inferior old syntax from previous Django
+versions:
+
+.. code-block:: html+django
+
+    {% cycle row1,row2,row3 %}
+
+Its parsing caused bugs with the current syntax, so support for the old syntax
+will be removed in Django 2.0 following an accelerated deprecation.
 
 Miscellaneous
 ~~~~~~~~~~~~~

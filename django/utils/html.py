@@ -26,7 +26,7 @@ WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
-word_split_re = re.compile(r'(\s+)')
+word_split_re = re.compile(r'''([\s<>"']+)''')
 simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$', re.IGNORECASE)
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
@@ -282,17 +282,17 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
         smart_urlquote. For example:
         http://example.com?x=1&amp;y=&lt;2&gt; => http://example.com?x=1&y=<2>
         """
-        if not safe_input:
-            return text, text, trail
         unescaped = (text + trail).replace(
             '&amp;', '&').replace('&lt;', '<').replace(
             '&gt;', '>').replace('&quot;', '"').replace('&#39;', "'")
-        # ';' in trail can be either trailing punctuation or end-of-entity marker
-        if unescaped.endswith(';'):
-            return text, unescaped[:-1], trail
-        else:
+        if trail and unescaped.endswith(trail):
+            # Remove trail for unescaped if it was not consumed by unescape
+            unescaped = unescaped[:-len(trail)]
+        elif trail == ';':
+            # Trail was consumed by unescape (as end-of-entity marker), move it to text
             text += trail
-            return text, unescaped, ''
+            trail = ''
+        return text, unescaped, trail
 
     words = word_split_re.split(force_text(text))
     for i, word in enumerate(words):
@@ -337,7 +337,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                 if autoescape and not safe_input:
                     lead, trail = escape(lead), escape(trail)
                     trimmed = escape(trimmed)
-                middle = '<a href="%s"%s>%s</a>' % (url, nofollow_attr, trimmed)
+                middle = '<a href="%s"%s>%s</a>' % (escape(url), nofollow_attr, trimmed)
                 words[i] = mark_safe('%s%s%s' % (lead, middle, trail))
             else:
                 if safe_input:

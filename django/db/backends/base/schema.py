@@ -709,9 +709,9 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Does it have a foreign key?
-        if new_field.rel and \
-           (fks_dropped or (old_field.rel and not old_field.db_constraint)) and \
-           new_field.db_constraint:
+        if (new_field.rel and
+                (fks_dropped or not old_field.rel or not old_field.db_constraint) and
+                new_field.db_constraint):
             self.execute(self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s"))
         # Rebuild FKs that pointed to us if we previously had to drop them
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
@@ -798,7 +798,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Else generate the name for the index using a different algorithm
         table_name = model._meta.db_table.replace('"', '').replace('.', '_')
-        index_unique_name = '_%x' % abs(hash((table_name, ','.join(column_names))))
+        index_unique_name = '_%s' % self._digest(table_name, *column_names)
         max_length = self.connection.ops.max_name_length() or 200
         # If the index name is too long, truncate it
         index_name = ('%s_%s%s%s' % (

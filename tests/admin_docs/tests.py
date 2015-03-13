@@ -1,3 +1,4 @@
+import datetime
 import sys
 import unittest
 
@@ -10,6 +11,19 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, modify_settings, override_settings
 
 from .models import Company, Person
+
+
+class TestDataMixin(object):
+
+    @classmethod
+    def setUpTestData(cls):
+        # password = "secret"
+        User.objects.create(
+            pk=100, username='super', first_name='Super', last_name='User', email='super@example.com',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158', is_active=True, is_superuser=True,
+            is_staff=True, last_login=datetime.datetime(2007, 5, 30, 13, 20, 10),
+            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
 
 
 @override_settings(
@@ -39,8 +53,7 @@ class MiscTests(AdminDocsTestCase):
 
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
-class AdminDocViewTests(AdminDocsTestCase):
-    fixtures = ['data.xml']
+class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
@@ -124,8 +137,7 @@ class AdminDocViewTests(AdminDocsTestCase):
             utils.docutils_is_available = True
 
 
-class XViewMiddlewareTest(AdminDocsTestCase):
-    fixtures = ['data.xml']
+class XViewMiddlewareTest(TestDataMixin, AdminDocsTestCase):
 
     def test_xview_func(self):
         user = User.objects.get(username='super')
@@ -201,12 +213,10 @@ class DefaultRoleTest(AdminDocsTestCase):
 
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
-class TestModelDetailView(AdminDocsTestCase):
+class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
     """
     Tests that various details render correctly
     """
-
-    fixtures = ['data.xml']
 
     def setUp(self):
         self.client.login(username='super', password='secret')

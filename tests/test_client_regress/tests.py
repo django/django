@@ -4,6 +4,7 @@ Regression tests for the Test Client, especially the customized assertions.
 """
 from __future__ import unicode_literals
 
+import datetime
 import itertools
 import os
 
@@ -22,6 +23,30 @@ from django.utils.translation import ugettext_lazy
 
 from .models import CustomUser
 from .views import CustomTestException
+
+
+class TestDataMixin(object):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
+            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u2 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
+            first_name='Inactive', last_name='User', email='testclient@example.com', is_staff=False, is_active=False,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u3 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
+            first_name='Staff', last_name='Member', email='testclient@example.com', is_staff=True, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
@@ -190,8 +215,7 @@ class AssertContainsTests(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
-class AssertTemplateUsedTests(TestCase):
-    fixtures = ['testdata.json']
+class AssertTemplateUsedTests(TestDataMixin, TestCase):
 
     def test_no_context(self):
         "Template usage assertions work then templates aren't in use"
@@ -812,8 +836,7 @@ class AssertFormsetErrorTests(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
-class LoginTests(TestCase):
-    fixtures = ['testdata']
+class LoginTests(TestDataMixin, TestCase):
 
     def test_login_different_client(self):
         "Check that using a different test client doesn't violate authentication"
@@ -837,8 +860,7 @@ class LoginTests(TestCase):
     SESSION_ENGINE='test_client_regress.session',
     ROOT_URLCONF='test_client_regress.urls',
 )
-class SessionEngineTests(TestCase):
-    fixtures = ['testdata']
+class SessionEngineTests(TestDataMixin, TestCase):
 
     def test_login(self):
         "A session engine that modifies the session key can be used to log in"
@@ -881,8 +903,7 @@ class URLEscapingTests(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
-class ExceptionTests(TestCase):
-    fixtures = ['testdata.json']
+class ExceptionTests(TestDataMixin, TestCase):
 
     def test_exception_cleared(self):
         "#5836 - A stale user exception isn't re-raised by the test client."
@@ -950,8 +971,7 @@ class zzUrlconfSubstitutionTests(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
-class ContextTests(TestCase):
-    fixtures = ['testdata']
+class ContextTests(TestDataMixin, TestCase):
 
     def test_single_context(self):
         "Context variables can be retrieved from a single context"
@@ -1025,8 +1045,7 @@ class ContextTests(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
-class SessionTests(TestCase):
-    fixtures = ['testdata.json']
+class SessionTests(TestDataMixin, TestCase):
 
     def test_session(self):
         "The session isn't lost if a user logs in"

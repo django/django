@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import os.path
 import sys
+import tempfile
 import types
 import unittest
 from contextlib import contextmanager
@@ -176,7 +177,16 @@ class EggLoaderTests(SimpleTestCase):
 class FileSystemLoaderTests(SimpleTestCase):
 
     def setUp(self):
-        self.engine = Engine()
+        self.engine = Engine(dirs=[TEMPLATE_DIR])
+
+    @contextmanager
+    def set_dirs(self, dirs):
+        original_dirs = self.engine.dirs
+        self.engine.dirs = dirs
+        try:
+            yield
+        finally:
+            self.engine.dirs = original_dirs
 
     @contextmanager
     def source_checker(self, dirs):
@@ -185,11 +195,12 @@ class FileSystemLoaderTests(SimpleTestCase):
         def check_sources(path, expected_sources):
             expected_sources = [os.path.abspath(s) for s in expected_sources]
             self.assertEqual(
-                list(loader.get_template_sources(path, dirs)),
+                list(loader.get_template_sources(path)),
                 expected_sources,
             )
 
-        yield check_sources
+        with self.set_dirs(dirs):
+            yield check_sources
 
     def test_directory_security(self):
         with self.source_checker(['/dir1', '/dir2']) as check_sources:
@@ -233,10 +244,40 @@ class FileSystemLoaderTests(SimpleTestCase):
             check_sources('index.html', ['/dir1/index.html', '/DIR2/index.html'])
             check_sources('/DIR1/index.HTML', ['/DIR1/index.HTML'])
 
+    def test_file_does_not_exist(self):
+        with self.assertRaises(TemplateDoesNotExist):
+            self.engine.get_template('doesnotexist.html')
 
-class AppDirectoriesLoaderTest(FileSystemLoaderTests):
+    @unittest.skipIf(
+        sys.platform == 'win32',
+        "Python on Windows doesn't have working os.chmod().",
+    )
+    def test_permissions_error(self):
+        with tempfile.NamedTemporaryFile() as tmpfile:
+            tmpdir = os.path.dirname(tmpfile.name)
+            tmppath = os.path.join(tmpdir, tmpfile.name)
+            os.chmod(tmppath, 0o0222)
+            with self.set_dirs([tmpdir]):
+                with self.assertRaisesMessage(IOError, 'Permission denied'):
+                    self.engine.get_template(tmpfile.name)
+
+    def test_notafile_error(self):
+        with self.assertRaises(IOError):
+            self.engine.get_template('first')
+
+
+class AppDirectoriesLoaderTest(SimpleTestCase):
 
     def setUp(self):
         self.engine = Engine(
             loaders=['django.template.loaders.app_directories.Loader'],
         )
+
+    @override_settings(INSTALLED_APPS=['template_tests'])
+    def test_load_template(self):
+        self.engine.get_template('index.html')
+
+    @override_settings(INSTALLED_APPS=[])
+    def test_not_installed(self):
+        with self.assertRaises(TemplateDoesNotExist):
+            self.engine.get_template('index.html')

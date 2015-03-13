@@ -301,6 +301,10 @@ class TestCollectionClear(CollectionTestCase):
     def test_cleared_not_found(self):
         self.assertFileNotFound('cleared.txt')
 
+    def test_dir_not_exists(self, **kwargs):
+        shutil.rmtree(six.text_type(settings.STATIC_ROOT))
+        super(TestCollectionClear, self).run_collectstatic(clear=True)
+
 
 class TestCollectionExcludeNoDefaultIgnore(CollectionTestCase, TestDefaults):
     """
