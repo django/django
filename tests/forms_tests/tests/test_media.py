@@ -455,6 +455,46 @@ class FormsMediaTestCase(TestCase):
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
 <link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />""")
 
+    def test_custom_media_types(self):
+        # MEDIA_TYPES can be customized to support more than just js/css
+        class CustomMedia(Media):
+            MEDIA_TYPES = Media.MEDIA_TYPES + (('text', list),)
+
+            def add_text(self, data):
+                if data:
+                    for path in data:
+                        if path not in self._text:
+                            self._text.append(path)
+
+            def render_text(self):
+                return ['<div>%s</div>' % text for text in self._text]
+
+        m = CustomMedia(
+            css={'all': ['/foo.css', '/bar.css']},
+            js=['/baz.js'],
+            text=['biff', '/bonk']
+        )
+
+        # render handles custom MEDIA_TYPES
+        self.assertEqual(m.render(), """<link href="/foo.css" type="text/css" media="all" rel="stylesheet" />
+<link href="/bar.css" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/baz.js"></script>
+<div>biff</div>
+<div>/bonk</div>""")
+
+        # __getitem__ populates the new media correctly.
+        new_m = m['text']
+        self.assertEqual(new_m.render(), """<div>biff</div>
+<div>/bonk</div>""")
+
+        new_m = m + CustomMedia(text=['blargh'])
+        self.assertEqual(new_m.render(), """<link href="/foo.css" type="text/css" media="all" rel="stylesheet" />
+<link href="/bar.css" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/baz.js"></script>
+<div>biff</div>
+<div>/bonk</div>
+<div>blargh</div>""")
+
 
 @override_settings(
     STATIC_URL='http://media.example.com/static/',

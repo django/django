@@ -34,28 +34,26 @@ __all__ = (
     'SplitHiddenDateTimeWidget', 'SelectDateWidget',
 )
 
-MEDIA_TYPES = ('css', 'js')
-
 
 @python_2_unicode_compatible
 class Media(object):
+    MEDIA_TYPES = (('css', dict), ('js', list))
+
     def __init__(self, media=None, **kwargs):
         if media:
             media_attrs = media.__dict__
         else:
             media_attrs = kwargs
 
-        self._css = {}
-        self._js = []
-
-        for name in MEDIA_TYPES:
+        for name, constructor in self.MEDIA_TYPES:
+            setattr(self, '_' + name, constructor())
             getattr(self, 'add_' + name)(media_attrs.get(name, None))
 
     def __str__(self):
         return self.render()
 
     def render(self):
-        return mark_safe('\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
+        return mark_safe('\n'.join(chain(*[getattr(self, 'render_' + name)() for name, _ in self.MEDIA_TYPES])))
 
     def render_js(self):
         return [
@@ -89,8 +87,8 @@ class Media(object):
 
     def __getitem__(self, name):
         "Returns a Media object that only contains media of the given type"
-        if name in MEDIA_TYPES:
-            return Media(**{str(name): getattr(self, '_' + name)})
+        if name in [mt[0] for mt in self.MEDIA_TYPES]:
+            return self.__class__(**{str(name): getattr(self, '_' + name)})
         raise KeyError('Unknown media type "%s"' % name)
 
     def add_js(self, data):
@@ -107,8 +105,8 @@ class Media(object):
                         self._css.setdefault(medium, []).append(path)
 
     def __add__(self, other):
-        combined = Media()
-        for name in MEDIA_TYPES:
+        combined = self.__class__()
+        for name, _ in self.MEDIA_TYPES:
             getattr(combined, 'add_' + name)(getattr(self, '_' + name, None))
             getattr(combined, 'add_' + name)(getattr(other, '_' + name, None))
         return combined
