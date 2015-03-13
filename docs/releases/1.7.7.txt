@@ -9,4 +9,4 @@ Django 1.7.7 fixes several bugs in 1.7.6.
 Bugfixes
 ========
 
-* ...
+* Sqlite schema editor causes SQL syntax error (:ticket:`24424`).
