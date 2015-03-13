@@ -54,7 +54,10 @@ Minor features
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The GDAL interface now supports instantiating file-based and in-memory
+  :ref:`GDALRaster objects <raster-data-source-objects>` from raw data.
+  Setters for raster properties such as projection or pixel values have
+  been added.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -31,6 +31,7 @@ get_driver_description = const_string_output(lgdal.GDALGetDescription, [c_void_p
 create_ds = voidptr_output(lgdal.GDALCreate, [c_void_p, c_char_p, c_int, c_int, c_int, c_int])
 open_ds = voidptr_output(lgdal.GDALOpen, [c_char_p, c_int])
 close_ds = void_output(lgdal.GDALClose, [c_void_p])
+flush_ds = int_output(lgdal.GDALFlushCache, [c_void_p])
 copy_ds = voidptr_output(lgdal.GDALCreateCopy, [c_void_p, c_char_p, c_void_p, c_int,
                                                 POINTER(c_char_p), c_void_p, c_void_p])
 add_band_ds = void_output(lgdal.GDALAddBand, [c_void_p, c_int])
