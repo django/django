@@ -23,7 +23,6 @@ logger = logging.getLogger('django.request')
 class BaseHandler(object):
     # Changes that are always applied to a response (in this order).
     response_fixes = [
-        http.fix_location_header,
         http.conditional_content_removal,
     ]
 
