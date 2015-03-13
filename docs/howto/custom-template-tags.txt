@@ -917,7 +917,8 @@ Registering the tag
 ~~~~~~~~~~~~~~~~~~~
 
 Finally, register the tag with your module's ``Library`` instance, as explained
-in "Writing custom template filters" above. Example::
+in :ref:`writing custom template filters<howto-writing-custom-template-tags>`
+above. Example::
 
     register.tag('current_time', do_current_time)
 
