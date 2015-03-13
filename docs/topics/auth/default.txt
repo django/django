@@ -1402,6 +1402,11 @@ have the power to create superusers, which can then, in turn, change other
 users. So Django requires add *and* change permissions as a slight security
 measure.
 
+Be thoughtful about how you allow users to manage permissions. If you give a
+non-superuser the ability to edit users, this is ultimately the same as giving
+them superuser status because they will be able to elevate permissions of
+users including themselves!
+
 Changing Passwords
 ------------------
 
