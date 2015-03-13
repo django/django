@@ -12,9 +12,8 @@ from django.utils._os import npath, upath
 def has_bom(fn):
     with open(fn, 'rb') as f:
         sample = f.read(4)
-    return sample[:3] == b'\xef\xbb\xbf' or \
-        sample.startswith(codecs.BOM_UTF16_LE) or \
-        sample.startswith(codecs.BOM_UTF16_BE)
+    return (sample[:3] == b'\xef\xbb\xbf' or
+        sample.startswith((codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE)))
 
 
 def is_writable(path):
