@@ -487,6 +487,34 @@ The login_required decorator
 
     The login_required decorator does NOT check the is_active flag on a user.
 
+.. _topics-staff_member_required:
+
+The staff_member_required decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As a shortcut, you can use
+:func:`~django.contrib.admin.views.decorators.staff_member_required` decorator::
+
+    from django.contrib.admin.views.decorators import staff_member_required
+
+    @staff_member_required
+    def my_view(request):
+        ...
+
+:func:`~django.contrib.admin.views.decorators.staff_member_required` takes
+two optional arguments: ``redirect_field_name`` and ``login_url`` -- their
+effect and default values are the same as ``login_required`` decorator --
+see :func:`~django.contrib.auth.decorators.login_required`.
+
+See :func:`~django.contrib.admin.views.decorators.staff_member_required`
+for more details.
+
+.. note::
+
+    Unlike the login_required decorator, staff_member_required DOES check the
+    is_active flag on a user.
+
+
 Limiting access to logged-in users that pass a test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
