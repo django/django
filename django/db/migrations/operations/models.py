@@ -122,6 +122,10 @@ class RenameModel(Operation):
         del state.models[app_label, self.old_name.lower()]
         # Repoint the FKs and M2Ms pointing to us
         for related_object in (related_objects + related_m2m_objects):
+            if related_object.field.rel.to is not model:
+                # The model being renamed does not participate in this relation
+                # directly. Rather, a superclass does.
+                continue
             # Use the new related key for self referential related objects.
             if related_object.model == model:
                 related_key = (app_label, self.new_name.lower())
