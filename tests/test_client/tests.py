@@ -181,12 +181,6 @@ class ClientTest(TestCase):
         # front of non-absolute URLs.
         self.assertRedirects(response, '/get_view/')
 
-        host = 'django.testserver'
-        client_providing_host = Client(HTTP_HOST=host)
-        response = client_providing_host.get('/redirect_view/')
-        # Check that the response was a 302 (redirect) with absolute URI
-        self.assertRedirects(response, '/get_view/', host=host)
-
     def test_redirect_with_query(self):
         "GET a URL that redirects with given GET parameters"
         response = self.client.get('/redirect_view/', {'var': 'value'})

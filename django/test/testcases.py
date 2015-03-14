@@ -251,6 +251,12 @@ class SimpleTestCase(unittest.TestCase):
         TestClient to do a request (use fetch_redirect_response=False to check
         such links without fetching them).
         """
+        if host is not None:
+            warnings.warn(
+                "The host argument is deprecated and no longer used by assertRedirects",
+                RemovedInDjango21Warning, stacklevel=2
+            )
+
         if msg_prefix:
             msg_prefix += ": "
 
