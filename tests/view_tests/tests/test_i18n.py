@@ -31,7 +31,7 @@ class I18NTests(TestCase):
         for lang_code, lang_name in settings.LANGUAGES:
             post_data = dict(language=lang_code, next='/')
             response = self.client.post('/i18n/setlang/', data=post_data)
-            self.assertRedirects(response, 'http://testserver/')
+            self.assertRedirects(response, '/')
             self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_unsafe_next(self):
@@ -76,13 +76,13 @@ class I18NTests(TestCase):
             follow=True, HTTP_REFERER='/en/translated/'
         )
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'nl')
-        self.assertRedirects(response, 'http://testserver/nl/vertaald/')
+        self.assertRedirects(response, '/nl/vertaald/')
         # And reverse
         response = self.client.post(
             '/i18n/setlang/', data={'language': 'en'},
             follow=True, HTTP_REFERER='/nl/vertaald/'
         )
-        self.assertRedirects(response, 'http://testserver/en/translated/')
+        self.assertRedirects(response, '/en/translated/')
 
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""

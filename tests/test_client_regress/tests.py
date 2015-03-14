@@ -18,7 +18,9 @@ from django.test import Client, TestCase, ignore_warnings, override_settings
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 from django.utils.translation import ugettext_lazy
 
 from .models import CustomUser
@@ -507,10 +509,6 @@ class AssertRedirectsTests(TestCase):
     def test_redirect_scheme(self):
         "An assertion is raised if the response doesn't have the scheme specified in expected_url"
 
-        # Assure that original request scheme is preserved if no scheme specified in the redirect location
-        response = self.client.get('/redirect_view/', secure=True)
-        self.assertRedirects(response, 'https://testserver/get_view/')
-
         # For all possible True/False combinations of follow and secure
         for follow, secure in itertools.product([True, False], repeat=2):
             # always redirects to https
@@ -519,6 +517,15 @@ class AssertRedirectsTests(TestCase):
             self.assertRedirects(response, 'https://testserver/secure_view/', status_code=302)
             with self.assertRaises(AssertionError):
                 self.assertRedirects(response, 'http://testserver/secure_view/', status_code=302)
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_full_path_in_expected_urls(self):
+        """
+        Test that specifying a full URL as assertRedirects expected_url still
+        work as backwards compatible behavior until Django 2.1.
+        """
+        response = self.client.get('/redirect_view/')
+        self.assertRedirects(response, 'http://testserver/get_view/')
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
@@ -850,7 +857,7 @@ class LoginTests(TestDataMixin, TestCase):
         # At this points, the self.client isn't logged in.
         # Check that assertRedirects uses the original client, not the
         # default client.
-        self.assertRedirects(response, "http://testserver/get_view/")
+        self.assertRedirects(response, "/get_view/")
 
 
 @override_settings(
