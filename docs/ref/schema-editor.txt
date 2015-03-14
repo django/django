@@ -163,6 +163,3 @@ connection
 A connection object to the database. A useful attribute of the connection is
 ``alias`` which can be used to determine the name of the database being
 accessed.
-
-This is useful when doing data migrations for :ref:`migrations with multiple
-databases <data-migrations-and-multiple-databases>`.
