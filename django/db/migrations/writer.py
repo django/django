@@ -184,7 +184,17 @@ class MigrationWriter(object):
         if self.migration.replaces:
             items['replaces_str'] = "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
 
-        return (MIGRATION_TEMPLATE % items).encode("utf8")
+        migration_statement = (MIGRATION_TEMPLATE % items).encode("utf8")
+        try:
+            import autopep8
+        except ImportError:
+            pass
+        else:
+            migration_statement = autopep8.fix_code(
+                migration_statement,
+                options=autopep8.parse_args(['--aggressive', ''])
+            )
+        return migration_statement
 
     @staticmethod
     def serialize_datetime(value):
