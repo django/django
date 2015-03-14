@@ -15,8 +15,8 @@
 
 <div id="{{ id }}_div_map">
     <div id="{{ id }}_map"></div>
-    <span class="clear_features"><a href="javascript:{{ module }}.clearFeatures()">Delete all Features</a></span>
-    {% if display_raw %}<p>Debugging window (serialized value):</p>{% endif %}
+    <span class="clear_features"><a href="javascript:{{ module }}.clearFeatures()">{% trans "Delete all Features" %}</a></span>
+    {% if display_raw %}<p>{% trans "Debugging window (serialized value)" %}</p>{% endif %}
     <textarea id="{{ id }}" class="vSerializedField required" cols="150" rows="10" name="{{ name }}">{{ serialized }}</textarea>
     <script type="text/javascript">
         {% block map_options %}var map_options = {};{% endblock %}
