@@ -765,16 +765,36 @@ def create_foreign_related_manager(superclass, rel):
             cache_name = self.field.related_query_name()
             return queryset, rel_obj_attr, instance_attr, False, cache_name
 
-        def add(self, *objs):
+        def add(self, *objs, **kwargs):
+            bulk = kwargs.pop('bulk', True)
             objs = list(objs)
             db = router.db_for_write(self.model, instance=self.instance)
-            with transaction.atomic(using=db, savepoint=False):
+
+            def check_and_update_obj(obj):
+                if not isinstance(obj, self.model):
+                    raise TypeError("'%s' instance expected, got %r" % (
+                        self.model._meta.object_name, obj,
+                    ))
+                setattr(obj, self.field.name, self.instance)
+
+            if bulk:
+                pks = []
                 for obj in objs:
-                    if not isinstance(obj, self.model):
-                        raise TypeError("'%s' instance expected, got %r" %
-                                        (self.model._meta.object_name, obj))
-                    setattr(obj, self.field.name, self.instance)
-                    obj.save()
+                    check_and_update_obj(obj)
+                    if obj._state.adding or obj._state.db != db:
+                        raise ValueError(
+                            "%r instance isn't saved. Use bulk=False or save "
+                            "the object first." % obj
+                        )
+                    pks.append(obj.pk)
+                self.model._base_manager.using(db).filter(pk__in=pks).update(**{
+                    self.field.name: self.instance,
+                })
+            else:
+                with transaction.atomic(using=db, savepoint=False):
+                    for obj in objs:
+                        check_and_update_obj(obj)
+                        obj.save()
         add.alters_data = True
 
         def create(self, **kwargs):
@@ -835,6 +855,7 @@ def create_foreign_related_manager(superclass, rel):
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)
 
+            bulk = kwargs.pop('bulk', True)
             clear = kwargs.pop('clear', False)
 
             if self.field.null:
@@ -842,7 +863,7 @@ def create_foreign_related_manager(superclass, rel):
                 with transaction.atomic(using=db, savepoint=False):
                     if clear:
                         self.clear()
-                        self.add(*objs)
+                        self.add(*objs, bulk=bulk)
                     else:
                         old_objs = set(self.using(db).all())
                         new_objs = []
@@ -852,10 +873,10 @@ def create_foreign_related_manager(superclass, rel):
                             else:
                                 new_objs.append(obj)
 
-                        self.remove(*old_objs)
-                        self.add(*new_objs)
+                        self.remove(*old_objs, bulk=bulk)
+                        self.add(*new_objs, bulk=bulk)
             else:
-                self.add(*objs)
+                self.add(*objs, bulk=bulk)
         set.alters_data = True
 
     return RelatedManager

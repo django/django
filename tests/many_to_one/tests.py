@@ -57,7 +57,11 @@ class ManyToOneTests(TestCase):
 
         # Create a new article, and add it to the article set.
         new_article2 = Article(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
-        self.r.article_set.add(new_article2)
+        msg = "<Article: Paul's story> instance isn't saved. Use bulk=False or save the object first."
+        with self.assertRaisesMessage(ValueError, msg):
+            self.r.article_set.add(new_article2)
+
+        self.r.article_set.add(new_article2, bulk=False)
         self.assertEqual(new_article2.reporter.id, self.r.id)
         self.assertQuerysetEqual(self.r.article_set.all(),
             [
