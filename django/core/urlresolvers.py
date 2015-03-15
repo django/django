@@ -527,15 +527,14 @@ def resolve(path, urlconf=None):
     return get_resolver(urlconf).resolve(path)
 
 
-def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current_app=None):
+def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
     if urlconf is None:
         urlconf = get_urlconf()
     resolver = get_resolver(urlconf)
     args = args or []
     kwargs = kwargs or {}
 
-    if prefix is None:
-        prefix = get_script_prefix()
+    prefix = get_script_prefix()
 
     if not isinstance(viewname, six.string_types):
         view = viewname

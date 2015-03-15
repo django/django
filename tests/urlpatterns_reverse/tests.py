@@ -24,6 +24,7 @@ from django.shortcuts import redirect
 from django.test import (
     SimpleTestCase, TestCase, ignore_warnings, override_settings,
 )
+from django.test.utils import override_script_prefix
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -199,33 +200,38 @@ class URLPatternReverse(TestCase):
         # Reversing None should raise an error, not return the last un-named view.
         self.assertRaises(NoReverseMatch, reverse, None)
 
+    @override_script_prefix('/{{invalid}}/')
     def test_prefix_braces(self):
         self.assertEqual(
             '/%7B%7Binvalid%7D%7D/includes/non_path_include/',
-            reverse('non_path_include', prefix='/{{invalid}}/')
+            reverse('non_path_include')
         )
 
     def test_prefix_parenthesis(self):
         # Parentheses are allowed and should not cause errors or be escaped
-        self.assertEqual(
-            '/bogus)/includes/non_path_include/',
-            reverse('non_path_include', prefix='/bogus)/')
-        )
-        self.assertEqual(
-            '/(bogus)/includes/non_path_include/',
-            reverse('non_path_include', prefix='/(bogus)/')
-        )
+        with override_script_prefix('/bogus)/'):
+            self.assertEqual(
+                '/bogus)/includes/non_path_include/',
+                reverse('non_path_include')
+            )
+        with override_script_prefix('/(bogus)/'):
+            self.assertEqual(
+                '/(bogus)/includes/non_path_include/',
+                reverse('non_path_include')
+            )
 
+    @override_script_prefix('/bump%20map/')
     def test_prefix_format_char(self):
         self.assertEqual(
             '/bump%2520map/includes/non_path_include/',
-            reverse('non_path_include', prefix='/bump%20map/')
+            reverse('non_path_include')
         )
 
+    @override_script_prefix('/%7Eme/')
     def test_non_urlsafe_prefix_with_args(self):
         # Regression for #20022, adjusted for #24013 because ~ is an unreserved
         # character. Tests whether % is escaped.
-        self.assertEqual('/%257Eme/places/1/', reverse('places', args=[1], prefix='/%7Eme/'))
+        self.assertEqual('/%257Eme/places/1/', reverse('places', args=[1]))
 
     def test_patterns_reported(self):
         # Regression for #17076
@@ -240,9 +246,10 @@ class URLPatternReverse(TestCase):
             # exception
             self.fail("Expected a NoReverseMatch, but none occurred.")
 
+    @override_script_prefix('/script:name/')
     def test_script_name_escaping(self):
         self.assertEqual(
-            reverse('optional', args=['foo:bar'], prefix='/script:name/'),
+            reverse('optional', args=['foo:bar']),
             '/script:name/optional/foo:bar/'
         )
 
