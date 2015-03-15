@@ -22,15 +22,13 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
-from django.core.urlresolvers import (
-    NoReverseMatch, get_script_prefix, resolve, reverse, set_script_prefix,
-)
+from django.core.urlresolvers import NoReverseMatch, resolve, reverse
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
     TestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
-from django.test.utils import patch_logger
+from django.test.utils import override_script_prefix, patch_logger
 from django.utils import formats, six, translation
 from django.utils._os import upath
 from django.utils.cache import get_max_age
@@ -5822,16 +5820,12 @@ class AdminKeepChangeListFiltersTests(TestCase):
             add_preserved_filters(context, url),
         )
 
-        original_prefix = get_script_prefix()
-        try:
-            set_script_prefix('/prefix/')
+        with override_script_prefix('/prefix/'):
             url = reverse('admin:auth_user_changelist', current_app=self.admin_site.name)
             self.assertURLEqual(
                 self.get_changelist_url(),
                 add_preserved_filters(context, url),
             )
-        finally:
-            set_script_prefix(original_prefix)
 
 
 class NamespacedAdminKeepChangeListFiltersTests(AdminKeepChangeListFiltersTests):
