@@ -25,7 +25,7 @@ def create_default_site(app_config, verbosity=2, interactive=True, using=DEFAULT
         # can also crop up outside of tests - see #15346.
         if verbosity >= 2:
             print("Creating example.com Site object")
-        Site(pk=settings.SITE_ID, domain="example.com", name="example.com").save(using=using)
+        Site(pk=getattr(settings, 'SITE_ID', 1), domain="example.com", name="example.com").save(using=using)
 
         # We set an explicit pk instead of relying on auto-incrementation,
         # so we need to reset the database sequence. See #17415.
