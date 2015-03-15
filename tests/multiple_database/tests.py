@@ -1043,6 +1043,17 @@ class RouterTestCase(TestCase):
         self.assertEqual(Book.objects.using('default').count(), 1)
         self.assertEqual(Book.objects.using('other').count(), 1)
 
+    def test_invalid_set_foreign_key_assignment(self):
+        marty = Person.objects.using('default').create(name="Marty Alchin")
+        dive = Book.objects.using('other').create(
+            title="Dive into Python",
+            published=datetime.date(2009, 5, 4),
+        )
+        # Set a foreign key set with an object from a different database
+        msg = "<Book: Dive into Python> instance isn't saved. Use bulk=False or save the object first."
+        with self.assertRaisesMessage(ValueError, msg):
+            marty.edited.set([dive])
+
     def test_foreign_key_cross_database_protection(self):
         "Foreign keys can cross databases if they two databases have a common source"
         # Create a book and author on the default database
@@ -1085,7 +1096,7 @@ class RouterTestCase(TestCase):
 
         # Set a foreign key set with an object from a different database
         try:
-            marty.edited = [pro, dive]
+            marty.edited.set([pro, dive], bulk=False)
         except ValueError:
             self.fail("Assignment across primary/replica databases with a common source should be ok")
 
@@ -1107,7 +1118,7 @@ class RouterTestCase(TestCase):
 
         # Add to a foreign key set with an object from a different database
         try:
-            marty.edited.add(dive)
+            marty.edited.add(dive, bulk=False)
         except ValueError:
             self.fail("Assignment across primary/replica databases with a common source should be ok")
 

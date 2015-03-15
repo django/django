@@ -400,6 +400,11 @@ Models
   managers created by ``ForeignKey``, ``GenericForeignKey``, and
   ``ManyToManyField``.
 
+* The :meth:`~django.db.models.fields.related.RelatedManager.add` method on
+  a reverse foreign key now has a ``bulk`` parameter to allow executing one
+  query regardless of the number of objects being added rather than one query
+  per object.
+
 * Added the ``keep_parents`` parameter to :meth:`Model.delete()
   <django.db.models.Model.delete>` to allow deleting only a child's data in a
   model that uses multi-table inheritance.
@@ -668,6 +673,15 @@ Dropped support for PostgreSQL 9.0
 
 Upstream support for PostgreSQL 9.0 ended in September 2015. As a consequence,
 Django 1.9 sets 9.1 as the minimum PostgreSQL version it officially supports.
+
+Bulk behavior of ``add()`` method of related managers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To improve performance, the ``add()`` methods of the related managers created
+by ``ForeignKey`` and ``GenericForeignKey`` changed from a series of
+``Model.save()`` calls to a single ``QuerySet.update()`` call. The change means
+that ``pre_save`` and ``post_save`` signals aren't sent anymore. You can use
+the ``bulk=False`` keyword argument to revert to the previous behavior.
 
 Template ``LoaderOrigin`` and ``StringOrigin`` are removed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
