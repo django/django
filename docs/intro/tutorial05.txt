@@ -177,7 +177,7 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
         def test_was_published_recently_with_future_question(self):
             """
             was_published_recently() should return False for questions whose
-            pub_date is in the future
+            pub_date is in the future.
             """
             time = timezone.now() + datetime.timedelta(days=30)
             future_question = Question(pub_date=time)
@@ -282,7 +282,7 @@ more comprehensively:
     def test_was_published_recently_with_old_question(self):
         """
         was_published_recently() should return False for questions whose
-        pub_date is older than 1 day
+        pub_date is older than 1 day.
         """
         time = timezone.now() - datetime.timedelta(days=30)
         old_question = Question(pub_date=time)
@@ -291,7 +291,7 @@ more comprehensively:
     def test_was_published_recently_with_recent_question(self):
         """
         was_published_recently() should return True for questions whose
-        pub_date is within the last day
+        pub_date is within the last day.
         """
         time = timezone.now() - datetime.timedelta(hours=1)
         recent_question = Question(pub_date=time)
@@ -483,7 +483,7 @@ class:
         def test_index_view_with_a_past_question(self):
             """
             Questions with a pub_date in the past should be displayed on the
-            index page
+            index page.
             """
             create_question(question_text="Past question.", days=-30)
             response = self.client.get(reverse('polls:index'))
