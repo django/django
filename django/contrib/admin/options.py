@@ -855,6 +855,13 @@ class ModelAdmin(BaseModelAdmin):
         """
         return self.list_filter
 
+    def get_list_select_related(self, request):
+        """
+        Returns a list of fields to add to the select_related() part of the
+        changelist items query.
+        """
+        return self.list_select_related
+
     def get_search_fields(self, request):
         """
         Returns a sequence containing the fields to be searched whenever
@@ -1433,6 +1440,7 @@ class ModelAdmin(BaseModelAdmin):
         list_display_links = self.get_list_display_links(request, list_display)
         list_filter = self.get_list_filter(request)
         search_fields = self.get_search_fields(request)
+        list_select_related = self.get_list_select_related(request)
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
@@ -1444,7 +1452,7 @@ class ModelAdmin(BaseModelAdmin):
         try:
             cl = ChangeList(request, self.model, list_display,
                 list_display_links, list_filter, self.date_hierarchy,
-                search_fields, self.list_select_related, self.list_per_page,
+                search_fields, list_select_related, self.list_per_page,
                 self.list_max_show_all, self.list_editable, self)
 
         except IncorrectLookupParameters:
