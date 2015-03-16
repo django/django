@@ -43,6 +43,11 @@ Minor features
   the old URL still redirects to the new one for backwards compatibility, but
   it may be removed in a future version.
 
+* :meth:`ModelAdmin.get_list_select_related()
+  <django.contrib.admin.ModelAdmin.get_list_select_related>` was added to allow
+  changing the ``select_related()`` values used in the admin's changelist query
+  based on the request.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

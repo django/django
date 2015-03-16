@@ -920,6 +920,9 @@ subclass::
 
     will call ``select_related('author', 'category')``.
 
+    If you need to specify a dynamic value based on the request, you can
+    implement a :meth:`~ModelAdmin.get_list_select_related` method.
+
 .. attribute:: ModelAdmin.ordering
 
     Set ``ordering`` to specify how lists of objects should be ordered in the
@@ -931,7 +934,6 @@ subclass::
 
     If you need to specify a dynamic order (for example depending on user or
     language) you can implement a :meth:`~ModelAdmin.get_ordering` method.
-
 
 .. attribute:: ModelAdmin.paginator
 
@@ -1365,6 +1367,14 @@ templates used by the :class:`ModelAdmin` views:
     The ``get_list_filter`` method is given the ``HttpRequest`` and is expected
     to return the same kind of sequence type as for the
     :attr:`~ModelAdmin.list_filter` attribute.
+
+.. method:: ModelAdmin.get_list_select_related(request)
+
+    .. versionadded:: 1.9
+
+    The ``get_list_select_related`` method is given the ``HttpRequest`` and
+    should return a boolean or list as :attr:`ModelAdmin.list_select_related`
+    does.
 
 .. method:: ModelAdmin.get_search_fields(request)
 

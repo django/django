@@ -50,9 +50,10 @@ class ChangeListTests(TestCase):
         """
         m = ChildAdmin(Child, admin.site)
         request = self.factory.get('/child/')
+        list_select_related = m.get_list_select_related(request)
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                         m.list_filter, m.date_hierarchy, m.search_fields,
-                        m.list_select_related, m.list_per_page,
+                        list_select_related, m.list_per_page,
                         m.list_max_show_all, m.list_editable, m)
         self.assertEqual(cl.queryset.query.select_related, {
             'parent': {'name': {}}
@@ -61,9 +62,10 @@ class ChangeListTests(TestCase):
     def test_select_related_as_tuple(self):
         ia = InvitationAdmin(Invitation, admin.site)
         request = self.factory.get('/invitation/')
+        list_select_related = ia.get_list_select_related(request)
         cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
                         ia.list_filter, ia.date_hierarchy, ia.search_fields,
-                        ia.list_select_related, ia.list_per_page,
+                        list_select_related, ia.list_per_page,
                         ia.list_max_show_all, ia.list_editable, ia)
         self.assertEqual(cl.queryset.query.select_related, {'player': {}})
 
@@ -71,11 +73,28 @@ class ChangeListTests(TestCase):
         ia = InvitationAdmin(Invitation, admin.site)
         ia.list_select_related = ()
         request = self.factory.get('/invitation/')
+        list_select_related = ia.get_list_select_related(request)
         cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
                         ia.list_filter, ia.date_hierarchy, ia.search_fields,
-                        ia.list_select_related, ia.list_per_page,
+                        list_select_related, ia.list_per_page,
                         ia.list_max_show_all, ia.list_editable, ia)
         self.assertEqual(cl.queryset.query.select_related, False)
+
+    def test_get_select_related_custom_method(self):
+        class GetListSelectRelatedAdmin(admin.ModelAdmin):
+            list_display = ('band', 'player')
+
+            def get_list_select_related(self, request):
+                return ('band', 'player')
+
+        ia = GetListSelectRelatedAdmin(Invitation, admin.site)
+        request = self.factory.get('/invitation/')
+        list_select_related = ia.get_list_select_related(request)
+        cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
+                        ia.list_filter, ia.date_hierarchy, ia.search_fields,
+                        list_select_related, ia.list_per_page,
+                        ia.list_max_show_all, ia.list_editable, ia)
+        self.assertEqual(cl.queryset.query.select_related, {'player': {}, 'band': {}})
 
     def test_result_list_empty_changelist_value(self):
         """
