@@ -617,8 +617,8 @@ class ExpressionOperatorTests(TestCase):
 class FTimeDeltaTests(TestCase):
 
     def setUp(self):
-        sday = datetime.date(2010, 6, 25)
-        stime = datetime.datetime(2010, 6, 25, 12, 15, 30, 747000)
+        self.sday = sday = datetime.date(2010, 6, 25)
+        self.stime = stime = datetime.datetime(2010, 6, 25, 12, 15, 30, 747000)
         midnight = datetime.time(0)
 
         delta0 = datetime.timedelta(0)
@@ -820,6 +820,19 @@ class FTimeDeltaTests(TestCase):
         over_estimate = [e.name for e in
             Experiment.objects.filter(estimated_time__lt=F('end') - F('start'))]
         self.assertEqual(over_estimate, ['e4'])
+
+    def test_duration_with_datetime(self):
+        # Exclude e1 which has very high precision so we can test this on
+        # all backends regardless of whether or not it supports
+        # microsecond_precision.
+        over_estimate = Experiment.objects.exclude(name='e1').filter(
+            completed__gt=self.stime + F('estimated_time')
+        ).order_by('name')
+        self.assertQuerysetEqual(
+            over_estimate,
+            ['e3', 'e4'],
+            lambda e: e.name
+        )
 
 
 class ValueTests(TestCase):
