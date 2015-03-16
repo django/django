@@ -345,6 +345,14 @@ Note: As with ``get()``, a
 :class:`~django.core.exceptions.MultipleObjectsReturned` exception
 will be raised if more than one object is found.
 
+``get_object_or_none``
+======================
+
+.. function:: get_object_or_none(klass, *args, **kwargs)
+
+    This is similar to :func:`get_object_or_404()` but instead of raising a
+    :class:`~django.http.Http404` error, it returns `None`.
+
 ``get_list_or_404``
 ===================
 
