@@ -1291,6 +1291,30 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     If in doubt, leave it to its default of ``True``.
 
+.. attribute:: ForeignKey.allow_unsaved_instance_assignment
+
+    .. versionadded:: 1.8
+
+        This flag was added for backwards compatibility as older versions of
+        Django always allowed assigning unsaved model instances.
+
+    Django prevents unsaved model instances from being assigned to a
+    ``ForeignKey`` field to prevent accidental data loss (unsaved foreign keys
+    are silently ignored when saving a model instance).
+
+    If you require allowing the assignment of unsaved instances and aren't
+    concerned about the data loss possibility (e.g. you never save the objects
+    to the database), you can disable this check by creating a subclass of the
+    field class and setting its ``allow_unsaved_instance_assignment`` attribute
+    to ``True``. For example::
+
+        class UnsavedForeignKey(models.ForeignKey):
+            # A ForeignKey which can point to an unsaved object
+            allow_unsaved_instance_assignment = True
+
+        class Book(models.Model):
+            author = UnsavedForeignKey(Author)
+
 .. _ref-manytomany:
 
 ``ManyToManyField``
@@ -1388,7 +1412,7 @@ that control how the relationship functions.
     * ``<other_model>_id``: the ``id`` of the model that the
       ``ManyToManyField`` points to.
 
-    If the ``ManyToManyField`` points from and to the same model, the following 
+    If the ``ManyToManyField`` points from and to the same model, the following
     fields are generated:
 
     * ``id``: the primary key of the relation.
@@ -1482,6 +1506,12 @@ that control how the relationship functions.
     if it is a profile model designed specifically for your custom user model.
 
     If in doubt, leave it to its default of ``True``.
+
+.. attribute:: ManyToManyField.allow_unsaved_instance_assignment
+
+    .. versionadded:: 1.8
+
+    Works analogously to :attr:`ForeignKey.allow_unsaved_instance_assignment`.
 
 :class:`ManyToManyField` does not support :attr:`~Field.validators`.
 

@@ -60,6 +60,10 @@ raises ``ValueError``::
     ...
     ValueError: 'Cannot assign "<Reporter: John Smith>": "Reporter" instance isn't saved in the database.'
 
+If you want to disable the unsaved instance check, you can use the
+:attr:`~django.db.models.ForeignKey.allow_unsaved_instance_assignment`
+attribute.
+
 .. versionchanged:: 1.8
 
     Previously, assigning unsaved objects did not raise an error and could

@@ -713,6 +713,12 @@ Now, an error will be raised to prevent data loss::
     ...
     ValueError: Cannot assign "<Author: John>": "Author" instance isn't saved in the database.
 
+If you require allowing the assignment of unsaved instances (the old behavior)
+and aren't concerned about the data loss possibility (e.g. you never save the
+objects to the database), you can disable this check by using the
+:attr:`~django.db.models.ForeignKey.allow_unsaved_instance_assignment`
+attribute.
+
 Management commands that only accept positional arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
