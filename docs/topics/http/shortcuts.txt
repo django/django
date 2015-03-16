@@ -346,7 +346,7 @@ Note: As with ``get()``, a
 will be raised if more than one object is found.
 
 ``get_object_or_none``
-=====================
+======================
 
 .. function:: get_object_or_none(klass, *args, **kwargs)
 
