@@ -1554,7 +1554,7 @@ Reorganization of ``django.contrib.contenttypes``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since ``django.contrib.contenttypes.generic`` defined both admin and model
-related objects an import of this module could trigger unexpected side effects.
+related objects, an import of this module could trigger unexpected side effects.
 As a consequence, its contents were split into :mod:`~django.contrib.contenttypes`
 submodules and the ``django.contrib.contenttypes.generic`` module is deprecated:
 
