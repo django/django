@@ -709,7 +709,7 @@ class ModelAdmin(BaseModelAdmin):
             object_id=object.pk,
             object_repr=force_text(object),
             action_flag=ADDITION,
-            change_message=message
+            change_message=message,
         )
 
     def log_change(self, request, object, message):
@@ -725,7 +725,7 @@ class ModelAdmin(BaseModelAdmin):
             object_id=object.pk,
             object_repr=force_text(object),
             action_flag=CHANGE,
-            change_message=message
+            change_message=message,
         )
 
     def log_deletion(self, request, object, object_repr):
@@ -741,7 +741,7 @@ class ModelAdmin(BaseModelAdmin):
             content_type_id=get_content_type_for_model(object).pk,
             object_id=object.pk,
             object_repr=object_repr,
-            action_flag=DELETION
+            action_flag=DELETION,
         )
 
     def action_checkbox(self, obj):
