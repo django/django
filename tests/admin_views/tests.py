@@ -1547,9 +1547,10 @@ class AdminViewPermissionsTest(TestCase):
         # Check that the addition was logged correctly
         addition_log = LogEntry.objects.all()[0]
         new_article = Article.objects.last()
+        article_ct = ContentType.objects.get_for_model(Article)
         self.assertEqual(addition_log.user_id, self.u2.pk)
-        self.assertEqual(addition_log.content_type_id, get_content_type_for_model(new_article).pk)
-        self.assertEqual(addition_log.object_id, new_article.pk)
+        self.assertEqual(addition_log.content_type_id, article_ct.pk)
+        self.assertEqual(addition_log.object_id, str(new_article.pk))
         self.assertEqual(addition_log.object_repr, "Døm ikke")
         self.assertEqual(addition_log.action_flag, ADDITION)
         self.assertEqual(addition_log.change_message, "Added.")
