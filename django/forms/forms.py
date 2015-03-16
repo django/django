@@ -73,9 +73,11 @@ class BaseForm(object):
     # class is different than Form. See the comments by the Form class for more
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
+    field_order = None
+
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
-                 empty_permitted=False):
+                 empty_permitted=False, field_order=None):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
@@ -96,6 +98,29 @@ class BaseForm(object):
         # self.base_fields.
         self.fields = copy.deepcopy(self.base_fields)
         self._bound_fields_cache = {}
+        self.order_fields(self.field_order if field_order is None else field_order)
+
+    def order_fields(self, field_order):
+        """
+        Rearranges the fields according to field_order.
+
+        field_order is a list of field names specifying the order. Fields not
+        included in the list are appended in the default order for backward
+        compatibility with subclasses not overriding field_order. If field_order
+        is None, all fields are kept in the order defined in the class.
+        Unknown fields in field_order are ignored to allow disabling fields in
+        form subclasses without redefining ordering.
+        """
+        if field_order is None:
+            return
+        fields = OrderedDict()
+        for key in field_order:
+            try:
+                fields[key] = self.fields.pop(key)
+            except KeyError:  # ignore unknown fields
+                pass
+        fields.update(self.fields)  # add remaining fields in original order
+        self.fields = fields
 
     def __str__(self):
         return self.as_table()
