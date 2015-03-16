@@ -398,9 +398,10 @@ class DurationExpression(Expression):
                 output = side.output_field
             except FieldError:
                 pass
-            if output.get_internal_type() == 'DurationField':
-                sql, params = compiler.compile(side)
-                return connection.ops.format_for_duration_arithmetic(sql), params
+            else:
+                if output.get_internal_type() == 'DurationField':
+                    sql, params = compiler.compile(side)
+                    return connection.ops.format_for_duration_arithmetic(sql), params
         return compiler.compile(side)
 
     def as_sql(self, compiler, connection):
