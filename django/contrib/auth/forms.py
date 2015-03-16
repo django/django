@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-from collections import OrderedDict
-
 from django import forms
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.hashers import (
@@ -303,6 +301,8 @@ class PasswordChangeForm(SetPasswordForm):
     old_password = forms.CharField(label=_("Old password"),
                                    widget=forms.PasswordInput)
 
+    field_order = ['old_password', 'new_password1', 'new_password2']
+
     def clean_old_password(self):
         """
         Validates that the old_password field is correct.
@@ -314,11 +314,6 @@ class PasswordChangeForm(SetPasswordForm):
                 code='password_incorrect',
             )
         return old_password
-
-PasswordChangeForm.base_fields = OrderedDict(
-    (k, PasswordChangeForm.base_fields[k])
-    for k in ['old_password', 'new_password1', 'new_password2']
-)
 
 
 class AdminPasswordChangeForm(forms.Form):

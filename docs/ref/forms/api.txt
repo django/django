@@ -700,6 +700,31 @@ example, in the ``ContactForm`` example, the fields are defined in the order
 ``subject``, ``message``, ``sender``, ``cc_myself``. To reorder the HTML
 output, just change the order in which those fields are listed in the class.
 
+There are several other ways to customize the order:
+
+.. attribute:: Form.field_order
+
+.. versionadded:: 1.9
+
+By default ``Form.field_order=None``, which retains the order in which you
+define the fields in your form class. If ``field_order`` is a list of field
+names, the fields are ordered as specified by the list and remaining fields are
+appended according to the default order. Unknown field names in the list are
+ignored. This makes it possible to disable a field in a subclass by setting it
+to ``None`` without having to redefine ordering.
+
+You can also use the ``Form.field_order`` argument to a :class:`Form` to
+override the field order. If a :class:`~django.forms.Form` defines
+:attr:`~Form.field_order` *and* you include ``field_order`` when instantiating
+the ``Form``, then the latter ``field_order`` will have precedence.
+
+.. method:: Form.order_fields(field_order)
+
+.. versionadded:: 1.9
+
+You may rearrange the fields any time using ``order_fields()`` with a list of
+field names as in :attr:`~django.forms.Form.field_order`.
+
 How errors are displayed
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
