@@ -8,7 +8,7 @@ import unittest
 
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
-from django.contrib.admin.models import DELETION, LogEntry
+from django.contrib.admin.models import ADDITION, DELETION, LogEntry
 from django.contrib.admin.options import TO_FIELD_VAR
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
@@ -1543,6 +1543,16 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a created object')
         self.client.get(reverse('admin:logout'))
+
+        # Check that the addition was logged correctly
+        addition_log = LogEntry.objects.all()[0]
+        new_article = Article.objects.last()
+        self.assertEqual(addition_log.user_id, self.u2.pk)
+        self.assertEqual(addition_log.content_type_id, get_content_type_for_model(new_article).pk)
+        self.assertEqual(addition_log.object_id, new_article.pk)
+        self.assertEqual(addition_log.object_repr, "Døm ikke")
+        self.assertEqual(addition_log.action_flag, ADDITION)
+        self.assertEqual(addition_log.change_message, "Added.")
 
         # Super can add too, but is redirected to the change list view
         self.client.get(self.index_url)

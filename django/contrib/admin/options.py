@@ -696,7 +696,7 @@ class ModelAdmin(BaseModelAdmin):
     def get_paginator(self, request, queryset, per_page, orphans=0, allow_empty_first_page=True):
         return self.paginator(queryset, per_page, orphans, allow_empty_first_page)
 
-    def log_addition(self, request, object):
+    def log_addition(self, request, object, message):
         """
         Log that an object has been successfully added.
 
@@ -708,7 +708,8 @@ class ModelAdmin(BaseModelAdmin):
             content_type_id=get_content_type_for_model(object).pk,
             object_id=object.pk,
             object_repr=force_text(object),
-            action_flag=ADDITION
+            action_flag=ADDITION,
+            change_message=message
         )
 
     def log_change(self, request, object, message):
@@ -913,12 +914,14 @@ class ModelAdmin(BaseModelAdmin):
                 return urlencode({'_changelist_filters': preserved_filters})
         return ''
 
-    def construct_change_message(self, request, form, formsets):
+    def construct_change_message(self, request, form, formsets, add=False):
         """
         Construct a change message from a changed object.
         """
         change_message = []
-        if form.changed_data:
+        if add:
+            change_message.append(_('Added.'))
+        elif form.changed_data:
             change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
 
         if formsets:
@@ -1366,11 +1369,11 @@ class ModelAdmin(BaseModelAdmin):
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, not add)
                 self.save_related(request, form, formsets, not add)
+                change_message = self.construct_change_message(request, form, formsets, add)
                 if add:
-                    self.log_addition(request, new_object)
+                    self.log_addition(request, new_object, change_message)
                     return self.response_add(request, new_object)
                 else:
-                    change_message = self.construct_change_message(request, form, formsets)
                     self.log_change(request, new_object, change_message)
                     return self.response_change(request, new_object)
         else:
