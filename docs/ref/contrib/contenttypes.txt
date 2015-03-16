@@ -299,6 +299,13 @@ model:
        is ``True``. This mirrors the ``for_concrete_model`` argument to
        :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`.
 
+    .. attribute:: GenericForeignKey.allow_unsaved_instance_assignment
+
+        .. versionadded:: 1.8
+
+        Works analogously to :attr:`ForeignKey.allow_unsaved_instance_assignment
+        <django.db.models.ForeignKey.allow_unsaved_instance_assignment>`.
+
 .. admonition:: Primary key type compatibility
 
    The "object_id" field doesn't have to be the same type as the
