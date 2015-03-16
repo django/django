@@ -71,6 +71,9 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
 
     from django.contrib.contenttypes.models import ContentType
 
+    permission_name_max_length = Permission._meta.get_field('name').max_length
+    verbose_name_max_length = permission_name_max_length - 11  # len('Can change ') prefix
+
     # This will hold the permissions we're looking for as
     # (content_type, (codename, name))
     searched_perms = list()
@@ -80,6 +83,16 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
         # Force looking up the content types in the current database
         # before creating foreign keys to them.
         ctype = ContentType.objects.db_manager(using).get_for_model(klass)
+
+        if len(klass._meta.verbose_name) > verbose_name_max_length:
+            raise exceptions.ValidationError(
+                "The verbose_name of %s.%s is longer than %s characters" % (
+                    ctype.app_label,
+                    ctype.model,
+                    verbose_name_max_length,
+                )
+            )
+
         ctypes.add(ctype)
         for perm in _get_all_permissions(klass._meta, ctype):
             searched_perms.append((ctype, perm))
@@ -98,17 +111,16 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
         for ct, (codename, name) in searched_perms
         if (ct.pk, codename) not in all_perms
     ]
-    # Validate the permissions before bulk_creation to avoid cryptic
-    # database error when the verbose_name is longer than 50 characters
-    permission_name_max_length = Permission._meta.get_field('name').max_length
-    verbose_name_max_length = permission_name_max_length - 11  # len('Can change ') prefix
+    # Validate the permissions before bulk_creation to avoid cryptic database
+    # error when the name is longer than 255 characters
     for perm in perms:
         if len(perm.name) > permission_name_max_length:
             raise exceptions.ValidationError(
-                "The verbose_name of %s.%s is longer than %s characters" % (
+                "The permission name %s of %s.%s is longer than %s characters" % (
+                    perm.name,
                     perm.content_type.app_label,
                     perm.content_type.model,
-                    verbose_name_max_length,
+                    permission_name_max_length,
                 )
             )
     Permission.objects.using(using).bulk_create(perms)
