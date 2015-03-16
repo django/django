@@ -167,11 +167,10 @@ def get_object_or_none(klass, *args, **kwargs):
     Note: Like with get(), an MultipleObjectsReturned will be raised if more
     than one object is found.
     """
-    queryset = _get_queryset(klass)
     try:
-        return queryset.get(*args, **kwargs)
-    except queryset.model.DoesNotExist:
-        raise None
+        return get_object_or_404(klass, *args, **kwargs)
+    except Http404:
+        return None
 
 
 def get_list_or_404(klass, *args, **kwargs):

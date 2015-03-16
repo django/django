@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 
 from django.http import Http404
-from django.shortcuts import get_list_or_404, get_object_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404, \
+    get_object_or_none
 from django.test import TestCase
 
 from .models import Article, Author
 
 
-class GetObjectOr404Tests(TestCase):
+class GetObjectTests(TestCase):
     def test_get_object_or_404(self):
         a1 = Author.objects.create(name="Brave Sir Robin")
         a2 = Author.objects.create(name="Patsy")
@@ -85,6 +86,59 @@ class GetObjectOr404Tests(TestCase):
             [article]
         )
 
+    def test_get_object_or_none(self):
+        a1 = Author.objects.create(name="Brave Sir Robin")
+        a2 = Author.objects.create(name="Patsy")
+
+        # No Articles yet, so we should get a `None`.
+        self.assertEqual(None, get_object_or_none(Article, title="Foo"))
+
+        article = Article.objects.create(title="Run away!")
+        article.authors = [a1, a2]
+        # get_object_or_none can be passed a Model to query.
+        self.assertEqual(
+            get_object_or_none(Article, title__contains="Run"),
+            article
+        )
+
+        # We can also use the Article manager through an Author object.
+        self.assertEqual(
+            get_object_or_none(a1.article_set, title__contains="Run"),
+            article
+        )
+
+        # No articles containing "Camelot".  This should return `None`.
+        self.assertEqual(
+            None,
+            get_object_or_none(a1.article_set, title__contains="Camelot")
+        )
+
+        # Custom managers can be used too.
+        self.assertEqual(
+            get_object_or_none(Article.by_a_sir, title="Run away!"),
+            article
+        )
+
+        # QuerySets can be used too.
+        self.assertEqual(
+            get_object_or_none(Article.objects.all(), title__contains="Run"),
+            article
+        )
+
+        # Just as when using a get() lookup, you will get an error if more than
+        # one object is returned.
+
+        self.assertRaises(
+            Author.MultipleObjectsReturned,
+            get_object_or_none, Author.objects.all()
+        )
+
+        # Using an empty QuerySet returns `None`
+        self.assertRaises(
+            None,
+            get_object_or_none(Article.objects.none(), title__contains="Run")
+        )
+
     def test_bad_class(self):
         # Given an argument klass that is not a Model, Manager, or Queryset
         # raises a helpful ValueError message
@@ -111,4 +165,18 @@ class GetObjectOr404Tests(TestCase):
             "Object is of type 'list', but must be a Django Model, Manager, "
             "or QuerySet",
             get_list_or_404, [Article], title__icontains="Run"
+        )
+
+        self.assertRaisesMessage(
+            ValueError,
+            "Object is of type 'str', but must be a Django Model, Manager, "
+            "or QuerySet",
+            get_object_or_none, str("Article"), title__icontains="Run"
+        )
+
+        self.assertRaisesMessage(
+            ValueError,
+            "Object is of type 'CustomClass', but must be a Django Model, "
+            "Manager, or QuerySet",
+            get_object_or_none, CustomClass, title__icontains="Run"
         )
