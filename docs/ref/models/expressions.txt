@@ -278,6 +278,17 @@ should define the desired ``output_field``. For example, adding an
 ``IntegerField()`` and a ``FloatField()`` together should probably have
 ``output_field=FloatField()`` defined.
 
+.. note::
+
+    When you need to define the ``output_field`` for ``F`` expression
+    arithmetic between different types, it's necessary to surround the
+    expression in another expression::
+
+        from django.db.models import DateTimeField, ExpressionNode, F
+
+        Race.objects.annotate(finish=ExpressionNode(
+            F('start') + F('duration'), output_field=DateTimeField()))
+
 .. versionchanged:: 1.8
 
     ``output_field`` is a new parameter.
