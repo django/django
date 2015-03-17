@@ -17,16 +17,6 @@ Settings
 
     The settings below have sensible defaults, and shouldn't require manual setting.
 
-.. setting:: POSTGIS_TEMPLATE
-
-``POSTGIS_TEMPLATE``
-^^^^^^^^^^^^^^^^^^^^
-
-This setting may be used to customize the name of the PostGIS template
-database to use. It automatically defaults to ``'template_postgis'``
-(the same name used in the
-:ref:`installation documentation <spatialdb_template>`).
-
 .. setting:: POSTGIS_VERSION
 
 ``POSTGIS_VERSION``
@@ -79,15 +69,6 @@ Or you may alter the user's role from the SQL shell (assuming this
 is done from an existing superuser account)::
 
     postgres# ALTER ROLE <user_name> SUPERUSER;
-
-Create a database using PostGIS version 2
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-When testing projects using :ref:`PostGIS 2 <spatialdb_template91>`,
-the test database is created using the ``CREATE EXTENSION postgis``
-instruction, provided that no template ``template_postgis`` (or named
-accordingly to :setting:`POSTGIS_TEMPLATE`) exists in the current
-database.
 
 Windows
 -------
