@@ -445,7 +445,7 @@ From within the Application Stack Builder (to run outside of the installer,
 :menuselection:`Start --> Programs --> PostgreSQL 9.x`), select
 :menuselection:`PostgreSQL Database Server 9.x on port 5432` from the drop down
 menu.  Next, expand the :menuselection:`Categories --> Spatial Extensions` menu
-tree and select :menuselection:`PostGIS 1.5 for PostgreSQL 9.x`.
+tree and select :menuselection:`PostGIS X.Y for PostgreSQL 9.x`.
 
 After clicking next, you will be prompted to select your mirror, PostGIS
 will be downloaded, and the PostGIS installer will begin.  Select only the

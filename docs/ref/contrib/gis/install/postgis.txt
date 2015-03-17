@@ -13,7 +13,7 @@ might also need additional libraries, see `PostGIS requirements`_.
     when using GeoDjango with PostGIS.
 
 .. _psycopg2: http://initd.org/psycopg/
-.. _PostGIS requirements: http://www.postgis.org/documentation/manual-2.0/postgis_installation.html#id554707
+.. _PostGIS requirements: http://postgis.net/docs/manual-2.1/postgis_installation.html#install_requirements
 
 On Debian/Ubuntu, you are advised to install the following packages:
 postgresql-x.x, postgresql-x.x-postgis, postgresql-server-dev-x.x,
@@ -26,9 +26,9 @@ Building from source
 
 First download the source archive, and extract::
 
-    $ wget http://download.osgeo.org/postgis/source/postgis-2.0.3.tar.gz
-    $ tar xzf postgis-2.0.3.tar.gz
-    $ cd postgis-2.0.3
+    $ wget http://download.osgeo.org/postgis/source/postgis-2.1.5.tar.gz
+    $ tar xzf postgis-2.1.5.tar.gz
+    $ cd postgis-2.1.5
 
 Next, configure, make and install PostGIS::
 
