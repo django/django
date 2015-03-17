@@ -147,6 +147,6 @@ be performed when executing the command::
 
     $ ./runtests.py --settings=postgis
 
-To run only the GeoDjango test suite, specify ``django.contrib.gis``::
+To run only the GeoDjango test suite, specify ``gis_tests``::
 
-    $ ./runtests.py --settings=postgis django.contrib.gis
+    $ ./runtests.py --settings=postgis gis_tests
