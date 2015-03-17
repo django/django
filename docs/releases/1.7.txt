@@ -1514,6 +1514,22 @@ As :class:`~collections.OrderedDict` was added to the standard library in
 Python 2.7, :class:`~django.utils.datastructures.SortedDict` is no longer
 needed and has been deprecated.
 
+The two additional, deprecated methods provided by ``SortedDict`` (``insert()``
+and ``value_for_index()``) have been removed. If you relied on these methods to
+alter structures like form fields, you should now treat these ``OrderedDict``\s
+as immutable objects and override them to change their content.
+
+For example, you might want to override ``MyFormClass.base_fields`` (although
+this attribute isn't considered a public API) to change the ordering of fields
+for all ``MyFormClass`` instances; or similarly, you could override
+``self.fields`` from inside ``MyFormClass.__init__()``, to change the fields
+for a particular form instance. For example (from Django itself)::
+
+    PasswordChangeForm.base_fields = OrderedDict(
+        (k, PasswordChangeForm.base_fields[k])
+        for k in ['old_password', 'new_password1', 'new_password2']
+    )
+
 Custom SQL location for models package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
