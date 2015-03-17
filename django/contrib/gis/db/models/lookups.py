@@ -4,7 +4,7 @@ import re
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Col, ExpressionNode
+from django.db.models.expressions import Col, Expression
 from django.db.models.lookups import Lookup
 from django.utils import six
 
@@ -80,7 +80,7 @@ class GISLookup(Lookup):
             if not hasattr(geo_fld, 'srid'):
                 raise ValueError('No geographic field found in expression.')
             self.rhs.srid = geo_fld.srid
-        elif isinstance(self.rhs, ExpressionNode):
+        elif isinstance(self.rhs, Expression):
             raise ValueError('Complex expressions not supported for GeometryField')
         elif isinstance(self.rhs, (list, tuple)):
             geom = self.rhs[0]
