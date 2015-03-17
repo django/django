@@ -190,8 +190,7 @@ class Collector(object):
         models, the one case in which the cascade follows the forwards
         direction of an FK rather than the reverse direction.)
 
-        If 'keep_parents' is False, data of parent's models will be not
-        deleted.
+        If 'keep_parents' is True, data of parent model's will be not deleted.
         """
         if self.can_fast_delete(objs):
             self.fast_deletes.append(objs)
