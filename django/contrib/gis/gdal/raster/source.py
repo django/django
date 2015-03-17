@@ -90,6 +90,10 @@ class GDALRaster(GDALBase):
             if 'width' not in ds_input or 'height' not in ds_input:
                 raise GDALException('Specify width and height attributes for JSON or dict input.')
 
+            # Check if srid was specified
+            if 'srid' not in ds_input:
+                raise GDALException('Specify srid for JSON or dict input.')
+
             # Create GDAL Raster
             self._ptr = capi.create_ds(
                 driver._ptr,
@@ -108,7 +112,7 @@ class GDALRaster(GDALBase):
                     self.bands[i].nodata_value = band_input['nodata_value']
 
             # Set SRID, default to 0 (this assures SRS is always instanciated)
-            self.srs = ds_input.get('srid', 0)
+            self.srs = ds_input.get('srid')
 
             # Set additional properties if provided
             if 'origin' in ds_input:
