@@ -308,12 +308,6 @@ This command should produce the following output:
     CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" );
     COMMIT;
 
-.. note::
-
-    With PostGIS < 2.0, the output is slightly different. The ``mpoly`` geometry
-    column is added through a separate ``SELECT AddGeometryColumn(...)``
-    statement.
-
 If this looks correct, run :djadmin:`migrate` to create this table in the
 database:
 

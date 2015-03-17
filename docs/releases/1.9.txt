@@ -418,6 +418,8 @@ Miscellaneous
   backwards incompatible if you have overridden the ``get_context_data()``
   method without calling ``super()``.
 
+* Support for PostGIS 1.5 has been dropped.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9

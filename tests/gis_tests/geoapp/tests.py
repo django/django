@@ -696,12 +696,8 @@ class GeoQuerySetTest(TestCase):
 
         for c in City.objects.filter(point__isnull=False).num_geom():
             # Oracle and PostGIS 2.0+ will return 1 for the number of
-            # geometries on non-collections, whereas PostGIS < 2.0.0
-            # will return None.
-            if postgis and connection.ops.spatial_version < (2, 0, 0):
-                self.assertIsNone(c.num_geom)
-            else:
-                self.assertEqual(1, c.num_geom)
+            # geometries on non-collections.
+            self.assertEqual(1, c.num_geom)
 
     @skipUnlessDBFeature("supports_num_points_poly")
     def test_num_points(self):

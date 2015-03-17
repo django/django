@@ -110,6 +110,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         self.distance_spheroid = prefix + 'distance_spheroid'
         self.envelope = prefix + 'Envelope'
         self.extent = prefix + 'Extent'
+        self.extent3d = prefix + '3DExtent'
         self.force_rhr = prefix + 'ForceRHR'
         self.geohash = prefix + 'GeoHash'
         self.geojson = prefix + 'AsGeoJson'
@@ -117,12 +118,14 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         self.intersection = prefix + 'Intersection'
         self.kml = prefix + 'AsKML'
         self.length = prefix + 'Length'
+        self.length3d = prefix + '3DLength'
         self.length_spheroid = prefix + 'length_spheroid'
         self.makeline = prefix + 'MakeLine'
         self.mem_size = prefix + 'mem_size'
         self.num_geom = prefix + 'NumGeometries'
         self.num_points = prefix + 'npoints'
         self.perimeter = prefix + 'Perimeter'
+        self.perimeter3d = prefix + '3DPerimeter'
         self.point_on_surface = prefix + 'PointOnSurface'
         self.polygonize = prefix + 'Polygonize'
         self.reverse = prefix + 'Reverse'
@@ -134,34 +137,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         self.translate = prefix + 'Translate'
         self.union = prefix + 'Union'
         self.unionagg = prefix + 'Union'
-
-    # Following "attributes" are properties due to the spatial_version check and
-    # to delay database access
-    @property
-    def extent3d(self):
-        if self.spatial_version >= (2, 0, 0):
-            return self.geom_func_prefix + '3DExtent'
-        else:
-            return self.geom_func_prefix + 'Extent3D'
-
-    @property
-    def length3d(self):
-        if self.spatial_version >= (2, 0, 0):
-            return self.geom_func_prefix + '3DLength'
-        else:
-            return self.geom_func_prefix + 'Length3D'
-
-    @property
-    def perimeter3d(self):
-        if self.spatial_version >= (2, 0, 0):
-            return self.geom_func_prefix + '3DPerimeter'
-        else:
-            return self.geom_func_prefix + 'Perimeter3D'
-
-    @property
-    def geometry(self):
-        # Native geometry type support added in PostGIS 2.0.
-        return self.spatial_version >= (2, 0, 0)
 
     @cached_property
     def spatial_version(self):
@@ -180,7 +155,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             except ProgrammingError:
                 raise ImproperlyConfigured(
                     'Cannot determine PostGIS version for database "%s". '
-                    'GeoDjango requires at least PostGIS version 1.5. '
+                    'GeoDjango requires at least PostGIS version 2.0. '
                     'Was the database created from a spatial database '
                     'template?' % self.connection.settings_dict['NAME']
                 )
@@ -234,16 +209,14 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
                 raise NotImplementedError('PostGIS only supports geography columns with an SRID of 4326.')
 
             return 'geography(%s,%d)' % (f.geom_type, f.srid)
-        elif self.geometry:
-            # Postgis 2.0 supports type-based geometries.
+        else:
+            # Type-based geometries.
             # TODO: Support 'M' extension.
             if f.dim == 3:
                 geom_type = f.geom_type + 'Z'
             else:
                 geom_type = f.geom_type
             return 'geometry(%s,%d)' % (geom_type, f.srid)
-        else:
-            return None
 
     def get_distance(self, f, dist_val, lookup_type):
         """
@@ -253,7 +226,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         This is the most complex implementation of the spatial backends due to
         what is supported on geodetic geometry columns vs. what's available on
         projected geometry columns.  In addition, it has to take into account
-        the geography column type newly introduced in PostGIS 1.5.
+        the geography column type.
         """
         # Getting the distance parameter and any options.
         if len(dist_val) == 1:
