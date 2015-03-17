@@ -164,6 +164,9 @@ Models
   <django.db.models.Model.delete>` to allow deleting only a child's data in a
   model that uses multi-table inheritance.
 
+* Added a system check to prevent defining both ``Meta.ordering`` and
+  ``order_with_respect_to`` on the same model.
+
 CSRF
 ^^^^
 

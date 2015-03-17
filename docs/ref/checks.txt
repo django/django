@@ -63,6 +63,8 @@ Models
   ``<M2M field>``. Maximum length is ``<maximum length>`` for database
   ``<alias>``.
 * **models.E020**: The ``<model>.check()`` class method is currently overridden.
+* **models.E021**: ``ordering`` and ``order_with_respect_to`` cannot be used
+  together.
 
 Fields
 ~~~~~~
