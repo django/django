@@ -444,6 +444,8 @@ header that matches the origin present in the ``Host`` header. This prevents,
 for example, a ``POST`` request from ``subdomain.example.com`` from succeeding
 against ``api.example.com``. If you need cross-origin unsafe requests over
 HTTPS, continuing the example, add ``"subdomain.example.com"`` to this list.
+The setting also supports subdomains, so you could add ``".example.com"``, for
+example, to allow access from all subdomains of ``example.com``.
 
 .. setting:: DATABASES
 
