@@ -2,7 +2,7 @@ from django.contrib.gis import forms
 from django.contrib.gis.db.models.lookups import gis_lookups
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
-from django.db.models.expressions import ExpressionNode
+from django.db.models.expressions import Expression
 from django.db.models.fields import Field
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
@@ -188,7 +188,7 @@ class GeometryField(GeoSelectFormatMixin, Field):
         returning to the caller.
         """
         value = super(GeometryField, self).get_prep_value(value)
-        if isinstance(value, ExpressionNode):
+        if isinstance(value, Expression):
             return value
         elif isinstance(value, (tuple, list)):
             geom = value[0]
@@ -282,7 +282,7 @@ class GeometryField(GeoSelectFormatMixin, Field):
                     pass
                 else:
                     params += value[1:]
-            elif isinstance(value, ExpressionNode):
+            elif isinstance(value, Expression):
                 params = []
             else:
                 params = [connection.ops.Adapter(value)]
