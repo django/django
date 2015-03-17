@@ -190,7 +190,8 @@ class GDALBandTests(unittest.TestCase):
             'name': 'mem_rst',
             'width': 10,
             'height': 10,
-            'nr_of_bands': 1
+            'nr_of_bands': 1,
+            'srid': 4326
         })
         bandmem = rsmem.bands[0]
 

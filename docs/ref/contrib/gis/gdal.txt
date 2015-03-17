@@ -1118,9 +1118,10 @@ blue.
     defines the raster source, it is either a path to a file or spatial data with
     values defining the properties of a new raster (such as size and name). If the
     input is a file path, the second parameter specifies if the raster should
-    be opened with write access. The following example shows how rasters can be
-    created from different input sources (using the sample data from the GeoDjango
-    tests, see the :ref:`gdal_sample_data` section)::
+    be opened with write access. If the input is raw data, the parameters ``width``,
+    ``heigth``, and ``srid`` are required. The following example shows how rasters
+    can be created from different input sources (using the sample data from the
+    GeoDjango tests, see also the :ref:`gdal_sample_data` section)::
 
         >>> from django.contrib.gis.gdal.raster.source import GDALRaster
         >>> rst = GDALRaster('/path/to/your/raster.tif', write=False)
@@ -1148,7 +1149,7 @@ blue.
         The name of the source which is equivalent to the input file path or the name
         provided upon instantiation.
 
-            >>> GDALRaster({'width': 10, 'height': 10, 'name': 'myraster'}).name
+            >>> GDALRaster({'width': 10, 'height': 10, 'name': 'myraster', 'srid': 4326}).name
             'myraster'
 
     .. attribute:: driver
@@ -1163,14 +1164,14 @@ blue.
 
         An in-memory raster is created through the following example:
 
-            >>> GDALRaster({'width': 10, 'height': 10}).driver.name
+            >>> GDALRaster({'width': 10, 'height': 10, 'srid': 4326}).driver.name
             'MEM'
 
         A file based GeoTiff raster is created through the following example:
 
             >>> import tempfile
             >>> rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
-            >>> rst = GDALRaster({'driver': 'GTiff', 'name': rstfile.name,
+            >>> rst = GDALRaster({'driver': 'GTiff', 'name': rstfile.name, 'srid': 4326
             ...                   'width': 255, 'height': 255, 'nr_of_bands': 1})
             >>> rst.name
             '/tmp/tmp7x9H4J.tif'           # The exact filename will be different on your computer
@@ -1181,14 +1182,14 @@ blue.
 
         The width of the source in pixels (X-axis).
 
-            >>> GDALRaster({'width': 10, 'height': 20}).width
+            >>> GDALRaster({'width': 10, 'height': 20, 'srid': 4326}).width
             10
 
     .. attribute:: height
 
         The height of the source in pixels (Y-axis).
 
-            >>> GDALRaster({'width': 10, 'height': 20}).height
+            >>> GDALRaster({'width': 10, 'height': 20, 'srid': 4326}).height
             20
 
     .. attribute:: srs
@@ -1198,12 +1199,12 @@ blue.
         setting it to an other :class:`SpatialReference` or providing any input
         that is accepted by the :class:`SpatialReference` constructor.
 
-            >>> rst = GDALRaster({'width': 10, 'height': 20})
-            >>> rst.srs
-            None
-            >>> rst.srs = 4326
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
             >>> rst.srs.srid
             4326
+            >>> rst.srs = 3086
+            >>> rst.srs.srid
+            3086
 
     .. attribute:: geotransform
 
@@ -1220,7 +1221,7 @@ blue.
 
         The default is ``[0.0, 1.0, 0.0, 0.0, 0.0, -1.0]``.
 
-            >>> rst = GDALRaster({'width': 10, 'height': 20})
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
             >>> rst.geotransform
             [0.0, 1.0, 0.0, 0.0, 0.0, -1.0]
 
@@ -1230,7 +1231,7 @@ blue.
         reference system of the source, as a point object with ``x`` and ``y``
         members.
 
-            >>> rst = GDALRaster({'width': 10, 'height': 20})
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
             >>> rst.origin
             [0.0, 0.0]
             >>> rst.origin.x = 1
@@ -1243,7 +1244,7 @@ blue.
         point object with ``x`` and ``y``  members. See :attr:`geotransform`
         for more information.
 
-            >>> rst = GDALRaster({'width': 10, 'height': 20})
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
             >>> rst.scale
             [1.0, -1.0]
             >>> rst.scale.x = 2
@@ -1256,7 +1257,7 @@ blue.
         with ``x`` and ``y``  members. In case of north up images, these
         coefficients are both ``0``.
 
-            >>> rst = GDALRaster({'width': 10, 'height': 20})
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
             >>> rst.skew
             [0.0, 0.0]
             >>> rst.skew.x = 3
@@ -1269,7 +1270,7 @@ blue.
         ``(xmin, ymin, xmax, ymax)`` in the spatial reference system of the
         source.
 
-            >>> rst = GDALRaster({'width': 10, 'height': 20})
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
             >>> rst.extent
             (0.0, -20.0, 10.0, 0.0)
             >>> rst.origin.x = 100
@@ -1280,8 +1281,8 @@ blue.
 
         List of all bands of the source, as :class:`GDALBand` instances.
 
-            >>> rst = GDALRaster({"width": 1, "height": 2, "bands": [{"data": [0, 1]},
-            ...                                                      {"data": [2, 3]}]})
+            >>> rst = GDALRaster({"width": 1, "height": 2, 'srid': 4326,
+            ...                   "bands": [{"data": [0, 1]}, {"data": [2, 3]}]})
             >>> len(rst.bands)
             2
             >>> rst.bands[1].data()
@@ -1360,7 +1361,7 @@ blue.
 
         For example:
 
-            >>> rst = GDALRaster({'width': 4, 'height': 4, 'datatype': 1, 'nr_of_bands': 1})
+            >>> rst = GDALRaster({'width': 4, 'height': 4, 'srid': 4326, 'datatype': 1, 'nr_of_bands': 1})
             >>> bnd = rst.bands[0]
             >>> bnd.data(range(16))
             >>> bnd.data()
@@ -1368,16 +1369,16 @@ blue.
                    [ 4,  5,  6,  7],
                    [ 8,  9, 10, 11],
                    [12, 13, 14, 15]], dtype=int8)
-            >>> bnd.data(offset=(1,1), size=(2,2))
+            >>> bnd.data(offset=(1, 1), size=(2, 2))
             array([[ 5,  6],
                    [ 9, 10]], dtype=int8)
-            >>> bnd.data(data=[-1, -2, -3, -4], offset=(1,1), size=(2,2))
+            >>> bnd.data(data=[-1, -2, -3, -4], offset=(1, 1), size=(2, 2))
             >>> bnd.data()
             array([[ 0,  1,  2,  3],
                    [ 4, -1, -2,  7],
                    [ 8, -3, -4, 11],
                    [12, 13, 14, 15]], dtype=int8)
-            >>> bnd.data(data='\x9d\xa8\xb3\xbe', offset=(1,1), size=(2,2))
+            >>> bnd.data(data='\x9d\xa8\xb3\xbe', offset=(1, 1), size=(2, 2))
             >>> bnd.data()
             array([[  0,   1,   2,   3],
                    [  4, -99, -88,   7],
