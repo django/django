@@ -827,7 +827,7 @@ class Model(six.with_metaclass(ModelBase)):
         return manager._insert([self], fields=fields, return_id=update_pk,
                                using=using, raw=raw)
 
-    def delete(self, using=None):
+    def delete(self, using=None, keep_parents=False):
         using = using or router.db_for_write(self.__class__, instance=self)
         assert self._get_pk_val() is not None, (
             "%s object can't be deleted because its %s attribute is set to None." %
@@ -835,7 +835,7 @@ class Model(six.with_metaclass(ModelBase)):
         )
 
         collector = Collector(using=using)
-        collector.collect([self])
+        collector.collect([self], keep_parents=keep_parents)
         collector.delete()
 
     delete.alters_data = True
