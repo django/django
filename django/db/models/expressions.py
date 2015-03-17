@@ -42,8 +42,8 @@ class Combinable(object):
                 other = Value(other)
 
         if reversed:
-            return Expression(other, connector, self)
-        return Expression(self, connector, other)
+            return CombinedExpression(other, connector, self)
+        return CombinedExpression(self, connector, other)
 
     #############
     # OPERATORS #
@@ -156,8 +156,8 @@ class BaseExpression(object):
         ```
         def override_as_sql(self, compiler, connection):
             # custom logic
-            return super(ExpressionNode, self).as_sql(compiler, connection)
-        setattr(ExpressionNode, 'as_' + connection.vendor, override_as_sql)
+            return super(Expression, self).as_sql(compiler, connection)
+        setattr(Expression, 'as_' + connection.vendor, override_as_sql)
         ```
 
         Arguments:
@@ -193,7 +193,7 @@ class BaseExpression(object):
          * summarize: a terminal aggregate clause
          * for_save: whether this expression about to be used in a save or update
 
-        Returns: an ExpressionNode to be added to the query.
+        Returns: an Expression to be added to the query.
         """
         c = self.copy()
         c.is_summary = summarize
@@ -330,17 +330,17 @@ class BaseExpression(object):
         return self
 
 
-class ExpressionNode(BaseExpression, Combinable):
+class Expression(BaseExpression, Combinable):
     """
     An expression that can be combined with other expressions.
     """
     pass
 
 
-class Expression(ExpressionNode):
+class CombinedExpression(Expression):
 
     def __init__(self, lhs, connector, rhs, output_field=None):
-        super(Expression, self).__init__(output_field=output_field)
+        super(CombinedExpression, self).__init__(output_field=output_field)
         self.connector = connector
         self.lhs = lhs
         self.rhs = rhs
@@ -391,7 +391,7 @@ class Expression(ExpressionNode):
         return c
 
 
-class DurationExpression(Expression):
+class DurationExpression(CombinedExpression):
     def compile(self, side, compiler, connection):
         if not isinstance(side, DurationValue):
             try:
@@ -446,7 +446,7 @@ class F(Combinable):
         return OrderBy(self, descending=True)
 
 
-class Func(ExpressionNode):
+class Func(Expression):
     """
     A SQL function call.
     """
@@ -503,7 +503,7 @@ class Func(ExpressionNode):
         return copy
 
 
-class Value(ExpressionNode):
+class Value(Expression):
     """
     Represents a wrapped value as a node within an expression
     """
@@ -556,7 +556,7 @@ class DurationValue(Value):
         return connection.ops.date_interval_sql(self.value)
 
 
-class RawSQL(ExpressionNode):
+class RawSQL(Expression):
     def __init__(self, sql, params, output_field=None):
         if output_field is None:
             output_field = fields.Field()
@@ -573,7 +573,7 @@ class RawSQL(ExpressionNode):
         return [self]
 
 
-class Random(ExpressionNode):
+class Random(Expression):
     def __init__(self):
         super(Random, self).__init__(output_field=fields.FloatField())
 
@@ -584,7 +584,7 @@ class Random(ExpressionNode):
         return connection.ops.random_function_sql(), []
 
 
-class Col(ExpressionNode):
+class Col(Expression):
     def __init__(self, alias, target, output_field=None):
         if output_field is None:
             output_field = target
@@ -612,7 +612,7 @@ class Col(ExpressionNode):
                 self.target.get_db_converters(connection))
 
 
-class Ref(ExpressionNode):
+class Ref(Expression):
     """
     Reference to column alias of the query. For example, Ref('sum_cost') in
     qs.annotate(sum_cost=Sum('cost')) query.
@@ -645,7 +645,7 @@ class Ref(ExpressionNode):
         return [self]
 
 
-class When(ExpressionNode):
+class When(Expression):
     template = 'WHEN %(condition)s THEN %(result)s'
 
     def __init__(self, condition=None, then=None, **lookups):
@@ -701,7 +701,7 @@ class When(ExpressionNode):
         return cols
 
 
-class Case(ExpressionNode):
+class Case(Expression):
     """
     An SQL searched CASE expression:
 
@@ -768,7 +768,7 @@ class Case(ExpressionNode):
         return sql, sql_params
 
 
-class Date(ExpressionNode):
+class Date(Expression):
     """
     Add a date selection column.
     """
@@ -815,7 +815,7 @@ class Date(ExpressionNode):
         return value
 
 
-class DateTime(ExpressionNode):
+class DateTime(Expression):
     """
     Add a datetime selection column.
     """

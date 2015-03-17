@@ -845,7 +845,7 @@ class ReprTests(TestCase):
         self.assertEqual(repr(Date('published', 'exact')), "Date(published, exact)")
         self.assertEqual(repr(DateTime('published', 'exact', utc)), "DateTime(published, exact, %s)" % utc)
         self.assertEqual(repr(F('published')), "F(published)")
-        self.assertEqual(repr(F('cost') + F('tax')), "<Expression: F(cost) + F(tax)>")
+        self.assertEqual(repr(F('cost') + F('tax')), "<CombinedExpression: F(cost) + F(tax)>")
         self.assertEqual(repr(Func('published', function='TO_CHAR')), "Func(F(published), function=TO_CHAR)")
         self.assertEqual(repr(OrderBy(Value(1))), 'OrderBy(Value(1), descending=False)')
         self.assertEqual(repr(Random()), "Random()")
