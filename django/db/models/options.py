@@ -100,6 +100,7 @@ class Options(object):
         self.verbose_name_plural = None
         self.db_table = ''
         self.ordering = []
+        self._ordering_clash = False
         self.unique_together = []
         self.index_together = []
         self.select_on_save = False
@@ -233,6 +234,9 @@ class Options(object):
             # by default.
             if self.verbose_name_plural is None:
                 self.verbose_name_plural = string_concat(self.verbose_name, 's')
+
+            # order_with_respect_and ordering are mutually exclusive.
+            self._ordering_clash = bool(self.ordering and self.order_with_respect_to)
 
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:

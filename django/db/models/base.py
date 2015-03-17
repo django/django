@@ -1479,7 +1479,17 @@ class Model(six.with_metaclass(ModelBase)):
     def _check_ordering(cls):
         """ Check "ordering" option -- is it a list of strings and do all fields
         exist? """
-        if not cls._meta.ordering:
+        if cls._meta._ordering_clash:
+            return [
+                checks.Error(
+                    "'ordering' and 'order_with_respect_to' cannot be used together.",
+                    hint=None,
+                    obj=cls,
+                    id='models.E021',
+                ),
+            ]
+
+        if cls._meta.order_with_respect_to or not cls._meta.ordering:
             return []
 
         if not isinstance(cls._meta.ordering, (list, tuple)):
@@ -1501,9 +1511,6 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Convert "-field" to "field".
         fields = ((f[1:] if f.startswith('-') else f) for f in fields)
-
-        fields = (f for f in fields if
-            f != '_order' or not cls._meta.order_with_respect_to)
 
         # Skip ordering in the format field1__field2 (FIXME: checking
         # this format would be nice, but it's a little fiddly).
