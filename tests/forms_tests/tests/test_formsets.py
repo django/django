@@ -10,6 +10,7 @@ from django.forms import (
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
 from django.test import TestCase
+from django.utils.encoding import force_text
 
 
 class Choice(Form):
@@ -1092,6 +1093,11 @@ class FormsFormsetTestCase(TestCase):
         data['choices-1-votes'] = ''
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertEqual(formset.total_error_count(), 2)
+
+    def test_html_safe(self):
+        formset = self.make_choiceformset()
+        self.assertTrue(hasattr(formset, '__html__'))
+        self.assertEqual(force_text(formset), formset.__html__())
 
 
 data = {
