@@ -692,12 +692,12 @@ storing a string.
 
 If :meth:`.get_internal_type` returns a string that is not known to Django for
 the database backend you are using -- that is, it doesn't appear in
-``django.db.backends.<db_name>.creation.data_types`` -- the string will still be
-used by the serializer, but the default :meth:`~Field.db_type` method will
-return ``None``. See the documentation of :meth:`~Field.db_type` for reasons why
-this might be useful. Putting a descriptive string in as the type of the field
-for the serializer is a useful idea if you're ever going to be using the
-serializer output in some other place, outside of Django.
+``django.db.backends.<db_name>.base.DatabaseWrapper.data_types`` -- the string
+will still be used by the serializer, but the default :meth:`~Field.db_type`
+method will return ``None``. See the documentation of :meth:`~Field.db_type`
+for reasons why this might be useful. Putting a descriptive string in as the
+type of the field for the serializer is a useful idea if you're ever going to
+be using the serializer output in some other place, outside of Django.
 
 .. _converting-model-field-to-serialization:
 
