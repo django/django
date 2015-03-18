@@ -159,6 +159,33 @@ class ManyToOneTests(TestCase):
         self.assertFalse(hasattr(self.r2.article_set, 'remove'))
         self.assertFalse(hasattr(self.r2.article_set, 'clear'))
 
+    def test_assign_unsaved_check_override(self):
+        """
+        #24495 - Assigning an unsaved object to a ForeignKey
+        should be allowed when the allow_unsaved_instance_assignment
+        attribute has been set to True.
+        """
+        class UnsavedForeignKey(models.ForeignKey):
+            # A ForeignKey which can point to an unsaved object
+            allow_unsaved_instance_assignment = True
+
+        class Band(models.Model):
+            name = models.CharField(max_length=50)
+
+        class BandMember(models.Model):
+            band = UnsavedForeignKey(Band)
+            first_name = models.CharField(max_length=50)
+            last_name = models.CharField(max_length=50)
+
+        beatles = Band(name='The Beatles')
+        john = BandMember(first_name='John', last_name='Lennon')
+
+        # This should not raise an exception as the ForeignKey
+        # between member and band has unsaved_instances_allowed set.
+        john.band = beatles
+
+        self.assertEqual(john.band, beatles)
+
     def test_selects(self):
         self.r.article_set.create(headline="John's second story",
                                   pub_date=datetime.date(2005, 7, 29))

@@ -513,7 +513,7 @@ class SingleRelatedObjectDescriptor(object):
                     raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
 
         related_pk = tuple(getattr(instance, field.attname) for field in self.related.field.foreign_related_fields)
-        if None in related_pk:
+        if not self.related.field.allow_unsaved_instance_assignment and None in related_pk:
             raise ValueError(
                 'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
                 (value, instance._meta.object_name)
@@ -684,7 +684,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
         else:
             for lh_field, rh_field in self.field.related_fields:
                 pk = value._get_pk_val()
-                if pk is None:
+                if not self.field.allow_unsaved_instance_assignment and pk is None:
                     raise ValueError(
                         'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
                         (value, self.field.rel.to._meta.object_name)
@@ -1534,6 +1534,7 @@ class ForeignObject(RelatedField):
     one_to_many = False
     one_to_one = False
 
+    allow_unsaved_instance_assignment = False
     requires_unique_target = True
     related_accessor_class = ForeignRelatedObjectsDescriptor
     rel_class = ForeignObjectRel
