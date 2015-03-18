@@ -80,6 +80,10 @@ class Command(BaseCommand):
         from django.conf import settings
         from django.test.utils import get_runner
 
+        # Don't run migrations for tests
+        if settings.DATABASES.get('migration') is not None:
+            del settings.DATABASES['migration']
+
         TestRunner = get_runner(settings, options.get('testrunner'))
 
         if options.get('liveserver') is not None:
