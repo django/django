@@ -125,6 +125,9 @@ class BaseForm(object):
     def __html__(self):
         return force_text(self)
 
+    def __html__(self):
+        return force_text(self)
+
     def __str__(self):
         return self.as_table()
 
