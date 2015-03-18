@@ -657,6 +657,15 @@ escaping HTML.
 .. _str.format: https://docs.python.org/library/stdtypes.html#str.format
 .. _bleach: https://pypi.python.org/pypi/bleach
 
+.. function:: html_safe
+
+    .. versionadded:: 1.8
+
+    A decorator that defines the ``__html__`` method.
+
+    This helps non-Django templates to detect classes whose ``__str__`` methods
+    return :class:`~django.utils.safestring.SafeText`.
+
 ``django.utils.http``
 =====================
 

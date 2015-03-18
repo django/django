@@ -360,3 +360,23 @@ def avoid_wrapping(value):
     spaces where there previously were normal spaces.
     """
     return value.replace(" ", "\xa0")
+
+
+def html_safe(klass):
+    """
+    A decorator that defines the __html__ method.
+    This helps non-Django templates to detect classes whose __str__ methods
+    return SafeText.
+    """
+    if '__html__' in klass.__dict__:
+        raise ValueError(
+            "can't apply @html_safe to %s because it defines "
+            "__html__()." % klass.__name__
+        )
+    if '__str__' not in klass.__dict__ and '__unicode__' not in klass.__dict__:
+        raise ValueError(
+            "can't apply @html_safe to %s because it doesn't "
+            "define __str__() or __unicode__()." % klass.__name__
+        )
+    klass.__html__ = lambda self: force_text(self)
+    return klass

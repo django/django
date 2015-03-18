@@ -6,9 +6,11 @@ from django.contrib.gis.geos import (
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import total_ordering
+from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
 
 
+@html_safe
 @python_2_unicode_compatible
 class GEvent(object):
     """
@@ -59,6 +61,7 @@ class GEvent(object):
         return mark_safe('"%s", %s' % (self.event, self.action))
 
 
+@html_safe
 @python_2_unicode_compatible
 class GOverlayBase(object):
     def __init__(self):
