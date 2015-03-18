@@ -2446,3 +2446,13 @@ class FormsTestCase(TestCase):
         self.assertRaises(AttributeError, lambda: p.cleaned_data)
         self.assertFalse(p.is_valid())
         self.assertEqual(p.cleaned_data, {'first_name': 'John', 'last_name': 'Lennon'})
+
+    def test_html_safe(self):
+        class SimpleForm(Form):
+            username = CharField()
+
+        form = SimpleForm()
+        self.assertTrue(hasattr(SimpleForm, '__html__'))
+        self.assertEqual(force_text(form), form.__html__())
+        self.assertTrue(hasattr(form['username'], '__html__'))
+        self.assertEqual(force_text(form['username']), form['username'].__html__())

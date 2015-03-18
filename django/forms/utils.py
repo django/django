@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import six, timezone
 from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.html import escape, format_html, format_html_join
+from django.utils.html import escape, format_html, format_html_join, html_safe
 from django.utils.translation import ugettext_lazy as _
 
 try:
@@ -42,6 +42,7 @@ def flatatt(attrs):
     )
 
 
+@html_safe
 @python_2_unicode_compatible
 class ErrorDict(dict):
     """
@@ -74,6 +75,7 @@ class ErrorDict(dict):
         return self.as_ul()
 
 
+@html_safe
 @python_2_unicode_compatible
 class ErrorList(UserList, list):
     """

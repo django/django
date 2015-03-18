@@ -14,7 +14,9 @@ from django.forms import (
     PasswordInput, RadioSelect, Select, SelectMultiple, SplitDateTimeWidget,
     Textarea, TextInput, TimeInput,
 )
-from django.forms.widgets import RadioFieldRenderer
+from django.forms.widgets import (
+    ChoiceFieldRenderer, ChoiceInput, RadioFieldRenderer,
+)
 from django.test import TestCase, ignore_warnings, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
@@ -1020,6 +1022,23 @@ beatle J R Ringo False""")
         self.assertHTMLEqual(w.render('date', d), '<input type="hidden" name="date_0" value="2007-09-17" /><input type="hidden" name="date_1" value="12:51:34" />')
         self.assertHTMLEqual(w.render('date', datetime.datetime(2007, 9, 17, 12, 51, 34)), '<input type="hidden" name="date_0" value="2007-09-17" /><input type="hidden" name="date_1" value="12:51:34" />')
         self.assertHTMLEqual(w.render('date', datetime.datetime(2007, 9, 17, 12, 51)), '<input type="hidden" name="date_0" value="2007-09-17" /><input type="hidden" name="date_1" value="12:51:00" />')
+
+    def test_sub_widget_html_safe(self):
+        widget = TextInput()
+        subwidget = next(widget.subwidgets('username', 'John Doe'))
+        self.assertTrue(hasattr(subwidget, '__html__'))
+        self.assertEqual(force_text(subwidget), subwidget.__html__())
+
+    def test_choice_input_html_safe(self):
+        widget = ChoiceInput('choices', 'CHOICE1', {}, ('CHOICE1', 'first choice'), 0)
+        self.assertTrue(hasattr(ChoiceInput, '__html__'))
+        self.assertEqual(force_text(widget), widget.__html__())
+
+    def test_choice_field_renderer_html_safe(self):
+        renderer = ChoiceFieldRenderer('choices', 'CHOICE1', {}, [('CHOICE1', 'first_choice')])
+        renderer.choice_input_class = lambda *args: args
+        self.assertTrue(hasattr(ChoiceFieldRenderer, '__html__'))
+        self.assertEqual(force_text(renderer), renderer.__html__())
 
 
 class NullBooleanSelectLazyForm(Form):
