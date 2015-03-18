@@ -69,6 +69,13 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"max_length": 65, "null": True, "blank": True})
 
+    def test_char_field_choices(self):
+        field = models.CharField(max_length=1, choices=(("A", "One"), ("B", "Two")))
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.CharField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"choices": [("A", "One"), ("B", "Two")], "max_length": 1})
+
     def test_csi_field(self):
         field = models.CommaSeparatedIntegerField(max_length=100)
         name, path, args, kwargs = field.deconstruct()
