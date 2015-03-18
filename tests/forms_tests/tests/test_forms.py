@@ -2570,3 +2570,13 @@ class FormsTestCase(TestCase):
         self.assertFalse(FormWithoutFile().is_multipart())
         self.assertTrue(FormWithFile().is_multipart())
         self.assertTrue(FormWithImage().is_multipart())
+
+    def test_html_safe(self):
+        class SimpleForm(Form):
+            username = CharField()
+
+        form = SimpleForm()
+        self.assertTrue(hasattr(SimpleForm, '__html__'))
+        self.assertEqual(force_text(form), form.__html__())
+        self.assertTrue(hasattr(form['username'], '__html__'))
+        self.assertEqual(force_text(form['username']), form['username'].__html__())

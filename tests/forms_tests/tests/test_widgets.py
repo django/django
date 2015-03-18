@@ -15,7 +15,9 @@ from django.forms import (
     RadioSelect, Select, SelectDateWidget, SelectMultiple, SplitDateTimeField,
     SplitDateTimeWidget, Textarea, TextInput, TimeInput, ValidationError,
 )
-from django.forms.widgets import RadioFieldRenderer
+from django.forms.widgets import (
+    ChoiceFieldRenderer, ChoiceInput, RadioFieldRenderer,
+)
 from django.test import TestCase, override_settings
 from django.utils import six, translation
 from django.utils.dates import MONTHS_AP
@@ -1146,6 +1148,23 @@ beatle J R Ringo False""")
             """,
         )
         self.assertEqual(f.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')
+
+    def test_sub_widget_html_safe(self):
+        widget = TextInput()
+        subwidget = next(widget.subwidgets('username', 'John Doe'))
+        self.assertTrue(hasattr(subwidget, '__html__'))
+        self.assertEqual(force_text(subwidget), subwidget.__html__())
+
+    def test_choice_input_html_safe(self):
+        widget = ChoiceInput('choices', 'CHOICE1', {}, ('CHOICE1', 'first choice'), 0)
+        self.assertTrue(hasattr(ChoiceInput, '__html__'))
+        self.assertEqual(force_text(widget), widget.__html__())
+
+    def test_choice_field_renderer_html_safe(self):
+        renderer = ChoiceFieldRenderer('choices', 'CHOICE1', {}, [('CHOICE1', 'first_choice')])
+        renderer.choice_input_class = lambda *args: args
+        self.assertTrue(hasattr(ChoiceFieldRenderer, '__html__'))
+        self.assertEqual(force_text(renderer), renderer.__html__())
 
 
 class NullBooleanSelectLazyForm(Form):

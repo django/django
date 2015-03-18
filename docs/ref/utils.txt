@@ -657,6 +657,20 @@ escaping HTML.
 .. _str.format: https://docs.python.org/library/stdtypes.html#str.format
 .. _bleach: https://pypi.python.org/pypi/bleach
 
+.. function:: html_safe()
+
+    .. versionadded:: 1.8
+
+    The ``__html__()`` method on a class helps non-Django templates detect
+    classes whose output doesn't require HTML escaping.
+
+    This decorator defines the ``__html__()`` method on the decorated class
+    by wrapping the ``__unicode__()`` (Python 2) or ``__str__()`` (Python 3)
+    in :meth:`~django.utils.safestring.mark_safe`. Ensure the ``__unicode__()``
+    or ``__str__()`` method does indeed return text that doesn't require HTML
+    escaping.
+
+
 ``django.utils.http``
 =====================
 

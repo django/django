@@ -2,6 +2,7 @@
 from django.forms import CharField, Form, Media, MultiWidget, TextInput
 from django.template import Context, Template
 from django.test import TestCase, override_settings
+from django.utils.encoding import force_text
 
 
 @override_settings(
@@ -454,6 +455,11 @@ class FormsMediaTestCase(TestCase):
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
 <link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />""")
+
+    def test_html_safe(self):
+        media = Media(css={'all': ['/path/to/css']}, js=['/path/to/js'])
+        self.assertTrue(hasattr(Media, '__html__'))
+        self.assertEqual(force_text(media), media.__html__())
 
 
 @override_settings(
