@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/gis/apps.py:9
+#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr ""
 
@@ -21,35 +21,35 @@ msgstr ""
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:324
+#: contrib/gis/db/models/fields.py:325
 msgid "Point"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:330
+#: contrib/gis/db/models/fields.py:331
 msgid "Line string"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:336
+#: contrib/gis/db/models/fields.py:337
 msgid "Polygon"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:342
+#: contrib/gis/db/models/fields.py:343
 msgid "Multi-point"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:348
+#: contrib/gis/db/models/fields.py:349
 msgid "Multi-line string"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:354
+#: contrib/gis/db/models/fields.py:355
 msgid "Multi polygon"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:360
+#: contrib/gis/db/models/fields.py:361
 msgid "Geometry collection"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:366
+#: contrib/gis/db/models/fields.py:367
 msgid "Extent Aggregate Field"
 msgstr ""
 
@@ -69,6 +69,23 @@ msgstr ""
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
+msgstr ""
+
+#: contrib/gis/templates/gis/admin/openlayers.html:35
+#: contrib/gis/templates/gis/openlayers.html:18
+msgid "Delete all Features"
+msgstr ""
+
+#: contrib/gis/templates/gis/admin/openlayers.html:37
+msgid "WKT debugging window:"
+msgstr ""
+
+#: contrib/gis/templates/gis/google/google-map.html:4
+msgid "Google Maps via GeoDjango"
+msgstr ""
+
+#: contrib/gis/templates/gis/openlayers.html:19
+msgid "Debugging window (serialized value)"
 msgstr ""
 
 #: contrib/gis/views.py:10
