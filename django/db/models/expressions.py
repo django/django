@@ -126,11 +126,11 @@ class BaseExpression(object):
     # aggregate specific fields
     is_summary = False
 
-    def get_db_converters(self, connection):
-        return [self.convert_value] + self.output_field.get_db_converters(connection)
-
     def __init__(self, output_field=None):
         self._output_field = output_field
+
+    def get_db_converters(self, connection):
+        return [self.convert_value] + self.output_field.get_db_converters(connection)
 
     def get_source_expressions(self):
         return []
@@ -654,6 +654,29 @@ class Ref(Expression):
 
     def get_group_by_cols(self):
         return [self]
+
+
+class ExpressionWrapper(Expression):
+    """
+    An expression that can wrap another expression so that it can provide
+    extra context to the inner expression, such as the output_field.
+    """
+
+    def __init__(self, expression, output_field):
+        super(ExpressionWrapper, self).__init__(output_field=output_field)
+        self.expression = expression
+
+    def set_source_expressions(self, exprs):
+        self.expression = exprs[0]
+
+    def get_source_expressions(self):
+        return [self.expression]
+
+    def as_sql(self, compiler, connection):
+        return self.expression.as_sql(compiler, connection)
+
+    def __repr__(self):
+        return "{}({})".format(self.__class__.__name__, self.expression)
 
 
 class When(Expression):
