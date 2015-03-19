@@ -368,6 +368,42 @@ the following example is valid::
 In the above example, the captured ``"username"`` variable is passed to the
 included URLconf, as expected.
 
+Nested arguments
+================
+
+Regular expressions allow nested arguments, and Django will resolve them and
+pass them to the view. When reversing, Django will try to fill in all outer
+captured arguments, ignoring any nested captured arguments. Consider the
+following URL patterns which optionally take a page argument::
+
+    from django.conf.urls import url
+
+    urlpatterns = [
+        url(r'blog/(page-(\d+)/)?$', blog_articles),                  # bad
+        url(r'comments/(?:page-(?P<page_number>\d+)/)?$', comments),  # good
+    ]
+
+Both patterns use nested arguments and will resolve: for example,
+``blog/page-2/`` will result in a match to ``blog_articles`` with two
+positional arguments: ``page-2/`` and ``2``. The second pattern for
+``comments`` will match ``comments/page-2/`` with keyword argument
+``page_number`` set to 2. The outer argument in this case is a non-capturing
+argument ``(?:...)``.
+
+The ``blog_articles`` view needs the outermost captured argument to be reversed,
+``page-2/`` or no arguments in this case, while ``comments`` can be reversed
+with either no arguments or a value for ``page_number``.
+
+Nested captured arguments create a strong coupling between the view arguments
+and the URL as illustrated by ``blog_articles``: the view receives part of the
+URL (``page-2/``) instead of only the value the view is interested in. This
+coupling is even more pronounced when reversing, since to reverse the view we
+need to pass the piece of URL instead of the page number.
+
+As a rule of thumb, only capture the values the view needs to work with and
+use non-capturing arguments when the regular expression needs an argument but
+the view ignores it.
+
 .. _views-extra-options:
 
 Passing extra options to view functions

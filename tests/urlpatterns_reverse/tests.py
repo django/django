@@ -97,6 +97,12 @@ test_data = (
     ('people_backref', '/people/nate-nate/', [], {'name': 'nate'}),
     ('optional', '/optional/fred/', [], {'name': 'fred'}),
     ('optional', '/optional/fred/', ['fred'], {}),
+    ('named_optional', '/optional/1/', [1], {}),
+    ('named_optional', '/optional/1/', [], {'arg1': 1}),
+    ('named_optional', '/optional/1/2/', [1, 2], {}),
+    ('named_optional', '/optional/1/2/', [], {'arg1': 1, 'arg2': 2}),
+    ('named_optional_terminated', '/optional/1/2/', [1, 2], {}),
+    ('named_optional_terminated', '/optional/1/2/', [], {'arg1': 1, 'arg2': 2}),
     ('hardcoded', '/hardcoded/', [], {}),
     ('hardcoded2', '/hardcoded/doc.pdf', [], {}),
     ('people3', '/people/il/adrian/', [], {'state': 'il', 'name': 'adrian'}),
@@ -144,6 +150,17 @@ test_data = (
     ('part2', '/part2/', [], {}),
     ('part2', '/prefix/xx/part2/one/', [], {'value': 'one', 'prefix': 'xx'}),
     ('part2', '/prefix/xx/part2/', [], {'prefix': 'xx'}),
+
+    # Tests for nested groups. Nested capturing groups will only work if you
+    # *only* supply the correct outer group.
+    ('nested-noncapture', '/nested/noncapture/opt', [], {'p': 'opt'}),
+    ('nested-capture', '/nested/capture/opt/', ['opt/'], {}),
+    ('nested-capture', NoReverseMatch, [], {'p': 'opt'}),
+    ('nested-mixedcapture', '/nested/capture/mixed/opt', ['opt'], {}),
+    ('nested-mixedcapture', NoReverseMatch, [], {'p': 'opt'}),
+    ('nested-namedcapture', '/nested/capture/named/opt/', [], {'outer': 'opt/'}),
+    ('nested-namedcapture', NoReverseMatch, [], {'outer': 'opt/', 'inner': 'opt'}),
+    ('nested-namedcapture', NoReverseMatch, [], {'inner': 'opt'}),
 
     # Regression for #9038
     # These views are resolved by method name. Each method is deployed twice -
