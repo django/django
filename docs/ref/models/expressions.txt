@@ -161,6 +161,27 @@ values, rather than on Python values.
 This is documented in :ref:`using F() expressions in queries
 <using-f-expressions-in-filters>`.
 
+.. _using-f-with-annotations:
+
+Using ``F()`` with annotations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``F()`` can be used to create dynamic fields on your models by combining
+different fields with arithmetic::
+
+    company = Company.objects.annotate(
+        chairs_needed=F('num_employees') - F('num_chairs'))
+
+If the fields that you're combining are of different types you'll need
+to tell Django what kind of field will be returned. Since ``F()`` does not
+directly support ``output_field`` you will need to wrap the expression with
+:class:`ExpressionWrapper`::
+
+    from django.db.models import DateTimeField, ExpressionWrapper, F
+
+    Ticket.objects.annotate(
+        expires=ExpressionWrapper(
+            F('active_at') + F('duration'), output_field=DateTimeField()))
 
 .. _func-expressions:
 
@@ -274,17 +295,6 @@ should define the desired ``output_field``. For example, adding an
 ``IntegerField()`` and a ``FloatField()`` together should probably have
 ``output_field=FloatField()`` defined.
 
-.. note::
-
-    When you need to define the ``output_field`` for ``F`` expression
-    arithmetic between different types, it's necessary to surround the
-    expression in another expression::
-
-        from django.db.models import DateTimeField, Expression, F
-
-        Race.objects.annotate(finish=Expression(
-            F('start') + F('duration'), output_field=DateTimeField()))
-
 .. versionchanged:: 1.8
 
     ``output_field`` is a new parameter.
@@ -342,6 +352,19 @@ after it's retrieved from the database. Usually no arguments are needed when
 instantiating the model field as any arguments relating to data validation
 (``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
 output value.
+
+``ExpressionWrapper()`` expressions
+-----------------------------------
+
+.. class:: ExpressionWrapper(expression, output_field)
+
+.. versionadded:: 1.8
+
+``ExpressionWrapper`` simply surrounds another expression and provides access
+to properties, such as ``output_field``, that may not be available on other
+expressions. ``ExpressionWrapper`` is necessary when using arithmetic on
+``F()`` expressions with different types as described in
+:ref:`using-f-with-annotations`.
 
 Conditional expressions
 -----------------------

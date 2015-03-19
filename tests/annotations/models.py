@@ -84,3 +84,12 @@ class Company(models.Model):
         return ('Company(name=%s, motto=%s, ticker_name=%s, description=%s)'
             % (self.name, self.motto, self.ticker_name, self.description)
         )
+
+
+@python_2_unicode_compatible
+class Ticket(models.Model):
+    active_at = models.DateTimeField()
+    duration = models.DurationField()
+
+    def __str__(self):
+        return '{} - {}'.format(self.active_at, self.duration)

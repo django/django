@@ -11,8 +11,8 @@ from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    F, Case, Col, Date, DateTime, Func, OrderBy, Random, RawSQL, Ref, Value,
-    When,
+    F, Case, Col, Date, DateTime, ExpressionWrapper, Func, OrderBy, Random,
+    RawSQL, Ref, Value, When,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
@@ -855,6 +855,10 @@ class ReprTests(TestCase):
         self.assertEqual(repr(DateTime('published', 'exact', utc)), "DateTime(published, exact, %s)" % utc)
         self.assertEqual(repr(F('published')), "F(published)")
         self.assertEqual(repr(F('cost') + F('tax')), "<CombinedExpression: F(cost) + F(tax)>")
+        self.assertEqual(
+            repr(ExpressionWrapper(F('cost') + F('tax'), models.IntegerField())),
+            "ExpressionWrapper(F(cost) + F(tax))"
+        )
         self.assertEqual(repr(Func('published', function='TO_CHAR')), "Func(F(published), function=TO_CHAR)")
         self.assertEqual(repr(OrderBy(Value(1))), 'OrderBy(Value(1), descending=False)')
         self.assertEqual(repr(Random()), "Random()")
