@@ -582,3 +582,32 @@ Versions affected
 
 * Django 1.7 `(patch) <https://github.com/django/django/commit/d16e4e1d6f95e6f46bff53cc4fd0ab398b8e5059>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/2654e1b93923bac55f12b4e66c5e39b16695ace5>`_
+
+March 18, 2015 - CVE-2015-2316
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-2316 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-2316&cid=2>`_:
+Denial-of-service possibility with ``strip_tags()``.
+`Full description <https://www.djangoproject.com/weblog/2015/mar/18/security-releases/>`__
+
+Versions affected
+-----------------
+
+* Django 1.6 `(patch) <https://github.com/django/django/commit/b6b3cb9899214a23ebb0f4ebf0e0b300b0ee524f>`__
+* Django 1.7 `(patch) <https://github.com/django/django/commit/e63363f8e075fa8d66326ad6a1cc3391cc95cd97>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/5447709a571cd5d95971f1d5d21d4a7edcf85bbd>`__
+
+March 18, 2015 - CVE-2015-2317
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-2317 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-2317&cid=2>`_:
+Mitigated possible XSS attack via user-supplied redirect URLs.
+`Full description <https://www.djangoproject.com/weblog/2015/mar/18/security-releases/>`__
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch) <https://github.com/django/django/commit/2342693b31f740a422abf7267c53b4e7bc487c1b>`__
+* Django 1.6 `(patch) <https://github.com/django/django/commit/5510f070711540aaa8d3707776cd77494e688ef9>`__
+* Django 1.7 `(patch) <https://github.com/django/django/commit/2a4113dbd532ce952308992633d802dc169a75f1>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/770427c2896a078925abfca2317486b284d22f04>`__
