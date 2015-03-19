@@ -1366,6 +1366,15 @@ templates used by the :class:`ModelAdmin` views:
     to return the same kind of sequence type as for the
     :attr:`~ModelAdmin.list_filter` attribute.
 
+.. method:: ModelAdmin.get_list_select_related(request)
+
+    .. versionadded:: 1.9
+
+    The ``get_list_select_related`` method is given the ``HttpRequest`` and should
+    return a boolean or list of related objects to add to the select statement. This list is
+    passed to :meth:`~django.db.models.query.QuerySet.select_related`.
+    For more information see :attr:`ModelAdmin.list_select_related`.
+
 .. method:: ModelAdmin.get_search_fields(request)
 
     The ``get_search_fields`` method is given the ``HttpRequest`` and is expected

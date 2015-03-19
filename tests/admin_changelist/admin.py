@@ -73,6 +73,13 @@ class InvitationAdmin(admin.ModelAdmin):
     list_select_related = ('player',)
 
 
+class MoreRelatedInvitationAdmin(admin.ModelAdmin):
+    list_display = ('band', 'player')
+
+    def get_list_select_related(self, request):
+        return ('band', 'player')
+
+
 class DynamicListDisplayChildAdmin(admin.ModelAdmin):
     list_display = ('parent', 'name', 'age')
 
