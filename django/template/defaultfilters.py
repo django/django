@@ -439,7 +439,7 @@ def cut(value, arg):
 @stringfilter
 def escape_filter(value):
     """
-    Marks the value as a string that should not be auto-escaped.
+    Marks the value as a string that should be auto-escaped.
     """
     return mark_for_escaping(value)
 
