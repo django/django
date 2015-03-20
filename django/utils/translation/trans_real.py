@@ -104,7 +104,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.__language = language
         self.__to_language = to_language(language)
         self.__locale = to_locale(language)
-        self.plural = lambda n: int(n != 1)
 
         self._init_translation_catalog()
         self._add_installed_apps_translations()
@@ -132,6 +131,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             # provides merge support for NullTranslations()
             translation._catalog = {}
             translation._info = {}
+            translation.plural = lambda n: int(n != 1)
         return translation
 
     def _init_translation_catalog(self):
@@ -144,6 +144,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             # gettext will raise an IOError (refs #18192).
             use_null_fallback = False
         translation = self._new_gnu_trans(localedir, use_null_fallback)
+        self.plural = translation.plural
         self._info = translation._info.copy()
         self._catalog = translation._catalog.copy()
 

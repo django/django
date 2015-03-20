@@ -30,7 +30,7 @@ from django.utils.translation import (
     get_language, get_language_from_request, get_language_info, gettext,
     gettext_lazy, ngettext_lazy, npgettext, npgettext_lazy, pgettext,
     pgettext_lazy, string_concat, to_locale, trans_real, ugettext,
-    ugettext_lazy, ungettext_lazy,
+    ugettext_lazy, ungettext, ungettext_lazy,
 )
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
@@ -56,6 +56,16 @@ def patch_formats(lang, **settings):
 
 
 class TranslationTests(TestCase):
+
+    @translation.override('fr')
+    def test_plural(self):
+        """
+        Test plurals with ungettext. French differs from English in that 0 is singular.
+        """
+        self.assertEqual(ungettext("%d year", "%d years", 0) % 0, "0 année")
+        self.assertEqual(ungettext("%d year", "%d years", 2) % 2, "2 années")
+        self.assertEqual(ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}, "0 octet")
+        self.assertEqual(ungettext("%(size)d byte", "%(size)d bytes", 2) % {'size': 2}, "2 octets")
 
     def test_override(self):
         activate('de')
