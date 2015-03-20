@@ -121,7 +121,7 @@ class GDALBand(GDALBase):
             access_flag = 1
 
             # Instantiate ctypes array holding the input data
-            if isinstance(data, (bytes, six.memoryview, numpy.ndarray)):
+            if isinstance(data, (bytes, six.memoryview)) or (numpy and isinstance(data, numpy.ndarray)):
                 data_array = ctypes_array.from_buffer_copy(data)
             else:
                 data_array = ctypes_array(*data)
