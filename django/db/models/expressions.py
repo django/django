@@ -238,7 +238,16 @@ class BaseExpression(object):
         """
         Attempts to infer the output type of the expression. If the output
         fields of all source fields match then we can simply infer the same
-        type here.
+        type here. This isn't always correct, but it makes sense most of the
+        time.
+
+        Consider the difference between `2 + 2` and `2 / 3`. Inferring
+        the type here is a convenience for the common case. The user should
+        supply their own output_field with more complex computations.
+
+        If a source does not have an `_output_field` then we exclude it from
+        this check. If all sources are `None`, then an error will be thrown
+        higher up the stack in the `output_field` property.
         """
         if self._output_field is None:
             sources = self.get_source_fields()
@@ -246,8 +255,9 @@ class BaseExpression(object):
             if num_sources == 0:
                 self._output_field = None
             else:
-                self._output_field = sources[0]
                 for source in sources:
+                    if self._output_field is None:
+                        self._output_field = source
                     if source is not None and not isinstance(self._output_field, source.__class__):
                         raise FieldError(
                             "Expression contains mixed types. You must set output_field")
