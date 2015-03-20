@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from django.core import mail
 from django.core.management import call_command
-from django.core.management.base import CommandError
 from django.test import SimpleTestCase
 
 
