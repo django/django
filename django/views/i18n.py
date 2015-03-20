@@ -77,12 +77,12 @@ def get_formats():
 
 js_catalog_template = r"""
 {% autoescape off %}
-(function (globals) {
+(function(globals) {
 
   var django = globals.django || (globals.django = {});
 
   {% if plural %}
-  django.pluralidx = function (n) {
+  django.pluralidx = function(n) {
     var v={{ plural }};
     if (typeof(v) == 'boolean') {
       return v ? 1 : 0;
@@ -91,7 +91,7 @@ js_catalog_template = r"""
     }
   };
   {% else %}
-  django.pluralidx = function (count) { return (count == 1) ? 0 : 1; };
+  django.pluralidx = function(count) { return (count == 1) ? 0 : 1; };
   {% endif %}
 
   /* gettext library */
@@ -105,7 +105,7 @@ js_catalog_template = r"""
   {% endif %}
 
   if (!django.jsi18n_initialized) {
-    django.gettext = function (msgid) {
+    django.gettext = function(msgid) {
       var value = django.catalog[msgid];
       if (typeof(value) == 'undefined') {
         return msgid;
@@ -114,7 +114,7 @@ js_catalog_template = r"""
       }
     };
 
-    django.ngettext = function (singular, plural, count) {
+    django.ngettext = function(singular, plural, count) {
       var value = django.catalog[singular];
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
@@ -123,9 +123,9 @@ js_catalog_template = r"""
       }
     };
 
-    django.gettext_noop = function (msgid) { return msgid; };
+    django.gettext_noop = function(msgid) { return msgid; };
 
-    django.pgettext = function (context, msgid) {
+    django.pgettext = function(context, msgid) {
       var value = django.gettext(context + '\x04' + msgid);
       if (value.indexOf('\x04') != -1) {
         value = msgid;
@@ -133,7 +133,7 @@ js_catalog_template = r"""
       return value;
     };
 
-    django.npgettext = function (context, singular, plural, count) {
+    django.npgettext = function(context, singular, plural, count) {
       var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
       if (value.indexOf('\x04') != -1) {
         value = django.ngettext(singular, plural, count);
@@ -141,7 +141,7 @@ js_catalog_template = r"""
       return value;
     };
 
-    django.interpolate = function (fmt, obj, named) {
+    django.interpolate = function(fmt, obj, named) {
       if (named) {
         return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
       } else {
@@ -154,7 +154,7 @@ js_catalog_template = r"""
 
     django.formats = {{ formats_str }};
 
-    django.get_format = function (format_type) {
+    django.get_format = function(format_type) {
       var value = django.formats[format_type];
       if (typeof(value) == 'undefined') {
         return format_type;
