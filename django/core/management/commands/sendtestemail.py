@@ -2,7 +2,7 @@ import datetime
 import socket
 
 from django.core.mail import send_mail
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
