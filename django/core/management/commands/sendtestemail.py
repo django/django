@@ -7,14 +7,15 @@ from django.core.management.base import BaseCommand, CommandError
 
 class Command(BaseCommand):
     help = "Sends a test email to the email addresses specified as arguments."
-    args = "<email1 email2 ...>"
+
+    def add_arguments(self, parser):
+        parser.add_argument('email', nargs='+',
+            help='One or more email addresses to send the test mail to.')
 
     def handle(self, *args, **kwargs):
-        if not args:
-            raise CommandError('You must provide at least one destination email.')
         send_mail(
             subject='Test email from %s on %s' % (socket.gethostname(), datetime.datetime.now()),
             message="If you\'re reading this, it was successful.",
             from_email=None,
-            recipient_list=args,
+            recipient_list=kwargs['email'],
         )

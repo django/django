@@ -32,10 +32,3 @@ class SendTestEmailManagementCommand(SimpleTestCase):
         mail_message = mail.outbox[0]
         self.assertEqual(mail_message.subject[0:15], 'Test email from')
         self.assertEqual(mail_message.recipients(), recipients)
-
-    def test_send_test_email_missing_recipient(self):
-        """
-        A CommandError is raised if no recipients are specified.
-        """
-        with self.assertRaisesMessage(CommandError, 'You must provide at least one destination email'):
-            call_command("sendtestemail")
