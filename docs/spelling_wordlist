@@ -682,6 +682,7 @@ screenshots
 sdist
 semimajor
 semiminor
+sendtestemail
 serializability
 serializable
 serializer

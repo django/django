@@ -875,6 +875,19 @@ By default, the development server doesn't serve any static files for your site
 you want to configure Django to serve static media, read
 :doc:`/howto/static-files/index`.
 
+sendtestemail
+-------------
+
+.. django-admin:: sendtestemail
+
+.. versionadded:: 1.9
+
+Sends a test email using to the recipient specified.
+
+e.g.::
+
+    django-admin sendtestemail foo@example.com
+
 shell
 -----
 
