@@ -204,10 +204,10 @@ class GDALBandTests(unittest.TestCase):
         if numpy:
             numpy.testing.assert_equal(bandmem.data(), numpy.arange(100).reshape(10, 10))
         else:
-            self.assertEqual(bandmem.data(), range(100))
+            self.assertEqual(bandmem.data(), list(range(100)))
 
         # Prepare data for setting values in subsequent tests
-        block = range(100, 104)
+        block = list(range(100, 104))
         packed_block = struct.pack('<' + 'B B B B', *block)
 
         # Set data from list
@@ -267,4 +267,4 @@ class GDALBandTests(unittest.TestCase):
                 numpy.array(range(25)).reshape(5, 5)
             )
         else:
-            self.assertEqual(bandmemjson.data(), range(25))
+            self.assertEqual(bandmemjson.data(), list(range(25)))
