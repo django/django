@@ -143,6 +143,9 @@ Internationalization
 * The :func:`django.views.i18n.set_language` view now properly redirects to
   :ref:`translated URLs <url-internationalization>`, when available.
 
+* The :func:`django.views.i18n.javascript_catalog` view now works correctly
+  if used multiple times with different configurations on the same page.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
