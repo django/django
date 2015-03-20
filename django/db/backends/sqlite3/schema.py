@@ -137,10 +137,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.create_model(temp_model)
         # Copy data from the old table
         field_maps = list(mapping.items())
-        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
+        insert_fields, select_fields = "", "*"
+        if field_maps != []:
+            insert_fields = "(" + ', '.join(self.quote_name(x) for x, y in field_maps) + ")"
+            select_fields = ', '.join(y for x, y in field_maps)
+        self.execute("INSERT INTO %s %s SELECT %s FROM %s" % (
             self.quote_name(temp_model._meta.db_table),
-            ', '.join(self.quote_name(x) for x, y in field_maps),
-            ', '.join(y for x, y in field_maps),
+            insert_fields,
+            select_fields,
             self.quote_name(model._meta.db_table),
         ))
         # Delete the old table
