@@ -17,7 +17,7 @@ class SendTestEmailManagementCommand(SimpleTestCase):
         """
         The mail is sent with the correct subject and recipient.
         """
-        recipient = "joe@somewhere.org"
+        recipient = "joe@example.com"
         call_command("sendtestemail", recipient)
         self.assertEqual(len(mail.outbox), 1)
         mail_message = mail.outbox[0]
@@ -28,7 +28,7 @@ class SendTestEmailManagementCommand(SimpleTestCase):
         """
         The mail may be sent with multiple recipients.
         """
-        recipients = ["joe@somewhere.org", "jane@elsewhere.net"]
+        recipients = ["joe@example.com", "jane@example.com"]
         call_command("sendtestemail", recipients[0], recipients[1])
         self.assertEqual(len(mail.outbox), 1)
         mail_message = mail.outbox[0]
