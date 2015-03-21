@@ -2320,6 +2320,12 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         logentry.content_type.model = "non-existent"
         self.assertEqual(logentry.get_admin_url(), None)
 
+    def test_logentry_get_edited_object(self):
+        "LogEntry.get_edited_object returns the edited object of a given LogEntry object"
+        logentry = LogEntry.objects.get(content_type__model__iexact="modelwithstringprimarykey")
+        edited_obj = logentry.get_edited_object()
+        self.assertEqual(logentry.object_id, str(edited_obj.pk))
+
     def test_deleteconfirmation_link(self):
         "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
         response = self.client.get(reverse('admin:admin_views_modelwithstringprimarykey_delete', args=(quote(self.pk),)))
