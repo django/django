@@ -205,6 +205,11 @@ Tests
 
 * ...
 
+URLs
+^^^^
+
+* Regular expression lookaround assertions are now allowed in URL patterns.
+
 Validators
 ^^^^^^^^^^
 
