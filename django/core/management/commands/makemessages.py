@@ -33,18 +33,21 @@ def check_programs(*programs):
                     "gettext tools 0.15 or newer installed." % program)
 
 
-def gettext_popen_wrapper(args, os_err_exc_type=CommandError):
+def gettext_popen_wrapper(args, os_err_exc_type=CommandError, stdout_encoding="utf-8"):
     """
     Makes sure text obtained from stdout of gettext utilities is Unicode.
     """
     stdout, stderr, status_code = popen_wrapper(args, os_err_exc_type=os_err_exc_type)
-    if os.name == 'nt' and six.PY3:
-        # This looks weird because it's undoing what subprocess.Popen(universal_newlines=True).communicate()
-        # does when capturing PO files contents from stdout of gettext command line programs. See ticket #23271
-        # for details. No need to do anything on Python 2 because it's already a UTF-8-encoded byte-string there
-        stdout = stdout.encode(locale.getpreferredencoding(False)).decode('utf-8')
+    preferred_encoding = locale.getpreferredencoding(False)
+    if os.name == 'nt' and six.PY3 and stdout_encoding != preferred_encoding:
+        # This looks weird because it's undoing what
+        # subprocess.Popen(universal_newlines=True).communicate()
+        # does when capturing PO files contents from stdout of gettext command
+        # line programs. No need to do anything on Python 2 because it's
+        # already a byte-string there (#23271).
+        stdout = stdout.encode(preferred_encoding).decode(stdout_encoding)
     if six.PY2:
-        stdout = stdout.decode('utf-8')
+        stdout = stdout.decode(stdout_encoding)
     return stdout, stderr, status_code
 
 
@@ -325,7 +328,12 @@ class Command(BaseCommand):
 
     @cached_property
     def gettext_version(self):
-        out, err, status = gettext_popen_wrapper(['xgettext', '--version'])
+        # Gettext tools will output system-encoded bytestrings instead of UTF-8,
+        # when looking up the version. It's especially a problem on Windows.
+        out, err, status = gettext_popen_wrapper(
+            ['xgettext', '--version'],
+            stdout_encoding=locale.getpreferredencoding(False),
+        )
         m = re.search(r'(\d+)\.(\d+)\.?(\d+)?', out)
         if m:
             return tuple(int(d) for d in m.groups() if d is not None)
@@ -341,8 +349,14 @@ class Command(BaseCommand):
         for f in file_list:
             try:
                 f.process(self, self.domain)
-            except UnicodeDecodeError:
-                self.stdout.write("UnicodeDecodeError: skipped file %s in %s" % (f.file, f.dirpath))
+            except UnicodeDecodeError as e:
+                self.stdout.write(
+                    "UnicodeDecodeError: skipped file %s in %s (reason: %s)" % (
+                        f.file,
+                        f.dirpath,
+                        e,
+                    )
+                )
 
         potfiles = []
         for path in self.locale_paths:
