@@ -226,11 +226,8 @@ class Options(object):
                     setattr(self, attr_name, getattr(self.meta, attr_name))
                     self.original_attrs[attr_name] = getattr(self, attr_name)
 
-            ut = meta_attrs.pop('unique_together', self.unique_together)
-            self.unique_together = normalize_together(ut)
-
-            it = meta_attrs.pop('index_together', self.index_together)
-            self.index_together = normalize_together(it)
+            self.unique_together = normalize_together(self.unique_together)
+            self.index_together = normalize_together(self.index_together)
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
