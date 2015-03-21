@@ -36,16 +36,10 @@ class City(NamedModel):
     dt = models.DateField()
     point = models.PointField()
 
-    class Meta:
-        app_label = 'layermap'
-
 
 class Interstate(NamedModel):
     length = models.DecimalField(max_digits=6, decimal_places=2)
     path = models.LineStringField()
-
-    class Meta:
-        app_label = 'layermap'
 
 
 # Same as `City` above, but for testing model inheritance.
