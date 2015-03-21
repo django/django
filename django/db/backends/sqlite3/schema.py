@@ -13,6 +13,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_delete_table = "DROP TABLE %(table)s"
     sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s)"
+    sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
+    sql_delete_unique = "DROP INDEX %(name)s"
 
     def __enter__(self):
         with self.connection.cursor() as c:
