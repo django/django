@@ -24,9 +24,6 @@ class Country(NamedModel):
 class City(NamedModel):
     point = models.PointField()
 
-    class Meta:
-        app_label = 'geoapp'
-
 
 # This is an inherited model from City
 class PennsylvaniaCity(City):
@@ -37,15 +34,9 @@ class PennsylvaniaCity(City):
 
     objects = models.GeoManager()
 
-    class Meta:
-        app_label = 'geoapp'
-
 
 class State(NamedModel):
     poly = models.PolygonField(null=gisfield_may_be_null)  # Allowing NULL geometries here.
-
-    class Meta:
-        app_label = 'geoapp'
 
 
 class Track(NamedModel):
