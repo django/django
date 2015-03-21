@@ -31,7 +31,6 @@ class BaseDatabaseSchemaEditor(object):
 
     # Overrideable SQL templates
     sql_create_table = "CREATE TABLE %(table)s (%(definition)s)"
-    sql_create_table_unique = "UNIQUE (%(columns)s)"
     sql_rename_table = "ALTER TABLE %(old_table)s RENAME TO %(new_table)s"
     sql_retablespace_table = "ALTER TABLE %(table)s SET TABLESPACE %(new_tablespace)s"
     sql_delete_table = "DROP TABLE %(table)s CASCADE"
@@ -263,12 +262,11 @@ class BaseDatabaseSchemaEditor(object):
                 if autoinc_sql:
                     self.deferred_sql.extend(autoinc_sql)
 
-        # Add any unique_togethers
+        # Add any unique_togethers (always deferred, as some fields might be
+        # created afterwards, like geometry fields with some backends)
         for fields in model._meta.unique_together:
             columns = [model._meta.get_field(field).column for field in fields]
-            column_sqls.append(self.sql_create_table_unique % {
-                "columns": ", ".join(self.quote_name(column) for column in columns),
-            })
+            self.deferred_sql.append(self._create_unique_sql(model, columns))
         # Make the table
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
