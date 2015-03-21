@@ -10,6 +10,9 @@ class City(models.Model):
 
     objects = models.GeoManager()
 
+    class Meta:
+        app_label = 'geoadmin'
+
     def __str__(self):
         return self.name
 
