@@ -264,8 +264,7 @@ class BaseCommand(object):
             parser = OptionParser(prog=prog_name,
                                 usage=self.usage(subcommand),
                                 version=self.get_version())
-            parser.add_option('-v', '--verbosity', action='store', dest='verbosity', default='1',
-                type='choice', choices=['0', '1', '2', '3'],
+            parser.add_option('-v', '--verbosity', action='store', dest='verbosity', default='1', type='int',
                 help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
             parser.add_option('--settings',
                 help=(
