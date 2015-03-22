@@ -81,8 +81,7 @@ The output follows the schema described in :pep:`386`::
     1.4a1
     1.4
 
-Displaying debug output
------------------------
+.. django-admin-option:: --verbosity, -v
 
 Use :djadminopt:`--verbosity` to specify the amount of notification and debug information
 that ``django-admin`` should print to the console. For more details, see the
@@ -111,7 +110,7 @@ a list of app labels as arguments::
 
 If you do not specify any app, all apps will be checked.
 
-.. django-admin-option:: --tag <tagname>
+.. django-admin-option:: --tag <tagname>, -t <tagname>
 
 The :doc:`system check framework </ref/checks>` performs many different
 types of checks. These check types are categorized with tags. You can use these tags
@@ -151,14 +150,19 @@ compilemessages
 Compiles .po files created by :djadmin:`makemessages` to .mo files for use with
 the builtin gettext support. See :doc:`/topics/i18n/index`.
 
-Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
-specify the locale(s) to process. If not provided, all locales are processed.
+.. django-admin-option:: --locale, -l
 
-Use the :djadminopt:`--exclude` option (or its shorter version ``-x``) to
-specify the locale(s) to exclude from processing. If not provided, no locales
-are excluded.
+Use the :djadminopt:`--locale` option to specify the locale(s) to process. If
+not provided, all locales are processed.
 
-You can pass ``--use-fuzzy`` option (or ``-f``) to include fuzzy translations
+.. django-admin-option:: --exclude, -x
+
+Use the :djadminopt:`--exclude` option to specify the locale(s) to exclude from
+processing. If not provided, no locales are excluded.
+
+.. django-admin-option:: --use-fuzzy, -f
+
+You can pass ``--use-fuzzy`` option to include fuzzy translations
 into compiled files.
 
 .. versionchanged:: 1.8
@@ -243,6 +247,8 @@ records to dump. If you're using a :ref:`custom manager <custom-managers>` as
 the default manager and it filters some of the available records, not all of the
 objects will be dumped.
 
+.. django-admin-option:: --all, -a
+
 The :djadminopt:`--all` option may be provided to specify that
 ``dumpdata`` should use Django's base manager, dumping records which
 might otherwise be filtered or modified by a custom manager.
@@ -259,11 +265,15 @@ By default, ``dumpdata`` will output all data on a single line. This isn't
 easy for humans to read, so you can use the ``--indent`` option to
 pretty-print the output with a number of indentation spaces.
 
+.. django-admin-option:: --exclude, -e
+
 The :djadminopt:`--exclude` option may be provided to prevent specific
 applications or models (specified as in the form of ``app_label.ModelName``)
 from being dumped. If you specify a model name to ``dumpdata``, the dumped
 output will be restricted to that model, rather than the entire application.
 You can also mix application names and model names.
+
+.. django-admin-option:: --database
 
 The :djadminopt:`--database` option can be used to specify the database
 from which data will be dumped.
@@ -306,8 +316,12 @@ flush
 Removes all data from the database, re-executes any post-synchronization
 handlers, and reinstalls any initial data fixtures.
 
+.. django-admin-option:: --noinput
+
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
+
+.. django-admin-option:: --database
 
 The :djadminopt:`--database` option may be used to specify the database
 to flush.
@@ -385,10 +399,11 @@ Searches for and loads the contents of the named fixture into the database.
 The :djadminopt:`--database` option can be used to specify the database
 onto which the data will be loaded.
 
-.. django-admin-option:: --ignorenonexistent
+.. django-admin-option:: --ignorenonexistent, -i
 
-The :djadminopt:`--ignorenonexistent` option can be used to ignore fields and
-models that may have been removed since the fixture was originally generated.
+The :djadminopt:`--ignorenonexistent` option (or its shorter version -i) can
+be used to ignore fields and models that may have been removed since the
+fixture was originally generated.
 
 .. django-admin-option:: --app
 
@@ -539,19 +554,24 @@ directory. After making changes to the messages files you need to compile them
 with :djadmin:`compilemessages` for use with the builtin gettext support. See
 the :ref:`i18n documentation <how-to-create-language-files>` for details.
 
-.. django-admin-option:: --all
+.. django-admin-option:: --all, -a
 
-Use the ``--all`` or ``-a`` option to update the message files for all
+Use the ``--all`` option to update the message files for all
 available languages.
 
 Example usage::
 
     django-admin makemessages --all
 
-.. django-admin-option:: --extension
+.. django-admin-option:: --extension, -e
 
-Use the ``--extension`` or ``-e`` option to specify a list of file extensions
+Use the ``--extension`` option to specify a list of file extensions
 to examine (default: ".html", ".txt").
+
+.. django-admin-option:: --locale, -l
+
+Use the :djadminopt:`--locale` option to
+specify the locale(s) to process.
 
 Example usage::
 
@@ -561,8 +581,6 @@ Separate multiple extensions with commas or use -e or --extension multiple times
 
     django-admin makemessages --locale=de --extension=html,txt --extension xml
 
-Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
-specify the locale(s) to process.
 
 .. versionadded:: 1.8
 
@@ -581,26 +599,26 @@ Example usage::
     django-admin makemessages -x pt_BR
     django-admin makemessages -x pt_BR -x fr
 
-.. django-admin-option:: --domain
+.. django-admin-option:: --domain, -d
 
-Use the ``--domain`` or ``-d`` option to change the domain of the messages files.
+Use the ``--domain`` option to change the domain of the messages files.
 Currently supported:
 
 * ``django`` for all ``*.py``, ``*.html`` and ``*.txt`` files (default)
 * ``djangojs`` for ``*.js`` files
 
-.. django-admin-option:: --symlinks
+.. django-admin-option:: --symlinks, -s
 
-Use the ``--symlinks`` or ``-s`` option to follow symlinks to directories when
+Use the ``--symlinks`` option to follow symlinks to directories when
 looking for new translation strings.
 
 Example usage::
 
     django-admin makemessages --locale=de --symlinks
 
-.. django-admin-option:: --ignore
+.. django-admin-option:: --ignore, -i
 
-Use the ``--ignore`` or ``-i`` option to ignore files or directories matching
+Use the ``--ignore`` option to ignore files or directories matching
 the given :mod:`glob`-style pattern. Use multiple times to ignore more.
 
 These patterns are used by default: ``'CVS'``, ``'.*'``, ``'*~'``, ``'*.pyc'``
@@ -900,9 +918,11 @@ use the ``--plain`` option, like so::
 
     django-admin shell --plain
 
+.. django-admin-option:: --interface <interpreter>, -i <interpreter>
+
 If you would like to specify either IPython or bpython as your interpreter if
 you have both installed you can specify an alternative interpreter interface
-with the ``-i`` or ``--interface`` options like so:
+with the ``--interface`` option like so:
 
 IPython::
 
@@ -1164,7 +1184,7 @@ information.
 The ``--failfast`` option can be used to stop running tests and report the
 failure immediately after a test fails.
 
-.. django-admin-option:: --testrunner
+.. django-admin-option:: --testrunner, -t
 
 The ``--testrunner`` option can be used to control the test runner class that
 is used to execute tests. If this value is provided, it overrides the value
