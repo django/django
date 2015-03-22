@@ -908,9 +908,8 @@ class decorators. As a consequence, when overriding ``setUpClass()`` or
 Removal of ``django.contrib.formtools``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The formtools contrib app has been moved into a separate package.
-``django.contrib.formtools`` itself has been removed. The docs provide
-:ref:`migration instructions <formtools-how-to-migrate>`.
+The formtools contrib app has been moved to a separate package and the
+relevant documentation pages have been updated or removed.
 
 The new package is available `on Github`_ and on PyPI.
 
