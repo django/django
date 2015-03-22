@@ -109,7 +109,7 @@ class FieldFile(File):
 
         # Save the object because it has changed, unless save is False
         if save:
-            self.instance.save()
+            self.instance.save(update_fields=[self.field.name])
     save.alters_data = True
 
     def delete(self, save=True):
@@ -132,7 +132,7 @@ class FieldFile(File):
         self._committed = False
 
         if save:
-            self.instance.save()
+            self.instance.save(update_fields=[self.field.name])
     delete.alters_data = True
 
     def _get_closed(self):
