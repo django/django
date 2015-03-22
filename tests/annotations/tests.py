@@ -5,13 +5,14 @@ from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
-    F, BooleanField, CharField, Count, Func, IntegerField, Sum, Value,
+    F, BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, Func,
+    IntegerField, Sum, Value,
 )
 from django.test import TestCase
 from django.utils import six
 
 from .models import (
-    Author, Book, Company, DepartmentStore, Employee, Publisher, Store,
+    Author, Book, Company, DepartmentStore, Employee, Publisher, Store, Ticket,
 )
 
 
@@ -135,6 +136,24 @@ class NonAggregateAnnotationTestCase(TestCase):
         for book in books:
             self.assertEqual(book.num_awards, book.publisher.num_awards)
 
+    def test_mixed_type_annotation_date_interval(self):
+        active = datetime.datetime(2015, 3, 20, 14, 0, 0)
+        duration = datetime.timedelta(hours=1)
+        expires = datetime.datetime(2015, 3, 20, 14, 0, 0) + duration
+        Ticket.objects.create(active_at=active, duration=duration)
+        t = Ticket.objects.annotate(
+            expires=ExpressionWrapper(F('active_at') + F('duration'), output_field=DateTimeField())
+        ).first()
+        self.assertEqual(t.expires, expires)
+
+    def test_mixed_type_annotation_numbers(self):
+        test = self.b1
+        b = Book.objects.annotate(
+            combined=ExpressionWrapper(F('pages') + F('rating'), output_field=IntegerField())
+        ).get(isbn=test.isbn)
+        combined = int(test.pages + test.rating)
+        self.assertEqual(b.combined, combined)
+
     def test_annotate_with_aggregation(self):
         books = Book.objects.annotate(
             is_book=Value(1, output_field=IntegerField()),
@@ -181,6 +200,14 @@ class NonAggregateAnnotationTestCase(TestCase):
             list(Book.objects.annotate(
                 sum_rating=Sum('rating')
             ).filter(sum_rating=F('nope')))
+
+    def test_combined_annotation_commutative(self):
+        book1 = Book.objects.annotate(adjusted_rating=F('rating') + 2).get(pk=self.b1.pk)
+        book2 = Book.objects.annotate(adjusted_rating=2 + F('rating')).get(pk=self.b1.pk)
+        self.assertEqual(book1.adjusted_rating, book2.adjusted_rating)
+        book1 = Book.objects.annotate(adjusted_rating=F('rating') + None).get(pk=self.b1.pk)
+        book2 = Book.objects.annotate(adjusted_rating=None + F('rating')).get(pk=self.b1.pk)
+        self.assertEqual(book1.adjusted_rating, book2.adjusted_rating)
 
     def test_update_with_annotation(self):
         book_preupdate = Book.objects.get(pk=self.b2.pk)
