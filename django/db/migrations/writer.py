@@ -153,7 +153,17 @@ class MigrationWriter(object):
                 migration_imports.add(line.split("import")[1].strip())
                 imports.remove(line)
                 self.needs_manual_porting = True
-        imports.discard("from django.db import models")
+
+        # Merge migration and model imports
+        # migrations is always needed
+        models_string = "from django.db import models"
+        migrations_string = "from django.db import migrations"
+        if models_string in imports:
+            imports.discard(models_string)
+            imports.add("%s, models" % migrations_string)
+        else:
+            imports.add(migrations_string)
+
         items["imports"] = "\n".join(imports) + "\n" if imports else ""
         if migration_imports:
             items["imports"] += (
@@ -414,7 +424,6 @@ MIGRATION_TEMPLATE = """\
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
 %(imports)s
 
 class Migration(migrations.Migration):
