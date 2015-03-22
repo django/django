@@ -1387,7 +1387,7 @@ class ModelAdmin(BaseModelAdmin):
             if add:
                 initial = self.get_changeform_initial_data(request)
                 form = ModelForm(initial=initial)
-                formsets, inline_instances = self._create_formsets(request, self.model(), change=False)
+                formsets, inline_instances = self._create_formsets(request, form.instance, change=False)
             else:
                 form = ModelForm(instance=obj)
                 formsets, inline_instances = self._create_formsets(request, obj, change=True)
