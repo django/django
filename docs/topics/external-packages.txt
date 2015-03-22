@@ -1,0 +1,57 @@
+=================
+External packages
+=================
+
+Django ships with a variety of extra, optional tools that solve common
+problems. For easier maintenance and to trim the size of the codebase,
+during the course of Django development a few of those applications
+have been moved out to separate projects. A few examples follow.
+
+Localflavor
+~~~~~~~~~~~
+
+The ``localflavor`` app, a collection of utilities for particular
+countries or cultures, was removed from Django in 1.6. The new package
+is named ``django-localflavor`` and the official documentation can be
+found at https://django-localflavor.readthedocs.org/.
+
+Comments
+~~~~~~~~
+
+Django's comment framework has been dropped in Django 1.8. Most users
+will be better served with a custom solution, or a hosted product like
+Disqus. The code formerly known as ``django.contrib.comments`` is
+still available in an external repository. Official documentation
+available at http://django-contrib-comments.readthedocs.org/.
+
+Formtools
+~~~~~~~~~
+
+The ``formtools`` app, a collection of assorted utilities to work with
+forms, was removed from Django in 1.8. The new package is named
+``django-formtools`` and the official documentation can be found at
+http://django-formtools.readthedocs.org/.
+
+.. _localflavor-how-to-migrate:
+
+How to migrate
+==============
+
+If you've used any of the above packages, follow these two easy steps
+to update your code:
+
+1. Install the third-party package from PyPI, eg
+``django-localflavor`` or ``django-contrib-comments``.
+
+2. Change your app's import statements to reference the new package.
+
+   For example, in the case of the localflavor app, change this::
+
+       from django.contrib.localflavor.fr.forms import FRPhoneNumberField
+
+   ...to this::
+
+       from localflavor.fr.forms import FRPhoneNumberField
+
+Please, refer to the external project documentation to get up to speed
+with possible recent changes.
