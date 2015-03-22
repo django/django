@@ -247,8 +247,8 @@ class URLRedirectWithoutTrailingSlashTests(URLTestCaseBase):
 
     def test_en_redirect(self):
         response = self.client.get('/account/register', HTTP_ACCEPT_LANGUAGE='en', follow=True)
-        # target status code of 301 because of CommonMiddleware redirecting
-        self.assertIn(('/en/account/register/', 301), response.redirect_chain)
+        # We only want one redirect, bypassing CommonMiddleware
+        self.assertListEqual(response.redirect_chain, [('/en/account/register/', 302)])
         self.assertRedirects(response, '/en/account/register/', 302)
 
         response = self.client.get('/prefixed.xml', HTTP_ACCEPT_LANGUAGE='en', follow=True)
