@@ -12,7 +12,7 @@ from django.test import TestCase
 from django.utils import six
 
 from .models import (
-    Author, Book, Company, DepartmentStore, Employee, Publisher, Store, Ticket,
+    Author, Book, Company, DepartmentStore, Employee, Store, Ticket,
 )
 
 
@@ -66,7 +66,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(t.expires, expires)
 
     def test_mixed_type_annotation_numbers(self):
-        test = self.b1
+        test = Book.objects.get(isbn='159059725')
         b = Book.objects.annotate(
             combined=ExpressionWrapper(F('pages') + F('rating'), output_field=IntegerField())
         ).get(isbn=test.isbn)
@@ -121,11 +121,12 @@ class NonAggregateAnnotationTestCase(TestCase):
             ).filter(sum_rating=F('nope')))
 
     def test_combined_annotation_commutative(self):
-        book1 = Book.objects.annotate(adjusted_rating=F('rating') + 2).get(pk=self.b1.pk)
-        book2 = Book.objects.annotate(adjusted_rating=2 + F('rating')).get(pk=self.b1.pk)
+        b1 = Book.objects.get(isbn='159059725')
+        book1 = Book.objects.annotate(adjusted_rating=F('rating') + 2).get(pk=b1.pk)
+        book2 = Book.objects.annotate(adjusted_rating=2 + F('rating')).get(pk=b1.pk)
         self.assertEqual(book1.adjusted_rating, book2.adjusted_rating)
-        book1 = Book.objects.annotate(adjusted_rating=F('rating') + None).get(pk=self.b1.pk)
-        book2 = Book.objects.annotate(adjusted_rating=None + F('rating')).get(pk=self.b1.pk)
+        book1 = Book.objects.annotate(adjusted_rating=F('rating') + None).get(pk=b1.pk)
+        book2 = Book.objects.annotate(adjusted_rating=None + F('rating')).get(pk=b1.pk)
         self.assertEqual(book1.adjusted_rating, book2.adjusted_rating)
 
     def test_update_with_annotation(self):
