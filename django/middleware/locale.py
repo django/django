@@ -34,15 +34,18 @@ class LocaleMiddleware(object):
             urlconf = getattr(request, 'urlconf', None)
             language_path = '/%s%s' % (language, request.path_info)
             path_valid = is_valid_path(language_path, urlconf)
-            if (not path_valid and settings.APPEND_SLASH
-                    and not language_path.endswith('/')):
-                path_valid = is_valid_path("%s/" % language_path, urlconf)
+            path_needs_slash = (
+                not path_valid and (
+                    settings.APPEND_SLASH and not language_path.endswith('/')
+                    and is_valid_path('%s/' % language_path, urlconf)
+                )
+            )
 
-            if path_valid:
+            if path_valid or path_needs_slash:
                 script_prefix = get_script_prefix()
                 # Insert language after the script prefix and before the
                 # rest of the URL
-                language_url = request.get_full_path().replace(
+                language_url = request.get_full_path(force_append_slash=path_needs_slash).replace(
                     script_prefix,
                     '%s%s/' % (script_prefix, language),
                     1

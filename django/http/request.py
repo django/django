@@ -99,11 +99,12 @@ class HttpRequest(object):
                 msg += " The domain name provided is not valid according to RFC 1034/1035."
             raise DisallowedHost(msg)
 
-    def get_full_path(self):
+    def get_full_path(self, force_append_slash=False):
         # RFC 3986 requires query string arguments to be in the ASCII range.
         # Rather than crash if this doesn't happen, we encode defensively.
-        return '%s%s' % (
+        return '%s%s%s' % (
             escape_uri_path(self.path),
+            '/' if force_append_slash and not self.path.endswith('/') else '',
             ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) if self.META.get('QUERY_STRING', '') else ''
         )
 
