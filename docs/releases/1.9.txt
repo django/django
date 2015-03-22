@@ -184,6 +184,10 @@ Models
 * Added a system check to prevent defining both ``Meta.ordering`` and
   ``order_with_respect_to`` on the same model.
 
+* :lookup:`Date and time <year>` lookups can be chained with other lookups
+  (such as :lookup:`exact`, :lookup:`gt`, :lookup:`lt`, etc.). For example:
+  ``Entry.objects.filter(pub_date__month__gt=6)``.
+
 CSRF
 ^^^^
 

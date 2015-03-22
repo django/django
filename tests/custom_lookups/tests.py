@@ -63,7 +63,8 @@ class UpperBilateralTransform(models.Transform):
 
 
 class YearTransform(models.Transform):
-    lookup_name = 'year'
+    # Use a name that avoids collision with the built-in year lookup.
+    lookup_name = 'testyear'
 
     def as_sql(self, compiler, connection):
         lhs_sql, params = compiler.compile(self.lhs)
@@ -400,19 +401,19 @@ class YearLteTests(TestCase):
     def test_year_lte(self):
         baseqs = Author.objects.order_by('name')
         self.assertQuerysetEqual(
-            baseqs.filter(birthdate__year__lte=2012),
+            baseqs.filter(birthdate__testyear__lte=2012),
             [self.a1, self.a2, self.a3, self.a4], lambda x: x)
         self.assertQuerysetEqual(
-            baseqs.filter(birthdate__year=2012),
+            baseqs.filter(birthdate__testyear=2012),
             [self.a2, self.a3, self.a4], lambda x: x)
 
-        self.assertNotIn('BETWEEN', str(baseqs.filter(birthdate__year=2012).query))
+        self.assertNotIn('BETWEEN', str(baseqs.filter(birthdate__testyear=2012).query))
         self.assertQuerysetEqual(
-            baseqs.filter(birthdate__year__lte=2011),
+            baseqs.filter(birthdate__testyear__lte=2011),
             [self.a1], lambda x: x)
         # The non-optimized version works, too.
         self.assertQuerysetEqual(
-            baseqs.filter(birthdate__year__lt=2012),
+            baseqs.filter(birthdate__testyear__lt=2012),
             [self.a1], lambda x: x)
 
     @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific SQL used")
@@ -425,10 +426,10 @@ class YearLteTests(TestCase):
         self.a4.save()
         baseqs = Author.objects.order_by('name')
         self.assertQuerysetEqual(
-            baseqs.filter(birthdate__year__lte=models.F('age')),
+            baseqs.filter(birthdate__testyear__lte=models.F('age')),
             [self.a3, self.a4], lambda x: x)
         self.assertQuerysetEqual(
-            baseqs.filter(birthdate__year__lt=models.F('age')),
+            baseqs.filter(birthdate__testyear__lt=models.F('age')),
             [self.a4], lambda x: x)
 
     def test_year_lte_sql(self):
@@ -437,16 +438,16 @@ class YearLteTests(TestCase):
         # error - not running YearLte SQL at all.
         baseqs = Author.objects.order_by('name')
         self.assertIn(
-            '<= (2011 || ', str(baseqs.filter(birthdate__year__lte=2011).query))
+            '<= (2011 || ', str(baseqs.filter(birthdate__testyear__lte=2011).query))
         self.assertIn(
-            '-12-31', str(baseqs.filter(birthdate__year__lte=2011).query))
+            '-12-31', str(baseqs.filter(birthdate__testyear__lte=2011).query))
 
     def test_postgres_year_exact(self):
         baseqs = Author.objects.order_by('name')
         self.assertIn(
-            '= (2011 || ', str(baseqs.filter(birthdate__year=2011).query))
+            '= (2011 || ', str(baseqs.filter(birthdate__testyear=2011).query))
         self.assertIn(
-            '-12-31', str(baseqs.filter(birthdate__year=2011).query))
+            '-12-31', str(baseqs.filter(birthdate__testyear=2011).query))
 
     def test_custom_implementation_year_exact(self):
         try:
@@ -462,7 +463,7 @@ class YearLteTests(TestCase):
             setattr(YearExact, 'as_' + connection.vendor, as_custom_sql)
             self.assertIn(
                 'concat(',
-                str(Author.objects.filter(birthdate__year=2012).query))
+                str(Author.objects.filter(birthdate__testyear=2012).query))
         finally:
             delattr(YearExact, 'as_' + connection.vendor)
         try:
@@ -483,14 +484,15 @@ class YearLteTests(TestCase):
             YearTransform.register_lookup(CustomYearExact)
             self.assertIn(
                 'CONCAT(',
-                str(Author.objects.filter(birthdate__year=2012).query))
+                str(Author.objects.filter(birthdate__testyear=2012).query))
         finally:
             YearTransform._unregister_lookup(CustomYearExact)
             YearTransform.register_lookup(YearExact)
 
 
 class TrackCallsYearTransform(YearTransform):
-    lookup_name = 'year'
+    # Use a name that avoids collision with the built-in year lookup.
+    lookup_name = 'testyear'
     call_order = []
 
     def as_sql(self, compiler, connection):
@@ -516,23 +518,23 @@ class LookupTransformCallOrderTests(TestCase):
         try:
             # junk lookup - tries lookup, then transform, then fails
             with self.assertRaises(FieldError):
-                Author.objects.filter(birthdate__year__junk=2012)
+                Author.objects.filter(birthdate__testyear__junk=2012)
             self.assertEqual(TrackCallsYearTransform.call_order,
                              ['lookup', 'transform'])
             TrackCallsYearTransform.call_order = []
             # junk transform - tries transform only, then fails
             with self.assertRaises(FieldError):
-                Author.objects.filter(birthdate__year__junk__more_junk=2012)
+                Author.objects.filter(birthdate__testyear__junk__more_junk=2012)
             self.assertEqual(TrackCallsYearTransform.call_order,
                              ['transform'])
             TrackCallsYearTransform.call_order = []
             # Just getting the year (implied __exact) - lookup only
-            Author.objects.filter(birthdate__year=2012)
+            Author.objects.filter(birthdate__testyear=2012)
             self.assertEqual(TrackCallsYearTransform.call_order,
                              ['lookup'])
             TrackCallsYearTransform.call_order = []
             # Just getting the year (explicit __exact) - lookup only
-            Author.objects.filter(birthdate__year__exact=2012)
+            Author.objects.filter(birthdate__testyear__exact=2012)
             self.assertEqual(TrackCallsYearTransform.call_order,
                              ['lookup'])
 
