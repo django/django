@@ -11,6 +11,10 @@ See the official documentation for more information:
 
     https://django-localflavor.readthedocs.org/
 
+.. _localflavor-packages:
+
+Code is hosted on github at https://github.com/django/django-localflavor
+
 .. _localflavor-how-to-migrate:
 
 How to migrate
@@ -35,3 +39,15 @@ update your code:
 The code in the new package is the same (it was copied directly from Django),
 so you don't have to worry about backwards compatibility in terms of
 functionality. Only the imports have changed.
+
+.. _localflavor-deprecation-policy:
+
+Deprecation policy
+==================
+
+In Django 1.5, importing from ``django.contrib.localflavor`` will result in a
+``DeprecationWarning``. This means your code will still work, but you should
+change it as soon as possible.
+
+In Django 1.6, importing from ``django.contrib.localflavor`` will no longer
+work.
