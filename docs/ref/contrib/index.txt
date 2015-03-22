@@ -26,7 +26,6 @@ those packages have.
    auth
    contenttypes
    flatpages
-   formtools/index
    gis/index
    humanize
    messages

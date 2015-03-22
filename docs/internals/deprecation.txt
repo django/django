@@ -338,6 +338,8 @@ details on these changes.
 
 * ``django.contrib.comments`` will be removed.
 
+* ``django.contrib.formtools`` will be removed.
+
 * The following transaction management APIs will be removed:
 
   - ``TransactionMiddleware``,
