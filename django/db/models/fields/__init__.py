@@ -12,7 +12,7 @@ from base64 import b64decode, b64encode
 
 from django.apps import apps
 from django.db import connection
-from django.db.models.lookups import default_lookups, RegisterLookupMixin
+from django.db.models.lookups import default_lookups, RegisterLookupMixin, Transform, Lookup
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
@@ -724,7 +724,6 @@ class Field(RegisterLookupMixin):
         if lookup_type in {
             'iexact', 'contains', 'icontains',
             'startswith', 'istartswith', 'endswith', 'iendswith',
-            'month', 'day', 'week_day', 'hour', 'minute', 'second',
             'isnull', 'search', 'regex', 'iregex',
         }:
             return value
@@ -732,12 +731,6 @@ class Field(RegisterLookupMixin):
             return self.get_prep_value(value)
         elif lookup_type in ('range', 'in'):
             return [self.get_prep_value(v) for v in value]
-        elif lookup_type == 'year':
-            try:
-                return int(value)
-            except ValueError:
-                raise ValueError("The __year lookup type requires an integer "
-                                 "argument")
         return self.get_prep_value(value)
 
     def get_db_prep_lookup(self, lookup_type, value, connection,
@@ -761,8 +754,7 @@ class Field(RegisterLookupMixin):
                 sql, params = value._as_sql(connection=connection)
             return QueryWrapper(('(%s)' % sql), params)
 
-        if lookup_type in ('month', 'day', 'week_day', 'hour', 'minute',
-                           'second', 'search', 'regex', 'iregex', 'contains',
+        if lookup_type in ('search', 'regex', 'iregex', 'contains',
                            'icontains', 'iexact', 'startswith', 'endswith',
                            'istartswith', 'iendswith'):
             return [value]
@@ -774,13 +766,6 @@ class Field(RegisterLookupMixin):
                                            prepared=prepared) for v in value]
         elif lookup_type == 'isnull':
             return []
-        elif lookup_type == 'year':
-            if isinstance(self, DateTimeField):
-                return connection.ops.year_lookup_bounds_for_datetime_field(value)
-            elif isinstance(self, DateField):
-                return connection.ops.year_lookup_bounds_for_date_field(value)
-            else:
-                return [value]          # this isn't supposed to happen
         else:
             return [value]
 
@@ -1301,13 +1286,6 @@ class DateField(DateTimeCheckMixin, Field):
             setattr(cls, 'get_previous_by_%s' % self.name,
                 curry(cls._get_next_or_previous_by_FIELD, field=self,
                       is_next=False))
-
-    def get_prep_lookup(self, lookup_type, value):
-        # For dates lookups, convert the value to an int
-        # so the database backend always sees a consistent type.
-        if lookup_type in ('month', 'day', 'week_day', 'hour', 'minute', 'second'):
-            return int(value)
-        return super(DateField, self).get_prep_lookup(lookup_type, value)
 
     def get_prep_value(self, value):
         value = super(DateField, self).get_prep_value(value)
@@ -2408,3 +2386,143 @@ class UUIDField(Field):
         }
         defaults.update(kwargs)
         return super(UUIDField, self).formfield(**defaults)
+
+
+class DateTransform(Transform):
+    def as_sql(self, compiler, connection):
+        sql, params = compiler.compile(self.lhs)
+        lhs_output_field = self.lhs.output_field
+        if isinstance(lhs_output_field, DateTimeField):
+            tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
+            sql, tz_params = connection.ops.datetime_extract_sql(self.lookup_name, sql, tzname)
+            params.extend(tz_params)
+        else:
+            # DateField and TimeField.
+            sql = connection.ops.date_extract_sql(self.lookup_name, sql)
+        return sql, params
+
+    @cached_property
+    def output_field(self):
+        return IntegerField()
+
+
+class YearTransform(DateTransform):
+    lookup_name = 'year'
+
+
+class YearLookup(Lookup):
+    def year_lookup_bounds(self, connection, year):
+        output_field = self.lhs.lhs.output_field
+        if isinstance(output_field, DateTimeField):
+            bounds = connection.ops.year_lookup_bounds_for_datetime_field(year)
+        else:
+            bounds = connection.ops.year_lookup_bounds_for_date_field(year)
+        return bounds
+
+
+@YearTransform.register_lookup
+class YearExact(YearLookup):
+    lookup_name = 'exact'
+
+    def as_sql(self, compiler, connection):
+        # We will need to skip the extract part and instead go
+        # directly with the originating field, that is self.lhs.lhs.
+        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
+        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
+        bounds = self.year_lookup_bounds(connection, rhs_params[0])
+        params.extend(bounds)
+        return '%s BETWEEN %%s AND %%s' % lhs_sql, params
+
+
+class YearComparisonLookup(YearLookup):
+    def as_sql(self, compiler, connection):
+        # We will need to skip the extract part and instead go
+        # directly with the originating field, that is self.lhs.lhs.
+        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
+        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
+        rhs_sql = self.get_rhs_op(connection, rhs_sql)
+        start, finish = self.year_lookup_bounds(connection, rhs_params[0])
+        params.append(self.get_bound(start, finish))
+        return '%s %s' % (lhs_sql, rhs_sql), params
+
+    def get_rhs_op(self, connection, rhs):
+        return connection.operators[self.lookup_name] % rhs
+
+    def get_bound(self):
+        raise NotImplementedError(
+            'subclasses of YearComparisonLookup must provide a get_bound() method'
+        )
+
+
+@YearTransform.register_lookup
+class YearGt(YearComparisonLookup):
+    lookup_name = 'gt'
+
+    def get_bound(self, start, finish):
+        return finish
+
+
+@YearTransform.register_lookup
+class YearGte(YearComparisonLookup):
+    lookup_name = 'gte'
+
+    def get_bound(self, start, finish):
+        return start
+
+
+@YearTransform.register_lookup
+class YearLt(YearComparisonLookup):
+    lookup_name = 'lt'
+
+    def get_bound(self, start, finish):
+        return start
+
+
+@YearTransform.register_lookup
+class YearLte(YearComparisonLookup):
+    lookup_name = 'lte'
+
+    def get_bound(self, start, finish):
+        return finish
+
+
+class MonthTransform(DateTransform):
+    lookup_name = 'month'
+
+
+class DayTransform(DateTransform):
+    lookup_name = 'day'
+
+
+class WeekDayTransform(DateTransform):
+    lookup_name = 'week_day'
+
+
+class HourTransform(DateTransform):
+    lookup_name = 'hour'
+
+
+class MinuteTransform(DateTransform):
+    lookup_name = 'minute'
+
+
+class SecondTransform(DateTransform):
+    lookup_name = 'second'
+
+
+DateField.register_lookup(YearTransform)
+DateField.register_lookup(MonthTransform)
+DateField.register_lookup(DayTransform)
+DateField.register_lookup(WeekDayTransform)
+
+TimeField.register_lookup(HourTransform)
+TimeField.register_lookup(MinuteTransform)
+TimeField.register_lookup(SecondTransform)
+
+DateTimeField.register_lookup(YearTransform)
+DateTimeField.register_lookup(MonthTransform)
+DateTimeField.register_lookup(DayTransform)
+DateTimeField.register_lookup(WeekDayTransform)
+DateTimeField.register_lookup(HourTransform)
+DateTimeField.register_lookup(MinuteTransform)
+DateTimeField.register_lookup(SecondTransform)
