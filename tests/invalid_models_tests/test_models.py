@@ -573,7 +573,7 @@ class OtherModelTests(IsolatedModelsTestCase):
             class Meta:
                 ordering = ['order']
 
-        self.assertEquals(Model.check(), [])
+        self.assertEqual(Model.check(), [])
 
     def test_just_order_with_respect_to_no_errors(self):
         class Question(models.Model):
@@ -585,7 +585,7 @@ class OtherModelTests(IsolatedModelsTestCase):
             class Meta:
                 order_with_respect_to = 'question'
 
-        self.assertEquals(Answer.check(), [])
+        self.assertEqual(Answer.check(), [])
 
     def test_ordering_with_order_with_respect_to(self):
         class Question(models.Model):
