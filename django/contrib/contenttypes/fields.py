@@ -275,6 +275,10 @@ class GenericRel(ForeignObjectRel):
     """
     Used by GenericRelation to store information about the relation.
     """
+    one_to_many = True
+    many_to_one = False
+    one_to_one = False
+    many_to_many = False
 
     def __init__(self, field, to, related_name=None, related_query_name=None, limit_choices_to=None):
         super(GenericRel, self).__init__(

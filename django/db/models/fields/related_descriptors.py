@@ -796,7 +796,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 qs._add_hints(instance=self.instance)
                 if self._db:
                     qs = qs.using(self._db)
-                return qs._next_is_sticky().filter(**self.core_filters)
+                return qs._sticky_filter(**self.core_filters)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
@@ -806,7 +806,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset = queryset.using(queryset._db or self._db)
 
             query = {'%s__in' % self.query_field_name: instances}
-            queryset = queryset._next_is_sticky().filter(**query)
+            queryset = queryset._sticky_filter(**query)
 
             # M2M: need to annotate the query in order to get the primary model
             # that the secondary model was actually related to. We know that

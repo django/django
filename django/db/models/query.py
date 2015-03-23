@@ -170,13 +170,21 @@ class QuerySet(object):
         self._hints = hints or {}
         self.query = query or sql.Query(self.model)
         self._result_cache = None
-        self._sticky_filter = False
         self._for_write = False
         self._prefetch_related_lookups = []
         self._prefetch_done = False
         self._known_related_objects = {}  # {rel_field, {pk: rel_obj}}
         self._iterable_class = ModelIterable
         self._fields = None
+        # Sticky filter is a horrific hack to support the following API:
+        #   Foo.tags.filter(foo__name='Bar')  # No new join created for foo
+        #   Foo.tags.all().filter(foo__name='Bar')  # New join created for foo
+        # So, filters directly after access to related manager reuse joins
+        # created by the related manager, but if there is any operation in between,
+        # then the same join isn't targeted anymore.
+        # While it would be nice to get rid of this API, deprecation for this ages
+        # old feature seems hard.
+        self.filter_is_sticky = False
 
     def as_manager(cls):
         # Address the circular dependency between `Queryset` and `Manager`.
@@ -350,12 +358,12 @@ class QuerySet(object):
                 raise TypeError("Complex aggregates require an alias")
             kwargs[arg.default_alias] = arg
 
-        query = self.query.clone()
+        clone = self._clone()
         for (alias, aggregate_expr) in kwargs.items():
-            query.add_annotation(aggregate_expr, alias, is_summary=True)
-            if not query.annotations[alias].contains_aggregate:
+            clone.query.add_annotation(aggregate_expr, alias, is_summary=True)
+            if not clone.query.annotations[alias].contains_aggregate:
                 raise TypeError("%s is not an aggregate expression" % alias)
-        return query.get_aggregation(self.db, kwargs.keys())
+        return clone.query.get_aggregation(self.db, kwargs.keys())
 
     def count(self):
         """
@@ -367,7 +375,6 @@ class QuerySet(object):
         """
         if self._result_cache is not None:
             return len(self._result_cache)
-
         return self.query.get_count(using=self.db)
 
     def get(self, *args, **kwargs):
@@ -801,12 +808,12 @@ class QuerySet(object):
         if args or kwargs:
             assert self.query.can_filter(), \
                 "Cannot filter a query once a slice has been taken."
-
-        clone = self._clone()
         if negate:
-            clone.query.add_q(~Q(*args, **kwargs))
+            q = ~Q(*args, **kwargs)
         else:
-            clone.query.add_q(Q(*args, **kwargs))
+            q = Q(*args, **kwargs)
+        clone = self._clone()
+        clone.query.add_q(q, reuse_joins=self.filter_is_sticky)
         return clone
 
     def complex_filter(self, filter_obj):
@@ -1058,15 +1065,12 @@ class QuerySet(object):
 
     def _clone(self, **kwargs):
         query = self.query.clone()
-        if self._sticky_filter:
-            query.filter_is_sticky = True
         clone = self.__class__(model=self.model, query=query, using=self._db, hints=self._hints)
         clone._for_write = self._for_write
         clone._prefetch_related_lookups = self._prefetch_related_lookups[:]
         clone._known_related_objects = self._known_related_objects
         clone._iterable_class = self._iterable_class
         clone._fields = self._fields
-
         clone.__dict__.update(kwargs)
         return clone
 
@@ -1075,20 +1079,6 @@ class QuerySet(object):
             self._result_cache = list(self.iterator())
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
-
-    def _next_is_sticky(self):
-        """
-        Indicates that the next filter call and the one following that should
-        be treated as a single filter. This is only important when it comes to
-        determining when to reuse tables for many-to-many filters. Required so
-        that we can filter naturally on the results of related managers.
-
-        This doesn't return a clone of the current QuerySet (it returns
-        "self"). The method is only used internally and should be immediately
-        followed by a filter() that does create a clone.
-        """
-        self._sticky_filter = True
-        return self
 
     def _merge_sanity_check(self, other):
         """
@@ -1167,6 +1157,19 @@ class QuerySet(object):
             return True
         return check_rel_lookup_compatibility(self.model, opts, field)
     is_compatible_query_object_type.queryset_only = True
+
+    def _sticky_filter(self, **kwargs):
+        """
+        Calling _sticky_filter(foo=bar).filter(fuu=baz) is equivalent
+        to calling filter(foo=bar, fuu=baz). Notably doing
+        ._sticky_filter(foo=bar).all().filter(fuu=baz) is *not*
+        equivalent to .filter(foo=bar, fuu=baz).
+
+        A hack needed by m2m relations.
+        """
+        clone = self.filter(**kwargs)
+        clone.filter_is_sticky = True
+        return clone
 
 
 class InstanceCheckMeta(type):
