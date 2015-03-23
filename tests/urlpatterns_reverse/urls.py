@@ -62,6 +62,10 @@ with warnings.catch_warnings():
         url(r'^outer/(?P<outer>[0-9]+)/', include('urlpatterns_reverse.included_urls')),
         url(r'^outer-no-kwargs/([0-9]+)/', include('urlpatterns_reverse.included_no_kwargs_urls')),
         url('', include('urlpatterns_reverse.extra_urls')),
+        url(r'^lookahead-/(?!not-a-city)(?P<city>[^/]+)/$', empty_view, name='lookahead-negative'),
+        url(r'^lookahead\+/(?=a-city)(?P<city>[^/]+)/$', empty_view, name='lookahead-positive'),
+        url(r'^lookbehind-/(?P<city>[^/]+)(?<!not-a-city)/$', empty_view, name='lookbehind-negative'),
+        url(r'^lookbehind\+/(?P<city>[^/]+)(?<=a-city)/$', empty_view, name='lookbehind-positive'),
 
         # Partials should be fine.
         url(r'^partial/', empty_view_partial, name="partial"),

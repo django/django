@@ -799,3 +799,44 @@ class IncludeTests(SimpleTestCase):
         msg = "Must specify a namespace if specifying app_name."
         with self.assertRaisesMessage(ValueError, msg):
             include('urls', app_name='bar')
+
+
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
+class LookaheadTests(TestCase):
+    def test_valid_resolve(self):
+        test_urls = ['/lookahead-/a-city/', '/lookbehind-/a-city/',
+                     '/lookahead+/a-city/', '/lookbehind+/a-city/', ]
+
+        for test_url in test_urls:
+            match = resolve(test_url)
+            self.assertEqual(match.kwargs, {'city': 'a-city'})
+
+    def test_invalid_resolve(self):
+        test_urls = ['/lookahead-/not-a-city/', '/lookbehind-/not-a-city/',
+                     '/lookahead+/other-city/', '/lookbehind+/other-city/', ]
+
+        for test_url in test_urls:
+            with self.assertRaises(Resolver404):
+                resolve(test_url)
+
+    def test_valid_reverse(self):
+        url = reverse('lookahead-positive', kwargs={'city': 'a-city'})
+        self.assertEqual(url, '/lookahead+/a-city/')
+        url = reverse('lookahead-negative', kwargs={'city': 'a-city'})
+        self.assertEqual(url, '/lookahead-/a-city/')
+
+        url = reverse('lookbehind-positive', kwargs={'city': 'a-city'})
+        self.assertEqual(url, '/lookbehind+/a-city/')
+        url = reverse('lookbehind-negative', kwargs={'city': 'a-city'})
+        self.assertEqual(url, '/lookbehind-/a-city/')
+
+    def test_invalid_reverse(self):
+        with self.assertRaises(NoReverseMatch):
+            reverse('lookahead-positive', kwargs={'city': 'other-city'})
+        with self.assertRaises(NoReverseMatch):
+            reverse('lookahead-negative', kwargs={'city': 'not-a-city'})
+
+        with self.assertRaises(NoReverseMatch):
+            reverse('lookbehind-positive', kwargs={'city': 'other-city'})
+        with self.assertRaises(NoReverseMatch):
+            reverse('lookbehind-negative', kwargs={'city': 'not-a-city'})
