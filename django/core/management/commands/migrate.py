@@ -13,10 +13,9 @@ from django.core.management.sql import (
     emit_post_migrate_signal, emit_pre_migrate_signal,
 )
 from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
-from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
-from django.db.migrations.state import ProjectState
+from django.db.migrations.utils import has_unmigrated_models
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.module_loading import module_has_submodule
 
@@ -174,12 +173,7 @@ class Command(BaseCommand):
             if self.verbosity >= 1:
                 self.stdout.write("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them how to fix it.
-                autodetector = MigrationAutodetector(
-                    executor.loader.project_state(),
-                    ProjectState.from_apps(apps),
-                )
-                changes = autodetector.changes(graph=executor.loader.graph)
-                if changes:
+                if has_unmigrated_models():
                     self.stdout.write(self.style.NOTICE(
                         "  Your models have changes that are not yet reflected "
                         "in a migration, and so won't be applied."
