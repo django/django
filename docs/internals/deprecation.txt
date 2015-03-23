@@ -44,8 +44,8 @@ details on these changes.
   * ``django.template.loaders.base.Loader.supports_recursion()``
   * ``django.template.loaders.cached.Loader.supports_recursion()``
 
-* The ``load_template and ``load_template_sources`` template loader methods
-  will be removed.
+* The ``load_template()`` and ``load_template_sources()`` template loader
+  methods will be removed.
 
 * The ``template_dirs`` argument for template loaders will be removed:
 
@@ -55,7 +55,8 @@ details on these changes.
   * ``django.template.loaders.cached.Loader.get_template_sources()``
   * ``django.template.loaders.filesystem.Loader.get_template_sources()``
 
-* The ``django.template.loaders.base.Loader.__call__`` method will be removed.
+* The ``django.template.loaders.base.Loader.__call__()`` method will be
+  removed.
 
 .. _deprecation-removed-in-2.0:
 
