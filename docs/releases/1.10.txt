@@ -79,7 +79,8 @@ Minor features
 :mod:`django.contrib.sessions`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The :djadmin:`clearsessions` management command now removes file-based
+  sessions.
 
 :mod:`django.contrib.sitemaps`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
