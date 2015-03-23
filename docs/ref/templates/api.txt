@@ -939,38 +939,128 @@ option. It uses each loader until a loader finds a match.
 
 .. _custom-template-loaders:
 
-Custom loaders
---------------
+.. currentmodule:: django.template.loaders.base
 
-Custom ``Loader`` classes should inherit from
-``django.template.loaders.base.Loader`` and override the
-``load_template_source()`` method, which takes a ``template_name`` argument,
-loads the template from disk (or elsewhere), and returns a tuple:
-``(template_string, template_origin)``.
+Custom loaders
+==============
+
+It's possible to load templates from additional sources using custom template
+loaders. Custom ``Loader`` classes should inherit from
+``django.template.loaders.base.Loader`` and define the ``get_contents()`` and
+``get_template_sources()`` methods.
 
 .. versionchanged:: 1.8
 
     ``django.template.loaders.base.Loader`` used to be defined at
     ``django.template.loader.BaseLoader``.
 
-The ``load_template()`` method of the ``Loader`` class retrieves the template
-string by calling ``load_template_source()``, instantiates a ``Template`` from
-the template source, and returns a tuple: ``(template, template_origin)``.
+.. versionchanged:: 1.9
 
-.. currentmodule:: django.template
+    In previous versions of Django, custom loaders defined a single method:
+    ``load_template_source()``.
+
+Loader methods
+--------------
+
+.. class:: Loader
+
+    Loads templates from a given source, such as the filesystem or a database.
+
+    .. method:: get_template_sources(template_name)
+
+        A method that takes a ``template_name`` and yields
+        :class:`~django.template.base.Origin` instances for each possible
+        source.
+
+        For example, the filesystem loader may receive ``'index.html'`` as a
+        ``template_name`` argument.  This method would yield origins for the
+        full path of ``index.html`` as it appears in each template directory
+        the loader looks at.
+
+        The method doesn't need to verify that the template exists at a given
+        path, but it should ensure the path is valid. For instance, the
+        filesystem loader makes sure the path lies under a valid template
+        directory.
+
+    .. method:: get_contents(origin)
+
+        Returns the contents for a template given a
+        :class:`~django.template.base.Origin` instance.
+
+        This is where a filesystem loader would read contents from the
+        filesystem, or a database loader would read from the database. If a
+        matching template doesn't exist, this should raise a
+        :exc:`~django.template.TemplateDoesNotExist` error.
+
+    .. method:: get_template(template_name, skip=None)
+
+        Returns a ``Template`` object for a given ``template_name`` by looping
+        through results from :meth:`get_template_sources` and calling
+        :meth:`get_contents`. This returns the first matching template. If no
+        template is found, :exc:`~django.template.TemplateDoesNotExist` is
+        raised.
+
+        The optional ``skip`` argument is a list of origins to ignore when
+        extending templates. This allow templates to extend other templates of
+        the same name. It also used to avoid recursion errors.
+
+        In general, it is enough to define :meth:`get_template_sources` and
+        :meth:`get_contents` for custom template loaders. ``get_template()``
+        will usually not need to be overridden.
+
+    .. method:: load_template_source(template_name, template_dirs=None)
+
+        Returns a tuple of (``template_string``, ``template_origin``), where
+        ``template_string`` is a string containing the template contents,
+        and ``template_origin`` is a string identifying the template source.
+        A filesystem-based loader may return the full path to the file as the
+        ``template_origin``, for example.
+
+        ``template_dirs`` is an optional argument used to control which
+        directories the loader will search.
+
+        This method is called automatically by :meth:`load_template` and should
+        be overridden when writing custom template loaders.
+
+        .. deprecated:: 1.9
+
+             Custom loaders should use :meth:`get_template` and
+             :meth:`get_contents` instead.
+
+    .. method:: load_template(template_name, template_dirs=None)
+
+        Returns a tuple of (``template``, ``template_origin``), where ``template``
+        is a ``Template`` object and ``template_origin`` is a string identifying
+        the template source. A filesystem-based loader may return the full
+        path to the file as the ``template_origin``, for example.
+
+        .. deprecated:: 1.9
+
+             Custom loaders should use :meth:`get_template` and
+             :meth:`get_contents` instead.
+
+.. admonition:: Building your own
+
+    For examples, `read the source code for Django's built-in loaders`_.
+
+.. _read the source code for Django's built-in loaders: https://github.com/django/django/tree/master/django/template/loaders
+
+.. currentmodule:: django.template.base
 
 Template origin
 ===============
 
-When an :class:`~django.template.Engine` is initialized with ``debug=True``,
-its templates have an ``origin`` attribute depending on the source they are
-loaded from. For engines initialized by Django, ``debug`` defaults to the
-value of :setting:`DEBUG`.
+Templates have an ``origin`` containing attributes depending on the source
+they are loaded from.
 
-.. class:: loader.LoaderOrigin
+.. versionchanged:: 1.9
 
-    Templates created from a template loader will use the
-    ``django.template.loader.LoaderOrigin`` class.
+    Django used to create an origin based on
+    ``django.template.loader.LoaderOrigin`` or
+    ``django.template.base.StringOrigin``. These have been replaced by
+    ``django.template.base.Origin``.
+
+.. class:: Origin
 
     .. attribute:: name
 
@@ -978,16 +1068,13 @@ value of :setting:`DEBUG`.
         For loaders that read from the file system, this is the full
         path to the template.
 
-    .. attribute:: loadname
+        If the template is instantiated directly rather than through a
+        template loader, this is a string value of ``<unknown_source>``.
+
+    .. attribute:: template_name
 
         The relative path to the template as passed into the
         template loader.
 
-.. class:: StringOrigin
-
-    Templates created from a ``Template`` class will use the
-    ``django.template.StringOrigin`` class.
-
-    .. attribute:: source
-
-        The string used to create the template.
+        If the template is instantiated directly rather than through a
+        template loader, this is ``None``.

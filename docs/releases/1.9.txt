@@ -223,6 +223,11 @@ Templates
 * :meth:`Context.update() <django.template.Context.update>` can now be used as
   a context manager.
 
+* Django template loaders can now extend templates recursively.
+
+* The debug page template postmortem now include output from each engine that
+  is installed.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -343,6 +348,16 @@ Dropped support for PostgreSQL 9.0
 Upstream support for PostgreSQL 9.0 ended in September 2015. As a consequence,
 Django 1.9 sets 9.1 as the minimum PostgreSQL version it officially supports.
 
+Template ``LoaderOrigin`` and ``StringOrigin`` are removed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In previous versions of Django, when a template engine was initialized with
+debug as ``True``, an instance of ``django.template.loader.LoaderOrigin`` or
+``django.template.base.StringOrigin`` was set as the origin attribute on the
+template object. These classes have been combined into
+:class:`~django.template.base.Origin` and is now always set regardless of the
+engine debug setting.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -414,6 +429,15 @@ new features). Hence the need to set a custom ``GeoManager`` to GIS-enabled
 models is now obsolete. As soon as your code doesn't call any of the deprecated
 methods, you can simply remove the ``objects = GeoManager()`` lines from your
 models.
+
+Template loader APIs have changed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django template loaders have been updated to allow recursive template
+extending. This change necessitated a new template loader API. The old
+``load_template()`` and ``load_template_sources()`` methods are now deprecated.
+Details about the new API can be found :ref:`in the template loader
+documentation <custom-template-loaders>`.
 
 Miscellaneous
 ~~~~~~~~~~~~~
