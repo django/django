@@ -623,9 +623,9 @@ TECHNICAL_500_TEMPLATE = ("""
     div.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
     div.context ol li { font-family:monospace; white-space:pre; color:#777; cursor:pointer; }
     div.context ol li pre { display:inline; }
-    div.context ol.context-line li { color:#505050; background-color:#dfdfdf; }
+    div.context ol.context-line li { color:#505050; background-color:#dfdfdf; padding: 5px; }
     div.context ol.context-line li span { position:absolute; right:32px; }
-    .user div.context ol.context-line li { background-color:#bbb; color:#000; }
+    .user div.context ol.context-line li { background-color:#bbb; color:#000; padding: 5px; }
     .user div.context ol li { color:#666; }
     div.commands { margin-left: 40px; }
     div.commands a { color:#555; text-decoration:none; }
