@@ -266,12 +266,12 @@ If you use this example, be sure to change the ``'filename'`` path to a
 location that's writable by the user that's running the Django application.
 
 Second, here's an example of how to make the logging system print Django's
-logging to the console. It overrides the fact that ``django.request`` and
-``django.security`` don't propagate their log entries by default. It may be
-useful during local development.
+logging to the console. It may be useful during local development.
 
 By default, this config only sends messages of level ``INFO`` or higher to the
-console. Django does not log many such messages. Set the environment variable
+console (same as Django's default logging config, except that the default only
+displays log records when ``DEBUG=True``). Django does not log many such
+messages. With this config, however, you can also set the environment variable
 ``DJANGO_LOG_LEVEL=DEBUG`` to see all of Django's debug logging which is very
 verbose as it includes all database queries::
 
@@ -292,6 +292,11 @@ verbose as it includes all database queries::
             },
         },
     }
+
+.. versionchanged:: 1.9
+
+    Django's default logging configuration changed. See :ref:`the release notes
+    <default-logging-changes-19>` for a description of the changes.
 
 Finally, here's an example of a fairly complex logging setup::
 
@@ -525,14 +530,12 @@ a client that does not match :setting:`ALLOWED_HOSTS`, Django will return a 400
 response, and an error message will be logged to the
 ``django.security.DisallowedHost`` logger.
 
-Only the parent ``django.security`` logger is configured by default, and all
-child loggers will propagate to the parent logger. The ``django.security``
-logger is configured the same as the ``django.request`` logger, and any error
-events will be mailed to admins. Requests resulting in a 400 response due to
-a ``SuspiciousOperation`` will not be logged to the ``django.request`` logger,
-but only to the ``django.security`` logger.
+These log events will reach the 'django' logger by default, which mails error
+events to admins when ``DEBUG=False``. Requests resulting in a 400 response due
+to a ``SuspiciousOperation`` will not be logged to the ``django.request``
+logger, but only to the ``django.security`` logger.
 
-To silence a particular type of SuspiciousOperation, you can override that
+To silence a particular type of ``SuspiciousOperation``, you can override that
 specific logger following this example:
 
 .. code-block:: python
@@ -704,20 +707,20 @@ By default, Django configures the following logging:
 When :setting:`DEBUG` is ``True``:
 
 * The ``django`` catch-all logger sends all messages at the ``INFO`` level or
-  higher to the console. Django doesn't make any such logging calls at this
-  time (all logging is at the ``DEBUG`` level or handled by the
-  ``django.request`` and ``django.security`` loggers).
+  higher to the console.
 
 * The ``py.warnings`` logger, which handles messages from ``warnings.warn()``,
   sends messages to the console.
 
 When :setting:`DEBUG` is ``False``:
 
-* The ``django.request`` and ``django.security`` loggers send messages with
-  ``ERROR`` or ``CRITICAL`` level to :class:`AdminEmailHandler`. These loggers
-  ignore anything at the ``WARNING`` level or below and log entries aren't
-  propagated to other loggers (they won't reach the ``django`` catch-all
-  logger, even when ``DEBUG`` is ``True``).
+* The ``django`` logger send messages with ``ERROR`` or ``CRITICAL`` level to
+  :class:`AdminEmailHandler`.
+
+.. versionchanged:: 1.9
+
+    Django's default logging configuration changed. See :ref:`the release notes
+    <default-logging-changes-19>` for a description of the changes.
 
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
 complement or replace this default logging configuration.

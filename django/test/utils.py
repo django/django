@@ -616,3 +616,18 @@ def override_script_prefix(prefix):
     Decorator or context manager to temporary override the script prefix.
     """
     return ScriptPrefix(prefix)
+
+
+class LoggingCaptureMixin(object):
+    """
+    Capture the output from the 'django' logger and store it on the class's
+    logger_output attribute.
+    """
+    def setUp(self):
+        self.logger = logging.getLogger('django')
+        self.old_stream = self.logger.handlers[0].stream
+        self.logger_output = six.StringIO()
+        self.logger.handlers[0].stream = self.logger_output
+
+    def tearDown(self):
+        self.logger.handlers[0].stream = self.old_stream

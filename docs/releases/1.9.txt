@@ -358,6 +358,26 @@ template object. These classes have been combined into
 :class:`~django.template.base.Origin` and is now always set regardless of the
 engine debug setting.
 
+.. _default-logging-changes-19:
+
+Changes to the default logging configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To make it easier to write custom logging configurations, Django's default
+logging configuration no longer defines 'django.request' and 'django.security'
+loggers. Instead, it defines a single 'django' logger with two handlers:
+
+* 'console': filtered at the ``INFO`` level and only active if ``DEBUG=True``.
+* 'mail_admins': filtered at the ``ERROR`` level and only active if
+  ``DEBUG=False``.
+
+If you aren't overriding Django's default logging, you should see minimal
+changes in behavior, but you might see some new logging to the ``runserver``
+console, for example.
+
+If you are overriding Django's default logging, you should check to see how
+your configuration merges with the new defaults.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
