@@ -16,6 +16,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.template.base import TemplateDoesNotExist
 from django.test import RequestFactory, TestCase, override_settings
+from django.test.utils import LoggingCaptureMixin
 from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import SimpleLazyObject
@@ -48,7 +49,7 @@ class CallableSettingWrapperTests(TestCase):
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF="view_tests.urls")
-class DebugViewTests(TestCase):
+class DebugViewTests(LoggingCaptureMixin, TestCase):
 
     def test_files(self):
         response = self.client.get('/raises/')
@@ -642,7 +643,7 @@ class ExceptionReportTestMixin(object):
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
+class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin, TestCase):
     """
     Ensure that sensitive information can be filtered out of error reports.
     Refs #14614.
@@ -833,7 +834,7 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
                 self.assertNotContains(response, 'should not be displayed', status_code=500)
 
 
-class AjaxResponseExceptionReporterFilter(TestCase, ExceptionReportTestMixin):
+class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptureMixin, TestCase):
     """
     Ensure that sensitive information can be filtered out of error reports.
 

@@ -9,7 +9,7 @@ from admin_scripts.tests import AdminScriptTestCase
 from django.core import mail
 from django.core.files.temp import NamedTemporaryFile
 from django.test import RequestFactory, TestCase, override_settings
-from django.test.utils import patch_logger
+from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.encoding import force_text
 from django.utils.log import (
@@ -65,26 +65,18 @@ class LoggingFiltersTest(TestCase):
             self.assertEqual(filter_.filter("record is not used"), False)
 
 
-class DefaultLoggingTest(TestCase):
-    def setUp(self):
-        self.logger = logging.getLogger('django')
-        self.old_stream = self.logger.handlers[0].stream
-
-    def tearDown(self):
-        self.logger.handlers[0].stream = self.old_stream
+class DefaultLoggingTest(LoggingCaptureMixin, TestCase):
 
     def test_django_logger(self):
         """
         The 'django' base logger only output anything when DEBUG=True.
         """
-        output = StringIO()
-        self.logger.handlers[0].stream = output
         self.logger.error("Hey, this is an error.")
-        self.assertEqual(output.getvalue(), '')
+        self.assertEqual(self.logger_output.getvalue(), '')
 
         with self.settings(DEBUG=True):
             self.logger.error("Hey, this is an error.")
-            self.assertEqual(output.getvalue(), 'Hey, this is an error.\n')
+            self.assertEqual(self.logger_output.getvalue(), 'Hey, this is an error.\n')
 
 
 class WarningLoggerTests(TestCase):
@@ -167,11 +159,10 @@ class CallbackFilterTest(TestCase):
 
 
 class AdminEmailHandlerTest(TestCase):
-    logger = logging.getLogger('django.request')
+    logger = logging.getLogger('django')
 
     def get_admin_email_handler(self, logger):
-        # Inspired from views/views.py: send_log()
-        # ensuring the AdminEmailHandler does not get filtered out
+        # Ensure that AdminEmailHandler does not get filtered out
         # even with DEBUG=True.
         admin_email_handler = [
             h for h in logger.handlers

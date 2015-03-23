@@ -19,6 +19,7 @@ from django.utils._os import upath
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango21Warning,
 )
+from django.utils.log import DEFAULT_LOGGING
 
 warnings.simplefilter("error", RemovedInDjango20Warning)
 warnings.simplefilter("error", RemovedInDjango21Warning)
@@ -144,6 +145,11 @@ def setup(verbosity, test_labels):
         'auth': 'django.contrib.auth.tests.migrations',
         'contenttypes': 'contenttypes_tests.migrations',
     }
+    log_config = DEFAULT_LOGGING
+    # Filter out non-error logging so we don't have to capture it in lots of
+    # tests.
+    log_config['loggers']['django']['level'] = 'ERROR'
+    settings.LOGGING = log_config
 
     if verbosity > 0:
         # Ensure any warnings captured to logging are piped through a verbose
