@@ -71,6 +71,16 @@ class SessionStore(SessionBase):
             modification = datetime.datetime.fromtimestamp(modification)
         return modification
 
+    def _expiry_date(self, session_data):
+        """
+        Return the expiry time of the file storing the session's content.
+        """
+        expiry = session_data.get('_session_expiry', None)
+        if expiry is None:
+            expiry = self._last_modification() + \
+                datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE)
+        return expiry
+
     def load(self):
         session_data = {}
         try:
@@ -90,8 +100,7 @@ class SessionStore(SessionBase):
 
                 # Remove expired sessions.
                 expiry_age = self.get_expiry_age(
-                    modification=self._last_modification(),
-                    expiry=session_data.get('_session_expiry'))
+                    expiry=self._expiry_date(session_data))
                 if expiry_age < 0:
                     session_data = {}
                     self.delete()
