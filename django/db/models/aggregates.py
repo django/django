@@ -13,9 +13,15 @@ __all__ = [
 class Aggregate(Func):
     contains_aggregate = True
     name = None
+    template = '%(function)s(%(distinct)s%(expressions)s)'
+
+    def __init__(self, expression, distinct=False, **extra):
+        super(Aggregate, self).__init__(
+            expression, distinct='DISTINCT ' if distinct else '', **extra)
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        assert len(self.source_expressions) == 1
+        assert len(self.source_expressions) == 1, \
+            'source_expressions for %s is "%s"' % (self.__class__.__name__, self.source_expressions)
         # Aggregates are not allowed in UPDATE queries, so ignore for_save
         c = super(Aggregate, self).resolve_expression(query, allow_joins, reuse, summarize)
         if c.source_expressions[0].contains_aggregate and not summarize:
@@ -69,6 +75,15 @@ class Aggregate(Func):
         if hasattr(sql_aggregate, 'sql_template'):
             self.extra['template'] = sql_aggregate.sql_template
 
+    def __repr__(self, **extra_properties):
+        extra_properties_repr = ', '.join("{!s}={!r}".format(key, val) for (key, val) in extra_properties.items())
+        return '{}({}{}{})'.format(
+            self.__class__.__name__,
+            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
+            ', distinct=True' if self.extra['distinct'] else '',
+            ', ' + extra_properties_repr if extra_properties else ''
+        )
+
 
 class Avg(Aggregate):
     function = 'AVG'
@@ -86,20 +101,11 @@ class Avg(Aggregate):
 class Count(Aggregate):
     function = 'COUNT'
     name = 'Count'
-    template = '%(function)s(%(distinct)s%(expressions)s)'
 
-    def __init__(self, expression, distinct=False, **extra):
+    def __init__(self, expression, **extra):
         if expression == '*':
             expression = Value(expression)
-        super(Count, self).__init__(
-            expression, distinct='DISTINCT ' if distinct else '', output_field=IntegerField(), **extra)
-
-    def __repr__(self):
-        return "{}({}, distinct={})".format(
-            self.__class__.__name__,
-            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
-            'False' if self.extra['distinct'] == '' else 'True',
-        )
+        super(Count, self).__init__(expression, output_field=IntegerField(), **extra)
 
     def convert_value(self, value, expression, connection, context):
         if value is None:
@@ -117,24 +123,30 @@ class Min(Aggregate):
     name = 'Min'
 
 
-class StdDev(Aggregate):
-    name = 'StdDev'
+class StatisticalAggregate(Aggregate):
+    sample_function = None
+    population_function = None
 
     def __init__(self, expression, sample=False, **extra):
-        self.function = 'STDDEV_SAMP' if sample else 'STDDEV_POP'
-        super(StdDev, self).__init__(expression, output_field=FloatField(), **extra)
+        self.function = self.sample_function if sample else self.population_function
+        super(StatisticalAggregate, self).__init__(expression, output_field=FloatField(), **extra)
 
     def __repr__(self):
-        return "{}({}, sample={})".format(
-            self.__class__.__name__,
-            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
-            'False' if self.function == 'STDDEV_POP' else 'True',
-        )
+        return super(StatisticalAggregate, self).__repr__(sample=self.uses_sample_function())
+
+    def uses_sample_function(self):
+        return self.function == self.sample_function
 
     def convert_value(self, value, expression, connection, context):
         if value is None:
             return value
         return float(value)
+
+
+class StdDev(StatisticalAggregate):
+    sample_function = 'STDDEV_SAMP'
+    population_function = 'STDDEV_POP'
+    name = 'StdDev'
 
 
 class Sum(Aggregate):
@@ -142,21 +154,7 @@ class Sum(Aggregate):
     name = 'Sum'
 
 
-class Variance(Aggregate):
+class Variance(StatisticalAggregate):
+    sample_function = 'VAR_SAMP'
+    population_function = 'VAR_POP'
     name = 'Variance'
-
-    def __init__(self, expression, sample=False, **extra):
-        self.function = 'VAR_SAMP' if sample else 'VAR_POP'
-        super(Variance, self).__init__(expression, output_field=FloatField(), **extra)
-
-    def __repr__(self):
-        return "{}({}, sample={})".format(
-            self.__class__.__name__,
-            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
-            'False' if self.function == 'VAR_POP' else 'True',
-        )
-
-    def convert_value(self, value, expression, connection, context):
-        if value is None:
-            return value
-        return float(value)
