@@ -302,7 +302,7 @@ class MigrationWriter(object):
             value = force_text(value)
 
         # Sequences
-        if isinstance(value, (list, set, tuple)):
+        if isinstance(value, (frozenset, list, set, tuple)):
             imports = set()
             strings = []
             for item in value:
@@ -312,6 +312,8 @@ class MigrationWriter(object):
             if isinstance(value, set):
                 # Don't use the literal "{%s}" as it doesn't support empty set
                 format = "set([%s])"
+            elif isinstance(value, frozenset):
+                format = "frozenset([%s])"
             elif isinstance(value, tuple):
                 # When len(value)==0, the empty tuple should be serialized as
                 # "()", not "(,)" because (,) is invalid Python syntax.

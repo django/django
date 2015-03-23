@@ -347,6 +347,10 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(FoodManager('a', 'b'))
         self.assertSerializedEqual(FoodManager('x', 'y', c=3, d=4))
 
+    def test_serialize_frozensets(self):
+        self.assertSerializedEqual(frozenset())
+        self.assertSerializedEqual(frozenset("let it go"))
+
     def test_simple_migration(self):
         """
         Tests serializing a simple migration.
