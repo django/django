@@ -333,7 +333,7 @@ class ConnectionRouter(object):
                 # If the router doesn't have a method, skip to the next one.
                 continue
 
-            argspec = inspect.getargspec(router.allow_migrate)
+            argspec = inspect.getargspec(method)
             if len(argspec.args) == 3 and not argspec.keywords:
                 warnings.warn(
                     "The signature of allow_migrate has changed from "
