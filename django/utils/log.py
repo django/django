@@ -34,9 +34,6 @@ DEFAULT_LOGGING = {
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
         },
-        'null': {
-            'class': 'logging.NullHandler',
-        },
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
