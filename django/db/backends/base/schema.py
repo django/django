@@ -1,12 +1,12 @@
 import hashlib
+import logging
 
 from django.db.backends.utils import truncate_name
 from django.db.transaction import atomic
 from django.utils import six
 from django.utils.encoding import force_bytes
-from django.utils.log import getLogger
 
-logger = getLogger('django.db.backends.schema')
+logger = logging.getLogger('django.db.backends.schema')
 
 
 def _related_non_m2m_objects(opts):
