@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import logging
 import sys
 
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
@@ -9,7 +10,6 @@ from django.core.urlresolvers import get_resolver
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response
 from django.template import TemplateDoesNotExist
-from django.utils.log import getLogger
 from django.views.debug import (
     SafeExceptionReporterFilter, technical_500_response,
 )
@@ -102,7 +102,7 @@ def render_no_template(request):
 
 
 def send_log(request, exc_info):
-    logger = getLogger('django.request')
+    logger = logging.getLogger('django.request')
     # The default logging config has a logging filter to ensure admin emails are
     # only sent with DEBUG=False, but since someone might choose to remove that
     # filter, we still want to be able to test the behavior of error emails
