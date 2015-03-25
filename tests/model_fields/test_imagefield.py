@@ -181,6 +181,21 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
         loaded_p = pickle.loads(dump)
         self.assertEqual(p.mugshot, loaded_p.mugshot)
 
+    def test_image_field_io_closed_file(self):
+        """
+        Opening 'image' property as Image object of a model's ImageField will fail
+        with an 'I/O operation on closed file' error. Regression for #13750
+
+        Accessing the image after saving it should return a closed file reference.
+        """
+        from .models import Profile
+        profile = Profile()
+        profile.image = self.file1
+
+        profile.save()
+
+        self.assertTrue(profile.image.closed)
+
 
 @skipIf(Image is None, "Pillow is required to test ImageField")
 class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):

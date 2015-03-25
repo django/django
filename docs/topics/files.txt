@@ -55,6 +55,10 @@ it has all the methods and attributes described below.
     file name used on disk cannot be relied on until after the model has been
     saved.
 
+.. note::
+    Accessing an image field (or other file-like field) on a model returns
+    a closed file reference. 
+
 
 The ``File`` object
 ===================

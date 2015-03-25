@@ -384,3 +384,7 @@ class AbstractForeignFieldsModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Profile(models.Model):
+    image = models.ImageField()
