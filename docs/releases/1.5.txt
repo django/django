@@ -723,13 +723,12 @@ Features deprecated in 1.5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The localflavor contrib app has been split into separate packages.
-``django.contrib.localflavor`` itself will be removed in Django 1.6, after an
-:ref:`accelerated deprecation <localflavor-deprecation-policy>`. The docs
-provide :ref:`migration instructions <localflavor-how-to-migrate>`.
+``django.contrib.localflavor`` itself will be removed in Django 1.6,
+after an accelerated deprecation.
 
-The new packages are available :ref:`on Github <localflavor-packages>`. The
-core team cannot efficiently maintain these packages in the long term — it
-spans just a dozen countries at this time; similar to translations, maintenance
+The new packages are available on Github. The core team cannot
+efficiently maintain these packages in the long term — it spans just a
+dozen countries at this time; similar to translations, maintenance
 will be handed over to interested members of the community.
 
 ``django.contrib.markup``

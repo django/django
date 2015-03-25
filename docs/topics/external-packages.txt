@@ -1,0 +1,37 @@
+=================
+External packages
+=================
+
+Django ships with a variety of extra, optional tools that solve common
+problems. For easier maintenance and to trim the size of the codebase,
+during the course of Django development a few of those applications
+have been moved out to separate projects. A few examples follow.
+
+Localflavor
+~~~~~~~~~~~
+
+The ``localflavor`` app, a collection of utilities for particular
+countries or cultures, was removed from Django in 1.6. The new package
+is named `django-localflavor
+<https://github.com/django/django-localflavor>`_ and the documentation
+can be found `here <https://django-localflavor.readthedocs.org/>`__.
+
+Comments
+~~~~~~~~
+
+Django's comment framework has been dropped in Django 1.8. Most users
+will be better served with a custom solution, or a hosted product like
+Disqus. The code formerly known as ``django.contrib.comments`` is
+still available in an external `repository
+<https://github.com/django/django-contrib-comments>`_. The
+documentation is available `here
+<http://django-contrib-comments.readthedocs.org/>`__.
+
+Formtools
+~~~~~~~~~
+
+The ``formtools`` app, a collection of assorted utilities to work with
+forms, was removed from Django in 1.8. The new package is named
+`django-formtools <https://github.com/django/django-formtools>`_ and
+the documentation can be found `here
+<http://django-formtools.readthedocs.org/>`__.
