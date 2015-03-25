@@ -542,12 +542,14 @@ class SQLCompiler(object):
         name, order = get_order_dir(name, default_order)
         descending = True if order == 'DESC' else False
         pieces = name.split(LOOKUP_SEP)
-        field, targets, alias, joins, path, opts = self._setup_joins(pieces, opts, alias)
+        field, targets, alias, joins, path, opts = self._setup_joins(
+            pieces, opts, alias,
+        )
 
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model unless the attribute name
         # of the field is specified.
-        if field.rel and path and opts.ordering and name != field.attname:
+        if field.is_relation and path and opts.ordering and name != field.attname:
             # Firstly, avoid infinite loops.
             if not already_seen:
                 already_seen = set()
@@ -676,7 +678,7 @@ class SQLCompiler(object):
                                           only_load.get(field_model)):
                 continue
             klass_info = {
-                'model': f.rel.to,
+                'model': f.remote_field.model,
                 'field': f,
                 'reverse': False,
                 'from_parent': False,
@@ -686,13 +688,13 @@ class SQLCompiler(object):
             _, _, _, joins, _ = self.query.setup_joins(
                 [f.name], opts, root_alias)
             alias = joins[-1]
-            columns = self.get_default_columns(start_alias=alias, opts=f.rel.to._meta)
+            columns = self.get_default_columns(start_alias=alias, opts=f.remote_field.model._meta)
             for col in columns:
                 select_fields.append(len(select))
                 select.append((col, None))
             klass_info['select_fields'] = select_fields
             next_klass_infos = self.get_related_selections(
-                select, f.rel.to._meta, alias, cur_depth + 1, next, restricted)
+                select, f.remote_field.model._meta, alias, cur_depth + 1, next, restricted)
             get_related_klass_infos(klass_info, next_klass_infos)
 
         if restricted:
@@ -1003,7 +1005,7 @@ class SQLUpdateCompiler(SQLCompiler):
                 if val.contains_aggregate:
                     raise FieldError("Aggregate functions are not allowed in this query")
             elif hasattr(val, 'prepare_database_save'):
-                if field.rel:
+                if field.remote_field:
                     val = val.prepare_database_save(field)
                 else:
                     raise TypeError("Database is trying to update a relational field "

@@ -17,7 +17,8 @@ from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
-from django.db.models.query_utils import Q, PathInfo, refs_aggregate
+from django.db.models.fields.related_lookups import MultiColSource
+from django.db.models.query_utils import Q, PathInfo, refs_expression
 from django.db.models.sql.constants import (
     INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, QUERY_TERMS, SINGLE,
 )
@@ -607,7 +608,7 @@ class Query(object):
                 if is_reverse_o2o(source):
                     cur_model = source.related_model
                 else:
-                    cur_model = source.rel.to
+                    cur_model = source.remote_field.model
                 opts = cur_model._meta
                 # Even if we're "just passing through" this model, we must add
                 # both the current model's pk and the related reference field
@@ -1006,7 +1007,7 @@ class Query(object):
         """
         lookup_splitted = lookup.split(LOOKUP_SEP)
         if self._annotations:
-            aggregate, aggregate_lookups = refs_aggregate(lookup_splitted, self.annotations)
+            aggregate, aggregate_lookups = refs_expression(lookup_splitted, self.annotations)
             if aggregate:
                 return aggregate_lookups, (), aggregate
         _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
@@ -1037,7 +1038,7 @@ class Query(object):
         """
         Checks the type of object passed to query relations.
         """
-        if field.rel:
+        if field.is_relation:
             # QuerySets implement is_compatible_query_object_type() to
             # determine compatibility with the given field.
             if hasattr(value, 'is_compatible_query_object_type'):
@@ -1157,24 +1158,20 @@ class Query(object):
         if can_reuse is not None:
             can_reuse.update(join_list)
         used_joins = set(used_joins).union(set(join_list))
-
-        # Process the join list to see if we can remove any non-needed joins from
-        # the far end (fewer tables in a query is better).
         targets, alias, join_list = self.trim_joins(sources, join_list, path)
 
-        if hasattr(field, 'get_lookup_constraint'):
-            # For now foreign keys get special treatment. This should be
-            # refactored when composite fields lands.
-            condition = field.get_lookup_constraint(self.where_class, alias, targets, sources,
-                                                    lookups, value)
-            lookup_type = lookups[-1]
-        else:
-            assert(len(targets) == 1)
-            if hasattr(targets[0], 'as_sql'):
-                # handle Expressions as annotations
-                col = targets[0]
+        if field.is_relation:
+            # No support for transforms for relational fields
+            assert len(lookups) == 1
+            lookup_class = field.get_lookup(lookups[0])
+            if len(targets) == 1:
+                lhs = targets[0].get_col(alias, field)
             else:
-                col = targets[0].get_col(alias, field)
+                lhs = MultiColSource(alias, targets, sources, field)
+            condition = lookup_class(lhs, value)
+            lookup_type = lookup_class.lookup_name
+        else:
+            col = targets[0].get_col(alias, field)
             condition = self.build_lookup(lookups, col, value)
             lookup_type = condition.lookup_name
 
@@ -1284,14 +1281,6 @@ class Query(object):
                     )
                 model = field.model._meta.concrete_model
             except FieldDoesNotExist:
-                # is it an annotation?
-                if self._annotations and name in self._annotations:
-                    field, model = self._annotations[name], None
-                    if not field.contains_aggregate:
-                        # Local non-relational field.
-                        final_field = field
-                        targets = (field,)
-                        break
                 # We didn't find the current field, so move position back
                 # one step.
                 pos -= 1
@@ -1314,7 +1303,7 @@ class Query(object):
                         opts = int_model._meta
                     else:
                         final_field = opts.parents[int_model]
-                        targets = (final_field.rel.get_related_field(),)
+                        targets = (final_field.remote_field.get_related_field(),)
                         opts = int_model._meta
                         path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
                         cur_names_with_path[1].append(
@@ -1389,8 +1378,6 @@ class Query(object):
             reuse = can_reuse if join.m2m else None
             alias = self.join(connection, reuse=reuse)
             joins.append(alias)
-        if hasattr(final_field, 'field'):
-            final_field = final_field.field
         return final_field, targets, opts, joins, path
 
     def trim_joins(self, targets, joins, path):
@@ -1985,7 +1972,7 @@ def is_reverse_o2o(field):
     A little helper to check if the given field is reverse-o2o. The field is
     expected to be some sort of relation field or related object.
     """
-    return not hasattr(field, 'rel') and field.field.unique
+    return field.is_relation and field.one_to_one and not field.concrete
 
 
 class JoinPromoter(object):

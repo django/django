@@ -74,9 +74,9 @@ class CreateModel(Operation):
                 strings_to_check.append(base.split(".")[-1])
         # Check we have no FKs/M2Ms with it
         for fname, field in self.fields:
-            if field.rel:
-                if isinstance(field.rel.to, six.string_types):
-                    strings_to_check.append(field.rel.to.split(".")[-1])
+            if field.remote_field:
+                if isinstance(field.remote_field.model, six.string_types):
+                    strings_to_check.append(field.remote_field.model.split(".")[-1])
         # Now go over all the strings and compare them
         for string in strings_to_check:
             if string.lower() == name.lower():
@@ -181,7 +181,7 @@ class RenameModel(Operation):
             for name, field in state.models[related_key].fields:
                 if name == related_object.field.name:
                     field = field.clone()
-                    field.rel.to = "%s.%s" % (app_label, self.new_name)
+                    field.remote_field.model = "%s.%s" % (app_label, self.new_name)
                 new_fields.append((name, field))
             state.models[related_key].fields = new_fields
             state.reload_model(*related_key)
@@ -220,11 +220,11 @@ class RenameModel(Operation):
             fields = zip(old_model._meta.local_many_to_many, new_model._meta.local_many_to_many)
             for (old_field, new_field) in fields:
                 # Skip self-referential fields as these are renamed above.
-                if new_field.model == new_field.related_model or not new_field.rel.through._meta.auto_created:
+                if new_field.model == new_field.related_model or not new_field.remote_field.through._meta.auto_created:
                     continue
                 # Rename the M2M table that's based on this model's name.
-                old_m2m_model = old_field.rel.through
-                new_m2m_model = new_field.rel.through
+                old_m2m_model = old_field.remote_field.through
+                new_m2m_model = new_field.remote_field.through
                 schema_editor.alter_db_table(
                     new_m2m_model,
                     old_m2m_model._meta.db_table,
@@ -296,11 +296,11 @@ class AlterModelTable(Operation):
             )
             # Rename M2M fields whose name is based on this model's db_table
             for (old_field, new_field) in zip(old_model._meta.local_many_to_many, new_model._meta.local_many_to_many):
-                if new_field.rel.through._meta.auto_created:
+                if new_field.remote_field.through._meta.auto_created:
                     schema_editor.alter_db_table(
-                        new_field.rel.through,
-                        old_field.rel.through._meta.db_table,
-                        new_field.rel.through._meta.db_table,
+                        new_field.remote_field.through,
+                        old_field.remote_field.through._meta.db_table,
+                        new_field.remote_field.through._meta.db_table,
                     )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
