@@ -213,7 +213,9 @@ URLs
 Validators
 ^^^^^^^^^^
 
-* ...
+* Added :attr:`int_list_validator <django.core.validators.int_list_validator>`
+  to generate validators of strings containing integers
+  separated with a custom character.
 
 Backwards incompatible changes in 1.9
 =====================================
@@ -320,6 +322,9 @@ Miscellaneous
   ``window.__admin_media_prefix__``. Image references in JavaScript that used
   that value to construct absolute URLs have been moved to CSS for easier
   customization.
+
+* ``CommaSeparatedIntegerField`` validation has been refined to forbid values
+  like ``','``, ``',1'`` or ``'1,,2'``.
 
 .. _deprecated-features-1.9:
 

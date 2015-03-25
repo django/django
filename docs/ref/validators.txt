@@ -211,8 +211,18 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 .. data:: validate_comma_separated_integer_list
 
-    A :class:`RegexValidator` instance that ensures a value is a
-    comma-separated list of integers.
+    A :class:`RegexValidator` instance that ensures a string
+    consists in integers separated by a comma.
+
+``int_list_validator``
+----------------------
+
+.. function:: int_list_validator(sep=',', message=None, code='invalid')
+
+    .. versionadded:: 1.9
+
+    Returns a :class:`RegexValidator` instance that ensures a string
+    consists in integers separated by ``sep``.
 
 ``MaxValueValidator``
 ---------------------
