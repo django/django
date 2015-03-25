@@ -387,6 +387,45 @@ class AggregateTestCase(TestCase):
         vals = Book.objects.aggregate(Count("rating", distinct=True))
         self.assertEqual(vals, {"rating__count": 4})
 
+    def test_annotate_distinct(self):
+        # Get all Authors that are older than 10 having books from publishers with more than one award.
+        qs = Author.objects.filter(age__gt=10, book__publisher__num_awards__gt=0).distinct()
+        # group by books
+        qs = qs.values('book')
+
+        vals = qs.annotate(count=Count('book__authors'))
+        self.assertEqual(vals[0]['count'], 4)
+
+        vals = qs.annotate(count=Count('book__authors', distinct=True))
+        self.assertEqual(vals[0]['count'], 2)
+
+        vals = qs.annotate(age_sum=Sum('book__authors__age'))
+        self.assertEqual(vals[0]['age_sum'], 138)
+
+        vals = qs.annotate(age_sum=Sum('book__authors__age', distinct=True))
+        self.assertEqual(vals[0]['age_sum'], 69)
+
+    def test_count_distinct(self):
+        vals = Book.objects.aggregate(Count("rating"))
+        self.assertEqual(vals, {"rating__count": 6})
+
+        vals = Book.objects.aggregate(Count("rating", distinct=True))
+        self.assertEqual(vals, {"rating__count": 4})
+
+    def test_sum_distinct(self):
+        vals = Book.objects.aggregate(Sum("rating"))
+        self.assertEqual(vals, {"rating__sum": 24.5})
+
+        vals = Book.objects.aggregate(Sum("rating", distinct=True))
+        self.assertEqual(vals, {"rating__sum": 16.5})
+
+    def test_avg_distinct(self):
+        vals = Book.objects.aggregate(Avg("rating"))
+        self.assertEqual(vals, {'rating__avg': Approximate(4.083, places=3)})
+
+        vals = Book.objects.aggregate(Avg("rating", distinct=True))
+        self.assertEqual(vals, {'rating__avg': Approximate(4.125, places=3)})
+
     def test_fkey_aggregate(self):
         explicit = list(Author.objects.annotate(Count('book__id')))
         implicit = list(Author.objects.annotate(Count('book')))
