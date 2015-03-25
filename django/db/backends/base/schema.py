@@ -1,12 +1,12 @@
 import hashlib
+import logging
 
 from django.db.backends.utils import truncate_name
 from django.db.transaction import atomic
 from django.utils import six
 from django.utils.encoding import force_bytes
-from django.utils.log import getLogger
 
-logger = getLogger('django.db.backends.schema')
+logger = logging.getLogger('django.db.backends.schema')
 
 
 def _related_non_m2m_objects(opts):
@@ -31,7 +31,6 @@ class BaseDatabaseSchemaEditor(object):
 
     # Overrideable SQL templates
     sql_create_table = "CREATE TABLE %(table)s (%(definition)s)"
-    sql_create_table_unique = "UNIQUE (%(columns)s)"
     sql_rename_table = "ALTER TABLE %(old_table)s RENAME TO %(new_table)s"
     sql_retablespace_table = "ALTER TABLE %(table)s SET TABLESPACE %(new_tablespace)s"
     sql_delete_table = "DROP TABLE %(table)s CASCADE"
@@ -242,9 +241,9 @@ class BaseDatabaseSchemaEditor(object):
                 definition += " %s" % col_type_suffix
             params.extend(extra_params)
             # FK
-            if field.rel and field.db_constraint:
-                to_table = field.rel.to._meta.db_table
-                to_column = field.rel.to._meta.get_field(field.rel.field_name).column
+            if field.remote_field and field.db_constraint:
+                to_table = field.remote_field.model._meta.db_table
+                to_column = field.remote_field.model._meta.get_field(field.remote_field.field_name).column
                 if self.connection.features.supports_foreign_keys:
                     self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
                 elif self.sql_create_inline_fk:
@@ -263,12 +262,11 @@ class BaseDatabaseSchemaEditor(object):
                 if autoinc_sql:
                     self.deferred_sql.extend(autoinc_sql)
 
-        # Add any unique_togethers
+        # Add any unique_togethers (always deferred, as some fields might be
+        # created afterwards, like geometry fields with some backends)
         for fields in model._meta.unique_together:
             columns = [model._meta.get_field(field).column for field in fields]
-            column_sqls.append(self.sql_create_table_unique % {
-                "columns": ", ".join(self.quote_name(column) for column in columns),
-            })
+            self.deferred_sql.append(self._create_unique_sql(model, columns))
         # Make the table
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
@@ -286,8 +284,8 @@ class BaseDatabaseSchemaEditor(object):
 
         # Make M2M tables
         for field in model._meta.local_many_to_many:
-            if field.rel.through._meta.auto_created:
-                self.create_model(field.rel.through)
+            if field.remote_field.through._meta.auto_created:
+                self.create_model(field.remote_field.through)
 
     def delete_model(self, model):
         """
@@ -295,8 +293,8 @@ class BaseDatabaseSchemaEditor(object):
         """
         # Handle auto-created intermediary models
         for field in model._meta.local_many_to_many:
-            if field.rel.through._meta.auto_created:
-                self.delete_model(field.rel.through)
+            if field.remote_field.through._meta.auto_created:
+                self.delete_model(field.remote_field.through)
 
         # Delete the table
         self.execute(self.sql_delete_table % {
@@ -379,8 +377,8 @@ class BaseDatabaseSchemaEditor(object):
         table instead (for M2M fields)
         """
         # Special-case implicit M2M tables
-        if field.many_to_many and field.rel.through._meta.auto_created:
-            return self.create_model(field.rel.through)
+        if field.many_to_many and field.remote_field.through._meta.auto_created:
+            return self.create_model(field.remote_field.through)
         # Get the column's definition
         definition, params = self.column_sql(model, field, include_default=True)
         # It might not actually have a column behind it
@@ -411,7 +409,7 @@ class BaseDatabaseSchemaEditor(object):
         if field.db_index and not field.unique:
             self.deferred_sql.append(self._create_index_sql(model, [field]))
         # Add any FK constraints later
-        if field.rel and self.connection.features.supports_foreign_keys and field.db_constraint:
+        if field.remote_field and self.connection.features.supports_foreign_keys and field.db_constraint:
             self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
@@ -423,13 +421,13 @@ class BaseDatabaseSchemaEditor(object):
         but for M2Ms may involve deleting a table.
         """
         # Special-case implicit M2M tables
-        if field.many_to_many and field.rel.through._meta.auto_created:
-            return self.delete_model(field.rel.through)
+        if field.many_to_many and field.remote_field.through._meta.auto_created:
+            return self.delete_model(field.remote_field.through)
         # It might not actually have a column behind it
         if field.db_parameters(connection=self.connection)['type'] is None:
             return
         # Drop any FK constraints, MySQL requires explicit deletion
-        if field.rel:
+        if field.remote_field:
             fk_names = self._constraint_names(model, [field.column], foreign_key=True)
             for fk_name in fk_names:
                 self.execute(self._delete_constraint_sql(self.sql_delete_fk, model, fk_name))
@@ -456,21 +454,21 @@ class BaseDatabaseSchemaEditor(object):
         old_type = old_db_params['type']
         new_db_params = new_field.db_parameters(connection=self.connection)
         new_type = new_db_params['type']
-        if (old_type is None and old_field.rel is None) or (new_type is None and new_field.rel is None):
+        if (old_type is None and old_field.remote_field is None) or (new_type is None and new_field.remote_field is None):
             raise ValueError(
                 "Cannot alter field %s into %s - they do not properly define "
                 "db_type (are you using PostGIS 1.5 or badly-written custom "
                 "fields?)" % (old_field, new_field),
             )
         elif old_type is None and new_type is None and (
-                old_field.rel.through and new_field.rel.through and
-                old_field.rel.through._meta.auto_created and
-                new_field.rel.through._meta.auto_created):
+                old_field.remote_field.through and new_field.remote_field.through and
+                old_field.remote_field.through._meta.auto_created and
+                new_field.remote_field.through._meta.auto_created):
             return self._alter_many_to_many(model, old_field, new_field, strict)
         elif old_type is None and new_type is None and (
-                old_field.rel.through and new_field.rel.through and
-                not old_field.rel.through._meta.auto_created and
-                not new_field.rel.through._meta.auto_created):
+                old_field.remote_field.through and new_field.remote_field.through and
+                not old_field.remote_field.through._meta.auto_created and
+                not new_field.remote_field.through._meta.auto_created):
             # Both sides have through models; this is a no-op.
             return
         elif old_type is None or new_type is None:
@@ -489,7 +487,7 @@ class BaseDatabaseSchemaEditor(object):
 
         # Drop any FK constraints, we'll remake them later
         fks_dropped = set()
-        if old_field.rel and old_field.db_constraint:
+        if old_field.remote_field and old_field.db_constraint:
             fk_names = self._constraint_names(model, [old_field.column], foreign_key=True)
             if strict and len(fk_names) != 1:
                 raise ValueError("Found wrong number (%s) of foreign key constraints for %s.%s" % (
@@ -593,7 +591,11 @@ class BaseDatabaseSchemaEditor(object):
                 ))
         # Nullability change?
         if old_field.null != new_field.null:
-            if new_field.null:
+            if (self.connection.features.interprets_empty_strings_as_nulls and
+                    new_field.get_internal_type() in ("CharField", "TextField")):
+                # The field is nullable in the database anyway, leave it alone
+                pass
+            elif new_field.null:
                 null_actions.append((
                     self.sql_alter_column_null % {
                         "column": self.quote_name(new_field.column),
@@ -705,9 +707,9 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Does it have a foreign key?
-        if new_field.rel and \
-           (fks_dropped or (old_field.rel and not old_field.db_constraint)) and \
-           new_field.db_constraint:
+        if (new_field.remote_field and
+                (fks_dropped or not old_field.remote_field or not old_field.db_constraint) and
+                new_field.db_constraint):
             self.execute(self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s"))
         # Rebuild FKs that pointed to us if we previously had to drop them
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
@@ -764,22 +766,22 @@ class BaseDatabaseSchemaEditor(object):
         Alters M2Ms to repoint their to= endpoints.
         """
         # Rename the through table
-        if old_field.rel.through._meta.db_table != new_field.rel.through._meta.db_table:
-            self.alter_db_table(old_field.rel.through, old_field.rel.through._meta.db_table,
-                                new_field.rel.through._meta.db_table)
+        if old_field.remote_field.through._meta.db_table != new_field.remote_field.through._meta.db_table:
+            self.alter_db_table(old_field.remote_field.through, old_field.remote_field.through._meta.db_table,
+                                new_field.remote_field.through._meta.db_table)
         # Repoint the FK to the other side
         self.alter_field(
-            new_field.rel.through,
+            new_field.remote_field.through,
             # We need the field that points to the target model, so we can tell alter_field to change it -
             # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
-            old_field.rel.through._meta.get_field(old_field.m2m_reverse_field_name()),
-            new_field.rel.through._meta.get_field(new_field.m2m_reverse_field_name()),
+            old_field.remote_field.through._meta.get_field(old_field.m2m_reverse_field_name()),
+            new_field.remote_field.through._meta.get_field(new_field.m2m_reverse_field_name()),
         )
         self.alter_field(
-            new_field.rel.through,
+            new_field.remote_field.through,
             # for self-referential models we need to alter field from the other end too
-            old_field.rel.through._meta.get_field(old_field.m2m_field_name()),
-            new_field.rel.through._meta.get_field(new_field.m2m_field_name()),
+            old_field.remote_field.through._meta.get_field(old_field.m2m_field_name()),
+            new_field.remote_field.through._meta.get_field(new_field.m2m_field_name()),
         )
 
     def _create_index_name(self, model, column_names, suffix=""):
@@ -794,7 +796,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Else generate the name for the index using a different algorithm
         table_name = model._meta.db_table.replace('"', '').replace('.', '_')
-        index_unique_name = '_%x' % abs(hash((table_name, ','.join(column_names))))
+        index_unique_name = '_%s' % self._digest(table_name, *column_names)
         max_length = self.connection.ops.max_name_length() or 200
         # If the index name is too long, truncate it
         index_name = ('%s_%s%s%s' % (
@@ -858,8 +860,8 @@ class BaseDatabaseSchemaEditor(object):
     def _create_fk_sql(self, model, field, suffix):
         from_table = model._meta.db_table
         from_column = field.column
-        to_table = field.related_field.model._meta.db_table
-        to_column = field.related_field.column
+        to_table = field.target_field.model._meta.db_table
+        to_column = field.target_field.column
         suffix = suffix % {
             "to_table": to_table,
             "to_column": to_column,

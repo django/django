@@ -51,6 +51,9 @@ class Media(object):
         for name in MEDIA_TYPES:
             getattr(self, 'add_' + name)(media_attrs.get(name, None))
 
+    def __html__(self):
+        return force_text(self)
+
     def __str__(self):
         return self.render()
 
@@ -977,10 +980,10 @@ class SelectDateWidget(Widget):
                         year_val, month_val, day_val = v.year, v.month, v.day
                     except ValueError:
                         pass
-                else:
+                if year_val is None:
                     match = self.date_re.match(value)
                     if match:
-                        year_val, month_val, day_val = [int(v) for v in match.groups()]
+                        year_val, month_val, day_val = [int(val) for val in match.groups()]
         html = {}
         choices = [(i, i) for i in self.years]
         html['year'] = self.create_select(name, self.year_field, value, year_val, choices, self.year_none_value)

@@ -161,6 +161,27 @@ values, rather than on Python values.
 This is documented in :ref:`using F() expressions in queries
 <using-f-expressions-in-filters>`.
 
+.. _using-f-with-annotations:
+
+Using ``F()`` with annotations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``F()`` can be used to create dynamic fields on your models by combining
+different fields with arithmetic::
+
+    company = Company.objects.annotate(
+        chairs_needed=F('num_employees') - F('num_chairs'))
+
+If the fields that you're combining are of different types you'll need
+to tell Django what kind of field will be returned. Since ``F()`` does not
+directly support ``output_field`` you will need to wrap the expression with
+:class:`ExpressionWrapper`::
+
+    from django.db.models import DateTimeField, ExpressionWrapper, F
+
+    Ticket.objects.annotate(
+        expires=ExpressionWrapper(
+            F('active_at') + F('duration'), output_field=DateTimeField()))
 
 .. _func-expressions:
 
@@ -332,6 +353,19 @@ instantiating the model field as any arguments relating to data validation
 (``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
 output value.
 
+``ExpressionWrapper()`` expressions
+-----------------------------------
+
+.. class:: ExpressionWrapper(expression, output_field)
+
+.. versionadded:: 1.8
+
+``ExpressionWrapper`` simply surrounds another expression and provides access
+to properties, such as ``output_field``, that may not be available on other
+expressions. ``ExpressionWrapper`` is necessary when using arithmetic on
+``F()`` expressions with different types as described in
+:ref:`using-f-with-annotations`.
+
 Conditional expressions
 -----------------------
 
@@ -354,13 +388,13 @@ Expression API
 
 Query expressions implement the :ref:`query expression API <query-expression>`,
 but also expose a number of extra methods and attributes listed below. All
-query expressions must inherit from ``ExpressionNode()`` or a relevant
+query expressions must inherit from ``Expression()`` or a relevant
 subclass.
 
 When a query expression wraps another expression, it is responsible for
 calling the appropriate methods on the wrapped expression.
 
-.. class:: ExpressionNode
+.. class:: Expression
 
     .. attribute:: contains_aggregate
 
@@ -412,7 +446,7 @@ calling the appropriate methods on the wrapped expression.
               clone.expression = self.expression.relabeled_clone(change_map)
               return clone
 
-    .. method:: convert_value(self, value, connection, context)
+    .. method:: convert_value(self, value, expression, connection, context)
 
         A hook allowing the expression to coerce ``value`` into a more
         appropriate type.
@@ -474,9 +508,9 @@ We'll start by defining the template to be used for SQL generation and
 an ``__init__()`` method to set some attributes::
 
   import copy
-  from django.db.models import ExpressionNode
+  from django.db.models import Expression
 
-  class Coalesce(ExpressionNode):
+  class Coalesce(Expression):
       template = 'COALESCE( %(expressions)s )'
 
       def __init__(self, expressions, output_field, **extra):

@@ -229,7 +229,7 @@ class LayerMapping(object):
             elif isinstance(model_field, models.ForeignKey):
                 if isinstance(ogr_name, dict):
                     # Is every given related model mapping field in the Layer?
-                    rel_model = model_field.rel.to
+                    rel_model = model_field.remote_field.model
                     for rel_name, ogr_field in ogr_name.items():
                         idx = check_ogr_fld(ogr_field)
                         try:

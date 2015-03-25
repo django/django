@@ -476,6 +476,33 @@ You can pass a second callable to
 want executed when migrating backwards. If this callable is omitted, migrating
 backwards will raise an exception.
 
+Accessing models from other apps
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When writing a ``RunPython`` function that uses models from apps other than the
+one in which the migration is located, the migration's ``dependencies``
+attribute should include the latest migration of each app that is involved,
+otherwise you may get an error similar to: ``LookupError: No installed app
+with label 'myappname'`` when you try to retrieve the model in the ``RunPython``
+function using ``apps.get_model()``.
+
+In the following example, we have a migration in ``app1`` which needs to use
+models in ``app2``. We aren't concerned with the details of ``move_m1`` other
+than the fact it will need to access models from both apps. Therefore we've
+added a dependency that specifies the last migration of ``app2``::
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('app1', '0001_initial'),
+            # added dependency to enable using models from app2 in move_m1
+            ('app2', '0004_foobar'),
+        ]
+
+        operations = [
+            migrations.RunPython(move_m1),
+        ]
+
 More advanced migrations
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -698,6 +725,20 @@ you add this to an app with existing migrations generated on Python 2, your
 next run of :djadmin:`makemigrations` on Python 3 will likely generate many
 changes as it converts all the bytestring attributes to text strings; this is
 normal and should only happen once.
+
+Supporting multiple Django versions
+-----------------------------------
+
+If you are the maintainer of a third-party app with models, you may need to
+ship migrations that support multiple Django versions. In this case, you should
+always run :djadmin:`makemigrations` **with the lowest Django version you wish
+to support**.
+
+The migrations system will maintain backwards-compatibility according to the
+same policy as the rest of Django, so migration files generated on Django X.Y
+should run unchanged on Django X.Y+1. The migrations system does not promise
+forwards-compatibility, however. New features may be added, and migration files
+generated with newer versions of Django may not work on older versions.
 
 .. _upgrading-from-south:
 

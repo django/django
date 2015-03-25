@@ -15,7 +15,7 @@ It'll consist of two parts:
 We'll assume you have :doc:`Django installed </intro/install>` already. You can
 tell Django is installed and which version by running the following command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python -c "import django; print(django.get_version())"
 
@@ -51,7 +51,7 @@ application-specific settings.
 From the command line, ``cd`` into a directory where you'd like to store your
 code, then run the following command:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ django-admin startproject mysite
 
@@ -127,7 +127,9 @@ module-level variables representing Django settings.
 By default, the configuration uses SQLite. If you're new to databases, or
 you're just interested in trying Django, this is the easiest choice. SQLite is
 included in Python, so you won't need to install anything else to support your
-database.
+database. When starting your first real project, however, you may want to use a
+more robust database like PostgreSQL, to avoid database-switching headaches
+down the road.
 
 If you wish to use another database, install the appropriate :ref:`database
 bindings <database-installation>`, and change the following keys in the
@@ -190,7 +192,7 @@ Some of these applications makes use of at least one database table, though,
 so we need to create the tables in the database before we can use them. To do
 that, run the following command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py migrate
 
@@ -217,7 +219,7 @@ The development server
 Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
 you haven't already, and run the following commands:
 
-.. code-block:: bash
+.. code-block:: console
 
    $ python manage.py runserver
 
@@ -255,7 +257,7 @@ It worked!
     it as a command-line argument. For instance, this command starts the server
     on port 8080:
 
-    .. code-block:: bash
+    .. code-block:: console
 
         $ python manage.py runserver 8080
 
@@ -263,7 +265,7 @@ It worked!
     listen on all public IPs (useful if you want to show off your work on other
     computers), use:
 
-    .. code-block:: bash
+    .. code-block:: console
 
         $ python manage.py runserver 0.0.0.0:8000
 
@@ -305,7 +307,7 @@ imported as its own top-level module, rather than a submodule of ``mysite``.
 To create your app, make sure you're in the same directory as :file:`manage.py`
 and type this command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py startapp polls
 
@@ -434,7 +436,7 @@ look like this:
 
 Now Django knows to include the ``polls`` app. Let's run another command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py makemigrations polls
 
@@ -464,10 +466,9 @@ schema automatically - that's called :djadmin:`migrate`, and we'll come to it in
 moment - but first, let's see what SQL that migration would run. The
 :djadmin:`sqlmigrate` command takes migration names and returns their SQL:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py sqlmigrate polls 0001
-
 
 You should see something similar to the following (we've reformatted it for
 readability):
@@ -475,28 +476,26 @@ readability):
 .. code-block:: sql
 
     BEGIN;
-    CREATE TABLE polls_question (
+    CREATE TABLE "polls_choice" (
+        "id" serial NOT NULL PRIMARY KEY,
+        "choice_text" varchar(200) NOT NULL,
+        "votes" integer NOT NULL
+    );
+    CREATE TABLE "polls_question" (
         "id" serial NOT NULL PRIMARY KEY,
         "question_text" varchar(200) NOT NULL,
         "pub_date" timestamp with time zone NOT NULL
     );
-
-    CREATE TABLE polls_choice (
-        "id" serial NOT NULL PRIMARY KEY,
-        "question_id" integer NOT NULL,
-        "choice_text" varchar(200) NOT NULL,
-        "votes" integer NOT NULL
-    );
-
-    CREATE INDEX polls_choice_7aa0f6ee ON "polls_choice" ("question_id");
-
+    ALTER TABLE "polls_choice" ADD COLUMN "question_id" integer NOT NULL;
+    ALTER TABLE "polls_choice" ALTER COLUMN "question_id" DROP DEFAULT;
+    CREATE INDEX "polls_choice_7aa0f6ee" ON "polls_choice" ("question_id");
     ALTER TABLE "polls_choice"
-      ADD CONSTRAINT polls_choice_question_id_246c99a640fbbd72_fk_polls_question_id
+      ADD CONSTRAINT "polls_choice_question_id_246c99a640fbbd72_fk_polls_question_id"
         FOREIGN KEY ("question_id")
         REFERENCES "polls_question" ("id")
         DEFERRABLE INITIALLY DEFERRED;
-    COMMIT;
 
+    COMMIT;
 
 Note the following:
 
@@ -534,7 +533,7 @@ your project without making migrations or touching the database.
 
 Now, run :djadmin:`migrate` again to create those model tables in your database:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py migrate
     Operations to perform:
@@ -577,7 +576,7 @@ Playing with the API
 Now, let's hop into the interactive Python shell and play around with the free
 API Django gives you. To invoke the Python shell, use this command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py shell
 
@@ -669,8 +668,8 @@ of this object. Let's fix that by editing the ``Question`` model (in the
             return self.choice_text
 
 It's important to add :meth:`~django.db.models.Model.__str__` methods to your
-models, not only for your own sanity when dealing with the interactive prompt,
-but also because objects' representations are used throughout Django's
+models, not only for your own convenience when dealing with the interactive
+prompt, but also because objects' representations are used throughout Django's
 automatically-generated admin.
 
 .. admonition:: ``__str__`` or ``__unicode__``?

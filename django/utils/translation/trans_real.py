@@ -104,7 +104,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.__language = language
         self.__to_language = to_language(language)
         self.__locale = to_locale(language)
-        self.plural = lambda n: int(n != 1)
 
         self._init_translation_catalog()
         self._add_installed_apps_translations()
@@ -132,6 +131,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             # provides merge support for NullTranslations()
             translation._catalog = {}
             translation._info = {}
+            translation.plural = lambda n: int(n != 1)
         return translation
 
     def _init_translation_catalog(self):
@@ -144,6 +144,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             # gettext will raise an IOError (refs #18192).
             use_null_fallback = False
         translation = self._new_gnu_trans(localedir, use_null_fallback)
+        self.plural = translation.plural
         self._info = translation._info.copy()
         self._catalog = translation._catalog.copy()
 
@@ -169,11 +170,9 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_fallback(self):
         """Sets the GNUTranslations() fallback with the default language."""
-        # Don't set a fallback for the default language or for
-        # en-us (as it's empty, so it'll ALWAYS fall back to the default
-        # language; found this as part of #21498, as we set en-us for
-        # management commands)
-        if self.__language == settings.LANGUAGE_CODE or self.__language == "en-us":
+        # Don't set a fallback for the default language or any English variant
+        # (as it's empty, so it'll ALWAYS fall back to the default language)
+        if self.__language == settings.LANGUAGE_CODE or self.__language.startswith('en'):
             return
         default_translation = translation(settings.LANGUAGE_CODE)
         self.add_fallback(default_translation)
@@ -558,7 +557,7 @@ def templatize(src, origin=None):
             message = trim_whitespace(message)
         return message
 
-    for t in Lexer(src, origin).tokenize():
+    for t in Lexer(src).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
                 content = ''.join(comment)

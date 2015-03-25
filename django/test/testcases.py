@@ -23,7 +23,7 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
-from django.core.management.commands import flush
+from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
@@ -37,7 +37,9 @@ from django.test.utils import (
     override_settings,
 )
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import (
     unquote, urlparse, urlsplit, urlunsplit,
@@ -249,10 +251,14 @@ class SimpleTestCase(unittest.TestCase):
         TestClient to do a request (use fetch_redirect_response=False to check
         such links without fetching them).
         """
+        if host is not None:
+            warnings.warn(
+                "The host argument is deprecated and no longer used by assertRedirects",
+                RemovedInDjango21Warning, stacklevel=2
+            )
+
         if msg_prefix:
             msg_prefix += ": "
-
-        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
 
         if hasattr(response, 'redirect_chain'):
             # The request was a followed redirect
@@ -295,10 +301,18 @@ class SimpleTestCase(unittest.TestCase):
                     " response code was %d (expected %d)" %
                         (path, redirect_response.status_code, target_status_code))
 
-        e_scheme = e_scheme if e_scheme else scheme or 'http'
-        e_netloc = e_netloc if e_netloc else host or 'testserver'
-        expected_url = urlunsplit((e_scheme, e_netloc, e_path, e_query,
-            e_fragment))
+        if url != expected_url:
+            # For temporary backwards compatibility, try to compare with a relative url
+            e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
+            relative_url = urlunsplit(('', '', e_path, e_query, e_fragment))
+            if url == relative_url:
+                warnings.warn(
+                    "assertRedirects had to strip the scheme and domain from the "
+                    "expected URL, as it was always added automatically to URLs "
+                    "before Django 1.9. Please update your expected URLs by "
+                    "removing the scheme and domain.",
+                    RemovedInDjango21Warning, stacklevel=2)
+                expected_url = relative_url
 
         self.assertEqual(url, expected_url,
             msg_prefix + "Response redirected to '%s', expected '%s'" %
@@ -777,7 +791,7 @@ class TransactionTestCase(SimpleTestCase):
                                  value=self.available_apps,
                                  enter=True)
             for db_name in self._databases_names(include_mirrors=False):
-                flush.Command.emit_post_migrate(verbosity=0, interactive=False, database=db_name)
+                emit_post_migrate_signal(verbosity=0, interactive=False, db=db_name)
         try:
             self._fixture_setup()
         except Exception:

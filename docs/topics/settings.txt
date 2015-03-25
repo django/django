@@ -188,7 +188,7 @@ Example::
 
     from django.conf import settings
 
-    settings.configure(DEBUG=True, TEMPLATE_DEBUG=True)
+    settings.configure(DEBUG=True)
 
 Pass ``configure()`` as many keyword arguments as you'd like, with each keyword
 argument representing a setting and its value. Each argument name should be all

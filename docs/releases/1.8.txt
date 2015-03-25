@@ -480,11 +480,13 @@ Migrations
   method/attribute were added to ease in making ``RunPython`` and ``RunSQL``
   operations reversible.
 
-* The :class:`~django.db.migrations.operations.RunPython` and
-  :class:`~django.db.migrations.operations.RunSQL` operations now accept a
-  ``hints`` parameter that will be passed to :meth:`allow_migrate`. To take
-  advantage of this feature you must ensure that the ``allow_migrate()`` method
-  of all your routers accept ``**hints``.
+* The migration operations :class:`~django.db.migrations.operations.RunPython`
+  and :class:`~django.db.migrations.operations.RunSQL` now call the
+  :meth:`allow_migrate` method of database routers. The router can use the
+  newly introduced ``app_label`` and ``hints`` arguments to make a routing
+  decision. To take advantage of this feature you need to update the router to
+  the new ``allow_migrate`` signature, see the :ref:`deprecation section
+  <deprecated-signature-of-allow-migrate>` for more details.
 
 Models
 ^^^^^^
@@ -711,6 +713,12 @@ Now, an error will be raised to prevent data loss::
     ...
     ValueError: Cannot assign "<Author: John>": "Author" instance isn't saved in the database.
 
+If you require allowing the assignment of unsaved instances (the old behavior)
+and aren't concerned about the data loss possibility (e.g. you never save the
+objects to the database), you can disable this check by using the
+:attr:`~django.db.models.ForeignKey.allow_unsaved_instance_assignment`
+attribute.
+
 Management commands that only accept positional arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -812,7 +820,8 @@ officially supports.
 This also includes dropping support for PostGIS 1.3 and 1.4 as these versions
 are not supported on versions of PostgreSQL later than 8.4.
 
-Django also now requires the use of Psycopg2 version 2.0.9 or higher.
+Django also now requires the use of Psycopg2 version 2.4.5 or higher (or 2.5+
+if you want to use :mod:`django.contrib.postgres`).
 
 Support for MySQL versions older than 5.5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -899,9 +908,8 @@ class decorators. As a consequence, when overriding ``setUpClass()`` or
 Removal of ``django.contrib.formtools``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The formtools contrib app has been moved into a separate package.
-``django.contrib.formtools`` itself has been removed. The docs provide
-:ref:`migration instructions <formtools-how-to-migrate>`.
+The formtools contrib app has been moved to a separate package and the
+relevant documentation pages have been updated or removed.
 
 The new package is available `on Github`_ and on PyPI.
 
@@ -989,6 +997,9 @@ those writing third-party backends in updating their code:
 * The ``SQLCompiler.as_sql()`` method now takes a ``subquery`` parameter
   (:ticket:`24164`).
 
+* The ``BaseDatabaseOperations.date_interval_sql()`` method now only takes a
+  ``timedelta`` parameter.
+
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1005,6 +1016,26 @@ those writing third-party backends in updating their code:
   <django.contrib.admin.ModelAdmin.response_delete>` method
   now takes a second argument named ``obj_id`` which is the serialized
   identifier used to retrieve the object before deletion.
+
+Default autoescaping of functions in ``django.template.defaultfilters``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to make built-in template filters that output HTML "safe by default"
+when calling them in Python code, the following functions in
+``django.template.defaultfilters`` have been changed to automatically escape
+their input value:
+
+* ``join``
+* ``linebreaksbr``
+* ``linebreaks_filter``
+* ``linenumbers``
+* ``unordered_list``
+* ``urlize``
+* ``urlizetrunc``
+
+You can revert to the old behavior by specifying ``autoescape=False`` if you
+are passing trusted content. This change doesn't have any effect when using
+the corresponding filters in templates.
 
 Miscellaneous
 ~~~~~~~~~~~~~
@@ -1123,14 +1154,6 @@ Miscellaneous
 * :func:`django.utils.translation.get_language()` now returns ``None`` instead
   of :setting:`LANGUAGE_CODE` when translations are temporarily deactivated.
 
-* The migration operations :class:`~django.db.migrations.operations.RunPython`
-  and :class:`~django.db.migrations.operations.RunSQL` now call the
-  :meth:`allow_migrate` method of database routers. In these cases the
-  ``model`` argument of ``allow_migrate()`` is set to ``None``, so the router
-  must properly handle this value. This is most useful when used together with
-  the newly introduced ``hints`` parameter for these operations, but it can
-  also be used to disable migrations from running on a particular database.
-
 * The ``name`` field of :class:`django.contrib.contenttypes.models.ContentType`
   has been removed by a migration and replaced by a property. That means it's
   not possible to query or filter a ``ContentType`` by this field any longer.
@@ -1241,6 +1264,7 @@ are deprecated in favor of :setting:`TEMPLATES`:
 
 * ``ALLOWED_INCLUDE_ROOTS``
 * ``TEMPLATE_CONTEXT_PROCESSORS``
+* ``TEMPLATE_DEBUG``
 * ``TEMPLATE_DIRS``
 * ``TEMPLATE_LOADERS``
 * ``TEMPLATE_STRING_IF_INVALID``
@@ -1627,6 +1651,23 @@ aggregate methods are deprecated and should be replaced by their function-based
 aggregate equivalents (``Collect``, ``Extent``, ``Extent3D``, ``MakeLine``, and
 ``Union``).
 
+.. _deprecated-signature-of-allow-migrate:
+
+Signature of the ``allow_migrate`` router method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The signature of the :meth:`allow_migrate` method of database routers has
+changed from ``allow_migrate(db, model)`` to
+``allow_migrate(db, app_label, model_name=None, **hints)``.
+
+When ``model_name`` is set, the value that was previously given through the
+``model`` positional argument may now be found inside the ``hints`` dictionary
+under the key ``'model'``.
+
+After switching to the new signature the router will also be called by the
+:class:`~django.db.migrations.operations.RunPython` and
+:class:`~django.db.migrations.operations.RunSQL` operations.
+
 .. removed-features-1.8:
 
 Features removed in 1.8
@@ -1685,7 +1726,10 @@ removed in Django 1.8 (please see the :ref:`deprecation timeline
 
 * The module ``django.test._doctest`` is removed.
 
-* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting is removed.
+* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting is removed. This change
+  affects both ``django.middleware.cache.CacheMiddleware`` and
+  ``django.middleware.cache.UpdateCacheMiddleware`` despite the lack of a
+  deprecation warning in the latter class.
 
 * Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
   more than one.* string to override or append to user-provided ``help_text`` in

@@ -12,10 +12,13 @@ This document contains all the API references of :class:`Field` including the
 
 .. seealso::
 
-    If the built-in fields don't do the trick, you can try :doc:`localflavor
-    </topics/localflavor>`, which contains assorted pieces of code
-    that are useful for particular countries or cultures. Also, you can easily
-    :doc:`write your own custom model fields </howto/custom-model-fields>`.
+    If the built-in fields don't do the trick, you can try `django-localflavor
+    <https://github.com/django/django-localflavor>`_ (`documentation
+    <https://django-localflavor.readthedocs.org/>`_), which contains assorted
+    pieces of code that are useful for particular countries and cultures.
+
+    Also, you can easily :doc:`write your own custom model fields
+    </howto/custom-model-fields>`.
 
 .. note::
 
@@ -1291,6 +1294,30 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     If in doubt, leave it to its default of ``True``.
 
+.. attribute:: ForeignKey.allow_unsaved_instance_assignment
+
+    .. versionadded:: 1.8
+
+        This flag was added for backwards compatibility as older versions of
+        Django always allowed assigning unsaved model instances.
+
+    Django prevents unsaved model instances from being assigned to a
+    ``ForeignKey`` field to prevent accidental data loss (unsaved foreign keys
+    are silently ignored when saving a model instance).
+
+    If you require allowing the assignment of unsaved instances and aren't
+    concerned about the data loss possibility (e.g. you never save the objects
+    to the database), you can disable this check by creating a subclass of the
+    field class and setting its ``allow_unsaved_instance_assignment`` attribute
+    to ``True``. For example::
+
+        class UnsavedForeignKey(models.ForeignKey):
+            # A ForeignKey which can point to an unsaved object
+            allow_unsaved_instance_assignment = True
+
+        class Book(models.Model):
+            author = UnsavedForeignKey(Author)
+
 .. _ref-manytomany:
 
 ``ManyToManyField``
@@ -1377,13 +1404,25 @@ that control how the relationship functions.
 
     If you don't specify an explicit ``through`` model, there is still an
     implicit ``through`` model class you can use to directly access the table
-    created to hold the association. It has three fields:
+    created to hold the association. It has three fields to link the models.
+
+    If the source and target models differ, the following fields are
+    generated:
 
     * ``id``: the primary key of the relation.
     * ``<containing_model>_id``: the ``id`` of the model that declares the
       ``ManyToManyField``.
     * ``<other_model>_id``: the ``id`` of the model that the
       ``ManyToManyField`` points to.
+
+    If the ``ManyToManyField`` points from and to the same model, the following
+    fields are generated:
+
+    * ``id``: the primary key of the relation.
+    * ``from_<model>_id``: the ``id`` of the instance which points at the
+      model (i.e. the source instance).
+    * ``to_<model>_id``: the ``id`` of the instance to which the relationship
+      points (i.e. the target model instance).
 
     This class can be used to query associated records for a given model
     instance like a normal model.
@@ -1470,6 +1509,12 @@ that control how the relationship functions.
     if it is a profile model designed specifically for your custom user model.
 
     If in doubt, leave it to its default of ``True``.
+
+.. attribute:: ManyToManyField.allow_unsaved_instance_assignment
+
+    .. versionadded:: 1.8
+
+    Works analogously to :attr:`ForeignKey.allow_unsaved_instance_assignment`.
 
 :class:`ManyToManyField` does not support :attr:`~Field.validators`.
 
@@ -1572,7 +1617,7 @@ Field API reference
 
     All of Django's built-in fields, such as :class:`CharField`, are particular
     implementations of ``Field``. If you need a custom field, you can either
-    subclass any of the built-in fields or write a ``Field``` from scratch. In
+    subclass any of the built-in fields or write a ``Field`` from scratch. In
     either case, see :doc:`/howto/custom-model-fields`.
 
     .. attribute:: description
@@ -1630,7 +1675,7 @@ Field API reference
 
     When loading data, :meth:`from_db_value` is used:
 
-    .. method:: from_db_value(value, connection, context)
+    .. method:: from_db_value(value, expression, connection, context)
 
         .. versionadded:: 1.8
 

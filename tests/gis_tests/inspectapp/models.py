@@ -14,3 +14,11 @@ class AllOGRFields(models.Model):
     point = models.PointField()
 
     objects = models.GeoManager()
+
+
+class Fields3D(models.Model):
+    point = models.PointField(dim=3)
+    line = models.LineStringField(dim=3)
+    poly = models.PolygonField(dim=3)
+
+    objects = models.GeoManager()

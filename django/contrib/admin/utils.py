@@ -13,8 +13,7 @@ from django.db.models.deletion import Collector
 from django.forms.forms import pretty_name
 from django.utils import formats, six, timezone
 from django.utils.encoding import force_str, force_text, smart_text
-from django.utils.html import conditional_escape, format_html
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils.translation import ungettext
 
@@ -316,7 +315,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
             label = field.verbose_name
         except AttributeError:
             # field is likely a ForeignObjectRel
-            label = field.opts.verbose_name
+            label = field.related_model._meta.verbose_name
     except FieldDoesNotExist:
         if name == "__unicode__":
             label = force_text(model._meta.verbose_name)
@@ -389,10 +388,7 @@ def display_for_field(value, field):
     elif isinstance(field, models.FloatField):
         return formats.number_format(value)
     elif isinstance(field, models.FileField) and value:
-        return mark_safe('<a href="%s">%s</a>' % (
-            conditional_escape(value.url),
-            conditional_escape(value),
-        ))
+        return format_html('<a href="{}">{}</a>', value.url, value)
     else:
         return smart_text(value)
 
@@ -450,7 +446,7 @@ def reverse_field_path(model, path):
         # Field should point to another model
         if field.is_relation and not (field.auto_created and not field.concrete):
             related_name = field.related_query_name()
-            parent = field.rel.to
+            parent = field.remote_field.model
         else:
             related_name = field.field.name
             parent = field.related_model
@@ -485,23 +481,3 @@ def remove_trailing_data_field(fields):
     except NotRelationField:
         fields = fields[:-1]
     return fields
-
-
-def get_limit_choices_to_from_path(model, path):
-    """ Return Q object for limiting choices if applicable.
-
-    If final model in path is linked via a ForeignKey or ManyToManyField which
-    has a ``limit_choices_to`` attribute, return it as a Q object.
-    """
-    fields = get_fields_from_path(model, path)
-    fields = remove_trailing_data_field(fields)
-    get_limit_choices_to = (
-        fields and hasattr(fields[-1], 'rel') and
-        getattr(fields[-1].rel, 'get_limit_choices_to', None))
-    if not get_limit_choices_to:
-        return models.Q()  # empty Q
-    limit_choices_to = get_limit_choices_to()
-    if isinstance(limit_choices_to, models.Q):
-        return limit_choices_to  # already a Q
-    else:
-        return models.Q(**limit_choices_to)  # convert dict to Q

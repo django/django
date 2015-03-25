@@ -15,7 +15,6 @@ from django.template.defaultfilters import force_escape, pprint
 from django.utils import lru_cache, six, timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, smart_text
-from django.utils.html import escape
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
@@ -186,7 +185,15 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 return request.POST
 
     def cleanse_special_types(self, request, value):
-        if isinstance(value, HttpRequest):
+        try:
+            # If value is lazy or a complex object of another kind, this check
+            # might raise an exception. isinstance checks that lazy HttpRequests
+            # or MultiValueDicts will have a return value.
+            is_request = isinstance(value, HttpRequest)
+        except Exception as e:
+            return '{!r} while evaluating {!r}'.format(e, value)
+
+        if is_request:
             # Cleanse the request's POST parameters.
             value = self.get_request_repr(value)
         elif isinstance(value, MultiValueDict):
@@ -257,7 +264,7 @@ class ExceptionReporter(object):
         self.tb = tb
         self.is_email = is_email
 
-        self.template_info = None
+        self.template_info = getattr(self.exc_value, 'template_debug', None)
         self.template_does_not_exist = False
         self.loader_debug_info = None
 
@@ -269,10 +276,6 @@ class ExceptionReporter(object):
     def format_path_status(self, path):
         if not os.path.exists(path):
             return "File does not exist"
-        if not os.path.isfile(path):
-            return "Not a file"
-        if not os.access(path, os.R_OK):
-            return "File is not readable"
         return "File exists"
 
     def get_traceback_data(self):
@@ -318,12 +321,6 @@ class ExceptionReporter(object):
                     'loader': loader_name,
                     'templates': template_list,
                 })
-
-        # TODO: add support for multiple template engines (#24119).
-        if (default_template_engine is not None
-                and default_template_engine.debug
-                and hasattr(self.exc_value, 'django_template_source')):
-            self.get_template_exception_info()
 
         frames = self.get_traceback_frames()
         for i, frame in enumerate(frames):
@@ -389,46 +386,6 @@ class ExceptionReporter(object):
         c = Context(self.get_traceback_data(), autoescape=False, use_l10n=False)
         return t.render(c)
 
-    def get_template_exception_info(self):
-        origin, (start, end) = self.exc_value.django_template_source
-        template_source = origin.reload()
-        context_lines = 10
-        line = 0
-        upto = 0
-        source_lines = []
-        before = during = after = ""
-        for num, next in enumerate(linebreak_iter(template_source)):
-            if start >= upto and end <= next:
-                line = num
-                before = escape(template_source[upto:start])
-                during = escape(template_source[start:end])
-                after = escape(template_source[end:next])
-            source_lines.append((num, escape(template_source[upto:next])))
-            upto = next
-        total = len(source_lines)
-
-        top = max(1, line - context_lines)
-        bottom = min(total, line + 1 + context_lines)
-
-        # In some rare cases, exc_value.args might be empty.
-        try:
-            message = self.exc_value.args[0]
-        except IndexError:
-            message = '(Could not get exception message)'
-
-        self.template_info = {
-            'message': message,
-            'source_lines': source_lines[top:bottom],
-            'before': before,
-            'during': during,
-            'after': after,
-            'top': top,
-            'bottom': bottom,
-            'total': total,
-            'line': line,
-            'name': origin.name,
-        }
-
     def _get_lines_from_file(self, filename, lineno, context_lines, loader=None, module_name=None):
         """
         Returns context_lines before and after lineno from file.
@@ -475,8 +432,29 @@ class ExceptionReporter(object):
         return lower_bound, pre_context, context_line, post_context
 
     def get_traceback_frames(self):
+        def explicit_or_implicit_cause(exc_value):
+            explicit = getattr(exc_value, '__cause__', None)
+            implicit = getattr(exc_value, '__context__', None)
+            return explicit or implicit
+
+        # Get the exception and all its causes
+        exceptions = []
+        exc_value = self.exc_value
+        while exc_value:
+            exceptions.append(exc_value)
+            exc_value = explicit_or_implicit_cause(exc_value)
+
         frames = []
-        tb = self.tb
+        # No exceptions were supplied to ExceptionReporter
+        if not exceptions:
+            return frames
+
+        # In case there's just one exception (always in Python 2,
+        # sometimes in Python 3), take the traceback from self.tb (Python 2
+        # doesn't have a __traceback__ attribute on Exception)
+        exc_value = exceptions.pop()
+        tb = self.tb if not exceptions else exc_value.__traceback__
+
         while tb is not None:
             # Support for __traceback_hide__ which is used by a few libraries
             # to hide internal frames.
@@ -493,6 +471,8 @@ class ExceptionReporter(object):
             )
             if pre_context_lineno is not None:
                 frames.append({
+                    'exc_cause': explicit_or_implicit_cause(exc_value),
+                    'exc_cause_explicit': getattr(exc_value, '__cause__', True),
                     'tb': tb,
                     'type': 'django' if module_name.startswith('django.') else 'user',
                     'filename': filename,
@@ -505,7 +485,14 @@ class ExceptionReporter(object):
                     'post_context': post_context,
                     'pre_context_lineno': pre_context_lineno + 1,
                 })
-            tb = tb.tb_next
+
+            # If the traceback for current exception is consumed, try the
+            # other exception.
+            if not tb.tb_next and exceptions:
+                exc_value = exceptions.pop()
+                tb = exc_value.__traceback__
+            else:
+                tb = tb.tb_next
 
         return frames
 
@@ -634,9 +621,9 @@ TECHNICAL_500_TEMPLATE = ("""
     ul.traceback li.user { background-color:#e0e0e0; color:#000 }
     div.context { padding:10px 0; overflow:hidden; }
     div.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
-    div.context ol li { font-family:monospace; white-space:pre; color:#777; cursor:pointer; }
+    div.context ol li { font-family:monospace; white-space:pre; color:#777; cursor:pointer; padding-left: 2px; }
     div.context ol li pre { display:inline; }
-    div.context ol.context-line li { color:#505050; background-color:#dfdfdf; }
+    div.context ol.context-line li { color:#505050; background-color:#dfdfdf; padding: 3px 2px; }
     div.context ol.context-line li span { position:absolute; right:32px; }
     .user div.context ol.context-line li { background-color:#bbb; color:#000; }
     .user div.context ol li { color:#666; }
@@ -834,6 +821,15 @@ TECHNICAL_500_TEMPLATE = ("""
   <div id="browserTraceback">
     <ul class="traceback">
       {% for frame in frames %}
+        {% ifchanged frame.exc_cause %}{% if frame.exc_cause %}
+          <li><h3>
+          {% if frame.exc_cause_explicit %}
+            The above exception ({{ frame.exc_cause }}) was the direct cause of the following exception:
+          {% else %}
+            During handling of the above exception ({{ frame.exc_cause }}), another exception occurred:
+          {% endif %}
+        </h3></li>
+        {% endif %}{% endifchanged %}
         <li class="frame {{ frame.type }}">
           <code>{{ frame.filename|escape }}</code> in <code>{{ frame.function|escape }}</code>
 
@@ -1119,7 +1115,17 @@ In template {{ template_info.name }}, error at line {{ template_info.line }}
    {{ source_line.0 }} : {{ source_line.1 }}
    {% endifequal %}{% endfor %}{% endif %}{% if frames %}
 Traceback:
-{% for frame in frames %}File "{{ frame.filename }}" in {{ frame.function }}
+{% for frame in frames %}
+{% ifchanged frame.exc_cause %}
+  {% if frame.exc_cause %}
+    {% if frame.exc_cause_explicit %}
+      The above exception ({{ frame.exc_cause }}) was the direct cause of the following exception:
+    {% else %}
+      During handling of the above exception ({{ frame.exc_cause }}), another exception occurred:
+    {% endif %}
+  {% endif %}
+{% endifchanged %}
+File "{{ frame.filename }}" in {{ frame.function }}
 {% if frame.context_line %}  {{ frame.lineno }}. {{ frame.context_line }}{% endif %}
 {% endfor %}
 {% if exception_type %}Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}

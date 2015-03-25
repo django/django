@@ -1,3 +1,6 @@
+# -*- encoding: utf-8 -*-
+from __future__ import unicode_literals
+
 from decimal import Decimal
 from sys import float_info
 from unittest import TestCase
@@ -59,3 +62,15 @@ class TestNumberFormat(TestCase):
         self.assertEqual(nformat(Decimal('1234'), '.', grouping=2, thousand_sep=',', force_grouping=True), '12,34')
         self.assertEqual(nformat(Decimal('-1234.33'), '.', decimal_pos=1), '-1234.3')
         self.assertEqual(nformat(Decimal('0.00000001'), '.', decimal_pos=8), '0.00000001')
+
+    def test_decimal_subclass(self):
+        class EuroDecimal(Decimal):
+            """
+            Wrapper for Decimal which prefixes each amount with the € symbol.
+            """
+            def __format__(self, specifier, **kwargs):
+                amount = super(EuroDecimal, self).__format__(specifier, **kwargs)
+                return '€ {}'.format(amount)
+
+        price = EuroDecimal('1.23')
+        self.assertEqual(nformat(price, ','), '€ 1,23')

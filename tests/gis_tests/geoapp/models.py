@@ -57,6 +57,9 @@ class MultiFields(NamedModel):
     point = models.PointField()
     poly = models.PolygonField()
 
+    class Meta:
+        unique_together = ('city', 'point')
+
 
 class Truth(models.Model):
     val = models.BooleanField(default=False)

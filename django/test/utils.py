@@ -12,11 +12,13 @@ from django.apps import apps
 from django.conf import UserSettingsHolder, settings
 from django.core import mail
 from django.core.signals import request_started
+from django.core.urlresolvers import get_script_prefix, set_script_prefix
 from django.db import reset_queries
 from django.http import request
 from django.template import Template
 from django.test.signals import setting_changed, template_rendered
 from django.utils import six
+from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
 
@@ -595,3 +597,22 @@ def require_jinja2(test_func):
         'OPTIONS': {'keep_trailing_newline': True},
     }])(test_func)
     return test_func
+
+
+class ScriptPrefix(ContextDecorator):
+    def __enter__(self):
+        set_script_prefix(self.prefix)
+
+    def __exit__(self, exc_type, exc_val, traceback):
+        set_script_prefix(self.old_prefix)
+
+    def __init__(self, prefix):
+        self.prefix = prefix
+        self.old_prefix = get_script_prefix()
+
+
+def override_script_prefix(prefix):
+    """
+    Decorator or context manager to temporary override the script prefix.
+    """
+    return ScriptPrefix(prefix)

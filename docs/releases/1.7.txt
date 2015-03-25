@@ -845,7 +845,7 @@ Templates
 * It is now possible to :ttag:`include` templates recursively.
 
 * Template objects now have an origin attribute set when
-  :setting:`TEMPLATE_DEBUG` is ``True``. This allows template origins to be
+  ``TEMPLATE_DEBUG`` is ``True``. This allows template origins to be
   inspected and logged outside of the ``django.template`` infrastructure.
 
 * ``TypeError`` exceptions are no longer silenced when raised during the
@@ -1512,6 +1512,22 @@ Python versions, this module isn't useful anymore. It has been deprecated. Use
 As :class:`~collections.OrderedDict` was added to the standard library in
 Python 2.7, ``SortedDict`` is no longer needed and has been deprecated.
 
+The two additional, deprecated methods provided by ``SortedDict`` (``insert()``
+and ``value_for_index()``) have been removed. If you relied on these methods to
+alter structures like form fields, you should now treat these ``OrderedDict``\s
+as immutable objects and override them to change their content.
+
+For example, you might want to override ``MyFormClass.base_fields`` (although
+this attribute isn't considered a public API) to change the ordering of fields
+for all ``MyFormClass`` instances; or similarly, you could override
+``self.fields`` from inside ``MyFormClass.__init__()``, to change the fields
+for a particular form instance. For example (from Django itself)::
+
+    PasswordChangeForm.base_fields = OrderedDict(
+        (k, PasswordChangeForm.base_fields[k])
+        for k in ['old_password', 'new_password1', 'new_password2']
+    )
+
 Custom SQL location for models package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1548,7 +1564,7 @@ Reorganization of ``django.contrib.contenttypes``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since ``django.contrib.contenttypes.generic`` defined both admin and model
-related objects an import of this module could trigger unexpected side effects.
+related objects, an import of this module could trigger unexpected side effects.
 As a consequence, its contents were split into :mod:`~django.contrib.contenttypes`
 submodules and the ``django.contrib.contenttypes.generic`` module is deprecated:
 

@@ -30,7 +30,7 @@ from django.utils.translation import (
     get_language, get_language_from_request, get_language_info, gettext,
     gettext_lazy, ngettext_lazy, npgettext, npgettext_lazy, pgettext,
     pgettext_lazy, string_concat, to_locale, trans_real, ugettext,
-    ugettext_lazy, ungettext_lazy,
+    ugettext_lazy, ungettext, ungettext_lazy,
 )
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
@@ -56,6 +56,16 @@ def patch_formats(lang, **settings):
 
 
 class TranslationTests(TestCase):
+
+    @translation.override('fr')
+    def test_plural(self):
+        """
+        Test plurals with ungettext. French differs from English in that 0 is singular.
+        """
+        self.assertEqual(ungettext("%d year", "%d years", 0) % 0, "0 année")
+        self.assertEqual(ungettext("%d year", "%d years", 2) % 2, "2 années")
+        self.assertEqual(ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}, "0 octet")
+        self.assertEqual(ungettext("%(size)d byte", "%(size)d bytes", 2) % {'size': 2}, "2 octets")
 
     def test_override(self):
         activate('de')
@@ -260,10 +270,6 @@ class TranslationTests(TestCase):
             t = Template('{% load i18n %}{% trans "May" as var context "verb" %}Value: {{ var }}')
             rendered = t.render(Context())
             self.assertEqual(rendered, 'Value: Kann')
-
-            # Mis-uses
-            self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% trans "May" context as var %}{{ var }}')
-            self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% trans "May" as var context %}{{ var }}')
 
             # {% blocktrans %} ------------------------------
 
@@ -901,6 +907,21 @@ class MiscTests(TestCase):
     def setUp(self):
         super(MiscTests, self).setUp()
         self.rf = RequestFactory()
+
+    @override_settings(LANGUAGE_CODE='de')
+    def test_english_fallback(self):
+        """
+        With a non-English LANGUAGE_CODE and if the active language is English
+        or one of its variants, the untranslated string should be returned
+        (instead of falling back to LANGUAGE_CODE) (See #24413).
+        """
+        self.assertEqual(ugettext("Image"), "Bild")
+        with translation.override('en'):
+            self.assertEqual(ugettext("Image"), "Image")
+        with translation.override('en-us'):
+            self.assertEqual(ugettext("Image"), "Image")
+        with translation.override('en-ca'):
+            self.assertEqual(ugettext("Image"), "Image")
 
     def test_parse_spec_http_header(self):
         """

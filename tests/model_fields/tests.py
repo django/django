@@ -76,7 +76,7 @@ class BasicFieldTests(test.TestCase):
 
     def test_field_verbose_name(self):
         m = VerboseNameField
-        for i in range(1, 22):
+        for i in range(1, 24):
             self.assertEqual(m._meta.get_field('field%d' % i).verbose_name,
                              'verbose field%d' % i)
 
@@ -199,7 +199,7 @@ class ForeignKeyTests(test.TestCase):
         self.assertEqual(warnings, expected_warnings)
 
     def test_related_name_converted_to_text(self):
-        rel_name = Bar._meta.get_field('a').rel.related_name
+        rel_name = Bar._meta.get_field('a').remote_field.related_name
         self.assertIsInstance(rel_name, six.text_type)
 
     def test_abstract_model_pending_lookups(self):
@@ -444,13 +444,6 @@ class ChoicesTests(test.TestCase):
         self.assertEqual(WhizIterEmpty(c="b").c, "b")      # Invalid value
         self.assertEqual(WhizIterEmpty(c=None).c, None)    # Blank value
         self.assertEqual(WhizIterEmpty(c='').c, '')        # Empty value
-
-    def test_charfield_get_choices_with_blank_iterator(self):
-        """
-        Check that get_choices works with an empty Iterator
-        """
-        f = models.CharField(choices=(x for x in []))
-        self.assertEqual(f.get_choices(include_blank=True), [('', '---------')])
 
 
 class SlugFieldTests(test.TestCase):

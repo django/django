@@ -230,15 +230,15 @@ class MigrationOptimizer(object):
     def reduce_create_model_add_field(self, operation, other, in_between):
         if operation.name_lower == other.model_name_lower:
             # Don't allow optimizations of FKs through models they reference
-            if hasattr(other.field, "rel") and other.field.rel:
+            if hasattr(other.field, "remote_field") and other.field.remote_field:
                 for between in in_between:
                     # Check that it doesn't point to the model
-                    app_label, object_name = self.model_to_key(other.field.rel.to)
+                    app_label, object_name = self.model_to_key(other.field.remote_field.model)
                     if between.references_model(object_name, app_label):
                         return None
                     # Check that it's not through the model
-                    if getattr(other.field.rel, "through", None):
-                        app_label, object_name = self.model_to_key(other.field.rel.through)
+                    if getattr(other.field.remote_field, "through", None):
+                        app_label, object_name = self.model_to_key(other.field.remote_field.through)
                         if between.references_model(object_name, app_label):
                             return None
             # OK, that's fine

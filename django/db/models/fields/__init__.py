@@ -9,7 +9,6 @@ import math
 import uuid
 import warnings
 from base64 import b64decode, b64encode
-from itertools import tee
 
 from django.apps import apps
 from django.db import connection
@@ -24,6 +23,7 @@ from django.utils.duration import duration_string
 from django.utils.functional import cached_property, curry, total_ordering, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import (smart_text, force_text, force_bytes,
     python_2_unicode_compatible)
@@ -147,15 +147,17 @@ class Field(RegisterLookupMixin):
         self.primary_key = primary_key
         self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
-        self.rel = rel
-        self.is_relation = self.rel is not None
+        self.remote_field = rel
+        self.is_relation = self.remote_field is not None
         self.default = default
         self.editable = editable
         self.serialize = serialize
         self.unique_for_date = unique_for_date
         self.unique_for_month = unique_for_month
         self.unique_for_year = unique_for_year
-        self._choices = choices or []
+        if isinstance(choices, collections.Iterator):
+            choices = list(choices)
+        self.choices = choices or []
         self.help_text = help_text
         self.db_index = db_index
         self.db_column = db_column
@@ -238,6 +240,13 @@ class Field(RegisterLookupMixin):
             ]
         else:
             return []
+
+    @property
+    def rel(self):
+        warnings.warn(
+            "Usage of field.rel has been deprecated. Use field.remote_field instead.",
+            RemovedInDjango21Warning, 2)
+        return self.remote_field
 
     def _check_choices(self):
         if self.choices:
@@ -330,12 +339,12 @@ class Field(RegisterLookupMixin):
             ]
         return []
 
-    def get_col(self, alias, source=None):
-        if source is None:
-            source = self
-        if alias != self.model._meta.db_table or source != self:
+    def get_col(self, alias, output_field=None):
+        if output_field is None:
+            output_field = self
+        if alias != self.model._meta.db_table or output_field != self:
             from django.db.models.expressions import Col
-            return Col(alias, self, source)
+            return Col(alias, self, output_field)
         else:
             return self.cached_col
 
@@ -405,7 +414,6 @@ class Field(RegisterLookupMixin):
         }
         attr_overrides = {
             "unique": "_unique",
-            "choices": "_choices",
             "error_messages": "_error_messages",
             "validators": "_validators",
             "verbose_name": "_verbose_name",
@@ -468,10 +476,10 @@ class Field(RegisterLookupMixin):
         # We don't have to deepcopy very much here, since most things are not
         # intended to be altered after initial creation.
         obj = copy.copy(self)
-        if self.rel:
-            obj.rel = copy.copy(self.rel)
-            if hasattr(self.rel, 'field') and self.rel.field is self:
-                obj.rel.field = obj
+        if self.remote_field:
+            obj.remote_field = copy.copy(self.remote_field)
+            if hasattr(self.remote_field, 'field') and self.remote_field.field is self:
+                obj.remote_field.field = obj
         memodict[id(self)] = obj
         return obj
 
@@ -553,7 +561,7 @@ class Field(RegisterLookupMixin):
             # Skip validation for non-editable fields.
             return
 
-        if self._choices and value not in self.empty_values:
+        if self.choices and value not in self.empty_values:
             for option_key, option_value in self.choices:
                 if isinstance(option_value, (list, tuple)):
                     # This is an optgroup, so look inside the group for
@@ -811,10 +819,10 @@ class Field(RegisterLookupMixin):
                         not blank_defined else [])
         if self.choices:
             return first_choice + choices
-        rel_model = self.rel.to
+        rel_model = self.remote_field.model
         limit_choices_to = limit_choices_to or self.get_limit_choices_to()
-        if hasattr(self.rel, 'get_related_field'):
-            lst = [(getattr(x, self.rel.get_related_field().attname),
+        if hasattr(self.remote_field, 'get_related_field'):
+            lst = [(getattr(x, self.remote_field.get_related_field().attname),
                    smart_text(x))
                    for x in rel_model._default_manager.complex_filter(
                        limit_choices_to)]
@@ -847,14 +855,6 @@ class Field(RegisterLookupMixin):
         This is used by the serialization framework.
         """
         return smart_text(self._get_val_from_obj(obj))
-
-    def _get_choices(self):
-        if isinstance(self._choices, collections.Iterator):
-            choices, self._choices = tee(self._choices)
-            return choices
-        else:
-            return self._choices
-    choices = property(_get_choices)
 
     def _get_flatchoices(self):
         """Flattened version of choices tuple."""
@@ -2369,9 +2369,9 @@ class UUIDField(Field):
     description = 'Universally unique identifier'
     empty_strings_allowed = False
 
-    def __init__(self, **kwargs):
+    def __init__(self, verbose_name=None, **kwargs):
         kwargs['max_length'] = 32
-        super(UUIDField, self).__init__(**kwargs)
+        super(UUIDField, self).__init__(verbose_name, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(UUIDField, self).deconstruct()

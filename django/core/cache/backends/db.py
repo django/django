@@ -30,6 +30,7 @@ class Options(object):
         self.abstract = False
         self.managed = True
         self.proxy = False
+        self.swapped = False
 
 
 class BaseDatabaseCache(BaseCache):

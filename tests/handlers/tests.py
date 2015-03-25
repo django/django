@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
+from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections, connection
 from django.test import (
@@ -200,3 +200,14 @@ class HandlerNotFoundTest(TestCase):
     def test_environ_path_info_type(self):
         environ = RequestFactory().get('/%E2%A8%87%87%A5%E2%A8%A0').environ
         self.assertIsInstance(environ['PATH_INFO'], six.text_type)
+
+
+class ScriptNameTests(TestCase):
+    def test_get_script_name(self):
+        # Regression test for #23173
+        # Test first without PATH_INFO
+        script_name = get_script_name({'SCRIPT_URL': '/foobar/'})
+        self.assertEqual(script_name, '/foobar/')
+
+        script_name = get_script_name({'SCRIPT_URL': '/foobar/', 'PATH_INFO': '/'})
+        self.assertEqual(script_name, '/foobar')

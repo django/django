@@ -8,17 +8,25 @@ from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, connection, models, router, transaction
 from django.db.models import DO_NOTHING, signals
 from django.db.models.base import ModelBase
-from django.db.models.fields.related import ForeignObject, ForeignObjectRel
+from django.db.models.fields.related import (
+    ForeignObject, ForeignObjectRel, ForeignRelatedObjectsDescriptor,
+)
 from django.db.models.query_utils import PathInfo
 from django.utils.encoding import python_2_unicode_compatible, smart_text
+from django.utils.functional import cached_property
 
 
 @python_2_unicode_compatible
 class GenericForeignKey(object):
     """
-    Provides a generic relation to any object through content-type/object-id
-    fields.
+    Provide a generic many-to-one relation through the ``content_type`` and
+    ``object_id`` fields.
+
+    This class also doubles as an accessor to the related object (similar to
+    ReverseSingleRelatedObjectDescriptor) by adding itself as a model
+    attribute.
     """
+
     # Field flags
     auto_created = False
     concrete = False
@@ -31,6 +39,9 @@ class GenericForeignKey(object):
     one_to_many = False
     one_to_one = False
     related_model = None
+    remote_field = None
+
+    allow_unsaved_instance_assignment = False
 
     def __init__(self, ct_field='content_type', fk_field='object_id', for_concrete_model=True):
         self.ct_field = ct_field
@@ -93,9 +104,10 @@ class GenericForeignKey(object):
             return []
 
     def _check_content_type_field(self):
-        """ Check if field named `field_name` in model `model` exists and is
-        valid content_type field (is a ForeignKey to ContentType). """
-
+        """
+        Check if field named `field_name` in model `model` exists and is a
+        valid content_type field (is a ForeignKey to ContentType).
+        """
         try:
             field = self.model._meta.get_field(self.ct_field)
         except FieldDoesNotExist:
@@ -124,7 +136,7 @@ class GenericForeignKey(object):
                         id='contenttypes.E003',
                     )
                 ]
-            elif field.rel.to != ContentType:
+            elif field.remote_field.model != ContentType:
                 return [
                     checks.Error(
                         "'%s.%s' is not a ForeignKey to 'contenttypes.ContentType'." % (
@@ -143,8 +155,8 @@ class GenericForeignKey(object):
 
     def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
         """
-        Handles initializing an object with the generic FK instead of
-        content-type/object-id fields.
+        Handle initializing an object with the generic FK instead of
+        content_type and object_id fields.
         """
         if self.name in kwargs:
             value = kwargs.pop(self.name)
@@ -241,7 +253,7 @@ class GenericForeignKey(object):
         if value is not None:
             ct = self.get_content_type(obj=value)
             fk = value._get_pk_val()
-            if fk is None:
+            if not self.allow_unsaved_instance_assignment and fk is None:
                 raise ValueError(
                     'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
                     (value, value._meta.object_name)
@@ -253,6 +265,10 @@ class GenericForeignKey(object):
 
 
 class GenericRel(ForeignObjectRel):
+    """
+    Used by GenericRelation to store information about the relation.
+    """
+
     def __init__(self, field, to, related_name=None, related_query_name=None, limit_choices_to=None):
         super(GenericRel, self).__init__(
             field, to,
@@ -264,7 +280,10 @@ class GenericRel(ForeignObjectRel):
 
 
 class GenericRelation(ForeignObject):
-    """Provides an accessor to generic related objects (e.g. comments)"""
+    """
+    Provide a reverse to a relation created by a GenericForeignKey.
+    """
+
     # Field flags
     auto_created = False
 
@@ -305,11 +324,8 @@ class GenericRelation(ForeignObject):
         return errors
 
     def _check_generic_foreign_key_existence(self):
-        target = self.rel.to
+        target = self.remote_field.model
         if isinstance(target, ModelBase):
-            # Using `vars` is very ugly approach, but there is no better one,
-            # because GenericForeignKeys are not considered as fields and,
-            # therefore, are not included in `target._meta.local_fields`.
             fields = target._meta.virtual_fields
             if any(isinstance(field, GenericForeignKey) and
                     field.ct_field == self.content_type_field_name and
@@ -333,16 +349,16 @@ class GenericRelation(ForeignObject):
 
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
-        return [(self.rel.to._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
+        return [(self.remote_field.model._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
 
     def get_path_info(self):
-        opts = self.rel.to._meta
+        opts = self.remote_field.model._meta
         target = opts.pk
-        return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
+        return [PathInfo(self.model._meta, opts, (target,), self.remote_field, True, False)]
 
     def get_reverse_path_info(self):
         opts = self.model._meta
-        from_opts = self.rel.to._meta
+        from_opts = self.remote_field.model._meta
         return [PathInfo(from_opts, opts, (opts.pk,), self, not self.unique, False)]
 
     def get_choices_default(self):
@@ -355,10 +371,8 @@ class GenericRelation(ForeignObject):
     def contribute_to_class(self, cls, name, **kwargs):
         kwargs['virtual_only'] = True
         super(GenericRelation, self).contribute_to_class(cls, name, **kwargs)
-        # Save a reference to which model this class is on for future use
         self.model = cls
-        # Add the descriptor for the relation
-        setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self, self.for_concrete_model))
+        setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self.remote_field))
 
     def set_attributes_from_rel(self):
         pass
@@ -368,13 +382,13 @@ class GenericRelation(ForeignObject):
 
     def get_content_type(self):
         """
-        Returns the content type associated with this field's model.
+        Return the content type associated with this field's model.
         """
         return ContentType.objects.get_for_model(self.model,
                                                  for_concrete_model=self.for_concrete_model)
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
-        field = self.rel.to._meta.get_field(self.content_type_field_name)
+        field = self.remote_field.model._meta.get_field(self.content_type_field_name)
         contenttype_pk = self.get_content_type().pk
         cond = where_class()
         lookup = field.get_lookup('exact')(field.get_col(remote_alias), contenttype_pk)
@@ -384,105 +398,75 @@ class GenericRelation(ForeignObject):
     def bulk_related_objects(self, objs, using=DEFAULT_DB_ALIAS):
         """
         Return all objects related to ``objs`` via this ``GenericRelation``.
-
         """
-        return self.rel.to._base_manager.db_manager(using).filter(**{
+        return self.remote_field.model._base_manager.db_manager(using).filter(**{
             "%s__pk" % self.content_type_field_name: ContentType.objects.db_manager(using).get_for_model(
                 self.model, for_concrete_model=self.for_concrete_model).pk,
             "%s__in" % self.object_id_field_name: [obj.pk for obj in objs]
         })
 
 
-class ReverseGenericRelatedObjectsDescriptor(object):
+class ReverseGenericRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
     """
-    This class provides the functionality that makes the related-object
-    managers available as attributes on a model class, for fields that have
-    multiple "remote" values and have a GenericRelation defined in their model
-    (rather than having another model pointed *at* them). In the example
-    "article.publications", the publications attribute is a
-    ReverseGenericRelatedObjectsDescriptor instance.
+    Accessor to the related objects manager on the one-to-many relation created
+    by GenericRelation.
+
+    In the example::
+
+        class Post(Model):
+            comments = GenericRelation(Comment)
+
+    ``post.comments`` is a ReverseGenericRelatedObjectsDescriptor instance.
     """
-    def __init__(self, field, for_concrete_model=True):
-        self.field = field
-        self.for_concrete_model = for_concrete_model
 
-    def __get__(self, instance, instance_type=None):
-        if instance is None:
-            return self
-
-        # Dynamically create a class that subclasses the related model's
-        # default manager.
-        rel_model = self.field.rel.to
-        superclass = rel_model._default_manager.__class__
-        RelatedManager = create_generic_related_manager(superclass)
-
-        qn = connection.ops.quote_name
-        content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(
-            instance, for_concrete_model=self.for_concrete_model)
-
-        join_cols = self.field.get_joining_columns(reverse_join=True)[0]
-        manager = RelatedManager(
-            model=rel_model,
-            instance=instance,
-            source_col_name=qn(join_cols[0]),
-            target_col_name=qn(join_cols[1]),
-            content_type=content_type,
-            content_type_field_name=self.field.content_type_field_name,
-            object_id_field_name=self.field.object_id_field_name,
-            prefetch_cache_name=self.field.attname,
+    @cached_property
+    def related_manager_cls(self):
+        return create_generic_related_manager(
+            self.rel.model._default_manager.__class__,
+            self.rel,
         )
 
-        return manager
 
-    def __set__(self, instance, value):
-        manager = self.__get__(instance)
-        manager.set(value)
-
-
-def create_generic_related_manager(superclass):
+def create_generic_related_manager(superclass, rel):
     """
-    Factory function for a manager that subclasses 'superclass' (which is a
-    Manager) and adds behavior for generic related objects.
+    Factory function to create a manager that subclasses another manager
+    (generally the default manager of a given model) and adds behaviors
+    specific to generic relations.
     """
 
     class GenericRelatedObjectManager(superclass):
-        def __init__(self, model=None, instance=None, symmetrical=None,
-                     source_col_name=None, target_col_name=None, content_type=None,
-                     content_type_field_name=None, object_id_field_name=None,
-                     prefetch_cache_name=None):
-
+        def __init__(self, instance=None):
             super(GenericRelatedObjectManager, self).__init__()
-            self.model = model
-            self.content_type = content_type
-            self.symmetrical = symmetrical
+
             self.instance = instance
-            self.source_col_name = source_col_name
-            self.target_col_name = target_col_name
-            self.content_type_field_name = content_type_field_name
-            self.object_id_field_name = object_id_field_name
-            self.prefetch_cache_name = prefetch_cache_name
-            self.pk_val = self.instance._get_pk_val()
+
+            self.model = rel.model
+
+            content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(
+                instance, for_concrete_model=rel.field.for_concrete_model)
+            self.content_type = content_type
+
+            qn = connection.ops.quote_name
+            join_cols = rel.field.get_joining_columns(reverse_join=True)[0]
+            self.source_col_name = qn(join_cols[0])
+            self.target_col_name = qn(join_cols[1])
+
+            self.content_type_field_name = rel.field.content_type_field_name
+            self.object_id_field_name = rel.field.object_id_field_name
+            self.prefetch_cache_name = rel.field.attname
+            self.pk_val = instance._get_pk_val()
+
             self.core_filters = {
-                '%s__pk' % content_type_field_name: content_type.id,
-                '%s' % object_id_field_name: instance._get_pk_val(),
+                '%s__pk' % self.content_type_field_name: content_type.id,
+                self.object_id_field_name: self.pk_val,
             }
 
         def __call__(self, **kwargs):
             # We use **kwargs rather than a kwarg argument to enforce the
             # `manager='manager_name'` syntax.
             manager = getattr(self.model, kwargs.pop('manager'))
-            manager_class = create_generic_related_manager(manager.__class__)
-            return manager_class(
-                model=self.model,
-                instance=self.instance,
-                symmetrical=self.symmetrical,
-                source_col_name=self.source_col_name,
-                target_col_name=self.target_col_name,
-                content_type=self.content_type,
-                content_type_field_name=self.content_type_field_name,
-                object_id_field_name=self.object_id_field_name,
-                prefetch_cache_name=self.prefetch_cache_name,
-            )
+            manager_class = create_generic_related_manager(manager.__class__, rel)
+            return manager_class(instance=self.instance)
         do_not_call_in_templates = True
 
         def __str__(self):

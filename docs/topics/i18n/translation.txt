@@ -263,6 +263,15 @@ In a case like this, consider something like the following::
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
 
+.. note:: Plural form and po files
+
+    Django does not support custom plural equations in po files. As all
+    translation catalogs are merged, only the plural form for the main Django po
+    file (in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.po``) is
+    considered. Plural forms in all other po files are ignored. Therefore, you
+    should not use different plural equations in your project or application po
+    files.
+
 .. _contextual-markers:
 
 Contextual markers
@@ -942,6 +951,31 @@ signs in the URL. This is especially useful if your pages use code from
 different apps and this changes often and you don't want to pull in one big
 catalog file. As a security measure, these values can only be either
 ``django.conf`` or any package from the :setting:`INSTALLED_APPS` setting.
+
+You can also split the catalogs in multiple URLs and load them as you need in
+your sites::
+
+    js_info_dict_app = {
+        'packages': ('your.app.package',),
+    }
+
+    js_info_dict_other_app = {
+        'packages': ('your.other.app.package',),
+    }
+
+    urlpatterns = [
+        url(r'^jsi18n/app/$', javascript_catalog, js_info_dict_app),
+        url(r'^jsi18n/other_app/$', javascript_catalog, js_info_dict_other_app),
+    ]
+
+If you use more than one ``javascript_catalog`` on a site and some of them
+define the same strings, the strings in the catalog that was loaded last take
+precedence.
+
+.. versionchanged:: 1.9
+
+    Before Django 1.9, the catalogs completely overwrote each other and you
+    could only use one at a time.
 
 The JavaScript translations found in the paths listed in the
 :setting:`LOCALE_PATHS` setting are also always included. To keep consistency

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import uuid
 
 from django.db import models
 from django.utils import six
@@ -241,3 +242,15 @@ class Post(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# Models for testing UUID primary keys
+class UUIDPKParent(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+
+
+class UUIDPKChild(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey(UUIDPKParent)

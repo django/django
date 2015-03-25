@@ -10,6 +10,19 @@ class SchemaIndexesTests(TestCase):
     """
     Test index handling by the db.backends.schema infrastructure.
     """
+
+    def test_index_name_hash(self):
+        """
+        Index names should be deterministic.
+        """
+        with connection.schema_editor() as editor:
+            index_name = editor._create_index_name(
+                model=Article,
+                column_names=("c1", "c2", "c3"),
+                suffix="123",
+            )
+        self.assertEqual(index_name, "indexes_article_c1_7ce4cc86123")
+
     def test_index_together(self):
         editor = connection.schema_editor()
         index_sql = editor._model_indexes_sql(Article)

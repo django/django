@@ -12,8 +12,6 @@ from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
 
-getLogger = logging.getLogger
-
 # Default logging for Django. This sends an email to the site admins on every
 # HTTP 500 error. Depending on DEBUG, all other log records are either sent to
 # the console (DEBUG=True) or discarded by mean of the NullHandler (DEBUG=False).
@@ -33,9 +31,6 @@ DEFAULT_LOGGING = {
             'level': 'INFO',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
-        },
-        'null': {
-            'class': 'logging.NullHandler',
         },
         'mail_admins': {
             'level': 'ERROR',

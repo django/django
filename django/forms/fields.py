@@ -195,6 +195,7 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
             data = self.to_python(data)
             if hasattr(self, '_coerce'):
                 data = self._coerce(data)
+                initial_value = self._coerce(initial_value)
         except ValidationError:
             return True
         data_value = data if data is not None else ''
@@ -236,6 +237,7 @@ class IntegerField(Field):
     default_error_messages = {
         'invalid': _('Enter a whole number.'),
     }
+    re_decimal = re.compile(r'\.0*\s*$')
 
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
         self.max_value, self.min_value = max_value, min_value
@@ -259,8 +261,9 @@ class IntegerField(Field):
             return None
         if self.localize:
             value = formats.sanitize_separators(value)
+        # Strip trailing decimal and zeros.
         try:
-            value = int(str(value))
+            value = int(self.re_decimal.sub('', str(value)))
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
@@ -514,7 +517,9 @@ class DurationField(Field):
     }
 
     def prepare_value(self, value):
-        return duration_string(value)
+        if isinstance(value, datetime.timedelta):
+            return duration_string(value)
+        return value
 
     def to_python(self, value):
         if value in self.empty_values:

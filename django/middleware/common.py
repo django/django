@@ -86,7 +86,7 @@ class CommonMiddleware(object):
         if new_url == old_url:
             # No redirects required.
             return
-        if new_url[0]:
+        if new_url[0] != old_url[0]:
             newurl = "%s://%s%s" % (
                 request.scheme,
                 new_url[0], urlquote(new_url[1]))

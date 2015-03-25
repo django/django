@@ -94,7 +94,7 @@ class DebugNode(Node):
         from pprint import pformat
         output = [force_text(pformat(val)) for val in context]
         output.append('\n\n')
-        output.append(pformat(sys.modules))
+        output.append(force_text(pformat(sys.modules)))
         return ''.join(output)
 
 
@@ -209,19 +209,10 @@ class ForNode(Node):
                         context.update(unpacked_vars)
                 else:
                     context[self.loopvars[0]] = item
-                # In TEMPLATE_DEBUG mode provide source of the node which
-                # actually raised the exception
-                if context.engine.debug:
-                    for node in self.nodelist_loop:
-                        try:
-                            nodelist.append(node.render(context))
-                        except Exception as e:
-                            if not hasattr(e, 'django_template_source'):
-                                e.django_template_source = node.source
-                            raise
-                else:
-                    for node in self.nodelist_loop:
-                        nodelist.append(node.render(context))
+
+                for node in self.nodelist_loop:
+                    nodelist.append(node.render_annotated(context))
+
                 if pop_context:
                     # The loop variables were pushed on to the context so pop them
                     # off again. This is necessary because the tag lets the length
@@ -392,7 +383,7 @@ class SsiNode(Node):
     def render(self, context):
         filepath = self.filepath.resolve(context)
 
-        if not include_is_allowed(filepath, context.engine.allowed_include_roots):
+        if not include_is_allowed(filepath, context.template.engine.allowed_include_roots):
             if settings.DEBUG:
                 return "[Didn't have permission to include file]"
             else:
@@ -404,7 +395,7 @@ class SsiNode(Node):
             output = ''
         if self.parsed:
             try:
-                t = Template(output, name=filepath, engine=context.engine)
+                t = Template(output, name=filepath, engine=context.template.engine)
                 return t.render(context)
             except TemplateSyntaxError as e:
                 if settings.DEBUG:
@@ -472,8 +463,10 @@ class URLNode(Node):
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = dict((smart_text(k, 'ascii'), v.resolve(context))
-                      for k, v in self.kwargs.items())
+        kwargs = {
+            smart_text(k, 'ascii'): v.resolve(context)
+            for k, v in self.kwargs.items()
+        }
 
         view_name = self.view_name.resolve(context)
 
@@ -652,6 +645,10 @@ def cycle(parser, token):
         raise TemplateSyntaxError("'cycle' tag requires at least two arguments")
 
     if ',' in args[1]:
+        warnings.warn(
+            "The old {% cycle %} syntax with comma-separated arguments is deprecated.",
+            RemovedInDjango20Warning,
+        )
         # Backwards compatibility: {% cycle a,b %} or {% cycle a,b as foo %}
         # case.
         args[1:2] = ['"%s"' % arg for arg in args[1].split(",")]

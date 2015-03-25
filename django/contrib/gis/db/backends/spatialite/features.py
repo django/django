@@ -1,6 +1,8 @@
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures
+from django.contrib.gis.geos import geos_version
 from django.db.backends.sqlite3.features import \
     DatabaseFeatures as SQLiteDatabaseFeatures
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 
 
@@ -15,3 +17,7 @@ class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
         # which can result in a significant performance improvement when
         # creating the database.
         return self.connection.ops.spatial_version >= (4, 1, 0)
+
+    @cached_property
+    def supports_3d_storage(self):
+        return force_text(geos_version()) >= '3.3'

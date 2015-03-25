@@ -181,9 +181,9 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
      * load_fields - the set of fields to be loaded on this model
      * reverse - boolean, True if we are checking a reverse select related
     """
-    if not field.rel:
+    if not field.remote_field:
         return False
-    if field.rel.parent_link and not reverse:
+    if field.remote_field.parent_link and not reverse:
         return False
     if restricted:
         if reverse and field.related_query_name() not in requested:
@@ -250,7 +250,7 @@ deferred_class_factory.__safe_for_unpickling__ = True
 
 def refs_aggregate(lookup_parts, aggregates):
     """
-    A little helper method to check if the lookup_parts contains references
+    A helper method to check if the lookup_parts contains references
     to the given aggregates set. Because the LOOKUP_SEP is contained in the
     default annotation names we must check each prefix of the lookup_parts
     for a match.
@@ -259,4 +259,18 @@ def refs_aggregate(lookup_parts, aggregates):
         level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
         if level_n_lookup in aggregates and aggregates[level_n_lookup].contains_aggregate:
             return aggregates[level_n_lookup], lookup_parts[n:]
+    return False, ()
+
+
+def refs_expression(lookup_parts, annotations):
+    """
+    A helper method to check if the lookup_parts contains references
+    to the given annotations set. Because the LOOKUP_SEP is contained in the
+    default annotation names we must check each prefix of the lookup_parts
+    for a match.
+    """
+    for n in range(len(lookup_parts) + 1):
+        level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
+        if level_n_lookup in annotations and annotations[level_n_lookup]:
+            return annotations[level_n_lookup], lookup_parts[n:]
     return False, ()

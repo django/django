@@ -3,13 +3,12 @@ from __future__ import unicode_literals
 import os
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import (
-    clear_url_caches, reverse, set_script_prefix,
-)
+from django.core.urlresolvers import clear_url_caches, reverse, translate_url
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
 from django.template import Context, Template
 from django.test import TestCase, override_settings
+from django.test.utils import override_script_prefix
 from django.utils import translation
 from django.utils._os import upath
 
@@ -135,6 +134,18 @@ class URLTranslationTests(URLTestCaseBase):
         with translation.override('pt-br'):
             self.assertEqual(reverse('users'), '/pt-br/usuarios/')
 
+    def test_translate_url_utility(self):
+        with translation.override('en'):
+            self.assertEqual(translate_url('/en/non-existent/', 'nl'), '/en/non-existent/')
+            self.assertEqual(translate_url('/en/users/', 'nl'), '/nl/gebruikers/')
+            # Namespaced URL
+            self.assertEqual(translate_url('/en/account/register/', 'nl'), '/nl/profiel/registeren/')
+            self.assertEqual(translation.get_language(), 'en')
+
+        with translation.override('nl'):
+            self.assertEqual(translate_url('/nl/gebruikers/', 'en'), '/en/users/')
+            self.assertEqual(translation.get_language(), 'nl')
+
 
 class URLNamespaceTests(URLTestCaseBase):
     """
@@ -237,7 +248,7 @@ class URLRedirectWithoutTrailingSlashTests(URLTestCaseBase):
     def test_en_redirect(self):
         response = self.client.get('/account/register', HTTP_ACCEPT_LANGUAGE='en', follow=True)
         # target status code of 301 because of CommonMiddleware redirecting
-        self.assertIn(('http://testserver/en/account/register/', 301), response.redirect_chain)
+        self.assertIn(('/en/account/register/', 301), response.redirect_chain)
         self.assertRedirects(response, '/en/account/register/', 302)
 
         response = self.client.get('/prefixed.xml', HTTP_ACCEPT_LANGUAGE='en', follow=True)
@@ -302,19 +313,11 @@ class URLRedirectWithScriptAliasTests(URLTestCaseBase):
     """
     #21579 - LocaleMiddleware should respect the script prefix.
     """
-    def setUp(self):
-        super(URLRedirectWithScriptAliasTests, self).setUp()
-        self.script_prefix = '/script_prefix'
-        set_script_prefix(self.script_prefix)
-
-    def tearDown(self):
-        super(URLRedirectWithScriptAliasTests, self).tearDown()
-        # reset script prefix
-        set_script_prefix('')
-
     def test_language_prefix_with_script_prefix(self):
-        response = self.client.get('/prefixed/', HTTP_ACCEPT_LANGUAGE='en', SCRIPT_NAME=self.script_prefix)
-        self.assertRedirects(response, '%s/en/prefixed/' % self.script_prefix, target_status_code=404)
+        prefix = '/script_prefix'
+        with override_script_prefix(prefix):
+            response = self.client.get('/prefixed/', HTTP_ACCEPT_LANGUAGE='en', SCRIPT_NAME=prefix)
+            self.assertRedirects(response, '%s/en/prefixed/' % prefix, target_status_code=404)
 
 
 class URLTagTests(URLTestCaseBase):

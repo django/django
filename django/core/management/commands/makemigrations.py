@@ -9,6 +9,7 @@ from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import (
     InteractiveMigrationQuestioner, MigrationQuestioner,
+    NonInteractiveMigrationQuestioner,
 )
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
@@ -93,11 +94,15 @@ class Command(BaseCommand):
         if self.merge and conflicts:
             return self.handle_merge(loader, conflicts)
 
+        if self.interactive:
+            questioner = InteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run)
+        else:
+            questioner = NonInteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run)
         # Set up autodetector
         autodetector = MigrationAutodetector(
             loader.project_state(),
             ProjectState.from_apps(apps),
-            InteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run),
+            questioner,
         )
 
         # If they want to make an empty migration, make one for each app
@@ -234,7 +239,18 @@ class Command(BaseCommand):
                 })
                 new_migration = subclass("%04i_merge" % (biggest_number + 1), app_label)
                 writer = MigrationWriter(new_migration)
-                with open(writer.path, "wb") as fh:
-                    fh.write(writer.as_string())
-                if self.verbosity > 0:
-                    self.stdout.write("\nCreated new merge migration %s" % writer.path)
+
+                if not self.dry_run:
+                    # Write the merge migrations file to the disk
+                    with open(writer.path, "wb") as fh:
+                        fh.write(writer.as_string())
+                    if self.verbosity > 0:
+                        self.stdout.write("\nCreated new merge migration %s" % writer.path)
+                elif self.verbosity == 3:
+                    # Alternatively, makemigrations --merge --dry-run --verbosity 3
+                    # will output the merge migrations to stdout rather than saving
+                    # the file to the disk.
+                    self.stdout.write(self.style.MIGRATE_HEADING(
+                        "Full merge migrations file '%s':" % writer.filename) + "\n"
+                    )
+                    self.stdout.write("%s\n" % writer.as_string())

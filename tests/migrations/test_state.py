@@ -1,10 +1,10 @@
 from django.apps.registry import Apps
 from django.db import models
-from django.db.migrations.operations import RemoveField
+from django.db.migrations.operations import DeleteModel, RemoveField
 from django.db.migrations.state import (
-    InvalidBasesError, ModelState, ProjectState,
+    InvalidBasesError, ModelState, ProjectState, get_related_models_recursive,
 )
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 
 from .models import (
     FoodManager, FoodQuerySet, ModelWithCustomBase, NoMigrationFoodManager,
@@ -366,6 +366,53 @@ class StateTests(TestCase):
         project_state.add_model(ModelState.from_model(B))
         self.assertEqual(len(project_state.apps.get_models()), 2)
 
+    def test_remove_relations(self):
+        """
+        #24225 - Tests that relations between models are updated while
+        remaining the relations and references for models of an old state.
+        """
+        class A(models.Model):
+            class Meta:
+                app_label = "something"
+
+        class B(models.Model):
+            to_a = models.ForeignKey(A)
+
+            class Meta:
+                app_label = "something"
+
+        def get_model_a(state):
+            return [mod for mod in state.apps.get_models() if mod._meta.model_name == 'a'][0]
+
+        project_state = ProjectState()
+        project_state.add_model(ModelState.from_model(A))
+        project_state.add_model(ModelState.from_model(B))
+        self.assertEqual(len(get_model_a(project_state)._meta.related_objects), 1)
+        old_state = project_state.clone()
+
+        operation = RemoveField("b", "to_a")
+        operation.state_forwards("something", project_state)
+        # Tests that model from old_state still has the relation
+        model_a_old = get_model_a(old_state)
+        model_a_new = get_model_a(project_state)
+        self.assertIsNot(model_a_old, model_a_new)
+        self.assertEqual(len(model_a_old._meta.related_objects), 1)
+        self.assertEqual(len(model_a_new._meta.related_objects), 0)
+
+        # Same test for deleted model
+        project_state = ProjectState()
+        project_state.add_model(ModelState.from_model(A))
+        project_state.add_model(ModelState.from_model(B))
+        old_state = project_state.clone()
+
+        operation = DeleteModel("b")
+        operation.state_forwards("something", project_state)
+        model_a_old = get_model_a(old_state)
+        model_a_new = get_model_a(project_state)
+        self.assertIsNot(model_a_old, model_a_new)
+        self.assertEqual(len(model_a_old._meta.related_objects), 1)
+        self.assertEqual(len(model_a_new._meta.related_objects), 0)
+
     def test_equality(self):
         """
         Tests that == and != are implemented correctly.
@@ -384,11 +431,13 @@ class StateTests(TestCase):
             {},
             None,
         ))
+        project_state.apps  # Fill the apps cached property
         other_state = project_state.clone()
         self.assertEqual(project_state, project_state)
         self.assertEqual(project_state, other_state)
         self.assertEqual(project_state != project_state, False)
         self.assertEqual(project_state != other_state, False)
+        self.assertNotEqual(project_state.apps, other_state.apps)
 
         # Make a very small change (max_len 99) and see if that affects it
         project_state = ProjectState()
@@ -546,6 +595,26 @@ class StateTests(TestCase):
         self.assertIsNot(old_model.food_mgr.model, new_model.food_mgr.model)
         self.assertIsNot(old_model.food_qs.model, new_model.food_qs.model)
 
+    def test_choices_iterator(self):
+        """
+        #24483 - ProjectState.from_apps should not destructively consume
+        Field.choices iterators.
+        """
+        new_apps = Apps(["migrations"])
+        choices = [('a', 'A'), ('b', 'B')]
+
+        class Author(models.Model):
+            name = models.CharField(max_length=255)
+            choice = models.CharField(max_length=255, choices=iter(choices))
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        ProjectState.from_apps(new_apps)
+        choices_field = Author._meta.get_field('choice')
+        self.assertEqual(list(choices_field.choices), choices)
+
 
 class ModelStateTests(TestCase):
     def test_custom_model_base(self):
@@ -578,3 +647,276 @@ class ModelStateTests(TestCase):
         project_state.add_model(state)
         with self.assertRaisesMessage(InvalidBasesError, "Cannot resolve bases for [<ModelState: 'app.Model'>]"):
             project_state.apps
+
+    @override_settings(TEST_SWAPPABLE_MODEL='migrations.SomeFakeModel')
+    def test_create_swappable(self):
+        """
+        Tests making a ProjectState from an Apps with a swappable model
+        """
+        new_apps = Apps(['migrations'])
+
+        class Author(models.Model):
+            name = models.CharField(max_length=255)
+            bio = models.TextField()
+            age = models.IntegerField(blank=True, null=True)
+
+            class Meta:
+                app_label = 'migrations'
+                apps = new_apps
+                swappable = 'TEST_SWAPPABLE_MODEL'
+
+        author_state = ModelState.from_model(Author)
+        self.assertEqual(author_state.app_label, 'migrations')
+        self.assertEqual(author_state.name, 'Author')
+        self.assertEqual([x for x, y in author_state.fields], ['id', 'name', 'bio', 'age'])
+        self.assertEqual(author_state.fields[1][1].max_length, 255)
+        self.assertEqual(author_state.fields[2][1].null, False)
+        self.assertEqual(author_state.fields[3][1].null, True)
+        self.assertEqual(author_state.options, {'swappable': 'TEST_SWAPPABLE_MODEL'})
+        self.assertEqual(author_state.bases, (models.Model, ))
+        self.assertEqual(author_state.managers, [])
+
+    @override_settings(TEST_SWAPPABLE_MODEL='migrations.SomeFakeModel')
+    def test_custom_manager_swappable(self):
+        """
+        Tests making a ProjectState from unused models with custom managers
+        """
+        new_apps = Apps(['migrations'])
+
+        class Food(models.Model):
+
+            food_mgr = FoodManager('a', 'b')
+            food_qs = FoodQuerySet.as_manager()
+            food_no_mgr = NoMigrationFoodManager('x', 'y')
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+                swappable = 'TEST_SWAPPABLE_MODEL'
+
+        food_state = ModelState.from_model(Food)
+
+        # The default manager is used in migrations
+        self.assertEqual([name for name, mgr in food_state.managers], ['food_mgr'])
+        self.assertEqual(food_state.managers[0][1].args, ('a', 'b', 1, 2))
+
+
+class RelatedModelsTests(SimpleTestCase):
+
+    def setUp(self):
+        self.apps = Apps(['migrations.related_models_app'])
+
+    def create_model(self, name, foreign_keys=[], bases=(), abstract=False, proxy=False):
+        test_name = 'related_models_app'
+        assert not (abstract and proxy)
+        meta_contents = {
+            'abstract': abstract,
+            'app_label': test_name,
+            'apps': self.apps,
+            'proxy': proxy,
+        }
+        meta = type(str("Meta"), tuple(), meta_contents)
+        if not bases:
+            bases = (models.Model,)
+        body = {
+            'Meta': meta,
+            '__module__': "__fake__",
+        }
+        fname_base = fname = '%s_%%d' % name.lower()
+        for i, fk in enumerate(foreign_keys, 1):
+            fname = fname_base % i
+            body[fname] = fk
+        return type(name, bases, body)
+
+    def assertRelated(self, model, needle):
+        self.assertEqual(
+            get_related_models_recursive(model),
+            {(n._meta.app_label, n._meta.model_name) for n in needle},
+        )
+
+    def test_unrelated(self):
+        A = self.create_model("A")
+        B = self.create_model("B")
+        self.assertRelated(A, [])
+        self.assertRelated(B, [])
+
+    def test_direct_fk(self):
+        A = self.create_model("A", foreign_keys=[models.ForeignKey('B')])
+        B = self.create_model("B")
+        self.assertRelated(A, [B])
+        self.assertRelated(B, [A])
+
+    def test_direct_hidden_fk(self):
+        A = self.create_model("A", foreign_keys=[models.ForeignKey('B', related_name='+')])
+        B = self.create_model("B")
+        self.assertRelated(A, [B])
+        self.assertRelated(B, [A])
+
+    def test_nested_fk(self):
+        A = self.create_model("A", foreign_keys=[models.ForeignKey('B')])
+        B = self.create_model("B", foreign_keys=[models.ForeignKey('C')])
+        C = self.create_model("C")
+        self.assertRelated(A, [B, C])
+        self.assertRelated(B, [A, C])
+        self.assertRelated(C, [A, B])
+
+    def test_two_sided(self):
+        A = self.create_model("A", foreign_keys=[models.ForeignKey('B')])
+        B = self.create_model("B", foreign_keys=[models.ForeignKey('A')])
+        self.assertRelated(A, [B])
+        self.assertRelated(B, [A])
+
+    def test_circle(self):
+        A = self.create_model("A", foreign_keys=[models.ForeignKey('B')])
+        B = self.create_model("B", foreign_keys=[models.ForeignKey('C')])
+        C = self.create_model("C", foreign_keys=[models.ForeignKey('A')])
+        self.assertRelated(A, [B, C])
+        self.assertRelated(B, [A, C])
+        self.assertRelated(C, [A, B])
+
+    def test_base(self):
+        A = self.create_model("A")
+        B = self.create_model("B", bases=(A,))
+        self.assertRelated(A, [B])
+        self.assertRelated(B, [A])
+
+    def test_nested_base(self):
+        A = self.create_model("A")
+        B = self.create_model("B", bases=(A,))
+        C = self.create_model("C", bases=(B,))
+        self.assertRelated(A, [B, C])
+        self.assertRelated(B, [A, C])
+        self.assertRelated(C, [A, B])
+
+    def test_multiple_bases(self):
+        A = self.create_model("A")
+        B = self.create_model("B")
+        C = self.create_model("C", bases=(A, B,))
+        self.assertRelated(A, [B, C])
+        self.assertRelated(B, [A, C])
+        self.assertRelated(C, [A, B])
+
+    def test_multiple_nested_bases(self):
+        A = self.create_model("A")
+        B = self.create_model("B")
+        C = self.create_model("C", bases=(A, B,))
+        D = self.create_model("D")
+        E = self.create_model("E", bases=(D,))
+        F = self.create_model("F", bases=(C, E,))
+        Y = self.create_model("Y")
+        Z = self.create_model("Z", bases=(Y,))
+        self.assertRelated(A, [B, C, D, E, F])
+        self.assertRelated(B, [A, C, D, E, F])
+        self.assertRelated(C, [A, B, D, E, F])
+        self.assertRelated(D, [A, B, C, E, F])
+        self.assertRelated(E, [A, B, C, D, F])
+        self.assertRelated(F, [A, B, C, D, E])
+        self.assertRelated(Y, [Z])
+        self.assertRelated(Z, [Y])
+
+    def test_base_to_base_fk(self):
+        A = self.create_model("A", foreign_keys=[models.ForeignKey('Y')])
+        B = self.create_model("B", bases=(A,))
+        Y = self.create_model("Y")
+        Z = self.create_model("Z", bases=(Y,))
+        self.assertRelated(A, [B, Y, Z])
+        self.assertRelated(B, [A, Y, Z])
+        self.assertRelated(Y, [A, B, Z])
+        self.assertRelated(Z, [A, B, Y])
+
+    def test_base_to_subclass_fk(self):
+        A = self.create_model("A", foreign_keys=[models.ForeignKey('Z')])
+        B = self.create_model("B", bases=(A,))
+        Y = self.create_model("Y")
+        Z = self.create_model("Z", bases=(Y,))
+        self.assertRelated(A, [B, Y, Z])
+        self.assertRelated(B, [A, Y, Z])
+        self.assertRelated(Y, [A, B, Z])
+        self.assertRelated(Z, [A, B, Y])
+
+    def test_direct_m2m(self):
+        A = self.create_model("A", foreign_keys=[models.ManyToManyField('B')])
+        B = self.create_model("B")
+        self.assertRelated(A, [A.a_1.rel.through, B])
+        self.assertRelated(B, [A, A.a_1.rel.through])
+
+    def test_direct_m2m_self(self):
+        A = self.create_model("A", foreign_keys=[models.ManyToManyField('A')])
+        self.assertRelated(A, [A.a_1.rel.through])
+
+    def test_intermediate_m2m_self(self):
+        A = self.create_model("A", foreign_keys=[models.ManyToManyField('A', through='T')])
+        T = self.create_model("T", foreign_keys=[models.ForeignKey('A'), models.ForeignKey('A')])
+        self.assertRelated(A, [T])
+        self.assertRelated(T, [A])
+
+    def test_intermediate_m2m(self):
+        A = self.create_model("A", foreign_keys=[models.ManyToManyField('B', through='T')])
+        B = self.create_model("B")
+        T = self.create_model("T", foreign_keys=[models.ForeignKey('A'), models.ForeignKey('B')])
+        self.assertRelated(A, [B, T])
+        self.assertRelated(B, [A, T])
+        self.assertRelated(T, [A, B])
+
+    def test_intermediate_m2m_extern_fk(self):
+        A = self.create_model("A", foreign_keys=[models.ManyToManyField('B', through='T')])
+        B = self.create_model("B")
+        Z = self.create_model("Z")
+        T = self.create_model("T", foreign_keys=[
+            models.ForeignKey('A'), models.ForeignKey('B'), models.ForeignKey('Z'),
+        ])
+        self.assertRelated(A, [B, T, Z])
+        self.assertRelated(B, [A, T, Z])
+        self.assertRelated(T, [A, B, Z])
+        self.assertRelated(Z, [A, B, T])
+
+    def test_intermediate_m2m_base(self):
+        A = self.create_model("A", foreign_keys=[models.ManyToManyField('B', through='T')])
+        B = self.create_model("B")
+        S = self.create_model("S")
+        T = self.create_model("T", foreign_keys=[models.ForeignKey('A'), models.ForeignKey('B')], bases=(S,))
+        self.assertRelated(A, [B, S, T])
+        self.assertRelated(B, [A, S, T])
+        self.assertRelated(S, [A, B, T])
+        self.assertRelated(T, [A, B, S])
+
+    def test_abstract_base(self):
+        A = self.create_model("A", abstract=True)
+        B = self.create_model("B", bases=(A,))
+        self.assertRelated(A, [B])
+        self.assertRelated(B, [])
+
+    def test_nested_abstract_base(self):
+        A = self.create_model("A", abstract=True)
+        B = self.create_model("B", bases=(A,), abstract=True)
+        C = self.create_model("C", bases=(B,))
+        self.assertRelated(A, [B, C])
+        self.assertRelated(B, [C])
+        self.assertRelated(C, [])
+
+    def test_proxy_base(self):
+        A = self.create_model("A")
+        B = self.create_model("B", bases=(A,), proxy=True)
+        self.assertRelated(A, [B])
+        self.assertRelated(B, [])
+
+    def test_nested_proxy_base(self):
+        A = self.create_model("A")
+        B = self.create_model("B", bases=(A,), proxy=True)
+        C = self.create_model("C", bases=(B,), proxy=True)
+        self.assertRelated(A, [B, C])
+        self.assertRelated(B, [C])
+        self.assertRelated(C, [])
+
+    def test_multiple_mixed_bases(self):
+        A = self.create_model("A", abstract=True)
+        M = self.create_model("M")
+        P = self.create_model("P")
+        Q = self.create_model("Q", bases=(P,), proxy=True)
+        Z = self.create_model("Z", bases=(A, M, Q))
+        # M has a pointer O2O field p_ptr to P
+        self.assertRelated(A, [M, P, Q, Z])
+        self.assertRelated(M, [P, Q, Z])
+        self.assertRelated(P, [M, Q, Z])
+        self.assertRelated(Q, [M, P, Z])
+        self.assertRelated(Z, [M, P, Q])

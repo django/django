@@ -226,19 +226,19 @@ operations to ``cache_replica``, and all write operations to
 
         def db_for_read(self, model, **hints):
             "All cache read operations go to the replica"
-            if model._meta.app_label in ('django_cache',):
+            if model._meta.app_label == 'django_cache':
                 return 'cache_replica'
             return None
 
         def db_for_write(self, model, **hints):
             "All cache write operations go to primary"
-            if model._meta.app_label in ('django_cache',):
+            if model._meta.app_label == 'django_cache':
                 return 'cache_primary'
             return None
 
-        def allow_migrate(self, db, model):
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
             "Only install the cache model on primary"
-            if model._meta.app_label in ('django_cache',):
+            if app_label == 'django_cache':
                 return db == 'cache_primary'
             return None
 
@@ -777,6 +777,25 @@ update the cache if the key specified is already present::
 If you need to know whether ``add()`` stored a value in the cache, you can
 check the return value. It will return ``True`` if the value was stored,
 ``False`` otherwise.
+
+If you want to get a key's value or set a value if the key isn't in the cache,
+there is the ``get_or_set()`` method. It takes the same parameters as ``get()``
+but the default is set as the new cache value for that key, rather than simply
+returned::
+
+    >>> cache.get('my_new_key')  # returns None
+    >>> cache.get_or_set('my_new_key', 'my new value', 100)
+    'my new value'
+
+You can also pass any callable as a *default* value::
+
+    >>> import datetime
+    >>> cache.get_or_set('some-timestamp-key', datetime.datetime.now)
+    datetime.datetime(2014, 12, 11, 0, 15, 49, 457920)
+
+.. versionchanged:: 1.9
+
+    The ``get_or_set()`` method was added.
 
 There's also a ``get_many()`` interface that only hits the cache once.
 ``get_many()`` returns a dictionary with all the keys you asked for that

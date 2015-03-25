@@ -179,6 +179,8 @@ class VerboseNameField(models.Model):
     field19 = models.TextField("verbose field19")
     field20 = models.TimeField("verbose field20")
     field21 = models.URLField("verbose field21")
+    field22 = models.UUIDField("verbose field22")
+    field23 = models.DurationField("verbose field23")
 
 
 class GenericIPAddress(models.Model):
@@ -234,7 +236,7 @@ if Image:
         attr_class = TestImageFieldFile
 
     # Set up a temp directory for file storage.
-    temp_storage_dir = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
+    temp_storage_dir = tempfile.mkdtemp()
     temp_storage = FileSystemStorage(temp_storage_dir)
     temp_upload_to_dir = os.path.join(temp_storage.location, 'tests')
 
@@ -367,6 +369,10 @@ class NullableUUIDModel(models.Model):
 
 class PrimaryKeyUUIDModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+
+class RelatedToUUIDModel(models.Model):
+    uuid_fk = models.ForeignKey('PrimaryKeyUUIDModel')
 
 
 ###############################################################################

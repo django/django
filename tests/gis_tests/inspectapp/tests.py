@@ -27,9 +27,11 @@ class InspectDbTests(TestCase):
         Test the geo-enabled inspectdb command.
         """
         out = StringIO()
-        call_command('inspectdb',
-                 table_name_filter=lambda tn: tn.startswith('inspectapp_'),
-                 stdout=out)
+        call_command(
+            'inspectdb',
+            table_name_filter=lambda tn: tn == 'inspectapp_allogrfields',
+            stdout=out
+        )
         output = out.getvalue()
         if connection.features.supports_geometry_field_introspection:
             self.assertIn('geom = models.PolygonField()', output)
@@ -37,6 +39,25 @@ class InspectDbTests(TestCase):
         else:
             self.assertIn('geom = models.GeometryField(', output)
             self.assertIn('point = models.GeometryField(', output)
+        self.assertIn('objects = models.GeoManager()', output)
+
+    @skipUnlessDBFeature("supports_3d_storage")
+    def test_3d_columns(self):
+        out = StringIO()
+        call_command(
+            'inspectdb',
+            table_name_filter=lambda tn: tn == 'inspectapp_fields3d',
+            stdout=out
+        )
+        output = out.getvalue()
+        if connection.features.supports_geometry_field_introspection:
+            self.assertIn('point = models.PointField(dim=3)', output)
+            self.assertIn('line = models.LineStringField(dim=3)', output)
+            self.assertIn('poly = models.PolygonField(dim=3)', output)
+        else:
+            self.assertIn('point = models.GeometryField(', output)
+            self.assertIn('line = models.GeometryField(', output)
+            self.assertIn('poly = models.GeometryField(', output)
         self.assertIn('objects = models.GeoManager()', output)
 
 

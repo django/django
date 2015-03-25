@@ -27,7 +27,7 @@ Creating an admin user
 First we'll need to create a user who can login to the admin site. Run the
 following command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py createsuperuser
 
@@ -60,7 +60,7 @@ server and explore it.
 
 Recall from Tutorial 1 that you start the development server like so:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py runserver
 
@@ -113,7 +113,8 @@ file, and edit it to look like this:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Question
+
+    from .models import Question
 
     admin.site.register(Question)
 
@@ -193,7 +194,8 @@ the ``admin.site.register(Question)`` line with:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Question
+
+    from .models import Question
 
 
     class QuestionAdmin(admin.ModelAdmin):
@@ -221,7 +223,8 @@ up into fieldsets:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Question
+
+    from .models import Question
 
 
     class QuestionAdmin(admin.ModelAdmin):
@@ -248,7 +251,8 @@ aren't commonly used:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Question
+
+    from .models import Question
 
 
     class QuestionAdmin(admin.ModelAdmin):
@@ -277,7 +281,8 @@ with the admin just as we did with ``Question``. That's easy:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Choice, Question
+
+    from .models import Choice, Question
     # ...
     admin.site.register(Choice)
 
@@ -310,7 +315,8 @@ registration code to read:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Choice, Question
+
+    from .models import Choice, Question
 
 
     class ChoiceInline(admin.StackedInline):
@@ -522,13 +528,9 @@ template directory in the source code of Django itself
     If you have difficulty finding where the Django source files are located
     on your system, run the following command:
 
-    .. code-block:: bash
+    .. code-block:: console
 
-        $ python -c "
-        import sys
-        sys.path = sys.path[1:]
-        import django
-        print(django.__path__)"
+        $ python -c "import django; print(django.__path__)"
 
 Then, just edit the file and replace
 ``{{ site_header|default:_('Django administration') }}`` (including the curly

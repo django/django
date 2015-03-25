@@ -187,7 +187,7 @@ different contexts.
 
       .. deprecated:: 1.8
 
-          The ``curent_app`` argument is deprecated. If you need it, you must
+          The ``current_app`` argument is deprecated. If you need it, you must
           now use a :class:`RequestContext` instead of a :class:`Context`.
 
     For details, see :ref:`playing-with-context` below.
@@ -414,6 +414,18 @@ dictionary syntax::
     >>> c['newvariable'] = 'hello'
     >>> c['newvariable']
     'hello'
+
+.. method:: Context.get(key, otherwise=None)
+
+    Returns the value for ``key`` if ``key`` is in the context, else returns
+    ``otherwise``.
+
+.. method:: Context.setdefault(key, default=None)
+
+    .. versionadded:: 1.9
+
+    If ``key`` is in the context, returns its value. Otherwise inserts ``key``
+    with a value of ``default`` and returns ``default``.
 
 .. method:: Context.pop()
 .. method:: Context.push()
@@ -936,7 +948,7 @@ Template origin
 When an :class:`~django.template.Engine` is initialized with ``debug=True``,
 its templates have an ``origin`` attribute depending on the source they are
 loaded from. For engines initialized by Django, ``debug`` defaults to the
-value of :setting:`TEMPLATE_DEBUG`.
+value of :setting:`DEBUG`.
 
 .. class:: loader.LoaderOrigin
 

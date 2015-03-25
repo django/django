@@ -1,9 +1,12 @@
 from __future__ import unicode_literals
 
+import datetime
+
 from django.apps import apps
 from django.contrib import admin
+from django.contrib.auth.models import User as AuthUser
 from django.contrib.contenttypes.models import ContentType
-from django.core import checks, management
+from django.core import checks, exceptions, management
 from django.core.urlresolvers import reverse
 from django.db import DEFAULT_DB_ALIAS, models
 from django.db.models import signals
@@ -328,8 +331,18 @@ class ProxyModelTests(TestCase):
         resp = StateProxy.objects.select_related().get(name='New South Wales')
         self.assertEqual(resp.name, 'New South Wales')
 
+    def test_filter_proxy_relation_reverse(self):
+        tu = TrackerUser.objects.create(
+            name='Contributor', status='contrib')
+        with self.assertRaises(exceptions.FieldError):
+            TrackerUser.objects.filter(issue=None),
+        self.assertQuerysetEqual(
+            ProxyTrackerUser.objects.filter(issue=None),
+            [tu], lambda x: x
+        )
+
     def test_proxy_bug(self):
-        contributor = TrackerUser.objects.create(name='Contributor',
+        contributor = ProxyTrackerUser.objects.create(name='Contributor',
             status='contrib')
         someone = BaseUser.objects.create(name='Someone')
         Bug.objects.create(summary='fix this', version='1.1beta',
@@ -384,7 +397,17 @@ class ProxyModelTests(TestCase):
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='proxy_models.urls',)
 class ProxyModelAdminTests(TestCase):
-    fixtures = ['myhorses']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = AuthUser.objects.create(
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
+            first_name='Super', last_name='User', email='super@example.com', is_staff=True, is_active=True,
+            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
+        cls.tu1 = ProxyTrackerUser.objects.create(name='Django Pony', status='emperor')
+        cls.i1 = Issue.objects.create(summary="Pony's Issue", assignee=cls.tu1)
 
     def test_cascade_delete_proxy_model_admin_warning(self):
         """

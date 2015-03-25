@@ -6,20 +6,20 @@ GDAL API
    :synopsis: GeoDjango's high-level interface to the GDAL library.
 
 `GDAL`__ stands for **Geospatial Data Abstraction Library**,
-and is a veritable "swiss army knife" of GIS data functionality.  A subset
+and is a veritable "Swiss army knife" of GIS data functionality.  A subset
 of GDAL is the `OGR`__ Simple Features Library, which specializes
 in reading and writing vector geographic data in a variety of standard
 formats.
 
 GeoDjango provides a high-level Python interface for some of the
 capabilities of OGR, including the reading and coordinate transformation
-of vector spatial data.
+of vector spatial data and minimal support for GDAL's features with respect
+to raster (image) data.
 
 .. note::
 
      Although the module is named ``gdal``, GeoDjango only supports
-     some of the capabilities of OGR.  Thus, GDAL's features with respect to
-     raster (image) data are minimally supported (read-only) at this time.
+     some of the capabilities of OGR and GDAL's raster features at this time.
 
 __ http://www.gdal.org/
 __ http://www.gdal.org/ogr/
@@ -27,20 +27,19 @@ __ http://www.gdal.org/ogr/
 Overview
 ========
 
+.. _gdal_sample_data:
+
 Sample Data
 -----------
 
 The GDAL/OGR tools described here are designed to help you read in
 your geospatial data, in order for most of them to be useful you have
 to have some data to work with.  If you're starting out and don't yet
-have any data of your own to use, GeoDjango comes with a number of
-simple data sets that you can use for testing.  This snippet will
-determine where these sample files are installed on your computer::
+have any data of your own to use, GeoDjango tests contain a number of
+simple data sets that you can use for testing. You can download them here::
 
-    >>> import os
-    >>> import django.contrib.gis
-    >>> GIS_PATH = os.path.dirname(django.contrib.gis.__file__)
-    >>> CITIES_PATH = os.path.join(GIS_PATH, 'tests/data/cities/cities.shp')
+    $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/cities/cities.{shp,prj,shx,dbf}
+    $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/rasters/raster.tif
 
 Vector Data Source Objects
 ==========================
@@ -59,10 +58,10 @@ points, polygons, etc.), as well as the names and types of any
 additional fields (:class:`Field`) of data that may be associated with
 each feature in that layer.
 
-.. class:: DataSource(ds_input)
+.. class:: DataSource(ds_input, [encoding='utf-8'])
 
-   The constructor for ``DataSource`` just a single parameter: the path of
-   the file you want to read.  However, OGR
+   The constructor for ``DataSource`` only requires one parameter: the path of
+   the file you want to read. However, OGR
    also supports a variety of more complex data sources, including
    databases, that may be accessed by passing a special name string instead
    of a path.  For more information, see the `OGR Vector Formats`__
@@ -70,15 +69,20 @@ each feature in that layer.
    instance gives the OGR name of the underlying data source that it is
    using.
 
+   The optional ``encoding`` parameter allows you to
+   specify a non-standard encoding of the strings in the source. This is
+   typically useful when you obtain ``DjangoUnicodeDecodeError`` exceptions
+   while reading field values.
+
    Once you've created your ``DataSource``, you can find out how many
    layers of data it contains by accessing the :attr:`layer_count` property,
    or (equivalently) by using the ``len()`` function.  For information on
    accessing the layers of data themselves, see the next section::
 
        >>> from django.contrib.gis.gdal import DataSource
-       >>> ds = DataSource(CITIES_PATH)
-       >>> ds.name                         # The exact filename may be different on your computer
-       '/usr/local/lib/python3.4/site-packages/django/contrib/gis/tests/data/cities/cities.shp'
+       >>> ds = DataSource('/path/to/your/cities.shp')
+       >>> ds.name
+       '/path/to/your/cities.shp'
        >>> ds.layer_count                  # This file only contains one layer
        1
 
@@ -1100,35 +1104,107 @@ one or more layers of data named bands.  Each band, represented by a
 image is represented as three bands: one for red, one for green, and one for
 blue.
 
-.. class:: GDALRaster(ds_input)
+.. note::
 
-    The constructor for ``GDALRaster`` accepts a single parameter: the path of
-    the file you want to read.
+    For raster data there is no difference between a raster instance and its
+    data source. Unlike for the Geometry objects, :class:`GDALRaster` objects are
+    always a data source. Temporary rasters can be instantiated in memory
+    using the corresponding driver, but they will be of the same class as file-based
+    raster sources.
+
+.. class:: GDALRaster(ds_input, write=False)
+
+    The constructor for ``GDALRaster`` accepts two parameters. The first parameter
+    defines the raster source, it is either a path to a file or spatial data with
+    values defining the properties of a new raster (such as size and name). If the
+    input is a file path, the second parameter specifies if the raster should
+    be opened with write access. If the input is raw data, the parameters ``width``,
+    ``heigth``, and ``srid`` are required. The following example shows how rasters
+    can be created from different input sources (using the sample data from the
+    GeoDjango tests, see also the :ref:`gdal_sample_data` section)::
+
+        >>> from django.contrib.gis.gdal.raster.source import GDALRaster
+        >>> rst = GDALRaster('/path/to/your/raster.tif', write=False)
+        >>> rst.name
+        '/path/to/your/raster.tif'
+        >>> rst.width, rst.height            # This file has 163 x 174 pixels
+        (163, 174)
+        >>> rst = GDALRaster({'srid': 4326, 'width': 1, 'height': 2, 'datatype': 1
+        ...                   'bands': [{'data': [0, 1]}]}) # Creates in-memory raster
+        >>> rst.srs.srid
+        4326
+        >>> rst.width, rst.height
+        (1, 2)
+        >>> rst.bands[0].data()
+        array([[0, 1]], dtype=int8)
+
+    .. versionchanged:: 1.9
+
+        ``GDALRaster`` objects can now be instantiated directly from raw data.
+        Setters have been added for the following properties: ``srs``,
+        ``geotransform``, ``origin``, ``scale``, and ``skew``.
 
     .. attribute:: name
 
-        The name of the source which is equivalent to the input file path.
+        The name of the source which is equivalent to the input file path or the name
+        provided upon instantiation.
+
+            >>> GDALRaster({'width': 10, 'height': 10, 'name': 'myraster', 'srid': 4326}).name
+            'myraster'
 
     .. attribute:: driver
 
-        The name of the GDAL driver used to handle the input file. For example,
-        ``GTiff`` for a ``GeoTiff`` file. See also the `GDAL Raster Formats`__
-        list.
+        The name of the GDAL driver used to handle the input file. For ``GDALRaster``\s created
+        from a file, the driver type is detected automatically. The creation of rasters from
+        scratch is a in-memory raster by default (``'MEM'``), but can be altered as
+        needed. For instance, use ``GTiff`` for a ``GeoTiff`` file. For a list of file types,
+        see also the `GDAL Raster Formats`__ list.
 
         __ http://www.gdal.org/formats_list.html
 
+        An in-memory raster is created through the following example:
+
+            >>> GDALRaster({'width': 10, 'height': 10, 'srid': 4326}).driver.name
+            'MEM'
+
+        A file based GeoTiff raster is created through the following example:
+
+            >>> import tempfile
+            >>> rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
+            >>> rst = GDALRaster({'driver': 'GTiff', 'name': rstfile.name, 'srid': 4326,
+            ...                   'width': 255, 'height': 255, 'nr_of_bands': 1})
+            >>> rst.name
+            '/tmp/tmp7x9H4J.tif'           # The exact filename will be different on your computer
+            >>> rst.driver.name
+            'GTiff'
+
     .. attribute:: width
 
-       The width of the source in pixels (X-axis).
+        The width of the source in pixels (X-axis).
+
+            >>> GDALRaster({'width': 10, 'height': 20, 'srid': 4326}).width
+            10
 
     .. attribute:: height
 
         The height of the source in pixels (Y-axis).
 
+            >>> GDALRaster({'width': 10, 'height': 20, 'srid': 4326}).height
+            20
+
     .. attribute:: srs
 
-        The spatial reference system of the source, as a
-        :class:`SpatialReference` instance.
+        The spatial reference system of the raster, as a
+        :class:`SpatialReference` instance. The SRS can be changed by
+        setting it to an other :class:`SpatialReference` or providing any input
+        that is accepted by the :class:`SpatialReference` constructor.
+
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
+            >>> rst.srs.srid
+            4326
+            >>> rst.srs = 3086
+            >>> rst.srs.srid
+            3086
 
     .. attribute:: geotransform
 
@@ -1143,11 +1219,24 @@ blue.
         (indices 0 and 3), :attr:`scale` (indices 1 and 5) and :attr:`skew`
         (indices 2 and 4) properties.
 
+        The default is ``[0.0, 1.0, 0.0, 0.0, 0.0, -1.0]``.
+
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
+            >>> rst.geotransform
+            [0.0, 1.0, 0.0, 0.0, 0.0, -1.0]
+
     .. attribute:: origin
 
         Coordinates of the top left origin of the raster in the spatial
         reference system of the source, as a point object with ``x`` and ``y``
         members.
+
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
+            >>> rst.origin
+            [0.0, 0.0]
+            >>> rst.origin.x = 1
+            >>> rst.origin
+            [1.0, 0.0]
 
     .. attribute:: scale
 
@@ -1155,11 +1244,25 @@ blue.
         point object with ``x`` and ``y``  members. See :attr:`geotransform`
         for more information.
 
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
+            >>> rst.scale
+            [1.0, -1.0]
+            >>> rst.scale.x = 2
+            >>> rst.scale
+            [2.0, -1.0]
+
     .. attribute:: skew
 
         Skew coefficients used to georeference the raster, as a point object
         with ``x`` and ``y``  members. In case of north up images, these
         coefficients are both ``0``.
+
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
+            >>> rst.skew
+            [0.0, 0.0]
+            >>> rst.skew.x = 3
+            >>> rst.skew
+            [3.0, 0.0]
 
     .. attribute:: extent
 
@@ -1167,9 +1270,23 @@ blue.
         ``(xmin, ymin, xmax, ymax)`` in the spatial reference system of the
         source.
 
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
+            >>> rst.extent
+            (0.0, -20.0, 10.0, 0.0)
+            >>> rst.origin.x = 100
+            >>> rst.extent
+            (100.0, -20.0, 110.0, 0.0)
+
     .. attribute:: bands
 
         List of all bands of the source, as :class:`GDALBand` instances.
+
+            >>> rst = GDALRaster({"width": 1, "height": 2, 'srid': 4326,
+            ...                   "bands": [{"data": [0, 1]}, {"data": [2, 3]}]})
+            >>> len(rst.bands)
+            2
+            >>> rst.bands[1].data()
+            array([[ 2.,  3.]], dtype=float32)
 
 ``GDALBand``
 ------------
@@ -1178,7 +1295,7 @@ blue.
 
     ``GDALBand`` instances are not created explicitly, but rather obtained
     from a :class:`GDALRaster` object, through its :attr:`~GDALRaster.bands`
-    attribute.
+    attribute. The GDALBands contain the actual pixel values of the raster.
 
     .. attribute:: description
 
@@ -1191,6 +1308,12 @@ blue.
     .. attribute:: height
 
         The height of the band in pixels (Y-axis).
+
+    .. attribute:: pixel_count
+
+        .. versionadded:: 1.9
+
+        The total number of pixels in this band. Is equal to ``width * height``.
 
     .. attribute:: min
 
@@ -1206,6 +1329,10 @@ blue.
         to mark pixels that are not valid data. Such pixels should generally not
         be displayed, nor contribute to analysis operations.
 
+        .. versionchanged:: 1.9
+
+            This property can now be set as well.
+
     .. method:: datatype([as_string=False])
 
         The data type contained in the band, as an integer constant between 0
@@ -1214,6 +1341,50 @@ blue.
         ``GDT_Unknown``, ``GDT_Byte``, ``GDT_UInt16``, ``GDT_Int16``,
         ``GDT_UInt32``, ``GDT_Int32``, ``GDT_Float32``, ``GDT_Float64``,
         ``GDT_CInt16``, ``GDT_CInt32``, ``GDT_CFloat32``, and ``GDT_CFloat64``.
+
+    .. method:: data(data=None, offset=None, size=None)
+
+        .. versionadded:: 1.9
+
+        The accessor to the pixel values of the ``GDALBand``. Returns the complete
+        data array if no parameters are provided. A subset of the pixel array can
+        be requested by specifying an offset and block size as tuples.
+
+        If NumPy is available, the data is returned as NumPy array. For performance
+        reasons, it is highly recommended to use NumPy.
+
+        Data is written to the ``GDALBand`` if the ``data`` parameter is provided.
+        The input can be of one of the following types - packed string, buffer, list,
+        array, and NumPy array. The number of items in the input must correspond to the
+        total number of pixels in the band, or to the number of pixels for a specific
+        block of pixel values if the ``offset`` and ``size`` parameters are provided.
+
+        For example:
+
+            >>> rst = GDALRaster({'width': 4, 'height': 4, 'srid': 4326, 'datatype': 1, 'nr_of_bands': 1})
+            >>> bnd = rst.bands[0]
+            >>> bnd.data(range(16))
+            >>> bnd.data()
+            array([[ 0,  1,  2,  3],
+                   [ 4,  5,  6,  7],
+                   [ 8,  9, 10, 11],
+                   [12, 13, 14, 15]], dtype=int8)
+            >>> bnd.data(offset=(1, 1), size=(2, 2))
+            array([[ 5,  6],
+                   [ 9, 10]], dtype=int8)
+            >>> bnd.data(data=[-1, -2, -3, -4], offset=(1, 1), size=(2, 2))
+            >>> bnd.data()
+            array([[ 0,  1,  2,  3],
+                   [ 4, -1, -2,  7],
+                   [ 8, -3, -4, 11],
+                   [12, 13, 14, 15]], dtype=int8)
+            >>> bnd.data(data='\x9d\xa8\xb3\xbe', offset=(1, 1), size=(2, 2))
+            >>> bnd.data()
+            array([[  0,   1,   2,   3],
+                   [  4, -99, -88,   7],
+                   [  8, -77, -66,  11],
+                   [ 12,  13,  14,  15]], dtype=int8)
+
 
 Settings
 ========

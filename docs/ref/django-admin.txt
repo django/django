@@ -38,7 +38,7 @@ be consistent, but any example can use ``manage.py`` just as well.
 Usage
 =====
 
-.. code-block:: bash
+.. code-block:: console
 
     $ django-admin <command> [options]
     $ manage.py <command> [options]
@@ -649,6 +649,11 @@ Providing one or more app names as arguments will limit the migrations created
 to the app(s) specified and any dependencies needed (the table at the other end
 of a ``ForeignKey``, for example).
 
+.. versionchanged:: 1.9
+
+The ``--noinput`` option may be provided to suppress all user prompts. If a suppressed
+prompt cannot be resolved automatically, the command will exit with error code 3.
+
 .. django-admin-option:: --empty
 
 The ``--empty`` option will cause ``makemigrations`` to output an empty
@@ -666,9 +671,7 @@ written.
 
 .. django-admin-option:: --merge
 
-The ``--merge`` option enables fixing of migration conflicts. The
-:djadminopt:`--noinput` option may be provided to suppress user prompts during
-a merge.
+The ``--merge`` option enables fixing of migration conflicts.
 
 .. django-admin-option:: --name, -n
 
@@ -871,6 +874,18 @@ By default, the development server doesn't serve any static files for your site
 (such as CSS files, images, things under :setting:`MEDIA_URL` and so forth). If
 you want to configure Django to serve static media, read
 :doc:`/howto/static-files/index`.
+
+sendtestemail
+-------------
+
+.. django-admin:: sendtestemail
+
+.. versionadded:: 1.9
+
+Sends a test email (to confirm email sending through Django is working) to the
+recipient(s) specified. For example::
+
+    django-admin sendtestemail foo@example.com bar@example.com
 
 shell
 -----

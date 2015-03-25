@@ -33,7 +33,7 @@ class ArrayField(Field):
 
     def check(self, **kwargs):
         errors = super(ArrayField, self).check(**kwargs)
-        if self.base_field.rel:
+        if self.base_field.remote_field:
             errors.append(
                 checks.Error(
                     'Base field for array cannot be a related field.',
@@ -137,6 +137,18 @@ class ArrayField(Field):
                 raise exceptions.ValidationError(
                     self.error_messages['nested_array_mismatch'],
                     code='nested_array_mismatch',
+                )
+
+    def run_validators(self, value):
+        super(ArrayField, self).run_validators(value)
+        for i, part in enumerate(value):
+            try:
+                self.base_field.run_validators(part)
+            except exceptions.ValidationError as e:
+                raise exceptions.ValidationError(
+                    string_concat(self.error_messages['item_invalid'], ' '.join(e.messages)),
+                    code='item_invalid',
+                    params={'nth': i},
                 )
 
     def formfield(self, **kwargs):

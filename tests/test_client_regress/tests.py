@@ -4,6 +4,7 @@ Regression tests for the Test Client, especially the customized assertions.
 """
 from __future__ import unicode_literals
 
+import datetime
 import itertools
 import os
 
@@ -17,11 +18,37 @@ from django.test import Client, TestCase, ignore_warnings, override_settings
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 from django.utils.translation import ugettext_lazy
 
 from .models import CustomUser
 from .views import CustomTestException
+
+
+class TestDataMixin(object):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
+            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u2 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='inactive',
+            first_name='Inactive', last_name='User', email='testclient@example.com', is_staff=False, is_active=False,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
+        cls.u3 = User.objects.create(
+            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
+            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='staff',
+            first_name='Staff', last_name='Member', email='testclient@example.com', is_staff=True, is_active=True,
+            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
+        )
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
@@ -190,8 +217,7 @@ class AssertContainsTests(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
-class AssertTemplateUsedTests(TestCase):
-    fixtures = ['testdata.json']
+class AssertTemplateUsedTests(TestDataMixin, TestCase):
 
     def test_no_context(self):
         "Template usage assertions work then templates aren't in use"
@@ -318,12 +344,12 @@ class AssertRedirectsTests(TestCase):
         try:
             self.assertRedirects(response, '/get_view/')
         except AssertionError as e:
-            self.assertIn("Response redirected to 'http://testserver/get_view/?var=value', expected 'http://testserver/get_view/'", str(e))
+            self.assertIn("Response redirected to '/get_view/?var=value', expected '/get_view/'", str(e))
 
         try:
             self.assertRedirects(response, '/get_view/', msg_prefix='abc')
         except AssertionError as e:
-            self.assertIn("abc: Response redirected to 'http://testserver/get_view/?var=value', expected 'http://testserver/get_view/'", str(e))
+            self.assertIn("abc: Response redirected to '/get_view/?var=value', expected '/get_view/'", str(e))
 
     def test_incorrect_target(self):
         "An assertion is raised if the response redirects to another target"
@@ -356,7 +382,7 @@ class AssertRedirectsTests(TestCase):
             status_code=302, target_status_code=200)
 
         self.assertEqual(len(response.redirect_chain), 1)
-        self.assertEqual(response.redirect_chain[0], ('http://testserver/no_template_view/', 302))
+        self.assertEqual(response.redirect_chain[0], ('/no_template_view/', 302))
 
     def test_multiple_redirect_chain(self):
         "You can follow a redirect chain of multiple redirects"
@@ -365,9 +391,9 @@ class AssertRedirectsTests(TestCase):
             status_code=302, target_status_code=200)
 
         self.assertEqual(len(response.redirect_chain), 3)
-        self.assertEqual(response.redirect_chain[0], ('http://testserver/redirects/further/', 302))
-        self.assertEqual(response.redirect_chain[1], ('http://testserver/redirects/further/more/', 302))
-        self.assertEqual(response.redirect_chain[2], ('http://testserver/no_template_view/', 302))
+        self.assertEqual(response.redirect_chain[0], ('/redirects/further/', 302))
+        self.assertEqual(response.redirect_chain[1], ('/redirects/further/more/', 302))
+        self.assertEqual(response.redirect_chain[2], ('/no_template_view/', 302))
 
     def test_redirect_chain_to_non_existent(self):
         "You can follow a chain to a non-existent view"
@@ -483,20 +509,23 @@ class AssertRedirectsTests(TestCase):
     def test_redirect_scheme(self):
         "An assertion is raised if the response doesn't have the scheme specified in expected_url"
 
-        # Assure that original request scheme is preserved if no scheme specified in the redirect location
-        response = self.client.get('/redirect_view/', secure=True)
-        self.assertRedirects(response, 'https://testserver/get_view/')
-
         # For all possible True/False combinations of follow and secure
         for follow, secure in itertools.product([True, False], repeat=2):
             # always redirects to https
             response = self.client.get('/https_redirect_view/', follow=follow, secure=secure)
-            # no scheme to compare too, always succeeds
-            self.assertRedirects(response, '/secure_view/', status_code=302)
             # the goal scheme is https
             self.assertRedirects(response, 'https://testserver/secure_view/', status_code=302)
             with self.assertRaises(AssertionError):
                 self.assertRedirects(response, 'http://testserver/secure_view/', status_code=302)
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_full_path_in_expected_urls(self):
+        """
+        Test that specifying a full URL as assertRedirects expected_url still
+        work as backwards compatible behavior until Django 2.1.
+        """
+        response = self.client.get('/redirect_view/')
+        self.assertRedirects(response, 'http://testserver/get_view/')
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
@@ -812,8 +841,7 @@ class AssertFormsetErrorTests(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
-class LoginTests(TestCase):
-    fixtures = ['testdata']
+class LoginTests(TestDataMixin, TestCase):
 
     def test_login_different_client(self):
         "Check that using a different test client doesn't violate authentication"
@@ -829,7 +857,7 @@ class LoginTests(TestCase):
         # At this points, the self.client isn't logged in.
         # Check that assertRedirects uses the original client, not the
         # default client.
-        self.assertRedirects(response, "http://testserver/get_view/")
+        self.assertRedirects(response, "/get_view/")
 
 
 @override_settings(
@@ -837,8 +865,7 @@ class LoginTests(TestCase):
     SESSION_ENGINE='test_client_regress.session',
     ROOT_URLCONF='test_client_regress.urls',
 )
-class SessionEngineTests(TestCase):
-    fixtures = ['testdata']
+class SessionEngineTests(TestDataMixin, TestCase):
 
     def test_login(self):
         "A session engine that modifies the session key can be used to log in"
@@ -881,8 +908,7 @@ class URLEscapingTests(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
-class ExceptionTests(TestCase):
-    fixtures = ['testdata.json']
+class ExceptionTests(TestDataMixin, TestCase):
 
     def test_exception_cleared(self):
         "#5836 - A stale user exception isn't re-raised by the test client."
@@ -950,8 +976,7 @@ class zzUrlconfSubstitutionTests(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
-class ContextTests(TestCase):
-    fixtures = ['testdata']
+class ContextTests(TestDataMixin, TestCase):
 
     def test_single_context(self):
         "Context variables can be retrieved from a single context"
@@ -1025,8 +1050,7 @@ class ContextTests(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='test_client_regress.urls',)
-class SessionTests(TestCase):
-    fixtures = ['testdata.json']
+class SessionTests(TestDataMixin, TestCase):
 
     def test_session(self):
         "The session isn't lost if a user logs in"

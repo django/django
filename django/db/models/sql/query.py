@@ -17,7 +17,8 @@ from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
-from django.db.models.query_utils import Q, PathInfo, refs_aggregate
+from django.db.models.fields.related_lookups import MultiColSource
+from django.db.models.query_utils import Q, PathInfo, refs_expression
 from django.db.models.sql.constants import (
     INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, QUERY_TERMS, SINGLE,
 )
@@ -351,7 +352,7 @@ class Query(object):
                 # is selected.
                 col_cnt += 1
                 col_alias = '__col%d' % col_cnt
-                self.annotation_select[col_alias] = expr
+                self.annotations[col_alias] = expr
                 self.append_annotation_mask([col_alias])
                 new_exprs.append(Ref(col_alias, expr))
             else:
@@ -390,10 +391,22 @@ class Query(object):
             from django.db.models.sql.subqueries import AggregateQuery
             outer_query = AggregateQuery(self.model)
             inner_query = self.clone()
-            if not has_limit and not self.distinct_fields:
-                inner_query.clear_ordering(True)
             inner_query.select_for_update = False
             inner_query.select_related = False
+            if not has_limit and not self.distinct_fields:
+                # Queries with distinct_fields need ordering and when a limit
+                # is applied we must take the slice from the ordered query.
+                # Otherwise no need for ordering.
+                inner_query.clear_ordering(True)
+            if not inner_query.distinct:
+                # If the inner query uses default select and it has some
+                # aggregate annotations, then we must make sure the inner
+                # query is grouped by the main model's primary key. However,
+                # clearing the select clause can alter results if distinct is
+                # used.
+                if inner_query.default_cols and has_existing_annotations:
+                    inner_query.group_by = [self.model._meta.pk.get_col(inner_query.get_initial_alias())]
+                inner_query.default_cols = False
 
             relabels = {t: 'subquery' for t in inner_query.tables}
             relabels[None] = 'subquery'
@@ -404,7 +417,14 @@ class Query(object):
                 if expression.is_summary:
                     expression, col_cnt = inner_query.rewrite_cols(expression, col_cnt)
                     outer_query.annotations[alias] = expression.relabeled_clone(relabels)
-                    del inner_query.annotation_select[alias]
+                    del inner_query.annotations[alias]
+                # Make sure the annotation_select wont use cached results.
+                inner_query.set_annotation_mask(inner_query.annotation_select_mask)
+            if inner_query.select == [] and not inner_query.default_cols and not inner_query.annotation_select_mask:
+                # In case of Model.objects[0:3].count(), there would be no
+                # field selected in the inner query, yet we must use a subquery.
+                # So, make sure at least one field is selected.
+                inner_query.select = [self.model._meta.pk.get_col(inner_query.get_initial_alias())]
             try:
                 outer_query.add_subquery(inner_query, using)
             except EmptyResultSet:
@@ -588,7 +608,7 @@ class Query(object):
                 if is_reverse_o2o(source):
                     cur_model = source.related_model
                 else:
-                    cur_model = source.rel.to
+                    cur_model = source.remote_field.model
                 opts = cur_model._meta
                 # Even if we're "just passing through" this model, we must add
                 # both the current model's pk and the related reference field
@@ -987,7 +1007,7 @@ class Query(object):
         """
         lookup_splitted = lookup.split(LOOKUP_SEP)
         if self._annotations:
-            aggregate, aggregate_lookups = refs_aggregate(lookup_splitted, self.annotations)
+            aggregate, aggregate_lookups = refs_expression(lookup_splitted, self.annotations)
             if aggregate:
                 return aggregate_lookups, (), aggregate
         _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
@@ -1018,7 +1038,7 @@ class Query(object):
         """
         Checks the type of object passed to query relations.
         """
-        if field.rel:
+        if field.is_relation:
             # QuerySets implement is_compatible_query_object_type() to
             # determine compatibility with the given field.
             if hasattr(value, 'is_compatible_query_object_type'):
@@ -1138,24 +1158,20 @@ class Query(object):
         if can_reuse is not None:
             can_reuse.update(join_list)
         used_joins = set(used_joins).union(set(join_list))
-
-        # Process the join list to see if we can remove any non-needed joins from
-        # the far end (fewer tables in a query is better).
         targets, alias, join_list = self.trim_joins(sources, join_list, path)
 
-        if hasattr(field, 'get_lookup_constraint'):
-            # For now foreign keys get special treatment. This should be
-            # refactored when composite fields lands.
-            condition = field.get_lookup_constraint(self.where_class, alias, targets, sources,
-                                                    lookups, value)
-            lookup_type = lookups[-1]
-        else:
-            assert(len(targets) == 1)
-            if hasattr(targets[0], 'as_sql'):
-                # handle Expressions as annotations
-                col = targets[0]
+        if field.is_relation:
+            # No support for transforms for relational fields
+            assert len(lookups) == 1
+            lookup_class = field.get_lookup(lookups[0])
+            if len(targets) == 1:
+                lhs = targets[0].get_col(alias, field)
             else:
-                col = targets[0].get_col(alias, field)
+                lhs = MultiColSource(alias, targets, sources, field)
+            condition = lookup_class(lhs, value)
+            lookup_type = lookup_class.lookup_name
+        else:
+            col = targets[0].get_col(alias, field)
             condition = self.build_lookup(lookups, col, value)
             lookup_type = condition.lookup_name
 
@@ -1265,14 +1281,6 @@ class Query(object):
                     )
                 model = field.model._meta.concrete_model
             except FieldDoesNotExist:
-                # is it an annotation?
-                if self._annotations and name in self._annotations:
-                    field, model = self._annotations[name], None
-                    if not field.contains_aggregate:
-                        # Local non-relational field.
-                        final_field = field
-                        targets = (field,)
-                        break
                 # We didn't find the current field, so move position back
                 # one step.
                 pos -= 1
@@ -1295,7 +1303,7 @@ class Query(object):
                         opts = int_model._meta
                     else:
                         final_field = opts.parents[int_model]
-                        targets = (final_field.rel.get_related_field(),)
+                        targets = (final_field.remote_field.get_related_field(),)
                         opts = int_model._meta
                         path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
                         cur_names_with_path[1].append(
@@ -1370,8 +1378,6 @@ class Query(object):
             reuse = can_reuse if join.m2m else None
             alias = self.join(connection, reuse=reuse)
             joins.append(alias)
-        if hasattr(final_field, 'field'):
-            final_field = final_field.field
         return final_field, targets, opts, joins, path
 
     def trim_joins(self, targets, joins, path):
@@ -1458,7 +1464,7 @@ class Query(object):
         # database from tripping over IN (...,NULL,...) selects and returning
         # nothing
         col = query.select[0]
-        select_field = col.field
+        select_field = col.target
         alias = col.alias
         if self.is_nullable(select_field):
             lookup_class = select_field.get_lookup('isnull')
@@ -1966,7 +1972,7 @@ def is_reverse_o2o(field):
     A little helper to check if the given field is reverse-o2o. The field is
     expected to be some sort of relation field or related object.
     """
-    return not hasattr(field, 'rel') and field.field.unique
+    return field.is_relation and field.one_to_one and not field.concrete
 
 
 class JoinPromoter(object):

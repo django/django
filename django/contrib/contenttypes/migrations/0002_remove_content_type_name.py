@@ -9,7 +9,7 @@ def add_legacy_name(apps, schema_editor):
     for ct in ContentType.objects.all():
         try:
             ct.name = apps.get_model(ct.app_label, ct.model)._meta.object_name
-        except:
+        except LookupError:
             ct.name = ct.model
         ct.save()
 
@@ -33,6 +33,7 @@ class Migration(migrations.Migration):
         migrations.RunPython(
             migrations.RunPython.noop,
             add_legacy_name,
+            hints={'model_name': 'contenttype'},
         ),
         migrations.RemoveField(
             model_name='contenttype',

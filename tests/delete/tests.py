@@ -153,7 +153,7 @@ class DeletionTests(TestCase):
         r = R.objects.create()
         m.m2m.add(r)
         r.delete()
-        through = M._meta.get_field('m2m').rel.through
+        through = M._meta.get_field('m2m').remote_field.through
         self.assertFalse(through.objects.exists())
 
         r = R.objects.create()
@@ -348,6 +348,13 @@ class DeletionTests(TestCase):
         self.assertNumQueries(expected_num_queries, s.delete)
         self.assertFalse(S.objects.exists())
         self.assertFalse(T.objects.exists())
+
+    def test_delete_with_keeping_parents(self):
+        child = RChild.objects.create()
+        parent_id = child.r_ptr_id
+        child.delete(keep_parents=True)
+        self.assertFalse(RChild.objects.filter(id=child.id).exists())
+        self.assertTrue(R.objects.filter(id=parent_id).exists())
 
 
 class FastDeleteTests(TestCase):

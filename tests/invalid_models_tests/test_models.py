@@ -566,6 +566,50 @@ class OtherModelTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_just_ordering_no_errors(self):
+        class Model(models.Model):
+            order = models.PositiveIntegerField()
+
+            class Meta:
+                ordering = ['order']
+
+        self.assertEqual(Model.check(), [])
+
+    def test_just_order_with_respect_to_no_errors(self):
+        class Question(models.Model):
+            pass
+
+        class Answer(models.Model):
+            question = models.ForeignKey(Question)
+
+            class Meta:
+                order_with_respect_to = 'question'
+
+        self.assertEqual(Answer.check(), [])
+
+    def test_ordering_with_order_with_respect_to(self):
+        class Question(models.Model):
+            pass
+
+        class Answer(models.Model):
+            question = models.ForeignKey(Question)
+            order = models.IntegerField()
+
+            class Meta:
+                order_with_respect_to = 'question'
+                ordering = ['order']
+
+        errors = Answer.check()
+        expected = [
+            Error(
+                "'ordering' and 'order_with_respect_to' cannot be used together.",
+                hint=None,
+                obj=Answer,
+                id='models.E021',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
     def test_non_valid(self):
         class RelationModel(models.Model):
             pass

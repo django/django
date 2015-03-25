@@ -43,6 +43,11 @@ Minor features
   the old URL still redirects to the new one for backwards compatibility, but
   it may be removed in a future version.
 
+* :meth:`ModelAdmin.get_list_select_related()
+  <django.contrib.admin.ModelAdmin.get_list_select_related>` was added to allow
+  changing the ``select_related()`` values used in the admin's changelist query
+  based on the request.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -54,7 +59,10 @@ Minor features
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The GDAL interface now supports instantiating file-based and in-memory
+  :ref:`GDALRaster objects <raster-data-source-objects>` from raw data.
+  Setters for raster properties such as projection or pixel values have
+  been added.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -94,7 +102,8 @@ Minor features
 Cache
 ^^^^^
 
-* ...
+* ``django.core.cache.backends.base.BaseCache`` now has a ``get_or_set()``
+  method.
 
 Email
 ^^^^^
@@ -118,6 +127,10 @@ Forms
   ``field_classes`` to customize the type of the fields. See
   :ref:`modelforms-overriding-default-fields` for details.
 
+* You can now specify the order in which form fields are rendered with the
+  :attr:`~django.forms.Form.field_order` attribute, the ``field_order``
+  constructor argument , or the :meth:`~django.forms.Form.order_fields` method.
+
 Generic Views
 ^^^^^^^^^^^^^
 
@@ -127,12 +140,17 @@ Generic Views
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The :func:`django.views.i18n.set_language` view now properly redirects to
+  :ref:`translated URLs <url-internationalization>`, when available.
+
+* The :func:`django.views.i18n.javascript_catalog` view now works correctly
+  if used multiple times with different configurations on the same page.
 
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The new :djadmin:`sendtestemail` command lets you send a test email to
+  easily confirm that email sending through Django is working.
 
 Models
 ^^^^^^
@@ -141,6 +159,19 @@ Models
   <django.db.models.fields.related.RelatedManager.set()>` method to the related
   managers created by ``ForeignKey``, ``GenericForeignKey``, and
   ``ManyToManyField``.
+
+* Added the ``keep_parents`` parameter to :meth:`Model.delete()
+  <django.db.models.Model.delete>` to allow deleting only a child's data in a
+  model that uses multi-table inheritance.
+
+* Added a system check to prevent defining both ``Meta.ordering`` and
+  ``order_with_respect_to`` on the same model.
+
+CSRF
+^^^^
+
+* The request header's name used for CSRF authentication can be customized
+  with :setting:`CSRF_HEADER_NAME`.
 
 Signals
 ^^^^^^^
@@ -154,15 +185,30 @@ Templates
   helper can now store results in a template variable by using the ``as``
   argument.
 
+* Added a :meth:`Context.setdefault() <django.template.Context.setdefault>`
+  method.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Unless :attr:`HttpResponse.reason_phrase
+  <django.http.HttpResponse.reason_phrase>` is explicitly set, it now is
+  determined by the current value of :attr:`HttpResponse.status_code
+  <django.http.HttpResponse.status_code>`. Modifying the value of
+  ``status_code`` outside of the constructor will also modify the value of
+  ``reason_phrase``.
+
+* The debug view now shows details of chained exceptions on Python 3.
 
 Tests
 ^^^^^
 
 * ...
+
+URLs
+^^^^
+
+* Regular expression lookaround assertions are now allowed in URL patterns.
 
 Validators
 ^^^^^^^^^^
@@ -224,11 +270,42 @@ the keyword argument ``clear=True``.
 assignment for many-to-many relations and as a consequence now use the new
 behavior.
 
+Filesystem-based template loaders catch more specific exceptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using the :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`
+or :class:`app_directories.Loader <django.template.loaders.app_directories.Loader>`
+template loaders, earlier versions of Django raised a
+:exc:`~django.template.TemplateDoesNotExist` error if a template source existed
+but was unreadable. This could happen under many circumstances, such as if
+Django didn't have permissions to open the file, or if the template source was
+a directory. Now, Django only silences the exception if the template source
+does not exist. All other situations result in the original ``IOError`` being
+raised.
+
+HTTP redirects no longer forced to absolute URIs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Relative redirects are no longer converted to absolute URIs. :rfc:`2616`
+required the ``Location`` header in redirect responses to be an absolute URI,
+but it has been superseded by :rfc:`7231` which allows relative URIs in
+``Location``, recognizing the actual practice of user agents, almost all of
+which support them.
+
+Consequently, the expected URLs passed to ``assertRedirects`` should generally
+no longer include the scheme and domain part of the URLs. For example,
+``self.assertRedirects(response, 'http://testserver/some-url/')`` should be
+replaced by ``self.assertRedirects(response, '/some-url/')`` (unless the
+redirection specifically contained an absolute URL, of course).
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
 * CSS and images in ``contrib.admin`` to support Internet Explorer 6 & 7 have
   been removed as these browsers have reached end-of-life.
+
+* The text displayed for null columns in the admin changelist ``list_display``
+  cells has changed from ``(None)`` (or its translated equivalent) to ``-``.
 
 * ``django.http.responses.REASON_PHRASES`` and
   ``django.core.handlers.wsgi.STATUS_CODE_TEXT`` have been removed. Use
@@ -238,6 +315,11 @@ Miscellaneous
   .. _`httplib.responses`: https://docs.python.org/2/library/httplib.html#httplib.responses
 
 * ``ValuesQuerySet`` and ``ValuesListQuerySet`` have been removed.
+
+* The ``admin/base.html`` template no longer sets
+  ``window.__admin_media_prefix__``. Image references in JavaScript that used
+  that value to construct absolute URLs have been moved to CSS for easier
+  customization.
 
 .. _deprecated-features-1.9:
 
@@ -252,6 +334,28 @@ template tags that store results in a template variable. The
 :meth:`~django.template.Library.simple_tag` helper has gained this same
 ability, making the ``assignment_tag`` obsolete. Tags that use
 ``assignment_tag`` should be updated to use ``simple_tag``.
+
+``{% cycle %}`` syntax with comma-separated arguments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :ttag:`cycle` tag supports an inferior old syntax from previous Django
+versions:
+
+.. code-block:: html+django
+
+    {% cycle row1,row2,row3 %}
+
+Its parsing caused bugs with the current syntax, so support for the old syntax
+will be removed in Django 2.0 following an accelerated deprecation.
+
+``Field.rel`` changes
+~~~~~~~~~~~~~~~~~~~~~
+
+``Field.rel`` and its methods and attributes have changed to match the related
+fields API. The ``Field.rel`` attribute is renamed to ``remote_field`` and many
+of its methods and attributes are either changed or renamed.
+
+The aim of these changes is to provide a documented API for relation fields.
 
 Miscellaneous
 ~~~~~~~~~~~~~

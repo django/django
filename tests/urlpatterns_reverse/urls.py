@@ -32,6 +32,12 @@ with warnings.catch_warnings():
         url(r'^people/(?:name/(\w+)/)?', empty_view, name="people2a"),
         url(r'^people/(?P<name>\w+)-(?P=name)/$', empty_view, name="people_backref"),
         url(r'^optional/(?P<name>.*)/(?:.+/)?', empty_view, name="optional"),
+        url(r'^optional/(?P<arg1>\d+)/(?:(?P<arg2>\d+)/)?', absolute_kwargs_view, name="named_optional"),
+        url(r'^optional/(?P<arg1>\d+)/(?:(?P<arg2>\d+)/)?$', absolute_kwargs_view, name="named_optional_terminated"),
+        url(r'^nested/noncapture/(?:(?P<p>\w+))$', empty_view, name='nested-noncapture'),
+        url(r'^nested/capture/((\w+)/)?$', empty_view, name='nested-capture'),
+        url(r'^nested/capture/mixed/((?P<p>\w+))$', empty_view, name='nested-mixedcapture'),
+        url(r'^nested/capture/named/(?P<outer>(?P<inner>\w+)/)?$', empty_view, name='nested-namedcapture'),
         url(r'^hardcoded/$', empty_view, name="hardcoded"),
         url(r'^hardcoded/doc\.pdf$', empty_view, name="hardcoded2"),
         url(r'^people/(?P<state>\w\w)/(?P<name>\w+)/$', empty_view, name="people3"),
@@ -56,6 +62,10 @@ with warnings.catch_warnings():
         url(r'^outer/(?P<outer>[0-9]+)/', include('urlpatterns_reverse.included_urls')),
         url(r'^outer-no-kwargs/([0-9]+)/', include('urlpatterns_reverse.included_no_kwargs_urls')),
         url('', include('urlpatterns_reverse.extra_urls')),
+        url(r'^lookahead-/(?!not-a-city)(?P<city>[^/]+)/$', empty_view, name='lookahead-negative'),
+        url(r'^lookahead\+/(?=a-city)(?P<city>[^/]+)/$', empty_view, name='lookahead-positive'),
+        url(r'^lookbehind-/(?P<city>[^/]+)(?<!not-a-city)/$', empty_view, name='lookbehind-negative'),
+        url(r'^lookbehind\+/(?P<city>[^/]+)(?<=a-city)/$', empty_view, name='lookbehind-positive'),
 
         # Partials should be fine.
         url(r'^partial/', empty_view_partial, name="partial"),

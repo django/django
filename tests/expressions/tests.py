@@ -5,14 +5,14 @@ import uuid
 from copy import deepcopy
 
 from django.core.exceptions import FieldError
-from django.db import DatabaseError, connection, transaction
+from django.db import DatabaseError, connection, models, transaction
 from django.db.models import TimeField, UUIDField
 from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    F, Case, Col, Date, DateTime, Func, OrderBy, Random, RawSQL, Ref, Value,
-    When,
+    F, Case, Col, Date, DateTime, ExpressionWrapper, Func, OrderBy, Random,
+    RawSQL, Ref, Value, When,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
@@ -30,15 +30,15 @@ class BasicExpressionsTests(TestCase):
     def setUpTestData(cls):
         Company.objects.create(
             name="Example Inc.", num_employees=2300, num_chairs=5,
-            ceo=Employee.objects.create(firstname="Joe", lastname="Smith")
+            ceo=Employee.objects.create(firstname="Joe", lastname="Smith", salary=10)
         )
         Company.objects.create(
             name="Foobar Ltd.", num_employees=3, num_chairs=4,
-            ceo=Employee.objects.create(firstname="Frank", lastname="Meyer")
+            ceo=Employee.objects.create(firstname="Frank", lastname="Meyer", salary=20)
         )
         Company.objects.create(
             name="Test GmbH", num_employees=32, num_chairs=1,
-            ceo=Employee.objects.create(firstname="Max", lastname="Mustermann")
+            ceo=Employee.objects.create(firstname="Max", lastname="Mustermann", salary=30)
         )
 
     def setUp(self):
@@ -47,6 +47,15 @@ class BasicExpressionsTests(TestCase):
         ).order_by(
             "name", "num_employees", "num_chairs"
         )
+
+    def test_annotate_values_aggregate(self):
+        companies = Company.objects.annotate(
+            salaries=F('ceo__salary'),
+        ).values('num_employees', 'salaries').aggregate(
+            result=Sum(F('salaries') + F('num_employees'),
+            output_field=models.IntegerField()),
+        )
+        self.assertEqual(companies['result'], 2395)
 
     def test_filter_inter_attribute(self):
         # We can filter on attribute relationships on same model obj, e.g.
@@ -608,8 +617,8 @@ class ExpressionOperatorTests(TestCase):
 class FTimeDeltaTests(TestCase):
 
     def setUp(self):
-        sday = datetime.date(2010, 6, 25)
-        stime = datetime.datetime(2010, 6, 25, 12, 15, 30, 747000)
+        self.sday = sday = datetime.date(2010, 6, 25)
+        self.stime = stime = datetime.datetime(2010, 6, 25, 12, 15, 30, 747000)
         midnight = datetime.time(0)
 
         delta0 = datetime.timedelta(0)
@@ -812,6 +821,15 @@ class FTimeDeltaTests(TestCase):
             Experiment.objects.filter(estimated_time__lt=F('end') - F('start'))]
         self.assertEqual(over_estimate, ['e4'])
 
+    def test_duration_with_datetime(self):
+        # Exclude e1 which has very high precision so we can test this on all
+        # backends regardless of whether or not it supports
+        # microsecond_precision.
+        over_estimate = Experiment.objects.exclude(name='e1').filter(
+            completed__gt=self.stime + F('estimated_time'),
+        ).order_by('name')
+        self.assertQuerysetEqual(over_estimate, ['e3', 'e4'], lambda e: e.name)
+
 
 class ValueTests(TestCase):
     def test_update_TimeField_using_Value(self):
@@ -836,7 +854,11 @@ class ReprTests(TestCase):
         self.assertEqual(repr(Date('published', 'exact')), "Date(published, exact)")
         self.assertEqual(repr(DateTime('published', 'exact', utc)), "DateTime(published, exact, %s)" % utc)
         self.assertEqual(repr(F('published')), "F(published)")
-        self.assertEqual(repr(F('cost') + F('tax')), "<Expression: F(cost) + F(tax)>")
+        self.assertEqual(repr(F('cost') + F('tax')), "<CombinedExpression: F(cost) + F(tax)>")
+        self.assertEqual(
+            repr(ExpressionWrapper(F('cost') + F('tax'), models.IntegerField())),
+            "ExpressionWrapper(F(cost) + F(tax))"
+        )
         self.assertEqual(repr(Func('published', function='TO_CHAR')), "Func(F(published), function=TO_CHAR)")
         self.assertEqual(repr(OrderBy(Value(1))), 'OrderBy(Value(1), descending=False)')
         self.assertEqual(repr(Random()), "Random()")

@@ -409,6 +409,23 @@ where ``reason`` is a short message (intended for developers or logging, not for
 end users) indicating the reason the request was rejected.  See
 :doc:`/ref/csrf`.
 
+.. setting:: CSRF_HEADER_NAME
+
+CSRF_HEADER_NAME
+----------------
+
+.. versionadded:: 1.9
+
+Default: ``'HTTP_X_CSRFTOKEN'``
+
+The name of the request header used for CSRF authentication.
+
+As with other HTTP headers in ``request.META``, the header name received from
+the server is normalized by converting all characters to uppercase, replacing
+any hyphens with underscores, and adding an ``'HTTP_'`` prefix to the name.
+For example, if your client sends a ``'X-XSRF-TOKEN'`` header, the setting
+should be ``'HTTP_X_XSRF_TOKEN'``.
+
 .. setting:: DATABASES
 
 DATABASES
@@ -1505,8 +1522,14 @@ It serves two purposes:
 
 * If the locale middleware isn't in use, it decides which translation is served
   to all users.
-* If the locale middleware is active, it provides the fallback translation when
-  no translation exist for a given literal to the user's preferred language.
+* If the locale middleware is active, it provides a fallback language in case the
+  user's preferred language can't be determined or is not supported by the Web
+  site. It also provides the fallback translation when a translation for a
+  given literal doesn't exist for the user's preferred language.
+
+.. versionchanged:: 1.8
+
+    The fallback for translation literals was added.
 
 See :ref:`how-django-discovers-language-preference` for more details.
 
@@ -1862,11 +1885,7 @@ The secret key is used for:
 * All :doc:`messages </ref/contrib/messages>` if you are using
   :class:`~django.contrib.messages.storage.cookie.CookieStorage` or
   :class:`~django.contrib.messages.storage.fallback.FallbackStorage`.
-* :mod:`Form wizard <formtools.wizard.views>` progress when using
-  cookie storage with
-  :class:`formtools.wizard.views.CookieWizardView`.
 * All :func:`~django.contrib.auth.views.password_reset` tokens.
-* All in progress :mod:`form previews <formtools.preview>`.
 * Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
   different key is provided.
 
@@ -2249,6 +2268,11 @@ TEMPLATE_DEBUG
 --------------
 
 Default: ``False``
+
+.. deprecated:: 1.8
+
+    Set the ``'debug'`` option in the :setting:`OPTIONS <TEMPLATES-OPTIONS>`
+    of a ``DjangoTemplates`` backend instead.
 
 A boolean that turns on/off template debug mode. If this is ``True``, the fancy
 error page will display a detailed report for any exception raised during
@@ -3256,6 +3280,7 @@ Security
   * :setting:`CSRF_COOKIE_PATH`
   * :setting:`CSRF_COOKIE_SECURE`
   * :setting:`CSRF_FAILURE_VIEW`
+  * :setting:`CSRF_HEADER_NAME`
 
 * :setting:`SECRET_KEY`
 * :setting:`X_FRAME_OPTIONS`

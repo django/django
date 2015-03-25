@@ -43,6 +43,9 @@ class PickleabilityTestCase(TestCase):
     def test_membermethod_as_default(self):
         self.assert_pickles(Happening.objects.filter(number4=1))
 
+    def test_filter_reverse_fk(self):
+        self.assert_pickles(Group.objects.filter(event=1))
+
     def test_doesnotexist_exception(self):
         # Ticket #17776
         original = Event.DoesNotExist("Doesn't exist")
@@ -79,7 +82,7 @@ class PickleabilityTestCase(TestCase):
         m1 = M2MModel.objects.create()
         g1 = Group.objects.create(name='foof')
         m1.groups.add(g1)
-        m2m_through = M2MModel._meta.get_field('groups').rel.through
+        m2m_through = M2MModel._meta.get_field('groups').remote_field.through
         original = m2m_through.objects.get()
         dumped = pickle.dumps(original)
         reloaded = pickle.loads(dumped)

@@ -42,8 +42,8 @@ class Combinable(object):
                 other = Value(other)
 
         if reversed:
-            return Expression(other, connector, self)
-        return Expression(self, connector, other)
+            return CombinedExpression(other, connector, self)
+        return CombinedExpression(self, connector, other)
 
     #############
     # OPERATORS #
@@ -126,11 +126,11 @@ class BaseExpression(object):
     # aggregate specific fields
     is_summary = False
 
-    def get_db_converters(self, connection):
-        return [self.convert_value] + self.output_field.get_db_converters(connection)
-
     def __init__(self, output_field=None):
         self._output_field = output_field
+
+    def get_db_converters(self, connection):
+        return [self.convert_value] + self.output_field.get_db_converters(connection)
 
     def get_source_expressions(self):
         return []
@@ -156,8 +156,8 @@ class BaseExpression(object):
         ```
         def override_as_sql(self, compiler, connection):
             # custom logic
-            return super(ExpressionNode, self).as_sql(compiler, connection)
-        setattr(ExpressionNode, 'as_' + connection.vendor, override_as_sql)
+            return super(Expression, self).as_sql(compiler, connection)
+        setattr(Expression, 'as_' + connection.vendor, override_as_sql)
         ```
 
         Arguments:
@@ -193,7 +193,7 @@ class BaseExpression(object):
          * summarize: a terminal aggregate clause
          * for_save: whether this expression about to be used in a save or update
 
-        Returns: an ExpressionNode to be added to the query.
+        Returns: an Expression to be added to the query.
         """
         c = self.copy()
         c.is_summary = summarize
@@ -238,7 +238,16 @@ class BaseExpression(object):
         """
         Attempts to infer the output type of the expression. If the output
         fields of all source fields match then we can simply infer the same
-        type here.
+        type here. This isn't always correct, but it makes sense most of the
+        time.
+
+        Consider the difference between `2 + 2` and `2 / 3`. Inferring
+        the type here is a convenience for the common case. The user should
+        supply their own output_field with more complex computations.
+
+        If a source does not have an `_output_field` then we exclude it from
+        this check. If all sources are `None`, then an error will be thrown
+        higher up the stack in the `output_field` property.
         """
         if self._output_field is None:
             sources = self.get_source_fields()
@@ -246,13 +255,14 @@ class BaseExpression(object):
             if num_sources == 0:
                 self._output_field = None
             else:
-                self._output_field = sources[0]
                 for source in sources:
+                    if self._output_field is None:
+                        self._output_field = source
                     if source is not None and not isinstance(self._output_field, source.__class__):
                         raise FieldError(
                             "Expression contains mixed types. You must set output_field")
 
-    def convert_value(self, value, connection, context):
+    def convert_value(self, value, expression, connection, context):
         """
         Expressions provide their own converters because users have the option
         of manually specifying the output_field which may be a different type
@@ -330,17 +340,17 @@ class BaseExpression(object):
         return self
 
 
-class ExpressionNode(BaseExpression, Combinable):
+class Expression(BaseExpression, Combinable):
     """
     An expression that can be combined with other expressions.
     """
     pass
 
 
-class Expression(ExpressionNode):
+class CombinedExpression(Expression):
 
     def __init__(self, lhs, connector, rhs, output_field=None):
-        super(Expression, self).__init__(output_field=output_field)
+        super(CombinedExpression, self).__init__(output_field=output_field)
         self.connector = connector
         self.lhs = lhs
         self.rhs = rhs
@@ -391,16 +401,17 @@ class Expression(ExpressionNode):
         return c
 
 
-class DurationExpression(Expression):
+class DurationExpression(CombinedExpression):
     def compile(self, side, compiler, connection):
         if not isinstance(side, DurationValue):
             try:
                 output = side.output_field
             except FieldError:
                 pass
-            if output.get_internal_type() == 'DurationField':
-                sql, params = compiler.compile(side)
-                return connection.ops.format_for_duration_arithmetic(sql), params
+            else:
+                if output.get_internal_type() == 'DurationField':
+                    sql, params = compiler.compile(side)
+                    return connection.ops.format_for_duration_arithmetic(sql), params
         return compiler.compile(side)
 
     def as_sql(self, compiler, connection):
@@ -446,7 +457,7 @@ class F(Combinable):
         return OrderBy(self, descending=True)
 
 
-class Func(ExpressionNode):
+class Func(Expression):
     """
     A SQL function call.
     """
@@ -503,7 +514,7 @@ class Func(ExpressionNode):
         return copy
 
 
-class Value(ExpressionNode):
+class Value(Expression):
     """
     Represents a wrapped value as a node within an expression
     """
@@ -556,7 +567,7 @@ class DurationValue(Value):
         return connection.ops.date_interval_sql(self.value)
 
 
-class RawSQL(ExpressionNode):
+class RawSQL(Expression):
     def __init__(self, sql, params, output_field=None):
         if output_field is None:
             output_field = fields.Field()
@@ -573,7 +584,7 @@ class RawSQL(ExpressionNode):
         return [self]
 
 
-class Random(ExpressionNode):
+class Random(Expression):
     def __init__(self):
         super(Random, self).__init__(output_field=fields.FloatField())
 
@@ -584,11 +595,11 @@ class Random(ExpressionNode):
         return connection.ops.random_function_sql(), []
 
 
-class Col(ExpressionNode):
-    def __init__(self, alias, target, source=None):
-        if source is None:
-            source = target
-        super(Col, self).__init__(output_field=source)
+class Col(Expression):
+    def __init__(self, alias, target, output_field=None):
+        if output_field is None:
+            output_field = target
+        super(Col, self).__init__(output_field=output_field)
         self.alias, self.target = alias, target
 
     def __repr__(self):
@@ -606,10 +617,13 @@ class Col(ExpressionNode):
         return [self]
 
     def get_db_converters(self, connection):
-        return self.output_field.get_db_converters(connection)
+        if self.target == self.output_field:
+            return self.output_field.get_db_converters(connection)
+        return (self.output_field.get_db_converters(connection) +
+                self.target.get_db_converters(connection))
 
 
-class Ref(ExpressionNode):
+class Ref(Expression):
     """
     Reference to column alias of the query. For example, Ref('sum_cost') in
     qs.annotate(sum_cost=Sum('cost')) query.
@@ -627,6 +641,11 @@ class Ref(ExpressionNode):
     def set_source_expressions(self, exprs):
         self.source, = exprs
 
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+        # The sub-expression `source` has already been resolved, as this is
+        # just a reference to the name of `source`.
+        return self
+
     def relabeled_clone(self, relabels):
         return self
 
@@ -637,7 +656,30 @@ class Ref(ExpressionNode):
         return [self]
 
 
-class When(ExpressionNode):
+class ExpressionWrapper(Expression):
+    """
+    An expression that can wrap another expression so that it can provide
+    extra context to the inner expression, such as the output_field.
+    """
+
+    def __init__(self, expression, output_field):
+        super(ExpressionWrapper, self).__init__(output_field=output_field)
+        self.expression = expression
+
+    def set_source_expressions(self, exprs):
+        self.expression = exprs[0]
+
+    def get_source_expressions(self):
+        return [self.expression]
+
+    def as_sql(self, compiler, connection):
+        return self.expression.as_sql(compiler, connection)
+
+    def __repr__(self):
+        return "{}({})".format(self.__class__.__name__, self.expression)
+
+
+class When(Expression):
     template = 'WHEN %(condition)s THEN %(result)s'
 
     def __init__(self, condition=None, then=None, **lookups):
@@ -693,7 +735,7 @@ class When(ExpressionNode):
         return cols
 
 
-class Case(ExpressionNode):
+class Case(Expression):
     """
     An SQL searched CASE expression:
 
@@ -760,7 +802,7 @@ class Case(ExpressionNode):
         return sql, sql_params
 
 
-class Date(ExpressionNode):
+class Date(Expression):
     """
     Add a date selection column.
     """
@@ -801,13 +843,13 @@ class Date(ExpressionNode):
         copy.lookup_type = self.lookup_type
         return copy
 
-    def convert_value(self, value, connection, context):
+    def convert_value(self, value, expression, connection, context):
         if isinstance(value, datetime.datetime):
             value = value.date()
         return value
 
 
-class DateTime(ExpressionNode):
+class DateTime(Expression):
     """
     Add a datetime selection column.
     """
@@ -853,7 +895,7 @@ class DateTime(ExpressionNode):
         copy.tzname = self.tzname
         return copy
 
-    def convert_value(self, value, connection, context):
+    def convert_value(self, value, expression, connection, context):
         if settings.USE_TZ:
             if value is None:
                 raise ValueError(

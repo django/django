@@ -24,6 +24,7 @@ from django.shortcuts import redirect
 from django.test import (
     SimpleTestCase, TestCase, ignore_warnings, override_settings,
 )
+from django.test.utils import override_script_prefix
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -41,6 +42,7 @@ resolve_test_data = (
     # Unnamed args are dropped if you have *any* kwargs in a pattern
     ('/mixed_args/42/37/', 'mixed-args', None, '', 'mixed-args', views.empty_view, tuple(), {'arg2': '37'}),
     ('/included/mixed_args/42/37/', 'inc-mixed-args', None, '', 'inc-mixed-args', views.empty_view, tuple(), {'arg2': '37'}),
+    ('/included/12/mixed_args/42/37/', 'inc-mixed-args', None, '', 'inc-mixed-args', views.empty_view, tuple(), {'arg2': '37'}),
 
     # Unnamed views should have None as the url_name. Regression data for #21157.
     ('/unnamed/normal/42/37/', None, None, '', 'urlpatterns_reverse.views.empty_view', views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}),
@@ -49,6 +51,7 @@ resolve_test_data = (
     # If you have no kwargs, you get an args list.
     ('/no_kwargs/42/37/', 'no-kwargs', None, '', 'no-kwargs', views.empty_view, ('42', '37'), {}),
     ('/included/no_kwargs/42/37/', 'inc-no-kwargs', None, '', 'inc-no-kwargs', views.empty_view, ('42', '37'), {}),
+    ('/included/12/no_kwargs/42/37/', 'inc-no-kwargs', None, '', 'inc-no-kwargs', views.empty_view, ('12', '42', '37'), {}),
 
     # Namespaces
     ('/test1/inner/42/37/', 'urlobject-view', 'testapp', 'test-ns1', 'test-ns1:urlobject-view', views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}),
@@ -94,6 +97,12 @@ test_data = (
     ('people_backref', '/people/nate-nate/', [], {'name': 'nate'}),
     ('optional', '/optional/fred/', [], {'name': 'fred'}),
     ('optional', '/optional/fred/', ['fred'], {}),
+    ('named_optional', '/optional/1/', [1], {}),
+    ('named_optional', '/optional/1/', [], {'arg1': 1}),
+    ('named_optional', '/optional/1/2/', [1, 2], {}),
+    ('named_optional', '/optional/1/2/', [], {'arg1': 1, 'arg2': 2}),
+    ('named_optional_terminated', '/optional/1/2/', [1, 2], {}),
+    ('named_optional_terminated', '/optional/1/2/', [], {'arg1': 1, 'arg2': 2}),
     ('hardcoded', '/hardcoded/', [], {}),
     ('hardcoded2', '/hardcoded/doc.pdf', [], {}),
     ('people3', '/people/il/adrian/', [], {'state': 'il', 'name': 'adrian'}),
@@ -142,6 +151,17 @@ test_data = (
     ('part2', '/prefix/xx/part2/one/', [], {'value': 'one', 'prefix': 'xx'}),
     ('part2', '/prefix/xx/part2/', [], {'prefix': 'xx'}),
 
+    # Tests for nested groups. Nested capturing groups will only work if you
+    # *only* supply the correct outer group.
+    ('nested-noncapture', '/nested/noncapture/opt', [], {'p': 'opt'}),
+    ('nested-capture', '/nested/capture/opt/', ['opt/'], {}),
+    ('nested-capture', NoReverseMatch, [], {'p': 'opt'}),
+    ('nested-mixedcapture', '/nested/capture/mixed/opt', ['opt'], {}),
+    ('nested-mixedcapture', NoReverseMatch, [], {'p': 'opt'}),
+    ('nested-namedcapture', '/nested/capture/named/opt/', [], {'outer': 'opt/'}),
+    ('nested-namedcapture', NoReverseMatch, [], {'outer': 'opt/', 'inner': 'opt'}),
+    ('nested-namedcapture', NoReverseMatch, [], {'inner': 'opt'}),
+
     # Regression for #9038
     # These views are resolved by method name. Each method is deployed twice -
     # once with an explicit argument, and once using the default value on
@@ -171,11 +191,13 @@ class NoURLPatternsTests(TestCase):
         """
         resolver = RegexURLResolver(r'^$', settings.ROOT_URLCONF)
 
-        self.assertRaisesMessage(ImproperlyConfigured,
+        self.assertRaisesMessage(
+            ImproperlyConfigured,
             "The included urlconf 'urlpatterns_reverse.no_urls' does not "
             "appear to have any patterns in it. If you see valid patterns in "
             "the file then the issue is probably caused by a circular import.",
-            getattr, resolver, 'url_patterns')
+            getattr, resolver, 'url_patterns'
+        )
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
@@ -195,22 +217,38 @@ class URLPatternReverse(TestCase):
         # Reversing None should raise an error, not return the last un-named view.
         self.assertRaises(NoReverseMatch, reverse, None)
 
+    @override_script_prefix('/{{invalid}}/')
     def test_prefix_braces(self):
-        self.assertEqual('/%7B%7Binvalid%7D%7D/includes/non_path_include/',
-               reverse('non_path_include', prefix='/{{invalid}}/'))
+        self.assertEqual(
+            '/%7B%7Binvalid%7D%7D/includes/non_path_include/',
+            reverse('non_path_include')
+        )
 
     def test_prefix_parenthesis(self):
-        self.assertEqual('/bogus%29/includes/non_path_include/',
-               reverse('non_path_include', prefix='/bogus)/'))
+        # Parentheses are allowed and should not cause errors or be escaped
+        with override_script_prefix('/bogus)/'):
+            self.assertEqual(
+                '/bogus)/includes/non_path_include/',
+                reverse('non_path_include')
+            )
+        with override_script_prefix('/(bogus)/'):
+            self.assertEqual(
+                '/(bogus)/includes/non_path_include/',
+                reverse('non_path_include')
+            )
 
+    @override_script_prefix('/bump%20map/')
     def test_prefix_format_char(self):
-        self.assertEqual('/bump%2520map/includes/non_path_include/',
-               reverse('non_path_include', prefix='/bump%20map/'))
+        self.assertEqual(
+            '/bump%2520map/includes/non_path_include/',
+            reverse('non_path_include')
+        )
 
+    @override_script_prefix('/%7Eme/')
     def test_non_urlsafe_prefix_with_args(self):
-        # Regression for #20022
-        self.assertEqual('/%7Eme/places/1/',
-                reverse('places', args=[1], prefix='/~me/'))
+        # Regression for #20022, adjusted for #24013 because ~ is an unreserved
+        # character. Tests whether % is escaped.
+        self.assertEqual('/%257Eme/places/1/', reverse('places', args=[1]))
 
     def test_patterns_reported(self):
         # Regression for #17076
@@ -224,6 +262,13 @@ class URLPatternReverse(TestCase):
             # we can't use .assertRaises, since we want to inspect the
             # exception
             self.fail("Expected a NoReverseMatch, but none occurred.")
+
+    @override_script_prefix('/script:name/')
+    def test_script_name_escaping(self):
+        self.assertEqual(
+            reverse('optional', args=['foo:bar']),
+            '/script:name/optional/foo:bar/'
+        )
 
     def test_reverse_returns_unicode(self):
         name, expected, args, kwargs = test_data[0]
@@ -535,8 +580,7 @@ class RequestURLconfTests(TestCase):
     def test_urlconf(self):
         response = self.client.get('/test/me/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, b'outer:/test/me/,'
-                                           b'inner:/inner_urlconf/second_test/')
+        self.assertEqual(response.content, b'outer:/test/me/,inner:/inner_urlconf/second_test/')
         response = self.client.get('/inner_urlconf/second_test/')
         self.assertEqual(response.status_code, 200)
         response = self.client.get('/second_test/')
@@ -726,8 +770,7 @@ class ErroneousViewTests(TestCase):
     def test_erroneous_reverse(self):
         """
         Ensure that a useful exception is raised when a regex is invalid in the
-        URLConf.
-        Refs #6170.
+        URLConf (#6170).
         """
         # The regex error will be hit before NoReverseMatch can be raised
         self.assertRaises(ImproperlyConfigured, reverse, 'whatever blah blah')
@@ -735,8 +778,7 @@ class ErroneousViewTests(TestCase):
 
 class ViewLoadingTests(TestCase):
     def test_view_loading(self):
-        self.assertEqual(get_callable('urlpatterns_reverse.views.empty_view'),
-                         empty_view)
+        self.assertEqual(get_callable('urlpatterns_reverse.views.empty_view'), empty_view)
 
         # passing a callable should return the callable
         self.assertEqual(get_callable(empty_view), empty_view)
@@ -744,14 +786,12 @@ class ViewLoadingTests(TestCase):
     def test_exceptions(self):
         # A missing view (identified by an AttributeError) should raise
         # ViewDoesNotExist, ...
-        six.assertRaisesRegex(self, ViewDoesNotExist,
-                              ".*View does not exist in.*",
-                              get_callable,
-                              'urlpatterns_reverse.views.i_should_not_exist')
+        with six.assertRaisesRegex(self, ViewDoesNotExist, ".*View does not exist in.*"):
+            get_callable('urlpatterns_reverse.views.i_should_not_exist')
         # ... but if the AttributeError is caused by something else don't
         # swallow it.
-        self.assertRaises(AttributeError, get_callable,
-                          'urlpatterns_reverse.views_broken.i_am_broken')
+        with self.assertRaises(AttributeError):
+            get_callable('urlpatterns_reverse.views_broken.i_am_broken')
 
 
 class IncludeTests(SimpleTestCase):
@@ -759,3 +799,50 @@ class IncludeTests(SimpleTestCase):
         msg = "Must specify a namespace if specifying app_name."
         with self.assertRaisesMessage(ValueError, msg):
             include('urls', app_name='bar')
+
+
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
+class LookaheadTests(TestCase):
+    def test_valid_resolve(self):
+        test_urls = [
+            '/lookahead-/a-city/',
+            '/lookbehind-/a-city/',
+            '/lookahead+/a-city/',
+            '/lookbehind+/a-city/',
+        ]
+        for test_url in test_urls:
+            match = resolve(test_url)
+            self.assertEqual(match.kwargs, {'city': 'a-city'})
+
+    def test_invalid_resolve(self):
+        test_urls = [
+            '/lookahead-/not-a-city/',
+            '/lookbehind-/not-a-city/',
+            '/lookahead+/other-city/',
+            '/lookbehind+/other-city/',
+        ]
+        for test_url in test_urls:
+            with self.assertRaises(Resolver404):
+                resolve(test_url)
+
+    def test_valid_reverse(self):
+        url = reverse('lookahead-positive', kwargs={'city': 'a-city'})
+        self.assertEqual(url, '/lookahead+/a-city/')
+        url = reverse('lookahead-negative', kwargs={'city': 'a-city'})
+        self.assertEqual(url, '/lookahead-/a-city/')
+
+        url = reverse('lookbehind-positive', kwargs={'city': 'a-city'})
+        self.assertEqual(url, '/lookbehind+/a-city/')
+        url = reverse('lookbehind-negative', kwargs={'city': 'a-city'})
+        self.assertEqual(url, '/lookbehind-/a-city/')
+
+    def test_invalid_reverse(self):
+        with self.assertRaises(NoReverseMatch):
+            reverse('lookahead-positive', kwargs={'city': 'other-city'})
+        with self.assertRaises(NoReverseMatch):
+            reverse('lookahead-negative', kwargs={'city': 'not-a-city'})
+
+        with self.assertRaises(NoReverseMatch):
+            reverse('lookbehind-positive', kwargs={'city': 'other-city'})
+        with self.assertRaises(NoReverseMatch):
+            reverse('lookbehind-negative', kwargs={'city': 'not-a-city'})

@@ -27,8 +27,11 @@ RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 
 TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, 'templates')
 
-TEMP_DIR = tempfile.mkdtemp(prefix='django_')
-os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
+# Create a specific subdirectory for the duration of the test suite.
+TMPDIR = tempfile.mkdtemp(prefix='django_')
+# Set the TMPDIR environment variable in addition to tempfile.tempdir
+# so that children processes inherit it.
+tempfile.tempdir = os.environ['TMPDIR'] = TMPDIR
 
 SUBDIRS_TO_SKIP = [
     'data',
@@ -84,7 +87,7 @@ def get_test_modules():
                     os.path.isfile(f) or
                     not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
                 continue
-            if not connection.vendor == 'postgresql' and f == 'postgres_tests' or f == 'postgres':
+            if connection.vendor != 'postgresql' and f == 'postgres_tests':
                 continue
             modules.append((modpath, f))
     return modules
@@ -121,7 +124,7 @@ def setup(verbosity, test_labels):
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
     settings.ROOT_URLCONF = 'urls'
     settings.STATIC_URL = '/static/'
-    settings.STATIC_ROOT = os.path.join(TEMP_DIR, 'static')
+    settings.STATIC_ROOT = os.path.join(TMPDIR, 'static')
     # Remove the following line in Django 2.0.
     settings.TEMPLATE_DIRS = [TEMPLATE_DIR]
     settings.TEMPLATES = [{
@@ -144,7 +147,7 @@ def setup(verbosity, test_labels):
         # these 'tests.migrations' modules don't actually exist, but this lets
         # us skip creating migrations for the test models.
         'auth': 'django.contrib.auth.tests.migrations',
-        'contenttypes': 'django.contrib.contenttypes.tests.migrations',
+        'contenttypes': 'contenttypes_tests.migrations',
     }
 
     if verbosity > 0:
@@ -213,13 +216,13 @@ def setup(verbosity, test_labels):
 
 def teardown(state):
     try:
-        # Removing the temporary TEMP_DIR. Ensure we pass in unicode
+        # Removing the temporary TMPDIR. Ensure we pass in unicode
         # so that it will successfully remove temp trees containing
         # non-ASCII filenames on Windows. (We're assuming the temp dir
         # name itself does not contain non-ASCII characters.)
-        shutil.rmtree(six.text_type(TEMP_DIR))
+        shutil.rmtree(six.text_type(TMPDIR))
     except OSError:
-        print('Failed to remove temp directory: %s' % TEMP_DIR)
+        print('Failed to remove temp directory: %s' % TMPDIR)
 
     # Restore the old settings.
     for key, value in state.items():
@@ -229,6 +232,11 @@ def teardown(state):
 def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels, debug_sql):
     state = setup(verbosity, test_labels)
     extra_tests = []
+
+    if test_labels and 'postgres_tests' in test_labels and connection.vendor != 'postgres':
+        if verbosity >= 2:
+            print("Removed postgres_tests from tests as we're not running with PostgreSQL.")
+        test_labels.remove('postgres_tests')
 
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):

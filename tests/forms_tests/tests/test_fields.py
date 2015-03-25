@@ -48,6 +48,7 @@ from django.test import SimpleTestCase, ignore_warnings
 from django.utils import formats, six, translation
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.duration import duration_string
 
 try:
     from PIL import Image
@@ -245,6 +246,22 @@ class FieldsTests(SimpleTestCase):
         """
         f1 = IntegerField(localize=True)
         self.assertWidgetRendersTo(f1, '<input id="id_f" name="f" type="text" />')
+
+    def test_integerfield_float(self):
+        f = IntegerField()
+        self.assertEqual(1, f.clean(1.0))
+        self.assertEqual(1, f.clean('1.0'))
+        self.assertEqual(1, f.clean(' 1.0 '))
+        self.assertEqual(1, f.clean('1.'))
+        self.assertEqual(1, f.clean(' 1. '))
+        self.assertRaisesMessage(ValidationError, "'Enter a whole number.'", f.clean, '1.5')
+        self.assertRaisesMessage(ValidationError, "'Enter a whole number.'", f.clean, '…')
+
+    def test_integerfield_big_num(self):
+        f = IntegerField()
+        self.assertEqual(9223372036854775808, f.clean(9223372036854775808))
+        self.assertEqual(9223372036854775808, f.clean('9223372036854775808'))
+        self.assertEqual(9223372036854775808, f.clean('9223372036854775808.0'))
 
     def test_integerfield_subclass(self):
         """
@@ -614,7 +631,7 @@ class FieldsTests(SimpleTestCase):
         d = datetime.datetime(2006, 9, 17, 14, 30, 0)
         self.assertFalse(f.has_changed(d, '2006 09 17 2:30 PM'))
 
-    # RegexField ##################################################################
+    # DurationField ###########################################################
 
     def test_durationfield_1(self):
         f = DurationField()
@@ -641,6 +658,15 @@ class FieldsTests(SimpleTestCase):
             '<input id="id_duration" type="text" name="duration" value="01:00:00">',
             str(f['duration'])
         )
+
+    def test_durationfield_prepare_value(self):
+        field = DurationField()
+        td = datetime.timedelta(minutes=15, seconds=30)
+        self.assertEqual(field.prepare_value(td), duration_string(td))
+        self.assertEqual(field.prepare_value('arbitrary'), 'arbitrary')
+        self.assertIsNone(field.prepare_value(None))
+
+    # RegexField ##################################################################
 
     def test_regexfield_1(self):
         f = RegexField('^[0-9][A-F][0-9]$')
@@ -1056,6 +1082,7 @@ class FieldsTests(SimpleTestCase):
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
         self.assertFalse(f.has_changed(None, ''))
         self.assertFalse(f.has_changed(1, '1'))
+        self.assertFalse(f.has_changed('1', '1'))
 
     def test_typedchoicefield_special_coerce(self):
         """

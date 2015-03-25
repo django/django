@@ -33,7 +33,7 @@ class ErrorIndexTest(TestCase):
     Checks whether index of error is calculated correctly in
     template debugger in for loops. Refs ticket #5831
     """
-    @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
+    @override_settings(DEBUG=True)
     def test_correct_exception_index(self):
         tests = [
             ('{% load bad_tag %}{% for i in range %}{% badsimpletag %}{% endfor %}', (38, 56)),
@@ -51,6 +51,5 @@ class ErrorIndexTest(TestCase):
             try:
                 template.render(context)
             except (RuntimeError, TypeError) as e:
-                error_source_index = e.django_template_source[1]
-                self.assertEqual(error_source_index,
-                                 expected_error_source_index)
+                debug = e.template_debug
+                self.assertEqual((debug['start'], debug['end']), expected_error_source_index)

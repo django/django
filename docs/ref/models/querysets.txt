@@ -388,6 +388,11 @@ You can tell if a query is ordered or not by checking the
 :attr:`.QuerySet.ordered` attribute, which will be ``True`` if the
 ``QuerySet`` has been ordered in any way.
 
+Each ``order_by()`` call will clear any previous ordering. For example, this
+query will be ordered by ``pub_date`` and not ``headline``::
+
+    Entry.objects.order_by('headline').order_by('pub_date')
+
 .. warning::
 
     Ordering is not a free operation. Each field you add to the ordering
@@ -2862,15 +2867,35 @@ The ``Prefetch()`` object can be used to control the operation of
 
 The ``lookup`` argument describes the relations to follow and works the same
 as the string based lookups passed to
-:meth:`~django.db.models.query.QuerySet.prefetch_related()`.
+:meth:`~django.db.models.query.QuerySet.prefetch_related()`. For example:
+
+    >>> Question.objects.prefetch_related(Prefetch('choice_set')).get().choice_set.all()
+    [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
+    # This will only execute two queries regardless of the number of Question
+    # and Choice objects.
+    >>> Question.objects.prefetch_related(Prefetch('choice_set')).all()
+    [<Question: Question object>]
 
 The ``queryset`` argument supplies a base ``QuerySet`` for the given lookup.
 This is useful to further filter down the prefetch operation, or to call
 :meth:`~django.db.models.query.QuerySet.select_related()` from the prefetched
-relation, hence reducing the number of queries even further.
+relation, hence reducing the number of queries even further:
+
+    >>> voted_choices = Choice.objects.filter(votes__gt=0)
+    >>> voted_choices
+    [<Choice: The sky>]
+    >>> prefetch = Prefetch('choice_set', queryset=voted_choices)
+    >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
+    [<Choice: The sky>]
 
 The ``to_attr`` argument sets the result of the prefetch operation to a custom
-attribute.
+attribute:
+
+    >>> prefetch = Prefetch('choice_set', queryset=voted_choices, to_attr='voted_choices')
+    >>> Question.objects.prefetch_related(prefetch).get().voted_choices
+    [<Choice: The sky>]
+    >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
+    [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
 
 .. note::
 

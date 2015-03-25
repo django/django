@@ -5,6 +5,7 @@ Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.utils.encoding import force_str
@@ -16,8 +17,18 @@ try:
     import psycopg2.extensions
     import psycopg2.extras
 except ImportError as e:
-    from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
+
+
+def psycopg2_version():
+    version = psycopg2.__version__.split(' ', 1)[0]
+    return tuple(int(v) for v in version.split('.') if v.isdigit())
+
+PSYCOPG2_VERSION = psycopg2_version()
+
+if PSYCOPG2_VERSION < (2, 4, 5):
+    raise ImproperlyConfigured("psycopg2_version 2.4.5 or newer is required; you have %s" % psycopg2.__version__)
+
 
 # Some of these import psycopg2, so import them after checking if it's installed.
 from .client import DatabaseClient                          # isort:skip
@@ -127,10 +138,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
-        opts = self.settings_dict["OPTIONS"]
-        RC = psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED
-        self.isolation_level = opts.get('isolation_level', RC)
-
         self.features = DatabaseFeatures(self)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
@@ -150,10 +157,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             'database': settings_dict['NAME'] or 'postgres',
         }
         conn_params.update(settings_dict['OPTIONS'])
-        if 'autocommit' in conn_params:
-            del conn_params['autocommit']
-        if 'isolation_level' in conn_params:
-            del conn_params['isolation_level']
+        conn_params.pop('isolation_level', None)
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
         if settings_dict['PASSWORD']:
@@ -165,30 +169,40 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn_params
 
     def get_new_connection(self, conn_params):
-        return Database.connect(**conn_params)
+        connection = Database.connect(**conn_params)
+
+        # self.isolation_level must be set:
+        # - after connecting to the database in order to obtain the database's
+        #   default when no value is explicitly specified in options.
+        # - before calling _set_autocommit() because if autocommit is on, that
+        #   will set connection.isolation_level to ISOLATION_LEVEL_AUTOCOMMIT.
+        options = self.settings_dict['OPTIONS']
+        try:
+            self.isolation_level = options['isolation_level']
+        except KeyError:
+            self.isolation_level = connection.isolation_level
+        else:
+            # Set the isolation level to the value from OPTIONS.
+            if self.isolation_level != connection.isolation_level:
+                connection.set_session(isolation_level=self.isolation_level)
+
+        return connection
 
     def init_connection_state(self):
-        settings_dict = self.settings_dict
         self.connection.set_client_encoding('UTF8')
-        tz = 'UTC' if settings.USE_TZ else settings_dict.get('TIME_ZONE')
-        if tz:
-            try:
-                get_parameter_status = self.connection.get_parameter_status
-            except AttributeError:
-                # psycopg2 < 2.0.12 doesn't have get_parameter_status
-                conn_tz = None
-            else:
-                conn_tz = get_parameter_status('TimeZone')
 
-            if conn_tz != tz:
-                cursor = self.connection.cursor()
-                try:
-                    cursor.execute(self.ops.set_time_zone_sql(), [tz])
-                finally:
-                    cursor.close()
-                # Commit after setting the time zone (see #17062)
-                if not self.get_autocommit():
-                    self.connection.commit()
+        tz = self.settings_dict['TIME_ZONE']
+        conn_tz = self.connection.get_parameter_status('TimeZone')
+
+        if conn_tz != tz:
+            cursor = self.connection.cursor()
+            try:
+                cursor.execute(self.ops.set_time_zone_sql(), [tz])
+            finally:
+                cursor.close()
+            # Commit after setting the time zone (see #17062)
+            if not self.get_autocommit():
+                self.connection.commit()
 
     def create_cursor(self):
         cursor = self.connection.cursor()
@@ -197,14 +211,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:
-            if self.psycopg2_version >= (2, 4, 2):
-                self.connection.autocommit = autocommit
-            else:
-                if autocommit:
-                    level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
-                else:
-                    level = self.isolation_level
-                self.connection.set_isolation_level(level)
+            self.connection.autocommit = autocommit
 
     def check_constraints(self, table_names=None):
         """
@@ -225,8 +232,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def psycopg2_version(self):
-        version = psycopg2.__version__.split(' ', 1)[0]
-        return tuple(int(v) for v in version.split('.') if v.isdigit())
+        return PSYCOPG2_VERSION
 
     @cached_property
     def pg_version(self):

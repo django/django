@@ -185,17 +185,17 @@ call to ``{% cycle %}`` doesn't specify ``silent``::
     {% cycle 'row1' 'row2' as rowcolors silent %}
     {% cycle rowcolors %}
 
-For backward compatibility, the ``{% cycle %}`` tag supports the much inferior
-old syntax from previous Django versions. You shouldn't use this in any new
-projects, but for the sake of the people who are still using it, here's what it
-looks like::
+.. deprecated:: 1.9
 
-    {% cycle row1,row2,row3 %}
+    The ``{% cycle %}`` tag supports the much inferior old syntax from previous
+    Django versions. You shouldn't use this in any new projects, but for the
+    sake of the people who are still using it, here's what it looks like::
 
-In this syntax, each value gets interpreted as a literal string, and there's no
-way to specify variable values. Or literal commas. Or spaces. Did we mention
-you shouldn't use this syntax in any new projects?
+        {% cycle row1,row2,row3 %}
 
+    In this syntax, each value gets interpreted as a literal string, and there's
+    no way to specify variable values, literal commas, or spaces. Support for
+    this syntax will be removed in Django 2.0.
 
 .. templatetag:: debug
 
@@ -2606,6 +2606,8 @@ get_media_prefix
 Similar to the :ttag:`get_static_prefix`, ``get_media_prefix`` populates a
 template variable with the media prefix :setting:`MEDIA_URL`, e.g.::
 
-    <script type="text/javascript" charset="utf-8">
-    var media_path = '{% get_media_prefix %}';
-    </script>
+    {% load static %}
+    <body data-media-url="{% get_media_prefix %}">
+
+By storing the value in a data attribute, we ensure it's escaped appropriately
+if we want to use it in a JavaScript context.

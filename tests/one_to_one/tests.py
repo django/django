@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.db import IntegrityError, connection, transaction
+from django.db import IntegrityError, connection, models, transaction
 from django.test import TestCase
 
 from .models import (
@@ -136,7 +136,7 @@ class OneToOneTests(TestCase):
         place = Place(name='User', address='London')
         with self.assertRaisesMessage(ValueError,
                             'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                            % (place, Restaurant.place.field.rel.to._meta.object_name)):
+                            % (place, Restaurant.place.field.remote_field.model._meta.object_name)):
             Restaurant.objects.create(place=place, serves_hot_dogs=True, serves_pizza=False)
         bar = UndergroundBar()
         p = Place(name='User', address='London')
@@ -144,6 +144,31 @@ class OneToOneTests(TestCase):
                             'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
                             % (bar, p._meta.object_name)):
             p.undergroundbar = bar
+
+    def test_unsaved_object_check_override(self):
+        """
+        #24495 - Assigning an unsaved object to a OneToOneField
+        should be allowed when the allow_unsaved_instance_assignment
+        attribute has been set to True.
+        """
+        class UnsavedOneToOneField(models.OneToOneField):
+            # A OneToOneField which can point to an unsaved object
+            allow_unsaved_instance_assignment = True
+
+        class Band(models.Model):
+            name = models.CharField(max_length=50)
+
+        class BandManager(models.Model):
+            band = UnsavedOneToOneField(Band)
+            first_name = models.CharField(max_length=50)
+            last_name = models.CharField(max_length=50)
+
+        band = Band(name='The Beatles')
+        manager = BandManager(first_name='Brian', last_name='Epstein')
+        # This should not raise an exception as the OneToOneField between
+        # manager and band has allow_unsaved_instance_assignment=True.
+        manager.band = band
+        self.assertEqual(manager.band, band)
 
     def test_reverse_relationship_cache_cascade(self):
         """
@@ -385,7 +410,7 @@ class OneToOneTests(TestCase):
         be added to the related model.
         """
         self.assertFalse(
-            hasattr(Target, HiddenPointer._meta.get_field('target').rel.get_accessor_name())
+            hasattr(Target, HiddenPointer._meta.get_field('target').remote_field.get_accessor_name())
         )
 
     def test_related_object(self):

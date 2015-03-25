@@ -86,23 +86,19 @@ databases with Django.
 In addition to a database backend, you'll need to make sure your Python
 database bindings are installed.
 
-* If you're using PostgreSQL, you'll need the `postgresql_psycopg2`_ package.
-  You might want to refer to our :ref:`PostgreSQL notes <postgresql-notes>` for
-  further technical details specific to this database.
+* If you're using PostgreSQL, you'll need the `psycopg2`_ package. Refer to the
+  :ref:`PostgreSQL notes <postgresql-notes>` for further details.
 
-  If you're on Windows, check out the unofficial `compiled Windows version`_.
-
-* If you're using MySQL, you'll need the ``MySQL-python`` package, version
-  1.2.1p2 or higher. You will also want to read the database-specific
-  :ref:`notes for the MySQL backend <mysql-notes>`.
+* If you're using MySQL, you'll need a :ref:`DB API driver
+  <mysql-db-api-drivers>` like ``mysqlclient``. See :ref:`notes for the MySQL
+  backend <mysql-notes>` for details.
 
 * If you're using SQLite you might want to read the :ref:`SQLite backend notes
   <sqlite-notes>`.
 
 * If you're using Oracle, you'll need a copy of cx_Oracle_, but please
-  read the database-specific :ref:`notes for the Oracle backend <oracle-notes>`
-  for important information regarding supported versions of both Oracle and
-  ``cx_Oracle``.
+  read the :ref:`notes for the Oracle backend <oracle-notes>` for details
+  regarding supported versions of both Oracle and ``cx_Oracle``.
 
 * If you're using an unofficial 3rd party backend, please consult the
   documentation provided for any additional requirements.
@@ -121,17 +117,11 @@ database queries, Django will need permission to create a test database.
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
-.. _postgresql_psycopg2: http://initd.org/psycopg/
-.. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
+.. _psycopg2: http://initd.org/psycopg/
 .. _SQLite: http://www.sqlite.org/
 .. _pysqlite: http://trac.edgewall.org/wiki/PySqlite
 .. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
-.. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
-.. _IBM DB2: http://code.google.com/p/ibm-db/
-.. _Microsoft SQL Server 2005: https://bitbucket.org/Manfre/django-mssql/
-.. _Firebird: http://code.google.com/p/django-firebird/
-.. _ODBC: http://code.google.com/p/django-pyodbc/
 .. _removing-old-versions-of-django:
 
 Remove any old versions of Django
@@ -150,9 +140,9 @@ uninstalling is as simple as deleting the ``django`` directory from your Python
 ``site-packages``. To find the directory you need to remove, you can run the
 following at your shell prompt (not the interactive Python prompt):
 
-.. code-block:: bash
+.. code-block:: console
 
-    python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"
+    $ python -c "import django; print(django.__path__)"
 
 
 .. _install-django-code:
@@ -266,18 +256,18 @@ latest bug fixes and improvements, follow these instructions:
 2. Check out Django's main development branch (the 'trunk' or 'master') like
    so:
 
-   .. code-block:: bash
+   .. code-block:: console
 
-       git clone git://github.com/django/django.git django-trunk
+        $ git clone git://github.com/django/django.git django-trunk
 
    This will create a directory ``django-trunk`` in your current directory.
 
 3. Make sure that the Python interpreter can load Django's code. The most
    convenient way to do this is via pip_. Run the following command:
 
-   .. code-block:: bash
+   .. code-block:: console
 
-       sudo pip install -e django-trunk/
+        $ sudo pip install -e django-trunk/
 
    (If using a virtualenv_ you can omit ``sudo``.)
 
@@ -312,9 +302,9 @@ with a checkout of Django's latest code in it. Then add a ``.pth`` file
 containing the full path to the ``django-trunk`` directory to your system's
 ``site-packages`` directory. For example, on a Unix-like system:
 
-.. code-block:: bash
+.. code-block:: console
 
-    echo WORKING-DIR/django-trunk > SITE-PACKAGES-DIR/django.pth
+    $ echo WORKING-DIR/django-trunk > SITE-PACKAGES-DIR/django.pth
 
 In the above line, change ``WORKING-DIR/django-trunk`` to match the full path
 to your new ``django-trunk`` directory, and change ``SITE-PACKAGES-DIR`` to
@@ -324,9 +314,9 @@ The location of the ``site-packages`` directory depends on the operating
 system, and the location in which Python was installed. To find your system's
 ``site-packages`` location, execute the following:
 
-.. code-block:: bash
+.. code-block:: console
 
-    python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
+    $ python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
 
 (Note that this should be run from a shell prompt, not a Python interactive
 prompt.)
@@ -344,9 +334,9 @@ On Unix-like systems, create a symbolic link to the file
 ``django-trunk/django/bin/django-admin`` in a directory on your system
 path, such as ``/usr/local/bin``. For example:
 
-.. code-block:: bash
+.. code-block:: console
 
-    ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin/
+    $ ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin/
 
 (In the above line, change WORKING-DIR to match the full path to your new
 ``django-trunk`` directory.)
