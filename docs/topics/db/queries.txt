@@ -602,7 +602,7 @@ may not be the same as the entries in the first filter. We are filtering the
 
     However, unlike the behavior when using
     :meth:`~django.db.models.query.QuerySet.filter`, this will not limit blogs
-    based on entries that satisfying both conditions. In order to do that, i.e.
+    based on entries that satisfy both conditions. In order to do that, i.e.
     to select all blogs that do not contain entries published with *"Lennon"*
     that were published in 2008, you need to make two queries::
 
