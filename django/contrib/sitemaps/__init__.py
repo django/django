@@ -14,13 +14,7 @@ class SitemapNotFound(Exception):
     pass
 
 
-def ping_google(sitemap_url=None, ping_url=PING_URL):
-    """
-    Alerts Google that the sitemap for the current site has been updated.
-    If sitemap_url is provided, it should be an absolute path to the sitemap
-    for this site -- e.g., '/sitemap.xml'. If sitemap_url is not provided, this
-    function will attempt to deduce it by using urlresolvers.reverse().
-    """
+def _get_sitemap_url(sitemap_url=None, site_domain=None, is_secure=False):
     if sitemap_url is None:
         try:
             # First, try to get the "index" sitemap URL.
@@ -35,13 +29,27 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     if sitemap_url is None:
         raise SitemapNotFound("You didn't provide a sitemap_url, and the sitemap URL couldn't be auto-detected.")
 
-    if not django_apps.is_installed('django.contrib.sites'):
-        raise ImproperlyConfigured("ping_google requires django.contrib.sites, which isn't installed.")
-    Site = django_apps.get_model('sites.Site')
-    current_site = Site.objects.get_current()
-    url = "http://%s%s" % (current_site.domain, sitemap_url)
-    params = urlencode({'sitemap': url})
-    urlopen("%s?%s" % (ping_url, params))
+    if not site_domain:
+        if not django_apps.is_installed('django.contrib.sites'):
+            raise ImproperlyConfigured("ping_google requires django.contrib.sites, which isn't installed.")
+        Site = django_apps.get_model('sites.Site')
+        current_site = Site.objects.get_current()
+        domain = current_site.domain
+    else:
+        domain = site_domain
+    return "%s://%s%s" % ('https' if is_secure else 'http', domain, sitemap_url)
+
+
+def ping_google(sitemap_url=None, ping_url=PING_URL, site_domain=None,
+        is_secure=False):
+    """
+    Alerts Google that the sitemap for the current site has been updated.
+    If sitemap_url is provided, it should be an absolute path to the sitemap
+    for this site -- e.g., '/sitemap.xml'. If sitemap_url is not provided, this
+    function will attempt to deduce it by using urlresolvers.reverse().
+    """
+    sitemap_url = _get_sitemap_url(sitemap_url, site_domain, is_secure)
+    urlopen("%s?%s" % (ping_url, urlencode({'sitemap': sitemap_url})))
 
 
 class Sitemap(object):
