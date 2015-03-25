@@ -81,7 +81,7 @@ The output follows the schema described in :pep:`386`::
     1.4a1
     1.4
 
-.. django-admin-option:: --verbosity, -v
+.. django-admin-verbosity:: --verbosity, -v
 
 Use :djadminopt:`--verbosity` to specify the amount of notification and debug information
 that ``django-admin`` should print to the console. For more details, see the
@@ -150,17 +150,17 @@ compilemessages
 Compiles .po files created by :djadmin:`makemessages` to .mo files for use with
 the builtin gettext support. See :doc:`/topics/i18n/index`.
 
-.. django-admin-option:: --locale, -l
+.. django-admin-compilemessage:: --locale, -l
 
 Use the :djadminopt:`--locale` option to specify the locale(s) to process. If
 not provided, all locales are processed.
 
-.. django-admin-option:: --exclude, -x
+.. django-admin-compilemessage:: --exclude, -x
 
 Use the :djadminopt:`--exclude` option to specify the locale(s) to exclude from
 processing. If not provided, no locales are excluded.
 
-.. django-admin-option:: --use-fuzzy, -f
+.. django-admin-compilemessage:: --use-fuzzy, -f
 
 You can pass ``--use-fuzzy`` option to include fuzzy translations
 into compiled files.
@@ -247,7 +247,7 @@ records to dump. If you're using a :ref:`custom manager <custom-managers>` as
 the default manager and it filters some of the available records, not all of the
 objects will be dumped.
 
-.. django-admin-option:: --all, -a
+.. django-admin-dumpdata:: --all, -a
 
 The :djadminopt:`--all` option may be provided to specify that
 ``dumpdata`` should use Django's base manager, dumping records which
@@ -259,13 +259,13 @@ By default, ``dumpdata`` will format its output in JSON, but you can use the
 ``--format`` option to specify another format. Currently supported formats
 are listed in :ref:`serialization-formats`.
 
-.. django-admin-option:: --indent <num>
+.. django-admin-dumpdata:: --indent <num>
 
 By default, ``dumpdata`` will output all data on a single line. This isn't
 easy for humans to read, so you can use the ``--indent`` option to
 pretty-print the output with a number of indentation spaces.
 
-.. django-admin-option:: --exclude, -e
+.. django-admin-dumpdata:: --exclude, -e
 
 The :djadminopt:`--exclude` option may be provided to prevent specific
 applications or models (specified as in the form of ``app_label.ModelName``)
@@ -273,12 +273,12 @@ from being dumped. If you specify a model name to ``dumpdata``, the dumped
 output will be restricted to that model, rather than the entire application.
 You can also mix application names and model names.
 
-.. django-admin-option:: --database
+.. django-admin-dumpdata:: --database
 
 The :djadminopt:`--database` option can be used to specify the database
 from which data will be dumped.
 
-.. django-admin-option:: --natural-foreign
+.. django-admin-dumpdata:: --natural-foreign
 
 When this option is specified, Django will use the ``natural_key()`` model
 method to serialize any foreign key and many-to-many relationship to objects of
@@ -288,20 +288,20 @@ should probably be using this flag. See the :ref:`natural keys
 <topics-serialization-natural-keys>` documentation for more details on this
 and the next option.
 
-.. django-admin-option:: --natural-primary
+.. django-admin-dumpdata:: --natural-primary
 
 When this option is specified, Django will not provide the primary key in the
 serialized data of this object since it can be calculated during
 deserialization.
 
-.. django-admin-option:: --pks
+.. django-admin-dumpdata:: --pks
 
 By default, ``dumpdata`` will output all the records of the model, but
 you can use the ``--pks`` option to specify a comma separated list of
 primary keys on which to filter.  This is only available when dumping
 one model.
 
-.. django-admin-option:: --output
+.. django-admin-dumpdata:: --output
 
 .. versionadded:: 1.8
 
@@ -316,12 +316,12 @@ flush
 Removes all data from the database, re-executes any post-synchronization
 handlers, and reinstalls any initial data fixtures.
 
-.. django-admin-option:: --noinput
+.. django-admin-flush:: --noinput
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
 
-.. django-admin-option:: --database
+.. django-admin-flush:: --database
 
 The :djadminopt:`--database` option may be used to specify the database
 to flush.
