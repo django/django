@@ -373,14 +373,3 @@ class PrimaryKeyUUIDModel(models.Model):
 
 class RelatedToUUIDModel(models.Model):
     uuid_fk = models.ForeignKey('PrimaryKeyUUIDModel')
-
-
-###############################################################################
-
-# See ticket #24215.
-class AbstractForeignFieldsModel(models.Model):
-    fk = models.ForeignKey('missing.FK')
-    m2m = models.ManyToManyField('missing.M2M', through='missing.Through')
-
-    class Meta:
-        abstract = True
