@@ -6,7 +6,6 @@ from __future__ import unicode_literals
 import unittest
 
 from admin_scripts.tests import AdminScriptTestCase
-
 from django import db
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
