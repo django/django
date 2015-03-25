@@ -45,6 +45,7 @@ TEST_DATA = [
     (validate_email, 'email@localhost', None),
     (EmailValidator(whitelist=['localdomain']), 'email@localdomain', None),
     (validate_email, '"test@test"@example.com', None),
+    (validate_email, 'example@atm.longgtldfortesting', None),
 
     (validate_email, None, ValidationError),
     (validate_email, '', ValidationError),
