@@ -67,6 +67,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``RegexValidator``
 ------------------
+
 .. class:: RegexValidator([regex=None, message=None, code=None, inverse_match=None, flags=0])
 
     :param regex: If not ``None``, overrides :attr:`regex`. Can be a regular
@@ -142,6 +143,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``URLValidator``
 ----------------
+
 .. class:: URLValidator([schemes=None, regex=None, message=None, code=None])
 
     A :class:`RegexValidator` that ensures a value looks like a URL, and raises
@@ -168,12 +170,14 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``validate_email``
 ------------------
+
 .. data:: validate_email
 
     An :class:`EmailValidator` instance without any customizations.
 
 ``validate_slug``
 -----------------
+
 .. data:: validate_slug
 
     A :class:`RegexValidator` instance that ensures a value consists of only
@@ -181,6 +185,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``validate_ipv4_address``
 -------------------------
+
 .. data:: validate_ipv4_address
 
     A :class:`RegexValidator` instance that ensures a value looks like an IPv4
@@ -203,6 +208,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``validate_comma_separated_integer_list``
 -----------------------------------------
+
 .. data:: validate_comma_separated_integer_list
 
     A :class:`RegexValidator` instance that ensures a value is a
@@ -210,6 +216,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``MaxValueValidator``
 ---------------------
+
 .. class:: MaxValueValidator(max_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
@@ -221,6 +228,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``MinValueValidator``
 ---------------------
+
 .. class:: MinValueValidator(min_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
@@ -232,6 +240,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``MaxLengthValidator``
 ----------------------
+
 .. class:: MaxLengthValidator(max_length, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
@@ -243,6 +252,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``MinLengthValidator``
 ----------------------
+
 .. class:: MinLengthValidator(min_length, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
