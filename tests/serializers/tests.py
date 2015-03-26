@@ -321,6 +321,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
     <field name="headline" type="CharField">Poker has no place on ESPN</field>
     <field name="pub_date" type="DateTimeField">2006-06-16T11:00:00</field>
     <field name="categories" rel="ManyToManyRel" to="serializers.category"><object pk="%(first_category_pk)s"></object><object pk="%(second_category_pk)s"></object></field>
+    <field name="meta_data" rel="ManyToManyRel" to="serializers.categorymetadata"></field>
   </object>
 </django-objects>"""
 
@@ -373,6 +374,7 @@ class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, Transacti
         <field to="serializers.category" name="categories" rel="ManyToManyRel">
             <object pk="1"></object>
         </field>
+        <field to="serializers.categorymetadata" name="meta_data" rel="ManyToManyRel"></field>
     </object>
     <object pk="1" model="serializers.author">
         <field type="CharField" name="name">Agnes</field>
@@ -404,7 +406,8 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
     "categories": [
       %(first_category_pk)s,
       %(second_category_pk)s
-    ]
+    ],
+    "meta_data": []
   }
 }
 ]
@@ -446,6 +449,166 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
         for line in json_data.splitlines():
             if re.search(r'.+,\s*$', line):
                 self.assertEqual(line, line.rstrip())
+
+    def test_helpful_error_message_invalid_pk(self):
+        """
+        If there is an invalid primary key, the error message should contain
+        the model associated with it.
+        """
+        test_string = """[{
+            "pk": "badpk",
+            "model": "serializers.player",
+            "fields": {
+                "name": "Bob",
+                "rank": 1,
+                "team": "Team"
+            }
+        }]"""
+        with self.assertRaisesMessage(serializers.base.DeserializationError, "(serializers.player:pk=badpk)"):
+            list(serializers.deserialize('json', test_string))
+
+    def test_helpful_error_message_invalid_field(self):
+        """
+        If there is an invalid field value, the error message should contain
+        the model associated with it.
+        """
+        test_string = """[{
+            "pk": "1",
+            "model": "serializers.player",
+            "fields": {
+                "name": "Bob",
+                "rank": "invalidint",
+                "team": "Team"
+            }
+        }]"""
+        expected = "(serializers.player:pk=1) field_value was 'invalidint'"
+        with self.assertRaisesMessage(serializers.base.DeserializationError, expected):
+            list(serializers.deserialize('json', test_string))
+
+    def test_helpful_error_message_for_foreign_keys(self):
+        """
+        Invalid foreign keys with a natural key should throw a helpful error
+        message, such as what the failing key is.
+        """
+        test_string = """[{
+            "pk": 1,
+            "model": "serializers.category",
+            "fields": {
+                "name": "Unknown foreign key",
+                "meta_data": [
+                    "doesnotexist",
+                    "metadata"
+                ]
+            }
+        }]"""
+        key = ["doesnotexist", "metadata"]
+        expected = "(serializers.category:pk=1) field_value was '%r'" % key
+        with self.assertRaisesMessage(serializers.base.DeserializationError, expected):
+            list(serializers.deserialize('json', test_string))
+
+    def test_helpful_error_message_for_many2many_non_natural(self):
+        """
+        Invalid many-to-many keys should throw a helpful error message.
+        """
+        test_string = """[{
+            "pk": 1,
+            "model": "serializers.article",
+            "fields": {
+                "author": 1,
+                "headline": "Unknown many to many",
+                "pub_date": "2014-09-15T10:35:00",
+                "categories": [1, "doesnotexist"]
+            }
+        }, {
+            "pk": 1,
+            "model": "serializers.author",
+            "fields": {
+                "name": "Agnes"
+            }
+        }, {
+            "pk": 1,
+            "model": "serializers.category",
+            "fields": {
+                "name": "Reference"
+            }
+        }]"""
+        expected = "(serializers.article:pk=1) field_value was 'doesnotexist'"
+        with self.assertRaisesMessage(serializers.base.DeserializationError, expected):
+            list(serializers.deserialize('json', test_string))
+
+    def test_helpful_error_message_for_many2many_natural1(self):
+        """
+        Invalid many-to-many keys should throw a helpful error message.
+        This tests the code path where one of a list of natural keys is invalid.
+        """
+        test_string = """[{
+            "pk": 1,
+            "model": "serializers.categorymetadata",
+            "fields": {
+                "kind": "author",
+                "name": "meta1",
+                "value": "Agnes"
+            }
+        }, {
+            "pk": 1,
+            "model": "serializers.article",
+            "fields": {
+                "author": 1,
+                "headline": "Unknown many to many",
+                "pub_date": "2014-09-15T10:35:00",
+                "meta_data": [
+                    ["author", "meta1"],
+                    ["doesnotexist", "meta1"],
+                    ["author", "meta1"]
+                ]
+            }
+        }, {
+            "pk": 1,
+            "model": "serializers.author",
+            "fields": {
+                "name": "Agnes"
+            }
+        }]"""
+        key = ["doesnotexist", "meta1"]
+        expected = "(serializers.article:pk=1) field_value was '%r'" % key
+        with self.assertRaisesMessage(serializers.base.DeserializationError, expected):
+            for obj in serializers.deserialize('json', test_string):
+                obj.save()
+
+    def test_helpful_error_message_for_many2many_natural2(self):
+        """
+        Invalid many-to-many keys should throw a helpful error message. This
+        tests the code path where a natural many-to-many key has only a single
+        value.
+        """
+        test_string = """[{
+            "pk": 1,
+            "model": "serializers.article",
+            "fields": {
+                "author": 1,
+                "headline": "Unknown many to many",
+                "pub_date": "2014-09-15T10:35:00",
+                "meta_data": [1, "doesnotexist"]
+            }
+        }, {
+            "pk": 1,
+            "model": "serializers.categorymetadata",
+            "fields": {
+                "kind": "author",
+                "name": "meta1",
+                "value": "Agnes"
+            }
+        }, {
+            "pk": 1,
+            "model": "serializers.author",
+            "fields": {
+                "name": "Agnes"
+            }
+        }]"""
+        expected = "(serializers.article:pk=1) field_value was 'doesnotexist'"
+        with self.assertRaisesMessage(serializers.base.DeserializationError, expected):
+            for obj in serializers.deserialize('json', test_string, ignore=False):
+                obj.save()
 
 
 class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
@@ -576,6 +739,7 @@ class YamlSerializerTestCase(SerializersTestBase, TestCase):
     headline: Poker has no place on ESPN
     pub_date: 2006-06-16 11:00:00
     categories: [%(first_category_pk)s, %(second_category_pk)s]
+    meta_data: []
 """
 
     @staticmethod
