@@ -35,7 +35,7 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_have_slash(self):
         """
-        Tests that URLs with slashes go unmolested.
+        URLs with slashes should go unmolested.
         """
         request = self.rf.get('/slash/')
         self.assertEqual(CommonMiddleware().process_request(request), None)
@@ -43,7 +43,7 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_slashless_resource(self):
         """
-        Tests that matches to explicit slashless URLs go unmolested.
+        Matches to explicit slashless URLs should go unmolested.
         """
         request = self.rf.get('/noslash')
         self.assertEqual(CommonMiddleware().process_request(request), None)
@@ -51,7 +51,7 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_slashless_unknown(self):
         """
-        Tests that APPEND_SLASH doesn't redirect to unknown resources.
+        APPEND_SLASH should not redirect to unknown resources.
         """
         request = self.rf.get('/unknown')
         self.assertEqual(CommonMiddleware().process_request(request), None)
@@ -59,12 +59,21 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_redirect(self):
         """
-        Tests that APPEND_SLASH redirects slashless URLs to a valid pattern.
+        APPEND_SLASH should redirect slashless URLs to a valid pattern.
         """
         request = self.rf.get('/slash')
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, '/slash/')
+
+    @override_settings(APPEND_SLASH=True)
+    def test_append_slash_redirect_querystring(self):
+        """
+        APPEND_SLASH should preserve querystrings when redirecting.
+        """
+        request = self.rf.get('/slash?test=1')
+        r = CommonMiddleware().process_request(request)
+        self.assertEqual(r.url, '/slash/?test=1')
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG(self):
@@ -90,7 +99,7 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=False)
     def test_append_slash_disabled(self):
         """
-        Tests disabling append slash functionality.
+        Disabling append slash functionality should leave slashless URLs alone.
         """
         request = self.rf.get('/slash')
         self.assertEqual(CommonMiddleware().process_request(request), None)
@@ -98,8 +107,7 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_quoted(self):
         """
-        Tests that URLs which require quoting are redirected to their slash
-        version ok.
+        URLs which require quoting should be redirected to their slash version ok.
         """
         request = self.rf.get(quote('/needsquoting#'))
         r = CommonMiddleware().process_request(request)
@@ -139,7 +147,7 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_have_slash_custom_urlconf(self):
         """
-        Tests that URLs with slashes go unmolested.
+        URLs with slashes should go unmolested.
         """
         request = self.rf.get('/customurlconf/slash/')
         request.urlconf = 'middleware.extra_urls'
@@ -148,7 +156,7 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_slashless_resource_custom_urlconf(self):
         """
-        Tests that matches to explicit slashless URLs go unmolested.
+        Matches to explicit slashless URLs should go unmolested.
         """
         request = self.rf.get('/customurlconf/noslash')
         request.urlconf = 'middleware.extra_urls'
@@ -157,7 +165,7 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_slashless_unknown_custom_urlconf(self):
         """
-        Tests that APPEND_SLASH doesn't redirect to unknown resources.
+        APPEND_SLASH should not redirect to unknown resources.
         """
         request = self.rf.get('/customurlconf/unknown')
         request.urlconf = 'middleware.extra_urls'
@@ -166,7 +174,7 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_redirect_custom_urlconf(self):
         """
-        Tests that APPEND_SLASH redirects slashless URLs to a valid pattern.
+        APPEND_SLASH should redirect slashless URLs to a valid pattern.
         """
         request = self.rf.get('/customurlconf/slash')
         request.urlconf = 'middleware.extra_urls'
@@ -192,7 +200,7 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=False)
     def test_append_slash_disabled_custom_urlconf(self):
         """
-        Tests disabling append slash functionality.
+        Disabling append slash functionality should leave slashless URLs alone.
         """
         request = self.rf.get('/customurlconf/slash')
         request.urlconf = 'middleware.extra_urls'
@@ -201,8 +209,7 @@ class CommonMiddlewareTest(TestCase):
     @override_settings(APPEND_SLASH=True)
     def test_append_slash_quoted_custom_urlconf(self):
         """
-        Tests that URLs which require quoting are redirected to their slash
-        version ok.
+        URLs which require quoting should be redirected to their slash version ok.
         """
         request = self.rf.get(quote('/customurlconf/needsquoting#'))
         request.urlconf = 'middleware.extra_urls'
