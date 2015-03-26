@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import six
 
 from .models import (
-    Entry, RegressionModelSplit, SelfRefer, SelfReferChild,
+    Category, Entry, Post, RegressionModelSplit, SelfRefer, SelfReferChild,
     SelfReferChildSibling, Tag, TagCollection, Worksheet,
 )
 
@@ -111,3 +111,16 @@ class M2MRegressionTests(TestCase):
 
         c1.refresh_from_db()
         self.assertQuerysetEqual(c1.tags.order_by('name'), ["<Tag: t1>", "<Tag: t2>"])
+
+    def test_multiple_forwards_only_m2m(self):
+        # Regression for #24505 - Multiple ManyToManyFields to same "to"
+        # model with related_name set to '+' mix up badly
+        category = Category.objects.create()
+        post = Post.objects.create()
+
+        post.primary_categories.add(category)
+
+        self.assertQuerysetEqual(
+            post.primary_categories.all(),
+            ['<Category: %s>' % category.pk]
+        )
