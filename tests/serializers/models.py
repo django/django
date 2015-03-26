@@ -14,9 +14,33 @@ from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
 
+class CategoryMetaDataManager(models.Manager):
+
+    def get_by_natural_key(self, kind, name):
+        return self.get(kind=kind, name=name)
+
+
+@python_2_unicode_compatible
+class CategoryMetaData(models.Model):
+    kind = models.CharField(max_length=10)
+    name = models.CharField(max_length=10)
+    value = models.CharField(max_length=10)
+    objects = CategoryMetaDataManager()
+
+    class Meta:
+        unique_together = (('kind', 'name'),)
+
+    def __str__(self):
+        return '[%s:%s]=%s' % (self.kind, self.name, self.value)
+
+    def natural_key(self):
+        return (self.kind, self.name)
+
+
 @python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(max_length=20)
+    meta_data = models.ForeignKey(CategoryMetaData, null=True, default=None)
 
     class Meta:
         ordering = ('name',)
@@ -42,6 +66,7 @@ class Article(models.Model):
     headline = models.CharField(max_length=50)
     pub_date = models.DateTimeField()
     categories = models.ManyToManyField(Category)
+    meta_data = models.ManyToManyField(CategoryMetaData)
 
     class Meta:
         ordering = ('pub_date',)
