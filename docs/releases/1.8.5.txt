@@ -52,3 +52,7 @@ Bugfixes
   (:ticket:`24921`).
 
 * Fixed the ``manage.py test --keepdb`` option on Oracle (:ticket:`25421`).
+
+* Fixed incorrect queries with multiple many-to-many fields on a model with the
+  same 'to' model and with ``related_name`` set to '+' (:ticket:`24505`,
+  :ticket:`25486`).
