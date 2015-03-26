@@ -1051,6 +1051,16 @@ def skipUnlessDBFeature(*features):
     )
 
 
+def skipUnlessAnyDBFeature(*features):
+    """
+    Skip a test unless a database has any of the named features.
+    """
+    return _deferredSkip(
+        lambda: not any(getattr(connection.features, feature, False) for feature in features),
+        "Database doesn't support any of the feature(s): %s" % ", ".join(features)
+    )
+
+
 class QuietWSGIRequestHandler(WSGIRequestHandler):
     """
     Just a regular WSGIRequestHandler except it doesn't log to the standard
