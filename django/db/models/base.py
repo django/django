@@ -311,21 +311,15 @@ class ModelBase(type):
             cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
 
-            # defer creating accessors on the foreign class until we are
-            # certain it has been created
-            def make_foreign_order_accessors(cls, model, field):
-                setattr(
-                    field.remote_field.model,
-                    'get_%s_order' % cls.__name__.lower(),
-                    curry(method_get_order, cls)
-                )
-                setattr(
-                    field.remote_field.model,
-                    'set_%s_order' % cls.__name__.lower(),
-                    curry(method_set_order, cls)
-                )
-            wrt = opts.order_with_respect_to
-            lazy_related_operation(make_foreign_order_accessors, cls, wrt.remote_field.model, field=wrt)
+            # Defer creating accessors on the foreign class until it has been
+            # created and registered. If remote_field is None, we're ordering
+            # with respect to a GenericForeignKey and don't know what the
+            # foreign class is - we'll add those accessors later in
+            # contribute_to_class().
+            if opts.order_with_respect_to.remote_field:
+                wrt = opts.order_with_respect_to
+                remote = wrt.remote_field.model
+                lazy_related_operation(make_foreign_order_accessors, cls, remote)
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
@@ -803,8 +797,8 @@ class Model(six.with_metaclass(ModelBase)):
                 # If this is a model with an order_with_respect_to
                 # autopopulate the _order field
                 field = meta.order_with_respect_to
-                order_value = cls._base_manager.using(using).filter(
-                    **{field.name: getattr(self, field.attname)}).count()
+                filter_args = field.get_filter_kwargs_for_object(self)
+                order_value = cls._base_manager.using(using).filter(**filter_args).count()
                 self._order = order_value
 
             fields = meta.local_concrete_fields
@@ -892,9 +886,8 @@ class Model(six.with_metaclass(ModelBase)):
             op = 'gt' if is_next else 'lt'
             order = '_order' if is_next else '-_order'
             order_field = self._meta.order_with_respect_to
-            obj = self._default_manager.filter(**{
-                order_field.name: getattr(self, order_field.attname)
-            }).filter(**{
+            filter_args = order_field.get_filter_kwargs_for_object(self)
+            obj = self._default_manager.filter(**filter_args).filter(**{
                 '_order__%s' % op: self._default_manager.values('_order').filter(**{
                     self._meta.pk.name: self.pk
                 })
@@ -1653,22 +1646,33 @@ class Model(six.with_metaclass(ModelBase)):
 def method_set_order(ordered_obj, self, id_list, using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
-    rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.remote_field.field_name)
-    order_name = ordered_obj._meta.order_with_respect_to.name
+    order_wrt = ordered_obj._meta.order_with_respect_to
+    filter_args = order_wrt.get_forward_related_filter(self)
     # FIXME: It would be nice if there was an "update many" version of update
     # for situations like this.
     with transaction.atomic(using=using, savepoint=False):
         for i, j in enumerate(id_list):
-            ordered_obj.objects.filter(**{'pk': j, order_name: rel_val}).update(_order=i)
+            ordered_obj.objects.filter(pk=j, **filter_args).update(_order=i)
 
 
 def method_get_order(ordered_obj, self):
-    rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.remote_field.field_name)
-    order_name = ordered_obj._meta.order_with_respect_to.name
+    order_wrt = ordered_obj._meta.order_with_respect_to
+    filter_args = order_wrt.get_forward_related_filter(self)
     pk_name = ordered_obj._meta.pk.name
-    return [r[pk_name] for r in
-            ordered_obj.objects.filter(**{order_name: rel_val}).values(pk_name)]
+    return ordered_obj.objects.filter(**filter_args).values_list(pk_name, flat=True)
 
+
+def make_foreign_order_accessors(model, related_model):
+    setattr(
+        related_model,
+        'get_%s_order' % model.__name__.lower(),
+        curry(method_get_order, model)
+    )
+    setattr(
+        related_model,
+        'set_%s_order' % model.__name__.lower(),
+        curry(method_set_order, model)
+    )
 
 ########
 # MISC #
