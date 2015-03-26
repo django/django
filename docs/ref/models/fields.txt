@@ -592,19 +592,36 @@ A file-upload field.
     The ``primary_key`` and ``unique`` arguments are not supported, and will
     raise a ``TypeError`` if used.
 
+    Depending on the storage backend being used the arguments listed below may
+    have different behaviours. The documentation below is based against the
+    :setting:`DEFAULT_FILE_STORAGE`. If you change the storage backend it is
+    recommended to refer to the specific backend storage documentation.
+
 Has two optional arguments:
 
 .. attribute:: FileField.upload_to
 
-    A local filesystem path that will be appended to your :setting:`MEDIA_ROOT`
-    setting to determine the value of the
-    :attr:`~django.db.models.fields.files.FieldFile.url` attribute.
+    `upload_to` provides a way of setting the upload directory. This attribute
+    can be set in two ways.
 
-    This path may contain :func:`~time.strftime` formatting, which will be
-    replaced by the date/time of the file upload (so that uploaded files don't
-    fill up the given directory).
+    Path string::
+    A string value which will be appended to your :setting:`MEDIA_ROOT` path to
+    form the location on the local machine where uploaded files will be stored.
+    The string value may also contain :func:`~time.strftime` formatting, which
+    will be replaced by the date/time of the file upload (so that uploaded files
+    don't fill up the given directory).
 
-    This may also be a callable, such as a function, which will be called to
+    Path strings example::
+
+        class MyModel(models.Model):
+            # file will be uploaded to MEDIA_ROOT/uploads
+            upload = models.FileField(upload_to='uploads/')
+            # or...
+            # file will be saved to MEDIA_ROOT/uploads/2015/01/30
+            upload = models.FileField(upload_to='uploads/%Y/%m/%d/')
+
+    Callable::
+    `upload_to` may also be callable, such as a function, this will be called to
     obtain the upload path, including the filename. This callable must be able
     to accept two arguments, and return a Unix-style path (with forward slashes)
     to be passed along to the storage system. The two arguments that will be
@@ -627,6 +644,15 @@ Has two optional arguments:
                             file. This may or may not be taken into account
                             when determining the final destination path.
     ======================  ===============================================
+
+    Callable example::
+
+        def a_callable(instance, filename):
+            # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+            return 'user_{0}/{1}'.format(instance.user.id, filename)
+
+        class MyModel(models.Model):
+            upload = models.FileField(upload_to=a_callable)
 
 .. attribute:: FileField.storage
 
