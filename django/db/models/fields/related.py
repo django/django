@@ -2621,6 +2621,12 @@ class ManyToManyField(RelatedField):
         if self.remote_field.symmetrical and (
                 self.remote_field.model == "self" or self.remote_field.model == cls._meta.object_name):
             self.remote_field.related_name = "%s_rel_+" % name
+        elif self.remote_field.is_hidden():
+            # If the backwards relation is disabled, replace the original
+            # related_name with one generated from the m2m field name. Django
+            # still uses backwards relations internally and we need to avoid
+            # clashes between multiple m2m fields with related_name == '+'.
+            self.remote_field.related_name = "_%s_+" % name
 
         super(ManyToManyField, self).contribute_to_class(cls, name, **kwargs)
 
