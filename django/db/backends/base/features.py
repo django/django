@@ -6,6 +6,7 @@ from django.utils.functional import cached_property
 class BaseDatabaseFeatures(object):
     gis_enabled = False
     allows_group_by_pk = False
+    allows_group_by_selected_pks = False
     # True if django.db.backends.utils.typecast_timestamp is used on values
     # returned from dates() calls.
     needs_datetime_string_cast = True
