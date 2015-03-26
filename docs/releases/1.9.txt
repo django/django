@@ -187,6 +187,13 @@ Minor features
   makes it possible to use ``REMOTE_USER`` for setups where the header is only
   populated on login pages instead of every request in the session.
 
+:mod:`django.contrib.contenttypes`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* It's now possible to use
+  :attr:`~django.db.models.Options.order_with_respect_to` with a
+  ``GenericForeignKey``.
+
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
