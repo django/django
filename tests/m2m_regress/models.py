@@ -87,3 +87,18 @@ class RegressionModelSplit(BadModelWithSplit):
     Model with a split method should not cause an error in add_lazy_relation
     """
     others = models.ManyToManyField('self')
+
+
+# Regression for #24505 -- Multiple ManyToManyFields to same "to" model
+# with related_name set to '+' mix up badly.
+class Category(models.Model):
+    def __str__(self):
+        return str(self.pk)
+
+
+class Post(models.Model):
+    primary_categories = models.ManyToManyField(Category, related_name='+')
+    secondary_categories = models.ManyToManyField(Category, related_name='+')
+
+    def __str__(self):
+        return str(self.pk)

@@ -319,7 +319,7 @@ TEST_RESULTS = {
     'get_all_related_objects_with_model_hidden_local': {
         Person: (
             ('+', None),
-            ('+', None),
+            ('_people_hidden_+', None),
             ('Person_following_inherited+', None),
             ('Person_following_inherited+', None),
             ('Person_friends_inherited+', None),
@@ -334,7 +334,7 @@ TEST_RESULTS = {
         ),
         BasePerson: (
             ('+', None),
-            ('+', None),
+            ('_basepeople_hidden_+', None),
             ('BasePerson_following_abstract+', None),
             ('BasePerson_following_abstract+', None),
             ('BasePerson_following_base+', None),
@@ -381,9 +381,9 @@ TEST_RESULTS = {
     'get_all_related_objects_with_model_hidden': {
         Person: (
             ('+', BasePerson),
-            ('+', BasePerson),
             ('+', None),
-            ('+', None),
+            ('_basepeople_hidden_+', BasePerson),
+            ('_people_hidden_+', None),
             ('BasePerson_following_abstract+', BasePerson),
             ('BasePerson_following_abstract+', BasePerson),
             ('BasePerson_following_base+', BasePerson),
@@ -416,7 +416,7 @@ TEST_RESULTS = {
         ),
         BasePerson: (
             ('+', None),
-            ('+', None),
+            ('_basepeople_hidden_+', None),
             ('BasePerson_following_abstract+', None),
             ('BasePerson_following_abstract+', None),
             ('BasePerson_following_base+', None),
@@ -730,7 +730,7 @@ TEST_RESULTS = {
             ('friends_base_rel_+', None),
             ('followers_base', None),
             ('relating_basepeople', None),
-            ('+', None),
+            ('_basepeople_hidden_+', None),
         ),
         Person: (
             ('friends_abstract_rel_+', BasePerson),
@@ -738,11 +738,11 @@ TEST_RESULTS = {
             ('friends_base_rel_+', BasePerson),
             ('followers_base', BasePerson),
             ('relating_basepeople', BasePerson),
-            ('+', BasePerson),
+            ('_basepeople_hidden_+', BasePerson),
             ('friends_inherited_rel_+', None),
             ('followers_concrete', None),
             ('relating_people', None),
-            ('+', None),
+            ('_people_hidden_+', None),
         ),
         Relation: (
             ('m2m_abstract_rel', None),
@@ -757,13 +757,13 @@ TEST_RESULTS = {
             'friends_base_rel_+',
             'followers_base',
             'relating_basepeople',
-            '+',
+            '_basepeople_hidden_+',
         ],
         Person: [
             'friends_inherited_rel_+',
             'followers_concrete',
             'relating_people',
-            '+',
+            '_people_hidden_+',
         ],
         Relation: [
             'm2m_abstract_rel',
