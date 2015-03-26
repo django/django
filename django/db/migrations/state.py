@@ -232,9 +232,42 @@ class StateApps(Apps):
         if ignore_swappable:
             pending_models -= {make_model_tuple(settings.AUTH_USER_MODEL)}
         if pending_models:
-            msg = "Unhandled pending operations for models: %s"
-            labels = (".".join(model_key) for model_key in self._pending_operations)
-            raise ValueError(msg % ", ".join(labels))
+            raise ValueError(self._pending_models_error(pending_models))
+
+    def _pending_models_error(self, pending_models):
+        """
+        Almost all internal uses of lazy operations are to resolve string model
+        references in related fields. We can extract the fields from those
+        operations and use them to provide a nicer error message.
+
+        This will work for any function passed to lazy_related_operation() that
+        has a keyword argument called 'field'.
+        """
+        def extract_field(operation):
+            # Expect a functools.partial() with a kwarg called 'field' applied.
+            try:
+                return operation.func.keywords['field']
+            except (AttributeError, KeyError):
+                return None
+
+        def extract_field_names(operations):
+            return (str(field) for field in map(extract_field, operations) if field)
+
+        get_ops = self._pending_operations.__getitem__
+        # Ordered list of pairs of the form
+        # ((app_label, model_name), [field_name_1, field_name_2, ...])
+        models_fields = sorted(
+            (model_key, sorted(extract_field_names(get_ops(model_key))))
+            for model_key in pending_models
+        )
+
+        def model_text(model_key, fields):
+            field_list = ", ".join(fields)
+            field_text = " (referred to by fields: %s)" % field_list if fields else ""
+            return ("%s.%s" % model_key) + field_text
+
+        msg = "Unhandled pending operations for models:"
+        return "\n  ".join([msg] + [model_text(*i) for i in models_fields])
 
     @contextmanager
     def bulk_update(self):
