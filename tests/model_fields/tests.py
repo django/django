@@ -245,7 +245,7 @@ class ManyToManyFieldTests(test.TestCase):
         )
 
 
-class DateTimeFieldTests(unittest.TestCase):
+class DateTimeFieldTests(test.TestCase):
     def test_datetimefield_to_python_usecs(self):
         """DateTimeField.to_python should support usecs"""
         f = models.DateTimeField()
@@ -275,7 +275,7 @@ class DateTimeFieldTests(unittest.TestCase):
         self.assertEqual(obj.t, tim)
 
 
-class BooleanFieldTests(unittest.TestCase):
+class BooleanFieldTests(test.TestCase):
     def _test_get_db_prep_lookup(self, f):
         self.assertEqual(f.get_db_prep_lookup('exact', True, connection=connection), [True])
         self.assertEqual(f.get_db_prep_lookup('exact', '1', connection=connection), [True])
@@ -414,8 +414,9 @@ class BooleanFieldTests(unittest.TestCase):
             self.assertFalse(boolean_field.has_default())
             b = BooleanModel()
             self.assertIsNone(b.bfield)
-            with self.assertRaises(IntegrityError):
-                b.save()
+            with transaction.atomic():
+                with self.assertRaises(IntegrityError):
+                    b.save()
         finally:
             boolean_field.default = old_default
 
