@@ -75,8 +75,8 @@ class SessionStore(SessionBase):
         """
         Return the expiry time of the file storing the session's content.
         """
-        expiry = session_data.get('_session_expiry', None)
-        if expiry is None:
+        expiry = session_data.get('_session_expiry')
+        if not expiry:
             expiry = self._last_modification() + \
                 datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE)
         return expiry
