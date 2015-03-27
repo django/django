@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import datetime
 import itertools
+import os
 import re
 from importlib import import_module
 
@@ -943,14 +944,28 @@ class ChangelistTests(AuthViewsTestCase):
         self.assertEqual(row.change_message, 'No fields changed.')
 
     def test_user_change_password(self):
+        user_change_url = reverse('auth_test_admin:auth_user_change', args=(self.admin.pk,))
+        password_change_url = reverse('auth_test_admin:auth_user_password_change', args=(self.admin.pk,))
+
+        response = self.client.get(user_change_url)
+        # Test the link inside password field help_text.
+        rel_link = re.search(
+            r'you can change the password using <a href="([^"]*)">this form</a>',
+            force_text(response.content)
+        ).groups()[0]
+        self.assertEqual(
+            os.path.normpath(user_change_url + rel_link),
+            os.path.normpath(password_change_url)
+        )
+
         response = self.client.post(
-            reverse('auth_test_admin:auth_user_password_change', args=(self.admin.pk,)),
+            password_change_url,
             {
                 'password1': 'password1',
                 'password2': 'password1',
             }
         )
-        self.assertRedirects(response, reverse('auth_test_admin:auth_user_change', args=(self.admin.pk,)))
+        self.assertRedirects(response, user_change_url)
         row = LogEntry.objects.latest('id')
         self.assertEqual(row.change_message, 'Changed password.')
         self.logout()
