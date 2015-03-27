@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import gzip
 import os
+import struct
 import tempfile
 import unittest
 import zlib
@@ -13,6 +14,7 @@ from django.core.files.base import ContentFile
 from django.core.files.move import file_move_safe
 from django.core.files.temp import NamedTemporaryFile
 from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
+from django.test import mock
 from django.utils import six
 from django.utils._os import upath
 
@@ -239,8 +241,9 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
             self.assertEqual(size, Image.open(fh).size)
 
 
-class GetImageDimensionsOnInvalidImages(unittest.TestCase):
-    @unittest.skipUnless(Image, "Pillow not installed")
+@unittest.skipUnless(Image, "Pillow not installed")
+class GetImageDimensionsTests(unittest.TestCase):
+
     def test_invalid_image(self):
         """
         get_image_dimensions() should return (None, None) for the dimensions of
@@ -253,6 +256,20 @@ class GetImageDimensionsOnInvalidImages(unittest.TestCase):
         with open(img_path, 'rb') as fh:
             size = images.get_image_dimensions(fh)
             self.assertEqual(size, (None, None))
+
+    def test_valid_image(self):
+        """
+        get_image_dimensions() should catch struct.error while feeding the PIL
+        Image parser (#24544).
+
+        Emulates the Parser feed error. Since the error is raised on every feed
+        attempt, the resulting image size should be invalid: (None, None).
+        """
+        img_path = os.path.join(os.path.dirname(upath(__file__)), "test.png")
+        with mock.patch('PIL.ImageFile.Parser.feed', side_effect=struct.error):
+            with open(img_path, 'rb') as fh:
+                size = images.get_image_dimensions(fh)
+                self.assertEqual(size, (None, None))
 
 
 class FileMoveSafeTests(unittest.TestCase):
