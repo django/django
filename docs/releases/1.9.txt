@@ -299,6 +299,12 @@ no longer include the scheme and domain part of the URLs. For example,
 replaced by ``self.assertRedirects(response, '/some-url/')`` (unless the
 redirection specifically contained an absolute URL, of course).
 
+Dropped support for PostgreSQL 9.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream support for PostgreSQL 9.0 ended in September 2015. As a consequence,
+Django 1.9 sets 9.1 as the minimum PostgreSQL version it officially supports.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
