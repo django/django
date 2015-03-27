@@ -250,6 +250,19 @@ class SessionTestsMixin(object):
         age = self.session.get_expiry_age(modification=modification)
         self.assertEqual(age, 10)
 
+    def test_non_expiry_datetime(self):
+        modification = timezone.now()
+
+        self.session['foo'] = 'bar'
+        self.session.save()
+
+        date = self.session.get_expiry_date(modification=modification)
+        self.assertEqual(date, modification +
+                         timedelta(seconds=settings.SESSION_COOKIE_AGE))
+
+        age = self.session.get_expiry_age(modification=modification)
+        self.assertEqual(age, settings.SESSION_COOKIE_AGE)
+
     def test_custom_expiry_reset(self):
         self.session.set_expiry(None)
         self.session.set_expiry(10)
@@ -462,6 +475,8 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         storage_path = self.backend._get_storage_path()
         file_prefix = settings.SESSION_COOKIE_NAME
 
+        settings.SESSION_COOKIE_AGE = 0
+
         def count_sessions():
             return len([session_file for session_file in os.listdir(storage_path)
                 if session_file.startswith(file_prefix)])
@@ -479,8 +494,12 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         other_session.set_expiry(-3600)
         other_session.save()
 
+        other_session2 = self.backend()
+        other_session2['foo'] = 'bar'
+        other_session2.save()
+
         # Two sessions are in the filesystem before clearsessions...
-        self.assertEqual(2, count_sessions())
+        self.assertEqual(3, count_sessions())
         management.call_command('clearsessions')
         # ... and one is deleted.
         self.assertEqual(1, count_sessions())
