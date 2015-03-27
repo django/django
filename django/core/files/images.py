@@ -4,6 +4,7 @@ Utility functions for handling images.
 Requires Pillow as you might imagine.
 """
 import zlib
+import struct
 
 from django.core.files import File
 
@@ -63,6 +64,10 @@ def get_image_dimensions(file_or_path, close=False):
                     pass
                 else:
                     raise
+            except struct.error as e:
+                # ignore struct complaining when the header is truncated,
+                # continue feeding chunks to the parser (ticket #24544)
+                pass
             if p.image:
                 return p.image.size
             chunk_size *= 2
