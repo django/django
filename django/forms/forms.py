@@ -16,7 +16,7 @@ from django.utils import six
 from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
 )
-from django.utils.html import conditional_escape, format_html
+from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
@@ -67,6 +67,7 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
         return new_class
 
 
+@html_safe
 @python_2_unicode_compatible
 class BaseForm(object):
     # This is the main implementation of all the Form logic. Note that this
@@ -121,9 +122,6 @@ class BaseForm(object):
                 pass
         fields.update(self.fields)  # add remaining fields in original order
         self.fields = fields
-
-    def __html__(self):
-        return force_text(self)
 
     def __str__(self):
         return self.as_table()
@@ -504,6 +502,7 @@ class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
     # BaseForm itself has no way of designating self.fields.
 
 
+@html_safe
 @python_2_unicode_compatible
 class BoundField(object):
     "A Field plus data"
@@ -520,9 +519,6 @@ class BoundField(object):
             self.label = self.field.label
         self.help_text = field.help_text or ''
         self._initial_value = UNSET
-
-    def __html__(self):
-        return force_text(self)
 
     def __str__(self):
         """Renders this field as an HTML widget."""
