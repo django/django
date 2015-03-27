@@ -663,8 +663,9 @@ escaping HTML.
 
     A decorator that defines the ``__html__`` method.
 
-    This helps non-Django templates to detect classes whose ``__str__`` methods
-    return :class:`~django.utils.safestring.SafeText`.
+    This helps non-Django templates to detect classes whose ``__unicode__``
+    (Python 2) or ``__str__`` (Python 3) methods return
+    :class:`~django.utils.safestring.SafeText`.
 
 ``django.utils.http``
 =====================

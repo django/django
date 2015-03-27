@@ -2,10 +2,11 @@
 from __future__ import unicode_literals
 
 import os
+import unittest
 from datetime import datetime
 
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils import html, safestring
+from django.utils import html, safestring, six
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -186,53 +187,75 @@ class TestUtilsHtml(SimpleTestCase):
         self.assertEqual(html.conditional_escape(safestring.mark_safe(s)), s)
 
     def test_html_safe(self):
-        @html.html_safe
-        class HtmlClassOne(object):
-            def __str__(self):
-                return "<h1>I'm html class one!</h1>"
+        if six.PY2:
+            @html.html_safe
+            class HtmlClass(object):
+                def __unicode__(self):
+                    return "<h1>I'm a html class!</h1>"
+        else:
+            @html.html_safe
+            class HtmlClass(object):
+                def __str__(self):
+                    return "<h1>I'm a html class!</h1>"
 
-        @html.html_safe
-        class HtmlClassTwo(object):
-            def __unicode__(self):
-                return "<h1>I'm html class two!</h1>"
-
-        html_one = HtmlClassOne()
-        html_two = HtmlClassTwo()
-        self.assertTrue(hasattr(HtmlClassOne, '__html__'))
-        self.assertTrue(hasattr(html_one, '__html__'))
-        self.assertEqual(force_text(html_one), html_one.__html__())
-        self.assertTrue(hasattr(HtmlClassTwo, '__html__'))
-        self.assertTrue(hasattr(html_two, '__html__'))
-        self.assertEqual(force_text(html_two), html_two.__html__())
+        html_obj = HtmlClass()
+        self.assertTrue(hasattr(HtmlClass, '__html__'))
+        self.assertTrue(hasattr(html_obj, '__html__'))
+        self.assertEqual(force_text(html_obj), html_obj.__html__())
 
     def test_html_safe_subclass(self):
-        class BaseClass(object):
-            def __html__(self):
-                # defines __html__ on its own
-                return 'some html content'
+        if six.PY2:
+            class BaseClass(object):
+                def __html__(self):
+                    # defines __html__ on its own
+                    return 'some html content'
 
-            def __str__(self):
-                return 'some non html content'
+                def __unicode__(self):
+                    return 'some non html content'
 
-        @html.html_safe
-        class Subclass(BaseClass):
-            def __str__(self):
-                # overrides __str__ and is marked as html_safe
-                return 'some html safe content'
+            @html.html_safe
+            class Subclass(BaseClass):
+                def __unicode__(self):
+                    # overrides __unicode__ and is marked as html_safe
+                    return 'some html safe content'
+        else:
+            class BaseClass(object):
+                def __html__(self):
+                    # defines __html__ on its own
+                    return 'some html content'
+
+                def __str__(self):
+                    return 'some non html content'
+
+            @html.html_safe
+            class Subclass(BaseClass):
+                def __str__(self):
+                    # overrides __str__ and is marked as html_safe
+                    return 'some html safe content'
 
         subclass_obj = Subclass()
         self.assertEqual(force_text(subclass_obj), subclass_obj.__html__())
 
-    def test_html_safe_errors(self):
-        msg = "can't apply @html_safe to HtmlClassOne because it defines __html__()."
+    def test_html_safe_defines_html_error(self):
+        msg = "can't apply @html_safe to HtmlClass because it defines __html__()."
         with self.assertRaisesMessage(ValueError, msg):
             @html.html_safe
-            class HtmlClassOne(object):
+            class HtmlClass(object):
                 def __html__(self):
                     return "<h1>I'm a html class!</h1>"
 
-        msg = "can't apply @html_safe to HtmlClassTwo because it doesn't define __str__() or __unicode__()."
+    @unittest.skipUnless(six.PY2, "test only applies to Python2")
+    def test_html_safe_doesnt_define_unicode(self):
+        msg = "can't apply @html_safe to HtmlClass because it doesn't define __unicode__()."
         with self.assertRaisesMessage(ValueError, msg):
             @html.html_safe
-            class HtmlClassTwo(object):
+            class HtmlClass(object):
+                pass
+
+    @unittest.skipUnless(six.PY3, "test only applies to Python3")
+    def test_html_safe_doesnt_define_str(self):
+        msg = "can't apply @html_safe to HtmlClass because it doesn't define __str__()."
+        with self.assertRaisesMessage(ValueError, msg):
+            @html.html_safe
+            class HtmlClass(object):
                 pass
