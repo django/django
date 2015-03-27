@@ -274,6 +274,15 @@ class SessionTestsMixin(object):
         age = self.session.get_expiry_age(modification=modification)
         self.assertEqual(age, 10)
 
+        self.session.set_expiry(None)
+
+        date = self.session.get_expiry_date(modification=modification)
+        self.assertEqual(date, modification +
+                         timedelta(seconds=settings.SESSION_COOKIE_AGE))
+
+        age = self.session.get_expiry_age(modification=modification)
+        self.assertEqual(age, settings.SESSION_COOKIE_AGE)
+
     def test_custom_expiry_reset(self):
         self.session.set_expiry(None)
         self.session.set_expiry(10)
@@ -521,7 +530,8 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertRaises(InvalidSessionKey,
                           self.backend()._key_to_file, "a/b/c")
 
-    @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.file")
+    @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.file",
+    SESSION_COOKIE_AGE=0)
     def test_clearsessions_command(self):
         """
         Test clearsessions command for clearing expired sessions.
@@ -546,8 +556,15 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         other_session.set_expiry(-3600)
         other_session.save()
 
-        # Two sessions are in the filesystem before clearsessions...
-        self.assertEqual(2, count_sessions())
+        # One object in the present without an expiry
+        # (should be deleted since its modification time + SESSION_COOKIE_AGE
+        # will be in the past when clearsessions runs)
+        other_session2 = self.backend()
+        other_session2['foo'] = 'bar'
+        other_session2.save()
+
+        # Three sessions are in the filesystem before clearsessions...
+        self.assertEqual(3, count_sessions())
         management.call_command('clearsessions')
         # ... and one is deleted.
         self.assertEqual(1, count_sessions())
