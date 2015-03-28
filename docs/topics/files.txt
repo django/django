@@ -55,6 +55,23 @@ it has all the methods and attributes described below.
     file name used on disk cannot be relied on until after the model has been
     saved.
 
+For example, you can change the file name by setting the file's
+:attr:`~django.core.files.File.name` to a path relative to the file storage's
+location (:setting:`MEDIA_ROOT` if you are using the default
+:class:`~django.core.files.storage.FileSystemStorage`)::
+
+    >>> import os
+    >>> from django.conf import settings
+    >>> initial_path = car.photo.path
+    >>> car.photo.name = 'cars/chevy_ii.jpg'
+    >>> new_path = settings.MEDIA_ROOT + car.photo.name
+    >>> # Move the file on the filesystem
+    >>> os.rename(initial_path, new_path)
+    >>> car.save()
+    >>> car.photo.path
+    '/media/cars/chevy_ii.jpg'
+    >>> car.photo.path == new_path
+    True
 
 The ``File`` object
 ===================
