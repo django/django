@@ -1,7 +1,8 @@
-from unittest import expectedFailure
+import warnings
 
 from django.db.migrations.graph import (
-    CircularDependencyError, MigrationGraph, NodeNotFoundError,
+    RECURSION_DEPTH_WARNING, CircularDependencyError, MigrationGraph,
+    NodeNotFoundError,
 )
 from django.test import TestCase
 from django.utils.encoding import force_text
@@ -164,11 +165,14 @@ class GraphTests(TestCase):
             graph.add_node(child, None)
             graph.add_dependency(str(i), child, parent)
             expected.append(child)
+        leaf = expected[-1]
 
-        actual = graph.node_map[root].descendants()
-        self.assertEqual(expected[::-1], actual)
+        forwards_plan = graph.forwards_plan(leaf)
+        self.assertEqual(expected, forwards_plan)
 
-    @expectedFailure
+        backwards_plan = graph.backwards_plan(root)
+        self.assertEqual(expected[::-1], backwards_plan)
+
     def test_graph_iterative(self):
         graph = MigrationGraph()
         root = ("app_a", "1")
@@ -180,9 +184,23 @@ class GraphTests(TestCase):
             graph.add_node(child, None)
             graph.add_dependency(str(i), child, parent)
             expected.append(child)
+        leaf = expected[-1]
 
-        actual = graph.node_map[root].descendants()
-        self.assertEqual(expected[::-1], actual)
+        with warnings.catch_warnings(record=True) as w:
+            forwards_plan = graph.forwards_plan(leaf)
+
+        self.assertEqual(len(w), 1)
+        self.assertTrue(issubclass(w[-1].category, RuntimeWarning))
+        self.assertEqual(str(w[-1].message), RECURSION_DEPTH_WARNING)
+        self.assertEqual(expected, forwards_plan)
+
+        with warnings.catch_warnings(record=True) as w:
+            backwards_plan = graph.backwards_plan(root)
+
+        self.assertEqual(len(w), 1)
+        self.assertTrue(issubclass(w[-1].category, RuntimeWarning))
+        self.assertEqual(str(w[-1].message), RECURSION_DEPTH_WARNING)
+        self.assertEqual(expected[::-1], backwards_plan)
 
     def test_plan_invalid_node(self):
         """
