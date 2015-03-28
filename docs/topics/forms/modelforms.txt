@@ -686,7 +686,7 @@ specifying an ``initial`` parameter when instantiating the form. Initial
 values provided this way will override both initial values from the form field
 and values from an attached model instance. For example::
 
-    >>> article = Article.objects.get(pk1=)
+    >>> article = Article.objects.get(pk=1)
     >>> article.headline
     'My headline'
     >>> form = ArticleForm(initial={'headline': 'Initial headline'), instance=article)
