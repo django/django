@@ -76,7 +76,7 @@ class MigrationAutodetector(object):
         change during renames)
         """
         fields_def = []
-        for name, field in fields:
+        for name, field in sorted(fields):
             deconstruction = self.deep_deconstruct(field)
             if field.remote_field and field.remote_field.model:
                 del deconstruction[2]['to']
