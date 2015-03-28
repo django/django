@@ -1,11 +1,19 @@
 from __future__ import unicode_literals
 
+import warnings
 from collections import deque
 
 from django.db.migrations.state import ProjectState
 from django.utils.datastructures import OrderedSet
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import total_ordering
+
+RECURSION_DEPTH_WARNING = (
+    "Maximum recursion depth exceeded while generating migration graph, "
+    "falling back to iterative approach. If you're experiencing performance issues, "
+    "consider squashing migrations as described at "
+    "https://docs.djangoproject.com/en/dev/topics/migrations/#squashing-migrations."
+)
 
 
 @python_2_unicode_compatible
@@ -139,7 +147,12 @@ class MigrationGraph(object):
         self.ensure_not_cyclic(target, lambda x: (parent.key for parent in self.node_map[x].parents))
         self.cached = True
         node = self.node_map[target]
-        return node.ancestors()
+        try:
+            return node.ancestors()
+        except RuntimeError:
+            # fallback to iterative dfs
+            warnings.warn(RECURSION_DEPTH_WARNING, RuntimeWarning)
+            return self.iterative_dfs(node)
 
     def backwards_plan(self, target):
         """
@@ -154,7 +167,35 @@ class MigrationGraph(object):
         self.ensure_not_cyclic(target, lambda x: (child.key for child in self.node_map[x].children))
         self.cached = True
         node = self.node_map[target]
-        return node.descendants()
+        try:
+            return node.descendants()
+        except RuntimeError:
+            # fallback to iterative dfs
+            warnings.warn(RECURSION_DEPTH_WARNING, RuntimeWarning)
+            return self.iterative_dfs(node, forwards=False)
+
+    def iterative_dfs(self, start, forwards=True):
+        """
+        Iterative depth first search, for finding dependencies.
+        """
+        visited = deque()
+        visited.append(start)
+        if forwards:
+            stack = deque(sorted(start.parents))
+        else:
+            stack = deque(sorted(start.children))
+        while stack:
+            node = stack.popleft()
+            visited.appendleft(node)
+            if forwards:
+                children = sorted(node.parents, reverse=True)
+            else:
+                children = sorted(node.children, reverse=True)
+            # reverse sorting is needed because prepending using deque.extendleft
+            # also effectively reverses values
+            stack.extendleft(children)
+
+        return list(OrderedSet(visited))
 
     def root_nodes(self, app=None):
         """
