@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.maps.google.overlays import GEvent, GOverlayBase
 from django.test import TestCase
 from django.test.utils import modify_settings, override_settings
 from django.utils.encoding import force_text
@@ -45,11 +44,13 @@ class GoogleMapsTest(TestCase):
         self.assertIn("En français", google_map.scripts)
 
     def test_gevent_html_safe(self):
+        from django.contrib.gis.maps.google.overlays import GEvent
         event = GEvent('click', 'function() {location.href = "http://www.google.com"}')
         self.assertTrue(hasattr(GEvent, '__html__'))
         self.assertEqual(force_text(event), event.__html__())
 
     def test_goverlay_html_safe(self):
+        from django.contrib.gis.maps.google.overlays import GOverlayBase
         overlay = GOverlayBase()
         overlay.js_params = '"foo", "bar"'
         self.assertTrue(hasattr(GOverlayBase, '__html__'))
