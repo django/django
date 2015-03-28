@@ -313,8 +313,10 @@ You can tell them apart with
 
     if request.user.is_authenticated():
         # Do something for authenticated users.
+        ...
     else:
         # Do something for anonymous users.
+        ...
 
 .. _how-to-log-a-user-in:
 
@@ -351,8 +353,10 @@ If you have an authenticated user you want to attach to the current session
                     # Redirect to a success page.
                 else:
                     # Return a 'disabled account' error message
+                    ...
             else:
                 # Return an 'invalid login' error message.
+                ...
 
 .. admonition:: Calling ``authenticate()`` first
 
