@@ -4,8 +4,9 @@ from django.db import IntegrityError, connection, models, transaction
 from django.test import TestCase
 
 from .models import (
-    Bar, Director, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,
-    Place, RelatedModel, Restaurant, School, Target, UndergroundBar, Waiter,
+    Band, BandManager, Bar, Director, Favorites, HiddenPointer,
+    ManualPrimaryKey, MultiModel, Place, RelatedModel, Restaurant, School,
+    Target, UndergroundBar, Waiter,
 )
 
 
@@ -151,18 +152,6 @@ class OneToOneTests(TestCase):
         should be allowed when the allow_unsaved_instance_assignment
         attribute has been set to True.
         """
-        class UnsavedOneToOneField(models.OneToOneField):
-            # A OneToOneField which can point to an unsaved object
-            allow_unsaved_instance_assignment = True
-
-        class Band(models.Model):
-            name = models.CharField(max_length=50)
-
-        class BandManager(models.Model):
-            band = UnsavedOneToOneField(Band)
-            first_name = models.CharField(max_length=50)
-            last_name = models.CharField(max_length=50)
-
         band = Band(name='The Beatles')
         manager = BandManager(first_name='Brian', last_name='Epstein')
         # This should not raise an exception as the OneToOneField between

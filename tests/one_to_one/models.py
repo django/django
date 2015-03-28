@@ -118,3 +118,18 @@ class Director(models.Model):
     is_temp = models.BooleanField(default=False)
     school = models.OneToOneField(School)
     objects = DirectorManager()
+
+
+class UnsavedOneToOneField(models.OneToOneField):
+    # A OneToOneField which can point to an unsaved object
+    allow_unsaved_instance_assignment = True
+
+
+class Band(models.Model):
+    name = models.CharField(max_length=50)
+
+
+class BandManager(models.Model):
+    band = UnsavedOneToOneField(Band)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)

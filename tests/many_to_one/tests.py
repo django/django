@@ -8,8 +8,8 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy
 
 from .models import (
-    Article, Category, Child, First, Parent, Record, Relation, Reporter,
-    School, Student, Third, ToFieldChild,
+    Article, Band, BandMember, Category, Child, First, Parent, Record, Relation,
+    Reporter, School, Student, Third, ToFieldChild,
 )
 
 
@@ -165,18 +165,6 @@ class ManyToOneTests(TestCase):
         should be allowed when the allow_unsaved_instance_assignment
         attribute has been set to True.
         """
-        class UnsavedForeignKey(models.ForeignKey):
-            # A ForeignKey which can point to an unsaved object
-            allow_unsaved_instance_assignment = True
-
-        class Band(models.Model):
-            name = models.CharField(max_length=50)
-
-        class BandMember(models.Model):
-            band = UnsavedForeignKey(Band)
-            first_name = models.CharField(max_length=50)
-            last_name = models.CharField(max_length=50)
-
         beatles = Band(name='The Beatles')
         john = BandMember(first_name='John', last_name='Lennon')
         # This should not raise an exception as the ForeignKey between member

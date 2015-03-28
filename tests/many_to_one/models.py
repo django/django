@@ -98,3 +98,18 @@ class School(models.Model):
 
 class Student(models.Model):
     school = models.ForeignKey(School)
+
+
+class UnsavedForeignKey(models.ForeignKey):
+    # A ForeignKey which can point to an unsaved object
+    allow_unsaved_instance_assignment = True
+
+
+class Band(models.Model):
+    name = models.CharField(max_length=50)
+
+
+class BandMember(models.Model):
+    band = UnsavedForeignKey(Band)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
