@@ -446,8 +446,8 @@ You should see something similar to the following:
 
     Migrations for 'polls':
       0001_initial.py:
-        - Create model Question
         - Create model Choice
+        - Create model Question
         - Add field question to choice
 
 By running ``makemigrations``, you're telling Django that you've made
@@ -476,16 +476,25 @@ readability):
 .. code-block:: sql
 
     BEGIN;
+    --
+    -- Create model Choice
+    --
     CREATE TABLE "polls_choice" (
         "id" serial NOT NULL PRIMARY KEY,
         "choice_text" varchar(200) NOT NULL,
         "votes" integer NOT NULL
     );
+    --
+    -- Create model Question
+    --
     CREATE TABLE "polls_question" (
         "id" serial NOT NULL PRIMARY KEY,
         "question_text" varchar(200) NOT NULL,
         "pub_date" timestamp with time zone NOT NULL
     );
+    --
+    -- Add field question to choice
+    --
     ALTER TABLE "polls_choice" ADD COLUMN "question_id" integer NOT NULL;
     ALTER TABLE "polls_choice" ALTER COLUMN "question_id" DROP DEFAULT;
     CREATE INDEX "polls_choice_7aa0f6ee" ON "polls_choice" ("question_id");

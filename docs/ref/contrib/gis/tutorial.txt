@@ -286,6 +286,9 @@ This command should produce the following output:
 .. code-block:: sql
 
     BEGIN;
+    --
+    -- Create model WorldBorder
+    --
     CREATE TABLE "world_worldborder" (
         "id" serial NOT NULL PRIMARY KEY,
         "name" varchar(50) NOT NULL,
