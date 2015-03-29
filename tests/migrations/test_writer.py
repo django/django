@@ -454,6 +454,22 @@ class WriterTests(TestCase):
             output
         )
 
+    def test_exclude_models_import(self):
+        """
+        #24514 - Test imports exclude django.db.models if it isn't needed.
+        """
+        migration = type(str("Migration"), (migrations.Migration,), {
+            "operations": [
+                migrations.AlterModelOptions(
+                    name='model',
+                    options={'verbose_name': 'model', 'verbose_name_plural': 'models'},
+                    ),
+            ]
+        })
+        writer = MigrationWriter(migration)
+        output = writer.as_string().decode('utf-8')
+        self.assertIn("from django.db import migrations\n", output)
+
     def test_deconstruct_class_arguments(self):
         # Yes, it doesn't make sense to use a class as a default for a
         # CharField. It does make sense for custom fields though, for example

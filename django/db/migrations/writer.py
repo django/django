@@ -138,7 +138,7 @@ class MigrationWriter(object):
             "replaces_str": "",
         }
 
-        imports = {"from django.db import migrations, models"}
+        imports = set()
 
         # Deconstruct operations
         operations = []
@@ -168,7 +168,15 @@ class MigrationWriter(object):
                 migration_imports.add(line.split("import")[1].strip())
                 imports.remove(line)
                 self.needs_manual_porting = True
-        imports.discard("from django.db import models")
+
+        # django.db.migrations is always used, but models import is not
+        # If models import exists, merge it with migrations import
+        if "from django.db import models" in imports:
+            imports.discard("from django.db import models")
+            imports.add("from django.db import migrations, models")
+        else:
+            imports.add("from django.db import migrations")
+
         # Sort imports by the package / module to be imported (the part after
         # "from" in "from ... import ..." or after "import" in "import ...").
         sorted_imports = sorted(imports, key=lambda i: i.split()[1])
