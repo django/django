@@ -984,6 +984,12 @@ By default, the SQL created is for running the migration in the forwards
 direction. Pass ``--backwards`` to generate the SQL for
 unapplying the migration instead.
 
+.. versionchanged:: 1.9
+
+    To increase the readability of the overall SQL output the SQL code
+    generated for each migration operation is preceded by the operation's
+    description.
+
 sqlsequencereset <app_label app_label ...>
 ------------------------------------------
 
