@@ -889,10 +889,15 @@ In template {{ template_info.name }}, error at line {{ template_info.line }}
 {% else %}
    {{ source_line.0 }} : {{ source_line.1 }}
 {% endifequal %}{% endfor %}{% endif %}
-Traceback:
-{% for frame in frames %}File "{{ frame.filename|escape }}" in {{ frame.function|escape }}
-{% if frame.context_line %}  {{ frame.lineno }}. {{ frame.context_line|escape }}{% endif %}
-{% endfor %}
+Traceback:{% for frame in frames %}
+{% ifchanged frame.exc_cause %}{% if frame.exc_cause %}{% if frame.exc_cause_explicit %}
+The above exception ({{ frame.exc_cause }}) was the direct cause of the following exception:
+{% else %}
+During handling of the above exception ({{ frame.exc_cause }}), another exception occurred:
+{% endif %}{% endif %}{% endifchanged %}
+File "{{ frame.filename|escape }}" in {{ frame.function|escape }}
+{% if frame.context_line %}  {{ frame.lineno }}. {{ frame.context_line|escape }}{% endif %}{% endfor %}
+
 Exception Type: {{ exception_type|escape }}{% if request %} at {{ request.path_info|escape }}{% endif %}
 Exception Value: {{ exception_value|force_escape }}
 </textarea>

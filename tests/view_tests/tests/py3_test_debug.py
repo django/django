@@ -32,10 +32,13 @@ class Py3ExceptionReporterTests(TestCase):
 
         explicit_exc = 'The above exception ({0}) was the direct cause of the following exception:'
         implicit_exc = 'During handling of the above exception ({0}), another exception occurred:'
+
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertIn(explicit_exc.format("Top level"), html)
-        self.assertIn(implicit_exc.format("Second exception"), html)
+        # Both messages are twice on page -- one rendered as html,
+        # one as plain text (for pastebin)
+        self.assertEqual(2, html.count(explicit_exc.format("Top level")))
+        self.assertEqual(2, html.count(implicit_exc.format("Second exception")))
 
         text = reporter.get_traceback_text()
         self.assertIn(explicit_exc.format("Top level"), text)
