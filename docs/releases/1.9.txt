@@ -48,6 +48,11 @@ Minor features
   changing the ``select_related()`` values used in the admin's changelist query
   based on the request.
 
+* The ``available_apps`` context variable, which lists the available
+  applications for the current user, has been added to the
+  :meth:`AdminSite.each_context() <django.contrib.admin.AdminSite.each_context>`
+  method.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

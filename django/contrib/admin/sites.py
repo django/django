@@ -301,6 +301,7 @@ class AdminSite(object):
             'site_header': self.site_header,
             'site_url': self.site_url,
             'has_permission': self.has_permission(request),
+            'available_apps': self.get_app_list(request),
         }
 
     def password_change(self, request, extra_context=None):
@@ -461,11 +462,10 @@ class AdminSite(object):
             return app_dict.get(label)
         return app_dict
 
-    @never_cache
-    def index(self, request, extra_context=None):
+    def get_app_list(self, request):
         """
-        Displays the main admin index page, which lists all of the installed
-        apps that have been registered in this site.
+        Returns a sorted list of all the installed apps that have been
+        registered in this site.
         """
         app_dict = self._build_app_dict(request)
 
@@ -475,6 +475,16 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         for app in app_list:
             app['models'].sort(key=lambda x: x['name'])
+
+        return app_list
+
+    @never_cache
+    def index(self, request, extra_context=None):
+        """
+        Displays the main admin index page, which lists all of the installed
+        apps that have been registered in this site.
+        """
+        app_list = self.get_app_list(request)
 
         context = dict(
             self.each_context(request),

@@ -2507,10 +2507,31 @@ Templates can override or extend base admin templates as described in
     * ``site_title``: :attr:`AdminSite.site_title`
     * ``site_url``: :attr:`AdminSite.site_url`
     * ``has_permission``: :meth:`AdminSite.has_permission`
+    * ``available_apps``: a list of applications from the :doc:`application registry
+      </ref/applications/>` available for the current user. Each entry in the
+      list is a dict representing an application with the following keys:
+
+      * ``app_label``: the application label
+      * ``app_url``: the URL of the application index in the admin
+      * ``has_module_perms``: a boolean indicating if displaying and accessing of
+        the module's index page is permitted for the current user
+      * ``models``: a list of the models available in the application
+
+      Each model is a dict with the following keys:
+
+      * ``object_name``: class name of the model
+      * ``name``: plural name of the model
+      * ``perms``: a ``dict`` tracking ``add``, ``change``, and ``delete`` permissions
+      * ``admin_url``: admin changelist URL for the model
+      * ``add_url``: admin URL to add a new model instance
 
     .. versionchanged:: 1.8
 
         The ``request`` argument and the ``has_permission`` variable were added.
+
+    .. versionchanged:: 1.9
+
+        The ``available_apps`` variable was added.
 
 .. method:: AdminSite.has_permission(request)
 
