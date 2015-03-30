@@ -77,6 +77,7 @@ class CarAdmin(admin.ModelAdmin):
             request, obj, post_url_continue=reverse('admin:admin_custom_urls_car_history', args=[obj.pk]))
 
 
-admin.site.register(Action, ActionAdmin)
-admin.site.register(Person, PersonAdmin)
-admin.site.register(Car, CarAdmin)
+site = admin.AdminSite(name='admin_custom_urls')
+site.register(Action, ActionAdmin)
+site.register(Person, PersonAdmin)
+site.register(Car, CarAdmin)

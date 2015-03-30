@@ -433,17 +433,17 @@ class ProxyModelAdminTests(TestCase):
         proxy = ProxyTrackerUser.objects.get(name='Django Pony')
 
         user_str = 'Tracker user: <a href="%s">%s</a>' % (
-            reverse('admin:proxy_models_trackeruser_change', args=(user.pk,)), user
+            reverse('admin_proxy:proxy_models_trackeruser_change', args=(user.pk,)), user
         )
         proxy_str = 'Proxy tracker user: <a href="%s">%s</a>' % (
-            reverse('admin:proxy_models_proxytrackeruser_change', args=(proxy.pk,)), proxy
+            reverse('admin_proxy:proxy_models_proxytrackeruser_change', args=(proxy.pk,)), proxy
         )
 
         self.client.login(username='super', password='secret')
-        response = self.client.get(reverse('admin:proxy_models_trackeruser_delete', args=(user.pk,)))
+        response = self.client.get(reverse('admin_proxy:proxy_models_trackeruser_delete', args=(user.pk,)))
         delete_str = response.context['deleted_objects'][0]
         self.assertEqual(delete_str, user_str)
-        response = self.client.get(reverse('admin:proxy_models_proxytrackeruser_delete', args=(proxy.pk,)))
+        response = self.client.get(reverse('admin_proxy:proxy_models_proxytrackeruser_delete', args=(proxy.pk,)))
         delete_str = response.context['deleted_objects'][0]
         self.assertEqual(delete_str, proxy_str)
         self.client.logout()

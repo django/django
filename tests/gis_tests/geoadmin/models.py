@@ -16,4 +16,5 @@ class City(models.Model):
     def __str__(self):
         return self.name
 
-admin.site.register(City, admin.OSMGeoAdmin)
+site = admin.AdminSite(name='admin_gis')
+site.register(City, admin.OSMGeoAdmin)

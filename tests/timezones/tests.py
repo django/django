@@ -1100,26 +1100,26 @@ class AdminTests(TestCase):
     @requires_tz_support
     def test_changelist(self):
         e = Event.objects.create(dt=datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
-        response = self.client.get(reverse('admin:timezones_event_changelist'))
+        response = self.client.get(reverse('admin_tz:timezones_event_changelist'))
         self.assertContains(response, e.dt.astimezone(EAT).isoformat())
 
     def test_changelist_in_other_timezone(self):
         e = Event.objects.create(dt=datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
         with timezone.override(ICT):
-            response = self.client.get(reverse('admin:timezones_event_changelist'))
+            response = self.client.get(reverse('admin_tz:timezones_event_changelist'))
         self.assertContains(response, e.dt.astimezone(ICT).isoformat())
 
     @requires_tz_support
     def test_change_editable(self):
         e = Event.objects.create(dt=datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
-        response = self.client.get(reverse('admin:timezones_event_change', args=(e.pk,)))
+        response = self.client.get(reverse('admin_tz:timezones_event_change', args=(e.pk,)))
         self.assertContains(response, e.dt.astimezone(EAT).date().isoformat())
         self.assertContains(response, e.dt.astimezone(EAT).time().isoformat())
 
     def test_change_editable_in_other_timezone(self):
         e = Event.objects.create(dt=datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
         with timezone.override(ICT):
-            response = self.client.get(reverse('admin:timezones_event_change', args=(e.pk,)))
+            response = self.client.get(reverse('admin_tz:timezones_event_change', args=(e.pk,)))
         self.assertContains(response, e.dt.astimezone(ICT).date().isoformat())
         self.assertContains(response, e.dt.astimezone(ICT).time().isoformat())
 
@@ -1128,7 +1128,7 @@ class AdminTests(TestCase):
         Timestamp.objects.create()
         # re-fetch the object for backends that lose microseconds (MySQL)
         t = Timestamp.objects.get()
-        response = self.client.get(reverse('admin:timezones_timestamp_change', args=(t.pk,)))
+        response = self.client.get(reverse('admin_tz:timezones_timestamp_change', args=(t.pk,)))
         self.assertContains(response, t.created.astimezone(EAT).isoformat())
 
     def test_change_readonly_in_other_timezone(self):
@@ -1136,5 +1136,5 @@ class AdminTests(TestCase):
         # re-fetch the object for backends that lose microseconds (MySQL)
         t = Timestamp.objects.get()
         with timezone.override(ICT):
-            response = self.client.get(reverse('admin:timezones_timestamp_change', args=(t.pk,)))
+            response = self.client.get(reverse('admin_tz:timezones_timestamp_change', args=(t.pk,)))
         self.assertContains(response, t.created.astimezone(ICT).isoformat())
