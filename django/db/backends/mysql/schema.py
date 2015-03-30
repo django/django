@@ -21,8 +21,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_delete_index = "DROP INDEX %(name)s ON %(table)s"
 
-    sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
-
     alter_string_set_null = 'MODIFY %(column)s %(type)s NULL;'
     alter_string_drop_null = 'MODIFY %(column)s %(type)s NOT NULL;'
 
