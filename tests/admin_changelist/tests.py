@@ -109,14 +109,17 @@ class ChangeListTests(TestCase):
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
+            m.list_filter, m.date_hierarchy, m.search_fields,
+            m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
-        row_html = '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th><td class="field-parent nowrap">-</td></tr></tbody>' % link
+        row_html = (
+            '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
+            '<td class="field-parent nowrap">-</td></tr></tbody>' % link
+        )
         self.assertNotEqual(table_output.find(row_html), -1,
             'Failed to find expected row element: %s' % table_output)
 
@@ -132,14 +135,17 @@ class ChangeListTests(TestCase):
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
+            m.list_filter, m.date_hierarchy, m.search_fields,
+            m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
-        row_html = '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th><td class="field-parent nowrap">???</td></tr></tbody>' % link
+        row_html = (
+            '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
+            '<td class="field-parent nowrap">???</td></tr></tbody>' % link
+        )
         self.assertNotEqual(table_output.find(row_html), -1,
             'Failed to find expected row element: %s' % table_output)
 
@@ -153,14 +159,17 @@ class ChangeListTests(TestCase):
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
+            m.list_filter, m.date_hierarchy, m.search_fields,
+            m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
-        row_html = '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th><td class="field-age_display">&dagger;</td><td class="field-age">-empty-</td></tr></tbody>' % link
+        row_html = (
+            '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
+            '<td class="field-age_display">&dagger;</td><td class="field-age">-empty-</td></tr></tbody>' % link
+        )
         self.assertNotEqual(table_output.find(row_html), -1,
             'Failed to find expected row element: %s' % table_output)
 
@@ -176,14 +185,17 @@ class ChangeListTests(TestCase):
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
+            m.list_filter, m.date_hierarchy, m.search_fields,
+            m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
-        row_html = '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th><td class="field-parent nowrap">Parent object</td></tr></tbody>' % link
+        row_html = (
+            '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
+            '<td class="field-parent nowrap">Parent object</td></tr></tbody>' % link
+        )
         self.assertNotEqual(table_output.find(row_html), -1,
             'Failed to find expected row element: %s' % table_output)
 

@@ -617,8 +617,8 @@ subclass::
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name', 'colored_name')
 
-    * If the value of a field is None, an empty string or a list without
-      elements then Django will display `-` (a dash). You can override this by
+    * If the value of a field is ``None``, an empty string, or a list without
+      elements then Django will display ``-`` (a dash). You can override this by
       setting another `empty_value_display` on `AdminSite` like::
 
           from django.contrib import admin
@@ -642,6 +642,12 @@ subclass::
 
               birth_date_view.empty_value_display = 'unknown'
 
+    .. versionadded:: 1.9
+
+    ``ModelAdmin`` and ``AdminSite`` now both have a ``empty_value_display``
+    attribute. Likewise it can be set to a custom ``ModelAdmin``
+    field specification.
+
     * If the string given is a method of the model, ``ModelAdmin`` or a
       callable that returns True or False Django will display a pretty
       "on" or "off" icon if you give the method a ``boolean`` attribute
@@ -662,7 +668,6 @@ subclass::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'born_in_fifties')
-
 
     * The ``__str__()`` (``__unicode__()`` on Python 2) method is just
       as valid in ``list_display`` as any other model method, so it's
@@ -2531,7 +2536,9 @@ Templates can override or extend base admin templates as described in
 
     .. versionadded:: 1.9
 
-    Sets the string to use for displaying empty values in the admin site.
+    The string to use for displaying empty values in the admin site change list.
+    The value can be overridden as an attribute on ``AdminSite``, on a per
+    ``ModelAdmin`` basis, or on a custom field within ``ModelAdmin``.
 
 .. attribute:: AdminSite.login_template
 
