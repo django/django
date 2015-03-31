@@ -539,7 +539,7 @@ setting for the middleware.  It can be used like this::
     def my_view(request):
         ...
 
-The ``key_prefix and ``cache`` arguments may be specified together. The
+The ``key_prefix`` and ``cache`` arguments may be specified together. The
 ``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
 specified under :setting:`CACHES` will be concatenated.
 
