@@ -21,3 +21,21 @@ class Jinja2Tests(TemplateStringsTests):
     engine_class = Jinja2
     backend_name = 'jinja2'
     options = {'keep_trailing_newline': True}
+
+    def test_self_context(self):
+        """
+        #24538 -- Using 'self' in the context should not throw errors
+        """
+        engine = Jinja2({
+            'DIRS': [],
+            'APP_DIRS': False,
+            'NAME': 'django',
+            'OPTIONS': {},
+        })
+
+        # self will be overridden to be a TemplateReference, so the self
+        # variable will not come through. Attempting to use one though should
+        # not throw an error.
+        template = engine.from_string('hello {{ foo }}!')
+        content = template.render(context={'self': 'self', 'foo': 'world'})
+        self.assertEqual(content, 'hello world!')
