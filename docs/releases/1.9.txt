@@ -159,6 +159,9 @@ Internationalization
 * The :func:`django.views.i18n.javascript_catalog` view now works correctly
   if used multiple times with different configurations on the same page.
 
+* The :func:`django.utils.timezone.make_aware` function gained an ``is_dst``
+  argument to help resolve ambiguous times during DST transitions.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 

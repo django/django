@@ -155,3 +155,37 @@ class TimezoneTests(unittest.TestCase):
             datetime.datetime(2011, 9, 1, 12, 20, 30))
         with self.assertRaises(ValueError):
             timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30), CET)
+
+    @unittest.skipIf(pytz is None, "this test requires pytz")
+    def test_make_aware_pytz_ambiguous(self):
+        # 2:30 happens twice, once before DST ends and once after
+        ambiguous = datetime.datetime(2015, 10, 25, 2, 30)
+
+        with self.assertRaises(pytz.AmbiguousTimeError):
+            timezone.make_aware(ambiguous, timezone=CET)
+
+        std = timezone.make_aware(ambiguous, timezone=CET, is_dst=False)
+        dst = timezone.make_aware(ambiguous, timezone=CET, is_dst=True)
+        self.assertEqual(std - dst, datetime.timedelta(hours=1))
+        self.assertEqual(std.tzinfo.utcoffset(std), datetime.timedelta(hours=1))
+        self.assertEqual(dst.tzinfo.utcoffset(dst), datetime.timedelta(hours=2))
+
+    @unittest.skipIf(pytz is None, "this test requires pytz")
+    def test_make_aware_pytz_non_existent(self):
+        # 2:30 never happened due to DST
+        non_existent = datetime.datetime(2015, 3, 29, 2, 30)
+
+        with self.assertRaises(pytz.NonExistentTimeError):
+            timezone.make_aware(non_existent, timezone=CET)
+
+        std = timezone.make_aware(non_existent, timezone=CET, is_dst=False)
+        dst = timezone.make_aware(non_existent, timezone=CET, is_dst=True)
+        self.assertEqual(std - dst, datetime.timedelta(hours=1))
+        self.assertEqual(std.tzinfo.utcoffset(std), datetime.timedelta(hours=1))
+        self.assertEqual(dst.tzinfo.utcoffset(dst), datetime.timedelta(hours=2))
+
+        # round trip to UTC then back to CET
+        std = timezone.localtime(timezone.localtime(std, timezone.UTC()), CET)
+        dst = timezone.localtime(timezone.localtime(dst, timezone.UTC()), CET)
+        self.assertEqual((std.hour, std.minute), (3, 30))
+        self.assertEqual((dst.hour, dst.minute), (1, 30))
