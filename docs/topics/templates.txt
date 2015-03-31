@@ -384,6 +384,12 @@ applications. This generic name was kept for backwards-compatibility.
 
 .. class:: Jinja2
 
+Requires Jinja2_ to be installed:
+
+.. code-block:: console
+
+    $ pip install Jinja2
+
 Set :setting:`BACKEND <TEMPLATES-BACKEND>` to
 ``'django.template.backends.jinja2.Jinja2'`` to configure a Jinja2_ engine.
 
