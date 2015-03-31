@@ -35,3 +35,6 @@ Bugfixes
 * Fixed a regression in the model detail view of
   :mod:`~django.contrib.admindocs` when a model has a reverse foreign key
   relation (:ticket:`24624`).
+
+* Prevented arbitrary file inclusions in :mod:`~django.contrib.admindocs`
+  (:ticket:`24625`).

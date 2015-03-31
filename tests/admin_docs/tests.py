@@ -290,6 +290,12 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
             "all related %s objects" % (link % ("admin_docs.group", "admin_docs.Group"))
         )
 
+        # "raw" and "include" directives are disabled
+        self.assertContains(self.response, '<p>&quot;raw&quot; directive disabled.</p>',)
+        self.assertContains(self.response, '.. raw:: html\n    :file: admin_docs/evilfile.txt')
+        self.assertContains(self.response, '<p>&quot;include&quot; directive disabled.</p>',)
+        self.assertContains(self.response, '.. include:: admin_docs/evilfile.txt')
+
     def test_model_with_many_to_one(self):
         link = '<a class="reference external" href="/admindocs/models/%s/">%s</a>'
         response = self.client.get(
