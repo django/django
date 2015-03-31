@@ -80,6 +80,7 @@ class MigrateTests(MigrationTestBase):
             "migrations.0001_initial... faked",
             out.getvalue().lower()
         )
+
         # Run migrations all the way
         call_command("migrate", verbosity=0)
         # Make sure the right tables exist
@@ -108,6 +109,24 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_fake_split_initial"})
+    def test_migrate_fake_split_initial(self):
+        """
+        Make sure split initial migrations can all be faked with --fake-initial.
+        """
+        call_command("migrate", "migrations", "0002", verbosity=0)
+        call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
+        out = six.StringIO()
+        with mock.patch('django.core.management.color.supports_color', lambda *args: False):
+            call_command("migrate", "migrations", "0002", fake_initial=True, stdout=out, verbosity=1)
+        value = out.getvalue().lower()
+        self.assertIn("migrations.0001_initial... faked", value)
+        self.assertIn("migrations.0002_second... faked", value)
+        # Fake an apply
+        call_command("migrate", "migrations", fake=True, verbosity=0)
+        # Unmigrate everything
+        call_command("migrate", "migrations", "zero", verbosity=0)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_migrate_conflict_exit(self):
@@ -409,6 +428,7 @@ class MakeMigrationsTests(MigrationTestBase):
                 content = fp.read()
                 self.assertIn('# -*- coding: utf-8 -*-', content)
                 self.assertIn('migrations.CreateModel', content)
+                self.assertIn('initial = True', content)
 
                 if six.PY3:
                     self.assertIn('úñí©óðé µóðéø', content)  # Meta.verbose_name

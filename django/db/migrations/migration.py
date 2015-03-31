@@ -41,6 +41,13 @@ class Migration(object):
     # are not applied.
     replaces = []
 
+    # Is this an initial migration? Initial migrations are skipped on
+    # --fake-initial if table or fields already exists; if None, check if the
+    # migration has any dependencies to determine if there are dependencies to
+    # tell if db introspection needs to be done; if True, always perform
+    # introspection; if False, never perform introspection.
+    initial = None
+
     def __init__(self, name, app_label):
         self.name = name
         self.app_label = app_label
