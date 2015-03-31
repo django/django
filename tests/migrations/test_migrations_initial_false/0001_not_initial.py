@@ -6,10 +6,9 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    initial = True
+    initial = False
 
     operations = [
-
         migrations.CreateModel(
             "Author",
             [
@@ -20,7 +19,6 @@ class Migration(migrations.Migration):
                 ("silly_field", models.BooleanField(default=False)),
             ],
         ),
-
         migrations.CreateModel(
             "Tribble",
             [
@@ -28,10 +26,8 @@ class Migration(migrations.Migration):
                 ("fluffy", models.BooleanField(default=True)),
             ],
         ),
-
         migrations.AlterUniqueTogether(
             name='author',
             unique_together=set([('name', 'slug')]),
         ),
-
     ]

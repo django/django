@@ -368,6 +368,14 @@ Management Commands
   to the database using the password from your settings file (instead of
   requiring it to be manually entered).
 
+Migrations
+^^^^^^^^^^
+
+* Initial migrations are now marked with an :attr:`initial = True
+  <django.db.migrations.Migration.initial>` class attribute which allows
+  :djadminopt:`migrate --fake-initial <--fake-initial>` to more easily detect
+  initial migrations.
+
 Models
 ^^^^^^
 

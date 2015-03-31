@@ -131,6 +131,7 @@ class Command(BaseCommand):
             "dependencies": dependencies,
             "operations": new_operations,
             "replaces": replaces,
+            "initial": True,
         })
         new_migration = subclass("0001_squashed_%s" % migration.name, app_label)
 
