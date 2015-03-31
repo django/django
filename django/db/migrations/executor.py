@@ -86,11 +86,20 @@ class MigrationExecutor(object):
         # models will be recursively reloaded as explained in
         # `django.db.migrations.state.get_related_models_recursive()`.
         for migration, _ in full_plan:
+            if not migrations_to_run:
+                # We remove every migration whose state was already computed
+                # from the set below (`migrations_to_run.remove(migration)`).
+                # If no states for migrations must be computed, we can exit
+                # this loop. Migrations that occur after the latest migration
+                # that is about to be applied would only trigger unneeded
+                # mutate_state() calls.
+                break
             do_run = migration in migrations_to_run
             if do_run:
                 if 'apps' not in state.__dict__:
                     state.apps  # Render all real_apps -- performance critical
                 states[migration] = state.clone()
+                migrations_to_run.remove(migration)
             # Only preserve the state if the migration is being run later
             state = migration.mutate_state(state, preserve=do_run)
         if self.progress_callback:
