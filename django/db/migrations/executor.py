@@ -87,7 +87,7 @@ class MigrationExecutor(object):
         for migration, _ in full_plan:
             if migration in migrations_to_run:
                 states[migration] = state.clone()
-            state = migration.mutate_state(state)  # state is cloned inside
+            state = migration.mutate_state(state, preserve=False)
         # Phase 2 -- Run the migrations
         for migration, backwards in plan:
             if not backwards:
