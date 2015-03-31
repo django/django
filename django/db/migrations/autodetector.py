@@ -33,6 +33,7 @@ class MigrationAutodetector(object):
         self.from_state = from_state
         self.to_state = to_state
         self.questioner = questioner or MigrationQuestioner()
+        self.existing_apps = {app for app, model in from_state.models}
 
     def changes(self, graph, trim_to_apps=None, convert_apps=None, migration_name=None):
         """
@@ -297,6 +298,7 @@ class MigrationAutodetector(object):
                         instance = subclass("auto_%i" % (len(self.migrations.get(app_label, [])) + 1), app_label)
                         instance.dependencies = list(dependencies)
                         instance.operations = chopped
+                        instance.initial = app_label not in self.existing_apps
                         self.migrations.setdefault(app_label, []).append(instance)
                         chop_mode = False
                     else:

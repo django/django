@@ -155,6 +155,7 @@ class MigrationWriter(object):
         """
         items = {
             "replaces_str": "",
+            "initial_str": "",
         }
 
         imports = set()
@@ -210,6 +211,9 @@ class MigrationWriter(object):
         # If there's a replaces, make a string for it
         if self.migration.replaces:
             items['replaces_str'] = "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
+
+        if self.migration.initial:
+            items['initial_str'] = "\n    initial = True\n"
 
         return (MIGRATION_TEMPLATE % items).encode("utf8")
 
@@ -508,7 +512,7 @@ from __future__ import unicode_literals
 %(imports)s
 
 class Migration(migrations.Migration):
-%(replaces_str)s
+%(replaces_str)s%(initial_str)s
     dependencies = [
 %(dependencies)s\
     ]

@@ -877,6 +877,9 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'otherapp', 1, ["AddField"])
         self.assertMigrationDependencies(changes, 'otherapp', 0, [])
         self.assertMigrationDependencies(changes, 'otherapp', 1, [("otherapp", "auto_1"), ("testapp", "auto_1")])
+        # both split migrations should be `initial`
+        self.assertTrue(changes['otherapp'][0].initial)
+        self.assertTrue(changes['otherapp'][1].initial)
 
     def test_same_app_circular_fk_dependency(self):
         """
