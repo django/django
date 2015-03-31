@@ -74,20 +74,27 @@ class MigrationExecutor(object):
         migrations_to_run = {m[0] for m in plan}
         # Create the forwards plan Django would follow on an empty database
         full_plan = self.migration_plan(self.loader.graph.leaf_nodes(), clean_start=True)
-        # Holds all states right before and right after a migration is applied
+        # Holds all states right before a migration is applied
         # if the migration is being run.
         states = {}
         state = ProjectState(real_apps=list(self.loader.unmigrated_apps))
         if self.progress_callback:
             self.progress_callback("render_start")
-        state.apps  # Render all real_apps -- performance critical
+        # Phase 1 -- Store all project states of migrations right before they
+        # are applied. The first migration that will be applied in phase 2 will
+        # trigger the rendering of the initial project state. From this time on
+        # models will be recursively reloaded as explained in
+        # `django.db.migrations.state.get_related_models_recursive()`.
+        for migration, _ in full_plan:
+            do_run = migration in migrations_to_run
+            if do_run:
+                if 'apps' not in state.__dict__:
+                    state.apps  # Render all real_apps -- performance critical
+                states[migration] = state.clone()
+            # Only preserve the state if the migration is being run later
+            state = migration.mutate_state(state, preserve=do_run)
         if self.progress_callback:
             self.progress_callback("render_success")
-        # Phase 1 -- Store all required states
-        for migration, _ in full_plan:
-            if migration in migrations_to_run:
-                states[migration] = state.clone()
-            state = migration.mutate_state(state)  # state is cloned inside
         # Phase 2 -- Run the migrations
         for migration, backwards in plan:
             if not backwards:
