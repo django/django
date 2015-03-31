@@ -29,6 +29,12 @@ class Person(models.Model):
         Field storing :model:`myapp.Company` where the person works.
 
     (DESCRIPTION)
+
+    .. raw:: html
+        :file: admin_docs/evilfile.txt
+
+    .. include:: admin_docs/evilfile.txt
+
     """
     first_name = models.CharField(max_length=200, help_text="The person's first name")
     last_name = models.CharField(max_length=200, help_text="The person's last name")
