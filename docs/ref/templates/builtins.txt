@@ -2305,7 +2305,7 @@ rel="nofollow">www.djangoproject.com</a>"``.
 In addition to web links, ``urlize`` also converts email addresses into
 ``mailto:`` links. If ``value`` is
 ``"Send questions to foo@example.com"``, the output will be
-``"Send questions to <a href="mailto:foo@example.com">foo@example</a>"``.
+``"Send questions to <a href="mailto:foo@example.com">foo@example.com</a>"``.
 
 The ``urlize`` filter also takes an optional parameter ``autoescape``. If
 ``autoescape`` is ``True``, the link text and URLs will be escaped using
