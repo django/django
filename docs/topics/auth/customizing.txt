@@ -401,6 +401,14 @@ use as your User model.
    have a ForeignKey to each other and seeing how ``makemigrations`` resolves that
    circular dependency if you want to see how it's usually done)
 
+.. admonition:: Reusable apps and ``AUTH_USER_MODEL``
+
+   Reusable apps shouldn't implement a custom user model. A project may use
+   many apps, and two reusable apps that implemented a custom user model
+   couldn't be used together. If you need to store per user information in your
+   app, use a :class:`~django.db.models.ForeignKey` or
+   :class:`~django.db.models.OneToOneField` to ``settings.AUTH_USER_MODEL``
+   as described below.
 
 Referencing the User model
 --------------------------
