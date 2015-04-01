@@ -321,7 +321,7 @@ Now you're ready to actually put the release out there. To do this:
    correct (proper version numbers, no stray ``.pyc`` or other undesirable
    files).
 
-#. Upload the release packages to PyPI (for prereleases, only upload the wheel
+#. Upload the release packages to PyPI (for pre-releases, only upload the wheel
    file)::
 
        $ twine upload -s dist/*
