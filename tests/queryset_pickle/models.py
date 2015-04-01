@@ -2,7 +2,6 @@ import datetime
 
 from django.db import DJANGO_VERSION_PICKLE_KEY, models
 from django.utils.translation import ugettext_lazy as _
-from django.utils.version import get_major_version
 
 
 def standalone_number():
@@ -27,7 +26,7 @@ nn = Numbers()
 class PreviousDjangoVersionQuerySet(models.QuerySet):
     def __getstate__(self):
         state = super(PreviousDjangoVersionQuerySet, self).__getstate__()
-        state[DJANGO_VERSION_PICKLE_KEY] = str(float(get_major_version()) - 0.1)  # previous major version
+        state[DJANGO_VERSION_PICKLE_KEY] = '1.0'
         return state
 
 

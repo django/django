@@ -6,7 +6,7 @@ import warnings
 
 from django.test import TestCase
 from django.utils.encoding import force_text
-from django.utils.version import get_major_version, get_version
+from django.utils.version import get_version
 
 from .models import Container, Event, Group, Happening, M2MModel
 
@@ -141,7 +141,8 @@ class PickleabilityTestCase(TestCase):
         with warnings.catch_warnings(record=True) as recorded:
             pickle.loads(pickle.dumps(qs))
             msg = force_text(recorded.pop().message)
-            self.assertEqual(msg,
-                "Pickled queryset instance's Django version %s does not "
-                "match the current version %s."
-                % (str(float(get_major_version()) - 0.1), get_version()))
+            self.assertEqual(
+                msg,
+                "Pickled queryset instance's Django version 1.0 does not "
+                "match the current version %s." % get_version()
+            )
