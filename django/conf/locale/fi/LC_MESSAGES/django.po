@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Aarni Koskela, 2015
 # Antti Kaihola <antti-2013@ambitone.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Lasse Liehu <larso@gmx.com>, 2015
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-23 14:10+0200\n"
-"PO-Revision-Date: 2014-08-24 08:52+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:44+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Finnish (http://www.transifex.com/projects/p/django/language/"
 "fi/)\n"
@@ -19,413 +21,315 @@ msgstr ""
 "Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: conf/global_settings.py:51
 msgid "Afrikaans"
-msgstr ""
+msgstr "afrikaans"
 
-#: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "arabia"
 
-#: conf/global_settings.py:53
 msgid "Asturian"
-msgstr ""
+msgstr "asturian kieli"
 
-#: conf/global_settings.py:53
 msgid "Azerbaijani"
-msgstr "Azeri"
+msgstr "azeri"
 
-#: conf/global_settings.py:54
 msgid "Bulgarian"
 msgstr "bulgaria"
 
-#: conf/global_settings.py:55
 msgid "Belarusian"
-msgstr ""
+msgstr "valkovenäjän kieli"
 
-#: conf/global_settings.py:56
 msgid "Bengali"
 msgstr "bengali"
 
-#: conf/global_settings.py:57
 msgid "Breton"
-msgstr ""
+msgstr "bretoni"
 
-#: conf/global_settings.py:58
 msgid "Bosnian"
 msgstr "bosnia"
 
-#: conf/global_settings.py:59
 msgid "Catalan"
 msgstr "katalaani"
 
-#: conf/global_settings.py:60
 msgid "Czech"
 msgstr "tšekki"
 
-#: conf/global_settings.py:61
 msgid "Welsh"
 msgstr "wales"
 
-#: conf/global_settings.py:62
 msgid "Danish"
 msgstr "tanska"
 
-#: conf/global_settings.py:63
 msgid "German"
 msgstr "saksa"
 
-#: conf/global_settings.py:64
 msgid "Greek"
 msgstr "kreikka"
 
-#: conf/global_settings.py:65
 msgid "English"
 msgstr "englanti"
 
-#: conf/global_settings.py:66
 msgid "Australian English"
-msgstr ""
+msgstr "australianenglanti"
 
-#: conf/global_settings.py:67
 msgid "British English"
 msgstr "brittienglanti"
 
-#: conf/global_settings.py:68
 msgid "Esperanto"
-msgstr ""
+msgstr "esperanto"
 
-#: conf/global_settings.py:69
 msgid "Spanish"
 msgstr "espanja"
 
-#: conf/global_settings.py:70
 msgid "Argentinian Spanish"
 msgstr "Argentiinan espanja"
 
-#: conf/global_settings.py:71
 msgid "Mexican Spanish"
 msgstr "Meksikon espanja"
 
-#: conf/global_settings.py:72
 msgid "Nicaraguan Spanish"
 msgstr "Nicaraguan espanja"
 
-#: conf/global_settings.py:73
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "Venezuelan espanja"
 
-#: conf/global_settings.py:74
 msgid "Estonian"
 msgstr "viro"
 
-#: conf/global_settings.py:75
 msgid "Basque"
 msgstr "baski"
 
-#: conf/global_settings.py:76
 msgid "Persian"
 msgstr "persia"
 
-#: conf/global_settings.py:77
 msgid "Finnish"
 msgstr "suomi"
 
-#: conf/global_settings.py:78
 msgid "French"
 msgstr "ranska"
 
-#: conf/global_settings.py:79
 msgid "Frisian"
 msgstr "friisi"
 
-#: conf/global_settings.py:80
 msgid "Irish"
 msgstr "irlanti"
 
-#: conf/global_settings.py:81
 msgid "Galician"
 msgstr "galicia"
 
-#: conf/global_settings.py:82
 msgid "Hebrew"
 msgstr "heprea"
 
-#: conf/global_settings.py:83
 msgid "Hindi"
 msgstr "hindi"
 
-#: conf/global_settings.py:84
 msgid "Croatian"
 msgstr "kroatia"
 
-#: conf/global_settings.py:85
 msgid "Hungarian"
 msgstr "unkari"
 
-#: conf/global_settings.py:86
 msgid "Interlingua"
-msgstr ""
+msgstr "interlingua"
 
-#: conf/global_settings.py:87
 msgid "Indonesian"
 msgstr "indonesia"
 
-#: conf/global_settings.py:88
 msgid "Ido"
-msgstr ""
+msgstr "ido"
 
-#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "islanti"
 
-#: conf/global_settings.py:89
 msgid "Italian"
 msgstr "italia"
 
-#: conf/global_settings.py:90
 msgid "Japanese"
 msgstr "japani"
 
-#: conf/global_settings.py:91
 msgid "Georgian"
 msgstr "georgia"
 
-#: conf/global_settings.py:92
 msgid "Kazakh"
-msgstr ""
+msgstr "kazakin kieli"
 
-#: conf/global_settings.py:93
 msgid "Khmer"
 msgstr "khmer"
 
-#: conf/global_settings.py:94
 msgid "Kannada"
 msgstr "kannada"
 
-#: conf/global_settings.py:95
 msgid "Korean"
 msgstr "korea"
 
-#: conf/global_settings.py:96
 msgid "Luxembourgish"
-msgstr ""
+msgstr "luxemburgin kieli"
 
-#: conf/global_settings.py:97
 msgid "Lithuanian"
 msgstr "liettua"
 
-#: conf/global_settings.py:98
 msgid "Latvian"
 msgstr "latvia"
 
-#: conf/global_settings.py:99
 msgid "Macedonian"
 msgstr "makedonia"
 
-#: conf/global_settings.py:100
 msgid "Malayalam"
 msgstr "malajalam"
 
-#: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "mongolia"
 
-#: conf/global_settings.py:102
 msgid "Marathi"
-msgstr ""
+msgstr "marathi"
 
-#: conf/global_settings.py:102
 msgid "Burmese"
-msgstr ""
+msgstr "burman kieli"
 
-#: conf/global_settings.py:103
 msgid "Norwegian Bokmal"
 msgstr "norja (kirjanorja)"
 
-#: conf/global_settings.py:104
 msgid "Nepali"
-msgstr ""
+msgstr "nepalin kieli"
 
-#: conf/global_settings.py:105
 msgid "Dutch"
 msgstr "hollanti"
 
-#: conf/global_settings.py:106
 msgid "Norwegian Nynorsk"
 msgstr "norja (uusnorja)"
 
-#: conf/global_settings.py:107
 msgid "Ossetic"
-msgstr ""
+msgstr "osseetin kieli"
 
-#: conf/global_settings.py:108
 msgid "Punjabi"
 msgstr "punjabin kieli"
 
-#: conf/global_settings.py:109
 msgid "Polish"
 msgstr "puola"
 
-#: conf/global_settings.py:110
 msgid "Portuguese"
 msgstr "portugali"
 
-#: conf/global_settings.py:111
 msgid "Brazilian Portuguese"
 msgstr "brasilian portugali"
 
-#: conf/global_settings.py:112
 msgid "Romanian"
 msgstr "romania"
 
-#: conf/global_settings.py:113
 msgid "Russian"
 msgstr "venäjä"
 
-#: conf/global_settings.py:114
 msgid "Slovak"
 msgstr "slovakia"
 
-#: conf/global_settings.py:115
 msgid "Slovenian"
 msgstr "slovenia"
 
-#: conf/global_settings.py:116
 msgid "Albanian"
 msgstr "albaani"
 
-#: conf/global_settings.py:117
 msgid "Serbian"
 msgstr "serbia"
 
-#: conf/global_settings.py:118
 msgid "Serbian Latin"
 msgstr "serbian latina"
 
-#: conf/global_settings.py:119
 msgid "Swedish"
 msgstr "ruotsi"
 
-#: conf/global_settings.py:120
 msgid "Swahili"
-msgstr ""
+msgstr "swahili"
 
-#: conf/global_settings.py:121
 msgid "Tamil"
 msgstr "tamili"
 
-#: conf/global_settings.py:122
 msgid "Telugu"
 msgstr "telugu"
 
-#: conf/global_settings.py:123
 msgid "Thai"
 msgstr "thain kieli"
 
-#: conf/global_settings.py:124
 msgid "Turkish"
 msgstr "turkki"
 
-#: conf/global_settings.py:125
 msgid "Tatar"
-msgstr ""
+msgstr "tataarin kieli"
 
-#: conf/global_settings.py:126
 msgid "Udmurt"
-msgstr ""
+msgstr "udmurtti"
 
-#: conf/global_settings.py:127
 msgid "Ukrainian"
 msgstr "ukraina"
 
-#: conf/global_settings.py:128
 msgid "Urdu"
-msgstr "Urdu"
+msgstr "urdu"
 
-#: conf/global_settings.py:129
 msgid "Vietnamese"
 msgstr "vietnam"
 
-#: conf/global_settings.py:130 conf/global_settings.py:131
 msgid "Simplified Chinese"
 msgstr "kiina (yksinkertaistettu)"
 
-#: conf/global_settings.py:132 conf/global_settings.py:133
 msgid "Traditional Chinese"
 msgstr "kiina (perinteinen)"
 
-#: contrib/sitemaps/apps.py:8
+msgid "Messages"
+msgstr ""
+
 msgid "Site Maps"
-msgstr ""
+msgstr "Sivukartat"
 
-#: contrib/staticfiles/apps.py:8
 msgid "Static Files"
-msgstr ""
+msgstr "Staattiset tiedostot"
 
-#: contrib/syndication/apps.py:8
 msgid "Syndication"
-msgstr ""
+msgstr "Syndikointi"
 
-#: contrib/webdesign/apps.py:8
 msgid "Web Design"
-msgstr ""
+msgstr "Websuunnittelu"
 
-#: core/validators.py:21
 msgid "Enter a valid value."
 msgstr "Syötä oikea arvo."
 
-#: core/validators.py:77 forms/fields.py:675
 msgid "Enter a valid URL."
 msgstr "Syötä oikea URL-osoite."
 
-#: core/validators.py:115
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Syötä kelvollinen kokonaisluku."
 
-#: core/validators.py:120
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "Syötä kelvollinen sähköpostiosoite."
 
-#: core/validators.py:185
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Tässä voidaan käyttää vain kirjaimia (a-z), numeroita (0-9) sekä ala- ja "
 "tavuviivoja (_ -)."
 
-#: core/validators.py:188 core/validators.py:207
 msgid "Enter a valid IPv4 address."
 msgstr "Syötä kelvollinen IPv4-osoite."
 
-#: core/validators.py:193 core/validators.py:208
 msgid "Enter a valid IPv6 address."
-msgstr ""
+msgstr "Syötä kelvollinen IPv6-osoite."
 
-#: core/validators.py:203 core/validators.py:206
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr ""
+msgstr "Syötä kelvollinen IPv4- tai IPv6-osoite."
 
-#: core/validators.py:229 db/models/fields/__init__.py:1070
 msgid "Enter only digits separated by commas."
 msgstr "Vain pilkulla erotetut kokonaisluvut kelpaavat tässä."
 
-#: core/validators.py:236
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "Tämän arvon on oltava %(limit_value)s (nyt %(show_value)s)."
 
-#: core/validators.py:255
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Tämän arvon on oltava enintään %(limit_value)s."
 
-#: core/validators.py:262
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Tämän luvun on oltava vähintään %(limit_value)s."
 
-#: core/validators.py:271
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
@@ -434,9 +338,12 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"Varmista, että tämä arvo on vähintään %(limit_value)d merkin pituinen (tällä "
+"hetkellä %(show_value)d)."
 msgstr[1] ""
+"Varmista, että tämä arvo on vähintään %(limit_value)d merkkiä pitkä (tällä "
+"hetkellä %(show_value)d)."
 
-#: core/validators.py:282
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d character (it has "
@@ -445,375 +352,340 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"Varmista, että tämä arvo on enintään %(limit_value)d merkin pituinen (tällä "
+"hetkellä %(show_value)d)."
 msgstr[1] ""
+"Varmista, että tämä arvo on enintään %(limit_value)d merkkiä pitkä (tällä "
+"hetkellä %(show_value)d)."
 
-#: db/models/base.py:975 forms/models.py:718
 msgid "and"
 msgstr "ja"
 
-#: db/models/base.py:977
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s jolla on nämä %(field_labels)s on jo olemassa."
 
-#: db/models/fields/__init__.py:104
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Arvo %(value)r ei kelpaa."
 
-#: db/models/fields/__init__.py:105
 msgid "This field cannot be null."
 msgstr "Tämän kentän arvo ei voi olla \"null\"."
 
-#: db/models/fields/__init__.py:106
 msgid "This field cannot be blank."
 msgstr "Tämä kenttä ei voi olla tyhjä."
 
-#: db/models/fields/__init__.py:107
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s jolla on tämä %(field_label)s, on jo olemassa."
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
 #. Eg: "Title must be unique for pub_date year"
-#: db/models/fields/__init__.py:111
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"\"%(field_label)s\"-kentän on oltava uniikki suhteessa: %(date_field_label)s "
+"%(lookup_type)s."
 
-#: db/models/fields/__init__.py:116
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Kenttä tyyppiä: %(field_type)s"
 
-#: db/models/fields/__init__.py:847 db/models/fields/__init__.py:1573
 msgid "Integer"
 msgstr "Kokonaisluku"
 
-#: db/models/fields/__init__.py:851 db/models/fields/__init__.py:1571
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "%(value)s-arvo tulee olla kokonaisluku."
 
-#: db/models/fields/__init__.py:926
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "%(value)s-arvo pitää olla joko tosi tai epätosi."
 
-#: db/models/fields/__init__.py:928
 msgid "Boolean (Either True or False)"
 msgstr "Totuusarvo: joko tosi (True) tai epätosi (False)"
 
-#: db/models/fields/__init__.py:1004
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Merkkijono (enintään %(max_length)s merkkiä)"
 
-#: db/models/fields/__init__.py:1065
 msgid "Comma-separated integers"
 msgstr "Pilkulla erotetut kokonaisluvut"
 
-#: db/models/fields/__init__.py:1080
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"%(value)s-arvo on väärässä päivämäärämuodossa. Sen tulee olla VVVV-KK-PP -"
+"muodossa."
 
-#: db/models/fields/__init__.py:1082 db/models/fields/__init__.py:1189
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"%(value)s-arvo on oikeassa päivämäärämuodossa (VVVV-KK-PP), muttei ole "
+"kelvollinen päivämäärä."
 
-#: db/models/fields/__init__.py:1085
 msgid "Date (without time)"
 msgstr "Päivämäärä (ilman kellonaikaa)"
 
-#: db/models/fields/__init__.py:1187
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"%(value)s-arvon muoto ei kelpaa. Se tulee olla VVVV-KK-PP TT:MM[:ss[.uuuuuu]]"
+"[TZ] -muodossa."
 
-#: db/models/fields/__init__.py:1191
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"%(value)s-arvon muoto on oikea (VVVV-KK-PP TT:MM[:ss[.uuuuuu]][TZ]), mutta "
+"päivämäärä/aika ei ole kelvollinen."
 
-#: db/models/fields/__init__.py:1195
 msgid "Date (with time)"
 msgstr "Päivämäärä ja kellonaika"
 
-#: db/models/fields/__init__.py:1297
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "%(value)s-arvo tulee olla desimaaliluku."
 
-#: db/models/fields/__init__.py:1299
 msgid "Decimal number"
 msgstr "Desimaaliluku"
 
-#: db/models/fields/__init__.py:1444
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"uuuuuu] format."
+msgstr ""
+
+msgid "Duration"
+msgstr ""
+
 msgid "Email address"
 msgstr "Sähköpostiosoite"
 
-#: db/models/fields/__init__.py:1470
 msgid "File path"
 msgstr "Tiedostopolku"
 
-#: db/models/fields/__init__.py:1537
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "%(value)s-arvo tulee olla liukuluku."
 
-#: db/models/fields/__init__.py:1539
 msgid "Floating point number"
 msgstr "Liukuluku"
 
-#: db/models/fields/__init__.py:1623
 msgid "Big (8 byte) integer"
 msgstr "Suuri (8-tavuinen) kokonaisluku"
 
-#: db/models/fields/__init__.py:1638
 msgid "IPv4 address"
-msgstr ""
+msgstr "IPv4-osoite"
 
-#: db/models/fields/__init__.py:1668
 msgid "IP address"
 msgstr "IP-osoite"
 
-#: db/models/fields/__init__.py:1747
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "%(value)s-arvo tulee olla joko ei mitään, tosi tai epätosi."
 
-#: db/models/fields/__init__.py:1749
 msgid "Boolean (Either True, False or None)"
 msgstr "Totuusarvo: joko tosi (True), epätosi (False) tai ei mikään (None)"
 
-#: db/models/fields/__init__.py:1809
 msgid "Positive integer"
-msgstr ""
+msgstr "Positiivinen kokonaisluku"
 
-#: db/models/fields/__init__.py:1821
 msgid "Positive small integer"
-msgstr ""
+msgstr "Pieni positiivinen kokonaisluku"
 
-#: db/models/fields/__init__.py:1834
 #, python-format
 msgid "Slug (up to %(max_length)s)"
-msgstr ""
+msgstr "Lyhytnimi (enintään %(max_length)s merkkiä)"
 
-#: db/models/fields/__init__.py:1863
 msgid "Small integer"
-msgstr ""
+msgstr "Pieni kokonaisluku"
 
-#: db/models/fields/__init__.py:1870
 msgid "Text"
 msgstr "Tekstiä"
 
-#: db/models/fields/__init__.py:1893
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
-msgstr ""
+msgstr "%(value)s-arvo pitää olla muodossa TT:MM[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:1895
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"%(value)s-arvo on oikeassa muodossa (TT:MM[:ss[.uuuuuu]]), mutta kellonaika "
+"ei kelpaa."
 
-#: db/models/fields/__init__.py:1898
 msgid "Time"
 msgstr "Kellonaika"
 
-#: db/models/fields/__init__.py:1977
 msgid "URL"
 msgstr "URL-osoite"
 
-#: db/models/fields/__init__.py:2000
 msgid "Raw binary data"
-msgstr ""
+msgstr "Raaka binaaridata"
 
-#: db/models/fields/files.py:225
-msgid "File"
-msgstr ""
-
-#: db/models/fields/files.py:375
-msgid "Image"
-msgstr ""
-
-#: db/models/fields/related.py:1580
 #, python-format
-msgid "%(model)s instance with pk %(pk)r does not exist."
+msgid "'%(value)s' is not a valid UUID."
 msgstr ""
 
-#: db/models/fields/related.py:1582
+msgid "File"
+msgstr "Tiedosto"
+
+msgid "Image"
+msgstr "Kuva"
+
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr ""
+
 msgid "Foreign Key (type determined by related field)"
 msgstr "Vierasavain (tyyppi määräytyy liittyvän kentän mukaan)"
 
-#: db/models/fields/related.py:1773
 msgid "One-to-one relationship"
 msgstr "Yksi-yhteen relaatio"
 
-#: db/models/fields/related.py:1843
 msgid "Many-to-many relationship"
 msgstr "Moni-moneen relaatio"
 
-#: forms/fields.py:55
 msgid "This field is required."
 msgstr "Tämä kenttä vaaditaan."
 
-#: forms/fields.py:236
 msgid "Enter a whole number."
 msgstr "Syötä kokonaisluku."
 
-#: forms/fields.py:279 forms/fields.py:316
 msgid "Enter a number."
 msgstr "Syötä luku."
 
-#: forms/fields.py:318
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Tässä luvussa voi olla yhteensä enintään %(max)s numero."
+msgstr[1] "Tässä luvussa voi olla yhteensä enintään %(max)s numeroa."
 
-#: forms/fields.py:322
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Tässä luvussa saa olla enintään %(max)s desimaali."
+msgstr[1] "Tässä luvussa saa olla enintään %(max)s desimaalia."
 
-#: forms/fields.py:326
 #, python-format
 msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
+"Tässä luvussa saa olla enintään %(max)s numero ennen desimaalipilkkua."
 msgstr[1] ""
+"Tässä luvussa saa olla enintään %(max)s numeroa ennen desimaalipilkkua."
 
-#: forms/fields.py:437 forms/fields.py:1139
 msgid "Enter a valid date."
 msgstr "Syötä oikea päivämäärä."
 
-#: forms/fields.py:461 forms/fields.py:1140
 msgid "Enter a valid time."
 msgstr "Syötä oikea kellonaika."
 
-#: forms/fields.py:483
 msgid "Enter a valid date/time."
 msgstr "Syötä oikea pvm/kellonaika."
 
-#: forms/fields.py:564
+msgid "Enter a valid duration."
+msgstr ""
+
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tiedostoa ei lähetetty. Tarkista lomakkeen koodaus (encoding)."
 
-#: forms/fields.py:565
 msgid "No file was submitted."
 msgstr "Yhtään tiedostoa ei ole lähetetty."
 
-#: forms/fields.py:566
 msgid "The submitted file is empty."
 msgstr "Lähetetty tiedosto on tyhjä."
 
-#: forms/fields.py:568
 #, python-format
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+"Varmista, että tämä tiedostonimi on enintään %(max)d merkin pituinen (tällä "
+"hetkellä %(length)d)."
 msgstr[1] ""
+"Varmista, että tämä tiedostonimi on enintään %(max)d merkkiä pitkä (tällä "
+"hetkellä %(length)d)."
 
-#: forms/fields.py:571
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "Voit joko lähettää tai poistaa tiedoston, muttei kumpaakin samalla."
 
-#: forms/fields.py:632
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
 "Kuva ei kelpaa. Lähettämäsi tiedosto ei ole kuva, tai tiedosto on vioittunut."
 
-#: forms/fields.py:782 forms/fields.py:871 forms/models.py:1192
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Valitse oikea vaihtoehto. %(value)s ei ole vaihtoehtojen joukossa."
 
-#: forms/fields.py:872 forms/fields.py:987 forms/models.py:1191
 msgid "Enter a list of values."
 msgstr "Syötä lista."
 
-#: forms/fields.py:988
 msgid "Enter a complete value."
+msgstr "Syötä kokonainen arvo."
+
+msgid "Enter a valid UUID."
 msgstr ""
 
 #. Translators: This is the default suffix added to form field labels
-#: forms/forms.py:122
 msgid ":"
-msgstr ""
+msgstr ":"
 
-#: forms/forms.py:192
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
+msgstr "(Piilokenttä %(name)s) %(error)s"
 
 #. Translators: If found as last label character, these punctuation
 #. characters will prevent the default label_suffix to be appended to the
 #. label
-#: forms/forms.py:620
 msgid ":?.!"
-msgstr ""
+msgstr ":?.!"
 
-#: forms/formsets.py:95
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "ManagementForm-tiedot puuttuvat tai niitä on muutettu"
 
-#: forms/formsets.py:332
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Lähetä enintään %d lomake."
+msgstr[1] "Lähetä enintään %d lomaketta."
 
-#: forms/formsets.py:339
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Lähetä vähintään %d lomake."
+msgstr[1] "Lähetä vähintään %d lomaketta."
 
-#: forms/formsets.py:367 forms/formsets.py:369
 msgid "Order"
 msgstr "Järjestys"
 
-#: forms/formsets.py:371
 msgid "Delete"
 msgstr "Poista"
 
-#: forms/models.py:712
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Korjaa kaksoisarvo kentälle %(field)s."
 
-#: forms/models.py:716
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "Ole hyvä ja korjaa uniikin kentän %(field)s kaksoisarvo."
 
-#: forms/models.py:722
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -822,520 +694,437 @@ msgstr ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 
-#: forms/models.py:730
 msgid "Please correct the duplicate values below."
 msgstr "Korjaa allaolevat kaksoisarvot."
 
-#: forms/models.py:1028
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "Liittyvä perusavain ei vastannut vanhemman perusavainta."
 
-#: forms/models.py:1094
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Valitse oikea vaihtoehto. Valintasi ei löydy vaihtoehtojen joukosta."
 
-#: forms/models.py:1194
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "\"%(pk)s\" ei ole kelvollinen pääavainarvo."
 
-#: forms/models.py:1205
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-" Pidä \"Ctrl\"-näppäin (tai Macin \"Command\") pohjassa valitaksesi useita "
-"vaihtoehtoja."
-
-#: forms/utils.py:148
 #, python-format
 msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
+"%(datetime)s -arvoa ei pystytty lukemaan aikavyöhykkeellä "
+"%(current_timezone)s; se saattaa olla moniarvoinen tai määrittämätön."
 
-#: forms/widgets.py:350
 msgid "Currently"
 msgstr "Tällä hetkellä"
 
-#: forms/widgets.py:351
 msgid "Change"
 msgstr "Muokkaa"
 
-#: forms/widgets.py:352
 msgid "Clear"
 msgstr "Poista"
 
-#: forms/widgets.py:546
 msgid "Unknown"
 msgstr "Tuntematon"
 
-#: forms/widgets.py:547
 msgid "Yes"
 msgstr "Kyllä"
 
-#: forms/widgets.py:548
 msgid "No"
 msgstr "Ei"
 
-#: template/defaultfilters.py:855
 msgid "yes,no,maybe"
 msgstr "kyllä,ei,ehkä"
 
-#: template/defaultfilters.py:884 template/defaultfilters.py:896
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d tavu"
 msgstr[1] "%(size)d tavua"
 
-#: template/defaultfilters.py:898
 #, python-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: template/defaultfilters.py:900
 #, python-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: template/defaultfilters.py:902
 #, python-format
 msgid "%s GB"
 msgstr "%s GB"
 
-#: template/defaultfilters.py:904
 #, python-format
 msgid "%s TB"
 msgstr "%s TB"
 
-#: template/defaultfilters.py:906
 #, python-format
 msgid "%s PB"
 msgstr "%s PB"
 
-#: utils/dateformat.py:59
 msgid "p.m."
 msgstr "ip"
 
-#: utils/dateformat.py:60
 msgid "a.m."
 msgstr "ap"
 
-#: utils/dateformat.py:65
 msgid "PM"
 msgstr "IP"
 
-#: utils/dateformat.py:66
 msgid "AM"
 msgstr "AP"
 
-#: utils/dateformat.py:149
 msgid "midnight"
 msgstr "keskiyö"
 
-#: utils/dateformat.py:151
 msgid "noon"
 msgstr "keskipäivä"
 
-#: utils/dates.py:6
 msgid "Monday"
 msgstr "maanantai"
 
-#: utils/dates.py:6
 msgid "Tuesday"
 msgstr "tiistai"
 
-#: utils/dates.py:6
 msgid "Wednesday"
 msgstr "keskiviikko"
 
-#: utils/dates.py:6
 msgid "Thursday"
 msgstr "torstai"
 
-#: utils/dates.py:6
 msgid "Friday"
 msgstr "perjantai"
 
-#: utils/dates.py:7
 msgid "Saturday"
 msgstr "lauantai"
 
-#: utils/dates.py:7
 msgid "Sunday"
 msgstr "sunnuntai"
 
-#: utils/dates.py:10
 msgid "Mon"
 msgstr "ma"
 
-#: utils/dates.py:10
 msgid "Tue"
 msgstr "ti"
 
-#: utils/dates.py:10
 msgid "Wed"
 msgstr "ke"
 
-#: utils/dates.py:10
 msgid "Thu"
 msgstr "to"
 
-#: utils/dates.py:10
 msgid "Fri"
 msgstr "pe"
 
-#: utils/dates.py:11
 msgid "Sat"
 msgstr "la"
 
-#: utils/dates.py:11
 msgid "Sun"
 msgstr "su"
 
-#: utils/dates.py:18
 msgid "January"
 msgstr "tammikuu"
 
-#: utils/dates.py:18
 msgid "February"
 msgstr "helmikuu"
 
-#: utils/dates.py:18
 msgid "March"
 msgstr "maaliskuu"
 
-#: utils/dates.py:18
 msgid "April"
 msgstr "huhtikuu"
 
-#: utils/dates.py:18
 msgid "May"
 msgstr "toukokuu"
 
-#: utils/dates.py:18
 msgid "June"
 msgstr "kesäkuu"
 
-#: utils/dates.py:19
 msgid "July"
 msgstr "heinäkuu"
 
-#: utils/dates.py:19
 msgid "August"
 msgstr "elokuu"
 
-#: utils/dates.py:19
 msgid "September"
 msgstr "syyskuu"
 
-#: utils/dates.py:19
 msgid "October"
 msgstr "lokakuu"
 
-#: utils/dates.py:19
 msgid "November"
 msgstr "marraskuu"
 
-#: utils/dates.py:20
 msgid "December"
 msgstr "joulukuu"
 
-#: utils/dates.py:23
 msgid "jan"
 msgstr "tam"
 
-#: utils/dates.py:23
 msgid "feb"
 msgstr "hel"
 
-#: utils/dates.py:23
 msgid "mar"
 msgstr "maa"
 
-#: utils/dates.py:23
 msgid "apr"
 msgstr "huh"
 
-#: utils/dates.py:23
 msgid "may"
 msgstr "tou"
 
-#: utils/dates.py:23
 msgid "jun"
 msgstr "kes"
 
-#: utils/dates.py:24
 msgid "jul"
 msgstr "hei"
 
-#: utils/dates.py:24
 msgid "aug"
 msgstr "elo"
 
-#: utils/dates.py:24
 msgid "sep"
 msgstr "syy"
 
-#: utils/dates.py:24
 msgid "oct"
 msgstr "lok"
 
-#: utils/dates.py:24
 msgid "nov"
 msgstr "mar"
 
-#: utils/dates.py:24
 msgid "dec"
 msgstr "jou"
 
-#: utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Jan."
 msgstr "tammi"
 
-#: utils/dates.py:32
 msgctxt "abbrev. month"
 msgid "Feb."
 msgstr "helmi"
 
-#: utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "March"
 msgstr "maalis"
 
-#: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
 msgstr "huhti"
 
-#: utils/dates.py:35
 msgctxt "abbrev. month"
 msgid "May"
 msgstr "touko"
 
-#: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
 msgstr "kesä"
 
-#: utils/dates.py:37
 msgctxt "abbrev. month"
 msgid "July"
 msgstr "heinä"
 
-#: utils/dates.py:38
 msgctxt "abbrev. month"
 msgid "Aug."
 msgstr "elo"
 
-#: utils/dates.py:39
 msgctxt "abbrev. month"
 msgid "Sept."
 msgstr "syys"
 
-#: utils/dates.py:40
 msgctxt "abbrev. month"
 msgid "Oct."
 msgstr "loka"
 
-#: utils/dates.py:41
 msgctxt "abbrev. month"
 msgid "Nov."
 msgstr "marras"
 
-#: utils/dates.py:42
 msgctxt "abbrev. month"
 msgid "Dec."
 msgstr "joulu"
 
-#: utils/dates.py:45
 msgctxt "alt. month"
 msgid "January"
 msgstr "tammikuuta"
 
-#: utils/dates.py:46
 msgctxt "alt. month"
 msgid "February"
 msgstr "helmikuuta"
 
-#: utils/dates.py:47
 msgctxt "alt. month"
 msgid "March"
 msgstr "maaliskuuta"
 
-#: utils/dates.py:48
 msgctxt "alt. month"
 msgid "April"
 msgstr "huhtikuuta"
 
-#: utils/dates.py:49
 msgctxt "alt. month"
 msgid "May"
 msgstr "toukokuuta"
 
-#: utils/dates.py:50
 msgctxt "alt. month"
 msgid "June"
 msgstr "kesäkuuta"
 
-#: utils/dates.py:51
 msgctxt "alt. month"
 msgid "July"
 msgstr "heinäkuuta"
 
-#: utils/dates.py:52
 msgctxt "alt. month"
 msgid "August"
 msgstr "elokuuta"
 
-#: utils/dates.py:53
 msgctxt "alt. month"
 msgid "September"
 msgstr "syyskuuta"
 
-#: utils/dates.py:54
 msgctxt "alt. month"
 msgid "October"
 msgstr "lokakuuta"
 
-#: utils/dates.py:55
 msgctxt "alt. month"
 msgid "November"
 msgstr "marraskuuta"
 
-#: utils/dates.py:56
 msgctxt "alt. month"
 msgid "December"
 msgstr "joulukuuta"
 
-#: utils/ipv6.py:10
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Tämä ei ole kelvollinen IPv6-osoite."
 
-#: utils/text.py:76
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s..."
-msgstr ""
+msgstr "%(truncated_text)s…"
 
-#: utils/text.py:245
 msgid "or"
 msgstr "tai"
 
 #. Translators: This string is used as a separator between list elements
-#: utils/text.py:264 utils/timesince.py:57
 msgid ", "
 msgstr ", "
 
-#: utils/timesince.py:25
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d vuosi"
+msgstr[1] "%d vuotta"
 
-#: utils/timesince.py:26
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d kuukausi"
+msgstr[1] "%d kuukautta"
 
-#: utils/timesince.py:27
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d viikko"
+msgstr[1] "%d viikkoa"
 
-#: utils/timesince.py:28
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d päivä"
+msgstr[1] "%d päivää"
 
-#: utils/timesince.py:29
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d tunti"
+msgstr[1] "%d tuntia"
 
-#: utils/timesince.py:30
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minuutti"
+msgstr[1] "%d minuuttia"
 
-#: utils/timesince.py:46
 msgid "0 minutes"
-msgstr ""
+msgstr "0 minuuttia"
 
-#: views/csrf.py:105
 msgid "Forbidden"
-msgstr ""
+msgstr "Kielletty"
 
-#: views/csrf.py:106
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "CSRF-vahvistus epäonnistui. Pyyntö hylätty."
 
-#: views/csrf.py:110
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
 "header' to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Näet tämän viestin, koska tämä HTTPS-sivusto vaatii selaintasi lähettämään "
+"Referer-otsakkeen, mutta sitä ei vastaanotettu. Otsake vaaditaan "
+"turvallisuussyistä, varmistamaan etteivät kolmannet osapuolet ole ottaneet "
+"selaintasi haltuun."
 
-#: views/csrf.py:115
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Jos olet konfiguroinut selaimesi olemaan lähettämättä Referer-otsaketta, ole "
+"hyvä ja kytke otsake takaisin päälle ainakin tälle sivulle, HTTPS-"
+"yhteyksille tai saman lähteen (\"same-origin\") pyynnöille."
 
-#: views/csrf.py:120
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"Näet tämän viestin, koska tämä sivusto vaatii CSRF-evästeen "
+"vastaanottaessaan lomaketietoja. Eväste vaaditaan turvallisuussyistä, "
+"varmistamaan etteivät kolmannet osapuolet ole ottaneet selaintasi haltuun."
 
-#: views/csrf.py:125
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Jos olet konfiguroinut selaimesi olemaan vastaanottamatta tai lähettämättä "
+"evästeitä, ole hyvä ja kytke evästeet takaisin päälle ainakin tälle sivulle "
+"tai saman lähteen (\"same-origin\") pyynnöille."
 
-#: views/csrf.py:129
 msgid "More information is available with DEBUG=True."
+msgstr "Lisätietoja `DEBUG=True`-konfiguraatioasetuksella."
+
+msgid "Welcome to Django"
+msgstr "Tervetuloa Djangoon"
+
+msgid "It worked!"
 msgstr ""
 
-#: views/generic/dates.py:43
+msgid "Congratulations on your first Django-powered page."
+msgstr ""
+
+msgid ""
+"Of course, you haven't actually done any work yet. Next, start your first "
+"app by running <code>python manage.py startapp [app_label]</code>."
+msgstr ""
+
+msgid ""
+"You're seeing this message because you have <code>DEBUG = True</code> in "
+"your Django settings file and you haven't configured any URLs. Get to work!"
+msgstr ""
+
 msgid "No year specified"
 msgstr "Vuosi puuttuu"
 
-#: views/generic/dates.py:99
 msgid "No month specified"
 msgstr "Kuukausi puuttuu"
 
-#: views/generic/dates.py:158
 msgid "No day specified"
 msgstr "Päivä puuttuu"
 
-#: views/generic/dates.py:214
 msgid "No week specified"
 msgstr "Viikko puuttuu"
 
-#: views/generic/dates.py:369 views/generic/dates.py:397
 #, python-format
 msgid "No %(verbose_name_plural)s available"
 msgstr "%(verbose_name_plural)s: yhtään kohdetta ei löydy"
 
-#: views/generic/dates.py:650
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
@@ -1344,40 +1133,32 @@ msgstr ""
 "%(verbose_name_plural)s: tulevia kohteita ei löydy, koska %(class_name)s."
 "allow_future:n arvo on False."
 
-#: views/generic/dates.py:682
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
 msgstr "Päivämäärä '%(datestr)s' ei ole muotoa '%(format)s'"
 
-#: views/generic/detail.py:54
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Hakua vastaavaa %(verbose_name)s -kohdetta ei löytynyt"
 
-#: views/generic/list.py:62
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr "Sivunumero ei ole 'last' (viimeinen) eikä näytä luvulta."
 
-#: views/generic/list.py:67
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Epäkelpo sivu (%(page_number)s): %(message)s"
 
-#: views/generic/list.py:158
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr "Lista on tyhjä, ja '%(class_name)s.allow_empty':n arvo on False."
 
-#: views/static.py:54
 msgid "Directory indexes are not allowed here."
-msgstr ""
+msgstr "Hakemistolistauksia ei sallita täällä."
 
-#: views/static.py:56
 #, python-format
 msgid "\"%(path)s\" does not exist"
-msgstr ""
+msgstr "\"%(path)s\" ei ole olemassa"
 
-#: views/static.py:97
 #, python-format
 msgid "Index of %(directory)s"
-msgstr ""
+msgstr "Hakemistolistaus: %(directory)s"
