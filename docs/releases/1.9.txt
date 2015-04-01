@@ -166,6 +166,9 @@ Management Commands
 
 * The :djadmin:`dumpdata` command output is now deterministically ordered.
 
+* The :djadmin:`createcachetable` command now has a ``--dry-run`` flag to
+  print out the SQL rather than execute it.
+
 Models
 ^^^^^^
 
