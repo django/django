@@ -335,7 +335,7 @@ Now you're ready to actually put the release out there. To do this:
 #. Make the blog post announcing the release live.
 
 #. For a new version release (e.g. 1.5, 1.6), update the default stable version
-   of the docs by flipping the ``is_default`` flag to `deployment/wsgi/uwsgi.html`True`` on the
+   of the docs by flipping the ``is_default`` flag to ``True`` on the
    appropriate ``DocumentRelease`` object in the ``docs.djangoproject.com``
    database (this will automatically flip it to ``False`` for all
    others); you can do this using the site's admin.
