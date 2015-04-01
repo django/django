@@ -2,7 +2,8 @@ from __future__ import unicode_literals
 
 import os
 
-from django.template import Context, Template, TemplateSyntaxError
+from django.template import Context, Engine, Template, TemplateSyntaxError
+from django.template.base import Node
 from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import extend_sys_path
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -258,6 +259,26 @@ class InclusionTagTests(TagTestCase):
 
         c.use_l10n = True
         self.assertEqual(t.render(c).strip(), 'True')
+
+    def test_no_render_side_effect(self):
+        """
+        #23441 -- InclusionNode shouldn't modify its nodelist at render time.
+        """
+        engine = Engine(app_dirs=True)
+        template = engine.from_string('{% load inclusion %}{% inclusion_no_params %}')
+        count = template.nodelist.get_nodes_by_type(Node)
+        template.render(Context({}))
+        self.assertEqual(template.nodelist.get_nodes_by_type(Node), count)
+
+    def test_render_context_is_cleared(self):
+        """
+        #24555 -- InclusionNode should push and pop the render_context stack
+        when rendering. Otherwise, leftover values such as blocks from
+        extending can interfere with subsequent rendering.
+        """
+        engine = Engine(app_dirs=True)
+        template = engine.from_string('{% load inclusion %}{% inclusion_extends1 %}{% inclusion_extends2 %}')
+        self.assertEqual(template.render(Context({})).strip(), 'one\ntwo')
 
 
 class AssignmentTagTests(TagTestCase):

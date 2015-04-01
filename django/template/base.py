@@ -1301,10 +1301,16 @@ class Library(object):
             class InclusionNode(TagHelperNode):
 
                 def render(self, context):
+                    """
+                    Renders the specified template and context. Caches the
+                    template object in render_context to avoid reparsing and
+                    loading when used in a for loop.
+                    """
                     resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
                     _dict = func(*resolved_args, **resolved_kwargs)
 
-                    if not getattr(self, 'nodelist', False):
+                    t = context.render_context.get(self)
+                    if t is None:
                         if isinstance(file_name, Template):
                             t = file_name
                         elif isinstance(getattr(file_name, 'template', None), Template):
@@ -1313,7 +1319,7 @@ class Library(object):
                             t = context.template.engine.select_template(file_name)
                         else:
                             t = context.template.engine.get_template(file_name)
-                        self.nodelist = t.nodelist
+                        context.render_context[self] = t
                     new_context = context.new(_dict)
                     # Copy across the CSRF token, if present, because
                     # inclusion tags are often used for forms, and we need
@@ -1322,7 +1328,7 @@ class Library(object):
                     csrf_token = context.get('csrf_token', None)
                     if csrf_token is not None:
                         new_context['csrf_token'] = csrf_token
-                    return self.nodelist.render(new_context)
+                    return t.render(new_context)
 
             function_name = (name or
                 getattr(func, '_decorated_function', func).__name__)
