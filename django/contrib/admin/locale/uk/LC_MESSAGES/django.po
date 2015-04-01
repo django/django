@@ -3,16 +3,18 @@
 # Translators:
 # Alexander Chernihov <aleksandr.chernigov@gmail.com>, 2014
 # Boryslav Larin <brabadu@gmail.com>, 2011
+# Igor Melnyk, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
+# Mykola Zamkovoi <nickzam@gmail.com>, 2014
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-09-24 09:11+0000\n"
-"Last-Translator: Alexander Chernihov <aleksandr.chernigov@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -22,68 +24,51 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Успішно видалено %(count)d %(items)s."
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr "Не можу видалити %(name)s"
+msgstr "Не вдається видалити %(name)s"
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "Ви впевнені?"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Видалити обрані %(verbose_name_plural)s"
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
 msgstr "Адміністрування"
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "Всі"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "Так"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "Ні"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "Невідомо"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "Будь-яка дата"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "Сьогодні"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "Останні 7 днів"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "Цього місяця"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "Цього року"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -92,99 +77,81 @@ msgstr ""
 "Будь ласка, введіть правильні %(username)s і пароль для облікового запису "
 "персоналу. Зауважте, що обидва поля можуть бути чутливі до регістру."
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "Дія:"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "час дії"
 
-#: contrib/admin/models.py:28
 msgid "object id"
-msgstr "id об'єкту"
+msgstr "id об'єкта"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
-msgstr "представлення об'єкту(repr)"
+msgstr "представлення об'єкта (repr)"
 
-#: contrib/admin/models.py:30
 msgid "action flag"
-msgstr "прапор дії"
+msgstr "позначка дії"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "змінити повідомлення"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
-msgstr "реєстрування записів"
+msgstr "запис у журналі"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
-msgstr "реєстрування записів"
+msgstr "записи в журналі"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "Додано \"%(object)s\"."
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Змінено \"%(object)s\" - %(changes)s"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Видалено \"%(object)s.\""
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
-msgstr "Запис у журналі"
+msgstr "Об'єкт журнального запису"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "Ніщо"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
 #, python-format
 msgid "Changed %s."
 msgstr "Змінено %s."
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "та"
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Додано %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Змінено %(list)s для %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Видалено %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "Поля не змінені."
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\"  був успішно доданий. Ви модете редагувати його знову "
-"внизу."
+"%(name)s \"%(obj)s\"  був успішно доданий. Нижче, Ви можете редагувати його "
+"знову."
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -193,12 +160,10 @@ msgstr ""
 "%(name)s \"%(obj)s\" було успішно додано. Ви можете додати ще одну %(name)s "
 "нижче."
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" було додано успішно."
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -207,7 +172,6 @@ msgstr ""
 "%(name)s \"%(obj)s\" було успішно змінено. Ви можете знову відредагувати її "
 "нижче."
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -216,47 +180,38 @@ msgstr ""
 "%(name)s \"%(obj)s\" було успішно змінено. Ви можете додати ще одну %(name)s "
 "нижче."
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" був успішно змінений."
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "Для виконання дії необхідно обрати елемент. Жодний елемент не був змінений."
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
-msgstr "Жодних дій не обрано."
+msgstr "Дія не обрана."
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" був видалений успішно."
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s об'єкт з первинним ключем %(key)r не існує."
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "Додати %s"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "Змінити %s"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "Помилка бази даних"
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -264,7 +219,6 @@ msgstr[0] "%(count)s %(name)s був успішно змінений."
 msgstr[1] "%(count)s %(name)s були успішно змінені."
 msgstr[2] "%(count)s %(name)s було успішно змінено."
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -272,24 +226,20 @@ msgstr[0] "%(total_count)s обраний"
 msgstr[1] "%(total_count)s обрані"
 msgstr[2] "Усі %(total_count)s обрано"
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 з %(cnt)s обрано"
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "Історія змін: %s"
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -298,214 +248,127 @@ msgstr ""
 "Видалення %(class_name)s %(instance)s вимагатиме видалення наступних "
 "захищених пов'язаних об'єктів: %(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "Django сайт адміністрування"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Django адміністрування"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "Адміністрування сайта"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "Увійти"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
 msgstr "Адміністрування %(app)s"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Сторінка не знайдена"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Ми шкодуємо, але сторінка яку ви запросили, не знайдена."
+msgstr "Нам шкода, але сторінка яку ви запросили, не знайдена."
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Домівка"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "Помилка сервера"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Помилка сервера (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Помилка сервера <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Виникла помилка. Адміністратор сайту буде повідомлений про неї по "
-"електронній пошті і вона повинна бути виправлена ​​найближчим часом. Дякуємо "
-"за ваше терпіння."
+"Виникла помилка. Адміністратора сайту повідомлено електронною поштою. "
+"Помилка буде виправлена ​​найближчим часом. Дякуємо за ваше терпіння."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "Виконати обрану дію"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
-msgstr "Уперед"
+msgstr "Вперед"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "Натисніть тут, щоб вибрати об'єкти на всіх сторінках"
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Обрати всі %(total_count)s %(module_name)s"
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Скинути вибір"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
-"Спочатку, введіть ім'я користувача і пароль. Потім ви зможете редагувати "
-"більше опцій користувача."
+"Спочатку введіть ім'я користувача і пароль. Після цього ви зможете "
+"редагувати більше опцій користувача."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "Введіть ім'я користувача і пароль."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Змінити пароль"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
-msgstr "Будь ласка, виправте помилки нижче."
+msgstr "Будь ласка, виправте помилку, вказану нижче."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
-msgstr "Будь ласка, виправте помилки нижче."
+msgstr "Будь ласка, виправте помилки, вказані нижче."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Введіть новий пароль для користувача <strong>%(username)s</strong>."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "Пароль"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "Пароль (знову)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "Повторіть пароль для перевірки."
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "Вітаємо,"
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr ""
+
 msgid "Documentation"
 msgstr "Документація"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Вийти"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "Додати"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Історія"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Дивитися на сайті"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Додати %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Відфільтрувати"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "Видалити з сортування"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "Пріорітет сортування: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "Сортувати в іншому напрямку"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "Видалити"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -516,7 +379,6 @@ msgstr ""
 "пов'язаних об'єктів, але ваш реєстраційний запис не має дозволу видаляти "
 "наступні типи об'єктів:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -525,25 +387,26 @@ msgstr ""
 "Видалення %(object_name)s '%(escaped_object)s' вимагатиме видалення "
 "наступних пов'язаних об'єктів:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Ви впевнені що хочете видалити %(object_name)s \"%(escaped_object)s\"? Всі "
+"Ви впевнені, що хочете видалити %(object_name)s \"%(escaped_object)s\"? Всі "
 "пов'язані записи, що перелічені, будуть видалені:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Objects"
+msgstr ""
+
 msgid "Yes, I'm sure"
 msgstr "Так, я впевнений"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "No, take me back"
+msgstr ""
+
 msgid "Delete multiple objects"
 msgstr "Видалити кілька об'єктів"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -553,7 +416,6 @@ msgstr ""
 "Видалення обраних %(objects_name)s вимагатиме видалення пов'язаних об'єктів, "
 "але ваш обліковий запис не має прав для видалення таких типів об'єктів:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -562,94 +424,73 @@ msgstr ""
 "Видалення обраних %(objects_name)s вимагатиме видалення наступних захищених "
 "пов'язаних об'єктів:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Ви впевнені, що хочете видалити вибрані %(objects_name)s? Всі наступні "
+"Ви впевнені, що хочете видалити вибрані %(objects_name)s? Всі вказані "
 "об'єкти та пов'язані з ними елементи будуть видалені:"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Change"
+msgstr "Змінити"
+
 msgid "Remove"
 msgstr "Видалити"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Додати ще %(verbose_name)s"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Видалити?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr "За %(filter_title)s"
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Моделі у %(name)s додатку"
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "Змінити"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
-msgstr "У вас немає дозволу редагувати будь-що."
+msgstr "У вас немає дозволу на редагування будь-чого."
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "Недавні дії"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "Мої дії"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "Немає"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "Невідомий зміст"
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Щось не так з інсталяцією бази даних. Перевірте, що таблиці бази даних "
-"створено і база даних може бути прочитана відповідним користувачем."
+"Щось не так з інсталяцією бази даних. Перевірте, що відповідні таблиці бази "
+"даних створені та база даних може бути прочитана відповідним користувачем."
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "Пароль:"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "Забули пароль або ім'я користувача?"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Дата/час"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Користувач"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Дія"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -657,20 +498,27 @@ msgstr ""
 "Цей об'єкт не має історії змін. Напевно, він був доданий не через цей сайт "
 "адміністрування."
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Показати всі"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "Зберегти"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
 msgid "Search"
 msgstr "Пошук"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
@@ -678,92 +526,63 @@ msgstr[0] "%(counter)s результат"
 msgstr[1] "%(counter)s результати"
 msgstr[2] "%(counter)s результатів"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s всього"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "Зберегти як нове"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "Зберегти і додати інше"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "Зберегти і продовжити редагування"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Дякуємо за час, проведений сьогодні на сайті."
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Увійти знову"
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "Зміна паролю"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "Ваш пароль було змінено."
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "Будь ласка введіть ваш старий пароль, задля безпеки, потім введіть ваш новий "
-"пароль двічі, щоб ми могли перевірити, що ви ввели його правильно"
+"пароль двічі для перевірки."
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "Старий пароль"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "Новий пароль"
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Змінити мій пароль"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "Перевстановлення паролю"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Пароль встановлено. Ви можете увійти зараз."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Підтвердження перевстановлення паролю"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
 "Будь ласка, введіть ваш старий пароль, задля безпеки, потім введіть ваш "
-"новий пароль двічі, щоб ми могли перевірити, що ви ввели його правильно."
+"новий пароль двічі для перевірки."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Новий пароль:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Підтвердіть пароль:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -771,49 +590,39 @@ msgstr ""
 "Посилання на перевстановлення паролю було помилковим. Можливо тому, що воно "
 "було вже використано. Будь ласка, замовте нове перевстановлення паролю."
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"На електронну адресу, яку ви ввели, ми надіслали вам листа з інструкціями "
-"щодо встановлення пароля. Ви повинні отримати його найближчим часом."
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Якщо Ви не отримали електронного листа, будь ласка, переконайтеся, що ввели "
-"адресу яку вказували при реєстрації та перевірте папку зі спамом"
+"Якщо Ви не отримали електронного листа, будь ласка переконайтеся, що ввели "
+"адресу яку вказували при реєстрації та перевірте папку зі спамом."
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Ви отримали цей лист, тому що ви зробили запит на перевстановлення пароля "
+"Ви отримали цей лист через те, що зробили запит на перевстановлення пароля "
 "для облікового запису користувача на %(site_name)s."
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Будь ласка, перейдіть на цю сторінку, та оберіть новий пароль:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "У разі, якщо ви забули, ваше ім'я користувача:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Дякуємо за користування нашим сайтом!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Команда сайту %(site_name)s "
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -821,52 +630,37 @@ msgstr ""
 "Забули пароль? Введіть свою email-адресу нижче і ми вишлемо інструкції по "
 "встановленню нового."
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "Email адреса:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Перевстановіть мій пароль"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "Всі дати"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
-msgstr "(None)"
+msgstr "(Не обрано)"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "Вибрати %s"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "Виберіть %s щоб змінити"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "Дата:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "Час:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "Пошук"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "Додати інше"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
-msgstr "В даний час:"
+msgstr "На даний час:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "Змінено:"

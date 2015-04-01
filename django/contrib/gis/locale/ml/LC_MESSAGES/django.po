@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-07-25 18:39+0000\n"
-"Last-Translator: Aby Thomas <abyzthomas@gmail.com>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:35+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
 "MIME-Version: 1.0\n"
@@ -19,83 +19,68 @@ msgstr ""
 "Language: ml\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr "ജി.ഐ.എസ്"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "അടിസ്ഥാന ജി.ഐ.എസ് കളം (ഫീല്‍ഡ്) -- ഓപ്പണ്‍ ജി.ഐ.എസ് നിര്‍ദേശിച്ച തരം ജ്യാമിതീയ രൂപത്തെ "
 "സൂചിപ്പിക്കാന്‍"
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "ബിന്ദു"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "രേഖാ സ്ട്രിങ്ങ്"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "ബഹുഭുജം"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "ബഹുബിന്ദു"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "ബഹു രേഖാ സ്ട്രിങ്ങ്"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "ബഹു ബഹുഭുജം"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "ജ്യാമിതി ശേഖരം"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr ""
+
 msgid "No geometry value provided."
 msgstr "ജ്യാമിതീയ മൂല്യമൊന്നും തന്നിട്ടില്ല."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "തെറ്റായ ജ്യാമിതീയ മൂല്യം."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "തെറ്റായ തരം ജ്യാമിതി."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
 "ജ്യാമിതീയ രൂപത്തെ ജ്യാമിതി കളത്തിന്റെ SRID-ലേക്കു മാറ്റുമ്പോള്‍ എന്തോ തകരാറു സംഭവിച്ചിട്ടുണ്ട്."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "%r എന്ന വിഭാഗത്തിനു സൈറ്റ്മാപ്പൊന്നും ലഭ്യമല്ല."
+msgid "Delete all Features"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "പേജ്  %s കാലിയാണ്"
+msgid "WKT debugging window:"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "'%s' എന്ന പേജില്ല."
+msgid "Google Maps via GeoDjango"
+msgstr ""
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr ""
+
 msgid "No feeds are registered."
 msgstr " ഫീഡുകളൊന്നും രജിസ്റ്റര്‍ ചെയ്തിട്ടില്ല."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "%r എന്ന സ്ലഗ് രജിസ്റ്റര്‍ ചെയ്തിട്ടില്ല."

@@ -4,14 +4,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013
 # madisvain <madisvain@gmail.com>, 2011
+# Martin <martinpajuste@gmail.com>, 2015
 # Marti Raudsepp <marti@juffo.org>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-08-14 20:45+0000\n"
-"Last-Translator: Marti Raudsepp <marti@juffo.org>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-19 21:59+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -20,80 +21,48 @@ msgstr ""
 "Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Isiklikud andmd"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Õigused"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Tähtsad kuupäevad"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Salasõna edukalt muudetud."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Muuda salasõna: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr "Autentimine ja Volitamine"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Parool on määramata."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Lubamatu parooli formaat või tundmatu räsialgoritm."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "Sama kasutajatunnusega kasutaja on juba olemas."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Kaks sisestatud parooli ei olnud identsed."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Kasutajatunnus"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Nõutav. 30 märki või vähem. Ainult tähed, numbrid ja /./+/-/_ tähemärgid."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
-"See väärtust võib sisaldada ainult tähti, numbreid ja/./+/-/_ tähemärke."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Salasõna"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Salasõna kinnitus"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr ""
 "Sisestage sama salasõna uuesti veendumaks, et sisestamisel ei tekkinud vigu"
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -103,7 +72,6 @@ msgstr ""
 "parooli nägemiseks, kuid saate seda muuta kasutades <a href=\"password/"
 "\">seda vormi</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -112,157 +80,126 @@ msgstr ""
 "Palun sisestage õige %(username)s ja parool. Teadke, et mõlemad väljad "
 "võivad olla tõstutundlikud."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "See konto ei ole aktiivne."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "E-post"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Uus salasõna"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Uue salasõna kinnitus"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Te sisestasite oma vana parooli vigaselt. Palun sisestage see uuesti."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Vana salasõna"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Salasõna (uuesti)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algoritm"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iteratsioone"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "sool"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "räsi"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "töötegur"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "kontrollsumma"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "nimi"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "koodnimi"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "õigus"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "õigused"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grupp"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grupid"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "salasõna"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "viimane sisenemine"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "superkasutaja staatus"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "Määrab, kas see kasutaja omab automaatselt ja alati kõiki õigus."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"Grupid millesse antud kasutaja kuulub. Kasutaja pärib kõik õigused mis on "
+"Grupid, millesse antud kasutaja kuulub. Kasutaja pärib kõik õigused, mis on "
 "määratud igale tema grupile."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "kasutajaõigused"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr "Spetsiaalsed õigused sellele kasutajale."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "kasutajatunnus"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Sisestage korrektne kasutajanimi."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Nõutav. 30 märki või vähem. Ainult tähed, numbrid ja /./+/-/_ tähemärgid."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+"Sisesta korrektne kasutajatunnus. See väärtus võib sisaldada ainult tähti, "
+"numbreid ja @/./+/-/_ tähemärke."
+
+msgid "A user with that username already exists."
+msgstr "Sama kasutajatunnusega kasutaja on juba olemas."
+
 msgid "first name"
 msgstr "eesnimi"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "perenimi"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "e-posti aadress"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "personalistaatus"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "Määrab, kas kasutaja saab sisse logida sellesse admininistreerimisliidesesse."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "aktiivne"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -270,55 +207,39 @@ msgstr ""
 "Määrab, kas see konto on aktiivne. Kustutamise asemel lihtsalt deaktiveerige "
 "konto."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "liitumise kuupäev"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "kasutaja"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "kasutajad"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Uue salasõna loomine saidil %(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Sisestage korrektne e-posti aadress."
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Välja logitud"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr "Uue salasõna loomine"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr "Uue salasõna loomine õnnestus"
+msgid "Password reset sent"
+msgstr ""
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr "Sisesta uus salasõna"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr "Uue salasõna loomine ebaõnnestus"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr "Uue salasõna loomine lõpetatud"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr "Salasõna muutmine"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr "Salasõna muutmine õnnestus"

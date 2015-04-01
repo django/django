@@ -2,7 +2,7 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2014
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2015
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2012
 # Adamo Mesha <adam.raizen@gmail.com>, 2012
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-21 13:29+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-17 09:13+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
 "language/eo/)\n"
@@ -21,68 +21,51 @@ msgstr ""
 "Language: eo\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Sukcese forigis %(count)d %(items)s."
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Ne povas forigi %(name)s"
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "Ĉu vi certas?"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Forigi elektitajn %(verbose_name_plural)s"
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
 msgstr "Administrado"
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "Ĉio"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "Jes"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "Ne"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "Nekonata"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "Ajna dato"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "Hodiaŭ"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "Lastaj 7 tagoj"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "Ĉi tiu monato"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "Ĉi tiu jaro"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -91,91 +74,75 @@ msgstr ""
 "Bonvolu eniri la ĝustan %(username)s-n kaj pasvorton por personara konto. "
 "Notu, ke ambaŭ kampoj povas esti usklecodistinga."
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "Ago:"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "aga tempo"
 
-#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "objekta identigaĵo"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr "objekta prezento"
 
-#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "aga marko"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "ŝanĝmesaĝo"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "protokolero"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "protokoleroj"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "\"%(object)s\" aldonita."
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Ŝanĝita \"%(object)s\" - %(changes)s"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Forigita \"%(object)s.\""
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
 msgstr "Protokolera objekto"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "Neniu"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Premadu la stirklavon, aŭ Komando-klavon ĉe Mac, por elekti pli ol unu."
+
 #, python-format
 msgid "Changed %s."
 msgstr "Ŝanĝita %s."
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "kaj"
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Aldonita %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Ŝanĝita %(list)s por %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Forigita %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "Neniu kampo ŝanĝita."
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -183,7 +150,6 @@ msgstr ""
 "La %(name)s \"%(obj)s\" estis aldonita sukcese. Vi rajtas ĝin redakti denove "
 "sube."
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -192,12 +158,10 @@ msgstr ""
 "La %(name)s \"%(obj)s\" estis sukcese aldonita. Vi povas sube aldoni alian "
 "%(name)s-n."
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "La %(name)s \"%(obj)s\" estis aldonita sukcese."
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -206,7 +170,6 @@ msgstr ""
 "La %(name)s \"%(obj)s\" estis sukcese ŝanĝita. Vi povas sube redakti ĝin "
 "denove."
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -215,12 +178,10 @@ msgstr ""
 "La %(name)s \"%(obj)s\" estis sukcese ŝanĝita. Vi povas sube aldoni alian "
 "%(name)s-n."
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "La %(name)s \"%(obj)s\" estis ŝanĝita sukcese."
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -228,66 +189,54 @@ msgstr ""
 "Elementoj devas esti elektitaj por elfari agojn sur ilin. Neniu elemento "
 "estis ŝanĝita."
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "Neniu ago elektita."
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "La %(name)s \"%(obj)s\" estis forigita sukcese."
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objekto kun ĉefŝlosilo %(key)r ne ekzistas."
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "Aldoni %s"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "Ŝanĝi %s"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "Datumbaza eraro"
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s estis sukcese ŝanĝita."
 msgstr[1] "%(count)s %(name)s estis sukcese ŝanĝitaj."
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s elektitaj"
 msgstr[1] "Ĉiuj %(total_count)s elektitaj"
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 el %(cnt)s elektita"
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "Ŝanĝa historio: %s"
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -296,71 +245,40 @@ msgstr ""
 "Forigi la %(class_name)s-n “%(instance)s” postulus forigi la sekvajn "
 "protektitajn rilatajn objektojn: %(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "Djanga reteja administrado"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Djanga administrado"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "Reteja administrado"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "Ensaluti"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
 msgstr "%(app)s administrado"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Paĝo ne trovita"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Bedaŭrinde la petitan paĝon ne povas esti trovita."
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Ĉefpaĝo"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "Servila eraro"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Servila eraro (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Servila eraro <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
@@ -368,28 +286,22 @@ msgstr ""
 "Okazis eraro. Ĝi estis raportita al la retejaj administrantoj tra retpoŝto "
 "kaj baldaŭ devus esti riparita. Dankon por via pacienco."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "Lanĉi la elektita agon"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "Ek"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "Klaku ĉi-tie por elekti la objektojn trans ĉiuj paĝoj"
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Elekti ĉiuj %(total_count)s %(module_name)s"
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Viŝi elekton"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
@@ -397,112 +309,63 @@ msgstr ""
 "Unue, bovolu tajpi salutnomon kaj pasvorton. Tiam, vi povos redakti pli da "
 "uzantaj agordoj."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "Enigu salutnomon kaj pasvorton."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Ŝanĝi pasvorton"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgstr "Bonvolu ĝustigi la erarojn sube."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
 msgstr "Bonvolu ĝustigi la erarojn sube."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Enigu novan pasvorton por la uzanto <strong>%(username)s</strong>."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "Pasvorto"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "Pasvorto (denove)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "Entajpu la saman pasvorton kiel supre, por konfirmo."
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "Bonvenon,"
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr "Vidi retejon"
+
 msgid "Documentation"
 msgstr "Dokumentaro"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Elsaluti"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "Aldoni"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Historio"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Vidi sur retejo"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Aldoni %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Filtri"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "Forigi el ordigado"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "Ordiga prioritato: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "Ŝalti ordigadon"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "Forigi"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -513,7 +376,6 @@ msgstr ""
 "rilatajn objektojn, sed via konto ne havas permeson por forigi la sekvantajn "
 "tipojn de objektoj:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -522,7 +384,6 @@ msgstr ""
 "Forigi la %(object_name)s '%(escaped_object)s' postulus forigi la sekvajn "
 "protektitajn rilatajn objektojn:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -531,16 +392,18 @@ msgstr ""
 "Ĉu vi certas, ke vi volas forigi %(object_name)s \"%(escaped_object)s\"? "
 "Ĉiuj el la sekvaj rilataj eroj estos forigitaj:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Objects"
+msgstr "Objektoj"
+
 msgid "Yes, I'm sure"
 msgstr "Jes, mi certas"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "No, take me back"
+msgstr "Ne, reen"
+
 msgid "Delete multiple objects"
 msgstr "Forigi plurajn objektojn"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -550,7 +413,6 @@ msgstr ""
 "Forigi la %(objects_name)s rezultus en forigi rilatajn objektojn, sed via "
 "konto ne havas permeson por forigi la sekvajn tipojn de objektoj:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -559,7 +421,6 @@ msgstr ""
 "Forigi la %(objects_name)s postulus forigi la sekvajn protektitajn rilatajn "
 "objektojn:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -568,56 +429,45 @@ msgstr ""
 "Ĉu vi certas, ke vi volas forigi la elektitajn %(objects_name)s? Ĉiuj el la "
 "sekvaj objektoj kaj iliaj rilataj eroj estos forigita:"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Change"
+msgstr "Ŝanĝi"
+
 msgid "Remove"
 msgstr "Forigu"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Aldoni alian %(verbose_name)s"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Forviŝi?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr " Laŭ %(filter_title)s "
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr "Resumo"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modeloj en la %(name)s aplikaĵo"
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "Ŝanĝi"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "Vi ne havas permeson por redakti ĉion ajn."
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "Lastaj agoj"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "Miaj agoj"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "Neniu disponebla"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "Nekonata enhavo"
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -627,27 +477,18 @@ msgstr ""
 "de datumbazo estis kreitaj, kaj ke la datumbazo estas legebla per la ĝusta "
 "uzanto."
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "Pasvorto:"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "Ĉu vi forgesis vian pasvorton aŭ salutnomo?"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Dato/horo"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Uzanto"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Ago"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -655,61 +496,58 @@ msgstr ""
 "Ĉi tiu objekto ne havas ŝanĝ-historion. Eble ĝi ne estis aldonita per la "
 "administranta retejo."
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Montri ĉion"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "Konservi"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Redaktu elektitan %(model)sn"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Aldoni alian %(model)sn"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Forigi elektitan %(model)sn"
+
 msgid "Search"
 msgstr "Serĉu"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s resulto"
 msgstr[1] "%(counter)s resultoj"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s entute"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "Konservi kiel novan"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "Konservi kaj aldoni alian"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "Konservi kaj daŭre redakti"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Dankon pro pasigo de kvalita tempon kun la retejo hodiaŭ."
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Ensaluti denove"
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "Pasvorta ŝanĝo"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "Via pasvorto estis sukcese ŝanĝita."
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -717,34 +555,18 @@ msgstr ""
 "Bonvolu enigi vian malnovan pasvorton, pro sekureco, kaj tiam enigi vian "
 "novan pasvorton dufoje, tiel ni povas konfirmi ke vi ĝuste tajpis ĝin."
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "Malnova pasvorto"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "Nova pasvorto"
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Ŝanĝi mian passvorton"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "Pasvorta rekomencigo"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Via pasvorto estis ŝanĝita. Vi povas iri antaŭen kaj ensaluti nun."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Pasvorta rekomenciga konfirmo"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
@@ -752,15 +574,12 @@ msgstr ""
 "Bonvolu entajpi vian novan pasvorton dufoje, tiel ni povas konfirmi ke vi "
 "ĝuste tajpis ĝin."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Nova pasvorto:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Konfirmi pasvorton:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -768,15 +587,13 @@ msgstr ""
 "La pasvorta rekomenciga ligo malvalidis, eble ĉar ĝi jam estis uzata.  "
 "Bonvolu peti novan pasvortan rekomencigon."
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Ni retpoŝte sendis al vi instrukciojn por agordi la pasvorton al la retpoŝto "
-"vi sendis. Vi baldaŭ devus ĝin ricevi."
+"Ni retpoŝte sendis al vi instrukciojn por agordi la pasvorton, se konto "
+"ekzistas, al la retpoŝto kiun vi sendis. Vi baldaŭ devus ĝin ricevi."
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -784,7 +601,6 @@ msgstr ""
 "Se vi ne ricevas retpoŝton, bonvolu certigi vin eniris la adreson kun kiu vi "
 "registris, kaj kontroli vian spaman dosierujon."
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -793,24 +609,19 @@ msgstr ""
 "Vi ricevis ĉi tiun retpoŝton ĉar vi petis pasvortan rekomencigon por via "
 "uzanta konto ĉe %(site_name)s."
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Bonvolu iri al la sekvanta paĝo kaj elekti novan pasvorton:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Via salutnomo, se vi forgesis:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Dankon pro uzo de nia retejo!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "La %(site_name)s teamo"
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -818,52 +629,37 @@ msgstr ""
 "Vi forgesis vian pasvorton? Malsupre enigu vian retpoŝtan adreson kaj ni "
 "retpoŝte sendos instrukciojn por agordi novan."
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "Retpoŝto:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Rekomencigi mian pasvorton"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "Ĉiuj datoj"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "(Neniu)"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
-msgstr "Elekti %s"
+msgstr "Elekti %sn"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
-msgstr "Elekti %s por ŝanĝi"
+msgstr "Elekti %sn por ŝanĝi"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "Dato:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "Horo:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "Trarigardo"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "Aldoni ankoraŭ unu"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
 msgstr "Nuntempe:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "Ŝanĝo:"

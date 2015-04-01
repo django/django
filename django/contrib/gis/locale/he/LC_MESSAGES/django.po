@@ -2,13 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2012,2014
+# Meir Kriheli <mkriheli@gmail.com>, 2012,2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-21 14:19+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-21 19:48+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
 "he/)\n"
@@ -18,80 +18,65 @@ msgstr ""
 "Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr "מערכת מידע גאוגרפית"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "שדה ה־GIS הבסיסי -- ממופה לטיפוס OpenGIS Specification Geometry."
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "נקודה"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "מחרוזת קו"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "פוליגון"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "מרובה־נקודות"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "מחרוזת קו מרובת שורות"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "פוליגון מרובה"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "אוסף גיאומטרי"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr "שדה Extent Aggregate"
+
 msgid "No geometry value provided."
 msgstr "לא סופק ערך גיאומטרי."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "ערך גאומטרי שגוי."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "סוג גיאומטרי שגוי."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr "הייתה בעיה עם השינוי של הצורה לסוג של השדה."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "אין sitemap זמין עבור מדור: %r"
+msgid "Delete all Features"
+msgstr "מחיקת כל התכונות"
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "עמוד %s ריק"
+msgid "WKT debugging window:"
+msgstr "חלון ניפוי שגיאות WKT:"
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "עמוד '%s' אינו קיים"
+msgid "Google Maps via GeoDjango"
+msgstr "מפות גוגל דרך GeoDjango"
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr "חלון ניפוי שגיאות (serialized value)"
+
 msgid "No feeds are registered."
 msgstr "לא נרשמו פידים."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Slug %r אינו רשום."

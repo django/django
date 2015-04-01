@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# machaku <bmachaku@gmail.com>, 2013-2014
+# Emil <bmachaku@gmail.com>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-22 16:51+0000\n"
-"Last-Translator: machaku <bmachaku@gmail.com>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:35+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -17,56 +17,46 @@ msgstr ""
 "Language: sw\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr "GIS"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Uga msingi wa GIS -- unaoana na aina ya kijiometri kwa viwango vya OpenGIS."
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Nukta"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Mstari"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Poligoni"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Nukta zaidi ya moja"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Mstari zaidi ya mmoja. "
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Poligoni zaidi ya moja"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Mkusanyiko wa jiometri"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr ""
+
 msgid "No geometry value provided."
 msgstr "Hakuna thamani ya jiometri iliyotolewa"
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Thamani batili ya jiometri."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Aina batili ya jiometri."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -74,26 +64,21 @@ msgstr ""
 "Hitilafu imetokea wakati wa kubadilisha jiometri kuwa SRID ya sehemu ya fomu "
 "ya jiometri."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "Hakuna ramani ya tovuti kipengele %r inayopatikana"
+msgid "Delete all Features"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "Ukurasa mtupu %s"
+msgid "WKT debugging window:"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "Ukurasa '%s' haupo"
+msgid "Google Maps via GeoDjango"
+msgstr ""
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr ""
+
 msgid "No feeds are registered."
 msgstr "Hakuna mlisho uliosajiliwa."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Slagi %r haijasajiliwa"

@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Burak Yavuz, 2014
+# BouRock, 2014-2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Murat Çorlu <muratcorlu@gmail.com>, 2012
 # Murat Sahin <martinamca@gmail.com>, 2012
@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-09-06 13:23+0000\n"
-"Last-Translator: Burak Yavuz\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 09:55+0000\n"
+"Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -20,55 +20,45 @@ msgstr ""
 "Language: tr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr "GIS"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "Temel GIS alanı -- OpenGIS Özellikli Geometri türüne eşleşmektedir."
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Nokta"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Satır dizgesi"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Çokgen"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Çok noktalı"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Çok satırlı dizge"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Çoklu çokgen"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Geometri koleksiyonu"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr "Toplama Alanını Genişlet"
+
 msgid "No geometry value provided."
 msgstr "Verilen hiç geometri değeri yok."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Geçersiz geometri değeri."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Geçersiz geometri türü."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -76,26 +66,21 @@ msgstr ""
 "Geometri verisi geometri form alanının SRID değerine dönüştürülürken bir "
 "hata meydana geldi."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "Mevcut site haritası şu bölüm için yok: %r"
+msgid "Delete all Features"
+msgstr "Tüm Özellikleri Sil"
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "%s sayfası boş"
+msgid "WKT debugging window:"
+msgstr "WKT hata ayıklama penceresi:"
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "'%s' adında sayfa yok"
+msgid "Google Maps via GeoDjango"
+msgstr "GeoDjango aracılığıyla Google Haritalar"
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr "Hata ayıklama penceresi (serileştirilmiş değer)"
+
 msgid "No feeds are registered."
 msgstr "Hiçbir besleme kayıtlı değil."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "%r kısaltması kayıtlı değil."

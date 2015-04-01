@@ -2,14 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2012-2014
+# Shinya Okano <tokibito@gmail.com>, 2012-2015
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-15 00:27+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-02-05 17:59+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
 "ja/)\n"
@@ -19,68 +19,51 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d 個の %(items)s を削除しました。"
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s が削除できません"
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "よろしいですか？"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "選択された %(verbose_name_plural)s の削除"
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
 msgstr "管理"
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "全て"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "はい"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "いいえ"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "不明"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "いつでも"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "今日"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "過去 7 日間"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "今月"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "今年"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -89,97 +72,81 @@ msgstr ""
 "スタッフアカウントの正しい%(username)sとパスワードを入力してください。どちら"
 "のフィールドも大文字と小文字は区別されます。"
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "操作:"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "操作時刻"
 
-#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "オブジェクト ID"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr "オブジェクトの文字列表現"
 
-#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "操作種別"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "変更メッセージ"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "ログエントリー"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "ログエントリー"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "\"%(object)s\" を追加しました。"
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "\"%(object)s\" を変更しました - %(changes)s"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\"を削除しました。"
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
 msgstr "ログエントリー オブジェクト"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "None"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"複数選択するときには Control キーを押したまま選択してください。Mac では "
+"Command キーを使ってください"
+
 #, python-format
 msgid "Changed %s."
 msgstr "%s を変更しました。"
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "と"
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\"を追加しました。"
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" の %(list)s を変更しました。"
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" を削除しました。"
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "変更はありませんでした。"
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" を追加しました。続けて編集できます。"
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -187,19 +154,16 @@ msgid ""
 msgstr ""
 "%(name)s \"%(obj)s\" を追加しました。 別の %(name)s を以下から追加できます。"
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" を追加しました。"
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr "%(name)s \"%(obj)s\" を変更しました。 以下から再度編集できます。"
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -207,76 +171,62 @@ msgid ""
 msgstr ""
 "%(name)s \"%(obj)s\" を変更しました。 別の %(name)s を以下から追加できます。"
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" を変更しました。"
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "操作を実行するには、対象を選択する必要があります。何も変更されませんでした。"
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "操作が選択されていません。"
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" を削除しました。"
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "主キーが %(key)r である %(name)s オブジェクトは存在しません。"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "%s を追加"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "%s を変更"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "データベースエラー"
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s 個の %(name)s を変更しました。"
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s 個選択されました"
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s個の内ひとつも選択されていません"
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "変更履歴: %s"
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -285,71 +235,40 @@ msgstr ""
 "%(class_name)s %(instance)s を削除するには以下の保護された関連オブジェクトを"
 "削除することになります: %(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "Django サイト管理"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Django 管理サイト"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "サイト管理"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "ログイン"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
 msgstr "%(app)s 管理"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "ページが見つかりません"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "申し訳ありませんが、お探しのページは見つかりませんでした。"
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "ホーム"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "サーバーエラー"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "サーバーエラー (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "サーバーエラー <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
@@ -357,28 +276,22 @@ msgstr ""
 "エラーが発生しました。サイト管理者にメールで報告されたので、修正されるまでし"
 "ばらくお待ちください。"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "選択された操作を実行"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "実行"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "全ページの項目を選択するにはここをクリック"
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "%(total_count)s個ある%(module_name)s を全て選択"
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "選択を解除"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
@@ -386,113 +299,64 @@ msgstr ""
 "まずユーザー名とパスワードを登録してください。その後詳細情報が編集可能になり"
 "ます。"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "ユーザー名とパスワードを入力してください。"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "パスワードの変更"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgstr "下記のエラーを修正してください。"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
 msgstr "下記のエラーを修正してください。"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "<strong>%(username)s</strong>さんの新しいパスワードを入力してください。"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "パスワード"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "パスワード(確認用)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "確認のため、再度パスワードを入力してください。"
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "ようこそ"
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr "サイトを表示"
+
 msgid "Documentation"
 msgstr "ドキュメント"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "ログアウト"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "追加"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "履歴"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "サイト上で表示"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s を追加"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "フィルター"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "ソート条件から外します"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "ソート優先順位: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "昇順降順を切り替えます"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "削除"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -503,7 +367,6 @@ msgstr ""
 "除しようとしましたが、あなたのアカウントには以下のタイプのオブジェクトを削除"
 "するパーミッションがありません:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -512,7 +375,6 @@ msgstr ""
 "%(object_name)s '%(escaped_object)s' を削除するには以下の保護された関連オブ"
 "ジェクトを削除することになります:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -521,16 +383,18 @@ msgstr ""
 "%(object_name)s \"%(escaped_object)s\"を削除しますか？ 関連づけられている以下"
 "のオブジェクトも全て削除されます:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
-msgid "Yes, I'm sure"
-msgstr "はい。"
+msgid "Objects"
+msgstr "オブジェクト"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "Yes, I'm sure"
+msgstr "はい"
+
+msgid "No, take me back"
+msgstr "戻る"
+
 msgid "Delete multiple objects"
 msgstr "複数のオブジェクトを削除します"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -540,7 +404,6 @@ msgstr ""
 "選択した %(objects_name)s を削除すると関連するオブジェクトも削除しますが、あ"
 "なたのアカウントは以下のオブジェクト型を削除する権限がありません:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -549,7 +412,6 @@ msgstr ""
 "選択した %(objects_name)s を削除すると以下の保護された関連オブジェクトを削除"
 "することになります:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -558,56 +420,45 @@ msgstr ""
 "本当に選択した %(objects_name)s を削除しますか？ 以下の全てのオブジェクトと関"
 "連する要素が削除されます:"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Change"
+msgstr "変更"
+
 msgid "Remove"
 msgstr "削除"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "%(verbose_name)s の追加"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "削除しますか?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr "%(filter_title)s で絞り込む"
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr "概要"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "%(name)s アプリケーション内のモデル"
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "変更"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "変更のためのパーミッションがありません。"
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "最近行った操作"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "操作"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "利用不可"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "不明なコンテント"
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -616,27 +467,18 @@ msgstr ""
 "データベースの設定に問題があるようです。適切なテーブルが作られていること、適"
 "切なユーザーでデータベースのデータを読み込めることを確認してください。"
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "パスワード:"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "パスワードまたはユーザー名を忘れましたか？"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "日付/時刻"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "ユーザー"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "操作"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -644,60 +486,57 @@ msgstr ""
 "このオブジェクトには変更履歴がありません。おそらくこの管理サイトで追加したも"
 "のではありません。"
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "全件表示"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "保存"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "選択された %(model)s の変更"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "%(model)s の追加"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "選択された %(model)s を削除"
+
 msgid "Search"
 msgstr "検索"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "結果 %(counter)s"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "全 %(full_result_count)s 件"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "新規保存"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "保存してもう一つ追加"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "保存して編集を続ける"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "ご利用ありがとうございました。"
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "もう一度ログイン"
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "パスワードの変更"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "あなたのパスワードは変更されました"
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -705,48 +544,29 @@ msgstr ""
 "セキュリティ上の理由から元のパスワードの入力が必要です。新しいパスワードは正"
 "しく入力したか確認できるように二度入力してください。"
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "元のパスワード"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "新しいパスワード"
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "パスワードの変更"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "パスワードをリセット"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "パスワードがセットされました。ログインしてください。"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "パスワードリセットの確認"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr "確認のために、新しいパスワードを二回入力してください。"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "新しいパスワード:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "新しいパスワード (確認用) :"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -754,15 +574,13 @@ msgstr ""
 "パスワードリセットのリンクが不正です。おそらくこのリンクは既に使われていま"
 "す。もう一度パスワードリセットしてください。"
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"送信されたメールアドレスに、パスワードを変更する方法をメールしました。受け"
-"取った内容を確認してください。"
+"入力されたメールアドレスを持つアカウントが存在する場合、パスワードを設定する"
+"ためのメールを送信しました。すぐに受け取る必要があります。"
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -770,7 +588,6 @@ msgstr ""
 "メールが届かない場合は、登録したメールアドレスを入力したか確認し、スパムフォ"
 "ルダに入っていないか確認してください。"
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -779,24 +596,19 @@ msgstr ""
 "このメールは %(site_name)s で、あなたのアカウントのパスワードリセットが要求さ"
 "れたため、送信されました。"
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "次のページで新しいパスワードを選んでください:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "あなたのユーザー名 (念のため):"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "ご利用ありがとうございました！"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr " %(site_name)s チーム"
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -804,52 +616,37 @@ msgstr ""
 "パスワードを忘れましたか? メールアドレスを以下に入力すると、新しいパスワード"
 "の設定方法をお知らせします。"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "メールアドレス:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "パスワードをリセット"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "いつでも"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "(なし)"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "%s を選択"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "変更する %s を選択"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "日付:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "時刻:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "検索"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "追加"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
 msgstr "現在の値:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "変更後:"

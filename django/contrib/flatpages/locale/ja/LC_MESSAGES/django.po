@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-28 09:49+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -19,25 +19,20 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/flatpages/admin.py:11
 msgid "Advanced options"
 msgstr "詳細設定"
 
-#: contrib/flatpages/apps.py:8
 msgid "Flat Pages"
 msgstr "フラットページ"
 
-#: contrib/flatpages/forms.py:8 contrib/flatpages/models.py:12
 msgid "URL"
 msgstr "URL"
 
-#: contrib/flatpages/forms.py:9
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "例: '/about/contact/'. 先頭と最後にスラッシュがあるか確認してください。"
 
-#: contrib/flatpages/forms.py:11
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
@@ -45,36 +40,28 @@ msgstr ""
 "この値は文字、数字、ドット、アンダースコア、ダッシュ、スラッシュかチルダのみ"
 "でなければいけません。"
 
-#: contrib/flatpages/forms.py:22
 msgid "URL is missing a leading slash."
 msgstr "URLの先頭はスラッシュが必要です。"
 
-#: contrib/flatpages/forms.py:29
 msgid "URL is missing a trailing slash."
 msgstr "URLの末尾はスラッシュが必要です。"
 
-#: contrib/flatpages/forms.py:46
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
 msgstr "URL %(url)s のフラットページは %(site)s のサイトに既に存在しています。"
 
-#: contrib/flatpages/models.py:13
 msgid "title"
 msgstr "タイトル"
 
-#: contrib/flatpages/models.py:14
 msgid "content"
 msgstr "内容"
 
-#: contrib/flatpages/models.py:15
 msgid "enable comments"
 msgstr "コメントを有効にする"
 
-#: contrib/flatpages/models.py:16
 msgid "template name"
 msgstr "テンプレート名"
 
-#: contrib/flatpages/models.py:17
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -82,22 +69,14 @@ msgstr ""
 "例: 'flatpages/contact_page.html'. 指定しなければ、デフォルト設定"
 "の'flatpages/default.html' を使います。"
 
-#: contrib/flatpages/models.py:18
 msgid "registration required"
 msgstr "登録が必要です"
 
-#: contrib/flatpages/models.py:19
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "チェックした場合、ログインしたユーザーだけがページを参照できます。"
 
-#: contrib/flatpages/models.py:25
 msgid "flat page"
 msgstr "フラットページ"
 
-#: contrib/flatpages/models.py:26
 msgid "flat pages"
 msgstr "フラットページ"
-
-#: contrib/flatpages/tests/test_forms.py:98
-msgid "This field is required."
-msgstr "このフィールドは必須です。"

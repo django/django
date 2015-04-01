@@ -4,14 +4,14 @@
 # André Hagenbruch, 2011
 # Florian Apolloner <florian@apolloner.eu>, 2012
 # Jannis Vajen, 2013
-# Jannis Leidel <jannis@leidel.info>, 2013-2014
-# Markus Holtermann <inyoka@markusholtermann.eu>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2013-2015
+# Markus Holtermann <inyoka@markusholtermann.eu>, 2013,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-20 08:59+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/django/language/"
 "de/)\n"
@@ -21,79 +21,47 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Persönliche Informationen"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Berechtigungen"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Wichtige Daten"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(name)s-Objekt mit Primärschlüssel %(key)r ist nicht vorhanden."
+
 msgid "Password changed successfully."
 msgstr "Passwort erfolgreich geändert."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Passwort ändern: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr "Authentifizierung und Autorisierung"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Kein Passwort gesetzt."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ungültiges Passwortformat oder unbekannter Hashing-Algorithmus."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "Dieser Benutzername ist bereits vergeben."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Die beiden Passwörter sind nicht identisch."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Benutzername"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Erforderlich. 30 Zeichen oder weniger. Nur alphanumerische Zeichen "
-"(Buchstaben, Ziffern und @/./+/-/_) sind erlaubt."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Dieser Wert darf nur Buchstaben, Ziffern und @/./+/-/_ enthalten."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Passwort"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Passwort bestätigen"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Bitte das gleiche Passwort zur Überprüfung nochmal eingeben."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -103,7 +71,6 @@ msgstr ""
 "Möglichkeit das Passwort dieses Benutzers anzuschauen. Allerdings kann das "
 "Passwort auf <a href=\"password/\">dieses Formular</a> geändert werden."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -112,102 +79,72 @@ msgstr ""
 "Bitte einen gültigen %(username)s und ein Passwort eingeben. Beide Felder "
 "berücksichtigen die Groß-/Kleinschreibung."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Dieser Benutzer ist inaktiv."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "E-Mail-Adresse"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Neues Passwort"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Neues Passwort bestätigen"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Das alte Passwort war falsch. Bitte neu eingeben."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Altes Passwort"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Passwort (wiederholen)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "Algorithmus"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "Wiederholungen"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "Salt"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "Hash"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "Arbeitsfaktor"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "Prüfsumme"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "Name"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "Codename"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "Berechtigung"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "Berechtigungen"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "Gruppe"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "Gruppen"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "Passwort"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "Letzte Anmeldung"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "Administrator-Status"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -215,56 +152,56 @@ msgstr ""
 "Legt fest, dass der Benutzer alle Berechtigungen hat, ohne diese einzeln "
 "zuweisen zu müssen."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
 "Die Gruppen, denen der Benutzer angehört. Ein Benutzer bekommt alle "
-"Berechtigungen seiner zugeteilten Gruppen."
+"Berechtigungen dieser Gruppen."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "Berechtigungen"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr "Spezifische Berechtigungen für diesen Benutzer."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "Benutzername"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Bitte einen gültigen Benutzernamen eingeben."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Erforderlich. 30 Zeichen oder weniger. Nur alphanumerische Zeichen "
+"(Buchstaben, Ziffern und @/./+/-/_) sind erlaubt."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+"Bitte einen gültigen Benutzernamen eingeben. Dieser Wert darf nur "
+"Buchstaben, Ziffern und @/./+/-/_ enthalten."
+
+msgid "A user with that username already exists."
+msgstr "Dieser Benutzername ist bereits vergeben."
+
 msgid "first name"
 msgstr "Vorname"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "Nachname"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "E-Mail-Adresse"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "Mitarbeiter-Status"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "Legt fest, ob sich der Benutzer an der Administrationsseite anmelden kann."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "Aktiv"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -272,55 +209,39 @@ msgstr ""
 "Legt fest, ob dieser Benutzer aktiv ist. Kann deaktiviert werden, anstatt "
 "Benutzer zu löschen."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "Mitglied seit"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "Benutzer"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "Benutzer"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Passwort auf %(site_name)s zurücksetzen"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Bitte eine gültige E-Mail-Adresse eingeben."
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Abgemeldet"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr "Passwort zurücksetzen"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr "Passwort erfolgreich zurückgesetzt"
+msgid "Password reset sent"
+msgstr "E-Mail zum Passwort zurücksetzen abgesendet"
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr "Neues Passwort eingeben"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr "Passwort nicht erfolgreich zurückgesetzt"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr "Passwort zurücksetzen abgeschlossen"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr "Passwort ändern"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr "Passwort erfolgreich geändert"

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:30+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Irish (http://www.transifex.com/projects/p/django/language/"
 "ga/)\n"
@@ -19,81 +19,47 @@ msgstr ""
 "Plural-Forms: nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
 "4);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Eolas pearsantach"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Ceada"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Dáta tábhactach"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Focal faire aithraithe rathúil"
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Athraigh focal faire: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr ""
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr ""
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "In ann do úsáideoir leis an ainm úsáideora."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Níl an dá focla faire comhoiriúnigh"
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Ainm úsaideoir"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Riachtanach. 30 carachtair nó níos lú. Litreacha, digite agus @/./+/-/_ "
-"amháin."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
-"Cathaigh litreacha, digite agus na carachtair @/./+/-/_ amhain le hadhaigh "
-"an méid seo."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Focal faire"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Focal faire deimhniú"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Iontráíl an focal faire céanna mar thuas, le fíorúchán."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -103,110 +69,79 @@ msgstr ""
 "an úsaideora a fheiceáil, ach is féidir leat athrú ar an focal faire leis <a "
 "href=\"password/\">an bhfoirm seo</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Tá an cuntas seo neamhghníomhach."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr ""
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Focal faire nua"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Deimnhiú focal faire nua"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 "Cuireadh do sean-focal faire isteach go mícheart. Iontráil isteach é arís."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Sean-focal faire "
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Focal faire (arís)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algartam"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "atriallta"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "salann"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "haiseáil"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "fachtóir oibre"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "suim sheiceála"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "ainm"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "Ainm cód"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "cead"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "ceada"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grúpa"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grúpa"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "focal faire"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "logáil deirneach"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "stádas forúsáideoir"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -214,57 +149,53 @@ msgstr ""
 "Sainíonn go bhfuil gach ceada ag an úsáideoir seo gan iad a cur le go "
 "díreach."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"Na grúpaí a mbaineann leis an úsáideoir seo. Gheobhaidh úsáideor na ceadanna "
-"a deonaíodh do gach ceann den a  grúpa."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "ceada úsáideoira"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr ""
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "Ainm úsáideoir"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Riachtanach. 30 carachtair nó níos lú. Litreacha, digite agus @/./+/-/_ "
+"amháin."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
 msgstr ""
 
-#: contrib/auth/models.py:373
+msgid "A user with that username already exists."
+msgstr "In ann do úsáideoir leis an ainm úsáideora."
+
 msgid "first name"
 msgstr "ainm baiste"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "sloinne"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr ""
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "stádas foirne"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "Sainigh an bhfuil cead ag an úsáideoir logáil isteach go dtí an suíomh "
 "riaracháin seo."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "gníomhach"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -272,55 +203,39 @@ msgstr ""
 "Sainíonn an bhfuil an úsáideoir gníomhach. Míroghnaigh seo in aineonn de "
 "scriseadh cuntasí."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "Dáta teacht isteach"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "úsáideoir"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "úsáideora"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Athshocraigh focal faire ar %(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr ""
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Logáilte amach"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr ""
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
+msgid "Password reset sent"
 msgstr ""
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr ""
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr ""
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr ""
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr ""
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr ""

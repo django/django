@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Burak Yavuz, 2014
+# BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-09-06 12:27+0000\n"
-"Last-Translator: Burak Yavuz\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:13+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -18,26 +18,20 @@ msgstr ""
 "Language: tr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: contrib/sessions/apps.py:8
 msgid "Sessions"
 msgstr "Oturumlar"
 
-#: contrib/sessions/models.py:38
 msgid "session key"
 msgstr "oturum anahtarı"
 
-#: contrib/sessions/models.py:40
 msgid "session data"
 msgstr "oturum verisi"
 
-#: contrib/sessions/models.py:41
 msgid "expire date"
 msgstr "bitiş tarihi"
 
-#: contrib/sessions/models.py:46
 msgid "session"
 msgstr "oturum"
 
-#: contrib/sessions/models.py:47
 msgid "sessions"
 msgstr "oturumlar"

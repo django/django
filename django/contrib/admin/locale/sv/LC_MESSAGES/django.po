@@ -6,15 +6,17 @@
 # cvitan <tome@cvitan.com>, 2011
 # Cybjit <cybjit@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jonathan Lindén, 2015
+# Jonathan Lindén, 2014
 # sorl <mikko@aino.se>, 2011
 # Thomas Lundqvist <thomas@biljettshop.se>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-09-29 14:03+0000\n"
-"Last-Translator: Andreas Pelme <andreas@pelme.se>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-30 13:39+0000\n"
+"Last-Translator: Jonathan Lindén\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -23,68 +25,51 @@ msgstr ""
 "Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Tog bort %(count)d %(items)s"
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Kan inte ta bort %(name)s"
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "Är du säker?"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Tag bort markerade %(verbose_name_plural)s"
+msgstr "Ta bort markerade %(verbose_name_plural)s"
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
 msgstr "Administration"
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "Alla"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "Ja"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "Nej"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "Okänt"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "Alla datum"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "Idag"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "Senaste 7 dagarna"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "Denna månad"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "Detta år"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -93,98 +78,81 @@ msgstr ""
 "Ange %(username)s och lösenord för ett personalkonto. Notera att båda fälten "
 "är skiftlägeskänsliga."
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "Åtgärd:"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "händelsetid"
 
-#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "objektets id"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr "objektets beskrivning"
 
-#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "händelseflagga"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "ändra meddelande"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "loggpost"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "loggposter"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "Lade till \"%(object)s\"."
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Ändrade \"%(object)s\" - %(changes)s"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Tog bort \"%(object)s.\""
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
 msgstr "LogEntry-Objekt"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "Inget"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Håll ner \"Control\", eller \"Command\" på en Mac, för att välja fler än en."
+
 #, python-format
 msgid "Changed %s."
 msgstr "Ändrade %s."
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "och"
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Lade till %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Ändrade %(list)s på %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Tog bort %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "Inga fält ändrade."
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" lades till. Du kan redigera objektet igen nedanför."
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -193,19 +161,16 @@ msgstr ""
 "%(name)s \"%(obj)s\" lades till. Du kan lägga till ytterligare %(name)s "
 "nedan."
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" lades till."
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr "%(name)s \"%(obj)s\" ändrades. Du kan ändra det igen nedan."
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -214,78 +179,64 @@ msgstr ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ändrades."
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "Poster måste väljas för att genomföra åtgärder. Inga poster har ändrats."
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "Inga åtgärder valda."
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" togs bort."
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s-objekt med primärnyckel %(key)r finns inte."
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "Lägg till %s"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "Ändra %s"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "Databasfel"
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s ändrades."
 msgstr[1] "%(count)s %(name)s ändrades."
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s vald"
 msgstr[1] "Alla %(total_count)s valda"
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 av %(cnt)s valda"
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "Ändringshistorik: %s"
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -294,71 +245,40 @@ msgstr ""
 "Borttagning av %(class_name)s %(instance)s  kräver borttagning av följande "
 "skyddade relaterade objekt: %(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "Django webbplatsadministration"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Django-administration"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "Webbplatsadministration"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "Logga in"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "Administration av %(app)s"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Sidan kunde inte hittas"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Vi beklagar men den begärda sidan hittades inte."
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Hem"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "Serverfel"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Serverfel (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Serverfel <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
@@ -367,28 +287,22 @@ msgstr ""
 "webbplatsadministratörerna via e-post och bör bli rättat omgående. Tack för "
 "ditt tålamod."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "Kör markerade operationer"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "Utför"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "Klicka här för att välja alla objekt från alla sidor"
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Välj alla %(total_count)s %(module_name)s"
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Rensa urval"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
@@ -396,112 +310,63 @@ msgstr ""
 "Ange först ett användarnamn och ett lösenord. Efter det kommer du att få "
 "fler användaralternativ."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "Mata in användarnamn och lösenord."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Ändra lösenord"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgstr "Rätta till felen nedan."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
 msgstr "Vänligen rätta till felen nedan."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Ange nytt lösenord för användare <strong>%(username)s</strong>."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "Lösenord"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "Lösenord (igen)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "Fyll i samma lösenord som ovan för verifiering."
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "Välkommen,"
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr "Visa sida"
+
 msgid "Documentation"
 msgstr "Dokumentation"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Logga ut"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "Lägg till"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Historik"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Visa på webbplats"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Lägg till %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Filtrera"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "Ta bort från sortering"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "Sorteringsprioritet: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "Ändra sorteringsordning"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "Radera"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -512,7 +377,6 @@ msgstr ""
 "relaterade objekt togs bort, men ditt konto har inte rättigheter att ta bort "
 "följande objekttyper:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -521,7 +385,6 @@ msgstr ""
 "Borttagning av %(object_name)s '%(escaped_object)s'  kräver borttagning av "
 "följande skyddade relaterade objekt:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -530,16 +393,18 @@ msgstr ""
 "Är du säker på att du vill ta bort %(object_name)s \"%(escaped_object)s\"? "
 "Följande relaterade objekt kommer att tas bort:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Objects"
+msgstr "Objekt"
+
 msgid "Yes, I'm sure"
 msgstr "Ja, jag är säker"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
-msgid "Delete multiple objects"
-msgstr "Tog bort %(name)s \"%(object)s\"."
+msgid "No, take me back"
+msgstr "Nej, ta mig tillbaka"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
+msgid "Delete multiple objects"
+msgstr "Ta bort flera objekt"
+
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -550,7 +415,6 @@ msgstr ""
 "relaterade objekt, men ditt konto har inte behörighet att ta bort följande "
 "typer av objekt:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -559,7 +423,6 @@ msgstr ""
 "Borttagning av valda %(objects_name)s skulle kräva borttagning av följande "
 "skyddade objekt:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -568,56 +431,45 @@ msgstr ""
 "Är du säker på att du vill ta bort valda %(objects_name)s? Alla följande "
 "objekt samt relaterade objekt kommer att tas bort: "
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
-msgid "Remove"
-msgstr "Tag bort"
+msgid "Change"
+msgstr "Ändra"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
+msgid "Remove"
+msgstr "Ta bort"
+
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Lägg till ytterligare %(verbose_name)s"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Radera?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr " På %(filter_title)s "
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr "Översikt"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "Ändra"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "Du har inte rättigheter att redigera något."
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "Senaste Händelser"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "Mina händelser"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "Inga tillgängliga"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "Okänt innehåll"
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -626,27 +478,18 @@ msgstr ""
 "Någonting är fel med din databasinstallation. Se till att de rätta "
 "databastabellerna har skapats och att databasen är läsbar av rätt användare."
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "Lösenord:"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "Har du glömt lösenordet eller användarnamnet?"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Datum tid"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Användare"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Händelse"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -654,61 +497,58 @@ msgstr ""
 "Detta objekt har ingen ändringshistorik. Det lades antagligen inte till via "
 "denna administrationssida."
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Visa alla"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "Spara"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Ändra markerade %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Lägg till %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Ta bort markerade %(model)s"
+
 msgid "Search"
 msgstr "Sök"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s resultat"
 msgstr[1] "%(counter)s resultat"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s totalt"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "Spara som ny"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "Spara och lägg till ny"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "Spara och fortsätt redigera"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Tack för att du spenderade lite kvalitetstid med webbplatsen idag."
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Logga in igen"
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "Ändra lösenord"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "Ditt lösenord har ändrats."
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -716,34 +556,18 @@ msgstr ""
 "Var god fyll i ditt gamla lösenord för säkerhets skull och skriv sedan in "
 "ditt nya lösenord två gånger så vi kan kontrollera att du skrev det rätt."
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "Gammalt lösenord"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "Nytt lösenord"
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Ändra mitt lösenord"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "Nollställ lösenord"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Ditt lösenord har ändrats.  Du kan nu logga in."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Bekräftelse av lösenordsnollställning"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
@@ -751,15 +575,12 @@ msgstr ""
 "Var god fyll i ditt nya lösenord två gånger så vi kan kontrollera att du "
 "skrev det rätt."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Nytt lösenord:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Bekräfta lösenord:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -767,15 +588,14 @@ msgstr ""
 "Länken för lösenordsnollställning var felaktig, möjligen därför att den "
 "redan använts.  Var god skicka en ny nollställningsförfrågan."
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Vi har skickat instruktioner för att sätta ert lösenord till er via e-post . "
-"De borde komma inom en snar framtid."
+"Vi har skickat ett email till dig med instruktioner hur du återställer ditt "
+"lösenord om ett konto med mailadressen du fyllt i existerar. Det borde dyka "
+"upp i din inkorg inom kort."
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -783,7 +603,6 @@ msgstr ""
 "Om ni inte får ett e-brev, vänligen kontrollera att du har skrivit in "
 "adressen du registrerade dig med och kolla din skräppostmapp."
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -792,24 +611,19 @@ msgstr ""
 "Du får detta e-postmeddelande för att du har begärt återställning av ditt "
 "lösenord av ditt konto på %(site_name)s."
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Var god gå till följande sida och välj ett nytt lösenord:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Ditt användarnamn (i fall du skulle ha glömt det):"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Tack för att du använder vår webbplats!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s-teamet"
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -817,52 +631,37 @@ msgstr ""
 "Glömt ditt lösenord? Fyll i din e-postadress nedan så skickar vi ett e-"
 "postmeddelande med instruktioner för hur du ställer in ett nytt."
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "E-postadress:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Nollställ mitt lösenord"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "Alla datum"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "(Ingen)"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "Välj %s"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "Välj %s att ändra"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "Datum:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "Tid:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "Uppslag"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "Lägg till ytterligare"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
 msgstr "Nuvarande:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "Ändra:"

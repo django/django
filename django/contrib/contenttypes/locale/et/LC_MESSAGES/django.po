@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-14 19:49+0000\n"
-"Last-Translator: Marti Raudsepp <marti@juffo.org>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -19,33 +19,26 @@ msgstr ""
 "Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
 msgstr "Sisutüübid"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "pythoni mudeli klassinimi"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "sisutüüp"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "sisutüübid"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Sisutüübi %(ct_id)s objektil puudub seos mudeliga"
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "Sisutüübi %(ct_id)s objekti %(obj_id)s ei ole olemas"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "%(ct_name)s objektil puudub meetod get_absolute_url()"
