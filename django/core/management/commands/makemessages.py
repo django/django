@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import fnmatch
 import glob
 import io
-import locale
 import os
 import re
 import sys
