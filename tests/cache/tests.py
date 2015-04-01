@@ -943,6 +943,18 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.assertEqual(out.getvalue(),
             "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
 
+    @override_settings(CACHES=caches_setting_for_tests(
+        BACKEND='django.core.cache.backends.db.DatabaseCache',
+        # Use another table name that won't trigger the 'table already exists'
+        # message
+        LOCATION='some cache table'
+    ))
+    def test_createcachetable_dry_run_mode(self):
+        out = six.StringIO()
+        management.call_command('createcachetable', dry_run=True, stdout=out)
+        output = out.getvalue()
+        self.assertTrue(output.startswith("CREATE TABLE"))
+
     def test_createcachetable_with_table_argument(self):
         """
         Delete and recreate cache table with legacy behavior (explicitly

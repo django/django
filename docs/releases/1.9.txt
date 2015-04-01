@@ -112,6 +112,8 @@ Cache
 
 * ``django.core.cache.backends.base.BaseCache`` now has a ``get_or_set()``
   method.
+* The ``createcachetable`` command now has a ``--dry-run`` flag to print out
+  the SQL rather than execute it.
 
 Email
 ^^^^^
