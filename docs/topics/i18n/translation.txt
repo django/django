@@ -1313,6 +1313,32 @@ multiple times::
     <creating-message-files-from-js-code>` you need to use the special
     'djangojs' domain, **not** ``-e js``.
 
+.. admonition:: Using Jinja2 templates?
+
+    :djadmin:`makemessages` doesn't understand the syntax of Jinja2 templates.
+    To extract strings from a project containing Jinja2 templates, use Babel_
+    instead.
+
+    Here's an example ``babel.cfg`` configuration file::
+
+        # Extraction from Python source files
+        [python: **.py]
+
+        # Extraction from Jinja2 templates
+        [jinja2: **.jinja]
+        extensions = jinja2.ext.with_
+
+    Make sure you list all extensions you're using! Otherwise Babel won't
+    recognize the tags defined by these extensions and will ignore Jinja2
+    templates containing them entirely.
+
+    Babel provides similar features to :djadmin:`makemessages`, can replace it
+    in general, and doesn't depend on ``gettext``. For more information, read
+    its documentation about `working with message catalogs`_.
+
+    .. _Babel: http://babel.pocoo.org/
+    .. _working with message catalogs: http://babel.pocoo.org/docs/messages/
+
 .. admonition:: No gettext?
 
     If you don't have the ``gettext`` utilities installed,
