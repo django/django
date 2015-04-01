@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-22 07:38+0000\n"
-"Last-Translator: Bayarkhuu Bataa\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -19,15 +19,12 @@ msgstr ""
 "Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
 msgstr "Чиглүүлэлтүүд"
 
-#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "redirect хаанаас"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -35,11 +32,9 @@ msgstr ""
 "Энэ нь домэйн нэр агуулаагүй абсолют зам байх ёстой. Жишээ нь: '/events/"
 "search/'."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "redirect хаашаа"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -47,10 +42,8 @@ msgstr ""
 "Энэ нь (дээрхийн нэгэн адил) абсолют зам юм уу 'http://' гэж эхэлсэн бүтэн "
 "URL байж болно. "
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "redirect"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "redirect-ууд"

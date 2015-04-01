@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:35+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
 "language/vi/)\n"
@@ -19,82 +19,67 @@ msgstr ""
 "Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Trường GIS cơ bản -- ánh xạ đến kiểu đặc tả hình học của OpenGIS ( OpenGIS "
 "Specification Geometry)"
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Điểm"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Đường"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Đa giác"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Đa điểm"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Multi-line string"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Multi polygon"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Kiểu hình học"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr ""
+
 msgid "No geometry value provided."
 msgstr "Không có giá trị geometry"
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Giá trị geometry không hợp lệ"
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Kiểu geometry không hợp lệ"
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr "Có lỗi khi chuyển đổi hình học từ SRID của trường geometry"
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "Không có sitemap cho mục: %r"
+msgid "Delete all Features"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "Trang %s trống"
+msgid "WKT debugging window:"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "Không có trang '%s'"
+msgid "Google Maps via GeoDjango"
+msgstr ""
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr ""
+
 msgid "No feeds are registered."
 msgstr "Không có feed nào được đăng kí"
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Slug %r không được đăng kí"

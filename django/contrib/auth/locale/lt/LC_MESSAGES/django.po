@@ -3,6 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lauris <lauris@runbox.com>, 2011
+# Matas Dailyda <matas@dailyda.com>, 2015
 # naktinis <naktinis@gmail.com>, 2012
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012-2013
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 16:35+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -22,79 +23,47 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Asmeninė informacija"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Leidimai"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Svarbios datos"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Įrašas %(name)s su pirminiu raktu %(key)r neegzistuoja."
+
 msgid "Password changed successfully."
 msgstr "Slaptažodis pakeistas sėkmingai."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Pakeisti slaptažodį: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Autentifikacija ir įgaliojimai"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Slaptažodis nenustatytas"
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Neteisingas slaptažodžio formatas arba nežinomas maišos algoritmas."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "Jau egzistuoja vartotojas su tokiu vardu."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Slaptažodžio laukai nesutapo"
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Vartotojo vardas"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Privalomas. 30 arba mažiau simbolių. Raidės, skaičiai bei @/./+/-/_ "
-"simboliai."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Ši reikšmė gali turėti tik raides, skaičius  ir @/./+/-/_ simbolius."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Slaptažodis"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Slaptažodžio patvirtinimas"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Patikrinimui įvesk tokį patį slaptažodį, kaip viršuje."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -104,7 +73,6 @@ msgstr ""
 "vartotojo slaptažodį nėra. Tiesa galite slaptažodį pakeisti naudodamiesi <a "
 "href=\"password/\">šia forma</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -113,156 +81,126 @@ msgstr ""
 "Įveskite teisingą %(username)s ir slaptažodį. Abiejuose laukuose didžiosios "
 "mažosios raidės skiriasi."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Ši paskyra yra neaktyvi."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "El. paštas"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Naujas slaptažodis"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Naujo slaptažodžio patvirtinimas"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Blogai įvestas senas slaptažodis. Bandykite dar kartą."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Senas slaptažodis"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Slaptažodis (dar kartą)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algoritmas"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iteracijos"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "druska"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "maiša"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "darbo faktorius"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "kontrolinė suma"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "vardas"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "kodinis vardas"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "leidimas"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "leidimai"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grupė"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grupės"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "slaptažodis"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "paskutinį kartą prisijungęs"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "supervartotojo statusas"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "Pažymi, kad šis vartotojas turi visas teises be specialių nustatymų."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
 "Grupės, kurioms šis vartotojas priklauso. Vartotojas gaus visas teises, "
 "kurios yra suteiktos jo grupėms."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "vartotojo leidimai"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Specifiniai šio vartotojo leidimai."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "vartotojo vardas"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Įveskite teisingą vartotojo vardą."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Privalomas. 30 arba mažiau simbolių. Raidės, skaičiai bei @/./+/-/_ "
+"simboliai."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+"Įveskite korektišką vartotojo vardą. Ši reikšmė gali turėti tik raides, "
+"skaičius  ir @/./+/-/_ simbolius."
+
+msgid "A user with that username already exists."
+msgstr "Jau egzistuoja vartotojas su tokiu vardu."
+
 msgid "first name"
 msgstr "vardas"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "pavardė"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "El. pašto adresas"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "personalo statusas"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Nurodo ar vartotojas gali prisijungti prie administravimo puslapio."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "aktyvus"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -270,55 +208,39 @@ msgstr ""
 "Nurodo ar vartotojas yra aktyvuotas. Užuot pašalinę vartotoją, galite nuimti "
 "šią žymę."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "data, kada prisijungė"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "vartotojas"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "vartotojai"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Slaptažodis atkurtas ant %(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Įveskite teisingą el. pašto adresą."
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Atsijungęs"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
-msgstr ""
+msgstr "Slaptažodžio atstatymas"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr ""
+msgid "Password reset sent"
+msgstr "Slaptažodžio atstatymas išsiųstas"
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
-msgstr ""
+msgstr "Įveskite naują slaptažodį"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Slaptažodžio atstatymas nesėkmingas"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
-msgstr ""
+msgstr "Slaptažodžio atstatymas baigtas"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
-msgstr ""
+msgstr "Slaptažodžio keitimas"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
-msgstr ""
+msgstr "Slaptažodis sėkmingai pakeistas"

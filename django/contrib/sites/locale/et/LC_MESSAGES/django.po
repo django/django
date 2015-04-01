@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-14 19:47+0000\n"
-"Last-Translator: Marti Raudsepp <marti@juffo.org>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -19,26 +19,20 @@ msgstr ""
 "Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/sites/apps.py:8
 msgid "Sites"
 msgstr "Saidid"
 
-#: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr "Domeeni nimes ei tohi olla ei tühikuid ega tabeldusmärke."
 
-#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "domeeninimi"
 
-#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "hüüdnimi"
 
-#: contrib/sites/models.py:74
 msgid "site"
 msgstr "sait"
 
-#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "saidid"

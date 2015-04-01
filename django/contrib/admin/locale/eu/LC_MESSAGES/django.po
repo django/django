@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:18+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
 "eu/)\n"
@@ -20,68 +20,51 @@ msgstr ""
 "Language: eu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s elementu ezabatu dira."
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Ezin da %(name)s ezabatu"
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "Ziur zaude?"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Ezabatu aukeratutako %(verbose_name_plural)s"
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
 msgstr ""
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "Dena"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "Bai"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "Ez"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "Ezezaguna"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "Edozein data"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "Gaur"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "Aurreko 7 egunak"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "Hilabete hau"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "Urte hau"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -90,97 +73,79 @@ msgstr ""
 "Idatzi kudeaketa gunerako %(username)s eta pasahitz zuzena. Kontuan izan "
 "biek maiuskula/minuskulak desberdintzen dituztela."
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "Ekintza:"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "Ekintza hordua"
 
-#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "Objetuaren id-a"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr "Objeturaren aurkezpena"
 
-#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "Ekintza botoia"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "Mezua aldatu"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "Log sarrera"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "log sarrerak"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "\"%(object)s\" gehituta."
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "\"%(object)s\" aldatuta - %(changes)s"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\" ezabatuta."
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
 msgstr "LogEntry objektua"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "Bat ere ez"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
 #, python-format
 msgid "Changed %s."
 msgstr "%s aldatuta."
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "eta"
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" gehituta."
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Changed %(list)s for %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ezabatuta."
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "Ez da eremurik aldatu."
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" ondo gehitu da. Jarraian aldatu dezakezu berriro."
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -189,12 +154,10 @@ msgstr ""
 "%(name)s \"%(obj)s\" ondo gehitu da. Beste %(name)s bat gehitu dezakezu "
 "jarraian."
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" ondo gehitu da."
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -203,7 +166,6 @@ msgstr ""
 "%(name)s \"%(obj)s\" ondo aldatu da. Aldaketa gehiago egin ditzazkezu "
 "jarraian."
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -212,12 +174,10 @@ msgstr ""
 "%(name)s \"%(obj)s\" ondo aldatu da. Beste %(name)s bat gehitu dezakezu "
 "jarraian."
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ondo aldatu da."
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -225,66 +185,54 @@ msgstr ""
 "Elementuak aukeratu behar dira beraien gain ekintzak burutzeko. Ez da "
 "elementurik aldatu."
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "Ez dago ekintzarik aukeratuta."
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ondo ezabatu da."
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Ez dago %(key)r gakodun %(name)s objekturik."
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "Gehitu %s"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "Aldatu %s"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "Datu-basearen errorea"
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(name)s %(count)s  ondo aldatu da."
 msgstr[1] "%(count)s %(name)s ondo aldatu dira."
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "Guztira %(total_count)s aukeratuta"
 msgstr[1] "Guztira %(total_count)s aukeratuta"
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "Guztira %(cnt)s, 0 aukeratuta"
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "Aldaketen historia: %s"
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -294,71 +242,40 @@ msgstr ""
 "objektu hauek ezabatzea eragingo du:\n"
 "%(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "Django kudeaketa gunea"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Django kudeaketa"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "Webgunearen kudeaketa"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "Sartu"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
 msgstr ""
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Ez da orririk aurkitu"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Barkatu, eskatutako orria ezin daiteke aurkitu"
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Hasiera"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "Zerbitzariaren errorea"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Zerbitzariaren errorea (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Zerbitzariaren errorea <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
@@ -366,28 +283,22 @@ msgstr ""
 "Errore bat gertatu da. Errorea guneko kudeatzaileari jakinarazi zaio email "
 "bidez eta laister egon beharko luke konponduta. Barkatu eragozpenak."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "Burutu hautatutako ekintza"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "Joan"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "Egin klik hemen orri guztietako objektuak aukeratzeko"
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Hautatu %(total_count)s %(module_name)s guztiak"
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Garbitu hautapena"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
@@ -395,113 +306,64 @@ msgstr ""
 "Lehenik idatzi erabiltzaile-izena eta pasahitza. Gero erabiltzaile-aukera "
 "gehiago aldatu ahal izango dituzu."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "Idatzi erabiltzaile-izen eta pasahitza."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Aldatu pasahitza"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgstr "Zuzendu azpiko erroreak."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
 msgstr ""
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Idatzi pasahitz berria <strong>%(username)s</strong> erabiltzailearentzat."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "Pasahitza"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "Pasahitza (berriro)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "Idatzi goiko pasahitz bera, egiaztapenerako."
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "Ongi etorri,"
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr ""
+
 msgid "Documentation"
 msgstr "Dokumentazioa"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Irten"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "Gehitu"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Historia"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Ikusi gunean"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Gehitu  %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Iragazkia"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "Kendu ordenaziotik"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "Ordenatzeko lehentasuna: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "Txandakatu ordenazioa"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "Ezabatu"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -511,7 +373,6 @@ msgstr ""
 "%(object_name)s ezabatzean bere '%(escaped_object)s' ere ezabatzen dira, "
 "baina zure kontuak ez dauka baimenik objetu mota hauek ezabatzeko:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -520,7 +381,6 @@ msgstr ""
 "%(object_name)s '%(escaped_object)s' ezabatzeak erlazionatutako objektu "
 "babestu hauek ezabatzea eskatzen du:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -529,16 +389,18 @@ msgstr ""
 "Ziur zaude %(object_name)s \"%(escaped_object)s\" ezabatu nahi dituzula? "
 "Erlazionaturik dauden hurrengo elementuak ere ezabatuko dira:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Objects"
+msgstr ""
+
 msgid "Yes, I'm sure"
 msgstr "Bai, ziur nago"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "No, take me back"
+msgstr ""
+
 msgid "Delete multiple objects"
 msgstr "Ezabatu hainbat objektu"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -549,7 +411,6 @@ msgstr ""
 "eskatzen du baina zure kontuak ez dauka baimen nahikorik objektu mota hauek "
 "ezabatzeko: "
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -558,7 +419,6 @@ msgstr ""
 "Hautatutako %(objects_name)s ezabatzeak erlazionatutako objektu babestu "
 "hauek ezabatzea eskatzen du:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -567,56 +427,45 @@ msgstr ""
 "Ziur zaude hautatutako %(objects_name)s ezabatu nahi duzula? Objektu guzti "
 "hauek eta erlazionatutako elementu guztiak ezabatuko dira:"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Change"
+msgstr "Aldatu"
+
 msgid "Remove"
 msgstr "Kendu"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Gehitu beste %(verbose_name)s bat"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Ezabatu?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr "Irizpidea: %(filter_title)s"
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "%(name)s aplikazioaren modeloak"
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "Aldatu"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "Ez daukazu ezer aldatzeko baimenik."
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "Azken ekintzak"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "Nire ekintzak"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "Ez dago ezer"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "Eduki ezezaguna"
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -625,27 +474,18 @@ msgstr ""
 "Zerbait gaizki dago zure datu-basearekin. Ziurtatu datu-baseko taulak sortu "
 "direla eta erabiltzaile egokiak irakurtzeko baimena duela."
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "Pasahitza:"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "Pasahitza edo erabiltzaile-izena ahaztu duzu?"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Data/ordua"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Erabiltzailea"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Ekintza"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -653,61 +493,58 @@ msgstr ""
 "Objektu honek ez dauka aldaketen historiarik. Ziurrenik kudeaketa gunetik "
 "kanpo gehituko zen."
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Erakutsi dena"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "Gorde"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
 msgid "Search"
 msgstr "Bilatu"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "Emaitza %(counter)s "
 msgstr[1] "%(counter)s emaitza"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s guztira"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "Gorde berri gisa"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "Gorde eta gehitu beste bat"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "Gorde eta jarraitu editatzen"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Eskerrik asko webguneari zure probetxuzko denbora eskaintzeagatik."
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Hasi saioa berriro"
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "Aldatu pasahitza"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "Zure pasahitza aldatu egin da."
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -715,48 +552,29 @@ msgstr ""
 "Idatzi pasahitz zaharra segurtasun arrazoiengatik eta gero pasahitz berria "
 "bi aldiz, akatsik egiten ez duzula ziurta dezagun."
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "Pasahitz zaharra"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "Pasahitz berria"
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Aldatu nire pasahitza"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "Berrezarri pasahitza"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Zure pasahitza ezarri da. Orain aurrera egin eta sartu zaitezke."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Pasahitza berrezartzeko berrespena"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr "Idatzi pasahitz berria birritan ondo idatzita dagoela ziurta dezagun."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Pasahitz berria:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Berretsi pasahitza:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -764,15 +582,11 @@ msgstr ""
 "Pasahitza berrezartzeko loturak baliogabea dirudi. Baliteke lotura aurretik "
 "erabilita egotea. Eskatu berriro pasahitza berrezartzea."
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Emandako helbide elektronikora bidali dizkizugu pasahitza berrezartzeko "
-"jarraibideak. Epe laburrean jaso behar zenuke."
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -780,7 +594,6 @@ msgstr ""
 "Ez baduzu mezurik jasotzen, ziurtatu izena ematean erabilitako helbide "
 "berdina idatzi duzula eta egiaztatu spam karpeta."
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -789,24 +602,19 @@ msgstr ""
 "Mezu hau %(site_name)s webgunean pasahitza berrezartzea eskatu duzulako jaso "
 "duzu"
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Zoaz hurrengo orrira eta aukeratu pasahitz berria:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Zure erabiltzaile-izena (ahaztu baduzu):"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Mila esker gure webgunea erabiltzeagatik!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s webguneko taldea"
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -814,52 +622,37 @@ msgstr ""
 "Pasahitza ahaztu duzu? Idatzi zure helbide elektronikoa eta berri bat "
 "ezartzeko jarraibideak bidaliko dizkizugu."
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "Helbide elektronikoa:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Berrezarri pasahitza"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "Data guztiak"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "(Bat ere ez)"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "Hautatu %s"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "Hautatu %s aldatzeko"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "Data:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "Ordua:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "Lookup"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "Beste bat gehitu"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
 msgstr "Oraingoa:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "Aldatu:"

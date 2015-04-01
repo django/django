@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-07-25 18:46+0000\n"
-"Last-Translator: Aby Thomas <abyzthomas@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
 "MIME-Version: 1.0\n"
@@ -19,13 +19,11 @@ msgstr ""
 "Language: ml\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
 msgstr "ലഭ്യമായ %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -33,39 +31,31 @@ msgstr ""
 "ഇതാണ് ലഭ്യമായ %s പട്ടിക. അതില്‍ ചിലത് തിരഞ്ഞെടുക്കാന്‍ താഴെ കളത്തില്‍ നിന്നും ഉചിതമായവ സെലക്ട് "
 "ചെയ്ത ശേഷം രണ്ടു കളങ്ങള്‍ക്കുമിടയിലെ \"തെരഞ്ഞെടുക്കൂ\" അടയാളത്തില്‍ ക്ലിക് ചെയ്യുക."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr "ലഭ്യമായ %s പട്ടികയെ ഫില്‍ട്ടര്‍ ചെയ്തെടുക്കാന്‍ ഈ ബോക്സില്‍ ടൈപ്പ് ചെയ്യുക."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Filter"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "എല്ലാം തെരഞ്ഞെടുക്കുക"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
 msgstr "%s എല്ലാം ഒന്നിച്ച് തെരഞ്ഞെടുക്കാന്‍ ക്ലിക് ചെയ്യുക."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr "തെരഞ്ഞെടുക്കൂ"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "നീക്കം ചെയ്യൂ"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
 msgstr "തെരഞ്ഞെടുത്ത %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -73,24 +63,18 @@ msgstr ""
 "തെരഞ്ഞെടുക്കപ്പെട്ട %s പട്ടികയാണിത്. അവയില്‍ ചിലത് ഒഴിവാക്കണമെന്നുണ്ടെങ്കില്‍ താഴെ കളത്തില്‍ "
 "നിന്നും അവ സെലക്ട് ചെയ്ത്  കളങ്ങള്‍ക്കിടയിലുള്ള \"നീക്കം ചെയ്യൂ\" എന്ന അടയാളത്തില്‍ ക്ലിക് ചെയ്യുക."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr "എല്ലാം നീക്കം ചെയ്യുക"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "തെരഞ്ഞെടുക്കപ്പെട്ട %s എല്ലാം ഒരുമിച്ച് നീക്കം ചെയ്യാന്‍ ക്ലിക് ചെയ്യുക."
 
-#: contrib/admin/static/admin/js/actions.js:22
-#: contrib/admin/static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(cnt)sല്‍ %(sel)s തെരഞ്ഞെടുത്തു"
 msgstr[1] "%(cnt)sല്‍ %(sel)s എണ്ണം തെരഞ്ഞെടുത്തു"
 
-#: contrib/admin/static/admin/js/actions.js:114
-#: contrib/admin/static/admin/js/actions.min.js:4
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -98,8 +82,6 @@ msgstr ""
 "വരുത്തിയ മാറ്റങ്ങള്‍ സേവ് ചെയ്തിട്ടില്ല. ഒരു ആക്ഷന്‍ പ്രയോഗിച്ചാല്‍ സേവ് ചെയ്യാത്ത മാറ്റങ്ങളെല്ലാം "
 "നഷ്ടപ്പെടും."
 
-#: contrib/admin/static/admin/js/actions.js:126
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -108,8 +90,6 @@ msgstr ""
 "നിങ്ങള്‍ ഒരു ആക്ഷന്‍ തെരഞ്ഞെടുത്തിട്ടുണ്ട്. പക്ഷേ, കളങ്ങളിലെ മാറ്റങ്ങള്‍ ഇനിയും സേവ് ചെയ്യാനുണ്ട്. "
 "ആദ്യം സേവ്ചെയ്യാനായി OK ക്ലിക് ചെയ്യുക. അതിനു ശേഷം ആക്ഷന്‍ ഒന്നു കൂടി പ്രയോഗിക്കേണ്ടി വരും."
 
-#: contrib/admin/static/admin/js/actions.js:128
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -118,84 +98,61 @@ msgstr ""
 "നിങ്ങള്‍ ഒരു ആക്ഷന്‍ തെരഞ്ഞെടുത്തിട്ടുണ്ട്. കളങ്ങളില്‍ സേവ് ചെയ്യാത്ത മാറ്റങ്ങള്‍ ഇല്ല. നിങ്ങള്‍സേവ് ബട്ടണ്‍ "
 "തന്നെയാണോ അതോ ഗോ ബട്ടണാണോ ഉദ്ദേശിച്ചത്."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:79
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] "ഒർക്കുക: സെർവർ സമയത്തിനെക്കാളും നിങ്ങൾ %s സമയം മുൻപിലാണ്."
 msgstr[1] "ഒർക്കുക: സെർവർ സമയത്തിനെക്കാളും നിങ്ങൾ %s സമയം മുൻപിലാണ്."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "ഒർക്കുക: സെർവർ സമയത്തിനെക്കാളും നിങ്ങൾ %s സമയം പിന്നിലാണ്."
 msgstr[1] "ഒർക്കുക: സെർവർ സമയത്തിനെക്കാളും നിങ്ങൾ %s സമയം പിന്നിലാണ്."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
 msgid "Now"
 msgstr "ഇപ്പോള്‍"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:118
 msgid "Clock"
 msgstr "ഘടികാരം (ക്ലോക്ക്)"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
 msgid "Choose a time"
 msgstr "സമയം തെരഞ്ഞെടുക്കൂ"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
 msgid "Midnight"
 msgstr "അര്‍ധരാത്രി"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:151
 msgid "6 a.m."
 msgstr "6 a.m."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Noon"
 msgstr "ഉച്ച"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:156
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:276
 msgid "Cancel"
 msgstr "റദ്ദാക്കൂ"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:216
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:269
 msgid "Today"
 msgstr "ഇന്ന്"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:220
 msgid "Calendar"
 msgstr "കലണ്ടര്‍"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:267
 msgid "Yesterday"
 msgstr "ഇന്നലെ"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:271
 msgid "Tomorrow"
 msgstr "നാളെ"
 
-#: contrib/admin/static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr "ജനുവരി ഫെബൃവരി മാര്‍ച്ച് ഏപ്രില്‍ മെയ് ജൂണ്‍ ജൂലൈ ആഗസ്ത് സെപ്തംബര്‍ ഒക്ടോബര്‍ നവംബര്‍ ഡിസംബര്‍"
 
-#: contrib/admin/static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "ഞാ തി ചൊ ബു വ്യാ വെ ശ"
 
-#: contrib/admin/static/admin/js/collapse.js:8
-#: contrib/admin/static/admin/js/collapse.js:19
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "കാണട്ടെ"
 
-#: contrib/admin/static/admin/js/collapse.js:16
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "മറയട്ടെ"

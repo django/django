@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:35+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
 "ko/)\n"
@@ -19,80 +19,65 @@ msgstr ""
 "Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr ""
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "기본 GIS 필드. OpenGIS Specification의 Geometry type으로 매핑됩니다."
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "위치"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "한줄 문자열"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "다각형"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "복수위치"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "여러줄 문자열"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "복수 다각형"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "지리적 위치 모음"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr ""
+
 msgid "No geometry value provided."
 msgstr "Geometry 값이 없습니다."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Geometry 값이 부적절합니다."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Geometry 형식이 부적절합니다."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr "Geometry를 geometry 필드의 SRID로 변환하는 도중 오류가 발생하였습니다."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "다음 섹션에 사용가능한 사이트맵이 없음 :%r"
+msgid "Delete all Features"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "%s 페이지 비었음"
+msgid "WKT debugging window:"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr " '%s' 페이지 없음"
+msgid "Google Maps via GeoDjango"
+msgstr ""
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr ""
+
 msgid "No feeds are registered."
 msgstr "등록된 피드가 없습니다."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "%r 이/가 등록되지 않았습니다."

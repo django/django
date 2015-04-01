@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:10+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Asturian (http://www.transifex.com/projects/p/django/language/"
 "ast/)\n"
@@ -17,26 +17,20 @@ msgstr ""
 "Language: ast\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/sessions/apps.py:8
 msgid "Sessions"
 msgstr ""
 
-#: contrib/sessions/models.py:38
 msgid "session key"
 msgstr "clave de sesión"
 
-#: contrib/sessions/models.py:40
 msgid "session data"
 msgstr "datos de sesión"
 
-#: contrib/sessions/models.py:41
 msgid "expire date"
 msgstr "data de caducidá"
 
-#: contrib/sessions/models.py:46
 msgid "session"
 msgstr "sesión"
 
-#: contrib/sessions/models.py:47
 msgid "sessions"
 msgstr "sesiones"

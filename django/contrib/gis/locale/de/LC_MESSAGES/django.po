@@ -2,13 +2,13 @@
 #
 # Translators:
 # André Hagenbruch, 2012
-# Jannis Leidel <jannis@leidel.info>, 2011-2012,2014
+# Jannis Leidel <jannis@leidel.info>, 2011-2012,2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-21 07:44+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-20 09:42+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/django/language/"
 "de/)\n"
@@ -18,55 +18,45 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr "GIS"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "Das Basis-GIS-Feld, das dem OpenGIS-Geometrie-Typ entspricht."
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Punkt"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Linienzug"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Polygon"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Mehrere Punkte"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Mehrere Linienzüge"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Mehrere Polygone"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Sammlung geometrischer Objekte"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr "Ausmaße-Aggregat-Feld"
+
 msgid "No geometry value provided."
 msgstr "Kein geometrischer Wert gegeben."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Ungültiger geometrischer Wert."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Ungültiger geometrischer Typ."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -74,26 +64,21 @@ msgstr ""
 "Ein Fehler ist beim Umwandeln der Geometrie-Werte in die SRID des Geometrie-"
 "Formularfeldes aufgetreten."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "Für den Abschnit %r ist keine Sitemap vorhanden"
+msgid "Delete all Features"
+msgstr "Alles löschen"
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "Seite %s ist leer"
+msgid "WKT debugging window:"
+msgstr "WKT-Debugging-Fenster:"
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "Seite '%s' existiert nicht"
+msgid "Google Maps via GeoDjango"
+msgstr "Google Maps via GeoDjango"
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr "Debugging-Fenster (serialisierter Wert)"
+
 msgid "No feeds are registered."
 msgstr "Keine Feeds registriert."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Kürzel %r nicht registriert."

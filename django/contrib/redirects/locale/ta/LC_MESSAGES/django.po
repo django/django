@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Tamil (http://www.transifex.com/projects/p/django/language/"
 "ta/)\n"
@@ -17,15 +17,12 @@ msgstr ""
 "Language: ta\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
 msgstr ""
 
-#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "லிருந்து திசைமாற்று"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -33,11 +30,9 @@ msgstr ""
 "இது ஒரு முழுமையான பாதையாக இருக்கவேண்டும். இணையத்தளப்பெயராக இருக்கக்கூடாது. உதாரணம்:'/"
 "events/search/'."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "திரும்ப அனுப்பு"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -45,10 +40,8 @@ msgstr ""
 "இது முழுமையான பாதையாக (மேலே உள்ளது போல) அல்லது  \"http\"//\" என தொடங்கும் வலை  "
 "முகவரியாக இருக்கலாம்."
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "திரும்ப அனுப்பு"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "திரும்ப அனுப்புகிறது. "

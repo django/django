@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-09-07 19:05+0000\n"
-"Last-Translator: xgenvn <xgenvn@gmail.com>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:30+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
 "language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -21,77 +21,47 @@ msgstr ""
 "Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Thông tin cá nhân"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Quyền"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Những ngày quan trọng"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Mật khẩu thay đổi thành công"
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Thay đổi mật khẩu: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr "Xác thực và ủy quyền"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Chưa đặt mật khẩu"
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Định dạng của mật khẩu không đúng hoặc thuật toán hash chưa rõ ràng."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "Tên đăng nhập đã được sử dụng"
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Hai trường mật khẩu không giống nhau"
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Tên đăng nhập"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Yêu cầu. 30 ký tự hoặc ít hơn. Chỉ là chữ cái, chữ số và @/./+/-/_."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Giá trị này có thể chứa chữ cái, số và ký tự @/./+/-/_."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Mật khẩu"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Xác nhận mật khẩu"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Nhập dãy mật mã trên để xác minh lại"
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -101,7 +71,6 @@ msgstr ""
 "được mật khẩu của người dùng này, nhưng bạn có thể thay đổi mật khẩu bằng "
 "cách truy cập <a href=\"password/\">mẫu đơn này</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -110,102 +79,72 @@ msgstr ""
 "Vui lòng điền vào %(username)s và mật khẩu chính xác. Chú ý rằng cả hai "
 "khung thông tin đều phân biệt chữ hoa và chữ thường."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Tài khoản này chưa được kích hoạt."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "Email"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Mật khẩu mới"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Xác nhận mật khẩu mới"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Mật khẩu cũ không chính xác. Hãy nhập lại lần nữa"
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Mật khẩu cũ"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Nhập lại mật khẩu"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "thuật toán"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "lặp lại"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "Mã salt"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "băm"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "yếu tố công việc"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "kiểm tra"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "Tên"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "tên mã"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "cho phép"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "cho phép"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "Nhóm"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "Các nhóm"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "Mật khẩu"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "Lần cuối đăng nhập"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "trạng thái superuser"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -213,55 +152,49 @@ msgstr ""
 "Định rằng người dùng này có tất cả các quyền mà không gán cho họ một cách cụ "
 "thể."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"Các nhóm người dùng này thuộc về. Người dùng sẽ nhận được tất cả các quyền "
-"được cấp cho mỗi nhóm của mình."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "quyền của người sử dụng"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr "Quyền hạn cụ thể cho người dùng này."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "Tên đăng nhập"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Nhập tên người dùng hợp lệ."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Yêu cầu. 30 ký tự hoặc ít hơn. Chỉ là chữ cái, chữ số và @/./+/-/_."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "Tên đăng nhập đã được sử dụng"
+
 msgid "first name"
 msgstr "Tên"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "Họ"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "địa chỉ email"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "tình trạng nhân viên"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Chỉ định người dùng nào được phép truy cập vào trang admin."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "Kích hoạt"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -269,55 +202,39 @@ msgstr ""
 "Chỉ định xem người dùng này phải được coi là đang hoạt động. Bạn nên bỏ chọn "
 "này thay vì xóa tài khoản."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "Ngày tham gia"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "Người dùng"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "người sử dụng"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Đặt lại mật khẩu trên %(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Nhập địa chỉ email hợp lệ."
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Đã thoát"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr "Đặt lại mật khẩu"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr "Đặt lại mật khẩu thành công"
+msgid "Password reset sent"
+msgstr ""
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr "Nhập mật khẩu mới"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr "Đặt lại mật khẩu thành công"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr "Đặt lại mật khẩu hoàn chỉnh"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr "Thay đổi mật khẩu"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr "Thay đổi mật khẩu thành công"

@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-10 10:51+0000\n"
-"Last-Translator: Jeong Seongtae <magno79@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
 "ko/)\n"
 "MIME-Version: 1.0\n"
@@ -18,33 +18,26 @@ msgstr ""
 "Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
 msgstr "콘텐츠 타입"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "python 모델 클래스 명"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "콘텐츠 타입"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "콘텐츠 타입(들)"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "콘텐츠 타입 %(ct_id)s 객체는 관련 모델이 없습니다"
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "콘텐츠  %(ct_id)s 의 객체 %(obj_id)s이/가 존재하지 않습니다"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "%(ct_name)s 객체는 get_absolute_url() 메소드가 없습니다"

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:43+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
 "sk/)\n"
@@ -18,26 +18,20 @@ msgstr ""
 "Language: sk\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: contrib/sites/apps.py:8
 msgid "Sites"
 msgstr ""
 
-#: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr "Názov domény nemôže obsahovať medzery alebo tabulátory."
 
-#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "názov domény"
 
-#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "zobrazené meno"
 
-#: contrib/sites/models.py:74
 msgid "site"
 msgstr "sídlo"
 
-#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "sídla"

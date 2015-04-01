@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Matas Dailyda <matas@dailyda.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-12 12:48+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -18,26 +19,20 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: contrib/sessions/apps.py:8
 msgid "Sessions"
-msgstr ""
+msgstr "Sesijos"
 
-#: contrib/sessions/models.py:38
 msgid "session key"
 msgstr "sesijos raktas"
 
-#: contrib/sessions/models.py:40
 msgid "session data"
 msgstr "sesijos data"
 
-#: contrib/sessions/models.py:41
 msgid "expire date"
 msgstr "galiojima data"
 
-#: contrib/sessions/models.py:46
 msgid "session"
 msgstr "sesija"
 
-#: contrib/sessions/models.py:47
 msgid "sessions"
 msgstr "sesijos"

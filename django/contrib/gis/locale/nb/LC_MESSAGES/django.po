@@ -3,14 +3,15 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2014
-# Jon <jonklo@gmail.com>, 2011-2012
+# Jon <jon@funkbit.no>, 2015
+# Jon <jon@funkbit.no>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-30 14:15+0000\n"
-"Last-Translator: jensadne <jensadne@pvv.ntnu.no>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:35+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -19,81 +20,66 @@ msgstr ""
 "Language: nb\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr "GIS"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "GIS-basefeltet - tilordnes til OpenGIS Specification Geometry-typen."
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Punkt"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Linje-string"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Polygon"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Multipunkt"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Multilinje-string"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Multi-polygon"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Geometri-samling"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr "Extent Aggregate-felt"
+
 msgid "No geometry value provided."
 msgstr "Ingen geometriverdi oppgitt."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Ugyldig geometriverdi"
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Ugyldig geometritype"
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
 "En feil oppstod ved transformering av geometrien til SRID fra geometrifeltet."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "Ingen sitemap tilgjengelig for seksjon: %r"
+msgid "Delete all Features"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "Side %s tom"
+msgid "WKT debugging window:"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "Ingen side '%s'"
+msgid "Google Maps via GeoDjango"
+msgstr ""
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr ""
+
 msgid "No feeds are registered."
 msgstr "Ingen feeds er registrert."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Slug %r er ikke registrert."

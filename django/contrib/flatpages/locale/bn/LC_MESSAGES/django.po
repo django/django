@@ -2,12 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Tahmid Rafi <rafi.tahmid@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:34+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Bengali (http://www.transifex.com/projects/p/django/language/"
 "bn/)\n"
@@ -17,59 +18,48 @@ msgstr ""
 "Language: bn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/flatpages/admin.py:11
 msgid "Advanced options"
 msgstr "এডভান্সড অপশন"
 
-#: contrib/flatpages/apps.py:8
 msgid "Flat Pages"
-msgstr ""
+msgstr "ফ্ল্যাট পেজ"
 
-#: contrib/flatpages/forms.py:8 contrib/flatpages/models.py:12
 msgid "URL"
 msgstr "ইউআরএল (URL)"
 
-#: contrib/flatpages/forms.py:9
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr "উদাহরণঃ '/about/contact/'। শুরু এবং শেষের স্ল্যাশগুলো আবশ্যক।"
 
-#: contrib/flatpages/forms.py:11
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
+"এই মানটিতে শুধুমাত্র বর্ণ, অঙ্ক, পিরিয়ড, আন্ডারস্কোর, ড্যাশ,  স্ল্যাশ অথবা টিল্ড "
+"ক্যারেক্টার থাকতে পারবে।"
 
-#: contrib/flatpages/forms.py:22
 msgid "URL is missing a leading slash."
-msgstr ""
+msgstr "ইউআরএল টির শুরুর স্ল্যাশ চিহ্নটি দেওয়া হয় নি।"
 
-#: contrib/flatpages/forms.py:29
 msgid "URL is missing a trailing slash."
-msgstr ""
+msgstr "ইউআরএল টির শেষের স্ল্যাশ চিহ্নটি দেওয়া হয় নি।"
 
-#: contrib/flatpages/forms.py:46
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr ""
+msgstr "%(site)s সাইটের জন্য %(url)s ইউআরএল এর ফ্ল্যাটপেজ আগেই তৈরী করা হয়েছ।"
 
-#: contrib/flatpages/models.py:13
 msgid "title"
 msgstr "শিরোনাম"
 
-#: contrib/flatpages/models.py:14
 msgid "content"
 msgstr "কনটেন্ট"
 
-#: contrib/flatpages/models.py:15
 msgid "enable comments"
 msgstr "মন্তব্য প্রদান সচল করুন"
 
-#: contrib/flatpages/models.py:16
 msgid "template name"
 msgstr "টেমপ্লেট নাম"
 
-#: contrib/flatpages/models.py:17
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -77,22 +67,14 @@ msgstr ""
 "উদাহরণঃ ’flatpage/contact_page.html'। এটি যদি খালি থাকে, তবে সিস্টেম "
 "’flatpage/default.html' ব্যবহার করবে।"
 
-#: contrib/flatpages/models.py:18
 msgid "registration required"
 msgstr "নিবন্ধন আবশ্যক"
 
-#: contrib/flatpages/models.py:19
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "এটি চেক করা হলে, শুধুমাত্র লগইন করা সদস্যরা পাতাটি দেখতে সমর্থ হবেন।"
 
-#: contrib/flatpages/models.py:25
 msgid "flat page"
 msgstr "ফ্লাট পাতা"
 
-#: contrib/flatpages/models.py:26
 msgid "flat pages"
 msgstr "ফ্লাট পাতা সমূহ"
-
-#: contrib/flatpages/tests/test_forms.py:98
-msgid "This field is required."
-msgstr "এটি আবশ্যক।"

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:43+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/django/language/"
 "ro/)\n"
@@ -20,26 +20,20 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
 "2:1));\n"
 
-#: contrib/sites/apps.py:8
 msgid "Sites"
 msgstr ""
 
-#: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr "Numele de domeniu nu poate conține spații sau tab-uri."
 
-#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "nume domeniu"
 
-#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "nume afișat"
 
-#: contrib/sites/models.py:74
 msgid "site"
 msgstr "sit"
 
-#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "situri"

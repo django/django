@@ -2,13 +2,14 @@
 #
 # Translators:
 # Abraham Estrada <abraham.estrada@gmail.com>, 2011
+# zodman <zodman@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-26 18:31+0000\n"
+"Last-Translator: zodman <zodman@gmail.com>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/projects/p/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -17,26 +18,20 @@ msgstr ""
 "Language: es_MX\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/sessions/apps.py:8
 msgid "Sessions"
-msgstr ""
+msgstr "Sesiones"
 
-#: contrib/sessions/models.py:38
 msgid "session key"
 msgstr "clave de sesión"
 
-#: contrib/sessions/models.py:40
 msgid "session data"
 msgstr "datos de la sesión"
 
-#: contrib/sessions/models.py:41
 msgid "expire date"
 msgstr "fecha de caducidad"
 
-#: contrib/sessions/models.py:46
 msgid "session"
 msgstr "período de sesiones"
 
-#: contrib/sessions/models.py:47
 msgid "sessions"
 msgstr "sesiones"

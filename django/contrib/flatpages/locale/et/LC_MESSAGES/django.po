@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-20 21:22+0000\n"
-"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -19,25 +19,20 @@ msgstr ""
 "Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/flatpages/admin.py:11
 msgid "Advanced options"
 msgstr "Lisavalikud"
 
-#: contrib/flatpages/apps.py:8
 msgid "Flat Pages"
 msgstr "Sisulehed"
 
-#: contrib/flatpages/forms.py:8 contrib/flatpages/models.py:12
 msgid "URL"
 msgstr "URL"
 
-#: contrib/flatpages/forms.py:9
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "Näide: '/about/contact/'. Veenduge, et URL algaks ja lõppeks kaldkriipsuga."
 
-#: contrib/flatpages/forms.py:11
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
@@ -45,36 +40,28 @@ msgstr ""
 "See väärtus peab sisaldama ainult tähti, numbreid, punkte, alakriipse, "
 "kriipse, kaldkriipse või tildeseid."
 
-#: contrib/flatpages/forms.py:22
 msgid "URL is missing a leading slash."
 msgstr "Internetiaadressil puudub alustav kaldkriips"
 
-#: contrib/flatpages/forms.py:29
 msgid "URL is missing a trailing slash."
 msgstr "Internetiaadressil puudub lõpetav kaldkriips"
 
-#: contrib/flatpages/forms.py:46
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
 msgstr "Saidil %(site)s on sisuleht aadressiga %(url)s juba olemas"
 
-#: contrib/flatpages/models.py:13
 msgid "title"
 msgstr "pealkiri"
 
-#: contrib/flatpages/models.py:14
 msgid "content"
 msgstr "sisu"
 
-#: contrib/flatpages/models.py:15
 msgid "enable comments"
 msgstr "võimalda kommentaarid"
 
-#: contrib/flatpages/models.py:16
 msgid "template name"
 msgstr "mall"
 
-#: contrib/flatpages/models.py:17
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -82,22 +69,14 @@ msgstr ""
 "Näide: 'flatpages/contact_page.html'. Kui mall on määramata, kasutatakse "
 "vaikimisi malli 'flatpages/default.html'."
 
-#: contrib/flatpages/models.py:18
 msgid "registration required"
 msgstr "registreerumine nõutav"
 
-#: contrib/flatpages/models.py:19
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "Kui see on valitud, näevad lehte ainult sisselogitud kasutajad"
 
-#: contrib/flatpages/models.py:25
 msgid "flat page"
 msgstr "sisuleht"
 
-#: contrib/flatpages/models.py:26
 msgid "flat pages"
 msgstr "sisulehed"
-
-#: contrib/flatpages/tests/test_forms.py:98
-msgid "This field is required."
-msgstr "See lahter on nõutav."

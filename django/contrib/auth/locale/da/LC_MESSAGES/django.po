@@ -2,15 +2,16 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2013-2014
+# Erik Wognsen <r4mses@gmail.com>, 2013-2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Stevenn <steven.gandso@gmail.com>, 2013
+# valberg <valberg@orn.li>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-08-15 13:05+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-20 11:00+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/projects/p/django/language/"
 "da/)\n"
@@ -20,78 +21,47 @@ msgstr ""
 "Language: da\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Personlig information"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Rettigheder"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Vigtige datoer"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Der findes ikke et %(name)s-objekt med primærnøgle %(key)r."
+
 msgid "Password changed successfully."
 msgstr "Adgangskoden blev ændret."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Skift adgangskode: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr "Godkendelse og autorisation"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Ingen adgangskode valgt."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ugyldigt adgangskodeformat eller hashing-algoritme."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "En bruger med dette brugernavn findes allerede."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "De to adgangskoder var ikke identiske."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Brugernavn"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Påkrævet. Højst 30 tegn. Kun  bogstaver og cifre samt @/./+/-/_"
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
-"Dette felt må kun indeholde bogstaver og cifre samt disse tegn: @/./+/-/_"
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Adgangskode"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Bekræftelse af adgangskode"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Indtast den samme adgangskode som ovenfor for verifikation."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -101,7 +71,6 @@ msgstr ""
 "adgangskode, men du kan ændre adgangskoden ved hjælp af <a href=\"password/"
 "\">denne formular</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -110,158 +79,125 @@ msgstr ""
 "Indtast venligst et korrekt %(username)s og adgangskode. Bemærk at begge "
 "felter kan være versalfølsomme."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Denne konto er inaktiv."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "E-mail"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Ny adgangskode"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Bekræftelse af ny adgangskode"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 "Din gamle adgangskode blev ikke indtastet korrekt. Indtast den venligst igen."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Gammel adgangskode"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Adgangskode (igen)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algoritme"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iterationer"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "salt"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "hash"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "work factor"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "tjeksum"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "navn"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "kodenavn"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "rettighed"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "rettigheder"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "gruppe"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grupper"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "adgangskode"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "sidst logget ind"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "superbrugerstatus"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
 "Bestemmer at denne bruger har alle rettigheder uden at tildele dem eksplicit."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
 "Grupperne som denne bruger hører til. En bruger får alle rettigheder givet "
 "til hver af hans/hendes grupper."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "rettigheder"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr "Specifikke rettigheder for denne bruger."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "brugernavn"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Indtast et gyldigt brugernavn."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Påkrævet. Højst 30 tegn. Kun  bogstaver og cifre samt @/./+/-/_"
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+"Dette felt må kun indeholde bogstaver og cifre samt disse tegn: @/./+/-/_"
+
+msgid "A user with that username already exists."
+msgstr "En bruger med dette brugernavn findes allerede."
+
 msgid "first name"
 msgstr "fornavn"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "efternavn"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "e-mail-adresse"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "admin-status"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Bestemmer om brugeren kan logge ind på dette administrationswebsite."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "aktiv"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -269,55 +205,39 @@ msgstr ""
 "Bestemmer om brugeren skal behandles som aktiv. Fravælg dette frem for at "
 "slette en konto."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "dato for registrering"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "bruger"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "brugere"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Adgangskode nulstillet på %(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Indtast en gyldig e-mail-adresse."
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Logget ud"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr "Nulstilling af adgangskode"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr "Adgangskoden blev nulstillet"
+msgid "Password reset sent"
+msgstr "Nulstilling af kodeord sendt"
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr "Indtast ny adgangskode"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr "Adgangskoden blev ikke nulstillet"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr "Nulstilling af adgangskode fuldført"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr "Ændring af adgangskode"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr "Adgangskoden blev ændret"

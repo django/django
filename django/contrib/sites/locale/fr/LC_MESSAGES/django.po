@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 11:32+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/django/language/"
 "fr/)\n"
 "MIME-Version: 1.0\n"
@@ -19,26 +19,20 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: contrib/sites/apps.py:8
 msgid "Sites"
 msgstr "Sites"
 
-#: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr "Le nom de domaine ne peut pas contenir d'espace ni de tabulation."
 
-#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "nom de domaine"
 
-#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "nom à afficher"
 
-#: contrib/sites/models.py:74
 msgid "site"
 msgstr "site"
 
-#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "sites"
