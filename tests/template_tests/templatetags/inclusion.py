@@ -164,3 +164,13 @@ def inclusion_tag_without_context_parameter(arg):
     """Expected inclusion_tag_without_context_parameter __doc__"""
     return {}
 inclusion_tag_without_context_parameter.anything = "Expected inclusion_tag_without_context_parameter __dict__"
+
+
+@register.inclusion_tag('inclusion_extends1.html')
+def inclusion_extends1():
+    return {}
+
+
+@register.inclusion_tag('inclusion_extends2.html')
+def inclusion_extends2():
+    return {}
